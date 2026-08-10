@@ -97,7 +97,7 @@ class YouTubeCaptionProvider(
         }
         if (cues.isEmpty()) throw CaptionUnavailableException("The selected caption track was empty.")
 
-        CaptionTrackResult(
+        return CaptionTrackResult(
             languageCode = selected.optString("languageCode", "en"),
             isGenerated = selected.optString("kind") == "asr" ||
                 selected.optString("vssId").startsWith("a."),
