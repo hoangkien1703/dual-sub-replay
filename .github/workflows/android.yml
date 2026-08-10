@@ -48,13 +48,13 @@ jobs:
         run: ./gradlew testDebugUnitTest lintDebug assembleDebug --stacktrace
 
       - name: Name preview APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.2.2-preview.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.2.4-preview.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DualSub-Replay-v0.2.2-preview
-          path: DualSub-Replay-v0.2.2-preview.apk
+          name: DualSub-Replay-v0.2.4-preview
+          path: DualSub-Replay-v0.2.4-preview.apk
           if-no-files-found: error
 
       - name: Remove obsolete preview APKs
@@ -63,6 +63,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh release delete-asset preview DualSub-Replay-v0.2.2-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.3-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.1-preview.apk --yes || true
 
@@ -78,5 +79,5 @@ jobs:
             Automated preview build from the latest verified `main` commit.
 
             This APK uses a CI debug signature. Uninstall an older preview first if Android reports a signature mismatch.
-          files: DualSub-Replay-v0.2.2-preview.apk
+          files: DualSub-Replay-v0.2.4-preview.apk
           overwrite_files: true

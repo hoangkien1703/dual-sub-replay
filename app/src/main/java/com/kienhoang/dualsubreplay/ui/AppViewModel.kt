@@ -31,6 +31,8 @@ data class DualSubUiState(
     val segments: List<SubtitleSegment> = emptyList(),
     val currentIndex: Int = -1,
     val fontScale: Float = 1f,
+    val videoDisplayMode: VideoDisplayMode = VideoDisplayMode.LEARNING,
+    val videoOrientation: VideoOrientation = VideoOrientation.LANDSCAPE,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -73,6 +75,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     it.copy(
                         currentPageUrl = url,
                         videoId = null,
+                        videoDisplayMode = it.videoDisplayMode.forPage(hasVideo = false),
+                        videoOrientation = VideoOrientation.LANDSCAPE,
                         subtitlePanelVisible = false,
                         segments = emptyList(),
                         currentIndex = -1,
@@ -106,6 +110,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         preferences.edit().putFloat("font_scale", safeScale).apply()
         _state.update { it.copy(fontScale = safeScale) }
     }
+
+    fun setVideoDisplayMode(mode: VideoDisplayMode) {
+        _state.update { current ->
+            current.copy(
+                videoDisplayMode = if (current.videoId == null) {
+                    VideoDisplayMode.LEARNING
+                } else {
+                    mode
+                },
+            )
+        }
+    }
+
+    fun exitFocusMode() = setVideoDisplayMode(VideoDisplayMode.LEARNING)
 
     fun retryCaptions() {
         val current = _state.value
@@ -186,10 +204,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updatePlaybackSecond(second: Float) {
-        val timeMs = (second * 1_000).toLong()
+    fun updatePlayerTelemetry(telemetry: PlayerTelemetry) {
+        val timeMs = (telemetry.playbackSecond * 1_000).toLong()
         val segments = _state.value.segments
         val index = segments.indexOfLast { timeMs >= it.startMs }
-        if (index != _state.value.currentIndex) _state.update { it.copy(currentIndex = index) }
+        val orientation = telemetry.orientation
+        if (index != _state.value.currentIndex || orientation != _state.value.videoOrientation) {
+            _state.update {
+                it.copy(
+                    currentIndex = index,
+                    videoOrientation = orientation,
+                )
+            }
+        }
     }
 }
