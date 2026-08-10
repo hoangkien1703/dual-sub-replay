@@ -86,6 +86,7 @@ internal fun YouTubeWebPage(
     initialUrl: String,
     navigationRequestId: Long,
     watchPageActive: Boolean,
+    aspectRatioHeightOverWidth: Float,
     onUrlChanged: (String) -> Unit,
     onPlaybackSecond: (Float) -> Unit,
     onPlayerBottomFraction: (Float) -> Unit,
@@ -139,32 +140,46 @@ internal fun YouTubeWebPage(
         if (navigationRequestId > 0L) controller.navigate(initialUrl)
     }
 
-    LaunchedEffect(webView, watchPageActive) {
+    LaunchedEffect(webView, watchPageActive, aspectRatioHeightOverWidth) {
         while (true) {
             delay(400)
             val watchMode = watchPageActive.toString()
+            val safeAspectRatio = aspectRatioHeightOverWidth.coerceIn(0.5f, 1.5f)
             webView.evaluateJavascript(
                 """
                 (function() {
-                  const video = document.querySelector('video');
+                  const visibleVideos = Array.from(document.querySelectorAll('video'))
+                    .map(function(candidate) {
+                      const bounds = candidate.getBoundingClientRect();
+                      const visible = bounds.width >= 40 && bounds.height >= 40 &&
+                        bounds.bottom > 0 && bounds.top < window.innerHeight;
+                      return { video: candidate, bounds: bounds, area: visible ? bounds.width * bounds.height : 0 };
+                    })
+                    .sort(function(left, right) { return right.area - left.area; });
+                  const video = visibleVideos.length > 0 ? visibleVideos[0].video : null;
                   if (!video || !Number.isFinite(video.currentTime)) return '-1,-1';
 
                   let player = video;
                   if ($watchMode && window.matchMedia('(orientation: portrait)').matches) {
-                    const viewportWidth = Math.max(window.innerWidth, 1);
-                    const desiredHeight = Math.round(viewportWidth * 9 / 16);
+                    const viewportWidth = Math.max(
+                      window.innerWidth,
+                      document.documentElement.clientWidth,
+                      document.body ? document.body.clientWidth : 0,
+                      1
+                    );
+                    const desiredHeight = Math.round(viewportWidth * $safeAspectRatio);
                     const videoBounds = video.getBoundingClientRect();
                     const playerNodes = [];
                     let node = video.parentElement;
 
                     for (let depth = 0; node && node !== document.body && depth < 12; depth++) {
                       const bounds = node.getBoundingClientRect();
-                      const isPlayerWidth = bounds.width >= viewportWidth * 0.65;
-                      const sharesTop = Math.abs(bounds.top - videoBounds.top) <= 64;
-                      const sharesBottom = Math.abs(bounds.bottom - videoBounds.bottom) <= 96;
-                      const isPlayerSized = bounds.height >= 60 && bounds.height <= desiredHeight * 1.45;
+                      const sharesTop = Math.abs(bounds.top - videoBounds.top) <= 120;
+                      const sharesBottom = Math.abs(bounds.bottom - videoBounds.bottom) <= 160;
+                      const isPlayerSized = bounds.height >= 40 &&
+                        bounds.height <= Math.max(desiredHeight * 1.45, videoBounds.height * 1.8);
 
-                      if (isPlayerWidth && sharesTop && sharesBottom && isPlayerSized) {
+                      if (sharesTop && sharesBottom && isPlayerSized) {
                         playerNodes.push(node);
                       } else if (playerNodes.length > 0 && bounds.height > desiredHeight * 1.8) {
                         break;
@@ -177,17 +192,33 @@ internal fun YouTubeWebPage(
                     }
 
                     for (const playerNode of playerNodes) {
-                      playerNode.style.setProperty('width', '100%', 'important');
+                      playerNode.style.setProperty('box-sizing', 'border-box', 'important');
+                      playerNode.style.setProperty('width', '100vw', 'important');
+                      playerNode.style.setProperty('min-width', '100vw', 'important');
                       playerNode.style.setProperty('max-width', '100vw', 'important');
                       playerNode.style.setProperty('height', desiredHeight + 'px', 'important');
                       playerNode.style.setProperty('min-height', desiredHeight + 'px', 'important');
                       playerNode.style.setProperty('max-height', desiredHeight + 'px', 'important');
                       playerNode.style.setProperty('padding-bottom', '0', 'important');
                       playerNode.style.setProperty('overflow', 'hidden', 'important');
+                      playerNode.style.setProperty('left', '0', 'important');
+                      playerNode.style.setProperty('right', 'auto', 'important');
+                      playerNode.style.setProperty('margin-left', '0', 'important');
+                      playerNode.style.setProperty('margin-right', '0', 'important');
                     }
 
-                    video.style.setProperty('width', '100%', 'important');
-                    video.style.setProperty('height', '100%', 'important');
+                    const immediateParent = video.parentElement;
+                    if (immediateParent) {
+                      immediateParent.style.setProperty('position', 'relative', 'important');
+                    }
+                    video.style.setProperty('box-sizing', 'border-box', 'important');
+                    video.style.setProperty('position', 'absolute', 'important');
+                    video.style.setProperty('inset', '0', 'important');
+                    video.style.setProperty('margin', 'auto', 'important');
+                    video.style.setProperty('width', '100vw', 'important');
+                    video.style.setProperty('min-width', '100vw', 'important');
+                    video.style.setProperty('height', desiredHeight + 'px', 'important');
+                    video.style.setProperty('min-height', desiredHeight + 'px', 'important');
                     video.style.setProperty('max-height', 'none', 'important');
                     video.style.setProperty('object-fit', 'contain', 'important');
                     player = playerNodes[playerNodes.length - 1] || video;
@@ -210,7 +241,7 @@ internal fun YouTubeWebPage(
                     ?.takeIf { it >= 0f }
                     ?.let(currentOnPlaybackSecond)
                 values.getOrNull(1)?.toFloatOrNull()
-                    ?.takeIf { it in 0.12f..0.80f }
+                    ?.takeIf { it in 0.12f..0.90f }
                     ?.let(currentOnPlayerBottomFraction)
             }
         }
