@@ -22,7 +22,7 @@ YouTube's official Data API does not allow ordinary viewers to download captions
 
 The app does not download video or audio, remove ads, enable background playback, or place controls over the YouTube player. Video playback remains inside the embedded YouTube player.
 
-The preview APK uses a CI debug signature. A stable release-signing keystore must be configured through GitHub Secrets before production distribution; never commit a keystore or password.
+The preview APK uses a CI debug signature persisted in the private GitHub Actions cache so later preview updates keep the same signature. A stable release-signing keystore must be configured through GitHub Secrets before production distribution; never commit a keystore or password.
 
 ## User flow
 

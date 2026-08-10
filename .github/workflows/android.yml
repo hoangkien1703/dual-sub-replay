@@ -35,6 +35,12 @@ jobs:
         with:
           gradle-version: "9.5.0"
 
+      - name: Restore persistent preview signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: dual-sub-replay-preview-signing-v1
+
       - name: Generate Gradle wrapper
         run: gradle wrapper --gradle-version 9.5.0
 
@@ -51,6 +57,13 @@ jobs:
           path: DualSub-Replay-v0.1.1-preview.apk
           if-no-files-found: error
 
+      - name: Remove obsolete preview APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete-asset preview DualSub-Replay-v0.1.0-preview.apk --yes
+
       - name: Publish rolling preview release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
@@ -64,3 +77,4 @@ jobs:
 
             This APK uses a CI debug signature. Uninstall an older preview first if Android reports a signature mismatch.
           files: DualSub-Replay-v0.1.1-preview.apk
+          overwrite_files: true
