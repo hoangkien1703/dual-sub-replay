@@ -6,11 +6,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.json.JSONArray
 import org.json.JSONObject
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
-import java.io.StringReader
 import java.util.concurrent.TimeUnit
 
 /**
@@ -82,26 +80,42 @@ class YouTubeCaptionProvider(
 
         val selected = selectTrack(tracks, preferredLanguages)
             ?: throw CaptionUnavailableException("No compatible caption track was found.")
-        val baseUrl = selected.getString("baseUrl")
-        val captionText = executeText(
-            Request.Builder()
-                .url(baseUrl + if (baseUrl.contains('?')) "&fmt=json3" else "?fmt=json3")
-                .header("User-Agent", ANDROID_USER_AGENT)
-                .build(),
-        )
-
-        val cues = if (captionText.trimStart().startsWith("<")) {
-            parseXml(captionText)
-        } else {
-            parseJson3(captionText)
-        }
-        if (cues.isEmpty()) throw CaptionUnavailableException("The selected caption track was empty.")
+        val cues = fetchCaptionCues(selected.getString("baseUrl"))
 
         return CaptionTrackResult(
             languageCode = selected.optString("languageCode", "en"),
             isGenerated = selected.optString("kind") == "asr" ||
                 selected.optString("vssId").startsWith("a."),
             cues = cues,
+        )
+    }
+
+    private fun fetchCaptionCues(baseUrl: String): List<RawCaptionCue> {
+        // YouTube often supplies fmt=srv3. Requesting json3 without removing it leaves
+        // two fmt parameters and can return XML that a JSON-only parser sees as empty.
+        val cleanUrl = baseUrl.toHttpUrl().newBuilder()
+            .removeAllQueryParameters("fmt")
+            .build()
+        val candidateUrls = listOf(
+            cleanUrl,
+            cleanUrl.newBuilder().addQueryParameter("fmt", "json3").build(),
+            cleanUrl.newBuilder().addQueryParameter("fmt", "srv3").build(),
+        ).distinct()
+
+        candidateUrls.forEach { url ->
+            val cues = runCatching {
+                val captionText = executeText(
+                    Request.Builder()
+                        .url(url)
+                        .header("User-Agent", ANDROID_USER_AGENT)
+                        .build(),
+                )
+                CaptionDocumentParser.parse(captionText)
+            }.getOrDefault(emptyList())
+            if (cues.isNotEmpty()) return cues
+        }
+        throw CaptionUnavailableException(
+            "This caption track exists, but YouTube returned no readable timed text.",
         )
     }
 
@@ -118,50 +132,12 @@ class YouTubeCaptionProvider(
             }
     }
 
-    private fun parseJson3(text: String): List<RawCaptionCue> {
-        val events = JSONObject(text).optJSONArray("events") ?: return emptyList()
-        return (0 until events.length()).mapNotNull { index ->
-            val event = events.optJSONObject(index) ?: return@mapNotNull null
-            val segments = event.optJSONArray("segs") ?: return@mapNotNull null
-            val content = buildString {
-                for (segmentIndex in 0 until segments.length()) {
-                    append(segments.optJSONObject(segmentIndex)?.optString("utf8").orEmpty())
-                }
-            }.normalizeCaptionText()
-            if (content.isBlank()) return@mapNotNull null
-            val start = event.optLong("tStartMs", -1L)
-            if (start < 0) return@mapNotNull null
-            val duration = event.optLong("dDurationMs", 1_200L).coerceAtLeast(200L)
-            RawCaptionCue(start, start + duration, content)
-        }
-    }
-
-    private fun parseXml(text: String): List<RawCaptionCue> {
-        val parser = XmlPullParserFactory.newInstance().newPullParser().apply {
-            setInput(StringReader(text))
-        }
-        val cues = mutableListOf<RawCaptionCue>()
-        var event = parser.eventType
-        while (event != XmlPullParser.END_DOCUMENT) {
-            if (event == XmlPullParser.START_TAG && parser.name == "text") {
-                val startMs = ((parser.getAttributeValue(null, "start")?.toDoubleOrNull() ?: 0.0) * 1_000).toLong()
-                val durationMs = ((parser.getAttributeValue(null, "dur")?.toDoubleOrNull() ?: 1.2) * 1_000).toLong()
-                val content = parser.nextText().normalizeCaptionText()
-                if (content.isNotBlank()) cues += RawCaptionCue(startMs, startMs + durationMs, content)
-            }
-            event = parser.next()
-        }
-        return cues
-    }
-
     private fun executeText(request: Request): String = client.newCall(request).execute().use { response ->
         if (!response.isSuccessful) {
             throw CaptionUnavailableException("YouTube returned HTTP ${response.code} while loading captions.")
         }
         response.body?.string() ?: throw CaptionUnavailableException("YouTube returned an empty response.")
     }
-
-    private fun String.normalizeCaptionText(): String = replace(Regex("\\s+"), " ").trim()
 
     private companion object {
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()

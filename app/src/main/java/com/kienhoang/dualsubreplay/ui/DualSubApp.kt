@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
@@ -38,6 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -79,6 +81,7 @@ fun DualSubApp(viewModel: AppViewModel) {
             state = state,
             onInputChange = viewModel::updateInput,
             onOpenVideo = viewModel::loadVideo,
+            onVideoSelected = viewModel::acceptSharedText,
             onSourceChange = viewModel::setSourcePreference,
             onFontScaleChange = viewModel::setFontScale,
             onPlaybackSecond = viewModel::updatePlaybackSecond,
@@ -92,12 +95,25 @@ private fun DualSubScreen(
     state: DualSubUiState,
     onInputChange: (String) -> Unit,
     onOpenVideo: () -> Unit,
+    onVideoSelected: (String) -> Unit,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onPlaybackSecond: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
+    var showYouTubeBrowser by remember { mutableStateOf(false) }
     var player by remember { mutableStateOf<YouTubePlayer?>(null) }
+
+    if (showYouTubeBrowser) {
+        YouTubeBrowserScreen(
+            onDismiss = { showYouTubeBrowser = false },
+            onVideoSelected = { url ->
+                showYouTubeBrowser = false
+                onVideoSelected(url)
+            },
+        )
+        return
+    }
 
     Scaffold(
         topBar = {
@@ -128,6 +144,7 @@ private fun DualSubScreen(
                 loading = state.stage == LoadStage.LOADING_CAPTIONS,
                 onValueChange = onInputChange,
                 onOpen = onOpenVideo,
+                onBrowse = { showYouTubeBrowser = true },
             )
 
             state.videoId?.let { videoId ->
@@ -170,25 +187,38 @@ private fun LinkEntry(
     loading: Boolean,
     onValueChange: (String) -> Unit,
     onOpen: () -> Unit,
+    onBrowse: () -> Unit,
 ) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.weight(1f),
-            label = { Text("YouTube link") },
-            placeholder = { Text("Paste or share a video") },
-            leadingIcon = { Icon(Icons.Default.ContentPaste, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            singleLine = true,
-        )
-        Button(onClick = onOpen, enabled = !loading && value.isNotBlank()) {
-            if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-            else Icon(Icons.Default.PlayArrow, contentDescription = "Open video")
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.weight(1f),
+                label = { Text("YouTube link") },
+                placeholder = { Text("Paste or share a video") },
+                leadingIcon = { Icon(Icons.Default.ContentPaste, contentDescription = null) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                singleLine = true,
+            )
+            Button(onClick = onOpen, enabled = !loading && value.isNotBlank()) {
+                if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                else Icon(Icons.Default.PlayArrow, contentDescription = "Open video")
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = onBrowse,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Search, contentDescription = null)
+            Spacer(Modifier.size(8.dp))
+            Text("Browse YouTube and choose a video")
         }
     }
 }
@@ -368,7 +398,7 @@ private fun WelcomePanel() {
             Text("Learn from the videos you already love", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(10.dp))
             Text(
-                "In YouTube, tap Share → DualSub Replay. Captions will appear as replayable English or Japanese paragraphs with Vietnamese translations.",
+                "Browse YouTube here, or use Share → DualSub Replay in the YouTube app. Captions appear as replayable English or Japanese paragraphs with Vietnamese translations.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

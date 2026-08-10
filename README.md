@@ -5,8 +5,10 @@ DualSub Replay is an experimental Android language-learning app inspired by the 
 ## MVP features
 
 - Open a video by sharing it from YouTube or pasting its URL.
+- Browse the real mobile YouTube site inside the app and tap a video to select it.
 - Play through YouTube's embedded IFrame player.
 - Retrieve manual or auto-generated public captions automatically.
+- Parse YouTube's default timed-text XML, nested SRV3 XML, and JSON3 caption formats.
 - Prefer English or Japanese captions and translate them to Vietnamese on-device.
 - Merge short caption cues into readable paragraphs.
 - Highlight the current paragraph and keep it in view.
