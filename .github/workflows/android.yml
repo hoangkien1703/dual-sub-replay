@@ -57,12 +57,14 @@ jobs:
           path: DualSub-Replay-v0.2.2-preview.apk
           if-no-files-found: error
 
-      - name: Remove obsolete preview APK
+      - name: Remove obsolete preview APKs
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release delete-asset preview DualSub-Replay-v0.2.1-preview.apk --yes
+        run: |
+          gh release delete-asset preview DualSub-Replay-v0.2.3-preview.apk --yes || true
+          gh release delete-asset preview DualSub-Replay-v0.2.1-preview.apk --yes || true
 
       - name: Publish rolling preview release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
