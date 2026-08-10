@@ -2,8 +2,8 @@ package com.kienhoang.dualsubreplay.data
 
 object SubtitleMerger {
     private const val MAX_GAP_MS = 1_200L
-    private const val MAX_DURATION_MS = 9_000L
-    private const val MAX_CHARACTERS = 160
+    private const val MAX_DURATION_MS = 6_000L
+    private const val MAX_CHARACTERS = 96
     private val sentenceEnding = Regex("[.!?。！？…][\\\"'’”)]*$")
 
     fun merge(cues: List<RawCaptionCue>): List<SubtitleSegment> {

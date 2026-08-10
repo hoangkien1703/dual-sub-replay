@@ -38,4 +38,18 @@ class SubtitleMergerTest {
         )
         assertEquals("今日はいい天気です。", merged.single().originalText)
     }
+
+    @Test fun keepsReplayParagraphsShortEnoughForTheDrawer() {
+        val merged = SubtitleMerger.merge(
+            listOf(
+                RawCaptionCue(0, 2_000, "First phrase"),
+                RawCaptionCue(2_000, 4_000, "continues here"),
+                RawCaptionCue(4_000, 6_000, "with more detail"),
+                RawCaptionCue(6_000, 8_000, "Next replay phrase"),
+            ),
+        )
+
+        assertEquals(2, merged.size)
+        assertEquals("Next replay phrase", merged[1].originalText)
+    }
 }

@@ -94,15 +94,19 @@ private fun DualSubExperience(
     onFontScaleChange: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
+    var playerBottomFraction by remember { mutableStateOf(0.38f) }
     val panelVisible = state.videoId != null && state.subtitlePanelVisible
+    val panelHeightFraction = (1f - playerBottomFraction).coerceIn(0.42f, 0.78f)
 
     Box(Modifier.fillMaxSize().safeDrawingPadding()) {
         YouTubeWebPage(
             controller = webController,
             initialUrl = state.currentPageUrl,
             navigationRequestId = state.navigationRequestId,
+            watchPageActive = state.videoId != null,
             onUrlChanged = onBrowserUrlChanged,
             onPlaybackSecond = onPlaybackSecond,
+            onPlayerBottomFraction = { playerBottomFraction = it },
         )
 
         AnimatedVisibility(
@@ -113,7 +117,7 @@ private fun DualSubExperience(
         ) {
             SubtitlePanel(
                 state = state,
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.52f),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(panelHeightFraction),
                 onHide = onHideSubtitles,
                 onSettings = { showSettings = true },
                 onRetry = onRetry,
@@ -123,7 +127,10 @@ private fun DualSubExperience(
 
         if (state.videoId != null && !panelVisible) {
             SmallFloatingActionButton(
-                onClick = onShowSubtitles,
+                onClick = {
+                    webController.focusPlayer()
+                    onShowSubtitles()
+                },
                 modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -158,6 +165,7 @@ private fun SubtitlePanel(
         modifier = modifier.shadow(18.dp, RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
         shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
         color = Color(0xFF061719),
+        contentColor = Color(0xFFF3FAFA),
         tonalElevation = 8.dp,
     ) {
         Column(Modifier.fillMaxSize()) {
@@ -184,22 +192,31 @@ private fun SubtitlePanel(
                     Text(
                         text = sourceDescription(state),
                         style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFFF3FAFA),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = state.statusMessage ?: "Tap a paragraph to replay it",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color(0xFFB7CED1),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
                 IconButton(onClick = onSettings) {
-                    Icon(Icons.Default.Settings, contentDescription = "Subtitle settings")
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = "Subtitle settings",
+                        tint = Color(0xFFE5F2F3),
+                    )
                 }
                 IconButton(onClick = onHide) {
-                    Icon(Icons.Default.Close, contentDescription = "Hide dual subtitles")
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Hide dual subtitles",
+                        tint = Color(0xFFE5F2F3),
+                    )
                 }
             }
             HorizontalDivider(color = Color(0xFF244044))
@@ -254,6 +271,7 @@ private fun CompactSubtitleCard(
         ),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (active) Color(0xFF0A2B30) else Color(0xFF081D20),
+            contentColor = Color(0xFFF3FAFA),
         ),
         shape = RoundedCornerShape(10.dp),
     ) {
@@ -284,13 +302,14 @@ private fun CompactSubtitleCard(
                     fontSize = (17 * fontScale).sp,
                     lineHeight = (22 * fontScale).sp,
                     fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
+                    color = Color(0xFFF3FAFA),
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = segment.translatedText ?: "Translating…",
                     fontSize = (14 * fontScale).sp,
                     lineHeight = (18 * fontScale).sp,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = Color(0xFF9EDCE4),
                 )
             }
         }
@@ -303,7 +322,7 @@ private fun CompactLoadingPanel(message: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(Modifier.size(34.dp), strokeWidth = 3.dp)
             Spacer(Modifier.height(10.dp))
-            Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(message, color = Color(0xFFB7CED1))
         }
     }
 }
