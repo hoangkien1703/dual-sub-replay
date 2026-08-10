@@ -1,54 +1,49 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,125 +51,94 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
 fun DualSubApp(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val webController = remember { YouTubeWebController() }
+
     DualSubTheme {
-        DualSubScreen(
+        DualSubExperience(
             state = state,
-            onInputChange = viewModel::updateInput,
-            onOpenVideo = viewModel::loadVideo,
-            onVideoSelected = viewModel::acceptSharedText,
+            webController = webController,
+            onBrowserUrlChanged = viewModel::onBrowserUrlChanged,
+            onPlaybackSecond = viewModel::updatePlaybackSecond,
+            onShowSubtitles = viewModel::showSubtitlePanel,
+            onHideSubtitles = viewModel::hideSubtitlePanel,
+            onRetry = viewModel::retryCaptions,
             onSourceChange = viewModel::setSourcePreference,
             onFontScaleChange = viewModel::setFontScale,
-            onPlaybackSecond = viewModel::updatePlaybackSecond,
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DualSubScreen(
+private fun DualSubExperience(
     state: DualSubUiState,
-    onInputChange: (String) -> Unit,
-    onOpenVideo: () -> Unit,
-    onVideoSelected: (String) -> Unit,
+    webController: YouTubeWebController,
+    onBrowserUrlChanged: (String) -> Unit,
+    onPlaybackSecond: (Float) -> Unit,
+    onShowSubtitles: () -> Unit,
+    onHideSubtitles: () -> Unit,
+    onRetry: () -> Unit,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
-    onPlaybackSecond: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
-    var showYouTubeBrowser by remember { mutableStateOf(false) }
-    var player by remember { mutableStateOf<YouTubePlayer?>(null) }
+    val panelVisible = state.videoId != null && state.subtitlePanelVisible
 
-    if (showYouTubeBrowser) {
-        YouTubeBrowserScreen(
-            onDismiss = { showYouTubeBrowser = false },
-            onVideoSelected = { url ->
-                showYouTubeBrowser = false
-                onVideoSelected(url)
-            },
+    Box(Modifier.fillMaxSize().safeDrawingPadding()) {
+        YouTubeWebPage(
+            controller = webController,
+            initialUrl = state.currentPageUrl,
+            navigationRequestId = state.navigationRequestId,
+            onUrlChanged = onBrowserUrlChanged,
+            onPlaybackSecond = onPlaybackSecond,
         )
-        return
-    }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Subtitles, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.size(10.dp))
-                        Text("DualSub Replay", fontWeight = FontWeight.Bold)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showSettings = true }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Subtitle settings")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-            )
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+        AnimatedVisibility(
+            visible = panelVisible,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it }),
         ) {
-            LinkEntry(
-                value = state.inputUrl,
-                loading = state.stage == LoadStage.LOADING_CAPTIONS,
-                onValueChange = onInputChange,
-                onOpen = onOpenVideo,
-                onBrowse = { showYouTubeBrowser = true },
+            SubtitlePanel(
+                state = state,
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.52f),
+                onHide = onHideSubtitles,
+                onSettings = { showSettings = true },
+                onRetry = onRetry,
+                onReplay = { segment -> webController.replayFrom(segment.startMs / 1_000f) },
             )
+        }
 
-            state.videoId?.let { videoId ->
-                YouTubePlayerPanel(
-                    videoId = videoId,
-                    onPlayerReady = { player = it },
-                    onPlaybackSecond = onPlaybackSecond,
-                )
-            }
-
-            LanguageControls(state, onSourceChange)
-
-            when {
-                state.errorMessage != null -> ErrorPanel(state.errorMessage, onOpenVideo)
-                state.stage == LoadStage.IDLE -> WelcomePanel()
-                state.segments.isEmpty() -> LoadingPanel(state.statusMessage ?: "Loading captions…")
-                else -> SubtitleTimeline(
-                    state = state,
-                    onReplay = { segment ->
-                        player?.seekTo(segment.startMs / 1_000f)
-                        player?.play()
-                    },
-                )
+        if (state.videoId != null && !panelVisible) {
+            SmallFloatingActionButton(
+                onClick = onShowSubtitles,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
+                Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
             }
         }
     }
 
     if (showSettings) {
-        SettingsDialog(
+        SubtitleSettingsDialog(
+            sourcePreference = state.sourcePreference,
             fontScale = state.fontScale,
+            onSourceChange = onSourceChange,
             onFontScaleChange = onFontScaleChange,
             onDismiss = { showSettings = false },
         )
@@ -182,139 +146,75 @@ private fun DualSubScreen(
 }
 
 @Composable
-private fun LinkEntry(
-    value: String,
-    loading: Boolean,
-    onValueChange: (String) -> Unit,
-    onOpen: () -> Unit,
-    onBrowse: () -> Unit,
+private fun SubtitlePanel(
+    state: DualSubUiState,
+    modifier: Modifier,
+    onHide: () -> Unit,
+    onSettings: () -> Unit,
+    onRetry: () -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+    Surface(
+        modifier = modifier.shadow(18.dp, RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
+        shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
+        color = Color(0xFF061719),
+        tonalElevation = 8.dp,
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.weight(1f),
-                label = { Text("YouTube link") },
-                placeholder = { Text("Paste or share a video") },
-                leadingIcon = { Icon(Icons.Default.ContentPaste, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                singleLine = true,
-            )
-            Button(onClick = onOpen, enabled = !loading && value.isNotBlank()) {
-                if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else Icon(Icons.Default.PlayArrow, contentDescription = "Open video")
+        Column(Modifier.fillMaxSize()) {
+            Box(
+                Modifier
+                    .padding(top = 6.dp)
+                    .size(width = 42.dp, height = 4.dp)
+                    .align(Alignment.CenterHorizontally),
+            ) {
+                Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
             }
-        }
-        Spacer(Modifier.height(8.dp))
-        OutlinedButton(
-            onClick = onBrowse,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(Icons.Default.Search, contentDescription = null)
-            Spacer(Modifier.size(8.dp))
-            Text("Browse YouTube and choose a video")
-        }
-    }
-}
 
-@Composable
-private fun YouTubePlayerPanel(
-    videoId: String,
-    onPlayerReady: (YouTubePlayer) -> Unit,
-    onPlaybackSecond: (Float) -> Unit,
-) {
-    val context = LocalContext.current
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val playerView = remember {
-        YouTubePlayerView(context).apply {
-            enableAutomaticInitialization = false
-            lifecycle.addObserver(this)
-        }
-    }
-    var initialized by remember { mutableStateOf(false) }
-    var activePlayer by remember { mutableStateOf<YouTubePlayer?>(null) }
-
-    LaunchedEffect(videoId, activePlayer) {
-        activePlayer?.loadVideo(videoId, 0f)
-    }
-
-    DisposableEffect(playerView) {
-        onDispose {
-            lifecycle.removeObserver(playerView)
-            playerView.release()
-        }
-    }
-
-    AndroidView(
-        factory = {
-            playerView.apply {
-                if (!initialized) {
-                    initialized = true
-                    val options = IFramePlayerOptions.Builder(context)
-                        .controls(1)
-                        .fullscreen(1)
-                        .build()
-                    initialize(
-                        object : AbstractYouTubePlayerListener() {
-                            override fun onReady(youTubePlayer: YouTubePlayer) {
-                                activePlayer = youTubePlayer
-                                onPlayerReady(youTubePlayer)
-                            }
-
-                            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                                onPlaybackSecond(second)
-                            }
-                        },
-                        options,
+            Row(
+                modifier = Modifier.fillMaxWidth().height(52.dp).padding(start = 12.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Default.ClosedCaption,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.size(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = sourceDescription(state),
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = state.statusMessage ?: "Tap a paragraph to replay it",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
+                IconButton(onClick = onSettings) {
+                    Icon(Icons.Default.Settings, contentDescription = "Subtitle settings")
+                }
+                IconButton(onClick = onHide) {
+                    Icon(Icons.Default.Close, contentDescription = "Hide dual subtitles")
+                }
             }
-        },
-        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
-    )
-}
+            HorizontalDivider(color = Color(0xFF244044))
 
-@Composable
-private fun LanguageControls(state: DualSubUiState, onSourceChange: (String) -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text("Original:", style = MaterialTheme.typography.labelLarge)
-            listOf("auto" to "Auto", "en" to "English", "ja" to "Japanese").forEach { (code, label) ->
-                FilterChip(
-                    selected = state.sourcePreference == code,
-                    onClick = { onSourceChange(code) },
-                    label = { Text(label) },
-                )
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Translation: Vietnamese", color = MaterialTheme.colorScheme.secondary)
-            Spacer(Modifier.weight(1f))
-            state.statusMessage?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            when {
+                state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
+                state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
+                else -> SubtitleTimeline(state, onReplay)
             }
         }
     }
-    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 }
 
 @Composable
-private fun ColumnScope.SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
+private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
     val listState = rememberLazyListState()
     LaunchedEffect(state.currentIndex) {
         if (state.currentIndex >= 0 && !listState.isScrollInProgress) {
@@ -324,12 +224,12 @@ private fun ColumnScope.SubtitleTimeline(state: DualSubUiState, onReplay: (Subti
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxWidth().weight(1f),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(6.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         itemsIndexed(state.segments, key = { _, segment -> segment.id }) { index, segment ->
-            SubtitleCard(
+            CompactSubtitleCard(
                 segment = segment,
                 active = index == state.currentIndex,
                 fontScale = state.fontScale,
@@ -340,7 +240,7 @@ private fun ColumnScope.SubtitleTimeline(state: DualSubUiState, onReplay: (Subti
 }
 
 @Composable
-private fun SubtitleCard(
+private fun CompactSubtitleCard(
     segment: SubtitleSegment,
     active: Boolean,
     fontScale: Float,
@@ -348,41 +248,49 @@ private fun SubtitleCard(
 ) {
     OutlinedCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onReplay),
-        border = BorderStroke(if (active) 2.dp else 1.dp, if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = if (active) Color(0xFF0A292E) else MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(
+            width = if (active) 2.dp else 1.dp,
+            color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
+        ),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = if (active) Color(0xFF0A2B30) else Color(0xFF081D20),
+        ),
+        shape = RoundedCornerShape(10.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Card(
-                modifier = Modifier.size(44.dp).clickable(onClick = onReplay),
+                modifier = Modifier.size(34.dp),
                 shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (active) MaterialTheme.colorScheme.primary else Color(0xFF24383B),
+                ),
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.PlayArrow,
                         contentDescription = "Replay this paragraph",
+                        modifier = Modifier.size(22.dp),
                         tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
-            Spacer(Modifier.size(12.dp))
+            Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    segment.originalText,
-                    fontSize = (21 * fontScale).sp,
-                    lineHeight = (28 * fontScale).sp,
+                    text = segment.originalText,
+                    fontSize = (17 * fontScale).sp,
+                    lineHeight = (22 * fontScale).sp,
                     fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
                 )
-                Spacer(Modifier.height(5.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
-                    segment.translatedText ?: "Translating…",
-                    fontSize = (16 * fontScale).sp,
-                    lineHeight = (22 * fontScale).sp,
-                    color = if (segment.translatedText == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.secondary,
+                    text = segment.translatedText ?: "Translating…",
+                    fontSize = (14 * fontScale).sp,
+                    lineHeight = (18 * fontScale).sp,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         }
@@ -390,68 +298,62 @@ private fun SubtitleCard(
 }
 
 @Composable
-private fun WelcomePanel() {
-    Box(Modifier.fillMaxSize().padding(28.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Default.Subtitles, null, Modifier.size(72.dp), tint = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(18.dp))
-            Text("Learn from the videos you already love", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(10.dp))
-            Text(
-                "Browse YouTube here, or use Share → DualSub Replay in the YouTube app. Captions appear as replayable English or Japanese paragraphs with Vietnamese translations.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun LoadingPanel(message: String) {
+private fun CompactLoadingPanel(message: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(14.dp))
+            CircularProgressIndicator(Modifier.size(34.dp), strokeWidth = 3.dp)
+            Spacer(Modifier.height(10.dp))
             Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
 
 @Composable
-private fun ErrorPanel(message: String, onRetry: () -> Unit) {
-    Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
-        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
-            Column(Modifier.padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(message, color = MaterialTheme.colorScheme.onErrorContainer)
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    "Automatic captions are experimental. Try another captioned video or retry after YouTube finishes generating captions.",
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                TextButton(onClick = onRetry) {
-                    Icon(Icons.Default.Refresh, null)
-                    Text("Retry")
-                }
+private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
+    Box(Modifier.fillMaxSize().padding(18.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(message, color = MaterialTheme.colorScheme.error)
+            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = onRetry) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+                Spacer(Modifier.size(5.dp))
+                Text("Retry captions")
             }
         }
     }
 }
 
 @Composable
-private fun SettingsDialog(
+private fun SubtitleSettingsDialog(
+    sourcePreference: String,
     fontScale: Float,
+    onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Subtitle settings") },
+        title = { Text("Dual-subtitle settings") },
         text = {
             Column {
+                Text("Original language")
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("auto" to "Auto", "en" to "English", "ja" to "Japanese").forEach { (code, label) ->
+                        FilterChip(
+                            selected = sourcePreference == code,
+                            onClick = { onSourceChange(code) },
+                            label = { Text(label) },
+                        )
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Text("Translation: Vietnamese")
+                Spacer(Modifier.height(14.dp))
                 Text("Text size: ${(fontScale * 100).toInt()}%")
                 Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
                 Text(
-                    "Translations run on your phone. The first use downloads a language model of about 30 MB.",
+                    "Captions continue tracking while the panel is hidden.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -459,4 +361,15 @@ private fun SettingsDialog(
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
     )
+}
+
+private fun sourceDescription(state: DualSubUiState): String {
+    val source = when (state.resolvedSourceLanguage?.substringBefore('-')) {
+        "en" -> "English"
+        "ja" -> "Japanese"
+        null -> "Finding captions"
+        else -> state.resolvedSourceLanguage.orEmpty().uppercase()
+    }
+    val generated = if (state.generatedCaptions) " (auto-generated)" else ""
+    return "$source$generated  →  Vietnamese"
 }

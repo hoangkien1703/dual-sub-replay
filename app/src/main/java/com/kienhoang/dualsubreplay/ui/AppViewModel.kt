@@ -21,8 +21,10 @@ import kotlinx.coroutines.launch
 enum class LoadStage { IDLE, LOADING_CAPTIONS, TRANSLATING, READY, ERROR }
 
 data class DualSubUiState(
-    val inputUrl: String = "",
+    val currentPageUrl: String = YOUTUBE_HOME_URL,
+    val navigationRequestId: Long = 0L,
     val videoId: String? = null,
+    val subtitlePanelVisible: Boolean = false,
     val sourcePreference: String = "auto",
     val resolvedSourceLanguage: String? = null,
     val generatedCaptions: Boolean = false,
@@ -34,6 +36,8 @@ data class DualSubUiState(
     val errorMessage: String? = null,
 )
 
+private const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
+
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
@@ -42,23 +46,59 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(
         DualSubUiState(
-            inputUrl = preferences.getString("last_url", "").orEmpty(),
             fontScale = preferences.getFloat("font_scale", 1f),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
-    fun updateInput(value: String) = _state.update { it.copy(inputUrl = value) }
-
     fun acceptSharedText(text: String) {
-        _state.update { it.copy(inputUrl = text) }
-        loadVideo()
+        val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
+        val url = "https://m.youtube.com/watch?v=$videoId"
+        _state.update {
+            it.copy(
+                currentPageUrl = url,
+                navigationRequestId = it.navigationRequestId + 1,
+            )
+        }
+        loadVideo(videoId, url, showPanel = true)
+    }
+
+    fun onBrowserUrlChanged(url: String) {
+        val videoId = YouTubeUrlParser.extractVideoId(url)
+        val current = _state.value
+        if (videoId == null) {
+            if (current.videoId != null) {
+                loadingJob?.cancel()
+                _state.update {
+                    it.copy(
+                        currentPageUrl = url,
+                        videoId = null,
+                        subtitlePanelVisible = false,
+                        segments = emptyList(),
+                        currentIndex = -1,
+                        stage = LoadStage.IDLE,
+                        statusMessage = null,
+                        errorMessage = null,
+                    )
+                }
+            } else if (url != current.currentPageUrl) {
+                _state.update { it.copy(currentPageUrl = url) }
+            }
+            return
+        }
+
+        if (videoId == current.videoId) {
+            if (url != current.currentPageUrl) _state.update { it.copy(currentPageUrl = url) }
+            return
+        }
+        loadVideo(videoId, url, showPanel = true)
     }
 
     fun setSourcePreference(language: String) {
         if (_state.value.sourcePreference == language) return
         _state.update { it.copy(sourcePreference = language) }
-        if (_state.value.videoId != null) loadVideo()
+        val current = _state.value
+        current.videoId?.let { loadVideo(it, current.currentPageUrl, showPanel = true) }
     }
 
     fun setFontScale(scale: Float) {
@@ -67,25 +107,26 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(fontScale = safeScale) }
     }
 
-    fun loadVideo() {
-        val input = _state.value.inputUrl
-        val videoId = YouTubeUrlParser.extractVideoId(input)
-        if (videoId == null) {
-            _state.update {
-                it.copy(
-                    stage = LoadStage.ERROR,
-                    errorMessage = "Paste a valid YouTube link or 11-character video ID.",
-                )
-            }
-            return
-        }
+    fun retryCaptions() {
+        val current = _state.value
+        current.videoId?.let { loadVideo(it, current.currentPageUrl, showPanel = true) }
+    }
 
-        preferences.edit().putString("last_url", input).apply()
+    fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }
+
+    fun hideSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = false) }
+
+    private fun loadVideo(videoId: String, url: String, showPanel: Boolean) {
+        preferences.edit().putString("last_url", url).apply()
         loadingJob?.cancel()
         loadingJob = viewModelScope.launch {
             _state.update {
                 it.copy(
+                    currentPageUrl = url,
                     videoId = videoId,
+                    subtitlePanelVisible = showPanel,
+                    resolvedSourceLanguage = null,
+                    generatedCaptions = false,
                     segments = emptyList(),
                     currentIndex = -1,
                     stage = LoadStage.LOADING_CAPTIONS,
