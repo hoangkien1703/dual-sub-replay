@@ -7,14 +7,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -78,8 +77,6 @@ fun DualSubApp(viewModel: AppViewModel) {
             onRetry = viewModel::retryCaptions,
             onSourceChange = viewModel::setSourcePreference,
             onFontScaleChange = viewModel::setFontScale,
-            onPlayerAspectRatioChange = viewModel::setPlayerAspectRatio,
-            onSubtitleAreaFractionChange = viewModel::setSubtitleAreaFraction,
         )
     }
 }
@@ -95,24 +92,18 @@ private fun DualSubExperience(
     onRetry: () -> Unit,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
-    onPlayerAspectRatioChange: (PlayerAspectRatio) -> Unit,
-    onSubtitleAreaFractionChange: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
     var playerBottomFraction by remember { mutableStateOf(0.38f) }
     val panelVisible = state.videoId != null && state.subtitlePanelVisible
+    val panelHeightFraction = (1f - playerBottomFraction).coerceIn(0.42f, 0.78f)
 
-    BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
-        val safePlayerBottom = playerBottomFraction.coerceIn(0.12f, 0.82f)
-        val availableBelowPlayer = (1f - safePlayerBottom).coerceAtLeast(0.18f)
-        val panelHeightFraction = availableBelowPlayer * state.subtitleAreaFraction
-
+    Box(Modifier.fillMaxSize().safeDrawingPadding()) {
         YouTubeWebPage(
             controller = webController,
             initialUrl = state.currentPageUrl,
             navigationRequestId = state.navigationRequestId,
             watchPageActive = state.videoId != null,
-            aspectRatioHeightOverWidth = state.playerAspectRatio.heightOverWidth,
             onUrlChanged = onBrowserUrlChanged,
             onPlaybackSecond = onPlaybackSecond,
             onPlayerBottomFraction = { playerBottomFraction = it },
@@ -120,16 +111,13 @@ private fun DualSubExperience(
 
         AnimatedVisibility(
             visible = panelVisible,
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = maxHeight * safePlayerBottom)
-                .height(maxHeight * panelHeightFraction),
+            modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(initialOffsetY = { it }),
             exit = slideOutVertically(targetOffsetY = { it }),
         ) {
             SubtitlePanel(
                 state = state,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(panelHeightFraction),
                 onHide = onHideSubtitles,
                 onSettings = { showSettings = true },
                 onRetry = onRetry,
@@ -157,12 +145,8 @@ private fun DualSubExperience(
         SubtitleSettingsDialog(
             sourcePreference = state.sourcePreference,
             fontScale = state.fontScale,
-            playerAspectRatio = state.playerAspectRatio,
-            subtitleAreaFraction = state.subtitleAreaFraction,
             onSourceChange = onSourceChange,
             onFontScaleChange = onFontScaleChange,
-            onPlayerAspectRatioChange = onPlayerAspectRatioChange,
-            onSubtitleAreaFractionChange = onSubtitleAreaFractionChange,
             onDismiss = { showSettings = false },
         )
     }
@@ -362,12 +346,8 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
 private fun SubtitleSettingsDialog(
     sourcePreference: String,
     fontScale: Float,
-    playerAspectRatio: PlayerAspectRatio,
-    subtitleAreaFraction: Float,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
-    onPlayerAspectRatioChange: (PlayerAspectRatio) -> Unit,
-    onSubtitleAreaFractionChange: (Float) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -388,31 +368,6 @@ private fun SubtitleSettingsDialog(
                 }
                 Spacer(Modifier.height(14.dp))
                 Text("Translation: Vietnamese")
-                Spacer(Modifier.height(14.dp))
-                Text("Video shape")
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    PlayerAspectRatio.entries.forEach { aspectRatio ->
-                        FilterChip(
-                            selected = playerAspectRatio == aspectRatio,
-                            onClick = { onPlayerAspectRatioChange(aspectRatio) },
-                            label = { Text(aspectRatio.label) },
-                        )
-                    }
-                }
-                Spacer(Modifier.height(14.dp))
-                Text("Subtitle area: ${(subtitleAreaFraction * 100).toInt()}%")
-                Slider(
-                    value = subtitleAreaFraction,
-                    onValueChange = onSubtitleAreaFractionChange,
-                    valueRange = 0.35f..1f,
-                    steps = 12,
-                )
-                Text(
-                    "The panel uses this amount of the free space below the video and never covers it.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Spacer(Modifier.height(14.dp))
                 Text("Text size: ${(fontScale * 100).toInt()}%")
                 Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)

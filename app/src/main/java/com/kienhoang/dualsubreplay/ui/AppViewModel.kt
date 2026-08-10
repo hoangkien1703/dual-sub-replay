@@ -20,16 +20,6 @@ import kotlinx.coroutines.launch
 
 enum class LoadStage { IDLE, LOADING_CAPTIONS, TRANSLATING, READY, ERROR }
 
-enum class PlayerAspectRatio(
-    val label: String,
-    val heightOverWidth: Float,
-) {
-    WIDE_16_9("16:9", 9f / 16f),
-    CLASSIC_4_3("4:3", 3f / 4f),
-    PORTRAIT_3_4("3:4", 4f / 3f),
-    SQUARE_1_1("1:1", 1f),
-}
-
 data class DualSubUiState(
     val currentPageUrl: String = YOUTUBE_HOME_URL,
     val navigationRequestId: Long = 0L,
@@ -41,8 +31,6 @@ data class DualSubUiState(
     val segments: List<SubtitleSegment> = emptyList(),
     val currentIndex: Int = -1,
     val fontScale: Float = 1f,
-    val playerAspectRatio: PlayerAspectRatio = PlayerAspectRatio.WIDE_16_9,
-    val subtitleAreaFraction: Float = 1f,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -59,11 +47,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _state = MutableStateFlow(
         DualSubUiState(
             fontScale = preferences.getFloat("font_scale", 1f),
-            playerAspectRatio = preferences.getString("player_aspect_ratio", null)
-                ?.let { stored -> PlayerAspectRatio.entries.firstOrNull { it.name == stored } }
-                ?: PlayerAspectRatio.WIDE_16_9,
-            subtitleAreaFraction = preferences.getFloat("subtitle_area_fraction", 1f)
-                .coerceIn(0.35f, 1f),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -122,17 +105,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val safeScale = scale.coerceIn(0.8f, 1.5f)
         preferences.edit().putFloat("font_scale", safeScale).apply()
         _state.update { it.copy(fontScale = safeScale) }
-    }
-
-    fun setPlayerAspectRatio(aspectRatio: PlayerAspectRatio) {
-        preferences.edit().putString("player_aspect_ratio", aspectRatio.name).apply()
-        _state.update { it.copy(playerAspectRatio = aspectRatio) }
-    }
-
-    fun setSubtitleAreaFraction(fraction: Float) {
-        val safeFraction = fraction.coerceIn(0.35f, 1f)
-        preferences.edit().putFloat("subtitle_area_fraction", safeFraction).apply()
-        _state.update { it.copy(subtitleAreaFraction = safeFraction) }
     }
 
     fun retryCaptions() {
