@@ -13,7 +13,7 @@ DualSub Replay is an experimental Android language-learning app inspired by the 
 - Merge short caption cues into readable paragraphs.
 - Show dual subtitles in a compact drawer over the lower part of the YouTube page.
 - Anchor the drawer directly below the visible video and use all remaining screen height.
-- Enforce a full-width 16:9 player on portrait watch pages without cropping the video.
+- Enforce a full-width 16:9 player on portrait watch pages without cropping the video, using the live video container chain so YouTube layout changes do not leave the player compressed.
 - Use explicit high-contrast subtitle colors for reliable dark-mode readability.
 - Hide the drawer to restore the normal full-page YouTube experience, then reopen it from a floating CC button.
 - Continue tracking playback while the subtitle drawer is hidden.

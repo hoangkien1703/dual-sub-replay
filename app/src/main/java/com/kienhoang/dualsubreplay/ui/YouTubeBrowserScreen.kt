@@ -62,10 +62,13 @@ internal class YouTubeWebController {
         webView?.evaluateJavascript(
             """
             (function() {
-              const player = document.querySelector('ytm-watch ytm-player') ||
-                document.querySelector('#player-container-id') ||
-                document.querySelector('ytm-watch #player') ||
-                document.querySelector('video');
+              const video = document.querySelector('video');
+              const player = video && (
+                video.closest('ytm-player') ||
+                video.closest('.html5-video-player') ||
+                video.closest('#player-container-id') ||
+                video.parentElement
+              );
               if (!player) return false;
               player.scrollIntoView({ block: 'start', behavior: 'smooth' });
               return true;
@@ -100,6 +103,9 @@ internal fun YouTubeWebPage(
             settings.mediaPlaybackRequiresUserGesture = true
             settings.setSupportMultipleWindows(false)
             settings.setSupportZoom(true)
+            settings.useWideViewPort = false
+            settings.loadWithOverviewMode = false
+            settings.textZoom = 100
             webChromeClient = WebChromeClient()
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
@@ -140,42 +146,58 @@ internal fun YouTubeWebPage(
             webView.evaluateJavascript(
                 """
                 (function() {
-                  if ($watchMode) {
-                    let style = document.getElementById('dualsub-player-style');
-                    if (!style) {
-                      style = document.createElement('style');
-                      style.id = 'dualsub-player-style';
-                      style.textContent = `
-                        @media (orientation: portrait) {
-                          html.dualsub-watch ytm-watch ytm-player,
-                          html.dualsub-watch ytm-watch #player-container-id,
-                          html.dualsub-watch ytm-watch .player-container,
-                          html.dualsub-watch ytm-watch #player {
-                            width: 100vw !important;
-                            max-width: 100vw !important;
-                            height: 56.25vw !important;
-                            min-height: 56.25vw !important;
-                            max-height: 56.25vw !important;
-                          }
-                          html.dualsub-watch ytm-watch video {
-                            width: 100% !important;
-                            height: 100% !important;
-                            object-fit: contain !important;
-                          }
-                        }
-                      `;
-                      document.head.appendChild(style);
-                    }
-                    document.documentElement.classList.add('dualsub-watch');
-                  } else {
-                    document.documentElement.classList.remove('dualsub-watch');
-                  }
                   const video = document.querySelector('video');
                   if (!video || !Number.isFinite(video.currentTime)) return '-1,-1';
-                  let player = document.querySelector('ytm-watch ytm-player') ||
-                    document.querySelector('#player-container-id') ||
-                    document.querySelector('ytm-watch #player') ||
-                    document.querySelector('.player-container') || video;
+
+                  let player = video;
+                  if ($watchMode && window.matchMedia('(orientation: portrait)').matches) {
+                    const viewportWidth = Math.max(window.innerWidth, 1);
+                    const desiredHeight = Math.round(viewportWidth * 9 / 16);
+                    const videoBounds = video.getBoundingClientRect();
+                    const playerNodes = [];
+                    let node = video.parentElement;
+
+                    for (let depth = 0; node && node !== document.body && depth < 12; depth++) {
+                      const bounds = node.getBoundingClientRect();
+                      const isPlayerWidth = bounds.width >= viewportWidth * 0.65;
+                      const sharesTop = Math.abs(bounds.top - videoBounds.top) <= 64;
+                      const sharesBottom = Math.abs(bounds.bottom - videoBounds.bottom) <= 96;
+                      const isPlayerSized = bounds.height >= 60 && bounds.height <= desiredHeight * 1.45;
+
+                      if (isPlayerWidth && sharesTop && sharesBottom && isPlayerSized) {
+                        playerNodes.push(node);
+                      } else if (playerNodes.length > 0 && bounds.height > desiredHeight * 1.8) {
+                        break;
+                      }
+                      node = node.parentElement;
+                    }
+
+                    if (playerNodes.length === 0 && video.parentElement) {
+                      playerNodes.push(video.parentElement);
+                    }
+
+                    for (const playerNode of playerNodes) {
+                      playerNode.style.setProperty('width', '100%', 'important');
+                      playerNode.style.setProperty('max-width', '100vw', 'important');
+                      playerNode.style.setProperty('height', desiredHeight + 'px', 'important');
+                      playerNode.style.setProperty('min-height', desiredHeight + 'px', 'important');
+                      playerNode.style.setProperty('max-height', desiredHeight + 'px', 'important');
+                      playerNode.style.setProperty('padding-bottom', '0', 'important');
+                      playerNode.style.setProperty('overflow', 'hidden', 'important');
+                    }
+
+                    video.style.setProperty('width', '100%', 'important');
+                    video.style.setProperty('height', '100%', 'important');
+                    video.style.setProperty('max-height', 'none', 'important');
+                    video.style.setProperty('object-fit', 'contain', 'important');
+                    player = playerNodes[playerNodes.length - 1] || video;
+                  } else {
+                    player = video.closest('ytm-player') ||
+                      video.closest('.html5-video-player') ||
+                      video.closest('#player-container-id') ||
+                      video.parentElement || video;
+                  }
+
                   let bounds = player.getBoundingClientRect();
                   if (bounds.height < 60) bounds = video.getBoundingClientRect();
                   const viewportHeight = Math.max(window.innerHeight, 1);
