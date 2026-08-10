@@ -1,9 +1,6 @@
 package com.kienhoang.dualsubreplay.data
 
 import org.json.JSONObject
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
-import java.io.StringReader
 
 /** Parses each caption format currently returned by YouTube timed-text URLs. */
 internal object CaptionDocumentParser {
@@ -31,51 +28,70 @@ internal object CaptionDocumentParser {
     }
 
     private fun parseXml(text: String): List<RawCaptionCue> {
-        val parser = XmlPullParserFactory.newInstance().newPullParser().apply {
-            setInput(StringReader(text))
-        }
         val cues = mutableListOf<RawCaptionCue>()
-        var event = parser.eventType
-        while (event != XmlPullParser.END_DOCUMENT) {
-            if (event == XmlPullParser.START_TAG && (parser.name == "text" || parser.name == "p")) {
-                val isLegacyText = parser.name == "text"
-                val startMs = if (isLegacyText) {
-                    secondsToMs(parser.getAttributeValue(null, "start"))
-                } else {
-                    parser.getAttributeValue(null, "t")?.toLongOrNull() ?: -1L
-                }
-                val durationMs = if (isLegacyText) {
-                    secondsToMs(parser.getAttributeValue(null, "dur"), defaultSeconds = 1.2)
-                } else {
-                    parser.getAttributeValue(null, "d")?.toLongOrNull() ?: 1_200L
-                }
-                val content = readElementText(parser).normalizeCaptionText()
-                if (content.isNotBlank() && startMs >= 0) {
-                    cues += RawCaptionCue(
-                        startMs = startMs,
-                        endMs = startMs + durationMs.coerceAtLeast(200L),
-                        text = content,
-                    )
-                }
+        LEGACY_TEXT_REGEX.findAll(text).forEach { match ->
+            val attributes = match.groupValues[1]
+            val startMs = secondsToMs(attribute(attributes, "start"))
+            val durationMs = secondsToMs(attribute(attributes, "dur"), defaultSeconds = 1.2)
+            val content = cleanXmlText(match.groupValues[2])
+            if (content.isNotBlank() && startMs >= 0) {
+                cues += RawCaptionCue(startMs, startMs + durationMs.coerceAtLeast(200L), content)
             }
-            event = parser.next()
         }
-        return cues
-    }
 
-    private fun readElementText(parser: XmlPullParser): String {
-        val elementDepth = parser.depth
-        return buildString {
-            var event = parser.next()
-            while (!(event == XmlPullParser.END_TAG && parser.depth == elementDepth)) {
-                if (event == XmlPullParser.TEXT) append(parser.text)
-                event = parser.next()
+        SRV3_PARAGRAPH_REGEX.findAll(text).forEach { match ->
+            val attributes = match.groupValues[1]
+            val startMs = attribute(attributes, "t")?.toLongOrNull() ?: -1L
+            val durationMs = attribute(attributes, "d")?.toLongOrNull() ?: 1_200L
+            val content = cleanXmlText(match.groupValues[2])
+            if (content.isNotBlank() && startMs >= 0) {
+                cues += RawCaptionCue(startMs, startMs + durationMs.coerceAtLeast(200L), content)
             }
         }
+        return cues.sortedBy(RawCaptionCue::startMs)
     }
 
     private fun secondsToMs(value: String?, defaultSeconds: Double = -0.001): Long =
         ((value?.toDoubleOrNull() ?: defaultSeconds) * 1_000).toLong()
 
+    private fun attribute(attributes: String, name: String): String? =
+        Regex("""\b${Regex.escape(name)}\s*=\s*[\"']([^\"']*)[\"']""")
+            .find(attributes)
+            ?.groupValues
+            ?.getOrNull(1)
+
+    private fun cleanXmlText(value: String): String = value
+        .replace(XML_TAG_REGEX, "")
+        .decodeXmlEntities()
+        .normalizeCaptionText()
+
+    private fun String.decodeXmlEntities(): String {
+        val named = replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&apos;", "'")
+        return NUMERIC_ENTITY_REGEX.replace(named) { match ->
+            val token = match.groupValues[1]
+            val codePoint = if (token.startsWith("x", ignoreCase = true)) {
+                token.drop(1).toIntOrNull(16)
+            } else {
+                token.toIntOrNull()
+            }
+            codePoint?.let { Character.toChars(it).concatToString() } ?: match.value
+        }
+    }
+
     private fun String.normalizeCaptionText(): String = replace(Regex("\\s+"), " ").trim()
+
+    private val LEGACY_TEXT_REGEX = Regex(
+        """<text\b([^>]*)>(.*?)</text>""",
+        setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
+    )
+    private val SRV3_PARAGRAPH_REGEX = Regex(
+        """<p\b([^>]*)>(.*?)</p>""",
+        setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
+    )
+    private val XML_TAG_REGEX = Regex("<[^>]+>")
+    private val NUMERIC_ENTITY_REGEX = Regex("&#(x[0-9a-fA-F]+|[0-9]+);")
 }

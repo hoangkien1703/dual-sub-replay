@@ -10,7 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,7 +39,6 @@ internal fun YouTubeBrowserScreen(
         WebView(context).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
-            settings.databaseEnabled = true
             settings.mediaPlaybackRequiresUserGesture = true
             webChromeClient = WebChromeClient()
             CookieManager.getInstance().setAcceptCookie(true)
@@ -93,7 +92,7 @@ internal fun YouTubeBrowserScreen(
                     IconButton(onClick = {
                         if (webView.canGoBack()) webView.goBack() else onDismiss()
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Go back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
                     }
                 },
                 actions = {
