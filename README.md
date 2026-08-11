@@ -14,7 +14,9 @@ DualSub Replay is an experimental Android language-learning app inspired by the 
 - Merge short caption cues into readable paragraphs.
 - Place the dual-subtitle timeline below the player so it never obscures YouTube controls.
 - Highlight the current paragraph and tap any paragraph to replay it.
-- Hide and reopen the subtitle timeline and remember the subtitle text size.
+- Hide the subtitle timeline to reveal the scrollable YouTube watch page, including video
+  actions, comments, and recommendations; selecting another video keeps the learning flow.
+- Reopen the subtitle timeline and remember the subtitle text size.
 - Build and test an installable preview APK automatically with GitHub Actions.
 
 ## User flow
@@ -24,7 +26,8 @@ DualSub Replay is an experimental Android language-learning app inspired by the 
 3. The app intercepts the video URL and opens the dedicated Learning screen.
 4. The full-width player cues the video while captions and translations load underneath it.
 5. Tap any subtitle paragraph to seek to its start and resume playback.
-6. Press Back to leave fullscreen first, then return from Learning to Browse.
+6. Hide the subtitle timeline to like the video, read comments, or choose another video.
+7. Press Back to leave fullscreen first, then return from Learning to Browse.
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay opens it directly in Learning.
 
@@ -78,7 +81,7 @@ The APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` publishes `DualSub-Replay-v0.2.6-preview.apk` to the rolling `preview` release only after both jobs pass.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` publishes `DualSub-Replay-v0.2.7-preview.apk` to the rolling `preview` release only after both jobs pass.
 
 ## Privacy
 

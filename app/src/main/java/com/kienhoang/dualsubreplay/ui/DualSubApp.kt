@@ -128,6 +128,7 @@ private fun DualSubExperience(
                     state = state,
                     session = destination.session,
                     onExitLearning = onExitLearning,
+                    onVideoSelected = onVideoSelected,
                     onPlayerCurrentSecond = onPlayerCurrentSecond,
                     onPlayerVideoId = onPlayerVideoId,
                     resumeSecond = playbackResumeSecond(destination.session.videoId),
@@ -156,6 +157,7 @@ private fun LearningScreen(
     state: DualSubUiState,
     session: WatchSession,
     onExitLearning: () -> Unit,
+    onVideoSelected: (String, String) -> Unit,
     onPlayerCurrentSecond: (String, Float) -> Unit,
     onPlayerVideoId: (String, String) -> Unit,
     resumeSecond: Float,
@@ -203,26 +205,37 @@ private fun LearningScreen(
             )
         }
 
-        if (state.subtitlePanelVisible) {
-            SubtitlePanel(
-                state = state,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .testTag("watch_details_container"),
+        ) {
+            YouTubeWatchPage(
+                videoId = session.videoId,
+                onVideoSelected = onVideoSelected,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .testTag("subtitle_timeline"),
-                onHide = onHideSubtitles,
-                onSettings = onSettings,
-                onRetry = onRetryCaptions,
-                onReplay = { segment -> playerController.replayFrom(segment.startMs / 1_000f) },
+                    .fillMaxSize()
+                    .testTag("youtube_watch_details"),
             )
-        } else {
-            Box(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentAlignment = Alignment.TopEnd,
-            ) {
+
+            if (state.subtitlePanelVisible) {
+                SubtitlePanel(
+                    state = state,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag("subtitle_timeline"),
+                    onHide = onHideSubtitles,
+                    onSettings = onSettings,
+                    onRetry = onRetryCaptions,
+                    onReplay = { segment -> playerController.replayFrom(segment.startMs / 1_000f) },
+                )
+            } else {
                 SmallFloatingActionButton(
                     onClick = onShowSubtitles,
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp),
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
