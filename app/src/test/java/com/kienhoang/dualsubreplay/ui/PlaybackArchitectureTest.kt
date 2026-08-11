@@ -22,6 +22,39 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun watchPageKeepsCurrentVideoButHandsDifferentVideosToLearning() {
+        assertNull(
+            watchVideoSelection(
+                currentVideoId = "dQw4w9WgXcQ",
+                url = "https://m.youtube.com/watch?v=dQw4w9WgXcQ",
+            ),
+        )
+        assertEquals(
+            BrowseVideoSelection(
+                videoId = "aqz-KE-bpKQ",
+                canonicalUrl = "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+            ),
+            watchVideoSelection(
+                currentVideoId = "dQw4w9WgXcQ",
+                url = "https://m.youtube.com/watch?v=aqz-KE-bpKQ",
+            ),
+        )
+        assertNull(
+            watchVideoSelection(
+                currentVideoId = "dQw4w9WgXcQ",
+                url = "https://m.youtube.com/results?search_query=english",
+            ),
+        )
+    }
+
+    @Test
+    fun watchPageScriptCollapsesNativePlayerAndPreservesScrolling() {
+        assertTrue(WATCH_DETAILS_SCRIPT.contains("ytm-watch ytm-player"))
+        assertTrue(WATCH_DETAILS_SCRIPT.contains("video.pause()"))
+        assertTrue(WATCH_DETAILS_SCRIPT.contains("overflow-y: auto"))
+    }
+
+    @Test
     fun learningDestinationRetainsCompleteWatchSession() {
         val session = WatchSession(
             videoId = "dQw4w9WgXcQ",
