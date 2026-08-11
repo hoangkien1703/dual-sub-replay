@@ -49,8 +49,18 @@ class PlaybackArchitectureTest {
 
     @Test
     fun watchPageScriptCollapsesNativePlayerAndPreservesScrolling() {
-        assertTrue(WATCH_DETAILS_SCRIPT.contains("ytm-watch ytm-player"))
+        assertTrue(WATCH_NATIVE_PLAYER_SELECTORS.contains("ytm-player"))
+        assertTrue(WATCH_NATIVE_PLAYER_SELECTORS.contains("#player"))
+        assertTrue(WATCH_NATIVE_PLAYER_SELECTORS.contains("#player-container-id"))
+        assertTrue(WATCH_NATIVE_PLAYER_SELECTORS.contains("#movie_player"))
+        assertTrue(WATCH_NATIVE_PLAYER_SELECTORS.none { it.startsWith("ytm-watch ") })
+        WATCH_NATIVE_PLAYER_SELECTORS.forEach { selector ->
+            assertTrue(WATCH_DETAILS_SCRIPT.contains(selector))
+        }
+        assertTrue(WATCH_DETAILS_SCRIPT.contains("player.querySelectorAll('video')"))
         assertTrue(WATCH_DETAILS_SCRIPT.contains("video.pause()"))
+        assertTrue(WATCH_DETAILS_SCRIPT.contains("MutationObserver"))
+        assertFalse(WATCH_DETAILS_SCRIPT.contains("document.querySelectorAll('video')"))
         assertTrue(WATCH_DETAILS_SCRIPT.contains("overflow-y: auto"))
     }
 
