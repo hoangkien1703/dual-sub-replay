@@ -2,30 +2,53 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
+import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.BuildConfig
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 private const val PLAYER_LOG_TAG = "DualSubPlayer"
+private const val PLAYER_PROBE_INTERVAL_MS = 500L
 
 internal class YouTubeWebController {
     private var webView: WebView? = null
@@ -51,10 +74,14 @@ internal class YouTubeWebController {
         webView?.evaluateJavascript(
             """
             (function() {
-              const manager = window.__dualSubReplayManager;
-              const video = manager && manager.currentVideo
-                ? manager.currentVideo()
-                : document.querySelector('video');
+              const videos = Array.from(document.querySelectorAll('video'));
+              const ranked = videos.map(function(candidate) {
+                const bounds = candidate.getBoundingClientRect();
+                const visibleWidth = Math.max(0, Math.min(bounds.right, window.innerWidth) - Math.max(bounds.left, 0));
+                const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0));
+                return { video: candidate, area: visibleWidth * visibleHeight };
+              }).sort(function(left, right) { return right.area - left.area; });
+              const video = ranked.length > 0 ? ranked[0].video : null;
               if (!video) return false;
               video.currentTime = $safeSecond;
               const playResult = video.play();
@@ -66,18 +93,23 @@ internal class YouTubeWebController {
         )
     }
 
-    fun focusPlayer() {
+    fun scrollPlayerIntoView() {
         webView?.evaluateJavascript(
             """
             (function() {
-              const manager = window.__dualSubReplayManager;
-              const video = manager && manager.currentVideo
-                ? manager.currentVideo()
-                : document.querySelector('video');
+              const videos = Array.from(document.querySelectorAll('video'));
+              const ranked = videos.map(function(candidate) {
+                const bounds = candidate.getBoundingClientRect();
+                const visibleWidth = Math.max(0, Math.min(bounds.right, window.innerWidth) - Math.max(bounds.left, 0));
+                const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0));
+                return { video: candidate, area: visibleWidth * visibleHeight };
+              }).sort(function(left, right) { return right.area - left.area; });
+              const video = ranked.length > 0 ? ranked[0].video : null;
               const player = video && (
                 video.closest('ytm-player') ||
                 video.closest('.html5-video-player') ||
                 video.closest('#player-container-id') ||
+                video.closest('#player-container') ||
                 video.parentElement
               );
               if (!player) return false;
@@ -97,19 +129,34 @@ internal fun YouTubeWebPage(
     initialUrl: String,
     navigationRequestId: Long,
     watchPageActive: Boolean,
-    displayMode: VideoDisplayMode,
     onUrlChanged: (String) -> Unit,
     onPlayerTelemetry: (PlayerTelemetry) -> Unit,
     onPlayerBottomFraction: (Float) -> Unit,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnUrlChanged by rememberUpdatedState(onUrlChanged)
     val currentOnPlayerTelemetry by rememberUpdatedState(onPlayerTelemetry)
     val currentOnPlayerBottomFraction by rememberUpdatedState(onPlayerBottomFraction)
     var canGoBack by remember { mutableStateOf(false) }
+    var lifecycleStarted by remember {
+        mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+    }
     var lastTelemetryLogMs by remember { mutableStateOf(0L) }
+    var webViewGeneration by remember { mutableIntStateOf(0) }
+    var rendererRecoveryUsed by remember { mutableStateOf(false) }
+    var webViewUnavailable by remember { mutableStateOf(false) }
+    var pageError by remember { mutableStateOf<String?>(null) }
 
-    val webView = remember {
+    val webView = remember(webViewGeneration) {
+        if (BuildConfig.DEBUG) {
+            val packageInfo = WebView.getCurrentWebViewPackage()
+            Log.d(
+                PLAYER_LOG_TAG,
+                "WebView=${packageInfo?.packageName ?: "unknown"}/${packageInfo?.versionName ?: "unknown"}",
+            )
+        }
+
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         WebView(context).apply {
             settings.javaScriptEnabled = true
@@ -139,9 +186,61 @@ internal fun YouTubeWebPage(
                     reportNavigation(view, url)
                 }
 
+                override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    pageError = null
+                }
+
                 override fun onPageFinished(view: WebView, url: String?) {
                     super.onPageFinished(view, url)
+                    rendererRecoveryUsed = false
+                    webViewUnavailable = false
                     reportNavigation(view, url)
+                }
+
+                override fun onReceivedError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    error: WebResourceError,
+                ) {
+                    super.onReceivedError(view, request, error)
+                    if (request.isForMainFrame) {
+                        pageError = "YouTube could not load: ${error.description}"
+                    }
+                }
+
+                override fun onReceivedHttpError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    errorResponse: WebResourceResponse,
+                ) {
+                    super.onReceivedHttpError(view, request, errorResponse)
+                    if (request.isForMainFrame && errorResponse.statusCode >= 400) {
+                        pageError = "YouTube returned HTTP ${errorResponse.statusCode}."
+                    }
+                }
+
+                override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+                    val message = if (detail.didCrash()) {
+                        "The Android WebView renderer crashed."
+                    } else {
+                        "Android stopped the WebView renderer to reclaim memory."
+                    }
+                    Log.e(PLAYER_LOG_TAG, message)
+                    webViewUnavailable = true
+                    controller.detach(view)
+                    view.post {
+                        (view.parent as? ViewGroup)?.removeView(view)
+                        runCatching { view.destroy() }
+                        if (!rendererRecoveryUsed) {
+                            rendererRecoveryUsed = true
+                            webViewUnavailable = false
+                            webViewGeneration += 1
+                        } else {
+                            pageError = "$message Tap Reload to recreate it."
+                        }
+                    }
+                    return true
                 }
             }
             controller.attach(this)
@@ -153,276 +252,154 @@ internal fun YouTubeWebPage(
         if (navigationRequestId > 0L) controller.navigate(initialUrl)
     }
 
-    LaunchedEffect(webView, watchPageActive, displayMode) {
-        while (true) {
-            val mode = if (displayMode == VideoDisplayMode.FOCUS) "'focus'" else "'learning'"
-            val watchActive = watchPageActive.toString()
-            webView.evaluateJavascript(playerLayoutScript(watchActive, mode)) { rawValue ->
-                val telemetry = PlayerTelemetryParser.parse(rawValue) ?: return@evaluateJavascript
+    DisposableEffect(lifecycleOwner, webView) {
+        val observer = LifecycleEventObserver { _, _ ->
+            lifecycleStarted = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+            if (lifecycleStarted) webView.onResume() else webView.onPause()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleStarted) webView.onResume() else webView.onPause()
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            runCatching { webView.onPause() }
+        }
+    }
+
+    LaunchedEffect(webView, watchPageActive, lifecycleStarted) {
+        if (!watchPageActive || !lifecycleStarted) return@LaunchedEffect
+        while (isActive) {
+            val rawValue = webView.evaluateJavascriptAwait(PLAYER_PROBE_SCRIPT)
+            val telemetry = PlayerTelemetryParser.parse(rawValue)
+            if (telemetry != null) {
                 currentOnPlayerTelemetry(telemetry)
-                if (displayMode == VideoDisplayMode.LEARNING) {
-                    currentOnPlayerBottomFraction(telemetry.playerBottomFraction)
-                }
+                currentOnPlayerBottomFraction(telemetry.playerBottomFraction)
                 if (BuildConfig.DEBUG && SystemClock.elapsedRealtime() - lastTelemetryLogMs >= 2_000L) {
                     lastTelemetryLogMs = SystemClock.elapsedRealtime()
                     Log.d(
                         PLAYER_LOG_TAG,
-                        "mode=$displayMode viewport=${telemetry.viewportWidth}x${telemetry.viewportHeight} " +
+                        "ready=${telemetry.readyState} network=${telemetry.networkState} " +
+                            "frames=${telemetry.decodedFrameCount} viewport=${telemetry.viewportWidth}x${telemetry.viewportHeight} " +
                             "player=[${telemetry.playerLeft},${telemetry.playerTop}," +
                             "${telemetry.playerRight},${telemetry.playerBottom}] " +
                             "video=${telemetry.videoWidth}x${telemetry.videoHeight}",
                     )
                 }
             }
-            delay(400)
+            delay(PLAYER_PROBE_INTERVAL_MS)
         }
     }
 
     DisposableEffect(webView) {
         onDispose {
-            webView.evaluateJavascript(
-                "window.__dualSubReplayManager && window.__dualSubReplayManager.restore();",
-                null,
-            )
             controller.detach(webView)
-            webView.stopLoading()
-            webView.destroy()
+            runCatching { webView.stopLoading() }
+            if (!webViewUnavailable) runCatching { webView.destroy() }
         }
     }
 
-    BackHandler(enabled = displayMode != VideoDisplayMode.FOCUS) {
+    BackHandler {
         if (canGoBack) controller.goBack() else (context as? Activity)?.finish()
     }
 
-    AndroidView(
-        factory = { webView },
-        modifier = Modifier.fillMaxSize(),
-    )
+    Box(Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { webView },
+            modifier = Modifier.fillMaxSize(),
+        )
+        pageError?.let { message ->
+            WebPageErrorCard(
+                message = message,
+                onReload = {
+                    pageError = null
+                    rendererRecoveryUsed = false
+                    if (webViewUnavailable) {
+                        webViewUnavailable = false
+                        webViewGeneration += 1
+                    } else {
+                        webView.reload()
+                    }
+                },
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+    }
 }
 
-private fun playerLayoutScript(watchActive: String, mode: String): String =
+@Composable
+internal fun WebPageErrorCard(
+    message: String,
+    onReload: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.padding(24.dp).widthIn(max = 420.dp),
+        shape = MaterialTheme.shapes.large,
+        tonalElevation = 8.dp,
+        shadowElevation = 8.dp,
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Text("Video page unavailable", style = MaterialTheme.typography.titleMedium)
+            Text(message, modifier = Modifier.padding(top = 8.dp, bottom = 16.dp))
+            Button(onClick = onReload, modifier = Modifier.align(Alignment.End)) {
+                Text("Reload")
+            }
+        }
+    }
+}
+
+private suspend fun WebView.evaluateJavascriptAwait(script: String): String =
+    suspendCancellableCoroutine { continuation ->
+        evaluateJavascript(script) { result ->
+            if (continuation.isActive) continuation.resume(result)
+        }
+    }
+
+internal val PLAYER_PROBE_SCRIPT: String =
     """
     (function() {
-      if (!window.__dualSubReplayManager) {
-        window.__dualSubReplayManager = (function() {
-          const originals = new Map();
-          let activeRoot = null;
-          let activeNodes = [];
-          let resizeObserver = null;
-          let scheduled = false;
-          let requestedMode = 'learning';
-          let requestedWatchActive = false;
+      const viewportWidth = Math.max(window.innerWidth, document.documentElement.clientWidth, 1);
+      const viewportHeight = Math.max(window.innerHeight, document.documentElement.clientHeight, 1);
+      const videos = Array.from(document.querySelectorAll('video'));
+      if (videos.length === 0) return null;
 
-          function save(node) {
-            if (node && !originals.has(node)) originals.set(node, node.getAttribute('style'));
-          }
+      const ranked = videos.map(function(video) {
+        const bounds = video.getBoundingClientRect();
+        const visibleWidth = Math.max(0, Math.min(bounds.right, viewportWidth) - Math.max(bounds.left, 0));
+        const visibleHeight = Math.max(0, Math.min(bounds.bottom, viewportHeight) - Math.max(bounds.top, 0));
+        return { video: video, area: visibleWidth * visibleHeight };
+      }).sort(function(left, right) { return right.area - left.area; });
 
-          function setStyle(node, name, value) {
-            if (!node) return;
-            save(node);
-            if (node.style.getPropertyValue(name) !== value ||
-                node.style.getPropertyPriority(name) !== 'important') {
-              node.style.setProperty(name, value, 'important');
-            }
-          }
+      const video = ranked[0].video;
+      if (!video || !Number.isFinite(video.currentTime)) return null;
+      const player = video.closest(
+        'ytm-player, .html5-video-player, #player-container-id, #player-container'
+      ) || video.parentElement || video;
+      let bounds = player.getBoundingClientRect();
+      if (bounds.width < 40 || bounds.height < 40) bounds = video.getBoundingClientRect();
 
-          function restoreNode(node) {
-            if (!node || !originals.has(node)) return;
-            const original = originals.get(node);
-            if (original === null) node.removeAttribute('style');
-            else node.setAttribute('style', original);
-            originals.delete(node);
-          }
-
-          function restoreActive() {
-            if (resizeObserver) resizeObserver.disconnect();
-            resizeObserver = null;
-            activeNodes.forEach(restoreNode);
-            activeNodes = [];
-            activeRoot = null;
-          }
-
-          function currentVideo() {
-            return Array.from(document.querySelectorAll('video'))
-              .map(function(video) {
-                const bounds = video.getBoundingClientRect();
-                const visible = bounds.width >= 40 && bounds.height >= 40 &&
-                  bounds.bottom > 0 && bounds.top < window.innerHeight;
-                return { video: video, area: visible ? bounds.width * bounds.height : 0 };
-              })
-              .sort(function(left, right) { return right.area - left.area; })
-              .map(function(item) { return item.video; })[0] || null;
-          }
-
-          function findPlayerNodes(video) {
-            const viewportWidth = Math.max(window.innerWidth, document.documentElement.clientWidth, 1);
-            const videoBounds = video.getBoundingClientRect();
-            const nodes = [];
-            let node = video.parentElement;
-
-            for (let depth = 0; node && node !== document.body && depth < 14; depth++) {
-              const bounds = node.getBoundingClientRect();
-              const sharesTop = Math.abs(bounds.top - videoBounds.top) <= 140;
-              const sharesBottom = Math.abs(bounds.bottom - videoBounds.bottom) <= 180;
-              const overlapsVideo = bounds.right > videoBounds.left && bounds.left < videoBounds.right;
-              const knownPlayer = node.matches && node.matches(
-                'ytm-player, .html5-video-player, #player-container-id, #player-container, #player'
-              );
-              const playerSized = bounds.height >= 40 &&
-                bounds.height <= Math.max(window.innerHeight * 0.9, videoBounds.height * 2.2);
-
-              if ((sharesTop && sharesBottom && overlapsVideo && playerSized) || knownPlayer) {
-                nodes.push(node);
-              } else if (nodes.length > 0 && bounds.height > window.innerHeight * 0.95) {
-                break;
-              }
-              node = node.parentElement;
-            }
-
-            const knownRoot = video.closest(
-              'ytm-player, #player-container-id, #player-container, .html5-video-player'
-            );
-            if (knownRoot && !nodes.includes(knownRoot)) nodes.push(knownRoot);
-            if (nodes.length === 0 && video.parentElement) nodes.push(video.parentElement);
-
-            return nodes.sort(function(left, right) {
-              const leftWidth = left.getBoundingClientRect().width;
-              const rightWidth = right.getBoundingClientRect().width;
-              const leftFullWidth = leftWidth >= viewportWidth * 0.8 ? 1 : 0;
-              const rightFullWidth = rightWidth >= viewportWidth * 0.8 ? 1 : 0;
-              return leftFullWidth - rightFullWidth || leftWidth - rightWidth;
-            });
-          }
-
-          function apply() {
-            scheduled = false;
-            if (!requestedWatchActive) {
-              restoreActive();
-              return null;
-            }
-
-            const video = currentVideo();
-            if (!video || !Number.isFinite(video.currentTime)) return null;
-
-            const nodes = findPlayerNodes(video);
-            const root = nodes[nodes.length - 1] || video.parentElement || video;
-            if (root !== activeRoot || !activeNodes.includes(video)) {
-              restoreActive();
-              activeRoot = root;
-              activeNodes = Array.from(new Set(nodes.concat([video])));
-              resizeObserver = new ResizeObserver(scheduleApply);
-              resizeObserver.observe(video);
-              if (root !== video) resizeObserver.observe(root);
-            }
-
-            const focus = requestedMode === 'focus';
-            const viewportWidth = Math.max(window.innerWidth, document.documentElement.clientWidth, 1);
-            const viewportHeight = Math.max(window.innerHeight, document.documentElement.clientHeight, 1);
-            const desiredHeight = Math.round(viewportWidth * 9 / 16);
-
-            setStyle(root, 'box-sizing', 'border-box');
-            setStyle(root, 'background', '#000');
-            setStyle(root, 'overflow', 'hidden');
-
-            if (focus) {
-              setStyle(root, 'position', 'fixed');
-              setStyle(root, 'inset', '0');
-              setStyle(root, 'left', '0');
-              setStyle(root, 'top', '0');
-              setStyle(root, 'width', '100vw');
-              setStyle(root, 'min-width', '100vw');
-              setStyle(root, 'max-width', '100vw');
-              setStyle(root, 'height', '100vh');
-              setStyle(root, 'min-height', '100vh');
-              setStyle(root, 'max-height', '100vh');
-              setStyle(root, 'margin', '0');
-              setStyle(root, 'transform', 'none');
-              setStyle(root, 'z-index', '2147483000');
-            } else {
-              setStyle(root, 'position', 'relative');
-              setStyle(root, 'inset', 'auto');
-              setStyle(root, 'left', 'auto');
-              setStyle(root, 'top', 'auto');
-              setStyle(root, 'width', '100vw');
-              setStyle(root, 'min-width', '100vw');
-              setStyle(root, 'max-width', '100vw');
-              setStyle(root, 'height', desiredHeight + 'px');
-              setStyle(root, 'min-height', desiredHeight + 'px');
-              setStyle(root, 'max-height', desiredHeight + 'px');
-              setStyle(root, 'margin-left', 'calc(50% - 50vw)');
-              setStyle(root, 'margin-right', 'calc(50% - 50vw)');
-              setStyle(root, 'transform', 'none');
-              setStyle(root, 'z-index', 'auto');
-            }
-
-            nodes.forEach(function(node) {
-              if (node === root) return;
-              setStyle(node, 'box-sizing', 'border-box');
-              setStyle(node, 'width', '100%');
-              setStyle(node, 'min-width', '100%');
-              setStyle(node, 'max-width', '100%');
-              setStyle(node, 'height', '100%');
-              setStyle(node, 'min-height', '100%');
-              setStyle(node, 'max-height', '100%');
-              setStyle(node, 'margin', '0');
-              setStyle(node, 'padding', '0');
-              setStyle(node, 'transform', 'none');
-              setStyle(node, 'overflow', 'hidden');
-            });
-
-            const videoParent = video.parentElement;
-            if (videoParent) setStyle(videoParent, 'position', 'relative');
-            setStyle(video, 'box-sizing', 'border-box');
-            setStyle(video, 'position', 'absolute');
-            setStyle(video, 'inset', '0');
-            setStyle(video, 'width', '100%');
-            setStyle(video, 'min-width', '100%');
-            setStyle(video, 'max-width', '100%');
-            setStyle(video, 'height', '100%');
-            setStyle(video, 'min-height', '100%');
-            setStyle(video, 'max-height', '100%');
-            setStyle(video, 'margin', 'auto');
-            setStyle(video, 'transform', 'none');
-            setStyle(video, 'object-fit', 'contain');
-
-            const bounds = root.getBoundingClientRect();
-            return JSON.stringify({
-              playbackSecond: video.currentTime,
-              viewportWidth: viewportWidth,
-              viewportHeight: viewportHeight,
-              playerLeft: bounds.left,
-              playerTop: bounds.top,
-              playerRight: bounds.right,
-              playerBottom: bounds.bottom,
-              videoWidth: video.videoWidth || 0,
-              videoHeight: video.videoHeight || 0
-            });
-          }
-
-          function scheduleApply() {
-            if (scheduled) return;
-            scheduled = true;
-            requestAnimationFrame(apply);
-          }
-
-          const observer = new MutationObserver(scheduleApply);
-          if (document.documentElement) {
-            observer.observe(document.documentElement, { childList: true, subtree: true });
-          }
-          window.addEventListener('resize', scheduleApply, { passive: true });
-
-          return {
-            update: function(watchActive, mode) {
-              requestedWatchActive = watchActive;
-              requestedMode = mode;
-              return apply();
-            },
-            restore: restoreActive,
-            currentVideo: currentVideo
-          };
-        })();
+      let decodedFrameCount = 0;
+      if (typeof video.getVideoPlaybackQuality === 'function') {
+        const quality = video.getVideoPlaybackQuality();
+        decodedFrameCount = quality && Number.isFinite(quality.totalVideoFrames)
+          ? quality.totalVideoFrames
+          : 0;
+      } else if (Number.isFinite(video.webkitDecodedFrameCount)) {
+        decodedFrameCount = video.webkitDecodedFrameCount;
       }
 
-      return window.__dualSubReplayManager.update($watchActive, $mode);
+      return JSON.stringify({
+        playbackSecond: video.currentTime,
+        viewportWidth: viewportWidth,
+        viewportHeight: viewportHeight,
+        playerLeft: bounds.left,
+        playerTop: bounds.top,
+        playerRight: bounds.right,
+        playerBottom: bounds.bottom,
+        videoWidth: video.videoWidth || 0,
+        videoHeight: video.videoHeight || 0,
+        readyState: video.readyState,
+        networkState: video.networkState,
+        decodedFrameCount: decodedFrameCount
+      });
     })();
     """.trimIndent()

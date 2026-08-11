@@ -2,18 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import org.json.JSONObject
 import org.json.JSONTokener
-
-enum class VideoDisplayMode { LEARNING, FOCUS }
-
-enum class VideoOrientation {
-    LANDSCAPE,
-    PORTRAIT;
-
-    companion object {
-        fun fromDimensions(width: Int, height: Int): VideoOrientation =
-            if (width > 0 && height > width) PORTRAIT else LANDSCAPE
-    }
-}
+import kotlin.math.abs
 
 data class PlayerTelemetry(
     val playbackSecond: Float,
@@ -25,12 +14,12 @@ data class PlayerTelemetry(
     val playerBottom: Float,
     val videoWidth: Int,
     val videoHeight: Int,
+    val readyState: Int,
+    val networkState: Int,
+    val decodedFrameCount: Long,
 ) {
     val playerBottomFraction: Float
         get() = (playerBottom / viewportHeight).coerceIn(0f, 1f)
-
-    val orientation: VideoOrientation
-        get() = VideoOrientation.fromDimensions(videoWidth, videoHeight)
 }
 
 internal object PlayerTelemetryParser {
@@ -52,10 +41,15 @@ internal object PlayerTelemetryParser {
             playerBottom = json.finiteFloat("playerBottom"),
             videoWidth = json.optInt("videoWidth").coerceAtLeast(0),
             videoHeight = json.optInt("videoHeight").coerceAtLeast(0),
+            readyState = json.getInt("readyState"),
+            networkState = json.getInt("networkState"),
+            decodedFrameCount = json.optLong("decodedFrameCount").coerceAtLeast(0L),
         ).takeIf {
             it.playbackSecond >= 0f &&
                 it.playerRight > it.playerLeft &&
-                it.playerBottom > it.playerTop
+                it.playerBottom > it.playerTop &&
+                it.readyState in 0..4 &&
+                it.networkState in 0..3
         }
     }.getOrNull()
 
@@ -68,5 +62,11 @@ internal object PlayerTelemetryParser {
             ?: throw IllegalArgumentException("$name must be positive")
 }
 
-internal fun VideoDisplayMode.forPage(hasVideo: Boolean): VideoDisplayMode =
-    if (hasVideo) this else VideoDisplayMode.LEARNING
+internal fun resolvedPlayerBottomFraction(
+    current: Float,
+    measured: Float?,
+    minimumChange: Float = 0.01f,
+): Float {
+    val validMeasurement = measured?.takeIf { it.isFinite() && it in 0.12f..0.80f } ?: return current
+    return if (abs(validMeasurement - current) >= minimumChange) validMeasurement else current
+}

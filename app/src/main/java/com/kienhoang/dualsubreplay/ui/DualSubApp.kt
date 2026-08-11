@@ -1,10 +1,5 @@
 package com.kienhoang.dualsubreplay.ui
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.pm.ActivityInfo
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -22,10 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -53,7 +44,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,16 +53,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 
@@ -92,8 +79,6 @@ fun DualSubApp(viewModel: AppViewModel) {
             onRetry = viewModel::retryCaptions,
             onSourceChange = viewModel::setSourcePreference,
             onFontScaleChange = viewModel::setFontScale,
-            onDisplayModeChange = viewModel::setVideoDisplayMode,
-            onExitFocus = viewModel::exitFocusMode,
         )
     }
 }
@@ -109,32 +94,24 @@ private fun DualSubExperience(
     onRetry: () -> Unit,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
-    onDisplayModeChange: (VideoDisplayMode) -> Unit,
-    onExitFocus: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
     var playerBottomFraction by remember { mutableStateOf(0.38f) }
-    val focusMode = state.videoId != null && state.videoDisplayMode == VideoDisplayMode.FOCUS
-    val panelVisible = state.videoId != null && state.subtitlePanelVisible && !focusMode
+    val panelVisible = state.videoId != null && state.subtitlePanelVisible
     val safePlayerBottom = playerBottomFraction.coerceIn(0.22f, 0.78f)
     val panelHeightFraction = 1f - safePlayerBottom
 
-    FocusWindowEffects(enabled = focusMode, orientation = state.videoOrientation)
-
-    Box(
-        Modifier
-            .fillMaxSize()
-            .then(if (focusMode) Modifier else Modifier.safeDrawingPadding()),
-    ) {
+    Box(Modifier.fillMaxSize().safeDrawingPadding()) {
         YouTubeWebPage(
             controller = webController,
             initialUrl = state.currentPageUrl,
             navigationRequestId = state.navigationRequestId,
             watchPageActive = state.videoId != null,
-            displayMode = state.videoDisplayMode,
             onUrlChanged = onBrowserUrlChanged,
             onPlayerTelemetry = onPlayerTelemetry,
-            onPlayerBottomFraction = { playerBottomFraction = it },
+            onPlayerBottomFraction = { measured ->
+                playerBottomFraction = resolvedPlayerBottomFraction(playerBottomFraction, measured)
+            },
         )
 
         AnimatedVisibility(
@@ -154,20 +131,9 @@ private fun DualSubExperience(
         }
 
         if (state.videoId != null && !panelVisible) {
-            if (focusMode) {
-                FocusSubtitleOverlay(
-                    state = state,
-                    modifier = Modifier.fillMaxSize(),
-                    onSettings = { showSettings = true },
-                    onReplay = { segment -> webController.replayFrom(segment.startMs / 1_000f) },
-                )
-            }
-        }
-
-        if (state.videoId != null && !panelVisible && !focusMode) {
             SmallFloatingActionButton(
                 onClick = {
-                    webController.focusPlayer()
+                    webController.scrollPlayerIntoView()
                     onShowSubtitles()
                 },
                 modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
@@ -180,131 +146,17 @@ private fun DualSubExperience(
         }
     }
 
-    BackHandler(enabled = focusMode, onBack = onExitFocus)
-
     if (showSettings) {
         SubtitleSettingsDialog(
             sourcePreference = state.sourcePreference,
             fontScale = state.fontScale,
-            displayMode = state.videoDisplayMode,
             onSourceChange = onSourceChange,
             onFontScaleChange = onFontScaleChange,
-            onDisplayModeChange = { mode ->
-                onDisplayModeChange(mode)
-                showSettings = false
-            },
             onDismiss = { showSettings = false },
         )
     }
 }
 
-@Composable
-private fun FocusWindowEffects(enabled: Boolean, orientation: VideoOrientation) {
-    val activity = LocalContext.current.findActivity() ?: return
-
-    DisposableEffect(activity, enabled, orientation) {
-        val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
-        if (enabled) {
-            activity.requestedOrientation = when (orientation) {
-                VideoOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                VideoOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            }
-            insetsController.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        } else {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            insetsController.show(WindowInsetsCompat.Type.systemBars())
-        }
-
-        onDispose {
-            if (enabled) {
-                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                insetsController.show(WindowInsetsCompat.Type.systemBars())
-            }
-        }
-    }
-}
-
-@Composable
-internal fun FocusSubtitleOverlay(
-    state: DualSubUiState,
-    modifier: Modifier = Modifier,
-    onSettings: () -> Unit,
-    onReplay: (SubtitleSegment) -> Unit,
-) {
-    val segment = state.segments.getOrNull(state.currentIndex)
-    val message = when {
-        state.errorMessage != null -> state.errorMessage
-        segment == null -> state.statusMessage ?: "Waiting for the next subtitle…"
-        else -> null
-    }
-
-    Box(
-        modifier = modifier.windowInsetsPadding(WindowInsets.safeDrawing),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        Surface(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth()
-                .widthIn(max = 920.dp)
-                .testTag("focus_subtitle_overlay")
-                .then(if (segment != null) Modifier.clickable { onReplay(segment) } else Modifier),
-            shape = RoundedCornerShape(14.dp),
-            color = Color(0xD9061719),
-            contentColor = Color(0xFFF3FAFA),
-            tonalElevation = 8.dp,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 18.dp, top = 10.dp, bottom = 10.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    if (segment != null) {
-                        Text(
-                            text = segment.originalText,
-                            fontSize = (18 * state.fontScale).sp,
-                            lineHeight = (23 * state.fontScale).sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFF3FAFA),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(Modifier.height(3.dp))
-                        Text(
-                            text = segment.translatedText ?: "Translating…",
-                            fontSize = (15 * state.fontScale).sp,
-                            lineHeight = (19 * state.fontScale).sp,
-                            color = Color(0xFF9EDCE4),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    } else {
-                        Text(
-                            text = message.orEmpty(),
-                            color = if (state.errorMessage == null) Color(0xFFF3FAFA) else MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
-                }
-                IconButton(onClick = onSettings) {
-                    Icon(
-                        Icons.Default.Settings,
-                        contentDescription = "Focus mode settings",
-                        tint = Color(0xFFE5F2F3),
-                    )
-                }
-            }
-        }
-    }
-}
-
-private tailrec fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-}
 
 @Composable
 private fun SubtitlePanel(
@@ -411,14 +263,17 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
 }
 
 @Composable
-private fun CompactSubtitleCard(
+internal fun CompactSubtitleCard(
     segment: SubtitleSegment,
     active: Boolean,
     fontScale: Float,
     onReplay: () -> Unit,
 ) {
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onReplay),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { stateDescription = if (active) "Active subtitle" else "Subtitle" }
+            .clickable(onClick = onReplay),
         border = BorderStroke(
             width = if (active) 2.dp else 1.dp,
             color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
@@ -500,10 +355,8 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
 internal fun SubtitleSettingsDialog(
     sourcePreference: String,
     fontScale: Float,
-    displayMode: VideoDisplayMode,
     onSourceChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
-    onDisplayModeChange: (VideoDisplayMode) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -511,30 +364,6 @@ internal fun SubtitleSettingsDialog(
         title = { Text("Dual-subtitle settings") },
         text = {
             Column {
-                Text("Viewing mode")
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    VideoDisplayMode.entries.forEach { mode ->
-                        FilterChip(
-                            selected = displayMode == mode,
-                            onClick = { onDisplayModeChange(mode) },
-                            label = {
-                                Text(
-                                    when (mode) {
-                                        VideoDisplayMode.LEARNING -> "Learning"
-                                        VideoDisplayMode.FOCUS -> "Focus"
-                                    },
-                                )
-                            },
-                        )
-                    }
-                }
-                Text(
-                    "Focus maximizes the video and shows only the active dual subtitle.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(14.dp))
                 Text("Original language")
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
