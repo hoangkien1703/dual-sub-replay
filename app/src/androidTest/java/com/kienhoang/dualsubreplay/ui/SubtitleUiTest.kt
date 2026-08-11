@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
@@ -33,7 +34,14 @@ class SubtitleUiTest {
                 LearningContentLayout(
                     player = { Box(Modifier.fillMaxSize().testTag("fake_player")) },
                 ) {
-                    Box(Modifier.weight(1f).testTag("fake_subtitles"))
+                    Box(Modifier.fillMaxWidth().weight(1f)) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .testTag("fake_subtitles"),
+                        )
+                    }
                 }
             }
         }
