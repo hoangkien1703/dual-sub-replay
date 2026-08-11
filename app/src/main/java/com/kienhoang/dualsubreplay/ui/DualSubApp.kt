@@ -1,21 +1,25 @@
 package com.kienhoang.dualsubreplay.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -38,6 +42,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
@@ -53,8 +58,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,14 +73,16 @@ import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 @Composable
 fun DualSubApp(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val webController = remember { YouTubeWebController() }
 
     DualSubTheme {
         DualSubExperience(
             state = state,
-            webController = webController,
-            onBrowserUrlChanged = viewModel::onBrowserUrlChanged,
-            onPlayerTelemetry = viewModel::updatePlayerTelemetry,
+            onBrowseUrlChanged = viewModel::onBrowseUrlChanged,
+            onVideoSelected = viewModel::onVideoSelected,
+            onExitLearning = viewModel::exitLearning,
+            onPlayerCurrentSecond = viewModel::onPlayerCurrentSecond,
+            onPlayerVideoId = viewModel::onPlayerVideoId,
+            playbackResumeSecond = viewModel::playbackResumeSecond,
             onShowSubtitles = viewModel::showSubtitlePanel,
             onHideSubtitles = viewModel::hideSubtitlePanel,
             onRetry = viewModel::retryCaptions,
@@ -86,9 +95,12 @@ fun DualSubApp(viewModel: AppViewModel) {
 @Composable
 private fun DualSubExperience(
     state: DualSubUiState,
-    webController: YouTubeWebController,
-    onBrowserUrlChanged: (String) -> Unit,
-    onPlayerTelemetry: (PlayerTelemetry) -> Unit,
+    onBrowseUrlChanged: (String) -> Unit,
+    onVideoSelected: (String, String) -> Unit,
+    onExitLearning: () -> Unit,
+    onPlayerCurrentSecond: (String, Float) -> Unit,
+    onPlayerVideoId: (String, String) -> Unit,
+    playbackResumeSecond: (String) -> Float,
     onShowSubtitles: () -> Unit,
     onHideSubtitles: () -> Unit,
     onRetry: () -> Unit,
@@ -96,52 +108,34 @@ private fun DualSubExperience(
     onFontScaleChange: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
-    var playerBottomFraction by remember { mutableStateOf(0.38f) }
-    val panelVisible = state.videoId != null && state.subtitlePanelVisible
-    val safePlayerBottom = playerBottomFraction.coerceIn(0.22f, 0.78f)
-    val panelHeightFraction = 1f - safePlayerBottom
 
-    Box(Modifier.fillMaxSize().safeDrawingPadding()) {
-        YouTubeWebPage(
-            controller = webController,
-            initialUrl = state.currentPageUrl,
-            navigationRequestId = state.navigationRequestId,
-            watchPageActive = state.videoId != null,
-            onUrlChanged = onBrowserUrlChanged,
-            onPlayerTelemetry = onPlayerTelemetry,
-            onPlayerBottomFraction = { measured ->
-                playerBottomFraction = resolvedPlayerBottomFraction(playerBottomFraction, measured)
-            },
-        )
-
-        AnimatedVisibility(
-            visible = panelVisible,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            enter = slideInVertically(initialOffsetY = { it }),
-            exit = slideOutVertically(targetOffsetY = { it }),
+    Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
         ) {
-            SubtitlePanel(
-                state = state,
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(panelHeightFraction),
-                onHide = onHideSubtitles,
-                onSettings = { showSettings = true },
-                onRetry = onRetry,
-                onReplay = { segment -> webController.replayFrom(segment.startMs / 1_000f) },
-            )
-        }
+            when (val destination = state.destination) {
+                AppDestination.Browse -> YouTubeBrowsePage(
+                    initialUrl = state.browserUrl,
+                    navigationRequestId = state.browserNavigationRequestId,
+                    onBrowseUrlChanged = onBrowseUrlChanged,
+                    onVideoSelected = onVideoSelected,
+                )
 
-        if (state.videoId != null && !panelVisible) {
-            SmallFloatingActionButton(
-                onClick = {
-                    webController.scrollPlayerIntoView()
-                    onShowSubtitles()
-                },
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
+                is AppDestination.Learning -> LearningScreen(
+                    state = state,
+                    session = destination.session,
+                    onExitLearning = onExitLearning,
+                    onPlayerCurrentSecond = onPlayerCurrentSecond,
+                    onPlayerVideoId = onPlayerVideoId,
+                    resumeSecond = playbackResumeSecond(destination.session.videoId),
+                    onShowSubtitles = onShowSubtitles,
+                    onHideSubtitles = onHideSubtitles,
+                    onSettings = { showSettings = true },
+                    onRetryCaptions = onRetry,
+                )
             }
         }
     }
@@ -154,6 +148,131 @@ private fun DualSubExperience(
             onFontScaleChange = onFontScaleChange,
             onDismiss = { showSettings = false },
         )
+    }
+}
+
+@Composable
+private fun LearningScreen(
+    state: DualSubUiState,
+    session: WatchSession,
+    onExitLearning: () -> Unit,
+    onPlayerCurrentSecond: (String, Float) -> Unit,
+    onPlayerVideoId: (String, String) -> Unit,
+    resumeSecond: Float,
+    onShowSubtitles: () -> Unit,
+    onHideSubtitles: () -> Unit,
+    onSettings: () -> Unit,
+    onRetryCaptions: () -> Unit,
+) {
+    val context = LocalContext.current
+    val playerController = rememberEmbeddedPlayerController()
+    var playerFailure by remember(session.videoId) { mutableStateOf<PlaybackFailure?>(null) }
+
+    BackHandler {
+        if (!playerController.exitFullscreen()) onExitLearning()
+    }
+
+    LearningContentLayout(
+        player = {
+            EmbeddedYouTubePlayer(
+            videoId = session.videoId,
+            resumeSecond = maxOf(session.resumeSecond, resumeSecond),
+            controller = playerController,
+            modifier = Modifier.fillMaxSize(),
+            onReady = { playerFailure = null },
+            onCurrentSecond = { second ->
+                onPlayerCurrentSecond(session.videoId, second)
+            },
+            onVideoId = { reportedVideoId ->
+                onPlayerVideoId(session.videoId, reportedVideoId)
+            },
+            onError = { playerFailure = it },
+            )
+        },
+    ) {
+        playerFailure?.let { failure ->
+            PlayerFailureBanner(
+                failure = failure,
+                onRetry = {
+                    playerFailure = null
+                    playerController.retry()
+                },
+                onOpenYouTube = {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(session.canonicalUrl)))
+                },
+            )
+        }
+
+        if (state.subtitlePanelVisible) {
+            SubtitlePanel(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .testTag("subtitle_timeline"),
+                onHide = onHideSubtitles,
+                onSettings = onSettings,
+                onRetry = onRetryCaptions,
+                onReplay = { segment -> playerController.replayFrom(segment.startMs / 1_000f) },
+            )
+        } else {
+            Box(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+                SmallFloatingActionButton(
+                    onClick = onShowSubtitles,
+                    modifier = Modifier.padding(12.dp),
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun LearningContentLayout(
+    player: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .testTag("learning_player"),
+        ) {
+            player()
+        }
+        content()
+    }
+}
+
+@Composable
+private fun PlayerFailureBanner(
+    failure: PlaybackFailure,
+    onRetry: () -> Unit,
+    onOpenYouTube: () -> Unit,
+) {
+    Surface(color = MaterialTheme.colorScheme.errorContainer) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+            Text(
+                text = when (failure) {
+                    PlaybackFailure.InitializationTimeout -> "The YouTube player took too long to start."
+                    is PlaybackFailure.Initialization -> "The YouTube player could not start: ${failure.message}"
+                    is PlaybackFailure.YouTube -> "YouTube could not play this video (${failure.code})."
+                },
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            Row(Modifier.align(Alignment.End)) {
+                if (failure.recoverable) TextButton(onClick = onRetry) { Text("Retry") }
+                TextButton(onClick = onOpenYouTube) { Text("Open in YouTube") }
+            }
+        }
     }
 }
 

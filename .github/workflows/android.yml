@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  verify-build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -27,13 +27,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android platform
+      - name: Install Android build SDK
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Set up Gradle
+      - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.5.0"
 
       - name: Restore persistent preview signing key
         uses: actions/cache@v4
@@ -41,35 +39,95 @@ jobs:
           path: ~/.android/debug.keystore
           key: dual-sub-replay-preview-signing-v1
 
-      - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 9.5.0
+      - name: Verify Gradle wrapper
+        run: bash ./gradlew --version
 
       - name: Test, lint, and build
-        run: ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest --stacktrace
+        run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest --stacktrace
 
       - name: Name preview APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.2.5-preview.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.2.6-preview.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DualSub-Replay-v0.2.5-preview
-          path: DualSub-Replay-v0.2.5-preview.apk
+          name: DualSub-Replay-v0.2.6-preview
+          path: DualSub-Replay-v0.2.6-preview.apk
           if-no-files-found: error
 
+  managed-device-tests:
+    needs: verify-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Enable KVM access
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install API 36 managed-device image
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "emulator" "system-images;android-36;default;x86_64"
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run offline WebView fixture tests on API 36
+        run: >-
+          bash ./gradlew pixel2Api36DebugAndroidTest
+          -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
+          --no-parallel --max-workers=2 --stacktrace
+
+      - name: Upload managed-device reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel2-api36-test-reports
+          path: |
+            app/build/reports/androidTests/managedDevice/
+            app/build/outputs/androidTest-results/managedDevice/
+          if-no-files-found: warn
+
+  publish-preview:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [verify-build, managed-device-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Download verified preview APK
+        uses: actions/download-artifact@v4
+        with:
+          name: DualSub-Replay-v0.2.6-preview
+          path: release
+
       - name: Remove obsolete preview APKs
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
+          gh release delete-asset preview DualSub-Replay-v0.2.1-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.2-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.3-preview.apk --yes || true
-          gh release delete-asset preview DualSub-Replay-v0.2.1-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.4-preview.apk --yes || true
+          gh release delete-asset preview DualSub-Replay-v0.2.5-preview.apk --yes || true
 
       - name: Publish rolling preview release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: preview
@@ -80,5 +138,5 @@ jobs:
             Automated preview build from the latest verified `main` commit.
 
             This APK uses a CI debug signature. Uninstall an older preview first if Android reports a signature mismatch.
-          files: DualSub-Replay-v0.2.5-preview.apk
+          files: release/DualSub-Replay-v0.2.6-preview.apk
           overwrite_files: true
