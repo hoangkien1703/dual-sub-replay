@@ -81,7 +81,7 @@ The APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` publishes `DualSub-Replay-v0.2.7-preview.apk` to the rolling `preview` release only after both jobs pass.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` publishes `DualSub-Replay-v0.2.8-preview.apk` to the rolling `preview` release only after both jobs pass.
 
 ## Privacy
 

@@ -46,8 +46,6 @@ import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import java.util.Collections
 import java.util.WeakHashMap
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
@@ -219,14 +217,6 @@ internal fun YouTubeWatchPage(
         }
     }
 
-    LaunchedEffect(webView, lifecycleStarted) {
-        if (!lifecycleStarted) return@LaunchedEffect
-        while (isActive) {
-            webView.evaluateJavascript(WATCH_DETAILS_SCRIPT, null)
-            delay(750)
-        }
-    }
-
     DisposableEffect(webView) {
         onDispose { webView.destroySafely() }
     }
@@ -257,9 +247,28 @@ internal fun YouTubeWatchPage(
     }
 }
 
+/**
+ * The mobile watch page can render its player beside `ytm-watch` instead of inside it. Keep
+ * these selectors global so both layouts collapse; scoping them under `ytm-watch` leaves a
+ * second, full-size player visible below the app-owned player.
+ */
+internal val WATCH_NATIVE_PLAYER_SELECTORS: List<String> = listOf(
+    "ytm-player",
+    "ytd-player",
+    "#player",
+    "#player-container-id",
+    "#player-container",
+    ".player-container",
+    ".player-container.sticky-player",
+    ".player-size",
+    "#movie_player",
+    ".html5-video-player",
+)
+
 internal val WATCH_DETAILS_SCRIPT: String =
     """
     (function() {
+      const nativePlayerSelector = '${WATCH_NATIVE_PLAYER_SELECTORS.joinToString(",")}';
       const styleId = 'dual-sub-watch-details-style';
       let style = document.getElementById(styleId);
       if (!style) {
@@ -268,10 +277,7 @@ internal val WATCH_DETAILS_SCRIPT: String =
         (document.head || document.documentElement).appendChild(style);
       }
       style.textContent = `
-        ytm-watch ytm-player,
-        ytm-watch #player-container-id,
-        ytm-watch #player-container,
-        ytm-watch .player-container,
+        ${WATCH_NATIVE_PLAYER_SELECTORS.joinToString(",\n        ")},
         ytm-mobile-topbar-renderer {
           display: none !important;
           width: 0 !important;
@@ -288,11 +294,38 @@ internal val WATCH_DETAILS_SCRIPT: String =
         }
         html, body { overflow-y: auto !important; }
       `;
-      document.querySelectorAll('video').forEach(function(video) {
-        video.autoplay = false;
-        video.muted = true;
-        if (!video.paused) video.pause();
-      });
+
+      const pauseNativePlayerMedia = function(root) {
+        if (!root || !root.querySelectorAll) return;
+        const players = [];
+        if (root.matches && root.matches(nativePlayerSelector)) players.push(root);
+        const containingPlayer = root.closest && root.closest(nativePlayerSelector);
+        if (containingPlayer) players.push(containingPlayer);
+        root.querySelectorAll(nativePlayerSelector).forEach(function(player) {
+          players.push(player);
+        });
+        players.forEach(function(player) {
+          player.querySelectorAll('video').forEach(function(video) {
+            video.autoplay = false;
+            video.removeAttribute('autoplay');
+            video.muted = true;
+            if (!video.paused) video.pause();
+          });
+        });
+      };
+
+      pauseNativePlayerMedia(document);
+      if (!window.__dualSubWatchObserver && document.documentElement) {
+        window.__dualSubWatchObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(pauseNativePlayerMedia);
+          });
+        });
+        window.__dualSubWatchObserver.observe(document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+      }
       return true;
     })();
     """.trimIndent()
