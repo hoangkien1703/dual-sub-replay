@@ -44,7 +44,7 @@ class SubtitleUiTest {
 
         assertEquals(root.width, player.width, 1f)
         assertEquals(16f / 9f, player.width / player.height, 0.01f)
-        assertTrue(subtitles.top >= player.bottom)
+        assertEquals(player.bottom, subtitles.top, 1f)
     }
 
     @Test
