@@ -1,6 +1,24 @@
 # DualSub Replay
 
-DualSub Replay is an experimental Android language-learning app inspired by the useful parts of 1Letters: find a YouTube video, read the original and Vietnamese subtitles together, and tap any paragraph to hear it again.
+An Android language-learning app for watching YouTube with original and Vietnamese subtitles together. Tap any subtitle paragraph to replay that moment.
+
+## Download
+
+### [Download the latest official APK](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+
+Requires **Android 8.0 or newer**. No account or API key is required.
+
+### Installation
+
+1. Tap the download link above and open `DualSub-Replay.apk` when it finishes.
+2. If Android asks, allow your browser or file manager to **install unknown apps**.
+3. Tap **Install**, then open DualSub Replay.
+
+Android may show a standard warning because the app is downloaded directly from GitHub instead of Google Play.
+
+> **Updating from a preview?** Uninstall the preview build once before installing the official app. Official releases use a new production signing key; future official versions will install as normal updates.
+
+Want to test the newest development build? See the [preview release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview). Preview builds may be less stable and use a different signature.
 
 ## Features
 
@@ -17,7 +35,7 @@ DualSub Replay is an experimental Android language-learning app inspired by the 
 - Hide the subtitle timeline to reveal the scrollable YouTube watch page, including video
   actions, comments, and recommendations; selecting another video keeps the learning flow.
 - Reopen the subtitle timeline and remember the subtitle text size.
-- Build and test an installable preview APK automatically with GitHub Actions.
+- Build, test, and publish installable APKs automatically with GitHub Actions.
 
 ## User flow
 
@@ -37,7 +55,7 @@ YouTube's official Data API does not allow ordinary viewers to download captions
 
 Video playback uses YouTube's IFrame Player API through `android-youtube-player`. The app does not download video or audio, remove ads, obscure the player controls, or enable background playback. Some videos cannot be embedded because of owner, region, age, or account restrictions; the Learning screen offers to open those videos in YouTube.
 
-The preview APK uses a CI debug signature persisted in the private GitHub Actions cache so later preview updates keep the same signature. A stable release-signing keystore must be configured through GitHub Secrets before production distribution; never commit a keystore or password.
+Official APKs use a dedicated production signing key kept outside the repository and restored through encrypted GitHub Actions secrets. Preview APKs use a separate CI debug signature, so Android treats the preview and official release as different update lines.
 
 ## Development
 
@@ -66,7 +84,7 @@ bash ./gradlew pixel2Api36DebugAndroidTest
 
 The managed-device suite uses a Pixel 2 profile with an API 36 AOSP image. Its WebView fixtures are designed to run without calls to the live YouTube site. On headless CI hosts, also pass `-Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect`.
 
-The APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
+Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An official release build requires the four `ANDROID_RELEASE_*` signing environment variables and `-PrequireReleaseSigning=true`; signing credentials must never be committed.
 
 ## Architecture
 
@@ -81,7 +99,7 @@ The APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` publishes `DualSub-Replay-v0.2.8-preview.apk` to the rolling `preview` release only after both jobs pass.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.2.8` must match the app version and publishes a verified, production-signed APK as the latest official release.
 
 ## Privacy
 
