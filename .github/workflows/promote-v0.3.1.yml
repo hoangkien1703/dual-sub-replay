@@ -1,0 +1,29 @@
+name: Promote v0.3.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/promote-v0.3.1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  create-release-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create v0.3.1 at the verified commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_SHA: c4eb6b2d3cae33440f1487968c741035b4f9642e
+        run: |
+          existing_sha="$(gh api "repos/$GH_REPO/git/ref/tags/v0.3.1" --jq '.object.sha' 2>/dev/null || true)"
+          if [ -n "$existing_sha" ]; then
+            test "$existing_sha" = "$RELEASE_SHA"
+            exit 0
+          fi
+          gh api --method POST "repos/$GH_REPO/git/refs" \
+            -f ref='refs/tags/v0.3.1' \
+            -f sha="$RELEASE_SHA"
