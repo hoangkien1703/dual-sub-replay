@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun DualSubApp(viewModel: AppViewModel) {
@@ -118,7 +120,7 @@ private fun DualSubExperience(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .fillMaxHeight(0.48f)
+                        .fillMaxHeight(0.60f)
                         .testTag("subtitle_timeline"),
                     onHide = onHideSubtitles,
                     onSettings = { showSettings = true },
@@ -238,7 +240,14 @@ private fun SubtitlePanel(
 private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
     val listState = rememberLazyListState()
     LaunchedEffect(state.currentIndex) {
-        if (state.currentIndex >= 0 && !listState.isScrollInProgress) {
+        val visibleItemIndices = snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo.map { it.index }
+        }.first { it.isNotEmpty() }
+
+        if (
+            !listState.isScrollInProgress &&
+            shouldPromoteActiveSubtitle(state.currentIndex, visibleItemIndices)
+        ) {
             listState.animateScrollToItem(state.currentIndex)
         }
     }
@@ -258,6 +267,19 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
             )
         }
     }
+}
+
+/**
+ * Keeps earlier paragraphs on screen until the active paragraph reaches the
+ * bottom-most visible slot. Seeking past the viewport also promotes the active
+ * paragraph so playback can recover without leaving it off-screen.
+ */
+internal fun shouldPromoteActiveSubtitle(
+    currentIndex: Int,
+    visibleItemIndices: List<Int>,
+): Boolean {
+    if (currentIndex < 0 || visibleItemIndices.isEmpty()) return false
+    return currentIndex >= visibleItemIndices.last()
 }
 
 @Composable

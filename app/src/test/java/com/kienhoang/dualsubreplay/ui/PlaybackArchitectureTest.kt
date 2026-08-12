@@ -91,4 +91,20 @@ class PlaybackArchitectureTest {
         assertEquals(1, activeSubtitleIndex(segments, 2_500))
         assertEquals(-1, activeSubtitleIndex(segments, 3_000))
     }
+
+    @Test
+    fun activeSubtitleStaysInPlaceUntilItReachesTheBottomOfThePanel() {
+        val visibleItems = listOf(4, 5, 6, 7)
+
+        assertFalse(shouldPromoteActiveSubtitle(5, visibleItems))
+        assertFalse(shouldPromoteActiveSubtitle(6, visibleItems))
+        assertTrue(shouldPromoteActiveSubtitle(7, visibleItems))
+    }
+
+    @Test
+    fun activeSubtitlePromotesAfterASeekBeyondTheVisiblePanel() {
+        assertTrue(shouldPromoteActiveSubtitle(12, listOf(4, 5, 6, 7)))
+        assertFalse(shouldPromoteActiveSubtitle(-1, listOf(4, 5, 6, 7)))
+        assertFalse(shouldPromoteActiveSubtitle(7, emptyList()))
+    }
 }
