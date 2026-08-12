@@ -7,10 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
-import org.json.JSONObject
-import org.json.JSONTokener
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -33,9 +30,10 @@ class BrowseWebViewLifecycleTest {
     }
 
     @Test
-    fun watchDetailsScriptHidesSiblingPlayerButKeepsDetailsAndRecommendations() {
+    fun oneNativePageVideoProvidesPlaybackTimeAndReplay() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val result = AtomicReference<String?>()
+        val snapshotResult = AtomicReference<String?>()
+        val replayResult = AtomicReference<String?>()
         val finished = CountDownLatch(1)
         lateinit var webView: WebView
 
@@ -44,40 +42,31 @@ class BrowseWebViewLifecycleTest {
                 settings.javaScriptEnabled = true
                 webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView, url: String?) {
-                        view.evaluateJavascript(WATCH_DETAILS_SCRIPT) {
-                            view.evaluateJavascript(
-                                """
-                                (function() {
-                                  return JSON.stringify({
-                                    playerDisplay: getComputedStyle(document.getElementById('native-player')).display,
-                                    detailsDisplay: getComputedStyle(document.getElementById('details')).display,
-                                    recommendationDisplay: getComputedStyle(document.getElementById('recommendation')).display,
-                                    nativeAutoplay: document.getElementById('native-video').hasAttribute('autoplay'),
-                                    previewAutoplay: document.getElementById('preview-video').hasAttribute('autoplay')
-                                  });
-                                })();
-                                """.trimIndent(),
-                            ) { value ->
-                                result.set(value)
+                        view.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { snapshot ->
+                            snapshotResult.set(snapshot)
+                            view.evaluateJavascript(webReplayScript(14.5f)) { replayed ->
+                                replayResult.set(replayed)
                                 finished.countDown()
                             }
                         }
                     }
                 }
                 loadDataWithBaseURL(
-                    "https://m.youtube.com/watch?v=test",
+                    "https://m.youtube.com/watch?v=testvideo01",
                     """
                     <!doctype html>
-                    <html><head></head><body>
-                      <ytm-app>
-                        <ytm-player id="native-player">
-                          <div id="player-container-id"><video id="native-video" autoplay></video></div>
-                        </ytm-player>
-                        <ytm-watch><section id="details">Comments</section></ytm-watch>
-                        <ytm-compact-video-renderer id="recommendation">
-                          <video id="preview-video" autoplay></video>
-                        </ytm-compact-video-renderer>
-                      </ytm-app>
+                    <html><body>
+                      <video id="native-video"></video>
+                      <section id="details">Comments and recommendations</section>
+                      <script>
+                        const video = document.getElementById('native-video');
+                        Object.defineProperty(video, 'currentTime', {
+                          configurable: true,
+                          get: function() { return this._time || 8.25; },
+                          set: function(value) { this._time = value; }
+                        });
+                        video.play = function() { return Promise.resolve(); };
+                      </script>
                     </body></html>
                     """.trimIndent(),
                     "text/html",
@@ -88,13 +77,21 @@ class BrowseWebViewLifecycleTest {
         }
 
         assertTrue("WebView fixture did not finish", finished.await(10, TimeUnit.SECONDS))
-        val jsonText = JSONTokener(result.get()).nextValue() as String
-        val state = JSONObject(jsonText)
-        assertEquals("none", state.getString("playerDisplay"))
-        assertFalse(state.getString("detailsDisplay") == "none")
-        assertFalse(state.getString("recommendationDisplay") == "none")
-        assertFalse(state.getBoolean("nativeAutoplay"))
-        assertTrue(state.getBoolean("previewAutoplay"))
+        val snapshot = parseWebPlaybackSnapshot(snapshotResult.get())
+        assertEquals("https://m.youtube.com/watch?v=testvideo01", snapshot?.url)
+        assertEquals(8.25f, snapshot?.currentSecond)
+        assertEquals("true", replayResult.get())
+
+        val replayedTime = AtomicReference<String?>()
+        val replayCheckFinished = CountDownLatch(1)
+        instrumentation.runOnMainSync {
+            webView.evaluateJavascript("document.querySelector('video').currentTime") {
+                replayedTime.set(it)
+                replayCheckFinished.countDown()
+            }
+        }
+        assertTrue(replayCheckFinished.await(10, TimeUnit.SECONDS))
+        assertEquals("14.5", replayedTime.get())
 
         instrumentation.runOnMainSync { webView.destroySafely() }
     }

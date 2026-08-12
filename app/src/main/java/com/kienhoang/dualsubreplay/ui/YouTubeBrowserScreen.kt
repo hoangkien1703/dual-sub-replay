@@ -2,8 +2,11 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.RenderProcessGoneDetail
@@ -16,6 +19,7 @@ import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -27,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,18 +39,27 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
+import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import org.json.JSONObject
+import org.json.JSONTokener
 
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
+private const val PLAYBACK_POLL_INTERVAL_MS = 250L
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
 
 internal data class BrowseVideoSelection(val videoId: String, val canonicalUrl: String)
@@ -57,295 +69,111 @@ internal fun browseVideoSelection(url: String): BrowseVideoSelection? {
     return BrowseVideoSelection(videoId, "https://www.youtube.com/watch?v=$videoId")
 }
 
-internal fun watchVideoSelection(currentVideoId: String, url: String): BrowseVideoSelection? =
-    browseVideoSelection(url)?.takeIf { it.videoId != currentVideoId }
+internal fun isYouTubeWebUrl(url: String): Boolean {
+    val uri = runCatching { URI(url) }.getOrNull() ?: return false
+    if (uri.scheme !in setOf("http", "https")) return false
+    val host = uri.host?.lowercase() ?: return false
+    return host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")
+}
 
-private fun mobileWatchUrl(videoId: String): String =
-    "https://m.youtube.com/watch?v=$videoId"
+internal data class WebPlaybackSnapshot(
+    val url: String,
+    val currentSecond: Float?,
+)
+
+private data class WebFullscreenSession(
+    val view: View,
+    val callback: WebChromeClient.CustomViewCallback,
+)
+
+internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
+    """
+    (function() {
+      const videos = Array.from(document.querySelectorAll('video'));
+      const video = videos.find(function(item) { return !item.paused && !item.ended; })
+        || videos.find(function(item) { return item.readyState > 0; })
+        || videos[0];
+      const second = video && Number.isFinite(video.currentTime) ? video.currentTime : null;
+      return JSON.stringify({ url: window.location.href, currentSecond: second });
+    })();
+    """.trimIndent()
+
+internal fun webReplayScript(second: Float): String {
+    val safeSecond = second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f
+    return """
+        (function() {
+          const videos = Array.from(document.querySelectorAll('video'));
+          const video = videos.find(function(item) { return !item.paused && !item.ended; })
+            || videos.find(function(item) { return item.readyState > 0; })
+            || videos[0];
+          if (!video) return false;
+          video.currentTime = $safeSecond;
+          const playRequest = video.play();
+          if (playRequest && playRequest.catch) playRequest.catch(function() {});
+          return true;
+        })();
+    """.trimIndent()
+}
+
+internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
+    if (rawValue.isNullOrBlank() || rawValue == "null") return null
+    return runCatching {
+        val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
+        val json = JSONObject(decoded)
+        WebPlaybackSnapshot(
+            url = json.getString("url"),
+            currentSecond = if (json.isNull("currentSecond")) {
+                null
+            } else {
+                json.getDouble("currentSecond").toFloat()
+            },
+        )
+    }.getOrNull()
+}
+
+internal class YouTubeWebController {
+    private var bindingToken: Any? = null
+    private var replayAction: ((Float) -> Unit)? = null
+
+    fun bind(replayFrom: (Float) -> Unit): Any {
+        val token = Any()
+        bindingToken = token
+        replayAction = replayFrom
+        return token
+    }
+
+    fun unbind(token: Any) {
+        if (bindingToken !== token) return
+        bindingToken = null
+        replayAction = null
+    }
+
+    fun replayFrom(second: Float) {
+        replayAction?.invoke(second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f)
+    }
+}
+
+@Composable
+internal fun rememberYouTubeWebController(): YouTubeWebController = remember { YouTubeWebController() }
 
 /**
- * Keeps YouTube's watch-page details, actions, comments, and recommendations below the
- * app-owned 16:9 player. The native page player is collapsed and paused so there is only one
- * visible and audible player. Selecting a different video hands navigation back to Learning.
+ * Hosts the complete YouTube experience in one persistent WebView. The same native page video
+ * supplies playback, controls, comments, recommendations, subtitle timing, and replay seeking.
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-internal fun YouTubeWatchPage(
-    videoId: String,
-    onVideoSelected: (videoId: String, canonicalUrl: String) -> Unit,
+internal fun SingleYouTubePage(
+    initialUrl: String,
+    navigationRequestId: Long,
+    controller: YouTubeWebController,
+    onPageChanged: (String) -> Unit,
+    onPlaybackSecond: (videoId: String, second: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val currentOnVideoSelected by rememberUpdatedState(onVideoSelected)
-    var lifecycleStarted by remember {
-        mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
-    }
-    var webViewGeneration by remember(videoId) { mutableIntStateOf(0) }
-    var rendererRecoveryUsed by remember(videoId) { mutableStateOf(false) }
-    var webViewUnavailable by remember(videoId) { mutableStateOf(false) }
-    var pageError by remember(videoId) { mutableStateOf<String?>(null) }
-
-    val webView = remember(videoId, webViewGeneration) {
-        WebView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            )
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-            settings.mediaPlaybackRequiresUserGesture = true
-            settings.setSupportMultipleWindows(false)
-            settings.setSupportZoom(false)
-            settings.builtInZoomControls = false
-            settings.displayZoomControls = false
-            settings.useWideViewPort = false
-            settings.loadWithOverviewMode = false
-            settings.textZoom = 100
-            webChromeClient = WebChromeClient()
-            CookieManager.getInstance().setAcceptCookie(true)
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-
-            webViewClient = object : WebViewClient() {
-                private fun handleNewVideo(view: WebView, url: String?): Boolean {
-                    val targetUrl = url?.takeIf(String::isNotBlank) ?: return false
-                    val selection = watchVideoSelection(videoId, targetUrl) ?: return false
-                    view.stopLoading()
-                    currentOnVideoSelected(selection.videoId, selection.canonicalUrl)
-                    return true
-                }
-
-                private fun prepareWatchDetails(view: WebView) {
-                    view.evaluateJavascript(WATCH_DETAILS_SCRIPT, null)
-                }
-
-                override fun shouldOverrideUrlLoading(
-                    view: WebView,
-                    request: WebResourceRequest,
-                ): Boolean {
-                    if (!request.isForMainFrame) return false
-                    if (request.url.scheme !in setOf("http", "https")) return true
-                    return handleNewVideo(view, request.url.toString())
-                }
-
-                @Suppress("DEPRECATION")
-                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    val scheme = runCatching { android.net.Uri.parse(url).scheme }.getOrNull()
-                    if (scheme !in setOf("http", "https")) return true
-                    return handleNewVideo(view, url)
-                }
-
-                override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
-                    super.doUpdateVisitedHistory(view, url, isReload)
-                    if (!handleNewVideo(view, url)) prepareWatchDetails(view)
-                }
-
-                override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
-                    super.onPageStarted(view, url, favicon)
-                    pageError = null
-                    handleNewVideo(view, url)
-                }
-
-                override fun onPageFinished(view: WebView, url: String?) {
-                    super.onPageFinished(view, url)
-                    if (handleNewVideo(view, url)) return
-                    rendererRecoveryUsed = false
-                    webViewUnavailable = false
-                    prepareWatchDetails(view)
-                }
-
-                override fun onReceivedError(
-                    view: WebView,
-                    request: WebResourceRequest,
-                    error: WebResourceError,
-                ) {
-                    super.onReceivedError(view, request, error)
-                    if (request.isForMainFrame) {
-                        pageError = "YouTube could not load: ${error.description}"
-                    }
-                }
-
-                override fun onReceivedHttpError(
-                    view: WebView,
-                    request: WebResourceRequest,
-                    errorResponse: WebResourceResponse,
-                ) {
-                    super.onReceivedHttpError(view, request, errorResponse)
-                    if (request.isForMainFrame && errorResponse.statusCode >= 400) {
-                        pageError = "YouTube returned HTTP ${errorResponse.statusCode}."
-                    }
-                }
-
-                override fun onRenderProcessGone(
-                    view: WebView,
-                    detail: RenderProcessGoneDetail,
-                ): Boolean {
-                    val message = if (detail.didCrash()) {
-                        "The Android WebView renderer crashed."
-                    } else {
-                        "Android stopped the WebView renderer to reclaim memory."
-                    }
-                    Log.e(BROWSER_LOG_TAG, message)
-                    webViewUnavailable = true
-                    view.post {
-                        view.destroySafely()
-                        if (!rendererRecoveryUsed) {
-                            rendererRecoveryUsed = true
-                            webViewUnavailable = false
-                            webViewGeneration += 1
-                        } else {
-                            pageError = "$message Tap Reload to recreate it."
-                        }
-                    }
-                    return true
-                }
-            }
-            loadUrl(mobileWatchUrl(videoId))
-        }
-    }
-
-    DisposableEffect(lifecycleOwner, webView) {
-        val observer = LifecycleEventObserver { _, _ ->
-            lifecycleStarted = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-            if (lifecycleStarted) webView.onResume() else webView.onPause()
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        if (lifecycleStarted) webView.onResume() else webView.onPause()
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            runCatching { webView.onPause() }
-        }
-    }
-
-    DisposableEffect(webView) {
-        onDispose { webView.destroySafely() }
-    }
-
-    Box(modifier) {
-        key(webView) {
-            AndroidView(
-                factory = { webView },
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-        pageError?.let { message ->
-            WebPageErrorCard(
-                message = message,
-                onReload = {
-                    pageError = null
-                    rendererRecoveryUsed = false
-                    if (webViewUnavailable) {
-                        webViewUnavailable = false
-                        webViewGeneration += 1
-                    } else {
-                        webView.reload()
-                    }
-                },
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
-    }
-}
-
-/**
- * The mobile watch page can render its player beside `ytm-watch` instead of inside it. Keep
- * these selectors global so both layouts collapse; scoping them under `ytm-watch` leaves a
- * second, full-size player visible below the app-owned player.
- */
-internal val WATCH_NATIVE_PLAYER_SELECTORS: List<String> = listOf(
-    "ytm-player",
-    "ytd-player",
-    "#player",
-    "#player-container-id",
-    "#player-container",
-    ".player-container",
-    ".player-container.sticky-player",
-    ".player-size",
-    "#movie_player",
-    ".html5-video-player",
-)
-
-internal val WATCH_DETAILS_SCRIPT: String =
-    """
-    (function() {
-      const nativePlayerSelector = '${WATCH_NATIVE_PLAYER_SELECTORS.joinToString(",")}';
-      const styleId = 'dual-sub-watch-details-style';
-      let style = document.getElementById(styleId);
-      if (!style) {
-        style = document.createElement('style');
-        style.id = styleId;
-        (document.head || document.documentElement).appendChild(style);
-      }
-      style.textContent = `
-        ${WATCH_NATIVE_PLAYER_SELECTORS.joinToString(",\n        ")},
-        ytm-mobile-topbar-renderer {
-          display: none !important;
-          width: 0 !important;
-          height: 0 !important;
-          min-height: 0 !important;
-          max-height: 0 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow: hidden !important;
-        }
-        ytm-watch, ytm-watch metadata-row-container, ytm-watch #below {
-          margin-top: 0 !important;
-          padding-top: 0 !important;
-        }
-        html, body { overflow-y: auto !important; }
-      `;
-
-      const pauseNativePlayerMedia = function(root) {
-        if (!root || !root.querySelectorAll) return;
-        const players = [];
-        if (root.matches && root.matches(nativePlayerSelector)) players.push(root);
-        const containingPlayer = root.closest && root.closest(nativePlayerSelector);
-        if (containingPlayer) players.push(containingPlayer);
-        root.querySelectorAll(nativePlayerSelector).forEach(function(player) {
-          players.push(player);
-        });
-        players.forEach(function(player) {
-          player.querySelectorAll('video').forEach(function(video) {
-            video.autoplay = false;
-            video.removeAttribute('autoplay');
-            video.muted = true;
-            if (!video.paused) video.pause();
-          });
-        });
-      };
-
-      pauseNativePlayerMedia(document);
-      if (!window.__dualSubWatchObserver && document.documentElement) {
-        window.__dualSubWatchObserver = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(pauseNativePlayerMedia);
-          });
-        });
-        window.__dualSubWatchObserver.observe(document.documentElement, {
-          childList: true,
-          subtree: true
-        });
-      }
-      return true;
-    })();
-    """.trimIndent()
-
-/**
- * YouTube's mobile site is used only for discovery. Watch-page navigation is handed to the
- * dedicated learning player before the mobile site creates its own video element.
- */
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-internal fun YouTubeBrowsePage(
-    initialUrl: String,
-    navigationRequestId: Long,
-    onBrowseUrlChanged: (String) -> Unit,
-    onVideoSelected: (videoId: String, canonicalUrl: String) -> Unit,
-) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val currentOnBrowseUrlChanged by rememberUpdatedState(onBrowseUrlChanged)
-    val currentOnVideoSelected by rememberUpdatedState(onVideoSelected)
+    val currentOnPageChanged by rememberUpdatedState(onPageChanged)
+    val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
         mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
@@ -354,8 +182,17 @@ internal fun YouTubeBrowsePage(
     var rendererRecoveryUsed by remember { mutableStateOf(false) }
     var webViewUnavailable by remember { mutableStateOf(false) }
     var pageError by remember { mutableStateOf<String?>(null) }
-    var lastBrowseUrl by remember { mutableStateOf(initialUrl) }
+    var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
+    var lastKnownUrl by remember { mutableStateOf(initialUrl) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
+
+    fun reportNavigation(view: WebView, url: String?) {
+        val currentUrl = url?.takeIf(String::isNotBlank) ?: return
+        if (!isYouTubeWebUrl(currentUrl)) return
+        lastKnownUrl = currentUrl
+        canGoBack = view.canGoBack()
+        currentOnPageChanged(currentUrl)
+    }
 
     val webView = remember(webViewGeneration) {
         if (BuildConfig.DEBUG) {
@@ -379,33 +216,39 @@ internal fun YouTubeBrowsePage(
             settings.setSupportZoom(false)
             settings.builtInZoomControls = false
             settings.displayZoomControls = false
-            settings.useWideViewPort = true
-            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = false
+            settings.loadWithOverviewMode = false
             settings.textZoom = 100
-            webChromeClient = WebChromeClient()
+            webChromeClient = object : WebChromeClient() {
+                override fun onShowCustomView(
+                    view: View,
+                    callback: CustomViewCallback,
+                ) {
+                    fullscreenSession?.callback?.onCustomViewHidden()
+                    (view.parent as? ViewGroup)?.removeView(view)
+                    fullscreenSession = WebFullscreenSession(view, callback)
+                }
+
+                override fun onHideCustomView() {
+                    val session = fullscreenSession ?: return
+                    fullscreenSession = null
+                    (session.view.parent as? ViewGroup)?.removeView(session.view)
+                    runCatching { session.callback.onCustomViewHidden() }
+                }
+            }
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
 
-            var lastSelectedVideoId: String? = null
             webViewClient = object : WebViewClient() {
-                private fun handleVideoNavigation(view: WebView, url: String?): Boolean {
-                    val targetUrl = url?.takeIf(String::isNotBlank) ?: return false
-                    val selection = browseVideoSelection(targetUrl) ?: return false
-                    view.stopLoading()
-                    if (selection.videoId != lastSelectedVideoId) {
-                        currentOnVideoSelected(selection.videoId, selection.canonicalUrl)
+                private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
+                    if (isYouTubeWebUrl(url)) {
+                        reportNavigation(view, url)
+                        return false
                     }
-                    lastSelectedVideoId = selection.videoId
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    }
                     return true
-                }
-
-                private fun reportBrowseNavigation(view: WebView, url: String?) {
-                    val currentUrl = url?.takeIf(String::isNotBlank) ?: return
-                    if (YouTubeUrlParser.extractVideoId(currentUrl) != null) return
-                    lastSelectedVideoId = null
-                    lastBrowseUrl = currentUrl
-                    canGoBack = view.canGoBack()
-                    currentOnBrowseUrlChanged(currentUrl)
                 }
 
                 override fun shouldOverrideUrlLoading(
@@ -413,35 +256,29 @@ internal fun YouTubeBrowsePage(
                     request: WebResourceRequest,
                 ): Boolean {
                     if (!request.isForMainFrame) return false
-                    if (request.url.scheme !in setOf("http", "https")) return true
-                    return handleVideoNavigation(view, request.url.toString())
+                    return handleMainFrameUrl(view, request.url.toString())
                 }
 
                 @Suppress("DEPRECATION")
-                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    val scheme = runCatching { android.net.Uri.parse(url).scheme }.getOrNull()
-                    if (scheme !in setOf("http", "https")) return true
-                    return handleVideoNavigation(view, url)
-                }
+                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean =
+                    handleMainFrameUrl(view, url)
 
                 override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
                     super.doUpdateVisitedHistory(view, url, isReload)
-                    if (!handleVideoNavigation(view, url)) reportBrowseNavigation(view, url)
+                    reportNavigation(view, url)
                 }
 
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     pageError = null
-                    if (handleVideoNavigation(view, url)) return
-                    reportBrowseNavigation(view, url)
+                    reportNavigation(view, url)
                 }
 
                 override fun onPageFinished(view: WebView, url: String?) {
                     super.onPageFinished(view, url)
-                    if (handleVideoNavigation(view, url)) return
                     rendererRecoveryUsed = false
                     webViewUnavailable = false
-                    reportBrowseNavigation(view, url)
+                    reportNavigation(view, url)
                 }
 
                 override fun onReceivedError(
@@ -490,20 +327,35 @@ internal fun YouTubeBrowsePage(
                     return true
                 }
             }
-            loadUrl(lastBrowseUrl)
+            loadUrl(lastKnownUrl)
         }
     }
 
-    LaunchedEffect(navigationRequestId, initialUrl) {
+    LaunchedEffect(navigationRequestId, initialUrl, webView) {
         if (navigationRequestId == handledNavigationRequestId) return@LaunchedEffect
         handledNavigationRequestId = navigationRequestId
-        val videoId = YouTubeUrlParser.extractVideoId(initialUrl)
-        if (videoId != null) {
-            webView.stopLoading()
-            currentOnVideoSelected(videoId, "https://www.youtube.com/watch?v=$videoId")
-        } else if (initialUrl.startsWith("https://") || initialUrl.startsWith("http://")) {
-            webView.loadUrl(initialUrl)
+        if (isYouTubeWebUrl(initialUrl)) webView.loadUrl(initialUrl)
+    }
+
+    LaunchedEffect(webView, lifecycleStarted) {
+        if (!lifecycleStarted) return@LaunchedEffect
+        while (isActive) {
+            webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
+                val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                reportNavigation(webView, snapshot.url)
+                val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
+                val second = snapshot.currentSecond ?: return@evaluateJavascript
+                currentOnPlaybackSecond(selection.videoId, second)
+            }
+            delay(PLAYBACK_POLL_INTERVAL_MS)
         }
+    }
+
+    DisposableEffect(controller, webView) {
+        val token = controller.bind { second ->
+            webView.evaluateJavascript(webReplayScript(second), null)
+        }
+        onDispose { controller.unbind(token) }
     }
 
     DisposableEffect(lifecycleOwner, webView) {
@@ -521,6 +373,7 @@ internal fun YouTubeBrowsePage(
 
     DisposableEffect(webView) {
         onDispose {
+            webView.webChromeClient?.onHideCustomView()
             webView.destroySafely()
         }
     }
@@ -529,7 +382,7 @@ internal fun YouTubeBrowsePage(
         if (canGoBack) webView.goBack() else (context as? Activity)?.finish()
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier) {
         AndroidView(
             factory = { webView },
             modifier = Modifier.fillMaxSize(),
@@ -548,6 +401,24 @@ internal fun YouTubeBrowsePage(
                     }
                 },
                 modifier = Modifier.align(Alignment.Center),
+            )
+        }
+    }
+
+    fullscreenSession?.let { session ->
+        Dialog(
+            onDismissRequest = { webView.webChromeClient?.onHideCustomView() },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false,
+            ),
+        ) {
+            AndroidView(
+                factory = {
+                    (session.view.parent as? ViewGroup)?.removeView(session.view)
+                    session.view
+                },
+                modifier = Modifier.fillMaxSize().background(Color.Black),
             )
         }
     }
