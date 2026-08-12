@@ -47,13 +47,13 @@ jobs:
         run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest --stacktrace
 
       - name: Name preview APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.2.8-preview.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.3.0-preview.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DualSub-Replay-v0.2.8-preview
-          path: DualSub-Replay-v0.2.8-preview.apk
+          name: DualSub-Replay-v0.3.0-preview
+          path: DualSub-Replay-v0.3.0-preview.apk
           if-no-files-found: error
 
   managed-device-tests:
@@ -113,7 +113,7 @@ jobs:
       - name: Download verified preview APK
         uses: actions/download-artifact@v4
         with:
-          name: DualSub-Replay-v0.2.8-preview
+          name: DualSub-Replay-v0.3.0-preview
           path: release
 
       - name: Remove obsolete preview APKs
@@ -129,6 +129,7 @@ jobs:
           gh release delete-asset preview DualSub-Replay-v0.2.5-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.6-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.2.7-preview.apk --yes || true
+          gh release delete-asset preview DualSub-Replay-v0.2.8-preview.apk --yes || true
 
       - name: Publish rolling preview release
         uses: softprops/action-gh-release@v2
@@ -143,7 +144,7 @@ jobs:
             Most people should install the [latest official release](https://github.com/${{ github.repository }}/releases/latest) instead.
 
             This APK uses a CI debug signature. Uninstall an older preview first if Android reports a signature mismatch.
-          files: release/DualSub-Replay-v0.2.8-preview.apk
+          files: release/DualSub-Replay-v0.3.0-preview.apk
           overwrite_files: true
 
   publish-release:

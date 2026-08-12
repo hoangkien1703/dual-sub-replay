@@ -23,17 +23,16 @@ Want to test the newest development build? See the [preview release](https://git
 ## Features
 
 - Browse and search the real mobile YouTube site inside the app.
-- Open watch, Shorts, live, embed, and `youtu.be` links in a dedicated Learning screen.
-- Play videos through YouTube's official IFrame API in a full-width 16:9 Android-owned container.
-- Preserve YouTube's native controls, fullscreen behavior, aspect ratio, and letterboxing for vertical video.
+- Open watch, Shorts, live, embed, and `youtu.be` links in the same persistent YouTube WebView.
+- Play videos with YouTube's native mobile webpage player and controls.
 - Retrieve manual or auto-generated public captions automatically.
 - Parse YouTube's default timed-text XML, nested SRV3 XML, and JSON3 caption formats.
 - Prefer English or Japanese captions and translate them to Vietnamese on-device.
 - Merge short caption cues into readable paragraphs.
-- Place the dual-subtitle timeline below the player so it never obscures YouTube controls.
+- Place the dual-subtitle timeline in a temporary bottom layer over the single YouTube page.
 - Highlight the current paragraph and tap any paragraph to replay it.
-- Hide the subtitle timeline to reveal the scrollable YouTube watch page, including video
-  actions, comments, and recommendations; selecting another video keeps the learning flow.
+- Hide the subtitle timeline to reveal the complete YouTube page, including the same video,
+  actions, comments, and recommendations; no second player or webpage is created.
 - Reopen the subtitle timeline and remember the subtitle text size.
 - Build, test, and publish installable APKs automatically with GitHub Actions.
 
@@ -41,19 +40,19 @@ Want to test the newest development build? See the [preview release](https://git
 
 1. Open DualSub Replay; the YouTube Browse screen appears immediately.
 2. Search normally and choose a captioned English or Japanese video.
-3. The app intercepts the video URL and opens the dedicated Learning screen.
-4. The full-width player cues the video while captions and translations load underneath it.
+3. The selected watch page stays in the same WebView while captions and translations load.
+4. The bottom dual-subtitle layer tracks the native webpage video's playback time.
 5. Tap any subtitle paragraph to seek to its start and resume playback.
 6. Hide the subtitle timeline to like the video, read comments, or choose another video.
-7. Press Back to leave fullscreen first, then return from Learning to Browse.
+7. Press Back to navigate through normal YouTube browsing history.
 
-Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay opens it directly in Learning.
+Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
 
 ## Important limitations
 
 YouTube's official Data API does not allow ordinary viewers to download captions from arbitrary public videos. To provide automatic captions, this prototype uses YouTube's undocumented Innertube transcript endpoint. It can stop working when YouTube changes its internal API, and its use may be restricted by YouTube's terms. The extraction code is isolated in `YouTubeCaptionProvider` so it can be replaced without rewriting the app.
 
-Video playback uses YouTube's IFrame Player API through `android-youtube-player`. The app does not download video or audio, remove ads, obscure the player controls, or enable background playback. Some videos cannot be embedded because of owner, region, age, or account restrictions; the Learning screen offers to open those videos in YouTube.
+Video playback uses the native player in YouTube's mobile webpage. The app does not download video or audio, remove ads, or enable background playback. The subtitle layer can be hidden at any time to restore the unobstructed YouTube page.
 
 Official APKs use a dedicated production signing key kept outside the repository and restored through encrypted GitHub Actions secrets. Preview APKs use a separate CI debug signature, so Android treats the preview and official release as different update lines.
 
@@ -92,14 +91,14 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 - `YouTubeCaptionProvider` discovers and downloads timed caption cues.
 - `SubtitleMerger` converts small cues into replayable paragraphs.
 - `OnDeviceTranslator` uses Google ML Kit to translate to Vietnamese.
-- `AppViewModel` owns Browse/Learning navigation, caption loading, translation, and active-cue tracking.
-- `YouTubeBrowsePage` hosts the Browse experience and intercepts video navigation without injecting playback scripts.
-- `EmbeddedYouTubePlayer` owns the IFrame player lifecycle and reports app-owned playback events.
-- `DualSubApp` renders either Browse or the Learning player with the subtitle timeline below it.
+- `AppViewModel` tracks the active watch URL, caption loading, translation, and active cue.
+- `SingleYouTubePage` owns the app's only WebView and keeps normal YouTube navigation and playback intact.
+- A small JavaScript polling bridge reads the native page video's time and seeks that same video for replay.
+- `DualSubApp` layers the hideable dual-subtitle timeline over the bottom of the single YouTube surface.
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.2.8` must match the app version and publishes a verified, production-signed APK as the latest official release.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.3.0` must match the app version and publishes a verified, production-signed APK as the latest official release.
 
 ## Privacy
 

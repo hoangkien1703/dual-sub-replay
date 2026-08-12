@@ -18,25 +18,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-sealed interface AppDestination {
-    data object Browse : AppDestination
-
-    data class Learning(val session: WatchSession) : AppDestination
-}
-
-data class WatchSession(
-    val videoId: String,
-    val canonicalUrl: String,
-    val returnBrowseUrl: String,
-    val resumeSecond: Float = 0f,
-)
-
 enum class LoadStage { IDLE, LOADING_CAPTIONS, TRANSLATING, READY, ERROR }
 
 data class DualSubUiState(
     val browserUrl: String = YOUTUBE_HOME_URL,
     val browserNavigationRequestId: Long = 0L,
-    val destination: AppDestination = AppDestination.Browse,
+    val activeVideoId: String? = null,
     val subtitlePanelVisible: Boolean = true,
     val sourcePreference: String = "auto",
     val resolvedSourceLanguage: String? = null,
@@ -47,10 +34,7 @@ data class DualSubUiState(
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
-) {
-    val watchSession: WatchSession?
-        get() = (destination as? AppDestination.Learning)?.session
-}
+)
 
 internal fun activeSubtitleIndex(segments: List<SubtitleSegment>, timeMs: Long): Int {
     var low = 0
@@ -76,7 +60,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val translator = OnDeviceTranslator()
     private var loadingJob: Job? = null
     private var loadGeneration = 0L
-    private var latestPlaybackSecond = 0f
 
     private val _state = MutableStateFlow(
         DualSubUiState(
@@ -90,30 +73,74 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun acceptSharedText(text: String) {
         val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
-        openLearning(videoId, canonicalWatchUrl(videoId), _state.value.browserUrl)
-    }
-
-    fun onBrowseUrlChanged(url: String) {
-        if (YouTubeUrlParser.extractVideoId(url) != null) return
-        if (url == _state.value.browserUrl) return
-        preferences.edit().putString("last_browser_url", url).apply()
-        _state.update { it.copy(browserUrl = url) }
-    }
-
-    fun onVideoSelected(videoId: String, canonicalUrl: String) {
-        val current = _state.value
-        val returnUrl = current.watchSession?.returnBrowseUrl ?: current.browserUrl
-        openLearning(videoId, canonicalUrl, returnUrl)
-    }
-
-    fun exitLearning() {
-        if (_state.value.destination !is AppDestination.Learning) return
-        loadGeneration += 1
-        loadingJob?.cancel()
-        latestPlaybackSecond = 0f
+        val watchUrl = mobileWatchUrl(videoId)
+        preferences.edit().putString("last_browser_url", watchUrl).apply()
         _state.update {
             it.copy(
-                destination = AppDestination.Browse,
+                browserUrl = watchUrl,
+                browserNavigationRequestId = it.browserNavigationRequestId + 1,
+            )
+        }
+        openVideo(videoId)
+    }
+
+    fun onYouTubePageChanged(url: String) {
+        if (!url.startsWith("https://") && !url.startsWith("http://")) return
+        if (url != _state.value.browserUrl) {
+            preferences.edit().putString("last_browser_url", url).apply()
+            _state.update { it.copy(browserUrl = url) }
+        }
+
+        val videoId = YouTubeUrlParser.extractVideoId(url)
+        if (videoId == null) {
+            clearActiveVideo()
+        } else {
+            openVideo(videoId)
+        }
+    }
+
+    fun onWebPlaybackSecond(videoId: String, second: Float) {
+        val current = _state.value
+        if (current.activeVideoId != videoId || !second.isFinite()) return
+        val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
+        val index = activeSubtitleIndex(current.segments, timeMs)
+        if (index != current.currentIndex) _state.update { it.copy(currentIndex = index) }
+    }
+
+    fun setSourcePreference(language: String) {
+        if (_state.value.sourcePreference == language) return
+        _state.update { it.copy(sourcePreference = language) }
+        val videoId = _state.value.activeVideoId ?: return
+        loadVideo(videoId, showPanel = true)
+    }
+
+    fun setFontScale(scale: Float) {
+        val safeScale = scale.coerceIn(0.8f, 1.5f)
+        preferences.edit().putFloat("font_scale", safeScale).apply()
+        _state.update { it.copy(fontScale = safeScale) }
+    }
+
+    fun retryCaptions() {
+        val videoId = _state.value.activeVideoId ?: return
+        loadVideo(videoId, showPanel = true)
+    }
+
+    fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }
+
+    fun hideSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = false) }
+
+    private fun openVideo(videoId: String) {
+        if (_state.value.activeVideoId == videoId) return
+        loadVideo(videoId, showPanel = true)
+    }
+
+    private fun clearActiveVideo() {
+        if (_state.value.activeVideoId == null) return
+        loadGeneration += 1
+        loadingJob?.cancel()
+        _state.update {
+            it.copy(
+                activeVideoId = null,
                 subtitlePanelVisible = true,
                 resolvedSourceLanguage = null,
                 generatedCaptions = false,
@@ -126,65 +153,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun onPlayerVideoId(sourceVideoId: String, videoId: String) {
-        val session = _state.value.watchSession ?: return
-        if (session.videoId != sourceVideoId) return
-        if (videoId == session.videoId) return
-        openLearning(videoId, canonicalWatchUrl(videoId), session.returnBrowseUrl)
-    }
-
-    fun onPlayerCurrentSecond(videoId: String, second: Float) {
-        val current = _state.value
-        if (current.watchSession?.videoId != videoId || !second.isFinite()) return
-        latestPlaybackSecond = second.coerceAtLeast(0f)
-        val timeMs = (latestPlaybackSecond * 1_000).toLong()
-        val index = activeSubtitleIndex(current.segments, timeMs)
-        if (index != current.currentIndex) _state.update { it.copy(currentIndex = index) }
-    }
-
-    fun playbackResumeSecond(videoId: String): Float =
-        if (_state.value.watchSession?.videoId == videoId) latestPlaybackSecond else 0f
-
-    fun setSourcePreference(language: String) {
-        if (_state.value.sourcePreference == language) return
-        _state.update { it.copy(sourcePreference = language) }
-        val session = _state.value.watchSession ?: return
-        loadVideo(session, showPanel = true)
-    }
-
-    fun setFontScale(scale: Float) {
-        val safeScale = scale.coerceIn(0.8f, 1.5f)
-        preferences.edit().putFloat("font_scale", safeScale).apply()
-        _state.update { it.copy(fontScale = safeScale) }
-    }
-
-    fun retryCaptions() {
-        val session = _state.value.watchSession ?: return
-        loadVideo(session, showPanel = true)
-    }
-
-    fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }
-
-    fun hideSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = false) }
-
-    private fun openLearning(videoId: String, canonicalUrl: String, returnBrowseUrl: String) {
-        val currentSession = _state.value.watchSession
-        if (currentSession?.videoId == videoId) return
-        latestPlaybackSecond = 0f
-        val session = WatchSession(
-            videoId = videoId,
-            canonicalUrl = canonicalUrl,
-            returnBrowseUrl = returnBrowseUrl,
-        )
-        loadVideo(session, showPanel = true)
-    }
-
-    private fun loadVideo(session: WatchSession, showPanel: Boolean) {
+    private fun loadVideo(videoId: String, showPanel: Boolean) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
         _state.update {
             it.copy(
-                destination = AppDestination.Learning(session),
+                activeVideoId = videoId,
                 subtitlePanelVisible = showPanel,
                 resolvedSourceLanguage = null,
                 generatedCaptions = false,
@@ -202,15 +176,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     "ja" -> listOf("ja", "en")
                     else -> listOf("en", "ja")
                 }
-                val track = captionProvider.fetch(session.videoId, preferredLanguages)
+                val track = captionProvider.fetch(videoId, preferredLanguages)
                 val merged = SubtitleMerger.merge(track.cues)
                 if (merged.isEmpty()) {
                     throw CaptionUnavailableException("This caption track contains no readable text.")
                 }
-                if (!isCurrentLoad(_state.value, session.videoId, generation)) return@launch
+                if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
 
                 _state.update { current ->
-                    if (!isCurrentLoad(current, session.videoId, generation)) return@update current
+                    if (!isCurrentLoad(current, videoId, generation)) return@update current
                     current.copy(
                         resolvedSourceLanguage = track.languageCode,
                         generatedCaptions = track.isGenerated,
@@ -225,7 +199,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     texts = merged.map(SubtitleSegment::originalText),
                 ) { index, translatedText ->
                     _state.update { current ->
-                        if (!isCurrentLoad(current, session.videoId, generation)) return@update current
+                        if (!isCurrentLoad(current, videoId, generation)) return@update current
                         current.copy(
                             segments = current.segments.mapIndexed { itemIndex, segment ->
                                 if (itemIndex == index) segment.copy(translatedText = translatedText) else segment
@@ -235,7 +209,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 _state.update { current ->
-                    if (!isCurrentLoad(current, session.videoId, generation)) return@update current
+                    if (!isCurrentLoad(current, videoId, generation)) return@update current
                     current.copy(
                         stage = LoadStage.READY,
                         statusMessage = if (track.isGenerated) {
@@ -248,7 +222,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
                 _state.update { current ->
-                    if (!isCurrentLoad(current, session.videoId, generation)) return@update current
+                    if (!isCurrentLoad(current, videoId, generation)) return@update current
                     current.copy(
                         stage = LoadStage.ERROR,
                         statusMessage = null,
@@ -259,9 +233,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun canonicalWatchUrl(videoId: String): String =
-        "https://www.youtube.com/watch?v=$videoId"
+    private fun mobileWatchUrl(videoId: String): String =
+        "https://m.youtube.com/watch?v=$videoId"
 
     private fun isCurrentLoad(state: DualSubUiState, videoId: String, generation: Long): Boolean =
-        generation == loadGeneration && state.watchSession?.videoId == videoId
+        generation == loadGeneration && state.activeVideoId == videoId
 }

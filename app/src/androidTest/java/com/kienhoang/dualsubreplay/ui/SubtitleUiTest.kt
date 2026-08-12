@@ -5,17 +5,8 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
@@ -26,34 +17,6 @@ import org.junit.Test
 class SubtitleUiTest {
     @get:Rule
     val composeRule = createComposeRule()
-
-    @Test
-    fun learningLayoutKeepsFullWidthSixteenByNinePlayerAboveContent() {
-        composeRule.setContent {
-            Box(Modifier.width(400.dp).height(700.dp).testTag("learning_root")) {
-                LearningContentLayout(
-                    player = { Box(Modifier.fillMaxSize().testTag("fake_player")) },
-                ) {
-                    Box(Modifier.fillMaxWidth().weight(1f)) {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .testTag("fake_subtitles"),
-                        )
-                    }
-                }
-            }
-        }
-
-        val root = composeRule.onNodeWithTag("learning_root").fetchSemanticsNode().boundsInRoot
-        val player = composeRule.onNodeWithTag("learning_player").fetchSemanticsNode().boundsInRoot
-        val subtitles = composeRule.onNodeWithTag("fake_subtitles").fetchSemanticsNode().boundsInRoot
-
-        assertEquals(root.width, player.width, 1f)
-        assertEquals(16f / 9f, player.width / player.height, 0.01f)
-        assertEquals(player.bottom, subtitles.top, 1f)
-    }
 
     @Test
     fun settingsKeepsLanguageAndTextOptionsWithoutFocus() {
