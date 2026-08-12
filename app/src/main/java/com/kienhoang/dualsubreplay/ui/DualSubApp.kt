@@ -1,7 +1,12 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -31,12 +38,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
@@ -46,25 +54,35 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 @Composable
 fun DualSubApp(viewModel: AppViewModel) {
@@ -79,6 +97,7 @@ fun DualSubApp(viewModel: AppViewModel) {
             onHideSubtitles = viewModel::hideSubtitlePanel,
             onRetry = viewModel::retryCaptions,
             onSourceChange = viewModel::setSourcePreference,
+            onTargetChange = viewModel::setTargetLanguage,
             onFontScaleChange = viewModel::setFontScale,
         )
     }
@@ -93,6 +112,7 @@ private fun DualSubExperience(
     onHideSubtitles: () -> Unit,
     onRetry: () -> Unit,
     onSourceChange: (String) -> Unit,
+    onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
@@ -149,8 +169,11 @@ private fun DualSubExperience(
     if (showSettings) {
         SubtitleSettingsDialog(
             sourcePreference = state.sourcePreference,
+            targetLanguage = state.targetLanguage,
+            availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
             onSourceChange = onSourceChange,
+            onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
             onDismiss = { showSettings = false },
         )
@@ -167,62 +190,99 @@ private fun SubtitlePanel(
     onRetry: () -> Unit,
     onReplay: (SubtitleSegment) -> Unit,
 ) {
+    var panelOffsetY by remember { mutableFloatStateOf(0f) }
+    var panelHeightPx by remember { mutableFloatStateOf(0f) }
+    val minimumDismissDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
+    val scope = rememberCoroutineScope()
+    val dragState = rememberDraggableState { delta ->
+        val maximum = panelHeightPx.takeIf { it > 0f } ?: Float.MAX_VALUE
+        panelOffsetY = (panelOffsetY + delta).coerceIn(0f, maximum)
+    }
+    val headerDragModifier = Modifier
+        .testTag("subtitle_panel_drag_handle")
+        .draggable(
+            state = dragState,
+            orientation = Orientation.Vertical,
+            onDragStopped = { velocity ->
+                val hide = shouldHideSubtitlePanel(
+                    dragOffsetPx = panelOffsetY,
+                    panelHeightPx = panelHeightPx,
+                    velocityPxPerSecond = velocity,
+                    minimumDistancePx = minimumDismissDistancePx,
+                )
+                scope.launch {
+                    val target = if (hide) panelHeightPx.coerceAtLeast(panelOffsetY) else 0f
+                    animate(
+                        initialValue = panelOffsetY,
+                        targetValue = target,
+                        animationSpec = tween(durationMillis = if (hide) 160 else 220),
+                    ) { value, _ -> panelOffsetY = value }
+                    if (hide) onHide()
+                }
+            },
+        )
+
     Surface(
-        modifier = modifier.shadow(18.dp, RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
+        modifier = modifier
+            .onSizeChanged { panelHeightPx = it.height.toFloat() }
+            .offset { IntOffset(0, panelOffsetY.roundToInt()) }
+            .shadow(18.dp, RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
         shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
         color = Color(0xFF061719),
         contentColor = Color(0xFFF3FAFA),
         tonalElevation = 8.dp,
     ) {
         Column(Modifier.fillMaxSize()) {
-            Box(
-                Modifier
-                    .padding(top = 6.dp)
-                    .size(width = 42.dp, height = 4.dp)
-                    .align(Alignment.CenterHorizontally),
-            ) {
-                Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
-            }
+            Column(headerDragModifier) {
+                Box(
+                    Modifier
+                        .padding(top = 6.dp)
+                        .size(width = 42.dp, height = 4.dp)
+                        .align(Alignment.CenterHorizontally),
+                ) {
+                    Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
+                }
 
-            Row(
-                modifier = Modifier.fillMaxWidth().height(52.dp).padding(start = 12.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    Icons.Default.ClosedCaption,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(Modifier.size(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = sourceDescription(state),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color(0xFFF3FAFA),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = state.statusMessage ?: "Tap a paragraph to replay it",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFB7CED1),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                IconButton(onClick = onSettings) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(52.dp).padding(start = 12.dp, end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Icon(
-                        Icons.Default.Settings,
-                        contentDescription = "Subtitle settings",
-                        tint = Color(0xFFE5F2F3),
+                        Icons.Default.ClosedCaption,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
-                }
-                IconButton(onClick = onHide) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Hide dual subtitles",
-                        tint = Color(0xFFE5F2F3),
-                    )
+                    Spacer(Modifier.size(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = sourceDescription(state),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFFF3FAFA),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = state.statusMessage ?: "Tap a paragraph to replay it",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFB7CED1),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    IconButton(onClick = onSettings) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Subtitle settings",
+                            tint = Color(0xFFE5F2F3),
+                        )
+                    }
+                    IconButton(onClick = onHide) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Hide dual subtitles",
+                            tint = Color(0xFFE5F2F3),
+                        )
+                    }
                 }
             }
             HorizontalDivider(color = Color(0xFF244044))
@@ -234,6 +294,16 @@ private fun SubtitlePanel(
             }
         }
     }
+}
+
+internal fun shouldHideSubtitlePanel(
+    dragOffsetPx: Float,
+    panelHeightPx: Float,
+    velocityPxPerSecond: Float,
+    minimumDistancePx: Float,
+): Boolean {
+    val distanceThreshold = max(minimumDistancePx, panelHeightPx * 0.18f)
+    return dragOffsetPx >= distanceThreshold || velocityPxPerSecond >= 1_500f
 }
 
 @Composable
@@ -374,50 +444,170 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
 @Composable
 internal fun SubtitleSettingsDialog(
     sourcePreference: String,
+    targetLanguage: String,
+    availableSourceLanguages: List<CaptionLanguage>,
     fontScale: Float,
     onSourceChange: (String) -> Unit,
+    onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    val sourceChoices = listOf(LanguageChoice("auto", "Auto (recommended)")) +
+        availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
+    val targetChoices = TranslationLanguages.all.map { LanguageChoice(it.code, it.name) }
+
+    val activePicker = pickerMode
+    if (activePicker != null) {
+        val choices = if (activePicker == LanguagePickerMode.SOURCE) sourceChoices else targetChoices
+        LanguagePickerDialog(
+            title = if (activePicker == LanguagePickerMode.SOURCE) {
+                "Original caption language"
+            } else {
+                "Translate to"
+            },
+            choices = choices,
+            selectedCode = if (activePicker == LanguagePickerMode.SOURCE) sourcePreference else targetLanguage,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            onChoice = { choice ->
+                if (activePicker == LanguagePickerMode.SOURCE) {
+                    onSourceChange(choice.code)
+                } else {
+                    onTargetChange(choice.code)
+                }
+                pickerMode = null
+                searchQuery = ""
+            },
+            onDismiss = {
+                pickerMode = null
+                searchQuery = ""
+            },
+            testTagPrefix = activePicker.name.lowercase(),
+        )
+    } else {
+        val sourceLabel = if (sourcePreference == "auto") {
+            "Auto (recommended)"
+        } else {
+            sourceChoices.firstOrNull {
+                TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
+            }?.label ?: TranslationLanguages.displayName(sourcePreference)
+        }
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Dual-subtitle settings") },
+            text = {
+                Column {
+                    Text("Original captions")
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedButton(
+                        onClick = {
+                            pickerMode = LanguagePickerMode.SOURCE
+                            searchQuery = ""
+                        },
+                        modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
+                    ) {
+                        Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Spacer(Modifier.height(14.dp))
+                    Text("Translate to")
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedButton(
+                        onClick = {
+                            pickerMode = LanguagePickerMode.TARGET
+                            searchQuery = ""
+                        },
+                        modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
+                    ) {
+                        Text(TranslationLanguages.displayName(targetLanguage))
+                    }
+                    Text(
+                        "A language model downloads only when it is needed.",
+                        modifier = Modifier.padding(top = 6.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    Text("Text size: ${(fontScale * 100).toInt()}%")
+                    Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+                    Text(
+                        "Swipe the panel header down to hide it. Captions keep tracking while hidden.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+        )
+    }
+}
+
+private enum class LanguagePickerMode { SOURCE, TARGET }
+
+private data class LanguageChoice(val code: String, val label: String)
+
+@Composable
+private fun LanguagePickerDialog(
+    title: String,
+    choices: List<LanguageChoice>,
+    selectedCode: String,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onChoice: (LanguageChoice) -> Unit,
+    onDismiss: () -> Unit,
+    testTagPrefix: String,
+) {
+    val filteredChoices = choices.filter { choice ->
+        searchQuery.isBlank() ||
+            choice.label.contains(searchQuery.trim(), ignoreCase = true) ||
+            choice.code.contains(searchQuery.trim(), ignoreCase = true)
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Dual-subtitle settings") },
+        title = { Text(title) },
         text = {
             Column {
-                Text("Original language")
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf("auto" to "Auto", "en" to "English", "ja" to "Japanese").forEach { (code, label) ->
-                        FilterChip(
-                            selected = sourcePreference == code,
-                            onClick = { onSourceChange(code) },
-                            label = { Text(label) },
-                        )
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
+                    modifier = Modifier.fillMaxWidth().testTag("language_search"),
+                    label = { Text("Search languages") },
+                    singleLine = true,
+                )
+                Spacer(Modifier.height(8.dp))
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+                    itemsIndexed(filteredChoices, key = { _, choice -> choice.code }) { _, choice ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onChoice(choice) }
+                                .testTag("language_option_${testTagPrefix}_${choice.code}")
+                                .padding(horizontal = 8.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(choice.label, modifier = Modifier.weight(1f))
+                            if (
+                                TranslationLanguages.normalize(choice.code) ==
+                                TranslationLanguages.normalize(selectedCode)
+                            ) {
+                                Text("Selected", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                     }
                 }
-                Spacer(Modifier.height(14.dp))
-                Text("Translation: Vietnamese")
-                Spacer(Modifier.height(14.dp))
-                Text("Text size: ${(fontScale * 100).toInt()}%")
-                Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
-                Text(
-                    "Captions continue tracking while the panel is hidden.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Back") } },
     )
 }
 
 private fun sourceDescription(state: DualSubUiState): String {
-    val source = when (state.resolvedSourceLanguage?.substringBefore('-')) {
-        "en" -> "English"
-        "ja" -> "Japanese"
-        null -> "Finding captions"
-        else -> state.resolvedSourceLanguage.orEmpty().uppercase()
-    }
+    val source = state.resolvedSourceLanguage?.let { resolved ->
+        state.availableSourceLanguages.firstOrNull {
+            TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
+        }?.name ?: TranslationLanguages.displayName(resolved)
+    } ?: "Finding captions"
     val generated = if (state.generatedCaptions) " (auto-generated)" else ""
-    return "$source$generated  →  Vietnamese"
+    return "$source$generated  →  ${TranslationLanguages.displayName(state.targetLanguage)}"
 }

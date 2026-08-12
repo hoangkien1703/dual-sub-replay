@@ -6,7 +6,10 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
@@ -21,24 +24,37 @@ class SubtitleUiTest {
     @Test
     fun settingsKeepsLanguageAndTextOptionsWithoutFocus() {
         var selectedLanguage: String? = null
+        var selectedTarget: String? = null
         var dismissed = false
         composeRule.setContent {
             DualSubTheme {
                 SubtitleSettingsDialog(
                     sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    availableSourceLanguages = listOf(
+                        CaptionLanguage("en", "English"),
+                        CaptionLanguage("ja", "Japanese"),
+                    ),
                     fontScale = 1f,
                     onSourceChange = { selectedLanguage = it },
+                    onTargetChange = { selectedTarget = it },
                     onFontScaleChange = {},
                     onDismiss = { dismissed = true },
                 )
             }
         }
 
-        composeRule.onNodeWithText("Original language").assertIsDisplayed()
-        composeRule.onNodeWithText("Translation: Vietnamese").assertIsDisplayed()
+        composeRule.onNodeWithText("Original captions").assertIsDisplayed()
+        composeRule.onNodeWithText("Translate to").assertIsDisplayed()
+        composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
         composeRule.onNodeWithText("Focus").assertDoesNotExist()
-        composeRule.onNodeWithText("Japanese").performClick()
+        composeRule.onNodeWithTag("source_language_picker").performClick()
+        composeRule.onNodeWithTag("language_option_source_ja").performClick()
         composeRule.runOnIdle { assertEquals("ja", selectedLanguage) }
+        composeRule.onNodeWithTag("target_language_picker").performClick()
+        composeRule.onNodeWithTag("language_search").performTextInput("English")
+        composeRule.onNodeWithTag("language_option_target_en").performClick()
+        composeRule.runOnIdle { assertEquals("en", selectedTarget) }
         composeRule.onNodeWithText("Done").performClick()
         composeRule.runOnIdle { assertTrue(dismissed) }
     }

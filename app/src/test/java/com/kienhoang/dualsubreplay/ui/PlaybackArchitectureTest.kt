@@ -107,4 +107,20 @@ class PlaybackArchitectureTest {
         assertFalse(shouldPromoteActiveSubtitle(-1, listOf(4, 5, 6, 7)))
         assertFalse(shouldPromoteActiveSubtitle(7, emptyList()))
     }
+
+    @Test
+    fun subtitlePanelHidesAfterEnoughDistanceOrAFastDownwardFling() {
+        assertTrue(shouldHideSubtitlePanel(200f, 1_000f, 0f, 72f))
+        assertTrue(shouldHideSubtitlePanel(20f, 1_000f, 1_600f, 72f))
+        assertFalse(shouldHideSubtitlePanel(100f, 1_000f, 400f, 72f))
+        assertFalse(shouldHideSubtitlePanel(200f, 1_000f, -2_000f, 220f))
+    }
+
+    @Test
+    fun sourcePreferenceUsesTheChosenCaptionAndFallsBackToAuto() {
+        assertEquals(emptyList<String>(), preferredCaptionLanguages("auto"))
+        assertEquals(listOf("ja"), preferredCaptionLanguages("ja"))
+        assertEquals("ja", resolvedSourcePreference("ja", "ja-JP"))
+        assertEquals("auto", resolvedSourcePreference("ja", "en-US"))
+    }
 }

@@ -12,12 +12,17 @@ import kotlin.coroutines.resumeWithException
 class OnDeviceTranslator {
     suspend fun translateAll(
         sourceLanguageCode: String,
+        targetLanguageCode: String,
         texts: List<String>,
         onTranslation: suspend (index: Int, translatedText: String) -> Unit,
     ) {
-        val source = TranslateLanguage.fromLanguageTag(sourceLanguageCode.substringBefore('-'))
-            ?: TranslateLanguage.ENGLISH
-        if (source == TranslateLanguage.VIETNAMESE) {
+        val normalizedSource = TranslationLanguages.normalize(sourceLanguageCode)
+        val normalizedTarget = TranslationLanguages.normalize(targetLanguageCode)
+        val source = TranslateLanguage.fromLanguageTag(normalizedSource)
+            ?: throw IllegalArgumentException("${TranslationLanguages.displayName(sourceLanguageCode)} translation is not supported.")
+        val target = TranslateLanguage.fromLanguageTag(normalizedTarget)
+            ?: throw IllegalArgumentException("${TranslationLanguages.displayName(targetLanguageCode)} translation is not supported.")
+        if (source == target) {
             texts.forEachIndexed { index, text -> onTranslation(index, text) }
             return
         }
@@ -25,7 +30,7 @@ class OnDeviceTranslator {
         val translator = Translation.getClient(
             TranslatorOptions.Builder()
                 .setSourceLanguage(source)
-                .setTargetLanguage(TranslateLanguage.VIETNAMESE)
+                .setTargetLanguage(target)
                 .build(),
         )
         try {

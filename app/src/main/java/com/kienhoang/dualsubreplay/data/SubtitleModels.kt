@@ -18,4 +18,10 @@ data class CaptionTrackResult(
     val languageCode: String,
     val isGenerated: Boolean,
     val cues: List<RawCaptionCue>,
+    val availableLanguages: List<CaptionLanguage> = emptyList(),
+)
+
+data class CaptionLanguage(
+    val code: String,
+    val name: String,
 )

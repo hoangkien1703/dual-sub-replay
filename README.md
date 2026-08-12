@@ -1,6 +1,6 @@
 # DualSub Replay
 
-An Android language-learning app for watching YouTube with original and Vietnamese subtitles together. Tap any subtitle paragraph to replay that moment.
+An Android language-learning app for watching YouTube with original and translated subtitles together. Tap any subtitle paragraph to replay that moment.
 
 ## Download
 
@@ -27,11 +27,12 @@ Want to test the newest development build? See the [preview release](https://git
 - Play videos with YouTube's native mobile webpage player and controls.
 - Retrieve manual or auto-generated public captions automatically.
 - Parse YouTube's default timed-text XML, nested SRV3 XML, and JSON3 caption formats.
-- Prefer English or Japanese captions and translate them to Vietnamese on-device.
+- Choose from the caption languages offered by each video and translate into any language supported by Google ML Kit.
+- Download translation models on demand and remember the preferred target language.
 - Merge short caption cues into readable paragraphs.
 - Place the dual-subtitle timeline in a temporary bottom layer over the single YouTube page.
 - Highlight the current paragraph and tap any paragraph to replay it.
-- Hide the subtitle timeline to reveal the complete YouTube page, including the same video,
+- Swipe the panel header down or use its close button to reveal the complete YouTube page, including the same video,
   actions, comments, and recommendations; no second player or webpage is created.
 - Reopen the subtitle timeline and remember the subtitle text size.
 - Build, test, and publish installable APKs automatically with GitHub Actions.
@@ -39,11 +40,11 @@ Want to test the newest development build? See the [preview release](https://git
 ## User flow
 
 1. Open DualSub Replay; the YouTube Browse screen appears immediately.
-2. Search normally and choose a captioned English or Japanese video.
+2. Search normally and choose a captioned video.
 3. The selected watch page stays in the same WebView while captions and translations load.
 4. The bottom dual-subtitle layer tracks the native webpage video's playback time.
 5. Tap any subtitle paragraph to seek to its start and resume playback.
-6. Hide the subtitle timeline to like the video, read comments, or choose another video.
+6. Swipe the subtitle timeline down to like the video, read comments, or choose another video.
 7. Press Back to navigate through normal YouTube browsing history.
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
@@ -90,7 +91,7 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 - `YouTubeUrlParser` normalizes shared links and extracts video IDs.
 - `YouTubeCaptionProvider` discovers and downloads timed caption cues.
 - `SubtitleMerger` converts small cues into replayable paragraphs.
-- `OnDeviceTranslator` uses Google ML Kit to translate to Vietnamese.
+- `OnDeviceTranslator` uses Google ML Kit to translate between the selected supported languages.
 - `AppViewModel` tracks the active watch URL, caption loading, translation, and active cue.
 - `SingleYouTubePage` owns the app's only WebView and keeps normal YouTube navigation and playback intact.
 - A small JavaScript polling bridge reads the native page video's time and seeks that same video for replay.
@@ -98,11 +99,11 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.3.0` must match the app version and publishes a verified, production-signed APK as the latest official release.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.3.1` must match the app version and publishes a verified, production-signed APK as the latest official release.
 
 ## Privacy
 
-No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads translation models from Google, then performs translation on the device. The app stores the last Browse URL and text-size setting in local app preferences.
+No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads only the language models needed for selected translations, then performs translation on the device. The app stores the last Browse URL, target language, and text-size setting in local app preferences.
 
 ## License
 
