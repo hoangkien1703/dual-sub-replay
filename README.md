@@ -2,6 +2,12 @@
 
 An Android language-learning app for watching YouTube with original and translated subtitles together. Tap any subtitle paragraph to replay that moment.
 
+## App preview
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-preview.jpg" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
+</p>
+
 ## Download
 
 ### [Download the latest official APK](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
