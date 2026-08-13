@@ -78,6 +78,35 @@ class SubtitleUiTest {
     }
 
     @Test
+    fun googleSignInDialogExplainsSecureHandoffAndSupportsBothActions() {
+        var continued = false
+        var dismissed = false
+        composeRule.setContent {
+            DualSubTheme {
+                GoogleSignInDialog(
+                    onContinue = { continued = true },
+                    onDismiss = { dismissed = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Sign in securely").assertIsDisplayed()
+        composeRule.onNodeWithText("Continue securely").performClick()
+        composeRule.runOnIdle { assertTrue(continued) }
+
+        composeRule.setContent {
+            DualSubTheme {
+                GoogleSignInDialog(
+                    onContinue = { continued = true },
+                    onDismiss = { dismissed = true },
+                )
+            }
+        }
+        composeRule.onNodeWithText("Not now").performClick()
+        composeRule.runOnIdle { assertTrue(dismissed) }
+    }
+
+    @Test
     fun activeSubtitleIsIdentifiedAndReplays() {
         var replayed = false
         composeRule.setContent {

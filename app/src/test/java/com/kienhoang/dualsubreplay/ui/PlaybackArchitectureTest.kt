@@ -30,6 +30,34 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun mainFrameNavigationSeparatesGoogleSignInFromYouTubeAndExternalLinks() {
+        assertEquals(
+            MainFrameDestination.YOUTUBE_WEB,
+            classifyMainFrameUrl("https://m.youtube.com/watch?v=dQw4w9WgXcQ"),
+        )
+        assertEquals(
+            MainFrameDestination.GOOGLE_SIGN_IN,
+            classifyMainFrameUrl("https://accounts.google.com/ServiceLogin?service=youtube"),
+        )
+        assertEquals(
+            MainFrameDestination.GOOGLE_SIGN_IN,
+            classifyMainFrameUrl("https://accounts.youtube.com/accounts/SetSID"),
+        )
+        assertEquals(
+            MainFrameDestination.EXTERNAL_WEB,
+            classifyMainFrameUrl("https://example.com/help"),
+        )
+        assertEquals(
+            MainFrameDestination.UNSUPPORTED,
+            classifyMainFrameUrl("javascript:alert(1)"),
+        )
+        assertEquals(
+            MainFrameDestination.UNSUPPORTED,
+            classifyMainFrameUrl("intent://accounts.google.com/#Intent;end"),
+        )
+    }
+
+    @Test
     fun playbackSnapshotParsesWebViewJavascriptResult() {
         val raw = "\"{\\\"url\\\":\\\"https://m.youtube.com/watch?v=dQw4w9WgXcQ\\\",\\\"currentSecond\\\":12.5}\""
 
