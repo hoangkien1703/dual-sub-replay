@@ -55,6 +55,8 @@ Want to test the newest development build? See the [preview release](https://git
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
 
+Google blocks account authentication inside embedded WebViews. If YouTube requests sign-in, DualSub Replay explains this security boundary and continues in the system browser or YouTube app. After choosing a video there, use **Share > DualSub Replay** to return to the dual-subtitle experience. The Google account session remains in the browser or YouTube app and is never copied into DualSub Replay.
+
 ## Important limitations
 
 YouTube's official Data API does not allow ordinary viewers to download captions from arbitrary public videos. To provide automatic captions, this prototype uses YouTube's undocumented Innertube transcript endpoint. It can stop working when YouTube changes its internal API, and its use may be restricted by YouTube's terms. The extraction code is isolated in `YouTubeCaptionProvider` so it can be replaced without rewriting the app.

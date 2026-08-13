@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -64,6 +67,13 @@ private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, B
 
 internal data class BrowseVideoSelection(val videoId: String, val canonicalUrl: String)
 
+internal enum class MainFrameDestination {
+    YOUTUBE_WEB,
+    GOOGLE_SIGN_IN,
+    EXTERNAL_WEB,
+    UNSUPPORTED,
+}
+
 internal fun browseVideoSelection(url: String): BrowseVideoSelection? {
     val videoId = YouTubeUrlParser.extractVideoId(url) ?: return null
     return BrowseVideoSelection(videoId, "https://www.youtube.com/watch?v=$videoId")
@@ -74,6 +84,19 @@ internal fun isYouTubeWebUrl(url: String): Boolean {
     if (uri.scheme !in setOf("http", "https")) return false
     val host = uri.host?.lowercase() ?: return false
     return host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")
+}
+
+internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
+    val uri = runCatching { URI(url) }.getOrNull() ?: return MainFrameDestination.UNSUPPORTED
+    if (uri.scheme !in setOf("http", "https")) return MainFrameDestination.UNSUPPORTED
+    val host = uri.host?.lowercase() ?: return MainFrameDestination.UNSUPPORTED
+    if (host in setOf("accounts.google.com", "myaccount.google.com", "accounts.youtube.com")) {
+        return MainFrameDestination.GOOGLE_SIGN_IN
+    }
+    if (host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")) {
+        return MainFrameDestination.YOUTUBE_WEB
+    }
+    return MainFrameDestination.EXTERNAL_WEB
 }
 
 internal data class WebPlaybackSnapshot(
@@ -183,6 +206,7 @@ internal fun SingleYouTubePage(
     var webViewUnavailable by remember { mutableStateOf(false) }
     var pageError by remember { mutableStateOf<String?>(null) }
     var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
+    var pendingGoogleSignInUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(initialUrl) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
 
@@ -241,14 +265,26 @@ internal fun SingleYouTubePage(
 
             webViewClient = object : WebViewClient() {
                 private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
-                    if (isYouTubeWebUrl(url)) {
-                        reportNavigation(view, url)
-                        return false
+                    return when (classifyMainFrameUrl(url)) {
+                        MainFrameDestination.YOUTUBE_WEB -> {
+                            reportNavigation(view, url)
+                            false
+                        }
+
+                        MainFrameDestination.GOOGLE_SIGN_IN -> {
+                            pendingGoogleSignInUrl = url
+                            true
+                        }
+
+                        MainFrameDestination.EXTERNAL_WEB -> {
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            }
+                            true
+                        }
+
+                        MainFrameDestination.UNSUPPORTED -> true
                     }
-                    runCatching {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    }
-                    return true
                 }
 
                 override fun shouldOverrideUrlLoading(
@@ -422,6 +458,50 @@ internal fun SingleYouTubePage(
             )
         }
     }
+
+    pendingGoogleSignInUrl?.let { signInUrl ->
+        GoogleSignInDialog(
+            onContinue = {
+                pendingGoogleSignInUrl = null
+                runCatching {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(signInUrl)))
+                }.onFailure {
+                    pageError = "No secure browser is available for Google sign-in."
+                }
+            },
+            onDismiss = { pendingGoogleSignInUrl = null },
+        )
+    }
+}
+
+@Composable
+internal fun GoogleSignInDialog(
+    onContinue: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        modifier = Modifier.testTag("google_sign_in_dialog"),
+        onDismissRequest = onDismiss,
+        title = { Text("Sign in securely") },
+        text = {
+            Text(
+                "Google does not allow account sign-in inside embedded browsers. " +
+                    "Continue in your browser or the YouTube app, choose a video, then use " +
+                    "Share > DualSub Replay to watch it here with dual subtitles. " +
+                    "Your account will remain signed in only in the browser or YouTube app.",
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onContinue) {
+                Text("Continue securely")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Not now")
+            }
+        },
+    )
 }
 
 internal fun WebView.destroySafely() {
