@@ -24,11 +24,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -90,7 +87,14 @@ internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
     val uri = runCatching { URI(url) }.getOrNull() ?: return MainFrameDestination.UNSUPPORTED
     if (uri.scheme !in setOf("http", "https")) return MainFrameDestination.UNSUPPORTED
     val host = uri.host?.lowercase() ?: return MainFrameDestination.UNSUPPORTED
-    if (host in setOf("accounts.google.com", "myaccount.google.com", "accounts.youtube.com")) {
+    if (
+        host in setOf(
+            "accounts.google.com",
+            "accounts.youtube.com",
+            "consent.google.com",
+            "myaccount.google.com",
+        )
+    ) {
         return MainFrameDestination.GOOGLE_SIGN_IN
     }
     if (host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")) {
@@ -98,6 +102,10 @@ internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
     }
     return MainFrameDestination.EXTERNAL_WEB
 }
+
+internal fun shouldOpenInsideApp(destination: MainFrameDestination): Boolean =
+    destination == MainFrameDestination.YOUTUBE_WEB ||
+        destination == MainFrameDestination.GOOGLE_SIGN_IN
 
 internal data class WebPlaybackSnapshot(
     val url: String,
@@ -206,15 +214,14 @@ internal fun SingleYouTubePage(
     var webViewUnavailable by remember { mutableStateOf(false) }
     var pageError by remember { mutableStateOf<String?>(null) }
     var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
-    var pendingGoogleSignInUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(initialUrl) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
+        canGoBack = view.canGoBack()
         if (!isYouTubeWebUrl(currentUrl)) return
         lastKnownUrl = currentUrl
-        canGoBack = view.canGoBack()
         currentOnPageChanged(currentUrl)
     }
 
@@ -265,17 +272,14 @@ internal fun SingleYouTubePage(
 
             webViewClient = object : WebViewClient() {
                 private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
-                    return when (classifyMainFrameUrl(url)) {
-                        MainFrameDestination.YOUTUBE_WEB -> {
+                    val destination = classifyMainFrameUrl(url)
+                    if (shouldOpenInsideApp(destination)) {
+                        if (destination == MainFrameDestination.YOUTUBE_WEB) {
                             reportNavigation(view, url)
-                            false
                         }
-
-                        MainFrameDestination.GOOGLE_SIGN_IN -> {
-                            pendingGoogleSignInUrl = url
-                            true
-                        }
-
+                        return false
+                    }
+                    return when (destination) {
                         MainFrameDestination.EXTERNAL_WEB -> {
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -284,6 +288,8 @@ internal fun SingleYouTubePage(
                         }
 
                         MainFrameDestination.UNSUPPORTED -> true
+                        MainFrameDestination.YOUTUBE_WEB,
+                        MainFrameDestination.GOOGLE_SIGN_IN -> false
                     }
                 }
 
@@ -315,6 +321,9 @@ internal fun SingleYouTubePage(
                     rendererRecoveryUsed = false
                     webViewUnavailable = false
                     reportNavigation(view, url)
+                    if (url?.let(::isYouTubeWebUrl) == true) {
+                        CookieManager.getInstance().flush()
+                    }
                 }
 
                 override fun onReceivedError(
@@ -459,49 +468,6 @@ internal fun SingleYouTubePage(
         }
     }
 
-    pendingGoogleSignInUrl?.let { signInUrl ->
-        GoogleSignInDialog(
-            onContinue = {
-                pendingGoogleSignInUrl = null
-                runCatching {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(signInUrl)))
-                }.onFailure {
-                    pageError = "No secure browser is available for Google sign-in."
-                }
-            },
-            onDismiss = { pendingGoogleSignInUrl = null },
-        )
-    }
-}
-
-@Composable
-internal fun GoogleSignInDialog(
-    onContinue: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        modifier = Modifier.testTag("google_sign_in_dialog"),
-        onDismissRequest = onDismiss,
-        title = { Text("Sign in securely") },
-        text = {
-            Text(
-                "Google does not allow account sign-in inside embedded browsers. " +
-                    "Continue in your browser or the YouTube app, choose a video, then use " +
-                    "Share > DualSub Replay to watch it here with dual subtitles. " +
-                    "Your account will remain signed in only in the browser or YouTube app.",
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onContinue) {
-                Text("Continue securely")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Not now")
-            }
-        },
-    )
 }
 
 internal fun WebView.destroySafely() {

@@ -44,6 +44,10 @@ class PlaybackArchitectureTest {
             classifyMainFrameUrl("https://accounts.youtube.com/accounts/SetSID"),
         )
         assertEquals(
+            MainFrameDestination.GOOGLE_SIGN_IN,
+            classifyMainFrameUrl("https://consent.google.com/m?continue=youtube"),
+        )
+        assertEquals(
             MainFrameDestination.EXTERNAL_WEB,
             classifyMainFrameUrl("https://example.com/help"),
         )
@@ -55,6 +59,10 @@ class PlaybackArchitectureTest {
             MainFrameDestination.UNSUPPORTED,
             classifyMainFrameUrl("intent://accounts.google.com/#Intent;end"),
         )
+        assertTrue(shouldOpenInsideApp(MainFrameDestination.YOUTUBE_WEB))
+        assertTrue(shouldOpenInsideApp(MainFrameDestination.GOOGLE_SIGN_IN))
+        assertFalse(shouldOpenInsideApp(MainFrameDestination.EXTERNAL_WEB))
+        assertFalse(shouldOpenInsideApp(MainFrameDestination.UNSUPPORTED))
     }
 
     @Test

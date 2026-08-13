@@ -55,7 +55,7 @@ Want to test the newest development build? See the [preview release](https://git
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
 
-Google blocks account authentication inside embedded WebViews. If YouTube requests sign-in, DualSub Replay explains this security boundary and continues in the system browser or YouTube app. After choosing a video there, use **Share > DualSub Replay** to return to the dual-subtitle experience. The Google account session remains in the browser or YouTube app and is never copied into DualSub Replay.
+The v0.3.2 preview experimentally keeps the Google/YouTube sign-in flow inside the same WebView and persists its WebView cookies. Google officially does not support account authentication in embedded WebViews, so Google may still reject the login with a “browser or app may not be secure” message. No user-agent spoofing or cookie copying is used.
 
 ## Important limitations
 
