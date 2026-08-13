@@ -78,14 +78,13 @@ class SubtitleUiTest {
     }
 
     @Test
-    fun googleSignInDialogExplainsSecureHandoffAndSupportsBothActions() {
+    fun googleSignInDialogExplainsSecureHandoffAndContinues() {
         var continued = false
-        var dismissed = false
         composeRule.setContent {
             DualSubTheme {
                 GoogleSignInDialog(
                     onContinue = { continued = true },
-                    onDismiss = { dismissed = true },
+                    onDismiss = {},
                 )
             }
         }
@@ -93,11 +92,15 @@ class SubtitleUiTest {
         composeRule.onNodeWithText("Sign in securely").assertIsDisplayed()
         composeRule.onNodeWithText("Continue securely").performClick()
         composeRule.runOnIdle { assertTrue(continued) }
+    }
 
+    @Test
+    fun googleSignInDialogCanBeDismissed() {
+        var dismissed = false
         composeRule.setContent {
             DualSubTheme {
                 GoogleSignInDialog(
-                    onContinue = { continued = true },
+                    onContinue = {},
                     onDismiss = { dismissed = true },
                 )
             }
