@@ -60,7 +60,20 @@ import org.json.JSONTokener
 
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
 private const val PLAYBACK_POLL_INTERVAL_MS = 250L
+private const val SIGN_IN_POLL_INTERVAL_MS = 500L
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
+private val authenticatedYouTubeCookieNames = setOf(
+    "APISID",
+    "HSID",
+    "LOGIN_INFO",
+    "SAPISID",
+    "SID",
+    "SSID",
+    "__Secure-1PAPISID",
+    "__Secure-1PSID",
+    "__Secure-3PAPISID",
+    "__Secure-3PSID",
+)
 
 internal data class BrowseVideoSelection(val videoId: String, val canonicalUrl: String)
 
@@ -88,12 +101,9 @@ internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
     if (uri.scheme !in setOf("http", "https")) return MainFrameDestination.UNSUPPORTED
     val host = uri.host?.lowercase() ?: return MainFrameDestination.UNSUPPORTED
     if (
-        host in setOf(
-            "accounts.google.com",
-            "accounts.youtube.com",
-            "consent.google.com",
-            "myaccount.google.com",
-        )
+        host == "accounts.youtube.com" ||
+        host == "google.com" || host.endsWith(".google.com") ||
+        host == "googleusercontent.com" || host.endsWith(".googleusercontent.com")
     ) {
         return MainFrameDestination.GOOGLE_SIGN_IN
     }
@@ -106,6 +116,13 @@ internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
 internal fun shouldOpenInsideApp(destination: MainFrameDestination): Boolean =
     destination == MainFrameDestination.YOUTUBE_WEB ||
         destination == MainFrameDestination.GOOGLE_SIGN_IN
+
+internal fun hasAuthenticatedYouTubeCookie(cookieHeader: String?): Boolean {
+    if (cookieHeader.isNullOrBlank()) return false
+    return cookieHeader.split(';').any { cookie ->
+        cookie.substringBefore('=').trim() in authenticatedYouTubeCookieNames
+    }
+}
 
 internal data class WebPlaybackSnapshot(
     val url: String,
@@ -214,15 +231,22 @@ internal fun SingleYouTubePage(
     var webViewUnavailable by remember { mutableStateOf(false) }
     var pageError by remember { mutableStateOf<String?>(null) }
     var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
+    var googleSignInInProgress by remember { mutableStateOf(false) }
+    var signInReturnUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(initialUrl) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
         canGoBack = view.canGoBack()
-        if (!isYouTubeWebUrl(currentUrl)) return
+        if (classifyMainFrameUrl(currentUrl) != MainFrameDestination.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl
         currentOnPageChanged(currentUrl)
+        if (googleSignInInProgress) {
+            googleSignInInProgress = false
+            signInReturnUrl = null
+            CookieManager.getInstance().flush()
+        }
     }
 
     val webView = remember(webViewGeneration) {
@@ -276,6 +300,9 @@ internal fun SingleYouTubePage(
                     if (shouldOpenInsideApp(destination)) {
                         if (destination == MainFrameDestination.YOUTUBE_WEB) {
                             reportNavigation(view, url)
+                        } else if (!googleSignInInProgress) {
+                            signInReturnUrl = lastKnownUrl
+                            googleSignInInProgress = true
                         }
                         return false
                     }
@@ -396,6 +423,26 @@ internal fun SingleYouTubePage(
         }
     }
 
+    LaunchedEffect(webView, lifecycleStarted, googleSignInInProgress) {
+        if (!lifecycleStarted || !googleSignInInProgress) return@LaunchedEffect
+        val cookieManager = CookieManager.getInstance()
+        while (isActive && googleSignInInProgress) {
+            val signedIn = sequenceOf(
+                "https://www.youtube.com",
+                "https://m.youtube.com",
+            ).any { url -> hasAuthenticatedYouTubeCookie(cookieManager.getCookie(url)) }
+            if (signedIn) {
+                val returnUrl = signInReturnUrl ?: lastKnownUrl
+                googleSignInInProgress = false
+                signInReturnUrl = null
+                cookieManager.flush()
+                webView.loadUrl(returnUrl)
+                return@LaunchedEffect
+            }
+            delay(SIGN_IN_POLL_INTERVAL_MS)
+        }
+    }
+
     DisposableEffect(controller, webView) {
         val token = controller.bind { second ->
             webView.evaluateJavascript(webReplayScript(second), null)
@@ -467,7 +514,6 @@ internal fun SingleYouTubePage(
             )
         }
     }
-
 }
 
 internal fun WebView.destroySafely() {

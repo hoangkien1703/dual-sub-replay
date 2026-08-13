@@ -32,8 +32,8 @@ android {
         applicationId = "com.kienhoang.dualsubreplay"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "0.3.2"
+        versionCode = 14
+        versionName = "0.3.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
