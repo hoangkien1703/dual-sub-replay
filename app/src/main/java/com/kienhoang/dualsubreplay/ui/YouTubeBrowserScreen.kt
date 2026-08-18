@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
@@ -62,6 +63,13 @@ private const val BROWSER_LOG_TAG = "DualSubBrowser"
 private const val PLAYBACK_POLL_INTERVAL_MS = 250L
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
+private val trustedGoogleSignInHosts = setOf(
+    "accounts.google.com",
+    "accounts.googleusercontent.com",
+    "accounts.youtube.com",
+    "consent.google.com",
+    "google.com",
+)
 private val authenticatedYouTubeCookieNames = setOf(
     "APISID",
     "HSID",
@@ -77,11 +85,11 @@ private val authenticatedYouTubeCookieNames = setOf(
 
 internal data class BrowseVideoSelection(val videoId: String, val canonicalUrl: String)
 
-internal enum class MainFrameDestination {
+internal enum class EmbeddedNavigationDecision {
     YOUTUBE_WEB,
     GOOGLE_SIGN_IN,
-    EXTERNAL_WEB,
-    UNSUPPORTED,
+    OPEN_EXTERNAL,
+    BLOCK,
 }
 
 internal fun browseVideoSelection(url: String): BrowseVideoSelection? {
@@ -90,32 +98,48 @@ internal fun browseVideoSelection(url: String): BrowseVideoSelection? {
 }
 
 internal fun isYouTubeWebUrl(url: String): Boolean {
-    val uri = runCatching { URI(url) }.getOrNull() ?: return false
-    if (uri.scheme !in setOf("http", "https")) return false
-    val host = uri.host?.lowercase() ?: return false
-    return host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")
+    return classifyMainFrameUrl(url) == EmbeddedNavigationDecision.YOUTUBE_WEB
 }
 
-internal fun classifyMainFrameUrl(url: String): MainFrameDestination {
-    val uri = runCatching { URI(url) }.getOrNull() ?: return MainFrameDestination.UNSUPPORTED
-    if (uri.scheme !in setOf("http", "https")) return MainFrameDestination.UNSUPPORTED
-    val host = uri.host?.lowercase() ?: return MainFrameDestination.UNSUPPORTED
-    if (
-        host == "accounts.youtube.com" ||
-        host == "google.com" || host.endsWith(".google.com") ||
-        host == "googleusercontent.com" || host.endsWith(".googleusercontent.com")
-    ) {
-        return MainFrameDestination.GOOGLE_SIGN_IN
+internal fun classifyMainFrameUrl(url: String): EmbeddedNavigationDecision {
+    val uri = runCatching { URI(url) }.getOrNull() ?: return EmbeddedNavigationDecision.BLOCK
+    if (!uri.scheme.equals("https", ignoreCase = true)) return EmbeddedNavigationDecision.BLOCK
+    if (uri.rawUserInfo != null || uri.port !in setOf(-1, 443)) {
+        return EmbeddedNavigationDecision.BLOCK
     }
-    if (host == "youtu.be" || host == "youtube.com" || host.endsWith(".youtube.com")) {
-        return MainFrameDestination.YOUTUBE_WEB
+    val host = uri.host?.lowercase()?.removeSuffix(".")
+        ?: return EmbeddedNavigationDecision.BLOCK
+    return when {
+        host in trustedGoogleSignInHosts -> EmbeddedNavigationDecision.GOOGLE_SIGN_IN
+        host == "youtube.com" || host.endsWith(".youtube.com") -> {
+            EmbeddedNavigationDecision.YOUTUBE_WEB
+        }
+        else -> EmbeddedNavigationDecision.OPEN_EXTERNAL
     }
-    return MainFrameDestination.EXTERNAL_WEB
 }
 
-internal fun shouldOpenInsideApp(destination: MainFrameDestination): Boolean =
-    destination == MainFrameDestination.YOUTUBE_WEB ||
-        destination == MainFrameDestination.GOOGLE_SIGN_IN
+internal fun shouldOpenInsideApp(destination: EmbeddedNavigationDecision): Boolean =
+    destination == EmbeddedNavigationDecision.YOUTUBE_WEB ||
+        destination == EmbeddedNavigationDecision.GOOGLE_SIGN_IN
+
+internal fun trustedEmbeddedUrlOrHome(url: String): String =
+    url.takeIf { shouldOpenInsideApp(classifyMainFrameUrl(it)) } ?: YOUTUBE_HOME_URL
+
+private fun openExternalHttpsUrl(context: android.content.Context, url: String) {
+    if (classifyMainFrameUrl(url) != EmbeddedNavigationDecision.OPEN_EXTERNAL) return
+    runCatching {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }.onFailure { error ->
+        Log.w(BROWSER_LOG_TAG, "No activity could open external HTTPS navigation.", error)
+    }
+}
+
+internal fun WebSettings.applyEmbeddedSecurityPolicy() {
+    allowFileAccess = false
+    allowContentAccess = false
+    mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+    safeBrowsingEnabled = true
+}
 
 internal fun hasAuthenticatedYouTubeCookie(cookieHeader: String?): Boolean {
     if (cookieHeader.isNullOrBlank()) return false
@@ -137,6 +161,9 @@ private data class WebFullscreenSession(
 internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
     """
     (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
       const videos = Array.from(document.querySelectorAll('video'));
       const video = videos.find(function(item) { return !item.paused && !item.ended; })
         || videos.find(function(item) { return item.readyState > 0; })
@@ -150,6 +177,9 @@ internal fun webReplayScript(second: Float): String {
     val safeSecond = second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f
     return """
         (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
           const videos = Array.from(document.querySelectorAll('video'));
           const video = videos.find(function(item) { return !item.paused && !item.ended; })
             || videos.find(function(item) { return item.readyState > 0; })
@@ -233,13 +263,13 @@ internal fun SingleYouTubePage(
     var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
     var googleSignInInProgress by remember { mutableStateOf(false) }
     var signInReturnUrl by remember { mutableStateOf<String?>(null) }
-    var lastKnownUrl by remember { mutableStateOf(initialUrl) }
+    var lastKnownUrl by remember { mutableStateOf(trustedEmbeddedUrlOrHome(initialUrl)) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
         canGoBack = view.canGoBack()
-        if (classifyMainFrameUrl(currentUrl) != MainFrameDestination.YOUTUBE_WEB) return
+        if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl
         currentOnPageChanged(currentUrl)
         if (googleSignInInProgress) {
@@ -266,6 +296,7 @@ internal fun SingleYouTubePage(
             )
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+            settings.applyEmbeddedSecurityPolicy()
             settings.mediaPlaybackRequiresUserGesture = true
             settings.setSupportMultipleWindows(false)
             settings.setSupportZoom(false)
@@ -298,7 +329,7 @@ internal fun SingleYouTubePage(
                 private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
                     val destination = classifyMainFrameUrl(url)
                     if (shouldOpenInsideApp(destination)) {
-                        if (destination == MainFrameDestination.YOUTUBE_WEB) {
+                        if (destination == EmbeddedNavigationDecision.YOUTUBE_WEB) {
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress) {
                             signInReturnUrl = lastKnownUrl
@@ -307,16 +338,18 @@ internal fun SingleYouTubePage(
                         return false
                     }
                     return when (destination) {
-                        MainFrameDestination.EXTERNAL_WEB -> {
-                            runCatching {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                            }
+                        EmbeddedNavigationDecision.OPEN_EXTERNAL -> {
+                            view.stopLoading()
+                            openExternalHttpsUrl(context, url)
                             true
                         }
 
-                        MainFrameDestination.UNSUPPORTED -> true
-                        MainFrameDestination.YOUTUBE_WEB,
-                        MainFrameDestination.GOOGLE_SIGN_IN -> false
+                        EmbeddedNavigationDecision.BLOCK -> {
+                            view.stopLoading()
+                            true
+                        }
+                        EmbeddedNavigationDecision.YOUTUBE_WEB,
+                        EmbeddedNavigationDecision.GOOGLE_SIGN_IN -> false
                     }
                 }
 
@@ -340,11 +373,13 @@ internal fun SingleYouTubePage(
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     pageError = null
+                    if (url != null && handleMainFrameUrl(view, url)) return
                     reportNavigation(view, url)
                 }
 
                 override fun onPageFinished(view: WebView, url: String?) {
                     super.onPageFinished(view, url)
+                    if (url != null && handleMainFrameUrl(view, url)) return
                     rendererRecoveryUsed = false
                     webViewUnavailable = false
                     reportNavigation(view, url)
@@ -399,7 +434,7 @@ internal fun SingleYouTubePage(
                     return true
                 }
             }
-            loadUrl(lastKnownUrl)
+            loadUrl(trustedEmbeddedUrlOrHome(lastKnownUrl))
         }
     }
 
@@ -412,6 +447,10 @@ internal fun SingleYouTubePage(
     LaunchedEffect(webView, lifecycleStarted) {
         if (!lifecycleStarted) return@LaunchedEffect
         while (isActive) {
+            if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                delay(PLAYBACK_POLL_INTERVAL_MS)
+                continue
+            }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
                 reportNavigation(webView, snapshot.url)
@@ -445,7 +484,9 @@ internal fun SingleYouTubePage(
 
     DisposableEffect(controller, webView) {
         val token = controller.bind { second ->
-            webView.evaluateJavascript(webReplayScript(second), null)
+            if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                webView.evaluateJavascript(webReplayScript(second), null)
+            }
         }
         onDispose { controller.unbind(token) }
     }

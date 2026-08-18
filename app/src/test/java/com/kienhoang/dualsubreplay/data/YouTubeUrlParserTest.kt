@@ -55,4 +55,17 @@ class YouTubeUrlParserTest {
             assertNull(input, YouTubeUrlParser.extractVideoId(input))
         }
     }
+
+    @Test
+    fun rejectsMalformedPercentEncodingWithoutThrowing() {
+        assertNull(YouTubeUrlParser.extractVideoId("https://youtube.com/watch?v=%ZZ"))
+    }
+
+    @Test
+    fun rejectsOversizedSharedText() {
+        val oversized = "x".repeat(YouTubeUrlParser.MAX_SHARED_TEXT_LENGTH + 1) +
+            " https://youtu.be/$videoId"
+
+        assertNull(YouTubeUrlParser.extractVideoId(oversized))
+    }
 }

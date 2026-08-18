@@ -2,17 +2,37 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebSettings
 import android.widget.FrameLayout
 import androidx.test.platform.app.InstrumentationRegistry
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BrowseWebViewLifecycleTest {
+    @Test
+    fun embeddedWebViewSecurityPolicyDisablesLocalAndMixedContentAccess() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.runOnMainSync {
+            val webView = WebView(instrumentation.targetContext)
+            webView.settings.applyEmbeddedSecurityPolicy()
+
+            assertFalse(webView.settings.allowFileAccess)
+            assertFalse(webView.settings.allowContentAccess)
+            assertEquals(
+                WebSettings.MIXED_CONTENT_NEVER_ALLOW,
+                webView.settings.mixedContentMode,
+            )
+            assertTrue(webView.settings.safeBrowsingEnabled)
+            webView.destroySafely()
+        }
+    }
+
     @Test
     fun destroySafelyDetachesWebViewAndIsIdempotent() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()

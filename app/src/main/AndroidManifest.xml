@@ -12,6 +12,10 @@
         android:theme="@style/Theme.DualSubReplay"
         android:usesCleartextTraffic="false">
 
+        <meta-data
+            android:name="android.webkit.WebView.EnableSafeBrowsing"
+            android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
