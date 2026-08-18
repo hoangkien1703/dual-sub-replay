@@ -55,7 +55,7 @@ Want to test the newest development build? See the [preview release](https://git
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
 
-The v0.3.3 preview experimentally keeps the Google/YouTube sign-in flow inside the same WebView, persists its WebView cookies, and automatically returns to the previous YouTube page after two-step verification completes. Google officially does not support account authentication in embedded WebViews, so Google may still reject the login with a “browser or app may not be secure” message. No user-agent spoofing or cookie copying is used.
+Starting with v0.3.3, the app experimentally keeps the Google/YouTube sign-in flow inside the same WebView, persists its WebView cookies, and automatically returns to the previous YouTube page after two-step verification completes. Google officially does not support account authentication in embedded WebViews, so Google may still reject the login with a “browser or app may not be secure” message. No user-agent spoofing or cookie copying is used.
 
 ## Important limitations
 
