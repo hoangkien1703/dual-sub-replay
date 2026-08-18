@@ -24,7 +24,7 @@ class PlaybackArchitectureTest {
     fun singleWebSurfaceAcceptsOnlyYouTubeMainFrameUrls() {
         assertTrue(isYouTubeWebUrl("https://m.youtube.com/watch?v=dQw4w9WgXcQ"))
         assertTrue(isYouTubeWebUrl("https://www.youtube.com/shorts/dQw4w9WgXcQ"))
-        assertTrue(isYouTubeWebUrl("https://youtu.be/dQw4w9WgXcQ"))
+        assertFalse(isYouTubeWebUrl("https://youtu.be/dQw4w9WgXcQ"))
         assertFalse(isYouTubeWebUrl("https://example.com/watch?v=dQw4w9WgXcQ"))
         assertFalse(isYouTubeWebUrl("javascript:alert(1)"))
     }
@@ -32,41 +32,41 @@ class PlaybackArchitectureTest {
     @Test
     fun mainFrameNavigationSeparatesGoogleSignInFromYouTubeAndExternalLinks() {
         assertEquals(
-            MainFrameDestination.YOUTUBE_WEB,
+            EmbeddedNavigationDecision.YOUTUBE_WEB,
             classifyMainFrameUrl("https://m.youtube.com/watch?v=dQw4w9WgXcQ"),
         )
         assertEquals(
-            MainFrameDestination.GOOGLE_SIGN_IN,
+            EmbeddedNavigationDecision.GOOGLE_SIGN_IN,
             classifyMainFrameUrl("https://accounts.google.com/ServiceLogin?service=youtube"),
         )
         assertEquals(
-            MainFrameDestination.GOOGLE_SIGN_IN,
+            EmbeddedNavigationDecision.GOOGLE_SIGN_IN,
             classifyMainFrameUrl("https://accounts.youtube.com/accounts/SetSID"),
         )
         assertEquals(
-            MainFrameDestination.GOOGLE_SIGN_IN,
+            EmbeddedNavigationDecision.GOOGLE_SIGN_IN,
             classifyMainFrameUrl("https://consent.google.com/m?continue=youtube"),
         )
         assertEquals(
-            MainFrameDestination.GOOGLE_SIGN_IN,
+            EmbeddedNavigationDecision.GOOGLE_SIGN_IN,
             classifyMainFrameUrl("https://accounts.googleusercontent.com/checkcookie"),
         )
         assertEquals(
-            MainFrameDestination.EXTERNAL_WEB,
+            EmbeddedNavigationDecision.OPEN_EXTERNAL,
             classifyMainFrameUrl("https://example.com/help"),
         )
         assertEquals(
-            MainFrameDestination.UNSUPPORTED,
+            EmbeddedNavigationDecision.BLOCK,
             classifyMainFrameUrl("javascript:alert(1)"),
         )
         assertEquals(
-            MainFrameDestination.UNSUPPORTED,
+            EmbeddedNavigationDecision.BLOCK,
             classifyMainFrameUrl("intent://accounts.google.com/#Intent;end"),
         )
-        assertTrue(shouldOpenInsideApp(MainFrameDestination.YOUTUBE_WEB))
-        assertTrue(shouldOpenInsideApp(MainFrameDestination.GOOGLE_SIGN_IN))
-        assertFalse(shouldOpenInsideApp(MainFrameDestination.EXTERNAL_WEB))
-        assertFalse(shouldOpenInsideApp(MainFrameDestination.UNSUPPORTED))
+        assertTrue(shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB))
+        assertTrue(shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN))
+        assertFalse(shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL))
+        assertFalse(shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK))
     }
 
     @Test
@@ -90,6 +90,14 @@ class PlaybackArchitectureTest {
         )
         assertNull(parseWebPlaybackSnapshot("null"))
         assertNull(parseWebPlaybackSnapshot("not-json"))
+    }
+
+    @Test
+    fun playbackScriptsRecheckTheExecutingYouTubeOrigin() {
+        assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("window.location.protocol !== 'https:'"))
+        assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("host.endsWith('.youtube.com')"))
+        assertTrue(webReplayScript(1f).contains("window.location.protocol !== 'https:'"))
+        assertTrue(webReplayScript(1f).contains("host.endsWith('.youtube.com')"))
     }
 
     @Test

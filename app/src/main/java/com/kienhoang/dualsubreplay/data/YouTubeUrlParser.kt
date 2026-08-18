@@ -5,10 +5,12 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
 object YouTubeUrlParser {
+    internal const val MAX_SHARED_TEXT_LENGTH = 8_192
     private val videoIdPattern = Regex("^[A-Za-z0-9_-]{11}$")
     private val urlPattern = Regex("https?://[^\\s]+", RegexOption.IGNORE_CASE)
 
     fun extractVideoId(input: String): String? {
+        if (input.length > MAX_SHARED_TEXT_LENGTH) return null
         val candidate = input.trim()
         if (videoIdPattern.matches(candidate)) return candidate
 
@@ -24,10 +26,11 @@ object YouTubeUrlParser {
         val id = when {
             host == "youtu.be" -> pathParts.firstOrNull()
             host == "youtube.com" || host == "m.youtube.com" || host.endsWith(".youtube.com") -> {
+                val parameters = queryParameters(uri.rawQuery) ?: return null
                 when (pathParts.firstOrNull()) {
-                    "watch" -> queryParameters(uri.rawQuery)["v"]
+                    "watch" -> parameters["v"]
                     "shorts", "embed", "live" -> pathParts.getOrNull(1)
-                    else -> queryParameters(uri.rawQuery)["v"]
+                    else -> parameters["v"]
                 }
             }
             else -> null
@@ -35,15 +38,19 @@ object YouTubeUrlParser {
         return id?.takeIf(videoIdPattern::matches)
     }
 
-    private fun queryParameters(query: String?): Map<String, String> = query.orEmpty()
-        .split('&')
-        .mapNotNull { pair ->
+    private fun queryParameters(query: String?): Map<String, String>? {
+        val result = mutableMapOf<String, String>()
+        query.orEmpty().split('&').forEach { pair ->
             val parts = pair.split('=', limit = 2)
-            if (parts.size != 2) null
-            else decode(parts[0]) to decode(parts[1])
+            if (parts.size != 2) return@forEach
+            val key = decode(parts[0]) ?: return null
+            val value = decode(parts[1]) ?: return null
+            result[key] = value
         }
-        .toMap()
+        return result
+    }
 
-    private fun decode(value: String): String =
+    private fun decode(value: String): String? = runCatching {
         URLDecoder.decode(value, StandardCharsets.UTF_8.name())
+    }.getOrNull()
 }

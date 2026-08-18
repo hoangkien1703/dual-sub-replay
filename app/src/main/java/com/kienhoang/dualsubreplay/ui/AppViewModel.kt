@@ -76,7 +76,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _state = MutableStateFlow(
         DualSubUiState(
             browserUrl = preferences.getString("last_browser_url", YOUTUBE_HOME_URL)
-                ?.takeIf { it.startsWith("https://") }
+                ?.let(::trustedEmbeddedUrlOrHome)
                 ?: YOUTUBE_HOME_URL,
             fontScale = preferences.getFloat("font_scale", 1f),
             targetLanguage = preferences.getString("target_language", "vi")
@@ -100,7 +100,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onYouTubePageChanged(url: String) {
-        if (!url.startsWith("https://") && !url.startsWith("http://")) return
+        if (classifyMainFrameUrl(url) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         if (url != _state.value.browserUrl) {
             preferences.edit().putString("last_browser_url", url).apply()
             _state.update { it.copy(browserUrl = url) }
