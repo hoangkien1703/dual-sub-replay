@@ -1,0 +1,131 @@
+name: Publish new main version
+
+on:
+  workflow_run:
+    workflows: ["Android build and releases"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-new-version:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out verified main commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
+      - name: Determine whether this version is new
+        id: release_meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(sed -n 's/.*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
+          if [ -z "$version" ]; then
+            echo "Could not determine app version" >&2
+            exit 1
+          fi
+          tag="v${version}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${tag}" >/dev/null 2>&1; then
+            echo "release_needed=false" >> "$GITHUB_OUTPUT"
+            echo "$tag already exists; no official release is needed."
+          else
+            echo "release_needed=true" >> "$GITHUB_OUTPUT"
+            echo "$tag is new; an official release will be published."
+          fi
+
+      - name: Set up Java 17
+        if: steps.release_meta.outputs.release_needed == 'true'
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        if: steps.release_meta.outputs.release_needed == 'true'
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+
+      - name: Install Android build SDK
+        if: steps.release_meta.outputs.release_needed == 'true'
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle cache
+        if: steps.release_meta.outputs.release_needed == 'true'
+        uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+
+      - name: Restore production signing key
+        if: steps.release_meta.outputs.release_needed == 'true'
+        env:
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$ANDROID_RELEASE_KEYSTORE_BASE64" ]; then
+            echo "ANDROID_RELEASE_KEYSTORE_BASE64 is not configured" >&2
+            exit 1
+          fi
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/dual-sub-replay-release.jks"
+          chmod 600 "$RUNNER_TEMP/dual-sub-replay-release.jks"
+
+      - name: Build production release APK
+        if: steps.release_meta.outputs.release_needed == 'true'
+        env:
+          ANDROID_RELEASE_STORE_FILE: ${{ runner.temp }}/dual-sub-replay-release.jks
+          ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: bash ./gradlew assembleRelease -PrequireReleaseSigning=true --stacktrace
+
+      - name: Verify and package official APK
+        if: steps.release_meta.outputs.release_needed == 'true'
+        run: |
+          source_apk="app/build/outputs/apk/release/app-release.apk"
+          release_apk="release/DualSub-Replay.apk"
+          mkdir -p release
+          cp "$source_apk" "$release_apk"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$release_apk" | tee release/signing-report.txt
+          if grep -q 'CN=Android Debug' release/signing-report.txt; then
+            echo "Official APK was signed with the Android debug certificate" >&2
+            exit 1
+          fi
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$release_apk" | head -n 1
+          sha256sum "$release_apk" | sed 's#  release/#  #' > release/DualSub-Replay.apk.sha256
+
+      - name: Publish official GitHub release
+        if: steps.release_meta.outputs.release_needed == 'true'
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          target_commitish: ${{ github.event.workflow_run.head_sha }}
+          name: DualSub Replay ${{ steps.release_meta.outputs.tag }}
+          prerelease: false
+          make_latest: true
+          fail_on_unmatched_files: true
+          body: |
+            ## Download and install
+
+            Download **DualSub-Replay.apk** below. On Android 8.0 or newer, open the downloaded file and allow your browser or file manager to install unknown apps if Android asks.
+
+            **Preview users:** uninstall the preview build once before installing this official release because the official app uses a production signing key.
+
+            ## v0.3.4 highlights
+
+            - Harden WebView navigation and origin validation.
+            - Safely reject malformed or oversized shared input.
+            - Validate caption origins and cap remote responses at 8 MiB.
+            - Harden GitHub Actions permissions and pin third-party actions to immutable commits.
+            - Preserve normal YouTube browsing, sign-in verification flow, captions, fullscreen, and subtitle replay.
+
+            The `.sha256` file can be used to verify the APK download.
+          files: |
+            release/DualSub-Replay.apk
+            release/DualSub-Replay.apk.sha256
