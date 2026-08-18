@@ -32,8 +32,8 @@ android {
         applicationId = "com.kienhoang.dualsubreplay"
         minSdk = 26
         targetSdk = 36
-        versionCode = 14
-        versionName = "0.3.3"
+        versionCode = 15
+        versionName = "0.3.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -104,6 +104,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.foundation:foundation")
@@ -119,6 +120,4 @@ dependencies {
     testImplementation("org.json:json:20240303")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
