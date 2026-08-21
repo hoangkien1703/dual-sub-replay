@@ -12,8 +12,11 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
+import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,6 +59,53 @@ internal fun activeSubtitleIndex(segments: List<SubtitleSegment>, timeMs: Long):
     return candidate.takeIf { it >= 0 && timeMs < segments[it].endMs } ?: -1
 }
 
+internal fun nearestSegmentIndex(segments: List<SubtitleSegment>, timeMs: Long): Int {
+    var low = 0
+    var high = segments.lastIndex
+    var candidate = -1
+    while (low <= high) {
+        val middle = (low + high).ushr(1)
+        if (segments[middle].startMs <= timeMs) {
+            candidate = middle
+            low = middle + 1
+        } else {
+            high = middle - 1
+        }
+    }
+    return candidate.coerceAtLeast(0)
+}
+
+internal const val TRANSLATION_PUBLISH_BATCH = 8
+
+/**
+ * Picks up to [batchSize] pending indices nearest to [positionIndex] by walking
+ * outward from the insertion point, so translation always follows the current
+ * playback position even after seeks.
+ */
+internal fun nearestUntranslatedBatch(
+    pendingIndices: List<Int>,
+    positionIndex: Int,
+    batchSize: Int = TRANSLATION_PUBLISH_BATCH,
+): List<Int> {
+    if (pendingIndices.isEmpty() || batchSize <= 0) return emptyList()
+    var up = pendingIndices.binarySearch(positionIndex)
+    if (up < 0) up = -(up + 1)
+    var down = up - 1
+    val result = ArrayList<Int>(minOf(batchSize, pendingIndices.size))
+    while (result.size < batchSize && (up < pendingIndices.size || down >= 0)) {
+        val upIndex = if (up < pendingIndices.size) pendingIndices[up] else Int.MAX_VALUE
+        val downIndex = if (down >= 0) pendingIndices[down] else Int.MAX_VALUE
+        if (abs(upIndex - positionIndex) <= abs(downIndex - positionIndex)) {
+            result.add(upIndex)
+            up += 1
+        } else {
+            result.add(downIndex)
+            down -= 1
+        }
+    }
+    return result
+}
+
 internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
 
 internal fun preferredCaptionLanguages(sourcePreference: String): List<String> =
@@ -72,6 +122,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val translator = OnDeviceTranslator()
     private var loadingJob: Job? = null
     private var loadGeneration = 0L
+    private var latestPlaybackSecondMs = 0L
 
     private val _state = MutableStateFlow(
         DualSubUiState(
@@ -118,6 +169,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val current = _state.value
         if (current.activeVideoId != videoId || !second.isFinite()) return
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
+        latestPlaybackSecondMs = timeMs
         val index = activeSubtitleIndex(current.segments, timeMs)
         if (index != current.currentIndex) _state.update { it.copy(currentIndex = index) }
     }
@@ -171,6 +223,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         if (_state.value.activeVideoId == null) return
         loadGeneration += 1
         loadingJob?.cancel()
+        latestPlaybackSecondMs = 0L
         _state.update {
             it.copy(
                 activeVideoId = null,
@@ -190,6 +243,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadVideo(videoId: String, showPanel: Boolean) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
+        latestPlaybackSecondMs = 0L
         _state.update {
             it.copy(
                 activeVideoId = videoId,
@@ -298,20 +352,42 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         targetLanguage: String,
         segments: List<SubtitleSegment>,
     ) {
-        translator.translateAll(
-            sourceLanguageCode = sourceLanguage,
-            targetLanguageCode = targetLanguage,
-            texts = segments.map(SubtitleSegment::originalText),
-        ) { index, translatedText ->
+        val working = segments.toMutableList()
+        val pending = segments.indices
+            .filter { working[it].translatedText == null }
+            .toMutableList()
+        val total = pending.size
+        var completed = 0
+
+        suspend fun publishProgress() {
+            val snapshot = working.toList()
+            val completedSoFar = completed
             _state.update { current ->
                 if (!isCurrentLoad(current, videoId, generation)) return@update current
                 current.copy(
-                    segments = current.segments.mapIndexed { itemIndex, segment ->
-                        if (itemIndex == index) segment.copy(translatedText = translatedText) else segment
-                    },
-                    statusMessage = "Translating ${index + 1} of ${segments.size}…",
+                    segments = snapshot,
+                    statusMessage = "Translating $completedSoFar of $total…",
                 )
             }
+        }
+
+        while (pending.isNotEmpty()) {
+            currentCoroutineContext().ensureActive()
+            val batch = nearestUntranslatedBatch(
+                pendingIndices = pending,
+                positionIndex = nearestSegmentIndex(segments, latestPlaybackSecondMs),
+            )
+            translator.translateAll(
+                sourceLanguageCode = sourceLanguage,
+                targetLanguageCode = targetLanguage,
+                texts = batch.map { segments[it].originalText },
+            ) { batchOffset, translatedText ->
+                val index = batch[batchOffset]
+                working[index] = working[index].copy(translatedText = translatedText)
+                completed += 1
+            }
+            pending.removeAll(batch.toSet())
+            publishProgress()
         }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current

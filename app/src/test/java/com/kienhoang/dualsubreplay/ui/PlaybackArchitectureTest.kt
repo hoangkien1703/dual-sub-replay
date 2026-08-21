@@ -223,6 +223,15 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun activeSubtitleFollowsRewindsAndSkippedSeeksImmediately() {
+        assertTrue(shouldFollowPlaybackSeek(previousIndex = 12, currentIndex = 5))
+        assertTrue(shouldFollowPlaybackSeek(previousIndex = 4, currentIndex = 40))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = 4, currentIndex = 5))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = -1, currentIndex = 3))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = 3, currentIndex = -1))
+    }
+
+    @Test
     fun subtitlePanelHidesAfterEnoughDistanceOrAFastDownwardFling() {
         assertTrue(shouldHideSubtitlePanel(200f, 1_000f, 0f, 72f))
         assertTrue(shouldHideSubtitlePanel(20f, 1_000f, 1_600f, 72f))

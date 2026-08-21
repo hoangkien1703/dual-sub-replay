@@ -35,8 +35,8 @@ class OnDeviceTranslator {
         )
         try {
             translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).awaitResult()
-            texts.forEachIndexed { index, text ->
-                onTranslation(index, translator.translate(text).awaitResult())
+            texts.indices.forEach { index ->
+                onTranslation(index, translator.translate(texts[index]).awaitResult())
             }
         } finally {
             translator.close()
