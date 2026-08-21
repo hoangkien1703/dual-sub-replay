@@ -117,6 +117,25 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun activeSignInKeepsUnknownHostsEmbeddedInsteadOfChrome() {
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, googleSignInInProgress = true),
+        )
+        assertFalse(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, googleSignInInProgress = false),
+        )
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB, googleSignInInProgress = false),
+        )
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN, googleSignInInProgress = false),
+        )
+        assertFalse(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK, googleSignInInProgress = true),
+        )
+    }
+
+    @Test
     fun playbackSnapshotParsesWebViewJavascriptResult() {
         val raw = "\"{\\\"url\\\":\\\"https://m.youtube.com/watch?v=dQw4w9WgXcQ\\\",\\\"currentSecond\\\":12.5}\""
 

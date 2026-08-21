@@ -133,6 +133,12 @@ internal fun shouldOpenInsideApp(destination: EmbeddedNavigationDecision): Boole
     destination == EmbeddedNavigationDecision.YOUTUBE_WEB ||
         destination == EmbeddedNavigationDecision.GOOGLE_SIGN_IN
 
+internal fun shouldOpenInsideApp(
+    destination: EmbeddedNavigationDecision,
+    googleSignInInProgress: Boolean,
+): Boolean = shouldOpenInsideApp(destination) ||
+    (googleSignInInProgress && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL)
+
 internal fun trustedEmbeddedUrlOrHome(url: String): String =
     url.takeIf { shouldOpenInsideApp(classifyMainFrameUrl(it)) } ?: YOUTUBE_HOME_URL
 
@@ -351,7 +357,13 @@ internal fun SingleYouTubePage(
             webViewClient = object : WebViewClient() {
                 private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
                     val destination = classifyMainFrameUrl(url)
-                    if (shouldOpenInsideApp(destination)) {
+                    if (BuildConfig.DEBUG) {
+                        val sanitized = runCatching { URI(url) }.getOrNull()
+                            ?.let { "${it.scheme}://${it.host}${it.path}" }
+                            ?: "unparsed"
+                        Log.d(BROWSER_LOG_TAG, "Main frame $destination: $sanitized")
+                    }
+                    if (shouldOpenInsideApp(destination, googleSignInInProgress)) {
                         if (destination == EmbeddedNavigationDecision.YOUTUBE_WEB) {
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress && !isSignOutNavigation(url)) {
