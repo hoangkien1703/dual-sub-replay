@@ -117,13 +117,11 @@ jobs:
 
             **Preview users:** uninstall the preview build once before installing this official release because the official app uses a production signing key.
 
-            ## v0.3.4 highlights
+            ## v0.4.0 highlights
 
-            - Harden WebView navigation and origin validation.
-            - Safely reject malformed or oversized shared input.
-            - Validate caption origins and cap remote responses at 8 MiB.
-            - Harden GitHub Actions permissions and pin third-party actions to immutable commits.
-            - Preserve normal YouTube browsing, sign-in verification flow, captions, fullscreen, and subtitle replay.
+            - Translate subtitles in batches nearest to the current playback position so translations appear where you are watching first.
+            - Subtitle timeline now follows playback jumps immediately, with instant scrolling for large seeks.
+            - Auto-scroll defers to manual scrolling and animates smoothly for nearby paragraphs.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
