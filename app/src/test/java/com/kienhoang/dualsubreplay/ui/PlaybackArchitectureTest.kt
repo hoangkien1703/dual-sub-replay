@@ -52,6 +52,10 @@ class PlaybackArchitectureTest {
             classifyMainFrameUrl("https://accounts.googleusercontent.com/checkcookie"),
         )
         assertEquals(
+            EmbeddedNavigationDecision.GOOGLE_SIGN_IN,
+            classifyMainFrameUrl("https://myaccount.google.com/signinoptions/security-checkup"),
+        )
+        assertEquals(
             EmbeddedNavigationDecision.OPEN_EXTERNAL,
             classifyMainFrameUrl("https://example.com/help"),
         )
@@ -75,6 +79,60 @@ class PlaybackArchitectureTest {
         assertFalse(hasAuthenticatedYouTubeCookie("PREF=abc; YSC=def; VISITOR_INFO1_LIVE=ghi"))
         assertTrue(hasAuthenticatedYouTubeCookie("PREF=abc; LOGIN_INFO=account-session"))
         assertTrue(hasAuthenticatedYouTubeCookie("__Secure-3PSID=secure-session; YSC=def"))
+    }
+
+    @Test
+    fun signOutNavigationsAreDistinguishedFromSignInPages() {
+        assertTrue(
+            isSignOutNavigation(
+                "https://accounts.google.com/Logout?continue=https%3A%2F%2Fwww.youtube.com%2F",
+            ),
+        )
+        assertTrue(
+            isSignOutNavigation(
+                "https://accounts.google.com/SignOutOptions?hl=en&continue=https://www.youtube.com/",
+            ),
+        )
+        assertTrue(isSignOutNavigation("https://accounts.youtube.com/Logout"))
+        assertFalse(isSignOutNavigation("https://accounts.google.com/ServiceLogin?service=youtube"))
+        assertFalse(isSignOutNavigation("https://www.youtube.com/logout"))
+        assertFalse(isSignOutNavigation("http://accounts.google.com/Logout"))
+        assertFalse(isSignOutNavigation("not a url"))
+    }
+
+    @Test
+    fun autoReturnOnlyFiresWhenSessionCookiesAppearFreshly() {
+        assertFalse(
+            shouldAutoReturnAfterSignIn(startedWithSessionCookies = false, sessionCookiesPresent = false),
+        )
+        assertTrue(
+            shouldAutoReturnAfterSignIn(startedWithSessionCookies = false, sessionCookiesPresent = true),
+        )
+        assertFalse(
+            shouldAutoReturnAfterSignIn(startedWithSessionCookies = true, sessionCookiesPresent = false),
+        )
+        assertFalse(
+            shouldAutoReturnAfterSignIn(startedWithSessionCookies = true, sessionCookiesPresent = true),
+        )
+    }
+
+    @Test
+    fun activeSignInKeepsUnknownHostsEmbeddedInsteadOfChrome() {
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = true),
+        )
+        assertFalse(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = false),
+        )
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB, signInEmbeddingActive = false),
+        )
+        assertTrue(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN, signInEmbeddingActive = false),
+        )
+        assertFalse(
+            shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK, signInEmbeddingActive = true),
+        )
     }
 
     @Test
@@ -162,6 +220,15 @@ class PlaybackArchitectureTest {
         assertTrue(shouldPromoteActiveSubtitle(12, listOf(4, 5, 6, 7)))
         assertFalse(shouldPromoteActiveSubtitle(-1, listOf(4, 5, 6, 7)))
         assertFalse(shouldPromoteActiveSubtitle(7, emptyList()))
+    }
+
+    @Test
+    fun activeSubtitleFollowsRewindsAndSkippedSeeksImmediately() {
+        assertTrue(shouldFollowPlaybackSeek(previousIndex = 12, currentIndex = 5))
+        assertTrue(shouldFollowPlaybackSeek(previousIndex = 4, currentIndex = 40))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = 4, currentIndex = 5))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = -1, currentIndex = 3))
+        assertFalse(shouldFollowPlaybackSeek(previousIndex = 3, currentIndex = -1))
     }
 
     @Test

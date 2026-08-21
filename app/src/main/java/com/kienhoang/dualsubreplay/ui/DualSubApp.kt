@@ -55,6 +55,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -81,6 +82,7 @@ import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -309,16 +311,31 @@ internal fun shouldHideSubtitlePanel(
 @Composable
 private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
     val listState = rememberLazyListState()
+    val previousIndex = remember { mutableIntStateOf(-1) }
     LaunchedEffect(state.currentIndex) {
+        val target = state.currentIndex
+        if (target < 0) return@LaunchedEffect
+        val lastIndex = previousIndex.intValue
+        previousIndex.intValue = target
+        if (listState.isScrollInProgress) {
+            snapshotFlow { listState.isScrollInProgress }.first { !it }
+        }
+        if (listState.isScrollInProgress) return@LaunchedEffect
         val visibleItemIndices = snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.map { it.index }
         }.first { it.isNotEmpty() }
 
-        if (
-            !listState.isScrollInProgress &&
-            shouldPromoteActiveSubtitle(state.currentIndex, visibleItemIndices)
-        ) {
-            listState.animateScrollToItem(state.currentIndex)
+        when {
+            shouldFollowPlaybackSeek(lastIndex, target) -> {
+                if (abs(target - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
+                    listState.scrollToItem(target)
+                } else {
+                    listState.animateScrollToItem(target)
+                }
+            }
+            shouldPromoteActiveSubtitle(target, visibleItemIndices) -> {
+                listState.animateScrollToItem(target)
+            }
         }
     }
 
@@ -350,6 +367,18 @@ internal fun shouldPromoteActiveSubtitle(
 ): Boolean {
     if (currentIndex < 0 || visibleItemIndices.isEmpty()) return false
     return currentIndex >= visibleItemIndices.last()
+}
+
+internal const val SUBTITLE_INSTANT_SCROLL_DISTANCE = 40
+
+/**
+ * Detects a playback jump (seek bar drag, rewind, replay tap) so the timeline
+ * follows the active paragraph immediately instead of waiting for it to reach
+ * the bottom of the panel.
+ */
+internal fun shouldFollowPlaybackSeek(previousIndex: Int, currentIndex: Int): Boolean {
+    if (previousIndex < 0 || currentIndex < 0) return false
+    return currentIndex < previousIndex || currentIndex - previousIndex > 1
 }
 
 @Composable
