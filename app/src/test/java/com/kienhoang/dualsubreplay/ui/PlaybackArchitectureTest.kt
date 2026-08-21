@@ -119,19 +119,19 @@ class PlaybackArchitectureTest {
     @Test
     fun activeSignInKeepsUnknownHostsEmbeddedInsteadOfChrome() {
         assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, googleSignInInProgress = true),
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = true),
         )
         assertFalse(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, googleSignInInProgress = false),
+            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = false),
         )
         assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB, googleSignInInProgress = false),
+            shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB, signInEmbeddingActive = false),
         )
         assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN, googleSignInInProgress = false),
+            shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN, signInEmbeddingActive = false),
         )
         assertFalse(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK, googleSignInInProgress = true),
+            shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK, signInEmbeddingActive = true),
         )
     }
 

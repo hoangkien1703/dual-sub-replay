@@ -135,9 +135,9 @@ internal fun shouldOpenInsideApp(destination: EmbeddedNavigationDecision): Boole
 
 internal fun shouldOpenInsideApp(
     destination: EmbeddedNavigationDecision,
-    googleSignInInProgress: Boolean,
+    signInEmbeddingActive: Boolean,
 ): Boolean = shouldOpenInsideApp(destination) ||
-    (googleSignInInProgress && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL)
+    (signInEmbeddingActive && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL)
 
 internal fun trustedEmbeddedUrlOrHome(url: String): String =
     url.takeIf { shouldOpenInsideApp(classifyMainFrameUrl(it)) } ?: YOUTUBE_HOME_URL
@@ -290,6 +290,7 @@ internal fun SingleYouTubePage(
     var fullscreenSession by remember { mutableStateOf<WebFullscreenSession?>(null) }
     var googleSignInInProgress by remember { mutableStateOf(false) }
     var signInStartedWithCookies by remember { mutableStateOf(false) }
+    var signInEmbedUntilYouTubeLands by remember { mutableStateOf(false) }
     var signInReturnUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(trustedEmbeddedUrlOrHome(initialUrl)) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
@@ -300,8 +301,9 @@ internal fun SingleYouTubePage(
         if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl
         currentOnPageChanged(currentUrl)
-        if (googleSignInInProgress) {
+        if (googleSignInInProgress || signInEmbedUntilYouTubeLands) {
             googleSignInInProgress = false
+            signInEmbedUntilYouTubeLands = false
             signInStartedWithCookies = false
             signInReturnUrl = null
             CookieManager.getInstance().flush()
@@ -363,7 +365,8 @@ internal fun SingleYouTubePage(
                             ?: "unparsed"
                         Log.d(BROWSER_LOG_TAG, "Main frame $destination: $sanitized")
                     }
-                    if (shouldOpenInsideApp(destination, googleSignInInProgress)) {
+                    val signInEmbeddingActive = googleSignInInProgress || signInEmbedUntilYouTubeLands
+                    if (shouldOpenInsideApp(destination, signInEmbeddingActive)) {
                         if (destination == EmbeddedNavigationDecision.YOUTUBE_WEB) {
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress && !isSignOutNavigation(url)) {
@@ -510,6 +513,7 @@ internal fun SingleYouTubePage(
                 googleSignInInProgress = false
                 signInStartedWithCookies = false
                 signInReturnUrl = null
+                signInEmbedUntilYouTubeLands = true
                 cookieManager.flush()
                 webView.loadUrl(returnUrl)
                 return@LaunchedEffect
