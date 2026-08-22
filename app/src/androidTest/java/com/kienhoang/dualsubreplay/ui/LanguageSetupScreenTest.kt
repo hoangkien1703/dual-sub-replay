@@ -34,7 +34,7 @@ class LanguageSetupScreenTest {
         composeRule.onNodeWithTag("onboarding_continue").assertIsNotEnabled()
 
         composeRule.onNodeWithTag("native_language_picker").performClick()
-        composeRule.onNodeWithText("Your native language").assertIsDisplayed()
+        composeRule.onNodeWithTag("language_search").performTextInput("Viet")
         composeRule.onNodeWithTag("language_option_native_vi").performClick()
         composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
         composeRule.onNodeWithTag("onboarding_continue").assertIsNotEnabled()
@@ -43,9 +43,8 @@ class LanguageSetupScreenTest {
         composeRule.onNodeWithTag("language_search").performTextInput("Japanese")
         composeRule.onNodeWithTag("language_option_learning_ja").performClick()
         composeRule.onNodeWithText("Japanese").assertIsDisplayed()
-        composeRule.onNodeWithTag("onboarding_continue").assertIsEnabled()
 
-        composeRule.onNodeWithTag("onboarding_continue").performClick()
+        composeRule.onNodeWithTag("onboarding_continue").assertIsEnabled().performClick()
         composeRule.runOnIdle { assertEquals("vi" to "ja", completed) }
     }
 
@@ -78,9 +77,12 @@ class LanguageSetupScreenTest {
         }
 
         composeRule.onNodeWithTag("native_language_picker").performClick()
+        composeRule.onNodeWithTag("language_search").performTextInput("Engl")
         composeRule.onNodeWithTag("language_option_native_en").performClick()
         composeRule.onNodeWithText("English").assertIsDisplayed()
+
         composeRule.onNodeWithTag("native_language_picker").performClick()
+        composeRule.onNodeWithTag("language_search").performTextInput("Jap")
         composeRule.onNodeWithTag("language_option_native_ja").performClick()
         composeRule.onNodeWithText("Japanese").assertIsDisplayed()
     }
