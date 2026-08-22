@@ -32,6 +32,7 @@ data class DualSubUiState(
     val subtitlePanelVisible: Boolean = true,
     val sourcePreference: String = "auto",
     val targetLanguage: String = "vi",
+    val onboardingCompleted: Boolean = false,
     val availableSourceLanguages: List<CaptionLanguage> = emptyList(),
     val resolvedSourceLanguage: String? = null,
     val generatedCaptions: Boolean = false,
@@ -116,6 +117,27 @@ internal fun resolvedSourcePreference(requested: String, resolved: String): Stri
         it == "auto" || TranslationLanguages.normalize(it) == TranslationLanguages.normalize(resolved)
     } ?: "auto"
 
+internal fun storedSourcePreference(raw: String?): String =
+    raw?.takeIf { it != "auto" }
+        ?.let(::normalizeSupportedLanguage)
+        ?: "auto"
+
+private fun normalizeSupportedLanguage(code: String): String? {
+    val normalized = TranslationLanguages.normalize(code)
+    return normalized.takeIf(TranslationLanguages::isSupported)
+}
+
+internal fun normalizedOnboardingLanguages(
+    nativeLanguage: String,
+    learningLanguage: String,
+): Pair<String, String>? {
+    val native = TranslationLanguages.normalize(nativeLanguage).takeIf(TranslationLanguages::isSupported)
+        ?: return null
+    val learning = TranslationLanguages.normalize(learningLanguage).takeIf(TranslationLanguages::isSupported)
+        ?: return null
+    return native to learning
+}
+
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
@@ -130,9 +152,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 ?.let(::trustedEmbeddedUrlOrHome)
                 ?: YOUTUBE_HOME_URL,
             fontScale = preferences.getFloat("font_scale", 1f),
+            sourcePreference = storedSourcePreference(
+                preferences.getString("preferred_caption_language", "auto"),
+            ),
             targetLanguage = preferences.getString("target_language", "vi")
                 ?.takeIf(TranslationLanguages::isSupported)
                 ?: "vi",
+            onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -184,6 +210,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         ) return
         if (current.sourcePreference == normalized) return
+        preferences.edit().putString("preferred_caption_language", normalized).apply()
         _state.update { it.copy(sourcePreference = normalized) }
         val videoId = _state.value.activeVideoId ?: return
         loadVideo(videoId, showPanel = true)
@@ -197,6 +224,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         if (_state.value.activeVideoId != null && _state.value.segments.isNotEmpty()) {
             retranslateCurrentSegments()
         }
+    }
+
+    fun completeOnboarding(nativeLanguage: String, learningLanguage: String) {
+        val languages = normalizedOnboardingLanguages(nativeLanguage, learningLanguage) ?: return
+        val (native, learning) = languages
+        preferences.edit().putString("preferred_caption_language", learning).apply()
+        preferences.edit().putString("target_language", native).apply()
+        _state.update { it.copy(sourcePreference = learning, targetLanguage = native) }
+        if (_state.value.activeVideoId != null && _state.value.segments.isNotEmpty()) {
+            retranslateCurrentSegments()
+        }
+        finishOnboarding()
+    }
+
+    fun skipOnboarding() = finishOnboarding()
+
+    private fun finishOnboarding() {
+        preferences.edit().putBoolean("onboarding_completed", true).apply()
+        _state.update { it.copy(onboardingCompleted = true) }
     }
 
     fun setFontScale(scale: Float) {

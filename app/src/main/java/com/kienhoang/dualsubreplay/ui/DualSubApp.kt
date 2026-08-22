@@ -91,17 +91,24 @@ fun DualSubApp(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     DualSubTheme {
-        DualSubExperience(
-            state = state,
-            onPageChanged = viewModel::onYouTubePageChanged,
-            onPlaybackSecond = viewModel::onWebPlaybackSecond,
-            onShowSubtitles = viewModel::showSubtitlePanel,
-            onHideSubtitles = viewModel::hideSubtitlePanel,
-            onRetry = viewModel::retryCaptions,
-            onSourceChange = viewModel::setSourcePreference,
-            onTargetChange = viewModel::setTargetLanguage,
-            onFontScaleChange = viewModel::setFontScale,
-        )
+        if (!state.onboardingCompleted) {
+            LanguageSetupScreen(
+                onComplete = viewModel::completeOnboarding,
+                onSkip = viewModel::skipOnboarding,
+            )
+        } else {
+            DualSubExperience(
+                state = state,
+                onPageChanged = viewModel::onYouTubePageChanged,
+                onPlaybackSecond = viewModel::onWebPlaybackSecond,
+                onShowSubtitles = viewModel::showSubtitlePanel,
+                onHideSubtitles = viewModel::hideSubtitlePanel,
+                onRetry = viewModel::retryCaptions,
+                onSourceChange = viewModel::setSourcePreference,
+                onTargetChange = viewModel::setTargetLanguage,
+                onFontScaleChange = viewModel::setFontScale,
+            )
+        }
     }
 }
 
@@ -574,10 +581,10 @@ internal fun SubtitleSettingsDialog(
 
 private enum class LanguagePickerMode { SOURCE, TARGET }
 
-private data class LanguageChoice(val code: String, val label: String)
+internal data class LanguageChoice(val code: String, val label: String)
 
 @Composable
-private fun LanguagePickerDialog(
+internal fun LanguagePickerDialog(
     title: String,
     choices: List<LanguageChoice>,
     selectedCode: String,
