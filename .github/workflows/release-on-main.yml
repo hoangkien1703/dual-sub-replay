@@ -117,11 +117,11 @@ jobs:
 
             **Preview users:** uninstall the preview build once before installing this official release because the official app uses a production signing key.
 
-            ## v0.4.0 highlights
+            ## v0.5.0 highlights
 
-            - Translate subtitles in batches nearest to the current playback position so translations appear where you are watching first.
-            - Subtitle timeline now follows playback jumps immediately, with instant scrolling for large seeks.
-            - Auto-scroll defers to manual scrolling and animates smoothly for nearby paragraphs.
+            - New first-launch welcome screen to pick your native language and the language you are learning before watching.
+            - Your preferred caption language now persists across restarts.
+            - Both choices are saved automatically; skipping the setup keeps your current defaults.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
