@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   build-pr-preview:
     if: >-
@@ -57,10 +61,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: >-
-          gh release upload preview
-          "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
-          --clobber
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ASSET_NAME: DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk
+        run: |
+          set -euo pipefail
+
+          pr_state="$(gh pr view "$PR_NUMBER" --json state --jq '.state')"
+          if [[ "$pr_state" != "OPEN" ]]; then
+            echo "PR #$PR_NUMBER is $pr_state; skipping stale preview upload."
+            exit 0
+          fi
+
+          gh release upload preview "release/$ASSET_NAME" --clobber
 
   cleanup-pr-preview:
     if: >-
@@ -73,11 +85,17 @@ jobs:
 
     steps:
       - name: Remove closed PR preview APK
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: >-
-          gh release delete-asset preview
-          "DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
-          --yes || true
+          ASSET_NAME: DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk
+        run: |
+          set -euo pipefail
+
+          assets="$(gh release view preview --json assets --jq '.assets[].name')"
+          if printf '%s\n' "$assets" | grep -Fxq "$ASSET_NAME"; then
+            gh release delete-asset preview "$ASSET_NAME" --yes
+            echo "Deleted $ASSET_NAME from the preview release."
+          else
+            echo "$ASSET_NAME is already absent from the preview release."
+          fi
