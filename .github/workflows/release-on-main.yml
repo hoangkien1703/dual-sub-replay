@@ -115,15 +115,17 @@ jobs:
 
             Download **DualSub-Replay.apk** below. On Android 8.0 or newer, open the downloaded file and allow your browser or file manager to install unknown apps if Android asks.
 
-            **Preview users:** uninstall the preview build once before installing this official release because the official app uses a production signing key.
+            **Preview users:** uninstall the preview build once before installing this official release because preview and official builds use different signing keys.
 
-            ## v0.7.0 highlights
+            ## v0.8.0 highlights
 
-            - Landscape split now starts at a video-first 75/25 layout and can be resized between 65% and 85% video width.
-            - The chosen landscape split ratio is remembered between sessions.
-            - Landscape mode automatically hides the status and navigation bars, with transient swipe-to-reveal behavior.
-            - Content can extend edge-to-edge into display-cutout/camera areas instead of leaving unused space.
-            - Portrait mode keeps normal safe insets, and the existing swipe-to-hide subtitle behavior remains available.
+            - Adds a LingoTube-inspired scroll-friendly bilingual subtitle overlay while keeping the normal YouTube page usable.
+            - Drag the subtitle overlay vertically, optionally remember its position, and reset it from settings.
+            - Automatically moves subtitles away from YouTube playback controls and restores the chosen position afterward.
+            - Automatically uses the compact overlay in fullscreen and landscape when enabled.
+            - Consolidates caption languages, text size, default view, and overlay behavior into one settings screen.
+            - Suppresses duplicate YouTube-rendered captions while the DualSub overlay is active and restores them when leaving it.
+            - Keeps the transcript panel, tap-to-replay flow, comments, recommendations, and single-WebView architecture.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
