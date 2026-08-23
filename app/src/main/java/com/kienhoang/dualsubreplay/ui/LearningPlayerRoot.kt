@@ -16,11 +16,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +47,10 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 
 internal const val PLAYER_EXPERIENCE_MODE_PREFERENCE = "player_experience_mode"
+internal const val AUTO_OVERLAY_FULLSCREEN_PREFERENCE = "auto_overlay_fullscreen"
+internal const val AUTO_OVERLAY_LANDSCAPE_PREFERENCE = "auto_overlay_landscape"
+internal const val OVERLAY_VERTICAL_POSITION_PREFERENCE = "overlay_vertical_position"
+internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
 
 enum class PlayerExperienceMode(val storageValue: String) {
     TRANSCRIPT_PANEL("transcript_panel"),
@@ -52,6 +60,26 @@ enum class PlayerExperienceMode(val storageValue: String) {
 internal fun storedPlayerExperienceMode(raw: String?): PlayerExperienceMode =
     PlayerExperienceMode.entries.firstOrNull { it.storageValue == raw }
         ?: PlayerExperienceMode.TRANSCRIPT_PANEL
+
+internal fun normalizeOverlayVerticalPosition(value: Float): Float =
+    if (value.isFinite()) value.coerceIn(0f, 1f) else DEFAULT_OVERLAY_VERTICAL_POSITION
+
+/**
+ * Slider value 0 = higher and 1 = lower. The default deliberately sits much closer to the
+ * bottom like LingoTube while leaving room for YouTube's seek bar and playback controls.
+ */
+internal fun overlayBottomPaddingDp(position: Float): Int {
+    val normalized = normalizeOverlayVerticalPosition(position)
+    return (180f - normalized * 160f).roundToInt()
+}
+
+internal fun shouldUseAutomaticLandscapeOverlay(
+    mode: PlayerExperienceMode,
+    autoLandscape: Boolean,
+    orientation: Int,
+): Boolean = mode == PlayerExperienceMode.TRANSCRIPT_PANEL &&
+    autoLandscape &&
+    orientation == Configuration.ORIENTATION_LANDSCAPE
 
 internal data class LearningOverlayContent(
     val originalText: String?,
@@ -77,12 +105,21 @@ internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayConte
 }
 
 /**
- * Places the compact overlay inside the lower half of a typical 16:9 mobile YouTube player.
- * It deliberately stays small so the underlying WebView remains usable for scrolling and browsing.
+ * Places the portrait overlay near the lower edge of the typical 16:9 mobile YouTube player.
+ * The position slider still lets the user move it upward when a video needs more clearance.
  */
-internal fun portraitLearningOverlayTopPaddingDp(screenWidthDp: Int): Int {
-    val estimatedVideoBottom = 56f + screenWidthDp.coerceAtLeast(0) * 9f / 16f
-    return (estimatedVideoBottom - 112f).roundToInt().coerceIn(104, 280)
+internal fun portraitLearningOverlayTopPaddingDp(
+    screenWidthDp: Int,
+    position: Float = DEFAULT_OVERLAY_VERTICAL_POSITION,
+): Int {
+    val width = screenWidthDp.coerceAtLeast(0).toFloat()
+    val estimatedVideoBottom = 56f + width * 9f / 16f
+    val minimumTop = 84f
+    val maximumTop = (estimatedVideoBottom - 80f).coerceAtLeast(minimumTop)
+    val normalized = normalizeOverlayVerticalPosition(position)
+    return (minimumTop + (maximumTop - minimumTop) * normalized)
+        .roundToInt()
+        .coerceIn(84, 320)
 }
 
 /**
@@ -93,6 +130,7 @@ internal fun portraitLearningOverlayTopPaddingDp(screenWidthDp: Int): Int {
 fun LearningPlayerRoot(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     val preferences = remember(context) {
         context.getSharedPreferences("dual_sub_preferences", 0)
     }
@@ -106,6 +144,24 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             ),
         )
     }
+    var autoOverlayFullscreen by remember {
+        mutableStateOf(preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true))
+    }
+    var autoOverlayLandscape by remember {
+        mutableStateOf(preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true))
+    }
+    var overlayVerticalPosition by remember {
+        mutableStateOf(
+            normalizeOverlayVerticalPosition(
+                preferences.getFloat(
+                    OVERLAY_VERTICAL_POSITION_PREFERENCE,
+                    DEFAULT_OVERLAY_VERTICAL_POSITION,
+                ),
+            ),
+        )
+    }
+    var restoreTranscriptAfterLandscapeOverlay by remember { mutableStateOf(false) }
+    var showOverlayBehaviorSettings by remember { mutableStateOf(false) }
     var settingsRequestId by remember { mutableLongStateOf(0L) }
 
     fun selectMode(newMode: PlayerExperienceMode) {
@@ -120,15 +176,56 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     }
 
-    fun requestSettings() {
+    fun requestSubtitleSettings() {
         settingsRequestId += 1L
     }
 
-    // Opening another video normally re-opens the transcript panel. In overlay mode we immediately
-    // collapse it again so the YouTube page stays scrollable while captions reload for the new video.
-    LaunchedEffect(mode, state.activeVideoId, state.subtitlePanelVisible) {
+    fun setAutoOverlayFullscreen(enabled: Boolean) {
+        autoOverlayFullscreen = enabled
+        preferences.edit().putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, enabled).apply()
+    }
+
+    fun setAutoOverlayLandscape(enabled: Boolean) {
+        autoOverlayLandscape = enabled
+        preferences.edit().putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, enabled).apply()
+    }
+
+    fun setOverlayVerticalPosition(position: Float) {
+        val normalized = normalizeOverlayVerticalPosition(position)
+        overlayVerticalPosition = normalized
+        preferences.edit().putFloat(OVERLAY_VERTICAL_POSITION_PREFERENCE, normalized).apply()
+    }
+
+    val automaticLandscapeOverlay = shouldUseAutomaticLandscapeOverlay(
+        mode = mode,
+        autoLandscape = autoOverlayLandscape,
+        orientation = configuration.orientation,
+    )
+    val effectiveMode = if (
+        mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY || automaticLandscapeOverlay
+    ) {
+        PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
+    } else {
+        PlayerExperienceMode.TRANSCRIPT_PANEL
+    }
+
+    // Landscape auto-overlay is temporary. If the transcript was open before rotation, restore it
+    // when the phone returns to portrait instead of changing the user's persistent player mode.
+    LaunchedEffect(automaticLandscapeOverlay, mode) {
+        if (automaticLandscapeOverlay) {
+            restoreTranscriptAfterLandscapeOverlay = state.subtitlePanelVisible
+            if (state.subtitlePanelVisible) viewModel.hideSubtitlePanel()
+        } else if (restoreTranscriptAfterLandscapeOverlay) {
+            if (mode == PlayerExperienceMode.TRANSCRIPT_PANEL) viewModel.showSubtitlePanel()
+            restoreTranscriptAfterLandscapeOverlay = false
+        }
+    }
+
+    // Opening another video normally re-opens the transcript panel. Whenever overlay presentation
+    // is active we immediately collapse it again so YouTube stays scrollable while captions reload.
+    LaunchedEffect(effectiveMode, state.activeVideoId, state.subtitlePanelVisible) {
         if (
-            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY &&
+            effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY &&
             state.activeVideoId != null &&
             state.subtitlePanelVisible
         ) {
@@ -137,17 +234,36 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     }
 
     val overlayContent = learningOverlayContent(state)
+    val bottomPadding = overlayBottomPaddingDp(overlayVerticalPosition).dp
+
+    // This slot is only drawn by SingleYouTubePage when YouTube opens its fullscreen custom view.
+    // Therefore transcript mode can stay the normal portrait default while fullscreen immediately
+    // gets the compact learning overlay, just like LingoTube.
     val fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? =
-        if (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY && overlayContent != null) {
+        if (
+            overlayContent != null &&
+            (effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY || autoOverlayFullscreen)
+        ) {
             {
                 LearningSubtitleOverlay(
                     content = overlayContent,
                     fontScale = state.fontScale,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(horizontal = 20.dp, vertical = 88.dp),
-                    onSettings = ::requestSettings,
-                    onClose = { selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL) },
+                        .padding(start = 20.dp, end = 20.dp, bottom = bottomPadding),
+                    onSettings = { showOverlayBehaviorSettings = true },
+                    onClose = {
+                        when {
+                            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY -> {
+                                selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
+                            }
+                            automaticLandscapeOverlay -> {
+                                setAutoOverlayLandscape(false)
+                                setAutoOverlayFullscreen(false)
+                            }
+                            else -> setAutoOverlayFullscreen(false)
+                        }
+                    },
                 )
             }
         } else {
@@ -157,7 +273,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     Box(Modifier.fillMaxSize()) {
         DualSubApp(
             viewModel = viewModel,
-            playerMode = mode,
+            playerMode = effectiveMode,
             onPlayerModeChange = ::selectMode,
             externalSettingsRequestId = settingsRequestId,
             fullscreenLearningOverlay = fullscreenLearningOverlay,
@@ -166,16 +282,15 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         if (
             state.onboardingCompleted &&
             state.activeVideoId != null &&
-            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
+            effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
         ) {
             overlayContent?.let { content ->
-                val configuration = LocalConfiguration.current
                 val overlayModifier = if (
                     configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
                 ) {
                     Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(start = 18.dp, end = 18.dp, bottom = 82.dp)
+                        .padding(start = 18.dp, end = 18.dp, bottom = bottomPadding)
                 } else {
                     Modifier
                         .align(Alignment.TopCenter)
@@ -184,6 +299,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                             end = 18.dp,
                             top = portraitLearningOverlayTopPaddingDp(
                                 configuration.screenWidthDp,
+                                overlayVerticalPosition,
                             ).dp,
                         )
                 }
@@ -191,12 +307,123 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     content = content,
                     fontScale = state.fontScale,
                     modifier = overlayModifier,
-                    onSettings = ::requestSettings,
-                    onClose = { selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL) },
+                    onSettings = { showOverlayBehaviorSettings = true },
+                    onClose = {
+                        if (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
+                            selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
+                        } else if (automaticLandscapeOverlay) {
+                            setAutoOverlayLandscape(false)
+                        }
+                    },
                 )
             }
         }
     }
+
+    if (showOverlayBehaviorSettings) {
+        OverlayBehaviorSettingsDialog(
+            autoOverlayFullscreen = autoOverlayFullscreen,
+            autoOverlayLandscape = autoOverlayLandscape,
+            overlayVerticalPosition = overlayVerticalPosition,
+            onAutoOverlayFullscreenChange = ::setAutoOverlayFullscreen,
+            onAutoOverlayLandscapeChange = ::setAutoOverlayLandscape,
+            onOverlayVerticalPositionChange = ::setOverlayVerticalPosition,
+            onOpenSubtitleSettings = {
+                showOverlayBehaviorSettings = false
+                requestSubtitleSettings()
+            },
+            onDismiss = { showOverlayBehaviorSettings = false },
+        )
+    }
+}
+
+@Composable
+internal fun OverlayBehaviorSettingsDialog(
+    autoOverlayFullscreen: Boolean,
+    autoOverlayLandscape: Boolean,
+    overlayVerticalPosition: Float,
+    onAutoOverlayFullscreenChange: (Boolean) -> Unit,
+    onAutoOverlayLandscapeChange: (Boolean) -> Unit,
+    onOverlayVerticalPositionChange: (Float) -> Unit,
+    onOpenSubtitleSettings: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Overlay behavior") },
+        text = {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Overlay in fullscreen")
+                        Text(
+                            "Automatically use the compact bilingual overlay whenever YouTube enters fullscreen.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = autoOverlayFullscreen,
+                        onCheckedChange = onAutoOverlayFullscreenChange,
+                        modifier = Modifier.testTag("auto_overlay_fullscreen_switch"),
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Overlay in landscape")
+                        Text(
+                            "Rotate sideways to replace the transcript panel with the compact overlay automatically.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = autoOverlayLandscape,
+                        onCheckedChange = onAutoOverlayLandscapeChange,
+                        modifier = Modifier.testTag("auto_overlay_landscape_switch"),
+                    )
+                }
+                Spacer(Modifier.size(16.dp))
+                Text("Overlay position")
+                Text(
+                    "Move the bilingual caption higher or lower over the video.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Slider(
+                    value = normalizeOverlayVerticalPosition(overlayVerticalPosition),
+                    onValueChange = onOverlayVerticalPositionChange,
+                    valueRange = 0f..1f,
+                    modifier = Modifier.testTag("overlay_position_slider"),
+                )
+                Row(Modifier.fillMaxWidth()) {
+                    Text(
+                        "Higher",
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "Lower",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.size(10.dp))
+                TextButton(onClick = onOpenSubtitleSettings) {
+                    Text("Open dual-subtitle settings")
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+    )
 }
 
 @Composable
