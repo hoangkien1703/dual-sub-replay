@@ -56,6 +56,7 @@ import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -180,7 +181,11 @@ private fun hasStoredYouTubeSessionCookie(): Boolean =
 internal data class WebPlaybackSnapshot(
     val url: String,
     val currentSecond: Float?,
+    val controlsVisible: Boolean = false,
 )
+
+internal val youtubePlayerControlsVisible = MutableStateFlow(false)
+internal val youtubeFullscreenActive = MutableStateFlow(false)
 
 private data class WebFullscreenSession(
     val view: View,
@@ -198,7 +203,29 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
         || videos.find(function(item) { return item.readyState > 0; })
         || videos[0];
       const second = video && Number.isFinite(video.currentTime) ? video.currentTime : null;
-      return JSON.stringify({ url: window.location.href, currentSecond: second });
+      const player = document.querySelector('.html5-video-player');
+      const chromeBottom = document.querySelector('.ytp-chrome-bottom');
+      const progressBar = document.querySelector('.ytp-progress-bar-container, .ytp-progress-bar');
+      const isVisible = function(element) {
+        if (!element) return false;
+        const style = window.getComputedStyle(element);
+        const opacity = Number.parseFloat(style.opacity || '1');
+        const rect = element.getBoundingClientRect();
+        return style.display !== 'none' && style.visibility !== 'hidden' &&
+          opacity > 0.05 && rect.width > 0 && rect.height > 0;
+      };
+      const controlsVisible = !!player && (
+        player.classList.contains('ytp-paused') ||
+        player.classList.contains('ytp-scrubbing') ||
+        !player.classList.contains('ytp-autohide') ||
+        isVisible(chromeBottom) ||
+        isVisible(progressBar)
+      );
+      return JSON.stringify({
+        url: window.location.href,
+        currentSecond: second,
+        controlsVisible: controlsVisible
+      });
     })();
     """.trimIndent()
 
@@ -261,6 +288,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
             } else {
                 json.getDouble("currentSecond").toFloat()
             },
+            controlsVisible = json.optBoolean("controlsVisible", false),
         )
     }.getOrNull()
 }
@@ -376,9 +404,11 @@ internal fun SingleYouTubePage(
                     fullscreenSession?.callback?.onCustomViewHidden()
                     (view.parent as? ViewGroup)?.removeView(view)
                     fullscreenSession = WebFullscreenSession(view, callback)
+                    youtubeFullscreenActive.value = true
                 }
 
                 override fun onHideCustomView() {
+                    youtubeFullscreenActive.value = false
                     val session = fullscreenSession ?: return
                     fullscreenSession = null
                     (session.view.parent as? ViewGroup)?.removeView(session.view)
@@ -529,11 +559,13 @@ internal fun SingleYouTubePage(
         if (!lifecycleStarted) return@LaunchedEffect
         while (isActive) {
             if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                youtubePlayerControlsVisible.value = false
                 delay(PLAYBACK_POLL_INTERVAL_MS)
                 continue
             }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                youtubePlayerControlsVisible.value = snapshot.controlsVisible
                 reportNavigation(webView, snapshot.url)
                 val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
                 val second = snapshot.currentSecond ?: return@evaluateJavascript
@@ -588,6 +620,8 @@ internal fun SingleYouTubePage(
 
     DisposableEffect(webView) {
         onDispose {
+            youtubePlayerControlsVisible.value = false
+            youtubeFullscreenActive.value = false
             webView.webChromeClient?.onHideCustomView()
             webView.destroySafely()
         }

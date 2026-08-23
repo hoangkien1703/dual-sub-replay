@@ -115,6 +115,16 @@ class LearningPlayerRootTest {
     }
 
     @Test
+    fun overlayDragAndPlayerControlAvoidanceStayBounded() {
+        assertEquals(1f, overlayPositionAfterDrag(0.8f, 100f, 100f))
+        assertEquals(0f, overlayPositionAfterDrag(0.2f, -100f, 100f))
+        assertEquals(0.5f, overlayPositionAfterDrag(0.5f, Float.NaN, 100f))
+        assertEquals(PLAYER_CONTROLS_AVOIDANCE_LIFT_DP, playerControlsAvoidanceLiftDp(true, true))
+        assertEquals(0, playerControlsAvoidanceLiftDp(true, false))
+        assertEquals(0, playerControlsAvoidanceLiftDp(false, true))
+    }
+
+    @Test
     fun captionSuppressionIsOriginCheckedAndReversible() {
         val hidden = webCaptionVisibilityScript(hidden = true)
         val restored = webCaptionVisibilityScript(hidden = false)
