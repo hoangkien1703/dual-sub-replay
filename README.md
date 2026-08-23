@@ -5,6 +5,10 @@ An Android language-learning app for watching YouTube with original and translat
 ## App preview
 
 <p align="center">
+  <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Chinese subtitles over a landscape video" width="900">
+</p>
+
+<p align="center">
   <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
 </p>
 
