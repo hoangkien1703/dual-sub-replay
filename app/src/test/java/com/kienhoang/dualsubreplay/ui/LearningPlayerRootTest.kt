@@ -1,7 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.res.Configuration
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -69,10 +71,47 @@ class LearningPlayerRootTest {
     }
 
     @Test
-    fun portraitOverlayPositionScalesWithTypicalPhoneWidthsAndStaysBounded() {
-        assertEquals(104, portraitLearningOverlayTopPaddingDp(0))
-        assertEquals(165, portraitLearningOverlayTopPaddingDp(393))
-        assertEquals(280, portraitLearningOverlayTopPaddingDp(1_000))
+    fun portraitOverlayDefaultsNearTheBottomAndStaysBounded() {
+        assertEquals(84, portraitLearningOverlayTopPaddingDp(0))
+        assertEquals(181, portraitLearningOverlayTopPaddingDp(393))
+        assertEquals(320, portraitLearningOverlayTopPaddingDp(1_000))
+        assertTrue(
+            portraitLearningOverlayTopPaddingDp(393, 1f) >
+                portraitLearningOverlayTopPaddingDp(393, 0f),
+        )
+    }
+
+    @Test
+    fun overlayPositionSliderMapsHigherToLargerBottomPadding() {
+        assertEquals(180, overlayBottomPaddingDp(0f))
+        assertEquals(42, overlayBottomPaddingDp(DEFAULT_OVERLAY_VERTICAL_POSITION))
+        assertEquals(20, overlayBottomPaddingDp(1f))
+        assertEquals(DEFAULT_OVERLAY_VERTICAL_POSITION, normalizeOverlayVerticalPosition(Float.NaN))
+    }
+
+    @Test
+    fun automaticLandscapeOverlayOnlyOverridesTranscriptMode() {
+        assertTrue(
+            shouldUseAutomaticLandscapeOverlay(
+                PlayerExperienceMode.TRANSCRIPT_PANEL,
+                autoLandscape = true,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+        )
+        assertFalse(
+            shouldUseAutomaticLandscapeOverlay(
+                PlayerExperienceMode.TRANSCRIPT_PANEL,
+                autoLandscape = true,
+                orientation = Configuration.ORIENTATION_PORTRAIT,
+            ),
+        )
+        assertFalse(
+            shouldUseAutomaticLandscapeOverlay(
+                PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+                autoLandscape = true,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+        )
     }
 
     @Test
