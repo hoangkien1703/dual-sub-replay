@@ -13,7 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.kienhoang.dualsubreplay.ui.AppViewModel
-import com.kienhoang.dualsubreplay.ui.DualSubApp
+import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         allowContentInDisplayCutout()
         updateImmersiveMode(resources.configuration)
-        setContent { DualSubApp(viewModel) }
+        setContent { LearningPlayerRoot(viewModel) }
         handleIntent(intent)
     }
 
