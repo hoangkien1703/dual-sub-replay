@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +50,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
@@ -95,7 +97,13 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Composable
-fun DualSubApp(viewModel: AppViewModel) {
+fun DualSubApp(
+    viewModel: AppViewModel,
+    playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+    onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
+    externalSettingsRequestId: Long = 0L,
+    fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     DualSubTheme {
@@ -107,6 +115,10 @@ fun DualSubApp(viewModel: AppViewModel) {
         } else {
             DualSubExperience(
                 state = state,
+                playerMode = playerMode,
+                onPlayerModeChange = onPlayerModeChange,
+                externalSettingsRequestId = externalSettingsRequestId,
+                fullscreenLearningOverlay = fullscreenLearningOverlay,
                 onPageChanged = viewModel::onYouTubePageChanged,
                 onPlaybackSecond = viewModel::onWebPlaybackSecond,
                 onShowSubtitles = viewModel::showSubtitlePanel,
@@ -124,6 +136,10 @@ fun DualSubApp(viewModel: AppViewModel) {
 @Composable
 private fun DualSubExperience(
     state: DualSubUiState,
+    playerMode: PlayerExperienceMode,
+    onPlayerModeChange: (PlayerExperienceMode) -> Unit,
+    externalSettingsRequestId: Long,
+    fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (String, Float) -> Unit,
     onShowSubtitles: () -> Unit,
@@ -170,6 +186,10 @@ private fun DualSubExperience(
         WindowInsets.safeDrawing
     }
 
+    LaunchedEffect(externalSettingsRequestId) {
+        if (externalSettingsRequestId > 0L) showSettings = true
+    }
+
     Scaffold(contentWindowInsets = contentInsets) { innerPadding ->
         Box(
             Modifier
@@ -190,6 +210,8 @@ private fun DualSubExperience(
                     controller = webController,
                     onPageChanged = onPageChanged,
                     onPlaybackSecond = onPlaybackSecond,
+                    suppressPageCaptions = playerMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+                    fullscreenOverlay = fullscreenLearningOverlay,
                     modifier = Modifier
                         .weight(if (sideBySide) landscapeVideoFraction else 1f)
                         .fillMaxHeight()
@@ -240,7 +262,11 @@ private fun DualSubExperience(
                         webController.replayFrom(segment.startMs / 1_000f)
                     },
                 )
-            } else if (!sideBySide && state.activeVideoId != null) {
+            } else if (
+                !sideBySide &&
+                state.activeVideoId != null &&
+                playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
+            ) {
                 SmallFloatingActionButton(
                     onClick = onShowSubtitles,
                     modifier = Modifier
@@ -264,10 +290,12 @@ private fun DualSubExperience(
             availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
             landscapeSplitEnabled = state.landscapeSplitEnabled,
+            playerMode = playerMode,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
             onLandscapeSplitChange = onLandscapeSplitChange,
+            onPlayerModeChange = onPlayerModeChange,
             onDismiss = { showSettings = false },
         )
     }
@@ -737,10 +765,12 @@ internal fun SubtitleSettingsDialog(
     availableSourceLanguages: List<CaptionLanguage>,
     fontScale: Float,
     landscapeSplitEnabled: Boolean,
+    playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
+    onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
@@ -795,6 +825,23 @@ internal fun SubtitleSettingsDialog(
                         .heightIn(max = bodyMaxHeight)
                         .verticalScroll(rememberScrollState()),
                 ) {
+                    Text("Player mode")
+                    PlayerModeSettingsOption(
+                        mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+                        selectedMode = playerMode,
+                        title = "Transcript panel",
+                        description = "Full dual-subtitle timeline with paragraph replay.",
+                        onModeChange = onPlayerModeChange,
+                    )
+                    HorizontalDivider()
+                    PlayerModeSettingsOption(
+                        mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+                        selectedMode = playerMode,
+                        title = "Scroll-friendly overlay",
+                        description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
+                        onModeChange = onPlayerModeChange,
+                    )
+                    Spacer(Modifier.height(14.dp))
                     Text("Original captions")
                     Spacer(Modifier.height(6.dp))
                     OutlinedButton(
@@ -855,6 +902,38 @@ internal fun SubtitleSettingsDialog(
             },
             confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
         )
+    }
+}
+
+@Composable
+private fun PlayerModeSettingsOption(
+    mode: PlayerExperienceMode,
+    selectedMode: PlayerExperienceMode,
+    title: String,
+    description: String,
+    onModeChange: (PlayerExperienceMode) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onModeChange(mode) }
+            .padding(vertical = 8.dp)
+            .testTag("player_mode_${mode.storageValue}"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(
+            selected = selectedMode == mode,
+            onClick = { onModeChange(mode) },
+        )
+        Spacer(Modifier.size(8.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
