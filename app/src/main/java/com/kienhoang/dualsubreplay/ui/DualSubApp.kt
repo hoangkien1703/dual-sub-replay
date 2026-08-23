@@ -27,8 +27,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ClosedCaption
@@ -704,7 +706,12 @@ internal fun SubtitleSettingsDialog(
             onDismissRequest = onDismiss,
             title = { Text("Dual-subtitle settings") },
             text = {
-                Column {
+                val bodyMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.55f
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = bodyMaxHeight)
+                        .verticalScroll(rememberScrollState()),
+                ) {
                     Text("Original captions")
                     Spacer(Modifier.height(6.dp))
                     OutlinedButton(
@@ -801,7 +808,8 @@ internal fun LanguagePickerDialog(
                     singleLine = true,
                 )
                 Spacer(Modifier.height(8.dp))
-                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+                val listMaxHeight = minOf(360.dp, LocalConfiguration.current.screenHeightDp.dp * 0.45f)
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = listMaxHeight)) {
                     itemsIndexed(filteredChoices, key = { _, choice -> choice.code }) { _, choice ->
                         Row(
                             modifier = Modifier
