@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -49,6 +50,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -66,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -107,6 +110,7 @@ fun DualSubApp(viewModel: AppViewModel) {
                 onSourceChange = viewModel::setSourcePreference,
                 onTargetChange = viewModel::setTargetLanguage,
                 onFontScaleChange = viewModel::setFontScale,
+                onLandscapeSplitChange = viewModel::setLandscapeSplitEnabled,
             )
         }
     }
@@ -123,9 +127,17 @@ private fun DualSubExperience(
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
+    onLandscapeSplitChange: (Boolean) -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
     val webController = rememberYouTubeWebController()
+    val configuration = LocalConfiguration.current
+    val sideBySide = shouldUseLandscapeSplit(
+        splitEnabled = state.landscapeSplitEnabled,
+        subtitlePanelVisible = state.subtitlePanelVisible,
+        hasActiveVideo = state.activeVideoId != null,
+        orientation = configuration.orientation,
+    )
 
     Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
         Box(
@@ -134,16 +146,39 @@ private fun DualSubExperience(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
         ) {
-            SingleYouTubePage(
-                initialUrl = state.browserUrl,
-                navigationRequestId = state.browserNavigationRequestId,
-                controller = webController,
-                onPageChanged = onPageChanged,
-                onPlaybackSecond = onPlaybackSecond,
-                modifier = Modifier.fillMaxSize().testTag("youtube_web_app"),
-            )
+            // Single call site on purpose: branching around SingleYouTubePage would
+            // leave composition and destroy the persistent WebView on every rotation.
+            Row(Modifier.fillMaxSize()) {
+                SingleYouTubePage(
+                    initialUrl = state.browserUrl,
+                    navigationRequestId = state.browserNavigationRequestId,
+                    controller = webController,
+                    onPageChanged = onPageChanged,
+                    onPlaybackSecond = onPlaybackSecond,
+                    modifier = Modifier
+                        .weight(if (sideBySide) 2f else 1f)
+                        .fillMaxHeight()
+                        .testTag("youtube_web_app"),
+                )
 
-            if (state.activeVideoId != null && state.subtitlePanelVisible) {
+                if (sideBySide) {
+                    SideSubtitlePanel(
+                        state = state,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .testTag("subtitle_timeline"),
+                        onHide = onHideSubtitles,
+                        onSettings = { showSettings = true },
+                        onRetry = onRetry,
+                        onReplay = { segment ->
+                            webController.replayFrom(segment.startMs / 1_000f)
+                        },
+                    )
+                }
+            }
+
+            if (!sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
                 SubtitlePanel(
                     state = state,
                     modifier = Modifier
@@ -158,7 +193,7 @@ private fun DualSubExperience(
                         webController.replayFrom(segment.startMs / 1_000f)
                     },
                 )
-            } else if (state.activeVideoId != null) {
+            } else if (!sideBySide && state.activeVideoId != null) {
                 SmallFloatingActionButton(
                     onClick = onShowSubtitles,
                     modifier = Modifier
@@ -181,9 +216,11 @@ private fun DualSubExperience(
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
+            landscapeSplitEnabled = state.landscapeSplitEnabled,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
+            onLandscapeSplitChange = onLandscapeSplitChange,
             onDismiss = { showSettings = false },
         )
     }
@@ -313,6 +350,142 @@ internal fun shouldHideSubtitlePanel(
 ): Boolean {
     val distanceThreshold = max(minimumDistancePx, panelHeightPx * 0.18f)
     return dragOffsetPx >= distanceThreshold || velocityPxPerSecond >= 1_500f
+}
+
+/**
+ * Landscape split shows the persistent WebView at a fixed 2:1 ratio beside the
+ * dual-subtitle panel. Every condition must hold so portrait, hidden panels,
+ * and idle browsing keep today's stacked layout.
+ */
+internal fun shouldUseLandscapeSplit(
+    splitEnabled: Boolean,
+    subtitlePanelVisible: Boolean,
+    hasActiveVideo: Boolean,
+    orientation: Int,
+): Boolean = splitEnabled &&
+    subtitlePanelVisible &&
+    hasActiveVideo &&
+    orientation == Configuration.ORIENTATION_LANDSCAPE
+
+internal const val SIDE_PANEL_SWIPE_VELOCITY_THRESHOLD = 1_500f
+
+internal fun shouldCollapseSidePanel(
+    dragOffsetPx: Float,
+    velocityPxPerSecond: Float,
+    minimumDistancePx: Float,
+): Boolean = dragOffsetPx >= minimumDistancePx ||
+    velocityPxPerSecond >= SIDE_PANEL_SWIPE_VELOCITY_THRESHOLD
+
+@Composable
+private fun SideSubtitlePanel(
+    state: DualSubUiState,
+    modifier: Modifier,
+    onHide: () -> Unit,
+    onSettings: () -> Unit,
+    onRetry: () -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
+) {
+    var panelOffsetX by remember { mutableFloatStateOf(0f) }
+    var panelWidthPx by remember { mutableFloatStateOf(0f) }
+    val minimumDismissDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
+    val scope = rememberCoroutineScope()
+    val dragState = rememberDraggableState { delta ->
+        val maximum = panelWidthPx.takeIf { it > 0f } ?: Float.MAX_VALUE
+        panelOffsetX = (panelOffsetX + delta).coerceIn(0f, maximum)
+    }
+    val headerDragModifier = Modifier
+        .draggable(
+            state = dragState,
+            orientation = Orientation.Horizontal,
+            onDragStopped = { velocity ->
+                val hide = shouldCollapseSidePanel(
+                    dragOffsetPx = panelOffsetX,
+                    velocityPxPerSecond = velocity,
+                    minimumDistancePx = minimumDismissDistancePx,
+                )
+                scope.launch {
+                    val target = if (hide) panelWidthPx.coerceAtLeast(panelOffsetX) else 0f
+                    animate(
+                        initialValue = panelOffsetX,
+                        targetValue = target,
+                        animationSpec = tween(durationMillis = if (hide) 160 else 220),
+                    ) { value, _ -> panelOffsetX = value }
+                    if (hide) onHide()
+                }
+            },
+        )
+
+    Surface(
+        modifier = modifier
+            .onSizeChanged { panelWidthPx = it.width.toFloat() }
+            .offset { IntOffset(panelOffsetX.roundToInt(), 0) }
+            .shadow(18.dp, RoundedCornerShape(topStart = 18.dp, bottomStart = 18.dp)),
+        shape = RoundedCornerShape(topStart = 18.dp, bottomStart = 18.dp),
+        color = Color(0xFF061719),
+        contentColor = Color(0xFFF3FAFA),
+        tonalElevation = 8.dp,
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            Column(headerDragModifier) {
+                Box(
+                    Modifier
+                        .padding(start = 6.dp)
+                        .size(width = 4.dp, height = 42.dp),
+                ) {
+                    Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(52.dp).padding(start = 12.dp, end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Default.ClosedCaption,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.size(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = sourceDescription(state),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFFF3FAFA),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = state.statusMessage ?: "Tap a paragraph to replay it",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFB7CED1),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    IconButton(onClick = onSettings) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Subtitle settings",
+                            tint = Color(0xFFE5F2F3),
+                        )
+                    }
+                    IconButton(onClick = onHide) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Hide dual subtitles",
+                            tint = Color(0xFFE5F2F3),
+                        )
+                    }
+                }
+            }
+            HorizontalDivider(color = Color(0xFF244044))
+
+            when {
+                state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
+                state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
+                else -> SubtitleTimeline(state, onReplay)
+            }
+        }
+    }
 }
 
 @Composable
@@ -483,9 +656,11 @@ internal fun SubtitleSettingsDialog(
     targetLanguage: String,
     availableSourceLanguages: List<CaptionLanguage>,
     fontScale: Float,
+    landscapeSplitEnabled: Boolean,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
+    onLandscapeSplitChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
@@ -567,8 +742,27 @@ internal fun SubtitleSettingsDialog(
                     Spacer(Modifier.height(14.dp))
                     Text("Text size: ${(fontScale * 100).toInt()}%")
                     Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Landscape split view")
+                            Text(
+                                "Rotate the phone to place subtitles beside a bigger video.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = landscapeSplitEnabled,
+                            onCheckedChange = onLandscapeSplitChange,
+                            modifier = Modifier.testTag("landscape_split_switch"),
+                        )
+                    }
                     Text(
-                        "Swipe the panel header down to hide it. Captions keep tracking while hidden.",
+                        "Swipe the panel header down (or right in split view) to hide it. " +
+                            "Captions keep tracking while hidden.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

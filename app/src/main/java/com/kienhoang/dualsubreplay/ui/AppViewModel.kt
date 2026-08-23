@@ -39,6 +39,7 @@ data class DualSubUiState(
     val segments: List<SubtitleSegment> = emptyList(),
     val currentIndex: Int = -1,
     val fontScale: Float = 1f,
+    val landscapeSplitEnabled: Boolean = false,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -159,6 +160,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 ?.takeIf(TranslationLanguages::isSupported)
                 ?: "vi",
             onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
+            landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", false),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -249,6 +251,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val safeScale = scale.coerceIn(0.8f, 1.5f)
         preferences.edit().putFloat("font_scale", safeScale).apply()
         _state.update { it.copy(fontScale = safeScale) }
+    }
+
+    fun setLandscapeSplitEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean("landscape_split_enabled", enabled).apply()
+        _state.update { it.copy(landscapeSplitEnabled = enabled) }
     }
 
     fun retryCaptions() {

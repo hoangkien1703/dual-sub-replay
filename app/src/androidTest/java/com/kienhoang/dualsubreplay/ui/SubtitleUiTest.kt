@@ -36,9 +36,11 @@ class SubtitleUiTest {
                         CaptionLanguage("ja", "Japanese"),
                     ),
                     fontScale = 1f,
+                    landscapeSplitEnabled = false,
                     onSourceChange = { selectedLanguage = it },
                     onTargetChange = { selectedTarget = it },
                     onFontScaleChange = {},
+                    onLandscapeSplitChange = {},
                     onDismiss = { dismissed = true },
                 )
             }
