@@ -18,9 +18,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -62,6 +63,7 @@ import org.json.JSONTokener
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
 private const val PLAYBACK_POLL_INTERVAL_MS = 250L
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
+internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
 private val trustedGoogleSignInHosts = setOf(
     "accounts.google.com",
@@ -220,6 +222,33 @@ internal fun webReplayScript(second: Float): String {
     """.trimIndent()
 }
 
+/**
+ * Hides only YouTube's rendered player captions while our bilingual learning overlay is active.
+ * The user's YouTube caption preference is left untouched and becomes visible again when the style
+ * element is removed.
+ */
+internal fun webCaptionVisibilityScript(hidden: Boolean): String {
+    val hiddenLiteral = if (hidden) "true" else "false"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          const styleId = '$YOUTUBE_CAPTION_STYLE_ID';
+          const existing = document.getElementById(styleId);
+          if ($hiddenLiteral) {
+            const style = existing || document.createElement('style');
+            style.id = styleId;
+            style.textContent = '.ytp-caption-window-container, .caption-window, .ytp-caption-segment { visibility: hidden !important; opacity: 0 !important; }';
+            if (!existing) (document.head || document.documentElement).appendChild(style);
+          } else if (existing) {
+            existing.remove();
+          }
+          return true;
+        })();
+    """.trimIndent()
+}
+
 internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     if (rawValue.isNullOrBlank() || rawValue == "null") return null
     return runCatching {
@@ -273,12 +302,15 @@ internal fun SingleYouTubePage(
     controller: YouTubeWebController,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (videoId: String, second: Float) -> Unit,
+    suppressPageCaptions: Boolean = false,
+    fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
     val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
+    val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
         mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
@@ -424,6 +456,10 @@ internal fun SingleYouTubePage(
                     reportNavigation(view, url)
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         CookieManager.getInstance().flush()
+                        view.evaluateJavascript(
+                            webCaptionVisibilityScript(currentSuppressPageCaptions),
+                            null,
+                        )
                     }
                 }
 
@@ -481,6 +517,12 @@ internal fun SingleYouTubePage(
         if (navigationRequestId == handledNavigationRequestId) return@LaunchedEffect
         handledNavigationRequestId = navigationRequestId
         if (isYouTubeWebUrl(initialUrl)) webView.loadUrl(initialUrl)
+    }
+
+    LaunchedEffect(webView, suppressPageCaptions) {
+        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+            webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
+        }
     }
 
     LaunchedEffect(webView, lifecycleStarted) {
@@ -586,13 +628,16 @@ internal fun SingleYouTubePage(
                 decorFitsSystemWindows = false,
             ),
         ) {
-            AndroidView(
-                factory = {
-                    (session.view.parent as? ViewGroup)?.removeView(session.view)
-                    session.view
-                },
-                modifier = Modifier.fillMaxSize().background(Color.Black),
-            )
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                AndroidView(
+                    factory = {
+                        (session.view.parent as? ViewGroup)?.removeView(session.view)
+                        session.view
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+                fullscreenOverlay?.invoke(this)
+            }
         }
     }
 }
