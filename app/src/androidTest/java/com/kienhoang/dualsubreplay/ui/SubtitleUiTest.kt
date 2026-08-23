@@ -46,7 +46,7 @@ class SubtitleUiTest {
             }
         }
 
-        composeRule.onNodeWithText("Original captions").assertIsDisplayed()
+        composeRule.onNodeWithText("Original language").assertIsDisplayed()
         composeRule.onNodeWithText("Translate to").assertIsDisplayed()
         composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
         composeRule.onNodeWithText("Focus").assertDoesNotExist()
