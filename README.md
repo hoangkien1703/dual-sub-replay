@@ -41,7 +41,8 @@ Want to test the newest development build? See the [preview release](https://git
 - Download translation models on demand and remember the preferred target language.
 - Merge short caption cues into readable paragraphs.
 - Place the dual-subtitle timeline in a temporary bottom layer over the single YouTube page.
-- Rotate to landscape for a default-on 2:1 split with the video on the left and dual subtitles on the right; turn it off in subtitle settings if preferred.
+- Rotate to landscape for a default-on 75/25 split favoring the video; drag the divider to resize the video between 65% and 85% of the width, and the app remembers your choice.
+- Landscape mode uses immersive edge-to-edge layout: status/navigation bars hide automatically and content can use display-cutout/camera space, while system bars remain available with a swipe.
 - Highlight the current paragraph and tap any paragraph to replay it.
 - Swipe the panel header down in portrait or right in landscape, or use its close button, to reveal the complete YouTube page, including the same video,
   actions, comments, and recommendations; no second player or webpage is created.
@@ -112,11 +113,11 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. A push to `main` updates the rolling `preview` release only after both jobs pass. A version tag such as `v0.3.1` must match the app version and publishes a verified, production-signed APK as the latest official release.
+Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. Same-repository pull requests also publish a numbered test APK such as `DualSub-Replay-PR16-preview.apk` to the rolling preview release and remove it automatically when the PR is closed. A push to `main` updates the rolling preview release only after both verification jobs pass. When `main` contains a new app version without a matching version tag, the verified production-signed APK is published automatically as the latest official release.
 
 ## Privacy
 
-No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads only the language models needed for selected translations, then performs translation on the device. The app stores the last Browse URL, target language, and text-size setting in local app preferences.
+No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads only the language models needed for selected translations, then performs translation on the device. The app stores the last Browse URL, target language, text-size setting, and landscape split ratio in local app preferences.
 
 ## License
 
