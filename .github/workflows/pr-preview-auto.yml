@@ -30,13 +30,13 @@ jobs:
           java-version: "17"
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@9fc6c4e9069bf581ec31e66cbd7dcb644d # v3
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
 
       - name: Install Android build SDK
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle cache
-        uses: gradle/actions/setup-gradle@0b6dd653ba04f4b7fcbf7536b8d23224f8a049 # v4
+        uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
 
       - name: Restore persistent preview signing key
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
