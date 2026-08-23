@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LearningPlayerRootTest {
@@ -72,5 +73,17 @@ class LearningPlayerRootTest {
         assertEquals(104, portraitLearningOverlayTopPaddingDp(0))
         assertEquals(165, portraitLearningOverlayTopPaddingDp(393))
         assertEquals(280, portraitLearningOverlayTopPaddingDp(1_000))
+    }
+
+    @Test
+    fun captionSuppressionIsOriginCheckedAndReversible() {
+        val hidden = webCaptionVisibilityScript(hidden = true)
+        val restored = webCaptionVisibilityScript(hidden = false)
+
+        assertTrue(hidden.contains("window.location.protocol !== 'https:'"))
+        assertTrue(hidden.contains("host.endsWith('.youtube.com')"))
+        assertTrue(hidden.contains(YOUTUBE_CAPTION_STYLE_ID))
+        assertTrue(hidden.contains("visibility: hidden !important"))
+        assertTrue(restored.contains("existing.remove()"))
     }
 }
