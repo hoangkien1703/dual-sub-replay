@@ -70,4 +70,28 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithContentDescription("Dual-subtitle settings").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Return to transcript panel").assertIsDisplayed()
     }
+
+    @Test
+    fun overlayBehaviorSettingsExposeAutomaticModesAndPosition() {
+        composeRule.setContent {
+            DualSubTheme {
+                OverlayBehaviorSettingsDialog(
+                    autoOverlayFullscreen = true,
+                    autoOverlayLandscape = true,
+                    overlayVerticalPosition = DEFAULT_OVERLAY_VERTICAL_POSITION,
+                    onAutoOverlayFullscreenChange = {},
+                    onAutoOverlayLandscapeChange = {},
+                    onOverlayVerticalPositionChange = {},
+                    onOpenSubtitleSettings = {},
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Overlay behavior").assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch").assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_overlay_landscape_switch").assertIsDisplayed()
+        composeRule.onNodeWithTag("overlay_position_slider").assertIsDisplayed()
+        composeRule.onNodeWithText("Open dual-subtitle settings").assertIsDisplayed()
+    }
 }
