@@ -1,1 +1,83 @@
-placeholder
+name: Automatic PR preview APK
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  build-pr-preview:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf581ec31e66cbd7dcb644d # v3
+
+      - name: Install Android build SDK
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@0b6dd653ba04f4b7fcbf7536b8d23224f8a049 # v4
+
+      - name: Restore persistent preview signing key
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.android/debug.keystore
+          key: dual-sub-replay-preview-signing-v1
+
+      - name: Test, lint, and build PR preview
+        run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug --stacktrace
+
+      - name: Package PR preview APK
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/debug/app-debug.apk "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
+          sha256sum "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
+
+      - name: Upload PR preview to rolling preview release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: >-
+          gh release upload preview
+          "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
+          --clobber
+
+  cleanup-pr-preview:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Remove closed PR preview APK
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: >-
+          gh release delete-asset preview
+          "DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
+          --yes || true
