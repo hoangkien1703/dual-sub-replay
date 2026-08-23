@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -72,10 +73,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -86,8 +88,8 @@ import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -135,14 +137,40 @@ private fun DualSubExperience(
     var showSettings by remember { mutableStateOf(false) }
     val webController = rememberYouTubeWebController()
     val configuration = LocalConfiguration.current
+    val context = LocalContext.current
+    val layoutPreferences = remember(context) {
+        context.getSharedPreferences("dual_sub_preferences", 0)
+    }
+    var landscapeVideoFraction by remember {
+        mutableFloatStateOf(
+            normalizeLandscapeVideoFraction(
+                layoutPreferences.getFloat(
+                    LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
+                    DEFAULT_LANDSCAPE_VIDEO_FRACTION,
+                ),
+            ),
+        )
+    }
+    var splitContainerWidthPx by remember { mutableFloatStateOf(0f) }
+    val splitDragState = rememberDraggableState { delta ->
+        if (splitContainerWidthPx <= 0f) return@rememberDraggableState
+        landscapeVideoFraction = normalizeLandscapeVideoFraction(
+            landscapeVideoFraction + delta / splitContainerWidthPx,
+        )
+    }
     val sideBySide = shouldUseLandscapeSplit(
         splitEnabled = state.landscapeSplitEnabled,
         subtitlePanelVisible = state.subtitlePanelVisible,
         hasActiveVideo = state.activeVideoId != null,
         orientation = configuration.orientation,
     )
+    val contentInsets = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        WindowInsets(0, 0, 0, 0)
+    } else {
+        WindowInsets.safeDrawing
+    }
 
-    Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
+    Scaffold(contentWindowInsets = contentInsets) { innerPadding ->
         Box(
             Modifier
                 .fillMaxSize()
@@ -151,7 +179,11 @@ private fun DualSubExperience(
         ) {
             // Single call site on purpose: branching around SingleYouTubePage would
             // leave composition and destroy the persistent WebView on every rotation.
-            Row(Modifier.fillMaxSize()) {
+            Row(
+                Modifier
+                    .fillMaxSize()
+                    .onSizeChanged { splitContainerWidthPx = it.width.toFloat() },
+            ) {
                 SingleYouTubePage(
                     initialUrl = state.browserUrl,
                     navigationRequestId = state.browserNavigationRequestId,
@@ -159,16 +191,28 @@ private fun DualSubExperience(
                     onPageChanged = onPageChanged,
                     onPlaybackSecond = onPlaybackSecond,
                     modifier = Modifier
-                        .weight(if (sideBySide) 2f else 1f)
+                        .weight(if (sideBySide) landscapeVideoFraction else 1f)
                         .fillMaxHeight()
                         .testTag("youtube_web_app"),
                 )
 
                 if (sideBySide) {
+                    LandscapeSplitDivider(
+                        videoFraction = landscapeVideoFraction,
+                        dragState = splitDragState,
+                        onDragStopped = {
+                            layoutPreferences.edit()
+                                .putFloat(
+                                    LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
+                                    landscapeVideoFraction,
+                                )
+                                .apply()
+                        },
+                    )
                     SideSubtitlePanel(
                         state = state,
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(1f - landscapeVideoFraction)
                             .fillMaxHeight()
                             .testTag("subtitle_timeline"),
                         onHide = onHideSubtitles,
@@ -228,7 +272,6 @@ private fun DualSubExperience(
         )
     }
 }
-
 
 @Composable
 private fun SubtitlePanel(
@@ -356,9 +399,8 @@ internal fun shouldHideSubtitlePanel(
 }
 
 /**
- * Landscape split shows the persistent WebView at a fixed 2:1 ratio beside the
- * dual-subtitle panel. Every condition must hold so portrait, hidden panels,
- * and idle browsing keep today's stacked layout.
+ * Landscape split keeps the persistent WebView beside the dual-subtitle panel.
+ * The divider is user-resizable and the chosen video width is remembered.
  */
 internal fun shouldUseLandscapeSplit(
     splitEnabled: Boolean,
@@ -369,6 +411,47 @@ internal fun shouldUseLandscapeSplit(
     subtitlePanelVisible &&
     hasActiveVideo &&
     orientation == Configuration.ORIENTATION_LANDSCAPE
+
+internal const val LANDSCAPE_VIDEO_FRACTION_PREFERENCE = "landscape_video_fraction"
+internal const val DEFAULT_LANDSCAPE_VIDEO_FRACTION = 0.75f
+internal const val MIN_LANDSCAPE_VIDEO_FRACTION = 0.65f
+internal const val MAX_LANDSCAPE_VIDEO_FRACTION = 0.85f
+
+internal fun normalizeLandscapeVideoFraction(value: Float): Float =
+    if (value.isFinite()) {
+        value.coerceIn(MIN_LANDSCAPE_VIDEO_FRACTION, MAX_LANDSCAPE_VIDEO_FRACTION)
+    } else {
+        DEFAULT_LANDSCAPE_VIDEO_FRACTION
+    }
+
+@Composable
+private fun LandscapeSplitDivider(
+    videoFraction: Float,
+    dragState: androidx.compose.foundation.gestures.DraggableState,
+    onDragStopped: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .width(12.dp)
+            .fillMaxHeight()
+            .semantics {
+                stateDescription = "Video ${(videoFraction * 100).roundToInt()} percent"
+            }
+            .testTag("landscape_split_divider")
+            .draggable(
+                state = dragState,
+                orientation = Orientation.Horizontal,
+                onDragStopped = { onDragStopped() },
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Surface(
+            modifier = Modifier.width(3.dp).height(64.dp),
+            shape = CircleShape,
+            color = Color(0xFF607477),
+        ) {}
+    }
+}
 
 internal const val SIDE_PANEL_SWIPE_VELOCITY_THRESHOLD = 1_500f
 
@@ -751,7 +834,7 @@ internal fun SubtitleSettingsDialog(
                         Column(Modifier.weight(1f)) {
                             Text("Landscape split view")
                             Text(
-                                "Rotate the phone to place subtitles beside a bigger video.",
+                                "Rotate the phone to place subtitles beside a bigger video. Drag the divider to resize it.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
