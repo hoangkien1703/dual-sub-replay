@@ -5,6 +5,10 @@ An Android language-learning app for watching YouTube with original and translat
 ## App preview
 
 <p align="center">
+  <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
+</p>
+
+<p align="center">
   <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
 </p>
 
@@ -37,8 +41,9 @@ Want to test the newest development build? See the [preview release](https://git
 - Download translation models on demand and remember the preferred target language.
 - Merge short caption cues into readable paragraphs.
 - Place the dual-subtitle timeline in a temporary bottom layer over the single YouTube page.
+- Rotate to landscape for a default-on 2:1 split with the video on the left and dual subtitles on the right; turn it off in subtitle settings if preferred.
 - Highlight the current paragraph and tap any paragraph to replay it.
-- Swipe the panel header down or use its close button to reveal the complete YouTube page, including the same video,
+- Swipe the panel header down in portrait or right in landscape, or use its close button, to reveal the complete YouTube page, including the same video,
   actions, comments, and recommendations; no second player or webpage is created.
 - Reopen the subtitle timeline and remember the subtitle text size.
 - Build, test, and publish installable APKs automatically with GitHub Actions.
@@ -48,9 +53,9 @@ Want to test the newest development build? See the [preview release](https://git
 1. Open DualSub Replay; the YouTube Browse screen appears immediately.
 2. Search normally and choose a captioned video.
 3. The selected watch page stays in the same WebView while captions and translations load.
-4. The bottom dual-subtitle layer tracks the native webpage video's playback time.
+4. The dual-subtitle timeline tracks the native webpage video's playback time, below it in portrait or beside it in landscape.
 5. Tap any subtitle paragraph to seek to its start and resume playback.
-6. Swipe the subtitle timeline down to like the video, read comments, or choose another video.
+6. Swipe the subtitle timeline down in portrait or right in landscape to like the video, read comments, or choose another video.
 7. Press Back to navigate through normal YouTube browsing history.
 
 Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
@@ -103,7 +108,7 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 - `AppViewModel` tracks the active watch URL, caption loading, translation, and active cue.
 - `SingleYouTubePage` owns the app's only WebView and keeps normal YouTube navigation and playback intact.
 - A small JavaScript polling bridge reads the native page video's time and seeks that same video for replay.
-- `DualSubApp` layers the hideable dual-subtitle timeline over the bottom of the single YouTube surface.
+- `DualSubApp` places the hideable dual-subtitle timeline below the single YouTube surface in portrait or beside it in landscape.
 
 ## Continuous integration
 
