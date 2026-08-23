@@ -1,12 +1,12 @@
 package com.kienhoang.dualsubreplay.ui
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
@@ -21,54 +21,54 @@ class LearningPlayerUiTest {
     fun unifiedSubtitleSettingsOffersViewAndOverlayBehavior() {
         var selected: PlayerExperienceMode? = null
         composeRule.setContent {
-  DualSubTheme {
-      SubtitleSettingsDialog(
-          sourcePreference = "auto",
-          targetLanguage = "vi",
-          availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
-          fontScale = 1f,
-          landscapeSplitEnabled = true,
-          playerMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-          onSourceChange = {},
-          onTargetChange = {},
-          onFontScaleChange = {},
-          onLandscapeSplitChange = {},
-          onPlayerModeChange = { selected = it },
-          onDismiss = {},
-      )
-  }
+            DualSubTheme {
+                SubtitleSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    fontScale = 1f,
+                    landscapeSplitEnabled = true,
+                    playerMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+                    onSourceChange = {},
+                    onTargetChange = {},
+                    onFontScaleChange = {},
+                    onLandscapeSplitChange = {},
+                    onPlayerModeChange = { selected = it },
+                    onDismiss = {},
+                )
+            }
         }
 
         composeRule.onNodeWithText("Dual-subtitle settings").assertIsDisplayed()
-        composeRule.onNodeWithText("Default view").assertExists()
-        composeRule.onNodeWithText("Transcript panel").assertExists()
-        composeRule.onNodeWithText("Scroll-friendly overlay").assertExists()
-        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch").assertExists()
-        composeRule.onNodeWithTag("auto_overlay_landscape_switch").assertExists()
-        composeRule.onNodeWithTag("auto_avoid_player_controls_switch").assertExists()
-        composeRule.onNodeWithTag("remember_overlay_position_switch").assertExists()
-        composeRule.onNodeWithTag("reset_overlay_position").assertExists()
-        composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay").performClick()
+        composeRule.onNodeWithText("Default view").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Transcript panel").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_overlay_landscape_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_avoid_player_controls_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("remember_overlay_position_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay").performScrollTo().performClick()
         composeRule.runOnIdle {
-  assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
+            assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
         }
     }
 
     @Test
     fun learningOverlayHidesActionsUntilTapped() {
         composeRule.setContent {
-  DualSubTheme {
-      LearningSubtitleOverlay(
-          content = LearningOverlayContent(
-              originalText = "What will we discuss?",
-              translatedText = "Chúng ta sẽ thảo luận gì?",
-              statusText = null,
-          ),
-          fontScale = 1f,
-          onSettings = {},
-          onClose = {},
-      )
-  }
+            DualSubTheme {
+                LearningSubtitleOverlay(
+                    content = LearningOverlayContent(
+                        originalText = "What will we discuss?",
+                        translatedText = "Chúng ta sẽ thảo luận gì?",
+                        statusText = null,
+                    ),
+                    fontScale = 1f,
+                    onSettings = {},
+                    onClose = {},
+                )
+            }
         }
 
         composeRule.onNodeWithContentDescription("Dual-subtitle settings").assertDoesNotExist()
