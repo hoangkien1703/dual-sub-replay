@@ -241,40 +241,37 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val overlayContent = learningOverlayContent(state)
     val bottomPadding = overlayBottomPaddingDp(overlayVerticalPosition).dp
 
-    // This slot is only drawn by SingleYouTubePage when YouTube opens its fullscreen custom view.
-    // Therefore transcript mode can stay the normal portrait default while fullscreen immediately
-    // gets the compact learning overlay, just like LingoTube.
-    val fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? =
+    // SingleYouTubePage only invokes this slot while its fullscreen custom view is open. Keeping
+    // the slot non-null guarantees that the fullscreen dialog hides system bars even before
+    // captions finish loading or when automatic fullscreen overlay is disabled.
+    val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
+        HideFullscreenSystemBars()
         if (
             overlayContent != null &&
             (effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY || autoOverlayFullscreen)
         ) {
-            {
-                HideFullscreenSystemBars()
-                LearningSubtitleOverlay(
-                    content = overlayContent,
-                    fontScale = state.fontScale,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(start = 20.dp, end = 20.dp, bottom = bottomPadding),
-                    onSettings = { showOverlayBehaviorSettings = true },
-                    onClose = {
-                        when {
-                            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY -> {
-                                selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
-                            }
-                            automaticLandscapeOverlay -> {
-                                setAutoOverlayLandscape(false)
-                                setAutoOverlayFullscreen(false)
-                            }
-                            else -> setAutoOverlayFullscreen(false)
+            LearningSubtitleOverlay(
+                content = overlayContent,
+                fontScale = state.fontScale,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 20.dp, end = 20.dp, bottom = bottomPadding),
+                onSettings = { showOverlayBehaviorSettings = true },
+                onClose = {
+                    when {
+                        mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY -> {
+                            selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
                         }
-                    },
-                )
-            }
-        } else {
-            null
+                        automaticLandscapeOverlay -> {
+                            setAutoOverlayLandscape(false)
+                            setAutoOverlayFullscreen(false)
+                        }
+                        else -> setAutoOverlayFullscreen(false)
+                    }
+                },
+            )
         }
+    }
 
     Box(Modifier.fillMaxSize()) {
         DualSubApp(
