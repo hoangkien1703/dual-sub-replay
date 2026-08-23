@@ -26,6 +26,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -37,11 +38,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
@@ -245,6 +250,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             (effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY || autoOverlayFullscreen)
         ) {
             {
+                HideFullscreenSystemBars()
                 LearningSubtitleOverlay(
                     content = overlayContent,
                     fontScale = state.fontScale,
@@ -334,6 +340,18 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             },
             onDismiss = { showOverlayBehaviorSettings = false },
         )
+    }
+}
+
+@Composable
+private fun HideFullscreenSystemBars() {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val controller = ViewCompat.getWindowInsetsController(view)
+        controller?.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller?.hide(WindowInsetsCompat.Type.systemBars())
+        onDispose { }
     }
 }
 
