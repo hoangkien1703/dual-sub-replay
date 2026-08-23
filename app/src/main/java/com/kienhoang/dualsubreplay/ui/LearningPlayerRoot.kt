@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,19 +16,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.roundToInt
+import kotlinx.coroutines.delay
 
 internal const val PLAYER_EXPERIENCE_MODE_PREFERENCE = "player_experience_mode"
 
@@ -108,7 +106,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             ),
         )
     }
-    var showPlayerModeDialog by remember { mutableStateOf(false) }
+    var settingsRequestId by remember { mutableLongStateOf(0L) }
 
     fun selectMode(newMode: PlayerExperienceMode) {
         mode = newMode
@@ -120,6 +118,10 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         } else {
             viewModel.showSubtitlePanel()
         }
+    }
+
+    fun requestSettings() {
+        settingsRequestId += 1L
     }
 
     // Opening another video normally re-opens the transcript panel. In overlay mode we immediately
@@ -134,82 +136,66 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     }
 
+    val overlayContent = learningOverlayContent(state)
+    val fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? =
+        if (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY && overlayContent != null) {
+            {
+                LearningSubtitleOverlay(
+                    content = overlayContent,
+                    fontScale = state.fontScale,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 20.dp, vertical = 88.dp),
+                    onSettings = ::requestSettings,
+                    onClose = { selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL) },
+                )
+            }
+        } else {
+            null
+        }
+
     Box(Modifier.fillMaxSize()) {
-        DualSubApp(viewModel)
+        DualSubApp(
+            viewModel = viewModel,
+            playerMode = mode,
+            onPlayerModeChange = ::selectMode,
+            externalSettingsRequestId = settingsRequestId,
+            fullscreenLearningOverlay = fullscreenLearningOverlay,
+        )
 
-        if (state.onboardingCompleted && state.activeVideoId != null) {
-            when (mode) {
-                PlayerExperienceMode.TRANSCRIPT_PANEL -> {
-                    SmallFloatingActionButton(
-                        onClick = { showPlayerModeDialog = true },
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(start = 8.dp)
-                            .testTag("player_mode_button"),
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ) {
-                        Icon(Icons.Default.Settings, contentDescription = "Player mode")
-                    }
-                }
-
-                PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY -> {
-                    learningOverlayContent(state)?.let { content ->
-                        val configuration = LocalConfiguration.current
-                        val overlayModifier = if (
-                            configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-                        ) {
-                            Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(start = 16.dp, end = 16.dp, bottom = 84.dp)
-                        } else {
-                            Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = portraitLearningOverlayTopPaddingDp(
-                                        configuration.screenWidthDp,
-                                    ).dp,
-                                )
-                        }
-                        LearningSubtitleOverlay(
-                            content = content,
-                            fontScale = state.fontScale,
-                            modifier = overlayModifier,
-                            onSettings = { showPlayerModeDialog = true },
-                            onClose = { selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL) },
+        if (
+            state.onboardingCompleted &&
+            state.activeVideoId != null &&
+            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
+        ) {
+            overlayContent?.let { content ->
+                val configuration = LocalConfiguration.current
+                val overlayModifier = if (
+                    configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                ) {
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(start = 18.dp, end = 18.dp, bottom = 82.dp)
+                } else {
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(
+                            start = 18.dp,
+                            end = 18.dp,
+                            top = portraitLearningOverlayTopPaddingDp(
+                                configuration.screenWidthDp,
+                            ).dp,
                         )
-                    }
-
-                    // The underlying DualSubApp intentionally shows its regular "show subtitles"
-                    // FAB when the transcript panel is hidden. Cover the same bottom-right slot with
-                    // this mode button so taps cannot accidentally reopen the large panel.
-                    SmallFloatingActionButton(
-                        onClick = { showPlayerModeDialog = true },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                            .testTag("player_mode_button"),
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ) {
-                        Icon(Icons.Default.Settings, contentDescription = "Player mode")
-                    }
                 }
+                LearningSubtitleOverlay(
+                    content = content,
+                    fontScale = state.fontScale,
+                    modifier = overlayModifier,
+                    onSettings = ::requestSettings,
+                    onClose = { selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL) },
+                )
             }
         }
-    }
-
-    if (showPlayerModeDialog) {
-        PlayerModeDialog(
-            selectedMode = mode,
-            onModeChange = { selected ->
-                selectMode(selected)
-                showPlayerModeDialog = false
-            },
-            onDismiss = { showPlayerModeDialog = false },
-        )
     }
 }
 
@@ -221,27 +207,43 @@ internal fun LearningSubtitleOverlay(
     onSettings: () -> Unit,
     onClose: () -> Unit,
 ) {
+    var controlsVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(controlsVisible) {
+        if (!controlsVisible) return@LaunchedEffect
+        delay(2_500)
+        controlsVisible = false
+    }
+
     Surface(
         modifier = modifier
-            .fillMaxWidth(0.94f)
-            .widthIn(max = 760.dp)
-            .testTag("learning_subtitle_overlay"),
-        shape = RoundedCornerShape(12.dp),
-        color = Color(0xDE061719),
+            .fillMaxWidth(0.90f)
+            .widthIn(max = 720.dp)
+            .testTag("learning_subtitle_overlay")
+            .clickable { controlsVisible = !controlsVisible },
+        shape = RoundedCornerShape(10.dp),
+        color = Color(0xD7061719),
         contentColor = Color(0xFFF3FAFA),
-        tonalElevation = 6.dp,
-        shadowElevation = 8.dp,
+        tonalElevation = 4.dp,
+        shadowElevation = 6.dp,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 9.dp, bottom = 9.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 14.dp,
+                    end = if (controlsVisible) 2.dp else 14.dp,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
                 content.originalText?.let { original ->
                     Text(
                         text = original,
-                        fontSize = (18f * fontScale).sp,
-                        lineHeight = (22f * fontScale).sp,
+                        fontSize = (17f * fontScale).sp,
+                        lineHeight = (21f * fontScale).sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White,
                         maxLines = 2,
@@ -249,11 +251,11 @@ internal fun LearningSubtitleOverlay(
                     )
                 }
                 content.translatedText?.let { translated ->
-                    if (content.originalText != null) Spacer(Modifier.size(3.dp))
+                    if (content.originalText != null) Spacer(Modifier.size(2.dp))
                     Text(
                         text = translated,
-                        fontSize = (15f * fontScale).sp,
-                        lineHeight = (19f * fontScale).sp,
+                        fontSize = (14f * fontScale).sp,
+                        lineHeight = (18f * fontScale).sp,
                         color = Color(0xFF75E7C1),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -269,76 +271,14 @@ internal fun LearningSubtitleOverlay(
                     )
                 }
             }
-            IconButton(onClick = onSettings) {
-                Icon(Icons.Default.Settings, contentDescription = "Player mode settings")
+            if (controlsVisible) {
+                IconButton(onClick = onSettings) {
+                    Icon(Icons.Default.Settings, contentDescription = "Dual-subtitle settings")
+                }
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Default.Close, contentDescription = "Return to transcript panel")
+                }
             }
-            IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Return to transcript panel")
-            }
-        }
-    }
-}
-
-@Composable
-internal fun PlayerModeDialog(
-    selectedMode: PlayerExperienceMode,
-    onModeChange: (PlayerExperienceMode) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Player mode") },
-        text = {
-            Column {
-                PlayerModeOption(
-                    mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-                    selectedMode = selectedMode,
-                    title = "Transcript panel",
-                    description = "Full dual-subtitle timeline with paragraph replay.",
-                    onModeChange = onModeChange,
-                )
-                HorizontalDivider()
-                PlayerModeOption(
-                    mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
-                    selectedMode = selectedMode,
-                    title = "Scroll-friendly overlay",
-                    description = "Keep YouTube scrollable so you can read comments and choose another video while the current dual subtitle stays visible.",
-                    onModeChange = onModeChange,
-                )
-            }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
-    )
-}
-
-@Composable
-private fun PlayerModeOption(
-    mode: PlayerExperienceMode,
-    selectedMode: PlayerExperienceMode,
-    title: String,
-    description: String,
-    onModeChange: (PlayerExperienceMode) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onModeChange(mode) }
-            .padding(vertical = 10.dp)
-            .testTag("player_mode_${mode.storageValue}"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(
-            selected = selectedMode == mode,
-            onClick = { onModeChange(mode) },
-        )
-        Spacer(Modifier.size(8.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(
-                description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
