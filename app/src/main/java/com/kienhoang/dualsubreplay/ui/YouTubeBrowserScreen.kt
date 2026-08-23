@@ -18,9 +18,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -55,6 +56,7 @@ import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -62,6 +64,7 @@ import org.json.JSONTokener
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
 private const val PLAYBACK_POLL_INTERVAL_MS = 250L
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
+internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
 private val trustedGoogleSignInHosts = setOf(
     "accounts.google.com",
@@ -178,7 +181,11 @@ private fun hasStoredYouTubeSessionCookie(): Boolean =
 internal data class WebPlaybackSnapshot(
     val url: String,
     val currentSecond: Float?,
+    val controlsVisible: Boolean = false,
 )
+
+internal val youtubePlayerControlsVisible = MutableStateFlow(false)
+internal val youtubeFullscreenActive = MutableStateFlow(false)
 
 private data class WebFullscreenSession(
     val view: View,
@@ -196,7 +203,29 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
         || videos.find(function(item) { return item.readyState > 0; })
         || videos[0];
       const second = video && Number.isFinite(video.currentTime) ? video.currentTime : null;
-      return JSON.stringify({ url: window.location.href, currentSecond: second });
+      const player = document.querySelector('.html5-video-player');
+      const chromeBottom = document.querySelector('.ytp-chrome-bottom');
+      const progressBar = document.querySelector('.ytp-progress-bar-container, .ytp-progress-bar');
+      const isVisible = function(element) {
+        if (!element) return false;
+        const style = window.getComputedStyle(element);
+        const opacity = Number.parseFloat(style.opacity || '1');
+        const rect = element.getBoundingClientRect();
+        return style.display !== 'none' && style.visibility !== 'hidden' &&
+          opacity > 0.05 && rect.width > 0 && rect.height > 0;
+      };
+      const controlsVisible = !!player && (
+        player.classList.contains('ytp-paused') ||
+        player.classList.contains('ytp-scrubbing') ||
+        !player.classList.contains('ytp-autohide') ||
+        isVisible(chromeBottom) ||
+        isVisible(progressBar)
+      );
+      return JSON.stringify({
+        url: window.location.href,
+        currentSecond: second,
+        controlsVisible: controlsVisible
+      });
     })();
     """.trimIndent()
 
@@ -220,6 +249,33 @@ internal fun webReplayScript(second: Float): String {
     """.trimIndent()
 }
 
+/**
+ * Hides only YouTube's rendered player captions while our bilingual learning overlay is active.
+ * The user's YouTube caption preference is left untouched and becomes visible again when the style
+ * element is removed.
+ */
+internal fun webCaptionVisibilityScript(hidden: Boolean): String {
+    val hiddenLiteral = if (hidden) "true" else "false"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          const styleId = '$YOUTUBE_CAPTION_STYLE_ID';
+          const existing = document.getElementById(styleId);
+          if ($hiddenLiteral) {
+            const style = existing || document.createElement('style');
+            style.id = styleId;
+            style.textContent = '.ytp-caption-window-container, .caption-window, .ytp-caption-segment { visibility: hidden !important; opacity: 0 !important; }';
+            if (!existing) (document.head || document.documentElement).appendChild(style);
+          } else if (existing) {
+            existing.remove();
+          }
+          return true;
+        })();
+    """.trimIndent()
+}
+
 internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     if (rawValue.isNullOrBlank() || rawValue == "null") return null
     return runCatching {
@@ -232,6 +288,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
             } else {
                 json.getDouble("currentSecond").toFloat()
             },
+            controlsVisible = json.optBoolean("controlsVisible", false),
         )
     }.getOrNull()
 }
@@ -273,12 +330,15 @@ internal fun SingleYouTubePage(
     controller: YouTubeWebController,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (videoId: String, second: Float) -> Unit,
+    suppressPageCaptions: Boolean = false,
+    fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
     val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
+    val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
         mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
@@ -344,9 +404,11 @@ internal fun SingleYouTubePage(
                     fullscreenSession?.callback?.onCustomViewHidden()
                     (view.parent as? ViewGroup)?.removeView(view)
                     fullscreenSession = WebFullscreenSession(view, callback)
+                    youtubeFullscreenActive.value = true
                 }
 
                 override fun onHideCustomView() {
+                    youtubeFullscreenActive.value = false
                     val session = fullscreenSession ?: return
                     fullscreenSession = null
                     (session.view.parent as? ViewGroup)?.removeView(session.view)
@@ -424,6 +486,10 @@ internal fun SingleYouTubePage(
                     reportNavigation(view, url)
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         CookieManager.getInstance().flush()
+                        view.evaluateJavascript(
+                            webCaptionVisibilityScript(currentSuppressPageCaptions),
+                            null,
+                        )
                     }
                 }
 
@@ -483,15 +549,23 @@ internal fun SingleYouTubePage(
         if (isYouTubeWebUrl(initialUrl)) webView.loadUrl(initialUrl)
     }
 
+    LaunchedEffect(webView, suppressPageCaptions) {
+        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+            webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
+        }
+    }
+
     LaunchedEffect(webView, lifecycleStarted) {
         if (!lifecycleStarted) return@LaunchedEffect
         while (isActive) {
             if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                youtubePlayerControlsVisible.value = false
                 delay(PLAYBACK_POLL_INTERVAL_MS)
                 continue
             }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                youtubePlayerControlsVisible.value = snapshot.controlsVisible
                 reportNavigation(webView, snapshot.url)
                 val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
                 val second = snapshot.currentSecond ?: return@evaluateJavascript
@@ -546,6 +620,8 @@ internal fun SingleYouTubePage(
 
     DisposableEffect(webView) {
         onDispose {
+            youtubePlayerControlsVisible.value = false
+            youtubeFullscreenActive.value = false
             webView.webChromeClient?.onHideCustomView()
             webView.destroySafely()
         }
@@ -586,13 +662,16 @@ internal fun SingleYouTubePage(
                 decorFitsSystemWindows = false,
             ),
         ) {
-            AndroidView(
-                factory = {
-                    (session.view.parent as? ViewGroup)?.removeView(session.view)
-                    session.view
-                },
-                modifier = Modifier.fillMaxSize().background(Color.Black),
-            )
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                AndroidView(
+                    factory = {
+                        (session.view.parent as? ViewGroup)?.removeView(session.view)
+                        session.view
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+                fullscreenOverlay?.invoke(this)
+            }
         }
     }
 }

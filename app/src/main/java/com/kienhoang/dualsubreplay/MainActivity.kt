@@ -13,7 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.kienhoang.dualsubreplay.ui.AppViewModel
-import com.kienhoang.dualsubreplay.ui.DualSubApp
+import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         allowContentInDisplayCutout()
         updateImmersiveMode(resources.configuration)
-        setContent { DualSubApp(viewModel) }
+        setContent { LearningPlayerRoot(viewModel) }
         handleIntent(intent)
     }
 
@@ -55,10 +55,16 @@ class MainActivity : ComponentActivity() {
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        // Keep the top status bar out of the video experience in every orientation.
+        controller.hide(WindowInsetsCompat.Type.statusBars())
+
+        // Landscape keeps the existing fully immersive behavior. Portrait keeps the navigation
+        // bar available while still removing the battery/time/status row from the top.
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
-            controller.show(WindowInsetsCompat.Type.systemBars())
+            controller.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 
