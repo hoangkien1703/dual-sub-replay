@@ -67,6 +67,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -418,37 +419,29 @@ private fun SideSubtitlePanel(
     Surface(
         modifier = modifier
             .onSizeChanged { panelWidthPx = it.width.toFloat() }
-            .offset { IntOffset(panelOffsetX.roundToInt(), 0) }
-            .shadow(18.dp, RoundedCornerShape(topStart = 18.dp, bottomStart = 18.dp)),
-        shape = RoundedCornerShape(topStart = 18.dp, bottomStart = 18.dp),
+            .offset { IntOffset(panelOffsetX.roundToInt(), 0) },
+        shape = RectangleShape,
         color = Color(0xFF061719),
         contentColor = Color(0xFFF3FAFA),
         tonalElevation = 8.dp,
     ) {
         Column(Modifier.fillMaxSize()) {
             Column(headerDragModifier) {
-                Box(
-                    Modifier
-                        .padding(start = 6.dp)
-                        .size(width = 4.dp, height = 42.dp),
-                ) {
-                    Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
-                }
-
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(52.dp).padding(start = 12.dp, end = 4.dp),
+                    modifier = Modifier.fillMaxWidth().height(44.dp).padding(start = 10.dp, end = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         Icons.Default.ClosedCaption,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
                     )
-                    Spacer(Modifier.size(10.dp))
+                    Spacer(Modifier.size(8.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = sourceDescription(state),
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelMedium,
                             color = Color(0xFFF3FAFA),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -461,18 +454,20 @@ private fun SideSubtitlePanel(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    IconButton(onClick = onSettings) {
+                    IconButton(onClick = onSettings, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "Subtitle settings",
                             tint = Color(0xFFE5F2F3),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
-                    IconButton(onClick = onHide) {
+                    IconButton(onClick = onHide, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Default.Close,
                             contentDescription = "Hide dual subtitles",
                             tint = Color(0xFFE5F2F3),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }

@@ -39,7 +39,7 @@ data class DualSubUiState(
     val segments: List<SubtitleSegment> = emptyList(),
     val currentIndex: Int = -1,
     val fontScale: Float = 1f,
-    val landscapeSplitEnabled: Boolean = false,
+    val landscapeSplitEnabled: Boolean = true,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -160,7 +160,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 ?.takeIf(TranslationLanguages::isSupported)
                 ?: "vi",
             onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
-            landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", false),
+            landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", true),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
