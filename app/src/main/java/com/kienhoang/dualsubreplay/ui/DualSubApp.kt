@@ -297,7 +297,6 @@ private fun DualSubExperience(
             }
         }
     }
-
     if (showSettings) {
         SubtitleSettingsDialog(
             sourcePreference = state.sourcePreference,
@@ -946,6 +945,40 @@ internal fun SubtitleSettingsDialog(
               onCheckedChange = onWordHighlightChange,
               testTag = "word_highlight_switch",
           )
+
+          Spacer(Modifier.height(14.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(14.dp))
+          Text("Default view", style = MaterialTheme.typography.titleSmall)
+          PlayerModeSettingsOption(
+              mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+              selectedMode = playerMode,
+              title = "Transcript panel",
+              description = "Full dual-subtitle timeline with paragraph replay.",
+              onModeChange = onPlayerModeChange,
+          )
+          HorizontalDivider()
+          PlayerModeSettingsOption(
+              mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+              selectedMode = playerMode,
+              title = "Scroll-friendly overlay",
+              description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
+              onModeChange = onPlayerModeChange,
+          )
+
+          Spacer(Modifier.height(14.dp))
+          OutlinedButton(
+              onClick = { showMoreSettings = !showMoreSettings },
+              modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
+          ) {
+              Text(if (showMoreSettings) "Hide more settings" else "More settings")
+          }
+
+          if (showMoreSettings) {
+          Spacer(Modifier.height(14.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(14.dp))
+          Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
           SettingsSwitchRow(
               title = "Custom subtitle colors",
               description = "Apply your chosen colors below. When off, the default theme colors are used.",
@@ -977,35 +1010,6 @@ internal fun SubtitleSettingsDialog(
               )
           }
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Default view", style = MaterialTheme.typography.titleSmall)
-          PlayerModeSettingsOption(
-              mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-              selectedMode = playerMode,
-              title = "Transcript panel",
-              description = "Full dual-subtitle timeline with paragraph replay.",
-              onModeChange = onPlayerModeChange,
-          )
-          HorizontalDivider()
-          PlayerModeSettingsOption(
-              mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
-              selectedMode = playerMode,
-              title = "Scroll-friendly overlay",
-              description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
-              onModeChange = onPlayerModeChange,
-          )
-
-          Spacer(Modifier.height(14.dp))
-          OutlinedButton(
-              onClick = { showMoreSettings = !showMoreSettings },
-              modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
-          ) {
-              Text(if (showMoreSettings) "Hide more settings" else "More settings")
-          }
-
-          if (showMoreSettings) {
           Spacer(Modifier.height(14.dp))
           HorizontalDivider()
           Spacer(Modifier.height(14.dp))
