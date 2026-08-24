@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download and installation help
+    url: https://github.com/hoangkien1703/dual-sub-replay/releases/latest
+    about: Check the latest release notes and APK before opening an issue.

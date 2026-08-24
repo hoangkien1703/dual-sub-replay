@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a reproducible problem in DualSub Replay
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve DualSub Replay. Remove private information before submitting.
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      placeholder: e.g. v0.6.0 official or preview
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: e.g. Pixel 8, Android 16
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Tap...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Caption and video context
+      description: Include caption languages and a public video URL only if it is safe to share.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs
+      description: Attach useful evidence after removing account details and other private information.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for this problem.
+          required: true
+        - label: I removed private information from the report and attachments.
+          required: true
