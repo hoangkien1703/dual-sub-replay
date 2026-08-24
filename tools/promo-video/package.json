@@ -1,0 +1,30 @@
+{
+  "name": "dualsub-replay-promo-video",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "preprocess": "node scripts/preprocess.mjs",
+    "typecheck": "tsc --noEmit",
+    "render:promo": "remotion render src/index.ts PromoVideo ../../docs/media/dualsub-replay-promo.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --props=props.json",
+    "render:loop": "remotion render src/index.ts ReadmeLoop out/readme-loop.mp4 --codec=h264 --crf=20 --pixel-format=yuv420p --props=props.json",
+    "render:poster": "remotion still src/index.ts PromoPoster ../../docs/images/dualsub-replay-promo-poster.jpg --image-format=jpeg --jpeg-quality=92 --props=props.json",
+    "render:social": "remotion still src/index.ts SocialCard ../../docs/images/dualsub-replay-social-preview.png --image-format=png --props=props.json",
+    "render": "npm run typecheck && npm run render:promo && npm run render:loop && npm run render:poster && npm run render:social && node scripts/postprocess.mjs",
+    "validate": "node scripts/validate.mjs",
+    "validate:links": "node scripts/validate-links.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.515",
+    "@remotion/google-fonts": "4.0.515",
+    "ffmpeg-static": "5.3.0",
+    "ffprobe-static": "3.1.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remotion": "4.0.515"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "typescript": "5.9.2"
+  }
+}

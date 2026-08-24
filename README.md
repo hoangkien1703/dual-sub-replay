@@ -1,24 +1,35 @@
 # DualSub Replay
 
-An Android language-learning app for watching YouTube with original and translated subtitles together. Tap any subtitle paragraph to replay that moment.
+Watch YouTube with two subtitle languages at once, then tap any sentence to replay that exact moment. Translation runs on your Android device.
 
-## App preview
+[![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
+[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+[![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-26c6da.svg)](LICENSE)
 
 <p align="center">
-  <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
+  <a href="docs/media/dualsub-replay-promo.mp4">
+    <img src="docs/images/dualsub-replay-demo.gif" alt="DualSub Replay showing dual subtitles, tap-to-replay, and fullscreen landscape mode" width="480">
+  </a>
 </p>
 
 <p align="center">
-  <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
+  <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk"><strong>Download the latest official APK</strong></a>
+  ·
+  <a href="docs/media/dualsub-replay-promo.mp4">Watch the 30-second demo</a>
 </p>
 
-<p align="center">
-  <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
-</p>
+## Why DualSub Replay?
+
+- **See every meaning:** keep original and translated captions together while you watch.
+- **Repeat without scrubbing:** tap a subtitle paragraph to jump back and hear it again.
+- **Learn privately:** translate on-device with Google ML Kit; no API key is required.
+
+If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
 
 ## Download
 
-### [Download the latest official APK](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+### [Download DualSub Replay for Android](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
 
 Requires **Android 8.0 or newer**. No account or API key is required.
 
@@ -33,6 +44,20 @@ Android may show a standard warning because the app is downloaded directly from 
 > **Updating from a preview?** Uninstall the preview build once before installing the official app. Official releases use a new production signing key; future official versions will install as normal updates.
 
 Want to test the newest development build? See the [preview release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview). Preview builds may be less stable and use a different signature.
+
+## App preview
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
+</p>
 
 ## Features
 
@@ -122,6 +147,12 @@ Every push and pull request uses the committed wrapper to run unit tests, lint, 
 ## Privacy
 
 No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads only the language models needed for selected translations, then performs translation on the device. The app stores the last Browse URL, target language, text-size setting, and landscape split ratio in local app preferences.
+
+See [PRIVACY.md](PRIVACY.md) for the full privacy overview.
+
+## Contributing and roadmap
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md), and the compact [roadmap](ROADMAP.md) before opening a pull request.
 
 ## License
 
