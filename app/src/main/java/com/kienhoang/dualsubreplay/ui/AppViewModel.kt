@@ -10,6 +10,7 @@ import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
+import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import kotlin.math.abs
@@ -38,12 +39,40 @@ data class DualSubUiState(
     val generatedCaptions: Boolean = false,
     val segments: List<SubtitleSegment> = emptyList(),
     val currentIndex: Int = -1,
+    val activeWordIndex: Int = -1,
     val fontScale: Float = 1f,
     val landscapeSplitEnabled: Boolean = true,
+    val originalColorKey: String = DEFAULT_ORIGINAL_COLOR_KEY,
+    val translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
+    val highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
+    val wordHighlightEnabled: Boolean = true,
+    val customColorsEnabled: Boolean = true,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
 )
+
+/**
+ * A source-language choice is only rejected when the video's track list is
+ * known AND clearly does not contain the requested language. While a load is
+ * still in flight (empty list) every valid selection must be accepted so
+ * changing the subtitle language mid-video always takes effect (issue #20).
+ */
+internal fun shouldAcceptSourcePreference(
+    requested: String,
+    availableSourceLanguages: List<CaptionLanguage>,
+): Boolean {
+    val normalized = TranslationLanguages.normalize(requested)
+    if (normalized == "auto") return true
+    if (availableSourceLanguages.isEmpty()) return true
+    return availableSourceLanguages.any {
+        TranslationLanguages.normalize(it.code) == normalized
+    }
+}
+
+/** Playback tracking only restarts from zero when a different video loads. */
+internal fun shouldResetPlaybackClock(previousVideoId: String?, newVideoId: String): Boolean =
+    previousVideoId != newVideoId
 
 internal fun activeSubtitleIndex(segments: List<SubtitleSegment>, timeMs: Long): Int {
     var low = 0
@@ -76,6 +105,16 @@ internal fun nearestSegmentIndex(segments: List<SubtitleSegment>, timeMs: Long):
     }
     return candidate.coerceAtLeast(0)
 }
+
+/** Word currently being spoken inside [segmentIndex]; -1 when none is tracked. */
+internal fun activeWordIndex(
+    segments: List<SubtitleSegment>,
+    segmentIndex: Int,
+    timeMs: Long,
+): Int = segments.getOrNull(segmentIndex)
+    ?.takeIf { segment -> segment.startMs <= timeMs && timeMs < segment.endMs }
+    ?.let { segment -> timedActiveWordIndex(segment.words, timeMs) }
+    ?: -1
 
 internal const val TRANSLATION_PUBLISH_BATCH = 8
 
@@ -161,6 +200,24 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 ?: "vi",
             onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
             landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", true),
+            originalColorKey = storedSubtitleColorKey(
+                preferences.getString(SUBTITLE_ORIGINAL_COLOR_PREFERENCE, null),
+                DEFAULT_ORIGINAL_COLOR_KEY,
+            ),
+            translatedColorKey = storedSubtitleColorKey(
+                preferences.getString(SUBTITLE_TRANSLATED_COLOR_PREFERENCE, null),
+                DEFAULT_TRANSLATED_COLOR_KEY,
+            ),
+            highlightColorKey = storedSubtitleColorKey(
+                preferences.getString(SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE, null),
+                DEFAULT_HIGHLIGHT_COLOR_KEY,
+            ),
+            wordHighlightEnabled = storedFeatureEnabled(
+                preferences.getBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, true),
+            ),
+            customColorsEnabled = storedFeatureEnabled(
+                preferences.getBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, true),
+            ),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -199,18 +256,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
         latestPlaybackSecondMs = timeMs
         val index = activeSubtitleIndex(current.segments, timeMs)
-        if (index != current.currentIndex) _state.update { it.copy(currentIndex = index) }
+        if (index != current.currentIndex) {
+            _state.update {
+                it.copy(
+                    currentIndex = index,
+                    activeWordIndex = activeWordIndex(it.segments, index, timeMs),
+                )
+            }
+        } else {
+            val wordIndex = activeWordIndex(current.segments, index, timeMs)
+            if (wordIndex != current.activeWordIndex) {
+                _state.update { it.copy(activeWordIndex = wordIndex) }
+            }
+        }
     }
 
     fun setSourcePreference(language: String) {
         val normalized = language.takeIf { it == "auto" } ?: TranslationLanguages.normalize(language)
         val current = _state.value
-        if (
-            normalized != "auto" &&
-            current.availableSourceLanguages.none {
-                TranslationLanguages.normalize(it.code) == normalized
-            }
-        ) return
+        if (!shouldAcceptSourcePreference(normalized, current.availableSourceLanguages)) return
         if (current.sourcePreference == normalized) return
         preferences.edit().putString("preferred_caption_language", normalized).apply()
         _state.update { it.copy(sourcePreference = normalized) }
@@ -258,6 +322,76 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(landscapeSplitEnabled = enabled) }
     }
 
+    fun setOriginalSubtitleColor(key: String) = setSubtitleColorKey(
+        preferenceKey = SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
+        key = key,
+        fallback = DEFAULT_ORIGINAL_COLOR_KEY,
+    )
+
+    fun setTranslatedSubtitleColor(key: String) = setSubtitleColorKey(
+        preferenceKey = SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
+        key = key,
+        fallback = DEFAULT_TRANSLATED_COLOR_KEY,
+    )
+
+    fun setHighlightColor(key: String) = setSubtitleColorKey(
+        preferenceKey = SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
+        key = key,
+        fallback = DEFAULT_HIGHLIGHT_COLOR_KEY,
+    )
+
+    fun setWordHighlightEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, enabled).apply()
+        _state.update { it.copy(wordHighlightEnabled = enabled, activeWordIndex = -1) }
+    }
+
+    fun setCustomColorsEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, enabled).apply()
+        _state.update { it.copy(customColorsEnabled = enabled) }
+    }
+
+    private fun setSubtitleColorKey(preferenceKey: String, key: String, fallback: String) {
+        val normalized = storedSubtitleColorKey(key, fallback)
+        val currentKey = when (preferenceKey) {
+            SUBTITLE_ORIGINAL_COLOR_PREFERENCE -> _state.value.originalColorKey
+            SUBTITLE_TRANSLATED_COLOR_PREFERENCE -> _state.value.translatedColorKey
+            else -> _state.value.highlightColorKey
+        }
+        if (currentKey == normalized) return
+        preferences.edit().putString(preferenceKey, normalized).apply()
+        _state.update { state ->
+            when (preferenceKey) {
+                SUBTITLE_ORIGINAL_COLOR_PREFERENCE -> state.copy(originalColorKey = normalized)
+                SUBTITLE_TRANSLATED_COLOR_PREFERENCE -> state.copy(translatedColorKey = normalized)
+                else -> state.copy(highlightColorKey = normalized)
+            }
+        }
+    }
+
+    /**
+     * Restores every user-facing setting to its factory default (issue #22).
+     * The browser URL is deliberately kept so the session is not disturbed.
+     */
+    fun resetAllSettings() {
+        val editor = preferences.edit()
+        RESETTABLE_SETTING_KEYS.forEach(editor::remove)
+        editor.apply()
+        latestPlaybackSecondMs = 0L
+        _state.update { current ->
+            current.copy(
+                sourcePreference = "auto",
+                targetLanguage = "vi",
+                fontScale = 1f,
+                landscapeSplitEnabled = true,
+                originalColorKey = DEFAULT_ORIGINAL_COLOR_KEY,
+                translatedColorKey = DEFAULT_TRANSLATED_COLOR_KEY,
+                highlightColorKey = DEFAULT_HIGHLIGHT_COLOR_KEY,
+                wordHighlightEnabled = true,
+                customColorsEnabled = true,
+            )
+        }
+    }
+
     fun retryCaptions() {
         val videoId = _state.value.activeVideoId ?: return
         loadVideo(videoId, showPanel = true)
@@ -296,7 +430,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadVideo(videoId: String, showPanel: Boolean) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
-        latestPlaybackSecondMs = 0L
+        // Reloading the same video (language change, retry) keeps tracking the
+        // current position so subtitles resume exactly where playback is.
+        if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
+            latestPlaybackSecondMs = 0L
+        }
         _state.update {
             it.copy(
                 activeVideoId = videoId,

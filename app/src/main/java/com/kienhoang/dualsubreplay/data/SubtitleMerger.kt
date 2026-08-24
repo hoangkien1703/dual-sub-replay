@@ -16,6 +16,7 @@ object SubtitleMerger {
         var start = ordered.first().startMs
         var end = ordered.first().endMs
         var text = clean(ordered.first().text)
+        var pendingWords = ordered.first().words.filter { word -> word.text.isNotBlank() }
 
         fun flush() {
             if (text.isNotBlank()) {
@@ -24,8 +25,10 @@ object SubtitleMerger {
                     startMs = start,
                     endMs = end,
                     originalText = text.trim(),
+                    words = timedOrEstimatedWords(text.trim(), start, end, pendingWords),
                 )
             }
+            pendingWords = emptyList()
         }
 
         ordered.drop(1).forEach { cue ->
@@ -41,13 +44,40 @@ object SubtitleMerger {
                 start = cue.startMs
                 end = cue.endMs
                 text = nextText
+                pendingWords = cue.words.filter { word -> word.text.isNotBlank() }
             } else {
                 text += separator(text.lastOrNull(), nextText.firstOrNull()) + nextText
                 end = maxOf(end, cue.endMs)
+                pendingWords += cue.words.filter { word -> word.text.isNotBlank() }
             }
         }
         flush()
         return output
+    }
+
+    /**
+     * Keeps real caption word timings when every merged cue provided them and
+     * they cover the whole segment; otherwise falls back to an even
+     * length-weighted estimate so the spoken highlight always has something to
+     * track.
+     */
+    private fun timedOrEstimatedWords(
+        segmentText: String,
+        startMs: Long,
+        endMs: Long,
+        collectedWords: List<SubtitleWord>,
+    ): List<SubtitleWord> {
+        val sorted = collectedWords.sortedBy(SubtitleWord::startMs)
+        val coversSegment = sorted.firstOrNull()?.startMs?.let { it <= startMs } == true &&
+            sorted.lastOrNull()?.endMs?.let { it >= endMs } == true
+        return if (coversSegment && sorted.all { word ->
+                word.startMs in startMs..endMs && word.endMs in (word.startMs + 1)..endMs
+            }
+        ) {
+            sorted
+        } else {
+            estimateWordTimings(segmentText, startMs, endMs)
+        }
     }
 
     private fun clean(text: String): String = text

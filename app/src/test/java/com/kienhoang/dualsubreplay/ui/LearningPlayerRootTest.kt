@@ -41,8 +41,33 @@ class LearningPlayerRootTest {
                 originalText = "Second line",
                 translatedText = "Translating…",
                 statusText = null,
+                segment = SubtitleSegment(2, 2_000, 3_000, "Second line", null),
             ),
             learningOverlayContent(state),
+        )
+    }
+
+    @Test
+    fun overlayWordHighlightFollowsTheToggle() {
+        val words = listOf(
+            com.kienhoang.dualsubreplay.data.SubtitleWord("Second", 2_000, 2_400),
+            com.kienhoang.dualsubreplay.data.SubtitleWord("line", 2_400, 3_000),
+        )
+        val segment = SubtitleSegment(2, 2_000, 3_000, "Second line", null, words = words)
+        val baseState = DualSubUiState(
+            activeVideoId = "dQw4w9WgXcQ",
+            segments = listOf(segment),
+            currentIndex = 0,
+            activeWordIndex = 1,
+        )
+
+        assertEquals(
+            1,
+            learningOverlayContent(baseState)?.activeWordIndex,
+        )
+        assertEquals(
+            -1,
+            learningOverlayContent(baseState.copy(wordHighlightEnabled = false))?.activeWordIndex,
         )
     }
 
