@@ -43,15 +43,34 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithText("Default view").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Transcript panel").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("auto_overlay_landscape_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("auto_avoid_player_controls_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("remember_overlay_position_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay").performScrollTo().performClick()
+
+        // Appearance controls are always composed.
+        composeRule.onNodeWithTag("word_highlight_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("custom_colors_switch").performScrollTo().assertIsDisplayed()
+
+        composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay")
+            .performScrollTo()
+            .performClick()
         composeRule.runOnIdle {
             assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
         }
+
+        // Advanced toggles and reset live behind the collapsed More settings section.
+        composeRule.onNodeWithTag("more_settings_toggle").performScrollTo().performClick()
+        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch")
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_overlay_landscape_switch")
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("auto_avoid_player_controls_switch")
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("remember_overlay_position_switch")
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("reset_all_settings").performScrollTo().assertIsDisplayed()
     }
 
     @Test
