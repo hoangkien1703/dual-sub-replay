@@ -981,7 +981,7 @@ internal fun SubtitleSettingsDialog(
           Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
           SettingsSwitchRow(
               title = "Custom subtitle colors",
-              description = "Apply your chosen colors below. When off, the default theme colors are used.",
+              description = "Apply your chosen text colors below. When off, the default subtitle colors are used.",
               checked = customColorsEnabled,
               onCheckedChange = onCustomColorsChange,
               testTag = "custom_colors_switch",
@@ -1009,6 +1009,9 @@ internal fun SubtitleSettingsDialog(
                   testTagPrefix = "highlight_color",
               )
           }
+
+          Spacer(Modifier.height(8.dp))
+          AdvancedAppearanceSettings()
 
           Spacer(Modifier.height(14.dp))
           HorizontalDivider()
