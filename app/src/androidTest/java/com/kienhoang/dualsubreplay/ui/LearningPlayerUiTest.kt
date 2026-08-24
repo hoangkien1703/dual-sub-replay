@@ -57,6 +57,12 @@ class LearningPlayerUiTest {
         // Custom colors and other advanced controls live behind More settings.
         composeRule.onNodeWithTag("more_settings_toggle").performScrollTo().performClick()
         composeRule.onNodeWithTag("custom_colors_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("color_option_box_background_deep_teal")
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("color_option_theme_accent_cyan")
+            .performScrollTo()
+            .assertIsDisplayed()
         composeRule.onNodeWithTag("auto_overlay_fullscreen_switch")
             .performScrollTo()
             .assertIsDisplayed()
