@@ -182,6 +182,16 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     var rememberOverlayPosition by remember {
         mutableStateOf(preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true))
     }
+    var subtitleBoxBackgroundKey by remember {
+        mutableStateOf(
+            storedSubtitleBoxBackgroundKey(
+                preferences.getString(
+                    SUBTITLE_BOX_BACKGROUND_PREFERENCE,
+                    DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY,
+                ),
+            ),
+        )
+    }
     var overlayVerticalPosition by remember {
         mutableStateOf(
   if (rememberOverlayPosition) {
@@ -225,6 +235,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
       OVERLAY_VERTICAL_POSITION_PREFERENCE -> {
           overlayVerticalPosition = normalizeOverlayVerticalPosition(
               sharedPreferences.getFloat(key, DEFAULT_OVERLAY_VERTICAL_POSITION),
+          )
+      }
+      SUBTITLE_BOX_BACKGROUND_PREFERENCE -> {
+          subtitleBoxBackgroundKey = storedSubtitleBoxBackgroundKey(
+              sharedPreferences.getString(key, DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
           )
       }
   }
@@ -309,6 +324,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         controlsVisible = youtubeControlsVisible,
     )
     val bottomPadding = (overlayBottomPaddingDp(overlayVerticalPosition) + controlsLiftDp).dp
+    val subtitleBoxBackgroundColor = subtitleBoxBackgroundColor(subtitleBoxBackgroundKey)
 
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
@@ -320,6 +336,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
       originalColor = effectiveOriginalColor(state),
       translatedColor = effectiveTranslatedColor(state),
       highlightColor = effectiveHighlightColor(state),
+      backgroundColor = subtitleBoxBackgroundColor,
       modifier = Modifier
           .align(Alignment.BottomCenter)
           .padding(start = 20.dp, end = 20.dp, bottom = bottomPadding),
@@ -383,6 +400,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
           originalColor = effectiveOriginalColor(state),
           translatedColor = effectiveTranslatedColor(state),
           highlightColor = effectiveHighlightColor(state),
+          backgroundColor = subtitleBoxBackgroundColor,
           modifier = overlayModifier,
           onPositionChange = ::updateOverlayPosition,
           onPositionChangeFinished = ::commitOverlayPosition,
@@ -421,6 +439,7 @@ internal fun LearningSubtitleOverlay(
     originalColor: Color = Color.White,
     translatedColor: Color = Color(0xFF75E7C1),
     highlightColor: Color = Color(0xFF75E7C1),
+    backgroundColor: Color = subtitleBoxBackgroundColor(DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
     onPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
     onSettings: () -> Unit,
@@ -459,7 +478,7 @@ internal fun LearningSubtitleOverlay(
   )
   .clickable { overlayActionsVisible = !overlayActionsVisible },
         shape = RoundedCornerShape(10.dp),
-        color = Color(0xD7061719),
+        color = backgroundColor,
         contentColor = Color(0xFFF3FAFA),
         tonalElevation = 4.dp,
         shadowElevation = 6.dp,
