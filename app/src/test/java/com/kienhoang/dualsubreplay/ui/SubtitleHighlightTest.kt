@@ -72,6 +72,16 @@ class SubtitleWordHighlightTest {
         )
     }
 
+    @Test fun backgroundAndThemeKeysRejectUnknownValues() {
+        assertEquals(DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY, storedSubtitleBoxBackgroundKey(null))
+        assertEquals("navy", storedSubtitleBoxBackgroundKey("navy"))
+        assertEquals(DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY, storedSubtitleBoxBackgroundKey("hot_pink"))
+
+        assertEquals(DEFAULT_APP_THEME_ACCENT_KEY, storedAppThemeAccentKey(null))
+        assertEquals("rose", storedAppThemeAccentKey("rose"))
+        assertEquals(DEFAULT_APP_THEME_ACCENT_KEY, storedAppThemeAccentKey("unknown"))
+    }
+
     @Test fun resettableSettingKeysCoverEveryUserFacingPreference() {
         val expected = setOf(
             "font_scale",
@@ -88,6 +98,8 @@ class SubtitleWordHighlightTest {
             SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
             SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
             SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
+            SUBTITLE_BOX_BACKGROUND_PREFERENCE,
+            APP_THEME_ACCENT_PREFERENCE,
             WORD_HIGHLIGHT_ENABLED_PREFERENCE,
             CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
         )
