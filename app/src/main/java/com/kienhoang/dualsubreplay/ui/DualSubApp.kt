@@ -343,7 +343,7 @@ private fun SubtitlePanel(
     val minimumDismissDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
     val scope = rememberCoroutineScope()
     val dragState = rememberDraggableState { delta ->
-        val maximum = panelHeightPx.takeIf { it > 0f } ?: Float.MAX_VALUE
+        val maximum = panelHeightPx.takeIf { it > 0f) ?: Float.MAX_VALUE
         panelOffsetY = (panelOffsetY + delta).coerceIn(0f, maximum)
     }
     val headerDragModifier = Modifier
@@ -670,7 +670,7 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
                 activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
                 originalColor = effectiveOriginalColor(state),
                 translatedColor = effectiveTranslatedColor(state),
-                highlightColor = subtitleColor(state.highlightColorKey),
+                highlightColor = effectiveHighlightColor(state),
             )
         }
     }
