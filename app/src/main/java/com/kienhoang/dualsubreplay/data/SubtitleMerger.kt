@@ -17,6 +17,7 @@ object SubtitleMerger {
         var end = ordered.first().endMs
         var text = clean(ordered.first().text)
         var pendingWords = ordered.first().words.filter { word -> word.text.isNotBlank() }
+        var pendingTimingsComplete = ordered.first().words.isNotEmpty()
 
         fun flush() {
             if (text.isNotBlank()) {
@@ -25,10 +26,17 @@ object SubtitleMerger {
                     startMs = start,
                     endMs = end,
                     originalText = text.trim(),
-                    words = timedOrEstimatedWords(text.trim(), start, end, pendingWords),
+                    words = timedOrEstimatedWords(
+                        segmentText = text.trim(),
+                        startMs = start,
+                        endMs = end,
+                        collectedWords = pendingWords,
+                        timingsComplete = pendingTimingsComplete,
+                    ),
                 )
             }
             pendingWords = emptyList()
+            pendingTimingsComplete = true
         }
 
         ordered.drop(1).forEach { cue ->
@@ -45,10 +53,12 @@ object SubtitleMerger {
                 end = cue.endMs
                 text = nextText
                 pendingWords = cue.words.filter { word -> word.text.isNotBlank() }
+                pendingTimingsComplete = cue.words.isNotEmpty()
             } else {
                 text += separator(text.lastOrNull(), nextText.firstOrNull()) + nextText
                 end = maxOf(end, cue.endMs)
                 pendingWords += cue.words.filter { word -> word.text.isNotBlank() }
+                pendingTimingsComplete = pendingTimingsComplete && cue.words.isNotEmpty()
             }
         }
         flush()
@@ -56,24 +66,26 @@ object SubtitleMerger {
     }
 
     /**
-     * Keeps real caption word timings when every merged cue provided them and
-     * they cover the whole segment; otherwise falls back to an even
-     * length-weighted estimate so the spoken highlight always has something to
-     * track.
+     * Keeps real caption word timings when every merged cue supplied them and
+     * all values are valid. Silent lead-ins and gaps are intentionally allowed:
+     * requiring timings to fill the entire cue would discard YouTube's precise
+     * offsets and replace them with estimates, making karaoke highlighting drift.
      */
     private fun timedOrEstimatedWords(
         segmentText: String,
         startMs: Long,
         endMs: Long,
         collectedWords: List<SubtitleWord>,
+        timingsComplete: Boolean,
     ): List<SubtitleWord> {
         val sorted = collectedWords.sortedBy(SubtitleWord::startMs)
-        val coversSegment = sorted.firstOrNull()?.startMs?.let { it <= startMs } == true &&
-            sorted.lastOrNull()?.endMs?.let { it >= endMs } == true
-        return if (coversSegment && sorted.all { word ->
-                word.startMs in startMs..endMs && word.endMs in (word.startMs + 1)..endMs
-            }
-        ) {
+        val hasValidTimedWords = timingsComplete && sorted.isNotEmpty() && sorted.all { word ->
+            word.startMs >= startMs &&
+                word.startMs < endMs &&
+                word.endMs > word.startMs &&
+                word.endMs <= endMs
+        }
+        return if (hasValidTimedWords) {
             sorted
         } else {
             estimateWordTimings(segmentText, startMs, endMs)

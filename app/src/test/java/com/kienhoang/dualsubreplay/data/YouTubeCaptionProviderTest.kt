@@ -21,6 +21,16 @@ class YouTubeCaptionProviderTest {
     }
 
     @Test
+    fun requestsWordTimedFormatsBeforeLegacyFallback() {
+        val urls = captionCandidateUrls(
+            "https://www.youtube.com/api/timedtext?v=test&lang=en&fmt=srv3",
+        )
+
+        assertEquals(listOf("json3", "srv3", null), urls.map { it.queryParameter("fmt") })
+        assertEquals(listOf("test", "test", "test"), urls.map { it.queryParameter("v") })
+    }
+
+    @Test
     fun readsResponsesAtOrBelowTheLimit() {
         val body = "captions".toByteArray(StandardCharsets.UTF_8)
 
