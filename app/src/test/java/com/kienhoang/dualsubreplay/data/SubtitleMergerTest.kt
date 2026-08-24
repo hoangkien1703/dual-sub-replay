@@ -52,4 +52,40 @@ class SubtitleMergerTest {
         assertEquals(2, merged.size)
         assertEquals("Next replay phrase", merged[1].originalText)
     }
+
+    @Test fun preservesPreciseTimingsAfterSilentLeadIn() {
+        val merged = SubtitleMerger.merge(
+            listOf(
+                RawCaptionCue(
+                    startMs = 0,
+                    endMs = 1_000,
+                    text = "Hello world",
+                    words = listOf(
+                        SubtitleWord("Hello", 250, 600),
+                        SubtitleWord("world", 600, 1_000),
+                    ),
+                ),
+            ),
+        ).single()
+
+        assertEquals(listOf(250L, 600L), merged.words.map { it.startMs })
+    }
+
+    @Test fun estimatesWholeMergedSegmentWhenAnyCueHasNoWordTimings() {
+        val merged = SubtitleMerger.merge(
+            listOf(
+                RawCaptionCue(
+                    startMs = 0,
+                    endMs = 1_000,
+                    text = "Hello",
+                    words = listOf(SubtitleWord("Hello", 250, 1_000)),
+                ),
+                RawCaptionCue(1_000, 2_000, "world"),
+            ),
+        ).single()
+
+        assertEquals(listOf("Hello", "world"), merged.words.map { it.text })
+        assertEquals(0L, merged.words.first().startMs)
+        assertEquals(2_000L, merged.words.last().endMs)
+    }
 }

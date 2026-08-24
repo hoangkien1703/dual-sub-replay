@@ -27,6 +27,24 @@ internal fun trustedYouTubeCaptionUrl(url: String): HttpUrl? {
     }
 }
 
+/**
+ * Prefer YouTube formats that contain per-word/chunk offsets. The unformatted
+ * endpoint is kept last as a compatibility fallback because it often returns
+ * legacy XML with cue-level timing only.
+ */
+internal fun captionCandidateUrls(baseUrl: String): List<HttpUrl> {
+    val normalizedUrl = trustedYouTubeCaptionUrl(baseUrl)
+        ?.newBuilder()
+        ?.removeAllQueryParameters("fmt")
+        ?.build()
+        ?: return emptyList()
+    return listOf(
+        normalizedUrl.newBuilder().addQueryParameter("fmt", "json3").build(),
+        normalizedUrl.newBuilder().addQueryParameter("fmt", "srv3").build(),
+        normalizedUrl,
+    ).distinct()
+}
+
 internal fun readUtf8WithLimit(
     input: InputStream,
     maxBytes: Int = MAX_YOUTUBE_RESPONSE_BYTES,
@@ -155,18 +173,10 @@ class YouTubeCaptionProvider(
     }
 
     private fun fetchCaptionCues(baseUrl: String): List<RawCaptionCue> {
-        // YouTube often supplies fmt=srv3. Requesting json3 without removing it leaves
-        // two fmt parameters and can return XML that a JSON-only parser sees as empty.
-        val cleanUrl = trustedYouTubeCaptionUrl(baseUrl)?.newBuilder()
-            ?: throw CaptionUnavailableException("YouTube returned an untrusted caption URL.")
-        val normalizedUrl = cleanUrl
-            .removeAllQueryParameters("fmt")
-            .build()
-        val candidateUrls = listOf(
-            normalizedUrl,
-            normalizedUrl.newBuilder().addQueryParameter("fmt", "json3").build(),
-            normalizedUrl.newBuilder().addQueryParameter("fmt", "srv3").build(),
-        ).distinct()
+        val candidateUrls = captionCandidateUrls(baseUrl)
+        if (candidateUrls.isEmpty()) {
+            throw CaptionUnavailableException("YouTube returned an untrusted caption URL.")
+        }
 
         candidateUrls.forEach { url ->
             val cues = try {

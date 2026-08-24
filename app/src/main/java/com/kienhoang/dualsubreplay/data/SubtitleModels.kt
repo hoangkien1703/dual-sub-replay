@@ -4,6 +4,7 @@ data class RawCaptionCue(
     val startMs: Long,
     val endMs: Long,
     val text: String,
+    val words: List<SubtitleWord> = emptyList(),
 )
 
 data class SubtitleSegment(
@@ -12,6 +13,14 @@ data class SubtitleSegment(
     val endMs: Long,
     val originalText: String,
     val translatedText: String? = null,
+    val words: List<SubtitleWord> = emptyList(),
+)
+
+/** A single spoken word/chunk with its absolute timing inside the video. */
+data class SubtitleWord(
+    val text: String,
+    val startMs: Long,
+    val endMs: Long,
 )
 
 data class CaptionTrackResult(

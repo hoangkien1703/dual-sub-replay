@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -70,6 +72,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -128,6 +131,12 @@ fun DualSubApp(
                 onTargetChange = viewModel::setTargetLanguage,
                 onFontScaleChange = viewModel::setFontScale,
                 onLandscapeSplitChange = viewModel::setLandscapeSplitEnabled,
+                onOriginalColorChange = viewModel::setOriginalSubtitleColor,
+                onTranslatedColorChange = viewModel::setTranslatedSubtitleColor,
+                onHighlightColorChange = viewModel::setHighlightColor,
+                onWordHighlightChange = viewModel::setWordHighlightEnabled,
+                onCustomColorsChange = viewModel::setCustomColorsEnabled,
+                onResetSettings = viewModel::resetAllSettings,
             )
         }
     }
@@ -149,6 +158,12 @@ private fun DualSubExperience(
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
+    onOriginalColorChange: (String) -> Unit,
+    onTranslatedColorChange: (String) -> Unit,
+    onHighlightColorChange: (String) -> Unit,
+    onWordHighlightChange: (Boolean) -> Unit,
+    onCustomColorsChange: (Boolean) -> Unit,
+    onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
     val webController = rememberYouTubeWebController()
@@ -282,7 +297,6 @@ private fun DualSubExperience(
             }
         }
     }
-
     if (showSettings) {
         SubtitleSettingsDialog(
             sourcePreference = state.sourcePreference,
@@ -291,11 +305,25 @@ private fun DualSubExperience(
             fontScale = state.fontScale,
             landscapeSplitEnabled = state.landscapeSplitEnabled,
             playerMode = playerMode,
+            originalColorKey = state.originalColorKey,
+            translatedColorKey = state.translatedColorKey,
+            highlightColorKey = state.highlightColorKey,
+            wordHighlightEnabled = state.wordHighlightEnabled,
+            customColorsEnabled = state.customColorsEnabled,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
             onLandscapeSplitChange = onLandscapeSplitChange,
             onPlayerModeChange = onPlayerModeChange,
+            onOriginalColorChange = onOriginalColorChange,
+            onTranslatedColorChange = onTranslatedColorChange,
+            onHighlightColorChange = onHighlightColorChange,
+            onWordHighlightChange = onWordHighlightChange,
+            onCustomColorsChange = onCustomColorsChange,
+            onResetSettings = {
+                showSettings = false
+                onResetSettings()
+            },
             onDismiss = { showSettings = false },
         )
     }
@@ -639,6 +667,10 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
                 active = index == state.currentIndex,
                 fontScale = state.fontScale,
                 onReplay = { onReplay(segment) },
+                activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
+                originalColor = effectiveOriginalColor(state),
+                translatedColor = effectiveTranslatedColor(state),
+                highlightColor = effectiveHighlightColor(state),
             )
         }
     }
@@ -675,6 +707,10 @@ internal fun CompactSubtitleCard(
     active: Boolean,
     fontScale: Float,
     onReplay: () -> Unit,
+    activeWordIndex: Int = -1,
+    originalColor: Color = subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY),
+    translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
+    highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -714,18 +750,23 @@ internal fun CompactSubtitleCard(
             Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = segment.originalText,
+                    text = annotatedSpokenText(
+                        segment = segment,
+                        activeWordIndex = if (active) activeWordIndex else -1,
+                        baseColor = originalColor,
+                        highlightColor = highlightColor,
+                    ),
                     fontSize = (17 * fontScale).sp,
                     lineHeight = (22 * fontScale).sp,
                     fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-                    color = Color(0xFFF3FAFA),
+                    color = originalColor,
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = segment.translatedText ?: "Translating…",
                     fontSize = (14 * fontScale).sp,
                     lineHeight = (18 * fontScale).sp,
-                    color = Color(0xFF9EDCE4),
+                    color = translatedColor,
                 )
             }
         }
@@ -766,15 +807,28 @@ internal fun SubtitleSettingsDialog(
     fontScale: Float,
     landscapeSplitEnabled: Boolean,
     playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+    originalColorKey: String = DEFAULT_ORIGINAL_COLOR_KEY,
+    translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
+    highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
+    wordHighlightEnabled: Boolean = true,
+    customColorsEnabled: Boolean = true,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
+    onOriginalColorChange: (String) -> Unit = {},
+    onTranslatedColorChange: (String) -> Unit = {},
+    onHighlightColorChange: (String) -> Unit = {},
+    onWordHighlightChange: (Boolean) -> Unit = {},
+    onCustomColorsChange: (Boolean) -> Unit = {},
+    onResetSettings: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
     var searchQuery by remember { mutableStateOf("") }
+    var showMoreSettings by remember { mutableStateOf(false) }
+    var showResetConfirmation by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val preferences = remember(context) {
         context.getSharedPreferences("dual_sub_preferences", 0)
@@ -883,6 +937,18 @@ internal fun SubtitleSettingsDialog(
           Spacer(Modifier.height(14.dp))
           HorizontalDivider()
           Spacer(Modifier.height(14.dp))
+          Text("Appearance", style = MaterialTheme.typography.titleSmall)
+          SettingsSwitchRow(
+              title = "Highlight spoken words",
+              description = "Tint the word currently being spoken in the original subtitle so you can follow along in real time.",
+              checked = wordHighlightEnabled,
+              onCheckedChange = onWordHighlightChange,
+              testTag = "word_highlight_switch",
+          )
+
+          Spacer(Modifier.height(14.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(14.dp))
           Text("Default view", style = MaterialTheme.typography.titleSmall)
           PlayerModeSettingsOption(
               mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
@@ -899,6 +965,53 @@ internal fun SubtitleSettingsDialog(
               description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
               onModeChange = onPlayerModeChange,
           )
+
+          Spacer(Modifier.height(14.dp))
+          OutlinedButton(
+              onClick = { showMoreSettings = !showMoreSettings },
+              modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
+          ) {
+              Text(if (showMoreSettings) "Hide more settings" else "More settings")
+          }
+
+          if (showMoreSettings) {
+          Spacer(Modifier.height(14.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(14.dp))
+          Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
+          SettingsSwitchRow(
+              title = "Custom subtitle colors",
+              description = "Apply your chosen text colors below. When off, the default subtitle colors are used.",
+              checked = customColorsEnabled,
+              onCheckedChange = onCustomColorsChange,
+              testTag = "custom_colors_switch",
+          )
+          if (customColorsEnabled) {
+              SubtitleColorSwatchRow(
+                  title = "Original subtitle color",
+                  selectedKey = originalColorKey,
+                  enabled = true,
+                  onColorChange = onOriginalColorChange,
+                  testTagPrefix = "original_color",
+              )
+              SubtitleColorSwatchRow(
+                  title = "Translated subtitle color",
+                  selectedKey = translatedColorKey,
+                  enabled = true,
+                  onColorChange = onTranslatedColorChange,
+                  testTagPrefix = "translated_color",
+              )
+              SubtitleColorSwatchRow(
+                  title = "Spoken-word highlight",
+                  selectedKey = highlightColorKey,
+                  enabled = wordHighlightEnabled,
+                  onColorChange = onHighlightColorChange,
+                  testTagPrefix = "highlight_color",
+              )
+          }
+
+          Spacer(Modifier.height(8.dp))
+          AdvancedAppearanceSettings()
 
           Spacer(Modifier.height(14.dp))
           HorizontalDivider()
@@ -988,10 +1101,91 @@ internal fun SubtitleSettingsDialog(
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
+          }
+
+          Spacer(Modifier.height(14.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(14.dp))
+          OutlinedButton(
+              onClick = { showResetConfirmation = true },
+              modifier = Modifier.fillMaxWidth().testTag("reset_all_settings"),
+          ) {
+              Text("Reset all settings to defaults")
+          }
       }
   },
   confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
         )
+
+        if (showResetConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showResetConfirmation = false },
+                title = { Text("Reset all settings?") },
+                text = {
+                    Text(
+                        "Languages, text size, colors, view mode, and overlay options " +
+                            "will return to their defaults. Your current video stays open.",
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showResetConfirmation = false
+                            onResetSettings()
+                        },
+                        modifier = Modifier.testTag("confirm_reset_settings"),
+                    ) { Text("Reset") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showResetConfirmation = false }) { Text("Cancel") }
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SubtitleColorSwatchRow(
+    title: String,
+    selectedKey: String,
+    enabled: Boolean,
+    onColorChange: (String) -> Unit,
+    testTagPrefix: String,
+) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Text(title)
+        Row(
+            modifier = Modifier.padding(top = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            SubtitleColorOption.entries.forEach { option ->
+                val selected = option.key == selectedKey
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(Color(option.argb))
+                        .then(
+                            if (selected) {
+                                Modifier.border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = CircleShape,
+                                )
+                            } else {
+                                Modifier.border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outline,
+                                    shape = CircleShape,
+                                )
+                            },
+                        )
+                        .clip(CircleShape)
+                        .clickable(enabled = enabled) { onColorChange(option.key) }
+                        .testTag("color_option_${testTagPrefix}_${option.key}"),
+                )
+            }
+        }
     }
 }
 

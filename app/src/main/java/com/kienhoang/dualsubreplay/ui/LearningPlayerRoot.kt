@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 
@@ -108,6 +110,8 @@ internal data class LearningOverlayContent(
     val originalText: String?,
     val translatedText: String?,
     val statusText: String?,
+    val activeWordIndex: Int = -1,
+    val segment: SubtitleSegment? = null,
 )
 
 internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? {
@@ -118,6 +122,8 @@ internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayConte
   originalText = active.originalText,
   translatedText = active.translatedText ?: "Translating…",
   statusText = null,
+  activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
+  segment = active,
         )
     }
     val status = state.errorMessage ?: state.statusMessage
@@ -176,6 +182,16 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     var rememberOverlayPosition by remember {
         mutableStateOf(preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true))
     }
+    var subtitleBoxBackgroundKey by remember {
+        mutableStateOf(
+            storedSubtitleBoxBackgroundKey(
+                preferences.getString(
+                    SUBTITLE_BOX_BACKGROUND_PREFERENCE,
+                    DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY,
+                ),
+            ),
+        )
+    }
     var overlayVerticalPosition by remember {
         mutableStateOf(
   if (rememberOverlayPosition) {
@@ -196,6 +212,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     DisposableEffect(preferences) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
   when (key) {
+      PLAYER_EXPERIENCE_MODE_PREFERENCE -> {
+          mode = storedPlayerExperienceMode(
+              sharedPreferences.getString(key, PlayerExperienceMode.TRANSCRIPT_PANEL.storageValue),
+          )
+      }
       AUTO_OVERLAY_FULLSCREEN_PREFERENCE -> {
           autoOverlayFullscreen = sharedPreferences.getBoolean(key, true)
       }
@@ -214,6 +235,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
       OVERLAY_VERTICAL_POSITION_PREFERENCE -> {
           overlayVerticalPosition = normalizeOverlayVerticalPosition(
               sharedPreferences.getFloat(key, DEFAULT_OVERLAY_VERTICAL_POSITION),
+          )
+      }
+      SUBTITLE_BOX_BACKGROUND_PREFERENCE -> {
+          subtitleBoxBackgroundKey = storedSubtitleBoxBackgroundKey(
+              sharedPreferences.getString(key, DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
           )
       }
   }
@@ -298,6 +324,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         controlsVisible = youtubeControlsVisible,
     )
     val bottomPadding = (overlayBottomPaddingDp(overlayVerticalPosition) + controlsLiftDp).dp
+    val subtitleBoxBackgroundColor = subtitleBoxBackgroundColor(subtitleBoxBackgroundKey)
 
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
@@ -306,6 +333,10 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
       content = overlayContent,
       fontScale = state.fontScale,
       position = overlayVerticalPosition,
+      originalColor = effectiveOriginalColor(state),
+      translatedColor = effectiveTranslatedColor(state),
+      highlightColor = effectiveHighlightColor(state),
+      backgroundColor = subtitleBoxBackgroundColor,
       modifier = Modifier
           .align(Alignment.BottomCenter)
           .padding(start = 20.dp, end = 20.dp, bottom = bottomPadding),
@@ -366,6 +397,10 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
           content = content,
           fontScale = state.fontScale,
           position = overlayVerticalPosition,
+          originalColor = effectiveOriginalColor(state),
+          translatedColor = effectiveTranslatedColor(state),
+          highlightColor = effectiveHighlightColor(state),
+          backgroundColor = subtitleBoxBackgroundColor,
           modifier = overlayModifier,
           onPositionChange = ::updateOverlayPosition,
           onPositionChangeFinished = ::commitOverlayPosition,
@@ -401,6 +436,10 @@ internal fun LearningSubtitleOverlay(
     fontScale: Float,
     position: Float = DEFAULT_OVERLAY_VERTICAL_POSITION,
     modifier: Modifier = Modifier,
+    originalColor: Color = Color.White,
+    translatedColor: Color = Color(0xFF75E7C1),
+    highlightColor: Color = Color(0xFF75E7C1),
+    backgroundColor: Color = subtitleBoxBackgroundColor(DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
     onPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
     onSettings: () -> Unit,
@@ -439,7 +478,7 @@ internal fun LearningSubtitleOverlay(
   )
   .clickable { overlayActionsVisible = !overlayActionsVisible },
         shape = RoundedCornerShape(10.dp),
-        color = Color(0xD7061719),
+        color = backgroundColor,
         contentColor = Color(0xFFF3FAFA),
         tonalElevation = 4.dp,
         shadowElevation = 6.dp,
@@ -457,12 +496,22 @@ internal fun LearningSubtitleOverlay(
         ) {
   Column(Modifier.weight(1f)) {
       content.originalText?.let { original ->
+          val annotated = if (content.activeWordIndex >= 0 && content.segment != null) {
+              annotatedSpokenText(
+                  segment = content.segment,
+                  activeWordIndex = content.activeWordIndex,
+                  baseColor = originalColor,
+                  highlightColor = highlightColor,
+              )
+          } else {
+              AnnotatedString(original)
+          }
           Text(
-              text = original,
+              text = annotated,
               fontSize = (17f * fontScale).sp,
               lineHeight = (21f * fontScale).sp,
               fontWeight = FontWeight.Medium,
-              color = Color.White,
+              color = originalColor,
               maxLines = 2,
               overflow = TextOverflow.Ellipsis,
           )
@@ -473,7 +522,7 @@ internal fun LearningSubtitleOverlay(
               text = translated,
               fontSize = (14f * fontScale).sp,
               lineHeight = (18f * fontScale).sp,
-              color = Color(0xFF75E7C1),
+              color = translatedColor,
               maxLines = 2,
               overflow = TextOverflow.Ellipsis,
           )

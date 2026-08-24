@@ -117,15 +117,16 @@ jobs:
 
             **Preview users:** uninstall the preview build once before installing this official release because preview and official builds use different signing keys.
 
-            ## v0.8.0 highlights
+            ## v0.9.0 highlights
 
-            - Adds a LingoTube-inspired scroll-friendly bilingual subtitle overlay while keeping the normal YouTube page usable.
-            - Drag the subtitle overlay vertically, optionally remember its position, and reset it from settings.
-            - Automatically moves subtitles away from YouTube playback controls and restores the chosen position afterward.
-            - Automatically uses the compact overlay in fullscreen and landscape when enabled.
-            - Consolidates caption languages, text size, default view, and overlay behavior into one settings screen.
-            - Suppresses duplicate YouTube-rendered captions while the DualSub overlay is active and restores them when leaving it.
-            - Keeps the transcript panel, tap-to-replay flow, comments, recommendations, and single-WebView architecture.
+            - Adds much more accurate karaoke-style spoken-word highlighting using YouTube JSON3/SRV3 word timing when available, with safe fallback timing for legacy captions.
+            - Fixes mid-video caption-language changes so the selected language reliably reloads without losing the current playback position.
+            - Adds customizable original, translated, and spoken-word subtitle colors, with proper fallback to the default palette when custom colors are disabled.
+            - Adds selectable background colors for the compact dual-subtitle overlay.
+            - Adds app accent-theme customization for switches, sliders, buttons, active borders, and other controls.
+            - Moves advanced appearance and playback options into **More settings** to keep the main settings screen simpler.
+            - Adds **Reset all settings to defaults**, including subtitle colors, overlay background, theme accent, view mode, overlay behavior, and language preferences.
+            - Keeps the scroll-friendly overlay, draggable positioning, fullscreen/landscape behavior, transcript replay, comments, recommendations, and single-WebView architecture.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
