@@ -150,6 +150,54 @@ class LearningPlayerRootTest {
     }
 
     @Test
+    fun horizontalOverlayPositionNormalizesAndStaysCenteredByDefault() {
+        assertEquals(DEFAULT_OVERLAY_HORIZONTAL_POSITION, normalizeOverlayHorizontalPosition(Float.NaN))
+        assertEquals(0f, normalizeOverlayHorizontalPosition(-3f))
+        assertEquals(1f, normalizeOverlayHorizontalPosition(7f))
+        assertEquals(-1f, overlayHorizontalShiftFraction(0f))
+        assertEquals(0f, overlayHorizontalShiftFraction(0.5f))
+        assertEquals(1f, overlayHorizontalShiftFraction(1f))
+    }
+
+    @Test
+    fun horizontalOverlayShiftKeepsTheBoxFullyOnScreen() {
+        // Degenerate sizes never shift the box.
+        assertEquals(0, overlayHorizontalShiftPx(1f, 0, 0))
+        assertEquals(0, overlayHorizontalShiftPx(1f, 400, 400))
+        val halfFreeSpace = (800 - 300) / 2
+        assertEquals(halfFreeSpace, overlayHorizontalShiftPx(1f, 800, 300))
+        assertEquals(-halfFreeSpace, overlayHorizontalShiftPx(-1f, 800, 300))
+        assertEquals(0, overlayHorizontalShiftPx(0f, 800, 300))
+        // Out-of-range fractions are clamped instead of pushing the box off screen.
+        assertEquals(halfFreeSpace, overlayHorizontalShiftPx(9f, 800, 300))
+    }
+
+    @Test
+    fun fullscreenOverlayCanTravelFromTopToBottom() {
+        val screenHeight = 800
+        val top = fullscreenOverlayBottomPaddingDp(0f, screenHeight)
+        val bottom = fullscreenOverlayBottomPaddingDp(1f, screenHeight)
+        assertTrue("position 0 should reach the top", top >= screenHeight - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP - 60)
+        assertEquals(0, bottom)
+        assertTrue(
+            fullscreenOverlayBottomPaddingDp(0.4f, screenHeight) >
+                fullscreenOverlayBottomPaddingDp(0.6f, screenHeight),
+        )
+        // Player-control avoidance lifts the box without going negative.
+        assertTrue(fullscreenOverlayBottomPaddingDp(1f, screenHeight, PLAYER_CONTROLS_AVOIDANCE_LIFT_DP) >= 0)
+    }
+
+    @Test
+    fun swipeDownDismissesOnlyDeliberateOrFastDownwardGestures() {
+        val minimum = SUBTITLE_BOX_MINIMUM_SWIPE_DISTANCE_DP.toFloat()
+        assertFalse(shouldDismissSubtitleBox(-50f, 4_000f, minimum))
+        assertFalse(shouldDismissSubtitleBox(0f, 4_000f, minimum))
+        assertFalse(shouldDismissSubtitleBox(20f, 900f, minimum))
+        assertTrue(shouldDismissSubtitleBox(minimum, 0f, minimum))
+        assertTrue(shouldDismissSubtitleBox(minimum / 2f, 2_000f, minimum))
+    }
+
+    @Test
     fun captionSuppressionIsOriginCheckedAndReversible() {
         val hidden = webCaptionVisibilityScript(hidden = true)
         val restored = webCaptionVisibilityScript(hidden = false)

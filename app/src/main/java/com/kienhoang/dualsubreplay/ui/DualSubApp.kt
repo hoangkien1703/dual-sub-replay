@@ -138,6 +138,7 @@ fun DualSubApp(
                 onHighlightColorChange = viewModel::setHighlightColor,
                 onWordHighlightChange = viewModel::setWordHighlightEnabled,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
+                onSplitSentencesChange = viewModel::setSplitLongSentencesEnabled,
                 onResetSettings = viewModel::resetAllSettings,
             )
         }
@@ -165,6 +166,7 @@ private fun DualSubExperience(
     onHighlightColorChange: (String) -> Unit,
     onWordHighlightChange: (Boolean) -> Unit,
     onCustomColorsChange: (Boolean) -> Unit,
+    onSplitSentencesChange: (Boolean) -> Unit,
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
@@ -312,6 +314,7 @@ private fun DualSubExperience(
             highlightColorKey = state.highlightColorKey,
             wordHighlightEnabled = state.wordHighlightEnabled,
             customColorsEnabled = state.customColorsEnabled,
+            splitLongSentencesEnabled = state.splitLongSentencesEnabled,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
@@ -319,13 +322,14 @@ private fun DualSubExperience(
             onPlayerModeChange = onPlayerModeChange,
             onOriginalColorChange = onOriginalColorChange,
             onTranslatedColorChange = onTranslatedColorChange,
-            onHighlightColorChange = onHighlightColorChange,
-            onWordHighlightChange = onWordHighlightChange,
-            onCustomColorsChange = onCustomColorsChange,
-            onResetSettings = {
-                showSettings = false
-                onResetSettings()
-            },
+                onHighlightColorChange = onHighlightColorChange,
+                onWordHighlightChange = onWordHighlightChange,
+                onCustomColorsChange = onCustomColorsChange,
+                onSplitSentencesChange = onSplitSentencesChange,
+                onResetSettings = {
+                    showSettings = false
+                    onResetSettings()
+                },
             onDismiss = { showSettings = false },
         )
     }
@@ -824,6 +828,8 @@ internal fun SubtitleSettingsDialog(
     onHighlightColorChange: (String) -> Unit = {},
     onWordHighlightChange: (Boolean) -> Unit = {},
     onCustomColorsChange: (Boolean) -> Unit = {},
+    splitLongSentencesEnabled: Boolean = true,
+    onSplitSentencesChange: (Boolean) -> Unit = {},
     onResetSettings: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
@@ -846,6 +852,9 @@ internal fun SubtitleSettingsDialog(
     }
     var rememberOverlayPosition by remember {
         mutableStateOf(preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true))
+    }
+    var movableSubtitleBox by remember {
+        mutableStateOf(preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true))
     }
     val sourceChoices = listOf(LanguageChoice("auto", "Auto (recommended)")) +
         availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
@@ -980,6 +989,18 @@ internal fun SubtitleSettingsDialog(
           Spacer(Modifier.height(14.dp))
           HorizontalDivider()
           Spacer(Modifier.height(14.dp))
+          Text("Captions layout", style = MaterialTheme.typography.titleSmall)
+          SettingsSwitchRow(
+              title = "Split long sentences",
+              description = "Cut long dual subtitles into shorter chunks at sentence breaks so they are easier to follow. On by default.",
+              checked = splitLongSentencesEnabled,
+              onCheckedChange = onSplitSentencesChange,
+              testTag = "split_long_sentences_switch",
+          )
+
+          Spacer(Modifier.height(8.dp))
+          HorizontalDivider()
+          Spacer(Modifier.height(8.dp))
           Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
           SettingsSwitchRow(
               title = "Custom subtitle colors",
@@ -1045,6 +1066,16 @@ internal fun SubtitleSettingsDialog(
           Spacer(Modifier.height(14.dp))
           Text("Overlay", style = MaterialTheme.typography.titleSmall)
           SettingsSwitchRow(
+              title = "Movable subtitle box",
+              description = "Drag the dual-subtitle box anywhere on screen, including the top edge in fullscreen. Flick it straight down in portrait to close it.",
+              checked = movableSubtitleBox,
+              onCheckedChange = {
+                  movableSubtitleBox = it
+                  setBooleanPreference(MOVABLE_OVERLAY_PREFERENCE, it)
+              },
+              testTag = "movable_subtitle_box_switch",
+          )
+          SettingsSwitchRow(
               title = "Automatically avoid video controls",
               description = "Move subtitles upward while YouTube's seek bar and playback controls are visible.",
               checked = autoAvoidPlayerControls,
@@ -1068,7 +1099,7 @@ internal fun SubtitleSettingsDialog(
               testTag = "remember_overlay_position_switch",
           )
           Text(
-              "Drag the subtitle box up or down directly on the video to reposition it.",
+              "Drag the subtitle box up, down, or sideways directly on the video to reposition it. In fullscreen you can move it all the way to the top; flicking it down closes it.",
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -1079,6 +1110,10 @@ internal fun SubtitleSettingsDialog(
                       .putFloat(
                           OVERLAY_VERTICAL_POSITION_PREFERENCE,
                           DEFAULT_OVERLAY_VERTICAL_POSITION,
+                      )
+                      .putFloat(
+                          OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+                          DEFAULT_OVERLAY_HORIZONTAL_POSITION,
                       )
                       .apply()
               },

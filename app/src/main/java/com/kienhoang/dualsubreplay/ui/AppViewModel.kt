@@ -48,6 +48,7 @@ data class DualSubUiState(
     val highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
     val wordHighlightEnabled: Boolean = true,
     val customColorsEnabled: Boolean = true,
+    val splitLongSentencesEnabled: Boolean = true,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -180,6 +181,7 @@ internal fun normalizedOnboardingLanguages(
 }
 
 internal const val GUIDE_COMPLETED_PREFERENCE = "guide_completed"
+internal const val SPLIT_LONG_SENTENCES_PREFERENCE = "split_long_sentences"
 
 /**
  * The "guide_completed" preference only exists after the first-launch guide has
@@ -200,6 +202,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private var loadingJob: Job? = null
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
+    private var rawMergedSegments: List<SubtitleSegment> = emptyList()
 
     private val _state = MutableStateFlow(
         DualSubUiState(
@@ -237,6 +240,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             ),
             customColorsEnabled = storedFeatureEnabled(
                 preferences.getBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, true),
+            ),
+            splitLongSentencesEnabled = storedFeatureEnabled(
+                preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
             ),
         ),
     )
@@ -375,6 +381,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(customColorsEnabled = enabled) }
     }
 
+    /**
+     * Toggling "Split long sentences" (issue #25) re-derives the displayed
+     * segments from the raw merged captions so both the overlay and the
+     * transcript panel switch immediately, then re-translates them.
+     */
+    fun setSplitLongSentencesEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, enabled).apply()
+        val alreadyEnabled = _state.value.splitLongSentencesEnabled
+        _state.update { it.copy(splitLongSentencesEnabled = enabled) }
+        if (alreadyEnabled == enabled) return
+        refreshSplitSegments()
+    }
+
+    private fun refreshSplitSegments() {
+        if (_state.value.activeVideoId != null && rawMergedSegments.isNotEmpty()) {
+            retranslateCurrentSegments()
+        }
+    }
+
     private fun setSubtitleColorKey(preferenceKey: String, key: String, fallback: String) {
         val normalized = storedSubtitleColorKey(key, fallback)
         val currentKey = when (preferenceKey) {
@@ -413,8 +438,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 highlightColorKey = DEFAULT_HIGHLIGHT_COLOR_KEY,
                 wordHighlightEnabled = true,
                 customColorsEnabled = true,
+                splitLongSentencesEnabled = true,
             )
         }
+        // "Reset all settings" re-enables sentence splitting, so the currently
+        // open video switches back to the default short-chunk presentation.
+        refreshSplitSegments()
     }
 
     fun retryCaptions() {
@@ -436,6 +465,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadGeneration += 1
         loadingJob?.cancel()
         latestPlaybackSecondMs = 0L
+        rawMergedSegments = emptyList()
         _state.update {
             it.copy(
                 activeVideoId = null,
@@ -483,6 +513,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     throw CaptionUnavailableException("This caption track contains no readable text.")
                 }
                 if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
+                val displaySegments = if (_state.value.splitLongSentencesEnabled) {
+                    SubtitleMerger.splitLongSegments(merged)
+                } else {
+                    merged
+                }
+                rawMergedSegments = merged
 
                 _state.update { current ->
                     if (!isCurrentLoad(current, videoId, generation)) return@update current
@@ -494,7 +530,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         ),
                         availableSourceLanguages = track.availableLanguages,
                         generatedCaptions = track.isGenerated,
-                        segments = merged,
+                        segments = displaySegments,
                         stage = LoadStage.TRANSLATING,
                         statusMessage = translationStartingMessage(current.targetLanguage),
                     )
@@ -505,7 +541,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     generation = generation,
                     sourceLanguage = track.languageCode,
                     targetLanguage = _state.value.targetLanguage,
-                    segments = merged,
+                    segments = displaySegments,
                 )
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
@@ -525,8 +561,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val current = _state.value
         val videoId = current.activeVideoId ?: return
         val sourceLanguage = current.resolvedSourceLanguage ?: return
-        val segments = current.segments
-        if (segments.isEmpty()) return
+        // Re-derive from the raw merged captions so toggling the sentence
+        // splitter (issue #25) always starts from un-split text.
+        val baseSegments = rawMergedSegments.ifEmpty { current.segments }
+        if (baseSegments.isEmpty()) return
+        val segments = if (current.splitLongSentencesEnabled) {
+            SubtitleMerger.splitLongSegments(baseSegments)
+        } else {
+            baseSegments
+        }
 
         val generation = ++loadGeneration
         loadingJob?.cancel()

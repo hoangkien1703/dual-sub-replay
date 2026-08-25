@@ -110,4 +110,146 @@ object SubtitleMerger {
         -> true
         else -> false
     }
+
+    internal fun splitLongSegments(
+        segments: List<SubtitleSegment>,
+        maxCharacters: Int = SPLIT_SENTENCE_MAX_CHARACTERS,
+    ): List<SubtitleSegment> {
+        if (segments.isEmpty()) return emptyList()
+        val output = mutableListOf<SubtitleSegment>()
+        segments.forEach { segment ->
+            val chunks = splitSentenceChunks(segment.originalText, maxCharacters)
+            if (chunks.size <= 1) {
+                output += segment
+                return@forEach
+            }
+            output += buildSplitSegments(segment, chunks)
+        }
+        return output
+    }
+
+    /** Splits [text] into short chunks at sentence ends, then clause marks, then word edges. */
+    internal fun splitSentenceChunks(text: String, maxCharacters: Int): List<String> {
+        val safeMax = maxCharacters.coerceAtLeast(16)
+        val pieces = mutableListOf<String>()
+        text.split(sentenceBreak).forEach { sentence ->
+            val trimmed = sentence.trim()
+            if (trimmed.isEmpty()) return@forEach
+            if (trimmed.length <= safeMax) {
+                pieces += trimmed
+                return@forEach
+            }
+            trimmed.split(clauseBreak).forEach { clause ->
+                val cleanClause = clause.trim()
+                if (cleanClause.isEmpty()) return@forEach
+                pieces += wrapAtWordEdges(cleanClause, safeMax)
+            }
+        }
+        return mergeTinyTrailingChunk(pieces, safeMax)
+    }
+
+    private fun mergeTinyTrailingChunk(pieces: List<String>, safeMax: Int): List<String> {
+        // A lone dangling word reads worse than a slightly longer final chunk,
+        // but never re-create an oversized chunk while doing so.
+        if (pieces.size < 2) return pieces
+        val last = pieces.last()
+        if (last.length > safeMax / 4) return pieces
+        val secondLast = pieces[pieces.size - 2]
+        val glue = if (secondLast.lastOrNull()?.let(::isCjk) == true && last.firstOrNull()?.let(::isCjk) == true) "" else " "
+        if (secondLast.length + glue.length + last.length > safeMax) return pieces
+        return pieces.dropLast(2) + (secondLast + glue + last).trim()
+    }
+
+    private fun wrapAtWordEdges(text: String, safeMax: Int): List<String> {
+        if (text.length <= safeMax) return listOf(text)
+        val hasSpaces = text.any(Char::isWhitespace)
+        if (!hasSpaces) {
+            // CJK runs have no word boundaries; cut on fixed character windows.
+            return text.chunked(safeMax)
+        }
+        val words = text.split(Regex("\\s+"))
+        val wrapped = mutableListOf<String>()
+        var current = StringBuilder()
+        words.forEach { word ->
+            val candidate = if (current.isEmpty()) word else "$current $word"
+            when {
+                current.isNotEmpty() && candidate.length > safeMax -> {
+                    wrapped += current.toString()
+                    current = StringBuilder(word)
+                }
+                else -> current = StringBuilder(candidate)
+            }
+        }
+        if (current.isNotEmpty()) wrapped += current.toString()
+        return wrapped
+    }
+
+    /**
+     * Turns one long segment into several short ones. The time range and the
+     * caption words are divided proportionally so karaoke highlighting keeps
+     * tracking the spoken word inside every new chunk.
+     */
+    private fun buildSplitSegments(segment: SubtitleSegment, chunks: List<String>): List<SubtitleSegment> {
+        val duration = (segment.endMs - segment.startMs).coerceAtLeast(0L)
+        val lengths = chunks.map { chunk -> chunk.length.toFloat().coerceAtLeast(1f) }
+        val totalLength = lengths.sum()
+        var consumedWeight = 0f
+        val ranges = chunks.mapIndexed { index, _ ->
+            val startShare = consumedWeight / totalLength
+            consumedWeight += lengths[index]
+            val endShare = consumedWeight / totalLength
+            val chunkStart = segment.startMs + (duration * startShare).toLong()
+            val chunkEnd = if (index == chunks.lastIndex) {
+                segment.endMs
+            } else {
+                segment.startMs + (duration * endShare).toLong()
+            }
+            chunkStart..chunkEnd
+        }.toMutableList()
+        // Keep ranges monotonic even for degenerate zero-length inputs.
+        for (index in 1 until ranges.size) {
+            if (ranges[index].first < ranges[index - 1].last) {
+                ranges[index] = ranges[index - 1].last..ranges[index].last
+            }
+        }
+
+        val assignedWords = assignWordsToRanges(segment.words, ranges)
+
+        return chunks.mapIndexed { index, chunkText ->
+            val range = ranges[index]
+            val words = assignedWords[index].ifEmpty {
+                estimateWordTimings(chunkText, range.first, range.last)
+            }
+            SubtitleSegment(
+                id = segment.id * 1000L + index,
+                startMs = range.first.coerceIn(segment.startMs, segment.endMs),
+                endMs = range.last.coerceIn(segment.startMs, segment.endMs),
+                originalText = chunkText,
+                translatedText = null,
+                words = words,
+            )
+        }
+    }
+
+    /** Places each timed word into the range covering its midpoint; misses fall back to estimates. */
+    private fun assignWordsToRanges(
+        words: List<SubtitleWord>,
+        ranges: List<LongRange>,
+    ): List<List<SubtitleWord>> {
+        val buckets = List(ranges.size) { mutableListOf<SubtitleWord>() }
+        words.forEach { word ->
+            val midpoint = (word.startMs + word.endMs) / 2L
+            val target = ranges.indexOfFirst { range -> midpoint in range }
+            val bucketIndex = if (target >= 0) target else {
+                if (midpoint < ranges.first().first) 0 else ranges.lastIndex
+            }
+            buckets[bucketIndex] += word
+        }
+        return buckets
+    }
 }
+
+internal const val SPLIT_SENTENCE_MAX_CHARACTERS = 48
+
+private val sentenceBreak = Regex("(?<=[.!?。！？…][\"'’”)]*)\\s+")
+private val clauseBreak = Regex("(?<=[,;:])\\s+")
