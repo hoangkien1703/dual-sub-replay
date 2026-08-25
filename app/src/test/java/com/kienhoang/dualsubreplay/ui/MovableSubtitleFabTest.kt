@@ -1,6 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.res.Configuration
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MovableSubtitleFabTest {
@@ -9,6 +11,41 @@ class MovableSubtitleFabTest {
         assertEquals(1f, normalizeControlPosition(3f), 0f)
         assertEquals(0.4f, normalizeControlPosition(0.4f), 0f)
         assertEquals(1f, normalizeControlPosition(Float.NaN), 0f)
+    }
+
+    @Test fun defaultCcIsHigherAndFullscreenLandscapeStartsNearTheTop() {
+        assertEquals(0.72f, DEFAULT_COLLAPSED_CC_VERTICAL_POSITION, 0f)
+        assertEquals(
+            FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+            collapsedCcVerticalPositionForContext(
+                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                isFullscreen = true,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+            0f,
+        )
+        assertEquals(
+            DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+            collapsedCcVerticalPositionForContext(
+                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                isFullscreen = false,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+            0f,
+        )
+        assertEquals(
+            0.44f,
+            collapsedCcVerticalPositionForContext(
+                0.44f,
+                isFullscreen = true,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+            0f,
+        )
+        assertTrue(
+            FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION <
+                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+        )
     }
 
     @Test fun offsetKeepsTheWholeControlInsideMargins() {

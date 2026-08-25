@@ -69,6 +69,7 @@ internal const val OVERLAY_VERTICAL_POSITION_PREFERENCE = "overlay_vertical_posi
 internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_horizontal_position"
 internal const val MOVABLE_OVERLAY_PREFERENCE = "movable_subtitle_box"
 internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
+internal const val FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION = 0.08f
 internal const val DEFAULT_OVERLAY_HORIZONTAL_POSITION = 0.5f
 internal const val FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP = 88
 internal const val PLAYER_CONTROLS_AVOIDANCE_LIFT_DP = 88
@@ -84,6 +85,25 @@ internal fun storedPlayerExperienceMode(raw: String?): PlayerExperienceMode =
 
 internal fun normalizeOverlayVerticalPosition(value: Float): Float =
     if (value.isFinite()) value.coerceIn(0f, 1f) else DEFAULT_OVERLAY_VERTICAL_POSITION
+
+/**
+ * The regular overlay keeps its lower default, while fullscreen landscape starts
+ * near the top unless the user has moved it away from that default.
+ */
+internal fun fullscreenOverlayVerticalPosition(
+    position: Float,
+    orientation: Int,
+): Float {
+    val normalized = normalizeOverlayVerticalPosition(position)
+    return if (
+        orientation == Configuration.ORIENTATION_LANDSCAPE &&
+        normalized == DEFAULT_OVERLAY_VERTICAL_POSITION
+    ) {
+        FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION
+    } else {
+        normalized
+    }
+}
 
 /** 0 = higher, 1 = lower. */
 internal fun overlayBottomPaddingDp(position: Float): Int {
@@ -141,6 +161,13 @@ internal fun fullscreenOverlayBottomPaddingDp(
 
 internal fun fullscreenOverlayDragTravelDp(screenHeightDp: Int): Int =
     (screenHeightDp.coerceAtLeast(240) - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP).coerceAtLeast(60)
+
+internal fun fullscreenOverlayBottomPaddingWithControlsDp(
+    position: Float,
+    screenHeightDp: Int,
+    controlsLiftDp: Int,
+): Int = (fullscreenOverlayBottomPaddingDp(position, screenHeightDp) + controlsLiftDp)
+    .coerceIn(0, fullscreenOverlayDragTravelDp(screenHeightDp))
 
 internal fun playerControlsAvoidanceLiftDp(
     enabled: Boolean,
@@ -408,12 +435,15 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         controlsVisible = youtubeControlsVisible,
     )
     val bottomPadding = (overlayBottomPaddingDp(overlayVerticalPosition) + controlsLiftDp).dp
-    // Fullscreen travels the whole screen so the box can sit at the very top.
-    val fullscreenBottomPadding = (
-        fullscreenOverlayBottomPaddingDp(
-            position = overlayVerticalPosition,
-            screenHeightDp = configuration.screenHeightDp,
-        ) + controlsLiftDp
+    val fullscreenVerticalPosition = fullscreenOverlayVerticalPosition(
+        position = overlayVerticalPosition,
+        orientation = configuration.orientation,
+    )
+    // Fullscreen landscape defaults close to the top and still keeps the whole box on-screen.
+    val fullscreenBottomPadding = fullscreenOverlayBottomPaddingWithControlsDp(
+        position = fullscreenVerticalPosition,
+        screenHeightDp = configuration.screenHeightDp,
+        controlsLiftDp = controlsLiftDp,
     ).dp
     val subtitleBoxBackgroundColor = subtitleBoxBackgroundColor(subtitleBoxBackgroundKey)
 
@@ -425,12 +455,13 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     onClick = { fullscreenOverlayHiddenByUser = false },
                     modifier = Modifier.fillMaxSize(),
                     autoDimAfterMillis = 1_000L,
+                    isFullscreen = true,
                 )
             } else {
                 LearningSubtitleOverlay(
                     content = overlayContent,
                     fontScale = state.fontScale,
-                    position = overlayVerticalPosition,
+                    position = fullscreenVerticalPosition,
                     orientation = configuration.orientation,
                     movableEnabled = movableSubtitleBox,
                     horizontalPosition = overlayHorizontalPosition,

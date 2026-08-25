@@ -173,6 +173,35 @@ class LearningPlayerRootTest {
     }
 
     @Test
+    fun fullscreenLandscapeStartsNearTheTopButKeepsDraggedPositions() {
+        assertEquals(
+            FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION,
+            fullscreenOverlayVerticalPosition(
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+                Configuration.ORIENTATION_LANDSCAPE,
+            ),
+            0f,
+        )
+        assertEquals(
+            DEFAULT_OVERLAY_VERTICAL_POSITION,
+            fullscreenOverlayVerticalPosition(
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+                Configuration.ORIENTATION_PORTRAIT,
+            ),
+            0f,
+        )
+        assertEquals(
+            0.37f,
+            fullscreenOverlayVerticalPosition(0.37f, Configuration.ORIENTATION_LANDSCAPE),
+            0f,
+        )
+        assertTrue(
+            FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION <
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+        )
+    }
+
+    @Test
     fun fullscreenOverlayCanTravelFromTopToBottom() {
         val screenHeight = 800
         val top = fullscreenOverlayBottomPaddingDp(0f, screenHeight)
@@ -183,8 +212,16 @@ class LearningPlayerRootTest {
             fullscreenOverlayBottomPaddingDp(0.4f, screenHeight) >
                 fullscreenOverlayBottomPaddingDp(0.6f, screenHeight),
         )
-        // Player-control avoidance lifts the box without going negative.
+        // Player-control avoidance lifts the box but clamps at the top edge.
         assertTrue(fullscreenOverlayBottomPaddingDp(1f, screenHeight, PLAYER_CONTROLS_AVOIDANCE_LIFT_DP) >= 0)
+        assertEquals(
+            fullscreenOverlayDragTravelDp(screenHeight),
+            fullscreenOverlayBottomPaddingWithControlsDp(
+                position = 0f,
+                screenHeightDp = screenHeight,
+                controlsLiftDp = PLAYER_CONTROLS_AVOIDANCE_LIFT_DP,
+            ),
+        )
     }
 
     @Test

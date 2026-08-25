@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -26,6 +27,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -36,11 +38,29 @@ import kotlin.math.roundToInt
 internal const val COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE = "collapsed_cc_horizontal_position"
 internal const val COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE = "collapsed_cc_vertical_position"
 internal const val DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION = 1f
-internal const val DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 1f
+internal const val DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 0.72f
+internal const val FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 0.08f
 private const val COLLAPSED_CC_MARGIN_DP = 16
 
 internal fun normalizeControlPosition(value: Float, fallback: Float = 1f): Float =
     if (value.isFinite()) value.coerceIn(0f, 1f) else fallback.coerceIn(0f, 1f)
+
+internal fun collapsedCcVerticalPositionForContext(
+    position: Float,
+    isFullscreen: Boolean,
+    orientation: Int,
+): Float {
+    val normalized = normalizeControlPosition(position, DEFAULT_COLLAPSED_CC_VERTICAL_POSITION)
+    return if (
+        isFullscreen &&
+        orientation == Configuration.ORIENTATION_LANDSCAPE &&
+        normalized == DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+    ) {
+        FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+    } else {
+        normalized
+    }
+}
 
 internal fun controlOffsetPx(
     position: Float,
@@ -76,8 +96,10 @@ internal fun MovableSubtitleFab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     autoDimAfterMillis: Long? = null,
+    isFullscreen: Boolean = false,
 ) {
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     val preferences = remember(context) {
         context.getSharedPreferences("dual_sub_preferences", 0)
     }
@@ -101,18 +123,20 @@ internal fun MovableSubtitleFab(
             },
         )
     }
-    var verticalPosition by remember {
+    var verticalPosition by remember(isFullscreen, configuration.orientation) {
         mutableFloatStateOf(
-            if (rememberPosition) {
-                normalizeControlPosition(
+            collapsedCcVerticalPositionForContext(
+                position = if (rememberPosition) {
                     preferences.getFloat(
                         COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
                         DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
-                    ),
-                )
-            } else {
-                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
-            },
+                    )
+                } else {
+                    DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+                },
+                isFullscreen = isFullscreen,
+                orientation = configuration.orientation,
+            ),
         )
     }
     var offsetXPx by remember { mutableFloatStateOf(0f) }
@@ -156,7 +180,11 @@ internal fun MovableSubtitleFab(
                     rememberPosition = sharedPreferences.getBoolean(key, true)
                     if (!rememberPosition) {
                         horizontalPosition = DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION
-                        verticalPosition = DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+                        verticalPosition = collapsedCcVerticalPositionForContext(
+                            position = DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                            isFullscreen = isFullscreen,
+                            orientation = configuration.orientation,
+                        )
                     }
                 }
                 COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE -> {
@@ -165,14 +193,35 @@ internal fun MovableSubtitleFab(
                     )
                 }
                 COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE -> {
-                    verticalPosition = normalizeControlPosition(
-                        sharedPreferences.getFloat(key, DEFAULT_COLLAPSED_CC_VERTICAL_POSITION),
+                    verticalPosition = collapsedCcVerticalPositionForContext(
+                        position = sharedPreferences.getFloat(
+                            key,
+                            DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                        ),
+                        isFullscreen = isFullscreen,
+                        orientation = configuration.orientation,
                     )
                 }
             }
         }
         preferences.registerOnSharedPreferenceChangeListener(listener)
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    LaunchedEffect(isFullscreen, configuration.orientation, rememberPosition) {
+        val storedPosition = if (rememberPosition) {
+            preferences.getFloat(
+                COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+            )
+        } else {
+            DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+        }
+        verticalPosition = collapsedCcVerticalPositionForContext(
+            position = storedPosition,
+            isFullscreen = isFullscreen,
+            orientation = configuration.orientation,
+        )
     }
 
     BoxWithConstraints(modifier.fillMaxSize()) {
