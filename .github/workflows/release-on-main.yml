@@ -117,16 +117,11 @@ jobs:
 
             **Preview users:** uninstall the preview build once before installing this official release because preview and official builds use different signing keys.
 
-            ## v0.9.0 highlights
+            ## v0.9.1 highlights
 
-            - Adds much more accurate karaoke-style spoken-word highlighting using YouTube JSON3/SRV3 word timing when available, with safe fallback timing for legacy captions.
-            - Fixes mid-video caption-language changes so the selected language reliably reloads without losing the current playback position.
-            - Adds customizable original, translated, and spoken-word subtitle colors, with proper fallback to the default palette when custom colors are disabled.
-            - Adds selectable background colors for the compact dual-subtitle overlay.
-            - Adds app accent-theme customization for switches, sliders, buttons, active borders, and other controls.
-            - Moves advanced appearance and playback options into **More settings** to keep the main settings screen simpler.
-            - Adds **Reset all settings to defaults**, including subtitle colors, overlay background, theme accent, view mode, overlay behavior, and language preferences.
-            - Keeps the scroll-friendly overlay, draggable positioning, fullscreen/landscape behavior, transcript replay, comments, recommendations, and single-WebView architecture.
+            - Adds a skippable three-page first-launch guide right after language setup, using real app screenshots to introduce dual subtitles, tap-to-replay, and opening videos.
+            - The guide appears only once for brand-new installs and never interrupts users who already finished language setup in an earlier version.
+            - Keeps the transcript panel, overlay experience, karaoke word highlighting, and single-WebView architecture unchanged.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
