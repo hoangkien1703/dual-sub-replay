@@ -1,0 +1,432 @@
+name: Apply issues 25 and 26 fix
+
+on:
+  push:
+    branches: [fix/issues-25-26-movable-controls]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: fix/issues-25-26-movable-controls
+          fetch-depth: 0
+
+      - name: Apply focused patch
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: Path, old: str, new: str):
+              text = path.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"Expected one match in {path}, found {count}")
+              path.write_text(text.replace(old, new, 1))
+
+          dual = Path("app/src/main/java/com/kienhoang/dualsubreplay/ui/DualSubApp.kt")
+          replace_once(
+              dual,
+              '''                SmallFloatingActionButton(
+                    onClick = onShowSubtitles,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .testTag("show_subtitles"),
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
+                }
+''',
+              '''                MovableSubtitleFab(onClick = onShowSubtitles)
+''',
+          )
+          replace_once(
+              dual,
+              '''              title = "Movable subtitle box",
+              description = "Drag the dual-subtitle box anywhere on screen, including the top edge in fullscreen. Flick it straight down in portrait to close it.",
+''',
+              '''              title = "Movable subtitle controls",
+              description = "Drag the dual-subtitle overlay or the collapsed CC button to the position you want. The overlay can reach the top edge in fullscreen.",
+''',
+          )
+          replace_once(
+              dual,
+              '''              description = "Save where you drag the subtitle overlay and reuse that position later.",
+''',
+              '''              description = "Save where you drag the subtitle overlay and collapsed CC button and reuse those positions later.",
+''',
+          )
+          replace_once(
+              dual,
+              '''                  if (!enabled) editor.remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
+                  editor.apply()
+''',
+              '''                  if (!enabled) {
+                      editor
+                          .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
+                          .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
+                          .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
+                          .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
+                  }
+                  editor.apply()
+''',
+          )
+          replace_once(
+              dual,
+              '''              "Drag the subtitle box up, down, or sideways directly on the video to reposition it. In fullscreen you can move it all the way to the top; flicking it down closes it.",
+''',
+              '''              "Drag the subtitle overlay up, down, or sideways. When the transcript is hidden, drag the CC button anywhere too. In portrait, flicking the overlay down closes it.",
+''',
+          )
+          replace_once(
+              dual,
+              '''                      .putFloat(
+                          OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+                          DEFAULT_OVERLAY_HORIZONTAL_POSITION,
+                      )
+                      .apply()
+''',
+              '''                      .putFloat(
+                          OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+                          DEFAULT_OVERLAY_HORIZONTAL_POSITION,
+                      )
+                      .putFloat(
+                          COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+                          DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
+                      )
+                      .putFloat(
+                          COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                          DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                      )
+                      .apply()
+''',
+          )
+          replace_once(
+              dual,
+              '''              Text("Reset overlay position")
+''',
+              '''              Text("Reset subtitle positions")
+''',
+          )
+
+          colors = Path("app/src/main/java/com/kienhoang/dualsubreplay/ui/SubtitleColors.kt")
+          replace_once(
+              colors,
+              '''    MOVABLE_OVERLAY_PREFERENCE,
+    SPLIT_LONG_SENTENCES_PREFERENCE,
+''',
+              '''    MOVABLE_OVERLAY_PREFERENCE,
+    COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+    COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+    SPLIT_LONG_SENTENCES_PREFERENCE,
+''',
+          )
+
+          highlight_test = Path("app/src/test/java/com/kienhoang/dualsubreplay/ui/SubtitleHighlightTest.kt")
+          replace_once(
+              highlight_test,
+              '''            MOVABLE_OVERLAY_PREFERENCE,
+            SPLIT_LONG_SENTENCES_PREFERENCE,
+''',
+              '''            MOVABLE_OVERLAY_PREFERENCE,
+            COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+            COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+            SPLIT_LONG_SENTENCES_PREFERENCE,
+''',
+          )
+
+          Path("app/src/main/java/com/kienhoang/dualsubreplay/ui/MovableSubtitleFab.kt").write_text(r'''package com.kienhoang.dualsubreplay.ui
+
+import android.content.SharedPreferences
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ClosedCaption
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
+
+internal const val COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE = "collapsed_cc_horizontal_position"
+internal const val COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE = "collapsed_cc_vertical_position"
+internal const val DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION = 1f
+internal const val DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 1f
+private const val COLLAPSED_CC_MARGIN_DP = 16
+
+internal fun normalizeControlPosition(value: Float, fallback: Float = 1f): Float =
+    if (value.isFinite()) value.coerceIn(0f, 1f) else fallback.coerceIn(0f, 1f)
+
+internal fun controlPositionAfterDrag(
+    currentPosition: Float,
+    deltaPx: Float,
+    travelPx: Float,
+): Float {
+    if (!deltaPx.isFinite() || !travelPx.isFinite() || travelPx <= 0f) {
+        return normalizeControlPosition(currentPosition)
+    }
+    return normalizeControlPosition(currentPosition + deltaPx / travelPx)
+}
+
+internal fun controlOffsetPx(
+    position: Float,
+    parentSizePx: Int,
+    controlSizePx: Int,
+    marginPx: Int,
+): Int {
+    val safeMargin = marginPx.coerceAtLeast(0)
+    val travel = (parentSizePx - controlSizePx - safeMargin * 2).coerceAtLeast(0)
+    return safeMargin + (travel * normalizeControlPosition(position)).roundToInt()
+}
+
+/** A collapsed CC control that can be parked anywhere without blocking the YouTube page. */
+@Composable
+internal fun MovableSubtitleFab(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val preferences = remember(context) {
+        context.getSharedPreferences("dual_sub_preferences", 0)
+    }
+    var movableEnabled by remember {
+        mutableStateOf(preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true))
+    }
+    var rememberPosition by remember {
+        mutableStateOf(preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true))
+    }
+    var horizontalPosition by remember {
+        mutableFloatStateOf(
+            if (rememberPosition) {
+                normalizeControlPosition(
+                    preferences.getFloat(
+                        COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+                        DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
+                    ),
+                )
+            } else {
+                DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION
+            },
+        )
+    }
+    var verticalPosition by remember {
+        mutableFloatStateOf(
+            if (rememberPosition) {
+                normalizeControlPosition(
+                    preferences.getFloat(
+                        COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                        DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                    ),
+                )
+            } else {
+                DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+            },
+        )
+    }
+
+    DisposableEffect(preferences) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            when (key) {
+                MOVABLE_OVERLAY_PREFERENCE -> {
+                    movableEnabled = sharedPreferences.getBoolean(key, true)
+                }
+                REMEMBER_OVERLAY_POSITION_PREFERENCE -> {
+                    rememberPosition = sharedPreferences.getBoolean(key, true)
+                    if (!rememberPosition) {
+                        horizontalPosition = DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION
+                        verticalPosition = DEFAULT_COLLAPSED_CC_VERTICAL_POSITION
+                    }
+                }
+                COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE -> {
+                    horizontalPosition = normalizeControlPosition(
+                        sharedPreferences.getFloat(key, DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION),
+                    )
+                }
+                COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE -> {
+                    verticalPosition = normalizeControlPosition(
+                        sharedPreferences.getFloat(key, DEFAULT_COLLAPSED_CC_VERTICAL_POSITION),
+                    )
+                }
+            }
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val parentWidthPx = with(density) { maxWidth.toPx() }.roundToInt()
+        val parentHeightPx = with(density) { maxHeight.toPx() }.roundToInt()
+        val marginPx = with(density) { COLLAPSED_CC_MARGIN_DP.dp.toPx() }.roundToInt()
+        var controlWidthPx by remember { mutableIntStateOf(0) }
+        var controlHeightPx by remember { mutableIntStateOf(0) }
+        val horizontalTravelPx =
+            (parentWidthPx - controlWidthPx - marginPx * 2).coerceAtLeast(1).toFloat()
+        val verticalTravelPx =
+            (parentHeightPx - controlHeightPx - marginPx * 2).coerceAtLeast(1).toFloat()
+
+        fun commitPosition() {
+            if (!rememberPosition) return
+            preferences.edit()
+                .putFloat(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE, horizontalPosition)
+                .putFloat(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE, verticalPosition)
+                .apply()
+        }
+
+        SmallFloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = controlOffsetPx(
+                            horizontalPosition,
+                            parentWidthPx,
+                            controlWidthPx,
+                            marginPx,
+                        ),
+                        y = controlOffsetPx(
+                            verticalPosition,
+                            parentHeightPx,
+                            controlHeightPx,
+                            marginPx,
+                        ),
+                    )
+                }
+                .onSizeChanged {
+                    controlWidthPx = it.width
+                    controlHeightPx = it.height
+                }
+                .pointerInput(movableEnabled, horizontalTravelPx, verticalTravelPx) {
+                    if (movableEnabled) {
+                        detectDragGestures(
+                            onDragEnd = ::commitPosition,
+                            onDragCancel = ::commitPosition,
+                        ) { change, dragAmount ->
+                            change.consume()
+                            horizontalPosition = controlPositionAfterDrag(
+                                horizontalPosition,
+                                dragAmount.x,
+                                horizontalTravelPx,
+                            )
+                            verticalPosition = controlPositionAfterDrag(
+                                verticalPosition,
+                                dragAmount.y,
+                                verticalTravelPx,
+                            )
+                        }
+                    }
+                }
+                .testTag("show_subtitles"),
+            shape = androidx.compose.foundation.shape.CircleShape,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ) {
+            Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
+        }
+    }
+}
+''')
+
+          Path("app/src/test/java/com/kienhoang/dualsubreplay/ui/MovableSubtitleFabTest.kt").write_text(r'''package com.kienhoang.dualsubreplay.ui
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class MovableSubtitleFabTest {
+    @Test fun positionsNormalizeAndRejectInvalidValues() {
+        assertEquals(0f, normalizeControlPosition(-3f), 0f)
+        assertEquals(1f, normalizeControlPosition(3f), 0f)
+        assertEquals(0.4f, normalizeControlPosition(0.4f), 0f)
+        assertEquals(1f, normalizeControlPosition(Float.NaN), 0f)
+    }
+
+    @Test fun dragUsesAvailableTravelAndClampsAtEdges() {
+        assertEquals(0.75f, controlPositionAfterDrag(0.5f, 25f, 100f), 0.0001f)
+        assertEquals(1f, controlPositionAfterDrag(0.9f, 50f, 100f), 0f)
+        assertEquals(0f, controlPositionAfterDrag(0.1f, -50f, 100f), 0f)
+        assertEquals(0.5f, controlPositionAfterDrag(0.5f, 20f, 0f), 0f)
+    }
+
+    @Test fun offsetKeepsTheWholeControlInsideMargins() {
+        assertEquals(16, controlOffsetPx(0f, 400, 40, 16))
+        assertEquals(344, controlOffsetPx(1f, 400, 40, 16))
+        assertEquals(180, controlOffsetPx(0.5f, 400, 40, 16))
+        assertEquals(16, controlOffsetPx(1f, 20, 40, 16))
+    }
+}
+''')
+
+          Path("app/src/androidTest/java/com/kienhoang/dualsubreplay/data/SubtitleSplitterDeviceTest.kt").write_text(r'''package com.kienhoang.dualsubreplay.data
+
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class SubtitleSplitterDeviceTest {
+    @Test fun splitterRunsOnAndroidRegexEngineWithoutCrashing() {
+        val text = "This is a long first sentence that should be split safely. A second sentence follows, with another clause for testing."
+        val split = SubtitleMerger.splitLongSegments(
+            listOf(SubtitleSegment(0, 0, 6_000, text)),
+        )
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { it.originalText.isNotBlank() })
+    }
+}
+''')
+          PY
+
+      - name: Remove one-shot workflow from final commit
+        run: rm .github/workflows/apply-issues-25-26-fix.yml
+
+      - name: Set up Java 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+
+      - name: Install Android build SDK
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+
+      - name: Verify tests, lint, and APKs
+        run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest --stacktrace
+
+      - name: Commit verified patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Finish movable subtitle controls and harden issue fixes"
+          git push origin HEAD:fix/issues-25-26-movable-controls
