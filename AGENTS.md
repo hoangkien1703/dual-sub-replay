@@ -2,7 +2,7 @@
 
 ## Project
 
-Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotlin 2.3, Jetpack Compose / Material 3, AGP 9.3.1, committed Gradle 9.5 wrapper (no local Gradle needed), JDK 17, compile/target SDK 36, minSdk 26.
+Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotlin 2.3.21, Jetpack Compose / Material 3, AGP 9.3.2, committed Gradle 9.5 wrapper (no local Gradle needed), JDK 17, compile/target SDK 36, minSdk 26.
 
 ## Commands (Windows)
 
@@ -29,6 +29,7 @@ Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotli
 - Main-frame navigation goes through `classifyMainFrameUrl` → `YOUTUBE_WEB` (embed) / `GOOGLE_SIGN_IN` (embed during sign-in flow) / `OPEN_EXTERNAL` (browser) / `BLOCK`. JS snapshot/replay scripts must keep re-verifying the executing origin (`https:` + `*.youtube.com`); `PlaybackArchitectureTest` asserts the literal script text.
 - Captions use YouTube's undocumented Innertube transcript endpoint, deliberately isolated in `data/YouTubeCaptionProvider.kt` (host allowlist, 8 MiB response cap) so it can be replaced without touching the rest of the app.
 - Translation is on-device via ML Kit (`translation/OnDeviceTranslator.kt`); the app has no API keys.
+- First-launch flow is `OnboardingScreen` → `GuideScreen` → main experience. Preserve the guide migration behavior: if `guide_completed` is absent, users who already completed onboarding are treated as guide-complete, while brand-new users see the guide. Do not simplify this to `getBoolean("guide_completed", false)` or existing users will see the guide after upgrading.
 
 ## Testing conventions
 
