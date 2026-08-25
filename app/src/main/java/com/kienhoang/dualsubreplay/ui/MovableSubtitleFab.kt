@@ -1,10 +1,12 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.SharedPreferences
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material3.Icon
@@ -12,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,13 +22,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 internal const val COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE = "collapsed_cc_horizontal_position"
@@ -36,17 +41,6 @@ private const val COLLAPSED_CC_MARGIN_DP = 16
 
 internal fun normalizeControlPosition(value: Float, fallback: Float = 1f): Float =
     if (value.isFinite()) value.coerceIn(0f, 1f) else fallback.coerceIn(0f, 1f)
-
-internal fun controlPositionAfterDrag(
-    currentPosition: Float,
-    deltaPx: Float,
-    travelPx: Float,
-): Float {
-    if (!deltaPx.isFinite() || !travelPx.isFinite() || travelPx <= 0f) {
-        return normalizeControlPosition(currentPosition)
-    }
-    return normalizeControlPosition(currentPosition + deltaPx / travelPx)
-}
 
 internal fun controlOffsetPx(
     position: Float,
@@ -59,11 +53,29 @@ internal fun controlOffsetPx(
     return safeMargin + (travel * normalizeControlPosition(position)).roundToInt()
 }
 
-/** A collapsed CC control that can be parked anywhere without blocking the YouTube page. */
+internal fun controlPositionFromOffsetPx(
+    offsetPx: Float,
+    parentSizePx: Int,
+    controlSizePx: Int,
+    marginPx: Int,
+): Float {
+    val safeMargin = marginPx.coerceAtLeast(0)
+    val travel = (parentSizePx - controlSizePx - safeMargin * 2).coerceAtLeast(0)
+    if (!offsetPx.isFinite() || travel <= 0) return 0f
+    return ((offsetPx - safeMargin) / travel.toFloat()).coerceIn(0f, 1f)
+}
+
+/**
+ * Collapsed CC control that follows the finger directly in pixel space.
+ *
+ * Normalized coordinates are only converted/saved at the end of a drag, avoiding
+ * repeated layout-scale conversions while the pointer is moving.
+ */
 @Composable
 internal fun MovableSubtitleFab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    autoDimAfterMillis: Long? = null,
 ) {
     val context = LocalContext.current
     val preferences = remember(context) {
@@ -103,6 +115,36 @@ internal fun MovableSubtitleFab(
             },
         )
     }
+    var offsetXPx by remember { mutableFloatStateOf(0f) }
+    var offsetYPx by remember { mutableFloatStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+    var interactionGeneration by remember { mutableIntStateOf(0) }
+    var dimmed by remember { mutableStateOf(false) }
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (dimmed) 0.32f else 1f,
+        animationSpec = tween(durationMillis = 180),
+        label = "collapsedCcAlpha",
+    )
+    val animatedBlur by animateDpAsState(
+        targetValue = if (dimmed) 2.dp else 0.dp,
+        animationSpec = tween(durationMillis = 180),
+        label = "collapsedCcBlur",
+    )
+
+    fun noteInteraction() {
+        dimmed = false
+        interactionGeneration += 1
+    }
+
+    LaunchedEffect(autoDimAfterMillis, interactionGeneration, isDragging) {
+        dimmed = false
+        val timeout = autoDimAfterMillis
+        if (!isDragging && timeout != null && timeout > 0L) {
+            delay(timeout)
+            dimmed = true
+        }
+    }
 
     DisposableEffect(preferences) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -140,59 +182,94 @@ internal fun MovableSubtitleFab(
         val marginPx = with(density) { COLLAPSED_CC_MARGIN_DP.dp.toPx() }.roundToInt()
         var controlWidthPx by remember { mutableIntStateOf(0) }
         var controlHeightPx by remember { mutableIntStateOf(0) }
-        val horizontalTravelPx =
-            (parentWidthPx - controlWidthPx - marginPx * 2).coerceAtLeast(1).toFloat()
-        val verticalTravelPx =
-            (parentHeightPx - controlHeightPx - marginPx * 2).coerceAtLeast(1).toFloat()
+
+        val minX = marginPx.toFloat()
+        val minY = marginPx.toFloat()
+        val maxX = (parentWidthPx - controlWidthPx - marginPx).coerceAtLeast(marginPx).toFloat()
+        val maxY = (parentHeightPx - controlHeightPx - marginPx).coerceAtLeast(marginPx).toFloat()
+
+        LaunchedEffect(
+            parentWidthPx,
+            parentHeightPx,
+            controlWidthPx,
+            controlHeightPx,
+            horizontalPosition,
+            verticalPosition,
+        ) {
+            if (!isDragging && controlWidthPx > 0 && controlHeightPx > 0) {
+                offsetXPx = controlOffsetPx(
+                    horizontalPosition,
+                    parentWidthPx,
+                    controlWidthPx,
+                    marginPx,
+                ).toFloat()
+                offsetYPx = controlOffsetPx(
+                    verticalPosition,
+                    parentHeightPx,
+                    controlHeightPx,
+                    marginPx,
+                ).toFloat()
+            }
+        }
 
         fun commitPosition() {
-            if (!rememberPosition) return
-            preferences.edit()
-                .putFloat(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE, horizontalPosition)
-                .putFloat(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE, verticalPosition)
-                .apply()
+            horizontalPosition = controlPositionFromOffsetPx(
+                offsetXPx,
+                parentWidthPx,
+                controlWidthPx,
+                marginPx,
+            )
+            verticalPosition = controlPositionFromOffsetPx(
+                offsetYPx,
+                parentHeightPx,
+                controlHeightPx,
+                marginPx,
+            )
+            if (rememberPosition) {
+                preferences.edit()
+                    .putFloat(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE, horizontalPosition)
+                    .putFloat(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE, verticalPosition)
+                    .apply()
+            }
         }
 
         SmallFloatingActionButton(
-            onClick = onClick,
+            onClick = {
+                noteInteraction()
+                onClick()
+            },
             modifier = Modifier
-                .offset {
-                    IntOffset(
-                        x = controlOffsetPx(
-                            horizontalPosition,
-                            parentWidthPx,
-                            controlWidthPx,
-                            marginPx,
-                        ),
-                        y = controlOffsetPx(
-                            verticalPosition,
-                            parentHeightPx,
-                            controlHeightPx,
-                            marginPx,
-                        ),
-                    )
+                .graphicsLayer {
+                    translationX = offsetXPx
+                    translationY = offsetYPx
+                    alpha = animatedAlpha
                 }
+                .blur(animatedBlur)
                 .onSizeChanged {
                     controlWidthPx = it.width
                     controlHeightPx = it.height
                 }
-                .pointerInput(movableEnabled, horizontalTravelPx, verticalTravelPx) {
+                .pointerInput(movableEnabled, parentWidthPx, parentHeightPx, controlWidthPx, controlHeightPx) {
                     if (movableEnabled) {
                         detectDragGestures(
-                            onDragEnd = ::commitPosition,
-                            onDragCancel = ::commitPosition,
+                            onDragStart = {
+                                isDragging = true
+                                noteInteraction()
+                            },
+                            onDragEnd = {
+                                commitPosition()
+                                isDragging = false
+                                noteInteraction()
+                            },
+                            onDragCancel = {
+                                commitPosition()
+                                isDragging = false
+                                noteInteraction()
+                            },
                         ) { change, dragAmount ->
                             change.consume()
-                            horizontalPosition = controlPositionAfterDrag(
-                                horizontalPosition,
-                                dragAmount.x,
-                                horizontalTravelPx,
-                            )
-                            verticalPosition = controlPositionAfterDrag(
-                                verticalPosition,
-                                dragAmount.y,
-                                verticalTravelPx,
-                            )
+                            offsetXPx = (offsetXPx + dragAmount.x).coerceIn(minX, maxX)
+                            offsetYPx = (offsetYPx + dragAmount.y).coerceIn(minY, maxY)
                         }
                     }
                 }

@@ -188,13 +188,9 @@ class LearningPlayerRootTest {
     }
 
     @Test
-    fun swipeDownDismissesOnlyDeliberateOrFastDownwardGestures() {
-        val minimum = SUBTITLE_BOX_MINIMUM_SWIPE_DISTANCE_DP.toFloat()
-        assertFalse(shouldDismissSubtitleBox(-50f, 4_000f, minimum))
-        assertFalse(shouldDismissSubtitleBox(0f, 4_000f, minimum))
-        assertFalse(shouldDismissSubtitleBox(20f, 900f, minimum))
-        assertTrue(shouldDismissSubtitleBox(minimum, 0f, minimum))
-        assertTrue(shouldDismissSubtitleBox(minimum / 2f, 2_000f, minimum))
+    fun fullscreenDragTravelMatchesVisibleVerticalTravel() {
+        assertEquals(712, fullscreenOverlayDragTravelDp(800))
+        assertEquals(152, fullscreenOverlayDragTravelDp(240))
     }
 
     @Test

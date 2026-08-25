@@ -272,7 +272,16 @@ private fun DualSubExperience(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .fillMaxHeight(0.60f)
+                        .fillMaxHeight(
+                            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                portraitSubtitlePanelHeightFraction(
+                                    screenWidthDp = configuration.screenWidthDp,
+                                    screenHeightDp = configuration.screenHeightDp,
+                                )
+                            } else {
+                                0.60f
+                            },
+                        )
                         .testTag("subtitle_timeline"),
                     onHide = onHideSubtitles,
                     onSettings = { showSettings = true },
@@ -322,6 +331,16 @@ private fun DualSubExperience(
             onDismiss = { showSettings = false },
         )
     }
+}
+
+internal fun portraitSubtitlePanelHeightFraction(
+    screenWidthDp: Int,
+    screenHeightDp: Int,
+): Float {
+    val safeHeight = screenHeightDp.coerceAtLeast(1).toFloat()
+    val estimatedVideoBottom = 56f + screenWidthDp.coerceAtLeast(0) * 9f / 16f
+    val desiredPanelTop = estimatedVideoBottom + 6f
+    return ((safeHeight - desiredPanelTop) / safeHeight).coerceIn(0.60f, 0.78f)
 }
 
 @Composable

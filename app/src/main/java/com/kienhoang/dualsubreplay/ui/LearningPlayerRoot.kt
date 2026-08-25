@@ -70,8 +70,6 @@ internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_horizontal_
 internal const val MOVABLE_OVERLAY_PREFERENCE = "movable_subtitle_box"
 internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
 internal const val DEFAULT_OVERLAY_HORIZONTAL_POSITION = 0.5f
-internal const val SUBTITLE_BOX_SWIPE_DISMISS_VELOCITY_PX_PER_SECOND = 1_500f
-internal const val SUBTITLE_BOX_MINIMUM_SWIPE_DISTANCE_DP = 72
 internal const val FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP = 88
 internal const val PLAYER_CONTROLS_AVOIDANCE_LIFT_DP = 88
 
@@ -141,19 +139,8 @@ internal fun fullscreenOverlayBottomPaddingDp(
         .coerceIn(0, usable)
 }
 
-/**
- * A quick downward flick closes the subtitle box in portrait (issue #26):
- * either a deliberate drag past [minimumDistancePx] or any fast fling.
- */
-internal fun shouldDismissSubtitleBox(
-    dragOffsetPx: Float,
-    velocityPxPerSecond: Float,
-    minimumDistancePx: Float,
-): Boolean {
-    if (!dragOffsetPx.isFinite() || dragOffsetPx <= 0f) return false
-    return dragOffsetPx >= minimumDistancePx ||
-        velocityPxPerSecond >= SUBTITLE_BOX_SWIPE_DISMISS_VELOCITY_PX_PER_SECOND && dragOffsetPx > 24f
-}
+internal fun fullscreenOverlayDragTravelDp(screenHeightDp: Int): Int =
+    (screenHeightDp.coerceAtLeast(240) - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP).coerceAtLeast(60)
 
 internal fun playerControlsAvoidanceLiftDp(
     enabled: Boolean,
@@ -286,6 +273,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         )
     }
     var restoreTranscriptAfterAutomaticOverlay by remember { mutableStateOf(false) }
+    var fullscreenOverlayHiddenByUser by remember { mutableStateOf(false) }
     var settingsRequestId by remember { mutableLongStateOf(0L) }
 
     DisposableEffect(preferences) {
@@ -398,6 +386,10 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     }
 
+    LaunchedEffect(youtubeFullscreen) {
+        if (!youtubeFullscreen) fullscreenOverlayHiddenByUser = false
+    }
+
     // Opening another video normally re-opens the transcript panel. While overlay presentation is
     // active, collapse it again so comments and recommendations remain directly scrollable.
     LaunchedEffect(effectiveMode, state.activeVideoId, state.subtitlePanelVisible) {
@@ -428,37 +420,35 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
         if (overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-  LearningSubtitleOverlay(
-      content = overlayContent,
-      fontScale = state.fontScale,
-      position = overlayVerticalPosition,
-      orientation = configuration.orientation,
-      movableEnabled = movableSubtitleBox,
-      horizontalPosition = overlayHorizontalPosition,
-      originalColor = effectiveOriginalColor(state),
-      translatedColor = effectiveTranslatedColor(state),
-      highlightColor = effectiveHighlightColor(state),
-      backgroundColor = subtitleBoxBackgroundColor,
-      modifier = Modifier
-          .align(Alignment.BottomCenter)
-          .padding(start = 20.dp, end = 20.dp, bottom = fullscreenBottomPadding),
-      onPositionChange = ::updateOverlayPosition,
-      onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
-      onPositionChangeFinished = ::commitOverlayPosition,
-      onSettings = ::requestSubtitleSettings,
-      onClose = {
-          if (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-              selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
-          } else {
-              if (youtubeFullscreen) {
-                  preferences.edit().putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, false).apply()
-              }
-              if (automaticLandscapeOverlay) {
-                  preferences.edit().putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, false).apply()
-              }
-          }
-      },
-  )
+            if (fullscreenOverlayHiddenByUser) {
+                MovableSubtitleFab(
+                    onClick = { fullscreenOverlayHiddenByUser = false },
+                    modifier = Modifier.fillMaxSize(),
+                    autoDimAfterMillis = 1_000L,
+                )
+            } else {
+                LearningSubtitleOverlay(
+                    content = overlayContent,
+                    fontScale = state.fontScale,
+                    position = overlayVerticalPosition,
+                    orientation = configuration.orientation,
+                    movableEnabled = movableSubtitleBox,
+                    horizontalPosition = overlayHorizontalPosition,
+                    isFullscreen = true,
+                    originalColor = effectiveOriginalColor(state),
+                    translatedColor = effectiveTranslatedColor(state),
+                    highlightColor = effectiveHighlightColor(state),
+                    backgroundColor = subtitleBoxBackgroundColor,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(start = 20.dp, end = 20.dp, bottom = fullscreenBottomPadding),
+                    onPositionChange = ::updateOverlayPosition,
+                    onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
+                    onPositionChangeFinished = ::commitOverlayPosition,
+                    onSettings = ::requestSubtitleSettings,
+                    onClose = { fullscreenOverlayHiddenByUser = true },
+                )
+            }
         }
     }
 
@@ -547,6 +537,7 @@ internal fun LearningSubtitleOverlay(
     orientation: Int = Configuration.ORIENTATION_PORTRAIT,
     movableEnabled: Boolean = true,
     horizontalPosition: Float = DEFAULT_OVERLAY_HORIZONTAL_POSITION,
+    isFullscreen: Boolean = false,
     originalColor: Color = Color.White,
     translatedColor: Color = Color(0xFF75E7C1),
     highlightColor: Color = Color(0xFF75E7C1),
@@ -561,17 +552,16 @@ internal fun LearningSubtitleOverlay(
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val dragTravelPx = with(density) {
-        (configuration.screenHeightDp.dp * 0.45f).toPx()
+        if (isFullscreen) {
+            fullscreenOverlayDragTravelDp(configuration.screenHeightDp).dp.toPx()
+        } else {
+            (configuration.screenHeightDp.dp * 0.45f).toPx()
+        }
     }.coerceAtLeast(1f)
-    val minimumSwipeDistancePx = with(density) {
-        SUBTITLE_BOX_MINIMUM_SWIPE_DISTANCE_DP.dp.toPx()
-    }
     val currentPosition by rememberUpdatedState(position)
     val currentOnPositionChange by rememberUpdatedState(onPositionChange)
     val currentOnHorizontalPositionChange by rememberUpdatedState(onHorizontalPositionChange)
     val currentOnPositionChangeFinished by rememberUpdatedState(onPositionChangeFinished)
-    val currentOnClose by rememberUpdatedState(onClose)
-    var downwardDragDistance by remember { mutableFloatStateOf(0f) }
 
     // Free horizontal movement (issue #26): the box shifts sideways inside its
     // parent while staying fully visible, and the offset survives recreation.
@@ -582,14 +572,11 @@ internal fun LearningSubtitleOverlay(
         parentWidthPx = parentWidthPx,
         selfWidthPx = selfWidthPx,
     )
-    val horizontalDragTravelPx = with(density) {
-        configuration.screenWidthDp.dp.toPx()
-    }.coerceAtLeast(1f)
+    val horizontalDragTravelPx =
+        (parentWidthPx - selfWidthPx).coerceAtLeast(1).toFloat()
     val currentHorizontalPosition by rememberUpdatedState(horizontalPosition)
 
     val verticalDragState = rememberDraggableState { delta ->
-        // Only net downward travel counts toward the swipe-to-close gesture.
-        downwardDragDistance = (downwardDragDistance + delta).coerceAtLeast(0f)
         currentOnPositionChange(
             overlayPositionAfterDrag(currentPosition, delta, dragTravelPx),
         )
@@ -622,22 +609,7 @@ internal fun LearningSubtitleOverlay(
       state = verticalDragState,
       orientation = Orientation.Vertical,
       enabled = movableEnabled,
-      onDragStarted = { downwardDragDistance = 0f },
-      onDragStopped = { velocity ->
-          val dismissed = orientation == Configuration.ORIENTATION_PORTRAIT &&
-              shouldDismissSubtitleBox(
-                  dragOffsetPx = downwardDragDistance,
-                  velocityPxPerSecond = velocity,
-                  minimumDistancePx = minimumSwipeDistancePx,
-              )
-          if (dismissed) {
-              downwardDragDistance = 0f
-              currentOnClose()
-          } else {
-              downwardDragDistance = 0f
-              currentOnPositionChangeFinished()
-          }
-      },
+      onDragStopped = { currentOnPositionChangeFinished() },
   )
   .draggable(
       state = horizontalDragState,
@@ -711,7 +683,7 @@ internal fun LearningSubtitleOverlay(
           Icon(Icons.Default.Settings, contentDescription = "Dual-subtitle settings")
       }
       IconButton(onClick = onClose) {
-          Icon(Icons.Default.Close, contentDescription = "Return to transcript panel")
+          Icon(Icons.Default.Close, contentDescription = "Hide dual subtitles")
       }
   }
         }
