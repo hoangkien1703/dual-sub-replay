@@ -254,5 +254,9 @@ object SubtitleMerger {
 
 internal const val SPLIT_SENTENCE_MAX_CHARACTERS = 48
 
-private val sentenceBreak = Regex("(?<=[.!?。！？…][\"'’”)]*)\\s+")
+// Keep Android's regex engine happy: both lookbehinds have fixed width.
+// The previous `*` inside lookbehind could throw PatternSyntaxException at runtime.
+private val sentenceBreak = Regex(
+    "(?<=[.!?。！？…])\\s+|(?<=[.!?。！？…][\\\"'’”)])\\s+",
+)
 private val clauseBreak = Regex("(?<=[,;:])\\s+")
