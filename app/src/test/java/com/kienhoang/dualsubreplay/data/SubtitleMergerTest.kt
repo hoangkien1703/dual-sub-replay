@@ -111,7 +111,33 @@ class SubtitleMergerTest {
 
         val split = SubtitleMerger.splitLongSegments(segments)
 
-        assertEquals(segments, split)
+        // Content, timing, and order survive untouched; only ids are renumbered.
+        assertEquals(segments.map { Triple(it.originalText, it.startMs, it.endMs) }, split.map { Triple(it.originalText, it.startMs, it.endMs) })
+        assertEquals(listOf(0L, 1L), split.map { it.id })
+    }
+
+    @Test fun splitSegmentIdsNeverCollideOnRealisticTimelines() {
+        // Regression: chunk ids derived as parent * 1000 + index collided with
+        // the original id of an unsplit far-later segment, crashing the
+        // transcript list ("Key was already used") on real videos.
+        val segments = mutableListOf<SubtitleSegment>()
+        segments += SubtitleSegment(0, 0, 1_000, "short")
+        segments += SubtitleSegment(1, 1_000, 2_000, "short again")
+        segments += SubtitleSegment(
+            2,
+            2_000,
+            4_000,
+            "A long opening sentence that certainly needs splitting here. And more.",
+        )
+        for (id in 3..2_001) {
+            segments += SubtitleSegment(id.toLong(), id * 1_000L, id * 1_000L + 500, "filler $id")
+        }
+
+        val split = SubtitleMerger.splitLongSegments(segments)
+
+        assertTrue(split.size > segments.size)
+        assertEquals(split.size, split.map { it.id }.distinct().size)
+        assertEquals(split.indices.map { it.toLong() }, split.map { it.id })
     }
 
     @Test fun dividesTimeProportionallyAcrossSplitChunks() {

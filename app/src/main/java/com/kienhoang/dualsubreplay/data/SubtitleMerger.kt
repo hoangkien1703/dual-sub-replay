@@ -125,7 +125,10 @@ object SubtitleMerger {
             }
             output += buildSplitSegments(segment, chunks)
         }
-        return output
+        // The transcript list keys segments by id, so every output segment must
+        // carry a unique fresh id; keeping original ids would collide once one
+        // parent's chunk ids overlap another unsplit segment's id.
+        return output.mapIndexed { index, segment -> segment.copy(id = index.toLong()) }
     }
 
     /** Splits [text] into short chunks at sentence ends, then clause marks, then word edges. */
@@ -221,7 +224,7 @@ object SubtitleMerger {
                 estimateWordTimings(chunkText, range.first, range.last)
             }
             SubtitleSegment(
-                id = segment.id * 1000L + index,
+                id = segment.id,
                 startMs = range.first.coerceIn(segment.startMs, segment.endMs),
                 endMs = range.last.coerceIn(segment.startMs, segment.endMs),
                 originalText = chunkText,
