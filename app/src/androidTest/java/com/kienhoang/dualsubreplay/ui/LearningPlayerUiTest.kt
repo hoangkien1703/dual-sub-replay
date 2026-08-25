@@ -97,9 +97,9 @@ class LearningPlayerUiTest {
         }
 
         composeRule.onNodeWithContentDescription("Dual-subtitle settings").assertDoesNotExist()
-        composeRule.onNodeWithContentDescription("Return to transcript panel").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Hide dual subtitles").assertDoesNotExist()
         composeRule.onNodeWithTag("learning_subtitle_overlay").performClick()
         composeRule.onNodeWithContentDescription("Dual-subtitle settings").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Return to transcript panel").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Hide dual subtitles").assertIsDisplayed()
     }
 }
