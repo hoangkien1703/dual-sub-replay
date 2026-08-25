@@ -584,7 +584,7 @@ internal fun LearningSubtitleOverlay(
     val horizontalDragState = rememberDraggableState { delta ->
         currentOnHorizontalPositionChange(
             normalizeOverlayHorizontalPosition(
-                currentHorizontalPosition + delta / horizontalDragTravelPx * 2f,
+                currentHorizontalPosition + delta / horizontalDragTravelPx,
             ),
         )
     }
