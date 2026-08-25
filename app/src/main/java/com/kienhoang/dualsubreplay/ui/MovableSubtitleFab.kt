@@ -170,7 +170,7 @@ internal fun MovableSubtitleFab(
         }
     }
 
-    DisposableEffect(preferences) {
+    DisposableEffect(preferences, isFullscreen, configuration.orientation) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             when (key) {
                 MOVABLE_OVERLAY_PREFERENCE -> {
