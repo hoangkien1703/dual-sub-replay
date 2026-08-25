@@ -575,7 +575,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadingJob?.cancel()
         _state.update {
             it.copy(
-                segments = it.segments.map { segment -> segment.copy(translatedText = null) },
+                segments = segments.map { segment -> segment.copy(translatedText = null) },
                 stage = LoadStage.TRANSLATING,
                 statusMessage = translationStartingMessage(it.targetLanguage),
                 errorMessage = null,

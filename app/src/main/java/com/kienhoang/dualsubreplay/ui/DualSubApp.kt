@@ -286,18 +286,7 @@ private fun DualSubExperience(
                 state.activeVideoId != null &&
                 playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
             ) {
-                SmallFloatingActionButton(
-                    onClick = onShowSubtitles,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                        .testTag("show_subtitles"),
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ) {
-                    Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
-                }
+                MovableSubtitleFab(onClick = onShowSubtitles)
             }
         }
     }
@@ -1066,8 +1055,8 @@ internal fun SubtitleSettingsDialog(
           Spacer(Modifier.height(14.dp))
           Text("Overlay", style = MaterialTheme.typography.titleSmall)
           SettingsSwitchRow(
-              title = "Movable subtitle box",
-              description = "Drag the dual-subtitle box anywhere on screen, including the top edge in fullscreen. Flick it straight down in portrait to close it.",
+              title = "Movable subtitle controls",
+              description = "Drag the dual-subtitle overlay or the collapsed CC button to the position you want. The overlay can reach the top edge in fullscreen.",
               checked = movableSubtitleBox,
               onCheckedChange = {
                   movableSubtitleBox = it
@@ -1087,19 +1076,25 @@ internal fun SubtitleSettingsDialog(
           )
           SettingsSwitchRow(
               title = "Remember dragged position",
-              description = "Save where you drag the subtitle overlay and reuse that position later.",
+              description = "Save where you drag the subtitle overlay and collapsed CC button and reuse those positions later.",
               checked = rememberOverlayPosition,
               onCheckedChange = { enabled ->
                   rememberOverlayPosition = enabled
                   val editor = preferences.edit()
                       .putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, enabled)
-                  if (!enabled) editor.remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
+                  if (!enabled) {
+                      editor
+                          .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
+                          .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
+                          .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
+                          .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
+                  }
                   editor.apply()
               },
               testTag = "remember_overlay_position_switch",
           )
           Text(
-              "Drag the subtitle box up, down, or sideways directly on the video to reposition it. In fullscreen you can move it all the way to the top; flicking it down closes it.",
+              "Drag the subtitle overlay up, down, or sideways. When the transcript is hidden, drag the CC button anywhere too. In portrait, flicking the overlay down closes it.",
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -1115,11 +1110,19 @@ internal fun SubtitleSettingsDialog(
                           OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
                           DEFAULT_OVERLAY_HORIZONTAL_POSITION,
                       )
+                      .putFloat(
+                          COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+                          DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
+                      )
+                      .putFloat(
+                          COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                          DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                      )
                       .apply()
               },
               modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
           ) {
-              Text("Reset overlay position")
+              Text("Reset subtitle positions")
           }
 
           Spacer(Modifier.height(14.dp))
