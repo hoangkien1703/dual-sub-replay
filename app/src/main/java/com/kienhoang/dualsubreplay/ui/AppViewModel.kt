@@ -34,6 +34,7 @@ data class DualSubUiState(
     val sourcePreference: String = "auto",
     val targetLanguage: String = "vi",
     val onboardingCompleted: Boolean = false,
+    val guideCompleted: Boolean = false,
     val availableSourceLanguages: List<CaptionLanguage> = emptyList(),
     val resolvedSourceLanguage: String? = null,
     val generatedCaptions: Boolean = false,
@@ -178,6 +179,20 @@ internal fun normalizedOnboardingLanguages(
     return native to learning
 }
 
+internal const val GUIDE_COMPLETED_PREFERENCE = "guide_completed"
+
+/**
+ * The "guide_completed" preference only exists after the first-launch guide has
+ * been finished once, so a missing preference means: show the guide to
+ * brand-new users while treating users who onboarded before the guide existed
+ * as already having seen it.
+ */
+internal fun initialGuideCompleted(
+    preferenceExists: Boolean,
+    preferenceValue: Boolean,
+    onboardingCompleted: Boolean,
+): Boolean = if (preferenceExists) preferenceValue else onboardingCompleted
+
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
@@ -199,6 +214,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 ?.takeIf(TranslationLanguages::isSupported)
                 ?: "vi",
             onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
+            guideCompleted = initialGuideCompleted(
+                preferenceExists = preferences.contains(GUIDE_COMPLETED_PREFERENCE),
+                preferenceValue = preferences.getBoolean(GUIDE_COMPLETED_PREFERENCE, false),
+                onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
+            ),
             landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", true),
             originalColorKey = storedSubtitleColorKey(
                 preferences.getString(SUBTITLE_ORIGINAL_COLOR_PREFERENCE, null),
@@ -309,6 +329,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun finishOnboarding() {
         preferences.edit().putBoolean("onboarding_completed", true).apply()
         _state.update { it.copy(onboardingCompleted = true) }
+    }
+
+    fun completeGuide() {
+        preferences.edit().putBoolean(GUIDE_COMPLETED_PREFERENCE, true).apply()
+        _state.update { it.copy(guideCompleted = true) }
     }
 
     fun setFontScale(scale: Float) {

@@ -33,4 +33,45 @@ class OnboardingPreferencesTest {
         assertEquals("pt", storedSourcePreference("pt-BR"))
         assertEquals("he", storedSourcePreference("iw"))
     }
+
+    @Test fun initialGuideCompletedShowsForNewUsers() {
+        assertEquals(
+            false,
+            initialGuideCompleted(
+                preferenceExists = false,
+                preferenceValue = false,
+                onboardingCompleted = false,
+            ),
+        )
+    }
+
+    @Test fun initialGuideCompletedSkipsUsersFromBeforeTheGuide() {
+        assertEquals(
+            true,
+            initialGuideCompleted(
+                preferenceExists = false,
+                preferenceValue = false,
+                onboardingCompleted = true,
+            ),
+        )
+    }
+
+    @Test fun initialGuideCompletedHonorsStoredPreference() {
+        assertEquals(
+            true,
+            initialGuideCompleted(
+                preferenceExists = true,
+                preferenceValue = true,
+                onboardingCompleted = false,
+            ),
+        )
+        assertEquals(
+            false,
+            initialGuideCompleted(
+                preferenceExists = true,
+                preferenceValue = false,
+                onboardingCompleted = true,
+            ),
+        )
+    }
 }

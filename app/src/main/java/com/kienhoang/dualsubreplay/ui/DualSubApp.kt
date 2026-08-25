@@ -115,6 +115,8 @@ fun DualSubApp(
                 onComplete = viewModel::completeOnboarding,
                 onSkip = viewModel::skipOnboarding,
             )
+        } else if (!state.guideCompleted) {
+            GuideScreen(onFinish = viewModel::completeGuide)
         } else {
             DualSubExperience(
                 state = state,

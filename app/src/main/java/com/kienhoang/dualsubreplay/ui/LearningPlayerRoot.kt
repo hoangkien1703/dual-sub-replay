@@ -370,6 +370,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
         if (
   state.onboardingCompleted &&
+  state.guideCompleted &&
   state.activeVideoId != null &&
   effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
         ) {
