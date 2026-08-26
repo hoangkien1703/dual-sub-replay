@@ -3,66 +3,106 @@ name: Automatic PR preview APK
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-preview-${{ github.event.pull_request.number }}
+  group: pr-preview-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   build-pr-preview:
     if: >-
-      github.event.action != 'closed' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event_name != 'pull_request' ||
+      (github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: write
+      pull-requests: read
 
     steps:
-      - name: Check out PR branch
+      - name: Check out source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
+      - name: Resolve open PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            pr_number="$EVENT_PR_NUMBER"
+          else
+            pr_number="$(gh pr list --head "$GITHUB_REF_NAME" --state open --json number --jq '.[0].number // empty')"
+          fi
+
+          if [[ -z "$pr_number" ]]; then
+            echo "No open PR found for $GITHUB_REF_NAME; skipping preview build."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Resolved PR #$pr_number"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+
       - name: Set up Java 17
+        if: steps.pr.outputs.found == 'true'
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Android SDK
+        if: steps.pr.outputs.found == 'true'
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
 
       - name: Install Android build SDK
+        if: steps.pr.outputs.found == 'true'
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle cache
+        if: steps.pr.outputs.found == 'true'
         uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
 
       - name: Restore persistent preview signing key
+        if: steps.pr.outputs.found == 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.android/debug.keystore
           key: dual-sub-replay-preview-signing-v1
 
       - name: Test, lint, and build PR preview
+        if: steps.pr.outputs.found == 'true'
         run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug --stacktrace
 
       - name: Package PR preview APK
+        if: steps.pr.outputs.found == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         run: |
           mkdir -p release
-          cp app/build/outputs/apk/debug/app-debug.apk "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
-          sha256sum "release/DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "release/DualSub-Replay-PR${PR_NUMBER}-preview.apk"
+          sha256sum "release/DualSub-Replay-PR${PR_NUMBER}-preview.apk"
 
       - name: Upload PR preview to rolling preview release
+        if: steps.pr.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          ASSET_NAME: DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         run: |
           set -euo pipefail
 
@@ -72,10 +112,12 @@ jobs:
             exit 0
           fi
 
-          gh release upload preview "release/$ASSET_NAME" --clobber
+          asset_name="DualSub-Replay-PR${PR_NUMBER}-preview.apk"
+          gh release upload preview "release/$asset_name" --clobber
 
   cleanup-pr-preview:
     if: >-
+      github.event_name == 'pull_request' &&
       github.event.action == 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
