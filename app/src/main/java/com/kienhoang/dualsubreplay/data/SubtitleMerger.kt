@@ -4,6 +4,7 @@ object SubtitleMerger {
     private const val MAX_GAP_MS = 1_200L
     private const val MAX_DURATION_MS = 6_000L
     private const val MAX_CHARACTERS = 96
+    private const val MIN_TIMED_WORD_TEXT_COVERAGE = 0.60f
     private val sentenceEnding = Regex("[.!?。！？…][\\\"'’”)]*$")
 
     fun merge(cues: List<RawCaptionCue>): List<SubtitleSegment> {
@@ -93,11 +94,16 @@ object SubtitleMerger {
         }
     }
 
-    /** True when every timed caption chunk can be found in display order. */
+    /**
+     * True when timed caption chunks can be found in display order and cover
+     * enough of the visible text to provide useful karaoke highlighting.
+     * Partial timing payloads from broken auto-captions otherwise leave most of
+     * a line permanently unhighlighted even though the few supplied words match.
+     */
     private fun wordsAlignWithText(text: String, words: List<SubtitleWord>): Boolean {
         if (text.isBlank() || words.isEmpty()) return false
         var searchFrom = 0
-        var matchedAny = false
+        var matchedCharacters = 0
         words.forEach { word ->
             val token = word.text.replace(Regex("\\s+"), " ").trim()
             if (token.isEmpty()) return@forEach
@@ -108,10 +114,11 @@ object SubtitleMerger {
                 text.indexOf(token, searchFrom, ignoreCase = true)
             }
             if (start < 0) return false
-            matchedAny = true
+            matchedCharacters += token.count { !it.isWhitespace() }
             searchFrom = start + token.length
         }
-        return matchedAny
+        val visibleCharacters = text.count { !it.isWhitespace() }.coerceAtLeast(1)
+        return matchedCharacters.toFloat() / visibleCharacters >= MIN_TIMED_WORD_TEXT_COVERAGE
     }
 
     private fun clean(text: String): String = text
