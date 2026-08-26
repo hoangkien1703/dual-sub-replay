@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.data
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -56,6 +57,27 @@ class YouTubeCaptionProviderTest {
         val clients = youtubePlayerClients(null)
 
         assertEquals("2.20260708.00.00", clients.last().clientVersion)
+    }
+
+    @Test
+    fun capsEachNetworkRequestBelowTheWholeLookupDeadline() {
+        val perRequestNanos = TimeUnit.MILLISECONDS.toNanos(YOUTUBE_REQUEST_TIMEOUT_MS)
+
+        assertEquals(
+            perRequestNanos,
+            boundedYouTubeRequestTimeoutNanos(perRequestNanos * 4),
+        )
+        assertEquals(
+            123L,
+            boundedYouTubeRequestTimeoutNanos(123L),
+        )
+    }
+
+    @Test
+    fun rejectsNonPositiveRemainingRequestTime() {
+        assertThrows(IllegalArgumentException::class.java) {
+            boundedYouTubeRequestTimeoutNanos(0L)
+        }
     }
 
     @Test
