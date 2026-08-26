@@ -3,11 +3,14 @@ package com.kienhoang.dualsubreplay.data
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InterruptedIOException
+import java.net.Inet4Address
+import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Dns
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
@@ -40,9 +43,62 @@ internal data class YouTubePlayerClient(
 
 private val INNERTUBE_CLIENT_VERSION_REGEX =
     Regex("""["']INNERTUBE_CLIENT_VERSION["']\s*:\s*["']([^"']+)["']""")
+private val INITIAL_PLAYER_RESPONSE_REGEX =
+    Regex("""(?:var\s+)?ytInitialPlayerResponse\s*=\s*""")
 
 internal fun extractWebInnertubeClientVersion(watchHtml: String): String? =
     INNERTUBE_CLIENT_VERSION_REGEX.find(watchHtml)?.groupValues?.getOrNull(1)
+
+/**
+ * OkHttp 4 tries resolved addresses sequentially. A short whole-call timeout can therefore expire
+ * on a broken IPv6 route before the IPv4 route is attempted, while Chromium/WebView succeeds via
+ * its own connection racing. Prefer IPv4 when both families are available, but retain IPv6 as a
+ * fallback so IPv6-only/NAT64 networks still work.
+ */
+internal fun preferIpv4Addresses(addresses: List<InetAddress>): List<InetAddress> =
+    addresses.sortedBy { address -> if (address is Inet4Address) 0 else 1 }
+
+/**
+ * The normal YouTube watch page often already embeds the exact player response that contains
+ * caption tracks. Reuse it before making any extra Innertube player request. This is especially
+ * important when the WebView can play the video but direct player POSTs are temporarily blocked or
+ * timing out.
+ */
+internal fun extractInitialPlayerResponse(watchHtml: String): JSONObject? {
+    val marker = INITIAL_PLAYER_RESPONSE_REGEX.find(watchHtml) ?: return null
+    val objectStart = watchHtml.indexOf('{', marker.range.last + 1)
+    if (objectStart < 0) return null
+    val jsonText = extractJsonObject(watchHtml, objectStart) ?: return null
+    return runCatching { JSONObject(jsonText) }.getOrNull()
+}
+
+internal fun extractJsonObject(text: String, objectStart: Int): String? {
+    if (objectStart !in text.indices || text[objectStart] != '{') return null
+    var depth = 0
+    var inString = false
+    var escaped = false
+    for (index in objectStart until text.length) {
+        val char = text[index]
+        if (inString) {
+            when {
+                escaped -> escaped = false
+                char == '\\' -> escaped = true
+                char == '"' -> inString = false
+            }
+            continue
+        }
+        when (char) {
+            '"' -> inString = true
+            '{' -> depth += 1
+            '}' -> {
+                depth -= 1
+                if (depth == 0) return text.substring(objectStart, index + 1)
+                if (depth < 0) return null
+            }
+        }
+    }
+    return null
+}
 
 internal fun youtubePlayerClients(webClientVersion: String?): List<YouTubePlayerClient> = listOf(
     YouTubePlayerClient(
@@ -82,6 +138,11 @@ internal fun youtubePlayerClients(webClientVersion: String?): List<YouTubePlayer
         clientVersion = webClientVersion?.takeIf(String::isNotBlank) ?: DEFAULT_WEB_CLIENT_VERSION,
         userAgent = WEB_USER_AGENT,
     ),
+)
+
+internal fun playerApiUrls(apiKey: String): List<String> = listOf(
+    "https://youtubei.googleapis.com/youtubei/v1/player?key=$apiKey",
+    "https://www.youtube.com/youtubei/v1/player?key=$apiKey",
 )
 
 internal fun trustedYouTubeCaptionUrl(url: String): HttpUrl? {
@@ -151,6 +212,7 @@ internal fun boundedYouTubeRequestTimeoutNanos(remainingNanos: Long): Long {
  */
 class YouTubeCaptionProvider(
     private val client: OkHttpClient = OkHttpClient.Builder()
+        .dns { hostname -> preferIpv4Addresses(Dns.SYSTEM.lookup(hostname)) }
         .connectTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .readTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .writeTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
@@ -215,6 +277,31 @@ class YouTubeCaptionProvider(
         }
         var sawNonTrackFailure = false
 
+        extractInitialPlayerResponse(watchHtml)?.let { embeddedPlayer ->
+            try {
+                return captionResultFromPlayerResponse(
+                    root = embeddedPlayer,
+                    preferredLanguages = preferredLanguages,
+                    userAgent = WEB_USER_AGENT,
+                    deadlineNanos = deadlineNanos,
+                    noTracksMessage = "The watch page embedded no public caption track.",
+                )
+            } catch (error: CaptionLookupTimeoutException) {
+                throw error
+            } catch (error: ResponseLimitExceededException) {
+                throw error
+            } catch (error: NoCaptionTracksException) {
+                lastError = error
+                failures += "Watch page: ${error.message}"
+            } catch (error: Exception) {
+                lastError = error
+                sawNonTrackFailure = true
+                val failure = "Watch page: ${error.message ?: error.javaClass.simpleName}"
+                failures += failure
+                lastServiceFailure = failure
+            }
+        }
+
         for (profile in profiles) {
             ensureLookupTimeRemaining(deadlineNanos, "trying ${profile.label}")
             try {
@@ -249,7 +336,8 @@ class YouTubeCaptionProvider(
             ?: failures.lastOrNull()
             ?: "No YouTube client returned usable captions."
         throw CaptionUnavailableException(
-            "Captions could not be loaded after trying YouTube client fallbacks. Last failure: $detail",
+            "Captions could not be loaded after trying the watch page and YouTube client fallbacks. " +
+                "Last failure: $detail",
             lastError,
         )
     }
@@ -279,19 +367,47 @@ class YouTubeCaptionProvider(
             .put("contentCheckOk", true)
             .put("racyCheckOk", true)
 
-        val playerJson = executeText(
-            Request.Builder()
-                .url("https://www.youtube.com/youtubei/v1/player?key=$apiKey")
-                .header("User-Agent", profile.userAgent)
-                .header("X-YouTube-Client-Name", profile.clientNumber)
-                .header("X-YouTube-Client-Version", profile.clientVersion)
-                .post(body.toString().toRequestBody(JSON_MEDIA_TYPE))
-                .build(),
-            stage = "player request (${profile.label})",
-            deadlineNanos = deadlineNanos,
-        )
+        var lastError: Exception? = null
+        for (playerUrl in playerApiUrls(apiKey)) {
+            ensureLookupTimeRemaining(deadlineNanos, "trying ${profile.label}")
+            val host = playerUrl.toHttpUrlOrNull()?.host ?: "player endpoint"
+            try {
+                val playerJson = executeText(
+                    Request.Builder()
+                        .url(playerUrl)
+                        .header("User-Agent", profile.userAgent)
+                        .header("X-YouTube-Client-Name", profile.clientNumber)
+                        .header("X-YouTube-Client-Version", profile.clientVersion)
+                        .post(body.toString().toRequestBody(JSON_MEDIA_TYPE))
+                        .build(),
+                    stage = "player request (${profile.label}, $host)",
+                    deadlineNanos = deadlineNanos,
+                )
+                return captionResultFromPlayerResponse(
+                    root = JSONObject(playerJson),
+                    preferredLanguages = preferredLanguages,
+                    userAgent = profile.userAgent,
+                    deadlineNanos = deadlineNanos,
+                    noTracksMessage = "This client returned no public caption track.",
+                )
+            } catch (error: CaptionLookupTimeoutException) {
+                throw error
+            } catch (error: ResponseLimitExceededException) {
+                throw error
+            } catch (error: Exception) {
+                lastError = error
+            }
+        }
+        throw lastError ?: CaptionUnavailableException("No YouTube player endpoint responded.")
+    }
 
-        val root = JSONObject(playerJson)
+    private fun captionResultFromPlayerResponse(
+        root: JSONObject,
+        preferredLanguages: List<String>,
+        userAgent: String,
+        deadlineNanos: Long,
+        noTracksMessage: String,
+    ): CaptionTrackResult {
         val playability = root.optJSONObject("playabilityStatus")
         val playabilityStatus = playability?.optString("status").orEmpty()
         if (playabilityStatus.isNotBlank() && playabilityStatus != "OK") {
@@ -308,13 +424,13 @@ class YouTubeCaptionProvider(
         val tracks = root.optJSONObject("captions")
             ?.optJSONObject("playerCaptionsTracklistRenderer")
             ?.optJSONArray("captionTracks")
-            ?: throw NoCaptionTracksException("This client returned no public caption track.")
+            ?: throw NoCaptionTracksException(noTracksMessage)
 
         val selected = selectTrack(tracks, preferredLanguages)
             ?: throw NoCaptionTracksException("No compatible caption track was found.")
         val cues = fetchCaptionCues(
             baseUrl = selected.getString("baseUrl"),
-            userAgent = profile.userAgent,
+            userAgent = userAgent,
             deadlineNanos = deadlineNanos,
         )
 
