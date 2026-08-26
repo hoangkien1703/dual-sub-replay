@@ -232,51 +232,47 @@ object SubtitleMerger {
     }
 
     /**
-     * Turns one long segment into several short ones. The time range and the
-     * caption words are divided proportionally. If noisy real timings land in
-     * the wrong split chunk, that chunk uses safe estimated timings so karaoke
-     * highlighting remains available instead of disappearing.
+     * Turns one long segment into several short display chunks while keeping the
+     * canonical word timeline untouched. Words are assigned by their position in
+     * the subtitle text, never by where their timestamps happen to fall inside a
+     * character-proportional range. When a following chunk has real timed words,
+     * its first word becomes the visual boundary between the two chunks.
      */
     private fun buildSplitSegments(segment: SubtitleSegment, chunks: List<String>): List<SubtitleSegment> {
-        val duration = (segment.endMs - segment.startMs).coerceAtLeast(0L)
-        val lengths = chunks.map { chunk -> chunk.length.toFloat().coerceAtLeast(1f) }
-        val totalLength = lengths.sum()
-        var consumedWeight = 0f
-        val ranges = chunks.mapIndexed { index, _ ->
-            val startShare = consumedWeight / totalLength
-            consumedWeight += lengths[index]
-            val endShare = consumedWeight / totalLength
-            val chunkStart = segment.startMs + (duration * startShare).toLong()
-            val chunkEnd = if (index == chunks.lastIndex) {
-                segment.endMs
-            } else {
-                segment.startMs + (duration * endShare).toLong()
-            }
-            chunkStart..chunkEnd
-        }.toMutableList()
-        // Keep ranges monotonic even for degenerate zero-length inputs.
-        for (index in 1 until ranges.size) {
-            if (ranges[index].first < ranges[index - 1].last) {
-                ranges[index] = ranges[index - 1].last..ranges[index].last
-            }
+        val fallbackBoundaries = proportionalSplitBoundaries(segment, chunks)
+        val assignedWords = assignWordsToChunksByText(segment.originalText, segment.words, chunks)
+        val usableWords = chunks.mapIndexed { index, chunkText ->
+            assignedWords[index]
+                .takeIf { candidate -> candidate.isNotEmpty() && wordsAlignWithText(chunkText, candidate) }
+                .orEmpty()
         }
 
-        val assignedWords = assignWordsToRanges(segment.words, ranges)
+        val boundaries = fallbackBoundaries.toMutableList()
+        for (index in 1 until chunks.size) {
+            val exactNextStart = usableWords[index].firstOrNull()?.startMs
+            val safeFallback = usableWords[index - 1].lastOrNull()?.endMs?.let { previousEnd ->
+                maxOf(boundaries[index], previousEnd)
+            } ?: boundaries[index]
+            boundaries[index] = (exactNextStart ?: safeFallback)
+                .coerceIn(segment.startMs, segment.endMs)
+        }
+        for (index in 1 until boundaries.size) {
+            boundaries[index] = maxOf(boundaries[index], boundaries[index - 1])
+        }
 
         return chunks.mapIndexed { index, chunkText ->
-            val range = ranges[index]
-            val candidateWords = assignedWords[index]
-            val words = if (
-                candidateWords.isNotEmpty() && wordsAlignWithText(chunkText, candidateWords)
-            ) {
+            val chunkStart = boundaries[index]
+            val chunkEnd = boundaries[index + 1]
+            val candidateWords = usableWords[index]
+            val words = if (candidateWords.isNotEmpty()) {
                 candidateWords
             } else {
-                estimateWordTimings(chunkText, range.first, range.last)
+                estimateWordTimings(chunkText, chunkStart, chunkEnd)
             }
             SubtitleSegment(
                 id = segment.id,
-                startMs = range.first.coerceIn(segment.startMs, segment.endMs),
-                endMs = range.last.coerceIn(segment.startMs, segment.endMs),
+                startMs = chunkStart,
+                endMs = chunkEnd,
                 originalText = chunkText,
                 translatedText = null,
                 words = words,
@@ -284,21 +280,66 @@ object SubtitleMerger {
         }
     }
 
-    /** Places each timed word into the range covering its midpoint; misses fall back to estimates. */
-    private fun assignWordsToRanges(
+    /** Character-proportional boundaries are only a fallback when no real word anchor exists. */
+    private fun proportionalSplitBoundaries(
+        segment: SubtitleSegment,
+        chunks: List<String>,
+    ): List<Long> {
+        val duration = (segment.endMs - segment.startMs).coerceAtLeast(0L)
+        val lengths = chunks.map { chunk -> chunk.length.toFloat().coerceAtLeast(1f) }
+        val totalLength = lengths.sum().coerceAtLeast(1f)
+        var consumedWeight = 0f
+        val boundaries = mutableListOf(segment.startMs)
+        for (index in 0 until chunks.lastIndex) {
+            consumedWeight += lengths[index]
+            boundaries += segment.startMs + (duration * (consumedWeight / totalLength)).toLong()
+        }
+        boundaries += segment.endMs
+        return boundaries
+    }
+
+    /**
+     * Maps timed words to display chunks by text order. Timestamp skew must never
+     * move a word into another visual sentence: that was the source of karaoke
+     * regressions when long-sentence splitting was enabled.
+     */
+    private fun assignWordsToChunksByText(
+        segmentText: String,
         words: List<SubtitleWord>,
-        ranges: List<LongRange>,
+        chunks: List<String>,
     ): List<List<SubtitleWord>> {
-        val buckets = List(ranges.size) { mutableListOf<SubtitleWord>() }
-        words.forEach { word ->
-            val midpoint = (word.startMs + word.endMs) / 2L
-            val target = ranges.indexOfFirst { range -> midpoint in range }
-            val bucketIndex = if (target >= 0) target else {
-                if (midpoint < ranges.first().first) 0 else ranges.lastIndex
+        val buckets = List(chunks.size) { mutableListOf<SubtitleWord>() }
+        if (segmentText.isBlank() || words.isEmpty() || chunks.isEmpty()) return buckets
+
+        val chunkRanges = mutableListOf<IntRange>()
+        var chunkSearchFrom = 0
+        chunks.forEach { chunk ->
+            val start = findTextStart(segmentText, chunk, chunkSearchFrom)
+            if (start < 0) {
+                chunkRanges += 1..0
+            } else {
+                chunkRanges += start until (start + chunk.length)
+                chunkSearchFrom = start + chunk.length
             }
-            buckets[bucketIndex] += word
+        }
+
+        var wordSearchFrom = 0
+        words.forEach { word ->
+            val token = word.text.replace(Regex("\\s+"), " ").trim()
+            if (token.isEmpty()) return@forEach
+            val start = findTextStart(segmentText, token, wordSearchFrom)
+            if (start < 0) return@forEach
+            val target = chunkRanges.indexOfFirst { range -> !range.isEmpty() && start in range }
+            if (target >= 0) buckets[target] += word
+            wordSearchFrom = start + token.length
         }
         return buckets
+    }
+
+    private fun findTextStart(text: String, token: String, fromIndex: Int): Int {
+        val safeFrom = fromIndex.coerceIn(0, text.length)
+        val exact = text.indexOf(token, safeFrom)
+        return if (exact >= 0) exact else text.indexOf(token, safeFrom, ignoreCase = true)
     }
 }
 
