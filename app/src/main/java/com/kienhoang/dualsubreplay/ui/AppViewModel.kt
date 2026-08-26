@@ -8,6 +8,7 @@ import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.SubtitleTimingSource
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
@@ -118,6 +119,49 @@ internal fun activeWordIndex(
     ?.let { segment -> timedActiveWordIndex(segment.words, timeMs) }
     ?: -1
 
+private val captionTokenRegex = Regex("""[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*""")
+
+internal fun normalizedCaptionTokens(text: String): List<String> =
+    captionTokenRegex.findAll(text.lowercase()).map { it.value }.toList()
+
+/**
+ * Turns a native YouTube caption DOM growth event into a conservative word hint.
+ * The first appearance of a caption window is ignored because YouTube can render
+ * a whole future phrase at once. Only a later prefix growth is trusted, only for
+ * estimated words, and only when it is reasonably close to the existing timing.
+ */
+internal fun domCaptionWordHint(
+    segment: SubtitleSegment,
+    observation: WebCaptionObservation?,
+    activeVideoId: String?,
+    timeMs: Long,
+    timedWordIndex: Int,
+): Int? {
+    val observed = observation ?: return null
+    if (activeVideoId == null || observed.videoId != activeVideoId) return null
+    if (kotlin.math.abs(timeMs - observed.observedAtMs) > 700L) return null
+    val previousText = observed.previousText ?: return null
+    val previousTokens = normalizedCaptionTokens(previousText)
+    val currentTokens = normalizedCaptionTokens(observed.text)
+    if (previousTokens.isEmpty() || currentTokens.size <= previousTokens.size) return null
+    if (currentTokens.take(previousTokens.size) != previousTokens) return null
+    val appended = currentTokens.drop(previousTokens.size)
+    val firstNewToken = appended.firstOrNull() ?: return null
+
+    val wordTokens = segment.words.map { normalizedCaptionTokens(it.text).firstOrNull().orEmpty() }
+    val candidates = wordTokens.indices.filter { index ->
+        wordTokens[index] == firstNewToken &&
+            (appended.size < 2 || index + 1 >= wordTokens.size || wordTokens[index + 1] == appended[1])
+    }
+    val target = candidates.minByOrNull { index ->
+        kotlin.math.abs(index - timedWordIndex.coerceAtLeast(0))
+    } ?: return null
+    val word = segment.words[target]
+    if (word.timingSource == SubtitleTimingSource.YOUTUBE_EXACT) return null
+    if (kotlin.math.abs(word.startMs - observed.observedAtMs) > 900L) return null
+    return target
+}
+
 internal const val TRANSLATION_PUBLISH_BATCH = 8
 
 /**
@@ -204,6 +248,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
     private var rawMergedSegments: List<SubtitleSegment> = emptyList()
+    private var lastAppliedDomObservationAtMs = -1L
+    private var domWordFloor: DomWordFloor? = null
+
+    private data class DomWordFloor(
+        val segmentId: Long,
+        val wordIndex: Int,
+        val expiresAtMs: Long,
+    )
 
     private val _state = MutableStateFlow(
         DualSubUiState(
@@ -283,18 +335,41 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
         latestPlaybackSecondMs = timeMs
         val index = activeSubtitleIndex(current.segments, timeMs)
-        if (index != current.currentIndex) {
-            _state.update {
-                it.copy(
-                    currentIndex = index,
-                    activeWordIndex = activeWordIndex(it.segments, index, timeMs),
+        var wordIndex = activeWordIndex(current.segments, index, timeMs)
+
+        if (current.generatedCaptions && index >= 0) {
+            val observation = latestYouTubeCaptionObservation
+            if (observation != null && observation.observedAtMs > lastAppliedDomObservationAtMs) {
+                val hint = domCaptionWordHint(
+                    segment = current.segments[index],
+                    observation = observation,
+                    activeVideoId = videoId,
+                    timeMs = timeMs,
+                    timedWordIndex = wordIndex,
                 )
+                if (hint != null) {
+                    domWordFloor = DomWordFloor(
+                        segmentId = current.segments[index].id,
+                        wordIndex = hint,
+                        expiresAtMs = timeMs + 1_200L,
+                    )
+                }
+                lastAppliedDomObservationAtMs = observation.observedAtMs
             }
-        } else {
-            val wordIndex = activeWordIndex(current.segments, index, timeMs)
-            if (wordIndex != current.activeWordIndex) {
-                _state.update { it.copy(activeWordIndex = wordIndex) }
+        }
+
+        val floor = domWordFloor
+        if (floor != null) {
+            val currentSegment = current.segments.getOrNull(index)
+            when {
+                currentSegment?.id != floor.segmentId || timeMs > floor.expiresAtMs -> domWordFloor = null
+                wordIndex < floor.wordIndex -> wordIndex = floor.wordIndex
+                else -> domWordFloor = null
             }
+        }
+
+        if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
+            _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
         }
     }
 
@@ -482,6 +557,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadingJob?.cancel()
         latestPlaybackSecondMs = 0L
         rawMergedSegments = emptyList()
+        lastAppliedDomObservationAtMs = -1L
+        domWordFloor = null
         _state.update {
             it.copy(
                 activeVideoId = null,
@@ -505,6 +582,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         // current position so subtitles resume exactly where playback is.
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
             latestPlaybackSecondMs = 0L
+            lastAppliedDomObservationAtMs = -1L
+            domWordFloor = null
         }
         _state.update {
             it.copy(

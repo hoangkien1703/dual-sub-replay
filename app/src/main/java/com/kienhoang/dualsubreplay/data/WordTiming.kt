@@ -6,19 +6,54 @@ package com.kienhoang.dualsubreplay.data
  */
 
 /**
- * Small visual lead that compensates for WebView playback polling + bridge/render latency.
- * It only advances transitions between already-visible words; it never highlights the first word
- * before its real start time.
+ * With a frame-synchronised WebView clock most polling latency disappears.
+ * Keep only a tiny render lead so Compose can paint the next word without
+ * visibly jumping ahead of the speaker.
  */
-internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 75L
+internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 20L
+private const val MIN_ESTIMATED_WORD_MS = 60L
+private val sentencePause = Regex("""[.!?。！？…]+["'’”)]*$""")
+private val clausePause = Regex("""[,;:，；：]+["'’”)]*$""")
+private val latinVowelGroups = Regex("(?i)[aeiouy]+")
 
-/** Splits [text] into words and spreads them across the cue duration by length. */
+/**
+ * A speech-oriented fallback weight. It avoids giving very long written words
+ * an unrealistically huge share of a cue and reserves a little time for
+ * punctuation pauses. This is still explicitly ESTIMATED timing.
+ */
+private fun estimatedTimingWeight(token: String): Long {
+    val spokenCharacters = token.count(Char::isLetterOrDigit).coerceAtLeast(1)
+    val vowelGroups = latinVowelGroups.findAll(token).count()
+    val roughSyllables = maxOf(vowelGroups, (spokenCharacters + 2) / 3)
+        .coerceIn(1, 6)
+    val pauseWeight = when {
+        sentencePause.containsMatchIn(token) -> 3
+        clausePause.containsMatchIn(token) -> 2
+        else -> 0
+    }
+    return (roughSyllables + pauseWeight).toLong()
+}
+
+/**
+ * Splits text into words and estimates their boundaries from speech-oriented
+ * weights. When the cue is long enough, every word receives a small minimum
+ * slice before the remaining duration is distributed by the weights.
+ */
 internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List<SubtitleWord> {
     val tokens = text.split(Regex("\\s+")).filter(String::isNotBlank)
     if (tokens.isEmpty() || endMs <= startMs) return emptyList()
-    val weights = tokens.map { token -> token.length.coerceAtLeast(1).toLong() }
-    val totalWeight = weights.sum().coerceAtLeast(1L)
+
     val duration = endMs - startMs
+    val minimumPerWord = if (duration >= tokens.size * MIN_ESTIMATED_WORD_MS) {
+        MIN_ESTIMATED_WORD_MS
+    } else {
+        0L
+    }
+    val reserved = minimumPerWord * tokens.size
+    val distributable = (duration - reserved).coerceAtLeast(0L)
+    val weights = tokens.map(::estimatedTimingWeight)
+    val totalWeight = weights.sum().coerceAtLeast(1L)
+
     var consumedWeight = 0L
     var cursor = startMs
     return tokens.mapIndexed { index, token ->
@@ -26,13 +61,17 @@ internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List
         val proportionalEnd = if (index == tokens.lastIndex) {
             endMs
         } else {
-            startMs + (duration * consumedWeight / totalWeight)
+            startMs +
+                minimumPerWord * (index + 1L) +
+                distributable * consumedWeight / totalWeight
         }
-        // Broken/very dense captions can contain more tokens than their tiny cue
-        // duration reasonably allows. Never let estimated timings run past the
-        // cue or become negative; zero-length slices are safer than overflow.
         val safeEnd = proportionalEnd.coerceIn(cursor, endMs)
-        val word = SubtitleWord(text = token, startMs = cursor, endMs = safeEnd)
+        val word = SubtitleWord(
+            text = token,
+            startMs = cursor,
+            endMs = safeEnd,
+            timingSource = SubtitleTimingSource.ESTIMATED,
+        )
         cursor = safeEnd
         word
     }
@@ -40,9 +79,7 @@ internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List
 
 /**
  * Index of the word being spoken at [timeMs]. Between words the previously
- * started word stays highlighted so short gaps do not flicker. After the first
- * word has really started, upcoming word transitions are allowed to lead the
- * playback clock slightly to hide WebView/polling latency.
+ * started word stays highlighted so short gaps do not flicker.
  */
 internal fun activeWordIndex(words: List<SubtitleWord>, timeMs: Long): Int {
     val firstWord = words.firstOrNull() ?: return -1

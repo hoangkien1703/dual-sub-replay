@@ -49,8 +49,9 @@ class WordTimingTest {
         assertEquals(1, activeWordIndex(words, timeMs = 600))
         // A normal gap still keeps the previous word highlighted.
         assertEquals(1, activeWordIndex(words, timeMs = 920))
-        // Near the next boundary, the small visual lead compensates for WebView/UI latency.
-        assertEquals(2, activeWordIndex(words, timeMs = 950))
+        // The frame-synced clock needs only a tiny render-path lead now.
+        assertEquals(1, activeWordIndex(words, timeMs = 950))
+        assertEquals(2, activeWordIndex(words, timeMs = 985))
         assertEquals(2, activeWordIndex(words, timeMs = 1_200))
     }
 

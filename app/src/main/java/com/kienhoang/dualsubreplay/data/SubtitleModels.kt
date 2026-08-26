@@ -16,11 +16,18 @@ data class SubtitleSegment(
     val words: List<SubtitleWord> = emptyList(),
 )
 
+enum class SubtitleTimingSource {
+    YOUTUBE_EXACT,
+    YOUTUBE_DOM_OBSERVED,
+    ESTIMATED,
+}
+
 /** A single spoken word/chunk with its absolute timing inside the video. */
 data class SubtitleWord(
     val text: String,
     val startMs: Long,
     val endMs: Long,
+    val timingSource: SubtitleTimingSource = SubtitleTimingSource.ESTIMATED,
 )
 
 data class CaptionTrackResult(

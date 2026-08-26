@@ -50,6 +50,10 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.WebMessageCompat
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import java.net.URI
@@ -62,11 +66,11 @@ import org.json.JSONObject
 import org.json.JSONTokener
 
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
-// Keep native karaoke tracking close to YouTube's own transcript cadence. 250 ms
-// polling made spoken-word changes visibly trail fast speech by up to a quarter
-// second; 100 ms keeps the highlight responsive without polling every frame.
-private const val PLAYBACK_POLL_INTERVAL_MS = 100L
+private const val PLAYBACK_FALLBACK_POLL_INTERVAL_MS = 100L
+private const val PLAYER_CHROME_POLL_INTERVAL_MS = 250L
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
+private const val KARAOKE_BRIDGE_NAME = "DualSubKaraokeBridge"
+private val YOUTUBE_BRIDGE_ORIGINS = setOf("https://youtube.com", "https://*.youtube.com")
 internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
 private val trustedGoogleSignInHosts = setOf(
@@ -186,6 +190,161 @@ internal data class WebPlaybackSnapshot(
     val currentSecond: Float?,
     val controlsVisible: Boolean = false,
 )
+
+internal data class WebKaraokeSyncMessage(
+    val type: String,
+    val url: String,
+    val currentSecond: Float?,
+    val captionText: String? = null,
+    val previousCaptionText: String? = null,
+)
+
+internal data class WebCaptionObservation(
+    val videoId: String,
+    val text: String,
+    val previousText: String?,
+    val observedAtMs: Long,
+)
+
+@Volatile
+internal var latestYouTubeCaptionObservation: WebCaptionObservation? = null
+
+internal fun isTrustedYouTubeOrigin(origin: String): Boolean {
+    val uri = runCatching { URI(origin) }.getOrNull() ?: return false
+    if (!uri.scheme.equals("https", ignoreCase = true)) return false
+    val host = uri.host?.lowercase()?.removeSuffix(".") ?: return false
+    return host == "youtube.com" || host.endsWith(".youtube.com")
+}
+
+internal fun parseWebKaraokeSyncMessage(raw: String?): WebKaraokeSyncMessage? {
+    if (raw.isNullOrBlank()) return null
+    return runCatching {
+        val json = JSONObject(raw)
+        WebKaraokeSyncMessage(
+            type = json.getString("type"),
+            url = json.getString("url"),
+            currentSecond = if (json.isNull("currentSecond")) null else json.getDouble("currentSecond").toFloat(),
+            captionText = json.optString("captionText").takeIf(String::isNotBlank),
+            previousCaptionText = json.optString("previousCaptionText").takeIf(String::isNotBlank),
+        )
+    }.getOrNull()
+}
+
+/**
+ * Runs inside trusted YouTube frames. Playback messages use the media timestamp
+ * of the frame being presented, while caption messages observe YouTube's own
+ * rendered auto-caption DOM and provide conservative extra timing anchors.
+ */
+internal val WEB_KARAOKE_SYNC_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return;
+      if (window.__dualSubKaraokeSyncInstalled) return;
+      window.__dualSubKaraokeSyncInstalled = true;
+      const bridge = window['$KARAOKE_BRIDGE_NAME'];
+      if (!bridge || typeof bridge.postMessage !== 'function') return;
+
+      let pendingVideo = null;
+      let lastPlaybackPostAt = 0;
+      let lastMediaTime = null;
+      let captionRoot = null;
+      let captionObserver = null;
+      let lastCaptionText = '';
+
+      const activeVideo = function() {
+        const videos = Array.from(document.querySelectorAll('video'));
+        return videos.find(function(item) { return !item.paused && !item.ended; })
+          || videos.find(function(item) { return item.readyState > 0; })
+          || videos[0]
+          || null;
+      };
+
+      const post = function(payload) {
+        try { bridge.postMessage(JSON.stringify(payload)); } catch (_) {}
+      };
+
+      const emitPlayback = function(second, now) {
+        if (!Number.isFinite(second)) return;
+        const clock = Number.isFinite(now) ? now : performance.now();
+        if (clock - lastPlaybackPostAt < 30) return;
+        lastPlaybackPostAt = clock;
+        lastMediaTime = second;
+        post({ type: 'playback', url: window.location.href, currentSecond: second });
+      };
+
+      const ensureFrameClock = function() {
+        const video = activeVideo();
+        if (!video) return;
+        if (typeof video.requestVideoFrameCallback !== 'function') {
+          emitPlayback(video.currentTime, performance.now());
+          return;
+        }
+        if (pendingVideo === video) return;
+        pendingVideo = video;
+        video.requestVideoFrameCallback(function(now, metadata) {
+          if (pendingVideo === video) pendingVideo = null;
+          const second = metadata && Number.isFinite(metadata.mediaTime)
+            ? metadata.mediaTime
+            : video.currentTime;
+          emitPlayback(second, now);
+          ensureFrameClock();
+        });
+      };
+
+      const visibleCaptionText = function() {
+        if (!captionRoot) return '';
+        return Array.from(captionRoot.querySelectorAll('.ytp-caption-segment'))
+          .map(function(node) { return node.textContent || ''; })
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      };
+
+      const emitCaption = function() {
+        const text = visibleCaptionText();
+        if (!text || text === lastCaptionText) return;
+        const previous = lastCaptionText;
+        lastCaptionText = text;
+        const video = activeVideo();
+        const second = Number.isFinite(lastMediaTime)
+          ? lastMediaTime
+          : (video && Number.isFinite(video.currentTime) ? video.currentTime : null);
+        if (!Number.isFinite(second)) return;
+        post({
+          type: 'caption',
+          url: window.location.href,
+          currentSecond: second,
+          captionText: text,
+          previousCaptionText: previous || null
+        });
+      };
+
+      const bindCaptionObserver = function() {
+        const nextRoot = document.querySelector('.ytp-caption-window-container, .caption-window');
+        if (nextRoot === captionRoot) return;
+        if (captionObserver) captionObserver.disconnect();
+        captionRoot = nextRoot;
+        lastCaptionText = '';
+        if (!captionRoot) return;
+        captionObserver = new MutationObserver(emitCaption);
+        captionObserver.observe(captionRoot, { childList: true, subtree: true, characterData: true });
+        emitCaption();
+      };
+
+      ensureFrameClock();
+      bindCaptionObserver();
+      setInterval(ensureFrameClock, 100);
+      setInterval(function() {
+        const video = activeVideo();
+        if (video && (video.paused || typeof video.requestVideoFrameCallback !== 'function')) {
+          emitPlayback(video.currentTime, performance.now());
+        }
+      }, 200);
+      setInterval(bindCaptionObserver, 400);
+    })();
+    """.trimIndent()
 
 internal val youtubePlayerControlsVisible = MutableStateFlow(false)
 internal val youtubeFullscreenActive = MutableStateFlow(false)
@@ -357,6 +516,7 @@ internal fun SingleYouTubePage(
     var signInReturnUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(trustedEmbeddedUrlOrHome(initialUrl)) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
+    var frameSyncedPlaybackActive by remember { mutableStateOf(false) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
@@ -421,6 +581,54 @@ internal fun SingleYouTubePage(
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
 
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+                WebViewCompat.addWebMessageListener(
+                    this,
+                    KARAOKE_BRIDGE_NAME,
+                    YOUTUBE_BRIDGE_ORIGINS,
+                    object : WebViewCompat.WebMessageListener {
+                        override fun onPostMessage(
+                            view: WebView,
+                            message: WebMessageCompat,
+                            sourceOrigin: Uri,
+                            isMainFrame: Boolean,
+                            replyProxy: JavaScriptReplyProxy,
+                        ) {
+                            if (!isMainFrame || !lifecycleStarted || !isTrustedYouTubeOrigin(sourceOrigin.toString())) return
+                            val event = parseWebKaraokeSyncMessage(message.data) ?: return
+                            when (event.type) {
+                                "playback" -> {
+                                    val selection = browseVideoSelection(event.url) ?: return
+                                    val second = event.currentSecond ?: return
+                                    frameSyncedPlaybackActive = true
+                                    reportNavigation(view, event.url)
+                                    currentOnPlaybackSecond(selection.videoId, second)
+                                }
+
+                                "caption" -> {
+                                    val selection = browseVideoSelection(event.url) ?: return
+                                    val text = event.captionText ?: return
+                                    val second = event.currentSecond ?: return
+                                    latestYouTubeCaptionObservation = WebCaptionObservation(
+                                        videoId = selection.videoId,
+                                        text = text,
+                                        previousText = event.previousCaptionText,
+                                        observedAtMs = (second.coerceAtLeast(0f) * 1_000).toLong(),
+                                    )
+                                }
+                            }
+                        }
+                    },
+                )
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                    WebViewCompat.addDocumentStartJavaScript(
+                        this,
+                        WEB_KARAOKE_SYNC_SCRIPT,
+                        YOUTUBE_BRIDGE_ORIGINS,
+                    )
+                }
+            }
+
             webViewClient = object : WebViewClient() {
                 private fun handleMainFrameUrl(view: WebView, url: String): Boolean {
                     val destination = classifyMainFrameUrl(url)
@@ -477,6 +685,8 @@ internal fun SingleYouTubePage(
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     pageError = null
+                    frameSyncedPlaybackActive = false
+                    latestYouTubeCaptionObservation = null
                     if (url != null && handleMainFrameUrl(view, url)) return
                     reportNavigation(view, url)
                 }
@@ -493,6 +703,12 @@ internal fun SingleYouTubePage(
                             webCaptionVisibilityScript(currentSuppressPageCaptions),
                             null,
                         )
+                        if (
+                            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                            !WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
+                        ) {
+                            view.evaluateJavascript(WEB_KARAOKE_SYNC_SCRIPT, null)
+                        }
                     }
                 }
 
@@ -563,18 +779,28 @@ internal fun SingleYouTubePage(
         while (isActive) {
             if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 youtubePlayerControlsVisible.value = false
-                delay(PLAYBACK_POLL_INTERVAL_MS)
+                frameSyncedPlaybackActive = false
+                latestYouTubeCaptionObservation = null
+                delay(PLAYBACK_FALLBACK_POLL_INTERVAL_MS)
                 continue
             }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
                 youtubePlayerControlsVisible.value = snapshot.controlsVisible
                 reportNavigation(webView, snapshot.url)
-                val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
-                val second = snapshot.currentSecond ?: return@evaluateJavascript
-                currentOnPlaybackSecond(selection.videoId, second)
+                if (!frameSyncedPlaybackActive) {
+                    val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
+                    val second = snapshot.currentSecond ?: return@evaluateJavascript
+                    currentOnPlaybackSecond(selection.videoId, second)
+                }
             }
-            delay(PLAYBACK_POLL_INTERVAL_MS)
+            delay(
+                if (frameSyncedPlaybackActive) {
+                    PLAYER_CHROME_POLL_INTERVAL_MS
+                } else {
+                    PLAYBACK_FALLBACK_POLL_INTERVAL_MS
+                },
+            )
         }
     }
 

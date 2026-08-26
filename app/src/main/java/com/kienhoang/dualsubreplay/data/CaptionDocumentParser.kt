@@ -137,9 +137,20 @@ internal object CaptionDocumentParser {
             }
 
             val expanded = estimateWordTimings(chunk.text, chunkStart, chunkEnd)
-            if (expanded.isNotEmpty()) {
-                words += expanded
-                cursorMs = expanded.last().endMs
+            val anchoredWords = if (chunk.offsetMs != null && expanded.isNotEmpty()) {
+                expanded.mapIndexed { wordIndex, word ->
+                    if (wordIndex == 0) {
+                        word.copy(timingSource = SubtitleTimingSource.YOUTUBE_EXACT)
+                    } else {
+                        word
+                    }
+                }
+            } else {
+                expanded
+            }
+            if (anchoredWords.isNotEmpty()) {
+                words += anchoredWords
+                cursorMs = anchoredWords.last().endMs
             } else {
                 cursorMs = chunkEnd
             }
