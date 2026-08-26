@@ -117,14 +117,12 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v0.9.2 highlights
+            ## ${{ steps.release_meta.outputs.tag }} highlights
 
-            - Adds default-on splitting for long subtitle sentences, including clause-aware and CJK-friendly splitting while preserving timing and replay behavior.
-            - Makes the compact dual-subtitle overlay and collapsed CC button smoothly movable, with near 1:1 dragging, better fullscreen-landscape defaults, position memory, and safer top-edge clamping.
-            - Changes subtitle hiding so the overlay closes only through the X action; fullscreen users can restore it from a floating CC button that fades and lightly blurs after inactivity.
-            - Improves karaoke-style spoken-word highlighting for incomplete or malformed auto-generated captions and increases playback tracking from 250 ms to 100 ms for tighter audio sync.
-            - Reopens the transcript panel directly at the current subtitle instead of scrolling from the beginning, removing the long-video reopen lag.
-            - Raises the portrait transcript panel closer to the video and adds regression coverage for subtitle splitting, timing, movement, fullscreen positioning, and Android API 36 behavior.
+            - Makes YouTube caption retrieval more resilient with multiple client fallbacks, watch-page caption extraction, bounded request timeouts, and clearer failure messages instead of indefinite loading.
+            - Improves karaoke-style word synchronization with a small latency compensation so highlighted words track speech more closely without highlighting the first word too early.
+            - Improves first-launch translation by warming the selected ML Kit language model after onboarding, publishing translated subtitle lines progressively, and timing out stalled model downloads with a useful retry message.
+            - Keeps caption loading cancellable when videos or languages change and preserves the existing dual-subtitle, replay, and auto-generated-caption behavior.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
