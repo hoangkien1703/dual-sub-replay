@@ -117,11 +117,14 @@ jobs:
 
             **Preview users:** uninstall the preview build once before installing this official release because preview and official builds use different signing keys.
 
-            ## v0.9.1 highlights
+            ## v0.9.2 highlights
 
-            - Adds a skippable three-page first-launch guide right after language setup, using real app screenshots to introduce dual subtitles, tap-to-replay, and opening videos.
-            - The guide appears only once for brand-new installs and never interrupts users who already finished language setup in an earlier version.
-            - Keeps the transcript panel, overlay experience, karaoke word highlighting, and single-WebView architecture unchanged.
+            - Adds default-on splitting for long subtitle sentences, including clause-aware and CJK-friendly splitting while preserving timing and replay behavior.
+            - Makes the compact dual-subtitle overlay and collapsed CC button smoothly movable, with near 1:1 dragging, better fullscreen-landscape defaults, position memory, and safer top-edge clamping.
+            - Changes subtitle hiding so the overlay closes only through the X action; fullscreen users can restore it from a floating CC button that fades and lightly blurs after inactivity.
+            - Improves karaoke-style spoken-word highlighting for incomplete or malformed auto-generated captions and increases playback tracking from 250 ms to 100 ms for tighter audio sync.
+            - Reopens the transcript panel directly at the current subtitle instead of scrolling from the beginning, removing the long-video reopen lag.
+            - Raises the portrait transcript panel closer to the video and adds regression coverage for subtitle splitting, timing, movement, fullscreen positioning, and Android API 36 behavior.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
