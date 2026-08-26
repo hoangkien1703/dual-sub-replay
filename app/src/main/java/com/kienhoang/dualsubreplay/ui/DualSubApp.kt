@@ -320,14 +320,14 @@ private fun DualSubExperience(
             onPlayerModeChange = onPlayerModeChange,
             onOriginalColorChange = onOriginalColorChange,
             onTranslatedColorChange = onTranslatedColorChange,
-                onHighlightColorChange = onHighlightColorChange,
-                onWordHighlightChange = onWordHighlightChange,
-                onCustomColorsChange = onCustomColorsChange,
-                onSplitSentencesChange = onSplitSentencesChange,
-                onResetSettings = {
-                    showSettings = false
-                    onResetSettings()
-                },
+            onHighlightColorChange = onHighlightColorChange,
+            onWordHighlightChange = onWordHighlightChange,
+            onCustomColorsChange = onCustomColorsChange,
+            onSplitSentencesChange = onSplitSentencesChange,
+            onResetSettings = {
+                showSettings = false
+                onResetSettings()
+            },
             onDismiss = { showSettings = false },
         )
     }
@@ -640,7 +640,13 @@ private fun SideSubtitlePanel(
 
 @Composable
 private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
-    val listState = rememberLazyListState()
+    // When the panel is recreated after being closed, start the lazy list at the
+    // current transcript row instead of item 0. This prevents long videos from
+    // visibly walking through hundreds of rows before catching up.
+    val initialItemIndex = state.currentIndex
+        .coerceAtLeast(0)
+        .coerceAtMost(state.segments.lastIndex.coerceAtLeast(0))
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialItemIndex)
     val previousIndex = remember { mutableIntStateOf(-1) }
     LaunchedEffect(state.currentIndex) {
         val target = state.currentIndex
@@ -656,6 +662,12 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
         }.first { it.isNotEmpty() }
 
         when {
+            // First placement after opening/reopening should always be an instant
+            // jump. Animating from row 0 is expensive and looks like a full-list
+            // scroll on long videos.
+            lastIndex < 0 -> {
+                listState.scrollToItem(target)
+            }
             shouldFollowPlaybackSeek(lastIndex, target) -> {
                 if (abs(target - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
                     listState.scrollToItem(target)
@@ -876,304 +888,304 @@ internal fun SubtitleSettingsDialog(
     if (activePicker != null) {
         val choices = if (activePicker == LanguagePickerMode.SOURCE) sourceChoices else targetChoices
         LanguagePickerDialog(
-  title = if (activePicker == LanguagePickerMode.SOURCE) {
-      "Original caption language"
-  } else {
-      "Translate to"
-  },
-  choices = choices,
-  selectedCode = if (activePicker == LanguagePickerMode.SOURCE) sourcePreference else targetLanguage,
-  searchQuery = searchQuery,
-  onSearchQueryChange = { searchQuery = it },
-  onChoice = { choice ->
-      if (activePicker == LanguagePickerMode.SOURCE) {
-          onSourceChange(choice.code)
-      } else {
-          onTargetChange(choice.code)
-      }
-      pickerMode = null
-      searchQuery = ""
-  },
-  onDismiss = {
-      pickerMode = null
-      searchQuery = ""
-  },
-  testTagPrefix = activePicker.name.lowercase(),
+            title = if (activePicker == LanguagePickerMode.SOURCE) {
+                "Original caption language"
+            } else {
+                "Translate to"
+            },
+            choices = choices,
+            selectedCode = if (activePicker == LanguagePickerMode.SOURCE) sourcePreference else targetLanguage,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            onChoice = { choice ->
+                if (activePicker == LanguagePickerMode.SOURCE) {
+                    onSourceChange(choice.code)
+                } else {
+                    onTargetChange(choice.code)
+                }
+                pickerMode = null
+                searchQuery = ""
+            },
+            onDismiss = {
+                pickerMode = null
+                searchQuery = ""
+            },
+            testTagPrefix = activePicker.name.lowercase(),
         )
     } else {
         val sourceLabel = if (sourcePreference == "auto") {
-  "Auto (recommended)"
+            "Auto (recommended)"
         } else {
-  sourceChoices.firstOrNull {
-      TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
-  }?.label ?: TranslationLanguages.displayName(sourcePreference)
+            sourceChoices.firstOrNull {
+                TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
+            }?.label ?: TranslationLanguages.displayName(sourcePreference)
         }
         AlertDialog(
-  onDismissRequest = onDismiss,
-  title = { Text("Dual-subtitle settings") },
-  text = {
-      val bodyMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.68f
-      Column(
-          modifier = Modifier
-              .heightIn(max = bodyMaxHeight)
-              .verticalScroll(rememberScrollState()),
-      ) {
-          Text("Captions", style = MaterialTheme.typography.titleSmall)
-          Spacer(Modifier.height(8.dp))
-          Text("Original language")
-          Spacer(Modifier.height(6.dp))
-          OutlinedButton(
-              onClick = {
-                  pickerMode = LanguagePickerMode.SOURCE
-                  searchQuery = ""
-              },
-              modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
-          ) {
-              Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
-          }
-          Spacer(Modifier.height(12.dp))
-          Text("Translate to")
-          Spacer(Modifier.height(6.dp))
-          OutlinedButton(
-              onClick = {
-                  pickerMode = LanguagePickerMode.TARGET
-                  searchQuery = ""
-              },
-              modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
-          ) {
-              Text(TranslationLanguages.displayName(targetLanguage))
-          }
-          Text(
-              "A language model downloads only when it is needed.",
-              modifier = Modifier.padding(top = 6.dp),
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Spacer(Modifier.height(12.dp))
-          Text("Text size: ${(fontScale * 100).toInt()}%")
-          Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+            onDismissRequest = onDismiss,
+            title = { Text("Dual-subtitle settings") },
+            text = {
+                val bodyMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.68f
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = bodyMaxHeight)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    Text("Captions", style = MaterialTheme.typography.titleSmall)
+                    Spacer(Modifier.height(8.dp))
+                    Text("Original language")
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedButton(
+                        onClick = {
+                            pickerMode = LanguagePickerMode.SOURCE
+                            searchQuery = ""
+                        },
+                        modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
+                    ) {
+                        Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Text("Translate to")
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedButton(
+                        onClick = {
+                            pickerMode = LanguagePickerMode.TARGET
+                            searchQuery = ""
+                        },
+                        modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
+                    ) {
+                        Text(TranslationLanguages.displayName(targetLanguage))
+                    }
+                    Text(
+                        "A language model downloads only when it is needed.",
+                        modifier = Modifier.padding(top = 6.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text("Text size: ${(fontScale * 100).toInt()}%")
+                    Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Appearance", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Highlight spoken words",
-              description = "Tint the word currently being spoken in the original subtitle so you can follow along in real time.",
-              checked = wordHighlightEnabled,
-              onCheckedChange = onWordHighlightChange,
-              testTag = "word_highlight_switch",
-          )
+                    Spacer(Modifier.height(14.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(14.dp))
+                    Text("Appearance", style = MaterialTheme.typography.titleSmall)
+                    SettingsSwitchRow(
+                        title = "Highlight spoken words",
+                        description = "Tint the word currently being spoken in the original subtitle so you can follow along in real time.",
+                        checked = wordHighlightEnabled,
+                        onCheckedChange = onWordHighlightChange,
+                        testTag = "word_highlight_switch",
+                    )
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Default view", style = MaterialTheme.typography.titleSmall)
-          PlayerModeSettingsOption(
-              mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-              selectedMode = playerMode,
-              title = "Transcript panel",
-              description = "Full dual-subtitle timeline with paragraph replay.",
-              onModeChange = onPlayerModeChange,
-          )
-          HorizontalDivider()
-          PlayerModeSettingsOption(
-              mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
-              selectedMode = playerMode,
-              title = "Scroll-friendly overlay",
-              description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
-              onModeChange = onPlayerModeChange,
-          )
+                    Spacer(Modifier.height(14.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(14.dp))
+                    Text("Default view", style = MaterialTheme.typography.titleSmall)
+                    PlayerModeSettingsOption(
+                        mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+                        selectedMode = playerMode,
+                        title = "Transcript panel",
+                        description = "Full dual-subtitle timeline with paragraph replay.",
+                        onModeChange = onPlayerModeChange,
+                    )
+                    HorizontalDivider()
+                    PlayerModeSettingsOption(
+                        mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+                        selectedMode = playerMode,
+                        title = "Scroll-friendly overlay",
+                        description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
+                        onModeChange = onPlayerModeChange,
+                    )
 
-          Spacer(Modifier.height(14.dp))
-          OutlinedButton(
-              onClick = { showMoreSettings = !showMoreSettings },
-              modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
-          ) {
-              Text(if (showMoreSettings) "Hide more settings" else "More settings")
-          }
+                    Spacer(Modifier.height(14.dp))
+                    OutlinedButton(
+                        onClick = { showMoreSettings = !showMoreSettings },
+                        modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
+                    ) {
+                        Text(if (showMoreSettings) "Hide more settings" else "More settings")
+                    }
 
-          if (showMoreSettings) {
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Captions layout", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Split long sentences",
-              description = "Cut long dual subtitles into shorter chunks at sentence breaks so they are easier to follow. On by default.",
-              checked = splitLongSentencesEnabled,
-              onCheckedChange = onSplitSentencesChange,
-              testTag = "split_long_sentences_switch",
-          )
+                    if (showMoreSettings) {
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Captions layout", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Split long sentences",
+                            description = "Cut long dual subtitles into shorter chunks at sentence breaks so they are easier to follow. On by default.",
+                            checked = splitLongSentencesEnabled,
+                            onCheckedChange = onSplitSentencesChange,
+                            testTag = "split_long_sentences_switch",
+                        )
 
-          Spacer(Modifier.height(8.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(8.dp))
-          Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Custom subtitle colors",
-              description = "Apply your chosen text colors below. When off, the default subtitle colors are used.",
-              checked = customColorsEnabled,
-              onCheckedChange = onCustomColorsChange,
-              testTag = "custom_colors_switch",
-          )
-          if (customColorsEnabled) {
-              SubtitleColorSwatchRow(
-                  title = "Original subtitle color",
-                  selectedKey = originalColorKey,
-                  enabled = true,
-                  onColorChange = onOriginalColorChange,
-                  testTagPrefix = "original_color",
-              )
-              SubtitleColorSwatchRow(
-                  title = "Translated subtitle color",
-                  selectedKey = translatedColorKey,
-                  enabled = true,
-                  onColorChange = onTranslatedColorChange,
-                  testTagPrefix = "translated_color",
-              )
-              SubtitleColorSwatchRow(
-                  title = "Spoken-word highlight",
-                  selectedKey = highlightColorKey,
-                  enabled = wordHighlightEnabled,
-                  onColorChange = onHighlightColorChange,
-                  testTagPrefix = "highlight_color",
-              )
-          }
+                        Spacer(Modifier.height(8.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(8.dp))
+                        Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Custom subtitle colors",
+                            description = "Apply your chosen text colors below. When off, the default subtitle colors are used.",
+                            checked = customColorsEnabled,
+                            onCheckedChange = onCustomColorsChange,
+                            testTag = "custom_colors_switch",
+                        )
+                        if (customColorsEnabled) {
+                            SubtitleColorSwatchRow(
+                                title = "Original subtitle color",
+                                selectedKey = originalColorKey,
+                                enabled = true,
+                                onColorChange = onOriginalColorChange,
+                                testTagPrefix = "original_color",
+                            )
+                            SubtitleColorSwatchRow(
+                                title = "Translated subtitle color",
+                                selectedKey = translatedColorKey,
+                                enabled = true,
+                                onColorChange = onTranslatedColorChange,
+                                testTagPrefix = "translated_color",
+                            )
+                            SubtitleColorSwatchRow(
+                                title = "Spoken-word highlight",
+                                selectedKey = highlightColorKey,
+                                enabled = wordHighlightEnabled,
+                                onColorChange = onHighlightColorChange,
+                                testTagPrefix = "highlight_color",
+                            )
+                        }
 
-          Spacer(Modifier.height(8.dp))
-          AdvancedAppearanceSettings()
+                        Spacer(Modifier.height(8.dp))
+                        AdvancedAppearanceSettings()
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Fullscreen & landscape", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Use overlay in fullscreen",
-              description = "Show the compact dual-subtitle overlay automatically when YouTube enters fullscreen.",
-              checked = autoOverlayFullscreen,
-              onCheckedChange = {
-                  autoOverlayFullscreen = it
-                  setBooleanPreference(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, it)
-              },
-              testTag = "auto_overlay_fullscreen_switch",
-          )
-          SettingsSwitchRow(
-              title = "Use overlay when rotated sideways",
-              description = "Temporarily replace the transcript panel with the compact overlay in landscape.",
-              checked = autoOverlayLandscape,
-              onCheckedChange = {
-                  autoOverlayLandscape = it
-                  setBooleanPreference(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, it)
-              },
-              testTag = "auto_overlay_landscape_switch",
-          )
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Fullscreen & landscape", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Use overlay in fullscreen",
+                            description = "Show the compact dual-subtitle overlay automatically when YouTube enters fullscreen.",
+                            checked = autoOverlayFullscreen,
+                            onCheckedChange = {
+                                autoOverlayFullscreen = it
+                                setBooleanPreference(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, it)
+                            },
+                            testTag = "auto_overlay_fullscreen_switch",
+                        )
+                        SettingsSwitchRow(
+                            title = "Use overlay when rotated sideways",
+                            description = "Temporarily replace the transcript panel with the compact overlay in landscape.",
+                            checked = autoOverlayLandscape,
+                            onCheckedChange = {
+                                autoOverlayLandscape = it
+                                setBooleanPreference(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, it)
+                            },
+                            testTag = "auto_overlay_landscape_switch",
+                        )
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Overlay", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Movable subtitle controls",
-              description = "Drag the dual-subtitle overlay or the collapsed CC button to the position you want. The overlay can reach the top edge in fullscreen.",
-              checked = movableSubtitleBox,
-              onCheckedChange = {
-                  movableSubtitleBox = it
-                  setBooleanPreference(MOVABLE_OVERLAY_PREFERENCE, it)
-              },
-              testTag = "movable_subtitle_box_switch",
-          )
-          SettingsSwitchRow(
-              title = "Automatically avoid video controls",
-              description = "Move subtitles upward while YouTube's seek bar and playback controls are visible.",
-              checked = autoAvoidPlayerControls,
-              onCheckedChange = {
-                  autoAvoidPlayerControls = it
-                  setBooleanPreference(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, it)
-              },
-              testTag = "auto_avoid_player_controls_switch",
-          )
-          SettingsSwitchRow(
-              title = "Remember dragged position",
-              description = "Save where you drag the subtitle overlay and collapsed CC button and reuse those positions later.",
-              checked = rememberOverlayPosition,
-              onCheckedChange = { enabled ->
-                  rememberOverlayPosition = enabled
-                  val editor = preferences.edit()
-                      .putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, enabled)
-                  if (!enabled) {
-                      editor
-                          .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
-                          .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
-                          .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
-                          .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
-                  }
-                  editor.apply()
-              },
-              testTag = "remember_overlay_position_switch",
-          )
-          Text(
-              "Drag the subtitle overlay up, down, or sideways. When the transcript is hidden, drag the CC button anywhere too. In portrait, flicking the overlay down closes it.",
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Spacer(Modifier.height(8.dp))
-          OutlinedButton(
-              onClick = {
-                  preferences.edit()
-                      .putFloat(
-                          OVERLAY_VERTICAL_POSITION_PREFERENCE,
-                          DEFAULT_OVERLAY_VERTICAL_POSITION,
-                      )
-                      .putFloat(
-                          OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
-                          DEFAULT_OVERLAY_HORIZONTAL_POSITION,
-                      )
-                      .putFloat(
-                          COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
-                          DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
-                      )
-                      .putFloat(
-                          COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
-                          DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
-                      )
-                      .apply()
-              },
-              modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
-          ) {
-              Text("Reset subtitle positions")
-          }
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Overlay", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Movable subtitle controls",
+                            description = "Drag the dual-subtitle overlay or the collapsed CC button to the position you want. The overlay can reach the top edge in fullscreen.",
+                            checked = movableSubtitleBox,
+                            onCheckedChange = {
+                                movableSubtitleBox = it
+                                setBooleanPreference(MOVABLE_OVERLAY_PREFERENCE, it)
+                            },
+                            testTag = "movable_subtitle_box_switch",
+                        )
+                        SettingsSwitchRow(
+                            title = "Automatically avoid video controls",
+                            description = "Move subtitles upward while YouTube's seek bar and playback controls are visible.",
+                            checked = autoAvoidPlayerControls,
+                            onCheckedChange = {
+                                autoAvoidPlayerControls = it
+                                setBooleanPreference(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, it)
+                            },
+                            testTag = "auto_avoid_player_controls_switch",
+                        )
+                        SettingsSwitchRow(
+                            title = "Remember dragged position",
+                            description = "Save where you drag the subtitle overlay and collapsed CC button and reuse those positions later.",
+                            checked = rememberOverlayPosition,
+                            onCheckedChange = { enabled ->
+                                rememberOverlayPosition = enabled
+                                val editor = preferences.edit()
+                                    .putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, enabled)
+                                if (!enabled) {
+                                    editor
+                                        .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
+                                        .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
+                                        .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
+                                        .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
+                                }
+                                editor.apply()
+                            },
+                            testTag = "remember_overlay_position_switch",
+                        )
+                        Text(
+                            "Drag the subtitle overlay up, down, or sideways. When the transcript is hidden, drag the CC button anywhere too. In portrait, flicking the overlay down closes it.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                preferences.edit()
+                                    .putFloat(
+                                        OVERLAY_VERTICAL_POSITION_PREFERENCE,
+                                        DEFAULT_OVERLAY_VERTICAL_POSITION,
+                                    )
+                                    .putFloat(
+                                        OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+                                        DEFAULT_OVERLAY_HORIZONTAL_POSITION,
+                                    )
+                                    .putFloat(
+                                        COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+                                        DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
+                                    )
+                                    .putFloat(
+                                        COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                                        DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+                                    )
+                                    .apply()
+                            },
+                            modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
+                        ) {
+                            Text("Reset subtitle positions")
+                        }
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          Text("Transcript mode", style = MaterialTheme.typography.titleSmall)
-          SettingsSwitchRow(
-              title = "Landscape split view",
-              description = "When automatic landscape overlay is off, place the transcript beside the video and drag the divider to resize it.",
-              checked = landscapeSplitEnabled,
-              onCheckedChange = onLandscapeSplitChange,
-              testTag = "landscape_split_switch",
-          )
-          Text(
-              "Swipe the transcript header down (or right in split view) to hide it. Captions keep tracking while hidden.",
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          }
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Transcript mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Landscape split view",
+                            description = "When automatic landscape overlay is off, place the transcript beside the video and drag the divider to resize it.",
+                            checked = landscapeSplitEnabled,
+                            onCheckedChange = onLandscapeSplitChange,
+                            testTag = "landscape_split_switch",
+                        )
+                        Text(
+                            "Swipe the transcript header down (or right in split view) to hide it. Captions keep tracking while hidden.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
 
-          Spacer(Modifier.height(14.dp))
-          HorizontalDivider()
-          Spacer(Modifier.height(14.dp))
-          OutlinedButton(
-              onClick = { showResetConfirmation = true },
-              modifier = Modifier.fillMaxWidth().testTag("reset_all_settings"),
-          ) {
-              Text("Reset all settings to defaults")
-          }
-      }
-  },
-  confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+                    Spacer(Modifier.height(14.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(14.dp))
+                    OutlinedButton(
+                        onClick = { showResetConfirmation = true },
+                        modifier = Modifier.fillMaxWidth().testTag("reset_all_settings"),
+                    ) {
+                        Text("Reset all settings to defaults")
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
         )
 
         if (showResetConfirmation) {
@@ -1261,17 +1273,17 @@ private fun SettingsSwitchRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-  Text(title)
-  Text(
-      description,
-      style = MaterialTheme.typography.bodySmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-  )
+            Text(title)
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         Switch(
-  checked = checked,
-  onCheckedChange = onCheckedChange,
-  modifier = Modifier.testTag(testTag),
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.testTag(testTag),
         )
     }
 }
