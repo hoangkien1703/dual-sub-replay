@@ -82,6 +82,33 @@ class WordTimingTest {
         assertEquals(2_200L, segments.single().words[2].startMs)
     }
 
+    @Test fun mergerKeepsGoodAnchorsWhenNeighborCueHasNoTimings() {
+        val cues = listOf(
+            RawCaptionCue(
+                startMs = 1_000,
+                endMs = 2_000,
+                text = "Hello world",
+                words = listOf(
+                    SubtitleWord("Hello", 1_000, 1_350),
+                    SubtitleWord("world", 1_350, 2_000),
+                ),
+            ),
+            RawCaptionCue(
+                startMs = 2_200,
+                endMs = 3_200,
+                text = "missing timing",
+            ),
+        )
+
+        val words = SubtitleMerger.merge(cues).single().words
+
+        assertEquals(listOf("Hello", "world", "missing", "timing"), words.map { it.text })
+        assertEquals(1_000L, words[0].startMs)
+        assertEquals(1_350L, words[1].startMs)
+        assertEquals(2_200L, words[2].startMs)
+        assertEquals(3_200L, words.last().endMs)
+    }
+
     @Test fun mergerFallsBackToEstimatesWhenTimingsAreMissing() {
         val cues = listOf(
             RawCaptionCue(startMs = 0, endMs = 1_000, text = "No timings here"),
