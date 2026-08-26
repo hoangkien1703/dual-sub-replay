@@ -15,6 +15,8 @@ val releaseSigningValues = listOf(
 )
 val hasReleaseSigning = releaseSigningValues.all { !it.isNullOrBlank() }
 val requireReleaseSigning = providers.gradleProperty("requireReleaseSigning").orNull == "true"
+val previewVersionCode = providers.gradleProperty("previewVersionCode").orNull?.toIntOrNull()
+val previewVersionNameSuffix = providers.gradleProperty("previewVersionNameSuffix").orNull.orEmpty()
 
 if (requireReleaseSigning && !hasReleaseSigning) {
     throw GradleException(
@@ -32,8 +34,8 @@ android {
         applicationId = "com.kienhoang.dualsubreplay"
         minSdk = 26
         targetSdk = 36
-        versionCode = 23
-        versionName = "0.9.2"
+        versionCode = previewVersionCode ?: 23
+        versionName = "0.9.2$previewVersionNameSuffix"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

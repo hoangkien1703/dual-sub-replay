@@ -86,23 +86,38 @@ jobs:
 
       - name: Test, lint, and build PR preview
         if: steps.pr.outputs.found == 'true'
-        run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug --stacktrace
-
-      - name: Package PR preview APK
-        if: steps.pr.outputs.found == 'true'
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          mkdir -p release
-          cp app/build/outputs/apk/debug/app-debug.apk "release/DualSub-Replay-PR${PR_NUMBER}-preview.apk"
-          sha256sum "release/DualSub-Replay-PR${PR_NUMBER}-preview.apk"
+          set -euo pipefail
+          preview_version_code=$((100000 + BUILD_NUMBER))
+          bash ./gradlew testDebugUnitTest lintDebug assembleDebug \
+            -PpreviewVersionCode="$preview_version_code" \
+            -PpreviewVersionNameSuffix="-pr${PR_NUMBER}-build${BUILD_NUMBER}" \
+            --stacktrace
 
-      - name: Upload PR preview to rolling preview release
+      - name: Package versioned PR preview APK
+        if: steps.pr.outputs.found == 'true'
+        id: package
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          asset_name="DualSub-Replay-PR${PR_NUMBER}-build${BUILD_NUMBER}-preview.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "release/$asset_name"
+          sha256sum "release/$asset_name"
+          echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
+
+      - name: Upload newest PR preview to rolling preview release
         if: steps.pr.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
+          ASSET_NAME: ${{ steps.package.outputs.asset_name }}
         run: |
           set -euo pipefail
 
@@ -112,8 +127,19 @@ jobs:
             exit 0
           fi
 
-          asset_name="DualSub-Replay-PR${PR_NUMBER}-preview.apk"
-          gh release upload preview "release/$asset_name" --clobber
+          # Remove older previews for this PR so the release always exposes one
+          # clearly versioned APK. This also avoids stale same-URL browser/CDN caches.
+          assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
+          while IFS= read -r asset; do
+            [[ -z "$asset" ]] && continue
+            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-(build[0-9]+-)?preview\.apk$ ]] && [[ "$asset" != "$ASSET_NAME" ]]; then
+              gh release delete-asset preview "$asset" --yes
+              echo "Removed older PR #$PR_NUMBER preview: $asset"
+            fi
+          done <<< "$assets"
+
+          gh release upload preview "release/$ASSET_NAME" --clobber
+          echo "Published $ASSET_NAME"
 
   cleanup-pr-preview:
     if: >-
@@ -126,18 +152,25 @@ jobs:
       contents: write
 
     steps:
-      - name: Remove closed PR preview APK
+      - name: Remove closed PR preview APKs
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          ASSET_NAME: DualSub-Replay-PR${{ github.event.pull_request.number }}-preview.apk
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
 
-          assets="$(gh release view preview --json assets --jq '.assets[].name')"
-          if printf '%s\n' "$assets" | grep -Fxq "$ASSET_NAME"; then
-            gh release delete-asset preview "$ASSET_NAME" --yes
-            echo "Deleted $ASSET_NAME from the preview release."
-          else
-            echo "$ASSET_NAME is already absent from the preview release."
+          assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
+          removed=false
+          while IFS= read -r asset; do
+            [[ -z "$asset" ]] && continue
+            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-(build[0-9]+-)?preview\.apk$ ]]; then
+              gh release delete-asset preview "$asset" --yes
+              echo "Deleted $asset from the preview release."
+              removed=true
+            fi
+          done <<< "$assets"
+
+          if [[ "$removed" == "false" ]]; then
+            echo "PR #$PR_NUMBER preview APK is already absent from the preview release."
           fi
