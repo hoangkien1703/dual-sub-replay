@@ -231,6 +231,17 @@ internal fun MovableSubtitleFab(
         val marginPx = with(density) { COLLAPSED_CC_MARGIN_DP.dp.toPx() }.roundToInt()
         var controlWidthPx by remember { mutableIntStateOf(0) }
         var controlHeightPx by remember { mutableIntStateOf(0) }
+        // The FAB first measures at (0, 0). Keep it invisible until its real size
+        // has been measured and the saved/default offset has been applied; this
+        // removes the one-frame top-left flash when the subtitle panel is closed.
+        var positionReady by remember(
+            parentWidthPx,
+            parentHeightPx,
+            controlWidthPx,
+            controlHeightPx,
+        ) {
+            mutableStateOf(false)
+        }
 
         val minX = marginPx.toFloat()
         val minY = marginPx.toFloat()
@@ -258,6 +269,7 @@ internal fun MovableSubtitleFab(
                     controlHeightPx,
                     marginPx,
                 ).toFloat()
+                positionReady = true
             }
         }
 
@@ -291,7 +303,7 @@ internal fun MovableSubtitleFab(
                 .graphicsLayer {
                     translationX = offsetXPx
                     translationY = offsetYPx
-                    alpha = animatedAlpha
+                    alpha = if (positionReady) animatedAlpha else 0f
                 }
                 .blur(animatedBlur)
                 .onSizeChanged {

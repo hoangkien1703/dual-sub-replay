@@ -67,9 +67,10 @@ object SubtitleMerger {
 
     /**
      * Keeps real caption word timings when every merged cue supplied them and
-     * all values are valid. Silent lead-ins and gaps are intentionally allowed:
-     * requiring timings to fill the entire cue would discard YouTube's precise
-     * offsets and replace them with estimates, making karaoke highlighting drift.
+     * all values are valid. Silent lead-ins and gaps are intentionally allowed.
+     * Auto-generated tracks occasionally contain stale/overlapping timing chunks
+     * whose text no longer matches the displayed caption; those now fall back to
+     * estimated word timings instead of disabling karaoke highlighting entirely.
      */
     private fun timedOrEstimatedWords(
         segmentText: String,
@@ -84,12 +85,33 @@ object SubtitleMerger {
                 word.startMs < endMs &&
                 word.endMs > word.startMs &&
                 word.endMs <= endMs
-        }
+        } && wordsAlignWithText(segmentText, sorted)
         return if (hasValidTimedWords) {
             sorted
         } else {
             estimateWordTimings(segmentText, startMs, endMs)
         }
+    }
+
+    /** True when every timed caption chunk can be found in display order. */
+    private fun wordsAlignWithText(text: String, words: List<SubtitleWord>): Boolean {
+        if (text.isBlank() || words.isEmpty()) return false
+        var searchFrom = 0
+        var matchedAny = false
+        words.forEach { word ->
+            val token = word.text.replace(Regex("\\s+"), " ").trim()
+            if (token.isEmpty()) return@forEach
+            val exactStart = text.indexOf(token, searchFrom)
+            val start = if (exactStart >= 0) {
+                exactStart
+            } else {
+                text.indexOf(token, searchFrom, ignoreCase = true)
+            }
+            if (start < 0) return false
+            matchedAny = true
+            searchFrom = start + token.length
+        }
+        return matchedAny
     }
 
     private fun clean(text: String): String = text
@@ -189,8 +211,9 @@ object SubtitleMerger {
 
     /**
      * Turns one long segment into several short ones. The time range and the
-     * caption words are divided proportionally so karaoke highlighting keeps
-     * tracking the spoken word inside every new chunk.
+     * caption words are divided proportionally. If noisy real timings land in
+     * the wrong split chunk, that chunk uses safe estimated timings so karaoke
+     * highlighting remains available instead of disappearing.
      */
     private fun buildSplitSegments(segment: SubtitleSegment, chunks: List<String>): List<SubtitleSegment> {
         val duration = (segment.endMs - segment.startMs).coerceAtLeast(0L)
@@ -220,7 +243,12 @@ object SubtitleMerger {
 
         return chunks.mapIndexed { index, chunkText ->
             val range = ranges[index]
-            val words = assignedWords[index].ifEmpty {
+            val candidateWords = assignedWords[index]
+            val words = if (
+                candidateWords.isNotEmpty() && wordsAlignWithText(chunkText, candidateWords)
+            ) {
+                candidateWords
+            } else {
                 estimateWordTimings(chunkText, range.first, range.last)
             }
             SubtitleSegment(

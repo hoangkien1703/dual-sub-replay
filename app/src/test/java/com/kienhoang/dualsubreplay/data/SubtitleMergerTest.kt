@@ -72,6 +72,32 @@ class SubtitleMergerTest {
         assertEquals(listOf(250L, 600L), merged.words.map { it.startMs })
     }
 
+    @Test fun malformedAutoCaptionWordsFallBackToStableEstimatedKaraoke() {
+        val merged = SubtitleMerger.merge(
+            listOf(
+                RawCaptionCue(
+                    startMs = 0,
+                    endMs = 2_000,
+                    text = "changes being applied on web",
+                    words = listOf(
+                        SubtitleWord("stale overlapping text", 0, 300),
+                        SubtitleWord("changes", 300, 700),
+                        SubtitleWord("being", 700, 1_000),
+                        SubtitleWord("applied", 1_000, 1_400),
+                        SubtitleWord("on web", 1_400, 2_000),
+                    ),
+                ),
+            ),
+        ).single()
+
+        assertEquals(
+            listOf("changes", "being", "applied", "on", "web"),
+            merged.words.map { it.text },
+        )
+        assertEquals(0L, merged.words.first().startMs)
+        assertEquals(2_000L, merged.words.last().endMs)
+    }
+
     @Test fun estimatesWholeMergedSegmentWhenAnyCueHasNoWordTimings() {
         val merged = SubtitleMerger.merge(
             listOf(
@@ -175,6 +201,30 @@ class SubtitleMergerTest {
         // Every timed word survives exactly once so real-time highlighting keeps working.
         assertEquals(words.map { it.text }, allWords.filter { it.text in words.map(SubtitleWord::text) }.map { it.text })
         assertTrue(split.all { chunk -> chunk.words.isNotEmpty() })
+    }
+
+    @Test fun splitChunkFallsBackWhenRealTimingsLandOnTheWrongText() {
+        val text = "Alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu"
+        val segment = SubtitleSegment(
+            id = 8,
+            startMs = 0,
+            endMs = 4_000,
+            originalText = text,
+            // Deliberately skew the timings so early words are assigned to the
+            // later proportional split range, reproducing noisy auto captions.
+            words = text.split(" ").mapIndexed { index, word ->
+                SubtitleWord(word, 2_600L + index * 80L, 2_670L + index * 80L)
+            },
+        )
+
+        val split = SubtitleMerger.splitLongSegments(listOf(segment))
+
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { chunk ->
+            chunk.words.isNotEmpty() && chunk.words.all { word ->
+                chunk.originalText.contains(word.text, ignoreCase = true)
+            }
+        })
     }
 
     @Test fun splitsCjkSentencesWithoutInsertingSpaces() {
