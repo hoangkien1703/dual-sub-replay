@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -14,9 +15,9 @@ class SubtitleWordHighlightTest {
             endMs = 2_000,
             originalText = "Hello brave world",
             words = listOf(
-                com.kienhoang.dualsubreplay.data.SubtitleWord("Hello", 0, 600),
-                com.kienhoang.dualsubreplay.data.SubtitleWord("brave", 600, 1_200),
-                com.kienhoang.dualsubreplay.data.SubtitleWord("world", 1_200, 2_000),
+                SubtitleWord("Hello", 0, 600),
+                SubtitleWord("brave", 600, 1_200),
+                SubtitleWord("world", 1_200, 2_000),
             ),
         )
 
@@ -32,11 +33,23 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun returnsEmptyWhenAlignmentFails() {
-        val words = listOf(
-            com.kienhoang.dualsubreplay.data.SubtitleWord("mismatched", 0, 500),
-        )
+        val words = listOf(SubtitleWord("mismatched", 0, 500))
 
         assertTrue(subtitleWordSpans("different text entirely", words).isEmpty())
+    }
+
+    @Test fun malformedAutoCaptionChunkDoesNotDisableLaterHighlights() {
+        val words = listOf(
+            SubtitleWord("stale overlapping text", 0, 300),
+            SubtitleWord("changes", 300, 600),
+            SubtitleWord("being", 600, 900),
+            SubtitleWord("applied", 900, 1_200),
+        )
+
+        val spans = subtitleWordSpans("changes being applied on web", words)
+
+        assertEquals(listOf(1, 2, 3), spans.map { it.wordIndex })
+        assertEquals("changes", "changes being applied on web".substring(spans[0].start, spans[0].end))
     }
 
     @Test fun returnsEmptyWithoutWordsOrText() {
@@ -44,7 +57,7 @@ class SubtitleWordHighlightTest {
         assertTrue(
             subtitleWordSpans(
                 "text",
-                listOf(com.kienhoang.dualsubreplay.data.SubtitleWord("text", 0, 10)),
+                listOf(SubtitleWord("text", 0, 10)),
             ).isNotEmpty(),
         )
     }
@@ -94,6 +107,11 @@ class SubtitleWordHighlightTest {
             AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE,
             REMEMBER_OVERLAY_POSITION_PREFERENCE,
             OVERLAY_VERTICAL_POSITION_PREFERENCE,
+            OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+            MOVABLE_OVERLAY_PREFERENCE,
+            COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+            COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+            SPLIT_LONG_SENTENCES_PREFERENCE,
             LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
             SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
             SUBTITLE_TRANSLATED_COLOR_PREFERENCE,

@@ -17,6 +17,20 @@ class WordTimingTest {
         assertEquals(3_000L, words.last().endMs)
     }
 
+    @Test fun denseBrokenCaptionEstimatesNeverRunPastCue() {
+        val words = estimateWordTimings(
+            "one two three four five six seven eight nine ten",
+            startMs = 1_000,
+            endMs = 1_120,
+        )
+
+        assertEquals(1_000L, words.first().startMs)
+        assertEquals(1_120L, words.last().endMs)
+        assertTrue(words.all { it.startMs in 1_000L..1_120L && it.endMs in 1_000L..1_120L })
+        assertTrue(words.all { it.endMs >= it.startMs })
+        assertTrue(words.zipWithNext().all { (left, right) -> left.endMs == right.startMs })
+    }
+
     @Test fun estimateReturnsEmptyForBlankOrInvalidRanges() {
         assertTrue(estimateWordTimings("", 0, 1_000).isEmpty())
         assertTrue(estimateWordTimings("hello", 1_000, 1_000).isEmpty())

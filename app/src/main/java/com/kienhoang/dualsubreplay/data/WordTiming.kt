@@ -9,18 +9,24 @@ package com.kienhoang.dualsubreplay.data
 internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List<SubtitleWord> {
     val tokens = text.split(Regex("\\s+")).filter(String::isNotBlank)
     if (tokens.isEmpty() || endMs <= startMs) return emptyList()
-    val weights = tokens.map { token -> token.length.coerceAtLeast(1).toFloat() }
-    val totalWeight = weights.sum()
-    val duration = (endMs - startMs).toFloat()
+    val weights = tokens.map { token -> token.length.coerceAtLeast(1).toLong() }
+    val totalWeight = weights.sum().coerceAtLeast(1L)
+    val duration = endMs - startMs
+    var consumedWeight = 0L
     var cursor = startMs
     return tokens.mapIndexed { index, token ->
-        val share = if (index == tokens.lastIndex) {
-            endMs - cursor
+        consumedWeight += weights[index]
+        val proportionalEnd = if (index == tokens.lastIndex) {
+            endMs
         } else {
-            (duration * weights[index] / totalWeight).toLong().coerceAtLeast(60L)
+            startMs + (duration * consumedWeight / totalWeight)
         }
-        val word = SubtitleWord(text = token, startMs = cursor, endMs = (cursor + share))
-        cursor = word.endMs
+        // Broken/very dense captions can contain more tokens than their tiny cue
+        // duration reasonably allows. Never let estimated timings run past the
+        // cue or become negative; zero-length slices are safer than overflow.
+        val safeEnd = proportionalEnd.coerceIn(cursor, endMs)
+        val word = SubtitleWord(text = token, startMs = cursor, endMs = safeEnd)
+        cursor = safeEnd
         word
     }
 }

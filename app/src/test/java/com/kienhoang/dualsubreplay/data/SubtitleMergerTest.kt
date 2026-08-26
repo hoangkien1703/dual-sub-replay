@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SubtitleMergerTest {
@@ -71,6 +72,32 @@ class SubtitleMergerTest {
         assertEquals(listOf(250L, 600L), merged.words.map { it.startMs })
     }
 
+    @Test fun malformedAutoCaptionWordsFallBackToStableEstimatedKaraoke() {
+        val merged = SubtitleMerger.merge(
+            listOf(
+                RawCaptionCue(
+                    startMs = 0,
+                    endMs = 2_000,
+                    text = "changes being applied on web",
+                    words = listOf(
+                        SubtitleWord("stale overlapping text", 0, 300),
+                        SubtitleWord("changes", 300, 700),
+                        SubtitleWord("being", 700, 1_000),
+                        SubtitleWord("applied", 1_000, 1_400),
+                        SubtitleWord("on web", 1_400, 2_000),
+                    ),
+                ),
+            ),
+        ).single()
+
+        assertEquals(
+            listOf("changes", "being", "applied", "on", "web"),
+            merged.words.map { it.text },
+        )
+        assertEquals(0L, merged.words.first().startMs)
+        assertEquals(2_000L, merged.words.last().endMs)
+    }
+
     @Test fun estimatesWholeMergedSegmentWhenAnyCueHasNoWordTimings() {
         val merged = SubtitleMerger.merge(
             listOf(
@@ -87,5 +114,127 @@ class SubtitleMergerTest {
         assertEquals(listOf("Hello", "world"), merged.words.map { it.text })
         assertEquals(0L, merged.words.first().startMs)
         assertEquals(2_000L, merged.words.last().endMs)
+    }
+
+    @Test fun splitsLongSegmentsIntoShorterChunksAtSentenceBoundaries() {
+        val long = "The quick brown fox jumps over the lazy dog. Then it rests under a tree."
+        val segments = listOf(SubtitleSegment(1, 0, 4_000, long))
+
+        val split = SubtitleMerger.splitLongSegments(segments)
+
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { it.originalText.length <= SPLIT_SENTENCE_MAX_CHARACTERS })
+        // Sentence-final punctuation ends a chunk instead of dangling mid-chunk.
+        assertTrue(split.first().originalText.endsWith("."))
+        assertEquals(long, split.joinToString(" ") { it.originalText })
+    }
+
+    @Test fun keepsShortSegmentsUnchangedWhenSplitting() {
+        val segments = listOf(
+            SubtitleSegment(1, 0, 1_000, "Hello world"),
+            SubtitleSegment(2, 1_000, 2_000, "Another short line"),
+        )
+
+        val split = SubtitleMerger.splitLongSegments(segments)
+
+        // Content, timing, and order survive untouched; only ids are renumbered.
+        assertEquals(segments.map { Triple(it.originalText, it.startMs, it.endMs) }, split.map { Triple(it.originalText, it.startMs, it.endMs) })
+        assertEquals(listOf(0L, 1L), split.map { it.id })
+    }
+
+    @Test fun splitSegmentIdsNeverCollideOnRealisticTimelines() {
+        // Regression: chunk ids derived as parent * 1000 + index collided with
+        // the original id of an unsplit far-later segment, crashing the
+        // transcript list ("Key was already used") on real videos.
+        val segments = mutableListOf<SubtitleSegment>()
+        segments += SubtitleSegment(0, 0, 1_000, "short")
+        segments += SubtitleSegment(1, 1_000, 2_000, "short again")
+        segments += SubtitleSegment(
+            2,
+            2_000,
+            4_000,
+            "A long opening sentence that certainly needs splitting here. And more.",
+        )
+        for (id in 3..2_001) {
+            segments += SubtitleSegment(id.toLong(), id * 1_000L, id * 1_000L + 500, "filler $id")
+        }
+
+        val split = SubtitleMerger.splitLongSegments(segments)
+
+        assertTrue(split.size > segments.size)
+        assertEquals(split.size, split.map { it.id }.distinct().size)
+        assertEquals(split.indices.map { it.toLong() }, split.map { it.id })
+    }
+
+    @Test fun dividesTimeProportionallyAcrossSplitChunks() {
+        val segments = listOf(
+            SubtitleSegment(1, 1_000, 5_000, "First half of a very long sentence right here. Second half follows."),
+        )
+
+        val split = SubtitleMerger.splitLongSegments(segments)
+
+        assertEquals(1_000L, split.first().startMs)
+        assertEquals(5_000L, split.last().endMs)
+        assertTrue(split.zipWithNext().all { (left, right) -> left.endMs <= right.startMs })
+    }
+
+    @Test fun splitChunksKeepKaraokeHighlightWords() {
+        val words = listOf(
+            SubtitleWord("Alpha", 100, 400),
+            SubtitleWord("beta", 400, 700),
+            SubtitleWord("gamma", 700, 1_000),
+            SubtitleWord("delta", 1_000, 1_300),
+            SubtitleWord("epsilon", 1_300, 1_600),
+        )
+        val segment = SubtitleSegment(
+            id = 3,
+            startMs = 0,
+            endMs = 2_000,
+            originalText = "Alpha beta gamma delta epsilon continues beyond the limit here now",
+            words = words,
+        )
+
+        val split = SubtitleMerger.splitLongSegments(segment.let { listOf(it) })
+
+        assertTrue(split.size >= 2)
+        val allWords = split.flatMap { it.words }
+        // Every timed word survives exactly once so real-time highlighting keeps working.
+        assertEquals(words.map { it.text }, allWords.filter { it.text in words.map(SubtitleWord::text) }.map { it.text })
+        assertTrue(split.all { chunk -> chunk.words.isNotEmpty() })
+    }
+
+    @Test fun splitChunkFallsBackWhenRealTimingsLandOnTheWrongText() {
+        val text = "Alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu"
+        val segment = SubtitleSegment(
+            id = 8,
+            startMs = 0,
+            endMs = 4_000,
+            originalText = text,
+            // Deliberately skew the timings so early words are assigned to the
+            // later proportional split range, reproducing noisy auto captions.
+            words = text.split(" ").mapIndexed { index, word ->
+                SubtitleWord(word, 2_600L + index * 80L, 2_670L + index * 80L)
+            },
+        )
+
+        val split = SubtitleMerger.splitLongSegments(listOf(segment))
+
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { chunk ->
+            chunk.words.isNotEmpty() && chunk.words.all { word ->
+                chunk.originalText.contains(word.text, ignoreCase = true)
+            }
+        })
+    }
+
+    @Test fun splitsCjkSentencesWithoutInsertingSpaces() {
+        val longCjk = "这是一段特别长的中文句子需要被切成更短的片段方便学习者跟读理解每一个部分的含义并且不会丢失任何原始的时间信息与内容"
+        val split = SubtitleMerger.splitLongSegments(
+            listOf(SubtitleSegment(9, 0, 6_000, longCjk)),
+        )
+
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { it.originalText.length <= SPLIT_SENTENCE_MAX_CHARACTERS })
+        assertEquals(longCjk.length, split.sumOf { it.originalText.length })
     }
 }

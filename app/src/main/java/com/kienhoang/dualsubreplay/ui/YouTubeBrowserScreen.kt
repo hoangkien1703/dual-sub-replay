@@ -62,7 +62,10 @@ import org.json.JSONObject
 import org.json.JSONTokener
 
 private const val BROWSER_LOG_TAG = "DualSubBrowser"
-private const val PLAYBACK_POLL_INTERVAL_MS = 250L
+// Keep native karaoke tracking close to YouTube's own transcript cadence. 250 ms
+// polling made spoken-word changes visibly trail fast speech by up to a quarter
+// second; 100 ms keeps the highlight responsive without polling every frame.
+private const val PLAYBACK_POLL_INTERVAL_MS = 100L
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
 internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 private val destroyedWebViews = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())

@@ -150,6 +150,87 @@ class LearningPlayerRootTest {
     }
 
     @Test
+    fun horizontalOverlayPositionNormalizesAndStaysCenteredByDefault() {
+        assertEquals(DEFAULT_OVERLAY_HORIZONTAL_POSITION, normalizeOverlayHorizontalPosition(Float.NaN))
+        assertEquals(0f, normalizeOverlayHorizontalPosition(-3f))
+        assertEquals(1f, normalizeOverlayHorizontalPosition(7f))
+        assertEquals(-1f, overlayHorizontalShiftFraction(0f))
+        assertEquals(0f, overlayHorizontalShiftFraction(0.5f))
+        assertEquals(1f, overlayHorizontalShiftFraction(1f))
+    }
+
+    @Test
+    fun horizontalOverlayShiftKeepsTheBoxFullyOnScreen() {
+        // Degenerate sizes never shift the box.
+        assertEquals(0, overlayHorizontalShiftPx(1f, 0, 0))
+        assertEquals(0, overlayHorizontalShiftPx(1f, 400, 400))
+        val halfFreeSpace = (800 - 300) / 2
+        assertEquals(halfFreeSpace, overlayHorizontalShiftPx(1f, 800, 300))
+        assertEquals(-halfFreeSpace, overlayHorizontalShiftPx(-1f, 800, 300))
+        assertEquals(0, overlayHorizontalShiftPx(0f, 800, 300))
+        // Out-of-range fractions are clamped instead of pushing the box off screen.
+        assertEquals(halfFreeSpace, overlayHorizontalShiftPx(9f, 800, 300))
+    }
+
+    @Test
+    fun fullscreenLandscapeStartsNearTheTopButKeepsDraggedPositions() {
+        assertEquals(
+            FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION,
+            fullscreenOverlayVerticalPosition(
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+                Configuration.ORIENTATION_LANDSCAPE,
+            ),
+            0f,
+        )
+        assertEquals(
+            DEFAULT_OVERLAY_VERTICAL_POSITION,
+            fullscreenOverlayVerticalPosition(
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+                Configuration.ORIENTATION_PORTRAIT,
+            ),
+            0f,
+        )
+        assertEquals(
+            0.37f,
+            fullscreenOverlayVerticalPosition(0.37f, Configuration.ORIENTATION_LANDSCAPE),
+            0f,
+        )
+        assertTrue(
+            FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION <
+                DEFAULT_OVERLAY_VERTICAL_POSITION,
+        )
+    }
+
+    @Test
+    fun fullscreenOverlayCanTravelFromTopToBottom() {
+        val screenHeight = 800
+        val top = fullscreenOverlayBottomPaddingDp(0f, screenHeight)
+        val bottom = fullscreenOverlayBottomPaddingDp(1f, screenHeight)
+        assertTrue("position 0 should reach the top", top >= screenHeight - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP - 60)
+        assertEquals(0, bottom)
+        assertTrue(
+            fullscreenOverlayBottomPaddingDp(0.4f, screenHeight) >
+                fullscreenOverlayBottomPaddingDp(0.6f, screenHeight),
+        )
+        // Player-control avoidance lifts the box but clamps at the top edge.
+        assertTrue(fullscreenOverlayBottomPaddingDp(1f, screenHeight, PLAYER_CONTROLS_AVOIDANCE_LIFT_DP) >= 0)
+        assertEquals(
+            fullscreenOverlayDragTravelDp(screenHeight),
+            fullscreenOverlayBottomPaddingWithControlsDp(
+                position = 0f,
+                screenHeightDp = screenHeight,
+                controlsLiftDp = PLAYER_CONTROLS_AVOIDANCE_LIFT_DP,
+            ),
+        )
+    }
+
+    @Test
+    fun fullscreenDragTravelMatchesVisibleVerticalTravel() {
+        assertEquals(712, fullscreenOverlayDragTravelDp(800))
+        assertEquals(152, fullscreenOverlayDragTravelDp(240))
+    }
+
+    @Test
     fun captionSuppressionIsOriginCheckedAndReversible() {
         val hidden = webCaptionVisibilityScript(hidden = true)
         val restored = webCaptionVisibilityScript(hidden = false)
