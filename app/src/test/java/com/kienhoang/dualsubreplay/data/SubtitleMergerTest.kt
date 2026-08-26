@@ -167,7 +167,7 @@ class SubtitleMergerTest {
         assertEquals(split.indices.map { it.toLong() }, split.map { it.id })
     }
 
-    @Test fun dividesTimeProportionallyAcrossSplitChunks() {
+    @Test fun dividesTimeProportionallyAcrossSplitChunksWhenNoWordAnchorsExist() {
         val segments = listOf(
             SubtitleSegment(1, 1_000, 5_000, "First half of a very long sentence right here. Second half follows."),
         )
@@ -199,33 +199,40 @@ class SubtitleMergerTest {
 
         assertTrue(split.size >= 2)
         val allWords = split.flatMap { it.words }
-        // Every timed word survives exactly once so real-time highlighting keeps working.
         assertEquals(words.map { it.text }, allWords.filter { it.text in words.map(SubtitleWord::text) }.map { it.text })
         assertTrue(split.all { chunk -> chunk.words.isNotEmpty() })
     }
 
-    @Test fun splitChunkFallsBackWhenRealTimingsLandOnTheWrongText() {
+    @Test fun splitChunksPreserveExactTimingWhenSpeechIsNotCharacterProportional() {
         val text = "Alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu"
+        val words = text.split(" ").mapIndexed { index, word ->
+            // Put nearly the whole sentence late in the cue. The old splitter
+            // assigned these words by timestamp midpoint to character-derived
+            // ranges and then replaced the real timings with estimates.
+            SubtitleWord(word, 2_600L + index * 80L, 2_670L + index * 80L)
+        }
         val segment = SubtitleSegment(
             id = 8,
             startMs = 0,
             endMs = 4_000,
             originalText = text,
-            // Deliberately skew the timings so early words are assigned to the
-            // later proportional split range, reproducing noisy auto captions.
-            words = text.split(" ").mapIndexed { index, word ->
-                SubtitleWord(word, 2_600L + index * 80L, 2_670L + index * 80L)
-            },
+            words = words,
         )
 
         val split = SubtitleMerger.splitLongSegments(listOf(segment))
 
         assertTrue(split.size >= 2)
+        assertEquals(words, split.flatMap { it.words })
         assertTrue(split.all { chunk ->
             chunk.words.isNotEmpty() && chunk.words.all { word ->
                 chunk.originalText.contains(word.text, ignoreCase = true)
             }
         })
+        // Once a new visual chunk has a real word anchor, the display switches
+        // exactly when that first word starts rather than at a character ratio.
+        split.drop(1).forEach { chunk ->
+            assertEquals(chunk.words.first().startMs, chunk.startMs)
+        }
     }
 
     @Test fun splitsCjkSentencesWithoutInsertingSpaces() {
