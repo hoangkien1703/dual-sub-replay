@@ -5,6 +5,8 @@ import org.json.JSONObject
 
 /** Parses each caption format currently returned by YouTube timed-text URLs. */
 internal object CaptionDocumentParser {
+    private data class TimedChunk(val text: String, val offsetMs: Long?)
+
     fun parse(text: String): List<RawCaptionCue> {
         val trimmed = text.trimStart()
         if (trimmed.isBlank()) return emptyList()
@@ -30,33 +32,23 @@ internal object CaptionDocumentParser {
     }
 
     /**
-     * json3 splits captions into chunks with per-chunk [tOffsetMs] offsets that
-     * enable the real-time spoken-word highlight. Newline-only chunks separate
-     * lines and carry no spoken text.
+     * json3 carries per-chunk [tOffsetMs] offsets. A chunk is not guaranteed to
+     * be exactly one word, so split multi-word chunks while keeping YouTube's
+     * real timing anchors. This avoids highlighting a whole phrase at once on
+     * noisy/auto-generated transcripts.
      */
     private fun json3Words(segments: JSONArray, cueStartMs: Long, cueEndMs: Long): List<SubtitleWord> {
-        data class Chunk(val text: String, val offsetMs: Long)
-
         val chunks = (0 until segments.length())
             .mapNotNull(segments::optJSONObject)
-            .map { it.optString("utf8") to it.optLong("tOffsetMs", -1L) }
-            .filter { (raw, _) -> raw.isNotBlank() && raw != "\n" }
-            .map { (raw, offset) -> Chunk(raw.normalizeCaptionText(), offset) }
-            .filter { it.text.isNotBlank() }
-        if (chunks.none { it.offsetMs >= 0 }) return emptyList()
-
-        var cursorMs = cueStartMs
-        return chunks.mapIndexed { index, chunk ->
-            val wordStart = if (chunk.offsetMs >= 0) cueStartMs + chunk.offsetMs else cursorMs
-            val nextOffset = chunks.getOrNull(index + 1)?.offsetMs?.takeIf { it >= 0 }
-            val wordEnd = when {
-                nextOffset != null -> cueStartMs + nextOffset
-                index == chunks.lastIndex -> cueEndMs
-                else -> wordStart + DEFAULT_WORD_DURATION_MS
-            }.coerceAtLeast(wordStart + MIN_WORD_DURATION_MS).coerceAtMost(cueEndMs)
-            cursorMs = wordEnd
-            SubtitleWord(text = chunk.text, startMs = wordStart, endMs = wordEnd)
-        }
+            .map { segment ->
+                TimedChunk(
+                    text = segment.optString("utf8").normalizeCaptionText(),
+                    offsetMs = segment.optLong("tOffsetMs", -1L).takeIf { it >= 0L },
+                )
+            }
+            .filter { chunk -> chunk.text.isNotBlank() && chunk.text != "\n" }
+        if (chunks.none { it.offsetMs != null }) return emptyList()
+        return expandTimedChunks(chunks, cueStartMs, cueEndMs)
     }
 
     private fun parseXml(text: String): List<RawCaptionCue> {
@@ -85,29 +77,72 @@ internal object CaptionDocumentParser {
     }
 
     /**
-     * srv3 auto captions mark each spoken chunk with an `<s t="…">` offset in
-     * milliseconds relative to the paragraph start. Chunks without offsets
-     * inherit the previous chunk's timing.
+     * srv3 auto captions mark spoken chunks with an `<s t="…">` offset in
+     * milliseconds relative to the paragraph start. Like json3, one `<s>` can
+     * contain several words, so preserve the anchor and estimate only inside
+     * that anchored chunk.
      */
     private fun srv3Words(paragraphInnerXml: String, cueStartMs: Long, cueEndMs: Long): List<SubtitleWord> {
-        val matches = SRV3_WORD_REGEX.findAll(paragraphInnerXml).toList()
-        if (matches.isEmpty()) return emptyList()
-        var cursorMs = cueStartMs
+        val chunks = SRV3_WORD_REGEX.findAll(paragraphInnerXml)
+            .map { match ->
+                TimedChunk(
+                    text = cleanXmlText(match.groupValues[2]),
+                    offsetMs = attribute(match.groupValues[1], "t")?.toLongOrNull()?.takeIf { it >= 0L },
+                )
+            }
+            .filter { chunk -> chunk.text.isNotBlank() }
+            .toList()
+        if (chunks.isEmpty()) return emptyList()
+        if (chunks.none { it.offsetMs != null }) {
+            return estimateWordTimings(cleanXmlText(paragraphInnerXml), cueStartMs, cueEndMs)
+        }
+        return expandTimedChunks(chunks, cueStartMs, cueEndMs)
+    }
+
+    /**
+     * Expands timed caption chunks into individual words. YouTube's offset is
+     * kept as the chunk anchor; when a chunk contains multiple words, only the
+     * time inside that chunk is estimated. The next real offset remains the
+     * boundary, so accurate ASR anchors are never replaced by whole-line timing.
+     */
+    private fun expandTimedChunks(
+        chunks: List<TimedChunk>,
+        cueStartMs: Long,
+        cueEndMs: Long,
+    ): List<SubtitleWord> {
+        if (chunks.isEmpty() || cueEndMs <= cueStartMs) return emptyList()
         val words = mutableListOf<SubtitleWord>()
-        matches.forEachIndexed { index, match ->
-            val offset = attribute(match.groupValues[1], "t")?.toLongOrNull()
-            val text = cleanXmlText(match.groupValues[2])
-            if (text.isBlank()) return@forEachIndexed
-            val wordStart = offset?.let(cueStartMs::plus) ?: cursorMs
-            val nextOffset = matches.getOrNull(index + 1)?.groupValues?.get(1)
-                ?.let { attribute(it, "t")?.toLongOrNull() }
-            val wordEnd = when {
-                nextOffset != null -> cueStartMs + nextOffset
-                index == matches.lastIndex -> cueEndMs
-                else -> wordStart + DEFAULT_WORD_DURATION_MS
-            }.coerceAtLeast(wordStart + MIN_WORD_DURATION_MS).coerceAtMost(cueEndMs)
-            cursorMs = wordEnd
-            words += SubtitleWord(text = text, startMs = wordStart, endMs = wordEnd)
+        var cursorMs = cueStartMs
+
+        chunks.forEachIndexed { index, chunk ->
+            val anchoredStart = chunk.offsetMs?.let(cueStartMs::plus)
+            val chunkStart = maxOf(cursorMs, anchoredStart ?: cursorMs)
+                .coerceIn(cueStartMs, cueEndMs)
+            val nextAnchoredStart = chunks
+                .asSequence()
+                .drop(index + 1)
+                .mapNotNull { next -> next.offsetMs?.let(cueStartMs::plus) }
+                .firstOrNull()
+            val desiredEnd = when {
+                nextAnchoredStart != null -> nextAnchoredStart
+                index == chunks.lastIndex -> cueEndMs
+                else -> chunkStart + DEFAULT_WORD_DURATION_MS
+            }
+            val chunkEnd = desiredEnd
+                .coerceAtLeast(chunkStart)
+                .coerceAtMost(cueEndMs)
+            if (chunkEnd <= chunkStart) {
+                cursorMs = chunkStart
+                return@forEachIndexed
+            }
+
+            val expanded = estimateWordTimings(chunk.text, chunkStart, chunkEnd)
+            if (expanded.isNotEmpty()) {
+                words += expanded
+                cursorMs = expanded.last().endMs
+            } else {
+                cursorMs = chunkEnd
+            }
         }
         return words
     }
