@@ -31,6 +31,33 @@ class YouTubeCaptionProviderTest {
     }
 
     @Test
+    fun extractsCurrentWebClientVersionFromWatchPage() {
+        val html = """<script>ytcfg.set({"INNERTUBE_CLIENT_VERSION":"2.20260826.01.00"})</script>"""
+
+        assertEquals("2.20260826.01.00", extractWebInnertubeClientVersion(html))
+        assertNull(extractWebInnertubeClientVersion("<html>missing config</html>"))
+    }
+
+    @Test
+    fun triesUpdatedAndroidThenIosThenTvThenWebClients() {
+        val clients = youtubePlayerClients("2.20260826.01.00")
+
+        assertEquals(listOf("ANDROID", "IOS", "TVHTML5", "WEB"), clients.map { it.clientName })
+        assertEquals(listOf("3", "5", "7", "1"), clients.map { it.clientNumber })
+        assertEquals("21.26.364", clients[0].clientVersion)
+        assertEquals("21.26.4", clients[1].clientVersion)
+        assertEquals("7.20260707.07.00", clients[2].clientVersion)
+        assertEquals("2.20260826.01.00", clients[3].clientVersion)
+    }
+
+    @Test
+    fun fallsBackToKnownWebVersionWhenWatchConfigIsUnavailable() {
+        val clients = youtubePlayerClients(null)
+
+        assertEquals("2.20260708.00.00", clients.last().clientVersion)
+    }
+
+    @Test
     fun readsResponsesAtOrBelowTheLimit() {
         val body = "captions".toByteArray(StandardCharsets.UTF_8)
 
