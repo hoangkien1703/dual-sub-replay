@@ -200,6 +200,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
     private val translator = OnDeviceTranslator()
     private var loadingJob: Job? = null
+    private var translationWarmupJob: Job? = null
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
     private var rawMergedSegments: List<SubtitleSegment> = emptyList()
@@ -324,6 +325,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         preferences.edit().putString("preferred_caption_language", learning).apply()
         preferences.edit().putString("target_language", native).apply()
         _state.update { it.copy(sourcePreference = learning, targetLanguage = native) }
+        warmTranslationModel(sourceLanguage = learning, targetLanguage = native)
         if (_state.value.activeVideoId != null && _state.value.segments.isNotEmpty()) {
             retranslateCurrentSegments()
         }
@@ -335,6 +337,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun finishOnboarding() {
         preferences.edit().putBoolean("onboarding_completed", true).apply()
         _state.update { it.copy(onboardingCompleted = true) }
+    }
+
+    private fun warmTranslationModel(sourceLanguage: String, targetLanguage: String) {
+        translationWarmupJob?.cancel()
+        translationWarmupJob = viewModelScope.launch {
+            try {
+                translator.prepare(sourceLanguage, targetLanguage)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                // Warm-up is opportunistic. The normal translation path retries
+                // model preparation and surfaces any real failure to the user.
+            }
+        }
     }
 
     fun completeGuide() {
@@ -644,9 +660,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 val index = batch[batchOffset]
                 working[index] = working[index].copy(translatedText = translatedText)
                 completed += 1
+                publishProgress()
             }
             pending.removeAll(batch.toSet())
-            publishProgress()
         }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
