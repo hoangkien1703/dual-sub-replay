@@ -4,7 +4,7 @@ object SubtitleMerger {
     private const val MAX_GAP_MS = 1_200L
     private const val MAX_DURATION_MS = 6_000L
     private const val MAX_CHARACTERS = 96
-    private const val MIN_TIMED_WORD_TEXT_COVERAGE = 0.60f
+    private const val MIN_TIMED_WORD_TEXT_COVERAGE = 0.85f
     private val sentenceEnding = Regex("[.!?。！？…][\\\"'’”)]*$")
 
     fun merge(cues: List<RawCaptionCue>): List<SubtitleSegment> {
@@ -17,8 +17,7 @@ object SubtitleMerger {
         var start = ordered.first().startMs
         var end = ordered.first().endMs
         var text = clean(ordered.first().text)
-        var pendingWords = ordered.first().words.filter { word -> word.text.isNotBlank() }
-        var pendingTimingsComplete = ordered.first().words.isNotEmpty()
+        var pendingWords = preparedCueWords(ordered.first())
 
         fun flush() {
             if (text.isNotBlank()) {
@@ -32,12 +31,10 @@ object SubtitleMerger {
                         startMs = start,
                         endMs = end,
                         collectedWords = pendingWords,
-                        timingsComplete = pendingTimingsComplete,
                     ),
                 )
             }
             pendingWords = emptyList()
-            pendingTimingsComplete = true
         }
 
         ordered.drop(1).forEach { cue ->
@@ -53,13 +50,11 @@ object SubtitleMerger {
                 start = cue.startMs
                 end = cue.endMs
                 text = nextText
-                pendingWords = cue.words.filter { word -> word.text.isNotBlank() }
-                pendingTimingsComplete = cue.words.isNotEmpty()
+                pendingWords = preparedCueWords(cue)
             } else {
                 text += separator(text.lastOrNull(), nextText.firstOrNull()) + nextText
                 end = maxOf(end, cue.endMs)
-                pendingWords += cue.words.filter { word -> word.text.isNotBlank() }
-                pendingTimingsComplete = pendingTimingsComplete && cue.words.isNotEmpty()
+                pendingWords += preparedCueWords(cue)
             }
         }
         flush()
@@ -67,21 +62,41 @@ object SubtitleMerger {
     }
 
     /**
-     * Keeps real caption word timings when every merged cue supplied them and
-     * all values are valid. Silent lead-ins and gaps are intentionally allowed.
-     * Auto-generated tracks occasionally contain stale/overlapping timing chunks
-     * whose text no longer matches the displayed caption; those now fall back to
-     * estimated word timings instead of disabling karaoke highlighting entirely.
+     * Keep YouTube's real word timing for each cue whenever it is coherent. If
+     * one noisy auto-caption cue is missing/stale, estimate only that cue instead
+     * of discarding accurate timing from every neighboring cue in the merged line.
+     */
+    private fun preparedCueWords(cue: RawCaptionCue): List<SubtitleWord> {
+        val cueText = clean(cue.text)
+        val sorted = cue.words
+            .filter { word -> word.text.isNotBlank() }
+            .sortedBy(SubtitleWord::startMs)
+        val hasUsableTimedWords = sorted.isNotEmpty() && sorted.all { word ->
+            word.startMs >= cue.startMs &&
+                word.startMs < cue.endMs &&
+                word.endMs > word.startMs &&
+                word.endMs <= cue.endMs
+        } && wordsAlignWithText(cueText, sorted)
+        return if (hasUsableTimedWords) {
+            sorted
+        } else {
+            estimateWordTimings(cueText, cue.startMs, cue.endMs)
+        }
+    }
+
+    /**
+     * Keeps the collected real/locally-estimated timings when they remain valid
+     * after merging. A final whole-line estimate is only a safety fallback for
+     * malformed overlapping data that cannot be aligned to the visible text.
      */
     private fun timedOrEstimatedWords(
         segmentText: String,
         startMs: Long,
         endMs: Long,
         collectedWords: List<SubtitleWord>,
-        timingsComplete: Boolean,
     ): List<SubtitleWord> {
         val sorted = collectedWords.sortedBy(SubtitleWord::startMs)
-        val hasValidTimedWords = timingsComplete && sorted.isNotEmpty() && sorted.all { word ->
+        val hasValidTimedWords = sorted.isNotEmpty() && sorted.all { word ->
             word.startMs >= startMs &&
                 word.startMs < endMs &&
                 word.endMs > word.startMs &&
@@ -97,8 +112,8 @@ object SubtitleMerger {
     /**
      * True when timed caption chunks can be found in display order and cover
      * enough of the visible text to provide useful karaoke highlighting.
-     * Partial timing payloads from broken auto-captions otherwise leave most of
-     * a line permanently unhighlighted even though the few supplied words match.
+     * Broken partial ASR payloads fall back to local estimates so visible words
+     * do not stay permanently unhighlighted.
      */
     private fun wordsAlignWithText(text: String, words: List<SubtitleWord>): Boolean {
         if (text.isBlank() || words.isEmpty()) return false
