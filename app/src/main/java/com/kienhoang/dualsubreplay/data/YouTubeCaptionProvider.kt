@@ -212,7 +212,12 @@ internal fun boundedYouTubeRequestTimeoutNanos(remainingNanos: Long): Long {
  */
 class YouTubeCaptionProvider(
     private val client: OkHttpClient = OkHttpClient.Builder()
-        .dns { hostname -> preferIpv4Addresses(Dns.SYSTEM.lookup(hostname)) }
+        .dns(
+            object : Dns {
+                override fun lookup(hostname: String): List<InetAddress> =
+                    preferIpv4Addresses(Dns.SYSTEM.lookup(hostname))
+            },
+        )
         .connectTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .readTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .writeTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
