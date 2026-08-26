@@ -1,5 +1,11 @@
 package com.kienhoang.dualsubreplay.data
 
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.InterruptedIOException
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -10,14 +16,73 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 
 internal const val MAX_YOUTUBE_RESPONSE_BYTES = 8 * 1024 * 1024
+internal const val CAPTION_LOOKUP_TIMEOUT_MS = 20_000L
+internal const val YOUTUBE_REQUEST_TIMEOUT_MS = 3_500L
 
 internal class ResponseLimitExceededException(message: String) : Exception(message)
+internal class CaptionLookupTimeoutException(message: String, cause: Throwable? = null) :
+    Exception(message, cause)
+
+internal data class YouTubePlayerClient(
+    val label: String,
+    val clientName: String,
+    val clientNumber: String,
+    val clientVersion: String,
+    val userAgent: String,
+    val androidSdkVersion: Int? = null,
+    val deviceMake: String? = null,
+    val deviceModel: String? = null,
+    val osName: String? = null,
+    val osVersion: String? = null,
+)
+
+private val INNERTUBE_CLIENT_VERSION_REGEX =
+    Regex("""["']INNERTUBE_CLIENT_VERSION["']\s*:\s*["']([^"']+)["']""")
+
+internal fun extractWebInnertubeClientVersion(watchHtml: String): String? =
+    INNERTUBE_CLIENT_VERSION_REGEX.find(watchHtml)?.groupValues?.getOrNull(1)
+
+internal fun youtubePlayerClients(webClientVersion: String?): List<YouTubePlayerClient> = listOf(
+    YouTubePlayerClient(
+        label = "Android current",
+        clientName = "ANDROID",
+        clientNumber = "3",
+        clientVersion = "21.26.364",
+        userAgent = "com.google.android.youtube/21.26.364 (Linux; U; Android 11) gzip",
+        androidSdkVersion = 30,
+        osName = "Android",
+        osVersion = "11",
+    ),
+    YouTubePlayerClient(
+        label = "iOS",
+        clientName = "IOS",
+        clientNumber = "5",
+        clientVersion = "21.26.4",
+        userAgent = "com.google.ios.youtube/21.26.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)",
+        deviceMake = "Apple",
+        deviceModel = "iPhone16,2",
+        osName = "iPhone",
+        osVersion = "18.3.2.22D82",
+    ),
+    YouTubePlayerClient(
+        label = "TV",
+        clientName = "TVHTML5",
+        clientNumber = "7",
+        clientVersion = "7.20260707.07.00",
+        userAgent =
+            "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/25.lts.30.1034943-gold " +
+                "(unlike Gecko), Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)",
+    ),
+    YouTubePlayerClient(
+        label = "Web",
+        clientName = "WEB",
+        clientNumber = "1",
+        clientVersion = webClientVersion?.takeIf(String::isNotBlank) ?: DEFAULT_WEB_CLIENT_VERSION,
+        userAgent = WEB_USER_AGENT,
+    ),
+)
 
 internal fun trustedYouTubeCaptionUrl(url: String): HttpUrl? {
     val parsed = url.toHttpUrlOrNull() ?: return null
@@ -68,13 +133,28 @@ internal fun readUtf8WithLimit(
     return output.toString(StandardCharsets.UTF_8.name())
 }
 
+internal fun boundedYouTubeRequestTimeoutNanos(remainingNanos: Long): Long {
+    require(remainingNanos > 0)
+    return minOf(
+        remainingNanos,
+        TimeUnit.MILLISECONDS.toNanos(YOUTUBE_REQUEST_TIMEOUT_MS),
+    )
+}
+
 /**
  * Retrieves public caption tracks from YouTube's undocumented Innertube endpoint.
- * This is deliberately isolated because YouTube can change the endpoint at any time.
+ * Multiple official client profiles are attempted because YouTube can roll endpoint
+ * changes out to one client family before another.
+ *
+ * The complete fallback chain has a hard deadline. Without it, several sequential
+ * network timeouts can leave the UI spinning for minutes when YouTube stops replying.
  */
 class YouTubeCaptionProvider(
     private val client: OkHttpClient = OkHttpClient.Builder()
-        .callTimeout(25, TimeUnit.SECONDS)
+        .connectTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        .readTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        .writeTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        .callTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .build(),
 ) : CaptionProvider {
 
@@ -82,42 +162,119 @@ class YouTubeCaptionProvider(
         videoId: String,
         preferredLanguages: List<String>,
     ): CaptionTrackResult = withContext(Dispatchers.IO) {
-        runCatching { fetchInternal(videoId, preferredLanguages) }
-            .getOrElse { error ->
-                if (error is CaptionUnavailableException) throw error
-                if (error is ResponseLimitExceededException) {
-                    throw CaptionUnavailableException(error.message.orEmpty(), error)
-                }
-                throw CaptionUnavailableException(
-                    "Captions could not be loaded. YouTube may have changed its transcript service.",
-                    error,
-                )
-            }
+        val deadlineNanos = System.nanoTime() +
+            TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
+        try {
+            fetchInternal(videoId, preferredLanguages, deadlineNanos)
+        } catch (error: CancellationException) {
+            // Never turn a cancelled/replaced load into a caption failure. The
+            // ViewModel uses cancellation whenever the video or language changes.
+            throw error
+        } catch (error: CaptionUnavailableException) {
+            throw error
+        } catch (error: ResponseLimitExceededException) {
+            throw CaptionUnavailableException(error.message.orEmpty(), error)
+        } catch (error: CaptionLookupTimeoutException) {
+            throw CaptionUnavailableException(error.message.orEmpty(), error)
+        } catch (error: Exception) {
+            throw CaptionUnavailableException(
+                "Captions could not be loaded. YouTube may have changed its transcript service.",
+                error,
+            )
+        }
     }
 
-    private fun fetchInternal(videoId: String, preferredLanguages: List<String>): CaptionTrackResult {
-        val watchHtml = executeText(
-            Request.Builder()
-                .url("https://www.youtube.com/watch?v=$videoId&hl=en")
-                .header("User-Agent", WEB_USER_AGENT)
-                .build(),
-        )
+    private fun fetchInternal(
+        videoId: String,
+        preferredLanguages: List<String>,
+        deadlineNanos: Long,
+    ): CaptionTrackResult {
+        ensureLookupTimeRemaining(deadlineNanos, "starting caption discovery")
+        val watchResult = runCatching {
+            executeText(
+                Request.Builder()
+                    .url("https://www.youtube.com/watch?v=$videoId&hl=en")
+                    .header("User-Agent", WEB_USER_AGENT)
+                    .build(),
+                stage = "watch-page discovery",
+                deadlineNanos = deadlineNanos,
+            )
+        }
+        watchResult.exceptionOrNull()?.let { error ->
+            if (error is CaptionLookupTimeoutException) throw error
+        }
+        val watchHtml = watchResult.getOrNull().orEmpty()
         val apiKey = INNERTUBE_KEY_REGEX.find(watchHtml)?.groupValues?.getOrNull(1)
             ?: FALLBACK_INNERTUBE_KEY
+        val profiles = youtubePlayerClients(extractWebInnertubeClientVersion(watchHtml))
+
+        val failures = mutableListOf<String>()
+        var lastError: Throwable? = watchResult.exceptionOrNull()
+        var lastServiceFailure: String? = watchResult.exceptionOrNull()?.message?.let {
+            "watch-page discovery: $it"
+        }
+        var sawNonTrackFailure = false
+
+        for (profile in profiles) {
+            ensureLookupTimeRemaining(deadlineNanos, "trying ${profile.label}")
+            try {
+                return fetchWithClient(
+                    videoId = videoId,
+                    preferredLanguages = preferredLanguages,
+                    apiKey = apiKey,
+                    profile = profile,
+                    deadlineNanos = deadlineNanos,
+                )
+            } catch (error: CaptionLookupTimeoutException) {
+                throw error
+            } catch (error: ResponseLimitExceededException) {
+                throw error
+            } catch (error: NoCaptionTracksException) {
+                lastError = error
+                failures += "${profile.label}: ${error.message}"
+            } catch (error: Exception) {
+                lastError = error
+                sawNonTrackFailure = true
+                val failure = "${profile.label}: ${error.message ?: error.javaClass.simpleName}"
+                failures += failure
+                lastServiceFailure = failure
+            }
+        }
+
+        if (!sawNonTrackFailure && failures.isNotEmpty()) {
+            throw CaptionUnavailableException("This video does not provide a public caption track.", lastError)
+        }
+
+        val detail = lastServiceFailure
+            ?: failures.lastOrNull()
+            ?: "No YouTube client returned usable captions."
+        throw CaptionUnavailableException(
+            "Captions could not be loaded after trying YouTube client fallbacks. Last failure: $detail",
+            lastError,
+        )
+    }
+
+    private fun fetchWithClient(
+        videoId: String,
+        preferredLanguages: List<String>,
+        apiKey: String,
+        profile: YouTubePlayerClient,
+        deadlineNanos: Long,
+    ): CaptionTrackResult {
+        val clientContext = JSONObject()
+            .put("clientName", profile.clientName)
+            .put("clientVersion", profile.clientVersion)
+            .put("userAgent", profile.userAgent)
+            .put("hl", "en")
+            .put("gl", "US")
+        profile.androidSdkVersion?.let { clientContext.put("androidSdkVersion", it) }
+        profile.deviceMake?.let { clientContext.put("deviceMake", it) }
+        profile.deviceModel?.let { clientContext.put("deviceModel", it) }
+        profile.osName?.let { clientContext.put("osName", it) }
+        profile.osVersion?.let { clientContext.put("osVersion", it) }
 
         val body = JSONObject()
-            .put(
-                "context",
-                JSONObject().put(
-                    "client",
-                    JSONObject()
-                        .put("clientName", "ANDROID")
-                        .put("clientVersion", ANDROID_CLIENT_VERSION)
-                        .put("androidSdkVersion", 35)
-                        .put("hl", "en")
-                        .put("gl", "US"),
-                ),
-            )
+            .put("context", JSONObject().put("client", clientContext))
             .put("videoId", videoId)
             .put("contentCheckOk", true)
             .put("racyCheckOk", true)
@@ -125,22 +282,41 @@ class YouTubeCaptionProvider(
         val playerJson = executeText(
             Request.Builder()
                 .url("https://www.youtube.com/youtubei/v1/player?key=$apiKey")
-                .header("User-Agent", ANDROID_USER_AGENT)
-                .header("X-YouTube-Client-Name", "3")
-                .header("X-YouTube-Client-Version", ANDROID_CLIENT_VERSION)
+                .header("User-Agent", profile.userAgent)
+                .header("X-YouTube-Client-Name", profile.clientNumber)
+                .header("X-YouTube-Client-Version", profile.clientVersion)
                 .post(body.toString().toRequestBody(JSON_MEDIA_TYPE))
                 .build(),
+            stage = "player request (${profile.label})",
+            deadlineNanos = deadlineNanos,
         )
 
         val root = JSONObject(playerJson)
+        val playability = root.optJSONObject("playabilityStatus")
+        val playabilityStatus = playability?.optString("status").orEmpty()
+        if (playabilityStatus.isNotBlank() && playabilityStatus != "OK") {
+            val reason = playability?.optString("reason").orEmpty()
+            throw CaptionUnavailableException(
+                buildString {
+                    append("Player returned ")
+                    append(playabilityStatus)
+                    if (reason.isNotBlank()) append(": ").append(reason)
+                },
+            )
+        }
+
         val tracks = root.optJSONObject("captions")
             ?.optJSONObject("playerCaptionsTracklistRenderer")
             ?.optJSONArray("captionTracks")
-            ?: throw CaptionUnavailableException("This video does not provide a public caption track.")
+            ?: throw NoCaptionTracksException("This client returned no public caption track.")
 
         val selected = selectTrack(tracks, preferredLanguages)
-            ?: throw CaptionUnavailableException("No compatible caption track was found.")
-        val cues = fetchCaptionCues(selected.getString("baseUrl"))
+            ?: throw NoCaptionTracksException("No compatible caption track was found.")
+        val cues = fetchCaptionCues(
+            baseUrl = selected.getString("baseUrl"),
+            userAgent = profile.userAgent,
+            deadlineNanos = deadlineNanos,
+        )
 
         return CaptionTrackResult(
             languageCode = selected.optString("languageCode", "en"),
@@ -172,30 +348,51 @@ class YouTubeCaptionProvider(
             .joinToString(separator = "") { it.optString("text") }
     }
 
-    private fun fetchCaptionCues(baseUrl: String): List<RawCaptionCue> {
+    private fun fetchCaptionCues(
+        baseUrl: String,
+        userAgent: String,
+        deadlineNanos: Long,
+    ): List<RawCaptionCue> {
         val candidateUrls = captionCandidateUrls(baseUrl)
         if (candidateUrls.isEmpty()) {
             throw CaptionUnavailableException("YouTube returned an untrusted caption URL.")
         }
 
+        var lastError: Throwable? = null
         candidateUrls.forEach { url ->
+            ensureLookupTimeRemaining(deadlineNanos, "downloading captions")
+            val format = url.queryParameter("fmt") ?: "legacy"
             val cues = try {
                 val captionText = executeText(
                     Request.Builder()
                         .url(url)
-                        .header("User-Agent", ANDROID_USER_AGENT)
+                        .header("User-Agent", userAgent)
                         .build(),
+                    stage = "caption download ($format)",
+                    deadlineNanos = deadlineNanos,
                 )
-                CaptionDocumentParser.parse(captionText)
+                CaptionDocumentParser.parse(captionText).also {
+                    if (it.isEmpty()) {
+                        lastError = CaptionUnavailableException(
+                            "YouTube returned an empty or unreadable $format caption document.",
+                        )
+                    }
+                }
+            } catch (error: CaptionLookupTimeoutException) {
+                throw error
             } catch (error: ResponseLimitExceededException) {
                 throw error
-            } catch (_: Exception) {
+            } catch (error: Exception) {
+                lastError = error
                 emptyList()
             }
             if (cues.isNotEmpty()) return cues
         }
+
         throw CaptionUnavailableException(
-            "This caption track exists, but YouTube returned no readable timed text.",
+            "This caption track exists, but YouTube returned no readable timed text. " +
+                "Last failure: ${lastError?.message ?: "empty caption response"}",
+            lastError,
         )
     }
 
@@ -212,26 +409,67 @@ class YouTubeCaptionProvider(
             }
     }
 
-    private fun executeText(request: Request): String = client.newCall(request).execute().use { response ->
-        if (!response.isSuccessful) {
-            throw CaptionUnavailableException("YouTube returned HTTP ${response.code} while loading captions.")
+    private fun executeText(
+        request: Request,
+        stage: String,
+        deadlineNanos: Long,
+    ): String {
+        val remainingNanos = deadlineNanos - System.nanoTime()
+        if (remainingNanos <= 0L) {
+            throw lookupTimeout(stage)
         }
-        val body = response.body
-            ?: throw CaptionUnavailableException("YouTube returned an empty response.")
-        if (body.contentLength() > MAX_YOUTUBE_RESPONSE_BYTES) {
-            throw ResponseLimitExceededException(
-                "YouTube returned a response larger than the 8 MiB safety limit.",
+        val call = client.newCall(request)
+        call.timeout().timeout(
+            boundedYouTubeRequestTimeoutNanos(remainingNanos),
+            TimeUnit.NANOSECONDS,
+        )
+        try {
+            return call.execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw CaptionUnavailableException(
+                        "YouTube returned HTTP ${response.code} during $stage.",
+                    )
+                }
+                val body = response.body
+                    ?: throw CaptionUnavailableException("YouTube returned an empty response during $stage.")
+                if (body.contentLength() > MAX_YOUTUBE_RESPONSE_BYTES) {
+                    throw ResponseLimitExceededException(
+                        "YouTube returned a response larger than the 8 MiB safety limit during $stage.",
+                    )
+                }
+                body.byteStream().use(::readUtf8WithLimit)
+            }
+        } catch (error: InterruptedIOException) {
+            if (System.nanoTime() >= deadlineNanos) {
+                throw lookupTimeout(stage, error)
+            }
+            throw CaptionUnavailableException(
+                "YouTube request timed out during $stage.",
+                error,
             )
         }
-        body.byteStream().use(::readUtf8WithLimit)
     }
+
+    private fun ensureLookupTimeRemaining(deadlineNanos: Long, stage: String) {
+        if (System.nanoTime() >= deadlineNanos) throw lookupTimeout(stage)
+    }
+
+    private fun lookupTimeout(stage: String, cause: Throwable? = null): CaptionLookupTimeoutException =
+        CaptionLookupTimeoutException(
+            "Caption discovery stopped after ${CAPTION_LOOKUP_TIMEOUT_MS / 1_000} seconds " +
+                "instead of continuing to spin. Last stage: $stage.",
+            cause,
+        )
+
+    private class NoCaptionTracksException(message: String) : Exception(message)
 
     private companion object {
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
         val INNERTUBE_KEY_REGEX = Regex("\\\"INNERTUBE_API_KEY\\\":\\\"([^\\\"]+)\\\"")
         const val FALLBACK_INNERTUBE_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
-        const val ANDROID_CLIENT_VERSION = "20.10.38"
-        const val ANDROID_USER_AGENT = "com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip"
-        const val WEB_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36"
     }
 }
+
+private const val DEFAULT_WEB_CLIENT_VERSION = "2.20260708.00.00"
+private const val WEB_USER_AGENT =
+    "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36"
