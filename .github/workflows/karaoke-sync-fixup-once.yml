@@ -36,12 +36,15 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import base64, gzip, re, subprocess
+          import base64, gzip, subprocess
+
           workflow = Path('.github/workflows/karaoke-sync-upgrade-once.yml').read_text()
-          match = re.search(r"printf '%s' '([A-Za-z0-9+/=]+)' \\| base64", workflow)
-          if not match:
-              raise SystemExit('Could not recover the original upgrade payload')
-          script = gzip.decompress(base64.b64decode(match.group(1)))
+          prefix = "printf '%s' '"
+          suffix = "' | base64 --decode | gzip --decompress"
+          start = workflow.index(prefix) + len(prefix)
+          end = workflow.index(suffix, start)
+          payload = workflow[start:end]
+          script = gzip.decompress(base64.b64decode(payload))
           path = Path('/tmp/apply-karaoke-sync.py')
           path.write_bytes(script)
           subprocess.run(['python', str(path)], check=True)
@@ -111,8 +114,8 @@ jobs:
            */
           internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 20L
           private const val MIN_ESTIMATED_WORD_MS = 60L
-          private val sentencePause = Regex("[.!?。！？…]+[\\\"'’”)]*$")
-          private val clausePause = Regex("[,;:，；：]+[\\\"'’”)]*$")
+          private val sentencePause = Regex("""[.!?。！？…]+["'’”)]*$""")
+          private val clausePause = Regex("""[,;:，；：]+["'’”)]*$""")
           private val latinVowelGroups = Regex("(?i)[aeiouy]+")
 
           /**
