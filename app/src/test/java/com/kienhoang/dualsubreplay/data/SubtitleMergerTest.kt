@@ -98,7 +98,7 @@ class SubtitleMergerTest {
         assertEquals(2_000L, merged.words.last().endMs)
     }
 
-    @Test fun estimatesWholeMergedSegmentWhenAnyCueHasNoWordTimings() {
+    @Test fun keepsRealTimingWhenNeighborCueNeedsEstimatedWords() {
         val merged = SubtitleMerger.merge(
             listOf(
                 RawCaptionCue(
@@ -112,7 +112,8 @@ class SubtitleMergerTest {
         ).single()
 
         assertEquals(listOf("Hello", "world"), merged.words.map { it.text })
-        assertEquals(0L, merged.words.first().startMs)
+        assertEquals(250L, merged.words.first().startMs)
+        assertEquals(1_000L, merged.words[1].startMs)
         assertEquals(2_000L, merged.words.last().endMs)
     }
 

@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 
@@ -35,7 +35,7 @@ internal fun subtitleWordSpans(text: String, words: List<SubtitleWord>): List<Su
     return spans
 }
 
-/** Renders the original line with the currently spoken word tinted. */
+/** Renders the original line with the currently spoken word tinted and underlined. */
 internal fun annotatedSpokenText(
     segment: SubtitleSegment,
     activeWordIndex: Int,
@@ -50,7 +50,10 @@ internal fun annotatedSpokenText(
     return buildAnnotatedString {
         append(text)
         addStyle(
-            SpanStyle(color = highlightColor, fontWeight = FontWeight.ExtraBold),
+            SpanStyle(
+                color = highlightColor,
+                textDecoration = TextDecoration.Underline,
+            ),
             span.start,
             span.end,
         )
