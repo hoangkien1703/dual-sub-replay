@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val appVersionCode = 23
+val appVersionName = "0.9.2"
 val releaseStoreFile = providers.environmentVariable("ANDROID_RELEASE_STORE_FILE").orNull
 val releaseStorePassword = providers.environmentVariable("ANDROID_RELEASE_STORE_PASSWORD").orNull
 val releaseKeyAlias = providers.environmentVariable("ANDROID_RELEASE_KEY_ALIAS").orNull
@@ -17,6 +19,7 @@ val hasReleaseSigning = releaseSigningValues.all { !it.isNullOrBlank() }
 val requireReleaseSigning = providers.gradleProperty("requireReleaseSigning").orNull == "true"
 val previewVersionCode = providers.gradleProperty("previewVersionCode").orNull?.toIntOrNull()
 val previewVersionNameSuffix = providers.gradleProperty("previewVersionNameSuffix").orNull.orEmpty()
+val previewApplicationIdSuffix = providers.gradleProperty("previewApplicationIdSuffix").orNull.orEmpty()
 
 if (requireReleaseSigning && !hasReleaseSigning) {
     throw GradleException(
@@ -34,8 +37,8 @@ android {
         applicationId = "com.kienhoang.dualsubreplay"
         minSdk = 26
         targetSdk = 36
-        versionCode = previewVersionCode ?: 23
-        versionName = "0.9.2$previewVersionNameSuffix"
+        versionCode = previewVersionCode ?: appVersionCode
+        versionName = appVersionName + previewVersionNameSuffix
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -62,6 +65,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            if (previewApplicationIdSuffix.isNotBlank()) {
+                applicationIdSuffix = previewApplicationIdSuffix
+            }
+        }
+
         release {
             isMinifyEnabled = false
             if (hasReleaseSigning) {

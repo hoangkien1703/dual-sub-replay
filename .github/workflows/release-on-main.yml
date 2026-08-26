@@ -29,7 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="$(sed -n 's/.*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
+          version="$(sed -n 's/^val appVersionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
           if [ -z "$version" ]; then
             echo "Could not determine app version" >&2
             exit 1
@@ -115,7 +115,7 @@ jobs:
 
             Download **DualSub-Replay.apk** below. On Android 8.0 or newer, open the downloaded file and allow your browser or file manager to install unknown apps if Android asks.
 
-            **Preview users:** uninstall the preview build once before installing this official release because preview and official builds use different signing keys.
+            Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
             ## v0.9.2 highlights
 

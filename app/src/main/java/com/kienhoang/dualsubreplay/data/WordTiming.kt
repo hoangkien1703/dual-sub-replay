@@ -5,6 +5,13 @@ package com.kienhoang.dualsubreplay.data
  * real-time spoken-word highlight in the UI.
  */
 
+/**
+ * Small visual lead that compensates for WebView playback polling + bridge/render latency.
+ * It only advances transitions between already-visible words; it never highlights the first word
+ * before its real start time.
+ */
+internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 75L
+
 /** Splits [text] into words and spreads them across the cue duration by length. */
 internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List<SubtitleWord> {
     val tokens = text.split(Regex("\\s+")).filter(String::isNotBlank)
@@ -33,12 +40,18 @@ internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List
 
 /**
  * Index of the word being spoken at [timeMs]. Between words the previously
- * started word stays highlighted so short gaps do not flicker.
+ * started word stays highlighted so short gaps do not flicker. After the first
+ * word has really started, upcoming word transitions are allowed to lead the
+ * playback clock slightly to hide WebView/polling latency.
  */
 internal fun activeWordIndex(words: List<SubtitleWord>, timeMs: Long): Int {
-    var result = -1
-    for ((index, word) in words.withIndex()) {
-        if (word.startMs <= timeMs) result = index else break
+    val firstWord = words.firstOrNull() ?: return -1
+    if (timeMs < firstWord.startMs) return -1
+
+    val syncTimeMs = timeMs + KARAOKE_HIGHLIGHT_LEAD_MS
+    var result = 0
+    for (index in 1 until words.size) {
+        if (words[index].startMs <= syncTimeMs) result = index else break
     }
     return result
 }

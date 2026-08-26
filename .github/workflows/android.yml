@@ -46,16 +46,32 @@ jobs:
         run: bash ./gradlew --version
 
       - name: Test, lint, and build
-        run: bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest --stacktrace
+        run: |
+          set -euo pipefail
+          preview_version_code=$(( $(date -u +%s) - 1700000000 ))
+          bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest \
+            -PpreviewVersionCode="$preview_version_code" \
+            -PpreviewVersionNameSuffix="-ci-build${GITHUB_RUN_NUMBER}" \
+            -PpreviewApplicationIdSuffix=".preview" \
+            --stacktrace
+
+      - name: Verify preview package id
+        run: |
+          badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging app/build/outputs/apk/debug/app-debug.apk | head -n 1)"
+          echo "$badging"
+          if [[ "$badging" != *"name='com.kienhoang.dualsubreplay.preview'"* ]]; then
+            echo "Preview APK does not use the isolated preview application id" >&2
+            exit 1
+          fi
 
       - name: Name preview APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-v0.9.1-preview.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk DualSub-Replay-preview.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: DualSub-Replay-v0.9.1-preview
-          path: DualSub-Replay-v0.9.1-preview.apk
+          name: DualSub-Replay-preview
+          path: DualSub-Replay-preview.apk
           if-no-files-found: error
 
   managed-device-tests:
@@ -119,7 +135,7 @@ jobs:
       - name: Download verified preview APK
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: DualSub-Replay-v0.9.1-preview
+          name: DualSub-Replay-preview
           path: release
 
       - name: Remove obsolete preview APKs
@@ -147,6 +163,7 @@ jobs:
           gh release delete-asset preview DualSub-Replay-v0.7.0-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.8.0-preview.apk --yes || true
           gh release delete-asset preview DualSub-Replay-v0.9.0-preview.apk --yes || true
+          gh release delete-asset preview DualSub-Replay-v0.9.1-preview.apk --yes || true
 
       - name: Publish rolling preview release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
@@ -160,10 +177,8 @@ jobs:
 
             Most people should install the [latest official release](https://github.com/${{ github.repository }}/releases/latest) instead.
 
-            v0.9.1 adds a skippable three-page first-launch guide after language setup that introduces dual subtitles, tap-to-replay, and opening videos with real app screenshots.
-
-            This APK uses a CI debug signature. Uninstall an older preview first if Android reports a signature mismatch.
-          files: release/DualSub-Replay-v0.9.1-preview.apk
+            Preview APKs install as **DualSub Replay Preview** with a separate Android package id, so they can coexist with the official app and no longer require reinstalling or uninstalling the production build.
+          files: release/DualSub-Replay-preview.apk
           overwrite_files: true
 
   publish-release:
@@ -198,7 +213,7 @@ jobs:
       - name: Require tag to match the app version
         run: |
           tag_version="${GITHUB_REF_NAME#v}"
-          app_version="$(sed -n 's/.*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
+          app_version="$(sed -n 's/^val appVersionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
           if [ -z "$app_version" ] || [ "$tag_version" != "$app_version" ]; then
             echo "Tag $GITHUB_REF_NAME does not match app version $app_version" >&2
             exit 1
@@ -249,7 +264,7 @@ jobs:
 
             Download **DualSub-Replay.apk** below. On Android 8.0 or newer, open the downloaded file and allow your browser or file manager to install unknown apps if Android asks.
 
-            **Preview users:** uninstall the preview build once before installing this official release because the official app uses a different signing key.
+            Preview builds now install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
             ## Highlights
 

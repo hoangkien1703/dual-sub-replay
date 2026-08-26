@@ -36,18 +36,21 @@ class WordTimingTest {
         assertTrue(estimateWordTimings("hello", 1_000, 1_000).isEmpty())
     }
 
-    @Test fun activeWordIndexTracksTheSpokenWord() {
+    @Test fun activeWordIndexTracksTheSpokenWordWithSmallLatencyLead() {
         val words = listOf(
             SubtitleWord("one", 0, 500),
             SubtitleWord("two", 500, 900),
             SubtitleWord("three", 1_000, 1_400),
         )
 
+        // Never light the first word before its real start.
         assertEquals(-1, activeWordIndex(words, timeMs = -1))
         assertEquals(0, activeWordIndex(words, timeMs = 100))
         assertEquals(1, activeWordIndex(words, timeMs = 600))
-        // Between words the last started word stays highlighted (no flicker).
-        assertEquals(1, activeWordIndex(words, timeMs = 950))
+        // A normal gap still keeps the previous word highlighted.
+        assertEquals(1, activeWordIndex(words, timeMs = 920))
+        // Near the next boundary, the small visual lead compensates for WebView/UI latency.
+        assertEquals(2, activeWordIndex(words, timeMs = 950))
         assertEquals(2, activeWordIndex(words, timeMs = 1_200))
     }
 

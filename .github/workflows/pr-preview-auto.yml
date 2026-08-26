@@ -3,8 +3,6 @@ name: Automatic PR preview APK
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
-  push:
-    branches-ignore: [main]
   workflow_dispatch:
 
 permissions:
@@ -91,10 +89,11 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
-          preview_version_code=$((100000 + BUILD_NUMBER))
+          preview_version_code=$(( $(date -u +%s) - 1700000000 ))
           bash ./gradlew testDebugUnitTest lintDebug assembleDebug \
             -PpreviewVersionCode="$preview_version_code" \
             -PpreviewVersionNameSuffix="-pr${PR_NUMBER}-build${BUILD_NUMBER}" \
+            -PpreviewApplicationIdSuffix=".preview" \
             --stacktrace
 
       - name: Package versioned PR preview APK
@@ -108,6 +107,12 @@ jobs:
           mkdir -p release
           asset_name="DualSub-Replay-PR${PR_NUMBER}-build${BUILD_NUMBER}-preview.apk"
           cp app/build/outputs/apk/debug/app-debug.apk "release/$asset_name"
+          badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "release/$asset_name" | head -n 1)"
+          echo "$badging"
+          if [[ "$badging" != *"name='com.kienhoang.dualsubreplay.preview'"* ]]; then
+            echo "Preview APK does not use the isolated preview application id" >&2
+            exit 1
+          fi
           sha256sum "release/$asset_name"
           echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
 
