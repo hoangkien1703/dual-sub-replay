@@ -1,5 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
@@ -50,6 +52,31 @@ class SubtitleWordHighlightTest {
 
         assertEquals(listOf(1, 2, 3), spans.map { it.wordIndex })
         assertEquals("changes", "changes being applied on web".substring(spans[0].start, spans[0].end))
+    }
+
+    @Test fun spokenWordUsesColorAndUnderlineWithoutBold() {
+        val segment = SubtitleSegment(
+            id = 1,
+            startMs = 0,
+            endMs = 1_000,
+            originalText = "really useful",
+            words = listOf(
+                SubtitleWord("really", 0, 500),
+                SubtitleWord("useful", 500, 1_000),
+            ),
+        )
+
+        val annotated = annotatedSpokenText(
+            segment = segment,
+            activeWordIndex = 0,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+        )
+        val style = annotated.spanStyles.single().item
+
+        assertEquals(Color.Yellow, style.color)
+        assertEquals(TextDecoration.Underline, style.textDecoration)
+        assertEquals(null, style.fontWeight)
     }
 
     @Test fun returnsEmptyWithoutWordsOrText() {
