@@ -18,6 +18,7 @@ data class SubtitleSegment(
 
 enum class SubtitleTimingSource {
     YOUTUBE_EXACT,
+    ACOUSTIC_ALIGNED,
     YOUTUBE_DOM_OBSERVED,
     ESTIMATED,
 }
