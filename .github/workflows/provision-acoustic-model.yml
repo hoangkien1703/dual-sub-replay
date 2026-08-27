@@ -23,7 +23,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install conversion tools
-        run: python -m pip install --upgrade 'onnxruntime==1.18.0' numpy
+        run: python -m pip install --upgrade 'onnxruntime==1.18.0' 'numpy<2'
 
       - name: Download and verify source model
         shell: bash
