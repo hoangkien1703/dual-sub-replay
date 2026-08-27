@@ -48,15 +48,15 @@ class OnDeviceCtcAligner(
     private val appContext = context.applicationContext
     private val modelStore = AlignmentModelStore(appContext, httpClient)
 
-    fun modelStatus(): AcousticModelStatus = modelStore.status()
+    internal fun modelStatus(): AcousticModelStatus = modelStore.status()
 
-    suspend fun downloadModel(): AcousticModelStatus {
+    internal suspend fun downloadModel(): AcousticModelStatus {
         modelStore.requireModel()
         KaraokeSyncPreferences.setAcousticModelEnabled(appContext, true)
         return modelStore.status()
     }
 
-    fun deleteModel(): Boolean {
+    internal fun deleteModel(): Boolean {
         KaraokeSyncPreferences.setAcousticModelEnabled(appContext, false)
         return modelStore.deleteModel()
     }
