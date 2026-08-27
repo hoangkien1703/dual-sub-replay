@@ -5,12 +5,6 @@ package com.kienhoang.dualsubreplay.data
  * real-time spoken-word highlight in the UI.
  */
 
-/**
- * With a frame-synchronised WebView clock most polling latency disappears.
- * Keep only a tiny render lead so Compose can paint the next word without
- * visibly jumping ahead of the speaker.
- */
-internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 20L
 private const val MIN_ESTIMATED_WORD_MS = 60L
 private val sentencePause = Regex("""[.!?。！？…]+["'’”)]*$""")
 private val clausePause = Regex("""[,;:，；：]+["'’”)]*$""")
@@ -80,12 +74,15 @@ internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List
 /**
  * Index of the word being spoken at [timeMs]. Between words the previously
  * started word stays highlighted so short gaps do not flicker.
+ *
+ * The render lead is deliberately runtime-adjustable under More settings so
+ * device/WebView latency can be separated from genuinely wrong word timing.
  */
 internal fun activeWordIndex(words: List<SubtitleWord>, timeMs: Long): Int {
     val firstWord = words.firstOrNull() ?: return -1
     if (timeMs < firstWord.startMs) return -1
 
-    val syncTimeMs = timeMs + KARAOKE_HIGHLIGHT_LEAD_MS
+    val syncTimeMs = timeMs + KaraokeSyncPreferences.highlightLeadMs()
     var result = 0
     for (index in 1 until words.size) {
         if (words[index].startMs <= syncTimeMs) result = index else break
