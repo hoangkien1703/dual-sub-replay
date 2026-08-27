@@ -5,6 +5,10 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.util.Log
+import com.kienhoang.dualsubreplay.data.KaraokeSyncDiagnostic
+import com.kienhoang.dualsubreplay.data.KaraokeSyncDiagnostics
+import com.kienhoang.dualsubreplay.data.KaraokeSyncMode
+import com.kienhoang.dualsubreplay.data.KaraokeSyncPreferences
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleTimingSource
 import com.kienhoang.dualsubreplay.data.SubtitleWord
@@ -24,13 +28,18 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
+internal data class AcousticModelStatus(
+    val installed: Boolean,
+    val sizeBytes: Long,
+)
+
 /**
- * Option 5: WhisperX-style forced alignment without a cloud service.
+ * WhisperX-style forced alignment without a cloud service.
  *
- * The app already knows the caption text. A quantized Wav2Vec2 CTC model is
- * therefore used only to place that text onto the speech waveform, not to
- * replace YouTube's transcript. The model is downloaded once (~95 MB), verified
- * by SHA-256, and cached in no-backup storage.
+ * The English Wav2Vec2 model is intentionally not bundled in the APK. Users can
+ * download it from More settings if they want acoustic word synchronization.
+ * Generated-caption YouTube timestamps can then be tested either as the strict
+ * PR #33 anchors or as soft priors that acoustic evidence may move slightly.
  */
 class OnDeviceCtcAligner(
     context: Context,
@@ -39,15 +48,38 @@ class OnDeviceCtcAligner(
     private val appContext = context.applicationContext
     private val modelStore = AlignmentModelStore(appContext, httpClient)
 
+    fun modelStatus(): AcousticModelStatus = modelStore.status()
+
+    suspend fun downloadModel(): AcousticModelStatus {
+        modelStore.requireModel()
+        KaraokeSyncPreferences.setAcousticModelEnabled(appContext, true)
+        return modelStore.status()
+    }
+
+    fun deleteModel(): Boolean {
+        KaraokeSyncPreferences.setAcousticModelEnabled(appContext, false)
+        return modelStore.deleteModel()
+    }
+
     suspend fun alignSegments(
         source: YouTubeAudioStream,
         segments: List<SubtitleSegment>,
         preferredIndex: Int,
         onAligned: suspend (index: Int, segment: SubtitleSegment) -> Unit,
     ): Int {
+        val mode = KaraokeSyncPreferences.mode(appContext)
+        if (mode == KaraokeSyncMode.ESTIMATED_ONLY) return 0
+        if (!KaraokeSyncPreferences.acousticModelEnabled(appContext)) return 0
+
         val eligibleIndices = alignmentOrder(segments.size, preferredIndex).filter { index ->
-            segments[index].words.any { word ->
-                word.timingSource != SubtitleTimingSource.YOUTUBE_EXACT
+            when (mode) {
+                KaraokeSyncMode.PR33_CURRENT -> segments[index].words.any { word ->
+                    word.timingSource != SubtitleTimingSource.YOUTUBE_EXACT
+                }
+                KaraokeSyncMode.SOFT_ANCHOR,
+                KaraokeSyncMode.ENHANCED,
+                -> segments[index].words.isNotEmpty()
+                KaraokeSyncMode.ESTIMATED_ONLY -> false
             }
         }
         if (eligibleIndices.isEmpty()) return 0
@@ -65,7 +97,7 @@ class OnDeviceCtcAligner(
                 for (index in eligibleIndices) {
                     currentCoroutineContext().ensureActive()
                     val aligned = runCatching {
-                        alignOne(session, source, segments[index])
+                        alignOne(session, source, segments[index], mode)
                     }.onFailure { error ->
                         Log.w(LOG_TAG, "Acoustic alignment skipped segment $index.", error)
                     }.getOrNull()
@@ -83,14 +115,25 @@ class OnDeviceCtcAligner(
         session: OrtSession,
         source: YouTubeAudioStream,
         segment: SubtitleSegment,
+        mode: KaraokeSyncMode,
     ): SubtitleSegment? {
         if (segment.words.isEmpty()) return null
         val target = ctcTargetForWords(segment.words.map(SubtitleWord::text)) ?: return null
         if (target.labels.size < MIN_TARGET_LABELS) return null
 
-        val windowStart = (segment.startMs - ALIGNMENT_CONTEXT_MS).coerceAtLeast(0L)
-        val windowEnd = segment.endMs + ALIGNMENT_CONTEXT_MS
-        val audio = YouTubeAudioDecoder.decodeWindow(source, windowStart, windowEnd) ?: return null
+        val contextMs = if (mode == KaraokeSyncMode.ENHANCED) {
+            ENHANCED_ALIGNMENT_CONTEXT_MS
+        } else {
+            ALIGNMENT_CONTEXT_MS
+        }
+        val windowStart = (segment.startMs - contextMs).coerceAtLeast(0L)
+        val windowEnd = segment.endMs + contextMs
+        val decodedAudio = YouTubeAudioDecoder.decodeWindow(source, windowStart, windowEnd) ?: return null
+        val audio = if (mode == KaraokeSyncMode.ENHANCED) {
+            trimOuterSilence(decodedAudio)
+        } else {
+            decodedAudio
+        }
         val normalizedAudio = normalizeAudio(audio.samples) ?: return null
         val inference = runInference(session, normalizedAudio) ?: return null
 
@@ -99,9 +142,13 @@ class OnDeviceCtcAligner(
             frameCount = inference.frameCount,
             vocabSize = inference.vocabSize,
         )
-        if (orderedTextCoverage(target.normalizedText, greedyText) < MIN_TEXT_COVERAGE) {
-            return null
+        val coverage = orderedTextCoverage(target.normalizedText, greedyText)
+        val requiredCoverage = if (mode == KaraokeSyncMode.PR33_CURRENT) {
+            MIN_TEXT_COVERAGE
+        } else {
+            MIN_SOFT_ANCHOR_TEXT_COVERAGE
         }
+        if (coverage < requiredCoverage) return null
 
         val labelSpans = withContext(Dispatchers.Default) {
             viterbiCtcAlignment(
@@ -116,9 +163,12 @@ class OnDeviceCtcAligner(
 
         val audioDurationMs = normalizedAudio.size * 1_000.0 / ALIGNMENT_SAMPLE_RATE
         val millisecondsPerFrame = audioDurationMs / inference.frameCount.toDouble()
-        val acousticWords = segment.words.mapIndexed { index, word ->
+        val rawAcousticWords = segment.words.mapIndexed { index, word ->
             val span = wordSpans[index] ?: return@mapIndexed word
-            if (word.timingSource == SubtitleTimingSource.YOUTUBE_EXACT) {
+            if (
+                mode == KaraokeSyncMode.PR33_CURRENT &&
+                word.timingSource == SubtitleTimingSource.YOUTUBE_EXACT
+            ) {
                 return@mapIndexed word
             }
             val start = audio.startMs + (span.firstFrame * millisecondsPerFrame).toLong()
@@ -135,9 +185,38 @@ class OnDeviceCtcAligner(
             }
         }
 
-        val stabilized = stabilizeAroundExactAnchors(segment.words, acousticWords)
+        val stabilized = when (mode) {
+            KaraokeSyncMode.PR33_CURRENT ->
+                stabilizeAroundExactAnchors(segment.words, rawAcousticWords)
+            KaraokeSyncMode.SOFT_ANCHOR,
+            KaraokeSyncMode.ENHANCED,
+            -> applySoftAnchorLimits(segment.words, rawAcousticWords)
+            KaraokeSyncMode.ESTIMATED_ONLY -> return null
+        }
         if (stabilized.none { it.timingSource == SubtitleTimingSource.ACOUSTIC_ALIGNED }) return null
         if (!isMonotonicEnough(stabilized)) return null
+
+        if (KaraokeSyncPreferences.diagnosticsEnabled(appContext)) {
+            stabilized.forEachIndexed { index, used ->
+                if (used.timingSource != SubtitleTimingSource.ACOUSTIC_ALIGNED) return@forEachIndexed
+                val original = segment.words[index]
+                val rawAcoustic = rawAcousticWords[index]
+                KaraokeSyncDiagnostics.record(
+                    KaraokeSyncDiagnostic(
+                        word = original.text,
+                        originalSource = original.timingSource,
+                        originalStartMs = original.startMs,
+                        acousticStartMs = rawAcoustic.startMs,
+                        usedStartMs = used.startMs,
+                    ),
+                )
+                Log.d(
+                    LOG_TAG,
+                    "word=${original.text} source=${original.timingSource} " +
+                        "original=${original.startMs} acoustic=${rawAcoustic.startMs} used=${used.startMs}",
+                )
+            }
+        }
 
         return segment.copy(
             startMs = stabilized.minOf(SubtitleWord::startMs),
@@ -190,6 +269,49 @@ class OnDeviceCtcAligner(
         }
     }
 
+    /**
+     * Enhanced mode uses larger overlapping segment windows. Trim only silence
+     * at the outer edges, keeping generous padding so we never cut a phoneme.
+     */
+    private fun trimOuterSilence(audio: DecodedAudioWindow): DecodedAudioWindow {
+        val samples = audio.samples
+        if (samples.size < ALIGNMENT_SAMPLE_RATE) return audio
+
+        val frameSamples = ALIGNMENT_SAMPLE_RATE * VAD_FRAME_MS / 1_000
+        if (frameSamples <= 0) return audio
+        val frameCount = samples.size / frameSamples
+        if (frameCount <= 1) return audio
+
+        val rms = FloatArray(frameCount)
+        var peak = 0f
+        for (frame in 0 until frameCount) {
+            var sumSquares = 0.0
+            val start = frame * frameSamples
+            val end = start + frameSamples
+            for (index in start until end) {
+                val value = samples[index].toDouble()
+                sumSquares += value * value
+            }
+            val value = sqrt(sumSquares / frameSamples).toFloat()
+            rms[frame] = value
+            peak = maxOf(peak, value)
+        }
+        if (peak <= 0f) return audio
+
+        val threshold = maxOf(MIN_VAD_RMS, peak * VAD_PEAK_FRACTION)
+        val firstActiveFrame = rms.indexOfFirst { it >= threshold }.takeIf { it >= 0 } ?: return audio
+        val lastActiveFrame = rms.indexOfLast { it >= threshold }.takeIf { it >= 0 } ?: return audio
+        val paddingSamples = ALIGNMENT_SAMPLE_RATE * VAD_PADDING_MS / 1_000
+        val startSample = (firstActiveFrame * frameSamples - paddingSamples).coerceAtLeast(0)
+        val endSample = ((lastActiveFrame + 1) * frameSamples + paddingSamples).coerceAtMost(samples.size)
+        if (endSample - startSample < ALIGNMENT_SAMPLE_RATE / 2) return audio
+
+        return DecodedAudioWindow(
+            samples = samples.copyOfRange(startSample, endSample),
+            startMs = audio.startMs + startSample * 1_000L / ALIGNMENT_SAMPLE_RATE,
+        )
+    }
+
     private fun stabilizeAroundExactAnchors(
         original: List<SubtitleWord>,
         candidate: List<SubtitleWord>,
@@ -229,6 +351,35 @@ class OnDeviceCtcAligner(
         }
     }
 
+    /**
+     * Auto-caption anchors are priors in the experimental modes, not immutable
+     * phoneme boundaries. Strong CTC timing may move an anchored word within a
+     * conservative +/-400 ms search range while estimated words remain free.
+     */
+    private fun applySoftAnchorLimits(
+        original: List<SubtitleWord>,
+        candidate: List<SubtitleWord>,
+    ): List<SubtitleWord> {
+        if (original.size != candidate.size) return original
+        return candidate.mapIndexed { index, word ->
+            if (word.timingSource != SubtitleTimingSource.ACOUSTIC_ALIGNED) {
+                return@mapIndexed word
+            }
+            val anchor = original[index]
+            if (anchor.timingSource != SubtitleTimingSource.YOUTUBE_EXACT) {
+                return@mapIndexed word
+            }
+
+            val minimumStart = anchor.startMs - KaraokeSyncPreferences.SOFT_ANCHOR_RANGE_MS
+            val maximumStart = anchor.startMs + KaraokeSyncPreferences.SOFT_ANCHOR_RANGE_MS
+            val boundedStart = word.startMs.coerceIn(minimumStart, maximumStart)
+            val appliedShift = boundedStart - word.startMs
+            val boundedEnd = (word.endMs + appliedShift)
+                .coerceAtLeast(boundedStart + MIN_ALIGNED_WORD_MS)
+            word.copy(startMs = boundedStart, endMs = boundedEnd)
+        }
+    }
+
     private fun isMonotonicEnough(words: List<SubtitleWord>): Boolean {
         if (words.isEmpty()) return false
         var previousStart = Long.MIN_VALUE
@@ -252,10 +403,16 @@ class OnDeviceCtcAligner(
         private const val LOG_TAG = "DualSubAlignment"
         private const val ALIGNMENT_SAMPLE_RATE = 16_000
         private const val ALIGNMENT_CONTEXT_MS = 1_500L
+        private const val ENHANCED_ALIGNMENT_CONTEXT_MS = 3_000L
         private const val MIN_TARGET_LABELS = 2
         private const val MIN_TEXT_COVERAGE = 0.52f
+        private const val MIN_SOFT_ANCHOR_TEXT_COVERAGE = 0.65f
         private const val MIN_ALIGNED_WORD_MS = 25L
         private const val MAX_INFERENCE_THREADS = 4
+        private const val VAD_FRAME_MS = 20
+        private const val VAD_PADDING_MS = 350
+        private const val MIN_VAD_RMS = 0.008f
+        private const val VAD_PEAK_FRACTION = 0.08f
     }
 }
 
@@ -274,6 +431,18 @@ private class AlignmentModelStore(
     private val directory = File(context.noBackupFilesDir, "acoustic_alignment")
     private val modelFile = File(directory, MODEL_FILE_NAME)
     private val verifiedMarker = File(directory, "$MODEL_FILE_NAME.sha256")
+
+    fun status(): AcousticModelStatus = AcousticModelStatus(
+        installed = modelFile.isFile && verifiedMarker.readTextOrNull()?.trim() == MODEL_SHA256,
+        sizeBytes = modelFile.takeIf(File::isFile)?.length() ?: 0L,
+    )
+
+    fun deleteModel(): Boolean {
+        File(directory, "$MODEL_FILE_NAME.part").delete()
+        verifiedMarker.delete()
+        modelFile.delete()
+        return !modelFile.exists()
+    }
 
     suspend fun requireModel(): File = withContext(Dispatchers.IO) {
         directory.mkdirs()
