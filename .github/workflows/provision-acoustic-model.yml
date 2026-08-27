@@ -30,16 +30,16 @@ jobs:
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 \
-            'https://huggingface.co/onnx-community/wav2vec2-base-960h-ONNX/resolve/main/onnx/model_int8.onnx?download=true' \
-            --output wav2vec2-base-960h-int8.onnx
-          echo '2aa77535eea4282df0374ff011c330e7abd84010f5d0cc079e5ed6c8ede2b6c5  wav2vec2-base-960h-int8.onnx' | sha256sum --check
+            'https://huggingface.co/onnx-community/wav2vec2-base-960h-ONNX/resolve/main/onnx/model_q4.onnx?download=true' \
+            --output wav2vec2-base-960h-q4.onnx
+          echo '3b3b785dd6a7756e78a84b9268fdaf07431a3f648d712b9ed2863f824714fe98  wav2vec2-base-960h-q4.onnx' | sha256sum --check
 
       - name: Check prebuilt ORT Mobile compatibility
         shell: bash
         run: |
           set -euo pipefail
           python -m onnxruntime.tools.check_onnx_model_mobile_usability \
-            wav2vec2-base-960h-int8.onnx --log_level info 2>&1 | tee mobile-usability.txt
+            wav2vec2-base-960h-q4.onnx --log_level info 2>&1 | tee mobile-usability.txt
 
       - name: Convert model to ORT format
         shell: bash
@@ -47,8 +47,8 @@ jobs:
           set -euo pipefail
           python -m onnxruntime.tools.convert_onnx_models_to_ort \
             --optimization_style Fixed \
-            wav2vec2-base-960h-int8.onnx
-          test -f wav2vec2-base-960h-int8.ort
+            wav2vec2-base-960h-q4.onnx
+          test -f wav2vec2-base-960h-q4.ort
 
       - name: Smoke-test converted model
         shell: bash
@@ -59,7 +59,7 @@ jobs:
           import onnxruntime as ort
 
           session = ort.InferenceSession(
-              'wav2vec2-base-960h-int8.ort',
+              'wav2vec2-base-960h-q4.ort',
               providers=['CPUExecutionProvider'],
           )
           input_meta = session.get_inputs()[0]
@@ -76,8 +76,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sha256sum wav2vec2-base-960h-int8.ort | tee wav2vec2-base-960h-int8.ort.sha256
-          ls -lh wav2vec2-base-960h-int8.onnx wav2vec2-base-960h-int8.ort
+          sha256sum wav2vec2-base-960h-q4.ort | tee wav2vec2-base-960h-q4.ort.sha256
+          ls -lh wav2vec2-base-960h-q4.onnx wav2vec2-base-960h-q4.ort
 
       - name: Publish optional acoustic model
         env:
@@ -92,7 +92,7 @@ jobs:
               --notes 'Optional on-device acoustic alignment models. These files are not bundled in the APK.'
           fi
           gh release upload acoustic-models \
-            wav2vec2-base-960h-int8.ort \
-            wav2vec2-base-960h-int8.ort.sha256 \
+            wav2vec2-base-960h-q4.ort \
+            wav2vec2-base-960h-q4.ort.sha256 \
             mobile-usability.txt \
             --clobber
