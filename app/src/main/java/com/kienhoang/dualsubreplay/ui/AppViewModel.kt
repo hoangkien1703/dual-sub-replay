@@ -1,14 +1,17 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.kienhoang.dualsubreplay.alignment.OnDeviceCtcAligner
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleTimingSource
+import com.kienhoang.dualsubreplay.data.YouTubeAudioStream
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
@@ -18,6 +21,7 @@ import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -124,6 +128,35 @@ private val captionTokenRegex = Regex("""[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*""
 internal fun normalizedCaptionTokens(text: String): List<String> =
     captionTokenRegex.findAll(text.lowercase()).map { it.value }.toList()
 
+internal fun shouldUseAcousticAlignment(
+    generated: Boolean,
+    sourceLanguage: String,
+    segments: List<SubtitleSegment>,
+): Boolean = generated &&
+    TranslationLanguages.normalize(sourceLanguage) == "en" &&
+    segments.any { segment ->
+        segment.words.any { word -> word.timingSource == SubtitleTimingSource.ESTIMATED }
+    }
+
+/**
+ * Translation and acoustic alignment run independently. Translation snapshots
+ * may be older than the latest word timing, so copy only translated text when
+ * the display segmentation still matches.
+ */
+internal fun mergeTranslatedTextPreservingTiming(
+    current: List<SubtitleSegment>,
+    translatedSnapshot: List<SubtitleSegment>,
+): List<SubtitleSegment> {
+    val compatible = current.size == translatedSnapshot.size &&
+        current.indices.all { index ->
+            current[index].originalText == translatedSnapshot[index].originalText
+        }
+    if (!compatible) return translatedSnapshot
+    return current.mapIndexed { index, segment ->
+        segment.copy(translatedText = translatedSnapshot[index].translatedText)
+    }
+}
+
 /**
  * Turns a native YouTube caption DOM growth event into a conservative word hint.
  * The first appearance of a caption window is ignored because YouTube can render
@@ -157,7 +190,10 @@ internal fun domCaptionWordHint(
         kotlin.math.abs(index - timedWordIndex.coerceAtLeast(0))
     } ?: return null
     val word = segment.words[target]
-    if (word.timingSource == SubtitleTimingSource.YOUTUBE_EXACT) return null
+    if (
+        word.timingSource == SubtitleTimingSource.YOUTUBE_EXACT ||
+        word.timingSource == SubtitleTimingSource.ACOUSTIC_ALIGNED
+    ) return null
     if (kotlin.math.abs(word.startMs - observed.observedAtMs) > 900L) return null
     return target
 }
@@ -243,9 +279,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
     private val translator = OnDeviceTranslator()
+    private val acousticAligner = OnDeviceCtcAligner(application)
     private var loadingJob: Job? = null
+    private var alignmentJob: Job? = null
     private var translationWarmupJob: Job? = null
     private var loadGeneration = 0L
+    private var alignmentGeneration = 0L
+    private var acousticAlignmentReadyVideoId: String? = null
     private var latestPlaybackSecondMs = 0L
     private var rawMergedSegments: List<SubtitleSegment> = emptyList()
     private var lastAppliedDomObservationAtMs = -1L
@@ -554,7 +594,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun clearActiveVideo() {
         if (_state.value.activeVideoId == null) return
         loadGeneration += 1
+        alignmentGeneration += 1
         loadingJob?.cancel()
+        alignmentJob?.cancel()
+        acousticAlignmentReadyVideoId = null
         latestPlaybackSecondMs = 0L
         rawMergedSegments = emptyList()
         lastAppliedDomObservationAtMs = -1L
@@ -577,7 +620,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadVideo(videoId: String, showPanel: Boolean) {
         val generation = ++loadGeneration
+        val acousticGeneration = ++alignmentGeneration
         loadingJob?.cancel()
+        alignmentJob?.cancel()
+        acousticAlignmentReadyVideoId = null
         // Reloading the same video (language change, retry) keeps tracking the
         // current position so subtitles resume exactly where playback is.
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
@@ -631,6 +677,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 }
 
+                startAcousticAlignment(
+                    videoId = videoId,
+                    generation = acousticGeneration,
+                    sourceLanguage = track.languageCode,
+                    generated = track.isGenerated,
+                    segments = merged,
+                )
+
                 translateSegments(
                     videoId = videoId,
                     generation = generation,
@@ -651,6 +705,98 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    private fun startAcousticAlignment(
+        videoId: String,
+        generation: Long,
+        sourceLanguage: String,
+        generated: Boolean,
+        segments: List<SubtitleSegment>,
+    ) {
+        if (!shouldUseAcousticAlignment(generated, sourceLanguage, segments)) return
+
+        alignmentJob = viewModelScope.launch {
+            try {
+                val source = waitForYouTubeAudioStream(videoId, generation) ?: return@launch
+                val preferredIndex = nearestSegmentIndex(segments, latestPlaybackSecondMs)
+                val alignedCount = acousticAligner.alignSegments(
+                    source = source,
+                    segments = segments,
+                    preferredIndex = preferredIndex,
+                ) aligned@{ index, aligned ->
+                    val current = _state.value
+                    if (!isCurrentAlignment(current, videoId, generation)) return@aligned
+
+                    val existingRaw = rawMergedSegments
+                    if (index !in existingRaw.indices) return@aligned
+                    if (existingRaw[index].originalText != aligned.originalText) return@aligned
+                    val updatedRaw = existingRaw.toMutableList()
+                    updatedRaw[index] = aligned.copy(translatedText = null)
+                    rawMergedSegments = updatedRaw
+
+                    val regenerated = if (_state.value.splitLongSentencesEnabled) {
+                        SubtitleMerger.splitLongSegments(updatedRaw)
+                    } else {
+                        updatedRaw
+                    }
+                    _state.update { latest ->
+                        if (!isCurrentAlignment(latest, videoId, generation)) return@update latest
+                        val displayed = mergeTranslatedTextPreservingTiming(
+                            current = regenerated,
+                            translatedSnapshot = latest.segments,
+                        )
+                        val activeIndex = activeSubtitleIndex(displayed, latestPlaybackSecondMs)
+                        latest.copy(
+                            segments = displayed,
+                            currentIndex = activeIndex,
+                            activeWordIndex = activeWordIndex(
+                                displayed,
+                                activeIndex,
+                                latestPlaybackSecondMs,
+                            ),
+                        )
+                    }
+                }
+
+                if (alignedCount > 0 && isCurrentAlignment(_state.value, videoId, generation)) {
+                    acousticAlignmentReadyVideoId = videoId
+                    _state.update { current ->
+                        if (!isCurrentAlignment(current, videoId, generation)) return@update current
+                        if (current.stage == LoadStage.READY) {
+                            current.copy(statusMessage = "Auto captions · acoustic word sync")
+                        } else {
+                            current
+                        }
+                    }
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.w("DualSubAlignment", "Option 5 acoustic alignment fell back to caption timing.", error)
+            }
+        }
+    }
+
+    private suspend fun waitForYouTubeAudioStream(
+        videoId: String,
+        generation: Long,
+    ): YouTubeAudioStream? {
+        repeat(75) {
+            currentCoroutineContext().ensureActive()
+            if (!isCurrentAlignment(_state.value, videoId, generation)) return null
+            latestYouTubeAudioStream
+                ?.takeIf { stream -> stream.videoId == videoId }
+                ?.let { return it }
+            delay(200L)
+        }
+        return null
+    }
+
+    private fun isCurrentAlignment(
+        state: DualSubUiState,
+        videoId: String,
+        generation: Long,
+    ): Boolean = generation == alignmentGeneration && state.activeVideoId == videoId
 
     private fun retranslateCurrentSegments() {
         val current = _state.value
@@ -719,7 +865,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             _state.update { current ->
                 if (!isCurrentLoad(current, videoId, generation)) return@update current
                 current.copy(
-                    segments = snapshot,
+                    segments = mergeTranslatedTextPreservingTiming(
+                        current = current.segments,
+                        translatedSnapshot = snapshot,
+                    ),
                     statusMessage = "Translating $completedSoFar of $total…",
                 )
             }
@@ -747,10 +896,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             current.copy(
                 stage = LoadStage.READY,
-                statusMessage = if (current.generatedCaptions) {
-                    "Using auto-generated captions"
-                } else {
-                    "Captions ready"
+                statusMessage = when {
+                    current.generatedCaptions && acousticAlignmentReadyVideoId == videoId ->
+                        "Auto captions · acoustic word sync"
+                    current.generatedCaptions -> "Using auto-generated captions"
+                    else -> "Captions ready"
                 },
             )
         }

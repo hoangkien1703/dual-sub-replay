@@ -55,6 +55,7 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
+import com.kienhoang.dualsubreplay.data.YouTubeAudioStream
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import java.net.URI
 import java.util.Collections
@@ -197,6 +198,9 @@ internal data class WebKaraokeSyncMessage(
     val currentSecond: Float?,
     val captionText: String? = null,
     val previousCaptionText: String? = null,
+    val audioUrl: String? = null,
+    val audioMimeType: String? = null,
+    val audioUserAgent: String? = null,
 )
 
 internal data class WebCaptionObservation(
@@ -209,11 +213,23 @@ internal data class WebCaptionObservation(
 @Volatile
 internal var latestYouTubeCaptionObservation: WebCaptionObservation? = null
 
+@Volatile
+internal var latestYouTubeAudioStream: YouTubeAudioStream? = null
+
 internal fun isTrustedYouTubeOrigin(origin: String): Boolean {
     val uri = runCatching { URI(origin) }.getOrNull() ?: return false
     if (!uri.scheme.equals("https", ignoreCase = true)) return false
     val host = uri.host?.lowercase()?.removeSuffix(".") ?: return false
     return host == "youtube.com" || host.endsWith(".youtube.com")
+}
+
+internal fun trustedYouTubeAudioStreamUrl(rawUrl: String): Boolean {
+    val uri = runCatching { URI(rawUrl) }.getOrNull() ?: return false
+    if (!uri.scheme.equals("https", ignoreCase = true)) return false
+    if (uri.rawUserInfo != null || uri.port !in setOf(-1, 443)) return false
+    val host = uri.host?.lowercase()?.removeSuffix(".") ?: return false
+    if (host != "googlevideo.com" && !host.endsWith(".googlevideo.com")) return false
+    return uri.path?.endsWith("/videoplayback") == true
 }
 
 internal fun parseWebKaraokeSyncMessage(raw: String?): WebKaraokeSyncMessage? {
@@ -226,6 +242,9 @@ internal fun parseWebKaraokeSyncMessage(raw: String?): WebKaraokeSyncMessage? {
             currentSecond = if (json.isNull("currentSecond")) null else json.getDouble("currentSecond").toFloat(),
             captionText = json.optString("captionText").takeIf(String::isNotBlank),
             previousCaptionText = json.optString("previousCaptionText").takeIf(String::isNotBlank),
+            audioUrl = json.optString("audioUrl").takeIf(String::isNotBlank),
+            audioMimeType = json.optString("audioMimeType").takeIf(String::isNotBlank),
+            audioUserAgent = json.optString("audioUserAgent").takeIf(String::isNotBlank),
         )
     }.getOrNull()
 }
@@ -252,6 +271,7 @@ internal val WEB_KARAOKE_SYNC_SCRIPT: String =
       let captionRoot = null;
       let captionObserver = null;
       let lastCaptionText = '';
+      let lastAudioVideoId = '';
 
       const activeVideo = function() {
         const videos = Array.from(document.querySelectorAll('video'));
@@ -263,6 +283,47 @@ internal val WEB_KARAOKE_SYNC_SCRIPT: String =
 
       const post = function(payload) {
         try { bridge.postMessage(JSON.stringify(payload)); } catch (_) {}
+      };
+
+      const emitAudioStream = function() {
+        const player = document.querySelector('#movie_player, .html5-video-player');
+        let response = null;
+        try {
+          response = player && typeof player.getPlayerResponse === 'function'
+            ? player.getPlayerResponse()
+            : window.ytInitialPlayerResponse;
+        } catch (_) {}
+        const videoId = response && response.videoDetails && response.videoDetails.videoId;
+        const formats = response && response.streamingData &&
+          Array.isArray(response.streamingData.adaptiveFormats)
+          ? response.streamingData.adaptiveFormats
+          : [];
+        if (!videoId || videoId === lastAudioVideoId || formats.length === 0) return;
+        const directAudio = formats
+          .filter(function(format) {
+            return format &&
+              typeof format.url === 'string' &&
+              format.url.startsWith('https://') &&
+              typeof format.mimeType === 'string' &&
+              format.mimeType.toLowerCase().startsWith('audio/');
+          })
+          .sort(function(left, right) {
+            return (left.bitrate || Number.MAX_SAFE_INTEGER) -
+              (right.bitrate || Number.MAX_SAFE_INTEGER);
+          });
+        const selected = directAudio.find(function(format) {
+          return format.mimeType.toLowerCase().startsWith('audio/mp4');
+        }) || directAudio[0];
+        if (!selected) return;
+        lastAudioVideoId = videoId;
+        post({
+          type: 'audioStream',
+          url: window.location.href,
+          currentSecond: null,
+          audioUrl: selected.url,
+          audioMimeType: selected.mimeType,
+          audioUserAgent: navigator.userAgent || null
+        });
       };
 
       const emitPlayback = function(second, now) {
@@ -335,6 +396,7 @@ internal val WEB_KARAOKE_SYNC_SCRIPT: String =
 
       ensureFrameClock();
       bindCaptionObserver();
+      emitAudioStream();
       setInterval(ensureFrameClock, 100);
       setInterval(function() {
         const video = activeVideo();
@@ -343,6 +405,7 @@ internal val WEB_KARAOKE_SYNC_SCRIPT: String =
         }
       }, 200);
       setInterval(bindCaptionObserver, 400);
+      setInterval(emitAudioStream, 1000);
     })();
     """.trimIndent()
 
@@ -616,6 +679,20 @@ internal fun SingleYouTubePage(
                                         observedAtMs = (second.coerceAtLeast(0f) * 1_000).toLong(),
                                     )
                                 }
+
+                                "audioStream" -> {
+                                    val selection = browseVideoSelection(event.url) ?: return
+                                    val audioUrl = event.audioUrl ?: return
+                                    val mimeType = event.audioMimeType ?: return
+                                    if (!mimeType.startsWith("audio/", ignoreCase = true)) return
+                                    if (!trustedYouTubeAudioStreamUrl(audioUrl)) return
+                                    latestYouTubeAudioStream = YouTubeAudioStream(
+                                        videoId = selection.videoId,
+                                        url = audioUrl,
+                                        mimeType = mimeType,
+                                        userAgent = event.audioUserAgent,
+                                    )
+                                }
                             }
                         }
                     },
@@ -687,6 +764,7 @@ internal fun SingleYouTubePage(
                     pageError = null
                     frameSyncedPlaybackActive = false
                     latestYouTubeCaptionObservation = null
+                    latestYouTubeAudioStream = null
                     if (url != null && handleMainFrameUrl(view, url)) return
                     reportNavigation(view, url)
                 }
