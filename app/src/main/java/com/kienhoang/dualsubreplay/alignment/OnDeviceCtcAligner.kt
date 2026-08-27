@@ -77,8 +77,7 @@ class OnDeviceCtcAligner(
                     word.timingSource != SubtitleTimingSource.YOUTUBE_EXACT
                 }
                 KaraokeSyncMode.SOFT_ANCHOR,
-                KaraokeSyncMode.ENHANCED,
-                -> segments[index].words.isNotEmpty()
+                KaraokeSyncMode.ENHANCED -> segments[index].words.isNotEmpty()
                 KaraokeSyncMode.ESTIMATED_ONLY -> false
             }
         }
@@ -189,8 +188,7 @@ class OnDeviceCtcAligner(
             KaraokeSyncMode.PR33_CURRENT ->
                 stabilizeAroundExactAnchors(segment.words, rawAcousticWords)
             KaraokeSyncMode.SOFT_ANCHOR,
-            KaraokeSyncMode.ENHANCED,
-            -> applySoftAnchorLimits(segment.words, rawAcousticWords)
+            KaraokeSyncMode.ENHANCED -> applySoftAnchorLimits(segment.words, rawAcousticWords)
             KaraokeSyncMode.ESTIMATED_ONLY -> return null
         }
         if (stabilized.none { it.timingSource == SubtitleTimingSource.ACOUSTIC_ALIGNED }) return null
@@ -434,7 +432,7 @@ private class AlignmentModelStore(
 
     fun status(): AcousticModelStatus = AcousticModelStatus(
         installed = modelFile.isFile && verifiedMarker.readTextOrNull()?.trim() == MODEL_SHA256,
-        sizeBytes = modelFile.takeIf(File::isFile)?.length() ?: 0L,
+        sizeBytes = modelFile.takeIf { it.isFile }?.length() ?: 0L,
     )
 
     fun deleteModel(): Boolean {
