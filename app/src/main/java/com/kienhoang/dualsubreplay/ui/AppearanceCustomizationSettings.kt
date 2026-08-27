@@ -118,6 +118,8 @@ internal fun AdvancedAppearanceSettings() {
         },
         testTagPrefix = "theme_accent",
     )
+
+    ExperimentalKaraokeSyncSettings()
 }
 
 @Composable
