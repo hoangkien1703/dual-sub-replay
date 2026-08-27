@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kienhoang.dualsubreplay.alignment.AcousticModelStatus
 import com.kienhoang.dualsubreplay.alignment.OnDeviceCtcAligner
 import com.kienhoang.dualsubreplay.data.KaraokeSyncDiagnostics
@@ -41,6 +42,7 @@ import kotlin.math.roundToInt
 @Composable
 internal fun ExperimentalKaraokeSyncSettings() {
     val context = LocalContext.current
+    val appViewModel: AppViewModel = viewModel()
     val aligner = remember(context) { OnDeviceCtcAligner(context) }
     val scope = rememberCoroutineScope()
     var selectedMode by remember { mutableStateOf(KaraokeSyncPreferences.mode(context)) }
@@ -57,13 +59,21 @@ internal fun ExperimentalKaraokeSyncSettings() {
     var modelBusy by remember { mutableStateOf(false) }
     var modelMessage by remember { mutableStateOf<String?>(null) }
     val diagnostics by KaraokeSyncDiagnostics.entries.collectAsState()
+    val selectMode: (KaraokeSyncMode) -> Unit = { mode ->
+        if (selectedMode != mode) {
+            selectedMode = mode
+            KaraokeSyncPreferences.setMode(context, mode)
+            KaraokeSyncDiagnostics.clear()
+            appViewModel.retryCaptions()
+        }
+    }
 
     Spacer(Modifier.height(14.dp))
     HorizontalDivider()
     Spacer(Modifier.height(14.dp))
     Text("Experimental karaoke sync", style = MaterialTheme.typography.titleSmall)
     Text(
-        "Compare synchronization strategies on the same difficult video before changing the default.",
+        "Compare synchronization strategies on the same difficult video before changing the default. Changing modes automatically reruns the current caption pipeline.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
@@ -74,40 +84,28 @@ internal fun ExperimentalKaraokeSyncSettings() {
         selected = selectedMode,
         title = "PR #33 current",
         description = "Hard YouTube anchors + acoustic alignment. Use this as the control.",
-        onSelect = {
-            selectedMode = it
-            KaraokeSyncPreferences.setMode(context, it)
-        },
+        onSelect = selectMode,
     )
     KaraokeSyncModeOption(
         mode = KaraokeSyncMode.SOFT_ANCHOR,
         selected = selectedMode,
         title = "Soft YouTube anchors",
         description = "Acoustic timing may move generated-caption anchors by up to ±400 ms.",
-        onSelect = {
-            selectedMode = it
-            KaraokeSyncPreferences.setMode(context, it)
-        },
+        onSelect = selectMode,
     )
     KaraokeSyncModeOption(
         mode = KaraokeSyncMode.ENHANCED,
         selected = selectedMode,
         title = "Enhanced acoustic sync",
         description = "Soft anchors + larger overlapping audio context + conservative silence trimming.",
-        onSelect = {
-            selectedMode = it
-            KaraokeSyncPreferences.setMode(context, it)
-        },
+        onSelect = selectMode,
     )
     KaraokeSyncModeOption(
         mode = KaraokeSyncMode.ESTIMATED_ONLY,
         selected = selectedMode,
         title = "Estimated only",
         description = "Disable acoustic alignment. Useful as a baseline/control.",
-        onSelect = {
-            selectedMode = it
-            KaraokeSyncPreferences.setMode(context, it)
-        },
+        onSelect = selectMode,
     )
 
     Spacer(Modifier.height(12.dp))
@@ -170,6 +168,8 @@ internal fun ExperimentalKaraokeSyncSettings() {
             onCheckedChange = { enabled ->
                 acousticEnabled = enabled
                 KaraokeSyncPreferences.setAcousticModelEnabled(context, enabled)
+                KaraokeSyncDiagnostics.clear()
+                appViewModel.retryCaptions()
             },
             modifier = Modifier.testTag("karaoke_acoustic_enabled"),
         )
@@ -190,7 +190,9 @@ internal fun ExperimentalKaraokeSyncSettings() {
                             .onSuccess { status ->
                                 modelStatus = status
                                 acousticEnabled = true
-                                modelMessage = "English acoustic model installed."
+                                modelMessage = "English acoustic model installed and enabled."
+                                KaraokeSyncDiagnostics.clear()
+                                appViewModel.retryCaptions()
                             }
                             .onFailure { error ->
                                 modelMessage = error.message ?: "Model download failed."
@@ -215,6 +217,8 @@ internal fun ExperimentalKaraokeSyncSettings() {
                     val deleted = aligner.deleteModel()
                     modelStatus = aligner.modelStatus()
                     modelMessage = if (deleted) "Acoustic model deleted." else "Could not delete the model."
+                    KaraokeSyncDiagnostics.clear()
+                    appViewModel.retryCaptions()
                 },
                 modifier = Modifier.testTag("delete_acoustic_model"),
             ) {
@@ -277,6 +281,23 @@ internal fun ExperimentalKaraokeSyncSettings() {
                 )
             }
         }
+    }
+
+    Spacer(Modifier.height(10.dp))
+    OutlinedButton(
+        onClick = {
+            selectedMode = KaraokeSyncMode.PR33_CURRENT
+            KaraokeSyncPreferences.setMode(context, selectedMode)
+            highlightLeadMs = KaraokeSyncPreferences.DEFAULT_HIGHLIGHT_LEAD_MS
+            KaraokeSyncPreferences.setHighlightLeadMs(context, highlightLeadMs)
+            diagnosticsEnabled = false
+            KaraokeSyncPreferences.setDiagnosticsEnabled(context, false)
+            KaraokeSyncDiagnostics.clear()
+            appViewModel.retryCaptions()
+        },
+        modifier = Modifier.testTag("reset_karaoke_sync_settings"),
+    ) {
+        Text("Reset sync settings")
     }
 }
 
