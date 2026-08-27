@@ -5,7 +5,6 @@ import com.kienhoang.dualsubreplay.data.SubtitleTimingSource
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -25,7 +24,7 @@ class AcousticAlignmentBridgeTest {
 
     @Test
     fun `audio stream bridge message carries direct adaptive format metadata`() {
-        val message = assertNotNull(
+        val message = requireNotNull(
             parseWebKaraokeSyncMessage(
                 """
                 {
@@ -38,7 +37,7 @@ class AcousticAlignmentBridgeTest {
                 }
                 """.trimIndent(),
             ),
-        ) as WebKaraokeSyncMessage
+        )
 
         assertEquals("audioStream", message.type)
         assertEquals("https://rr1.googlevideo.com/videoplayback?sig=abc", message.audioUrl)

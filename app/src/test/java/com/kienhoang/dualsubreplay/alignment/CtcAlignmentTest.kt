@@ -1,14 +1,13 @@
 package com.kienhoang.dualsubreplay.alignment
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CtcAlignmentTest {
     @Test
     fun `target uses wav2vec alphabet and preserves visible word indices`() {
-        val target = assertNotNull(ctcTargetForWords(listOf("Hello,", "4you", "can't"))) as CtcTarget
+        val target = requireNotNull(ctcTargetForWords(listOf("Hello,", "4you", "can't")))
 
         assertEquals("HELLO YOU CAN'T", target.normalizedText)
         assertTrue(target.labels.any { it.tokenId == CTC_WORD_DELIMITER_ID && it.wordIndex == -1 })
@@ -24,7 +23,7 @@ class CtcAlignmentTest {
 
     @Test
     fun `viterbi places words on their acoustic frames`() {
-        val target = assertNotNull(ctcTargetForWords(listOf("H", "I"))) as CtcTarget
+        val target = requireNotNull(ctcTargetForWords(listOf("H", "I")))
         val logits = logitsForPath(
             intArrayOf(
                 CTC_BLANK_ID,
@@ -35,9 +34,9 @@ class CtcAlignmentTest {
             ),
         )
 
-        val labelSpans = assertNotNull(
+        val labelSpans = requireNotNull(
             viterbiCtcAlignment(logits, 5, CTC_VOCAB_SIZE, target),
-        ) as List<CtcFrameSpan>
+        )
         val words = ctcWordFrameSpans(target, labelSpans)
 
         assertEquals(CtcFrameSpan(1, 1), words[0])
@@ -46,7 +45,7 @@ class CtcAlignmentTest {
 
     @Test
     fun `viterbi requires a blank between repeated letters`() {
-        val target = assertNotNull(ctcTargetForWords(listOf("LL"))) as CtcTarget
+        val target = requireNotNull(ctcTargetForWords(listOf("LL")))
         val logits = logitsForPath(
             intArrayOf(
                 CTC_BLANK_ID,
@@ -57,9 +56,9 @@ class CtcAlignmentTest {
             ),
         )
 
-        val labelSpans = assertNotNull(
+        val labelSpans = requireNotNull(
             viterbiCtcAlignment(logits, 5, CTC_VOCAB_SIZE, target),
-        ) as List<CtcFrameSpan>
+        )
         val words = ctcWordFrameSpans(target, labelSpans)
 
         assertEquals(CtcFrameSpan(1, 3), words[0])
