@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.kienhoang.dualsubreplay.data.KaraokeSyncPreferences
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
 
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        KaraokeSyncPreferences.initialize(applicationContext)
         enableEdgeToEdge()
         allowContentInDisplayCutout()
         updateImmersiveMode(resources.configuration)
