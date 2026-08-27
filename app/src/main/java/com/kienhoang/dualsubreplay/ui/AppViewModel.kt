@@ -134,9 +134,7 @@ internal fun shouldUseAcousticAlignment(
     segments: List<SubtitleSegment>,
 ): Boolean = generated &&
     TranslationLanguages.normalize(sourceLanguage) == "en" &&
-    segments.any { segment ->
-        segment.words.any { word -> word.timingSource == SubtitleTimingSource.ESTIMATED }
-    }
+    segments.any { segment -> segment.words.isNotEmpty() }
 
 /**
  * Translation and acoustic alignment run independently. Translation snapshots
@@ -683,6 +681,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     sourceLanguage = track.languageCode,
                     generated = track.isGenerated,
                     segments = merged,
+                    initialSource = track.audioStream,
                 )
 
                 translateSegments(
@@ -712,12 +711,30 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         sourceLanguage: String,
         generated: Boolean,
         segments: List<SubtitleSegment>,
+        initialSource: YouTubeAudioStream?,
     ) {
-        if (!shouldUseAcousticAlignment(generated, sourceLanguage, segments)) return
+        if (!shouldUseAcousticAlignment(generated, sourceLanguage, segments)) {
+            Log.d("DualSubAlignment", "Skipped ineligible caption track ($sourceLanguage, generated=$generated).")
+            return
+        }
+        if (!acousticAligner.readyForAlignment()) {
+            Log.d("DualSubAlignment", "Skipped because the optional model is not enabled and installed.")
+            return
+        }
 
         alignmentJob = viewModelScope.launch {
             try {
-                val source = waitForYouTubeAudioStream(videoId, generation) ?: return@launch
+                val source = initialSource
+                    ?.takeIf { it.videoId == videoId }
+                    ?: waitForYouTubeAudioStream(videoId, generation)
+                if (source == null) {
+                    Log.w("DualSubAlignment", "No trusted audio stream became available for $videoId.")
+                    return@launch
+                }
+                Log.d(
+                    "DualSubAlignment",
+                    "Starting acoustic alignment from ${if (initialSource != null) "native player fallback" else "WebView player"}.",
+                )
                 val preferredIndex = nearestSegmentIndex(segments, latestPlaybackSecondMs)
                 val alignedCount = acousticAligner.alignSegments(
                     source = source,

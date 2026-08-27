@@ -46,9 +46,11 @@ jobs:
         run: |
           set -euo pipefail
           python -m onnxruntime.tools.convert_onnx_models_to_ort \
-            --optimization_style Fixed \
-            wav2vec2-base-960h-q4.onnx
+            wav2vec2-base-960h-q4.onnx \
+            --optimization_style=Fixed \
+            --enable_type_reduction
           test -f wav2vec2-base-960h-q4.ort
+          test -f wav2vec2-base-960h-q4.required_operators_and_types.config
 
       - name: Smoke-test converted model
         shell: bash
@@ -77,7 +79,10 @@ jobs:
         run: |
           set -euo pipefail
           sha256sum wav2vec2-base-960h-q4.ort | tee wav2vec2-base-960h-q4.ort.sha256
-          ls -lh wav2vec2-base-960h-q4.onnx wav2vec2-base-960h-q4.ort
+          ls -lh \
+            wav2vec2-base-960h-q4.onnx \
+            wav2vec2-base-960h-q4.ort \
+            wav2vec2-base-960h-q4.required_operators_and_types.config
 
       - name: Publish optional acoustic model
         env:
@@ -94,5 +99,6 @@ jobs:
           gh release upload acoustic-models \
             wav2vec2-base-960h-q4.ort \
             wav2vec2-base-960h-q4.ort.sha256 \
+            wav2vec2-base-960h-q4.required_operators_and_types.config \
             mobile-usability.txt \
             --clobber

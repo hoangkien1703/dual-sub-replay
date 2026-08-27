@@ -149,6 +149,38 @@ internal fun orderedTextCoverage(target: String, observed: String): Float {
 }
 
 /**
+ * Word-level companion to [orderedTextCoverage]. Character coverage alone can
+ * look high when a noisy window contains repeated short words in the wrong
+ * places. Requiring ordered whole-word matches makes enhanced alignment fail
+ * closed instead of forcing a plausible-looking but incorrect CTC path.
+ */
+internal fun orderedWordCoverage(target: String, observed: String): Float {
+    fun tokens(value: String): List<String> = Regex("[A-Z]+(?:'[A-Z]+)?")
+        .findAll(value.uppercase())
+        .map { it.value }
+        .toList()
+
+    val left = tokens(target)
+    val right = tokens(observed)
+    if (left.isEmpty() || right.isEmpty()) return 0f
+
+    val previous = IntArray(right.size + 1)
+    val current = IntArray(right.size + 1)
+    for (i in left.indices) {
+        for (j in right.indices) {
+            current[j + 1] = if (left[i] == right[j]) {
+                previous[j] + 1
+            } else {
+                maxOf(current[j], previous[j + 1])
+            }
+        }
+        current.copyInto(previous)
+        current.fill(0)
+    }
+    return previous[right.size].toFloat() / left.size
+}
+
+/**
  * Standard CTC Viterbi trellis. The expanded state sequence inserts a blank
  * between every transcript token, which correctly handles repeated letters.
  */

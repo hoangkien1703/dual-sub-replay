@@ -13,7 +13,7 @@ internal enum class KaraokeSyncMode(val preferenceValue: String) {
 
     companion object {
         fun fromPreference(value: String?): KaraokeSyncMode =
-            entries.firstOrNull { it.preferenceValue == value } ?: PR33_CURRENT
+            entries.firstOrNull { it.preferenceValue == value } ?: ENHANCED
     }
 }
 
@@ -50,7 +50,7 @@ internal object KaraokeSyncPreferences {
     const val DEFAULT_HIGHLIGHT_LEAD_MS = 20L
     const val MIN_HIGHLIGHT_LEAD_MS = -200L
     const val MAX_HIGHLIGHT_LEAD_MS = 300L
-    const val SOFT_ANCHOR_RANGE_MS = 400L
+    const val SOFT_ANCHOR_RANGE_MS = 1_000L
 
     private const val PREFERENCES_NAME = "dual_sub_preferences"
     private const val MODE_KEY = "karaoke_sync_mode"

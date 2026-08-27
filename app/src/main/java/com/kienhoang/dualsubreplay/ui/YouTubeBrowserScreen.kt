@@ -57,6 +57,7 @@ import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.data.YouTubeAudioStream
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
+import com.kienhoang.dualsubreplay.data.trustedYouTubeAudioStreamUrl
 import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
@@ -221,15 +222,6 @@ internal fun isTrustedYouTubeOrigin(origin: String): Boolean {
     if (!uri.scheme.equals("https", ignoreCase = true)) return false
     val host = uri.host?.lowercase()?.removeSuffix(".") ?: return false
     return host == "youtube.com" || host.endsWith(".youtube.com")
-}
-
-internal fun trustedYouTubeAudioStreamUrl(rawUrl: String): Boolean {
-    val uri = runCatching { URI(rawUrl) }.getOrNull() ?: return false
-    if (!uri.scheme.equals("https", ignoreCase = true)) return false
-    if (uri.rawUserInfo != null || uri.port !in setOf(-1, 443)) return false
-    val host = uri.host?.lowercase()?.removeSuffix(".") ?: return false
-    if (host != "googlevideo.com" && !host.endsWith(".googlevideo.com")) return false
-    return uri.path?.endsWith("/videoplayback") == true
 }
 
 internal fun parseWebKaraokeSyncMessage(raw: String?): WebKaraokeSyncMessage? {

@@ -171,6 +171,54 @@ internal fun captionCandidateUrls(baseUrl: String): List<HttpUrl> {
     ).distinct()
 }
 
+internal fun audioStreamFromPlayerResponse(
+    root: JSONObject,
+    requestedVideoId: String,
+    userAgent: String,
+): YouTubeAudioStream? {
+    val responseVideoId = root.optJSONObject("videoDetails")
+        ?.optString("videoId")
+        ?.takeIf(String::isNotBlank)
+        ?: requestedVideoId
+    if (responseVideoId != requestedVideoId) return null
+    val streamingData = root.optJSONObject("streamingData") ?: return null
+
+    fun candidates(arrayName: String): List<JSONObject> {
+        val formats = streamingData.optJSONArray(arrayName) ?: return emptyList()
+        return (0 until formats.length()).mapNotNull(formats::optJSONObject)
+    }
+
+    val adaptiveAudio = candidates("adaptiveFormats")
+        .filter { format ->
+            format.optString("mimeType").startsWith("audio/", ignoreCase = true) &&
+                trustedYouTubeAudioStreamUrl(format.optString("url"))
+        }
+        .sortedWith(
+            compareByDescending<JSONObject> { format ->
+                if (format.optJSONObject("audioTrack")?.optBoolean("audioIsDefault", false) == true) 1 else 0
+            }.thenByDescending { format ->
+                if (format.optString("mimeType").startsWith("audio/mp4", ignoreCase = true)) 1 else 0
+            }.thenBy { format -> format.optLong("bitrate", Long.MAX_VALUE) },
+        )
+
+    // Current Android player responses can expose adaptive formats through
+    // SABR without individual URLs. A low-bitrate progressive MP4 still has a
+    // signed URL and MediaExtractor can select its audio track with range reads.
+    val progressiveAudio = candidates("formats")
+        .filter { format ->
+            format.has("audioQuality") && trustedYouTubeAudioStreamUrl(format.optString("url"))
+        }
+        .sortedBy { format -> format.optLong("bitrate", Long.MAX_VALUE) }
+
+    val selected = adaptiveAudio.firstOrNull() ?: progressiveAudio.firstOrNull() ?: return null
+    return YouTubeAudioStream(
+        videoId = requestedVideoId,
+        url = selected.getString("url"),
+        mimeType = selected.optString("mimeType").takeIf(String::isNotBlank),
+        userAgent = userAgent,
+    )
+}
+
 internal fun readUtf8WithLimit(
     input: InputStream,
     maxBytes: Int = MAX_YOUTUBE_RESPONSE_BYTES,
@@ -282,15 +330,19 @@ class YouTubeCaptionProvider(
         }
         var sawNonTrackFailure = false
 
+        var fallbackCaptionResult: CaptionTrackResult? = null
         extractInitialPlayerResponse(watchHtml)?.let { embeddedPlayer ->
             try {
-                return captionResultFromPlayerResponse(
+                val result = captionResultFromPlayerResponse(
                     root = embeddedPlayer,
+                    videoId = videoId,
                     preferredLanguages = preferredLanguages,
                     userAgent = WEB_USER_AGENT,
                     deadlineNanos = deadlineNanos,
                     noTracksMessage = "The watch page embedded no public caption track.",
                 )
+                if (result.audioStream != null) return result
+                fallbackCaptionResult = result
             } catch (error: CaptionLookupTimeoutException) {
                 throw error
             } catch (error: ResponseLimitExceededException) {
@@ -310,13 +362,15 @@ class YouTubeCaptionProvider(
         for (profile in profiles) {
             ensureLookupTimeRemaining(deadlineNanos, "trying ${profile.label}")
             try {
-                return fetchWithClient(
+                val result = fetchWithClient(
                     videoId = videoId,
                     preferredLanguages = preferredLanguages,
                     apiKey = apiKey,
                     profile = profile,
                     deadlineNanos = deadlineNanos,
                 )
+                if (result.audioStream != null) return result
+                if (fallbackCaptionResult == null) fallbackCaptionResult = result
             } catch (error: CaptionLookupTimeoutException) {
                 throw error
             } catch (error: ResponseLimitExceededException) {
@@ -332,6 +386,8 @@ class YouTubeCaptionProvider(
                 lastServiceFailure = failure
             }
         }
+
+        fallbackCaptionResult?.let { return it }
 
         if (!sawNonTrackFailure && failures.isNotEmpty()) {
             throw CaptionUnavailableException("This video does not provide a public caption track.", lastError)
@@ -390,6 +446,7 @@ class YouTubeCaptionProvider(
                 )
                 return captionResultFromPlayerResponse(
                     root = JSONObject(playerJson),
+                    videoId = videoId,
                     preferredLanguages = preferredLanguages,
                     userAgent = profile.userAgent,
                     deadlineNanos = deadlineNanos,
@@ -408,6 +465,7 @@ class YouTubeCaptionProvider(
 
     private fun captionResultFromPlayerResponse(
         root: JSONObject,
+        videoId: String,
         preferredLanguages: List<String>,
         userAgent: String,
         deadlineNanos: Long,
@@ -445,6 +503,7 @@ class YouTubeCaptionProvider(
                 selected.optString("vssId").startsWith("a."),
             cues = cues,
             availableLanguages = availableLanguages(tracks),
+            audioStream = audioStreamFromPlayerResponse(root, videoId, userAgent),
         )
     }
 

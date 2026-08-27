@@ -53,6 +53,7 @@ jobs:
             -PpreviewVersionCode="$preview_version_code" \
             -PpreviewVersionNameSuffix="-ci-build${GITHUB_RUN_NUMBER}" \
             -PpreviewApplicationIdSuffix=".preview" \
+            -PtargetAbi=arm64-v8a \
             --stacktrace
 
       - name: Verify preview package id
@@ -178,6 +179,8 @@ jobs:
             Most people should install the [latest official release](https://github.com/${{ github.repository }}/releases/latest) instead.
 
             Preview APKs install as **DualSub Replay Preview** with a separate Android package id, so they can coexist with the official app and no longer require reinstalling or uninstalling the production build.
+
+            This compact preview targets ARM64 Android phones. The optional acoustic model downloads separately after installation.
           files: release/DualSub-Replay-preview.apk
           overwrite_files: true
 

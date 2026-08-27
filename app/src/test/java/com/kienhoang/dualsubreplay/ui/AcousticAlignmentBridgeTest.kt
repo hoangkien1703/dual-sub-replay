@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleTimingSource
 import com.kienhoang.dualsubreplay.data.SubtitleWord
+import com.kienhoang.dualsubreplay.data.trustedYouTubeAudioStreamUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -54,14 +55,14 @@ class AcousticAlignmentBridgeTest {
     }
 
     @Test
-    fun `acoustic alignment is limited to generated English captions needing estimates`() {
+    fun `acoustic alignment covers generated English captions even when anchors are exact`() {
         val estimated = subtitle(SubtitleTimingSource.ESTIMATED)
         val exact = subtitle(SubtitleTimingSource.YOUTUBE_EXACT)
 
         assertTrue(shouldUseAcousticAlignment(true, "en", listOf(estimated)))
         assertFalse(shouldUseAcousticAlignment(false, "en", listOf(estimated)))
         assertFalse(shouldUseAcousticAlignment(true, "fr", listOf(estimated)))
-        assertFalse(shouldUseAcousticAlignment(true, "en", listOf(exact)))
+        assertTrue(shouldUseAcousticAlignment(true, "en", listOf(exact)))
     }
 
     @Test

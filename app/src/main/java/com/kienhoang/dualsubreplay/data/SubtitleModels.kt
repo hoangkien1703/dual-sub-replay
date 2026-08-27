@@ -36,6 +36,7 @@ data class CaptionTrackResult(
     val isGenerated: Boolean,
     val cues: List<RawCaptionCue>,
     val availableLanguages: List<CaptionLanguage> = emptyList(),
+    val audioStream: YouTubeAudioStream? = null,
 )
 
 data class CaptionLanguage(

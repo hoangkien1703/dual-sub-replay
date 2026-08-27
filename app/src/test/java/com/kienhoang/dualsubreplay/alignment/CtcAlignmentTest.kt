@@ -19,6 +19,9 @@ class CtcAlignmentTest {
     fun `greedy coverage accepts transcript surrounded by audio context`() {
         assertTrue(orderedTextCoverage("HELLO WORLD", "SO HELLO WORLD TODAY") > 0.95f)
         assertTrue(orderedTextCoverage("HELLO WORLD", "UNRELATED SPEECH") < 0.5f)
+        assertEquals(1f, orderedWordCoverage("HELLO WORLD", "SO HELLO WORLD TODAY"))
+        assertEquals(0.5f, orderedWordCoverage("HELLO WORLD", "HELLO THERE"))
+        assertEquals(0f, orderedWordCoverage("HELLO WORLD", "SHELL LOW WORLDLY"))
     }
 
     @Test

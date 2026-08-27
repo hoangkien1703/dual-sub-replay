@@ -4,9 +4,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class KaraokeSyncPreferencesTest {
-    @Test fun unknownModeFallsBackToPr33Control() {
+    @Test fun unknownModeFallsBackToEnhancedSync() {
         assertEquals(
-            KaraokeSyncMode.PR33_CURRENT,
+            KaraokeSyncMode.ENHANCED,
             KaraokeSyncMode.fromPreference("future-mode"),
         )
         assertEquals(

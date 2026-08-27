@@ -50,6 +50,9 @@ class OnDeviceCtcAligner(
 
     internal fun modelStatus(): AcousticModelStatus = modelStore.status()
 
+    internal fun readyForAlignment(): Boolean =
+        KaraokeSyncPreferences.acousticModelEnabled(appContext) && modelStore.status().installed
+
     internal suspend fun downloadModel(): AcousticModelStatus {
         modelStore.requireModel()
         KaraokeSyncPreferences.setAcousticModelEnabled(appContext, true)
@@ -71,7 +74,7 @@ class OnDeviceCtcAligner(
         if (mode == KaraokeSyncMode.ESTIMATED_ONLY) return 0
         if (!KaraokeSyncPreferences.acousticModelEnabled(appContext)) return 0
 
-        val eligibleIndices = alignmentOrder(segments.size, preferredIndex).filter { index ->
+        val eligibleIndices = segments.indices.filter { index ->
             when (mode) {
                 KaraokeSyncMode.PR33_CURRENT -> segments[index].words.any { word ->
                     word.timingSource != SubtitleTimingSource.YOUTUBE_EXACT
@@ -86,6 +89,7 @@ class OnDeviceCtcAligner(
         val modelFile = modelStore.requireModel()
         val environment = OrtEnvironment.getEnvironment()
         var alignedCount = 0
+        val emittedIndices = mutableSetOf<Int>()
 
         OrtSession.SessionOptions().use { options ->
             options.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
@@ -93,14 +97,37 @@ class OnDeviceCtcAligner(
                 Runtime.getRuntime().availableProcessors().coerceIn(1, MAX_INFERENCE_THREADS),
             )
             environment.createSession(modelFile.absolutePath, options).use { session ->
-                for (index in eligibleIndices) {
+                val plans = if (mode == KaraokeSyncMode.ENHANCED) {
+                    alignmentWindowPlans(segments, preferredIndex)
+                } else {
+                    alignmentOrder(segments.size, preferredIndex)
+                        .filter(eligibleIndices::contains)
+                        .map { index -> AlignmentWindowPlan(index..index, index..index) }
+                }
+                Log.d(LOG_TAG, "Prepared ${plans.size} acoustic alignment windows for ${segments.size} segments.")
+                for (plan in plans) {
                     currentCoroutineContext().ensureActive()
-                    val aligned = runCatching {
-                        alignOne(session, source, segments[index], mode)
+                    val alignedSegments = runCatching {
+                        alignWindow(session, source, segments, plan, mode)
                     }.onFailure { error ->
-                        Log.w(LOG_TAG, "Acoustic alignment skipped segment $index.", error)
-                    }.getOrNull()
-                    if (aligned != null) {
+                        Log.w(
+                            LOG_TAG,
+                            "Acoustic alignment skipped window ${plan.contextIndices}.",
+                            error,
+                        )
+                    }.getOrNull().orEmpty()
+
+                    val output = if (alignedSegments.isNotEmpty() || mode != KaraokeSyncMode.ENHANCED) {
+                        alignedSegments
+                    } else {
+                        // A long window can fail on noise or unusual text. Preserve
+                        // the previous per-segment path as a conservative fallback.
+                        plan.outputIndices.mapNotNull { index ->
+                            alignOne(session, source, segments[index], mode)?.let { index to it }
+                        }
+                    }
+                    for ((index, aligned) in output) {
+                        if (index !in eligibleIndices || !emittedIndices.add(index)) continue
                         onAligned(index, aligned)
                         alignedCount += 1
                     }
@@ -108,6 +135,31 @@ class OnDeviceCtcAligner(
             }
         }
         return alignedCount
+    }
+
+    private suspend fun alignWindow(
+        session: OrtSession,
+        source: YouTubeAudioStream,
+        segments: List<SubtitleSegment>,
+        plan: AlignmentWindowPlan,
+        mode: KaraokeSyncMode,
+    ): List<Pair<Int, SubtitleSegment>> {
+        val contextIndices = plan.contextIndices.filter(segments.indices::contains)
+        if (contextIndices.isEmpty()) return emptyList()
+        val contextSegments = contextIndices.map(segments::get)
+        val combinedWords = contextSegments.flatMap(SubtitleSegment::words)
+        if (combinedWords.isEmpty()) return emptyList()
+
+        val combined = SubtitleSegment(
+            id = contextSegments.first().id,
+            startMs = contextSegments.first().startMs,
+            endMs = contextSegments.last().endMs,
+            originalText = contextSegments.joinToString(" ") { it.originalText },
+            words = combinedWords,
+        )
+        val aligned = alignOne(session, source, combined, mode) ?: return emptyList()
+
+        return splitAlignedWindow(segments, plan, aligned.words)
     }
 
     private suspend fun alignOne(
@@ -142,12 +194,16 @@ class OnDeviceCtcAligner(
             vocabSize = inference.vocabSize,
         )
         val coverage = orderedTextCoverage(target.normalizedText, greedyText)
+        val wordCoverage = orderedWordCoverage(target.normalizedText, greedyText)
         val requiredCoverage = if (mode == KaraokeSyncMode.PR33_CURRENT) {
             MIN_TEXT_COVERAGE
         } else {
             MIN_SOFT_ANCHOR_TEXT_COVERAGE
         }
         if (coverage < requiredCoverage) return null
+        if (mode == KaraokeSyncMode.ENHANCED && wordCoverage < MIN_ENHANCED_WORD_COVERAGE) {
+            return null
+        }
 
         val labelSpans = withContext(Dispatchers.Default) {
             viterbiCtcAlignment(
@@ -352,7 +408,7 @@ class OnDeviceCtcAligner(
     /**
      * Auto-caption anchors are priors in the experimental modes, not immutable
      * phoneme boundaries. Strong CTC timing may move an anchored word within a
-     * conservative +/-400 ms search range while estimated words remain free.
+     * conservative +/-1,000 ms search range while estimated words remain free.
      */
     private fun applySoftAnchorLimits(
         original: List<SubtitleWord>,
@@ -405,6 +461,7 @@ class OnDeviceCtcAligner(
         private const val MIN_TARGET_LABELS = 2
         private const val MIN_TEXT_COVERAGE = 0.52f
         private const val MIN_SOFT_ANCHOR_TEXT_COVERAGE = 0.65f
+        private const val MIN_ENHANCED_WORD_COVERAGE = 0.60f
         private const val MIN_ALIGNED_WORD_MS = 25L
         private const val MAX_INFERENCE_THREADS = 4
         private const val VAD_FRAME_MS = 20

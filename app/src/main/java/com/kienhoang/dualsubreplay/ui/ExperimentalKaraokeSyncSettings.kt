@@ -90,14 +90,14 @@ internal fun ExperimentalKaraokeSyncSettings() {
         mode = KaraokeSyncMode.SOFT_ANCHOR,
         selected = selectedMode,
         title = "Soft YouTube anchors",
-        description = "Acoustic timing may move generated-caption anchors by up to ±400 ms.",
+        description = "Acoustic timing may move generated-caption anchors by up to ±1,000 ms.",
         onSelect = selectMode,
     )
     KaraokeSyncModeOption(
         mode = KaraokeSyncMode.ENHANCED,
         selected = selectedMode,
         title = "Enhanced acoustic sync",
-        description = "Soft anchors + larger overlapping audio context + conservative silence trimming.",
+        description = "Recommended. Aligns overlapping transcript windows with soft anchors and silence trimming.",
         onSelect = selectMode,
     )
     KaraokeSyncModeOption(
@@ -286,7 +286,7 @@ internal fun ExperimentalKaraokeSyncSettings() {
     Spacer(Modifier.height(10.dp))
     OutlinedButton(
         onClick = {
-            selectedMode = KaraokeSyncMode.PR33_CURRENT
+            selectedMode = KaraokeSyncMode.ENHANCED
             KaraokeSyncPreferences.setMode(context, selectedMode)
             highlightLeadMs = KaraokeSyncPreferences.DEFAULT_HIGHLIGHT_LEAD_MS
             KaraokeSyncPreferences.setHighlightLeadMs(context, highlightLeadMs)

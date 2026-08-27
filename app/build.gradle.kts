@@ -20,6 +20,14 @@ val requireReleaseSigning = providers.gradleProperty("requireReleaseSigning").or
 val previewVersionCode = providers.gradleProperty("previewVersionCode").orNull?.toIntOrNull()
 val previewVersionNameSuffix = providers.gradleProperty("previewVersionNameSuffix").orNull.orEmpty()
 val previewApplicationIdSuffix = providers.gradleProperty("previewApplicationIdSuffix").orNull.orEmpty()
+val targetAbi = providers.gradleProperty("targetAbi").orNull?.takeIf(String::isNotBlank)
+val supportedTargetAbis = setOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
+
+if (targetAbi != null && targetAbi !in supportedTargetAbis) {
+    throw GradleException(
+        "Unsupported targetAbi '$targetAbi'. Expected one of ${supportedTargetAbis.joinToString()}.",
+    )
+}
 
 if (requireReleaseSigning && !hasReleaseSigning) {
     throw GradleException(
@@ -41,6 +49,13 @@ android {
         versionName = appVersionName + previewVersionNameSuffix
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // The full ONNX and ML Kit runtimes both contain native code. GitHub
+        // releases can build one APK per ABI so users do not download four
+        // copies of those libraries. Omit -PtargetAbi for a universal APK.
+        ndk {
+            targetAbi?.let { abiFilters += it }
+        }
     }
 
     buildFeatures {

@@ -8,6 +8,8 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** Regression coverage for the August 2026 YouTube caption retrieval incident. */
 class YouTubeCaptionProviderTest {
@@ -98,4 +100,65 @@ class YouTubeCaptionProviderTest {
             readUtf8WithLimit(ByteArrayInputStream(body), maxBytes = body.size - 1)
         }
     }
+
+    @Test
+    fun prefersTheOriginalDirectAdaptiveAudioTrack() {
+        val dubbed = audioFormat(
+            url = "https://dubbed.googlevideo.com/videoplayback?sig=dubbed",
+            bitrate = 32_000L,
+            isDefault = false,
+        )
+        val original = audioFormat(
+            url = "https://original.googlevideo.com/videoplayback?sig=original",
+            bitrate = 48_000L,
+            isDefault = true,
+        )
+        val root = playerResponse(adaptiveFormats = JSONArray().put(dubbed).put(original))
+
+        val stream = audioStreamFromPlayerResponse(root, "abcdefghijk", "test-agent")
+
+        assertEquals("https://original.googlevideo.com/videoplayback?sig=original", stream?.url)
+        assertEquals("test-agent", stream?.userAgent)
+    }
+
+    @Test
+    fun fallsBackToProgressiveMp4WhenSabrOmitsAdaptiveUrls() {
+        val progressive = JSONObject()
+            .put("url", "https://progressive.googlevideo.com/videoplayback?sig=progressive")
+            .put("mimeType", "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"")
+            .put("bitrate", 600_000L)
+            .put("audioQuality", "AUDIO_QUALITY_LOW")
+        val root = playerResponse(
+            adaptiveFormats = JSONArray().put(
+                JSONObject()
+                    .put("mimeType", "audio/mp4; codecs=\"mp4a.40.2\"")
+                    .put("bitrate", 48_000L),
+            ),
+            formats = JSONArray().put(progressive),
+        )
+
+        val stream = audioStreamFromPlayerResponse(root, "abcdefghijk", "test-agent")
+
+        assertEquals("https://progressive.googlevideo.com/videoplayback?sig=progressive", stream?.url)
+        assertEquals("video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"", stream?.mimeType)
+    }
+
+    private fun audioFormat(url: String, bitrate: Long, isDefault: Boolean): JSONObject =
+        JSONObject()
+            .put("url", url)
+            .put("mimeType", "audio/mp4; codecs=\"mp4a.40.2\"")
+            .put("bitrate", bitrate)
+            .put("audioTrack", JSONObject().put("audioIsDefault", isDefault))
+
+    private fun playerResponse(
+        adaptiveFormats: JSONArray,
+        formats: JSONArray = JSONArray(),
+    ): JSONObject = JSONObject()
+        .put("videoDetails", JSONObject().put("videoId", "abcdefghijk"))
+        .put(
+            "streamingData",
+            JSONObject()
+                .put("adaptiveFormats", adaptiveFormats)
+                .put("formats", formats),
+        )
 }
