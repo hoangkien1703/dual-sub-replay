@@ -1,0 +1,98 @@
+name: Provision acoustic sync model
+
+on:
+  push:
+    branches:
+      - fix/karaoke-preserve-word-timing
+    paths:
+      - .github/workflows/provision-acoustic-model.yml
+
+permissions:
+  contents: write
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install conversion tools
+        run: python -m pip install --upgrade 'onnxruntime==1.18.0' numpy
+
+      - name: Download and verify source model
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            'https://huggingface.co/onnx-community/wav2vec2-base-960h-ONNX/resolve/main/onnx/model_int8.onnx?download=true' \
+            --output wav2vec2-base-960h-int8.onnx
+          echo '2aa77535eea4282df0374ff011c330e7abd84010f5d0cc079e5ed6c8ede2b6c5  wav2vec2-base-960h-int8.onnx' | sha256sum --check
+
+      - name: Check prebuilt ORT Mobile compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m onnxruntime.tools.check_onnx_model_mobile_usability \
+            wav2vec2-base-960h-int8.onnx --log_level info 2>&1 | tee mobile-usability.txt
+
+      - name: Convert model to ORT format
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m onnxruntime.tools.convert_onnx_models_to_ort \
+            --optimization_style Fixed \
+            wav2vec2-base-960h-int8.onnx
+          test -f wav2vec2-base-960h-int8.ort
+
+      - name: Smoke-test converted model
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+
+          session = ort.InferenceSession(
+              'wav2vec2-base-960h-int8.ort',
+              providers=['CPUExecutionProvider'],
+          )
+          input_meta = session.get_inputs()[0]
+          output_meta = session.get_outputs()[0]
+          audio = np.zeros((1, 16000), dtype=np.float32)
+          output = session.run([output_meta.name], {input_meta.name: audio})[0]
+          assert output.ndim == 3, output.shape
+          assert output.shape[0] == 1, output.shape
+          assert output.shape[2] == 32, output.shape
+          print('ORT smoke test output shape:', output.shape)
+          PY
+
+      - name: Record model metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum wav2vec2-base-960h-int8.ort | tee wav2vec2-base-960h-int8.ort.sha256
+          ls -lh wav2vec2-base-960h-int8.onnx wav2vec2-base-960h-int8.ort
+
+      - name: Publish optional acoustic model
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view acoustic-models >/dev/null 2>&1; then
+            gh release create acoustic-models \
+              --target main \
+              --title 'Optional acoustic sync models' \
+              --notes 'Optional on-device acoustic alignment models. These files are not bundled in the APK.'
+          fi
+          gh release upload acoustic-models \
+            wav2vec2-base-960h-int8.ort \
+            wav2vec2-base-960h-int8.ort.sha256 \
+            mobile-usability.txt \
+            --clobber
