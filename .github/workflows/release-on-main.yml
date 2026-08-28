@@ -117,12 +117,15 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## ${{ steps.release_meta.outputs.tag }} highlights
+            ## v0.9.5 highlights
 
-            - Makes YouTube caption retrieval more resilient with multiple client fallbacks, watch-page caption extraction, bounded request timeouts, and clearer failure messages instead of indefinite loading.
-            - Improves karaoke-style word synchronization with a small latency compensation so highlighted words track speech more closely without highlighting the first word too early.
-            - Improves first-launch translation by warming the selected ML Kit language model after onboarding, publishing translated subtitle lines progressively, and timing out stalled model downloads with a useful retry message.
-            - Keeps caption loading cancellable when videos or languages change and preserves the existing dual-subtitle, replay, and auto-generated-caption behavior.
+            - Adds Adaptive spoken-word timing for eligible YouTube auto-generated captions by mapping live rendered caption words onto the app's transcript.
+            - Adds strict Live YouTube captions and always-available Transcript timing choices in subtitle settings.
+            - Keeps manual captions and videos without a reliable live word signal on transcript timing, with a safe Adaptive fallback.
+            - Preserves the single-WebView architecture, trusted HTTPS YouTube origin checks, and persisted/resettable subtitle settings.
+            - Expands unit, Compose UI, architecture, and WebView lifecycle coverage for live caption capture and karaoke mapping.
+
+            Live timing depends on YouTube's webpage caption rendering and can vary by video, device, and WebView version. Unsupported cases continue using transcript timing.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
