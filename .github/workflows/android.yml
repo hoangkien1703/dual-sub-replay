@@ -266,15 +266,15 @@ jobs:
 
             Preview builds now install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## Highlights
+            ## v0.9.5 highlights
 
-            - Adds a LingoTube-inspired scroll-friendly bilingual subtitle overlay while keeping the normal YouTube page usable.
-            - Drag the subtitle overlay vertically, optionally remember its position, and reset it from settings.
-            - Automatically moves subtitles away from YouTube playback controls and restores the chosen position afterward.
-            - Automatically uses the compact overlay in fullscreen and landscape when enabled.
-            - Consolidates caption languages, text size, default view, and overlay behavior into one settings screen.
-            - Suppresses duplicate YouTube-rendered captions while the DualSub overlay is active and restores them when leaving it.
-            - Keeps the existing transcript panel, tap-to-replay flow, comments, recommendations, and single-WebView architecture.
+            - Adds Adaptive spoken-word timing for eligible YouTube auto-generated captions by mapping live rendered caption words onto the app's transcript.
+            - Adds strict Live YouTube captions and always-available Transcript timing choices in subtitle settings.
+            - Keeps manual captions and videos without a reliable live word signal on transcript timing, with a safe Adaptive fallback.
+            - Preserves the single-WebView architecture, trusted HTTPS YouTube origin checks, and persisted/resettable subtitle settings.
+            - Expands unit, Compose UI, architecture, and WebView lifecycle coverage for live caption capture and karaoke mapping.
+
+            Live timing depends on YouTube's webpage caption rendering and can vary by video, device, and WebView version. Unsupported cases continue using transcript timing.
 
             The `.sha256` file can be used to verify the APK download.
           files: |

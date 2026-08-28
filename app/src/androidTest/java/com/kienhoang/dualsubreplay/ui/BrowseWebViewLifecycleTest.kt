@@ -115,4 +115,94 @@ class BrowseWebViewLifecycleTest {
 
         instrumentation.runOnMainSync { webView.destroySafely() }
     }
+
+    @Test
+    fun liveCaptionObserverReadsMutationsAndRestoresCaptionButton() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val pageLoaded = CountDownLatch(1)
+        lateinit var webView: WebView
+
+        instrumentation.runOnMainSync {
+            webView = WebView(instrumentation.targetContext).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) {
+                        pageLoaded.countDown()
+                    }
+                }
+                loadDataWithBaseURL(
+                    "https://m.youtube.com/watch?v=captiontest1",
+                    """
+                    <!doctype html>
+                    <html><body>
+                      <video id="native-video"></video>
+                      <button class="ytmClosedCaptioningButtonButton" aria-label="字幕がオフになりました" aria-pressed="false">CC</button>
+                      <div class="ytp-caption-window-container">
+                        <span class="ytp-caption-segment">Hello</span>
+                      </div>
+                      <script>
+                        const video = document.getElementById('native-video');
+                        Object.defineProperty(video, 'currentTime', {
+                          configurable: true,
+                          get: function() { return 4.5; }
+                        });
+                        document.querySelector('.ytmClosedCaptioningButtonButton').onclick = function() {
+                          this.setAttribute(
+                            'aria-pressed',
+                            this.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'
+                          );
+                        };
+                      </script>
+                    </body></html>
+                    """.trimIndent(),
+                    "text/html",
+                    "UTF-8",
+                    null,
+                )
+            }
+        }
+
+        assertTrue("Live-caption fixture did not load", pageLoaded.await(10, TimeUnit.SECONDS))
+        assertEquals("true", evaluateJavascript(webView, webLiveCaptionConfigurationScript(enabled = true)))
+        assertEquals(
+            "\"true\"",
+            evaluateJavascript(
+                webView,
+                "document.querySelector('.ytmClosedCaptioningButtonButton').getAttribute('aria-pressed')",
+            ),
+        )
+        evaluateJavascript(
+            webView,
+            "document.querySelector('.ytp-caption-segment').textContent = 'Hello world'",
+        )
+        Thread.sleep(150)
+        val snapshot = parseWebPlaybackSnapshot(evaluateJavascript(webView, WEB_PLAYBACK_SNAPSHOT_SCRIPT))
+        assertEquals("Hello world", snapshot?.liveCaption?.text)
+        assertTrue((snapshot?.liveCaption?.revision ?: 0L) >= 2L)
+        assertEquals(4_500L, snapshot?.liveCaption?.mediaTimeMs)
+        assertEquals("true", evaluateJavascript(webView, webLiveCaptionConfigurationScript(enabled = false)))
+        assertEquals(
+            "\"false\"",
+            evaluateJavascript(
+                webView,
+                "document.querySelector('.ytmClosedCaptioningButtonButton').getAttribute('aria-pressed')",
+            ),
+        )
+
+        instrumentation.runOnMainSync { webView.destroySafely() }
+    }
+
+    private fun evaluateJavascript(webView: WebView, script: String): String? {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val result = AtomicReference<String?>()
+        val completed = CountDownLatch(1)
+        instrumentation.runOnMainSync {
+            webView.evaluateJavascript(script) { value ->
+                result.set(value)
+                completed.countDown()
+            }
+        }
+        assertTrue("JavaScript evaluation did not finish", completed.await(10, TimeUnit.SECONDS))
+        return result.get()
+    }
 }

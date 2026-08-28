@@ -6,6 +6,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.json.JSONObject
 
 class PlaybackArchitectureTest {
     @Test
@@ -151,6 +152,31 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun playbackSnapshotCarriesSanitizedLiveCaptionSample() {
+        val payload = JSONObject()
+            .put("url", "https://m.youtube.com/watch?v=dQw4w9WgXcQ")
+            .put("currentSecond", 12.5)
+            .put(
+                "liveCaption",
+                JSONObject()
+                    .put("text", "  Hello   world  ")
+                    .put("revision", 7)
+                    .put("mediaSecond", 12.25)
+                    .put("present", true),
+            )
+
+        assertEquals(
+            LiveCaptionSample("Hello world", 7, 12_250, present = true),
+            parseWebPlaybackSnapshot(JSONObject.quote(payload.toString()))?.liveCaption,
+        )
+
+        payload.getJSONObject("liveCaption").put("text", "x".repeat(MAX_LIVE_CAPTION_TEXT_LENGTH + 1))
+        assertNull(
+            parseWebPlaybackSnapshot(JSONObject.quote(payload.toString()))?.liveCaption,
+        )
+    }
+
+    @Test
     fun playbackScriptsRecheckTheExecutingYouTubeOrigin() {
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("window.location.protocol !== 'https:'"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("host.endsWith('.youtube.com')"))
@@ -158,6 +184,20 @@ class PlaybackArchitectureTest {
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("ytp-autohide"))
         assertTrue(webReplayScript(1f).contains("window.location.protocol !== 'https:'"))
         assertTrue(webReplayScript(1f).contains("host.endsWith('.youtube.com')"))
+        val enabled = webLiveCaptionConfigurationScript(enabled = true)
+        val disabled = webLiveCaptionConfigurationScript(enabled = false)
+        assertTrue(enabled.contains("window.location.protocol !== 'https:'"))
+        assertTrue(enabled.contains("currentHost.endsWith('.youtube.com')"))
+        assertTrue(enabled.contains("new MutationObserver"))
+        assertTrue(enabled.contains(".ytmClosedCaptioningButtonButton"))
+        assertTrue(enabled.contains("ytInitialPlayerResponse"))
+        assertTrue(enabled.contains("player.loadModule('captions')"))
+        assertTrue(enabled.contains("player.setOption('captions', 'track', track)"))
+        assertTrue(disabled.contains("existing.restoreCaptions()"))
+        assertTrue(enabled.contains("requestVideoFrameCallback"))
+        assertTrue(enabled.contains("state.ensureCaptions()"))
+        assertTrue(disabled.contains("existing.restoreCaptions()"))
+        assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains(LIVE_CAPTION_CAPTURE_STATE_KEY))
     }
 
     @Test

@@ -146,6 +146,7 @@ class SubtitleWordHighlightTest {
             SUBTITLE_BOX_BACKGROUND_PREFERENCE,
             APP_THEME_ACCENT_PREFERENCE,
             WORD_HIGHLIGHT_ENABLED_PREFERENCE,
+            KARAOKE_TIMING_MODE_PREFERENCE,
             CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
         )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())

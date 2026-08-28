@@ -47,6 +47,7 @@ data class DualSubUiState(
     val translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
     val highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
     val wordHighlightEnabled: Boolean = true,
+    val karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     val customColorsEnabled: Boolean = true,
     val splitLongSentencesEnabled: Boolean = true,
     val stage: LoadStage = LoadStage.IDLE,
@@ -204,6 +205,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
     private var rawMergedSegments: List<SubtitleSegment> = emptyList()
+    private val liveCaptionTracker = LiveCaptionTracker()
 
     private val _state = MutableStateFlow(
         DualSubUiState(
@@ -238,6 +240,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             ),
             wordHighlightEnabled = storedFeatureEnabled(
                 preferences.getBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, true),
+            ),
+            karaokeTimingMode = storedKaraokeTimingMode(
+                preferences.getString(KARAOKE_TIMING_MODE_PREFERENCE, null),
             ),
             customColorsEnabled = storedFeatureEnabled(
                 preferences.getBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, true),
@@ -277,24 +282,55 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun onWebPlaybackSecond(videoId: String, second: Float) {
+    internal fun onWebPlaybackSecond(
+        videoId: String,
+        second: Float,
+        liveCaption: LiveCaptionSample? = null,
+    ) {
         val current = _state.value
         if (current.activeVideoId != videoId || !second.isFinite()) return
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
+        if (timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs) {
+            liveCaptionTracker.reset()
+        }
         latestPlaybackSecondMs = timeMs
-        val index = activeSubtitleIndex(current.segments, timeMs)
-        if (index != current.currentIndex) {
-            _state.update {
-                it.copy(
-                    currentIndex = index,
-                    activeWordIndex = activeWordIndex(it.segments, index, timeMs),
-                )
-            }
+        val timedIndex = activeSubtitleIndex(current.segments, timeMs)
+        val referenceIndex = if (timedIndex >= 0) {
+            timedIndex
         } else {
-            val wordIndex = activeWordIndex(current.segments, index, timeMs)
-            if (wordIndex != current.activeWordIndex) {
-                _state.update { it.copy(activeWordIndex = wordIndex) }
-            }
+            nearestSegmentIndex(current.segments, timeMs)
+        }
+        val liveCaptureAllowed = shouldCaptureLiveCaptions(
+            mode = current.karaokeTimingMode,
+            generatedCaptions = current.generatedCaptions,
+            wordHighlightEnabled = current.wordHighlightEnabled,
+        )
+        val livePosition = if (liveCaptureAllowed) {
+            liveCaptionTracker.resolve(
+                sample = liveCaption,
+                segments = current.segments,
+                referenceSegmentIndex = referenceIndex,
+                playbackTimeMs = timeMs,
+                strict = current.karaokeTimingMode == KaraokeTimingMode.YOUTUBE_LIVE,
+            )
+        } else {
+            null
+        }
+        val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
+        val timedPosition = timedIndex.takeIf { it >= 0 }?.let {
+            KaraokePosition(segmentIndex = it, wordIndex = timedWordIndex)
+        }?.takeIf { it.wordIndex >= 0 }
+        val effectivePosition = effectiveKaraokePosition(
+            mode = current.karaokeTimingMode,
+            generatedCaptions = current.generatedCaptions,
+            wordHighlightEnabled = current.wordHighlightEnabled,
+            timedPosition = timedPosition,
+            livePosition = livePosition,
+        )
+        val index = livePosition?.segmentIndex ?: timedIndex
+        val wordIndex = effectivePosition?.wordIndex ?: -1
+        if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
+            _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
         }
     }
 
@@ -389,7 +425,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setWordHighlightEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, enabled).apply()
+        liveCaptionTracker.reset()
         _state.update { it.copy(wordHighlightEnabled = enabled, activeWordIndex = -1) }
+    }
+
+    fun setKaraokeTimingMode(mode: KaraokeTimingMode) {
+        if (_state.value.karaokeTimingMode == mode) return
+        preferences.edit().putString(KARAOKE_TIMING_MODE_PREFERENCE, mode.storageValue).apply()
+        liveCaptionTracker.reset()
+        _state.update { it.copy(karaokeTimingMode = mode, activeWordIndex = -1) }
     }
 
     fun setCustomColorsEnabled(enabled: Boolean) {
@@ -407,6 +451,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val alreadyEnabled = _state.value.splitLongSentencesEnabled
         _state.update { it.copy(splitLongSentencesEnabled = enabled) }
         if (alreadyEnabled == enabled) return
+        liveCaptionTracker.reset()
         refreshSplitSegments()
     }
 
@@ -443,6 +488,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         RESETTABLE_SETTING_KEYS.forEach(editor::remove)
         editor.apply()
         latestPlaybackSecondMs = 0L
+        liveCaptionTracker.reset()
         _state.update { current ->
             current.copy(
                 sourcePreference = "auto",
@@ -453,6 +499,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 translatedColorKey = DEFAULT_TRANSLATED_COLOR_KEY,
                 highlightColorKey = DEFAULT_HIGHLIGHT_COLOR_KEY,
                 wordHighlightEnabled = true,
+                karaokeTimingMode = KaraokeTimingMode.ADAPTIVE,
                 customColorsEnabled = true,
                 splitLongSentencesEnabled = true,
             )
@@ -481,6 +528,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadGeneration += 1
         loadingJob?.cancel()
         latestPlaybackSecondMs = 0L
+        liveCaptionTracker.reset()
         rawMergedSegments = emptyList()
         _state.update {
             it.copy(
@@ -491,6 +539,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 generatedCaptions = false,
                 segments = emptyList(),
                 currentIndex = -1,
+                activeWordIndex = -1,
                 stage = LoadStage.IDLE,
                 statusMessage = null,
                 errorMessage = null,
@@ -501,6 +550,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadVideo(videoId: String, showPanel: Boolean) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
+        liveCaptionTracker.reset()
         // Reloading the same video (language change, retry) keeps tracking the
         // current position so subtitles resume exactly where playback is.
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
@@ -515,6 +565,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 generatedCaptions = false,
                 segments = emptyList(),
                 currentIndex = -1,
+                activeWordIndex = -1,
                 stage = LoadStage.LOADING_CAPTIONS,
                 statusMessage = "Finding the best caption track…",
                 errorMessage = null,
