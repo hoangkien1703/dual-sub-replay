@@ -1,123 +1,85 @@
 name: Automatic PR preview APK
 
 on:
+  workflow_run:
+    workflows: ["Android build and releases"]
+    types: [completed]
   pull_request:
-    types: [opened, synchronize, reopened, closed]
-  workflow_dispatch:
+    types: [closed]
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-preview-${{ github.head_ref || github.ref_name }}
+  group: pr-preview-${{ github.event.workflow_run.id || github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  build-pr-preview:
+  publish-pr-preview:
     if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.action != 'closed' &&
-      github.event.pull_request.head.repo.full_name == github.repository)
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.pull_requests[0].number != null
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     permissions:
+      actions: read
       contents: write
       pull-requests: read
 
     steps:
-      - name: Check out source
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-
-      - name: Resolve open PR number
+      - name: Verify the source PR is still open and trusted
         id: pr
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          EVENT_NAME: ${{ github.event_name }}
-          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         run: |
           set -euo pipefail
+          pr_json="$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}")"
+          state="$(jq -r '.state' <<< "$pr_json")"
+          head_repo="$(jq -r '.head.repo.full_name' <<< "$pr_json")"
 
-          if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            pr_number="$EVENT_PR_NUMBER"
-          else
-            pr_number="$(gh pr list --head "$GITHUB_REF_NAME" --state open --json number --jq '.[0].number // empty')"
+          if [[ "$state" != "open" ]]; then
+            echo "PR #$PR_NUMBER is $state; skipping stale preview upload."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-
-          if [[ -z "$pr_number" ]]; then
-            echo "No open PR found for $GITHUB_REF_NAME; skipping preview build."
-            echo "found=false" >> "$GITHUB_OUTPUT"
+          if [[ "$head_repo" != "$GH_REPO" ]]; then
+            echo "PR #$PR_NUMBER comes from $head_repo; refusing to publish an untrusted preview."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Resolved PR #$pr_number"
-          echo "found=true" >> "$GITHUB_OUTPUT"
-          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Java 17
-        if: steps.pr.outputs.found == 'true'
-        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+      - name: Download the APK produced by full PR CI
+        if: steps.pr.outputs.publish == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          distribution: temurin
-          java-version: "17"
+          name: DualSub-Replay-preview
+          path: verified
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Set up Android SDK
-        if: steps.pr.outputs.found == 'true'
-        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
-
-      - name: Install Android build SDK
-        if: steps.pr.outputs.found == 'true'
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
-
-      - name: Set up Gradle cache
-        if: steps.pr.outputs.found == 'true'
-        uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
-
-      - name: Restore persistent preview signing key
-        if: steps.pr.outputs.found == 'true'
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.android/debug.keystore
-          key: dual-sub-replay-preview-signing-v1
-
-      - name: Test, lint, and build PR preview
-        if: steps.pr.outputs.found == 'true'
-        env:
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
-          BUILD_NUMBER: ${{ github.run_number }}
-        run: |
-          set -euo pipefail
-          preview_version_code=$(( $(date -u +%s) - 1700000000 ))
-          bash ./gradlew testDebugUnitTest lintDebug assembleDebug \
-            -PpreviewVersionCode="$preview_version_code" \
-            -PpreviewVersionNameSuffix="-pr${PR_NUMBER}-build${BUILD_NUMBER}" \
-            -PpreviewApplicationIdSuffix=".preview" \
-            --stacktrace
-
-      - name: Package versioned PR preview APK
-        if: steps.pr.outputs.found == 'true'
+      - name: Package the versioned PR preview APK
+        if: steps.pr.outputs.publish == 'true'
         id: package
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
-          BUILD_NUMBER: ${{ github.run_number }}
+          BUILD_NUMBER: ${{ github.event.workflow_run.run_number }}
         run: |
           set -euo pipefail
           mkdir -p release
           asset_name="DualSub-Replay-PR${PR_NUMBER}-build${BUILD_NUMBER}-preview.apk"
-          cp app/build/outputs/apk/debug/app-debug.apk "release/$asset_name"
-          badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "release/$asset_name" | head -n 1)"
-          echo "$badging"
-          if [[ "$badging" != *"name='com.kienhoang.dualsubreplay.preview'"* ]]; then
-            echo "Preview APK does not use the isolated preview application id" >&2
-            exit 1
-          fi
+          cp verified/DualSub-Replay-preview.apk "release/$asset_name"
           sha256sum "release/$asset_name"
           echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
 
       - name: Upload newest PR preview to rolling preview release
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -125,15 +87,6 @@ jobs:
           ASSET_NAME: ${{ steps.package.outputs.asset_name }}
         run: |
           set -euo pipefail
-
-          pr_state="$(gh pr view "$PR_NUMBER" --json state --jq '.state')"
-          if [[ "$pr_state" != "OPEN" ]]; then
-            echo "PR #$PR_NUMBER is $pr_state; skipping stale preview upload."
-            exit 0
-          fi
-
-          # Remove older previews for this PR so the release always exposes one
-          # clearly versioned APK. This also avoids stale same-URL browser/CDN caches.
           assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
           while IFS= read -r asset; do
             [[ -z "$asset" ]] && continue
@@ -144,7 +97,7 @@ jobs:
           done <<< "$assets"
 
           gh release upload preview "release/$ASSET_NAME" --clobber
-          echo "Published $ASSET_NAME"
+          echo "Published $ASSET_NAME from the already-verified CI artifact."
 
   cleanup-pr-preview:
     if: >-
@@ -164,7 +117,6 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
-
           assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
           removed=false
           while IFS= read -r asset; do
