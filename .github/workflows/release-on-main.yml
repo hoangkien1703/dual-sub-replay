@@ -1,27 +1,27 @@
 name: Publish new main version
 
 on:
-  workflow_run:
-    workflows: ["Android build and releases"]
-    types: [completed]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: publish-main
+  cancel-in-progress: false
+
 jobs:
-  publish-new-version:
-    if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_branch == 'main'
+  publish-main:
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
-      - name: Check out verified main commit
+      - name: Check out main commit
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
 
       - name: Determine whether this version is new
@@ -29,8 +29,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           version="$(sed -n 's/^val appVersionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
-          if [ -z "$version" ]; then
+          if [[ -z "$version" ]]; then
             echo "Could not determine app version" >&2
             exit 1
           fi
@@ -46,30 +47,72 @@ jobs:
           fi
 
       - name: Set up Java 17
-        if: steps.release_meta.outputs.release_needed == 'true'
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Android SDK
-        if: steps.release_meta.outputs.release_needed == 'true'
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
 
       - name: Install Android build SDK
-        if: steps.release_meta.outputs.release_needed == 'true'
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle cache
-        if: steps.release_meta.outputs.release_needed == 'true'
         uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+
+      - name: Restore persistent preview signing key
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.android/debug.keystore
+          key: dual-sub-replay-preview-signing-v1
+
+      - name: Build main preview APK without repeating PR tests
+        run: |
+          set -euo pipefail
+          preview_version_code=$(( $(date -u +%s) - 1700000000 ))
+          bash ./gradlew assembleDebug \
+            -PpreviewVersionCode="$preview_version_code" \
+            -PpreviewVersionNameSuffix="-main-build${GITHUB_RUN_NUMBER}" \
+            -PpreviewApplicationIdSuffix=".preview" \
+            --stacktrace
+
+      - name: Verify and package main preview APK
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          preview_apk="release/DualSub-Replay-preview.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$preview_apk"
+          badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$preview_apk" | head -n 1)"
+          echo "$badging"
+          if [[ "$badging" != *"name='com.kienhoang.dualsubreplay.preview'"* ]]; then
+            echo "Preview APK does not use the isolated preview application id" >&2
+            exit 1
+          fi
+          sha256sum "$preview_apk"
+
+      - name: Publish rolling main preview
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          tag_name: preview
+          name: DualSub Replay preview
+          prerelease: true
+          make_latest: false
+          body: |
+            Testing build from the latest PR-verified `main` commit.
+
+            Most people should install the [latest official release](https://github.com/${{ github.repository }}/releases/latest) instead.
+
+            Preview APKs install as **DualSub Replay Preview** with a separate Android package id, so they can coexist with the official app.
+          files: release/DualSub-Replay-preview.apk
+          overwrite_files: true
 
       - name: Restore production signing key
         if: steps.release_meta.outputs.release_needed == 'true'
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$ANDROID_RELEASE_KEYSTORE_BASE64" ]; then
+          if [[ -z "$ANDROID_RELEASE_KEYSTORE_BASE64" ]]; then
             echo "ANDROID_RELEASE_KEYSTORE_BASE64 is not configured" >&2
             exit 1
           fi
@@ -88,9 +131,9 @@ jobs:
       - name: Verify and package official APK
         if: steps.release_meta.outputs.release_needed == 'true'
         run: |
+          set -euo pipefail
           source_apk="app/build/outputs/apk/release/app-release.apk"
           release_apk="release/DualSub-Replay.apk"
-          mkdir -p release
           cp "$source_apk" "$release_apk"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$release_apk" | tee release/signing-report.txt
           if grep -q 'CN=Android Debug' release/signing-report.txt; then
@@ -105,7 +148,7 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ steps.release_meta.outputs.tag }}
-          target_commitish: ${{ github.event.workflow_run.head_sha }}
+          target_commitish: ${{ github.sha }}
           name: DualSub Replay ${{ steps.release_meta.outputs.tag }}
           prerelease: false
           make_latest: true
