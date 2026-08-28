@@ -20,6 +20,7 @@ class LearningPlayerUiTest {
     @Test
     fun unifiedSubtitleSettingsOffersViewAndOverlayBehavior() {
         var selected: PlayerExperienceMode? = null
+        var selectedTiming = KaraokeTimingMode.ADAPTIVE
         composeRule.setContent {
             DualSubTheme {
                 SubtitleSettingsDialog(
@@ -29,11 +30,14 @@ class LearningPlayerUiTest {
                     fontScale = 1f,
                     landscapeSplitEnabled = true,
                     playerMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+                    karaokeTimingMode = selectedTiming,
                     onSourceChange = {},
                     onTargetChange = {},
                     onFontScaleChange = {},
                     onLandscapeSplitChange = {},
                     onPlayerModeChange = { selected = it },
+                    onKaraokeTimingModeChange = { selectedTiming = it },
+                    onResetSettings = { selectedTiming = KaraokeTimingMode.ADAPTIVE },
                     onDismiss = {},
                 )
             }
@@ -56,6 +60,15 @@ class LearningPlayerUiTest {
 
         // Custom colors and other advanced controls live behind More settings.
         composeRule.onNodeWithTag("more_settings_toggle").performScrollTo().performClick()
+        composeRule.onNodeWithTag("karaoke_mode_adaptive").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("karaoke_mode_youtube_live")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.runOnIdle {
+            assertEquals(KaraokeTimingMode.YOUTUBE_LIVE, selectedTiming)
+        }
+        composeRule.onNodeWithTag("karaoke_mode_transcript").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("custom_colors_switch").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("color_option_box_background_deep_teal")
             .performScrollTo()
@@ -76,7 +89,11 @@ class LearningPlayerUiTest {
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("reset_all_settings").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("reset_all_settings").performScrollTo().performClick()
+        composeRule.onNodeWithTag("confirm_reset_settings").performClick()
+        composeRule.runOnIdle {
+            assertEquals(KaraokeTimingMode.ADAPTIVE, selectedTiming)
+        }
     }
 
     @Test
