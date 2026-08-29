@@ -39,7 +39,8 @@ internal const val COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE = "collapsed_cc_h
 internal const val COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE = "collapsed_cc_vertical_position"
 internal const val DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION = 1f
 internal const val DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 0.72f
-internal const val FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 0.08f
+// Keep the fullscreen FAB higher than normal without covering YouTube's top-right controls.
+internal const val FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION = 0.50f
 private const val COLLAPSED_CC_MARGIN_DP = 16
 
 internal fun normalizeControlPosition(value: Float, fallback: Float = 1f): Float =
