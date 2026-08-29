@@ -173,7 +173,7 @@ class LearningPlayerRootTest {
     }
 
     @Test
-    fun fullscreenLandscapeStartsNearTheTopButKeepsDraggedPositions() {
+    fun fullscreenLandscapeDefaultStaysBelowTopControlsAndKeepsDraggedPositions() {
         assertEquals(
             FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION,
             fullscreenOverlayVerticalPosition(
@@ -198,6 +198,10 @@ class LearningPlayerRootTest {
         assertTrue(
             FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION <
                 DEFAULT_OVERLAY_VERTICAL_POSITION,
+        )
+        assertTrue(
+            "fullscreen default must stay out of YouTube's top control band",
+            FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION >= 0.60f,
         )
     }
 
