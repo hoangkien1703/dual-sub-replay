@@ -192,6 +192,65 @@ class BrowseWebViewLifecycleTest {
         instrumentation.runOnMainSync { webView.destroySafely() }
     }
 
+    @Test
+    fun liveCaptionPollingDoesNotRepeatedlyClickMobileCaptionControl() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val pageLoaded = CountDownLatch(1)
+        lateinit var webView: WebView
+
+        instrumentation.runOnMainSync {
+            webView = WebView(instrumentation.targetContext).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) {
+                        pageLoaded.countDown()
+                    }
+                }
+                loadDataWithBaseURL(
+                    "https://m.youtube.com/watch?v=controltest1",
+                    """
+                    <!doctype html>
+                    <html><body>
+                      <video id="native-video"></video>
+                      <button class="ytmClosedCaptioningButtonButton">CC</button>
+                      <button id="settings">Settings</button>
+                      <script>
+                        const video = document.getElementById('native-video');
+                        Object.defineProperty(video, 'currentTime', {
+                          configurable: true,
+                          get: function() { return 3.5; }
+                        });
+                        window.captionClicks = 0;
+                        window.settingsOpen = false;
+                        document.querySelector('.ytmClosedCaptioningButtonButton').onclick = function() {
+                          window.captionClicks += 1;
+                          window.settingsOpen = false;
+                        };
+                        document.getElementById('settings').onclick = function() {
+                          window.settingsOpen = true;
+                        };
+                      </script>
+                    </body></html>
+                    """.trimIndent(),
+                    "text/html",
+                    "UTF-8",
+                    null,
+                )
+            }
+        }
+
+        assertTrue("Live-caption control fixture did not load", pageLoaded.await(10, TimeUnit.SECONDS))
+        assertEquals("true", evaluateJavascript(webView, webLiveCaptionConfigurationScript(enabled = true)))
+        repeat(3) { evaluateJavascript(webView, WEB_PLAYBACK_SNAPSHOT_SCRIPT) }
+        evaluateJavascript(webView, "document.getElementById('settings').click()")
+        repeat(3) { evaluateJavascript(webView, WEB_PLAYBACK_SNAPSHOT_SCRIPT) }
+
+        assertEquals("1", evaluateJavascript(webView, "window.captionClicks"))
+        assertEquals("true", evaluateJavascript(webView, "window.settingsOpen"))
+
+        instrumentation.runOnMainSync { webView.destroySafely() }
+    }
+
     private fun evaluateJavascript(webView: WebView, script: String): String? {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val result = AtomicReference<String?>()

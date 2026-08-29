@@ -193,6 +193,8 @@ class PlaybackArchitectureTest {
         assertTrue(enabled.contains("ytInitialPlayerResponse"))
         assertTrue(enabled.contains("player.loadModule('captions')"))
         assertTrue(enabled.contains("player.setOption('captions', 'track', track)"))
+        assertTrue(enabled.contains("captionEnableAttemptUrl"))
+        assertTrue(enabled.contains("state.captionEnableAttemptUrl === pageUrl"))
         assertTrue(disabled.contains("existing.restoreCaptions()"))
         assertTrue(enabled.contains("requestVideoFrameCallback"))
         assertTrue(enabled.contains("state.ensureCaptions()"))

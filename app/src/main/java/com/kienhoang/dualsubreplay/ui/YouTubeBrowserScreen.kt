@@ -287,6 +287,7 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             captionMediaSecond: null,
             captionWasEnabled: null,
             enabledByApp: false,
+            captionEnableAttemptUrl: null,
             observer: null
           };
           state.trustedOrigin = function() {
@@ -344,17 +345,28 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
               state.captionWasEnabled = pressed || !!activeTrack;
             }
             if (pressed || activeTrack) return;
-            if (button) {
-              try {
-                button.click();
-                state.enabledByApp = true;
-              } catch (_) {}
-            }
+
+            // Some mobile YouTube controls do not expose aria-pressed. Clicking their CC button on
+            // every 100 ms playback poll toggles captions repeatedly and closes native popups such
+            // as Settings. Attempt activation only once for each SPA page/video instead.
+            const pageUrl = window.location.href;
+            if (state.captionEnableAttemptUrl === pageUrl) return;
             const track = state.availableCaptionTrack(player);
             if (player && track) {
+              state.captionEnableAttemptUrl = pageUrl;
               try {
                 if (typeof player.loadModule === 'function') player.loadModule('captions');
                 player.setOption('captions', 'track', track);
+                state.enabledByApp = true;
+                return;
+              } catch (_) {
+                // Fall through to the mobile caption button when the player API is unavailable.
+              }
+            }
+            if (button) {
+              state.captionEnableAttemptUrl = pageUrl;
+              try {
+                button.click();
                 state.enabledByApp = true;
               } catch (_) {}
             }
