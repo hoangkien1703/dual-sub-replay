@@ -13,7 +13,7 @@ class MovableSubtitleFabTest {
         assertEquals(1f, normalizeControlPosition(Float.NaN), 0f)
     }
 
-    @Test fun defaultCcIsHigherAndFullscreenLandscapeStartsNearTheTop() {
+    @Test fun defaultCcStaysHigherWithoutOccupyingFullscreenTopControls() {
         assertEquals(0.72f, DEFAULT_COLLAPSED_CC_VERTICAL_POSITION, 0f)
         assertEquals(
             FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
@@ -45,6 +45,10 @@ class MovableSubtitleFabTest {
         assertTrue(
             FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION <
                 DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
+        )
+        assertTrue(
+            "fullscreen CC default must stay below YouTube's top-right controls",
+            FULLSCREEN_LANDSCAPE_DEFAULT_COLLAPSED_CC_VERTICAL_POSITION >= 0.40f,
         )
     }
 
