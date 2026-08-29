@@ -69,7 +69,7 @@ internal const val OVERLAY_VERTICAL_POSITION_PREFERENCE = "overlay_vertical_posi
 internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_horizontal_position"
 internal const val MOVABLE_OVERLAY_PREFERENCE = "movable_subtitle_box"
 internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
-internal const val FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION = 0.08f
+internal const val FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION = 0.72f
 internal const val DEFAULT_OVERLAY_HORIZONTAL_POSITION = 0.5f
 internal const val FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP = 88
 internal const val PLAYER_CONTROLS_AVOIDANCE_LIFT_DP = 88
@@ -87,8 +87,8 @@ internal fun normalizeOverlayVerticalPosition(value: Float): Float =
     if (value.isFinite()) value.coerceIn(0f, 1f) else DEFAULT_OVERLAY_VERTICAL_POSITION
 
 /**
- * The regular overlay keeps its lower default, while fullscreen landscape starts
- * near the top unless the user has moved it away from that default.
+ * The regular overlay keeps its lower default. Fullscreen landscape stays somewhat higher
+ * to leave room for YouTube's bottom controls, but it no longer starts in the top control band.
  */
 internal fun fullscreenOverlayVerticalPosition(
     position: Float,
@@ -439,7 +439,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         position = overlayVerticalPosition,
         orientation = configuration.orientation,
     )
-    // Fullscreen landscape defaults close to the top and still keeps the whole box on-screen.
+    // Keep the default fullscreen overlay below YouTube's top control strip.
     val fullscreenBottomPadding = fullscreenOverlayBottomPaddingWithControlsDp(
         position = fullscreenVerticalPosition,
         screenHeightDp = configuration.screenHeightDp,
