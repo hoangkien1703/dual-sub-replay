@@ -7,7 +7,15 @@ object SubtitleMerger {
     private const val MIN_TIMED_WORD_TEXT_COVERAGE = 0.85f
     private val sentenceEnding = Regex("[.!?。！？…][\\\"'’”)]*$")
 
-    fun merge(cues: List<RawCaptionCue>): List<SubtitleSegment> {
+    private val clauseConjunctions = Regex(
+        "^(and|but|so|because|although|however|then|if|when|while|therefore|or)\\b",
+        RegexOption.IGNORE_CASE,
+    )
+
+    fun merge(
+        cues: List<RawCaptionCue>,
+        enhancedNaturalFlow: Boolean = false,
+    ): List<SubtitleSegment> {
         val ordered = cues
             .filter { it.text.isNotBlank() && it.endMs > it.startMs }
             .sortedBy { it.startMs }
@@ -21,13 +29,18 @@ object SubtitleMerger {
 
         fun flush() {
             if (text.isNotBlank()) {
+                val formattedText = if (enhancedNaturalFlow) {
+                    text.trim().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                } else {
+                    text.trim()
+                }
                 output += SubtitleSegment(
                     id = output.size.toLong(),
                     startMs = start,
                     endMs = end,
-                    originalText = text.trim(),
+                    originalText = formattedText,
                     words = timedOrEstimatedWords(
-                        segmentText = text.trim(),
+                        segmentText = formattedText,
                         startMs = start,
                         endMs = end,
                         collectedWords = pendingWords,
@@ -40,10 +53,13 @@ object SubtitleMerger {
         ordered.drop(1).forEach { cue ->
             val nextText = clean(cue.text)
             val gap = cue.startMs - end
+            val startsWithConjunction = clauseConjunctions.containsMatchIn(nextText)
+            val isPhraseBreak = startsWithConjunction && (gap >= 350L || end - start >= 3_000L) && text.length >= 32
             val shouldStartNew = gap > MAX_GAP_MS ||
                 end - start >= MAX_DURATION_MS ||
                 text.length >= MAX_CHARACTERS ||
-                sentenceEnding.containsMatchIn(text)
+                sentenceEnding.containsMatchIn(text) ||
+                (enhancedNaturalFlow && isPhraseBreak)
 
             if (shouldStartNew) {
                 flush()
@@ -59,6 +75,18 @@ object SubtitleMerger {
         }
         flush()
         return output
+    }
+
+    fun formatNaturalTranslation(text: String): String {
+        if (text.isBlank()) return text
+        val trimmed = text.trim()
+        val capitalized = trimmed.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val sentencePunctuation = setOf('.', '?', '!', '。', '！', '？')
+        return if (capitalized.isNotEmpty() && capitalized.last() !in sentencePunctuation) {
+            "$capitalized."
+        } else {
+            capitalized
+        }
     }
 
     /**

@@ -47,10 +47,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -85,6 +87,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -144,7 +149,24 @@ fun DualSubApp(
                 onKaraokeTimingModeChange = viewModel::setKaraokeTimingMode,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
                 onSplitSentencesChange = viewModel::setSplitLongSentencesEnabled,
+                onLockOverlayToVideoChange = viewModel::setLockOverlayToVideo,
+                onPreloadModelsChange = viewModel::setPreloadModelsEnabled,
+                onNaturalSubtitlesChange = viewModel::setNaturalSubtitlesEnabled,
+                onWordLearningChange = viewModel::setWordLearningEnabled,
+                onWordLearningTargetChange = viewModel::setWordLearningTarget,
+                onTapToLearnChange = viewModel::setTapToLearnEnabled,
+                onWordClick = viewModel::selectLearningToken,
                 onResetSettings = viewModel::resetAllSettings,
+            )
+        }
+
+        state.selectedLearningToken?.let { token ->
+            WordLearningDialog(
+                token = token,
+                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
+                targetLanguage = state.targetLanguage,
+                onTranslateWord = viewModel::translateWord,
+                onDismiss = { viewModel.selectLearningToken(null) },
             )
         }
     }
@@ -174,6 +196,19 @@ private fun DualSubExperience(
     onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit,
     onCustomColorsChange: (Boolean) -> Unit,
     onSplitSentencesChange: (Boolean) -> Unit,
+    lockOverlayToVideo: Boolean = false,
+    onLockOverlayToVideoChange: (Boolean) -> Unit = {},
+    preloadModelsEnabled: Boolean = true,
+    onPreloadModelsChange: (Boolean) -> Unit = {},
+    naturalSubtitlesEnabled: Boolean = true,
+    onNaturalSubtitlesChange: (Boolean) -> Unit = {},
+    wordLearningEnabled: Boolean = false,
+    onWordLearningChange: (Boolean) -> Unit = {},
+    wordLearningTarget: String = "original",
+    onWordLearningTargetChange: (String) -> Unit = {},
+    tapToLearnEnabled: Boolean = true,
+    onTapToLearnChange: (Boolean) -> Unit = {},
+    onWordClick: (AnalyzedToken) -> Unit = {},
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
@@ -273,6 +308,7 @@ private fun DualSubExperience(
                         onHide = onHideSubtitles,
                         onSettings = { showSettings = true },
                         onRetry = onRetry,
+                        onWordClick = onWordClick,
                         onReplay = { segment ->
                             webController.replayFrom(segment.startMs / 1_000f)
                         },
@@ -300,6 +336,7 @@ private fun DualSubExperience(
                     onHide = onHideSubtitles,
                     onSettings = { showSettings = true },
                     onRetry = onRetry,
+                    onWordClick = onWordClick,
                     onReplay = { segment ->
                         webController.replayFrom(segment.startMs / 1_000f)
                     },
@@ -328,6 +365,18 @@ private fun DualSubExperience(
             karaokeTimingMode = state.karaokeTimingMode,
             customColorsEnabled = state.customColorsEnabled,
             splitLongSentencesEnabled = state.splitLongSentencesEnabled,
+            lockOverlayToVideo = lockOverlayToVideo,
+            onLockOverlayToVideoChange = onLockOverlayToVideoChange,
+            preloadModelsEnabled = preloadModelsEnabled,
+            onPreloadModelsChange = onPreloadModelsChange,
+            naturalSubtitlesEnabled = naturalSubtitlesEnabled,
+            onNaturalSubtitlesChange = onNaturalSubtitlesChange,
+            wordLearningEnabled = wordLearningEnabled,
+            onWordLearningChange = onWordLearningChange,
+            wordLearningTarget = wordLearningTarget,
+            onWordLearningTargetChange = onWordLearningTargetChange,
+            tapToLearnEnabled = tapToLearnEnabled,
+            onTapToLearnChange = onTapToLearnChange,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
             onFontScaleChange = onFontScaleChange,
@@ -366,6 +415,7 @@ private fun SubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
+    onWordClick: (AnalyzedToken) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetY by remember { mutableFloatStateOf(0f) }
@@ -413,12 +463,18 @@ private fun SubtitlePanel(
         Column(Modifier.fillMaxSize()) {
             Column(headerDragModifier) {
                 Box(
-                    Modifier
-                        .padding(top = 6.dp)
-                        .size(width = 42.dp, height = 4.dp)
-                        .align(Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(20.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Surface(Modifier.fillMaxSize(), shape = CircleShape, color = Color(0xFF607477)) {}
+                    Surface(
+                        modifier = Modifier
+                            .width(36.dp)
+                            .height(4.dp),
+                        shape = CircleShape,
+                        color = Color(0xFF51686B),
+                    ) {}
                 }
 
                 Row(
@@ -429,6 +485,7 @@ private fun SubtitlePanel(
                         Icons.Default.ClosedCaption,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(Modifier.size(10.dp))
                     Column(Modifier.weight(1f)) {
@@ -468,7 +525,7 @@ private fun SubtitlePanel(
             when {
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
-                else -> SubtitleTimeline(state, onReplay)
+                else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
             }
         }
     }
@@ -555,6 +612,7 @@ private fun SideSubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
+    onWordClick: (AnalyzedToken) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetX by remember { mutableFloatStateOf(0f) }
@@ -648,14 +706,18 @@ private fun SideSubtitlePanel(
             when {
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
-                else -> SubtitleTimeline(state, onReplay)
+                else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
             }
         }
     }
 }
 
 @Composable
-private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) -> Unit) {
+private fun SubtitleTimeline(
+    state: DualSubUiState,
+    onWordClick: (AnalyzedToken) -> Unit = {},
+    onReplay: (SubtitleSegment) -> Unit,
+) {
     // When the panel is recreated after being closed, start the lazy list at the
     // current transcript row instead of item 0. This prevents long videos from
     // visibly walking through hundreds of rows before catching up.
@@ -713,6 +775,13 @@ private fun SubtitleTimeline(state: DualSubUiState, onReplay: (SubtitleSegment) 
                 originalColor = effectiveOriginalColor(state),
                 translatedColor = effectiveTranslatedColor(state),
                 highlightColor = effectiveHighlightColor(state),
+                wordLearningEnabled = state.wordLearningEnabled,
+                wordLearningTarget = state.wordLearningTarget,
+                tapToLearnEnabled = state.tapToLearnEnabled,
+                resolvedSourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
+                targetLanguage = state.targetLanguage,
+                isDownloadingTranslationModel = state.isDownloadingTranslationModel,
+                onWordClick = onWordClick,
             )
         }
     }
@@ -753,6 +822,13 @@ internal fun CompactSubtitleCard(
     originalColor: Color = subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY),
     translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
     highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
+    wordLearningEnabled: Boolean = false,
+    wordLearningTarget: String = "original",
+    tapToLearnEnabled: Boolean = true,
+    resolvedSourceLanguage: String? = null,
+    targetLanguage: String = "vi",
+    isDownloadingTranslationModel: Boolean = false,
+    onWordClick: (AnalyzedToken) -> Unit = {},
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -791,25 +867,89 @@ internal fun CompactSubtitleCard(
             }
             Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = annotatedSpokenText(
-                        segment = segment,
-                        activeWordIndex = if (active) activeWordIndex else -1,
-                        baseColor = originalColor,
-                        highlightColor = highlightColor,
-                    ),
-                    fontSize = (17 * fontScale).sp,
-                    lineHeight = (22 * fontScale).sp,
-                    fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-                    color = originalColor,
+                val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
+                val annotatedOriginal = annotatedSubtitleText(
+                    text = segment.originalText,
+                    words = segment.words,
+                    activeWordIndex = if (active) activeWordIndex else -1,
+                    baseColor = originalColor,
+                    highlightColor = highlightColor,
+                    wordLearningEnabled = shouldHighlightPos,
+                    languageCode = resolvedSourceLanguage,
                 )
+                if (shouldHighlightPos && tapToLearnEnabled) {
+                    ClickableText(
+                        text = annotatedOriginal,
+                        style = TextStyle(
+                            fontSize = (17 * fontScale).sp,
+                            lineHeight = (22 * fontScale).sp,
+                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
+                            color = originalColor,
+                        ),
+                        onClick = { offset ->
+                            val token = findWordAtOffset(segment.originalText, offset, resolvedSourceLanguage)
+                            if (token != null) {
+                                onWordClick(token)
+                            } else {
+                                onReplay()
+                            }
+                        },
+                    )
+                } else {
+                    Text(
+                        text = annotatedOriginal,
+                        fontSize = (17 * fontScale).sp,
+                        lineHeight = (22 * fontScale).sp,
+                        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
+                        color = originalColor,
+                    )
+                }
                 Spacer(Modifier.height(2.dp))
-                Text(
-                    text = segment.translatedText ?: "Translating…",
-                    fontSize = (14 * fontScale).sp,
-                    lineHeight = (18 * fontScale).sp,
-                    color = translatedColor,
-                )
+                val shouldHighlightTrans = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
+                val translatedText = segment.translatedText
+                val fallbackText = if (isDownloadingTranslationModel) {
+                    "Downloading translation model…"
+                } else {
+                    "Translating…"
+                }
+                val annotatedTrans = if (shouldHighlightTrans && translatedText != null) {
+                    annotatedSubtitleText(
+                        text = translatedText,
+                        words = emptyList(),
+                        activeWordIndex = -1,
+                        baseColor = translatedColor,
+                        highlightColor = highlightColor,
+                        wordLearningEnabled = true,
+                        languageCode = targetLanguage,
+                    )
+                } else {
+                    AnnotatedString(translatedText ?: fallbackText)
+                }
+                if (shouldHighlightTrans && tapToLearnEnabled && translatedText != null) {
+                    ClickableText(
+                        text = annotatedTrans,
+                        style = TextStyle(
+                            fontSize = (14 * fontScale).sp,
+                            lineHeight = (18 * fontScale).sp,
+                            color = translatedColor,
+                        ),
+                        onClick = { offset ->
+                            val token = findWordAtOffset(translatedText, offset, targetLanguage)
+                            if (token != null) {
+                                onWordClick(token)
+                            } else {
+                                onReplay()
+                            }
+                        },
+                    )
+                } else {
+                    Text(
+                        text = annotatedTrans,
+                        fontSize = (14 * fontScale).sp,
+                        lineHeight = (18 * fontScale).sp,
+                        color = translatedColor,
+                    )
+                }
             }
         }
     }
@@ -855,6 +995,19 @@ internal fun SubtitleSettingsDialog(
     wordHighlightEnabled: Boolean = true,
     karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     customColorsEnabled: Boolean = true,
+    splitLongSentencesEnabled: Boolean = true,
+    lockOverlayToVideo: Boolean = false,
+    onLockOverlayToVideoChange: (Boolean) -> Unit = {},
+    preloadModelsEnabled: Boolean = true,
+    onPreloadModelsChange: (Boolean) -> Unit = {},
+    naturalSubtitlesEnabled: Boolean = true,
+    onNaturalSubtitlesChange: (Boolean) -> Unit = {},
+    wordLearningEnabled: Boolean = false,
+    onWordLearningChange: (Boolean) -> Unit = {},
+    wordLearningTarget: String = "original",
+    onWordLearningTargetChange: (String) -> Unit = {},
+    tapToLearnEnabled: Boolean = true,
+    onTapToLearnChange: (Boolean) -> Unit = {},
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
@@ -866,7 +1019,6 @@ internal fun SubtitleSettingsDialog(
     onWordHighlightChange: (Boolean) -> Unit = {},
     onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit = {},
     onCustomColorsChange: (Boolean) -> Unit = {},
-    splitLongSentencesEnabled: Boolean = true,
     onSplitSentencesChange: (Boolean) -> Unit = {},
     onResetSettings: () -> Unit = {},
     onDismiss: () -> Unit,
@@ -1166,6 +1318,13 @@ internal fun SubtitleSettingsDialog(
                             testTag = "movable_subtitle_box_switch",
                         )
                         SettingsSwitchRow(
+                            title = "Lock overlay to video player",
+                            description = "Keep the portrait subtitle overlay strictly within the video player area instead of allowing free movement down across the screen (useful for 16:9 videos).",
+                            checked = lockOverlayToVideo,
+                            onCheckedChange = onLockOverlayToVideoChange,
+                            testTag = "lock_overlay_to_video_switch",
+                        )
+                        SettingsSwitchRow(
                             title = "Automatically avoid video controls",
                             description = "Move subtitles upward while YouTube's seek bar and playback controls are visible.",
                             checked = autoAvoidPlayerControls,
@@ -1225,6 +1384,64 @@ internal fun SubtitleSettingsDialog(
                         ) {
                             Text("Reset subtitle positions")
                         }
+
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Word learning mode (POS colors)",
+                            description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",
+                            checked = wordLearningEnabled,
+                            onCheckedChange = onWordLearningChange,
+                            testTag = "word_learning_mode_switch",
+                        )
+                        if (wordLearningEnabled) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                "Colored subtitle lines",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                listOf("original" to "Original", "translation" to "Translation", "both" to "Both").forEach { (targetKey, targetLabel) ->
+                                    FilterChip(
+                                        selected = wordLearningTarget == targetKey,
+                                        onClick = { onWordLearningTargetChange(targetKey) },
+                                        label = { Text(targetLabel) },
+                                    )
+                                }
+                            }
+                            SettingsSwitchRow(
+                                title = "Tap word for definition",
+                                description = "Tap any word in dual subtitles to inspect its reading, part of speech, and instant translation popup.",
+                                checked = tapToLearnEnabled,
+                                onCheckedChange = onTapToLearnChange,
+                                testTag = "tap_to_learn_switch",
+                            )
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        Text("Auto-transcripts & Translation", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Natural subtitle flow & punctuation",
+                            description = "Merge auto-generated captions along speech pauses and clauses with proper capitalization for natural readability.",
+                            checked = naturalSubtitlesEnabled,
+                            onCheckedChange = onNaturalSubtitlesChange,
+                            testTag = "natural_subtitles_switch",
+                        )
+                        SettingsSwitchRow(
+                            title = "Preload translation models in background",
+                            description = "Pre-download offline translation models eagerly on launch so playback starts immediately with zero translation wait.",
+                            checked = preloadModelsEnabled,
+                            onCheckedChange = onPreloadModelsChange,
+                            testTag = "preload_models_switch",
+                        )
 
                         Spacer(Modifier.height(14.dp))
                         HorizontalDivider()

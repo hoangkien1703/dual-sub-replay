@@ -14,7 +14,16 @@ internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 75L
 
 /** Splits [text] into words and spreads them across the cue duration by length. */
 internal fun estimateWordTimings(text: String, startMs: Long, endMs: Long): List<SubtitleWord> {
-    val tokens = text.split(Regex("\\s+")).filter(String::isNotBlank)
+    val tokens = if (LanguageAwareTokenizer.isCjk(text)) {
+        val analyzed = LanguageAwareTokenizer.tokenize(text)
+        if (analyzed.isNotEmpty()) {
+            analyzed.map { it.text }
+        } else {
+            text.split(Regex("\\s+")).filter(String::isNotBlank)
+        }
+    } else {
+        text.split(Regex("\\s+")).filter(String::isNotBlank)
+    }
     if (tokens.isEmpty() || endMs <= startMs) return emptyList()
     val weights = tokens.map { token -> token.length.coerceAtLeast(1).toLong() }
     val totalWeight = weights.sum().coerceAtLeast(1L)

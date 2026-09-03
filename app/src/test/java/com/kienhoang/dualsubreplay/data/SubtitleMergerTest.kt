@@ -238,4 +238,28 @@ class SubtitleMergerTest {
         assertTrue(split.all { it.originalText.length <= SPLIT_SENTENCE_MAX_CHARACTERS })
         assertEquals(longCjk.length, split.sumOf { it.originalText.length })
     }
+
+    @Test fun enhancedNaturalFlowMergesAutoTranscriptsAtPausesAndCapitalizes() {
+        val cues = listOf(
+            RawCaptionCue(startMs = 0, endMs = 800, text = "i was walking home"),
+            RawCaptionCue(startMs = 1_000, endMs = 1_800, text = "and then it rained"),
+            RawCaptionCue(startMs = 2_000, endMs = 3_000, text = "so i ran quickly"),
+        )
+
+        val merged = SubtitleMerger.merge(cues, enhancedNaturalFlow = true)
+
+        assertTrue("Should have merged into natural sentences, size=${merged.size}", merged.isNotEmpty())
+        assertTrue("First word should be capitalized", merged.first().originalText.startsWith("I was"))
+    }
+
+    @Test fun formatNaturalTranslationEnsuresPunctuationAndCapitalization() {
+        val raw = "xin chào thế giới"
+        val formatted = SubtitleMerger.formatNaturalTranslation(raw)
+
+        assertEquals("Xin chào thế giới.", formatted)
+
+        val alreadyPunctual = "Hôm nay trời đẹp!"
+        assertEquals("Hôm nay trời đẹp!", SubtitleMerger.formatNaturalTranslation(alreadyPunctual))
+    }
 }
+
