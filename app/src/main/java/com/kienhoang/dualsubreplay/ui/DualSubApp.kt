@@ -160,6 +160,8 @@ fun DualSubApp(
                 onWordLearningChange = viewModel::setWordLearningEnabled,
                 wordLearningTarget = state.wordLearningTarget,
                 onWordLearningTargetChange = viewModel::setWordLearningTarget,
+                wordLearningActiveOnly = state.wordLearningActiveOnly,
+                onWordLearningActiveOnlyChange = viewModel::setWordLearningActiveOnly,
                 tapToLearnEnabled = state.tapToLearnEnabled,
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
                 onWordClick = viewModel::selectLearningToken,
@@ -213,6 +215,8 @@ private fun DualSubExperience(
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "both",
     onWordLearningTargetChange: (String) -> Unit = {},
+    wordLearningActiveOnly: Boolean = true,
+    onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
     onWordClick: (AnalyzedToken) -> Unit = {},
@@ -382,6 +386,8 @@ private fun DualSubExperience(
             onWordLearningChange = onWordLearningChange,
             wordLearningTarget = state.wordLearningTarget,
             onWordLearningTargetChange = onWordLearningTargetChange,
+            wordLearningActiveOnly = state.wordLearningActiveOnly,
+            onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
             tapToLearnEnabled = state.tapToLearnEnabled,
             onTapToLearnChange = onTapToLearnChange,
             onSourceChange = onSourceChange,
@@ -784,6 +790,7 @@ private fun SubtitleTimeline(
                 highlightColor = effectiveHighlightColor(state),
                 wordLearningEnabled = state.wordLearningEnabled,
                 wordLearningTarget = state.wordLearningTarget,
+                wordLearningActiveOnly = state.wordLearningActiveOnly,
                 tapToLearnEnabled = state.tapToLearnEnabled,
                 resolvedSourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
                 targetLanguage = state.targetLanguage,
@@ -831,6 +838,7 @@ internal fun CompactSubtitleCard(
     highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
     wordLearningEnabled: Boolean = false,
     wordLearningTarget: String = "both",
+    wordLearningActiveOnly: Boolean = true,
     tapToLearnEnabled: Boolean = true,
     resolvedSourceLanguage: String? = null,
     targetLanguage: String = "vi",
@@ -874,7 +882,8 @@ internal fun CompactSubtitleCard(
             }
             Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
-                val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
+                val isSentenceEligibleForPos = !wordLearningActiveOnly || active
+                val shouldHighlightPos = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "original" || wordLearningTarget == "both")
                 val annotatedOriginal = annotatedSubtitleText(
                     text = segment.originalText,
                     words = segment.words,
@@ -884,7 +893,7 @@ internal fun CompactSubtitleCard(
                     wordLearningEnabled = shouldHighlightPos,
                     languageCode = resolvedSourceLanguage,
                 )
-                if (shouldHighlightPos && tapToLearnEnabled) {
+                if (wordLearningEnabled && tapToLearnEnabled) {
                     ClickableText(
                         text = annotatedOriginal,
                         style = TextStyle(
@@ -912,7 +921,7 @@ internal fun CompactSubtitleCard(
                     )
                 }
                 Spacer(Modifier.height(2.dp))
-                val shouldHighlightTrans = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
+                val shouldHighlightTrans = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "translation" || wordLearningTarget == "both")
                 val translatedText = segment.translatedText
                 val fallbackText = if (isDownloadingTranslationModel) {
                     "Downloading translation model…"
@@ -936,7 +945,7 @@ internal fun CompactSubtitleCard(
                 } else {
                     AnnotatedString(translatedText ?: fallbackText)
                 }
-                if (shouldHighlightTrans && tapToLearnEnabled && translatedText != null) {
+                if (wordLearningEnabled && tapToLearnEnabled && translatedText != null) {
                     ClickableText(
                         text = annotatedTrans,
                         style = TextStyle(
@@ -1022,6 +1031,8 @@ internal fun SubtitleSettingsDialog(
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "both",
     onWordLearningTargetChange: (String) -> Unit = {},
+    wordLearningActiveOnly: Boolean = true,
+    onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
     onSourceChange: (String) -> Unit,
@@ -1252,6 +1263,13 @@ internal fun SubtitleSettingsDialog(
                                 checked = tapToLearnEnabled,
                                 onCheckedChange = onTapToLearnChange,
                                 testTag = "tap_to_learn_switch",
+                            )
+                            SettingsSwitchRow(
+                                title = "Highlight active sentence only",
+                                description = "Only apply POS colors to the sentence currently being spoken to keep the transcript clean and focused.",
+                                checked = wordLearningActiveOnly,
+                                onCheckedChange = onWordLearningActiveOnlyChange,
+                                testTag = "word_learning_active_only_switch",
                             )
                         }
 

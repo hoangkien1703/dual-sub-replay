@@ -57,6 +57,7 @@ data class DualSubUiState(
     val naturalSubtitlesEnabled: Boolean = true,
     val wordLearningEnabled: Boolean = true,
     val wordLearningTarget: String = "both",
+    val wordLearningActiveOnly: Boolean = true,
     val tapToLearnEnabled: Boolean = true,
     val selectedLearningToken: AnalyzedToken? = null,
     val stage: LoadStage = LoadStage.IDLE,
@@ -198,6 +199,7 @@ internal const val NATURAL_SUBTITLES_PREFERENCE = "enhanced_natural_subtitles"
 internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enabled"
 internal const val WORD_LEARNING_TARGET_PREFERENCE = "word_learning_target"
 internal const val TAP_TO_LEARN_PREFERENCE = "tap_to_learn_enabled"
+internal const val WORD_LEARNING_ACTIVE_ONLY_PREFERENCE = "word_learning_active_only"
 
 /**
  * The "guide_completed" preference only exists after the first-launch guide has
@@ -278,6 +280,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
             ),
             wordLearningTarget = preferences.getString(WORD_LEARNING_TARGET_PREFERENCE, "both") ?: "both",
+            wordLearningActiveOnly = storedFeatureEnabled(
+                preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
+            ),
             tapToLearnEnabled = storedFeatureEnabled(
                 preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
             ),
@@ -537,6 +542,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(tapToLearnEnabled = enabled) }
     }
 
+    fun setWordLearningActiveOnly(enabled: Boolean) {
+        preferences.edit().putBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, enabled).apply()
+        _state.update { it.copy(wordLearningActiveOnly = enabled) }
+    }
+
     fun selectLearningToken(token: AnalyzedToken?) {
         _state.update { it.copy(selectedLearningToken = token) }
     }
@@ -593,6 +603,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 naturalSubtitlesEnabled = true,
                 wordLearningEnabled = true,
                 wordLearningTarget = "both",
+                wordLearningActiveOnly = true,
                 tapToLearnEnabled = true,
                 selectedLearningToken = null,
             )
