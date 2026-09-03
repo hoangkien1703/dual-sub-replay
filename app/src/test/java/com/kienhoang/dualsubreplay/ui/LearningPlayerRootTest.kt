@@ -248,4 +248,21 @@ class LearningPlayerRootTest {
         assertTrue(hidden.contains("visibility: hidden !important"))
         assertTrue(restored.contains("existing.remove()"))
     }
+
+    @Test
+    fun portraitOverlayTopPaddingAllowsFullVerticalTravelWhenUnlocked() {
+        val screenWidth = 360
+        val screenHeight = 800
+
+        val lockedTop = portraitLearningOverlayTopPaddingDp(screenWidth, position = 0f, screenHeightDp = screenHeight, lockToVideo = true)
+        val lockedBottom = portraitLearningOverlayTopPaddingDp(screenWidth, position = 1f, screenHeightDp = screenHeight, lockToVideo = true)
+        assertTrue(lockedTop >= 84)
+        assertTrue(lockedBottom <= 320)
+
+        val unlockedTop = portraitLearningOverlayTopPaddingDp(screenWidth, position = 0f, screenHeightDp = screenHeight, lockToVideo = false)
+        val unlockedBottom = portraitLearningOverlayTopPaddingDp(screenWidth, position = 1f, screenHeightDp = screenHeight, lockToVideo = false)
+        assertEquals(84, unlockedTop)
+        assertTrue("Unlocked bottom padding should reach lower screen area, was $unlockedBottom", unlockedBottom > 600)
+    }
 }
+

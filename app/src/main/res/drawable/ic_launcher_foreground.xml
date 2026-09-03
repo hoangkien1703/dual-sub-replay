@@ -4,10 +4,12 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Dark rounded player plate -->
     <path
-        android:fillColor="#13C6D7"
-        android:pathData="M22,28C22,22 27,18 33,18H75C81,18 86,22 86,28V68C86,74 81,78 75,78H51L36,91V78H33C27,78 22,74 22,68Z" />
+        android:fillColor="#0B1C20"
+        android:pathData="M40,37 H68 C73.5,37 78,41.5 78,47 V61 C78,66.5 73.5,71 68,71 H40 C34.5,71 30,66.5 30,61 V47 C30,41.5 34.5,37 40,37 Z" />
+    <!-- Cyan play triangle centered in the plate -->
     <path
-        android:fillColor="#061416"
-        android:pathData="M47,35L70,48L47,61Z" />
+        android:fillColor="#00C5E5"
+        android:pathData="M49,46 C49,44.8 50.3,44.1 51.3,44.7 L62.5,52.7 C63.5,53.3 63.5,54.7 62.5,55.3 L51.3,63.3 C50.3,63.9 49,63.2 49,62.0 Z" />
 </vector>

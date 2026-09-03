@@ -160,15 +160,16 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v0.9.5 highlights
+            ## v0.9.6 highlights
 
-            - Adds Adaptive spoken-word timing for eligible YouTube auto-generated captions by mapping live rendered caption words onto the app's transcript.
-            - Adds strict Live YouTube captions and always-available Transcript timing choices in subtitle settings.
-            - Keeps manual captions and videos without a reliable live word signal on transcript timing, with a safe Adaptive fallback.
-            - Preserves the single-WebView architecture, trusted HTTPS YouTube origin checks, and persisted/resettable subtitle settings.
-            - Expands unit, Compose UI, architecture, and WebView lifecycle coverage for live caption capture and karaoke mapping.
-
-            Live timing depends on YouTube's webpage caption rendering and can vary by video, device, and WebView version. Unsupported cases continue using transcript timing.
+            - **Word Learning Mode (POS Colors & Tap-to-Learn)**: Color-coded grammatical parts of speech (nouns, verbs, adjectives, adverbs, pronouns, conjunctions, prepositions, particles) and instant tap-to-learn dictionary popups (#42).
+            - **Cross-Language Subtitle Alignment**: Harmonized POS coloring across both original and translated subtitle lines, with unaligned/filler words rendered in dark slate gray (#42 V4 & V5).
+            - **Active-Sentence-Only Focus**: Keeps the transcript list calm, legible, and clutter-free by lighting up only the currently spoken sentence, with a toggle in More Settings (#42).
+            - **Preload Translation Models**: Automatic background preloading of ML Kit translation models for instant translations on video open (#47).
+            - **Video Overlay Aspect Ratio Lock**: Lock the minimized subtitle overlay to the video player bounds (#46).
+            - **Japanese & CJK Morphological Timing**: High-precision morpheme segmentation for non-spaced languages during karaoke playback (#44).
+            - **Natural Subtitle Flow**: Cleaner subtitle presentation without artificial boundary punctuation (#43).
+            - **Clean Playback UI**: Suppressed YouTube player overlays and cluttering web elements during video playback (#37).
 
             The `.sha256` file can be used to verify the APK download.
           files: |

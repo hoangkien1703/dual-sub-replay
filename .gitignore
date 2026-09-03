@@ -14,3 +14,5 @@ keystore.properties
 tools/promo-video/node_modules/
 tools/promo-video/.cache/
 tools/promo-video/out/
+Screenshot*.png
+

@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -50,6 +51,15 @@ data class DualSubUiState(
     val karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     val customColorsEnabled: Boolean = true,
     val splitLongSentencesEnabled: Boolean = true,
+    val isDownloadingTranslationModel: Boolean = false,
+    val lockOverlayToVideo: Boolean = false,
+    val preloadModelsEnabled: Boolean = true,
+    val naturalSubtitlesEnabled: Boolean = true,
+    val wordLearningEnabled: Boolean = true,
+    val wordLearningTarget: String = "both",
+    val wordLearningActiveOnly: Boolean = true,
+    val tapToLearnEnabled: Boolean = true,
+    val selectedLearningToken: AnalyzedToken? = null,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -183,6 +193,13 @@ internal fun normalizedOnboardingLanguages(
 
 internal const val GUIDE_COMPLETED_PREFERENCE = "guide_completed"
 internal const val SPLIT_LONG_SENTENCES_PREFERENCE = "split_long_sentences"
+internal const val LOCK_OVERLAY_TO_VIDEO_PREFERENCE = "lock_overlay_to_video_player"
+internal const val PRELOAD_MODELS_ENABLED_PREFERENCE = "preload_translation_models"
+internal const val NATURAL_SUBTITLES_PREFERENCE = "enhanced_natural_subtitles"
+internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enabled"
+internal const val WORD_LEARNING_TARGET_PREFERENCE = "word_learning_target"
+internal const val TAP_TO_LEARN_PREFERENCE = "tap_to_learn_enabled"
+internal const val WORD_LEARNING_ACTIVE_ONLY_PREFERENCE = "word_learning_active_only"
 
 /**
  * The "guide_completed" preference only exists after the first-launch guide has
@@ -250,9 +267,35 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             splitLongSentencesEnabled = storedFeatureEnabled(
                 preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
             ),
+            lockOverlayToVideo = storedFeatureEnabled(
+                preferences.getBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, false),
+            ),
+            preloadModelsEnabled = storedFeatureEnabled(
+                preferences.getBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, true),
+            ),
+            naturalSubtitlesEnabled = storedFeatureEnabled(
+                preferences.getBoolean(NATURAL_SUBTITLES_PREFERENCE, true),
+            ),
+            wordLearningEnabled = storedFeatureEnabled(
+                preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
+            ),
+            wordLearningTarget = preferences.getString(WORD_LEARNING_TARGET_PREFERENCE, "both") ?: "both",
+            wordLearningActiveOnly = storedFeatureEnabled(
+                preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
+            ),
+            tapToLearnEnabled = storedFeatureEnabled(
+                preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
+            ),
         ),
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
+
+    init {
+        if (_state.value.preloadModelsEnabled) {
+            val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
+            warmTranslationModel(sourceLanguage = source, targetLanguage = _state.value.targetLanguage)
+        }
+    }
 
     fun acceptSharedText(text: String) {
         val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
@@ -461,6 +504,59 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun setLockOverlayToVideo(locked: Boolean) {
+        preferences.edit().putBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, locked).apply()
+        _state.update { it.copy(lockOverlayToVideo = locked) }
+    }
+
+    fun setPreloadModelsEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, enabled).apply()
+        _state.update { it.copy(preloadModelsEnabled = enabled) }
+        if (enabled) {
+            val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
+            warmTranslationModel(sourceLanguage = source, targetLanguage = _state.value.targetLanguage)
+        }
+    }
+
+    fun setNaturalSubtitlesEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(NATURAL_SUBTITLES_PREFERENCE, enabled).apply()
+        _state.update { it.copy(naturalSubtitlesEnabled = enabled) }
+        val videoId = _state.value.activeVideoId
+        if (videoId != null) {
+            loadVideo(videoId = videoId, showPanel = _state.value.subtitlePanelVisible)
+        }
+    }
+
+    fun setWordLearningEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(WORD_LEARNING_ENABLED_PREFERENCE, enabled).apply()
+        _state.update { it.copy(wordLearningEnabled = enabled) }
+    }
+
+    fun setWordLearningTarget(target: String) {
+        preferences.edit().putString(WORD_LEARNING_TARGET_PREFERENCE, target).apply()
+        _state.update { it.copy(wordLearningTarget = target) }
+    }
+
+    fun setTapToLearnEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(TAP_TO_LEARN_PREFERENCE, enabled).apply()
+        _state.update { it.copy(tapToLearnEnabled = enabled) }
+    }
+
+    fun setWordLearningActiveOnly(enabled: Boolean) {
+        preferences.edit().putBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, enabled).apply()
+        _state.update { it.copy(wordLearningActiveOnly = enabled) }
+    }
+
+    fun selectLearningToken(token: AnalyzedToken?) {
+        _state.update { it.copy(selectedLearningToken = token) }
+    }
+
+    suspend fun translateWord(word: String): String {
+        val current = _state.value
+        val source = current.resolvedSourceLanguage ?: current.sourcePreference.takeUnless { it == "auto" } ?: "en"
+        return translator.translateSingle(source, current.targetLanguage, word)
+    }
+
     private fun setSubtitleColorKey(preferenceKey: String, key: String, fallback: String) {
         val normalized = storedSubtitleColorKey(key, fallback)
         val currentKey = when (preferenceKey) {
@@ -502,6 +598,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 karaokeTimingMode = KaraokeTimingMode.ADAPTIVE,
                 customColorsEnabled = true,
                 splitLongSentencesEnabled = true,
+                lockOverlayToVideo = false,
+                preloadModelsEnabled = true,
+                naturalSubtitlesEnabled = true,
+                wordLearningEnabled = true,
+                wordLearningTarget = "both",
+                wordLearningActiveOnly = true,
+                tapToLearnEnabled = true,
+                selectedLearningToken = null,
             )
         }
         // "Reset all settings" re-enables sentence splitting, so the currently
@@ -575,7 +679,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val preferredLanguages = preferredCaptionLanguages(_state.value.sourcePreference)
                 val track = captionProvider.fetch(videoId, preferredLanguages)
-                val merged = SubtitleMerger.merge(track.cues)
+                val merged = SubtitleMerger.merge(
+                    track.cues,
+                    enhancedNaturalFlow = _state.value.naturalSubtitlesEnabled,
+                )
                 if (merged.isEmpty()) {
                     throw CaptionUnavailableException("This caption track contains no readable text.")
                 }
@@ -707,8 +814,23 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 sourceLanguageCode = sourceLanguage,
                 targetLanguageCode = targetLanguage,
                 texts = batch.map { segments[it].originalText },
-            ) { batchOffset, translatedText ->
+                onDownloadingChange = { isDownloading ->
+                    _state.update { current ->
+                        current.copy(
+                            isDownloadingTranslationModel = isDownloading,
+                            statusMessage = if (isDownloading) {
+                                "Downloading ${TranslationLanguages.displayName(targetLanguage)} model (one-time setup)…"
+                            } else current.statusMessage,
+                        )
+                    }
+                },
+            ) { batchOffset, rawTranslatedText ->
                 val index = batch[batchOffset]
+                val translatedText = if (_state.value.naturalSubtitlesEnabled) {
+                    SubtitleMerger.formatNaturalTranslation(rawTranslatedText)
+                } else {
+                    rawTranslatedText
+                }
                 working[index] = working[index].copy(translatedText = translatedText)
                 completed += 1
                 publishProgress()

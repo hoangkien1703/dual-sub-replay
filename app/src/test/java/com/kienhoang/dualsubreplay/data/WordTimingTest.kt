@@ -127,4 +127,14 @@ class WordTimingTest {
         assertEquals(segment.startMs, segment.words.first().startMs)
         assertEquals(segment.endMs, segment.words.last().endMs)
     }
+
+    @Test fun estimatesWordTimingsForJapaneseWithoutSpaces() {
+        val words = estimateWordTimings("桜の花が咲く", startMs = 0, endMs = 2_000)
+
+        assertTrue(words.size >= 3)
+        assertEquals(0L, words.first().startMs)
+        assertEquals(2_000L, words.last().endMs)
+        assertTrue(words.zipWithNext().all { (left, right) -> left.endMs == right.startMs })
+    }
 }
+

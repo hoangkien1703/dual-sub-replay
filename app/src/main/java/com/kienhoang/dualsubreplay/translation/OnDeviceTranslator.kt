@@ -26,12 +26,30 @@ class OnDeviceTranslator {
     suspend fun prepare(
         sourceLanguageCode: String,
         targetLanguageCode: String,
+        onDownloadingChange: ((Boolean) -> Unit)? = null,
     ) {
         val languages = resolveLanguages(sourceLanguageCode, targetLanguageCode)
         if (languages.source == languages.target) return
         val translator = newTranslator(languages)
         try {
+            ensureModelReady(languages, translator, onDownloadingChange)
+        } finally {
+            translator.close()
+        }
+    }
+
+    suspend fun translateSingle(
+        sourceLanguageCode: String,
+        targetLanguageCode: String,
+        text: String,
+    ): String {
+        if (text.isBlank()) return text
+        val languages = resolveLanguages(sourceLanguageCode, targetLanguageCode)
+        if (languages.source == languages.target) return text
+        val translator = newTranslator(languages)
+        return try {
             ensureModelReady(languages, translator)
+            translator.translate(text).awaitResult()
         } finally {
             translator.close()
         }
@@ -41,6 +59,7 @@ class OnDeviceTranslator {
         sourceLanguageCode: String,
         targetLanguageCode: String,
         texts: List<String>,
+        onDownloadingChange: ((Boolean) -> Unit)? = null,
         onTranslation: suspend (index: Int, translatedText: String) -> Unit,
     ) {
         val languages = resolveLanguages(sourceLanguageCode, targetLanguageCode)
@@ -51,7 +70,7 @@ class OnDeviceTranslator {
 
         val translator = newTranslator(languages)
         try {
-            ensureModelReady(languages, translator)
+            ensureModelReady(languages, translator, onDownloadingChange)
             texts.indices.forEach { index ->
                 onTranslation(index, translator.translate(texts[index]).awaitResult())
             }
@@ -84,11 +103,16 @@ class OnDeviceTranslator {
             .build(),
     )
 
-    private suspend fun ensureModelReady(languages: TranslationPair, translator: Translator) {
+    private suspend fun ensureModelReady(
+        languages: TranslationPair,
+        translator: Translator,
+        onDownloadingChange: ((Boolean) -> Unit)? = null,
+    ) {
         val pairKey = "${languages.source}>${languages.target}"
         modelDownloadMutex.withLock {
             if (pairKey in preparedPairs) return
             try {
+                onDownloadingChange?.invoke(true)
                 withTimeout(MODEL_DOWNLOAD_TIMEOUT_MS) {
                     translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).awaitResult()
                 }
@@ -98,6 +122,8 @@ class OnDeviceTranslator {
                     "The translation model download took too long. Check your internet connection and retry.",
                     error,
                 )
+            } finally {
+                onDownloadingChange?.invoke(false)
             }
         }
     }

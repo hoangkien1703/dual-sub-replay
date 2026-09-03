@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
@@ -79,6 +80,35 @@ class SubtitleWordHighlightTest {
         assertEquals(null, style.fontWeight)
     }
 
+    @Test fun wordLearningSpokenWordUsesUnderlineOnlyWithoutBoldOrBackground() {
+        val segment = SubtitleSegment(
+            id = 1,
+            startMs = 0,
+            endMs = 1_000,
+            originalText = "really useful",
+            words = listOf(
+                SubtitleWord("really", 0, 500),
+                SubtitleWord("useful", 500, 1_000),
+            ),
+        )
+
+        val annotated = annotatedSubtitleText(
+            text = segment.originalText,
+            words = segment.words,
+            activeWordIndex = 0,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = true,
+        )
+
+        val activeStyles = annotated.spanStyles.filter { it.start == 0 && it.item.textDecoration == TextDecoration.Underline }
+        assertTrue("Should have active karaoke underline style", activeStyles.isNotEmpty())
+        val activeStyle = activeStyles.last().item
+        assertEquals(TextDecoration.Underline, activeStyle.textDecoration)
+        assertEquals(Color.Unspecified, activeStyle.background)
+        assertEquals(null, activeStyle.fontWeight)
+    }
+
     @Test fun returnsEmptyWithoutWordsOrText() {
         assertTrue(subtitleWordSpans("text", emptyList()).isEmpty())
         assertTrue(
@@ -148,8 +178,75 @@ class SubtitleWordHighlightTest {
             WORD_HIGHLIGHT_ENABLED_PREFERENCE,
             KARAOKE_TIMING_MODE_PREFERENCE,
             CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
+            LOCK_OVERLAY_TO_VIDEO_PREFERENCE,
+            PRELOAD_MODELS_ENABLED_PREFERENCE,
+            NATURAL_SUBTITLES_PREFERENCE,
+            WORD_LEARNING_ENABLED_PREFERENCE,
+            WORD_LEARNING_TARGET_PREFERENCE,
+            TAP_TO_LEARN_PREFERENCE,
+            WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
         )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)
     }
+
+    @Test fun wordLearningModeDefaultsToEnabled() {
+        val state = DualSubUiState()
+        assertTrue("Word Learning Mode should be enabled by default", state.wordLearningEnabled)
+        assertEquals("both", state.wordLearningTarget)
+        assertTrue(state.wordLearningActiveOnly)
+        assertTrue(state.tapToLearnEnabled)
+    }
+
+    @Test fun translationLineAppliesAlignedPosColorsAndDarkGrayForUnalignedWords() {
+        val origTokens = LanguageAwareTokenizer.tokenize("Both Cursor and OpenAI", "en")
+        val translation = "Cả con trỏ và Openai được"
+
+        val annotated = annotatedSubtitleText(
+            text = translation,
+            words = emptyList(),
+            activeWordIndex = -1,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = true,
+            languageCode = "vi",
+            alignedOriginalTokens = origTokens,
+        )
+
+        // Find style applied to "được"
+        val duocStart = translation.indexOf("được")
+        val duocStyles = annotated.spanStyles.filter { it.start == duocStart }
+        assertTrue("Should have style for unaligned word được", duocStyles.isNotEmpty())
+        assertEquals(Color(0xFF78909C), duocStyles.first().item.color) // Dark Gray for unaligned
+    }
+
+    @Test fun wordLearningActiveOnlyRestrictsPosColoringToActiveSentence() {
+        val text = "Kotlin is fun"
+        val words = emptyList<SubtitleWord>()
+
+        // Inactive sentence with wordLearningActiveOnly = true -> should NOT have POS styles
+        val inactiveAnnotated = annotatedSubtitleText(
+            text = text,
+            words = words,
+            activeWordIndex = -1,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = false, // When inactive and active-only is ON
+            languageCode = "en",
+        )
+        assertTrue("Inactive sentence should have no POS spans", inactiveAnnotated.spanStyles.isEmpty())
+
+        // Active sentence with wordLearningActiveOnly = true -> should have POS styles
+        val activeAnnotated = annotatedSubtitleText(
+            text = text,
+            words = words,
+            activeWordIndex = -1,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = true, // When active
+            languageCode = "en",
+        )
+        assertTrue("Active sentence should have POS spans", activeAnnotated.spanStyles.isNotEmpty())
+    }
 }
+

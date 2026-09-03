@@ -47,11 +47,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -209,19 +213,29 @@ internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayConte
     }
 }
 
-/** Places the portrait overlay near the lower edge of a typical 16:9 mobile YouTube player. */
+/** Places the portrait overlay near the player or across the full screen height (Issue #46). */
 internal fun portraitLearningOverlayTopPaddingDp(
     screenWidthDp: Int,
     position: Float = DEFAULT_OVERLAY_VERTICAL_POSITION,
+    screenHeightDp: Int = 0,
+    lockToVideo: Boolean = false,
 ): Int {
     val width = screenWidthDp.coerceAtLeast(0).toFloat()
     val estimatedVideoBottom = 56f + width * 9f / 16f
     val minimumTop = 84f
-    val maximumTop = (estimatedVideoBottom - 80f).coerceAtLeast(minimumTop)
     val normalized = normalizeOverlayVerticalPosition(position)
-    return (minimumTop + (maximumTop - minimumTop) * normalized)
-        .roundToInt()
-        .coerceIn(84, 320)
+    return if (lockToVideo || screenHeightDp <= 0) {
+        val maximumTop = (estimatedVideoBottom - 80f).coerceAtLeast(minimumTop)
+        (minimumTop + (maximumTop - minimumTop) * normalized)
+            .roundToInt()
+            .coerceIn(minimumTop.toInt(), 320)
+    } else {
+        // Free movement anywhere across the screen in portrait (YouTube Shorts & full-screen vertical drag)
+        val maximumTop = (screenHeightDp - 120f).coerceAtLeast(minimumTop)
+        (minimumTop + (maximumTop - minimumTop) * normalized)
+            .roundToInt()
+            .coerceIn(minimumTop.toInt(), (screenHeightDp - 60).coerceAtLeast(minimumTop.toInt()))
+    }
 }
 
 /** Keeps one persistent YouTube WebView while changing only the learning presentation layer. */
@@ -473,6 +487,13 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     translatedColor = effectiveTranslatedColor(state),
                     highlightColor = effectiveHighlightColor(state),
                     backgroundColor = subtitleBoxBackgroundColor,
+                    wordLearningEnabled = state.wordLearningEnabled,
+                    wordLearningTarget = state.wordLearningTarget,
+                    tapToLearnEnabled = state.tapToLearnEnabled,
+                    originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
+                    targetLanguageCode = state.targetLanguage,
+                    lockToVideo = state.lockOverlayToVideo,
+                    onWordClick = viewModel::selectLearningToken,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(start = 20.dp, end = 20.dp, bottom = fullscreenBottomPadding),
@@ -497,52 +518,71 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         )
 
         if (
-  state.onboardingCompleted &&
-  state.guideCompleted &&
-  state.activeVideoId != null &&
-  effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
+            state.onboardingCompleted &&
+            state.guideCompleted &&
+            state.activeVideoId != null &&
+            effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
         ) {
-  overlayContent?.let { content ->
-      val overlayModifier = if (
-          configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-      ) {
-          Modifier
-              .align(Alignment.BottomCenter)
-              .padding(start = 18.dp, end = 18.dp, bottom = bottomPadding)
-      } else {
-          val baseTop = portraitLearningOverlayTopPaddingDp(
-              configuration.screenWidthDp,
-              overlayVerticalPosition,
-          )
-          Modifier
-              .align(Alignment.TopCenter)
-              .padding(
-                  start = 18.dp,
-                  end = 18.dp,
-                  top = (baseTop - controlsLiftDp).coerceAtLeast(72).dp,
-              )
-      }
-      LearningSubtitleOverlay(
-          content = content,
-          fontScale = state.fontScale,
-          position = overlayVerticalPosition,
-          orientation = configuration.orientation,
-          movableEnabled = movableSubtitleBox,
-          horizontalPosition = overlayHorizontalPosition,
-          originalColor = effectiveOriginalColor(state),
-          translatedColor = effectiveTranslatedColor(state),
-          highlightColor = effectiveHighlightColor(state),
-          backgroundColor = subtitleBoxBackgroundColor,
-          modifier = overlayModifier,
-          onPositionChange = ::updateOverlayPosition,
-          onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
-          onPositionChangeFinished = ::commitOverlayPosition,
-          onSettings = ::requestSubtitleSettings,
-          onClose = {
-              selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
-          },
-      )
-  }
+            overlayContent?.let { content ->
+                val overlayModifier = if (
+                    configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                ) {
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(start = 18.dp, end = 18.dp, bottom = bottomPadding)
+                } else {
+                    val baseTop = portraitLearningOverlayTopPaddingDp(
+                        screenWidthDp = configuration.screenWidthDp,
+                        position = overlayVerticalPosition,
+                        screenHeightDp = configuration.screenHeightDp,
+                        lockToVideo = state.lockOverlayToVideo,
+                    )
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(
+                            start = 18.dp,
+                            end = 18.dp,
+                            top = (baseTop - controlsLiftDp).coerceAtLeast(72).dp,
+                        )
+                }
+                LearningSubtitleOverlay(
+                    content = content,
+                    fontScale = state.fontScale,
+                    position = overlayVerticalPosition,
+                    orientation = configuration.orientation,
+                    movableEnabled = movableSubtitleBox,
+                    horizontalPosition = overlayHorizontalPosition,
+                    originalColor = effectiveOriginalColor(state),
+                    translatedColor = effectiveTranslatedColor(state),
+                    highlightColor = effectiveHighlightColor(state),
+                    backgroundColor = subtitleBoxBackgroundColor,
+                    wordLearningEnabled = state.wordLearningEnabled,
+                    wordLearningTarget = state.wordLearningTarget,
+                    tapToLearnEnabled = state.tapToLearnEnabled,
+                    originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
+                    targetLanguageCode = state.targetLanguage,
+                    lockToVideo = state.lockOverlayToVideo,
+                    onWordClick = viewModel::selectLearningToken,
+                    modifier = overlayModifier,
+                    onPositionChange = ::updateOverlayPosition,
+                    onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
+                    onPositionChangeFinished = ::commitOverlayPosition,
+                    onSettings = ::requestSubtitleSettings,
+                    onClose = {
+                        selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
+                    },
+                )
+            }
+        }
+
+        state.selectedLearningToken?.let { token ->
+            WordLearningDialog(
+                token = token,
+                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
+                targetLanguage = state.targetLanguage,
+                onTranslateWord = viewModel::translateWord,
+                onDismiss = { viewModel.selectLearningToken(null) },
+            )
         }
     }
 }
@@ -573,6 +613,13 @@ internal fun LearningSubtitleOverlay(
     translatedColor: Color = Color(0xFF75E7C1),
     highlightColor: Color = Color(0xFF75E7C1),
     backgroundColor: Color = subtitleBoxBackgroundColor(DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
+    wordLearningEnabled: Boolean = false,
+    wordLearningTarget: String = "original",
+    tapToLearnEnabled: Boolean = true,
+    originalLanguageCode: String? = null,
+    targetLanguageCode: String? = null,
+    lockToVideo: Boolean = false,
+    onWordClick: (AnalyzedToken) -> Unit = {},
     onPositionChange: (Float) -> Unit = {},
     onHorizontalPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
@@ -585,8 +632,10 @@ internal fun LearningSubtitleOverlay(
     val dragTravelPx = with(density) {
         if (isFullscreen) {
             fullscreenOverlayDragTravelDp(configuration.screenHeightDp).dp.toPx()
-        } else {
+        } else if (lockToVideo) {
             (configuration.screenHeightDp.dp * 0.45f).toPx()
+        } else {
+            (configuration.screenHeightDp.dp * 0.80f).toPx()
         }
     }.coerceAtLeast(1f)
     val currentPosition by rememberUpdatedState(position)
@@ -628,27 +677,27 @@ internal fun LearningSubtitleOverlay(
 
     Surface(
         modifier = modifier
-  .fillMaxWidth(0.90f)
-  .widthIn(max = 720.dp)
-  .testTag("learning_subtitle_overlay")
-  .onGloballyPositioned { coordinates ->
-      selfWidthPx = coordinates.size.width
-      parentWidthPx = (coordinates.parentLayoutCoordinates?.size?.width ?: 0)
-  }
-  .absoluteOffset { IntOffset(horizontalShiftPx, 0) }
-  .draggable(
-      state = verticalDragState,
-      orientation = Orientation.Vertical,
-      enabled = movableEnabled,
-      onDragStopped = { currentOnPositionChangeFinished() },
-  )
-  .draggable(
-      state = horizontalDragState,
-      orientation = Orientation.Horizontal,
-      enabled = movableEnabled,
-      onDragStopped = { currentOnPositionChangeFinished() },
-  )
-  .clickable { overlayActionsVisible = !overlayActionsVisible },
+            .fillMaxWidth(0.90f)
+            .widthIn(max = 720.dp)
+            .testTag("learning_subtitle_overlay")
+            .onGloballyPositioned { coordinates ->
+                selfWidthPx = coordinates.size.width
+                parentWidthPx = (coordinates.parentLayoutCoordinates?.size?.width ?: 0)
+            }
+            .absoluteOffset { IntOffset(horizontalShiftPx, 0) }
+            .draggable(
+                state = verticalDragState,
+                orientation = Orientation.Vertical,
+                enabled = movableEnabled,
+                onDragStopped = { currentOnPositionChangeFinished() },
+            )
+            .draggable(
+                state = horizontalDragState,
+                orientation = Orientation.Horizontal,
+                enabled = movableEnabled,
+                onDragStopped = { currentOnPositionChangeFinished() },
+            )
+            .clickable { overlayActionsVisible = !overlayActionsVisible },
         shape = RoundedCornerShape(10.dp),
         color = backgroundColor,
         contentColor = Color(0xFFF3FAFA),
@@ -656,59 +705,125 @@ internal fun LearningSubtitleOverlay(
         shadowElevation = 6.dp,
     ) {
         Row(
-  modifier = Modifier
-      .fillMaxWidth()
-      .padding(
-          start = 14.dp,
-          end = if (overlayActionsVisible) 2.dp else 14.dp,
-          top = 8.dp,
-          bottom = 8.dp,
-      ),
-  verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 14.dp,
+                    end = if (overlayActionsVisible) 2.dp else 14.dp,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-  Column(Modifier.weight(1f)) {
-      content.originalText?.let { original ->
-          val annotated = if (content.activeWordIndex >= 0 && content.segment != null) {
-              annotatedSpokenText(
-                  segment = content.segment,
-                  activeWordIndex = content.activeWordIndex,
-                  baseColor = originalColor,
-                  highlightColor = highlightColor,
-              )
-          } else {
-              AnnotatedString(original)
-          }
-          Text(
-              text = annotated,
-              fontSize = (17f * fontScale).sp,
-              lineHeight = (21f * fontScale).sp,
-              fontWeight = FontWeight.Medium,
-              color = originalColor,
-              maxLines = 2,
-              overflow = TextOverflow.Ellipsis,
-          )
-      }
-      content.translatedText?.let { translated ->
-          if (content.originalText != null) Spacer(Modifier.size(2.dp))
-          Text(
-              text = translated,
-              fontSize = (14f * fontScale).sp,
-              lineHeight = (18f * fontScale).sp,
-              color = translatedColor,
-              maxLines = 2,
-              overflow = TextOverflow.Ellipsis,
-          )
-      }
-      content.statusText?.let { status ->
-          Text(
-              text = status,
-              style = MaterialTheme.typography.bodyMedium,
-              color = Color(0xFFC9D9DB),
-              maxLines = 2,
-              overflow = TextOverflow.Ellipsis,
-          )
-      }
-  }
+            Column(Modifier.weight(1f)) {
+                content.originalText?.let { original ->
+                    val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
+                    val annotated = annotatedSubtitleText(
+                        text = original,
+                        words = content.segment?.words.orEmpty(),
+                        activeWordIndex = content.activeWordIndex,
+                        baseColor = originalColor,
+                        highlightColor = highlightColor,
+                        wordLearningEnabled = shouldHighlightPos,
+                        languageCode = originalLanguageCode,
+                    )
+                    if (wordLearningEnabled && tapToLearnEnabled) {
+                        ClickableText(
+                            text = annotated,
+                            style = TextStyle(
+                                fontSize = (17f * fontScale).sp,
+                                lineHeight = (21f * fontScale).sp,
+                                fontWeight = FontWeight.Medium,
+                                color = originalColor,
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            onClick = { offset ->
+                                val token = findWordAtOffset(original, offset, originalLanguageCode)
+                                if (token != null) {
+                                    onWordClick(token)
+                                } else {
+                                    overlayActionsVisible = !overlayActionsVisible
+                                }
+                            },
+                        )
+                    } else {
+                        Text(
+                            text = annotated,
+                            fontSize = (17f * fontScale).sp,
+                            lineHeight = (21f * fontScale).sp,
+                            fontWeight = FontWeight.Medium,
+                            color = originalColor,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                content.translatedText?.let { translated ->
+                    if (content.originalText != null) Spacer(Modifier.size(2.dp))
+                    val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
+                    val origTokens: List<AnalyzedToken>? = content.originalText?.let {
+                        LanguageAwareTokenizer.tokenize(it, originalLanguageCode)
+                    }
+                    val annotated = if (shouldHighlightPos) {
+                        annotatedSubtitleText(
+                            text = translated,
+                            words = emptyList(),
+                            activeWordIndex = -1,
+                            baseColor = translatedColor,
+                            highlightColor = highlightColor,
+                            wordLearningEnabled = true,
+                            languageCode = targetLanguageCode,
+                            alignedOriginalTokens = origTokens,
+                        )
+                    } else {
+                        AnnotatedString(translated)
+                    }
+                    if (shouldHighlightPos && tapToLearnEnabled) {
+                        ClickableText(
+                            text = annotated,
+                            style = TextStyle(
+                                fontSize = (14f * fontScale).sp,
+                                lineHeight = (18f * fontScale).sp,
+                                color = translatedColor,
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            onClick = { offset ->
+                                val token = findWordAtOffset(
+                                    text = translated,
+                                    charOffset = offset,
+                                    languageCode = targetLanguageCode,
+                                    alignedOriginalTokens = origTokens,
+                                )
+                                if (token != null) {
+                                    onWordClick(token)
+                                } else {
+                                    overlayActionsVisible = !overlayActionsVisible
+                                }
+                            },
+                        )
+                    } else {
+                        Text(
+                            text = annotated,
+                            fontSize = (14f * fontScale).sp,
+                            lineHeight = (18f * fontScale).sp,
+                            color = translatedColor,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                content.statusText?.let { status ->
+                    Text(
+                        text = status,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFFC9D9DB),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
   if (overlayActionsVisible) {
       IconButton(onClick = onSettings) {
           Icon(Icons.Default.Settings, contentDescription = "Dual-subtitle settings")
