@@ -126,6 +126,13 @@ class LearningPlayerRootTest {
         assertFalse(
             shouldUseAutomaticLandscapeOverlay(
                 PlayerExperienceMode.TRANSCRIPT_PANEL,
+                autoLandscape = false,
+                orientation = Configuration.ORIENTATION_LANDSCAPE,
+            ),
+        )
+        assertFalse(
+            shouldUseAutomaticLandscapeOverlay(
+                PlayerExperienceMode.TRANSCRIPT_PANEL,
                 autoLandscape = true,
                 orientation = Configuration.ORIENTATION_PORTRAIT,
             ),

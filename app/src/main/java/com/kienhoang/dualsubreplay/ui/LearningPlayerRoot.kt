@@ -353,14 +353,17 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     fun selectMode(newMode: PlayerExperienceMode) {
         mode = newMode
-        preferences.edit()
-  .putString(PLAYER_EXPERIENCE_MODE_PREFERENCE, newMode.storageValue)
-  .apply()
+        val editor = preferences.edit()
+            .putString(PLAYER_EXPERIENCE_MODE_PREFERENCE, newMode.storageValue)
         if (newMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-  viewModel.hideSubtitlePanel()
+            viewModel.hideSubtitlePanel()
         } else {
-  viewModel.showSubtitlePanel()
+            autoOverlayLandscape = false
+            editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, false)
+            restoreTranscriptAfterAutomaticOverlay = false
+            viewModel.showSubtitlePanel()
         }
+        editor.apply()
     }
 
     fun requestSubtitleSettings() {
@@ -485,11 +488,12 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     Box(Modifier.fillMaxSize()) {
         DualSubApp(
-  viewModel = viewModel,
-  playerMode = effectiveMode,
-  onPlayerModeChange = ::selectMode,
-  externalSettingsRequestId = settingsRequestId,
-  fullscreenLearningOverlay = fullscreenLearningOverlay,
+            viewModel = viewModel,
+            playerMode = mode,
+            effectivePlayerMode = effectiveMode,
+            onPlayerModeChange = ::selectMode,
+            externalSettingsRequestId = settingsRequestId,
+            fullscreenLearningOverlay = fullscreenLearningOverlay,
         )
 
         if (
@@ -535,11 +539,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
           onPositionChangeFinished = ::commitOverlayPosition,
           onSettings = ::requestSubtitleSettings,
           onClose = {
-              if (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-                  selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
-              } else if (automaticLandscapeOverlay) {
-                  preferences.edit().putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, false).apply()
-              }
+              selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
           },
       )
   }

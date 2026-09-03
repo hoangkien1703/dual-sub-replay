@@ -1,6 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.SharedPreferences
 import android.content.res.Configuration
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -103,6 +105,7 @@ import kotlin.math.roundToInt
 fun DualSubApp(
     viewModel: AppViewModel,
     playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
+    effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     externalSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
@@ -121,6 +124,7 @@ fun DualSubApp(
             DualSubExperience(
                 state = state,
                 playerMode = playerMode,
+                effectivePlayerMode = effectivePlayerMode,
                 onPlayerModeChange = onPlayerModeChange,
                 externalSettingsRequestId = externalSettingsRequestId,
                 fullscreenLearningOverlay = fullscreenLearningOverlay,
@@ -150,6 +154,7 @@ fun DualSubApp(
 private fun DualSubExperience(
     state: DualSubUiState,
     playerMode: PlayerExperienceMode,
+    effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
     externalSettingsRequestId: Long,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
@@ -238,7 +243,7 @@ private fun DualSubExperience(
                     onPlaybackSecond = onPlaybackSecond,
                     liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
                     suppressPageCaptions = liveCaptionCaptureEnabled ||
-                        playerMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
+                        effectivePlayerMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
                     fullscreenOverlay = fullscreenLearningOverlay,
                     modifier = Modifier
                         .weight(if (sideBySide) landscapeVideoFraction else 1f)
@@ -302,7 +307,7 @@ private fun DualSubExperience(
             } else if (
                 !sideBySide &&
                 state.activeVideoId != null &&
-                playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
+                effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
             ) {
                 MovableSubtitleFab(onClick = onShowSubtitles)
             }
@@ -888,6 +893,30 @@ internal fun SubtitleSettingsDialog(
     }
     var movableSubtitleBox by remember {
         mutableStateOf(preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true))
+    }
+
+    DisposableEffect(preferences) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            when (key) {
+                AUTO_OVERLAY_FULLSCREEN_PREFERENCE -> {
+                    autoOverlayFullscreen = sharedPreferences.getBoolean(key, true)
+                }
+                AUTO_OVERLAY_LANDSCAPE_PREFERENCE -> {
+                    autoOverlayLandscape = sharedPreferences.getBoolean(key, true)
+                }
+                AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE -> {
+                    autoAvoidPlayerControls = sharedPreferences.getBoolean(key, true)
+                }
+                REMEMBER_OVERLAY_POSITION_PREFERENCE -> {
+                    rememberOverlayPosition = sharedPreferences.getBoolean(key, true)
+                }
+                MOVABLE_OVERLAY_PREFERENCE -> {
+                    movableSubtitleBox = sharedPreferences.getBoolean(key, true)
+                }
+            }
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
     val sourceChoices = listOf(LanguageChoice("auto", "Auto (recommended)")) +
         availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
