@@ -158,4 +158,12 @@ class SubtitleWordHighlightTest {
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)
     }
+
+    @Test fun wordLearningModeDefaultsToEnabled() {
+        val state = DualSubUiState()
+        assertTrue("Word Learning Mode should be enabled by default", state.wordLearningEnabled)
+        assertEquals("original", state.wordLearningTarget)
+        assertTrue(state.tapToLearnEnabled)
+    }
 }
+

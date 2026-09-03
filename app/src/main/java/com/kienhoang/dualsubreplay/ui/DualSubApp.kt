@@ -149,11 +149,17 @@ fun DualSubApp(
                 onKaraokeTimingModeChange = viewModel::setKaraokeTimingMode,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
                 onSplitSentencesChange = viewModel::setSplitLongSentencesEnabled,
+                lockOverlayToVideo = state.lockOverlayToVideo,
                 onLockOverlayToVideoChange = viewModel::setLockOverlayToVideo,
+                preloadModelsEnabled = state.preloadModelsEnabled,
                 onPreloadModelsChange = viewModel::setPreloadModelsEnabled,
+                naturalSubtitlesEnabled = state.naturalSubtitlesEnabled,
                 onNaturalSubtitlesChange = viewModel::setNaturalSubtitlesEnabled,
+                wordLearningEnabled = state.wordLearningEnabled,
                 onWordLearningChange = viewModel::setWordLearningEnabled,
+                wordLearningTarget = state.wordLearningTarget,
                 onWordLearningTargetChange = viewModel::setWordLearningTarget,
+                tapToLearnEnabled = state.tapToLearnEnabled,
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
                 onWordClick = viewModel::selectLearningToken,
                 onResetSettings = viewModel::resetAllSettings,
@@ -202,7 +208,7 @@ private fun DualSubExperience(
     onPreloadModelsChange: (Boolean) -> Unit = {},
     naturalSubtitlesEnabled: Boolean = true,
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
-    wordLearningEnabled: Boolean = false,
+    wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "original",
     onWordLearningTargetChange: (String) -> Unit = {},
@@ -365,17 +371,17 @@ private fun DualSubExperience(
             karaokeTimingMode = state.karaokeTimingMode,
             customColorsEnabled = state.customColorsEnabled,
             splitLongSentencesEnabled = state.splitLongSentencesEnabled,
-            lockOverlayToVideo = lockOverlayToVideo,
+            lockOverlayToVideo = state.lockOverlayToVideo,
             onLockOverlayToVideoChange = onLockOverlayToVideoChange,
-            preloadModelsEnabled = preloadModelsEnabled,
+            preloadModelsEnabled = state.preloadModelsEnabled,
             onPreloadModelsChange = onPreloadModelsChange,
-            naturalSubtitlesEnabled = naturalSubtitlesEnabled,
+            naturalSubtitlesEnabled = state.naturalSubtitlesEnabled,
             onNaturalSubtitlesChange = onNaturalSubtitlesChange,
-            wordLearningEnabled = wordLearningEnabled,
+            wordLearningEnabled = state.wordLearningEnabled,
             onWordLearningChange = onWordLearningChange,
-            wordLearningTarget = wordLearningTarget,
+            wordLearningTarget = state.wordLearningTarget,
             onWordLearningTargetChange = onWordLearningTargetChange,
-            tapToLearnEnabled = tapToLearnEnabled,
+            tapToLearnEnabled = state.tapToLearnEnabled,
             onTapToLearnChange = onTapToLearnChange,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
@@ -1002,7 +1008,7 @@ internal fun SubtitleSettingsDialog(
     onPreloadModelsChange: (Boolean) -> Unit = {},
     naturalSubtitlesEnabled: Boolean = true,
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
-    wordLearningEnabled: Boolean = false,
+    wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "original",
     onWordLearningTargetChange: (String) -> Unit = {},
@@ -1203,6 +1209,45 @@ internal fun SubtitleSettingsDialog(
                         Spacer(Modifier.height(14.dp))
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
+                        Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow(
+                            title = "Word learning mode (POS colors)",
+                            description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",
+                            checked = wordLearningEnabled,
+                            onCheckedChange = onWordLearningChange,
+                            testTag = "word_learning_mode_switch",
+                        )
+                        if (wordLearningEnabled) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                "Colored subtitle lines",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                listOf("original" to "Original", "translation" to "Translation", "both" to "Both").forEach { (targetKey, targetLabel) ->
+                                    FilterChip(
+                                        selected = wordLearningTarget == targetKey,
+                                        onClick = { onWordLearningTargetChange(targetKey) },
+                                        label = { Text(targetLabel) },
+                                    )
+                                }
+                            }
+                            SettingsSwitchRow(
+                                title = "Tap word for definition",
+                                description = "Tap any word in dual subtitles to inspect its reading, part of speech, and instant translation popup.",
+                                checked = tapToLearnEnabled,
+                                onCheckedChange = onTapToLearnChange,
+                                testTag = "tap_to_learn_switch",
+                            )
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
                         Text("Spoken-word timing", style = MaterialTheme.typography.titleSmall)
                         KaraokeTimingSettingsOption(
                             mode = KaraokeTimingMode.ADAPTIVE,
@@ -1383,45 +1428,6 @@ internal fun SubtitleSettingsDialog(
                             modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
                         ) {
                             Text("Reset subtitle positions")
-                        }
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Word learning mode (POS colors)",
-                            description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",
-                            checked = wordLearningEnabled,
-                            onCheckedChange = onWordLearningChange,
-                            testTag = "word_learning_mode_switch",
-                        )
-                        if (wordLearningEnabled) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                "Colored subtitle lines",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                listOf("original" to "Original", "translation" to "Translation", "both" to "Both").forEach { (targetKey, targetLabel) ->
-                                    FilterChip(
-                                        selected = wordLearningTarget == targetKey,
-                                        onClick = { onWordLearningTargetChange(targetKey) },
-                                        label = { Text(targetLabel) },
-                                    )
-                                }
-                            }
-                            SettingsSwitchRow(
-                                title = "Tap word for definition",
-                                description = "Tap any word in dual subtitles to inspect its reading, part of speech, and instant translation popup.",
-                                checked = tapToLearnEnabled,
-                                onCheckedChange = onTapToLearnChange,
-                                testTag = "tap_to_learn_switch",
-                            )
                         }
 
                         Spacer(Modifier.height(14.dp))
