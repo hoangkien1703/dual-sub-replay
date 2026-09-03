@@ -54,6 +54,7 @@ internal fun annotatedSubtitleText(
     highlightColor: Color,
     wordLearningEnabled: Boolean = false,
     languageCode: String? = null,
+    alignedOriginalTokens: List<AnalyzedToken>? = null,
 ): AnnotatedString {
     if (text.isBlank()) return AnnotatedString("")
 
@@ -62,7 +63,11 @@ internal fun annotatedSubtitleText(
     } else null
 
     val tokens = if (wordLearningEnabled) {
-        LanguageAwareTokenizer.tokenize(text, languageCode)
+        if (alignedOriginalTokens != null) {
+            LanguageAwareTokenizer.alignAndTokenizeTranslation(text, alignedOriginalTokens, languageCode)
+        } else {
+            LanguageAwareTokenizer.tokenize(text, languageCode)
+        }
     } else emptyList()
 
     return buildAnnotatedString {
@@ -93,10 +98,9 @@ internal fun annotatedSubtitleText(
         // Active spoken-word karaoke highlight
         if (activeSpan != null) {
             if (wordLearningEnabled) {
-                // Keep POS color, add underline and subtle background highlight (no bolding, zero layout shift)
+                // Keep POS color, add clean underline only (no background, no bolding, zero layout shift)
                 addStyle(
                     SpanStyle(
-                        background = highlightColor.copy(alpha = 0.25f),
                         textDecoration = TextDecoration.Underline,
                     ),
                     activeSpan.start,
@@ -137,8 +141,13 @@ internal fun findWordAtOffset(
     text: String,
     charOffset: Int,
     languageCode: String? = null,
+    alignedOriginalTokens: List<AnalyzedToken>? = null,
 ): AnalyzedToken? {
     if (text.isBlank() || charOffset < 0 || charOffset >= text.length) return null
-    val tokens = LanguageAwareTokenizer.tokenize(text, languageCode)
+    val tokens = if (alignedOriginalTokens != null) {
+        LanguageAwareTokenizer.alignAndTokenizeTranslation(text, alignedOriginalTokens, languageCode)
+    } else {
+        LanguageAwareTokenizer.tokenize(text, languageCode)
+    }
     return tokens.firstOrNull { charOffset >= it.startIndex && charOffset < it.endIndex }
 }

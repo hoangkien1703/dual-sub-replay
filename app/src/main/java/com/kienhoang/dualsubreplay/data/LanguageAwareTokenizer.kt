@@ -3,15 +3,19 @@ package com.kienhoang.dualsubreplay.data
 import java.util.Locale
 
 /**
- * Grammatical roles for Word Learning Mode (Issue #42).
+ * Grammatical roles for Word Learning Mode (Issue #42 V1-V5).
  */
 enum class PartOfSpeech(val label: String, val colorHex: Long) {
-    NOUN("Noun", 0xFF64B5F6),           // Soft Blue
+    NOUN("Noun", 0xFF4FC3F7),           // Soft Sky Blue
     VERB("Verb", 0xFF81C784),           // Soft Emerald Green
-    ADJECTIVE("Adjective", 0xFFFFB74D), // Soft Amber / Orange
-    ADVERB("Adverb", 0xFFBA68C8),       // Soft Purple
-    PARTICLE("Particle / Grammar", 0xFFE57373), // Soft Rose / Coral
-    OTHER("Other", 0xFFECEFF1);        // Neutral Light
+    ADJECTIVE("Adjective", 0xFFFFB74D), // Soft Amber / Gold
+    ADVERB("Adverb", 0xFFBA68C8),       // Soft Lavender / Purple
+    PRONOUN("Pronoun", 0xFF4DD0E1),     // Soft Teal / Cyan
+    CONJUNCTION("Conjunction", 0xFFFF8A65), // Soft Warm Coral
+    PREPOSITION("Preposition", 0xFFF06292), // Soft Rose Pink
+    PARTICLE("Particle / Grammar", 0xFFE57373), // Soft Rose
+    UNALIGNED("Unaligned / Idiom", 0xFF78909C), // Dark Slate Gray (cannot be translated word-to-word)
+    OTHER("Other", 0xFFCFD8DC);        // Neutral Light
 
     companion object {
         fun fromKey(key: String): PartOfSpeech = entries.firstOrNull {
@@ -65,23 +69,61 @@ object LanguageAwareTokenizer {
         "好き", "嫌い", "綺麗", "きれい", "静か", "元気", "大切", "大丈夫"
     )
 
-    // Common English closed-class words for POS heuristics
-    private val ENGLISH_PARTICLES_PREPOSITIONS = setOf(
+    // English closed-class words for POS heuristics
+    private val ENGLISH_ARTICLES = setOf("the", "a", "an")
+
+    private val ENGLISH_CONJUNCTIONS = setOf(
+        "and", "or", "but", "because", "both", "if", "so", "than", "until", "while", "as",
+        "though", "although", "either", "neither", "since", "unless"
+    )
+
+    private val ENGLISH_PREPOSITIONS = setOf(
         "in", "on", "at", "by", "for", "with", "about", "against", "between",
         "into", "through", "during", "before", "after", "above", "below", "to",
-        "from", "up", "down", "in", "out", "off", "over", "under", "again", "then",
-        "once", "here", "there", "when", "where", "why", "how", "all", "any", "both",
-        "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not",
-        "only", "own", "same", "so", "than", "too", "very", "can", "will", "just",
-        "the", "a", "an",
-        "don", "should", "now", "and", "but", "if", "or", "because", "as", "until", "while", "of"
+        "from", "up", "down", "out", "off", "over", "under", "of", "via", "onto"
     )
 
     private val ENGLISH_PRONOUNS = setOf(
         "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us",
         "them", "my", "your", "his", "her", "its", "our", "their", "mine", "yours",
         "hers", "ours", "theirs", "this", "that", "these", "those", "what", "which",
-        "who", "whom", "whose"
+        "who", "whom", "whose", "myself", "yourself", "himself", "herself", "itself"
+    )
+
+    private val ENGLISH_COMMON_ADVERBS = setOf(
+        "actually", "really", "very", "too", "quickly", "possibly", "now", "then",
+        "here", "there", "again", "once", "just", "always", "never", "often", "sometimes",
+        "soon", "almost", "quite", "already", "well", "away", "back", "still", "also"
+    )
+
+    // Vietnamese lexical sets for cross-language alignment and POS tagging (Issue #42 V4 & V5)
+    private val VIETNAMESE_CONJUNCTIONS = setOf(
+        "và", "hoặc", "nhưng", "bởi vì", "vì", "nếu", "mà", "thì", "cả", "tuy", "cho nên"
+    )
+
+    private val VIETNAMESE_PREPOSITIONS = setOf(
+        "trong", "trên", "tại", "ở", "với", "cho", "từ", "đến", "về", "để", "theo", "giữa"
+    )
+
+    private val VIETNAMESE_PRONOUNS = setOf(
+        "tôi", "bạn", "chúng tôi", "chúng ta", "nó", "họ", "anh", "chị", "em", "ông", "bà", "mình",
+        "này", "đó", "kia", "ai", "gì", "nào"
+    )
+
+    private val VIETNAMESE_COMMON_VERBS = setOf(
+        "bao gồm", "gồm", "nói", "làm", "biết", "đi", "có", "lấy", "hiểu", "thấy", "nghĩ", "thử",
+        "xem", "đến", "muốn", "tìm", "hỏi", "đặt", "giữ", "yêu", "thích"
+    )
+
+    private val VIETNAMESE_COMMON_ADJECTIVES = setOf(
+        "thật", "hỗn loạn", "quan trọng", "nhiều", "ít", "tốt", "mới", "cũ", "lớn", "nhỏ",
+        "nhanh", "chậm", "khó", "dễ", "đẹp", "cao", "thấp", "đúng", "sai"
+    )
+
+    // Words that are grammatical filler, auxiliary particles, or do not have a 1:1 direct word translation (Dark Gray)
+    private val VIETNAMESE_UNALIGNED_MARKERS = setOf(
+        "đã", "đang", "sẽ", "được", "bị", "các", "những", "cái", "chiếc", "rất", "quá", "lắm",
+        "ạ", "nhé", "nha", "đâu", "chứ"
     )
 
     private val ENGLISH_COMMON_VERBS = setOf(
@@ -301,9 +343,12 @@ object LanguageAwareTokenizer {
     }
 
     private fun classifyEnglishWord(lower: String, original: String): PartOfSpeech {
-        if (lower in ENGLISH_PARTICLES_PREPOSITIONS) return PartOfSpeech.PARTICLE
+        if (lower in ENGLISH_ARTICLES) return PartOfSpeech.PARTICLE
+        if (lower in ENGLISH_CONJUNCTIONS) return PartOfSpeech.CONJUNCTION
+        if (lower in ENGLISH_PREPOSITIONS) return PartOfSpeech.PREPOSITION
+        if (lower in ENGLISH_PRONOUNS) return PartOfSpeech.PRONOUN
+        if (lower in ENGLISH_COMMON_ADVERBS) return PartOfSpeech.ADVERB
         if (lower in ENGLISH_COMMON_ADJECTIVES) return PartOfSpeech.ADJECTIVE
-        if (lower in ENGLISH_PRONOUNS) return PartOfSpeech.NOUN
         if (lower in ENGLISH_COMMON_VERBS) return PartOfSpeech.VERB
 
         // Suffix heuristics
@@ -321,5 +366,103 @@ object LanguageAwareTokenizer {
         }
 
         return PartOfSpeech.NOUN
+    }
+
+    /**
+     * Splits spaced text into word tokens with accurate character bounds.
+     */
+    fun tokenizeWordsWithOffsets(text: String): List<AnalyzedToken> {
+        val tokens = mutableListOf<AnalyzedToken>()
+        val regex = Regex("[\\p{L}\\p{M}\\p{N}'-]+")
+        regex.findAll(text).forEach { match ->
+            tokens += AnalyzedToken(
+                text = match.value,
+                startIndex = match.range.first,
+                endIndex = match.range.last + 1,
+                partOfSpeech = PartOfSpeech.OTHER,
+            )
+        }
+        return tokens
+    }
+
+    /**
+     * Aligns translated subtitle text with the original sentence's tokens (Issue #42 V4 & V5).
+     * Matching words share the original grammatical POS colors. Words that have no direct
+     * word-for-word counterpart or represent grammatical filler/aspect markers are colored
+     * in dark gray (PartOfSpeech.UNALIGNED).
+     */
+    fun alignAndTokenizeTranslation(
+        translationText: String,
+        originalTokens: List<AnalyzedToken>,
+        translationLanguage: String? = null,
+    ): List<AnalyzedToken> {
+        if (translationText.isBlank()) return emptyList()
+        val isCjk = isCjk(translationText) || (translationLanguage != null && (translationLanguage.startsWith("ja") || translationLanguage.startsWith("zh")))
+
+        val rawTokens = if (isCjk) {
+            tokenizeJapanese(translationText)
+        } else {
+            tokenizeWordsWithOffsets(translationText)
+        }
+
+        if (originalTokens.isEmpty()) {
+            return rawTokens
+        }
+
+        val originalMeaningfulTokens = originalTokens.filter {
+            it.partOfSpeech != PartOfSpeech.OTHER
+        }
+
+        val totalRaw = rawTokens.size
+        val totalOrig = originalMeaningfulTokens.size
+        val result = mutableListOf<AnalyzedToken>()
+
+        rawTokens.forEachIndexed { index, token ->
+            val lower = token.text.lowercase(Locale.ROOT)
+
+            // 1. Untranslatable auxiliary / filler marker -> Dark Gray
+            if (lower in VIETNAMESE_UNALIGNED_MARKERS) {
+                result += token.copy(partOfSpeech = PartOfSpeech.UNALIGNED)
+                return@forEachIndexed
+            }
+
+            // 2. Direct literal / transliteration match with original word
+            val directMatch = originalTokens.find { orig ->
+                orig.text.equals(token.text, ignoreCase = true) ||
+                orig.text.lowercase(Locale.ROOT).contains(lower) ||
+                lower.contains(orig.text.lowercase(Locale.ROOT))
+            }
+            if (directMatch != null) {
+                result += token.copy(partOfSpeech = directMatch.partOfSpeech)
+                return@forEachIndexed
+            }
+
+            // 3. Known lexical classification for target language
+            val knownPos = classifyVietnameseWord(lower)
+            if (knownPos != null) {
+                result += token.copy(partOfSpeech = knownPos)
+                return@forEachIndexed
+            }
+
+            // 4. Positional sequence alignment to corresponding original word
+            if (totalOrig > 0 && totalRaw > 0) {
+                val origIndex = ((index.toFloat() / totalRaw) * totalOrig).toInt().coerceIn(0, totalOrig - 1)
+                val alignedOrig = originalMeaningfulTokens[origIndex]
+                result += token.copy(partOfSpeech = alignedOrig.partOfSpeech)
+            } else {
+                result += token.copy(partOfSpeech = PartOfSpeech.UNALIGNED)
+            }
+        }
+
+        return result
+    }
+
+    private fun classifyVietnameseWord(lower: String): PartOfSpeech? {
+        if (lower in VIETNAMESE_CONJUNCTIONS) return PartOfSpeech.CONJUNCTION
+        if (lower in VIETNAMESE_PREPOSITIONS) return PartOfSpeech.PREPOSITION
+        if (lower in VIETNAMESE_PRONOUNS) return PartOfSpeech.PRONOUN
+        if (lower in VIETNAMESE_COMMON_VERBS) return PartOfSpeech.VERB
+        if (lower in VIETNAMESE_COMMON_ADJECTIVES) return PartOfSpeech.ADJECTIVE
+        return null
     }
 }

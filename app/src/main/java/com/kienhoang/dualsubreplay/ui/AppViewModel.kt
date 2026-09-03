@@ -56,7 +56,7 @@ data class DualSubUiState(
     val preloadModelsEnabled: Boolean = true,
     val naturalSubtitlesEnabled: Boolean = true,
     val wordLearningEnabled: Boolean = true,
-    val wordLearningTarget: String = "original",
+    val wordLearningTarget: String = "both",
     val tapToLearnEnabled: Boolean = true,
     val selectedLearningToken: AnalyzedToken? = null,
     val stage: LoadStage = LoadStage.IDLE,
@@ -277,7 +277,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             wordLearningEnabled = storedFeatureEnabled(
                 preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
             ),
-            wordLearningTarget = preferences.getString(WORD_LEARNING_TARGET_PREFERENCE, "original") ?: "original",
+            wordLearningTarget = preferences.getString(WORD_LEARNING_TARGET_PREFERENCE, "both") ?: "both",
             tapToLearnEnabled = storedFeatureEnabled(
                 preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
             ),
@@ -592,7 +592,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,
                 wordLearningEnabled = true,
-                wordLearningTarget = "original",
+                wordLearningTarget = "both",
                 tapToLearnEnabled = true,
                 selectedLearningToken = null,
             )

@@ -42,7 +42,7 @@ class LanguageAwareTokenizerTest {
         assertEquals(9, tokens.size)
         assertEquals(PartOfSpeech.PARTICLE, tokens[0].partOfSpeech) // "The" -> article/grammar particle
         assertEquals(PartOfSpeech.NOUN, tokens[3].partOfSpeech) // fox
-        assertEquals(PartOfSpeech.PARTICLE, tokens[5].partOfSpeech) // over -> preposition
+        assertEquals(PartOfSpeech.PREPOSITION, tokens[5].partOfSpeech) // over -> preposition
     }
 
     @Test
@@ -73,9 +73,45 @@ class LanguageAwareTokenizerTest {
         val nounColor = PartOfSpeech.NOUN.colorHex
         val verbColor = PartOfSpeech.VERB.colorHex
         val particleColor = PartOfSpeech.PARTICLE.colorHex
+        val unalignedColor = PartOfSpeech.UNALIGNED.colorHex
 
         assertTrue(nounColor != verbColor)
         assertTrue(verbColor != particleColor)
+        assertTrue(unalignedColor != nounColor)
+        assertEquals(0xFF78909CL, unalignedColor)
+    }
+
+    @Test
+    fun alignsTranslationTokensAndColorsUnalignedWordsInDarkGray() {
+        val originalText = "Both Cursor and OpenAI in order to get as many"
+        val originalTokens = LanguageAwareTokenizer.tokenize(originalText, "en")
+        val translationText = "Cả con trỏ và Openai để có được nhiều"
+
+        val alignedTokens = LanguageAwareTokenizer.alignAndTokenizeTranslation(
+            translationText = translationText,
+            originalTokens = originalTokens,
+            translationLanguage = "vi",
+        )
+
+        assertTrue(alignedTokens.isNotEmpty())
+        val openaiToken = alignedTokens.find { it.text.equals("Openai", ignoreCase = true) }
+        assertNotNull(openaiToken)
+        assertEquals(PartOfSpeech.NOUN, openaiToken?.partOfSpeech)
+
+        val duocToken = alignedTokens.find { it.text == "được" }
+        assertNotNull(duocToken)
+        assertEquals(PartOfSpeech.UNALIGNED, duocToken?.partOfSpeech)
+        assertEquals(0xFF78909CL, duocToken?.partOfSpeech?.colorHex)
+    }
+
+    @Test
+    fun classifiesEnglishPronounsAndConjunctionsDistinctly() {
+        val text = "Both you and I"
+        val tokens = LanguageAwareTokenizer.tokenize(text, "en")
+        assertEquals(PartOfSpeech.CONJUNCTION, tokens[0].partOfSpeech)
+        assertEquals(PartOfSpeech.PRONOUN, tokens[1].partOfSpeech)
+        assertEquals(PartOfSpeech.CONJUNCTION, tokens[2].partOfSpeech)
+        assertEquals(PartOfSpeech.PRONOUN, tokens[3].partOfSpeech)
     }
 }
 

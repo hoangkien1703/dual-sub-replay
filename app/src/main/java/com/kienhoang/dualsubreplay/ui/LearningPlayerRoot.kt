@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -761,6 +762,9 @@ internal fun LearningSubtitleOverlay(
                 content.translatedText?.let { translated ->
                     if (content.originalText != null) Spacer(Modifier.size(2.dp))
                     val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
+                    val origTokens: List<AnalyzedToken>? = content.originalText?.let {
+                        LanguageAwareTokenizer.tokenize(it, originalLanguageCode)
+                    }
                     val annotated = if (shouldHighlightPos) {
                         annotatedSubtitleText(
                             text = translated,
@@ -770,6 +774,7 @@ internal fun LearningSubtitleOverlay(
                             highlightColor = highlightColor,
                             wordLearningEnabled = true,
                             languageCode = targetLanguageCode,
+                            alignedOriginalTokens = origTokens,
                         )
                     } else {
                         AnnotatedString(translated)
@@ -785,7 +790,12 @@ internal fun LearningSubtitleOverlay(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             onClick = { offset ->
-                                val token = findWordAtOffset(translated, offset, targetLanguageCode)
+                                val token = findWordAtOffset(
+                                    text = translated,
+                                    charOffset = offset,
+                                    languageCode = targetLanguageCode,
+                                    alignedOriginalTokens = origTokens,
+                                )
                                 if (token != null) {
                                     onWordClick(token)
                                 } else {

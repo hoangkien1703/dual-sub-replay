@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
@@ -79,7 +80,7 @@ class SubtitleWordHighlightTest {
         assertEquals(null, style.fontWeight)
     }
 
-    @Test fun wordLearningSpokenWordUsesUnderlineAndBackgroundWithoutBold() {
+    @Test fun wordLearningSpokenWordUsesUnderlineOnlyWithoutBoldOrBackground() {
         val segment = SubtitleSegment(
             id = 1,
             startMs = 0,
@@ -104,7 +105,7 @@ class SubtitleWordHighlightTest {
         assertTrue("Should have active karaoke underline style", activeStyles.isNotEmpty())
         val activeStyle = activeStyles.last().item
         assertEquals(TextDecoration.Underline, activeStyle.textDecoration)
-        assertEquals(Color.Yellow.copy(alpha = 0.25f), activeStyle.background)
+        assertEquals(Color.Unspecified, activeStyle.background)
         assertEquals(null, activeStyle.fontWeight)
     }
 
@@ -191,8 +192,30 @@ class SubtitleWordHighlightTest {
     @Test fun wordLearningModeDefaultsToEnabled() {
         val state = DualSubUiState()
         assertTrue("Word Learning Mode should be enabled by default", state.wordLearningEnabled)
-        assertEquals("original", state.wordLearningTarget)
+        assertEquals("both", state.wordLearningTarget)
         assertTrue(state.tapToLearnEnabled)
+    }
+
+    @Test fun translationLineAppliesAlignedPosColorsAndDarkGrayForUnalignedWords() {
+        val origTokens = LanguageAwareTokenizer.tokenize("Both Cursor and OpenAI", "en")
+        val translation = "Cả con trỏ và Openai được"
+
+        val annotated = annotatedSubtitleText(
+            text = translation,
+            words = emptyList(),
+            activeWordIndex = -1,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = true,
+            languageCode = "vi",
+            alignedOriginalTokens = origTokens,
+        )
+
+        // Find style applied to "được"
+        val duocStart = translation.indexOf("được")
+        val duocStyles = annotated.spanStyles.filter { it.start == duocStart }
+        assertTrue("Should have style for unaligned word được", duocStyles.isNotEmpty())
+        assertEquals(Color(0xFF78909C), duocStyles.first().item.color) // Dark Gray for unaligned
     }
 }
 

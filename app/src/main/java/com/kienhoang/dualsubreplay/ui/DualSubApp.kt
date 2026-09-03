@@ -53,6 +53,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -210,7 +211,7 @@ private fun DualSubExperience(
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
-    wordLearningTarget: String = "original",
+    wordLearningTarget: String = "both",
     onWordLearningTargetChange: (String) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
@@ -829,7 +830,7 @@ internal fun CompactSubtitleCard(
     translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
     highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
     wordLearningEnabled: Boolean = false,
-    wordLearningTarget: String = "original",
+    wordLearningTarget: String = "both",
     tapToLearnEnabled: Boolean = true,
     resolvedSourceLanguage: String? = null,
     targetLanguage: String = "vi",
@@ -918,6 +919,9 @@ internal fun CompactSubtitleCard(
                 } else {
                     "Translating…"
                 }
+                val originalTokens: List<AnalyzedToken> = remember(segment.originalText, resolvedSourceLanguage) {
+                    LanguageAwareTokenizer.tokenize(segment.originalText, resolvedSourceLanguage)
+                }
                 val annotatedTrans = if (shouldHighlightTrans && translatedText != null) {
                     annotatedSubtitleText(
                         text = translatedText,
@@ -927,6 +931,7 @@ internal fun CompactSubtitleCard(
                         highlightColor = highlightColor,
                         wordLearningEnabled = true,
                         languageCode = targetLanguage,
+                        alignedOriginalTokens = originalTokens,
                     )
                 } else {
                     AnnotatedString(translatedText ?: fallbackText)
@@ -940,7 +945,12 @@ internal fun CompactSubtitleCard(
                             color = translatedColor,
                         ),
                         onClick = { offset ->
-                            val token = findWordAtOffset(translatedText, offset, targetLanguage)
+                            val token = findWordAtOffset(
+                                text = translatedText,
+                                charOffset = offset,
+                                languageCode = targetLanguage,
+                                alignedOriginalTokens = originalTokens,
+                            )
                             if (token != null) {
                                 onWordClick(token)
                             } else {
@@ -1010,7 +1020,7 @@ internal fun SubtitleSettingsDialog(
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
-    wordLearningTarget: String = "original",
+    wordLearningTarget: String = "both",
     onWordLearningTargetChange: (String) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
