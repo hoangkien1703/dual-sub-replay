@@ -201,6 +201,22 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun playbackSettingsScriptEnforcesOriginAndAvoidsTrustedHtmlViolations() {
+        val script = WEB_PLAYBACK_SETTINGS_SCRIPT
+
+        assertTrue(script.contains("window.location.protocol !== 'https:'"))
+        assertTrue(script.contains("!(host === 'youtube.com' || host.endsWith('.youtube.com'))"))
+        assertFalse(script.contains("innerHTML"))
+        assertTrue(script.contains("movie_player"))
+        assertTrue(script.contains("setPlaybackQualityRange"))
+        assertTrue(script.contains("setPlaybackRate"))
+        assertTrue(script.contains("toggleSubtitles"))
+        assertTrue(script.contains("player-settings-icon"))
+        assertTrue(script.contains("More options"))
+        assertFalse(script.contains("ytm-mobile-topbar-renderer.sticky-player"))
+    }
+
+    @Test
     fun replayScriptSeeksAndResumesTheNativePageVideo() {
         val script = webReplayScript(42.25f)
 
