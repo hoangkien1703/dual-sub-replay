@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val appVersionCode = 26
-val appVersionName = "0.9.5"
+val appVersionCode = 27
+val appVersionName = "0.9.6"
 val releaseStoreFile = providers.environmentVariable("ANDROID_RELEASE_STORE_FILE").orNull
 val releaseStorePassword = providers.environmentVariable("ANDROID_RELEASE_STORE_PASSWORD").orNull
 val releaseKeyAlias = providers.environmentVariable("ANDROID_RELEASE_KEY_ALIAS").orNull
