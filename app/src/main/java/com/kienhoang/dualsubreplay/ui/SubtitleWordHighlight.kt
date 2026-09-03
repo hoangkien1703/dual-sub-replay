@@ -5,7 +5,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.font.FontWeight
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
@@ -94,11 +93,11 @@ internal fun annotatedSubtitleText(
         // Active spoken-word karaoke highlight
         if (activeSpan != null) {
             if (wordLearningEnabled) {
-                // Keep POS color, add bold underline for active karaoke word
+                // Keep POS color, add underline and subtle background highlight (no bolding, zero layout shift)
                 addStyle(
                     SpanStyle(
+                        background = highlightColor.copy(alpha = 0.25f),
                         textDecoration = TextDecoration.Underline,
-                        fontWeight = FontWeight.Bold,
                     ),
                     activeSpan.start,
                     activeSpan.end,

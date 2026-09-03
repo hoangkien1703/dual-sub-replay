@@ -79,6 +79,35 @@ class SubtitleWordHighlightTest {
         assertEquals(null, style.fontWeight)
     }
 
+    @Test fun wordLearningSpokenWordUsesUnderlineAndBackgroundWithoutBold() {
+        val segment = SubtitleSegment(
+            id = 1,
+            startMs = 0,
+            endMs = 1_000,
+            originalText = "really useful",
+            words = listOf(
+                SubtitleWord("really", 0, 500),
+                SubtitleWord("useful", 500, 1_000),
+            ),
+        )
+
+        val annotated = annotatedSubtitleText(
+            text = segment.originalText,
+            words = segment.words,
+            activeWordIndex = 0,
+            baseColor = Color.White,
+            highlightColor = Color.Yellow,
+            wordLearningEnabled = true,
+        )
+
+        val activeStyles = annotated.spanStyles.filter { it.start == 0 && it.item.textDecoration == TextDecoration.Underline }
+        assertTrue("Should have active karaoke underline style", activeStyles.isNotEmpty())
+        val activeStyle = activeStyles.last().item
+        assertEquals(TextDecoration.Underline, activeStyle.textDecoration)
+        assertEquals(Color.Yellow.copy(alpha = 0.25f), activeStyle.background)
+        assertEquals(null, activeStyle.fontWeight)
+    }
+
     @Test fun returnsEmptyWithoutWordsOrText() {
         assertTrue(subtitleWordSpans("text", emptyList()).isEmpty())
         assertTrue(
