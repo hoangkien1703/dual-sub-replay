@@ -44,7 +44,8 @@ internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null) {
     if (showLicense) {
         val license by produceState("Loading license…") {
             value = withContext(Dispatchers.IO) {
-                context.assets.open("licenses/GPL-3.0.txt").bufferedReader().use { it.readText() }
+                context.assets.open("licenses/MIT.txt").bufferedReader().use { it.readText() } + "\n\n" +
+                    context.assets.open("licenses/GPL-3.0.txt").bufferedReader().use { it.readText() }
             }
         }
         AlertDialog(onDismissRequest = { showLicense = false }, title = { Text("Open-source licenses") },

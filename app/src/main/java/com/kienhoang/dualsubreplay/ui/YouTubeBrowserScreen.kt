@@ -1020,7 +1020,7 @@ internal fun webClipReplayScript(videoId: String, startMs: Long, endMs: Long): S
             video.currentTime = ${startMs / 1000.0};
             const promise = video.play();
             if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
-          } else if (video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
+          } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
             video.pause(); clearInterval(window.__dualSubClipTimer);
           }
         }, 50);

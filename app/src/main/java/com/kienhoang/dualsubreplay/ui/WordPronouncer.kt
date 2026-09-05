@@ -13,6 +13,7 @@ internal class WordPronouncer(context: Context) {
     var message by mutableStateOf<String?>(null)
         private set
     private var ready = false
+    private var initializationFailed = false
     private var disposed = false
     private var pending: Pair<String, String>? = null
     private var engine: TextToSpeech? = null
@@ -22,12 +23,17 @@ internal class WordPronouncer(context: Context) {
             if (!disposed) {
                 ready = status == TextToSpeech.SUCCESS
                 if (ready) pending?.let { speak(it.first, it.second) }
-                else { pending = null; message = "Speech is unavailable on this device." }
+                else {
+                    initializationFailed = true
+                    if (pending != null) message = "Speech is unavailable on this device."
+                    pending = null
+                }
             }
         }
     }
     fun speak(word: String, language: String) {
         if (disposed || word.isBlank()) return
+        if (initializationFailed) { message = "Speech is unavailable on this device."; return }
         if (!ready) { pending = word to language; return }
         pending = null
         val tts = engine ?: return

@@ -37,7 +37,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal fun intervalLabel(interval: Long): String = if (interval < DAY_MS) "10 min" else "${interval / DAY_MS} days"
+internal fun intervalLabel(interval: Long): String = if (interval < DAY_MS) "10 min" else {
+    val days = interval / DAY_MS
+    "$days ${if (days == 1L) "day" else "days"}"
+}
 
 @Composable
 internal fun SavedWordsScreen(
@@ -69,7 +72,17 @@ internal fun SavedWordsScreen(
     val storage by produceState(0L, words, workInfos) {
         value = withContext(Dispatchers.IO) { repository.clipDirectory.listFiles()?.filter { it.isFile }?.sumOf { it.length() } ?: 0L }
     }
-    LaunchedEffect(Unit) { repository.refresh(); while (true) { now = System.currentTimeMillis(); delay(30_000) } }
+    LaunchedEffect(Unit) {
+        try { repository.refresh() }
+        catch (cancel: CancellationException) { throw cancel }
+        catch (_: Exception) { error = "Could not load saved words. Check storage and reopen this screen to retry." }
+        while (true) { now = System.currentTimeMillis(); delay(30_000) }
+    }
+    LaunchedEffect(workInfos.map { it.id to it.state }) {
+        try { repository.reconcileDownloads(context) }
+        catch (cancel: CancellationException) { throw cancel }
+        catch (_: Exception) { error = "Could not check offline downloads. Reopen this screen to retry." }
+    }
     DisposableEffect(Unit) { onDispose { onPause(); pronouncer.stop() } }
 
     fun action(block: suspend () -> Unit) {
@@ -112,7 +125,7 @@ internal fun SavedWordsScreen(
                         Text("Your reviews are saved. Come back when more words are due.")
                         TextButton(onClick = { practice = false }) { Text("Back to words") }
                     } else {
-                        Text("${words.size} words · ${due.size} due · ${storage / (1024 * 1024)} MiB of clips")
+                        Text("${words.size} ${if (words.size == 1) "word" else "words"} · ${due.size} due · ${storage / (1024 * 1024)} MiB of clips")
                         Button(enabled = due.isNotEmpty(), modifier = Modifier.testTag("practice_words"), onClick = {
                             queue = due.map { it.id }; practice = true
                         }) { Text("Practice due words") }

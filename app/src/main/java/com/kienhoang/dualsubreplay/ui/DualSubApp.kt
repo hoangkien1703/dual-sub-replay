@@ -1195,9 +1195,6 @@ internal fun SubtitleSettingsDialog(
                         .verticalScroll(rememberScrollState()),
                 ) {
                     SettingsRepositoryLink()
-                    TextButton(onClick = onVocabulary) { Text("Saved words and practice") }
-                    SettingsSwitchRow("Pronounce tapped words", "Automatically speak a word when you open its definition.",
-                        autoPronounce, onAutoPronounceChange, "auto_pronounce_switch")
                     Text("Captions", style = MaterialTheme.typography.titleSmall)
                     Spacer(Modifier.height(8.dp))
                     Text("Original language")
@@ -1232,6 +1229,7 @@ internal fun SubtitleSettingsDialog(
                     Spacer(Modifier.height(12.dp))
                     Text("Text size: ${(fontScale * 100).toInt()}%")
                     Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+                    TextButton(onClick = onVocabulary) { Text("Saved words and practice") }
 
                     Spacer(Modifier.height(14.dp))
                     HorizontalDivider()
@@ -1278,6 +1276,8 @@ internal fun SubtitleSettingsDialog(
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
                         Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow("Pronounce tapped words", "Automatically speak a word when you open its definition.",
+                            autoPronounce, onAutoPronounceChange, "auto_pronounce_switch")
                         SettingsSwitchRow(
                             title = "Word learning mode (POS colors)",
                             description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",

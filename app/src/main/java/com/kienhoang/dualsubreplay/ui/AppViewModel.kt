@@ -301,7 +301,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch { vocabulary.refresh() }
+        viewModelScope.launch {
+            try {
+                vocabulary.refresh()
+                vocabulary.reconcileDownloads(application)
+            } catch (cancel: CancellationException) { throw cancel }
+            catch (_: Exception) { /* The saved-words screen reports storage failures with a retry on reopen. */ }
+        }
         if (_state.value.preloadModelsEnabled) {
             val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
             warmTranslationModel(sourceLanguage = source, targetLanguage = _state.value.targetLanguage)
@@ -562,10 +568,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val current = _state.value
         val source = current.resolvedSourceLanguage ?: current.sourcePreference.takeUnless { it == "auto" } ?: "en"
         _state.update { it.copy(selectedLearningWord = tap?.let { selected ->
-            LearningWordSelection(selected.token,
-                if (selected.translated) current.targetLanguage else source,
-                if (selected.translated) source else current.targetLanguage,
-                current.activeVideoId, selected.segment, selected.translated)
+            com.kienhoang.dualsubreplay.data.learningSelection(selected, source, current.targetLanguage, current.activeVideoId)
         }) }
     }
 

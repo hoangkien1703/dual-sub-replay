@@ -8,6 +8,17 @@ class SavedWordTest {
         "dQw4w9WgXcQ", SubtitleSegment(1, 1250, 4250, "Learn a word", "Học một từ"), false)
     private val card = savedWordFrom(selection, "học", true, false)
 
+    @Test fun selectionUsesTappedLineLanguageAndKeepsItsSentenceSnapshot() {
+        val original = learningSelection(WordTap(selection.token, selection.segment, false), "en", "vi", selection.videoId)
+        val translated = learningSelection(WordTap(selection.token.copy(text = "học"), selection.segment, true), "en", "vi", selection.videoId)
+        assertEquals("en", original.wordLanguage)
+        assertEquals("vi", original.meaningLanguage)
+        assertEquals("vi", translated.wordLanguage)
+        assertEquals("en", translated.meaningLanguage)
+        assertEquals(selection.segment, translated.segment)
+        assertEquals(selection.videoId, translated.videoId)
+    }
+
     @Test fun identityIncludesLanguageAndExampleButNotMeaningOrClipChoices() {
         assertEquals(card.id, savedWordFrom(selection.copy(token = selection.token.copy(text = "learn")), "new meaning", false, true).id)
         assertNotEquals(card.id, savedWordFrom(selection.copy(wordLanguage = "de"), "học", true, false).id)

@@ -21,7 +21,7 @@ internal class VocabularyRepository internal constructor(context: Context, datab
         }
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
     }
-    val clipDirectory = File(context.noBackupFilesDir, "word-clips")
+    val clipDirectory = File(context.noBackupFilesDir, if (databaseName == "vocabulary.db") "word-clips" else "clips-$databaseName")
     private val mutex = Mutex()
     private val _words = MutableStateFlow<List<SavedWord>>(emptyList())
     val words = _words.asStateFlow()
@@ -30,6 +30,24 @@ internal class VocabularyRepository internal constructor(context: Context, datab
     fun clipFile(word: SavedWord): File = File(clipDirectory, "${word.id}-${word.clipGeneration}.mp4")
 
     suspend fun refresh() = withContext(Dispatchers.IO) { mutex.withLock { publish() } }
+
+    /** Recover after process death/cancellation, without touching files owned by active jobs. */
+    suspend fun reconcileDownloads(context: Context) = withContext(Dispatchers.IO) { mutex.withLock {
+        val activeWords = androidx.work.WorkManager.getInstance(context).getWorkInfosByTag("word-clip").get()
+            .filter { !it.state.isFinished }.flatMap { it.tags }
+            .filter { it.startsWith("word:") }.map { it.removePrefix("word:") }.toSet()
+        val wordsById = readAll().associateBy { it.id }
+        clipDirectory.listFiles()?.forEach { file ->
+            val owner = wordsById[file.name.substringBefore('-')]
+            if (owner?.id !in activeWords && (owner == null || owner.clipStatus != "ready" || file != clipFile(owner))) {
+                file.deleteRecursively()
+            }
+        }
+        wordsById.values.filter { it.id !in activeWords && it.clipStatus in listOf("queued", "downloading") }.forEach {
+            write(it.copy(clipStatus = "failed", clipError = "Download interrupted. Tap Retry to start again."))
+        }
+        publish()
+    } }
 
     private fun readAll(): List<SavedWord> = database.readableDatabase.query(
         "words", arrayOf("payload"), null, null, null, null, "rowid DESC",

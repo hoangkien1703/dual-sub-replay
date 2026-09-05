@@ -5,7 +5,8 @@ Watch YouTube with two subtitle languages at once, then tap any sentence to repl
 [![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
 [![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
 [![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-26c6da.svg)](LICENSE)
+[![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
+[![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
 
 <p align="center">
   <a href="docs/media/dualsub-replay-promo.mp4">

@@ -14,6 +14,10 @@ data class LearningWordSelection(
     val translated: Boolean,
 )
 
+internal fun learningSelection(tap: WordTap, source: String, target: String, videoId: String?): LearningWordSelection =
+    LearningWordSelection(tap.token, if (tap.translated) target else source,
+        if (tap.translated) source else target, videoId, tap.segment, tap.translated)
+
 data class SavedWord(
     val id: String,
     val word: String,

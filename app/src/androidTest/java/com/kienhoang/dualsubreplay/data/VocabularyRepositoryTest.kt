@@ -26,6 +26,12 @@ class VocabularyRepositoryTest {
             assertEquals("edited", repository.words.value.single().meaning)
             assertFalse(repository.words.value.single().online)
             assertEquals(1000 + 3 * DAY_MS, repository.words.value.single().dueAt)
+            repository.update(word.id) { it.copy(offline = true, clipStatus = "downloading", clipGeneration = 1) }
+            val partial = java.io.File(repository.clipDirectory, "${word.id}-1-interrupted.part").apply { mkdirs() }
+            java.io.File(partial, "partial.mp4").writeText("unfinished download")
+            repository.reconcileDownloads(context)
+            assertEquals("failed", repository.words.value.single().clipStatus)
+            assertFalse(partial.exists())
             repository.remove(word.id)
             assertNull(repository.update(word.id) { it.copy(clipStatus = "ready") })
             assertTrue(repository.words.value.isEmpty())
