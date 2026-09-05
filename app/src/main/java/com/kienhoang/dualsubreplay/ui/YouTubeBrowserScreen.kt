@@ -936,6 +936,32 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
 internal class YouTubeWebController {
     private var bindingToken: Any? = null
     private var replayAction: ((Float) -> Unit)? = null
+    private var scriptAction: ((String) -> Unit)? = null
+    private var pendingClip: com.kienhoang.dualsubreplay.data.SavedWord? = null
+    private var playingClipVideo: String? = null
+
+    fun bindScripts(action: (String) -> Unit) { scriptAction = action }
+    fun pause() {
+        pendingClip = null
+        playingClipVideo = null
+        scriptAction?.invoke(webPauseScript())
+    }
+    fun replayClip(word: com.kienhoang.dualsubreplay.data.SavedWord) {
+        pause()
+        pendingClip = word
+    }
+    fun pageChanged(url: String) {
+        if (playingClipVideo != null && playingClipVideo != browseVideoSelection(url)?.videoId) pause()
+    }
+    fun observePage(url: String) {
+        val videoId = browseVideoSelection(url)?.videoId
+        if (playingClipVideo != null && playingClipVideo != videoId) pause()
+        val clip = pendingClip ?: return
+        if (videoId != clip.videoId) return
+        pendingClip = null
+        playingClipVideo = videoId
+        scriptAction?.invoke(webClipReplayScript(videoId.orEmpty(), clip.startMs, clip.endMs))
+    }
 
     fun bind(replayFrom: (Float) -> Unit): Any {
         val token = Any()
@@ -948,11 +974,59 @@ internal class YouTubeWebController {
         if (bindingToken !== token) return
         bindingToken = null
         replayAction = null
+        scriptAction = null
+        pendingClip = null
+        playingClipVideo = null
     }
 
     fun replayFrom(second: Float) {
+        pause()
         replayAction?.invoke(second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f)
     }
+}
+
+internal fun webPauseScript(): String = """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+      if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      clearInterval(window.__dualSubClipTimer);
+      document.querySelectorAll('video').forEach(function(video) { video.pause(); });
+      return true;
+    })();
+""".trimIndent()
+
+internal fun webClipReplayScript(videoId: String, startMs: Long, endMs: Long): String {
+    require(com.kienhoang.dualsubreplay.data.validClipRange(videoId, startMs, endMs))
+    return """
+      (function() {
+        const expected = '$videoId';
+        const valid = function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          const url = new URL(window.location.href);
+          const id = url.searchParams.get('v') || url.pathname.split('/')[2];
+          return window.location.protocol === 'https:' && (host === 'youtube.com' || host.endsWith('.youtube.com')) && id === expected;
+        };
+        if (!valid()) return false;
+        clearInterval(window.__dualSubClipTimer);
+        let started = false;
+        const deadline = Date.now() + 30000;
+        window.__dualSubClipTimer = setInterval(function() {
+          if (!valid()) { clearInterval(window.__dualSubClipTimer); return; }
+          const video = document.querySelector('video');
+          if (!started && Date.now() > deadline) { clearInterval(window.__dualSubClipTimer); return; }
+          if (!video || video.readyState < 1 || document.querySelector('.ad-showing')) return;
+          if (!started) {
+            started = true;
+            video.currentTime = ${startMs / 1000.0};
+            const promise = video.play();
+            if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
+          } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
+            video.pause(); clearInterval(window.__dualSubClipTimer);
+          }
+        }, 50);
+        return true;
+      })();
+    """.trimIndent()
 }
 
 @Composable
@@ -999,6 +1073,7 @@ internal fun SingleYouTubePage(
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
+        controller.pageChanged(currentUrl)
         canGoBack = view.canGoBack()
         if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl
@@ -1221,6 +1296,7 @@ internal fun SingleYouTubePage(
             }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                controller.observePage(snapshot.url)
                 youtubePlayerControlsVisible.value = snapshot.controlsVisible
                 reportNavigation(webView, snapshot.url)
                 val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
@@ -1254,6 +1330,7 @@ internal fun SingleYouTubePage(
     }
 
     DisposableEffect(controller, webView) {
+        controller.bindScripts { script -> webView.evaluateJavascript(script, null) }
         val token = controller.bind { second ->
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 webView.evaluateJavascript(webReplayScript(second), null)
@@ -1265,7 +1342,7 @@ internal fun SingleYouTubePage(
     DisposableEffect(lifecycleOwner, webView) {
         val observer = LifecycleEventObserver { _, _ ->
             lifecycleStarted = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-            if (lifecycleStarted) webView.onResume() else webView.onPause()
+            if (lifecycleStarted) webView.onResume() else { controller.pause(); webView.onPause() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         if (lifecycleStarted) webView.onResume() else webView.onPause()

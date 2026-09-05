@@ -39,6 +39,7 @@ internal data class YouTubePlayerClient(
     val deviceModel: String? = null,
     val osName: String? = null,
     val osVersion: String? = null,
+    val embedUrl: String? = null,
 )
 
 private val INNERTUBE_CLIENT_VERSION_REGEX =
@@ -100,7 +101,49 @@ internal fun extractJsonObject(text: String, objectStart: Int): String? {
     return null
 }
 
+/**
+ * Keep the most reliable logged-out caption clients first. YouTube changed player access again in
+ * mid-2026: older Android/iOS/Web profiles can now return UNPLAYABLE even while the same video is
+ * playing normally in the embedded WebView. visionOS is the current no-JS player fallback and
+ * Android VR plus the embedded web player provide additional compatibility for videos that reject
+ * one client family.
+ */
 internal fun youtubePlayerClients(webClientVersion: String?): List<YouTubePlayerClient> = listOf(
+    YouTubePlayerClient(
+        label = "visionOS",
+        clientName = "VISIONOS",
+        clientNumber = "101",
+        clientVersion = "1.02",
+        userAgent =
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 " +
+                "(KHTML, like Gecko) Version/26.0 Safari/605.1.15",
+        deviceMake = "Apple",
+        deviceModel = "RealityDevice17,1",
+        osName = "visionOS",
+        osVersion = "26.5.23O471",
+    ),
+    YouTubePlayerClient(
+        label = "Android VR",
+        clientName = "ANDROID_VR",
+        clientNumber = "28",
+        clientVersion = "1.65.10",
+        userAgent =
+            "com.google.android.apps.youtube.vr.oculus/1.65.10 " +
+                "(Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip",
+        androidSdkVersion = 32,
+        deviceMake = "Oculus",
+        deviceModel = "Quest 3",
+        osName = "Android",
+        osVersion = "12L",
+    ),
+    YouTubePlayerClient(
+        label = "Web embedded",
+        clientName = "WEB_EMBEDDED_PLAYER",
+        clientNumber = "56",
+        clientVersion = webClientVersion?.takeIf(String::isNotBlank) ?: DEFAULT_WEB_CLIENT_VERSION,
+        userAgent = WEB_USER_AGENT,
+        embedUrl = "https://www.reddit.com/",
+    ),
     YouTubePlayerClient(
         label = "Android current",
         clientName = "ANDROID",
@@ -121,6 +164,13 @@ internal fun youtubePlayerClients(webClientVersion: String?): List<YouTubePlayer
         deviceModel = "iPhone16,2",
         osName = "iPhone",
         osVersion = "18.3.2.22D82",
+    ),
+    YouTubePlayerClient(
+        label = "TV downgraded",
+        clientName = "TVHTML5",
+        clientNumber = "7",
+        clientVersion = "5.20260707",
+        userAgent = "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version",
     ),
     YouTubePlayerClient(
         label = "TV",
@@ -144,6 +194,30 @@ internal fun playerApiUrls(apiKey: String): List<String> = listOf(
     "https://youtubei.googleapis.com/youtubei/v1/player?key=$apiKey",
     "https://www.youtube.com/youtubei/v1/player?key=$apiKey",
 )
+
+internal fun playerRequestBody(videoId: String, profile: YouTubePlayerClient): JSONObject {
+    val clientContext = JSONObject()
+        .put("clientName", profile.clientName)
+        .put("clientVersion", profile.clientVersion)
+        .put("userAgent", profile.userAgent)
+        .put("hl", "en")
+        .put("gl", "US")
+    profile.androidSdkVersion?.let { clientContext.put("androidSdkVersion", it) }
+    profile.deviceMake?.let { clientContext.put("deviceMake", it) }
+    profile.deviceModel?.let { clientContext.put("deviceModel", it) }
+    profile.osName?.let { clientContext.put("osName", it) }
+    profile.osVersion?.let { clientContext.put("osVersion", it) }
+
+    val context = JSONObject().put("client", clientContext)
+    profile.embedUrl?.let { embedUrl ->
+        context.put("thirdParty", JSONObject().put("embedUrl", embedUrl))
+    }
+    return JSONObject()
+        .put("context", context)
+        .put("videoId", videoId)
+        .put("contentCheckOk", true)
+        .put("racyCheckOk", true)
+}
 
 internal fun trustedYouTubeCaptionUrl(url: String): HttpUrl? {
     val parsed = url.toHttpUrlOrNull() ?: return null
@@ -354,23 +428,7 @@ class YouTubeCaptionProvider(
         profile: YouTubePlayerClient,
         deadlineNanos: Long,
     ): CaptionTrackResult {
-        val clientContext = JSONObject()
-            .put("clientName", profile.clientName)
-            .put("clientVersion", profile.clientVersion)
-            .put("userAgent", profile.userAgent)
-            .put("hl", "en")
-            .put("gl", "US")
-        profile.androidSdkVersion?.let { clientContext.put("androidSdkVersion", it) }
-        profile.deviceMake?.let { clientContext.put("deviceMake", it) }
-        profile.deviceModel?.let { clientContext.put("deviceModel", it) }
-        profile.osName?.let { clientContext.put("osName", it) }
-        profile.osVersion?.let { clientContext.put("osVersion", it) }
-
-        val body = JSONObject()
-            .put("context", JSONObject().put("client", clientContext))
-            .put("videoId", videoId)
-            .put("contentCheckOk", true)
-            .put("racyCheckOk", true)
+        val body = playerRequestBody(videoId, profile)
 
         var lastError: Exception? = null
         for (playerUrl in playerApiUrls(apiKey)) {
@@ -381,6 +439,7 @@ class YouTubeCaptionProvider(
                     Request.Builder()
                         .url(playerUrl)
                         .header("User-Agent", profile.userAgent)
+                        .header("Origin", "https://www.youtube.com")
                         .header("X-YouTube-Client-Name", profile.clientNumber)
                         .header("X-YouTube-Client-Version", profile.clientVersion)
                         .post(body.toString().toRequestBody(JSON_MEDIA_TYPE))

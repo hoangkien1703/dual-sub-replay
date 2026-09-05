@@ -84,6 +84,8 @@ android {
     }
 
     packaging {
+        jniLibs.useLegacyPackaging = true
+        jniLibs.keepDebugSymbols += setOf("**/libffmpeg.zip.so", "**/libpython.zip.so")
         resources.excludes += setOf(
             "/META-INF/{AL2.0,LGPL2.1}",
             "META-INF/DEPENDENCIES",
@@ -125,6 +127,11 @@ dependencies {
     implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("androidx.media3:media3-exoplayer:1.5.1")
+    implementation("androidx.media3:media3-ui:1.5.1")
+    implementation("io.github.junkfood02.youtubedl-android:library:0.18.1")
+    implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")
@@ -133,4 +140,15 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// Put screenshot evidence alongside the reports already uploaded by CI.
+val collectUiEvidence by tasks.registering(Copy::class) {
+    from(layout.buildDirectory.dir("outputs/managed_device_android_test_additional_output"))
+    from(layout.buildDirectory.dir("intermediates/managed_device_android_test_additional_output"))
+    include("**/*.png")
+    into(layout.buildDirectory.dir("reports/androidTests/managedDevice/ui-evidence"))
+}
+tasks.matching { it.name == "pixel2Api36DebugAndroidTest" }.configureEach {
+    finalizedBy(collectUiEvidence)
 }

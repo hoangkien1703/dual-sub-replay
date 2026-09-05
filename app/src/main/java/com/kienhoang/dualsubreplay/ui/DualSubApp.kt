@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +54,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
@@ -117,6 +119,10 @@ fun DualSubApp(
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
+    val webController = rememberYouTubeWebController()
+    val pronouncer = rememberWordPronouncer()
+    var showVocabulary by remember { mutableStateOf(false) }
 
     DualSubTheme {
         if (!state.onboardingCompleted) {
@@ -129,6 +135,9 @@ fun DualSubApp(
         } else {
             DualSubExperience(
                 state = state,
+                webController = webController,
+                onVocabulary = { viewModel.selectLearningWord(null); webController.pause(); showVocabulary = true },
+                onAutoPronounceChange = viewModel::setAutoPronounce,
                 playerMode = playerMode,
                 effectivePlayerMode = effectivePlayerMode,
                 onPlayerModeChange = onPlayerModeChange,
@@ -164,26 +173,48 @@ fun DualSubApp(
                 onWordLearningActiveOnlyChange = viewModel::setWordLearningActiveOnly,
                 tapToLearnEnabled = state.tapToLearnEnabled,
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
-                onWordClick = viewModel::selectLearningToken,
+                onWordClick = viewModel::selectLearningWord,
                 onResetSettings = viewModel::resetAllSettings,
             )
         }
-
-        state.selectedLearningToken?.let { token ->
-            WordLearningDialog(
-                token = token,
-                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
-                targetLanguage = state.targetLanguage,
-                onTranslateWord = viewModel::translateWord,
-                onDismiss = { viewModel.selectLearningToken(null) },
-            )
+        state.selectedLearningWord?.let { selection ->
+            androidx.compose.runtime.key(selection) {
+                androidx.compose.runtime.DisposableEffect(selection) {
+                    onDispose { pronouncer.stop() }
+                }
+                WordLearningDialog(
+                    selection = selection,
+                    existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false, false).id },
+                    autoPronounce = state.autoPronounce,
+                    onTranslateWord = { viewModel.translateSelection(selection) },
+                    onSave = { meaning, online, offline -> viewModel.saveWord(selection, meaning, online, offline); Unit },
+                    onSpeak = { webController.pause(); pronouncer.speak(selection.token.text, selection.wordLanguage) },
+                    speechMessage = pronouncer.message,
+                    onDismiss = { viewModel.selectLearningWord(null) },
+                )
+            }
         }
+        if (showVocabulary) SavedWordsScreen(
+            repository = viewModel.vocabulary,
+            onOnline = { word ->
+                pronouncer.stop()
+                if (state.activeVideoId != word.videoId) {
+                    viewModel.acceptSharedText("https://www.youtube.com/watch?v=${word.videoId}")
+                }
+                webController.replayClip(word)
+            },
+            onPause = { webController.pause() },
+            onDismiss = { showVocabulary = false },
+        )
     }
 }
 
 @Composable
 private fun DualSubExperience(
     state: DualSubUiState,
+    webController: YouTubeWebController,
+    onVocabulary: () -> Unit,
+    onAutoPronounceChange: (Boolean) -> Unit,
     playerMode: PlayerExperienceMode,
     effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
@@ -219,11 +250,10 @@ private fun DualSubExperience(
     onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
-    val webController = rememberYouTubeWebController()
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val layoutPreferences = remember(context) {
@@ -267,7 +297,14 @@ private fun DualSubExperience(
         if (externalSettingsRequestId > 0L) showSettings = true
     }
 
-    Scaffold(contentWindowInsets = contentInsets) { innerPadding ->
+    Scaffold(contentWindowInsets = contentInsets, topBar = {
+        Surface {
+            Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = onVocabulary, modifier = Modifier.testTag("open_saved_words")) { Text("Saved words") }
+                TextButton(onClick = { showSettings = true }) { Text("Settings") }
+            }
+        }
+    }) { innerPadding ->
         Box(
             Modifier
                 .fillMaxSize()
@@ -363,6 +400,9 @@ private fun DualSubExperience(
     }
     if (showSettings) {
         SubtitleSettingsDialog(
+            autoPronounce = state.autoPronounce,
+            onAutoPronounceChange = onAutoPronounceChange,
+            onVocabulary = { showSettings = false; onVocabulary() },
             sourcePreference = state.sourcePreference,
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
@@ -428,7 +468,7 @@ private fun SubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetY by remember { mutableFloatStateOf(0f) }
@@ -625,7 +665,7 @@ private fun SideSubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetX by remember { mutableFloatStateOf(0f) }
@@ -728,7 +768,7 @@ private fun SideSubtitlePanel(
 @Composable
 private fun SubtitleTimeline(
     state: DualSubUiState,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     // When the panel is recreated after being closed, start the lazy list at the
@@ -843,7 +883,7 @@ internal fun CompactSubtitleCard(
     resolvedSourceLanguage: String? = null,
     targetLanguage: String = "vi",
     isDownloadingTranslationModel: Boolean = false,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -905,7 +945,7 @@ internal fun CompactSubtitleCard(
                         onClick = { offset ->
                             val token = findWordAtOffset(segment.originalText, offset, resolvedSourceLanguage)
                             if (token != null) {
-                                onWordClick(token)
+                                onWordClick(WordTap(token, segment, false))
                             } else {
                                 onReplay()
                             }
@@ -961,7 +1001,7 @@ internal fun CompactSubtitleCard(
                                 alignedOriginalTokens = originalTokens,
                             )
                             if (token != null) {
-                                onWordClick(token)
+                                onWordClick(WordTap(token, segment, true))
                             } else {
                                 onReplay()
                             }
@@ -1048,6 +1088,9 @@ internal fun SubtitleSettingsDialog(
     onCustomColorsChange: (Boolean) -> Unit = {},
     onSplitSentencesChange: (Boolean) -> Unit = {},
     onResetSettings: () -> Unit = {},
+    autoPronounce: Boolean = true,
+    onAutoPronounceChange: (Boolean) -> Unit = {},
+    onVocabulary: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
@@ -1151,6 +1194,7 @@ internal fun SubtitleSettingsDialog(
                         .heightIn(max = bodyMaxHeight)
                         .verticalScroll(rememberScrollState()),
                 ) {
+                    SettingsRepositoryLink()
                     Text("Captions", style = MaterialTheme.typography.titleSmall)
                     Spacer(Modifier.height(8.dp))
                     Text("Original language")
@@ -1185,6 +1229,7 @@ internal fun SubtitleSettingsDialog(
                     Spacer(Modifier.height(12.dp))
                     Text("Text size: ${(fontScale * 100).toInt()}%")
                     Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+                    TextButton(onClick = onVocabulary) { Text("Saved words and practice") }
 
                     Spacer(Modifier.height(14.dp))
                     HorizontalDivider()
@@ -1231,6 +1276,8 @@ internal fun SubtitleSettingsDialog(
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
                         Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow("Pronounce tapped words", "Automatically speak a word when you open its definition.",
+                            autoPronounce, onAutoPronounceChange, "auto_pronounce_switch")
                         SettingsSwitchRow(
                             title = "Word learning mode (POS colors)",
                             description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",
