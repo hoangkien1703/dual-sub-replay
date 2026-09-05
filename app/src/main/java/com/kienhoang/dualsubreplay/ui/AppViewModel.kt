@@ -4,6 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.WordTap
+import com.kienhoang.dualsubreplay.data.VocabularyRepository
+import com.kienhoang.dualsubreplay.data.SavedWord
+import com.kienhoang.dualsubreplay.data.savedWordFrom
+import com.kienhoang.dualsubreplay.data.enqueueClip
+import com.kienhoang.dualsubreplay.data.removeClip
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -59,7 +66,8 @@ data class DualSubUiState(
     val wordLearningTarget: String = "both",
     val wordLearningActiveOnly: Boolean = true,
     val tapToLearnEnabled: Boolean = true,
-    val selectedLearningToken: AnalyzedToken? = null,
+    val selectedLearningWord: LearningWordSelection? = null,
+    val autoPronounce: Boolean = true,
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
@@ -217,6 +225,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val captionProvider: CaptionProvider = YouTubeCaptionProvider()
     private val translator = OnDeviceTranslator()
+    internal val vocabulary = VocabularyRepository.get(application)
     private var loadingJob: Job? = null
     private var translationWarmupJob: Job? = null
     private var loadGeneration = 0L
@@ -283,6 +292,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             wordLearningActiveOnly = storedFeatureEnabled(
                 preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
             ),
+            autoPronounce = preferences.getBoolean("auto_pronounce", true),
             tapToLearnEnabled = storedFeatureEnabled(
                 preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
             ),
@@ -291,6 +301,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
     init {
+        viewModelScope.launch { vocabulary.refresh() }
         if (_state.value.preloadModelsEnabled) {
             val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
             warmTranslationModel(sourceLanguage = source, targetLanguage = _state.value.targetLanguage)
@@ -547,8 +558,30 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(wordLearningActiveOnly = enabled) }
     }
 
-    fun selectLearningToken(token: AnalyzedToken?) {
-        _state.update { it.copy(selectedLearningToken = token) }
+    fun selectLearningWord(tap: WordTap?) {
+        val current = _state.value
+        val source = current.resolvedSourceLanguage ?: current.sourcePreference.takeUnless { it == "auto" } ?: "en"
+        _state.update { it.copy(selectedLearningWord = tap?.let { selected ->
+            LearningWordSelection(selected.token,
+                if (selected.translated) current.targetLanguage else source,
+                if (selected.translated) source else current.targetLanguage,
+                current.activeVideoId, selected.segment, selected.translated)
+        }) }
+    }
+
+    fun setAutoPronounce(enabled: Boolean) {
+        preferences.edit().putBoolean("auto_pronounce", enabled).apply()
+        _state.update { it.copy(autoPronounce = enabled) }
+    }
+
+    internal suspend fun translateSelection(selection: LearningWordSelection): String =
+        translator.translateSingle(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
+
+    internal suspend fun saveWord(selection: LearningWordSelection, meaning: String, online: Boolean, offline: Boolean): SavedWord {
+        val word = vocabulary.save(savedWordFrom(selection, meaning, online, offline))
+        if (offline && (word.clipStatus != "ready" || !vocabulary.clipFile(word).isFile)) enqueueClip(getApplication(), word.id)
+        else if (!offline && word.clipStatus != "none") removeClip(getApplication(), word)
+        return word
     }
 
     suspend fun translateWord(word: String): String {
@@ -583,6 +616,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val editor = preferences.edit()
         RESETTABLE_SETTING_KEYS.forEach(editor::remove)
         editor.apply()
+        _state.update { it.copy(autoPronounce = true) }
         latestPlaybackSecondMs = 0L
         liveCaptionTracker.reset()
         _state.update { current ->
@@ -605,7 +639,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 wordLearningTarget = "both",
                 wordLearningActiveOnly = true,
                 tapToLearnEnabled = true,
-                selectedLearningToken = null,
+                selectedLearningWord = null,
             )
         }
         // "Reset all settings" re-enables sentence splitting, so the currently

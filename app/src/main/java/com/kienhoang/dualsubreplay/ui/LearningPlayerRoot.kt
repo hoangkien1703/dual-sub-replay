@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -493,7 +494,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguageCode = state.targetLanguage,
                     lockToVideo = state.lockOverlayToVideo,
-                    onWordClick = viewModel::selectLearningToken,
+                    onWordClick = viewModel::selectLearningWord,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(start = 20.dp, end = 20.dp, bottom = fullscreenBottomPadding),
@@ -562,7 +563,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguageCode = state.targetLanguage,
                     lockToVideo = state.lockOverlayToVideo,
-                    onWordClick = viewModel::selectLearningToken,
+                    onWordClick = viewModel::selectLearningWord,
                     modifier = overlayModifier,
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
@@ -575,15 +576,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             }
         }
 
-        state.selectedLearningToken?.let { token ->
-            WordLearningDialog(
-                token = token,
-                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
-                targetLanguage = state.targetLanguage,
-                onTranslateWord = viewModel::translateWord,
-                onDismiss = { viewModel.selectLearningToken(null) },
-            )
-        }
+
     }
 }
 
@@ -619,7 +612,7 @@ internal fun LearningSubtitleOverlay(
     originalLanguageCode: String? = null,
     targetLanguageCode: String? = null,
     lockToVideo: Boolean = false,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onPositionChange: (Float) -> Unit = {},
     onHorizontalPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
@@ -741,7 +734,7 @@ internal fun LearningSubtitleOverlay(
                             onClick = { offset ->
                                 val token = findWordAtOffset(original, offset, originalLanguageCode)
                                 if (token != null) {
-                                    onWordClick(token)
+                                    onWordClick(WordTap(token, content.segment, false))
                                 } else {
                                     overlayActionsVisible = !overlayActionsVisible
                                 }
@@ -797,7 +790,7 @@ internal fun LearningSubtitleOverlay(
                                     alignedOriginalTokens = origTokens,
                                 )
                                 if (token != null) {
-                                    onWordClick(token)
+                                    onWordClick(WordTap(token, content.segment, true))
                                 } else {
                                     overlayActionsVisible = !overlayActionsVisible
                                 }
