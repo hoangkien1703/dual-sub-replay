@@ -198,7 +198,9 @@ fun DualSubApp(
             repository = viewModel.vocabulary,
             onOnline = { word ->
                 pronouncer.stop()
-                viewModel.acceptSharedText("https://www.youtube.com/watch?v=${word.videoId}")
+                if (state.activeVideoId != word.videoId) {
+                    viewModel.acceptSharedText("https://www.youtube.com/watch?v=${word.videoId}")
+                }
                 webController.replayClip(word)
             },
             onPause = { webController.pause() },

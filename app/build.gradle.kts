@@ -141,3 +141,14 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+// Put screenshot evidence alongside the reports already uploaded by CI.
+val collectUiEvidence by tasks.registering(Copy::class) {
+    from(layout.buildDirectory.dir("outputs/managed_device_android_test_additional_output"))
+    from(layout.buildDirectory.dir("intermediates/managed_device_android_test_additional_output"))
+    include("**/*.png")
+    into(layout.buildDirectory.dir("reports/androidTests/managedDevice/ui-evidence"))
+}
+tasks.matching { it.name == "pixel2Api36DebugAndroidTest" }.configureEach {
+    finalizedBy(collectUiEvidence)
+}

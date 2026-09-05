@@ -92,12 +92,19 @@ internal class ClipDownloadWorker(context: Context, params: WorkerParameters) : 
                         val transfer = async { backend.download(request, temporary) { percent ->
                             setProgressAsync(Data.Builder().putInt("percent", percent).build())
                         } }
-                        while (!transfer.isCompleted) {
-                            delay(500)
-                            val bytes = withContext(Dispatchers.IO) { temporary.walkTopDown().filter { it.isFile }.sumOf { it.length() } }
-                            check(bytes <= MAX_CLIP_BYTES) { "Clip exceeds the 100 MiB storage limit" }
+                        try {
+                            while (!transfer.isCompleted) {
+                                delay(500)
+                                val bytes = withContext(Dispatchers.IO) { temporary.walkTopDown().filter { it.isFile }.sumOf { it.length() } }
+                                check(bytes <= MAX_CLIP_BYTES) { "Clip exceeds the 100 MiB storage limit" }
+                            }
+                            transfer.await()
+                        } catch (error: Exception) {
+                            withContext(kotlinx.coroutines.NonCancellable + Dispatchers.IO) {
+                                runCatching { backend.cancel(request.processId) }
+                            }
+                            throw error
                         }
-                        transfer.await()
                     }
                 }
                 withContext(Dispatchers.IO) {

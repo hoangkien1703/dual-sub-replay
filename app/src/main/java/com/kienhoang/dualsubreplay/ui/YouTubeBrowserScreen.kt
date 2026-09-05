@@ -950,6 +950,9 @@ internal class YouTubeWebController {
         pause()
         pendingClip = word
     }
+    fun pageChanged(url: String) {
+        if (playingClipVideo != null && playingClipVideo != browseVideoSelection(url)?.videoId) pause()
+    }
     fun observePage(url: String) {
         val videoId = browseVideoSelection(url)?.videoId
         if (playingClipVideo != null && playingClipVideo != videoId) pause()
@@ -1070,7 +1073,7 @@ internal fun SingleYouTubePage(
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
-        controller.observePage(currentUrl)
+        controller.pageChanged(currentUrl)
         canGoBack = view.canGoBack()
         if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl

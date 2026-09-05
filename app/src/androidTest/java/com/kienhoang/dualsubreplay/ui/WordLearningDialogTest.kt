@@ -26,6 +26,7 @@ class WordLearningDialogTest {
         compose.runOnIdle { assertEquals(1, spoken); recompose.value = "Voice ready" }
         compose.waitForIdle()
         compose.runOnIdle { assertEquals(1, spoken) }
+        saveUiEvidence("word-definition")
         compose.onNodeWithTag("offline_clip_choice").performScrollTo().performClick()
         compose.onNodeWithTag("save_word").performClick()
         compose.waitForIdle()
