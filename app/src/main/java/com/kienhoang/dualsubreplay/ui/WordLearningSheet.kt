@@ -22,20 +22,21 @@ internal fun WordLearningDialog(
     onSpeak: () -> Unit,
     speechMessage: String?,
     onDismiss: () -> Unit,
+    existingWord: com.kienhoang.dualsubreplay.data.SavedWord? = null,
 ) {
-    var meaning by remember(selection) { mutableStateOf("") }
+    var meaning by remember(selection) { mutableStateOf(existingWord?.meaning.orEmpty()) }
     var loading by remember(selection) { mutableStateOf(true) }
     var error by remember(selection) { mutableStateOf<String?>(null) }
-    var saved by remember(selection) { mutableStateOf(false) }
+    var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
-    var online by remember(selection) { mutableStateOf(true) }
-    var offline by remember(selection) { mutableStateOf(false) }
+    var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
+    var offline by remember(selection) { mutableStateOf(existingWord?.offline ?: false) }
     val scope = rememberCoroutineScope()
     val canClip = validClipRange(selection.videoId, selection.segment?.startMs ?: -1, selection.segment?.endMs ?: -1)
 
     LaunchedEffect(selection) {
         if (autoPronounce) onSpeak()
-        try { meaning = onTranslateWord() }
+        try { if (existingWord == null) meaning = onTranslateWord() }
         catch (cancel: CancellationException) { throw cancel }
         catch (_: Exception) { error = "Translation unavailable. You can enter a meaning and save the word." }
         finally { loading = false }

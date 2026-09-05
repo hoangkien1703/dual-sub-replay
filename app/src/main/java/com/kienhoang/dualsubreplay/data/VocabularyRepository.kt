@@ -14,8 +14,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 /** Separate from preferences: resetting appearance/settings never erases learning history. */
-internal class VocabularyRepository private constructor(context: Context) {
-    private val database = object : SQLiteOpenHelper(context, "vocabulary.db", null, 1) {
+internal class VocabularyRepository internal constructor(context: Context, databaseName: String = "vocabulary.db") {
+    private val database = object : SQLiteOpenHelper(context, databaseName, null, 1) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL("CREATE TABLE words (id TEXT PRIMARY KEY, payload TEXT NOT NULL)")
         }
@@ -25,6 +25,7 @@ internal class VocabularyRepository private constructor(context: Context) {
     private val mutex = Mutex()
     private val _words = MutableStateFlow<List<SavedWord>>(emptyList())
     val words = _words.asStateFlow()
+    internal fun close() = database.close()
 
     fun clipFile(word: SavedWord): File = File(clipDirectory, "${word.id}-${word.clipGeneration}.mp4")
 

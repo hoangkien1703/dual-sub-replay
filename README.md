@@ -97,7 +97,21 @@ Starting with v0.3.3, the app experimentally keeps the Google/YouTube sign-in fl
 
 YouTube's official Data API does not allow ordinary viewers to download captions from arbitrary public videos. To provide automatic captions, this prototype uses YouTube's undocumented Innertube transcript endpoint. It can stop working when YouTube changes its internal API, and its use may be restricted by YouTube's terms. The extraction code is isolated in `YouTubeCaptionProvider` so it can be replaced without rewriting the app.
 
-Video playback uses the native player in YouTube's mobile webpage. The app does not download video or audio, remove ads, or enable background playback. The subtitle layer can be hidden at any time to restore the unobstructed YouTube page.
+Online video playback uses the native player in YouTube's mobile webpage. Saved vocabulary can optionally download a short example clip for offline practice. Downloads use yt-dlp and FFmpeg, may be unavailable for some videos, and can stop working when YouTube changes. Normal browsing does not download media. The subtitle layer can be hidden at any time to restore the unobstructed YouTube page.
+
+## Saved words and practice
+
+Tap a word in either subtitle line to hear it, inspect its meaning, and choose **Save word**. Pronunciation uses the tapped word's language and the device's installed speech engine; Android voice availability varies. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
+
+Each card stores an editable meaning and its original subtitle context. The two clip options are independent: online only, offline only, both, or neither. Online examples replay the saved sentence in the existing YouTube page and stop at its end. A translated word's example contains the original spoken sentence, which may not literally contain the translated word. Offline files play without an internet connection and never silently fall back to online playback.
+
+Open **Saved words** beside Settings to search, edit, delete, or practice cards. Practice reveals the meaning on request and schedules reviews with Again (10 minutes), Hard (initially 1 day), Good (3 days), or Easy (7 days). Later successful reviews expand the previous interval by 1.2, 2, or 3 respectively; Again restarts progression. This is an independent local review system, without Anki sync. Cards are due immediately when first saved; duplicate saves of the same word/languages/video/segment retain review progress.
+
+Offline clips download only on request, at up to 480p, one at a time. The app shows progress and offers cancellation, retry, and removal. A job is limited to 10 minutes and 100 MiB of temporary/output storage. Clips live in app-private storage excluded from backups. Removing a clip keeps the card; deleting a word also removes its clip and review history. Resetting Settings preserves vocabulary. A restored card whose clip is missing can download it again.
+
+## Distribution licenses
+
+Source contributed to this repository retains its [MIT notice](LICENSE). APKs combining it with the GPL-3.0 Android downloader are distributed as a whole under GPL-3.0. See [third-party notices and build/source information](THIRD_PARTY_NOTICES.md). Settings includes an offline copy of the GPL terms. Native download dependencies increase APK size.
 
 Live spoken-word timing reads caption text rendered by YouTube's webpage and is available only for eligible auto-generated caption tracks. Adaptive mode falls back to transcript timing when a reliable live word cannot be mapped; manual captions always use transcript timing. YouTube's page structure and WebView behavior can vary by video and device, so live word timing may be unavailable or less precise on some phones.
 

@@ -85,6 +85,7 @@ android {
 
     packaging {
         jniLibs.useLegacyPackaging = true
+        jniLibs.keepDebugSymbols += setOf("**/libffmpeg.zip.so", "**/libpython.zip.so")
         resources.excludes += setOf(
             "/META-INF/{AL2.0,LGPL2.1}",
             "META-INF/DEPENDENCIES",

@@ -25,7 +25,7 @@ Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotli
 
 ## Architecture invariants (enforced by tests)
 
-- Exactly one WebView exists (`SingleYouTubePage` in `ui/YouTubeBrowserScreen.kt`). Replay seeks the native YouTube page video via a JS polling bridge — never add a second player/WebView.
+- Exactly one WebView exists (`SingleYouTubePage` in `ui/YouTubeBrowserScreen.kt`). Online replay seeks the native YouTube page video via a JS polling bridge. Saved offline clips may use a lifecycle-managed Media3 player for app-private local files; pause the YouTube player before local playback and never add a second online player/WebView.
 - Main-frame navigation goes through `classifyMainFrameUrl` → `YOUTUBE_WEB` (embed) / `GOOGLE_SIGN_IN` (embed during sign-in flow) / `OPEN_EXTERNAL` (browser) / `BLOCK`. JS snapshot/replay scripts must keep re-verifying the executing origin (`https:` + `*.youtube.com`); `PlaybackArchitectureTest` asserts the literal script text.
 - Captions use YouTube's undocumented Innertube transcript endpoint, deliberately isolated in `data/YouTubeCaptionProvider.kt` (host allowlist, 8 MiB response cap) so it can be replaced without touching the rest of the app.
 - Translation is on-device via ML Kit (`translation/OnDeviceTranslator.kt`); the app has no API keys.

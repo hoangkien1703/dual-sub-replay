@@ -185,6 +185,7 @@ class SubtitleWordHighlightTest {
             WORD_LEARNING_TARGET_PREFERENCE,
             TAP_TO_LEARN_PREFERENCE,
             WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
+            "auto_pronounce",
         )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)
@@ -249,4 +250,3 @@ class SubtitleWordHighlightTest {
         assertTrue("Active sentence should have POS spans", activeAnnotated.spanStyles.isNotEmpty())
     }
 }
-

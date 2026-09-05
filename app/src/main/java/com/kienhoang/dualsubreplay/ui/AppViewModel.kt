@@ -579,7 +579,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     internal suspend fun saveWord(selection: LearningWordSelection, meaning: String, online: Boolean, offline: Boolean): SavedWord {
         val word = vocabulary.save(savedWordFrom(selection, meaning, online, offline))
-        if (offline && (word.clipStatus != "ready" || !vocabulary.clipFile(word).isFile)) enqueueClip(getApplication(), word.id)
+        if (offline && word.clipStatus !in listOf("queued", "downloading") &&
+            (word.clipStatus != "ready" || !vocabulary.clipFile(word).isFile)) enqueueClip(getApplication(), word.id)
         else if (!offline && word.clipStatus != "none") removeClip(getApplication(), word)
         return word
     }

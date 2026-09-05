@@ -119,6 +119,7 @@ fun DualSubApp(
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
     val webController = rememberYouTubeWebController()
     val pronouncer = rememberWordPronouncer()
     var showVocabulary by remember { mutableStateOf(false) }
@@ -183,6 +184,7 @@ fun DualSubApp(
                 }
                 WordLearningDialog(
                     selection = selection,
+                    existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false, false).id },
                     autoPronounce = state.autoPronounce,
                     onTranslateWord = { viewModel.translateSelection(selection) },
                     onSave = { meaning, online, offline -> viewModel.saveWord(selection, meaning, online, offline); Unit },
