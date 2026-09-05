@@ -104,7 +104,7 @@ internal fun SavedWordsScreen(
                 Column(Modifier.padding(12.dp)) {
                     Text("Example video · internet required")
                     Text("If the video is unavailable, return to keep practicing.", style = MaterialTheme.typography.bodySmall)
-                    TextButton(onClick = ::returnFromVideo, modifier = Modifier.testTag("return_to_words")) { Text("Return to saved words") }
+                    TextButton(onClick = ::returnFromVideo, modifier = Modifier.testTag("return_to_words")) { Text("Return to Practice") }
                 }
             }
         }
@@ -115,7 +115,7 @@ internal fun SavedWordsScreen(
         Surface(Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.9f), shape = MaterialTheme.shapes.large) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Saved words", style = MaterialTheme.typography.titleLarge)
+                    Text("Practice", style = MaterialTheme.typography.titleLarge)
                     TextButton(onClick = onDismiss) { Text("Close") }
                 }
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -123,7 +123,7 @@ internal fun SavedWordsScreen(
                     if (practice) {
                         Text("Session complete", modifier = Modifier.testTag("practice_complete"))
                         Text("Your reviews are saved. Come back when more words are due.")
-                        TextButton(onClick = { practice = false }) { Text("Back to words") }
+                        TextButton(onClick = { practice = false }) { Text("Back to saved words") }
                     } else {
                         Text("${words.size} ${if (words.size == 1) "word" else "words"} · ${due.size} due · ${storage / (1024 * 1024)} MiB of clips")
                         Button(enabled = due.isNotEmpty(), modifier = Modifier.testTag("practice_words"), onClick = {
@@ -197,7 +197,7 @@ internal fun SavedWordsScreen(
                         }
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        TextButton(onClick = { selectedId = null; practice = false; pronouncer.stop() }) { Text("Back to words") }
+                        TextButton(onClick = { selectedId = null; practice = false; pronouncer.stop() }) { Text("Back to saved words") }
                         if (!practice) TextButton(enabled = !busy, onClick = { confirmDelete = selected }) { Text("Delete word") }
                     }
                 }
@@ -239,7 +239,7 @@ private fun LocalClipDialog(file: File, onDismiss: () -> Unit) {
                 Text("Offline example", style = MaterialTheme.typography.titleMedium)
                 AndroidView(factory = { PlayerView(it).apply { this.player = player } }, modifier = Modifier.fillMaxWidth().height(220.dp))
                 error?.let { Text(it) }
-                TextButton(onClick = onDismiss) { Text("Return to saved words") }
+                TextButton(onClick = onDismiss) { Text("Return to Practice") }
             }
         }
     }
