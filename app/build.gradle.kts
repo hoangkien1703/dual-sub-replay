@@ -17,6 +17,7 @@ val releaseSigningValues = listOf(
 )
 val hasReleaseSigning = releaseSigningValues.all { !it.isNullOrBlank() }
 val requireReleaseSigning = providers.gradleProperty("requireReleaseSigning").orNull == "true"
+val testReleaseSigning = providers.gradleProperty("testReleaseSigning").orNull == "true"
 val previewVersionCode = providers.gradleProperty("previewVersionCode").orNull?.toIntOrNull()
 val previewVersionNameSuffix = providers.gradleProperty("previewVersionNameSuffix").orNull.orEmpty()
 val previewApplicationIdSuffix = providers.gradleProperty("previewApplicationIdSuffix").orNull.orEmpty()
@@ -72,9 +73,15 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            if (previewApplicationIdSuffix.isNotBlank()) {
+                applicationIdSuffix = previewApplicationIdSuffix
+            }
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("production")
+            } else if (testReleaseSigning) {
+                signingConfig = signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -85,7 +92,6 @@ android {
 
     packaging {
         jniLibs.useLegacyPackaging = true
-        jniLibs.keepDebugSymbols += setOf("**/libffmpeg.zip.so", "**/libpython.zip.so")
         resources.excludes += setOf(
             "/META-INF/{AL2.0,LGPL2.1}",
             "META-INF/DEPENDENCIES",
@@ -127,11 +133,6 @@ dependencies {
     implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("androidx.work:work-runtime-ktx:2.10.1")
-    implementation("androidx.media3:media3-exoplayer:1.5.1")
-    implementation("androidx.media3:media3-ui:1.5.1")
-    implementation("io.github.junkfood02.youtubedl-android:library:0.18.1")
-    implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")

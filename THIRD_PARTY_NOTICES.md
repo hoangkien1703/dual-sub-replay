@@ -1,14 +1,24 @@
 # Distribution and source notices
 
-DualSub Replay copyright (c) 2026 Hoang Trung Kien. Original repository source retains the MIT permissions and notice in LICENSE. The application combining that source with the GPL-3.0 downloader is distributed as a whole under GNU GPL version 3, without warranty. You may copy, modify, and redistribute the combined application under those terms. The full GPL text is packaged at `app/src/main/assets/licenses/GPL-3.0.txt` and accessible in Settings.
+DualSub Replay copyright (c) 2026 Hoang Trung Kien. Original repository source is released under the [MIT License](LICENSE).
 
-The vocabulary/downloader integration was added in September 2026. The upstream download libraries are used without source modifications.
+Offline video downloading (`yt-dlp`, `FFmpeg`), local media playback (`Media3`), and `WorkManager` were removed to simplify the app and drastically reduce APK size.
 
-## Download components
+## Historical release notices (v0.9.7 and earlier)
 
+For historical releases (v0.9.7 and earlier) that bundled the optional downloader:
+- Combined applications were distributed under GNU GPL version 3.
 - `io.github.junkfood02.youtubedl-android:library:0.18.1` and `:ffmpeg:0.18.1`: GPL-3.0 Android wrapper, by yausername, JunkFood02, xibr, and contributors. [Versioned source](https://github.com/yausername/youtubedl-android/tree/0.18.1), [source archive](https://github.com/yausername/youtubedl-android/archive/refs/tags/0.18.1.tar.gz), [license](https://github.com/yausername/youtubedl-android/blob/0.18.1/LICENSE).
-- The wrapper bundles yt-dlp, CPython, QuickJS, FFmpeg, and their native dependencies. Their upstream terms continue to apply. The wrapper's [Python build instructions](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_PYTHON.md) and [FFmpeg build instructions](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_FFMPEG.md) describe the native package build process. Native package recipes and patches are maintained in [Termux packages](https://github.com/termux/termux-packages). The bundled yt-dlp build is maintained in [ytdlp-lazy](https://github.com/xibr/ytdlp-lazy); upstream [yt-dlp source and third-party licenses](https://github.com/yt-dlp/yt-dlp) remain available.
-- Media3 ExoPlayer/UI 1.5.1 and WorkManager 2.10.1: Android Open Source Project contributors, Apache-2.0. Sources and source JARs are available from Google's Maven repository and [AndroidX](https://android.googlesource.com/platform/frameworks/support/).
+- Upstream terms for bundled yt-dlp, CPython, QuickJS, FFmpeg continue to apply for those releases. [Python build instructions](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_PYTHON.md) and [FFmpeg build instructions](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_FFMPEG.md) describe the build process.
+- Media3 ExoPlayer/UI 1.5.1 and WorkManager 2.10.1: Android Open Source Project contributors, Apache-2.0. Sources from Google Maven and [AndroidX](https://android.googlesource.com/platform/frameworks/support/).
+
+## Current dependencies
+
+Current releases bundle only:
+- AndroidX / Jetpack Compose libraries: Apache-2.0.
+- Google ML Kit Translate: Google APIs Terms of Service / Apache-2.0.
+- Square OkHttp: Apache-2.0.
+- Kotlin / Coroutines: Apache-2.0.
 
 ## Obtain and build this application's source
 

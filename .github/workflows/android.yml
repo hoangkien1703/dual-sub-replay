@@ -77,6 +77,31 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Build optimized release APK with test signing
+        run: |
+          set -euo pipefail
+          bash ./gradlew assembleRelease \
+            -PtestReleaseSigning=true \
+            -PpreviewApplicationIdSuffix=".releasesmoke" \
+            --stacktrace
+
+      - name: Verify release APK size, permissions, and forbidden components
+        run: |
+          python3 tools/report_apk.py app/build/outputs/apk/release/app-release.apk \
+            --max-bytes 80000000 \
+            --stretch-bytes 40000000 \
+            --output-json apk-size-report.json
+
+      - name: Upload size report and R8 mapping
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-size-and-r8-mapping
+          path: |
+            apk-size-report.json
+            app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: warn
+          retention-days: 14
+
   managed-device-tests:
     needs: verify-build
     runs-on: ubuntu-latest

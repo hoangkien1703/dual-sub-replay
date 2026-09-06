@@ -6,7 +6,7 @@ import org.junit.Test
 class SavedWordTest {
     private val selection = LearningWordSelection(AnalyzedToken("Learn", 0, 5, PartOfSpeech.VERB), "en", "vi",
         "dQw4w9WgXcQ", SubtitleSegment(1, 1250, 4250, "Learn a word", "Học một từ"), false)
-    private val card = savedWordFrom(selection, "học", true, false)
+    private val card = savedWordFrom(selection, "học", true)
 
     @Test fun selectionUsesTappedLineLanguageAndKeepsItsSentenceSnapshot() {
         val original = learningSelection(WordTap(selection.token, selection.segment, false), "en", "vi", selection.videoId)
@@ -20,18 +20,18 @@ class SavedWordTest {
     }
 
     @Test fun identityIncludesLanguageAndExampleButNotMeaningOrClipChoices() {
-        assertEquals(card.id, savedWordFrom(selection.copy(token = selection.token.copy(text = "learn")), "new meaning", false, true).id)
-        assertNotEquals(card.id, savedWordFrom(selection.copy(wordLanguage = "de"), "học", true, false).id)
-        assertNotEquals(card.id, savedWordFrom(selection.copy(segment = selection.segment!!.copy(startMs = 1500)), "học", true, false).id)
+        assertEquals(card.id, savedWordFrom(selection.copy(token = selection.token.copy(text = "learn")), "new meaning", false).id)
+        assertNotEquals(card.id, savedWordFrom(selection.copy(wordLanguage = "de"), "học", true).id)
+        assertNotEquals(card.id, savedWordFrom(selection.copy(segment = selection.segment!!.copy(startMs = 1500)), "học", true).id)
         assertTrue(card.id.matches(Regex("[a-f0-9]{64}")))
     }
-    @Test fun allFourClipChoicesAreIndependentAndInvalidContextCannotCreateClip() {
-        for (online in listOf(true, false)) for (offline in listOf(true, false)) {
-            val saved = savedWordFrom(selection, "học", online, offline)
-            assertEquals(online, saved.online); assertEquals(offline, saved.offline)
+    @Test fun onlineClipChoiceIsIndependentAndInvalidContextCannotCreateClip() {
+        for (online in listOf(true, false)) {
+            val saved = savedWordFrom(selection, "học", online)
+            assertEquals(online, saved.online)
         }
-        val invalid = savedWordFrom(selection.copy(videoId = "../invalid"), "học", true, true)
-        assertFalse(invalid.online); assertFalse(invalid.offline)
+        val invalid = savedWordFrom(selection.copy(videoId = "../invalid"), "học", true)
+        assertFalse(invalid.online)
         assertFalse(validClipRange(selection.videoId, 100, 100))
         assertFalse(validClipRange(selection.videoId, -1, 100))
     }
@@ -46,16 +46,10 @@ class SavedWordTest {
         val lapsed = reviewWord(reviewed, ReviewRating.AGAIN, now)
         assertEquals(3 * DAY_MS, reviewWord(lapsed, ReviewRating.GOOD, now).intervalMs)
     }
-    @Test fun savedDataRoundTripsWithReviewAndDownloadState() {
-        val saved = card.copy(clipStatus = "ready", clipGeneration = 4, offline = true, intervalMs = 99, dueAt = 123)
+    @Test fun savedDataRoundTripsWithReviewState() {
+        val saved = card.copy(intervalMs = 99, dueAt = 123)
         assertEquals(saved, decodeWord(encodeWord(saved)))
         assertEquals(card.copy(videoId = null, reading = null, translatedSentence = null),
             decodeWord(encodeWord(card.copy(videoId = null, reading = null, translatedSentence = null))))
-    }
-    @Test fun downloadUsesExactSecondsAndNeverExpandsIntoPlaylist() {
-        val arguments = clipDownloadArguments(ClipRequest(selection.videoId!!, 1250, 4250, "request"), java.io.File("clip.%(ext)s"))
-        assertEquals("*1.250-4.250", arguments.toMap()["--download-sections"])
-        assertTrue(arguments.any { it.first == "--no-playlist" })
-        assertTrue(arguments.any { it.first == "--force-keyframes-at-cuts" })
     }
 }

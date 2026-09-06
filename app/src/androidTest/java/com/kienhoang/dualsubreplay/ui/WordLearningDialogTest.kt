@@ -14,12 +14,12 @@ class WordLearningDialogTest {
     private val selection = LearningWordSelection(AnalyzedToken("word", 0, 4, PartOfSpeech.NOUN), "en", "vi",
         "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false)
 
-    @Test fun pronouncesOnceAndSavesBothOptionalClipChoices() {
+    @Test fun pronouncesOnceAndSavesOnlineClipChoiceWithoutOfflineOption() {
         var spoken = 0
-        var saved: Triple<String, Boolean, Boolean>? = null
+        var saved: Pair<String, Boolean>? = null
         val recompose = mutableStateOf<String?>(null)
         compose.setContent { DualSubTheme {
-            WordLearningDialog(selection, true, { "từ" }, { meaning, online, offline -> saved = Triple(meaning, online, offline) },
+            WordLearningDialog(selection, true, { "từ" }, { meaning, online -> saved = Pair(meaning, online) },
                 { spoken++ }, recompose.value, {})
         } }
         compose.waitForIdle()
@@ -27,16 +27,17 @@ class WordLearningDialogTest {
         compose.waitForIdle()
         compose.runOnIdle { assertEquals(1, spoken) }
         saveUiEvidence("word-definition")
-        compose.onNodeWithTag("offline_clip_choice").performScrollTo().performClick()
+        compose.onNodeWithTag("offline_clip_choice").assertDoesNotExist()
+        compose.onNodeWithTag("online_clip_choice").assertIsDisplayed()
         compose.onNodeWithTag("save_word").performClick()
         compose.waitForIdle()
-        compose.runOnIdle { assertEquals(Triple("từ", true, true), saved) }
+        compose.runOnIdle { assertEquals(Pair("từ", true), saved) }
         compose.onNodeWithTag("word_saved").performScrollTo().assertIsDisplayed()
     }
     @Test fun manualSpeechWorksWhenAutomaticSpeechIsDisabled() {
         var spoken = 0
         compose.setContent { DualSubTheme {
-            WordLearningDialog(selection, false, { "từ" }, { _, _, _ -> }, { spoken++ }, null, {})
+            WordLearningDialog(selection, false, { "từ" }, { _, _ -> }, { spoken++ }, null, {})
         } }
         compose.waitForIdle()
         compose.runOnIdle { assertEquals(0, spoken) }
@@ -45,15 +46,15 @@ class WordLearningDialogTest {
     }
 
     @Test fun liveWordCanBeSavedWithoutOfferingUnreliableClipExamples() {
-        var saved: Triple<String, Boolean, Boolean>? = null
+        var saved: Pair<String, Boolean>? = null
         compose.setContent { DualSubTheme {
             WordLearningDialog(selection.copy(videoId = null, segment = null), false, { "từ" },
-                { meaning, online, offline -> saved = Triple(meaning, online, offline) }, {}, null, {})
+                { meaning, online -> saved = Pair(meaning, online) }, {}, null, {})
         } }
         compose.onNodeWithTag("offline_clip_choice").assertDoesNotExist()
         compose.onNodeWithTag("online_clip_choice").assertDoesNotExist()
         compose.onNodeWithTag("save_word").performClick()
         compose.waitForIdle()
-        compose.runOnIdle { assertEquals(Triple("từ", false, false), saved) }
+        compose.runOnIdle { assertEquals(Pair("từ", false), saved) }
     }
 }

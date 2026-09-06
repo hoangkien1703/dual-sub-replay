@@ -9,8 +9,7 @@ import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.savedWordFrom
-import com.kienhoang.dualsubreplay.data.enqueueClip
-import com.kienhoang.dualsubreplay.data.removeClip
+import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -311,7 +310,7 @@ class AppViewModel internal constructor(application: Application, private val ca
         viewModelScope.launch {
             try {
                 vocabulary.refresh()
-                vocabulary.reconcileDownloads(application)
+                retireLegacyDownloadJobs(application)
             } catch (cancel: CancellationException) { throw cancel }
             catch (_: Exception) { /* The saved-words screen reports storage failures with a retry on reopen. */ }
         }
@@ -636,12 +635,8 @@ class AppViewModel internal constructor(application: Application, private val ca
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
         translator.translateSingle(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
 
-    internal suspend fun saveWord(selection: LearningWordSelection, meaning: String, online: Boolean, offline: Boolean): SavedWord {
-        val word = vocabulary.save(savedWordFrom(selection, meaning, online, offline))
-        if (offline && word.clipStatus !in listOf("queued", "downloading") &&
-            (word.clipStatus != "ready" || !vocabulary.clipFile(word).isFile)) enqueueClip(getApplication(), word.id)
-        else if (!offline && word.clipStatus != "none") removeClip(getApplication(), word)
-        return word
+    internal suspend fun saveWord(selection: LearningWordSelection, meaning: String, online: Boolean): SavedWord {
+        return vocabulary.save(savedWordFrom(selection, meaning, online))
     }
 
     suspend fun translateWord(word: String): String {

@@ -6,7 +6,7 @@ import org.junit.Test
 
 class WordClipPlaybackTest {
     private fun card() = savedWordFrom(LearningWordSelection(AnalyzedToken("word", 0, 4, PartOfSpeech.NOUN), "en", "vi",
-        "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false), "từ", true, false)
+        "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false), "từ", true)
     @Test fun clipWaitsForMatchingVideoAndDoesNotRepeatOnPolling() {
         val controller = YouTubeWebController()
         val scripts = mutableListOf<String>()

@@ -20,7 +20,7 @@ class SavedWordsScreenTest {
         val repository = VocabularyRepository(context, name)
         val visible = androidx.compose.runtime.mutableStateOf(true)
         val word = savedWordFrom(LearningWordSelection(AnalyzedToken("learn", 0, 5, PartOfSpeech.VERB), "en", "vi",
-            "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "Learn a word", "Học một từ"), false), "học", false, false)
+            "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "Learn a word", "Học một từ"), false), "học", false)
         runBlocking { repository.save(word) }
         try {
             compose.setContent { DualSubTheme { if (visible.value) SavedWordsScreen(repository, {}, {}, {}) } }
