@@ -20,12 +20,14 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 internal const val REPOSITORY_URL = "https://github.com/hoangkien1703/dual-sub-replay"
 
 @Composable
-internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null) {
+internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null, beforeOpen: suspend () -> Unit = {}) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var failed by remember { mutableStateOf(false) }
     var showLicense by remember { mutableStateOf(false) }
     val text = buildAnnotatedString {
@@ -33,14 +35,17 @@ internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null) {
         withLink(LinkAnnotation.Url(REPOSITORY_URL,
             TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline)),
             linkInteractionListener = {
+                scope.launch {
+                beforeOpen()
                 try { if (onOpen != null) onOpen() else context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY_URL))) }
                 catch (_: ActivityNotFoundException) { failed = true }
+                }
             })) { append("GitHub") }
         append(".")
     }
     Text(text, modifier = Modifier.testTag("settings_github_link"), style = MaterialTheme.typography.bodySmall)
     if (failed) Text("No browser is available to open GitHub.", style = MaterialTheme.typography.bodySmall)
-    TextButton(onClick = { showLicense = true }) { Text("Open-source licenses") }
+    TextButton(onClick = { scope.launch { beforeOpen(); showLicense = true } }) { Text("Open-source licenses") }
     if (showLicense) {
         val license by produceState("Loading license…") {
             value = withContext(Dispatchers.IO) {

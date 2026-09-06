@@ -242,6 +242,8 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
           text: liveState.text || '',
           revision: liveState.revision,
           mediaSecond: liveState.captionMediaSecond,
+          videoId: liveState.videoId || null,
+          languageCode: liveState.languageCode || null,
           present: !!liveState.text
         } : null
       });
@@ -388,7 +390,15 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
           state.recordCaption = function() {
             if (!state.enabled || !state.trustedOrigin()) return;
             const text = state.visibleCaptionText();
-            if (text === state.text) return;
+            const player = state.player();
+            let response = null;
+            try { response = player && player.getPlayerResponse ? player.getPlayerResponse() : null; } catch (_) {}
+            const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
+            const track = state.activeCaptionTrack(player);
+            const languageCode = track && (track.translationLanguage ? track.translationLanguage.languageCode : track.languageCode);
+            if (text === state.text && videoId === state.videoId && languageCode === state.languageCode) return;
+            state.videoId = videoId;
+            state.languageCode = languageCode;
             const video = state.activeVideo();
             const mediaSecond = Number.isFinite(state.latestMediaSecond)
               ? state.latestMediaSecond
@@ -900,6 +910,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     return runCatching {
         val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
         val json = JSONObject(decoded)
+        if (!isYouTubeWebUrl(json.optString("url"))) return@runCatching null
         val liveCaption = json.optJSONObject("liveCaption")?.let { live ->
             val text = live.optString("text").replace(Regex("\\s+"), " ").trim()
             val revision = live.optLong("revision", -1L)
@@ -915,6 +926,8 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
                     revision = revision,
                     mediaTimeMs = (mediaSecond * 1_000.0).toLong(),
                     present = live.optBoolean("present", text.isNotBlank()) && text.isNotBlank(),
+                    videoId = live.optString("videoId").takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) },
+                    languageCode = live.optString("languageCode").takeIf { it.length in 2..35 && it != "null" },
                 )
             } else {
                 null

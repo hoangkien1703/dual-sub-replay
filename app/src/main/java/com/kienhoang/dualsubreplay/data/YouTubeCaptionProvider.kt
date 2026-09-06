@@ -28,6 +28,21 @@ internal class ResponseLimitExceededException(message: String) : Exception(messa
 internal class CaptionLookupTimeoutException(message: String, cause: Throwable? = null) :
     Exception(message, cause)
 
+/** Fixed categories only: never put server text, signed URLs, or cookies in logcat. */
+internal fun captionFailureCategory(message: String?): String = when {
+    message == null -> "discovery"
+    message.contains("HTTP ") -> Regex("HTTP ([0-9]{3})").find(message)?.value ?: "http"
+    message.contains("timed out", true) || message.contains("seconds", true) -> "timeout"
+    message.contains("Player returned") -> "playability"
+    message.contains("empty", true) || message.contains("readable", true) -> "empty-response"
+    message.contains("track", true) -> "no-tracks"
+    else -> "discovery"
+}
+
+private fun reportCaptionFailure(stage: String, error: Throwable) {
+    android.util.Log.w("CaptionRecovery", "$stage: ${captionFailureCategory(error.message)}")
+}
+
 internal data class YouTubePlayerClient(
     val label: String,
     val clientName: String,
@@ -312,10 +327,12 @@ class YouTubeCaptionProvider(
             // ViewModel uses cancellation whenever the video or language changes.
             throw error
         } catch (error: CaptionUnavailableException) {
+            reportCaptionFailure("lookup", error)
             throw error
         } catch (error: ResponseLimitExceededException) {
             throw CaptionUnavailableException(error.message.orEmpty(), error)
         } catch (error: CaptionLookupTimeoutException) {
+            reportCaptionFailure("lookup", error)
             throw CaptionUnavailableException(error.message.orEmpty(), error)
         } catch (error: Exception) {
             throw CaptionUnavailableException(
@@ -342,6 +359,7 @@ class YouTubeCaptionProvider(
             )
         }
         watchResult.exceptionOrNull()?.let { error ->
+            reportCaptionFailure("watch-page", error)
             if (error is CaptionLookupTimeoutException) throw error
         }
         val watchHtml = watchResult.getOrNull().orEmpty()
@@ -372,11 +390,13 @@ class YouTubeCaptionProvider(
             } catch (error: NoCaptionTracksException) {
                 lastError = error
                 failures += "Watch page: ${error.message}"
+                reportCaptionFailure("watch-page", error)
             } catch (error: Exception) {
                 lastError = error
                 sawNonTrackFailure = true
                 val failure = "Watch page: ${error.message ?: error.javaClass.simpleName}"
                 failures += failure
+                reportCaptionFailure("watch-page", error)
                 lastServiceFailure = failure
             }
         }
@@ -398,10 +418,12 @@ class YouTubeCaptionProvider(
             } catch (error: NoCaptionTracksException) {
                 lastError = error
                 failures += "${profile.label}: ${error.message}"
+                reportCaptionFailure(profile.clientName, error)
             } catch (error: Exception) {
                 lastError = error
                 sawNonTrackFailure = true
                 val failure = "${profile.label}: ${error.message ?: error.javaClass.simpleName}"
+                reportCaptionFailure(profile.clientName, error)
                 failures += failure
                 lastServiceFailure = failure
             }

@@ -131,12 +131,13 @@ class BrowseWebViewLifecycleTest {
                     }
                 }
                 loadDataWithBaseURL(
-                    "https://m.youtube.com/watch?v=captiontest1",
+                    "https://m.youtube.com/watch?v=abcdefghijk",
                     """
                     <!doctype html>
                     <html><body>
                       <video id="native-video"></video>
                       <button class="ytmClosedCaptioningButtonButton" aria-label="字幕がオフになりました" aria-pressed="false">CC</button>
+                      <div id="movie_player"></div>
                       <div class="ytp-caption-window-container">
                         <span class="ytp-caption-segment">Hello</span>
                       </div>
@@ -146,6 +147,12 @@ class BrowseWebViewLifecycleTest {
                           configurable: true,
                           get: function() { return 4.5; }
                         });
+                        const player = document.getElementById('movie_player');
+                        player.getOption = function() {
+                          return document.querySelector('button').getAttribute('aria-pressed') === 'true' ? {languageCode:'en'} : {};
+                        };
+                        player.setOption = function() {};
+                        player.getPlayerResponse = function() { return {videoDetails:{videoId:'abcdefghijk'}}; };
                         document.querySelector('.ytmClosedCaptioningButtonButton').onclick = function() {
                           this.setAttribute(
                             'aria-pressed',
@@ -178,6 +185,8 @@ class BrowseWebViewLifecycleTest {
         Thread.sleep(150)
         val snapshot = parseWebPlaybackSnapshot(evaluateJavascript(webView, WEB_PLAYBACK_SNAPSHOT_SCRIPT))
         assertEquals("Hello world", snapshot?.liveCaption?.text)
+        assertEquals("abcdefghijk", snapshot?.liveCaption?.videoId)
+        assertEquals("en", snapshot?.liveCaption?.languageCode)
         assertTrue((snapshot?.liveCaption?.revision ?: 0L) >= 2L)
         assertEquals(4_500L, snapshot?.liveCaption?.mediaTimeMs)
         assertEquals("true", evaluateJavascript(webView, webLiveCaptionConfigurationScript(enabled = false)))
@@ -190,6 +199,26 @@ class BrowseWebViewLifecycleTest {
         )
 
         instrumentation.runOnMainSync { webView.destroySafely() }
+    }
+
+    @Test fun liveObserverRejectsUntrustedOrigin() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val loaded = CountDownLatch(1)
+        lateinit var view: WebView
+        instrumentation.runOnMainSync {
+            view = WebView(instrumentation.targetContext).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) { loaded.countDown() }
+                }
+                loadDataWithBaseURL("https://youtube.com.evil.test/", "<html><video></video></html>", "text/html", "UTF-8", null)
+            }
+        }
+        try {
+            assertTrue(loaded.await(10, TimeUnit.SECONDS))
+            assertEquals("false", evaluateJavascript(view, webLiveCaptionConfigurationScript(true)))
+            assertNull(parseWebPlaybackSnapshot(evaluateJavascript(view, WEB_PLAYBACK_SNAPSHOT_SCRIPT)))
+        } finally { instrumentation.runOnMainSync { view.destroySafely() } }
     }
 
     private fun evaluateJavascript(webView: WebView, script: String): String? {

@@ -117,6 +117,7 @@ fun DualSubApp(
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     externalSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
+    onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
@@ -143,6 +144,7 @@ fun DualSubApp(
                 onPlayerModeChange = onPlayerModeChange,
                 externalSettingsRequestId = externalSettingsRequestId,
                 fullscreenLearningOverlay = fullscreenLearningOverlay,
+                onNavigationVisibilityChange = onNavigationVisibilityChange,
                 onPageChanged = viewModel::onYouTubePageChanged,
                 onPlaybackSecond = viewModel::onWebPlaybackSecond,
                 onShowSubtitles = viewModel::showSubtitlePanel,
@@ -220,6 +222,7 @@ private fun DualSubExperience(
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
     externalSettingsRequestId: Long,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
+    onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (String, Float, LiveCaptionSample?) -> Unit,
     onShowSubtitles: () -> Unit,
@@ -287,21 +290,21 @@ private fun DualSubExperience(
     } else {
         WindowInsets.safeDrawing
     }
-    val liveCaptionCaptureEnabled = shouldCaptureLiveCaptions(
+    val liveCaptionCaptureEnabled = state.subtitlePanelVisible && (state.liveFallback || shouldCaptureLiveCaptions(
         mode = state.karaokeTimingMode,
         generatedCaptions = state.generatedCaptions,
         wordHighlightEnabled = state.wordHighlightEnabled,
-    )
+    ))
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showSettings = true
     }
 
+    AppNavigation(onPractice = onVocabulary, onSettings = { showSettings = true }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
     Scaffold(contentWindowInsets = contentInsets, topBar = {
         Surface {
-            Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onVocabulary, modifier = Modifier.testTag("open_saved_words")) { Text("Saved words") }
-                TextButton(onClick = { showSettings = true }) { Text("Settings") }
+            Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.Start) {
+                menuButton()
             }
         }
     }) { innerPadding ->
@@ -398,11 +401,11 @@ private fun DualSubExperience(
             }
         }
     }
+    }
     if (showSettings) {
         SubtitleSettingsDialog(
             autoPronounce = state.autoPronounce,
             onAutoPronounceChange = onAutoPronounceChange,
-            onVocabulary = { showSettings = false; onVocabulary() },
             sourcePreference = state.sourcePreference,
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
@@ -576,6 +579,7 @@ private fun SubtitlePanel(
             HorizontalDivider(color = Color(0xFF244044))
 
             when {
+                state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
                 else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
@@ -757,6 +761,7 @@ private fun SideSubtitlePanel(
             HorizontalDivider(color = Color(0xFF244044))
 
             when {
+                state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
                 else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
@@ -884,12 +889,13 @@ internal fun CompactSubtitleCard(
     targetLanguage: String = "vi",
     isDownloadingTranslationModel: Boolean = false,
     onWordClick: (WordTap) -> Unit = {},
+    replayEnabled: Boolean = true,
 ) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .semantics { stateDescription = if (active) "Active subtitle" else "Subtitle" }
-            .clickable(onClick = onReplay),
+            .clickable(enabled = replayEnabled, onClick = onReplay),
         border = BorderStroke(
             width = if (active) 2.dp else 1.dp,
             color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
@@ -904,7 +910,7 @@ internal fun CompactSubtitleCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Card(
+            if (replayEnabled) Card(
                 modifier = Modifier.size(34.dp),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(
@@ -920,7 +926,7 @@ internal fun CompactSubtitleCard(
                     )
                 }
             }
-            Spacer(Modifier.size(9.dp))
+            if (replayEnabled) Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
                 val isSentenceEligibleForPos = !wordLearningActiveOnly || active
                 val shouldHighlightPos = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "original" || wordLearningTarget == "both")
@@ -1090,7 +1096,6 @@ internal fun SubtitleSettingsDialog(
     onResetSettings: () -> Unit = {},
     autoPronounce: Boolean = true,
     onAutoPronounceChange: (Boolean) -> Unit = {},
-    onVocabulary: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
@@ -1194,7 +1199,6 @@ internal fun SubtitleSettingsDialog(
                         .heightIn(max = bodyMaxHeight)
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    SettingsRepositoryLink()
                     Text("Captions", style = MaterialTheme.typography.titleSmall)
                     Spacer(Modifier.height(8.dp))
                     Text("Original language")
@@ -1229,7 +1233,6 @@ internal fun SubtitleSettingsDialog(
                     Spacer(Modifier.height(12.dp))
                     Text("Text size: ${(fontScale * 100).toInt()}%")
                     Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
-                    TextButton(onClick = onVocabulary) { Text("Saved words and practice") }
 
                     Spacer(Modifier.height(14.dp))
                     HorizontalDivider()

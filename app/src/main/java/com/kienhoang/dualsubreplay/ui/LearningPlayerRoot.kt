@@ -197,6 +197,11 @@ internal data class LearningOverlayContent(
 
 internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? {
     if (state.activeVideoId == null) return null
+    if (state.liveFallback) return LearningOverlayContent(
+        originalText = state.liveOriginal,
+        translatedText = state.liveTranslated ?: if (state.liveOriginal != null) "Translating…" else null,
+        statusText = "Live subtitles · ${state.statusMessage.orEmpty()}",
+    )
     val active = state.segments.getOrNull(state.currentIndex)
     if (active != null) {
         return LearningOverlayContent(
@@ -317,6 +322,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     var restoreTranscriptAfterAutomaticOverlay by remember { mutableStateOf(false) }
     var fullscreenOverlayHiddenByUser by remember { mutableStateOf(false) }
     var settingsRequestId by remember { mutableLongStateOf(0L) }
+    var navigationOpen by remember { mutableStateOf(false) }
 
     DisposableEffect(preferences) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -501,6 +507,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                     onPositionChangeFinished = ::commitOverlayPosition,
+                    onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
                     onSettings = ::requestSubtitleSettings,
                     onClose = { fullscreenOverlayHiddenByUser = true },
                 )
@@ -516,10 +523,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             onPlayerModeChange = ::selectMode,
             externalSettingsRequestId = settingsRequestId,
             fullscreenLearningOverlay = fullscreenLearningOverlay,
+            onNavigationVisibilityChange = { navigationOpen = it },
         )
 
         if (
-            state.onboardingCompleted &&
+            !navigationOpen && state.onboardingCompleted &&
             state.guideCompleted &&
             state.activeVideoId != null &&
             effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
@@ -568,6 +576,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                     onPositionChangeFinished = ::commitOverlayPosition,
+                    onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
                     onSettings = ::requestSubtitleSettings,
                     onClose = {
                         selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
@@ -617,6 +626,7 @@ internal fun LearningSubtitleOverlay(
     onHorizontalPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
     onSettings: () -> Unit,
+    onRetryTranscript: (() -> Unit)? = null,
     onClose: () -> Unit,
 ) {
     var overlayActionsVisible by remember { mutableStateOf(false) }
@@ -806,6 +816,9 @@ internal fun LearningSubtitleOverlay(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
+                }
+                onRetryTranscript?.let { retry ->
+                    androidx.compose.material3.TextButton(onClick = retry) { Text("Retry full transcript") }
                 }
                 content.statusText?.let { status ->
                     Text(

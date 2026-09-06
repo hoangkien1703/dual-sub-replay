@@ -43,4 +43,17 @@ class WordLearningDialogTest {
         compose.onNodeWithTag("pronounce_word").performClick()
         compose.runOnIdle { assertEquals(1, spoken) }
     }
+
+    @Test fun liveWordCanBeSavedWithoutOfferingUnreliableClipExamples() {
+        var saved: Triple<String, Boolean, Boolean>? = null
+        compose.setContent { DualSubTheme {
+            WordLearningDialog(selection.copy(videoId = null, segment = null), false, { "từ" },
+                { meaning, online, offline -> saved = Triple(meaning, online, offline) }, {}, null, {})
+        } }
+        compose.onNodeWithTag("offline_clip_choice").assertDoesNotExist()
+        compose.onNodeWithTag("online_clip_choice").assertDoesNotExist()
+        compose.onNodeWithTag("save_word").performClick()
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals(Triple("từ", false, false), saved) }
+    }
 }
