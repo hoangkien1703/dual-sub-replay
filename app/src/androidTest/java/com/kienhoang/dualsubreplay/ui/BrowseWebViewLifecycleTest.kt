@@ -221,6 +221,58 @@ class BrowseWebViewLifecycleTest {
         } finally { instrumentation.runOnMainSync { view.destroySafely() } }
     }
 
+    @Test fun nativeSettingsReceiveClickAndTouchEventsWithCaptionScriptsInstalled() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val loaded = CountDownLatch(1)
+        lateinit var view: WebView
+        instrumentation.runOnMainSync {
+            view = WebView(instrumentation.targetContext).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) { loaded.countDown() }
+                }
+                loadDataWithBaseURL("https://m.youtube.com/watch?v=abcdefghijk", """
+                    <html><body><div id="movie_player"><video></video>
+                    <button class="player-settings-icon" aria-label="Playback Settings">Settings</button>
+                    </div><ytm-mobile-topbar-renderer><button aria-label="More options">More</button></ytm-mobile-topbar-renderer>
+                    <bottom-sheet-container id="native-menu" role="dialog" aria-modal="true" style="display:none">
+                    <ytw-scrim style="display:block;position:fixed;left:0;top:0;width:300px;height:400px">YouTube settings fixture</ytw-scrim>
+                    </bottom-sheet-container>
+                    <script>
+                      window.clicks = 0; window.touches = 0; window.bubbled = 0;
+                      document.querySelectorAll('button').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                          window.clicks++; document.getElementById('native-menu').style.display = 'contents';
+                        });
+                        button.addEventListener('touchend', function() { window.touches++; });
+                      });
+                      document.addEventListener('click', function() { window.bubbled++; });
+                    </script></body></html>
+                """.trimIndent(), "text/html", "UTF-8", null)
+            }
+        }
+        try {
+            assertTrue(loaded.await(10, TimeUnit.SECONDS))
+            evaluateJavascript(view, webLiveCaptionConfigurationScript(true))
+            evaluateJavascript(view, webCaptionVisibilityScript(true))
+            evaluateJavascript(view, WEB_PLAYBACK_SNAPSHOT_SCRIPT)
+            assertEquals("true", evaluateJavascript(view, """
+                (function() {
+                  let allowed = true;
+                  document.querySelectorAll('button').forEach(function(button) {
+                    allowed = button.dispatchEvent(new Event('touchend', {bubbles:true, cancelable:true})) && allowed;
+                    button.click();
+                  });
+                  return allowed && window.clicks === 2 && window.touches === 2 && window.bubbled === 2 &&
+                    !document.getElementById('dualsub-settings-overlay');
+                })();
+            """.trimIndent()))
+            assertTrue(parseWebPlaybackSnapshot(evaluateJavascript(view, WEB_PLAYBACK_SNAPSHOT_SCRIPT))!!.nativeDialogVisible)
+            evaluateJavascript(view, "document.getElementById('native-menu').style.display = 'none'")
+            assertFalse(parseWebPlaybackSnapshot(evaluateJavascript(view, WEB_PLAYBACK_SNAPSHOT_SCRIPT))!!.nativeDialogVisible)
+        } finally { instrumentation.runOnMainSync { view.destroySafely() } }
+    }
+
     private fun evaluateJavascript(webView: WebView, script: String): String? {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val result = AtomicReference<String?>()

@@ -249,6 +249,7 @@ internal fun portraitLearningOverlayTopPaddingDp(
 fun LearningPlayerRoot(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val youtubeControlsVisible by youtubePlayerControlsVisible.collectAsStateWithLifecycle()
+    val youtubeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
     val youtubeFullscreen by youtubeFullscreenActive.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -473,7 +474,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
-        if (overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
+        if (!youtubeDialogVisible && overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
             if (fullscreenOverlayHiddenByUser) {
                 MovableSubtitleFab(
                     onClick = { fullscreenOverlayHiddenByUser = false },
@@ -527,7 +528,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         )
 
         if (
-            !navigationOpen && state.onboardingCompleted &&
+            !youtubeDialogVisible && !navigationOpen && state.onboardingCompleted &&
             state.guideCompleted &&
             state.activeVideoId != null &&
             effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY

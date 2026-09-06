@@ -279,7 +279,8 @@ private fun DualSubExperience(
             landscapeVideoFraction + delta / splitContainerWidthPx,
         )
     }
-    val sideBySide = shouldUseLandscapeSplit(
+    val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
+    val sideBySide = !nativeDialogVisible && shouldUseLandscapeSplit(
         splitEnabled = state.landscapeSplitEnabled,
         subtitlePanelVisible = state.subtitlePanelVisible,
         hasActiveVideo = state.activeVideoId != null,
@@ -367,7 +368,7 @@ private fun DualSubExperience(
                 }
             }
 
-            if (!sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
+            if (!nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
                 SubtitlePanel(
                     state = state,
                     modifier = Modifier
@@ -393,7 +394,7 @@ private fun DualSubExperience(
                     },
                 )
             } else if (
-                !sideBySide &&
+                !nativeDialogVisible && !sideBySide &&
                 state.activeVideoId != null &&
                 effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
             ) {

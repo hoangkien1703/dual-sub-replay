@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -59,8 +62,17 @@ internal fun AppNavigation(
         },
     ) {
         content {
-            IconButton(onClick = { scope.launch { drawer.open() } }) {
-                Icon(Icons.Default.Menu, contentDescription = "Open navigation menu")
+            Box(
+                modifier = Modifier.size(width = 72.dp, height = 48.dp)
+                    .testTag("navigation_menu_button")
+                    .clickable(role = Role.Button) { scope.launch { drawer.open() } },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Icon(
+                    Icons.Default.Menu,
+                    contentDescription = "Open navigation menu",
+                    modifier = Modifier.padding(start = 12.dp).size(24.dp),
+                )
             }
         }
     }

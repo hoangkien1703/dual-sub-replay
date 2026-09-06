@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.unit.dp
 import androidx.test.espresso.Espresso
 import org.junit.Assert.*
 import org.junit.Rule
@@ -35,7 +36,9 @@ class NavigationRecoveryUiTest {
                 }
             }
         }
-        compose.onNodeWithContentDescription("Open navigation menu").performClick()
+        compose.onNodeWithTag("navigation_menu_button")
+            .assertWidthIsEqualTo(72.dp).assertHeightIsEqualTo(48.dp)
+            .performTouchInput { click(androidx.compose.ui.geometry.Offset(width - 4f, height / 2f)) }
         compose.onNodeWithText("Practice").assertIsDisplayed()
         compose.onNodeWithText("Open-source licenses").performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("settings_github_link").assertIsDisplayed()
