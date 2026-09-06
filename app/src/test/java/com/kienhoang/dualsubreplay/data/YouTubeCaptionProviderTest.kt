@@ -41,15 +41,13 @@ class YouTubeCaptionProviderTest {
     }
 
     @Test
-    fun triesUpdatedAndroidThenIosThenTvThenWebClients() {
+    fun retainsLegacyClientContextsAlongsideNewFallbacks() {
         val clients = youtubePlayerClients("2.20260826.01.00")
-
-        assertEquals(listOf("ANDROID", "IOS", "TVHTML5", "WEB"), clients.map { it.clientName })
-        assertEquals(listOf("3", "5", "7", "1"), clients.map { it.clientNumber })
-        assertEquals("21.26.364", clients[0].clientVersion)
-        assertEquals("21.26.4", clients[1].clientVersion)
-        assertEquals("7.20260707.07.00", clients[2].clientVersion)
-        assertEquals("2.20260826.01.00", clients[3].clientVersion)
+        val android = clients.first { it.clientName == "ANDROID" }
+        assertEquals("3", android.clientNumber)
+        assertEquals("21.26.364", android.clientVersion)
+        assertEquals("21.26.4", clients.first { it.clientName == "IOS" }.clientVersion)
+        assertEquals("2.20260826.01.00", clients.last { it.clientName == "WEB" }.clientVersion)
     }
 
     @Test

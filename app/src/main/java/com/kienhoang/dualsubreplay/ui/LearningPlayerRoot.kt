@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -196,6 +197,11 @@ internal data class LearningOverlayContent(
 
 internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? {
     if (state.activeVideoId == null) return null
+    if (state.liveFallback) return LearningOverlayContent(
+        originalText = state.liveOriginal,
+        translatedText = state.liveTranslated ?: if (state.liveOriginal != null) "Translating…" else null,
+        statusText = "Live subtitles · ${state.statusMessage.orEmpty()}",
+    )
     val active = state.segments.getOrNull(state.currentIndex)
     if (active != null) {
         return LearningOverlayContent(
@@ -243,6 +249,7 @@ internal fun portraitLearningOverlayTopPaddingDp(
 fun LearningPlayerRoot(viewModel: AppViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val youtubeControlsVisible by youtubePlayerControlsVisible.collectAsStateWithLifecycle()
+    val youtubeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
     val youtubeFullscreen by youtubeFullscreenActive.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -316,6 +323,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     var restoreTranscriptAfterAutomaticOverlay by remember { mutableStateOf(false) }
     var fullscreenOverlayHiddenByUser by remember { mutableStateOf(false) }
     var settingsRequestId by remember { mutableLongStateOf(0L) }
+    var navigationOpen by remember { mutableStateOf(false) }
 
     DisposableEffect(preferences) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -466,7 +474,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
-        if (overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
+        if (!youtubeDialogVisible && overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
             if (fullscreenOverlayHiddenByUser) {
                 MovableSubtitleFab(
                     onClick = { fullscreenOverlayHiddenByUser = false },
@@ -493,13 +501,14 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguageCode = state.targetLanguage,
                     lockToVideo = state.lockOverlayToVideo,
-                    onWordClick = viewModel::selectLearningToken,
+                    onWordClick = viewModel::selectLearningWord,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(start = 20.dp, end = 20.dp, bottom = fullscreenBottomPadding),
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                     onPositionChangeFinished = ::commitOverlayPosition,
+                    onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
                     onSettings = ::requestSubtitleSettings,
                     onClose = { fullscreenOverlayHiddenByUser = true },
                 )
@@ -515,10 +524,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             onPlayerModeChange = ::selectMode,
             externalSettingsRequestId = settingsRequestId,
             fullscreenLearningOverlay = fullscreenLearningOverlay,
+            onNavigationVisibilityChange = { navigationOpen = it },
         )
 
         if (
-            state.onboardingCompleted &&
+            !youtubeDialogVisible && !navigationOpen && state.onboardingCompleted &&
             state.guideCompleted &&
             state.activeVideoId != null &&
             effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
@@ -562,11 +572,12 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguageCode = state.targetLanguage,
                     lockToVideo = state.lockOverlayToVideo,
-                    onWordClick = viewModel::selectLearningToken,
+                    onWordClick = viewModel::selectLearningWord,
                     modifier = overlayModifier,
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                     onPositionChangeFinished = ::commitOverlayPosition,
+                    onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
                     onSettings = ::requestSubtitleSettings,
                     onClose = {
                         selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
@@ -575,15 +586,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             }
         }
 
-        state.selectedLearningToken?.let { token ->
-            WordLearningDialog(
-                token = token,
-                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
-                targetLanguage = state.targetLanguage,
-                onTranslateWord = viewModel::translateWord,
-                onDismiss = { viewModel.selectLearningToken(null) },
-            )
-        }
+
     }
 }
 
@@ -619,11 +622,12 @@ internal fun LearningSubtitleOverlay(
     originalLanguageCode: String? = null,
     targetLanguageCode: String? = null,
     lockToVideo: Boolean = false,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onPositionChange: (Float) -> Unit = {},
     onHorizontalPositionChange: (Float) -> Unit = {},
     onPositionChangeFinished: () -> Unit = {},
     onSettings: () -> Unit,
+    onRetryTranscript: (() -> Unit)? = null,
     onClose: () -> Unit,
 ) {
     var overlayActionsVisible by remember { mutableStateOf(false) }
@@ -741,7 +745,7 @@ internal fun LearningSubtitleOverlay(
                             onClick = { offset ->
                                 val token = findWordAtOffset(original, offset, originalLanguageCode)
                                 if (token != null) {
-                                    onWordClick(token)
+                                    onWordClick(WordTap(token, content.segment, false))
                                 } else {
                                     overlayActionsVisible = !overlayActionsVisible
                                 }
@@ -797,7 +801,7 @@ internal fun LearningSubtitleOverlay(
                                     alignedOriginalTokens = origTokens,
                                 )
                                 if (token != null) {
-                                    onWordClick(token)
+                                    onWordClick(WordTap(token, content.segment, true))
                                 } else {
                                     overlayActionsVisible = !overlayActionsVisible
                                 }
@@ -813,6 +817,9 @@ internal fun LearningSubtitleOverlay(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
+                }
+                onRetryTranscript?.let { retry ->
+                    androidx.compose.material3.TextButton(onClick = retry) { Text("Retry full transcript") }
                 }
                 content.statusText?.let { status ->
                     Text(

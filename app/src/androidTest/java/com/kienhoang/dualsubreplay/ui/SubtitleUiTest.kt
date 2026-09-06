@@ -49,6 +49,7 @@ class SubtitleUiTest {
         composeRule.onNodeWithText("Original language").assertIsDisplayed()
         composeRule.onNodeWithText("Translate to").assertIsDisplayed()
         composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
+        saveUiEvidence("settings")
         composeRule.onNodeWithText("Focus").assertDoesNotExist()
         composeRule.onNodeWithTag("source_language_picker").performClick()
         composeRule.onNodeWithTag("language_option_source_ja").performClick()

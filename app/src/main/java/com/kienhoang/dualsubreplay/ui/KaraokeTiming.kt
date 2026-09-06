@@ -29,6 +29,8 @@ internal data class LiveCaptionSample(
     val revision: Long,
     val mediaTimeMs: Long,
     val present: Boolean,
+    val videoId: String? = null,
+    val languageCode: String? = null,
 )
 
 internal data class KaraokePosition(

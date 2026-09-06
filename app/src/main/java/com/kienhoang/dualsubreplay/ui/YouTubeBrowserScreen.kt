@@ -188,9 +188,11 @@ internal data class WebPlaybackSnapshot(
     val currentSecond: Float?,
     val controlsVisible: Boolean = false,
     val liveCaption: LiveCaptionSample? = null,
+    val nativeDialogVisible: Boolean = false,
 )
 
 internal val youtubePlayerControlsVisible = MutableStateFlow(false)
+internal val youtubeNativeDialogVisible = MutableStateFlow(false)
 internal val youtubeFullscreenActive = MutableStateFlow(false)
 
 private data class WebFullscreenSession(
@@ -234,14 +236,23 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
         isVisible(chromeBottom) ||
         isVisible(progressBar)
       );
+      // YouTube's mobile dialog wrapper can have zero bounds; its fixed scrim/layout is visible.
+      const nativeDialogVisible = Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"]'))
+        .some(function(dialog) {
+          return isVisible(dialog) || Array.from(dialog.querySelectorAll('ytw-scrim, .ytSpecBottomSheetLayoutHost'))
+            .some(isVisible);
+        });
       return JSON.stringify({
         url: window.location.href,
         currentSecond: second,
         controlsVisible: controlsVisible,
+        nativeDialogVisible: nativeDialogVisible,
         liveCaption: liveState ? {
           text: liveState.text || '',
           revision: liveState.revision,
           mediaSecond: liveState.captionMediaSecond,
+          videoId: liveState.videoId || null,
+          languageCode: liveState.languageCode || null,
           present: !!liveState.text
         } : null
       });
@@ -388,7 +399,15 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
           state.recordCaption = function() {
             if (!state.enabled || !state.trustedOrigin()) return;
             const text = state.visibleCaptionText();
-            if (text === state.text) return;
+            const player = state.player();
+            let response = null;
+            try { response = player && player.getPlayerResponse ? player.getPlayerResponse() : null; } catch (_) {}
+            const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
+            const track = state.activeCaptionTrack(player);
+            const languageCode = track && (track.translationLanguage ? track.translationLanguage.languageCode : track.languageCode);
+            if (text === state.text && videoId === state.videoId && languageCode === state.languageCode) return;
+            state.videoId = videoId;
+            state.languageCode = languageCode;
             const video = state.activeVideo();
             const mediaSecond = Number.isFinite(state.latestMediaSecond)
               ? state.latestMediaSecond
@@ -480,426 +499,12 @@ internal fun webCaptionVisibilityScript(hidden: Boolean): String {
     """.trimIndent()
 }
 
-/**
- * In-player playback settings overlay and touch interceptor.
- * Resolves issue #39 where YouTube's mobile web sticky topbar blocks touch input and
- * YouTube's fullscreen script drops the settings bottom sheet.
- * Fully compliant with YouTube Trusted Types (pure DOM element construction).
- */
-internal val WEB_PLAYBACK_SETTINGS_SCRIPT: String =
-    """
-    (function() {
-      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
-      if (window.location.protocol !== 'https:' ||
-          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
-
-      const STYLE_ID = 'dualsub-settings-overlay-style';
-      const OVERLAY_ID = 'dualsub-settings-overlay';
-
-      let style = document.getElementById(STYLE_ID);
-      if (!style) {
-        style = document.createElement('style');
-        style.id = STYLE_ID;
-        style.textContent = `
-          #dualsub-settings-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 2147483647;
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-start;
-            box-sizing: border-box;
-          }
-          #dualsub-settings-scrim {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-          }
-          #dualsub-settings-panel {
-            position: relative;
-            background: rgba(28, 28, 28, 0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            color: #f1f1f1;
-            border-radius: 12px;
-            margin: 48px 24px 16px 16px;
-            min-width: 260px;
-            max-width: 320px;
-            max-height: calc(100vh - 64px);
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-            font-family: Roboto, -apple-system, sans-serif;
-            font-size: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            animation: dualsub-pop 0.15s ease-out;
-            z-index: 1;
-          }
-          @keyframes dualsub-pop {
-            from { opacity: 0; transform: scale(0.96) translateY(-6px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-          }
-          .dualsub-settings-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            font-weight: 600;
-            font-size: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .dualsub-settings-back {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            line-height: 1;
-            margin-right: 12px;
-            cursor: pointer;
-            padding: 0 4px;
-            display: flex;
-            align-items: center;
-          }
-          .dualsub-settings-list {
-            list-style: none;
-            margin: 0;
-            padding: 6px 0;
-          }
-          .dualsub-settings-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            transition: background 0.1s;
-          }
-          .dualsub-settings-item:active {
-            background: rgba(255, 255, 255, 0.15);
-          }
-          .dualsub-settings-item-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-          }
-          .dualsub-settings-item-value {
-            color: #aaa;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-          }
-          .dualsub-check {
-            color: #3ea6ff;
-            font-weight: bold;
-            width: 16px;
-            display: inline-block;
-          }
-        `;
-        (document.head || document.documentElement).appendChild(style);
-      }
-
-      if (window.__dualsubSettingsInstalled) return true;
-      window.__dualsubSettingsInstalled = true;
-
-      let activeSubmenu = null;
-      let lastOpenTime = 0;
-
-      function getPlayer() {
-        return document.getElementById('movie_player') || document.querySelector('.html5-video-player');
-      }
-
-      function closeOverlay() {
-        const el = document.getElementById(OVERLAY_ID);
-        if (el) el.remove();
-        activeSubmenu = null;
-      }
-
-      function renderOverlay() {
-        const mp = getPlayer();
-        if (!mp) return;
-        lastOpenTime = Date.now();
-
-        let container = document.getElementById(OVERLAY_ID);
-        if (!container) {
-          container = document.createElement('div');
-          container.id = OVERLAY_ID;
-          const parent = document.getElementById('player-container-id') ||
-                         document.getElementById('player') ||
-                         document.body;
-          parent.appendChild(container);
-        }
-        while (container.firstChild) container.removeChild(container.firstChild);
-
-        const scrim = document.createElement('div');
-        scrim.id = 'dualsub-settings-scrim';
-        scrim.onclick = function(e) {
-          e.stopPropagation();
-          if (Date.now() - lastOpenTime < 350) return;
-          closeOverlay();
-        };
-        container.appendChild(scrim);
-
-        const panel = document.createElement('div');
-        panel.id = 'dualsub-settings-panel';
-
-        if (activeSubmenu === 'quality') {
-          renderQualitySubmenu(panel, mp);
-        } else if (activeSubmenu === 'speed') {
-          renderSpeedSubmenu(panel, mp);
-        } else {
-          renderMainMenu(panel, mp);
-        }
-
-        container.appendChild(panel);
-      }
-
-      function createHeader(title, onBack) {
-        const header = document.createElement('div');
-        header.className = 'dualsub-settings-header';
-        if (onBack) {
-          const back = document.createElement('button');
-          back.className = 'dualsub-settings-back';
-          back.textContent = '‹';
-          back.onclick = function(e) {
-            e.stopPropagation();
-            onBack();
-          };
-          header.appendChild(back);
-        }
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = title;
-        header.appendChild(titleSpan);
-        return header;
-      }
-
-      function createSvgIcon(pathD) {
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('width', '20');
-        svg.setAttribute('height', '20');
-        svg.setAttribute('viewBox', '0 0 24 24');
-        svg.setAttribute('fill', 'currentColor');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathD);
-        svg.appendChild(path);
-        return svg;
-      }
-
-      function renderMainMenu(panel, mp) {
-        panel.appendChild(createHeader('Playback settings'));
-        const list = document.createElement('ul');
-        list.className = 'dualsub-settings-list';
-
-        const currentQuality = (mp.getPlaybackQualityLabel && mp.getPlaybackQualityLabel()) ||
-                              (mp.getPlaybackQuality && mp.getPlaybackQuality()) || 'Auto';
-        const qualityItem = createMenuItem(
-          createSvgIcon('M15 17h6v-2h-6v2zm-4 0h2V7h-2v10zm-8 0h6v-4H3v4zM3 7v4h6V7H3zm12 6h6V7h-6v6z'),
-          'Quality',
-          currentQuality + ' ›',
-          function() {
-            activeSubmenu = 'quality';
-            renderOverlay();
-          }
-        );
-        list.appendChild(qualityItem);
-
-        const currentRate = (mp.getPlaybackRate && mp.getPlaybackRate()) || 1;
-        const rateText = currentRate === 1 ? 'Normal' : currentRate + 'x';
-        const speedItem = createMenuItem(
-          createSvgIcon('M10 8v8l6-4-6-4zm9-5H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z'),
-          'Playback speed',
-          rateText + ' ›',
-          function() {
-            activeSubmenu = 'speed';
-            renderOverlay();
-          }
-        );
-        list.appendChild(speedItem);
-
-        const isSubsOn = (mp.isSubtitlesOn && mp.isSubtitlesOn()) || false;
-        const captionsItem = createMenuItem(
-          createSvgIcon('M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z'),
-          'Captions',
-          isSubsOn ? 'On' : 'Off',
-          function() {
-            if (mp.toggleSubtitles) mp.toggleSubtitles();
-            closeOverlay();
-          }
-        );
-        list.appendChild(captionsItem);
-
-        panel.appendChild(list);
-      }
-
-      function createMenuItem(icon, labelText, valueText, onClick) {
-        const li = document.createElement('li');
-        li.className = 'dualsub-settings-item';
-        li.onclick = function(e) {
-          e.stopPropagation();
-          onClick();
-        };
-
-        const labelDiv = document.createElement('span');
-        labelDiv.className = 'dualsub-settings-item-label';
-        if (icon) labelDiv.appendChild(icon);
-        const labelSpan = document.createElement('span');
-        labelSpan.textContent = labelText;
-        labelDiv.appendChild(labelSpan);
-        li.appendChild(labelDiv);
-
-        if (valueText) {
-          const valSpan = document.createElement('span');
-          valSpan.className = 'dualsub-settings-item-value';
-          valSpan.textContent = valueText;
-          li.appendChild(valSpan);
-        }
-
-        return li;
-      }
-
-      function renderQualitySubmenu(panel, mp) {
-        panel.appendChild(createHeader('Quality', function() {
-          activeSubmenu = null;
-          renderOverlay();
-        }));
-
-        const list = document.createElement('ul');
-        list.className = 'dualsub-settings-list';
-
-        const rawLevels = (mp.getAvailableQualityLevels && mp.getAvailableQualityLevels()) || [];
-        const rawData = (mp.getAvailableQualityData && mp.getAvailableQualityData()) || [];
-        const preferred = (mp.getPreferredQuality && mp.getPreferredQuality()) || '';
-        const currentQuality = (mp.getPlaybackQuality && mp.getPlaybackQuality()) || '';
-
-        const options = [];
-        if (rawData.length > 0) {
-          for (let i = 0; i < rawData.length; i++) {
-            const q = rawData[i];
-            const level = q.quality || q.qualityLevel;
-            const label = q.qualityLabel || level;
-            options.push({ level: level, label: label });
-          }
-          options.push({ level: 'auto', label: 'Auto' });
-        } else if (rawLevels.length > 0) {
-          for (let i = 0; i < rawLevels.length; i++) {
-            const q = rawLevels[i];
-            const num = q.replace(/[^0-9]/g, '');
-            const label = q === 'auto' ? 'Auto' : (num ? num + 'p' : q);
-            options.push({ level: q, label: label });
-          }
-        } else {
-          options.push({ level: 'auto', label: 'Auto' });
-        }
-
-        for (let i = 0; i < options.length; i++) {
-          const opt = options[i];
-          const isSelected = opt.level === preferred || opt.level === currentQuality ||
-                             ((preferred === '' || preferred === 'auto') && opt.level === 'auto');
-          const li = document.createElement('li');
-          li.className = 'dualsub-settings-item';
-          li.onclick = function(e) {
-            e.stopPropagation();
-            if (mp.setPlaybackQualityRange) mp.setPlaybackQualityRange(opt.level, opt.level);
-            else if (mp.setPlaybackQuality) mp.setPlaybackQuality(opt.level);
-            closeOverlay();
-          };
-
-          const labelDiv = document.createElement('span');
-          labelDiv.className = 'dualsub-settings-item-label';
-
-          const check = document.createElement('span');
-          check.className = 'dualsub-check';
-          check.textContent = isSelected ? '✓' : '';
-          labelDiv.appendChild(check);
-
-          const labelSpan = document.createElement('span');
-          labelSpan.textContent = opt.label;
-          labelDiv.appendChild(labelSpan);
-
-          li.appendChild(labelDiv);
-          list.appendChild(li);
-        }
-
-        panel.appendChild(list);
-      }
-
-      function renderSpeedSubmenu(panel, mp) {
-        panel.appendChild(createHeader('Playback speed', function() {
-          activeSubmenu = null;
-          renderOverlay();
-        }));
-
-        const list = document.createElement('ul');
-        list.className = 'dualsub-settings-list';
-
-        const rates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-        const currentRate = (mp.getPlaybackRate && mp.getPlaybackRate()) || 1;
-
-        for (let i = 0; i < rates.length; i++) {
-          const r = rates[i];
-          const isSelected = Math.abs(currentRate - r) < 0.01;
-          const label = r === 1 ? 'Normal' : r + 'x';
-          const li = document.createElement('li');
-          li.className = 'dualsub-settings-item';
-          li.onclick = function(e) {
-            e.stopPropagation();
-            if (mp.setPlaybackRate) mp.setPlaybackRate(r);
-            closeOverlay();
-          };
-
-          const labelDiv = document.createElement('span');
-          labelDiv.className = 'dualsub-settings-item-label';
-
-          const check = document.createElement('span');
-          check.className = 'dualsub-check';
-          check.textContent = isSelected ? '✓' : '';
-          labelDiv.appendChild(check);
-
-          const labelSpan = document.createElement('span');
-          labelSpan.textContent = label;
-          labelDiv.appendChild(labelSpan);
-
-          li.appendChild(labelDiv);
-          list.appendChild(li);
-        }
-
-        panel.appendChild(list);
-      }
-
-      function handleSettingsCapture(e) {
-        const target = e.target;
-        if (!target) return;
-        const btn = (target.closest && target.closest('.player-settings-icon, [aria-label="Playback Settings"], ytm-mobile-topbar-renderer [aria-label="More options"]')) ||
-                    (target.classList && target.classList.contains('player-settings-icon') ? target : null);
-        if (btn) {
-          const mp = document.getElementById('movie_player');
-          if (mp) {
-            e.stopPropagation();
-            e.preventDefault();
-            renderOverlay();
-          }
-        }
-      }
-
-      window.addEventListener('click', handleSettingsCapture, true);
-      window.addEventListener('touchend', handleSettingsCapture, true);
-      document.addEventListener('click', handleSettingsCapture, true);
-      document.addEventListener('touchend', handleSettingsCapture, true);
-
-      return true;
-    })();
-    """.trimIndent()
-
 internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     if (rawValue.isNullOrBlank() || rawValue == "null") return null
     return runCatching {
         val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
         val json = JSONObject(decoded)
+        if (!isYouTubeWebUrl(json.optString("url"))) return@runCatching null
         val liveCaption = json.optJSONObject("liveCaption")?.let { live ->
             val text = live.optString("text").replace(Regex("\\s+"), " ").trim()
             val revision = live.optLong("revision", -1L)
@@ -915,6 +520,8 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
                     revision = revision,
                     mediaTimeMs = (mediaSecond * 1_000.0).toLong(),
                     present = live.optBoolean("present", text.isNotBlank()) && text.isNotBlank(),
+                    videoId = live.optString("videoId").takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) },
+                    languageCode = live.optString("languageCode").takeIf { it.length in 2..35 && it != "null" },
                 )
             } else {
                 null
@@ -928,6 +535,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
                 json.getDouble("currentSecond").toFloat()
             },
             controlsVisible = json.optBoolean("controlsVisible", false),
+            nativeDialogVisible = json.optBoolean("nativeDialogVisible", false),
             liveCaption = liveCaption,
         )
     }.getOrNull()
@@ -936,6 +544,32 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
 internal class YouTubeWebController {
     private var bindingToken: Any? = null
     private var replayAction: ((Float) -> Unit)? = null
+    private var scriptAction: ((String) -> Unit)? = null
+    private var pendingClip: com.kienhoang.dualsubreplay.data.SavedWord? = null
+    private var playingClipVideo: String? = null
+
+    fun bindScripts(action: (String) -> Unit) { scriptAction = action }
+    fun pause() {
+        pendingClip = null
+        playingClipVideo = null
+        scriptAction?.invoke(webPauseScript())
+    }
+    fun replayClip(word: com.kienhoang.dualsubreplay.data.SavedWord) {
+        pause()
+        pendingClip = word
+    }
+    fun pageChanged(url: String) {
+        if (playingClipVideo != null && playingClipVideo != browseVideoSelection(url)?.videoId) pause()
+    }
+    fun observePage(url: String) {
+        val videoId = browseVideoSelection(url)?.videoId
+        if (playingClipVideo != null && playingClipVideo != videoId) pause()
+        val clip = pendingClip ?: return
+        if (videoId != clip.videoId) return
+        pendingClip = null
+        playingClipVideo = videoId
+        scriptAction?.invoke(webClipReplayScript(videoId.orEmpty(), clip.startMs, clip.endMs))
+    }
 
     fun bind(replayFrom: (Float) -> Unit): Any {
         val token = Any()
@@ -948,11 +582,59 @@ internal class YouTubeWebController {
         if (bindingToken !== token) return
         bindingToken = null
         replayAction = null
+        scriptAction = null
+        pendingClip = null
+        playingClipVideo = null
     }
 
     fun replayFrom(second: Float) {
+        pause()
         replayAction?.invoke(second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f)
     }
+}
+
+internal fun webPauseScript(): String = """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+      if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      clearInterval(window.__dualSubClipTimer);
+      document.querySelectorAll('video').forEach(function(video) { video.pause(); });
+      return true;
+    })();
+""".trimIndent()
+
+internal fun webClipReplayScript(videoId: String, startMs: Long, endMs: Long): String {
+    require(com.kienhoang.dualsubreplay.data.validClipRange(videoId, startMs, endMs))
+    return """
+      (function() {
+        const expected = '$videoId';
+        const valid = function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          const url = new URL(window.location.href);
+          const id = url.searchParams.get('v') || url.pathname.split('/')[2];
+          return window.location.protocol === 'https:' && (host === 'youtube.com' || host.endsWith('.youtube.com')) && id === expected;
+        };
+        if (!valid()) return false;
+        clearInterval(window.__dualSubClipTimer);
+        let started = false;
+        const deadline = Date.now() + 30000;
+        window.__dualSubClipTimer = setInterval(function() {
+          if (!valid()) { clearInterval(window.__dualSubClipTimer); return; }
+          const video = document.querySelector('video');
+          if (!started && Date.now() > deadline) { clearInterval(window.__dualSubClipTimer); return; }
+          if (!video || video.readyState < 1 || document.querySelector('.ad-showing')) return;
+          if (!started) {
+            started = true;
+            video.currentTime = ${startMs / 1000.0};
+            const promise = video.play();
+            if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
+          } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
+            video.pause(); clearInterval(window.__dualSubClipTimer);
+          }
+        }, 50);
+        return true;
+      })();
+    """.trimIndent()
 }
 
 @Composable
@@ -999,6 +681,7 @@ internal fun SingleYouTubePage(
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
+        controller.pageChanged(currentUrl)
         canGoBack = view.canGoBack()
         if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
         lastKnownUrl = currentUrl
@@ -1115,6 +798,7 @@ internal fun SingleYouTubePage(
 
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
+                    youtubeNativeDialogVisible.value = false
                     pageError = null
                     if (url != null && handleMainFrameUrl(view, url)) return
                     reportNavigation(view, url)
@@ -1136,7 +820,6 @@ internal fun SingleYouTubePage(
                             webCaptionVisibilityScript(currentSuppressPageCaptions),
                             null,
                         )
-                        view.evaluateJavascript(WEB_PLAYBACK_SETTINGS_SCRIPT, null)
                     }
                 }
 
@@ -1216,18 +899,20 @@ internal fun SingleYouTubePage(
         while (isActive) {
             if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 youtubePlayerControlsVisible.value = false
+                youtubeNativeDialogVisible.value = false
                 delay(PLAYBACK_POLL_INTERVAL_MS)
                 continue
             }
             webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
                 val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                controller.observePage(snapshot.url)
                 youtubePlayerControlsVisible.value = snapshot.controlsVisible
+                youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
                 reportNavigation(webView, snapshot.url)
                 val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
                 val second = snapshot.currentSecond ?: return@evaluateJavascript
                 currentOnPlaybackSecond(selection.videoId, second, snapshot.liveCaption)
             }
-            webView.evaluateJavascript(WEB_PLAYBACK_SETTINGS_SCRIPT, null)
             delay(PLAYBACK_POLL_INTERVAL_MS)
         }
     }
@@ -1254,6 +939,7 @@ internal fun SingleYouTubePage(
     }
 
     DisposableEffect(controller, webView) {
+        controller.bindScripts { script -> webView.evaluateJavascript(script, null) }
         val token = controller.bind { second ->
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 webView.evaluateJavascript(webReplayScript(second), null)
@@ -1265,7 +951,7 @@ internal fun SingleYouTubePage(
     DisposableEffect(lifecycleOwner, webView) {
         val observer = LifecycleEventObserver { _, _ ->
             lifecycleStarted = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-            if (lifecycleStarted) webView.onResume() else webView.onPause()
+            if (lifecycleStarted) webView.onResume() else { controller.pause(); webView.onPause() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         if (lifecycleStarted) webView.onResume() else webView.onPause()
@@ -1278,6 +964,7 @@ internal fun SingleYouTubePage(
     DisposableEffect(webView) {
         onDispose {
             youtubePlayerControlsVisible.value = false
+            youtubeNativeDialogVisible.value = false
             youtubeFullscreenActive.value = false
             webView.webChromeClient?.onHideCustomView()
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {

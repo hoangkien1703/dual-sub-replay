@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +54,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
@@ -115,8 +117,13 @@ fun DualSubApp(
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     externalSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
+    onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
+    val webController = rememberYouTubeWebController()
+    val pronouncer = rememberWordPronouncer()
+    var showVocabulary by remember { mutableStateOf(false) }
 
     DualSubTheme {
         if (!state.onboardingCompleted) {
@@ -129,11 +136,15 @@ fun DualSubApp(
         } else {
             DualSubExperience(
                 state = state,
+                webController = webController,
+                onVocabulary = { viewModel.selectLearningWord(null); webController.pause(); showVocabulary = true },
+                onAutoPronounceChange = viewModel::setAutoPronounce,
                 playerMode = playerMode,
                 effectivePlayerMode = effectivePlayerMode,
                 onPlayerModeChange = onPlayerModeChange,
                 externalSettingsRequestId = externalSettingsRequestId,
                 fullscreenLearningOverlay = fullscreenLearningOverlay,
+                onNavigationVisibilityChange = onNavigationVisibilityChange,
                 onPageChanged = viewModel::onYouTubePageChanged,
                 onPlaybackSecond = viewModel::onWebPlaybackSecond,
                 onShowSubtitles = viewModel::showSubtitlePanel,
@@ -164,31 +175,54 @@ fun DualSubApp(
                 onWordLearningActiveOnlyChange = viewModel::setWordLearningActiveOnly,
                 tapToLearnEnabled = state.tapToLearnEnabled,
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
-                onWordClick = viewModel::selectLearningToken,
+                onWordClick = viewModel::selectLearningWord,
                 onResetSettings = viewModel::resetAllSettings,
             )
         }
-
-        state.selectedLearningToken?.let { token ->
-            WordLearningDialog(
-                token = token,
-                sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
-                targetLanguage = state.targetLanguage,
-                onTranslateWord = viewModel::translateWord,
-                onDismiss = { viewModel.selectLearningToken(null) },
-            )
+        state.selectedLearningWord?.let { selection ->
+            androidx.compose.runtime.key(selection) {
+                androidx.compose.runtime.DisposableEffect(selection) {
+                    onDispose { pronouncer.stop() }
+                }
+                WordLearningDialog(
+                    selection = selection,
+                    existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false, false).id },
+                    autoPronounce = state.autoPronounce,
+                    onTranslateWord = { viewModel.translateSelection(selection) },
+                    onSave = { meaning, online, offline -> viewModel.saveWord(selection, meaning, online, offline); Unit },
+                    onSpeak = { webController.pause(); pronouncer.speak(selection.token.text, selection.wordLanguage) },
+                    speechMessage = pronouncer.message,
+                    onDismiss = { viewModel.selectLearningWord(null) },
+                )
+            }
         }
+        if (showVocabulary) SavedWordsScreen(
+            repository = viewModel.vocabulary,
+            onOnline = { word ->
+                pronouncer.stop()
+                if (state.activeVideoId != word.videoId) {
+                    viewModel.acceptSharedText("https://www.youtube.com/watch?v=${word.videoId}")
+                }
+                webController.replayClip(word)
+            },
+            onPause = { webController.pause() },
+            onDismiss = { showVocabulary = false },
+        )
     }
 }
 
 @Composable
 private fun DualSubExperience(
     state: DualSubUiState,
+    webController: YouTubeWebController,
+    onVocabulary: () -> Unit,
+    onAutoPronounceChange: (Boolean) -> Unit,
     playerMode: PlayerExperienceMode,
     effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
     externalSettingsRequestId: Long,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
+    onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (String, Float, LiveCaptionSample?) -> Unit,
     onShowSubtitles: () -> Unit,
@@ -219,11 +253,10 @@ private fun DualSubExperience(
     onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},
     tapToLearnEnabled: Boolean = true,
     onTapToLearnChange: (Boolean) -> Unit = {},
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
-    val webController = rememberYouTubeWebController()
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val layoutPreferences = remember(context) {
@@ -246,7 +279,8 @@ private fun DualSubExperience(
             landscapeVideoFraction + delta / splitContainerWidthPx,
         )
     }
-    val sideBySide = shouldUseLandscapeSplit(
+    val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
+    val sideBySide = !nativeDialogVisible && shouldUseLandscapeSplit(
         splitEnabled = state.landscapeSplitEnabled,
         subtitlePanelVisible = state.subtitlePanelVisible,
         hasActiveVideo = state.activeVideoId != null,
@@ -257,17 +291,24 @@ private fun DualSubExperience(
     } else {
         WindowInsets.safeDrawing
     }
-    val liveCaptionCaptureEnabled = shouldCaptureLiveCaptions(
+    val liveCaptionCaptureEnabled = state.subtitlePanelVisible && (state.liveFallback || shouldCaptureLiveCaptions(
         mode = state.karaokeTimingMode,
         generatedCaptions = state.generatedCaptions,
         wordHighlightEnabled = state.wordHighlightEnabled,
-    )
+    ))
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showSettings = true
     }
 
-    Scaffold(contentWindowInsets = contentInsets) { innerPadding ->
+    AppNavigation(onPractice = onVocabulary, onSettings = { showSettings = true }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
+    Scaffold(contentWindowInsets = contentInsets, topBar = {
+        Surface {
+            Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.Start) {
+                menuButton()
+            }
+        }
+    }) { innerPadding ->
         Box(
             Modifier
                 .fillMaxSize()
@@ -327,7 +368,7 @@ private fun DualSubExperience(
                 }
             }
 
-            if (!sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
+            if (!nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
                 SubtitlePanel(
                     state = state,
                     modifier = Modifier
@@ -353,7 +394,7 @@ private fun DualSubExperience(
                     },
                 )
             } else if (
-                !sideBySide &&
+                !nativeDialogVisible && !sideBySide &&
                 state.activeVideoId != null &&
                 effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
             ) {
@@ -361,8 +402,11 @@ private fun DualSubExperience(
             }
         }
     }
+    }
     if (showSettings) {
         SubtitleSettingsDialog(
+            autoPronounce = state.autoPronounce,
+            onAutoPronounceChange = onAutoPronounceChange,
             sourcePreference = state.sourcePreference,
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
@@ -428,7 +472,7 @@ private fun SubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetY by remember { mutableFloatStateOf(0f) }
@@ -536,6 +580,7 @@ private fun SubtitlePanel(
             HorizontalDivider(color = Color(0xFF244044))
 
             when {
+                state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
                 else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
@@ -625,7 +670,7 @@ private fun SideSubtitlePanel(
     onHide: () -> Unit,
     onSettings: () -> Unit,
     onRetry: () -> Unit,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     var panelOffsetX by remember { mutableFloatStateOf(0f) }
@@ -717,6 +762,7 @@ private fun SideSubtitlePanel(
             HorizontalDivider(color = Color(0xFF244044))
 
             when {
+                state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
                 else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
@@ -728,7 +774,7 @@ private fun SideSubtitlePanel(
 @Composable
 private fun SubtitleTimeline(
     state: DualSubUiState,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     // When the panel is recreated after being closed, start the lazy list at the
@@ -843,13 +889,14 @@ internal fun CompactSubtitleCard(
     resolvedSourceLanguage: String? = null,
     targetLanguage: String = "vi",
     isDownloadingTranslationModel: Boolean = false,
-    onWordClick: (AnalyzedToken) -> Unit = {},
+    onWordClick: (WordTap) -> Unit = {},
+    replayEnabled: Boolean = true,
 ) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .semantics { stateDescription = if (active) "Active subtitle" else "Subtitle" }
-            .clickable(onClick = onReplay),
+            .clickable(enabled = replayEnabled, onClick = onReplay),
         border = BorderStroke(
             width = if (active) 2.dp else 1.dp,
             color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
@@ -864,7 +911,7 @@ internal fun CompactSubtitleCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Card(
+            if (replayEnabled) Card(
                 modifier = Modifier.size(34.dp),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(
@@ -880,7 +927,7 @@ internal fun CompactSubtitleCard(
                     )
                 }
             }
-            Spacer(Modifier.size(9.dp))
+            if (replayEnabled) Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
                 val isSentenceEligibleForPos = !wordLearningActiveOnly || active
                 val shouldHighlightPos = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "original" || wordLearningTarget == "both")
@@ -905,7 +952,7 @@ internal fun CompactSubtitleCard(
                         onClick = { offset ->
                             val token = findWordAtOffset(segment.originalText, offset, resolvedSourceLanguage)
                             if (token != null) {
-                                onWordClick(token)
+                                onWordClick(WordTap(token, segment, false))
                             } else {
                                 onReplay()
                             }
@@ -961,7 +1008,7 @@ internal fun CompactSubtitleCard(
                                 alignedOriginalTokens = originalTokens,
                             )
                             if (token != null) {
-                                onWordClick(token)
+                                onWordClick(WordTap(token, segment, true))
                             } else {
                                 onReplay()
                             }
@@ -1048,6 +1095,8 @@ internal fun SubtitleSettingsDialog(
     onCustomColorsChange: (Boolean) -> Unit = {},
     onSplitSentencesChange: (Boolean) -> Unit = {},
     onResetSettings: () -> Unit = {},
+    autoPronounce: Boolean = true,
+    onAutoPronounceChange: (Boolean) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
@@ -1231,6 +1280,8 @@ internal fun SubtitleSettingsDialog(
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
                         Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
+                        SettingsSwitchRow("Pronounce tapped words", "Automatically speak a word when you open its definition.",
+                            autoPronounce, onAutoPronounceChange, "auto_pronounce_switch")
                         SettingsSwitchRow(
                             title = "Word learning mode (POS colors)",
                             description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",

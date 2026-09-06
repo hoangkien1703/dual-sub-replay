@@ -160,16 +160,15 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v0.9.6 highlights
+            ## v0.9.7 highlights
 
-            - **Word Learning Mode (POS Colors & Tap-to-Learn)**: Color-coded grammatical parts of speech (nouns, verbs, adjectives, adverbs, pronouns, conjunctions, prepositions, particles) and instant tap-to-learn dictionary popups (#42).
-            - **Cross-Language Subtitle Alignment**: Harmonized POS coloring across both original and translated subtitle lines, with unaligned/filler words rendered in dark slate gray (#42 V4 & V5).
-            - **Active-Sentence-Only Focus**: Keeps the transcript list calm, legible, and clutter-free by lighting up only the currently spoken sentence, with a toggle in More Settings (#42).
-            - **Preload Translation Models**: Automatic background preloading of ML Kit translation models for instant translations on video open (#47).
-            - **Video Overlay Aspect Ratio Lock**: Lock the minimized subtitle overlay to the video player bounds (#46).
-            - **Japanese & CJK Morphological Timing**: High-precision morpheme segmentation for non-spaced languages during karaoke playback (#44).
-            - **Natural Subtitle Flow**: Cleaner subtitle presentation without artificial boundary punctuation (#43).
-            - **Clean Playback UI**: Suppressed YouTube player overlays and cluttering web elements during video playback (#37).
+            - **Practice mode with spaced repetition**: Save vocabulary and review it with Again, Hard, Good, and Easy ratings (#52).
+            - **Pronunciation and examples**: Saved words keep their language and subtitle context, with automatic pronunciation plus optional online examples and downloadable offline clips (#52).
+            - **Cleaner navigation**: Practice and Settings now live in a left navigation drawer with a larger, easier-to-tap menu target (#52).
+            - **More resilient dual subtitles**: When full transcript retrieval fails, the app can fall back to live YouTube captions, translate them, reconcile rolling text, and recover back to the full transcript when available (#52).
+            - **Native YouTube playback settings restored**: The app no longer injects a replacement settings menu or intercepts YouTube's original playback controls (#52).
+            - **Better dialog behavior**: App subtitle panels temporarily hide while YouTube's native dialog is open and return when it closes (#52).
+            - **Updated open-source notices**: Licensing and third-party notices now cover the optional downloader and bundled FFmpeg components (#52).
 
             The `.sha256` file can be used to verify the APK download.
           files: |

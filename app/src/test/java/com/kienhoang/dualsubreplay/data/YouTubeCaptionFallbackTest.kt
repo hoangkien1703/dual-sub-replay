@@ -8,7 +8,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Regression coverage for the August 2026 device-only caption fallback failure. */
+/** Regression coverage for the August/September 2026 device-only caption fallback failures. */
 class YouTubeCaptionFallbackTest {
     @Test
     fun extractsEmbeddedPlayerResponseWithoutBeingConfusedByBracesInsideStrings() {
@@ -62,6 +62,35 @@ class YouTubeCaptionFallbackTest {
                 "https://www.youtube.com/youtubei/v1/player?key=test-key",
             ),
             playerApiUrls("test-key"),
+        )
+    }
+
+    @Test
+    fun currentFallbackOrderStartsWithClientsThatStillExposeLoggedOutPlayerData() {
+        val clients = youtubePlayerClients("2.20260708.00.00")
+
+        assertEquals("VISIONOS", clients.first().clientName)
+        assertTrue(clients.any { it.clientName == "ANDROID_VR" && it.clientNumber == "28" })
+        assertTrue(
+            clients.any {
+                it.clientName == "WEB_EMBEDDED_PLAYER" &&
+                    it.clientNumber == "56" &&
+                    it.embedUrl == "https://www.reddit.com/"
+            },
+        )
+    }
+
+    @Test
+    fun embeddedClientAddsThirdPartyEmbedContext() {
+        val embedded = youtubePlayerClients("2.20260708.00.00")
+            .first { it.clientName == "WEB_EMBEDDED_PLAYER" }
+
+        val body = playerRequestBody("abc123", embedded)
+
+        assertEquals("abc123", body.getString("videoId"))
+        assertEquals(
+            "https://www.reddit.com/",
+            body.getJSONObject("context").getJSONObject("thirdParty").getString("embedUrl"),
         )
     }
 }
