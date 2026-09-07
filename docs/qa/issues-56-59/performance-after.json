@@ -1,0 +1,26 @@
+{
+  "serial": "emulator-5554",
+  "fingerprint": "Android/sdk_phone64_x86_64/emu64x:16/BE2A.250530.026.D1/13818094:userdebug/test-keys",
+  "package": "com.kienhoang.dualsubreplay.qualityqa",
+  "apk_sha256": "6fbc0a20dab1bac52821eb4668d5c9fa5ba92b53e744fc1322cdd5378275ab07",
+  "apk_bytes": 29728445,
+  "startup_ms": [
+    730,
+    740,
+    910,
+    965,
+    660
+  ],
+  "startup_median_ms": 740,
+  "pss_kb": [
+    29744,
+    29694,
+    29681,
+    29755,
+    29751
+  ],
+  "pss_median_kb": 29744,
+  "caveat": "TTID and stable-screen memory only. Keep app data/screen identical. Emulator timing is noisy.",
+  "startup_median_ms_change_percent": 8.66,
+  "pss_median_kb_change_percent": 11.87
+}

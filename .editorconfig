@@ -1,0 +1,11 @@
+root = true
+
+[*.{kt,kts}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# Existing Compose code uses grouped imports and behavior-oriented filenames.
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_filename = disabled
