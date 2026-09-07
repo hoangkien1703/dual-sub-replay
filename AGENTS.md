@@ -19,7 +19,7 @@ Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotli
 
 - Every push to `main` publishes the rolling `preview` GitHub release (debug-signed) after both CI jobs pass.
 - If `versionName` in `app/build.gradle.kts` has no matching `v<version>` tag, `release-on-main.yml` also publishes an official production-signed release. **Do not bump `versionName`/`versionCode` unless a release is intended.**
-- The preview APK name (`DualSub-Replay-v<version>-preview.apk`) is hardcoded in several places in `.github/workflows/android.yml` (copy step, artifact upload/download, release body) — update all of them when bumping the version; CI does not derive it.
+- The rolling preview artifact name is standardized as `DualSub-Replay-preview.apk`.
 - A pushed tag `vX.Y.Z` must equal `versionName` or CI fails.
 - Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true` (the build throws otherwise). Never commit signing material (`*.jks`/`*.keystore` are gitignored).
 
