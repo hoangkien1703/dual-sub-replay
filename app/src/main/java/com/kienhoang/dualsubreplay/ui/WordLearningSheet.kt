@@ -18,7 +18,7 @@ internal fun WordLearningDialog(
     selection: LearningWordSelection,
     autoPronounce: Boolean,
     onTranslateWord: suspend () -> String,
-    onSave: suspend (meaning: String, online: Boolean, offline: Boolean) -> Unit,
+    onSave: suspend (meaning: String, online: Boolean) -> Unit,
     onSpeak: () -> Unit,
     speechMessage: String?,
     onDismiss: () -> Unit,
@@ -30,7 +30,6 @@ internal fun WordLearningDialog(
     var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
     var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
-    var offline by remember(selection) { mutableStateOf(existingWord?.offline ?: false) }
     val scope = rememberCoroutineScope()
     val canClip = validClipRange(selection.videoId, selection.segment?.startMs ?: -1, selection.segment?.endMs ?: -1)
 
@@ -57,9 +56,7 @@ internal fun WordLearningDialog(
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 if (canClip) {
                     ClipChoice("Online example", online, { online = it; saved = false }, "online_clip_choice")
-                    ClipChoice("Download offline clip", offline, { offline = it; saved = false }, "offline_clip_choice")
-                    Text("Both options are optional. Downloads use your internet connection.", style = MaterialTheme.typography.bodySmall)
-                    if (selection.translated) Text("The clip plays the original sentence, not the translated word.", style = MaterialTheme.typography.bodySmall)
+                    if (selection.translated) Text("The example plays the original sentence, not the translated word.", style = MaterialTheme.typography.bodySmall)
                 }
                 if (saved) Text("Word saved", modifier = Modifier.testTag("word_saved"))
             }
@@ -68,7 +65,7 @@ internal fun WordLearningDialog(
             TextButton(enabled = !saving && !loading && !saved, modifier = Modifier.testTag("save_word"), onClick = {
                 saving = true
                 scope.launch {
-                    try { onSave(meaning, online && canClip, offline && canClip); saved = true; error = null }
+                    try { onSave(meaning, online && canClip); saved = true; error = null }
                     catch (cancel: CancellationException) { throw cancel }
                     catch (_: Exception) { error = "Could not save. Check your available storage and try again." }
                     finally { saving = false }

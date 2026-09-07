@@ -19,13 +19,13 @@ Single-module Android app (`:app`, package `com.kienhoang.dualsubreplay`): Kotli
 
 - Every push to `main` publishes the rolling `preview` GitHub release (debug-signed) after both CI jobs pass.
 - If `versionName` in `app/build.gradle.kts` has no matching `v<version>` tag, `release-on-main.yml` also publishes an official production-signed release. **Do not bump `versionName`/`versionCode` unless a release is intended.**
-- The preview APK name (`DualSub-Replay-v<version>-preview.apk`) is hardcoded in several places in `.github/workflows/android.yml` (copy step, artifact upload/download, release body) — update all of them when bumping the version; CI does not derive it.
+- The rolling preview artifact name is standardized as `DualSub-Replay-preview.apk`.
 - A pushed tag `vX.Y.Z` must equal `versionName` or CI fails.
 - Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true` (the build throws otherwise). Never commit signing material (`*.jks`/`*.keystore` are gitignored).
 
 ## Architecture invariants (enforced by tests)
 
-- Exactly one WebView exists (`SingleYouTubePage` in `ui/YouTubeBrowserScreen.kt`). Online replay seeks the native YouTube page video via a JS polling bridge. Saved offline clips may use a lifecycle-managed Media3 player for app-private local files; pause the YouTube player before local playback and never add a second online player/WebView.
+- Exactly one WebView exists (`SingleYouTubePage` in `ui/YouTubeBrowserScreen.kt`). Online replay seeks the native YouTube page video via a JS polling bridge. Offline video downloading and local Media3 playback are removed; never add a second online player/WebView.
 - Main-frame navigation goes through `classifyMainFrameUrl` → `YOUTUBE_WEB` (embed) / `GOOGLE_SIGN_IN` (embed during sign-in flow) / `OPEN_EXTERNAL` (browser) / `BLOCK`. JS snapshot/replay scripts must keep re-verifying the executing origin (`https:` + `*.youtube.com`); `PlaybackArchitectureTest` asserts the literal script text.
 - Captions use YouTube's undocumented Innertube transcript endpoint, deliberately isolated in `data/YouTubeCaptionProvider.kt` (host allowlist, 8 MiB response cap) so it can be replaced without touching the rest of the app.
 - Translation is on-device via ML Kit (`translation/OnDeviceTranslator.kt`); the app has no API keys.

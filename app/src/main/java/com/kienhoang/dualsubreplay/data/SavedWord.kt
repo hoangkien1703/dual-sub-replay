@@ -32,10 +32,6 @@ data class SavedWord(
     val endMs: Long,
     val translated: Boolean,
     val online: Boolean = true,
-    val offline: Boolean = false,
-    val clipStatus: String = "none",
-    val clipError: String? = null,
-    val clipGeneration: Long = 0,
     val dueAt: Long = 0,
     val intervalMs: Long = 0,
 )
@@ -58,7 +54,7 @@ internal fun reviewWord(word: SavedWord, rating: ReviewRating, now: Long): Saved
 internal fun validClipRange(videoId: String?, start: Long, end: Long): Boolean =
     videoId?.matches(Regex("[A-Za-z0-9_-]{11}")) == true && start >= 0 && end > start
 
-internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, online: Boolean, offline: Boolean): SavedWord {
+internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, online: Boolean): SavedWord {
     val segment = selection.segment
     val word = selection.token.text.trim()
     val key = listOf(word.lowercase(Locale.ROOT), selection.wordLanguage, selection.meaningLanguage,
@@ -69,5 +65,5 @@ internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, on
     return SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
         meaning.trim(), segment?.originalText.orEmpty(), segment?.translatedText, selection.videoId,
         segment?.startMs ?: 0, segment?.endMs ?: 0, selection.translated,
-        online = online && hasClip, offline = offline && hasClip)
+        online = online && hasClip)
 }

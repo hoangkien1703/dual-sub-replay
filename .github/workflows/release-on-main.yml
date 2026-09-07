@@ -160,15 +160,13 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v0.9.7 highlights
+            ## v0.9.8 highlights
 
-            - **Practice mode with spaced repetition**: Save vocabulary and review it with Again, Hard, Good, and Easy ratings (#52).
-            - **Pronunciation and examples**: Saved words keep their language and subtitle context, with automatic pronunciation plus optional online examples and downloadable offline clips (#52).
-            - **Cleaner navigation**: Practice and Settings now live in a left navigation drawer with a larger, easier-to-tap menu target (#52).
-            - **More resilient dual subtitles**: When full transcript retrieval fails, the app can fall back to live YouTube captions, translate them, reconcile rolling text, and recover back to the full transcript when available (#52).
-            - **Native YouTube playback settings restored**: The app no longer injects a replacement settings menu or intercepts YouTube's original playback controls (#52).
-            - **Better dialog behavior**: App subtitle panels temporarily hide while YouTube's native dialog is open and return when it closes (#52).
-            - **Updated open-source notices**: Licensing and third-party notices now cover the optional downloader and bundled FFmpeg components (#52).
+            - **Massive APK size reduction (88% smaller)**: Streamlined app size from ~245 MB down to ~29.7 MB by removing bulky offline video tools (yt-dlp, FFmpeg, Media3) and enabling full R8 release shrinking (#54, #55).
+            - **Permission clean-up**: Removed high-risk foreground service, data-sync, and notification permissions; DualSub Replay now requires only standard network access (#54, #55).
+            - **Safe offline-to-online transition**: Retained existing saved words and review history without reviving download jobs or deleting legacy user files (#54, #55).
+            - **Vocabulary database reliability**: Parameterized primary-key lookups, row-order preservation across edits, and non-destructive malformed row recovery (#54, #55).
+            - **WebView architecture refinement**: Extracted JavaScript timing bridges into a focused internal component with strict YouTube origin verification (#54, #55).
 
             The `.sha256` file can be used to verify the APK download.
           files: |

@@ -186,10 +186,10 @@ fun DualSubApp(
                 }
                 WordLearningDialog(
                     selection = selection,
-                    existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false, false).id },
+                    existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false).id },
                     autoPronounce = state.autoPronounce,
                     onTranslateWord = { viewModel.translateSelection(selection) },
-                    onSave = { meaning, online, offline -> viewModel.saveWord(selection, meaning, online, offline); Unit },
+                    onSave = { meaning, online -> viewModel.saveWord(selection, meaning, online); Unit },
                     onSpeak = { webController.pause(); pronouncer.speak(selection.token.text, selection.wordLanguage) },
                     speechMessage = pronouncer.message,
                     onDismiss = { viewModel.selectLearningWord(null) },
