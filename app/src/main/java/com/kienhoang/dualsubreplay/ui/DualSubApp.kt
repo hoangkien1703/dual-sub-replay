@@ -147,6 +147,7 @@ fun DualSubApp(
                 onNavigationVisibilityChange = onNavigationVisibilityChange,
                 onPageChanged = viewModel::onYouTubePageChanged,
                 onPlaybackSecond = viewModel::onWebPlaybackSecond,
+                onPlaybackPaused = viewModel::onWebPlaybackPaused,
                 onShowSubtitles = viewModel::showSubtitlePanel,
                 onHideSubtitles = viewModel::hideSubtitlePanel,
                 onRetry = viewModel::retryCaptions,
@@ -225,6 +226,7 @@ private fun DualSubExperience(
     onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (String, Float, LiveCaptionSample?) -> Unit,
+    onPlaybackPaused: (String, Boolean) -> Unit,
     onShowSubtitles: () -> Unit,
     onHideSubtitles: () -> Unit,
     onRetry: () -> Unit,
@@ -259,9 +261,10 @@ private fun DualSubExperience(
     var showSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
-    val layoutPreferences = remember(context) {
-        context.getSharedPreferences("dual_sub_preferences", 0)
-    }
+    val layoutPreferences =
+        remember(context) {
+            context.getSharedPreferences("dual_sub_preferences", 0)
+        }
     var landscapeVideoFraction by remember {
         mutableFloatStateOf(
             normalizeLandscapeVideoFraction(
@@ -273,90 +276,132 @@ private fun DualSubExperience(
         )
     }
     var splitContainerWidthPx by remember { mutableFloatStateOf(0f) }
-    val splitDragState = rememberDraggableState { delta ->
-        if (splitContainerWidthPx <= 0f) return@rememberDraggableState
-        landscapeVideoFraction = normalizeLandscapeVideoFraction(
-            landscapeVideoFraction + delta / splitContainerWidthPx,
-        )
-    }
+    val splitDragState =
+        rememberDraggableState { delta ->
+            if (splitContainerWidthPx <= 0f) return@rememberDraggableState
+            landscapeVideoFraction =
+                normalizeLandscapeVideoFraction(
+                    landscapeVideoFraction + delta / splitContainerWidthPx,
+                )
+        }
     val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
-    val sideBySide = !nativeDialogVisible && shouldUseLandscapeSplit(
-        splitEnabled = state.landscapeSplitEnabled,
-        subtitlePanelVisible = state.subtitlePanelVisible,
-        hasActiveVideo = state.activeVideoId != null,
-        orientation = configuration.orientation,
-    )
-    val contentInsets = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        WindowInsets(0, 0, 0, 0)
-    } else {
-        WindowInsets.safeDrawing
-    }
-    val liveCaptionCaptureEnabled = state.subtitlePanelVisible && (state.liveFallback || shouldCaptureLiveCaptions(
-        mode = state.karaokeTimingMode,
-        generatedCaptions = state.generatedCaptions,
-        wordHighlightEnabled = state.wordHighlightEnabled,
-    ))
+    val tracksVisible = state.showOriginal() || state.showTranslation()
+    val sideBySide =
+        tracksVisible && !nativeDialogVisible &&
+            shouldUseLandscapeSplit(
+                splitEnabled = state.landscapeSplitEnabled,
+                subtitlePanelVisible = state.subtitlePanelVisible,
+                hasActiveVideo = state.activeVideoId != null,
+                orientation = configuration.orientation,
+            )
+    val contentInsets =
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            WindowInsets(0, 0, 0, 0)
+        } else {
+            WindowInsets.safeDrawing
+        }
+    val liveCaptionCaptureEnabled =
+        state.subtitlePanelVisible && (
+            state.liveFallback ||
+                shouldCaptureLiveCaptions(
+                    mode = state.karaokeTimingMode,
+                    generatedCaptions = state.generatedCaptions,
+                    wordHighlightEnabled = state.wordHighlightEnabled,
+                )
+        )
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showSettings = true
     }
 
-    AppNavigation(onPractice = onVocabulary, onSettings = { showSettings = true }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
-    Scaffold(contentWindowInsets = contentInsets, topBar = {
-        Surface {
-            Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.Start) {
-                menuButton()
+    AppNavigation(onPractice = onVocabulary, onSettings = {
+        showSettings = true
+    }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
+        Scaffold(contentWindowInsets = contentInsets, topBar = {
+            Surface {
+                Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.Start) {
+                    menuButton()
+                }
             }
-        }
-    }) { innerPadding ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-        ) {
-            // Single call site on purpose: branching around SingleYouTubePage would
-            // leave composition and destroy the persistent WebView on every rotation.
-            Row(
+        }) { innerPadding ->
+            Box(
                 Modifier
                     .fillMaxSize()
-                    .onSizeChanged { splitContainerWidthPx = it.width.toFloat() },
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
-                SingleYouTubePage(
-                    initialUrl = state.browserUrl,
-                    navigationRequestId = state.browserNavigationRequestId,
-                    controller = webController,
-                    onPageChanged = onPageChanged,
-                    onPlaybackSecond = onPlaybackSecond,
-                    liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
-                    suppressPageCaptions = liveCaptionCaptureEnabled ||
-                        effectivePlayerMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
-                    fullscreenOverlay = fullscreenLearningOverlay,
-                    modifier = Modifier
-                        .weight(if (sideBySide) landscapeVideoFraction else 1f)
-                        .fillMaxHeight()
-                        .testTag("youtube_web_app"),
-                )
-
-                if (sideBySide) {
-                    LandscapeSplitDivider(
-                        videoFraction = landscapeVideoFraction,
-                        dragState = splitDragState,
-                        onDragStopped = {
-                            layoutPreferences.edit()
-                                .putFloat(
-                                    LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
-                                    landscapeVideoFraction,
-                                )
-                                .apply()
-                        },
+                // Single call site on purpose: branching around SingleYouTubePage would
+                // leave composition and destroy the persistent WebView on every rotation.
+                Row(
+                    Modifier
+                        .fillMaxSize()
+                        .onSizeChanged { splitContainerWidthPx = it.width.toFloat() },
+                ) {
+                    SingleYouTubePage(
+                        initialUrl = state.browserUrl,
+                        navigationRequestId = state.browserNavigationRequestId,
+                        controller = webController,
+                        onPageChanged = onPageChanged,
+                        onPlaybackSecond = onPlaybackSecond,
+                        onPlaybackPaused = onPlaybackPaused,
+                        liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
+                        suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
+                        fullscreenOverlay = fullscreenLearningOverlay,
+                        modifier =
+                            Modifier
+                                .weight(if (sideBySide) landscapeVideoFraction else 1f)
+                                .fillMaxHeight()
+                                .testTag("youtube_web_app"),
                     )
-                    SideSubtitlePanel(
+
+                    if (sideBySide) {
+                        LandscapeSplitDivider(
+                            videoFraction = landscapeVideoFraction,
+                            dragState = splitDragState,
+                            onDragStopped = {
+                                layoutPreferences
+                                    .edit()
+                                    .putFloat(
+                                        LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
+                                        landscapeVideoFraction,
+                                    ).apply()
+                            },
+                        )
+                        SideSubtitlePanel(
+                            state = state,
+                            modifier =
+                                Modifier
+                                    .weight(1f - landscapeVideoFraction)
+                                    .fillMaxHeight()
+                                    .testTag("subtitle_timeline"),
+                            onHide = onHideSubtitles,
+                            onSettings = { showSettings = true },
+                            onRetry = onRetry,
+                            onWordClick = onWordClick,
+                            onReplay = { segment ->
+                                webController.replayFrom(segment.startMs / 1_000f)
+                            },
+                        )
+                    }
+                }
+
+                if (tracksVisible && !nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
+                    SubtitlePanel(
                         state = state,
-                        modifier = Modifier
-                            .weight(1f - landscapeVideoFraction)
-                            .fillMaxHeight()
-                            .testTag("subtitle_timeline"),
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .fillMaxHeight(
+                                    if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                        portraitSubtitlePanelHeightFraction(
+                                            screenWidthDp = configuration.screenWidthDp,
+                                            screenHeightDp = configuration.screenHeightDp,
+                                        )
+                                    } else {
+                                        0.60f
+                                    },
+                                ).testTag("subtitle_timeline"),
                         onHide = onHideSubtitles,
                         onSettings = { showSettings = true },
                         onRetry = onRetry,
@@ -365,43 +410,15 @@ private fun DualSubExperience(
                             webController.replayFrom(segment.startMs / 1_000f)
                         },
                     )
+                } else if (
+                    !nativeDialogVisible && !sideBySide &&
+                    state.activeVideoId != null &&
+                    effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
+                ) {
+                    MovableSubtitleFab(onClick = { if (tracksVisible) onShowSubtitles() else showSettings = true })
                 }
             }
-
-            if (!nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
-                SubtitlePanel(
-                    state = state,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .fillMaxHeight(
-                            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                portraitSubtitlePanelHeightFraction(
-                                    screenWidthDp = configuration.screenWidthDp,
-                                    screenHeightDp = configuration.screenHeightDp,
-                                )
-                            } else {
-                                0.60f
-                            },
-                        )
-                        .testTag("subtitle_timeline"),
-                    onHide = onHideSubtitles,
-                    onSettings = { showSettings = true },
-                    onRetry = onRetry,
-                    onWordClick = onWordClick,
-                    onReplay = { segment ->
-                        webController.replayFrom(segment.startMs / 1_000f)
-                    },
-                )
-            } else if (
-                !nativeDialogVisible && !sideBySide &&
-                state.activeVideoId != null &&
-                effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
-            ) {
-                MovableSubtitleFab(onClick = onShowSubtitles)
-            }
         }
-    }
     }
     if (showSettings) {
         SubtitleSettingsDialog(
@@ -827,6 +844,8 @@ private fun SubtitleTimeline(
         itemsIndexed(state.segments, key = { _, segment -> segment.id }) { index, segment ->
             CompactSubtitleCard(
                 segment = segment,
+                showOriginal = state.showOriginal(),
+                showTranslation = state.showTranslation(),
                 active = index == state.currentIndex,
                 fontScale = state.fontScale,
                 onReplay = { onReplay(segment) },
@@ -870,161 +889,6 @@ internal const val SUBTITLE_INSTANT_SCROLL_DISTANCE = 40
 internal fun shouldFollowPlaybackSeek(previousIndex: Int, currentIndex: Int): Boolean {
     if (previousIndex < 0 || currentIndex < 0) return false
     return currentIndex < previousIndex || currentIndex - previousIndex > 1
-}
-
-@Composable
-internal fun CompactSubtitleCard(
-    segment: SubtitleSegment,
-    active: Boolean,
-    fontScale: Float,
-    onReplay: () -> Unit,
-    activeWordIndex: Int = -1,
-    originalColor: Color = subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY),
-    translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
-    highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
-    wordLearningEnabled: Boolean = false,
-    wordLearningTarget: String = "both",
-    wordLearningActiveOnly: Boolean = true,
-    tapToLearnEnabled: Boolean = true,
-    resolvedSourceLanguage: String? = null,
-    targetLanguage: String = "vi",
-    isDownloadingTranslationModel: Boolean = false,
-    onWordClick: (WordTap) -> Unit = {},
-    replayEnabled: Boolean = true,
-) {
-    OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics { stateDescription = if (active) "Active subtitle" else "Subtitle" }
-            .clickable(enabled = replayEnabled, onClick = onReplay),
-        border = BorderStroke(
-            width = if (active) 2.dp else 1.dp,
-            color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
-        ),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = if (active) Color(0xFF0A2B30) else Color(0xFF081D20),
-            contentColor = Color(0xFFF3FAFA),
-        ),
-        shape = RoundedCornerShape(10.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (replayEnabled) Card(
-                modifier = Modifier.size(34.dp),
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = if (active) MaterialTheme.colorScheme.primary else Color(0xFF24383B),
-                ),
-            ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Default.PlayArrow,
-                        contentDescription = "Replay this paragraph",
-                        modifier = Modifier.size(22.dp),
-                        tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-            if (replayEnabled) Spacer(Modifier.size(9.dp))
-            Column(Modifier.weight(1f)) {
-                val isSentenceEligibleForPos = !wordLearningActiveOnly || active
-                val shouldHighlightPos = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "original" || wordLearningTarget == "both")
-                val annotatedOriginal = annotatedSubtitleText(
-                    text = segment.originalText,
-                    words = segment.words,
-                    activeWordIndex = if (active) activeWordIndex else -1,
-                    baseColor = originalColor,
-                    highlightColor = highlightColor,
-                    wordLearningEnabled = shouldHighlightPos,
-                    languageCode = resolvedSourceLanguage,
-                )
-                if (wordLearningEnabled && tapToLearnEnabled) {
-                    ClickableText(
-                        text = annotatedOriginal,
-                        style = TextStyle(
-                            fontSize = (17 * fontScale).sp,
-                            lineHeight = (22 * fontScale).sp,
-                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-                            color = originalColor,
-                        ),
-                        onClick = { offset ->
-                            val token = findWordAtOffset(segment.originalText, offset, resolvedSourceLanguage)
-                            if (token != null) {
-                                onWordClick(WordTap(token, segment, false))
-                            } else {
-                                onReplay()
-                            }
-                        },
-                    )
-                } else {
-                    Text(
-                        text = annotatedOriginal,
-                        fontSize = (17 * fontScale).sp,
-                        lineHeight = (22 * fontScale).sp,
-                        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-                        color = originalColor,
-                    )
-                }
-                Spacer(Modifier.height(2.dp))
-                val shouldHighlightTrans = wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "translation" || wordLearningTarget == "both")
-                val translatedText = segment.translatedText
-                val fallbackText = if (isDownloadingTranslationModel) {
-                    "Downloading translation model…"
-                } else {
-                    "Translating…"
-                }
-                val originalTokens: List<AnalyzedToken> = remember(segment.originalText, resolvedSourceLanguage) {
-                    LanguageAwareTokenizer.tokenize(segment.originalText, resolvedSourceLanguage)
-                }
-                val annotatedTrans = if (shouldHighlightTrans && translatedText != null) {
-                    annotatedSubtitleText(
-                        text = translatedText,
-                        words = emptyList(),
-                        activeWordIndex = -1,
-                        baseColor = translatedColor,
-                        highlightColor = highlightColor,
-                        wordLearningEnabled = true,
-                        languageCode = targetLanguage,
-                        alignedOriginalTokens = originalTokens,
-                    )
-                } else {
-                    AnnotatedString(translatedText ?: fallbackText)
-                }
-                if (wordLearningEnabled && tapToLearnEnabled && translatedText != null) {
-                    ClickableText(
-                        text = annotatedTrans,
-                        style = TextStyle(
-                            fontSize = (14 * fontScale).sp,
-                            lineHeight = (18 * fontScale).sp,
-                            color = translatedColor,
-                        ),
-                        onClick = { offset ->
-                            val token = findWordAtOffset(
-                                text = translatedText,
-                                charOffset = offset,
-                                languageCode = targetLanguage,
-                                alignedOriginalTokens = originalTokens,
-                            )
-                            if (token != null) {
-                                onWordClick(WordTap(token, segment, true))
-                            } else {
-                                onReplay()
-                            }
-                        },
-                    )
-                } else {
-                    Text(
-                        text = annotatedTrans,
-                        fontSize = (14 * fontScale).sp,
-                        lineHeight = (18 * fontScale).sp,
-                        color = translatedColor,
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -1239,6 +1103,7 @@ internal fun SubtitleSettingsDialog(
                     HorizontalDivider()
                     Spacer(Modifier.height(14.dp))
                     Text("Appearance", style = MaterialTheme.typography.titleSmall)
+                    CaptionVisibilitySettings()
                     SettingsSwitchRow(
                         title = "Highlight spoken words",
                         description = "Tint the word currently being spoken in the original subtitle so you can follow along in real time.",

@@ -256,6 +256,7 @@ internal fun SingleYouTubePage(
     controller: YouTubeWebController,
     onPageChanged: (String) -> Unit,
     onPlaybackSecond: (videoId: String, second: Float, liveCaption: LiveCaptionSample?) -> Unit,
+    onPlaybackPaused: (String, Boolean) -> Unit = { _, _ -> },
     liveCaptionCaptureEnabled: Boolean = false,
     suppressPageCaptions: Boolean = false,
     fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
@@ -265,6 +266,7 @@ internal fun SingleYouTubePage(
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
     val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
+    val currentOnPlaybackPaused by rememberUpdatedState(onPlaybackPaused)
     val currentLiveCaptionCaptureEnabled by rememberUpdatedState(liveCaptionCaptureEnabled)
     val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
     var canGoBack by remember { mutableStateOf(false) }
@@ -500,24 +502,33 @@ internal fun SingleYouTubePage(
 
     LaunchedEffect(webView, lifecycleStarted) {
         if (!lifecycleStarted) return@LaunchedEffect
-        while (isActive) {
-            if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
-                youtubePlayerControlsVisible.value = false
-                youtubeNativeDialogVisible.value = false
+        val gate = PlaybackSnapshotGate()
+        try {
+            while (isActive) {
+                if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                    youtubePlayerControlsVisible.value = false
+                    youtubeNativeDialogVisible.value = false
+                    delay(PLAYBACK_POLL_INTERVAL_MS)
+                    continue
+                }
+                val requestedUrl = webView.url
+                val ticket = gate.request()
+                webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
+                    val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                    if (!gate.accept(ticket, requestedUrl, webView.url, snapshot.url)) return@evaluateJavascript
+                    controller.observePage(snapshot.url)
+                    youtubePlayerControlsVisible.value = snapshot.controlsVisible
+                    youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
+                    reportNavigation(webView, snapshot.url)
+                    val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
+                    val second = snapshot.currentSecond ?: return@evaluateJavascript
+                    currentOnPlaybackPaused(selection.videoId, snapshot.paused)
+                    currentOnPlaybackSecond(selection.videoId, second, snapshot.liveCaption)
+                }
                 delay(PLAYBACK_POLL_INTERVAL_MS)
-                continue
             }
-            webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
-                val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
-                controller.observePage(snapshot.url)
-                youtubePlayerControlsVisible.value = snapshot.controlsVisible
-                youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
-                reportNavigation(webView, snapshot.url)
-                val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
-                val second = snapshot.currentSecond ?: return@evaluateJavascript
-                currentOnPlaybackSecond(selection.videoId, second, snapshot.liveCaption)
-            }
-            delay(PLAYBACK_POLL_INTERVAL_MS)
+        } finally {
+            gate.close()
         }
     }
 

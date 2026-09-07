@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -187,39 +188,6 @@ internal fun shouldUseAutomaticLandscapeOverlay(
     autoLandscape &&
     orientation == Configuration.ORIENTATION_LANDSCAPE
 
-internal data class LearningOverlayContent(
-    val originalText: String?,
-    val translatedText: String?,
-    val statusText: String?,
-    val activeWordIndex: Int = -1,
-    val segment: SubtitleSegment? = null,
-)
-
-internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? {
-    if (state.activeVideoId == null) return null
-    if (state.liveFallback) return LearningOverlayContent(
-        originalText = state.liveOriginal,
-        translatedText = state.liveTranslated ?: if (state.liveOriginal != null) "Translating…" else null,
-        statusText = "Live subtitles · ${state.statusMessage.orEmpty()}",
-    )
-    val active = state.segments.getOrNull(state.currentIndex)
-    if (active != null) {
-        return LearningOverlayContent(
-  originalText = active.originalText,
-  translatedText = active.translatedText ?: "Translating…",
-  statusText = null,
-  activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
-  segment = active,
-        )
-    }
-    val status = state.errorMessage ?: state.statusMessage
-        ?: if (state.segments.isNotEmpty()) "Waiting for the next caption…" else null
-    return status?.let {
-        LearningOverlayContent(originalText = null, translatedText = null, statusText = it)
-    }
-}
-
-/** Places the portrait overlay near the player or across the full screen height (Issue #46). */
 internal fun portraitLearningOverlayTopPaddingDp(
     screenWidthDp: Int,
     position: Float = DEFAULT_OVERLAY_VERTICAL_POSITION,
@@ -475,7 +443,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
         if (!youtubeDialogVisible && overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-            if (fullscreenOverlayHiddenByUser) {
+            if (fullscreenOverlayHiddenByUser || overlayContent.isEmpty()) {
                 MovableSubtitleFab(
                     onClick = { fullscreenOverlayHiddenByUser = false },
                     modifier = Modifier.fillMaxSize(),
@@ -630,6 +598,11 @@ internal fun LearningSubtitleOverlay(
     onRetryTranscript: (() -> Unit)? = null,
     onClose: () -> Unit,
 ) {
+    if (content.originalText == null && content.translatedText == null && content.statusText == null) {
+        Box(modifier) { TextButton(onClick = onSettings) { Text("Subtitle settings") } }
+        return
+    }
+
     var overlayActionsVisible by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -722,7 +695,7 @@ internal fun LearningSubtitleOverlay(
             Column(Modifier.weight(1f)) {
                 content.originalText?.let { original ->
                     val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
-                    val annotated = annotatedSubtitleText(
+                    val annotated = rememberAnnotatedSubtitleText(
                         text = original,
                         words = content.segment?.words.orEmpty(),
                         activeWordIndex = content.activeWordIndex,
@@ -766,11 +739,11 @@ internal fun LearningSubtitleOverlay(
                 content.translatedText?.let { translated ->
                     if (content.originalText != null) Spacer(Modifier.size(2.dp))
                     val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
-                    val origTokens: List<AnalyzedToken>? = content.originalText?.let {
-                        LanguageAwareTokenizer.tokenize(it, originalLanguageCode)
+                    val origTokens: List<AnalyzedToken>? = remember(content.segment?.originalText, originalLanguageCode) {
+                        content.segment?.originalText?.let { LanguageAwareTokenizer.tokenize(it, originalLanguageCode) }
                     }
                     val annotated = if (shouldHighlightPos) {
-                        annotatedSubtitleText(
+                        rememberAnnotatedSubtitleText(
                             text = translated,
                             words = emptyList(),
                             activeWordIndex = -1,

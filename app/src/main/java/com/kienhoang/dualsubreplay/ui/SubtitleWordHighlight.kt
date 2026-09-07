@@ -1,5 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -11,14 +13,21 @@ import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 
-internal data class SubtitleWordSpan(val wordIndex: Int, val start: Int, val end: Int)
+internal data class SubtitleWordSpan(
+    val wordIndex: Int,
+    val start: Int,
+    val end: Int,
+)
 
 /**
  * Maps caption word timings onto character ranges of [text]. Broken auto-caption
  * chunks are skipped individually so one malformed timing token does not disable
  * karaoke highlighting for the whole subtitle line.
  */
-internal fun subtitleWordSpans(text: String, words: List<SubtitleWord>): List<SubtitleWordSpan> {
+internal fun subtitleWordSpans(
+    text: String,
+    words: List<SubtitleWord>,
+): List<SubtitleWordSpan> {
     if (text.isBlank() || words.isEmpty()) return emptyList()
     val spans = ArrayList<SubtitleWordSpan>(words.size)
     var searchFrom = 0
@@ -26,11 +35,12 @@ internal fun subtitleWordSpans(text: String, words: List<SubtitleWord>): List<Su
         val token = word.text.replace(Regex("\\s+"), " ").trim()
         if (token.isEmpty()) return@forEachIndexed
         val exactStart = text.indexOf(token, searchFrom)
-        val start = if (exactStart >= 0) {
-            exactStart
-        } else {
-            text.indexOf(token, searchFrom, ignoreCase = true)
-        }
+        val start =
+            if (exactStart >= 0) {
+                exactStart
+            } else {
+                text.indexOf(token, searchFrom, ignoreCase = true)
+            }
         if (start < 0) return@forEachIndexed
         spans += SubtitleWordSpan(index, start, start + token.length)
         searchFrom = start + token.length
@@ -55,20 +65,32 @@ internal fun annotatedSubtitleText(
     wordLearningEnabled: Boolean = false,
     languageCode: String? = null,
     alignedOriginalTokens: List<AnalyzedToken>? = null,
+    preparedTokens: List<AnalyzedToken>? = null,
+    preparedSpans: List<SubtitleWordSpan>? = null,
 ): AnnotatedString {
     if (text.isBlank()) return AnnotatedString("")
 
-    val activeSpan = if (activeWordIndex >= 0 && words.isNotEmpty()) {
-        subtitleWordSpans(text, words).firstOrNull { it.wordIndex == activeWordIndex }
-    } else null
-
-    val tokens = if (wordLearningEnabled) {
-        if (alignedOriginalTokens != null) {
-            LanguageAwareTokenizer.alignAndTokenizeTranslation(text, alignedOriginalTokens, languageCode)
+    val activeSpan =
+        if (activeWordIndex >= 0 && words.isNotEmpty()) {
+            (preparedSpans ?: subtitleWordSpans(text, words)).firstOrNull { it.wordIndex == activeWordIndex }
         } else {
-            LanguageAwareTokenizer.tokenize(text, languageCode)
+            null
         }
-    } else emptyList()
+
+    val tokens =
+        preparedTokens ?: if (wordLearningEnabled) {
+            if (alignedOriginalTokens != null) {
+                LanguageAwareTokenizer.alignAndTokenizeTranslation(
+                    text,
+                    alignedOriginalTokens,
+                    languageCode,
+                )
+            } else {
+                LanguageAwareTokenizer.tokenize(text, languageCode)
+            }
+        } else {
+            emptyList()
+        }
 
     return buildAnnotatedString {
         append(text)
@@ -121,20 +143,63 @@ internal fun annotatedSubtitleText(
     }
 }
 
+/** Expensive language analysis is independent of the changing spoken-word index. */
+@Composable
+internal fun rememberAnnotatedSubtitleText(
+    text: String,
+    words: List<SubtitleWord>,
+    activeWordIndex: Int,
+    baseColor: Color,
+    highlightColor: Color,
+    wordLearningEnabled: Boolean = false,
+    languageCode: String? = null,
+    alignedOriginalTokens: List<AnalyzedToken>? = null,
+): AnnotatedString {
+    val spans = remember(text, words) { subtitleWordSpans(text, words) }
+    val tokens =
+        remember(text, wordLearningEnabled, languageCode, alignedOriginalTokens) {
+            when {
+                !wordLearningEnabled -> emptyList()
+                alignedOriginalTokens != null ->
+                    LanguageAwareTokenizer.alignAndTokenizeTranslation(
+                        text,
+                        alignedOriginalTokens,
+                        languageCode,
+                    )
+                else -> LanguageAwareTokenizer.tokenize(text, languageCode)
+            }
+        }
+    return remember(text, spans, tokens, activeWordIndex, baseColor, highlightColor, wordLearningEnabled) {
+        annotatedSubtitleText(
+            text,
+            words,
+            activeWordIndex,
+            baseColor,
+            highlightColor,
+            wordLearningEnabled,
+            languageCode,
+            alignedOriginalTokens,
+            tokens,
+            spans,
+        )
+    }
+}
+
 /** Renders the original line with the currently spoken word tinted and underlined. */
 internal fun annotatedSpokenText(
     segment: SubtitleSegment,
     activeWordIndex: Int,
     baseColor: Color,
     highlightColor: Color,
-): AnnotatedString = annotatedSubtitleText(
-    text = segment.originalText,
-    words = segment.words,
-    activeWordIndex = activeWordIndex,
-    baseColor = baseColor,
-    highlightColor = highlightColor,
-    wordLearningEnabled = false,
-)
+): AnnotatedString =
+    annotatedSubtitleText(
+        text = segment.originalText,
+        words = segment.words,
+        activeWordIndex = activeWordIndex,
+        baseColor = baseColor,
+        highlightColor = highlightColor,
+        wordLearningEnabled = false,
+    )
 
 /** Finds the analyzed word at [charOffset] in [text], for Tap-to-learn inspection. */
 internal fun findWordAtOffset(
@@ -144,10 +209,15 @@ internal fun findWordAtOffset(
     alignedOriginalTokens: List<AnalyzedToken>? = null,
 ): AnalyzedToken? {
     if (text.isBlank() || charOffset < 0 || charOffset >= text.length) return null
-    val tokens = if (alignedOriginalTokens != null) {
-        LanguageAwareTokenizer.alignAndTokenizeTranslation(text, alignedOriginalTokens, languageCode)
-    } else {
-        LanguageAwareTokenizer.tokenize(text, languageCode)
-    }
+    val tokens =
+        if (alignedOriginalTokens != null) {
+            LanguageAwareTokenizer.alignAndTokenizeTranslation(
+                text,
+                alignedOriginalTokens,
+                languageCode,
+            )
+        } else {
+            LanguageAwareTokenizer.tokenize(text, languageCode)
+        }
     return tokens.firstOrNull { charOffset >= it.startIndex && charOffset < it.endIndex }
 }
