@@ -102,6 +102,7 @@ internal fun SavedWordsScreen(
                         Text("Your reviews are saved. Come back when more words are due.")
                         TextButton(onClick = { practice = false }) { Text("Back to saved words") }
                     } else {
+                        PracticeTransferControls(repository, words)
                         Text("${words.size} ${if (words.size == 1) "word" else "words"} · ${due.size} due")
                         Button(enabled = due.isNotEmpty(), modifier = Modifier.testTag("practice_words"), onClick = {
                             queue = due.map { it.id }; practice = true

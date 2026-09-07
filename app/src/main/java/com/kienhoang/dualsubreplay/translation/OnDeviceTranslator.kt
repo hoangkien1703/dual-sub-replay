@@ -6,15 +6,17 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class OnDeviceTranslator {
+    private val cache = TranslationCache()
     private val modelDownloadMutex = Mutex()
     private val preparedPairs = mutableSetOf<String>()
 
@@ -46,10 +48,11 @@ class OnDeviceTranslator {
         if (text.isBlank()) return text
         val languages = resolveLanguages(sourceLanguageCode, targetLanguageCode)
         if (languages.source == languages.target) return text
+        cache.get(languages.source, languages.target, text)?.let { return it }
         val translator = newTranslator(languages)
         return try {
             ensureModelReady(languages, translator)
-            translator.translate(text).awaitResult()
+            translator.translate(text).awaitResult().also { cache.put(languages.source, languages.target, text, it) }
         } finally {
             translator.close()
         }
@@ -72,7 +75,12 @@ class OnDeviceTranslator {
         try {
             ensureModelReady(languages, translator, onDownloadingChange)
             texts.indices.forEach { index ->
-                onTranslation(index, translator.translate(texts[index]).awaitResult())
+                kotlinx.coroutines.currentCoroutineContext().ensureActive()
+                val text = texts[index]
+                val translated =
+                    cache.get(languages.source, languages.target, text)
+                        ?: translator.translate(text).awaitResult().also { cache.put(languages.source, languages.target, text, it) }
+                onTranslation(index, translated)
             }
         } finally {
             translator.close()
@@ -85,23 +93,27 @@ class OnDeviceTranslator {
     ): TranslationPair {
         val normalizedSource = TranslationLanguages.normalize(sourceLanguageCode)
         val normalizedTarget = TranslationLanguages.normalize(targetLanguageCode)
-        val source = TranslateLanguage.fromLanguageTag(normalizedSource)
-            ?: throw IllegalArgumentException(
-                "${TranslationLanguages.displayName(sourceLanguageCode)} translation is not supported.",
-            )
-        val target = TranslateLanguage.fromLanguageTag(normalizedTarget)
-            ?: throw IllegalArgumentException(
-                "${TranslationLanguages.displayName(targetLanguageCode)} translation is not supported.",
-            )
+        val source =
+            TranslateLanguage.fromLanguageTag(normalizedSource)
+                ?: throw IllegalArgumentException(
+                    "${TranslationLanguages.displayName(sourceLanguageCode)} translation is not supported.",
+                )
+        val target =
+            TranslateLanguage.fromLanguageTag(normalizedTarget)
+                ?: throw IllegalArgumentException(
+                    "${TranslationLanguages.displayName(targetLanguageCode)} translation is not supported.",
+                )
         return TranslationPair(source, target)
     }
 
-    private fun newTranslator(languages: TranslationPair): Translator = Translation.getClient(
-        TranslatorOptions.Builder()
-            .setSourceLanguage(languages.source)
-            .setTargetLanguage(languages.target)
-            .build(),
-    )
+    private fun newTranslator(languages: TranslationPair): Translator =
+        Translation.getClient(
+            TranslatorOptions
+                .Builder()
+                .setSourceLanguage(languages.source)
+                .setTargetLanguage(languages.target)
+                .build(),
+        )
 
     private suspend fun ensureModelReady(
         languages: TranslationPair,
@@ -128,13 +140,17 @@ class OnDeviceTranslator {
         }
     }
 
-    private suspend fun <T> Task<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
-        addOnSuccessListener { result -> if (continuation.isActive) continuation.resume(result) }
-        addOnFailureListener { error -> if (continuation.isActive) continuation.resumeWithException(error) }
-        addOnCanceledListener { continuation.cancel() }
-    }
+    private suspend fun <T> Task<T>.awaitResult(): T =
+        suspendCancellableCoroutine { continuation ->
+            addOnSuccessListener { result -> if (continuation.isActive) continuation.resume(result) }
+            addOnFailureListener { error -> if (continuation.isActive) continuation.resumeWithException(error) }
+            addOnCanceledListener { continuation.cancel() }
+        }
 
-    private data class TranslationPair(val source: String, val target: String)
+    private data class TranslationPair(
+        val source: String,
+        val target: String,
+    )
 
     private companion object {
         const val MODEL_DOWNLOAD_TIMEOUT_MS = 45_000L

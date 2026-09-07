@@ -1,0 +1,64 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 2462390 Realtime: 2462390
+
+** MEMINFO in pid 10463 [com.kienhoang.dualsubreplay.qualityqa] **
+                   Pss  Private  Private     Swap      Rss     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------   ------
+  Native Heap     8440     8356        0        0    12232    22388    16408     1546
+  Dalvik Heap     1650     1448        0        0     9368     4525     2327     2198
+ Dalvik Other      729      708        0        0     1652
+        Stack      416      416        0        0      424
+       Ashmem       13        0        0        0      608
+    Other dev       13        0       12        0      248
+     .so mmap     1912      284        0        0    38864
+    .jar mmap     1206        0        0        0    34316
+    .apk mmap      194       44        0        0     1412
+    .ttf mmap       49        0        0        0      384
+    .dex mmap     8063       28     8020        0     8912
+    .oat mmap      382        0        0        0    10780
+    .art mmap     1198      552       12        0    31896
+   Other mmap       72        4        0        0     1632
+      Unknown     2250     2244        0        0     3176
+        TOTAL    26587    14084     8044        0   155904    26913    18735     3744
+
+ App Summary
+                       Pss(KB)                        Rss(KB)
+                        ------                         ------
+           Java Heap:     2012                          41264
+         Native Heap:     8356                          12232
+                Code:     8392                          94684
+               Stack:      416                            424
+            Graphics:        0                              0
+       Private Other:     2952
+              System:     4459
+             Unknown:                                    7300
+
+           TOTAL PSS:    26587            TOTAL RSS:   155904      TOTAL SWAP (KB):        0
+
+ Objects
+               Views:        8         ViewRootImpl:        1
+         AppContexts:        6           Activities:        1
+              Assets:        9        AssetManagers:        0
+       Local Binders:       14        Proxy Binders:       49
+       Parcel memory:        5         Parcel count:       23
+    Death Recipients:        0             WebViews:        0
+
+ Native Allocations
+                         Count                       Total(kB)
+                        ------                         ------
+    Other (malloced):      381                             34
+ Other (nonmalloced):       67                             51
+   Bitmap (malloced):        1                             13
+
+ SQL
+         MEMORY_USED:       76
+  PAGECACHE_OVERFLOW:       16          MALLOC_SIZE:       46
+
+ DATABASES
+      pgsz     dbsz   Lookaside(b) cache hits cache misses cache size  Dbname
+PER CONNECTION STATS
+         4       20             23     1    16     2  /data/user/0/com.kienhoang.dualsubreplay.qualityqa/databases/vocabulary.db
+POOL STATS
+     cache hits  cache misses    cache size  Dbname
+              1            17            18  /data/user/0/com.kienhoang.dualsubreplay.qualityqa/databases/vocabulary.db

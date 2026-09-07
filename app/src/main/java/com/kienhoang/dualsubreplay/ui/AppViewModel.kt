@@ -50,6 +50,9 @@ data class DualSubUiState(
     val resolvedSourceLanguage: String? = null,
     val generatedCaptions: Boolean = false,
     val segments: List<SubtitleSegment> = emptyList(),
+    val playbackPaused: Boolean = false,
+    val originalVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
+    val translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     val currentIndex: Int = -1,
     val activeWordIndex: Int = -1,
     val fontScale: Float = 1f,
@@ -244,6 +247,8 @@ class AppViewModel internal constructor(application: Application, private val ca
             browserUrl = preferences.getString("last_browser_url", YOUTUBE_HOME_URL)
                 ?.let(::trustedEmbeddedUrlOrHome)
                 ?: YOUTUBE_HOME_URL,
+            originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
+            translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
             fontScale = preferences.getFloat("font_scale", 1f),
             sourcePreference = storedSourcePreference(
                 preferences.getString("preferred_caption_language", "auto"),
@@ -306,7 +311,32 @@ class AppViewModel internal constructor(application: Application, private val ca
     )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
+    private val visibilityListener =
+        android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == ORIGINAL_VISIBILITY || key == TRANSLATED_VISIBILITY || key == null) {
+                _state.update {
+                    it.copy(
+                        originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
+                        translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
+                    )
+                }
+            }
+        }
+
+    override fun onCleared() {
+        preferences.unregisterOnSharedPreferenceChangeListener(visibilityListener)
+        super.onCleared()
+    }
+
+    internal fun onWebPlaybackPaused(
+        videoId: String,
+        paused: Boolean,
+    ) {
+        _state.update { if (it.activeVideoId == videoId) it.copy(playbackPaused = paused) else it }
+    }
+
     init {
+        preferences.registerOnSharedPreferenceChangeListener(visibilityListener)
         viewModelScope.launch {
             try {
                 vocabulary.refresh()
@@ -686,6 +716,8 @@ class AppViewModel internal constructor(application: Application, private val ca
                 wordHighlightEnabled = true,
                 karaokeTimingMode = KaraokeTimingMode.ADAPTIVE,
                 customColorsEnabled = true,
+                originalVisibility = CaptionVisibility.ALWAYS,
+                translatedVisibility = CaptionVisibility.ALWAYS,
                 splitLongSentencesEnabled = true,
                 lockOverlayToVideo = false,
                 preloadModelsEnabled = true,
@@ -765,6 +797,7 @@ class AppViewModel internal constructor(application: Application, private val ca
                 liveTranslated = if (preserveLive) it.liveTranslated else null,
                 retryingTranscript = preserveLive,
                 activeVideoId = videoId,
+                playbackPaused = false,
                 subtitlePanelVisible = showPanel,
                 availableSourceLanguages = emptyList(),
                 resolvedSourceLanguage = if (preserveLive) it.resolvedSourceLanguage else null,
@@ -891,67 +924,50 @@ class AppViewModel internal constructor(application: Application, private val ca
         targetLanguage: String,
         segments: List<SubtitleSegment>,
     ) {
-        val working = segments.toMutableList()
-        val pending = segments.indices
-            .filter { working[it].translatedText == null }
-            .toMutableList()
-        val total = pending.size
-        var completed = 0
-
-        suspend fun publishProgress() {
-            val snapshot = working.toList()
-            val completedSoFar = completed
-            _state.update { current ->
-                if (!isCurrentLoad(current, videoId, generation)) return@update current
-                current.copy(
-                    segments = snapshot,
-                    statusMessage = "Translating $completedSoFar of $total…",
-                )
-            }
-        }
-
-        while (pending.isNotEmpty()) {
-            currentCoroutineContext().ensureActive()
-            val batch = nearestUntranslatedBatch(
-                pendingIndices = pending,
-                positionIndex = nearestSegmentIndex(segments, latestPlaybackSecondMs),
-            )
-            translator.translateAll(
-                sourceLanguageCode = sourceLanguage,
-                targetLanguageCode = targetLanguage,
-                texts = batch.map { segments[it].originalText },
-                onDownloadingChange = { isDownloading ->
-                    _state.update { current ->
-                        current.copy(
-                            isDownloadingTranslationModel = isDownloading,
-                            statusMessage = if (isDownloading) {
-                                "Downloading ${TranslationLanguages.displayName(targetLanguage)} model (one-time setup)…"
-                            } else current.statusMessage,
-                        )
-                    }
-                },
-            ) { batchOffset, rawTranslatedText ->
-                val index = batch[batchOffset]
-                val translatedText = if (_state.value.naturalSubtitlesEnabled) {
-                    SubtitleMerger.formatNaturalTranslation(rawTranslatedText)
-                } else {
-                    rawTranslatedText
+        translateCaptionUnits(
+            translator = translator,
+            sourceLanguage = sourceLanguage,
+            targetLanguage = targetLanguage,
+            display = segments,
+            source = rawMergedSegments,
+            natural = _state.value.naturalSubtitlesEnabled,
+            playbackTime = { latestPlaybackSecondMs },
+            onDownloading = { downloading ->
+                _state.update { current ->
+                    if (!isCurrentLoad(current, videoId, generation)) return@update current
+                    current.copy(
+                        isDownloadingTranslationModel = downloading,
+                        statusMessage =
+                            if (downloading) {
+                                "Downloading ${TranslationLanguages.displayName(
+                                    targetLanguage,
+                                )} model…"
+                            } else {
+                                current.statusMessage
+                            },
+                    )
                 }
-                working[index] = working[index].copy(translatedText = translatedText)
-                completed += 1
-                publishProgress()
-            }
-            pending.removeAll(batch.toSet())
-        }
+            },
+            onProgress = { snapshot, completed, total ->
+                _state.update { current ->
+                    if (!isCurrentLoad(current, videoId, generation)) return@update current
+                    current.copy(
+                        segments = snapshot,
+                        statusMessage = "Translating $completed of $total…",
+                    )
+                }
+            },
+        )
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             current.copy(
                 stage = LoadStage.READY,
-                statusMessage = if (current.generatedCaptions) {
-                    "Using auto-generated captions"
-                } else {
-                    "Captions ready"
-                },
+                statusMessage =
+                    if (current.generatedCaptions) {
+                        "Using auto-generated captions"
+                    } else {
+                        "Captions ready"
+                    },
             )
         }
     }

@@ -1,0 +1,82 @@
+{
+  "apk_path": "app/build/outputs/apk/release/app-release.apk",
+  "total_bytes": 29728445,
+  "total_mb": 28.35,
+  "max_bytes_limit": 80000000,
+  "stretch_target_bytes": 40000000,
+  "below_limit": true,
+  "below_stretch_target": true,
+  "compressed_breakdown": {
+    "dex_bytes": 1678948,
+    "resources_bytes": 755990,
+    "assets_bytes": 22781,
+    "per_abi_bytes": {
+      "arm64-v8a": 6783889,
+      "armeabi-v7a": 5999034,
+      "x86": 7256435,
+      "x86_64": 7102616
+    }
+  },
+  "top_10_largest_entries": [
+    {
+      "path": "lib/x86/libtranslate_jni.so",
+      "compressed_bytes": 7251653,
+      "uncompressed_bytes": 17258012
+    },
+    {
+      "path": "lib/x86_64/libtranslate_jni.so",
+      "compressed_bytes": 7098002,
+      "uncompressed_bytes": 17371632
+    },
+    {
+      "path": "lib/arm64-v8a/libtranslate_jni.so",
+      "compressed_bytes": 6779503,
+      "uncompressed_bytes": 16361048
+    },
+    {
+      "path": "lib/armeabi-v7a/libtranslate_jni.so",
+      "compressed_bytes": 5994970,
+      "uncompressed_bytes": 11608808
+    },
+    {
+      "path": "classes.dex",
+      "compressed_bytes": 1678948,
+      "uncompressed_bytes": 3360212
+    },
+    {
+      "path": "resources.arsc",
+      "compressed_bytes": 296524,
+      "uncompressed_bytes": 296524
+    },
+    {
+      "path": "res/8N.jpg",
+      "compressed_bytes": 245040,
+      "uncompressed_bytes": 245040
+    },
+    {
+      "path": "res/s6.jpg",
+      "compressed_bytes": 116763,
+      "uncompressed_bytes": 116763
+    },
+    {
+      "path": "okhttp3/internal/publicsuffix/publicsuffixes.gz",
+      "compressed_bytes": 41409,
+      "uncompressed_bytes": 41394
+    },
+    {
+      "path": "assets/licenses/GPL-3.0.txt",
+      "compressed_bytes": 12289,
+      "uncompressed_bytes": 35823
+    }
+  ],
+  "package_name": "com.kienhoang.dualsubreplay.MainActivity",
+  "permissions": [
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.BIND_JOB_SERVICE",
+    "android.permission.DUMP",
+    "android.permission.INTERNET",
+    "com.kienhoang.dualsubreplay.qualityqa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "forbidden_permissions_found": [],
+  "forbidden_components_found": []
+}

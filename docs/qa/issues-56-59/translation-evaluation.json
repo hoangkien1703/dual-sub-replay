@@ -1,0 +1,80 @@
+[
+  {
+    "source": "en",
+    "target": "vi",
+    "fragments": [
+      "I gave up",
+      "because it was raining."
+    ],
+    "before": [
+      "Tôi từ bỏ",
+      "Vì trời đang mưa."
+    ],
+    "after": "Tôi đã từ bỏ vì trời đang mưa."
+  },
+  {
+    "source": "en",
+    "target": "vi",
+    "fragments": [
+      "Could you give me",
+      "a hand with this box?"
+    ],
+    "before": [
+      "Bạn có thể cho tôi",
+      "Một bàn tay với chiếc hộp này?"
+    ],
+    "after": "Bạn có thể cho tôi một tay với hộp này?"
+  },
+  {
+    "source": "en",
+    "target": "vi",
+    "fragments": [
+      "She has been working",
+      "here for five years."
+    ],
+    "before": [
+      "Cô ấy đã làm việc",
+      "Ở đây trong năm năm."
+    ],
+    "after": "Cô đã làm việc ở đây trong năm năm."
+  },
+  {
+    "source": "en",
+    "target": "vi",
+    "fragments": [
+      "If I had known,",
+      "I would have called you."
+    ],
+    "before": [
+      "Nếu tôi biết,",
+      "Tôi sẽ gọi bạn."
+    ],
+    "after": "Nếu tôi biết, tôi sẽ gọi bạn."
+  },
+  {
+    "source": "vi",
+    "target": "en",
+    "fragments": [
+      "Tôi đã sống ở đây",
+      "được năm năm rồi."
+    ],
+    "before": [
+      "I lived here",
+      "It's five years ago."
+    ],
+    "after": "I have lived here for five years."
+  },
+  {
+    "source": "ja",
+    "target": "vi",
+    "fragments": [
+      "雨が降っていたので",
+      "出かけるのをやめました。"
+    ],
+    "before": [
+      "Bởi vì trời đang mưa",
+      "Tôi đã ngừng đi ra ngoài."
+    ],
+    "after": "Tôi đã ngừng đi ra ngoài vì trời đang mưa."
+  }
+]

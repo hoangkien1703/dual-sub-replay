@@ -13,6 +13,7 @@ internal data class WebPlaybackSnapshot(
     val controlsVisible: Boolean = false,
     val liveCaption: LiveCaptionSample? = null,
     val nativeDialogVisible: Boolean = false,
+    val paused: Boolean = false,
 )
 
 internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
@@ -60,6 +61,7 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
       return JSON.stringify({
         url: window.location.href,
         currentSecond: second,
+        paused: !!video && video.paused === true,
         controlsVisible: controlsVisible,
         nativeDialogVisible: nativeDialogVisible,
         liveCaption: liveState ? {
@@ -224,9 +226,12 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             state.videoId = videoId;
             state.languageCode = languageCode;
             const video = state.activeVideo();
-            const mediaSecond = Number.isFinite(state.latestMediaSecond)
-              ? state.latestMediaSecond
-              : (video && Number.isFinite(video.currentTime) ? video.currentTime : null);
+            // Android's fullscreen custom video surface can stop frame callbacks on
+            // the page element. Timestamp new captions from the same media clock as
+            // playback snapshots, never from the last (possibly frozen) frame.
+            const mediaSecond = video && Number.isFinite(video.currentTime)
+              ? video.currentTime
+              : null;
             state.text = text;
             state.captionMediaSecond = mediaSecond;
             state.revision += 1;
@@ -349,6 +354,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
             } else {
                 json.getDouble("currentSecond").toFloat()
             },
+            paused = json.optBoolean("paused", false),
             controlsVisible = json.optBoolean("controlsVisible", false),
             nativeDialogVisible = json.optBoolean("nativeDialogVisible", false),
             liveCaption = liveCaption,

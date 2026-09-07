@@ -1,0 +1,482 @@
+{
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/data/SubtitleSplitterDeviceTest.kt": {
+    "standard:multiline-expression-wrapping": 1
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/data/VocabularyRepositoryTest.kt": {
+    "standard:no-wildcard-imports": 1,
+    "standard:function-signature": 10,
+    "standard:argument-list-wrapping": 11,
+    "standard:multiline-expression-wrapping": 8,
+    "standard:chain-method-continuation": 18,
+    "standard:try-catch-finally-spacing": 10,
+    "standard:statement-wrapping": 15
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/BrowseWebViewLifecycleTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 11,
+    "standard:function-signature": 15,
+    "standard:statement-wrapping": 8,
+    "standard:try-catch-finally-spacing": 4,
+    "standard:wrapping": 10,
+    "standard:string-template-indent": 5
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/CaptionRecoveryStateTest.kt": {
+    "standard:no-wildcard-imports": 3,
+    "standard:multiline-expression-wrapping": 2,
+    "standard:function-signature": 4
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/LearningPlayerUiTest.kt": {
+    "standard:chain-method-continuation": 8,
+    "standard:multiline-expression-wrapping": 1
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/NavigationRecoveryUiTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:no-wildcard-imports": 3,
+    "standard:chain-method-continuation": 4,
+    "standard:statement-wrapping": 8,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:wrapping": 5,
+    "standard:argument-list-wrapping": 5,
+    "standard:trailing-comma-on-call-site": 1
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/SavedWordsScreenTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:no-wildcard-imports": 3,
+    "standard:multiline-expression-wrapping": 2,
+    "standard:wrapping": 5,
+    "standard:argument-list-wrapping": 6,
+    "standard:trailing-comma-on-call-site": 1,
+    "standard:chain-method-continuation": 4,
+    "standard:statement-wrapping": 1
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/SubtitleUiTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:chain-method-continuation": 2
+  },
+  "app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/WordLearningDialogTest.kt": {
+    "standard:no-wildcard-imports": 3,
+    "standard:multiline-expression-wrapping": 4,
+    "standard:wrapping": 12,
+    "standard:argument-list-wrapping": 20,
+    "standard:trailing-comma-on-call-site": 3,
+    "standard:function-literal": 6,
+    "standard:statement-wrapping": 9,
+    "standard:spacing-between-declarations-with-annotations": 1,
+    "standard:blank-line-before-declaration": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/MainActivity.kt": {
+    "standard:multiline-expression-wrapping": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/CaptionDocumentParser.kt": {
+    "standard:class-signature": 3,
+    "standard:multiline-expression-wrapping": 13,
+    "standard:function-signature": 16,
+    "standard:chain-method-continuation": 3
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/CaptionProvider.kt": {
+    "standard:function-signature": 3,
+    "standard:class-signature": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/LanguageAwareTokenizer.kt": {
+    "standard:class-signature": 3,
+    "standard:no-multi-spaces": 5,
+    "standard:trailing-comma-on-declaration-site": 1,
+    "standard:multiline-expression-wrapping": 29,
+    "standard:function-signature": 7,
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:argument-list-wrapping": 370,
+    "standard:trailing-comma-on-call-site": 15,
+    "standard:chain-wrapping": 1,
+    "standard:blank-line-before-declaration": 2,
+    "standard:wrapping": 2,
+    "standard:binary-expression-wrapping": 4,
+    "standard:max-line-length": 1,
+    "standard:indent": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/SavedWord.kt": {
+    "standard:class-signature": 4,
+    "standard:function-signature": 22,
+    "standard:wrapping": 6,
+    "standard:argument-list-wrapping": 23,
+    "standard:trailing-comma-on-call-site": 3,
+    "standard:blank-line-before-declaration": 1,
+    "standard:multiline-expression-wrapping": 3,
+    "standard:chain-method-continuation": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/SubtitleMerger.kt": {
+    "standard:multiline-expression-wrapping": 19,
+    "standard:function-signature": 20,
+    "standard:chain-method-continuation": 1,
+    "standard:if-else-bracing": 1,
+    "standard:if-else-wrapping": 1,
+    "standard:multiline-if-else": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/VocabularyRepository.kt": {
+    "standard:class-signature": 3,
+    "standard:multiline-expression-wrapping": 17,
+    "standard:blank-line-before-declaration": 2,
+    "standard:function-signature": 13,
+    "standard:function-expression-body": 1,
+    "standard:chain-method-continuation": 2,
+    "standard:argument-list-wrapping": 12,
+    "standard:if-else-wrapping": 7,
+    "standard:if-else-bracing": 2,
+    "standard:multiline-if-else": 4,
+    "standard:function-literal": 4,
+    "standard:wrapping": 15,
+    "standard:statement-wrapping": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/WordTiming.kt": {
+    "standard:no-consecutive-comments": 1,
+    "standard:function-signature": 7,
+    "standard:multiline-expression-wrapping": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/YouTubeCaptionProvider.kt": {
+    "standard:import-ordering": 1,
+    "standard:class-signature": 8,
+    "standard:blank-line-before-declaration": 1,
+    "standard:multiline-expression-wrapping": 22,
+    "standard:function-signature": 23,
+    "standard:chain-method-continuation": 10,
+    "standard:no-empty-first-line-in-class-body": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/data/YouTubeUrlParser.kt": {
+    "standard:multiline-expression-wrapping": 3,
+    "standard:chain-method-continuation": 5,
+    "standard:function-signature": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/translation/OnDeviceTranslator.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 4,
+    "standard:function-signature": 2,
+    "standard:chain-method-continuation": 1,
+    "standard:class-signature": 3
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/translation/TranslationLanguages.kt": {
+    "standard:multiline-expression-wrapping": 2,
+    "standard:function-signature": 3
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/AppNavigation.kt": {
+    "standard:import-ordering": 1,
+    "standard:no-wildcard-imports": 3,
+    "standard:function-naming": 1,
+    "standard:argument-list-wrapping": 2,
+    "standard:statement-wrapping": 6,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:chain-method-continuation": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/AppViewModel.kt": {
+    "standard:import-ordering": 1,
+    "standard:function-signature": 44,
+    "standard:multiline-expression-wrapping": 48,
+    "standard:chain-method-continuation": 9,
+    "standard:class-signature": 3,
+    "standard:argument-list-wrapping": 25,
+    "standard:max-line-length": 7,
+    "standard:blank-line-before-declaration": 1,
+    "standard:try-catch-finally-spacing": 5,
+    "standard:statement-wrapping": 6,
+    "standard:keyword-spacing": 1,
+    "standard:function-literal": 12,
+    "standard:wrapping": 7,
+    "standard:binary-expression-wrapping": 4,
+    "standard:function-expression-body": 1,
+    "standard:if-else-wrapping": 2,
+    "standard:if-else-bracing": 1,
+    "standard:multiline-if-else": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/AppearanceCustomizationSettings.kt": {
+    "standard:function-naming": 2,
+    "standard:multiline-expression-wrapping": 5,
+    "standard:chain-method-continuation": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/DualSubApp.kt": {
+    "standard:import-ordering": 1,
+    "standard:function-naming": 15,
+    "standard:statement-wrapping": 10,
+    "standard:function-literal": 8,
+    "standard:chain-method-continuation": 16,
+    "standard:argument-list-wrapping": 17,
+    "standard:max-line-length": 17,
+    "standard:if-else-wrapping": 2,
+    "standard:multiline-if-else": 2,
+    "standard:multiline-expression-wrapping": 51,
+    "standard:wrapping": 5,
+    "standard:indent": 98,
+    "standard:function-signature": 11,
+    "standard:binary-expression-wrapping": 8,
+    "standard:trailing-comma-on-call-site": 1,
+    "standard:parameter-list-wrapping": 1,
+    "standard:class-signature": 3
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/GuideScreen.kt": {
+    "standard:function-naming": 3,
+    "standard:multiline-expression-wrapping": 6,
+    "standard:function-signature": 4,
+    "standard:max-line-length": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/KaraokeTiming.kt": {
+    "standard:class-signature": 2,
+    "standard:multiline-expression-wrapping": 11,
+    "standard:function-signature": 3,
+    "standard:chain-method-continuation": 3
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/LanguageSetupScreen.kt": {
+    "standard:function-naming": 2,
+    "standard:multiline-expression-wrapping": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/LearningPlayerRoot.kt": {
+    "standard:import-ordering": 1,
+    "standard:class-signature": 2,
+    "standard:function-signature": 3,
+    "standard:multiline-expression-wrapping": 30,
+    "standard:if-else-wrapping": 1,
+    "standard:multiline-if-else": 1,
+    "standard:indent": 71,
+    "standard:function-naming": 3,
+    "standard:chain-method-continuation": 5,
+    "standard:no-blank-line-before-rbrace": 1,
+    "standard:no-consecutive-blank-lines": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/LiveSubtitleRecovery.kt": {
+    "standard:no-wildcard-imports": 2,
+    "standard:class-signature": 5,
+    "standard:function-signature": 14,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:chain-method-continuation": 1,
+    "standard:blank-line-before-declaration": 3,
+    "standard:statement-wrapping": 3,
+    "standard:function-naming": 1,
+    "standard:argument-list-wrapping": 5
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/MovableSubtitleFab.kt": {
+    "standard:function-signature": 4,
+    "standard:function-naming": 1,
+    "standard:multiline-expression-wrapping": 14,
+    "standard:chain-method-continuation": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/SavedWordsScreen.kt": {
+    "standard:import-ordering": 1,
+    "standard:no-wildcard-imports": 4,
+    "standard:multiline-expression-wrapping": 3,
+    "standard:function-signature": 1,
+    "standard:if-else-bracing": 2,
+    "standard:if-else-wrapping": 5,
+    "standard:multiline-if-else": 5,
+    "standard:function-naming": 1,
+    "standard:try-catch-finally-spacing": 19,
+    "standard:statement-wrapping": 42,
+    "standard:keyword-spacing": 5,
+    "standard:blank-line-before-declaration": 1,
+    "standard:argument-list-wrapping": 57,
+    "standard:function-literal": 28,
+    "standard:chain-method-continuation": 4,
+    "standard:max-line-length": 8,
+    "standard:wrapping": 11,
+    "standard:trailing-comma-on-call-site": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/SettingsRepositoryLink.kt": {
+    "standard:import-ordering": 1,
+    "standard:no-wildcard-imports": 2,
+    "standard:function-naming": 1,
+    "standard:function-signature": 3,
+    "standard:multiline-expression-wrapping": 4,
+    "standard:wrapping": 10,
+    "standard:argument-list-wrapping": 7,
+    "standard:indent": 3,
+    "standard:try-catch-finally-spacing": 5,
+    "standard:statement-wrapping": 9,
+    "standard:keyword-spacing": 1,
+    "standard:trailing-comma-on-call-site": 3,
+    "standard:chain-method-continuation": 6,
+    "standard:function-literal": 2,
+    "standard:binary-expression-wrapping": 2,
+    "standard:max-line-length": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/SubtitleColors.kt": {
+    "standard:function-signature": 11,
+    "standard:multiline-expression-wrapping": 4
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/SubtitleWordHighlight.kt": {
+    "standard:class-signature": 4,
+    "standard:function-signature": 4,
+    "standard:multiline-expression-wrapping": 5,
+    "standard:if-else-wrapping": 4,
+    "standard:if-else-bracing": 2,
+    "standard:multiline-if-else": 2
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/WordLearningSheet.kt": {
+    "standard:no-wildcard-imports": 3,
+    "standard:function-naming": 2,
+    "standard:try-catch-finally-spacing": 22,
+    "standard:statement-wrapping": 24,
+    "standard:keyword-spacing": 6,
+    "standard:argument-list-wrapping": 17,
+    "standard:max-line-length": 2,
+    "standard:chain-method-continuation": 2,
+    "standard:wrapping": 2,
+    "standard:trailing-comma-on-call-site": 1,
+    "standard:if-else-wrapping": 5,
+    "standard:multiline-if-else": 2,
+    "standard:function-signature": 5
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/WordPronouncer.kt": {
+    "standard:no-wildcard-imports": 1,
+    "standard:class-signature": 2,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:if-else-bracing": 1,
+    "standard:if-else-wrapping": 3,
+    "standard:multiline-if-else": 1,
+    "standard:blank-line-before-declaration": 3,
+    "standard:function-signature": 3,
+    "standard:statement-wrapping": 17
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/YouTubeBrowserScreen.kt": {
+    "standard:import-ordering": 1,
+    "standard:spacing-between-declarations-with-comments": 1,
+    "standard:multiline-expression-wrapping": 13,
+    "standard:class-signature": 3,
+    "standard:function-expression-body": 1,
+    "standard:function-signature": 25,
+    "standard:statement-wrapping": 5,
+    "standard:blank-line-before-declaration": 4,
+    "standard:function-naming": 2,
+    "standard:chain-method-continuation": 1,
+    "standard:trailing-comma-on-declaration-site": 1,
+    "standard:if-else-bracing": 1,
+    "standard:if-else-wrapping": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/YouTubeWebScripts.kt": {
+    "standard:indent": 5,
+    "standard:string-template-indent": 34,
+    "standard:multiline-expression-wrapping": 3,
+    "standard:function-signature": 5,
+    "standard:chain-method-continuation": 1
+  },
+  "app/src/main/java/com/kienhoang/dualsubreplay/ui/theme/Theme.kt": {
+    "standard:multiline-expression-wrapping": 4,
+    "standard:function-signature": 1,
+    "standard:function-naming": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/CaptionDocumentParserTest.kt": {
+    "standard:multiline-expression-wrapping": 7,
+    "standard:string-template-indent": 14,
+    "standard:chain-method-continuation": 4
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/LanguageAwareTokenizerTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:no-consecutive-blank-lines": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/LegacyVocabularyUpgradeTest.kt": {
+    "standard:no-wildcard-imports": 1,
+    "standard:multiline-expression-wrapping": 3
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/SavedWordTest.kt": {
+    "standard:no-wildcard-imports": 1,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:wrapping": 4,
+    "standard:argument-list-wrapping": 19,
+    "standard:trailing-comma-on-call-site": 2,
+    "standard:property-wrapping": 1,
+    "standard:max-line-length": 1,
+    "standard:spacing-between-declarations-with-annotations": 3,
+    "standard:blank-line-before-declaration": 3
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/SubtitleMergerTest.kt": {
+    "standard:multiline-expression-wrapping": 20,
+    "standard:chain-method-continuation": 3,
+    "standard:argument-list-wrapping": 11,
+    "standard:function-literal": 4,
+    "standard:max-line-length": 1,
+    "standard:wrapping": 2,
+    "standard:no-consecutive-blank-lines": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/WordTimingTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:multiline-expression-wrapping": 8,
+    "standard:no-consecutive-blank-lines": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/YouTubeCaptionFallbackTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 3,
+    "standard:string-template-indent": 2
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/YouTubeCaptionProviderTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/data/YouTubeUrlParserTest.kt": {
+    "standard:multiline-expression-wrapping": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/translation/TranslationLanguagesTest.kt": {
+    "standard:chain-method-continuation": 3
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/KaraokeTimingTest.kt": {
+    "standard:multiline-expression-wrapping": 9,
+    "standard:function-signature": 9
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/LandscapeResizeTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/LandscapeSplitViewTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/LearningPlayerRootTest.kt": {
+    "standard:multiline-expression-wrapping": 4,
+    "standard:chain-method-continuation": 2,
+    "standard:property-wrapping": 3,
+    "standard:argument-list-wrapping": 15,
+    "standard:max-line-length": 3,
+    "standard:no-consecutive-blank-lines": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/LiveSubtitleRecoveryTest.kt": {
+    "standard:no-wildcard-imports": 2,
+    "standard:multiline-expression-wrapping": 5,
+    "standard:function-signature": 1,
+    "standard:statement-wrapping": 8,
+    "standard:wrapping": 7,
+    "standard:argument-list-wrapping": 5,
+    "standard:trailing-comma-on-call-site": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/OnboardingPreferencesTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/OverlayDragRegressionTest.kt": {
+    "standard:multiline-expression-wrapping": 3
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/PlaybackArchitectureTest.kt": {
+    "standard:import-ordering": 1,
+    "standard:multiline-expression-wrapping": 4
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/SourcePreferenceTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:function-signature": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/SubtitleHighlightTest.kt": {
+    "standard:filename": 1,
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:multiline-expression-wrapping": 14
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/TranslationQueueTest.kt": {
+    "standard:no-empty-first-line-in-class-body": 1,
+    "standard:multiline-expression-wrapping": 1,
+    "standard:function-signature": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/WebNavigationPolicyTest.kt": {
+    "standard:multiline-expression-wrapping": 1
+  },
+  "app/src/test/java/com/kienhoang/dualsubreplay/ui/WordClipPlaybackTest.kt": {
+    "standard:no-wildcard-imports": 2,
+    "standard:multiline-expression-wrapping": 2,
+    "standard:function-signature": 1,
+    "standard:wrapping": 5,
+    "standard:argument-list-wrapping": 6,
+    "standard:trailing-comma-on-call-site": 1,
+    "standard:spacing-between-declarations-with-annotations": 2,
+    "standard:blank-line-before-declaration": 2,
+    "standard:statement-wrapping": 2
+  }
+}

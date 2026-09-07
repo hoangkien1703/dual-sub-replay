@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val appVersionCode = 29
-val appVersionName = "0.9.8"
+val appVersionCode = 30
+val appVersionName = "0.9.9"
 val releaseStoreFile = providers.environmentVariable("ANDROID_RELEASE_STORE_FILE").orNull
 val releaseStorePassword = providers.environmentVariable("ANDROID_RELEASE_STORE_PASSWORD").orNull
 val releaseKeyAlias = providers.environmentVariable("ANDROID_RELEASE_KEY_ALIAS").orNull
@@ -88,6 +88,15 @@ android {
                 "proguard-rules.pro",
             )
         }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".benchmark"
+            isDebuggable = false
+            isMinifyEnabled = !providers.gradleProperty("profileGeneration").isPresent
+            isShrinkResources = isMinifyEnabled
+            matchingFallbacks += "release"
+        }
     }
 
     packaging {
@@ -118,6 +127,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.06.01"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2026.06.01"))
 
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")

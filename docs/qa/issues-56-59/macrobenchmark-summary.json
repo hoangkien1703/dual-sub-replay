@@ -1,0 +1,99 @@
+{
+  "device": {
+    "build": {
+      "brand": "Android",
+      "device": "emu64x",
+      "fingerprint": "Android/sdk_phone64_x86_64/emu64x:16/BE2A.250530.026.D1/13818094:userdebug/test-keys",
+      "id": "BE2A.250530.026.D1",
+      "model": "Android SDK built for x86_64",
+      "type": "userdebug",
+      "version": {
+        "codename": "REL",
+        "sdk": 36
+      }
+    },
+    "cpuCoreCount": 2,
+    "cpuLocked": false,
+    "cpuMaxFreqHz": 2000,
+    "memTotalBytes": 2593079296,
+    "sustainedPerformanceModeEnabled": false,
+    "artMainlineVersion": 360499999,
+    "osCodenameAbbreviated": "REL",
+    "compilationMode": "run-from-apk",
+    "payload": {}
+  },
+  "caveat": "Emulator harness evidence, not physical-device acceptance; five iterations per journey.",
+  "benchmarks": [
+    {
+      "name": "subtitleScroll",
+      "totalRunTimeNs": 63509142291,
+      "warmupIterations": 0,
+      "repeatIterations": 5,
+      "metrics": {
+        "frameCount": {
+          "minimum": 103.0,
+          "maximum": 113.0,
+          "median": 109.0,
+          "coefficientOfVariation": 0.03432713198875176
+        }
+      },
+      "sampledMetrics": {
+        "frameDurationCpuMs": {
+          "P50": 21.087372,
+          "P90": 38.47875500000001,
+          "P95": 43.406231399999996,
+          "P99": 52.82423051999989
+        },
+        "frameOverrunMs": {
+          "P50": 13.537459,
+          "P90": 32.2429162,
+          "P95": 38.670438799999964,
+          "P99": 50.564023439999815
+        }
+      }
+    },
+    {
+      "name": "startup",
+      "totalRunTimeNs": 31986528513,
+      "warmupIterations": 0,
+      "repeatIterations": 5,
+      "metrics": {
+        "timeToInitialDisplayMs": {
+          "minimum": 947.025054,
+          "maximum": 1630.806371,
+          "median": 995.216619,
+          "coefficientOfVariation": 0.25620585906822557
+        }
+      },
+      "sampledMetrics": {}
+    },
+    {
+      "name": "practiceScroll",
+      "totalRunTimeNs": 50954358457,
+      "warmupIterations": 0,
+      "repeatIterations": 5,
+      "metrics": {
+        "frameCount": {
+          "minimum": 30.0,
+          "maximum": 33.0,
+          "median": 32.0,
+          "coefficientOfVariation": 0.038273277230987154
+        }
+      },
+      "sampledMetrics": {
+        "frameDurationCpuMs": {
+          "P50": 21.422320499999998,
+          "P90": 33.6598153,
+          "P95": 39.00172439999999,
+          "P99": 48.05210077999999
+        },
+        "frameOverrunMs": {
+          "P50": 11.522425,
+          "P90": 29.0950706,
+          "P95": 32.16990079999999,
+          "P99": 38.20495244
+        }
+      }
+    }
+  ]
+}
