@@ -1,0 +1,20 @@
+{
+  "orientation=1,fullscreen=false": {
+    "samples": 645,
+    "bridgeMedianMs": 25,
+    "bridgeP95Ms": 114,
+    "bridgeMaxMs": 1650
+  },
+  "orientation=2,fullscreen=false": {
+    "samples": 706,
+    "bridgeMedianMs": 16.0,
+    "bridgeP95Ms": 64,
+    "bridgeMaxMs": 2056
+  },
+  "orientation=2,fullscreen=true": {
+    "samples": 1649,
+    "bridgeMedianMs": 3,
+    "bridgeP95Ms": 77,
+    "bridgeMaxMs": 650
+  }
+}

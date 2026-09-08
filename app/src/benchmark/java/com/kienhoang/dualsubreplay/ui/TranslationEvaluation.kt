@@ -17,6 +17,7 @@ internal suspend fun evaluateTranslation(context: Context): String {
             Triple("en", "vi", listOf("Could you give me", "a hand with this box?")),
             Triple("en", "vi", listOf("She has been working", "here for five years.")),
             Triple("en", "vi", listOf("If I had known,", "I would have called you.")),
+            Triple("en", "vi", listOf("Could you give me a hand with this box,", "because it is too heavy for me to carry alone?")),
             Triple("vi", "en", listOf("Tôi đã sống ở đây", "được năm năm rồi.")),
             Triple("ja", "vi", listOf("雨が降っていたので", "出かけるのをやめました。")),
         )
@@ -26,7 +27,17 @@ internal suspend fun evaluateTranslation(context: Context): String {
         try {
             row.put("before", JSONArray(fragments.map { translator.translateSingle(source, target, it) }))
             val sentence = fragments.joinToString(if (source == "ja") "" else " ")
-            row.put("after", translator.translateSingle(source, target, sentence))
+            row.put("wholeSentence", translator.translateSingle(source, target, sentence))
+            val segments =
+                com.kienhoang.dualsubreplay.data.SubtitleMerger.merge(
+                    listOf(
+                        com.kienhoang.dualsubreplay.data
+                            .RawCaptionCue(0, 6000, sentence),
+                    ),
+                )
+            val short = captionDisplaySegments(segments, CaptionFormat.SHORT_PHRASES, true)
+            row.put("shortInputs", JSONArray(short.map { it.originalText }))
+            row.put("shortTranslations", JSONArray(short.map { translator.translateSingle(source, target, it.originalText) }))
         } catch (error: Exception) {
             if (error is kotlinx.coroutines.CancellationException) throw error
             row.put("error", error.message)

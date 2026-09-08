@@ -175,8 +175,8 @@ class KaraokeTimingTest {
                 strict = false,
             ),
         )
-        assertEquals(
-            KaraokePosition(0, 4),
+        // Even coherent live text must not hold Adaptive on an expired word.
+        assertNull(
             tracker.resolve(
                 sample = sample("it kind now", 4, 3_700),
                 segments = segments,
@@ -213,14 +213,22 @@ class KaraokeTimingTest {
         )
     }
 
-    private fun sample(text: String, revision: Long, mediaTimeMs: Long) = LiveCaptionSample(
+    private fun sample(
+        text: String,
+        revision: Long,
+        mediaTimeMs: Long,
+    ) = LiveCaptionSample(
         text = text,
         revision = revision,
         mediaTimeMs = mediaTimeMs,
         present = text.isNotBlank(),
     )
 
-    private fun segment(id: Long, startMs: Long, text: String): SubtitleSegment {
+    private fun segment(
+        id: Long,
+        startMs: Long,
+        text: String,
+    ): SubtitleSegment {
         val tokens = text.split(' ')
         val duration = tokens.size * 400L
         return SubtitleSegment(
@@ -228,13 +236,14 @@ class KaraokeTimingTest {
             startMs = startMs,
             endMs = startMs + duration,
             originalText = text,
-            words = tokens.mapIndexed { index, token ->
-                SubtitleWord(
-                    text = token,
-                    startMs = startMs + index * 400L,
-                    endMs = startMs + (index + 1) * 400L,
-                )
-            },
+            words =
+                tokens.mapIndexed { index, token ->
+                    SubtitleWord(
+                        text = token,
+                        startMs = startMs + index * 400L,
+                        endMs = startMs + (index + 1) * 400L,
+                    )
+                },
         )
     }
 }

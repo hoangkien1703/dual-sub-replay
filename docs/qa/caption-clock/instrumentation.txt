@@ -1,0 +1,24 @@
+
+com.kienhoang.dualsubreplay.data.PracticeImportTest:..
+com.kienhoang.dualsubreplay.data.SubtitleSplitterDeviceTest:.
+com.kienhoang.dualsubreplay.data.VocabularyRepositoryTest:......
+com.kienhoang.dualsubreplay.ui.BrowseWebViewLifecycleTest:......
+com.kienhoang.dualsubreplay.ui.CaptionFormatDeviceTest:..
+com.kienhoang.dualsubreplay.ui.CaptionPresentationUiTest:.
+com.kienhoang.dualsubreplay.ui.CaptionRecoveryStateTest:.
+com.kienhoang.dualsubreplay.ui.CaptionVisibilityPersistenceTest:.
+com.kienhoang.dualsubreplay.ui.FullscreenCaptionClockTest:.
+com.kienhoang.dualsubreplay.ui.GuideScreenTest:...
+com.kienhoang.dualsubreplay.ui.LanguageSetupScreenTest:...
+com.kienhoang.dualsubreplay.ui.LearningPlayerUiTest:..
+com.kienhoang.dualsubreplay.ui.NavigationRecoveryUiTest:..
+com.kienhoang.dualsubreplay.ui.PlaybackClockWebViewTest:.
+com.kienhoang.dualsubreplay.ui.SavedWordsScreenTest:.
+com.kienhoang.dualsubreplay.ui.SubtitleUiTest:....
+com.kienhoang.dualsubreplay.ui.WordLearningDialogTest:...
+
+Time: 187.873
+
+OK (40 tests)
+
+

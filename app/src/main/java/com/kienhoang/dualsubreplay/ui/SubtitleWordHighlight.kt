@@ -69,6 +69,7 @@ internal fun annotatedSubtitleText(
     preparedSpans: List<SubtitleWordSpan>? = null,
 ): AnnotatedString {
     if (text.isBlank()) return AnnotatedString("")
+    CaptionTimingDiagnostics.record("presentation") { "presentation word=$activeWordIndex" }
 
     val activeSpan =
         if (activeWordIndex >= 0 && words.isNotEmpty()) {

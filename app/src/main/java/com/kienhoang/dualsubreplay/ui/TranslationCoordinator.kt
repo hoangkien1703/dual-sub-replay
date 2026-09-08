@@ -11,7 +11,7 @@ internal data class CaptionTranslationUnit(
 )
 
 /** Display splitting must not remove the sentence context passed to ML Kit. */
-internal fun captionTranslationUnits(
+internal fun sentenceCaptionUnits(
     display: List<SubtitleSegment>,
     source: List<SubtitleSegment>,
     natural: Boolean,
@@ -75,31 +75,36 @@ internal suspend fun translateCaptionUnits(
     sourceLanguage: String,
     targetLanguage: String,
     display: List<SubtitleSegment>,
-    source: List<SubtitleSegment>,
-    natural: Boolean,
     playbackTime: () -> Long,
     onDownloading: (Boolean) -> Unit,
     onProgress: (List<SubtitleSegment>, Int, Int) -> Unit,
 ) {
+    translateDisplayCaptions(display, playbackTime, { text ->
+        var result = ""
+        translator.translateAll(sourceLanguage, targetLanguage, listOf(text), onDownloading) { _, translated -> result = translated }
+        result
+    }, onProgress)
+}
+
+internal suspend fun translateDisplayCaptions(
+    display: List<SubtitleSegment>,
+    playbackTime: () -> Long,
+    translate: suspend (String) -> String,
+    onProgress: (List<SubtitleSegment>, Int, Int) -> Unit,
+) {
     val working = display.toMutableList()
-    val pending =
-        captionTranslationUnits(display, source, natural)
-            .filter {
-                it.indices.any { index -> display[index].translatedText == null }
-            }.toMutableList()
+    val pending = display.indices.filter { display[it].translatedText == null }.toMutableList()
     val total = pending.size
     var completed = 0
     while (pending.isNotEmpty()) {
         currentCoroutineContext().ensureActive()
         val position = nearestSegmentIndex(display, playbackTime())
-        val unit = pending.minBy { candidate -> candidate.indices.minOf { kotlin.math.abs(it - position) } }
-        translator.translateAll(sourceLanguage, targetLanguage, listOf(unit.text), onDownloading) { _, text ->
-            currentCoroutineContext().ensureActive()
-            // One translation covers this source sentence's entire span. No invented word alignment.
-            unit.indices.forEach { index -> working[index] = working[index].copy(translatedText = text.trim()) }
-            completed++
-            onProgress(working.toList(), completed, total)
-        }
-        pending.remove(unit)
+        val index = pending.minBy { kotlin.math.abs(it - position) }
+        val text = translate(display[index].originalText)
+        currentCoroutineContext().ensureActive()
+        working[index] = working[index].copy(translatedText = text.trim())
+        completed++
+        onProgress(working.toList(), completed, total)
+        pending.remove(index)
     }
 }

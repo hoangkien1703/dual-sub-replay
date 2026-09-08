@@ -14,6 +14,11 @@ internal data class WebPlaybackSnapshot(
     val liveCaption: LiveCaptionSample? = null,
     val nativeDialogVisible: Boolean = false,
     val paused: Boolean = false,
+    val sampledAtEpochMs: Long = 0,
+    val playbackRate: Double = 1.0,
+    val seeking: Boolean = false,
+    val buffering: Boolean = false,
+    val sessionId: String = "",
 )
 
 internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
@@ -26,6 +31,25 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
       const video = videos.find(function(item) { return !item.paused && !item.ended; })
         || videos.find(function(item) { return item.readyState > 0; })
         || videos[0];
+      let clock = window.__dualSubPlaybackClock;
+      if (!clock) clock = window.__dualSubPlaybackClock = { next: 0, video: null, state: null };
+      if (video && (clock.video !== video || clock.state.source !== video.currentSrc)) {
+        clock.video = video;
+        const state = { id: String(performance.timeOrigin) + ':' + (++clock.next), source: video.currentSrc, waiting: false };
+        clock.state = state;
+        // Listeners belong to this element; retired elements cannot mutate the active state.
+        if (!video.__dualSubClockEvents) {
+          video.__dualSubClockEvents = true;
+          ['waiting', 'stalled', 'playing', 'seeked', 'seeking', 'emptied'].forEach(function(event) {
+            video.addEventListener(event, function() {
+              if (clock.video !== video) return;
+              if (event === 'seeking' || event === 'emptied') clock.state.id = String(performance.timeOrigin) + ':' + (++clock.next);
+              clock.state.waiting = event === 'waiting' || event === 'emptied';
+            });
+          });
+        }
+      }
+      const sampledAtEpochMs = Date.now();
       const second = video && Number.isFinite(video.currentTime) ? video.currentTime : null;
       const liveState = window['$LIVE_CAPTION_CAPTURE_STATE_KEY'];
       if (liveState && liveState.enabled) {
@@ -61,6 +85,11 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
       return JSON.stringify({
         url: window.location.href,
         currentSecond: second,
+        sampledAtEpochMs: sampledAtEpochMs,
+        playbackRate: video ? video.playbackRate : 1,
+        seeking: !!video && video.seeking,
+        buffering: !video || video.readyState < 3 || !!(clock.state && clock.state.waiting),
+        sessionId: video && clock.state ? clock.state.id : '',
         paused: !!video && video.paused === true,
         controlsVisible: controlsVisible,
         nativeDialogVisible: nativeDialogVisible,
@@ -269,7 +298,7 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
           state.frameLoop();
           return true;
         })();
-    """.trimIndent()
+        """.trimIndent()
 }
 
 internal fun webReplayScript(second: Float): String {
@@ -289,7 +318,7 @@ internal fun webReplayScript(second: Float): String {
           if (playRequest && playRequest.catch) playRequest.catch(function() {});
           return true;
         })();
-    """.trimIndent()
+        """.trimIndent()
 }
 
 /**
@@ -316,7 +345,7 @@ internal fun webCaptionVisibilityScript(hidden: Boolean): String {
           }
           return true;
         })();
-    """.trimIndent()
+        """.trimIndent()
 }
 
 internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
@@ -325,36 +354,43 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
         val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
         val json = JSONObject(decoded)
         if (!isYouTubeWebUrl(json.optString("url"))) return@runCatching null
-        val liveCaption = json.optJSONObject("liveCaption")?.let { live ->
-            val text = live.optString("text").replace(Regex("\\s+"), " ").trim()
-            val revision = live.optLong("revision", -1L)
-            val mediaSecond = live.optDouble("mediaSecond", Double.NaN)
-            if (
-                text.length <= MAX_LIVE_CAPTION_TEXT_LENGTH &&
-                revision >= 0L &&
-                mediaSecond.isFinite() &&
-                mediaSecond >= 0.0
-            ) {
-                LiveCaptionSample(
-                    text = text,
-                    revision = revision,
-                    mediaTimeMs = (mediaSecond * 1_000.0).toLong(),
-                    present = live.optBoolean("present", text.isNotBlank()) && text.isNotBlank(),
-                    videoId = live.optString("videoId").takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) },
-                    languageCode = live.optString("languageCode").takeIf { it.length in 2..35 && it != "null" },
-                )
-            } else {
-                null
+        val liveCaption =
+            json.optJSONObject("liveCaption")?.let { live ->
+                val text = live.optString("text").replace(Regex("\\s+"), " ").trim()
+                val revision = live.optLong("revision", -1L)
+                val mediaSecond = live.optDouble("mediaSecond", Double.NaN)
+                if (
+                    text.length <= MAX_LIVE_CAPTION_TEXT_LENGTH &&
+                    revision >= 0L &&
+                    mediaSecond.isFinite() &&
+                    mediaSecond >= 0.0
+                ) {
+                    LiveCaptionSample(
+                        text = text,
+                        revision = revision,
+                        mediaTimeMs = (mediaSecond * 1_000.0).toLong(),
+                        present = live.optBoolean("present", text.isNotBlank()) && text.isNotBlank(),
+                        videoId = live.optString("videoId").takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) },
+                        languageCode = live.optString("languageCode").takeIf { it.length in 2..35 && it != "null" },
+                    )
+                } else {
+                    null
+                }
             }
-        }
         WebPlaybackSnapshot(
             url = json.getString("url"),
-            currentSecond = if (json.isNull("currentSecond")) {
-                null
-            } else {
-                json.getDouble("currentSecond").toFloat()
-            },
+            currentSecond =
+                if (json.isNull("currentSecond")) {
+                    null
+                } else {
+                    json.getDouble("currentSecond").toFloat()
+                },
             paused = json.optBoolean("paused", false),
+            sampledAtEpochMs = json.optLong("sampledAtEpochMs", 0),
+            playbackRate = json.optDouble("playbackRate", 1.0),
+            seeking = json.optBoolean("seeking", false),
+            buffering = json.optBoolean("buffering", false),
+            sessionId = json.optString("sessionId", ""),
             controlsVisible = json.optBoolean("controlsVisible", false),
             nativeDialogVisible = json.optBoolean("nativeDialogVisible", false),
             liveCaption = liveCaption,
@@ -362,7 +398,8 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     }.getOrNull()
 }
 
-internal fun webPauseScript(): String = """
+internal fun webPauseScript(): String =
+    """
     (function() {
       const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
       if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
@@ -370,38 +407,45 @@ internal fun webPauseScript(): String = """
       document.querySelectorAll('video').forEach(function(video) { video.pause(); });
       return true;
     })();
-""".trimIndent()
-
-internal fun webClipReplayScript(videoId: String, startMs: Long, endMs: Long): String {
-    require(com.kienhoang.dualsubreplay.data.validClipRange(videoId, startMs, endMs))
-    return """
-      (function() {
-        const expected = '$videoId';
-        const valid = function() {
-          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
-          const url = new URL(window.location.href);
-          const id = url.searchParams.get('v') || url.pathname.split('/')[2];
-          return window.location.protocol === 'https:' && (host === 'youtube.com' || host.endsWith('.youtube.com')) && id === expected;
-        };
-        if (!valid()) return false;
-        clearInterval(window.__dualSubClipTimer);
-        let started = false;
-        const deadline = Date.now() + 30000;
-        window.__dualSubClipTimer = setInterval(function() {
-          if (!valid()) { clearInterval(window.__dualSubClipTimer); return; }
-          const video = document.querySelector('video');
-          if (!started && Date.now() > deadline) { clearInterval(window.__dualSubClipTimer); return; }
-          if (!video || video.readyState < 1 || document.querySelector('.ad-showing')) return;
-          if (!started) {
-            started = true;
-            video.currentTime = ${startMs / 1000.0};
-            const promise = video.play();
-            if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
-          } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
-            video.pause(); clearInterval(window.__dualSubClipTimer);
-          }
-        }, 50);
-        return true;
-      })();
     """.trimIndent()
+
+internal fun webClipReplayScript(
+    videoId: String,
+    startMs: Long,
+    endMs: Long,
+): String {
+    require(
+        com.kienhoang.dualsubreplay.data
+            .validClipRange(videoId, startMs, endMs),
+    )
+    return """
+        (function() {
+          const expected = '$videoId';
+          const valid = function() {
+            const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+            const url = new URL(window.location.href);
+            const id = url.searchParams.get('v') || url.pathname.split('/')[2];
+            return window.location.protocol === 'https:' && (host === 'youtube.com' || host.endsWith('.youtube.com')) && id === expected;
+          };
+          if (!valid()) return false;
+          clearInterval(window.__dualSubClipTimer);
+          let started = false;
+          const deadline = Date.now() + 30000;
+          window.__dualSubClipTimer = setInterval(function() {
+            if (!valid()) { clearInterval(window.__dualSubClipTimer); return; }
+            const video = document.querySelector('video');
+            if (!started && Date.now() > deadline) { clearInterval(window.__dualSubClipTimer); return; }
+            if (!video || video.readyState < 1 || document.querySelector('.ad-showing')) return;
+            if (!started) {
+              started = true;
+              video.currentTime = ${startMs / 1000.0};
+              const promise = video.play();
+              if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
+            } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
+              video.pause(); clearInterval(window.__dualSubClipTimer);
+            }
+          }, 50);
+          return true;
+        })();
+        """.trimIndent()
 }
