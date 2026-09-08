@@ -444,7 +444,7 @@ class AppViewModel internal constructor(
             updateLiveSubtitle(videoId, liveCaption, seek)
             return
         }
-        if (timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs) {
+        if (seek) {
             liveCaptionTracker.reset()
         }
         latestPlaybackSecondMs = timeMs
@@ -487,6 +487,7 @@ class AppViewModel internal constructor(
                 wordHighlightEnabled = current.wordHighlightEnabled,
                 timedPosition = timedPosition,
                 livePosition = livePosition,
+                transcriptWordsAvailable = current.segments.getOrNull(referenceIndex)?.words?.isNotEmpty() == true,
             )
         val index = effectivePosition?.segmentIndex ?: timedIndex
         val wordIndex = effectivePosition?.wordIndex ?: -1

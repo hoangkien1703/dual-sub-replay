@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
+import com.kienhoang.dualsubreplay.data.activeWordIndex
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -37,7 +38,7 @@ class KaraokeTimingTest {
             effectiveKaraokePosition(KaraokeTimingMode.YOUTUBE_LIVE, false, true, timed, live),
         )
         assertEquals(
-            live,
+            timed,
             effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, true, timed, live),
         )
         assertEquals(
@@ -53,6 +54,95 @@ class KaraokeTimingTest {
         )
         assertNull(
             effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, false, timed, live),
+        )
+    }
+
+    @Test
+    fun adaptiveKeepsWordBoundariesWhenLiveTextArrivesEarlyOrLate() {
+        val words = segment(0, 0, "one two three four").words
+        val tracker = LiveCaptionTracker()
+        val segments = listOf(segment(0, 0, "one two three four"))
+        tracker.resolve(sample("one", 1, 0), segments, 0, 0, false)
+
+        // A DOM update contains the NEXT word 150 ms before its timestamp.
+        val early = tracker.resolve(sample("one two", 2, 250), segments, 0, 250, false)
+        assertEquals(KaraokePosition(0, 1), early)
+        listOf(250L, 399L, 400L, 799L, 800L, 1200L).forEach { time ->
+            val timed = KaraokePosition(0, activeWordIndex(words, time))
+            assertEquals(
+                "DOM revision must not override playback at $time ms",
+                timed,
+                effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, true, timed, early),
+            )
+        }
+    }
+
+    @Test
+    fun adaptiveDoesNotHighlightLiveTextBeforeFirstWordOrBetweenCues() {
+        assertNull(
+            effectiveKaraokePosition(
+                KaraokeTimingMode.ADAPTIVE,
+                true,
+                true,
+                timedPosition = null,
+                livePosition = KaraokePosition(1, 0),
+                transcriptWordsAvailable = true,
+            ),
+        )
+    }
+
+    @Test
+    fun adaptiveCanUseLivePositionWhenTranscriptWordsAreUnavailable() {
+        val live = KaraokePosition(1, 0)
+        assertEquals(
+            live,
+            effectiveKaraokePosition(
+                KaraokeTimingMode.ADAPTIVE,
+                true,
+                true,
+                timedPosition = null,
+                livePosition = live,
+                transcriptWordsAvailable = false,
+            ),
+        )
+    }
+
+    @Test
+    fun adaptiveFollowsRatePauseAndSeekWhileLivePositionStaysUnchanged() {
+        val words = segment(0, 0, "one two three four").words
+        val clock = CaptionPlaybackClock()
+        val live = KaraokePosition(0, 3)
+        val initial = WebPlaybackSnapshot(
+            url = "https://m.youtube.com/watch?v=dQw4w9WgXcQ",
+            currentSecond = 0f,
+            sampledAtEpochMs = 1000,
+            playbackRate = 2.0,
+            sessionId = "playing",
+        )
+        assertTrue(clock.accept(initial, 100, 100, 1000))
+        assertAdaptiveWord(clock, words, live, 299, 0)
+        assertAdaptiveWord(clock, words, live, 300, 1)
+
+        val paused = initial.copy(currentSecond = 0.4f, sampledAtEpochMs = 1200, paused = true)
+        assertTrue(clock.accept(paused, 300, 300, 1200))
+        assertAdaptiveWord(clock, words, live, 500, 1)
+
+        val sought = initial.copy(currentSecond = 0f, sampledAtEpochMs = 1500, sessionId = "seek")
+        assertTrue(clock.accept(sought, 600, 600, 1500))
+        assertAdaptiveWord(clock, words, live, 600, 0)
+    }
+
+    private fun assertAdaptiveWord(
+        clock: CaptionPlaybackClock,
+        words: List<SubtitleWord>,
+        live: KaraokePosition,
+        now: Long,
+        expected: Int,
+    ) {
+        val timed = KaraokePosition(0, activeWordIndex(words, clock.position(now)!!))
+        assertEquals(
+            KaraokePosition(0, expected),
+            effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, true, timed, live),
         )
     }
 

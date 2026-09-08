@@ -48,9 +48,9 @@ internal fun estimateWordTimings(
 
 /**
  * Index of the word being spoken at [timeMs]. Between words the previously
- * started word stays highlighted so short gaps do not flicker. After the first
- * word has really started, upcoming word transitions are allowed to lead the
- * playback clock. Transport compensation now belongs to CaptionPlaybackClock.
+ * started word stays highlighted so short gaps do not flicker. Transitions happen
+ * at their timestamp, without a fixed lead. Transport compensation belongs to
+ * CaptionPlaybackClock.
  */
 internal fun activeWordIndex(
     words: List<SubtitleWord>,

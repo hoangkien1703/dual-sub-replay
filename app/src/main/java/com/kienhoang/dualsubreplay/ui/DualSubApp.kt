@@ -1197,7 +1197,7 @@ internal fun SubtitleSettingsDialog(
                             mode = KaraokeTimingMode.ADAPTIVE,
                             selectedMode = karaokeTimingMode,
                             title = "Adaptive (recommended)",
-                            description = "Use reliable live YouTube words for auto-generated captions, with transcript timing as a safe fallback.",
+                            description = "Follow word timestamps with the playback clock. Use live captions only when word timings are unavailable. Captions without word timestamps use estimated timing.",
                             onModeChange = onKaraokeTimingModeChange,
                         )
                         HorizontalDivider()
@@ -1205,7 +1205,7 @@ internal fun SubtitleSettingsDialog(
                             mode = KaraokeTimingMode.YOUTUBE_LIVE,
                             selectedMode = karaokeTimingMode,
                             title = "Live YouTube captions",
-                            description = "Strict live timing for auto-generated captions. If the live word is unavailable, no word is highlighted. Manual captions keep transcript timing.",
+                            description = "Follow changes in YouTube's displayed captions. Text can arrive in batches, so highlighting may jump or lag. Manual captions keep transcript timing.",
                             onModeChange = onKaraokeTimingModeChange,
                         )
                         HorizontalDivider()

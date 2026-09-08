@@ -50,11 +50,16 @@ internal fun effectiveKaraokePosition(
     wordHighlightEnabled: Boolean,
     timedPosition: KaraokePosition?,
     livePosition: KaraokePosition?,
+    transcriptWordsAvailable: Boolean = true,
 ): KaraokePosition? =
     when {
         !wordHighlightEnabled -> null
         !generatedCaptions -> timedPosition
         mode == KaraokeTimingMode.TRANSCRIPT -> timedPosition
+        // DOM captions arrive in batches, not at acoustic word boundaries. Once
+        // we have word times, stay on the media clock even before the first word
+        // or between cues; a live update must not jump ahead or rewind a word.
+        mode == KaraokeTimingMode.ADAPTIVE && transcriptWordsAvailable -> timedPosition
         livePosition != null -> livePosition
         mode == KaraokeTimingMode.YOUTUBE_LIVE -> null
         else -> timedPosition
