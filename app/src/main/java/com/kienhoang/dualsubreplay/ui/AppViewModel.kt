@@ -61,7 +61,6 @@ data class DualSubUiState(
     val translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
     val highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
     val wordHighlightEnabled: Boolean = true,
-    val karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     val customColorsEnabled: Boolean = true,
     val captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     val isDownloadingTranslationModel: Boolean = false,
@@ -257,7 +256,7 @@ class AppViewModel internal constructor(
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
     private var rawMergedSegments: List<SubtitleSegment> = emptyList()
-    private val liveCaptionTracker = LiveCaptionTracker()
+    private var lastEngineSampleAt = 0L
     private val liveTranslationGate = LiveTranslationGate()
     private var liveTranslationJob: Job? = null
     private var rejectedLiveRevision: Long? = null
@@ -308,10 +307,6 @@ class AppViewModel internal constructor(
                 wordHighlightEnabled =
                     storedFeatureEnabled(
                         preferences.getBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, true),
-                    ),
-                karaokeTimingMode =
-                    storedKaraokeTimingMode(
-                        preferences.getString(KARAOKE_TIMING_MODE_PREFERENCE, null),
                     ),
                 customColorsEnabled =
                     storedFeatureEnabled(
@@ -381,6 +376,7 @@ class AppViewModel internal constructor(
     }
 
     init {
+        preferences.edit().remove(KARAOKE_TIMING_MODE_PREFERENCE).apply()
         preferences.registerOnSharedPreferenceChangeListener(visibilityListener)
         viewModelScope.launch {
             try {
@@ -441,11 +437,11 @@ class AppViewModel internal constructor(
                 timeMs > latestPlaybackSecondMs + 2_000L
         if (current.liveFallback) {
             latestPlaybackSecondMs = timeMs
-            updateLiveSubtitle(videoId, liveCaption, seek)
+            updateLiveFallbackPlayback(videoId, liveCaption, seek)
             return
         }
         if (seek) {
-            liveCaptionTracker.reset()
+            lastEngineSampleAt = 0L
         }
         latestPlaybackSecondMs = timeMs
         val timedIndex = activeSubtitleIndex(current.segments, timeMs)
@@ -455,45 +451,46 @@ class AppViewModel internal constructor(
             } else {
                 nearestSegmentIndex(current.segments, timeMs)
             }
-        val liveCaptureAllowed =
-            shouldCaptureLiveCaptions(
-                mode = current.karaokeTimingMode,
-                generatedCaptions = current.generatedCaptions,
-                wordHighlightEnabled = current.wordHighlightEnabled,
-            )
-        val livePosition =
-            if (liveCaptureAllowed) {
-                liveCaptionTracker.resolve(
-                    sample = liveCaption,
-                    segments = current.segments,
-                    referenceSegmentIndex = referenceIndex,
-                    playbackTimeMs = timeMs,
-                    strict = current.karaokeTimingMode == KaraokeTimingMode.YOUTUBE_LIVE,
-                )
-            } else {
-                null
-            }
-        val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
-        val timedPosition =
-            timedIndex
-                .takeIf { it >= 0 }
-                ?.let {
-                    KaraokePosition(segmentIndex = it, wordIndex = timedWordIndex)
-                }?.takeIf { it.wordIndex >= 0 }
-        val effectivePosition =
-            effectiveKaraokePosition(
-                mode = current.karaokeTimingMode,
-                generatedCaptions = current.generatedCaptions,
-                wordHighlightEnabled = current.wordHighlightEnabled,
-                timedPosition = timedPosition,
-                livePosition = livePosition,
-                transcriptWordsAvailable = current.segments.getOrNull(referenceIndex)?.words?.isNotEmpty() == true,
-            )
-        val index = effectivePosition?.segmentIndex ?: timedIndex
-        val wordIndex = effectivePosition?.wordIndex ?: -1
-        CaptionTimingDiagnostics.record("selection") {
-            "selection mediaMs=$timeMs captionMs=${liveCaption?.mediaTimeMs} segment=$index word=$wordIndex " +
-                "source=${if (effectivePosition != null && effectivePosition == livePosition) "live" else "transcript"}"
+        applyEngineCaption(videoId, liveCaption, current, referenceIndex, timedIndex, seek)
+    }
+
+    private fun updateLiveFallbackPlayback(videoId: String, liveCaption: LiveCaptionSample?, seek: Boolean) {
+        val engineEvent = liveCaption?.activeWordIndex != null
+        if (engineEvent || lastEngineSampleAt == 0L || android.os.SystemClock.elapsedRealtime() - lastEngineSampleAt >= 500) {
+            updateLiveSubtitle(videoId, liveCaption, seek)
+        }
+        if (engineEvent) lastEngineSampleAt = android.os.SystemClock.elapsedRealtime()
+        if (liveCaption?.activeWordIndex != null) {
+            _state.update { it.copy(activeWordIndex = if (it.wordHighlightEnabled && !seek) liveCaption.activeWordIndex else -1) }
+        }
+    }
+
+    private fun applyEngineCaption(
+        videoId: String,
+        liveCaption: LiveCaptionSample?,
+        current: DualSubUiState,
+        referenceIndex: Int,
+        timedIndex: Int,
+        seek: Boolean,
+    ) {
+        val engineSample = liveCaption?.takeIf { it.activeWordIndex != null && it.videoId == videoId }
+        if (engineSample != null) lastEngineSampleAt = android.os.SystemClock.elapsedRealtime()
+        val enginePosition = engineSample?.takeIf { it.present }?.let {
+            mapLiveCaptionWord(current.segments, referenceIndex, karaokeTokens(it.text), it.activeWordIndex!!)
+        }
+        // Playback polling still drives replay/paragraph position. It never
+        // reselects a spoken word or overrides an engine heartbeat.
+        val engineFresh = lastEngineSampleAt > 0 && android.os.SystemClock.elapsedRealtime() - lastEngineSampleAt < 500
+        val index = when {
+            enginePosition != null && current.wordHighlightEnabled -> enginePosition.segmentIndex
+            engineSample == null && engineFresh && !seek && current.wordHighlightEnabled -> current.currentIndex
+            else -> timedIndex
+        }
+        val wordIndex = when {
+            !current.wordHighlightEnabled || seek -> -1
+            engineSample != null -> enginePosition?.wordIndex ?: -1
+            engineFresh -> current.activeWordIndex
+            else -> -1
         }
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
             _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
@@ -673,15 +670,8 @@ class AppViewModel internal constructor(
 
     fun setWordHighlightEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, enabled).apply()
-        liveCaptionTracker.reset()
+        lastEngineSampleAt = 0L
         _state.update { it.copy(wordHighlightEnabled = enabled, activeWordIndex = -1) }
-    }
-
-    fun setKaraokeTimingMode(mode: KaraokeTimingMode) {
-        if (_state.value.karaokeTimingMode == mode) return
-        preferences.edit().putString(KARAOKE_TIMING_MODE_PREFERENCE, mode.storageValue).apply()
-        liveCaptionTracker.reset()
-        _state.update { it.copy(karaokeTimingMode = mode, activeWordIndex = -1) }
     }
 
     fun setCustomColorsEnabled(enabled: Boolean) {
@@ -693,7 +683,7 @@ class AppViewModel internal constructor(
         if (_state.value.captionFormat == format) return
         preferences.edit().putString(CAPTION_FORMAT_PREFERENCE, format.storageValue).apply()
         _state.update { it.copy(captionFormat = format) }
-        liveCaptionTracker.reset()
+        lastEngineSampleAt = 0L
         refreshSplitSegments()
     }
 
@@ -817,7 +807,7 @@ class AppViewModel internal constructor(
         editor.apply()
         _state.update { it.copy(autoPronounce = true) }
         latestPlaybackSecondMs = 0L
-        liveCaptionTracker.reset()
+        lastEngineSampleAt = 0L
         _state.update { current ->
             current.copy(
                 sourcePreference = "auto",
@@ -828,7 +818,6 @@ class AppViewModel internal constructor(
                 translatedColorKey = DEFAULT_TRANSLATED_COLOR_KEY,
                 highlightColorKey = DEFAULT_HIGHLIGHT_COLOR_KEY,
                 wordHighlightEnabled = true,
-                karaokeTimingMode = KaraokeTimingMode.ADAPTIVE,
                 customColorsEnabled = true,
                 originalVisibility = CaptionVisibility.ALWAYS,
                 translatedVisibility = CaptionVisibility.ALWAYS,
@@ -869,7 +858,7 @@ class AppViewModel internal constructor(
         liveTranslationJob?.cancel()
         liveTranslationGate.reset()
         latestPlaybackSecondMs = 0L
-        liveCaptionTracker.reset()
+        lastEngineSampleAt = 0L
         rawMergedSegments = emptyList()
         _state.update {
             it.copy(
@@ -895,7 +884,7 @@ class AppViewModel internal constructor(
     ) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
-        liveCaptionTracker.reset()
+        lastEngineSampleAt = 0L
         val preserveLive = _state.value.liveFallback && _state.value.activeVideoId == videoId
         if (!preserveLive) {
             rejectedLiveRevision = null

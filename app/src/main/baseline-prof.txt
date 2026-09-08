@@ -289,8 +289,6 @@ Lcom/kienhoang/dualsubreplay/ui/DualSubAppKt$DualSubApp$3$2$1;
 SPLcom/kienhoang/dualsubreplay/ui/DualSubAppKt$DualSubApp$3$2$1;-><init>(Ljava/lang/Object;)V
 Lcom/kienhoang/dualsubreplay/ui/DualSubUiState;
 SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;-><clinit>()V
-SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;-><init>(ZLjava/lang/String;Ljava/lang/String;ZLjava/lang/String;JLjava/lang/String;ZLjava/lang/String;Ljava/lang/String;ZZLjava/util/List;Ljava/lang/String;ZLjava/util/List;ZLcom/kienhoang/dualsubreplay/ui/CaptionVisibility;Lcom/kienhoang/dualsubreplay/ui/CaptionVisibility;IIFZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;ZZZZZZZLjava/lang/String;ZZLcom/kienhoang/dualsubreplay/data/LearningWordSelection;ZLcom/kienhoang/dualsubreplay/ui/LoadStage;Ljava/lang/String;Ljava/lang/String;)V
-SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;-><init>(ZLjava/lang/String;Ljava/lang/String;ZLjava/lang/String;JLjava/lang/String;ZLjava/lang/String;Ljava/lang/String;ZZLjava/util/List;Ljava/lang/String;ZLjava/util/List;ZLcom/kienhoang/dualsubreplay/ui/CaptionVisibility;Lcom/kienhoang/dualsubreplay/ui/CaptionVisibility;IIFZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;ZZZZZZZLjava/lang/String;ZZLcom/kienhoang/dualsubreplay/data/LearningWordSelection;ZLcom/kienhoang/dualsubreplay/ui/LoadStage;Ljava/lang/String;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;->equals(Ljava/lang/Object;)Z
 SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;->getActiveVideoId()Ljava/lang/String;
 SPLcom/kienhoang/dualsubreplay/ui/DualSubUiState;->getOnboardingCompleted()Z
@@ -305,13 +303,6 @@ SPLcom/kienhoang/dualsubreplay/ui/EmbeddedNavigationDecision;-><clinit>()V
 SPLcom/kienhoang/dualsubreplay/ui/EmbeddedNavigationDecision;-><init>(Ljava/lang/String;I)V
 Lcom/kienhoang/dualsubreplay/ui/KaraokeTimingKt;
 SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingKt;-><clinit>()V
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingKt;->storedKaraokeTimingMode(Ljava/lang/String;)Lcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;
-Lcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;->$values()[Lcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;-><clinit>()V
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;-><init>(Ljava/lang/String;ILjava/lang/String;)V
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;->getEntries()Lkotlin/enums/EnumEntries;
-SPLcom/kienhoang/dualsubreplay/ui/KaraokeTimingMode;->getStorageValue()Ljava/lang/String;
 Lcom/kienhoang/dualsubreplay/ui/LanguageChoice;
 SPLcom/kienhoang/dualsubreplay/ui/LanguageChoice;-><clinit>()V
 SPLcom/kienhoang/dualsubreplay/ui/LanguageChoice;-><init>(Ljava/lang/String;Ljava/lang/String;)V

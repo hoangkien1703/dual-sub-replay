@@ -26,12 +26,10 @@ class CaptionRecoveryStateTest {
         val vm = withContext(Dispatchers.Main) { AppViewModel(application, provider) }
         val oldTarget = vm.state.value.targetLanguage
         val oldHighlight = vm.state.value.wordHighlightEnabled
-        val oldTiming = vm.state.value.karaokeTimingMode
         try {
             withContext(Dispatchers.Main) {
                 vm.setTargetLanguage("en") // Exercises ML Kit's no-download same-language path.
                 vm.setWordHighlightEnabled(false)
-                vm.setKaraokeTimingMode(KaraokeTimingMode.TRANSCRIPT)
                 vm.onYouTubePageChanged("https://m.youtube.com/watch?v=abcdefghijk")
             }
             withTimeout(5000) { vm.state.first { it.liveFallback } }
@@ -52,7 +50,6 @@ class CaptionRecoveryStateTest {
                 vm.onYouTubePageChanged(YOUTUBE_HOME_URL)
                 vm.setTargetLanguage(oldTarget)
                 vm.setWordHighlightEnabled(oldHighlight)
-                vm.setKaraokeTimingMode(oldTiming)
             }
             preferences.edit().putBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, previousPreload).commit()
         }

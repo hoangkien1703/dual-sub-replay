@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.SubtitleWord
 
 internal data class LearningOverlayContent(
     val originalText: String?,
@@ -8,6 +9,7 @@ internal data class LearningOverlayContent(
     val statusText: String?,
     val activeWordIndex: Int = -1,
     val segment: SubtitleSegment? = null,
+    val words: List<SubtitleWord> = segment?.words.orEmpty(),
 )
 
 internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? {
@@ -23,6 +25,8 @@ private fun unfilteredLearningOverlayContent(state: DualSubUiState): LearningOve
     if (state.activeVideoId == null) return null
     if (state.liveFallback) {
         return LearningOverlayContent(
+            activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
+            words = state.liveOriginal?.let(::labCaptionWords).orEmpty(),
             originalText = state.liveOriginal,
             translatedText = state.liveTranslated ?: if (state.liveOriginal != null) "Translating…" else null,
             statusText = "Live subtitles · ${state.statusMessage.orEmpty()}",
