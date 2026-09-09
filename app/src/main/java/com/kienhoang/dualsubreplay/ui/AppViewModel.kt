@@ -1001,11 +1001,11 @@ class AppViewModel internal constructor(
         loadingJob?.cancel()
         _state.update {
             val index = activeSubtitleIndex(segments, latestPlaybackSecondMs)
-            val word = if (it.wordHighlightEnabled) activeWordIndex(segments, index, latestPlaybackSecondMs) else -1
             it.copy(
                 segments = segments.map { segment -> segment.copy(translatedText = null) },
                 currentIndex = index,
-                activeWordIndex = word,
+                // The next engine heartbeat remaps the word onto the new caption layout.
+                activeWordIndex = -1,
                 stage = LoadStage.TRANSLATING,
                 statusMessage = translationStartingMessage(it.targetLanguage),
                 errorMessage = null,

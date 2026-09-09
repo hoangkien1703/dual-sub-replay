@@ -2,12 +2,15 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.ByteArrayInputStream
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -48,6 +51,33 @@ class LabCaptionBridgeTest {
                 }
                 view.webViewClient =
                     object : WebViewClient() {
+                        override fun shouldInterceptRequest(
+                            view: WebView,
+                            request: WebResourceRequest,
+                        ): WebResourceResponse {
+                            // A real navigation gives WebView.url the same identity as location.href.
+                            // Intercept every request so the fixture never reaches live YouTube.
+                            val html =
+                                if (request.isForMainFrame) {
+                                    """
+                                    <html><body><video></video><span class="ytp-caption-segment">one two three</span>
+                                    <script>
+                                    const video = document.querySelector('video');
+                                    video._time = 1;
+                                    Object.defineProperties(video, {
+                                      currentTime: {get: () => video._time}, readyState: {get: () => 4},
+                                      paused: {get: () => false}, seeking: {get: () => false}
+                                    });
+                                    video.requestVideoFrameCallback = function() {};
+                                    window.fetch = function() { return new Promise(function() {}); };
+                                    </script></body></html>
+                                    """.trimIndent()
+                                } else {
+                                    ""
+                                }
+                            return WebResourceResponse("text/html", "UTF-8", ByteArrayInputStream(html.toByteArray()))
+                        }
+
                         override fun onPageFinished(
                             view: WebView,
                             url: String,
@@ -70,25 +100,7 @@ class LabCaptionBridgeTest {
                             }
                         }
                     }
-                view.loadDataWithBaseURL(
-                    "https://m.youtube.com/watch?v=obQgWiSX8tY",
-                    """
-                    <html><body><video></video><span class="ytp-caption-segment">one two three</span>
-                    <script>
-                    const video = document.querySelector('video');
-                    video._time = 1;
-                    Object.defineProperties(video, {
-                      currentTime: {get: () => video._time}, readyState: {get: () => 4},
-                      paused: {get: () => false}, seeking: {get: () => false}
-                    });
-                    video.requestVideoFrameCallback = function() {};
-                    window.fetch = function() { return new Promise(function() {}); };
-                    </script></body></html>
-                    """.trimIndent(),
-                    "text/html",
-                    "UTF-8",
-                    null,
-                )
+                view.loadUrl("https://m.youtube.com/watch?v=obQgWiSX8tY")
             }
             val received = done.await(15, TimeUnit.SECONDS)
             assertTrue("Expected direct engine word update: $diagnostics", received)
