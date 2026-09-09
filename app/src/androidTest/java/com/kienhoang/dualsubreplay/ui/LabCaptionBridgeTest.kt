@@ -1,13 +1,17 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class LabCaptionBridgeTest {
@@ -17,12 +21,26 @@ class LabCaptionBridgeTest {
         val done = CountDownLatch(1)
         val result = AtomicReference<LiveCaptionSample>()
         val web = AtomicReference<WebView>()
+        val advanced = AtomicBoolean(false)
+        val diagnostics = CopyOnWriteArrayList<String>()
         try {
             instrumentation.runOnMainSync {
                 val view = WebView(instrumentation.targetContext)
                 web.set(view)
                 view.settings.javaScriptEnabled = true
+                view.webChromeClient =
+                    object : WebChromeClient() {
+                        override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                            diagnostics.add("JS: ${message.message()}")
+                            return true
+                        }
+                    }
                 installLabCaptionBridge(view) { sample ->
+                    diagnostics.add("caption: ${sample.activeWordIndex} at ${sample.mediaTimeMs}")
+                    if (sample.text == "one two three" && sample.activeWordIndex == 0 && advanced.compareAndSet(false, true)) {
+                        // Advance only after the engine anchored the initial caption, even on a slow emulator.
+                        view.evaluateJavascript("video._time = 1.35;", null)
+                    }
                     if (sample.activeWordIndex == 1) {
                         result.set(sample)
                         done.countDown()
@@ -40,7 +58,15 @@ class LabCaptionBridgeTest {
                                     .bufferedReader()
                                     .use { it.readText() }
                             view.evaluateJavascript(labEngineConfigurationScript(true, "en", engine)) {
-                                view.evaluateJavascript("setTimeout(function() { video._time = 1.35; }, 200);", null)
+                                view.evaluateJavascript(
+                                    """
+                                    JSON.stringify({url: location.href,
+                                      bridge: typeof window.DualSubCaptionBridge?.postMessage,
+                                      installed: window.__highlightDualSubLabEngineV2Installed,
+                                      enabled: window.__dualSubLabOptions?.enabled,
+                                      second: document.querySelector('video').currentTime})
+                                    """.trimIndent(),
+                                ) { diagnostics.add("installed: $it, native URL: ${view.url}") }
                             }
                         }
                     }
@@ -64,7 +90,8 @@ class LabCaptionBridgeTest {
                     null,
                 )
             }
-            assertTrue("Expected direct engine word update", done.await(15, TimeUnit.SECONDS))
+            val received = done.await(15, TimeUnit.SECONDS)
+            assertTrue("Expected direct engine word update: $diagnostics", received)
             assertEquals("one two three", result.get().text)
             assertEquals(1350L, result.get().mediaTimeMs)
         } finally {
