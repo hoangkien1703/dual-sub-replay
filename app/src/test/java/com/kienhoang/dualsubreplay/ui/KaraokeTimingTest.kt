@@ -10,50 +10,16 @@ import org.junit.Test
 
 class KaraokeTimingTest {
     @Test
-    fun timingModeStorageDefaultsToAdaptive() {
-        assertEquals(KaraokeTimingMode.ADAPTIVE, storedKaraokeTimingMode(null))
-        assertEquals(KaraokeTimingMode.ADAPTIVE, storedKaraokeTimingMode("unknown"))
-        assertEquals(KaraokeTimingMode.YOUTUBE_LIVE, storedKaraokeTimingMode("youtube_live"))
-        assertEquals(KaraokeTimingMode.TRANSCRIPT, storedKaraokeTimingMode("transcript"))
-        assertTrue(RESETTABLE_SETTING_KEYS.contains(KARAOKE_TIMING_MODE_PREFERENCE))
-    }
-
-    @Test
-    fun liveCaptureRunsOnlyForGeneratedHighlightedTracks() {
-        assertTrue(shouldCaptureLiveCaptions(KaraokeTimingMode.ADAPTIVE, true, true))
-        assertTrue(shouldCaptureLiveCaptions(KaraokeTimingMode.YOUTUBE_LIVE, true, true))
-        assertFalse(shouldCaptureLiveCaptions(KaraokeTimingMode.TRANSCRIPT, true, true))
-        assertFalse(shouldCaptureLiveCaptions(KaraokeTimingMode.ADAPTIVE, false, true))
-        assertFalse(shouldCaptureLiveCaptions(KaraokeTimingMode.ADAPTIVE, true, false))
-    }
-
-    @Test
-    fun effectiveModeKeepsManualCaptionsOnTranscriptTiming() {
+    fun automaticTimingUsesLiveProgressWhenAvailableAndTimestampsOtherwise() {
         val timed = KaraokePosition(1, 2)
         val live = KaraokePosition(2, 0)
-
-        assertEquals(
-            timed,
-            effectiveKaraokePosition(KaraokeTimingMode.YOUTUBE_LIVE, false, true, timed, live),
-        )
-        assertEquals(
-            live,
-            effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, true, timed, live),
-        )
-        assertEquals(
-            timed,
-            effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, true, timed, null),
-        )
-        assertNull(
-            effectiveKaraokePosition(KaraokeTimingMode.YOUTUBE_LIVE, true, true, timed, null),
-        )
-        assertEquals(
-            timed,
-            effectiveKaraokePosition(KaraokeTimingMode.TRANSCRIPT, true, true, timed, live),
-        )
-        assertNull(
-            effectiveKaraokePosition(KaraokeTimingMode.ADAPTIVE, true, false, timed, live),
-        )
+        assertTrue(shouldCaptureLiveCaptions(true, true))
+        assertFalse(shouldCaptureLiveCaptions(false, true))
+        assertFalse(shouldCaptureLiveCaptions(true, false))
+        assertEquals(live, effectiveKaraokePosition(true, true, timed, live))
+        assertEquals(timed, effectiveKaraokePosition(true, true, timed, null))
+        assertEquals(timed, effectiveKaraokePosition(false, true, timed, live))
+        assertNull(effectiveKaraokePosition(true, false, timed, live))
     }
 
     @Test
@@ -144,7 +110,6 @@ class KaraokeTimingTest {
                 segments = segments,
                 referenceSegmentIndex = 0,
                 playbackTimeMs = 1_000,
-                strict = false,
             ),
         )
         assertEquals(
@@ -154,7 +119,6 @@ class KaraokeTimingTest {
                 segments = segments,
                 referenceSegmentIndex = 0,
                 playbackTimeMs = 1_300,
-                strict = false,
             ),
         )
         assertNull(
@@ -163,7 +127,6 @@ class KaraokeTimingTest {
                 segments = segments,
                 referenceSegmentIndex = 0,
                 playbackTimeMs = 3_301,
-                strict = false,
             ),
         )
         assertNull(
@@ -172,63 +135,27 @@ class KaraokeTimingTest {
                 segments = segments,
                 referenceSegmentIndex = 0,
                 playbackTimeMs = 3_400,
-                strict = false,
             ),
         )
-        // Even coherent live text must not hold Adaptive on an expired word.
-        assertNull(
+        assertEquals(
+            KaraokePosition(0, 4),
             tracker.resolve(
                 sample = sample("it kind now", 4, 3_700),
                 segments = segments,
                 referenceSegmentIndex = 0,
                 playbackTimeMs = 3_700,
-                strict = false,
             ),
         )
     }
 
-    @Test
-    fun strictLiveAcceptsFirstMappingButNeverUsesMissingSignal() {
-        val tracker = LiveCaptionTracker()
-        val segments = listOf(segment(0, 0, "strict live words"))
-
-        assertEquals(
-            KaraokePosition(0, 0),
-            tracker.resolve(
-                sample = sample("strict live", 1, 500),
-                segments = segments,
-                referenceSegmentIndex = 0,
-                playbackTimeMs = 500,
-                strict = true,
-            ),
-        )
-        assertNull(
-            tracker.resolve(
-                sample = null,
-                segments = segments,
-                referenceSegmentIndex = 0,
-                playbackTimeMs = 600,
-                strict = true,
-            ),
-        )
-    }
-
-    private fun sample(
-        text: String,
-        revision: Long,
-        mediaTimeMs: Long,
-    ) = LiveCaptionSample(
+    private fun sample(text: String, revision: Long, mediaTimeMs: Long) = LiveCaptionSample(
         text = text,
         revision = revision,
         mediaTimeMs = mediaTimeMs,
         present = text.isNotBlank(),
     )
 
-    private fun segment(
-        id: Long,
-        startMs: Long,
-        text: String,
-    ): SubtitleSegment {
+    private fun segment(id: Long, startMs: Long, text: String): SubtitleSegment {
         val tokens = text.split(' ')
         val duration = tokens.size * 400L
         return SubtitleSegment(
@@ -236,14 +163,13 @@ class KaraokeTimingTest {
             startMs = startMs,
             endMs = startMs + duration,
             originalText = text,
-            words =
-                tokens.mapIndexed { index, token ->
-                    SubtitleWord(
-                        text = token,
-                        startMs = startMs + index * 400L,
-                        endMs = startMs + (index + 1) * 400L,
-                    )
-                },
+            words = tokens.mapIndexed { index, token ->
+                SubtitleWord(
+                    text = token,
+                    startMs = startMs + index * 400L,
+                    endMs = startMs + (index + 1) * 400L,
+                )
+            },
         )
     }
 }

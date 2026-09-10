@@ -1,31 +1,17 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.SubtitleWord
 
 const val KARAOKE_TIMING_MODE_PREFERENCE = "karaoke_timing_mode"
 internal const val LIVE_CAPTION_STALE_MS = 2_000L
 internal const val LIVE_CAPTION_BACKWARD_SEEK_RESET_MS = 450L
 
-enum class KaraokeTimingMode(
-    val storageValue: String,
-) {
-    ADAPTIVE("adaptive"),
-    YOUTUBE_LIVE("youtube_live"),
-    TRANSCRIPT("transcript"),
-}
-
-internal fun storedKaraokeTimingMode(raw: String?): KaraokeTimingMode =
-    KaraokeTimingMode.entries.firstOrNull { it.storageValue == raw }
-        ?: KaraokeTimingMode.ADAPTIVE
-
+/** v0.9.5's automatic path: live progress for generated captions, timestamps otherwise. */
 internal fun shouldCaptureLiveCaptions(
-    mode: KaraokeTimingMode,
     generatedCaptions: Boolean,
     wordHighlightEnabled: Boolean,
-): Boolean =
-    generatedCaptions &&
-        wordHighlightEnabled &&
-        mode != KaraokeTimingMode.TRANSCRIPT
+): Boolean = generatedCaptions && wordHighlightEnabled
 
 internal data class LiveCaptionSample(
     val text: String,
@@ -45,20 +31,16 @@ internal data class KaraokePosition(
 }
 
 internal fun effectiveKaraokePosition(
-    mode: KaraokeTimingMode,
     generatedCaptions: Boolean,
     wordHighlightEnabled: Boolean,
     timedPosition: KaraokePosition?,
     livePosition: KaraokePosition?,
-): KaraokePosition? =
-    when {
-        !wordHighlightEnabled -> null
-        !generatedCaptions -> timedPosition
-        mode == KaraokeTimingMode.TRANSCRIPT -> timedPosition
-        livePosition != null -> livePosition
-        mode == KaraokeTimingMode.YOUTUBE_LIVE -> null
-        else -> timedPosition
-    }
+): KaraokePosition? = when {
+    !wordHighlightEnabled -> null
+    !generatedCaptions -> timedPosition
+    livePosition != null -> livePosition
+    else -> timedPosition
+}
 
 internal data class LiveCaptionProgress(
     val text: String,
@@ -75,11 +57,10 @@ private data class TranscriptWordRef(
 
 private val karaokeTokenRegex = Regex("""[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*""")
 
-internal fun karaokeTokens(text: String): List<String> =
-    karaokeTokenRegex
-        .findAll(text)
-        .map { it.value.lowercase() }
-        .toList()
+internal fun karaokeTokens(text: String): List<String> = karaokeTokenRegex
+    .findAll(text)
+    .map { it.value.lowercase() }
+    .toList()
 
 internal fun longestSuffixPrefixOverlap(
     previousTokens: List<String>,
@@ -109,9 +90,8 @@ internal fun reconcileLiveCaptionProgress(
         return previous.copy(text = cleanText, revision = sample.revision)
     }
 
-    val prefixGrowth =
-        currentTokens.size > previous.tokens.size &&
-            previous.tokens.indices.all { index -> previous.tokens[index] == currentTokens[index] }
+    val prefixGrowth = currentTokens.size > previous.tokens.size &&
+        previous.tokens.indices.all { index -> previous.tokens[index] == currentTokens[index] }
     if (prefixGrowth) {
         return LiveCaptionProgress(cleanText, currentTokens, currentTokens.lastIndex, sample.revision)
     }
@@ -121,20 +101,17 @@ internal fun reconcileLiveCaptionProgress(
         val dropped = previous.tokens.size - overlap
         val mappedOldIndex = (previous.activeWordIndex - dropped).coerceAtLeast(0)
         val appendedCount = currentTokens.size - overlap
-        val activeIndex =
-            if (appendedCount > 0) {
-                currentTokens.lastIndex
-            } else {
-                mappedOldIndex.coerceAtMost(currentTokens.lastIndex)
-            }
+        val activeIndex = if (appendedCount > 0) {
+            currentTokens.lastIndex
+        } else {
+            mappedOldIndex.coerceAtMost(currentTokens.lastIndex)
+        }
         return LiveCaptionProgress(cleanText, currentTokens, activeIndex, sample.revision)
     }
 
     val previousActiveToken = previous.tokens.getOrNull(previous.activeWordIndex)
-    val remappedIndex =
-        previousActiveToken
-            ?.let { currentTokens.indexOfLast { token -> token == it } }
-            ?.takeIf { it >= 0 }
+    val remappedIndex = previousActiveToken?.let { currentTokens.indexOfLast { token -> token == it } }
+        ?.takeIf { it >= 0 }
     return LiveCaptionProgress(
         text = cleanText,
         tokens = currentTokens,
@@ -159,25 +136,22 @@ internal fun mapLiveCaptionWord(
     val safeReference = referenceSegmentIndex.coerceIn(0, segments.lastIndex)
     val firstSegment = (safeReference - LIVE_MAPPING_SEGMENT_RADIUS).coerceAtLeast(0)
     val lastSegment = (safeReference + LIVE_MAPPING_SEGMENT_RADIUS).coerceAtMost(segments.lastIndex)
-    val refs =
-        buildList {
-            for (segmentIndex in firstSegment..lastSegment) {
-                segments[segmentIndex].words.forEachIndexed { wordIndex, word ->
-                    karaokeTokens(word.text).forEach { token ->
-                        add(TranscriptWordRef(segmentIndex, wordIndex, token))
-                    }
+    val refs = buildList {
+        for (segmentIndex in firstSegment..lastSegment) {
+            segments[segmentIndex].words.forEachIndexed { wordIndex, word ->
+                karaokeTokens(word.text).forEach { token ->
+                    add(TranscriptWordRef(segmentIndex, wordIndex, token))
                 }
             }
         }
+    }
     if (refs.isEmpty()) return null
 
-    val expectedRefIndex =
-        refs
-            .indexOfFirst { ref ->
-                previousPosition?.let {
-                    ref.segmentIndex == it.segmentIndex && ref.wordIndex == it.wordIndex
-                } ?: (ref.segmentIndex == safeReference)
-            }.takeIf { it >= 0 } ?: 0
+    val expectedRefIndex = refs.indexOfFirst { ref ->
+        previousPosition?.let {
+            ref.segmentIndex == it.segmentIndex && ref.wordIndex == it.wordIndex
+        } ?: (ref.segmentIndex == safeReference)
+    }.takeIf { it >= 0 } ?: 0
 
     data class Candidate(
         val matchedCount: Int,
@@ -203,19 +177,17 @@ internal fun mapLiveCaptionWord(
             val activeRefIndex = refStart + activeOffset
             val activeRef = refs[activeRefIndex]
             val position = KaraokePosition(activeRef.segmentIndex, activeRef.wordIndex)
-            val closeSingleToken =
-                count >= MIN_LIVE_MAPPING_CONTEXT_TOKENS ||
-                    liveTokens.size == 1 ||
-                    kotlin.math.abs(activeRefIndex - expectedRefIndex) <= MAX_SINGLE_TOKEN_MAPPING_DISTANCE
+            val closeSingleToken = count >= MIN_LIVE_MAPPING_CONTEXT_TOKENS ||
+                liveTokens.size == 1 ||
+                kotlin.math.abs(activeRefIndex - expectedRefIndex) <= MAX_SINGLE_TOKEN_MAPPING_DISTANCE
             if (!closeSingleToken) continue
-            candidates +=
-                Candidate(
-                    matchedCount = count,
-                    activeRefIndex = activeRefIndex,
-                    position = position,
-                    distance = kotlin.math.abs(activeRefIndex - expectedRefIndex),
-                    regresses = previousPosition != null && position < previousPosition,
-                )
+            candidates += Candidate(
+                matchedCount = count,
+                activeRefIndex = activeRefIndex,
+                position = position,
+                distance = kotlin.math.abs(activeRefIndex - expectedRefIndex),
+                regresses = previousPosition != null && position < previousPosition,
+            )
         }
     }
 
@@ -224,7 +196,8 @@ internal fun mapLiveCaptionWord(
             compareBy<Candidate> { it.regresses }
                 .thenByDescending { it.matchedCount }
                 .thenBy { it.distance },
-        ).firstOrNull()
+        )
+        .firstOrNull()
         ?.position
 }
 
@@ -249,7 +222,6 @@ internal class LiveCaptionTracker {
         segments: List<SubtitleSegment>,
         referenceSegmentIndex: Int,
         playbackTimeMs: Long,
-        strict: Boolean,
     ): KaraokePosition? {
         if (sample == null || !sample.present) {
             reset()
@@ -259,16 +231,15 @@ internal class LiveCaptionTracker {
             lastProcessedRevision = sample.revision
             progress = reconcileLiveCaptionProgress(progress, sample)
             val currentProgress = progress
-            val mapped =
-                currentProgress?.let {
-                    mapLiveCaptionWord(
-                        segments = segments,
-                        referenceSegmentIndex = referenceSegmentIndex,
-                        liveTokens = it.tokens,
-                        liveActiveWordIndex = it.activeWordIndex,
-                        previousPosition = lastPosition,
-                    )
-                }
+            val mapped = currentProgress?.let {
+                mapLiveCaptionWord(
+                    segments = segments,
+                    referenceSegmentIndex = referenceSegmentIndex,
+                    liveTokens = it.tokens,
+                    liveActiveWordIndex = it.activeWordIndex,
+                    previousPosition = lastPosition,
+                )
+            }
             if (mapped == null) {
                 coherentRevisionCount = 0
                 lastPosition = null
@@ -280,22 +251,12 @@ internal class LiveCaptionTracker {
         }
 
         val mapped = lastPosition ?: return null
-        val age = playbackTimeMs - lastMappedMediaTimeMs
-        val word = segments.getOrNull(mapped.segmentIndex)?.words?.getOrNull(mapped.wordIndex)
-        val stale = age > LIVE_CAPTION_STALE_MS || age < -450
-        if (!strict && (
-                age > 400 || word == null ||
-                    playbackTimeMs < word.startMs - 400 || playbackTimeMs > word.endMs + 150
-            )
-        ) {
-            if (stale) reset()
-            return null
-        }
+        val stale = playbackTimeMs - lastMappedMediaTimeMs > LIVE_CAPTION_STALE_MS
         if (stale) {
             reset()
             return null
         }
-        return if (strict || coherentRevisionCount >= MIN_ADAPTIVE_COHERENT_REVISIONS) mapped else null
+        return if (coherentRevisionCount >= MIN_ADAPTIVE_COHERENT_REVISIONS) mapped else null
     }
 }
 
@@ -303,3 +264,10 @@ private const val LIVE_MAPPING_SEGMENT_RADIUS = 2
 private const val MIN_LIVE_MAPPING_CONTEXT_TOKENS = 2
 private const val MAX_SINGLE_TOKEN_MAPPING_DISTANCE = 4
 private const val MIN_ADAPTIVE_COHERENT_REVISIONS = 2
+
+/** Character ranges for the existing live-only recovery UI; no estimated timing clock. */
+internal fun liveCaptionWords(text: String): List<SubtitleWord> =
+    karaokeTokenRegex
+        .findAll(text)
+        .map { SubtitleWord(it.value, 0, 0) }
+        .toList()

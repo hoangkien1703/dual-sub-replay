@@ -70,7 +70,7 @@ class NavigationRecoveryUiTest {
             MaterialTheme {
                 LiveSubtitlePanel(DualSubUiState(liveFallback = true, liveOriginal = "Hello world",
                     liveTranslated = "Xin chào thế giới", resolvedSourceLanguage = "en",
-                    wordHighlightEnabled = false, karaokeTimingMode = KaraokeTimingMode.TRANSCRIPT,
+                    wordHighlightEnabled = false,
                     wordLearningEnabled = false), onRetry = { retries++ }, onWordClick = {})
             }
         }

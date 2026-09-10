@@ -159,7 +159,6 @@ fun DualSubApp(
                 onTranslatedColorChange = viewModel::setTranslatedSubtitleColor,
                 onHighlightColorChange = viewModel::setHighlightColor,
                 onWordHighlightChange = viewModel::setWordHighlightEnabled,
-                onKaraokeTimingModeChange = viewModel::setKaraokeTimingMode,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
                 onCaptionFormatChange = viewModel::setCaptionFormat,
                 lockOverlayToVideo = state.lockOverlayToVideo,
@@ -238,7 +237,6 @@ private fun DualSubExperience(
     onTranslatedColorChange: (String) -> Unit,
     onHighlightColorChange: (String) -> Unit,
     onWordHighlightChange: (Boolean) -> Unit,
-    onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit,
     onCustomColorsChange: (Boolean) -> Unit,
     onCaptionFormatChange: (CaptionFormat) -> Unit,
     lockOverlayToVideo: Boolean = false,
@@ -300,15 +298,7 @@ private fun DualSubExperience(
         } else {
             WindowInsets.safeDrawing
         }
-    val liveCaptionCaptureEnabled =
-        state.subtitlePanelVisible && (
-            state.liveFallback ||
-                shouldCaptureLiveCaptions(
-                    mode = state.karaokeTimingMode,
-                    generatedCaptions = state.generatedCaptions,
-                    wordHighlightEnabled = state.wordHighlightEnabled,
-                )
-        )
+    val liveCaptionCaptureEnabled = shouldCaptureCaptionsForPresentation(state, effectivePlayerMode)
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showSettings = true
@@ -434,7 +424,6 @@ private fun DualSubExperience(
             translatedColorKey = state.translatedColorKey,
             highlightColorKey = state.highlightColorKey,
             wordHighlightEnabled = state.wordHighlightEnabled,
-            karaokeTimingMode = state.karaokeTimingMode,
             customColorsEnabled = state.customColorsEnabled,
             captionFormat = state.captionFormat,
             lockOverlayToVideo = state.lockOverlayToVideo,
@@ -460,7 +449,6 @@ private fun DualSubExperience(
             onTranslatedColorChange = onTranslatedColorChange,
             onHighlightColorChange = onHighlightColorChange,
             onWordHighlightChange = onWordHighlightChange,
-            onKaraokeTimingModeChange = onKaraokeTimingModeChange,
             onCustomColorsChange = onCustomColorsChange,
             onCaptionFormatChange = onCaptionFormatChange,
             onResetSettings = {
@@ -929,7 +917,6 @@ internal fun SubtitleSettingsDialog(
     translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
     highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
     wordHighlightEnabled: Boolean = true,
-    karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     customColorsEnabled: Boolean = true,
     captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     lockOverlayToVideo: Boolean = false,
@@ -955,7 +942,6 @@ internal fun SubtitleSettingsDialog(
     onTranslatedColorChange: (String) -> Unit = {},
     onHighlightColorChange: (String) -> Unit = {},
     onWordHighlightChange: (Boolean) -> Unit = {},
-    onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit = {},
     onCustomColorsChange: (Boolean) -> Unit = {},
     onCaptionFormatChange: (CaptionFormat) -> Unit = {},
     onResetSettings: () -> Unit = {},
@@ -1188,34 +1174,6 @@ internal fun SubtitleSettingsDialog(
                                 testTag = "word_learning_active_only_switch",
                             )
                         }
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Spoken-word timing", style = MaterialTheme.typography.titleSmall)
-                        KaraokeTimingSettingsOption(
-                            mode = KaraokeTimingMode.ADAPTIVE,
-                            selectedMode = karaokeTimingMode,
-                            title = "Adaptive (recommended)",
-                            description = "Use reliable live YouTube words for auto-generated captions, with transcript timing as a safe fallback.",
-                            onModeChange = onKaraokeTimingModeChange,
-                        )
-                        HorizontalDivider()
-                        KaraokeTimingSettingsOption(
-                            mode = KaraokeTimingMode.YOUTUBE_LIVE,
-                            selectedMode = karaokeTimingMode,
-                            title = "Live YouTube captions",
-                            description = "Strict live timing for auto-generated captions. If the live word is unavailable, no word is highlighted. Manual captions keep transcript timing.",
-                            onModeChange = onKaraokeTimingModeChange,
-                        )
-                        HorizontalDivider()
-                        KaraokeTimingSettingsOption(
-                            mode = KaraokeTimingMode.TRANSCRIPT,
-                            selectedMode = karaokeTimingMode,
-                            title = "Transcript timing",
-                            description = "Always use the existing JSON3, SRV3, or estimated transcript word timing.",
-                            onModeChange = onKaraokeTimingModeChange,
-                        )
 
                         Spacer(Modifier.height(14.dp))
                         HorizontalDivider()
@@ -1541,38 +1499,6 @@ private fun PlayerModeSettingsOption(
         Spacer(Modifier.size(8.dp))
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(
-                description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun KaraokeTimingSettingsOption(
-    mode: KaraokeTimingMode,
-    selectedMode: KaraokeTimingMode,
-    title: String,
-    description: String,
-    onModeChange: (KaraokeTimingMode) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onModeChange(mode) }
-            .padding(vertical = 8.dp)
-            .testTag("karaoke_mode_${mode.storageValue}"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(
-            selected = selectedMode == mode,
-            onClick = { onModeChange(mode) },
-        )
-        Spacer(Modifier.size(8.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
             Text(
                 description,
                 style = MaterialTheme.typography.bodySmall,

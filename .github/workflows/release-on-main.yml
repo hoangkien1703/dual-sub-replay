@@ -160,19 +160,24 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v0.9.9 highlights
+            ## v1.0.0 highlights
 
-            - **Practice backup and transfer**: Import/export versioned JSON backups and Anki TSV using Android's file picker, with previews and duplicate handling (#60).
-            - **On-device translation**: Retain sentence context, bound the translation cache, and reject stale callbacks (#60).
-            - **Caption controls**: Independently choose Always, Only when paused, or Never for each caption track, with preferences shared across portrait and fullscreen (#60).
-            - **Fullscreen highlighting**: Share playback state and fix stale fullscreen media-clock snapshots (#60).
-            - **Quality checks**: Add formatting and complexity gates, an isolated benchmark module, and a Baseline Profile (#60).
+            - **Spoken-word highlighting**: Restore v0.9.5's automatic timing and keep live caption tracking active in portrait, landscape, and fullscreen overlays (#63).
+            - **Bilingual caption formats**: Choose Short paired phrases or Whole sentence, with each displayed unit translated independently while retaining source-word timestamps (#62).
+            - **Playback timing**: Share a rate-aware clock across subtitle layouts, with stale-sample rejection and recovery after pauses, buffering, and seeks (#62, #63).
+            - **Existing features preserved**: On-device translation, vocabulary, Word Learning, Practice backup and transfer, replay, caption colors, and visibility controls remain available.
+
+            ## Validation
+
+            - PR checks cover unit tests, formatting, complexity, lint, debug and optimized release builds, and 42 API 36 emulator tests.
+            - The landscape regression exercises the complete player and live caption capture through landscape/fullscreen transitions with an offline WebView fixture.
+            - The user confirmed PR #63 build 271 works well on their phone before approving this official release.
 
             ## Known limitations
 
-            - Live YouTube fullscreen/rotation, extended playback, and perceptual highlighting still need physical-device acceptance testing.
-            - Controlled startup was 686 ms versus 681 ms; startup memory (PSS) increased by 11.83% (about 3.1 MiB), with the cause still under investigation.
-            - ML Kit translations can still be literal or imprecise. Issues #56–#59 remain open pending acceptance.
+            - Live word timing depends on eligible auto-generated captions and YouTube's page behavior; transcript timing is used when live timing is unavailable.
+            - ML Kit translations can still be literal or imprecise.
+            - Phone acceptance does not establish synchronization accuracy for every video or device; emulator fixtures do not measure real audio latency.
 
             The `.sha256` file can be used to verify the APK download.
           files: |

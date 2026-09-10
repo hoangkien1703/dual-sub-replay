@@ -697,7 +697,7 @@ internal fun LearningSubtitleOverlay(
                     val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
                     val annotated = rememberAnnotatedSubtitleText(
                         text = original,
-                        words = content.segment?.words.orEmpty(),
+                        words = content.words,
                         activeWordIndex = content.activeWordIndex,
                         baseColor = originalColor,
                         highlightColor = highlightColor,

@@ -67,8 +67,7 @@ class LiveSubtitleRecoveryTest {
 
     @Test fun overlayUsesLiveTextWithoutInventedReplaySegment() {
         val content = learningOverlayContent(DualSubUiState(activeVideoId = "abcdefghijk", liveFallback = true,
-            liveOriginal = "Hello", liveTranslated = "Xin chào", wordHighlightEnabled = false,
-            karaokeTimingMode = KaraokeTimingMode.TRANSCRIPT))!!
+            liveOriginal = "Hello", liveTranslated = "Xin chào", wordHighlightEnabled = false))!!
         assertEquals("Hello", content.originalText)
         assertEquals("Xin chào", content.translatedText)
         assertNull(content.segment)

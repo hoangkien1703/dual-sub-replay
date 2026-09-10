@@ -35,13 +35,12 @@ class WordTimingTest {
         assertTrue(estimateWordTimings("hello", 1_000, 1_000).isEmpty())
     }
 
-    @Test fun activeWordIndexUsesTheCompensatedClockWithoutAnExtraLead() {
-        val words =
-            listOf(
-                SubtitleWord("one", 0, 500),
-                SubtitleWord("two", 500, 900),
-                SubtitleWord("three", 1_000, 1_400),
-            )
+    @Test fun activeWordIndexTracksTheSpokenWordWithSmallLatencyLead() {
+        val words = listOf(
+            SubtitleWord("one", 0, 500),
+            SubtitleWord("two", 500, 900),
+            SubtitleWord("three", 1_000, 1_400),
+        )
 
         // Never light the first word before its real start.
         assertEquals(-1, activeWordIndex(words, timeMs = -1))
@@ -49,8 +48,8 @@ class WordTimingTest {
         assertEquals(1, activeWordIndex(words, timeMs = 600))
         // A normal gap still keeps the previous word highlighted.
         assertEquals(1, activeWordIndex(words, timeMs = 920))
-        // The clock already accounts for transport time; never advance a word early.
-        assertEquals(1, activeWordIndex(words, timeMs = 950))
+        // Near the next boundary, the small visual lead compensates for WebView/UI latency.
+        assertEquals(2, activeWordIndex(words, timeMs = 950))
         assertEquals(2, activeWordIndex(words, timeMs = 1_200))
     }
 
