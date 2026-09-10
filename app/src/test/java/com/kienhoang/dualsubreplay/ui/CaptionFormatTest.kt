@@ -23,10 +23,13 @@ class CaptionFormatTest {
         assertEquals(text, short.joinToString(" ") { it.originalText })
         assertEquals(words, short.flatMap { it.words })
         assertEquals(words, whole.flatMap { it.words })
-        words.forEach { word ->
+        // v0.9.5's 75 ms lead skips this fixture's 30 ms opening token once
+        // the cue starts. All later token starts are at least 90 ms apart.
+        words.forEachIndexed { wordIndex, word ->
+            val expected = words[if (wordIndex == 0) 1 else wordIndex]
             listOf(short, whole).forEach { rows ->
                 val index = activeSubtitleIndex(rows, word.startMs)
-                assertEquals(word, rows[index].words[activeWordIndex(rows, index, word.startMs)])
+                assertEquals(expected, rows[index].words[activeWordIndex(rows, index, word.startMs)])
             }
         }
     }
