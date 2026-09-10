@@ -22,6 +22,8 @@ The existing single WebView, validated playback clock, fullscreen lifecycle hand
 
 ## Phone acceptance
 
+On 2026-09-10, after receiving PR #63 build 271, the user reported that the app works well and approved merging and publishing v1.0.0. This records acceptance of that build; it does not imply every scenario below was individually measured.
+
 Compare the same video/time range with v0.9.5, with matching source language and highlight setting. Check portrait, landscape split, fullscreen overlay, rotation during playback, pause/resume, backward/forward seeks, 1x/1.5x/2x, both caption formats, and Word Learning on/off. Repeat with auto captions and a manually authored track. Fixtures cannot establish subjective synchronization with live YouTube audio on the user's phone.
 
 ## Landscape live capture correction

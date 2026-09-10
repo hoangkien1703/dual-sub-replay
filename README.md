@@ -42,7 +42,7 @@ Requires **Android 8.0 or newer**. No account or API key is required.
 
 Android may show a standard warning because the app is downloaded directly from GitHub instead of Google Play.
 
-> **Updating from a preview?** Uninstall the preview build once before installing the official app. Official releases use a new production signing key; future official versions will install as normal updates.
+> **Installing after testing a preview?** Current preview builds install separately as **DualSub Replay Preview**, so you can keep both apps. Official releases update the existing official app. Preview settings and vocabulary remain in the preview app; use Practice backup and transfer to move saved study data.
 
 Want to test the newest development build? See the [preview release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview). Preview builds may be less stable and use a different signature.
 
@@ -114,7 +114,7 @@ Offline video downloading and local video playback have been removed to reduce A
 
 Source contributed to this repository is released under the [MIT license](LICENSE). See [third-party notices and build/source information](THIRD_PARTY_NOTICES.md).
 
-Live spoken-word timing reads caption text rendered by YouTube's webpage and is available only for eligible auto-generated caption tracks. Adaptive mode falls back to transcript timing when a reliable live word cannot be mapped; manual captions always use transcript timing. YouTube's page structure and WebView behavior can vary by video and device, so live word timing may be unavailable or less precise on some phones.
+Live spoken-word timing reads caption text rendered by YouTube's webpage and is available only for eligible auto-generated caption tracks. Highlighting automatically falls back to transcript timing when a reliable live word cannot be mapped; manual captions always use transcript timing. YouTube's page structure and WebView behavior can vary by video and device, so live word timing may be unavailable or less precise on some phones.
 
 Official APKs use a dedicated production signing key kept outside the repository and restored through encrypted GitHub Actions secrets. Preview APKs use a separate CI debug signature, so Android treats the preview and official release as different update lines.
 
@@ -160,7 +160,7 @@ Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. An offic
 
 ## Continuous integration
 
-Every push and pull request uses the committed wrapper to run unit tests, lint, debug APK assembly, and Android-test APK assembly. A second job executes the offline fixture suite on the API 36 managed device. Same-repository pull requests also publish a numbered test APK such as `DualSub-Replay-PR16-preview.apk` to the rolling preview release and remove it automatically when the PR is closed. A push to `main` updates the rolling preview release only after both verification jobs pass. When `main` contains a new app version without a matching version tag, the verified production-signed APK is published automatically as the latest official release.
+Pull requests use the committed wrapper to run formatting and complexity checks, unit tests, lint, debug and Android-test APK assembly, and an optimized release build. A second job executes the offline fixture suite on the API 36 managed device. Both jobs must pass before merging into `main`. Same-repository pull requests also publish a numbered test APK such as `DualSub-Replay-PR63-build271-preview.apk` to the rolling preview release and remove it automatically when the PR is closed. After merge, the main publishing workflow builds the rolling preview without repeating PR tests. When `main` contains a new app version without a matching version tag, it also builds, verifies, and publishes the production-signed APK as the latest official release.
 
 ## Privacy
 
