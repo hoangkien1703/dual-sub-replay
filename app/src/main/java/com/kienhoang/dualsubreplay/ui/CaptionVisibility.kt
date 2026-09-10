@@ -29,6 +29,14 @@ internal fun DualSubUiState.showOriginal() = originalVisibility.visible(playback
 
 internal fun DualSubUiState.showTranslation() = translatedVisibility.visible(playbackPaused)
 
+/** Hiding the transcript for an overlay must not disconnect its live timing source. */
+internal fun shouldCaptureCaptionsForPresentation(
+    state: DualSubUiState,
+    mode: PlayerExperienceMode,
+): Boolean =
+    (state.subtitlePanelVisible || mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) &&
+        (state.liveFallback || shouldCaptureLiveCaptions(state.generatedCaptions, state.wordHighlightEnabled))
+
 @Composable
 internal fun CaptionVisibilitySettings() {
     val context = LocalContext.current

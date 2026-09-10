@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -185,6 +186,10 @@ internal val youtubePlayerControlsVisible = MutableStateFlow(false)
 internal val youtubeNativeDialogVisible = MutableStateFlow(false)
 internal val youtubeFullscreenActive = MutableStateFlow(false)
 
+/** Optional request substitution lets integration tests run the complete player with offline pages. */
+internal val LocalYouTubeRequestInterceptor =
+    staticCompositionLocalOf<((WebView, WebResourceRequest) -> WebResourceResponse?)?> { null }
+
 private data class WebFullscreenSession(
     val view: View,
     val callback: WebChromeClient.CustomViewCallback,
@@ -264,6 +269,7 @@ internal fun SingleYouTubePage(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val requestInterceptor = LocalYouTubeRequestInterceptor.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
     val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
@@ -397,6 +403,11 @@ internal fun SingleYouTubePage(
                 @Suppress("DEPRECATION")
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean =
                     handleMainFrameUrl(view, url)
+
+                override fun shouldInterceptRequest(
+                    view: WebView,
+                    request: WebResourceRequest,
+                ): WebResourceResponse? = requestInterceptor?.invoke(view, request) ?: super.shouldInterceptRequest(view, request)
 
                 override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
                     super.doUpdateVisitedHistory(view, url, isReload)

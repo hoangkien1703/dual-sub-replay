@@ -23,3 +23,13 @@ The existing single WebView, validated playback clock, fullscreen lifecycle hand
 ## Phone acceptance
 
 Compare the same video/time range with v0.9.5, with matching source language and highlight setting. Check portrait, landscape split, fullscreen overlay, rotation during playback, pause/resume, backward/forward seeks, 1x/1.5x/2x, both caption formats, and Word Learning on/off. Repeat with auto captions and a manually authored track. Fixtures cannot establish subjective synchronization with live YouTube audio on the user's phone.
+
+## Landscape live capture correction
+
+Build 270 restored the timing algorithm but left a later visibility guard in place: `subtitlePanelVisible && ...`. Automatic landscape/fullscreen overlays hide the transcript panel, so that guard removed the live-caption observer while subtitles remained visible in the overlay. The app consequently switched to transcript timestamps. v0.9.5 did not have that guard.
+
+`shouldCaptureCaptionsForPresentation` now considers either a visible transcript panel or the effective overlay mode. Hidden transcript-only mode still disables capture, and the highlighting/manual-caption rules remain. Live translation recovery continues to capture even with highlighting off.
+
+The regression suite now includes the complete `LearningPlayerRoot` and its persistent `SingleYouTubePage`, with all page requests intercepted by an offline fixture. It switches the Compose orientation configuration into landscape, exercises the production native-fullscreen callbacks, returns to portrait, and verifies that live words continue while the panel is hidden. Transcript timestamps are deliberately too late to produce any expected word, so timestamp fallback cannot make the test pass. It also verifies that the same page survives each transition. This tests the real presentation/capture wiring; it does not measure phone audio latency or simulate physical device rotation.
+
+The optional request interceptor is unset in production. It lets instrumentation use the real WebView client, capture scripts, polling, and ViewModel without reaching YouTube.
