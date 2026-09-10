@@ -55,10 +55,3 @@ tasks.register<Exec>("formatCheck") {
     dependsOn("formatReport")
     commandLine("python", "tools/check_format_ratchet.py")
 }
-
-// Exercise the page-side timing engine on the same gate as Kotlin formatting.
-tasks.register<Exec>("testCaptionEngine") {
-    group = "verification"
-    commandLine("node", "--test", "tests/caption-engine.test.cjs", "tests/caption-engine-integration.test.cjs")
-}
-tasks.named("formatCheck") { dependsOn("testCaptionEngine") }

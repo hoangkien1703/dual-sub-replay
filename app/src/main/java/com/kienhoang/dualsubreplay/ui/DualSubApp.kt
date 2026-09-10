@@ -298,7 +298,8 @@ private fun DualSubExperience(
         } else {
             WindowInsets.safeDrawing
         }
-    val liveCaptionCaptureEnabled = state.subtitlePanelVisible && (state.liveFallback || state.wordHighlightEnabled)
+    val liveCaptionCaptureEnabled = state.subtitlePanelVisible &&
+        (state.liveFallback || shouldCaptureLiveCaptions(state.generatedCaptions, state.wordHighlightEnabled))
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showSettings = true
@@ -335,7 +336,6 @@ private fun DualSubExperience(
                         onPlaybackSecond = onPlaybackSecond,
                         onPlaybackPaused = onPlaybackPaused,
                         liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
-                        captionLanguage = captionEngineLanguage(state),
                         suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
                         fullscreenOverlay = fullscreenLearningOverlay,
                         modifier =

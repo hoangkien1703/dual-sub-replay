@@ -5,6 +5,9 @@ package com.kienhoang.dualsubreplay.data
  * real-time spoken-word highlight in the UI.
  */
 
+/** v0.9.5's visual lead, applied only after the first word has started. */
+internal const val KARAOKE_HIGHLIGHT_LEAD_MS = 75L
+
 /** Splits [text] into words and spreads them across the cue duration by length. */
 internal fun estimateWordTimings(
     text: String,
@@ -48,9 +51,8 @@ internal fun estimateWordTimings(
 
 /**
  * Index of the word being spoken at [timeMs]. Between words the previously
- * started word stays highlighted so short gaps do not flicker. Transitions happen
- * at their timestamp, without a fixed lead. Transport compensation belongs to
- * CaptionPlaybackClock.
+ * started word stays highlighted so short gaps do not flicker. Keep v0.9.5's
+ * small visual lead for transitions between words, without starting a cue early.
  */
 internal fun activeWordIndex(
     words: List<SubtitleWord>,
@@ -59,7 +61,7 @@ internal fun activeWordIndex(
     val firstWord = words.firstOrNull() ?: return -1
     if (timeMs < firstWord.startMs) return -1
 
-    val syncTimeMs = timeMs
+    val syncTimeMs = timeMs + KARAOKE_HIGHLIGHT_LEAD_MS
     var result = 0
     for (index in 1 until words.size) {
         if (words[index].startMs <= syncTimeMs) result = index else break

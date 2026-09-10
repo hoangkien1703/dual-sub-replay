@@ -1,3 +1,5 @@
+> Superseded: the user rejected this engine on their phone in landscape. PR #63 now restores the v0.9.5 timing path; see [current restoration and checks](../v095-highlighting.md). This document records the earlier attempt.
+
 # Preview-16 timing engine port
 
 The user confirmed that `highlight-dual-sub-app` release `preview-16` provides the desired word timing on their phone. This port replaces the unsuccessful Adaptive/Live/Transcript arbitration in PR #63.

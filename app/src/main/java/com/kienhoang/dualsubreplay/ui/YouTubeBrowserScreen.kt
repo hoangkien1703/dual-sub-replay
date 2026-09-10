@@ -259,7 +259,6 @@ internal fun SingleYouTubePage(
     onPlaybackSecond: (videoId: String, second: Float, liveCaption: LiveCaptionSample?) -> Unit,
     onPlaybackPaused: (String, Boolean) -> Unit = { _, _ -> },
     liveCaptionCaptureEnabled: Boolean = false,
-    captionLanguage: String = "en",
     suppressPageCaptions: Boolean = false,
     fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -270,8 +269,6 @@ internal fun SingleYouTubePage(
     val currentOnPlaybackSecond by rememberUpdatedState(onPlaybackSecond)
     val currentOnPlaybackPaused by rememberUpdatedState(onPlaybackPaused)
     val currentLiveCaptionCaptureEnabled by rememberUpdatedState(liveCaptionCaptureEnabled)
-    val currentCaptionLanguage by rememberUpdatedState(captionLanguage)
-    val labEngine = remember(context) { loadLabCaptionEngine(context) }
     val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
@@ -430,14 +427,6 @@ internal fun SingleYouTubePage(
                             webCaptionVisibilityScript(currentSuppressPageCaptions),
                             null,
                         )
-                        view.evaluateJavascript(
-                            labEngineConfigurationScript(
-                                currentLiveCaptionCaptureEnabled && lifecycleStarted,
-                                currentCaptionLanguage,
-                                labEngine,
-                            ),
-                            null,
-                        )
                     }
                 }
 
@@ -487,12 +476,6 @@ internal fun SingleYouTubePage(
                     return true
                 }
             }
-            installLabCaptionBridge(this) { sample ->
-                val sameLanguage = sample.languageCode?.substringBefore('-') == currentCaptionLanguage.substringBefore('-')
-                if (currentLiveCaptionCaptureEnabled && lifecycleStarted && sameLanguage) {
-                    currentOnPlaybackSecond(sample.videoId!!, sample.mediaTimeMs / 1000f, sample)
-                }
-            }
             loadUrl(trustedEmbeddedUrlOrHome(lastKnownUrl))
         }
     }
@@ -509,14 +492,10 @@ internal fun SingleYouTubePage(
         }
     }
 
-    LaunchedEffect(webView, liveCaptionCaptureEnabled, captionLanguage, lifecycleStarted) {
+    LaunchedEffect(webView, liveCaptionCaptureEnabled, lifecycleStarted) {
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(
-                webLiveCaptionConfigurationScript(liveCaptionCaptureEnabled),
-                null,
-            )
-            webView.evaluateJavascript(
-                labEngineConfigurationScript(liveCaptionCaptureEnabled && lifecycleStarted, captionLanguage, labEngine),
+                webLiveCaptionConfigurationScript(liveCaptionCaptureEnabled && lifecycleStarted),
                 null,
             )
         }

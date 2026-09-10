@@ -3,16 +3,74 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class KaraokeTimingTest {
     @Test
+    fun automaticTimingUsesLiveProgressWhenAvailableAndTimestampsOtherwise() {
+        val timed = KaraokePosition(1, 2)
+        val live = KaraokePosition(2, 0)
+        assertTrue(shouldCaptureLiveCaptions(true, true))
+        assertFalse(shouldCaptureLiveCaptions(false, true))
+        assertFalse(shouldCaptureLiveCaptions(true, false))
+        assertEquals(live, effectiveKaraokePosition(true, true, timed, live))
+        assertEquals(timed, effectiveKaraokePosition(true, true, timed, null))
+        assertEquals(timed, effectiveKaraokePosition(false, true, timed, live))
+        assertNull(effectiveKaraokePosition(true, false, timed, live))
+    }
+
+    @Test
+    fun rollingCaptionProgressNeverFlashesBackToTheFirstWord() {
+        val first = reconcileLiveCaptionProgress(
+            null,
+            sample("You explain it kind of", revision = 1, mediaTimeMs = 20_000),
+        )!!
+        assertEquals(0, first.activeWordIndex)
+
+        val grown = reconcileLiveCaptionProgress(
+            first,
+            sample("You explain it kind of now", revision = 2, mediaTimeMs = 20_300),
+        )!!
+        assertEquals(5, grown.activeWordIndex)
+
+        val rolled = reconcileLiveCaptionProgress(
+            grown,
+            sample("it kind of now please", revision = 3, mediaTimeMs = 20_600),
+        )!!
+        assertEquals(4, rolled.activeWordIndex)
+
+        val shrunk = reconcileLiveCaptionProgress(
+            rolled,
+            sample("kind of now please", revision = 4, mediaTimeMs = 20_900),
+        )!!
+        assertEquals(3, shrunk.activeWordIndex)
+    }
+
+    @Test
+    fun unrelatedCaptionStartsAtItsFirstWordAndPunctuationIsNormalized() {
+        val old = reconcileLiveCaptionProgress(
+            null,
+            sample("We're ready!", revision = 1, mediaTimeMs = 1_000),
+        )!!
+        val fresh = reconcileLiveCaptionProgress(
+            old,
+            sample("Completely new sentence.", revision = 2, mediaTimeMs = 2_000),
+        )!!
+
+        assertEquals(listOf("completely", "new", "sentence"), fresh.tokens)
+        assertEquals(0, fresh.activeWordIndex)
+        assertEquals(listOf("we're", "ready"), karaokeTokens("WE'RE ready!"))
+    }
+
+    @Test
     fun liveWordMapsAcrossSplitSegmentBoundary() {
-        val segments =
-            listOf(
-                segment(0, 0, "We are"),
-                segment(1, 1_000, "really ready"),
-            )
+        val segments = listOf(
+            segment(0, 0, "We are"),
+            segment(1, 1_000, "really ready"),
+        )
 
         assertEquals(
             KaraokePosition(1, 0),
@@ -41,11 +99,63 @@ class KaraokeTimingTest {
         )
     }
 
-    private fun segment(
-        id: Long,
-        startMs: Long,
-        text: String,
-    ): SubtitleSegment {
+    @Test
+    fun adaptiveNeedsTwoCoherentRevisionsAndFallsBackWhenStale() {
+        val tracker = LiveCaptionTracker()
+        val segments = listOf(segment(0, 0, "you explain it kind now"))
+
+        assertNull(
+            tracker.resolve(
+                sample = sample("you explain", 1, 1_000),
+                segments = segments,
+                referenceSegmentIndex = 0,
+                playbackTimeMs = 1_000,
+            ),
+        )
+        assertEquals(
+            KaraokePosition(0, 2),
+            tracker.resolve(
+                sample = sample("you explain it", 2, 1_300),
+                segments = segments,
+                referenceSegmentIndex = 0,
+                playbackTimeMs = 1_300,
+            ),
+        )
+        assertNull(
+            tracker.resolve(
+                sample = sample("you explain it", 2, 1_300),
+                segments = segments,
+                referenceSegmentIndex = 0,
+                playbackTimeMs = 3_301,
+            ),
+        )
+        assertNull(
+            tracker.resolve(
+                sample = sample("it kind", 3, 3_400),
+                segments = segments,
+                referenceSegmentIndex = 0,
+                playbackTimeMs = 3_400,
+            ),
+        )
+        assertEquals(
+            KaraokePosition(0, 4),
+            tracker.resolve(
+                sample = sample("it kind now", 4, 3_700),
+                segments = segments,
+                referenceSegmentIndex = 0,
+                playbackTimeMs = 3_700,
+            ),
+        )
+    }
+
+    private fun sample(text: String, revision: Long, mediaTimeMs: Long) = LiveCaptionSample(
+        text = text,
+        revision = revision,
+        mediaTimeMs = mediaTimeMs,
+        present = text.isNotBlank(),
+    )
+
+    private fun segment(id: Long, startMs: Long, text: String): SubtitleSegment {
         val tokens = text.split(' ')
         val duration = tokens.size * 400L
         return SubtitleSegment(
@@ -53,14 +163,13 @@ class KaraokeTimingTest {
             startMs = startMs,
             endMs = startMs + duration,
             originalText = text,
-            words =
-                tokens.mapIndexed { index, token ->
-                    SubtitleWord(
-                        text = token,
-                        startMs = startMs + index * 400L,
-                        endMs = startMs + (index + 1) * 400L,
-                    )
-                },
+            words = tokens.mapIndexed { index, token ->
+                SubtitleWord(
+                    text = token,
+                    startMs = startMs + index * 400L,
+                    endMs = startMs + (index + 1) * 400L,
+                )
+            },
         )
     }
 }

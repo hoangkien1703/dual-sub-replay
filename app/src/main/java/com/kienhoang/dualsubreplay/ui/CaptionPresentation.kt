@@ -26,7 +26,7 @@ private fun unfilteredLearningOverlayContent(state: DualSubUiState): LearningOve
     if (state.liveFallback) {
         return LearningOverlayContent(
             activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
-            words = state.liveOriginal?.let(::labCaptionWords).orEmpty(),
+            words = state.liveOriginal?.let(::liveCaptionWords).orEmpty(),
             originalText = state.liveOriginal,
             translatedText = state.liveTranslated ?: if (state.liveOriginal != null) "Translating…" else null,
             statusText = "Live subtitles · ${state.statusMessage.orEmpty()}",

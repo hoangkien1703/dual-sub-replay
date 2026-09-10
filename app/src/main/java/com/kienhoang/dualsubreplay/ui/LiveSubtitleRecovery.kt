@@ -85,7 +85,7 @@ internal fun LiveSubtitlePanel(
         Text(state.statusMessage ?: "Current captions only; paragraph replay is unavailable.", style = MaterialTheme.typography.bodySmall)
         state.liveOriginal?.let { original ->
             CompactSubtitleCard(
-                segment = SubtitleSegment(0, 0, 0, original, state.liveTranslated, labCaptionWords(original)),
+                segment = SubtitleSegment(0, 0, 0, original, state.liveTranslated, liveCaptionWords(original)),
                 activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
                 showOriginal = state.showOriginal(),
                 showTranslation = state.showTranslation(),
