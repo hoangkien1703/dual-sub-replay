@@ -713,7 +713,7 @@ internal fun LearningSubtitleOverlay(
                                 fontWeight = FontWeight.Medium,
                                 color = originalColor,
                             ),
-                            maxLines = 2,
+                            maxLines = Int.MAX_VALUE,
                             overflow = TextOverflow.Ellipsis,
                             onClick = { offset ->
                                 val token = findWordAtOffset(original, offset, originalLanguageCode)
@@ -731,7 +731,7 @@ internal fun LearningSubtitleOverlay(
                             lineHeight = (21f * fontScale).sp,
                             fontWeight = FontWeight.Medium,
                             color = originalColor,
-                            maxLines = 2,
+                            maxLines = Int.MAX_VALUE,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -764,7 +764,7 @@ internal fun LearningSubtitleOverlay(
                                 lineHeight = (18f * fontScale).sp,
                                 color = translatedColor,
                             ),
-                            maxLines = 2,
+                            maxLines = Int.MAX_VALUE,
                             overflow = TextOverflow.Ellipsis,
                             onClick = { offset ->
                                 val token = findWordAtOffset(
@@ -786,7 +786,7 @@ internal fun LearningSubtitleOverlay(
                             fontSize = (14f * fontScale).sp,
                             lineHeight = (18f * fontScale).sp,
                             color = translatedColor,
-                            maxLines = 2,
+                            maxLines = Int.MAX_VALUE,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }

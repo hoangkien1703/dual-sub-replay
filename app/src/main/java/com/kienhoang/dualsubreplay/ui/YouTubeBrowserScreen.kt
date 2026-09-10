@@ -55,6 +55,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
@@ -500,34 +501,58 @@ internal fun SingleYouTubePage(
         }
     }
 
-    LaunchedEffect(webView, lifecycleStarted) {
+    LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect
         val gate = PlaybackSnapshotGate()
+        val clock = CaptionPlaybackClock()
+        var pending = false
+        var lastRequest = 0L
+        val ticker =
+            launch {
+                while (isActive) {
+                    val snapshot = clock.sample()
+                    val now = android.os.SystemClock.elapsedRealtime()
+                    val position = clock.position(now)
+                    val selection = snapshot?.url?.takeIf { it == webView.url }?.let(::browseVideoSelection)
+                    if (selection != null && position != null) {
+                        currentOnPlaybackPaused(selection.videoId, snapshot.paused)
+                        currentOnPlaybackSecond(selection.videoId, position / 1000f, snapshot.liveCaption)
+                    }
+                    delay(33)
+                }
+            }
         try {
             while (isActive) {
-                if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
-                    youtubePlayerControlsVisible.value = false
-                    youtubeNativeDialogVisible.value = false
-                    delay(PLAYBACK_POLL_INTERVAL_MS)
-                    continue
-                }
-                val requestedUrl = webView.url
-                val ticket = gate.request()
-                webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
-                    val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
-                    if (!gate.accept(ticket, requestedUrl, webView.url, snapshot.url)) return@evaluateJavascript
-                    controller.observePage(snapshot.url)
-                    youtubePlayerControlsVisible.value = snapshot.controlsVisible
-                    youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
-                    reportNavigation(webView, snapshot.url)
-                    val selection = browseVideoSelection(snapshot.url) ?: return@evaluateJavascript
-                    val second = snapshot.currentSecond ?: return@evaluateJavascript
-                    currentOnPlaybackPaused(selection.videoId, snapshot.paused)
-                    currentOnPlaybackSecond(selection.videoId, second, snapshot.liveCaption)
+                val now = android.os.SystemClock.elapsedRealtime()
+                if (webView.url.orEmpty().let(::isYouTubeWebUrl) && (!pending || now - lastRequest > 500)) {
+                    pending = true
+                    val requestedUrl = webView.url
+                    val ticket = gate.request()
+                    val requestedAt = now
+                    lastRequest = now
+                    webView.evaluateJavascript(WEB_PLAYBACK_SNAPSHOT_SCRIPT) { rawValue ->
+                        if (lastRequest == requestedAt) pending = false
+                        val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
+                        if (!gate.accept(ticket, requestedUrl, webView.url, snapshot.url)) return@evaluateJavascript
+                        controller.observePage(snapshot.url)
+                        youtubePlayerControlsVisible.value = snapshot.controlsVisible
+                        youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
+                        reportNavigation(webView, snapshot.url)
+                        val receivedAt = android.os.SystemClock.elapsedRealtime()
+                        val accepted = clock.accept(snapshot, requestedAt, receivedAt, System.currentTimeMillis())
+                        CaptionTimingDiagnostics.record {
+                            "sample mediaMs=${snapshot.currentSecond?.times(1000)?.toLong()} bridgeMs=${receivedAt - requestedAt} " +
+                                "sampleAgeMs=${System.currentTimeMillis() - snapshot.sampledAtEpochMs} " +
+                                "captionMs=${snapshot.liveCaption?.mediaTimeMs} " +
+                                "accepted=$accepted paused=${snapshot.paused} buffering=${snapshot.buffering} " +
+                                "fullscreen=${fullscreenSession != null} orientation=${webView.resources.configuration.orientation}"
+                        }
+                    }
                 }
                 delay(PLAYBACK_POLL_INTERVAL_MS)
             }
         } finally {
+            ticker.cancel()
             gate.close()
         }
     }

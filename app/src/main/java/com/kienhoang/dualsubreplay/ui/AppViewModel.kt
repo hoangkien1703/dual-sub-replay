@@ -4,23 +4,21 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
-import com.kienhoang.dualsubreplay.data.LearningWordSelection
-import com.kienhoang.dualsubreplay.data.WordTap
-import com.kienhoang.dualsubreplay.data.VocabularyRepository
-import com.kienhoang.dualsubreplay.data.SavedWord
-import com.kienhoang.dualsubreplay.data.savedWordFrom
-import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
+import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.VocabularyRepository
+import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
-import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
+import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
+import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
-import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
@@ -30,6 +28,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
 
 enum class LoadStage { IDLE, LOADING_CAPTIONS, TRANSLATING, READY, ERROR }
 
@@ -63,7 +63,7 @@ data class DualSubUiState(
     val wordHighlightEnabled: Boolean = true,
     val karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     val customColorsEnabled: Boolean = true,
-    val splitLongSentencesEnabled: Boolean = true,
+    val captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     val isDownloadingTranslationModel: Boolean = false,
     val lockOverlayToVideo: Boolean = false,
     val preloadModelsEnabled: Boolean = true,
@@ -98,10 +98,15 @@ internal fun shouldAcceptSourcePreference(
 }
 
 /** Playback tracking only restarts from zero when a different video loads. */
-internal fun shouldResetPlaybackClock(previousVideoId: String?, newVideoId: String): Boolean =
-    previousVideoId != newVideoId
+internal fun shouldResetPlaybackClock(
+    previousVideoId: String?,
+    newVideoId: String,
+): Boolean = previousVideoId != newVideoId
 
-internal fun activeSubtitleIndex(segments: List<SubtitleSegment>, timeMs: Long): Int {
+internal fun activeSubtitleIndex(
+    segments: List<SubtitleSegment>,
+    timeMs: Long,
+): Int {
     var low = 0
     var high = segments.lastIndex
     var candidate = -1
@@ -117,7 +122,10 @@ internal fun activeSubtitleIndex(segments: List<SubtitleSegment>, timeMs: Long):
     return candidate.takeIf { it >= 0 && timeMs < segments[it].endMs } ?: -1
 }
 
-internal fun nearestSegmentIndex(segments: List<SubtitleSegment>, timeMs: Long): Int {
+internal fun nearestSegmentIndex(
+    segments: List<SubtitleSegment>,
+    timeMs: Long,
+): Int {
     var low = 0
     var high = segments.lastIndex
     var candidate = -1
@@ -138,10 +146,12 @@ internal fun activeWordIndex(
     segments: List<SubtitleSegment>,
     segmentIndex: Int,
     timeMs: Long,
-): Int = segments.getOrNull(segmentIndex)
-    ?.takeIf { segment -> segment.startMs <= timeMs && timeMs < segment.endMs }
-    ?.let { segment -> timedActiveWordIndex(segment.words, timeMs) }
-    ?: -1
+): Int =
+    segments
+        .getOrNull(segmentIndex)
+        ?.takeIf { segment -> segment.startMs <= timeMs && timeMs < segment.endMs }
+        ?.let { segment -> timedActiveWordIndex(segment.words, timeMs) }
+        ?: -1
 
 internal const val TRANSLATION_PUBLISH_BATCH = 8
 
@@ -179,13 +189,17 @@ internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
 internal fun preferredCaptionLanguages(sourcePreference: String): List<String> =
     sourcePreference.takeUnless { it == "auto" }?.let(::listOf).orEmpty()
 
-internal fun resolvedSourcePreference(requested: String, resolved: String): String =
+internal fun resolvedSourcePreference(
+    requested: String,
+    resolved: String,
+): String =
     requested.takeIf {
         it == "auto" || TranslationLanguages.normalize(it) == TranslationLanguages.normalize(resolved)
     } ?: "auto"
 
 internal fun storedSourcePreference(raw: String?): String =
-    raw?.takeIf { it != "auto" }
+    raw
+        ?.takeIf { it != "auto" }
         ?.let(::normalizeSupportedLanguage)
         ?: "auto"
 
@@ -198,10 +212,12 @@ internal fun normalizedOnboardingLanguages(
     nativeLanguage: String,
     learningLanguage: String,
 ): Pair<String, String>? {
-    val native = TranslationLanguages.normalize(nativeLanguage).takeIf(TranslationLanguages::isSupported)
-        ?: return null
-    val learning = TranslationLanguages.normalize(learningLanguage).takeIf(TranslationLanguages::isSupported)
-        ?: return null
+    val native =
+        TranslationLanguages.normalize(nativeLanguage).takeIf(TranslationLanguages::isSupported)
+            ?: return null
+    val learning =
+        TranslationLanguages.normalize(learningLanguage).takeIf(TranslationLanguages::isSupported)
+            ?: return null
     return native to learning
 }
 
@@ -227,8 +243,12 @@ internal fun initialGuideCompleted(
     onboardingCompleted: Boolean,
 ): Boolean = if (preferenceExists) preferenceValue else onboardingCompleted
 
-class AppViewModel internal constructor(application: Application, private val captionProvider: CaptionProvider) : AndroidViewModel(application) {
+class AppViewModel internal constructor(
+    application: Application,
+    private val captionProvider: CaptionProvider,
+) : AndroidViewModel(application) {
     constructor(application: Application) : this(application, YouTubeCaptionProvider())
+
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
     private val translator = OnDeviceTranslator()
     internal val vocabulary = VocabularyRepository.get(application)
@@ -242,73 +262,98 @@ class AppViewModel internal constructor(application: Application, private val ca
     private var liveTranslationJob: Job? = null
     private var rejectedLiveRevision: Long? = null
 
-    private val _state = MutableStateFlow(
-        DualSubUiState(
-            browserUrl = preferences.getString("last_browser_url", YOUTUBE_HOME_URL)
-                ?.let(::trustedEmbeddedUrlOrHome)
-                ?: YOUTUBE_HOME_URL,
-            originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
-            translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
-            fontScale = preferences.getFloat("font_scale", 1f),
-            sourcePreference = storedSourcePreference(
-                preferences.getString("preferred_caption_language", "auto"),
-            ),
-            targetLanguage = preferences.getString("target_language", "vi")
-                ?.takeIf(TranslationLanguages::isSupported)
-                ?: "vi",
-            onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
-            guideCompleted = initialGuideCompleted(
-                preferenceExists = preferences.contains(GUIDE_COMPLETED_PREFERENCE),
-                preferenceValue = preferences.getBoolean(GUIDE_COMPLETED_PREFERENCE, false),
+    private val _state =
+        MutableStateFlow(
+            DualSubUiState(
+                browserUrl =
+                    preferences
+                        .getString("last_browser_url", YOUTUBE_HOME_URL)
+                        ?.let(::trustedEmbeddedUrlOrHome)
+                        ?: YOUTUBE_HOME_URL,
+                originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
+                translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
+                fontScale = preferences.getFloat("font_scale", 1f),
+                sourcePreference =
+                    storedSourcePreference(
+                        preferences.getString("preferred_caption_language", "auto"),
+                    ),
+                targetLanguage =
+                    preferences
+                        .getString("target_language", "vi")
+                        ?.takeIf(TranslationLanguages::isSupported)
+                        ?: "vi",
                 onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
+                guideCompleted =
+                    initialGuideCompleted(
+                        preferenceExists = preferences.contains(GUIDE_COMPLETED_PREFERENCE),
+                        preferenceValue = preferences.getBoolean(GUIDE_COMPLETED_PREFERENCE, false),
+                        onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
+                    ),
+                landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", true),
+                originalColorKey =
+                    storedSubtitleColorKey(
+                        preferences.getString(SUBTITLE_ORIGINAL_COLOR_PREFERENCE, null),
+                        DEFAULT_ORIGINAL_COLOR_KEY,
+                    ),
+                translatedColorKey =
+                    storedSubtitleColorKey(
+                        preferences.getString(SUBTITLE_TRANSLATED_COLOR_PREFERENCE, null),
+                        DEFAULT_TRANSLATED_COLOR_KEY,
+                    ),
+                highlightColorKey =
+                    storedSubtitleColorKey(
+                        preferences.getString(SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE, null),
+                        DEFAULT_HIGHLIGHT_COLOR_KEY,
+                    ),
+                wordHighlightEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, true),
+                    ),
+                karaokeTimingMode =
+                    storedKaraokeTimingMode(
+                        preferences.getString(KARAOKE_TIMING_MODE_PREFERENCE, null),
+                    ),
+                customColorsEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, true),
+                    ),
+                captionFormat =
+                    storedCaptionFormat(
+                        preferences.getString(CAPTION_FORMAT_PREFERENCE, null),
+                        preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
+                    ),
+                lockOverlayToVideo =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, false),
+                    ),
+                preloadModelsEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, true),
+                    ),
+                naturalSubtitlesEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(NATURAL_SUBTITLES_PREFERENCE, true),
+                    ),
+                wordLearningEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
+                    ),
+                wordLearningTarget =
+                    preferences.getString(
+                        WORD_LEARNING_TARGET_PREFERENCE,
+                        "both",
+                    ) ?: "both",
+                wordLearningActiveOnly =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
+                    ),
+                autoPronounce = preferences.getBoolean("auto_pronounce", true),
+                tapToLearnEnabled =
+                    storedFeatureEnabled(
+                        preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
+                    ),
             ),
-            landscapeSplitEnabled = preferences.getBoolean("landscape_split_enabled", true),
-            originalColorKey = storedSubtitleColorKey(
-                preferences.getString(SUBTITLE_ORIGINAL_COLOR_PREFERENCE, null),
-                DEFAULT_ORIGINAL_COLOR_KEY,
-            ),
-            translatedColorKey = storedSubtitleColorKey(
-                preferences.getString(SUBTITLE_TRANSLATED_COLOR_PREFERENCE, null),
-                DEFAULT_TRANSLATED_COLOR_KEY,
-            ),
-            highlightColorKey = storedSubtitleColorKey(
-                preferences.getString(SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE, null),
-                DEFAULT_HIGHLIGHT_COLOR_KEY,
-            ),
-            wordHighlightEnabled = storedFeatureEnabled(
-                preferences.getBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, true),
-            ),
-            karaokeTimingMode = storedKaraokeTimingMode(
-                preferences.getString(KARAOKE_TIMING_MODE_PREFERENCE, null),
-            ),
-            customColorsEnabled = storedFeatureEnabled(
-                preferences.getBoolean(CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE, true),
-            ),
-            splitLongSentencesEnabled = storedFeatureEnabled(
-                preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
-            ),
-            lockOverlayToVideo = storedFeatureEnabled(
-                preferences.getBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, false),
-            ),
-            preloadModelsEnabled = storedFeatureEnabled(
-                preferences.getBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, true),
-            ),
-            naturalSubtitlesEnabled = storedFeatureEnabled(
-                preferences.getBoolean(NATURAL_SUBTITLES_PREFERENCE, true),
-            ),
-            wordLearningEnabled = storedFeatureEnabled(
-                preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
-            ),
-            wordLearningTarget = preferences.getString(WORD_LEARNING_TARGET_PREFERENCE, "both") ?: "both",
-            wordLearningActiveOnly = storedFeatureEnabled(
-                preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
-            ),
-            autoPronounce = preferences.getBoolean("auto_pronounce", true),
-            tapToLearnEnabled = storedFeatureEnabled(
-                preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
-            ),
-        ),
-    )
+        )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
     private val visibilityListener =
@@ -341,8 +386,13 @@ class AppViewModel internal constructor(application: Application, private val ca
             try {
                 vocabulary.refresh()
                 retireLegacyDownloadJobs(application)
-            } catch (cancel: CancellationException) { throw cancel }
-            catch (_: Exception) { /* The saved-words screen reports storage failures with a retry on reopen. */ }
+            } catch (
+                cancel: CancellationException,
+            ) {
+                throw cancel
+            } catch (_: Exception) {
+                // The saved-words screen reports storage failures with a retry on reopen.
+            }
         }
         if (_state.value.preloadModelsEnabled) {
             val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
@@ -386,8 +436,9 @@ class AppViewModel internal constructor(application: Application, private val ca
         val current = _state.value
         if (current.activeVideoId != videoId || !second.isFinite()) return
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
-        val seek = timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs ||
-            timeMs > latestPlaybackSecondMs + 2_000L
+        val seek =
+            timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs ||
+                timeMs > latestPlaybackSecondMs + 2_000L
         if (current.liveFallback) {
             latestPlaybackSecondMs = timeMs
             updateLiveSubtitle(videoId, liveCaption, seek)
@@ -398,78 +449,122 @@ class AppViewModel internal constructor(application: Application, private val ca
         }
         latestPlaybackSecondMs = timeMs
         val timedIndex = activeSubtitleIndex(current.segments, timeMs)
-        val referenceIndex = if (timedIndex >= 0) {
-            timedIndex
-        } else {
-            nearestSegmentIndex(current.segments, timeMs)
-        }
-        val liveCaptureAllowed = shouldCaptureLiveCaptions(
-            mode = current.karaokeTimingMode,
-            generatedCaptions = current.generatedCaptions,
-            wordHighlightEnabled = current.wordHighlightEnabled,
-        )
-        val livePosition = if (liveCaptureAllowed) {
-            liveCaptionTracker.resolve(
-                sample = liveCaption,
-                segments = current.segments,
-                referenceSegmentIndex = referenceIndex,
-                playbackTimeMs = timeMs,
-                strict = current.karaokeTimingMode == KaraokeTimingMode.YOUTUBE_LIVE,
+        val referenceIndex =
+            if (timedIndex >= 0) {
+                timedIndex
+            } else {
+                nearestSegmentIndex(current.segments, timeMs)
+            }
+        val liveCaptureAllowed =
+            shouldCaptureLiveCaptions(
+                mode = current.karaokeTimingMode,
+                generatedCaptions = current.generatedCaptions,
+                wordHighlightEnabled = current.wordHighlightEnabled,
             )
-        } else {
-            null
-        }
+        val livePosition =
+            if (liveCaptureAllowed) {
+                liveCaptionTracker.resolve(
+                    sample = liveCaption,
+                    segments = current.segments,
+                    referenceSegmentIndex = referenceIndex,
+                    playbackTimeMs = timeMs,
+                    strict = current.karaokeTimingMode == KaraokeTimingMode.YOUTUBE_LIVE,
+                )
+            } else {
+                null
+            }
         val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
-        val timedPosition = timedIndex.takeIf { it >= 0 }?.let {
-            KaraokePosition(segmentIndex = it, wordIndex = timedWordIndex)
-        }?.takeIf { it.wordIndex >= 0 }
-        val effectivePosition = effectiveKaraokePosition(
-            mode = current.karaokeTimingMode,
-            generatedCaptions = current.generatedCaptions,
-            wordHighlightEnabled = current.wordHighlightEnabled,
-            timedPosition = timedPosition,
-            livePosition = livePosition,
-        )
-        val index = livePosition?.segmentIndex ?: timedIndex
+        val timedPosition =
+            timedIndex
+                .takeIf { it >= 0 }
+                ?.let {
+                    KaraokePosition(segmentIndex = it, wordIndex = timedWordIndex)
+                }?.takeIf { it.wordIndex >= 0 }
+        val effectivePosition =
+            effectiveKaraokePosition(
+                mode = current.karaokeTimingMode,
+                generatedCaptions = current.generatedCaptions,
+                wordHighlightEnabled = current.wordHighlightEnabled,
+                timedPosition = timedPosition,
+                livePosition = livePosition,
+            )
+        val index = effectivePosition?.segmentIndex ?: timedIndex
         val wordIndex = effectivePosition?.wordIndex ?: -1
+        CaptionTimingDiagnostics.record("selection") {
+            "selection mediaMs=$timeMs captionMs=${liveCaption?.mediaTimeMs} segment=$index word=$wordIndex " +
+                "source=${if (effectivePosition != null && effectivePosition == livePosition) "live" else "transcript"}"
+        }
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
             _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
         }
     }
 
-    private fun updateLiveSubtitle(videoId: String, sample: LiveCaptionSample?, seek: Boolean) {
+    private fun updateLiveSubtitle(
+        videoId: String,
+        sample: LiveCaptionSample?,
+        seek: Boolean,
+    ) {
         if (seek) rejectedLiveRevision = sample?.revision
         val key = liveTranslationKey(sample?.takeUnless { it.revision == rejectedLiveRevision }, videoId, _state.value.targetLanguage)
         if (!liveTranslationGate.update(key, seek)) return
         liveTranslationJob?.cancel()
         val ticket = liveTranslationGate.generation
-        _state.update { it.copy(
-            liveOriginal = key?.text, liveTranslated = null,
-            resolvedSourceLanguage = key?.language,
-            statusMessage = if (key == null) "Waiting for YouTube captions and their language. Play the video with captions enabled." else "Translating live captions…",
-        ) }
+        _state.update {
+            it.copy(
+                liveOriginal = key?.text,
+                liveTranslated = null,
+                resolvedSourceLanguage = key?.language,
+                statusMessage =
+                    if (key ==
+                        null
+                    ) {
+                        "Waiting for YouTube captions and their language. Play the video with captions enabled."
+                    } else {
+                        "Translating live captions…"
+                    },
+            )
+        }
         if (key == null) return
         if (!TranslationLanguages.isSupported(key.language)) {
-            _state.update { it.copy(statusMessage = "Live translation is not supported for ${TranslationLanguages.displayName(key.language)}.") }
+            _state.update {
+                it.copy(
+                    statusMessage = "Live translation is not supported for ${TranslationLanguages.displayName(key.language)}.",
+                )
+            }
             return
         }
-        liveTranslationJob = viewModelScope.launch {
-            try {
-                val translated = debouncedLiveTranslation(key,
-                    isCurrent = { liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback && _state.value.activeVideoId == videoId },
-                    translate = translator::translateSingle,
-                ) ?: return@launch
-                if (liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback && _state.value.activeVideoId == videoId) {
-                    _state.update { it.copy(liveTranslated = translated, statusMessage = "Current captions only; paragraph replay is unavailable.") }
-                }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (_: Exception) {
-                if (liveTranslationGate.accepts(ticket, key)) {
-                    _state.update { it.copy(statusMessage = "Live translation unavailable. Check the connection for the language model download.") }
+        liveTranslationJob =
+            viewModelScope.launch {
+                try {
+                    val translated =
+                        debouncedLiveTranslation(
+                            key,
+                            isCurrent = {
+                                liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback &&
+                                    _state.value.activeVideoId == videoId
+                            },
+                            translate = translator::translateSingle,
+                        ) ?: return@launch
+                    if (liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback && _state.value.activeVideoId == videoId) {
+                        _state.update {
+                            it.copy(
+                                liveTranslated = translated,
+                                statusMessage = "Current captions only; paragraph replay is unavailable.",
+                            )
+                        }
+                    }
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    if (liveTranslationGate.accepts(ticket, key)) {
+                        _state.update {
+                            it.copy(
+                                statusMessage = "Live translation unavailable. Check the connection for the language model download.",
+                            )
+                        }
+                    }
                 }
             }
-        }
     }
 
     fun setSourcePreference(language: String) {
@@ -497,7 +592,10 @@ class AppViewModel internal constructor(application: Application, private val ca
         }
     }
 
-    fun completeOnboarding(nativeLanguage: String, learningLanguage: String) {
+    fun completeOnboarding(
+        nativeLanguage: String,
+        learningLanguage: String,
+    ) {
         val languages = normalizedOnboardingLanguages(nativeLanguage, learningLanguage) ?: return
         val (native, learning) = languages
         preferences.edit().putString("preferred_caption_language", learning).apply()
@@ -517,18 +615,22 @@ class AppViewModel internal constructor(application: Application, private val ca
         _state.update { it.copy(onboardingCompleted = true) }
     }
 
-    private fun warmTranslationModel(sourceLanguage: String, targetLanguage: String) {
+    private fun warmTranslationModel(
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
         translationWarmupJob?.cancel()
-        translationWarmupJob = viewModelScope.launch {
-            try {
-                translator.prepare(sourceLanguage, targetLanguage)
-            } catch (error: CancellationException) {
-                throw error
-            } catch (_: Exception) {
-                // Warm-up is opportunistic. The normal translation path retries
-                // model preparation and surfaces any real failure to the user.
+        translationWarmupJob =
+            viewModelScope.launch {
+                try {
+                    translator.prepare(sourceLanguage, targetLanguage)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    // Warm-up is opportunistic. The normal translation path retries
+                    // model preparation and surfaces any real failure to the user.
+                }
             }
-        }
     }
 
     fun completeGuide() {
@@ -547,23 +649,26 @@ class AppViewModel internal constructor(application: Application, private val ca
         _state.update { it.copy(landscapeSplitEnabled = enabled) }
     }
 
-    fun setOriginalSubtitleColor(key: String) = setSubtitleColorKey(
-        preferenceKey = SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
-        key = key,
-        fallback = DEFAULT_ORIGINAL_COLOR_KEY,
-    )
+    fun setOriginalSubtitleColor(key: String) =
+        setSubtitleColorKey(
+            preferenceKey = SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
+            key = key,
+            fallback = DEFAULT_ORIGINAL_COLOR_KEY,
+        )
 
-    fun setTranslatedSubtitleColor(key: String) = setSubtitleColorKey(
-        preferenceKey = SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
-        key = key,
-        fallback = DEFAULT_TRANSLATED_COLOR_KEY,
-    )
+    fun setTranslatedSubtitleColor(key: String) =
+        setSubtitleColorKey(
+            preferenceKey = SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
+            key = key,
+            fallback = DEFAULT_TRANSLATED_COLOR_KEY,
+        )
 
-    fun setHighlightColor(key: String) = setSubtitleColorKey(
-        preferenceKey = SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
-        key = key,
-        fallback = DEFAULT_HIGHLIGHT_COLOR_KEY,
-    )
+    fun setHighlightColor(key: String) =
+        setSubtitleColorKey(
+            preferenceKey = SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
+            key = key,
+            fallback = DEFAULT_HIGHLIGHT_COLOR_KEY,
+        )
 
     fun setWordHighlightEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, enabled).apply()
@@ -583,16 +688,10 @@ class AppViewModel internal constructor(application: Application, private val ca
         _state.update { it.copy(customColorsEnabled = enabled) }
     }
 
-    /**
-     * Toggling "Split long sentences" (issue #25) re-derives the displayed
-     * segments from the raw merged captions so both the overlay and the
-     * transcript panel switch immediately, then re-translates them.
-     */
-    fun setSplitLongSentencesEnabled(enabled: Boolean) {
-        preferences.edit().putBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, enabled).apply()
-        val alreadyEnabled = _state.value.splitLongSentencesEnabled
-        _state.update { it.copy(splitLongSentencesEnabled = enabled) }
-        if (alreadyEnabled == enabled) return
+    fun setCaptionFormat(format: CaptionFormat) {
+        if (_state.value.captionFormat == format) return
+        preferences.edit().putString(CAPTION_FORMAT_PREFERENCE, format.storageValue).apply()
+        _state.update { it.copy(captionFormat = format) }
         liveCaptionTracker.reset()
         refreshSplitSegments()
     }
@@ -649,12 +748,19 @@ class AppViewModel internal constructor(application: Application, private val ca
     fun selectLearningWord(tap: WordTap?) {
         val current = _state.value
         val source = current.resolvedSourceLanguage ?: current.sourcePreference.takeUnless { it == "auto" } ?: "en"
-        _state.update { it.copy(selectedLearningWord = tap?.let { selected ->
-            com.kienhoang.dualsubreplay.data.learningSelection(
-                if (current.liveFallback) selected.copy(segment = null) else selected,
-                source, current.targetLanguage, current.activeVideoId.takeUnless { current.liveFallback },
+        _state.update {
+            it.copy(
+                selectedLearningWord =
+                    tap?.let { selected ->
+                        com.kienhoang.dualsubreplay.data.learningSelection(
+                            if (current.liveFallback) selected.copy(segment = null) else selected,
+                            source,
+                            current.targetLanguage,
+                            current.activeVideoId.takeUnless { current.liveFallback },
+                        )
+                    },
             )
-        }) }
+        }
     }
 
     fun setAutoPronounce(enabled: Boolean) {
@@ -665,9 +771,11 @@ class AppViewModel internal constructor(application: Application, private val ca
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
         translator.translateSingle(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
 
-    internal suspend fun saveWord(selection: LearningWordSelection, meaning: String, online: Boolean): SavedWord {
-        return vocabulary.save(savedWordFrom(selection, meaning, online))
-    }
+    internal suspend fun saveWord(
+        selection: LearningWordSelection,
+        meaning: String,
+        online: Boolean,
+    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online))
 
     suspend fun translateWord(word: String): String {
         val current = _state.value
@@ -675,13 +783,18 @@ class AppViewModel internal constructor(application: Application, private val ca
         return translator.translateSingle(source, current.targetLanguage, word)
     }
 
-    private fun setSubtitleColorKey(preferenceKey: String, key: String, fallback: String) {
+    private fun setSubtitleColorKey(
+        preferenceKey: String,
+        key: String,
+        fallback: String,
+    ) {
         val normalized = storedSubtitleColorKey(key, fallback)
-        val currentKey = when (preferenceKey) {
-            SUBTITLE_ORIGINAL_COLOR_PREFERENCE -> _state.value.originalColorKey
-            SUBTITLE_TRANSLATED_COLOR_PREFERENCE -> _state.value.translatedColorKey
-            else -> _state.value.highlightColorKey
-        }
+        val currentKey =
+            when (preferenceKey) {
+                SUBTITLE_ORIGINAL_COLOR_PREFERENCE -> _state.value.originalColorKey
+                SUBTITLE_TRANSLATED_COLOR_PREFERENCE -> _state.value.translatedColorKey
+                else -> _state.value.highlightColorKey
+            }
         if (currentKey == normalized) return
         preferences.edit().putString(preferenceKey, normalized).apply()
         _state.update { state ->
@@ -718,7 +831,7 @@ class AppViewModel internal constructor(application: Application, private val ca
                 customColorsEnabled = true,
                 originalVisibility = CaptionVisibility.ALWAYS,
                 translatedVisibility = CaptionVisibility.ALWAYS,
-                splitLongSentencesEnabled = true,
+                captionFormat = CaptionFormat.SHORT_PHRASES,
                 lockOverlayToVideo = false,
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,
@@ -775,7 +888,10 @@ class AppViewModel internal constructor(application: Application, private val ca
         }
     }
 
-    private fun loadVideo(videoId: String, showPanel: Boolean) {
+    private fun loadVideo(
+        videoId: String,
+        showPanel: Boolean,
+    ) {
         val generation = ++loadGeneration
         loadingJob?.cancel()
         liveCaptionTracker.reset()
@@ -810,65 +926,76 @@ class AppViewModel internal constructor(application: Application, private val ca
                 errorMessage = null,
             )
         }
-        loadingJob = viewModelScope.launch {
-            try {
-                val preferredLanguages = preferredCaptionLanguages(_state.value.sourcePreference)
-                val track = captionProvider.fetch(videoId, preferredLanguages)
-                val merged = SubtitleMerger.merge(
-                    track.cues,
-                    enhancedNaturalFlow = _state.value.naturalSubtitlesEnabled,
-                )
-                if (merged.isEmpty()) {
-                    throw CaptionUnavailableException("This caption track contains no readable text.")
-                }
-                if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
-                val displaySegments = if (_state.value.splitLongSentencesEnabled) {
-                    SubtitleMerger.splitLongSegments(merged)
-                } else {
-                    merged
-                }
-                rawMergedSegments = merged
-                liveTranslationGate.reset()
-                liveTranslationJob?.cancel()
+        loadingJob =
+            viewModelScope.launch {
+                try {
+                    val preferredLanguages = preferredCaptionLanguages(_state.value.sourcePreference)
+                    val track = captionProvider.fetch(videoId, preferredLanguages)
+                    val merged = mergeCaptionTrack(track)
+                    if (merged.isEmpty()) {
+                        throw CaptionUnavailableException("This caption track contains no readable text.")
+                    }
+                    if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
+                    val displaySegments = captionDisplaySegments(merged, _state.value.captionFormat, _state.value.naturalSubtitlesEnabled)
+                    rawMergedSegments = merged
+                    liveTranslationGate.reset()
+                    liveTranslationJob?.cancel()
 
-                _state.update { current ->
-                    if (!isCurrentLoad(current, videoId, generation)) return@update current
-                    current.copy(
-                        liveFallback = false, liveOriginal = null, liveTranslated = null, retryingTranscript = false,
-                        resolvedSourceLanguage = track.languageCode,
-                        sourcePreference = resolvedSourcePreference(
-                            current.sourcePreference,
-                            track.languageCode,
-                        ),
-                        availableSourceLanguages = track.availableLanguages,
-                        generatedCaptions = track.isGenerated,
+                    _state.update { current ->
+                        if (!isCurrentLoad(current, videoId, generation)) return@update current
+                        current.copy(
+                            liveFallback = false,
+                            liveOriginal = null,
+                            liveTranslated = null,
+                            retryingTranscript = false,
+                            resolvedSourceLanguage = track.languageCode,
+                            sourcePreference =
+                                resolvedSourcePreference(
+                                    current.sourcePreference,
+                                    track.languageCode,
+                                ),
+                            availableSourceLanguages = track.availableLanguages,
+                            generatedCaptions = track.isGenerated,
+                            segments = displaySegments,
+                            stage = LoadStage.TRANSLATING,
+                            statusMessage = translationStartingMessage(current.targetLanguage),
+                        )
+                    }
+
+                    translateSegments(
+                        videoId = videoId,
+                        generation = generation,
+                        sourceLanguage = track.languageCode,
+                        targetLanguage = _state.value.targetLanguage,
                         segments = displaySegments,
-                        stage = LoadStage.TRANSLATING,
-                        statusMessage = translationStartingMessage(current.targetLanguage),
                     )
-                }
-
-                translateSegments(
-                    videoId = videoId,
-                    generation = generation,
-                    sourceLanguage = track.languageCode,
-                    targetLanguage = _state.value.targetLanguage,
-                    segments = displaySegments,
-                )
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-                _state.update { current ->
-                    if (!isCurrentLoad(current, videoId, generation)) return@update current
-                    current.copy(
-                        stage = LoadStage.READY,
-                        liveFallback = true, retryingTranscript = false,
-                        statusMessage = if (current.liveOriginal != null) current.statusMessage else "Waiting for YouTube captions and their language. Play the video with captions enabled.",
-                        errorMessage = null,
-                    )
+                } catch (error: Exception) {
+                    if (error is CancellationException) throw error
+                    _state.update { current ->
+                        if (!isCurrentLoad(current, videoId, generation)) return@update current
+                        current.copy(
+                            stage = LoadStage.READY,
+                            liveFallback = true,
+                            retryingTranscript = false,
+                            statusMessage =
+                                if (current.liveOriginal !=
+                                    null
+                                ) {
+                                    current.statusMessage
+                                } else {
+                                    "Waiting for YouTube captions and their language. Play the video with captions enabled."
+                                },
+                            errorMessage = null,
+                        )
+                    }
                 }
             }
-        }
     }
+
+    private fun mergeCaptionTrack(track: com.kienhoang.dualsubreplay.data.CaptionTrackResult) = SubtitleMerger.merge(
+        track.cues,
+        enhancedNaturalFlow = _state.value.naturalSubtitlesEnabled,
+    )
 
     private fun retranslateCurrentSegments() {
         val current = _state.value
@@ -878,43 +1005,44 @@ class AppViewModel internal constructor(application: Application, private val ca
         // splitter (issue #25) always starts from un-split text.
         val baseSegments = rawMergedSegments.ifEmpty { current.segments }
         if (baseSegments.isEmpty()) return
-        val segments = if (current.splitLongSentencesEnabled) {
-            SubtitleMerger.splitLongSegments(baseSegments)
-        } else {
-            baseSegments
-        }
+        val segments = captionDisplaySegments(baseSegments, current.captionFormat, current.naturalSubtitlesEnabled)
 
         val generation = ++loadGeneration
         loadingJob?.cancel()
         _state.update {
+            val index = activeSubtitleIndex(segments, latestPlaybackSecondMs)
+            val word = if (it.wordHighlightEnabled) activeWordIndex(segments, index, latestPlaybackSecondMs) else -1
             it.copy(
                 segments = segments.map { segment -> segment.copy(translatedText = null) },
+                currentIndex = index,
+                activeWordIndex = word,
                 stage = LoadStage.TRANSLATING,
                 statusMessage = translationStartingMessage(it.targetLanguage),
                 errorMessage = null,
             )
         }
-        loadingJob = viewModelScope.launch {
-            try {
-                translateSegments(
-                    videoId = videoId,
-                    generation = generation,
-                    sourceLanguage = sourceLanguage,
-                    targetLanguage = _state.value.targetLanguage,
-                    segments = segments,
-                )
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-                _state.update { state ->
-                    if (!isCurrentLoad(state, videoId, generation)) return@update state
-                    state.copy(
-                        stage = LoadStage.ERROR,
-                        statusMessage = null,
-                        errorMessage = error.message ?: "The subtitles could not be translated.",
+        loadingJob =
+            viewModelScope.launch {
+                try {
+                    translateSegments(
+                        videoId = videoId,
+                        generation = generation,
+                        sourceLanguage = sourceLanguage,
+                        targetLanguage = _state.value.targetLanguage,
+                        segments = segments,
                     )
+                } catch (error: Exception) {
+                    if (error is CancellationException) throw error
+                    _state.update { state ->
+                        if (!isCurrentLoad(state, videoId, generation)) return@update state
+                        state.copy(
+                            stage = LoadStage.ERROR,
+                            statusMessage = null,
+                            errorMessage = error.message ?: "The subtitles could not be translated.",
+                        )
+                    }
                 }
             }
-        }
     }
 
     private suspend fun translateSegments(
@@ -929,8 +1057,6 @@ class AppViewModel internal constructor(application: Application, private val ca
             sourceLanguage = sourceLanguage,
             targetLanguage = targetLanguage,
             display = segments,
-            source = rawMergedSegments,
-            natural = _state.value.naturalSubtitlesEnabled,
             playbackTime = { latestPlaybackSecondMs },
             onDownloading = { downloading ->
                 _state.update { current ->
@@ -975,9 +1101,11 @@ class AppViewModel internal constructor(application: Application, private val ca
     private fun translationStartingMessage(targetLanguage: String): String =
         "Preparing ${TranslationLanguages.displayName(targetLanguage)} translation…"
 
-    private fun mobileWatchUrl(videoId: String): String =
-        "https://m.youtube.com/watch?v=$videoId"
+    private fun mobileWatchUrl(videoId: String): String = "https://m.youtube.com/watch?v=$videoId"
 
-    private fun isCurrentLoad(state: DualSubUiState, videoId: String, generation: Long): Boolean =
-        generation == loadGeneration && state.activeVideoId == videoId
+    private fun isCurrentLoad(
+        state: DualSubUiState,
+        videoId: String,
+        generation: Long,
+    ): Boolean = generation == loadGeneration && state.activeVideoId == videoId
 }

@@ -1,0 +1,13 @@
+{
+  "app_id": "com.kienhoang.dualsubreplay.qa",
+  "device": "emulator-5554",
+  "status": "passed",
+  "commit": "2a9d452e8d29ec55444f55fc1b5d633b3dde5046",
+  "worktree_status": " M app/src/benchmark/java/com/kienhoang/dualsubreplay/ui/TranslationEvaluation.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/data/SubtitleMerger.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/data/WordTiming.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/AppViewModel.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/DualSubApp.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/KaraokeTiming.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/LearningPlayerRoot.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/SubtitleColors.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/SubtitleWordHighlight.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/TranslationCoordinator.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/YouTubeBrowserScreen.kt\n M app/src/main/java/com/kienhoang/dualsubreplay/ui/YouTubeWebScripts.kt\n M app/src/test/java/com/kienhoang/dualsubreplay/data/WordTimingTest.kt\n M app/src/test/java/com/kienhoang/dualsubreplay/ui/KaraokeTimingTest.kt\n M app/src/test/java/com/kienhoang/dualsubreplay/ui/SubtitleHighlightTest.kt\n M app/src/test/java/com/kienhoang/dualsubreplay/ui/TranslationCoordinatorTest.kt\n M config/quality/detekt-baseline.xml\n?? .maestro/\n?? app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/CaptionFormatDeviceTest.kt\n?? app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/PlaybackClockWebViewTest.kt\n?? app/src/main/java/com/kienhoang/dualsubreplay/ui/CaptionFormat.kt\n?? app/src/main/java/com/kienhoang/dualsubreplay/ui/CaptionFormatSettings.kt\n?? app/src/main/java/com/kienhoang/dualsubreplay/ui/CaptionPlaybackClock.kt\n?? app/src/main/java/com/kienhoang/dualsubreplay/ui/CaptionTimingDiagnostics.kt\n?? app/src/test/java/com/kienhoang/dualsubreplay/ui/CaptionFormatTest.kt\n?? app/src/test/java/com/kienhoang/dualsubreplay/ui/CaptionPlaybackClockTest.kt\n?? app/src/test/java/com/kienhoang/dualsubreplay/ui/CaptionTranslationCancellationTest.kt\n?? baseline-build.log\n?? tools/run_maestro_qa.py\n",
+  "apk_sha256": "c4e8d59f8f55183b9a0d8dfcf8b667ea41516c8129d6a1949839669d1c57a8da",
+  "version_name": "0.9.9",
+  "maestro_version": "2.10.0",
+  "avd": "Pixel_7_API_36_Lite",
+  "maestro_exit_code": 0,
+  "passed_tests": 1
+}

@@ -161,7 +161,7 @@ fun DualSubApp(
                 onWordHighlightChange = viewModel::setWordHighlightEnabled,
                 onKaraokeTimingModeChange = viewModel::setKaraokeTimingMode,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
-                onSplitSentencesChange = viewModel::setSplitLongSentencesEnabled,
+                onCaptionFormatChange = viewModel::setCaptionFormat,
                 lockOverlayToVideo = state.lockOverlayToVideo,
                 onLockOverlayToVideoChange = viewModel::setLockOverlayToVideo,
                 preloadModelsEnabled = state.preloadModelsEnabled,
@@ -240,7 +240,7 @@ private fun DualSubExperience(
     onWordHighlightChange: (Boolean) -> Unit,
     onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit,
     onCustomColorsChange: (Boolean) -> Unit,
-    onSplitSentencesChange: (Boolean) -> Unit,
+    onCaptionFormatChange: (CaptionFormat) -> Unit,
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -436,7 +436,7 @@ private fun DualSubExperience(
             wordHighlightEnabled = state.wordHighlightEnabled,
             karaokeTimingMode = state.karaokeTimingMode,
             customColorsEnabled = state.customColorsEnabled,
-            splitLongSentencesEnabled = state.splitLongSentencesEnabled,
+            captionFormat = state.captionFormat,
             lockOverlayToVideo = state.lockOverlayToVideo,
             onLockOverlayToVideoChange = onLockOverlayToVideoChange,
             preloadModelsEnabled = state.preloadModelsEnabled,
@@ -462,7 +462,7 @@ private fun DualSubExperience(
             onWordHighlightChange = onWordHighlightChange,
             onKaraokeTimingModeChange = onKaraokeTimingModeChange,
             onCustomColorsChange = onCustomColorsChange,
-            onSplitSentencesChange = onSplitSentencesChange,
+            onCaptionFormatChange = onCaptionFormatChange,
             onResetSettings = {
                 showSettings = false
                 onResetSettings()
@@ -931,7 +931,7 @@ internal fun SubtitleSettingsDialog(
     wordHighlightEnabled: Boolean = true,
     karaokeTimingMode: KaraokeTimingMode = KaraokeTimingMode.ADAPTIVE,
     customColorsEnabled: Boolean = true,
-    splitLongSentencesEnabled: Boolean = true,
+    captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -957,7 +957,7 @@ internal fun SubtitleSettingsDialog(
     onWordHighlightChange: (Boolean) -> Unit = {},
     onKaraokeTimingModeChange: (KaraokeTimingMode) -> Unit = {},
     onCustomColorsChange: (Boolean) -> Unit = {},
-    onSplitSentencesChange: (Boolean) -> Unit = {},
+    onCaptionFormatChange: (CaptionFormat) -> Unit = {},
     onResetSettings: () -> Unit = {},
     autoPronounce: Boolean = true,
     onAutoPronounceChange: (Boolean) -> Unit = {},
@@ -1220,14 +1220,7 @@ internal fun SubtitleSettingsDialog(
                         Spacer(Modifier.height(14.dp))
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
-                        Text("Captions layout", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Split long sentences",
-                            description = "Cut long dual subtitles into shorter chunks at sentence breaks so they are easier to follow. On by default.",
-                            checked = splitLongSentencesEnabled,
-                            onCheckedChange = onSplitSentencesChange,
-                            testTag = "split_long_sentences_switch",
-                        )
+                        CaptionFormatSettings(captionFormat, onCaptionFormatChange)
 
                         Spacer(Modifier.height(8.dp))
                         HorizontalDivider()

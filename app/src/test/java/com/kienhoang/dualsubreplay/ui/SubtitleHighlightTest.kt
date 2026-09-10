@@ -10,7 +10,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SubtitleWordHighlightTest {
-
     @Test fun mapsWordTimingsOntoCharacterRanges() {
         val segment = SubtitleSegment(
             id = 1,
@@ -153,40 +152,42 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun resettableSettingKeysCoverEveryUserFacingPreference() {
-        val expected = setOf(
-            "font_scale",
-            "preferred_caption_language",
-            "target_language",
-            "landscape_split_enabled",
-            PLAYER_EXPERIENCE_MODE_PREFERENCE,
-            AUTO_OVERLAY_FULLSCREEN_PREFERENCE,
-            AUTO_OVERLAY_LANDSCAPE_PREFERENCE,
-            AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE,
-            REMEMBER_OVERLAY_POSITION_PREFERENCE,
-            OVERLAY_VERTICAL_POSITION_PREFERENCE,
-            OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
-            MOVABLE_OVERLAY_PREFERENCE,
-            COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
-            COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
-            SPLIT_LONG_SENTENCES_PREFERENCE,
-            LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
-            SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
-            SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
-            SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
-            SUBTITLE_BOX_BACKGROUND_PREFERENCE,
-            APP_THEME_ACCENT_PREFERENCE,
-            WORD_HIGHLIGHT_ENABLED_PREFERENCE,
-            KARAOKE_TIMING_MODE_PREFERENCE,
-            CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
-            LOCK_OVERLAY_TO_VIDEO_PREFERENCE,
-            PRELOAD_MODELS_ENABLED_PREFERENCE,
-            NATURAL_SUBTITLES_PREFERENCE,
-            WORD_LEARNING_ENABLED_PREFERENCE,
-            WORD_LEARNING_TARGET_PREFERENCE,
-            TAP_TO_LEARN_PREFERENCE,
-            WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
-            "auto_pronounce",
-        )
+        val expected =
+            setOf(
+                "font_scale",
+                "preferred_caption_language",
+                "target_language",
+                "landscape_split_enabled",
+                PLAYER_EXPERIENCE_MODE_PREFERENCE,
+                AUTO_OVERLAY_FULLSCREEN_PREFERENCE,
+                AUTO_OVERLAY_LANDSCAPE_PREFERENCE,
+                AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE,
+                REMEMBER_OVERLAY_POSITION_PREFERENCE,
+                OVERLAY_VERTICAL_POSITION_PREFERENCE,
+                OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+                MOVABLE_OVERLAY_PREFERENCE,
+                COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+                COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+                SPLIT_LONG_SENTENCES_PREFERENCE,
+                CAPTION_FORMAT_PREFERENCE,
+                LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
+                SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
+                SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
+                SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
+                SUBTITLE_BOX_BACKGROUND_PREFERENCE,
+                APP_THEME_ACCENT_PREFERENCE,
+                WORD_HIGHLIGHT_ENABLED_PREFERENCE,
+                KARAOKE_TIMING_MODE_PREFERENCE,
+                CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
+                LOCK_OVERLAY_TO_VIDEO_PREFERENCE,
+                PRELOAD_MODELS_ENABLED_PREFERENCE,
+                NATURAL_SUBTITLES_PREFERENCE,
+                WORD_LEARNING_ENABLED_PREFERENCE,
+                WORD_LEARNING_TARGET_PREFERENCE,
+                TAP_TO_LEARN_PREFERENCE,
+                WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
+                "auto_pronounce",
+            )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)
     }
