@@ -102,7 +102,7 @@ Online video playback uses the native player in YouTube's mobile webpage. Saved 
 
 ## Saved words and practice
 
-Tap a word in either subtitle line to hear it, inspect its meaning, and choose **Save word**. Pronunciation uses the tapped word's language and the device's installed speech engine; Android voice availability varies. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
+Tap a word in either subtitle line to hear it, inspect its meaning, and choose **Save word**. Pronunciation uses the tapped word's language, trying your preferred Android speech engine and then other installed engines. It prefers installed offline voices and can fall back to a supported network voice. If no voice works, use **Speech settings** to install or select one, then tap **Pronounce** again. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
 
 Each card stores an editable meaning and its original subtitle context. The Online example option replays the saved sentence in the existing YouTube page and stops at its end. A translated word's example contains the original spoken sentence, which may not literally contain the translated word.
 

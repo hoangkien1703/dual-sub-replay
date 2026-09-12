@@ -192,6 +192,7 @@ fun DualSubApp(
                     onSave = { meaning, online -> viewModel.saveWord(selection, meaning, online); Unit },
                     onSpeak = { webController.pause(); pronouncer.speak(selection.token.text, selection.wordLanguage) },
                     speechMessage = pronouncer.message,
+                    onSpeechSettings = if (pronouncer.showSpeechSettings) pronouncer::openSpeechSettings else null,
                     onDismiss = { viewModel.selectLearningWord(null) },
                 )
             }
