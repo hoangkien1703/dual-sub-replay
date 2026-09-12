@@ -57,4 +57,20 @@ class WordLearningDialogTest {
         compose.waitForIdle()
         compose.runOnIdle { assertEquals(Pair("từ", false), saved) }
     }
+
+    @Test fun missingVoiceOffersSettingsAndAllowsPronunciationRetry() {
+        var settingsOpened = 0
+        var spoken = 0
+        compose.setContent { DualSubTheme {
+            WordLearningDialog(selection, false, { "từ" }, { _, _ -> }, { spoken++ },
+                "No installed speech engine has a voice for this language.", {},
+                onSpeechSettings = { settingsOpened++ })
+        } }
+        compose.onNodeWithTag("speech_settings").performScrollTo().performClick()
+        compose.onNodeWithTag("pronounce_word").performScrollTo().performClick()
+        compose.runOnIdle {
+            assertEquals(1, settingsOpened)
+            assertEquals(1, spoken)
+        }
+    }
 }

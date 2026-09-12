@@ -126,6 +126,9 @@ internal fun SavedWordsScreen(
                         selected.reading?.let { Text(it) }
                         TextButton(onClick = { onPause(); pronouncer.speak(selected.word, selected.wordLanguage) }) { Text("Pronounce") }
                         pronouncer.message?.let { Text(it) }
+                        if (pronouncer.showSpeechSettings) {
+                            TextButton(onClick = pronouncer::openSpeechSettings, modifier = Modifier.testTag("speech_settings")) { Text("Speech settings") }
+                        }
                         if (practice && !revealed) {
                             Button(onClick = { revealed = true }, modifier = Modifier.testTag("reveal_meaning")) { Text("Show meaning") }
                         } else {

@@ -1,54 +1,82 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.Context
-import android.speech.tts.TextToSpeech
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import java.util.Locale
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 internal class WordPronouncer(context: Context) {
+    private val application = context.applicationContext
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var speech: Job? = null
+    private var disposed = false
     var message by mutableStateOf<String?>(null)
         private set
-    private var ready = false
-    private var initializationFailed = false
-    private var disposed = false
-    private var pending: Pair<String, String>? = null
-    private var engine: TextToSpeech? = null
+    var showSpeechSettings by mutableStateOf(false)
+        private set
 
-    init {
-        engine = TextToSpeech(context.applicationContext) { status ->
-            if (!disposed) {
-                ready = status == TextToSpeech.SUCCESS
-                if (ready) pending?.let { speak(it.first, it.second) }
-                else {
-                    initializationFailed = true
-                    if (pending != null) message = "Speech is unavailable on this device."
-                    pending = null
-                }
+    fun speak(word: String, language: String) {
+        if (disposed || word.isBlank()) return
+        stop()
+        message = "Preparing pronunciation…"
+        speech = scope.launch {
+            val result = try {
+                withTimeoutOrNull(25_000) {
+                    pronounceWord(word, language, installedPronunciationEngines(application)) {
+                        AndroidPronunciationEngine(application, it)
+                    }
+                } ?: PronunciationResult.PLAYBACK_FAILED
+            } catch (cancel: CancellationException) {
+                throw cancel
+            } catch (_: Exception) {
+                PronunciationResult.UNAVAILABLE
+            }
+            showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
+            message = when (result) {
+                PronunciationResult.SPOKEN -> null
+                PronunciationResult.NO_VOICE -> "No installed speech engine has a voice for this language. Open Speech settings to add one, then tap Pronounce again."
+                PronunciationResult.UNAVAILABLE -> "Speech is unavailable. Open Speech settings to enable or install a text-to-speech engine, then try again."
+                PronunciationResult.PLAYBACK_FAILED -> "Could not play pronunciation. Check media volume and your connection, or choose a voice in Speech settings."
+                PronunciationResult.INVALID_LANGUAGE -> "Choose a subtitle language before pronouncing this word."
             }
         }
     }
-    fun speak(word: String, language: String) {
-        if (disposed || word.isBlank()) return
-        if (initializationFailed) { message = "Speech is unavailable on this device."; return }
-        if (!ready) { pending = word to language; return }
-        pending = null
-        val tts = engine ?: return
-        val result = tts.setLanguage(Locale.forLanguageTag(language))
-        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            message = "Install a speech voice for this language in Android settings."
-            return
+
+    fun openSpeechSettings() {
+        stop()
+        val opened = listOf("com.android.settings.TTS_SETTINGS", Settings.ACTION_ACCESSIBILITY_SETTINGS).any { action ->
+            runCatching { application.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
         }
-        message = null
-        if (tts.speak(word, TextToSpeech.QUEUE_FLUSH, null, "word") == TextToSpeech.ERROR) {
-            message = "Could not pronounce this word. Try again."
+        if (!opened) {
+            showSpeechSettings = true
+            message = "Open Android Settings and search for Text-to-speech to install or select a voice."
         }
     }
-    fun stop() { pending = null; engine?.stop() }
-    fun close() { disposed = true; stop(); engine?.shutdown(); engine = null }
+
+    fun stop() {
+        speech?.cancel()
+        speech = null
+        message = null
+        showSpeechSettings = false
+    }
+
+    fun close() {
+        disposed = true
+        stop()
+        scope.cancel()
+    }
 }
 
 @Composable
@@ -59,7 +87,10 @@ internal fun rememberWordPronouncer(): WordPronouncer {
     DisposableEffect(pronouncer, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) pronouncer.stop() }
         owner.lifecycle.addObserver(observer)
-        onDispose { owner.lifecycle.removeObserver(observer); pronouncer.close() }
+        onDispose { owner.lifecycle.removeObserver(observer) }
+    }
+    DisposableEffect(pronouncer) {
+        onDispose { pronouncer.close() }
     }
     return pronouncer
 }

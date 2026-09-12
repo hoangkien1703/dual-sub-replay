@@ -23,6 +23,7 @@ internal fun WordLearningDialog(
     speechMessage: String?,
     onDismiss: () -> Unit,
     existingWord: com.kienhoang.dualsubreplay.data.SavedWord? = null,
+    onSpeechSettings: (() -> Unit)? = null,
 ) {
     var meaning by remember(selection) { mutableStateOf(existingWord?.meaning.orEmpty()) }
     var loading by remember(selection) { mutableStateOf(true) }
@@ -50,6 +51,9 @@ internal fun WordLearningDialog(
                 selection.token.reading?.takeIf { it.isNotBlank() }?.let { Text(it) }
                 TextButton(onClick = onSpeak, modifier = Modifier.testTag("pronounce_word")) { Text("Pronounce") }
                 speechMessage?.let { Text(it) }
+                onSpeechSettings?.let { open ->
+                    TextButton(onClick = open, modifier = Modifier.testTag("speech_settings")) { Text("Speech settings") }
+                }
                 if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
                 OutlinedTextField(meaning, { meaning = it; saved = false }, label = { Text("Meaning (${selection.meaningLanguage})") },
                     enabled = !loading && !saving, modifier = Modifier.testTag("word_meaning"))
