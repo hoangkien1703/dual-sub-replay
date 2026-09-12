@@ -160,24 +160,21 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v1.0.0 highlights
+            ## v1.0.1 highlights
 
-            - **Spoken-word highlighting**: Restore v0.9.5's automatic timing and keep live caption tracking active in portrait, landscape, and fullscreen overlays (#63).
-            - **Bilingual caption formats**: Choose Short paired phrases or Whole sentence, with each displayed unit translated independently while retaining source-word timestamps (#62).
-            - **Playback timing**: Share a rate-aware clock across subtitle layouts, with stale-sample rejection and recovery after pauses, buffering, and seeks (#62, #63).
-            - **Existing features preserved**: On-device translation, vocabulary, Word Learning, Practice backup and transfer, replay, caption colors, and visibility controls remain available.
+            - **Word pronunciation**: Pronounce now tries the preferred Android speech engine and other installed engines, selecting an available offline voice first and falling back to a supported network voice if needed (#65).
+            - **Recovery**: Word Learning and Saved words offer Speech settings when no suitable voice works. Retry Pronounce after installing or selecting a voice (#65).
+            - **Playback handling**: Speech waits for the utterance to finish, handles playback errors, and stops when a new pronunciation starts or the app goes to the background (#65).
 
             ## Validation
 
-            - PR checks cover unit tests, formatting, complexity, lint, debug and optimized release builds, and 42 API 36 emulator tests.
-            - The landscape regression exercises the complete player and live caption capture through landscape/fullscreen transitions with an offline WebView fixture.
-            - The user confirmed PR #63 build 271 works well on their phone before approving this official release.
+            - PR #65 passed formatting, complexity, unit tests, lint, and debug build checks, including 15 pronunciation regression cases.
+            - The official APK is built with production signing and verified by this release workflow.
 
             ## Known limitations
 
-            - Live word timing depends on eligible auto-generated captions and YouTube's page behavior; transcript timing is used when live timing is unavailable.
-            - ML Kit translations can still be literal or imprecise.
-            - Phone acceptance does not establish synchronization accuracy for every video or device; emulator fixtures do not measure real audio latency.
+            - Pronunciation requires an installed Android speech engine with a suitable voice. Network voices need connectivity.
+            - Pronunciation audio on a physical phone has not been verified for this release.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
