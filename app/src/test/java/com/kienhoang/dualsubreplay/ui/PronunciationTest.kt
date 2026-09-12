@@ -16,137 +16,169 @@ class PronunciationTest {
     private val network = PronunciationVoice("ja-network", Locale.JAPAN, network = true)
 
     @Test
-    fun missingJapaneseInDefaultEngineFallsBackToAnotherInstalledEngine() = runBlocking {
-        val vendor = FakeEngine()
-        val multilingual = FakeEngine(listOf(japanese))
-        val requested = mutableListOf<String?>()
-        val result = pronounceWord("座れそう", "ja", listOf("vendor", "multilingual", "vendor")) {
-            requested += it
-            if (it == "vendor") vendor else multilingual
+    fun missingJapaneseInDefaultEngineFallsBackToAnotherInstalledEngine() {
+        runBlocking {
+            val vendor = FakeEngine()
+            val multilingual = FakeEngine(listOf(japanese))
+            val requested = mutableListOf<String?>()
+            val result =
+                pronounceWord("座れそう", "ja", listOf("vendor", "multilingual", "vendor")) {
+                    requested += it
+                    if (it == "vendor") vendor else multilingual
+                }
+            assertEquals(PronunciationResult.SPOKEN, result)
+            assertEquals(listOf("vendor", "multilingual"), requested)
+            assertEquals(listOf("座れそう"), multilingual.spoken)
+            assertEquals(listOf(japanese), multilingual.selected)
+            assertTrue(vendor.closed && multilingual.closed)
         }
-        assertEquals(PronunciationResult.SPOKEN, result)
-        assertEquals(listOf("vendor", "multilingual"), requested)
-        assertEquals(listOf("座れそう"), multilingual.spoken)
-        assertEquals(listOf(japanese), multilingual.selected)
-        assertTrue(vendor.closed && multilingual.closed)
     }
 
     @Test
-    fun defaultEngineSuccessDoesNotOpenOtherEngines() = runBlocking {
-        val engine = FakeEngine(listOf(japanese))
-        val requested = mutableListOf<String?>()
-        assertEquals(PronunciationResult.SPOKEN, pronounceWord("こんにちは", "ja", listOf(null, "other")) {
-            requested += it
-            engine
-        })
-        assertEquals(listOf<String?>(null), requested)
-        assertTrue(engine.closed)
+    fun defaultEngineSuccessDoesNotOpenOtherEngines() {
+        runBlocking {
+            val engine = FakeEngine(listOf(japanese))
+            val requested = mutableListOf<String?>()
+            val result =
+                pronounceWord("こんにちは", "ja", listOf(null, "other")) {
+                    requested += it
+                    engine
+                }
+            assertEquals(PronunciationResult.SPOKEN, result)
+            assertEquals(listOf<String?>(null), requested)
+            assertTrue(engine.closed)
+        }
     }
 
     @Test
-    fun availableNetworkVoiceWorksWithoutAnOfflineLanguagePack() = runBlocking {
-        val engine = FakeEngine(listOf(japanese.copy(installed = false), network))
-        assertEquals(PronunciationResult.SPOKEN, pronounce(engine))
-        assertEquals(listOf(network), engine.selected)
-        assertEquals(0, engine.languageRequests)
+    fun availableNetworkVoiceWorksWithoutAnOfflineLanguagePack() {
+        runBlocking {
+            val engine = FakeEngine(listOf(japanese.copy(installed = false), network))
+            assertEquals(PronunciationResult.SPOKEN, pronounce(engine))
+            assertEquals(listOf(network), engine.selected)
+            assertEquals(0, engine.languageRequests)
+        }
     }
 
     @Test
-    fun asynchronousPlaybackFailureTriesNetworkVoice() = runBlocking {
-        val firstPlayback = CompletableDeferred<Boolean>()
-        val started = CompletableDeferred<Unit>()
-        val engine = FakeEngine(listOf(network, japanese))
-        engine.play = {
-            if (engine.selected.last() == japanese) {
-                started.complete(Unit)
-                firstPlayback.await()
-            } else {
-                true
+    fun asynchronousPlaybackFailureTriesNetworkVoice() {
+        runBlocking {
+            val firstPlayback = CompletableDeferred<Boolean>()
+            val started = CompletableDeferred<Unit>()
+            val engine = FakeEngine(listOf(network, japanese))
+            engine.play = {
+                if (engine.selected.last() == japanese) {
+                    started.complete(Unit)
+                    firstPlayback.await()
+                } else {
+                    true
+                }
             }
+            val result = async { pronounce(engine) }
+            started.await()
+            assertFalse(result.isCompleted)
+            firstPlayback.complete(false)
+            assertEquals(PronunciationResult.SPOKEN, result.await())
+            assertEquals(listOf(japanese, network), engine.selected)
         }
-        val result = async { pronounce(engine) }
-        started.await()
-        assertFalse(result.isCompleted)
-        firstPlayback.complete(false)
-        assertEquals(PronunciationResult.SPOKEN, result.await())
-        assertEquals(listOf(japanese, network), engine.selected)
     }
 
     @Test
-    fun brokenInitializationFallsBackAndClosesEngine() = runBlocking {
-        val broken = FakeEngine().apply { ready = false }
-        val working = FakeEngine(listOf(japanese))
-        assertEquals(PronunciationResult.SPOKEN, pronounceWord("座れそう", "ja", listOf("broken", "working")) {
-            if (it == "broken") broken else working
-        })
-        assertTrue(broken.closed && working.closed)
-    }
-
-    @Test
-    fun vendorExceptionDoesNotPreventFallback() = runBlocking {
-        val working = FakeEngine(listOf(japanese))
-        assertEquals(PronunciationResult.SPOKEN, pronounceWord("座れそう", "ja", listOf("broken", "working")) {
-            if (it == "broken") error("Engine failed to bind") else working
-        })
-    }
-
-    @Test
-    fun olderEngineWithoutVoiceCatalogCanUseSetLanguage() = runBlocking {
-        val engine = FakeEngine().apply { languageAvailable = true }
-        assertEquals(PronunciationResult.SPOKEN, pronounce(engine))
-        assertEquals(1, engine.languageRequests)
-    }
-
-    @Test
-    fun missingVoiceAndPlaybackFailureHaveDifferentResults() = runBlocking {
-        assertEquals(PronunciationResult.NO_VOICE, pronounce(FakeEngine()))
-        assertEquals(PronunciationResult.UNAVAILABLE, pronounce(FakeEngine().apply { ready = false }))
-        assertEquals(PronunciationResult.PLAYBACK_FAILED, pronounce(FakeEngine(listOf(japanese)).apply { play = { false } }))
-    }
-
-    @Test
-    fun cancellationWhileInitializingClosesEngineWithoutFallback() = runBlocking {
-        val started = CompletableDeferred<Unit>()
-        val engine = FakeEngine(listOf(japanese)).apply {
-            init = {
-                started.complete(Unit)
-                CompletableDeferred<Boolean>().await()
-            }
+    fun brokenInitializationFallsBackAndClosesEngine() {
+        runBlocking {
+            val broken = FakeEngine().apply { ready = false }
+            val working = FakeEngine(listOf(japanese))
+            val result =
+                pronounceWord("座れそう", "ja", listOf("broken", "working")) {
+                    if (it == "broken") broken else working
+                }
+            assertEquals(PronunciationResult.SPOKEN, result)
+            assertTrue(broken.closed && working.closed)
         }
-        val requested = mutableListOf<String?>()
-        val job = async {
-            pronounceWord("座れそう", "ja", listOf("first", "other")) {
-                requested += it
-                engine
-            }
-        }
-        started.await()
-        job.cancelAndJoin()
-        assertTrue(engine.closed)
-        assertTrue(engine.spoken.isEmpty())
-        assertEquals(listOf("first"), requested)
     }
 
     @Test
-    fun cancellationDuringPlaybackClosesEngineWithoutFallback() = runBlocking {
-        val started = CompletableDeferred<Unit>()
-        val engine = FakeEngine(listOf(japanese)).apply {
-            play = {
-                started.complete(Unit)
-                CompletableDeferred<Boolean>().await()
-            }
+    fun vendorExceptionDoesNotPreventFallback() {
+        runBlocking {
+            val working = FakeEngine(listOf(japanese))
+            val result =
+                pronounceWord("座れそう", "ja", listOf("broken", "working")) {
+                    if (it == "broken") error("Engine failed to bind") else working
+                }
+            assertEquals(PronunciationResult.SPOKEN, result)
         }
-        val job = async { pronounce(engine) }
-        started.await()
-        job.cancelAndJoin()
-        assertTrue(engine.closed)
-        assertEquals(1, engine.spoken.size)
     }
 
     @Test
-    fun retryRechecksEnginesAfterVoiceInstallation() = runBlocking {
-        assertEquals(PronunciationResult.NO_VOICE, pronounce(FakeEngine()))
-        assertEquals(PronunciationResult.SPOKEN, pronounce(FakeEngine(listOf(japanese))))
+    fun olderEngineWithoutVoiceCatalogCanUseSetLanguage() {
+        runBlocking {
+            val engine = FakeEngine().apply { languageAvailable = true }
+            assertEquals(PronunciationResult.SPOKEN, pronounce(engine))
+            assertEquals(1, engine.languageRequests)
+        }
+    }
+
+    @Test
+    fun missingVoiceAndPlaybackFailureHaveDifferentResults() {
+        runBlocking {
+            assertEquals(PronunciationResult.NO_VOICE, pronounce(FakeEngine()))
+            assertEquals(PronunciationResult.UNAVAILABLE, pronounce(FakeEngine().apply { ready = false }))
+            assertEquals(PronunciationResult.PLAYBACK_FAILED, pronounce(FakeEngine(listOf(japanese)).apply { play = { false } }))
+        }
+    }
+
+    @Test
+    fun cancellationWhileInitializingClosesEngineWithoutFallback() {
+        runBlocking {
+            val started = CompletableDeferred<Unit>()
+            val engine =
+                FakeEngine(listOf(japanese)).apply {
+                    init = {
+                        started.complete(Unit)
+                        CompletableDeferred<Boolean>().await()
+                    }
+                }
+            val requested = mutableListOf<String?>()
+            val job =
+                async {
+                    pronounceWord("座れそう", "ja", listOf("first", "other")) {
+                        requested += it
+                        engine
+                    }
+                }
+            started.await()
+            job.cancelAndJoin()
+            assertTrue(engine.closed)
+            assertTrue(engine.spoken.isEmpty())
+            assertEquals(listOf("first"), requested)
+        }
+    }
+
+    @Test
+    fun cancellationDuringPlaybackClosesEngineWithoutFallback() {
+        runBlocking {
+            val started = CompletableDeferred<Unit>()
+            val engine =
+                FakeEngine(listOf(japanese)).apply {
+                    play = {
+                        started.complete(Unit)
+                        CompletableDeferred<Boolean>().await()
+                    }
+                }
+            val job = async { pronounce(engine) }
+            started.await()
+            job.cancelAndJoin()
+            assertTrue(engine.closed)
+            assertEquals(1, engine.spoken.size)
+        }
+    }
+
+    @Test
+    fun retryRechecksEnginesAfterVoiceInstallation() {
+        runBlocking {
+            assertEquals(PronunciationResult.NO_VOICE, pronounce(FakeEngine()))
+            assertEquals(PronunciationResult.SPOKEN, pronounce(FakeEngine(listOf(japanese))))
+        }
     }
 
     @Test
@@ -159,10 +191,14 @@ class PronunciationTest {
     }
 
     @Test
-    fun invalidLanguageDoesNotStartAnEngine() = runBlocking {
-        assertEquals(PronunciationResult.INVALID_LANGUAGE, pronounceWord("word", "auto", listOf(null)) {
-            error("Must not open an engine for an unresolved language")
-        })
+    fun invalidLanguageDoesNotStartAnEngine() {
+        runBlocking {
+            val result =
+                pronounceWord("word", "auto", listOf(null)) {
+                    error("Must not open an engine for an unresolved language")
+                }
+            assertEquals(PronunciationResult.INVALID_LANGUAGE, result)
+        }
     }
 
     @Test
@@ -174,8 +210,13 @@ class PronunciationTest {
         assertEquals(listOf(british, english), pronunciationVoices(listOf(english, british), Locale.UK))
     }
 
-    private suspend fun pronounce(engine: FakeEngine): PronunciationResult =
-        pronounceWord("座れそう", "ja", listOf(null)) { engine }
+    private suspend fun pronounce(engine: FakeEngine): PronunciationResult = pronounceWord("座れそう", "ja", listOf(null)) { engine }
+
+    @Test
+    fun manyOfflineVoicesCannotCrowdOutTheNetworkFallback() {
+        val offline = (1..5).map { japanese.copy(name = "offline-$it") }
+        assertEquals(listOf(offline.first(), network, offline[1]), pronunciationVoices(offline + network, Locale.JAPAN))
+    }
 
     private class FakeEngine(
         private val available: List<PronunciationVoice> = emptyList(),

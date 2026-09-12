@@ -41,17 +41,22 @@ internal fun pronunciationLocale(language: String): Locale? =
 internal fun pronunciationVoices(
     voices: List<PronunciationVoice>,
     locale: Locale,
-): List<PronunciationVoice> =
-    voices
-        .filter { it.installed && it.locale.language == locale.language }
-        .filter { locale.script.isBlank() || it.locale.script.isBlank() || it.locale.script == locale.script }
-        .sortedWith(
-            compareBy<PronunciationVoice> { it.network }
-                .thenBy { it.locale != locale }
-                .thenBy { it.locale.country != locale.country }
-                .thenBy { it.name },
-        ).distinctBy { Triple(it.locale, it.network, it.installed) }
+): List<PronunciationVoice> {
+    val matching =
+        voices
+            .filter { it.installed && it.locale.language == locale.language }
+            .filter { locale.script.isBlank() || it.locale.script.isBlank() || it.locale.script == locale.script }
+            .sortedWith(
+                compareBy<PronunciationVoice> { it.network }
+                    .thenBy { it.locale != locale }
+                    .thenBy { it.locale.country != locale.country }
+                    .thenBy { it.name },
+            )
+    // Keep a network fallback reachable even when an engine lists many offline voices.
+    return (matching.take(1) + matching.filter { it.network }.take(1) + matching.drop(1))
+        .distinctBy { it.name }
         .take(3)
+}
 
 /** Try the user's default engine first, then other installed engines, without changing system settings. */
 internal suspend fun pronounceWord(

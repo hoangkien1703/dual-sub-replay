@@ -55,15 +55,24 @@ internal class AndroidPronunciationEngine(
                 @Deprecated("Required by UtteranceProgressListener")
                 override fun onError(id: String?) = complete(id, false)
 
-                override fun onError(id: String?, errorCode: Int) = complete(id, false)
+                override fun onError(
+                    id: String?,
+                    errorCode: Int,
+                ) = complete(id, false)
 
-                override fun onStop(id: String?, interrupted: Boolean) = complete(id, false)
+                override fun onStop(
+                    id: String?,
+                    interrupted: Boolean,
+                ) = complete(id, false)
             },
         )
         return true
     }
 
-    private fun complete(id: String?, success: Boolean) {
+    private fun complete(
+        id: String?,
+        success: Boolean,
+    ) {
         handler.post {
             if (!closed && id == utteranceId) playback?.complete(success)
         }
