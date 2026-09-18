@@ -56,7 +56,10 @@ class CaptionTranslationCancellationTest {
             val job = launch {
                 translatePlaybackWindow(store, requests, { text ->
                     inputs.add(text)
-                    if (inputs.size == 1) { started.complete(Unit); release.await() }
+                    if (inputs.size == 1) {
+                        started.complete(Unit)
+                        release.await()
+                    }
                     text
                 }) { snapshot, preparing ->
                     if (requests.value.seekGeneration == 1L) {
@@ -90,7 +93,10 @@ class CaptionTranslationCancellationTest {
             val job = launch {
                 translatePlaybackWindow(store, requests, {
                     count++
-                    if (count == 1) { started.complete(Unit); release.await() }
+                    if (count == 1) {
+                        started.complete(Unit)
+                        release.await()
+                    }
                     it
                 }) { _, preparing ->
                     if (!preparing && requests.value.paused) paused.complete(Unit)

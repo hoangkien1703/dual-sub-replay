@@ -404,7 +404,12 @@ class AppViewModel internal constructor(
     private fun updatePlaybackRequest(seek: Boolean = false) {
         playbackRequests.update {
             CaptionPlaybackRequest(
-                timeMs = latestPlaybackSecondMs,
+                // Translation scheduling needs seconds, while karaoke keeps its 33 ms clock.
+                timeMs = if (seek || !it.enabled || latestPlaybackSecondMs / 1000 != it.timeMs / 1000) {
+                    latestPlaybackSecondMs
+                } else {
+                    it.timeMs
+                },
                 paused = _state.value.playbackPaused,
                 enabled = appVisible && playbackKnown && _state.value.activeVideoId != null,
                 seekGeneration = it.seekGeneration + if (seek) 1 else 0,
@@ -1077,7 +1082,11 @@ class AppViewModel internal constructor(
                     activeWordIndex(rows, index, latestPlaybackSecondMs)
                 } else -1,
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
-                statusMessage = if (preparing) "Preparing nearby translations…" else "Subtitles ready near playback",
+                statusMessage = when {
+                    current.playbackPaused -> "Paused · translations resume with playback"
+                    preparing -> "Preparing nearby translations…"
+                    else -> "Subtitles ready near playback"
+                },
             )
         }
     }

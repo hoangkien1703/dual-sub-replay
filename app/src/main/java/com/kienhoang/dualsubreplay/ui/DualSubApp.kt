@@ -799,8 +799,10 @@ private fun SubtitleTimeline(
     LaunchedEffect(state.currentIndex, state.segments.firstOrNull()?.id) {
         val target = state.currentIndex
         if (target < 0) return@LaunchedEffect
+        // IDs remain global when the local window shifts or jumps hours ahead.
+        val globalIndex = state.segments.getOrNull(target)?.id?.toInt() ?: return@LaunchedEffect
         val lastIndex = previousIndex.intValue
-        previousIndex.intValue = target
+        previousIndex.intValue = globalIndex
         if (listState.isScrollInProgress) {
             snapshotFlow { listState.isScrollInProgress }.first { !it }
         }
@@ -816,8 +818,8 @@ private fun SubtitleTimeline(
             lastIndex < 0 -> {
                 listState.scrollToItem(target)
             }
-            shouldFollowPlaybackSeek(lastIndex, target) -> {
-                if (abs(target - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
+            shouldFollowPlaybackSeek(lastIndex, globalIndex) -> {
+                if (abs(globalIndex - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
                     listState.scrollToItem(target)
                 } else {
                     listState.animateScrollToItem(target)

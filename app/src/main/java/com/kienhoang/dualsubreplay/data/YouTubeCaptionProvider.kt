@@ -661,7 +661,9 @@ class YouTubeCaptionProvider(
                         if (!it.isSuccessful) throw CaptionUnavailableException("YouTube returned HTTP ${it.code} during $stage.")
                         val body = it.body ?: throw CaptionUnavailableException("YouTube returned an empty response during $stage.")
                         if (body.contentLength() > MAX_YOUTUBE_RESPONSE_BYTES) {
-                            throw ResponseLimitExceededException("YouTube returned a response larger than the 8 MiB safety limit during $stage.")
+                            throw ResponseLimitExceededException(
+                                "YouTube returned a response larger than the 8 MiB safety limit during $stage.",
+                            )
                         }
                         body.byteStream().use(::readUtf8WithLimit)
                     }

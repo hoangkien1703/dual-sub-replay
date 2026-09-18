@@ -51,7 +51,11 @@ jobs:
 
       - name: Format changed Kotlin for validation
         run: |
-          bash ./gradlew formatNewCode -PformatFiles="app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/RestoredHighlightPlaybackTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/translation/TranslationDiskCacheTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/ui/CaptionTranslationCancellationTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/data/SubtitleStoreTest.kt,app/src/main/java/com/kienhoang/dualsubreplay/translation/TranslationDiskCache.kt,app/src/main/java/com/kienhoang/dualsubreplay/translation/OnDeviceTranslator.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/PlaybackTranslation.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/TranslationCoordinator.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/DualSubApp.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/AppViewModel.kt,app/src/main/java/com/kienhoang/dualsubreplay/data/SubtitleStore.kt,app/src/main/java/com/kienhoang/dualsubreplay/data/YouTubeCaptionProvider.kt"
+          set +e
+          bash ./gradlew formatNewCode -PformatFiles="app/src/androidTest/java/com/kienhoang/dualsubreplay/ui/RestoredHighlightPlaybackTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/translation/TranslationDiskCacheTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/ui/CaptionTranslationCancellationTest.kt,app/src/test/java/com/kienhoang/dualsubreplay/data/SubtitleStoreTest.kt,app/src/main/java/com/kienhoang/dualsubreplay/translation/TranslationDiskCache.kt,app/src/main/java/com/kienhoang/dualsubreplay/translation/OnDeviceTranslator.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/PlaybackTranslation.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/TranslationCoordinator.kt,app/src/main/java/com/kienhoang/dualsubreplay/ui/AppViewModel.kt,app/src/main/java/com/kienhoang/dualsubreplay/data/SubtitleStore.kt,app/src/main/java/com/kienhoang/dualsubreplay/data/YouTubeCaptionProvider.kt"
+          format_exit=$?
+          set -e
+          echo "Formatter exit status: $format_exit; normal formatCheck below remains authoritative"
           echo 'SUBTITLE_FORMAT_PATCH_BEGIN'
           git diff --binary | base64 -w 100
           echo 'SUBTITLE_FORMAT_PATCH_END'
