@@ -68,6 +68,8 @@ class RestoredHighlightPlaybackTest {
                     vm.setTargetLanguage("en")
                     vm.setWordHighlightEnabled(true)
                     vm.onYouTubePageChanged("https://m.youtube.com/watch?v=abcdefghijk")
+                    vm.onWebPlaybackSecond("abcdefghijk", 0f)
+                    vm.onWebPlaybackPaused("abcdefghijk", false)
                 }
                 withTimeout(5000) { vm.state.first { it.segments.isNotEmpty() } }
                 compose.setContent {

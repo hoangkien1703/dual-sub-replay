@@ -1,9 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
-import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 
 internal data class CaptionTranslationUnit(
     val text: String,
@@ -68,43 +65,4 @@ private fun displayIndicesForSource(
         low++
     }
     return result
-}
-
-internal suspend fun translateCaptionUnits(
-    translator: OnDeviceTranslator,
-    sourceLanguage: String,
-    targetLanguage: String,
-    display: List<SubtitleSegment>,
-    playbackTime: () -> Long,
-    onDownloading: (Boolean) -> Unit,
-    onProgress: (List<SubtitleSegment>, Int, Int) -> Unit,
-) {
-    translateDisplayCaptions(display, playbackTime, { text ->
-        var result = ""
-        translator.translateAll(sourceLanguage, targetLanguage, listOf(text), onDownloading) { _, translated -> result = translated }
-        result
-    }, onProgress)
-}
-
-internal suspend fun translateDisplayCaptions(
-    display: List<SubtitleSegment>,
-    playbackTime: () -> Long,
-    translate: suspend (String) -> String,
-    onProgress: (List<SubtitleSegment>, Int, Int) -> Unit,
-) {
-    val working = display.toMutableList()
-    val pending = display.indices.filter { display[it].translatedText == null }.toMutableList()
-    val total = pending.size
-    var completed = 0
-    while (pending.isNotEmpty()) {
-        currentCoroutineContext().ensureActive()
-        val position = nearestSegmentIndex(display, playbackTime())
-        val index = pending.minBy { kotlin.math.abs(it - position) }
-        val text = translate(display[index].originalText)
-        currentCoroutineContext().ensureActive()
-        working[index] = working[index].copy(translatedText = text.trim())
-        completed++
-        onProgress(working.toList(), completed, total)
-        pending.remove(index)
-    }
 }
