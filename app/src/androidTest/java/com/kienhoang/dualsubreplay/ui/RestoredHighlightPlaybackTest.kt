@@ -110,7 +110,8 @@ class RestoredHighlightPlaybackTest {
                     if (changed) {
                         // A new presentation is now indexed on disk before its window is published.
                         compose.waitUntil(timeoutMillis = 5000) {
-                            vm.state.value.segments.isNotEmpty() && vm.state.value.segments !== previous
+                            val loaded = vm.state.value.segments
+                            loaded.isNotEmpty() && loaded !== previous
                         }
                     }
                     listOf(Configuration.ORIENTATION_PORTRAIT, Configuration.ORIENTATION_LANDSCAPE).forEach { value ->
