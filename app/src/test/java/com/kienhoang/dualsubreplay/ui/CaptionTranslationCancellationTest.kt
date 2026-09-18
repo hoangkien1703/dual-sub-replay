@@ -190,19 +190,20 @@ class CaptionTranslationCancellationTest {
                 val ready = CompletableDeferred<Unit>()
                 var count = 0
                 var publications = 0
-                val job = launch {
-                    translatePlaybackWindow(store, requests, {
-                        count++
-                        if (count == 1) {
-                            started.complete(Unit)
-                            release.await()
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, {
+                            count++
+                            if (count == 1) {
+                                started.complete(Unit)
+                                release.await()
+                            }
+                            it
+                        }) { _, preparing ->
+                            publications++
+                            if (!preparing) ready.complete(Unit)
                         }
-                        it
-                    }) { _, preparing ->
-                        publications++
-                        if (!preparing) ready.complete(Unit)
                     }
-                }
                 try {
                     withTimeout(5000) { started.await() }
                     val before = publications

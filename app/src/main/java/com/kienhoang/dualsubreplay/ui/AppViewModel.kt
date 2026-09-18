@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
+import com.kienhoang.dualsubreplay.data.CaptionTrackResult
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.SavedWord
@@ -499,11 +500,12 @@ class AppViewModel internal constructor(
     ) {
         val current = _state.value
         updateLiveSubtitle(videoId, liveCaption, seek)
-        val accepted = liveCaption?.takeIf {
-            liveTranslationGate.key != null &&
-                liveTranslationKey(it, videoId, current.targetLanguage) == liveTranslationGate.key &&
-                it.revision != rejectedLiveRevision
-        }
+        val accepted =
+            liveCaption?.takeIf {
+                liveTranslationGate.key != null &&
+                    liveTranslationKey(it, videoId, current.targetLanguage) == liveTranslationGate.key &&
+                    it.revision != rejectedLiveRevision
+            }
         liveCaptionProgress = accepted?.let { reconcileLiveCaptionProgress(liveCaptionProgress, it) }
         _state.update {
             it.copy(activeWordIndex = if (it.wordHighlightEnabled) liveCaptionProgress?.activeWordIndex ?: -1 else -1)
@@ -517,23 +519,32 @@ class AppViewModel internal constructor(
     ) {
         val timedIndex = activeSubtitleIndex(current.segments, timeMs)
         val referenceIndex = if (timedIndex >= 0) timedIndex else nearestSegmentIndex(current.segments, timeMs)
-        val livePosition = if (shouldCaptureLiveCaptions(current.generatedCaptions, current.wordHighlightEnabled)) {
-            val sample = liveCaption?.takeIf {
-                (it.videoId == null || it.videoId == current.activeVideoId) &&
-                    (it.languageCode == null ||
-                        it.languageCode.substringBefore('-') == current.resolvedSourceLanguage?.substringBefore('-'))
+        val livePosition =
+            if (shouldCaptureLiveCaptions(current.generatedCaptions, current.wordHighlightEnabled)) {
+                val sample =
+                    liveCaption?.takeIf {
+                        (it.videoId == null || it.videoId == current.activeVideoId) &&
+                            (
+                                it.languageCode == null ||
+                                    it.languageCode.substringBefore('-') == current.resolvedSourceLanguage?.substringBefore('-')
+                            )
+                    }
+                liveCaptionTracker.resolve(sample, current.segments, referenceIndex, timeMs)
+            } else {
+                null
             }
-            liveCaptionTracker.resolve(sample, current.segments, referenceIndex, timeMs)
-        } else {
-            null
-        }
         val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
-        val timedPosition = timedIndex.takeIf { it >= 0 && timedWordIndex >= 0 }?.let {
-            KaraokePosition(it, timedWordIndex)
-        }
-        val position = effectiveKaraokePosition(
-            current.generatedCaptions, current.wordHighlightEnabled, timedPosition, livePosition,
-        )
+        val timedPosition =
+            timedIndex.takeIf { it >= 0 && timedWordIndex >= 0 }?.let {
+                KaraokePosition(it, timedWordIndex)
+            }
+        val position =
+            effectiveKaraokePosition(
+                current.generatedCaptions,
+                current.wordHighlightEnabled,
+                timedPosition,
+                livePosition,
+            )
         val index = position?.segmentIndex ?: timedIndex
         val wordIndex = position?.wordIndex ?: -1
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
@@ -1021,10 +1032,10 @@ class AppViewModel internal constructor(
     }
 
     private suspend fun persistCaptionTrack(
-        track: com.kienhoang.dualsubreplay.data.CaptionTrackResult,
+        track: CaptionTrackResult,
         natural: Boolean,
         onStored: (SubtitleStore) -> Unit,
-    ): com.kienhoang.dualsubreplay.data.CaptionTrackResult {
+    ): CaptionTrackResult {
         currentCoroutineContext().ensureActive()
         val merged = SubtitleMerger.merge(track.cues, enhancedNaturalFlow = natural)
         if (merged.isEmpty()) throw CaptionUnavailableException("This caption track contains no readable text.")
