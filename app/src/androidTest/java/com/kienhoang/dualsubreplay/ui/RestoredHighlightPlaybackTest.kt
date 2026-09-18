@@ -104,7 +104,15 @@ class RestoredHighlightPlaybackTest {
                     }
                 }
                 CaptionFormat.entries.forEach { format ->
+                    val changed = vm.state.value.captionFormat != format
+                    val previous = vm.state.value.segments
                     compose.runOnIdle { vm.setCaptionFormat(format) }
+                    if (changed) {
+                        // A new presentation is now indexed on disk before its window is published.
+                        compose.waitUntil(timeoutMillis = 5000) {
+                            vm.state.value.segments.isNotEmpty() && vm.state.value.segments !== previous
+                        }
+                    }
                     listOf(Configuration.ORIENTATION_PORTRAIT, Configuration.ORIENTATION_LANDSCAPE).forEach { value ->
                         compose.runOnIdle { orientation.value = value }
                         listOf(0.1f to "One", 1.1f to "two", 2.1f to "three.", 0.1f to "One").forEach { (second, word) ->
