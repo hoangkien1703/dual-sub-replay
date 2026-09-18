@@ -1,10 +1,17 @@
 package com.kienhoang.dualsubreplay.data
 
-import java.io.Closeable
-import java.io.File
-import java.io.RandomAccessFile
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import java.io.Closeable
+import java.io.File
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.DataInput
+import java.io.DataInputStream
+import java.io.DataOutput
+import java.io.DataOutputStream
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 internal const val SUBTITLE_LOOK_AHEAD_MS = 60_000L
 internal const val SUBTITLE_LOOK_BEHIND_MS = 30_000L
@@ -41,11 +48,13 @@ internal class SubtitleStore private constructor(
     suspend fun read(indices: IntRange): List<SubtitleSegment> {
         if (indices.isEmpty()) return emptyList()
         require(indices.first >= 0 && indices.last < size)
-        return RandomAccessFile(file, "r").use { input ->
-            input.seek(offsets[indices.first])
-            indices.map {
-                currentCoroutineContext().ensureActive()
-                input.readSegment()
+        return FileInputStream(file).use { source ->
+            source.channel.position(offsets[indices.first])
+            DataInputStream(BufferedInputStream(source)).use { input ->
+                indices.map {
+                    currentCoroutineContext().ensureActive()
+                    input.readSegment()
+                }
             }
         }
     }
@@ -59,21 +68,24 @@ internal class SubtitleStore private constructor(
         private const val MAX_STORE_BYTES = 64L * 1024 * 1024
         private const val MAX_SEGMENTS = 200_000
 
-        suspend fun create(directory: File, segments: List<SubtitleSegment>): SubtitleStore {
+        suspend fun create(
+            directory: File,
+            segments: List<SubtitleSegment>,
+        ): SubtitleStore {
             require(segments.size <= MAX_SEGMENTS) { "Caption track contains too many entries." }
             check(directory.isDirectory || directory.mkdirs()) { "Cannot create subtitle storage." }
             val file = File.createTempFile("transcript-", ".bin", directory)
             try {
                 val starts = LongArray(segments.size)
                 val offsets = LongArray(segments.size)
-                RandomAccessFile(file, "rw").use { output ->
+                DataOutputStream(BufferedOutputStream(FileOutputStream(file))).use { output ->
                     segments.forEachIndexed { index, segment ->
                         currentCoroutineContext().ensureActive()
                         require(index == 0 || segment.startMs >= starts[index - 1])
                         starts[index] = segment.startMs
-                        offsets[index] = output.filePointer
+                        offsets[index] = output.size().toLong()
                         output.writeSegment(segment)
-                        check(output.filePointer <= MAX_STORE_BYTES) { "Caption storage limit exceeded." }
+                        check(output.size().toLong() <= MAX_STORE_BYTES) { "Caption storage limit exceeded." }
                     }
                 }
                 return SubtitleStore(file, starts, offsets)
@@ -85,7 +97,7 @@ internal class SubtitleStore private constructor(
     }
 }
 
-private fun RandomAccessFile.writeSegment(segment: SubtitleSegment) {
+private fun DataOutput.writeSegment(segment: SubtitleSegment) {
     writeLong(segment.id)
     writeLong(segment.startMs)
     writeLong(segment.endMs)
@@ -99,7 +111,7 @@ private fun RandomAccessFile.writeSegment(segment: SubtitleSegment) {
     }
 }
 
-private fun RandomAccessFile.readSegment(): SubtitleSegment {
+private fun DataInput.readSegment(): SubtitleSegment {
     val id = readLong()
     val start = readLong()
     val end = readLong()
@@ -110,14 +122,14 @@ private fun RandomAccessFile.readSegment(): SubtitleSegment {
     return SubtitleSegment(id, start, end, text, words = words)
 }
 
-private fun RandomAccessFile.writeText(text: String) {
+private fun DataOutput.writeText(text: String) {
     val bytes = text.toByteArray(Charsets.UTF_8)
     require(bytes.size <= 1024 * 1024)
     writeInt(bytes.size)
     write(bytes)
 }
 
-private fun RandomAccessFile.readText(): String {
+private fun DataInput.readText(): String {
     val count = readInt()
     require(count in 0..1024 * 1024)
     val bytes = ByteArray(count)

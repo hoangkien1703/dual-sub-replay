@@ -1,5 +1,23 @@
 package com.kienhoang.dualsubreplay.data
 
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Dns
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -8,26 +26,8 @@ import java.net.Inet4Address
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import okhttp3.Dns
-import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
 
 internal const val MAX_YOUTUBE_RESPONSE_BYTES = 8 * 1024 * 1024
 internal const val CAPTION_LOOKUP_TIMEOUT_MS = 20_000L
@@ -326,30 +326,32 @@ class YouTubeCaptionProvider(
     override suspend fun fetch(
         videoId: String,
         preferredLanguages: List<String>,
-    ): CaptionTrackResult = withContext(Dispatchers.IO) {
-        val deadlineNanos = System.nanoTime() +
-            TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
-        try {
-            fetchInternal(videoId, preferredLanguages, deadlineNanos)
-        } catch (error: CancellationException) {
-            // Never turn a cancelled/replaced load into a caption failure. The
-            // ViewModel uses cancellation whenever the video or language changes.
-            throw error
-        } catch (error: CaptionUnavailableException) {
-            reportCaptionFailure("lookup", error)
-            throw error
-        } catch (error: ResponseLimitExceededException) {
-            throw CaptionUnavailableException(error.message.orEmpty(), error)
-        } catch (error: CaptionLookupTimeoutException) {
-            reportCaptionFailure("lookup", error)
-            throw CaptionUnavailableException(error.message.orEmpty(), error)
-        } catch (error: Exception) {
-            throw CaptionUnavailableException(
-                "Captions could not be loaded. YouTube may have changed its transcript service.",
-                error,
-            )
+    ): CaptionTrackResult =
+        withContext(Dispatchers.IO) {
+            val deadlineNanos =
+                System.nanoTime() +
+                    TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
+            try {
+                fetchInternal(videoId, preferredLanguages, deadlineNanos)
+            } catch (error: CancellationException) {
+                // Never turn a cancelled/replaced load into a caption failure. The
+                // ViewModel uses cancellation whenever the video or language changes.
+                throw error
+            } catch (error: CaptionUnavailableException) {
+                reportCaptionFailure("lookup", error)
+                throw error
+            } catch (error: ResponseLimitExceededException) {
+                throw CaptionUnavailableException(error.message.orEmpty(), error)
+            } catch (error: CaptionLookupTimeoutException) {
+                reportCaptionFailure("lookup", error)
+                throw CaptionUnavailableException(error.message.orEmpty(), error)
+            } catch (error: Exception) {
+                throw CaptionUnavailableException(
+                    "Captions could not be loaded. YouTube may have changed its transcript service.",
+                    error,
+                )
+            }
         }
-    }
 
     private suspend fun fetchInternal(
         videoId: String,
@@ -357,16 +359,7 @@ class YouTubeCaptionProvider(
         deadlineNanos: Long,
     ): CaptionTrackResult {
         ensureLookupTimeRemaining(deadlineNanos, "starting caption discovery")
-        val watchResult = runCatching {
-            executeText(
-                Request.Builder()
-                    .url("https://www.youtube.com/watch?v=$videoId&hl=en")
-                    .header("User-Agent", WEB_USER_AGENT)
-                    .build(),
-                stage = "watch-page discovery",
-                deadlineNanos = deadlineNanos,
-            )
-        }
+        val watchResult = runCatching { discoverWatchPage(videoId, deadlineNanos) }
         watchResult.exceptionOrNull()?.let { error ->
             if (error is CancellationException) throw error
             reportCaptionFailure("watch-page", error)
@@ -456,6 +449,16 @@ class YouTubeCaptionProvider(
             lastError,
         )
     }
+
+    private suspend fun discoverWatchPage(videoId: String, deadlineNanos: Long): String =
+        executeText(
+            Request.Builder()
+                .url("https://www.youtube.com/watch?v=$videoId&hl=en")
+                .header("User-Agent", WEB_USER_AGENT)
+                .build(),
+            stage = "watch-page discovery",
+            deadlineNanos = deadlineNanos,
+        )
 
     private suspend fun fetchWithClient(
         videoId: String,
@@ -596,16 +599,6 @@ class YouTubeCaptionProvider(
                         )
                     }
                 }
-            } catch (error: CaptionLookupTimeoutException) {
-                throw error
-            } catch (error: ResponseLimitExceededException) {
-                throw error
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                lastError = error
-                emptyList()
-            }
             if (cues.isNotEmpty()) return cues
         }
 
@@ -633,52 +626,74 @@ class YouTubeCaptionProvider(
         request: Request,
         stage: String,
         deadlineNanos: Long,
-    ): String = suspendCancellableCoroutine { continuation ->
-        val remainingNanos = deadlineNanos - System.nanoTime()
-        if (remainingNanos <= 0L) {
-            continuation.resumeWithException(lookupTimeout(stage))
-            return@suspendCancellableCoroutine
-        }
-        val call = client.newCall(request)
-        call.timeout().timeout(boundedYouTubeRequestTimeoutNanos(remainingNanos), TimeUnit.NANOSECONDS)
-        continuation.invokeOnCancellation { call.cancel() }
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, error: IOException) {
-                if (!continuation.isActive) return
-                val failure = if (error is InterruptedIOException && System.nanoTime() >= deadlineNanos) {
-                    lookupTimeout(stage, error)
-                } else if (error is InterruptedIOException) {
-                    CaptionUnavailableException("YouTube request timed out during $stage.", error)
-                } else {
-                    CaptionUnavailableException("YouTube request failed during $stage.", error)
-                }
-                continuation.resumeWithException(failure)
+    ): String =
+        suspendCancellableCoroutine { continuation ->
+            val remainingNanos = deadlineNanos - System.nanoTime()
+            if (remainingNanos <= 0L) {
+                continuation.resumeWithException(lookupTimeout(stage))
+                return@suspendCancellableCoroutine
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                val result = runCatching {
-                    response.use {
-                        if (!it.isSuccessful) throw CaptionUnavailableException("YouTube returned HTTP ${it.code} during $stage.")
-                        val body = it.body ?: throw CaptionUnavailableException("YouTube returned an empty response during $stage.")
-                        if (body.contentLength() > MAX_YOUTUBE_RESPONSE_BYTES) {
-                            throw ResponseLimitExceededException(
-                                "YouTube returned a response larger than the 8 MiB safety limit during $stage.",
-                            )
-                        }
-                        body.byteStream().use(::readUtf8WithLimit)
+            val call = client.newCall(request)
+            call.timeout().timeout(boundedYouTubeRequestTimeoutNanos(remainingNanos), TimeUnit.NANOSECONDS)
+            continuation.invokeOnCancellation { call.cancel() }
+            call.enqueue(
+                object : Callback {
+                    override fun onFailure(
+                        call: Call,
+                        error: IOException,
+                    ) {
+                        if (!continuation.isActive) return
+                        val failure =
+                            if (error is InterruptedIOException && System.nanoTime() >= deadlineNanos) {
+                                lookupTimeout(stage, error)
+                            } else if (error is InterruptedIOException) {
+                                CaptionUnavailableException("YouTube request timed out during $stage.", error)
+                            } else {
+                                CaptionUnavailableException("YouTube request failed during $stage.", error)
+                            }
+                        continuation.resumeWithException(failure)
                     }
-                }
-                if (continuation.isActive) result.fold({ continuation.resume(it) }, { continuation.resumeWithException(it) })
-            }
-        })
-    }
 
-    private suspend fun ensureLookupTimeRemaining(deadlineNanos: Long, stage: String) {
+                    override fun onResponse(
+                        call: Call,
+                        response: Response,
+                    ) {
+                        val result =
+                            runCatching {
+                                response.use {
+                                    if (!it.isSuccessful) {
+                                        throw CaptionUnavailableException(
+                                            "YouTube returned HTTP ${it.code} during $stage.",
+                                        )
+                                    }
+                                    val body =
+                                        it.body ?: throw CaptionUnavailableException("YouTube returned an empty response during $stage.")
+                                    if (body.contentLength() > MAX_YOUTUBE_RESPONSE_BYTES) {
+                                        throw ResponseLimitExceededException(
+                                            "YouTube returned a response larger than the 8 MiB safety limit during $stage.",
+                                        )
+                                    }
+                                    body.byteStream().use(::readUtf8WithLimit)
+                                }
+                            }
+                        if (continuation.isActive) result.fold({ continuation.resume(it) }, { continuation.resumeWithException(it) })
+                    }
+                },
+            )
+        }
+
+    private suspend fun ensureLookupTimeRemaining(
+        deadlineNanos: Long,
+        stage: String,
+    ) {
         currentCoroutineContext().ensureActive()
         if (System.nanoTime() >= deadlineNanos) throw lookupTimeout(stage)
     }
 
-    private fun lookupTimeout(stage: String, cause: Throwable? = null): CaptionLookupTimeoutException =
+    private fun lookupTimeout(
+        stage: String,
+        cause: Throwable? = null,
+    ): CaptionLookupTimeoutException =
         CaptionLookupTimeoutException(
             "Caption discovery stopped after ${CAPTION_LOOKUP_TIMEOUT_MS / 1_000} seconds " +
                 "instead of continuing to spin. Last stage: $stage.",

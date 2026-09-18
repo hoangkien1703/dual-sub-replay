@@ -1,7 +1,7 @@
 package com.kienhoang.dualsubreplay.translation
 
-import java.nio.file.Files
 import org.junit.Test
+import java.nio.file.Files
 
 class TranslationDiskCacheTest {
     @Test

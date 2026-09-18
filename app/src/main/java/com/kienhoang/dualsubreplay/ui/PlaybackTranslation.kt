@@ -35,9 +35,10 @@ internal suspend fun translatePlaybackWindow(
         val nextIndices = store.windowIndices(request.timeMs)
         if (nextIndices != indices) {
             val previous = rows.associateBy { it.id }
-            rows = withContext(Dispatchers.IO) { store.read(nextIndices) }.map { row ->
-                row.copy(translatedText = previous[row.id]?.translatedText)
-            }
+            rows =
+                withContext(Dispatchers.IO) { store.read(nextIndices) }.map { row ->
+                    row.copy(translatedText = previous[row.id]?.translatedText)
+                }
             indices = nextIndices
         }
         // Reading disk can suspend across a seek. Never show the old position afterwards.
@@ -58,7 +59,10 @@ internal suspend fun translatePlaybackWindow(
     }
 }
 
-internal fun nextWindowTranslation(rows: List<SubtitleSegment>, request: CaptionPlaybackRequest): Int? {
+internal fun nextWindowTranslation(
+    rows: List<SubtitleSegment>,
+    request: CaptionPlaybackRequest,
+): Int? {
     if (!request.enabled || request.paused || rows.isEmpty()) return null
     val current = nearestSegmentIndex(rows, request.timeMs)
     val ahead = request.timeMs + com.kienhoang.dualsubreplay.data.SUBTITLE_LOOK_AHEAD_MS

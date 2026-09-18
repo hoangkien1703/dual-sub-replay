@@ -14,20 +14,30 @@ internal class TranslationDiskCache(
     private var initialized = false
     private var bytes = 0L
 
-    @Synchronized fun get(source: String, target: String, text: String): String? = safely {
-        initialize()
-        val key = key(source, target, text)
-        val size = entries[key] ?: return@safely null
-        val file = File(directory, key)
-        if (!file.isFile || file.length() != size || size > maxBytes) {
-            remove(key)
-            return@safely null
+    @Synchronized fun get(
+        source: String,
+        target: String,
+        text: String,
+    ): String? =
+        safely {
+            initialize()
+            val key = key(source, target, text)
+            val size = entries[key] ?: return@safely null
+            val file = File(directory, key)
+            if (!file.isFile || file.length() != size || size > maxBytes) {
+                remove(key)
+                return@safely null
+            }
+            file.setLastModified(System.currentTimeMillis())
+            file.readText(Charsets.UTF_8)
         }
-        file.setLastModified(System.currentTimeMillis())
-        file.readText(Charsets.UTF_8)
-    }
 
-    @Synchronized fun put(source: String, target: String, text: String, translation: String) {
+    @Synchronized fun put(
+        source: String,
+        target: String,
+        text: String,
+        translation: String,
+    ) {
         safely {
             initialize()
             val data = translation.toByteArray(Charsets.UTF_8)
@@ -72,17 +82,24 @@ internal class TranslationDiskCache(
         File(directory, key).delete()
     }
 
-    private fun key(source: String, target: String, text: String): String {
+    private fun key(
+        source: String,
+        target: String,
+        text: String,
+    ): String {
         val input = "v1:${source.length}:$source:${target.length}:$target:$text"
-        return MessageDigest.getInstance("SHA-256").digest(input.toByteArray(Charsets.UTF_8))
+        return MessageDigest
+            .getInstance("SHA-256")
+            .digest(input.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }
     }
 
-    private fun safely(block: () -> String?): String? = try {
-        block()
-    } catch (_: IOException) {
-        null
-    } catch (_: SecurityException) {
-        null
-    }
+    private fun safely(block: () -> String?): String? =
+        try {
+            block()
+        } catch (_: IOException) {
+            null
+        } catch (_: SecurityException) {
+            null
+        }
 }

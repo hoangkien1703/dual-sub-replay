@@ -6,19 +6,21 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
-import java.io.File
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class OnDeviceTranslator(cacheDirectory: File? = null) {
+class OnDeviceTranslator(
+    cacheDirectory: File? = null,
+) {
     private val diskCache = cacheDirectory?.let { TranslationDiskCache(it) }
     private val cache = TranslationCache()
     private val modelDownloadMutex = Mutex()
@@ -64,16 +66,18 @@ class OnDeviceTranslator(cacheDirectory: File? = null) {
                 if (text.isBlank() || languages.source == languages.target) {
                     text
                 } else {
-                    val cached = cache.get(languages.source, languages.target, text)
-                        ?: withContext(Dispatchers.IO) { diskCache?.get(languages.source, languages.target, text) }
+                    val cached =
+                        cache.get(languages.source, languages.target, text)
+                            ?: withContext(Dispatchers.IO) { diskCache?.get(languages.source, languages.target, text) }
                     if (cached != null) {
                         cache.put(languages.source, languages.target, text, cached)
                         cached
                     } else {
-                        val active = client ?: newTranslator(languages).also {
-                            client = it
-                            ensureModelReady(languages, it, onDownloadingChange)
-                        }
+                        val active =
+                            client ?: newTranslator(languages).also {
+                                client = it
+                                ensureModelReady(languages, it, onDownloadingChange)
+                            }
                         val translated = active.translate(text).awaitResult()
                         cache.put(languages.source, languages.target, text, translated)
                         withContext(Dispatchers.IO) { diskCache?.put(languages.source, languages.target, text, translated) }
