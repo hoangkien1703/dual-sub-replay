@@ -99,6 +99,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -120,6 +121,10 @@ fun DualSubApp(
     onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    LifecycleStartEffect(viewModel) {
+        viewModel.setAppVisible(true)
+        onStopOrDispose { viewModel.setAppVisible(false) }
+    }
     val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
     val webController = rememberYouTubeWebController()
     val pronouncer = rememberWordPronouncer()
@@ -791,11 +796,13 @@ private fun SubtitleTimeline(
         .coerceAtMost(state.segments.lastIndex.coerceAtLeast(0))
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialItemIndex)
     val previousIndex = remember { mutableIntStateOf(-1) }
-    LaunchedEffect(state.currentIndex) {
+    LaunchedEffect(state.currentIndex, state.segments.firstOrNull()?.id) {
         val target = state.currentIndex
         if (target < 0) return@LaunchedEffect
+        // IDs remain global when the local window shifts or jumps hours ahead.
+        val globalIndex = state.segments.getOrNull(target)?.id?.toInt() ?: return@LaunchedEffect
         val lastIndex = previousIndex.intValue
-        previousIndex.intValue = target
+        previousIndex.intValue = globalIndex
         if (listState.isScrollInProgress) {
             snapshotFlow { listState.isScrollInProgress }.first { !it }
         }
@@ -811,8 +818,8 @@ private fun SubtitleTimeline(
             lastIndex < 0 -> {
                 listState.scrollToItem(target)
             }
-            shouldFollowPlaybackSeek(lastIndex, target) -> {
-                if (abs(target - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
+            shouldFollowPlaybackSeek(lastIndex, globalIndex) -> {
+                if (abs(globalIndex - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
                     listState.scrollToItem(target)
                 } else {
                     listState.animateScrollToItem(target)

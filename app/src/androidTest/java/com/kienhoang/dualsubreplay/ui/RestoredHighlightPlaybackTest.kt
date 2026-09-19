@@ -68,6 +68,8 @@ class RestoredHighlightPlaybackTest {
                     vm.setTargetLanguage("en")
                     vm.setWordHighlightEnabled(true)
                     vm.onYouTubePageChanged("https://m.youtube.com/watch?v=abcdefghijk")
+                    vm.onWebPlaybackSecond("abcdefghijk", 0f)
+                    vm.onWebPlaybackPaused("abcdefghijk", false)
                 }
                 withTimeout(5000) { vm.state.first { it.segments.isNotEmpty() } }
                 compose.setContent {
@@ -102,7 +104,16 @@ class RestoredHighlightPlaybackTest {
                     }
                 }
                 CaptionFormat.entries.forEach { format ->
+                    val changed = vm.state.value.captionFormat != format
+                    val previous = vm.state.value.segments
                     compose.runOnIdle { vm.setCaptionFormat(format) }
+                    if (changed) {
+                        // A new presentation is now indexed on disk before its window is published.
+                        compose.waitUntil(timeoutMillis = 5000) {
+                            val loaded = vm.state.value.segments
+                            loaded.isNotEmpty() && loaded !== previous
+                        }
+                    }
                     listOf(Configuration.ORIENTATION_PORTRAIT, Configuration.ORIENTATION_LANDSCAPE).forEach { value ->
                         compose.runOnIdle { orientation.value = value }
                         listOf(0.1f to "One", 1.1f to "two", 2.1f to "three.", 0.1f to "One").forEach { (second, word) ->
