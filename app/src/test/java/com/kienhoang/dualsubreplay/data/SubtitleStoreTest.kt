@@ -35,6 +35,21 @@ class SubtitleStoreTest {
         }
 
     @Test
+    fun overlappingSplitCueOrderDoesNotCrashTheLookupIndex() =
+        runBlocking {
+            val rows =
+                listOf(
+                    SubtitleSegment(0, 0, 1_000, "first"),
+                    SubtitleSegment(1, 4_000, 5_000, "later chunk from the first cue"),
+                    SubtitleSegment(2, 1_000, 2_000, "overlapping next cue"),
+                )
+            withStore(rows) { store ->
+                check(store.read(0..2) == rows)
+                check(store.read(store.windowIndices(1_500)).any { it.originalText == "overlapping next cue" })
+            }
+        }
+
+    @Test
     fun closingAStoreDeletesItsTranscriptFile() =
         runBlocking {
             val directory = Files.createTempDirectory("subtitle-close-test").toFile()

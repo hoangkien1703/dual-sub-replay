@@ -47,7 +47,9 @@ internal class SubtitleStore private constructor(
     /** Call on an IO dispatcher. Each read owns its handle so cancellation cannot leak it. */
     suspend fun read(indices: IntRange): List<SubtitleSegment> {
         if (indices.isEmpty()) return emptyList()
-        require(indices.first >= 0 && indices.last < size)
+        require(indices.first >= 0 && indices.last < size) {
+            "Subtitle window ${indices.first}..${indices.last} is outside 0..${size - 1}."
+        }
         return FileInputStream(file).use { source ->
             source.channel.position(offsets[indices.first])
             DataInputStream(BufferedInputStream(source)).use { input ->
@@ -71,24 +73,44 @@ internal class SubtitleStore private constructor(
         suspend fun create(
             directory: File,
             segments: List<SubtitleSegment>,
+        ): SubtitleStore = create(directory) { append -> append(segments) }
+
+        /**
+         * Writes caption batches directly to disk. This keeps formatting a very long transcript
+         * bounded too; lazy translation is not useful if preparation first materializes the whole
+         * track a second time.
+         */
+        suspend fun create(
+            directory: File,
+            writeBatches: suspend (append: suspend (List<SubtitleSegment>) -> Unit) -> Unit,
         ): SubtitleStore {
-            require(segments.size <= MAX_SEGMENTS) { "Caption track contains too many entries." }
             check(directory.isDirectory || directory.mkdirs()) { "Cannot create subtitle storage." }
             val file = File.createTempFile("transcript-", ".bin", directory)
             try {
-                val starts = LongArray(segments.size)
-                val offsets = LongArray(segments.size)
+                val starts = mutableListOf<Long>()
+                val offsets = mutableListOf<Long>()
                 DataOutputStream(BufferedOutputStream(FileOutputStream(file))).use { output ->
-                    segments.forEachIndexed { index, segment ->
-                        currentCoroutineContext().ensureActive()
-                        require(index == 0 || segment.startMs >= starts[index - 1])
-                        starts[index] = segment.startMs
-                        offsets[index] = output.size().toLong()
-                        output.writeSegment(segment)
-                        check(output.size().toLong() <= MAX_STORE_BYTES) { "Caption storage limit exceeded." }
+                    writeBatches { batch ->
+                        require(starts.size + batch.size <= MAX_SEGMENTS) {
+                            "Caption track contains too many entries."
+                        }
+                        batch.forEach { sourceSegment ->
+                            currentCoroutineContext().ensureActive()
+                            val segment = sourceSegment
+                            // Overlapping YouTube ASR cues can make a split chunk start after the
+                            // following cue. Keep the display order, but clamp only the lookup key
+                            // so binary search remains valid instead of crashing with an unnamed
+                            // IllegalArgumentException ("Failed requirement").
+                            starts += maxOf(segment.startMs, starts.lastOrNull() ?: Long.MIN_VALUE)
+                            offsets += output.size().toLong()
+                            output.writeSegment(segment)
+                            check(output.size().toLong() <= MAX_STORE_BYTES) {
+                                "Caption storage limit exceeded."
+                            }
+                        }
                     }
                 }
-                return SubtitleStore(file, starts, offsets)
+                return SubtitleStore(file, starts.toLongArray(), offsets.toLongArray())
             } catch (error: Throwable) {
                 file.delete()
                 throw error
@@ -102,7 +124,7 @@ private fun DataOutput.writeSegment(segment: SubtitleSegment) {
     writeLong(segment.startMs)
     writeLong(segment.endMs)
     writeText(segment.originalText)
-    require(segment.words.size <= 16_384)
+    require(segment.words.size <= 16_384) { "A caption contains too many timed words." }
     writeInt(segment.words.size)
     segment.words.forEach { word ->
         writeText(word.text)
@@ -117,21 +139,21 @@ private fun DataInput.readSegment(): SubtitleSegment {
     val end = readLong()
     val text = readText()
     val count = readInt()
-    require(count in 0..16_384)
+    require(count in 0..16_384) { "Stored caption word count is invalid." }
     val words = List(count) { SubtitleWord(readText(), readLong(), readLong()) }
     return SubtitleSegment(id, start, end, text, words = words)
 }
 
 private fun DataOutput.writeText(text: String) {
     val bytes = text.toByteArray(Charsets.UTF_8)
-    require(bytes.size <= 1024 * 1024)
+    require(bytes.size <= 1024 * 1024) { "A caption text entry is larger than 1 MiB." }
     writeInt(bytes.size)
     write(bytes)
 }
 
 private fun DataInput.readText(): String {
     val count = readInt()
-    require(count in 0..1024 * 1024)
+    require(count in 0..1024 * 1024) { "Stored caption text length is invalid." }
     val bytes = ByteArray(count)
     readFully(bytes)
     return bytes.toString(Charsets.UTF_8)

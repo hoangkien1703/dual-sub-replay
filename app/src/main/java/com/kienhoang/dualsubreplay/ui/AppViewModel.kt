@@ -1068,9 +1068,13 @@ class AppViewModel internal constructor(
         }
         try {
             withContext(Dispatchers.IO) {
-                val raw = rawStore.read(0 until rawStore.size)
-                val display = captionDisplaySegments(raw, format, natural)
-                displayStore = SubtitleStore.create(subtitleDirectory, display)
+                displayStore =
+                    prepareCaptionDisplayStore(
+                        source = rawStore,
+                        directory = subtitleDirectory,
+                        format = format,
+                        natural = natural,
+                    )
             }
             translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
                 _state.update { current ->
