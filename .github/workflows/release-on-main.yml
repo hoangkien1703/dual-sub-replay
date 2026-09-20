@@ -160,21 +160,24 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v1.0.1 highlights
+            ## v1.0.2 highlights
 
-            - **Word pronunciation**: Pronounce now tries the preferred Android speech engine and other installed engines, selecting an available offline voice first and falling back to a supported network voice if needed (#65).
-            - **Recovery**: Word Learning and Saved words offer Speech settings when no suitable voice works. Retry Pronounce after installing or selecting a voice (#65).
-            - **Playback handling**: Speech waits for the utterance to finish, handles playback errors, and stops when a new pronunciation starts or the app goes to the background (#65).
+            - **Long-video efficiency**: Only subtitles near the current playback position are prepared and translated—up to 60 seconds ahead and 30 seconds behind, with a hard cap of 96 loaded entries (#67).
+            - **Lower memory and battery use**: Source and display transcripts use temporary indexed disk storage, display formatting runs in batches, and translation stops while paused or backgrounded (#67).
+            - **Fast seeking**: Seeking replaces obsolete subtitle work and starts preparing captions near the new position instead of continuing through unwatched hours (#67).
+            - **Crash fix**: Overlapping auto-generated captions no longer trigger the “Failed requirement” error after long lines are split (#67).
+            - **Translation reuse**: Previously translated lines can be reused from the bounded persistent cache when revisiting a section (#67).
 
             ## Validation
 
-            - PR #65 passed formatting, complexity, unit tests, lint, and debug build checks, including 15 pronunciation regression cases.
+            - PR #67 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
+            - Regression coverage includes dense and long transcripts, large seeks, pause/resume, cancellation, batched formatting, overlapping captions, disk cleanup, and translation-cache limits.
             - The official APK is built with production signing and verified by this release workflow.
 
             ## Known limitations
 
-            - Pronunciation requires an installed Android speech engine with a suitable voice. Network voices need connectivity.
-            - Pronunciation audio on a physical phone has not been verified for this release.
+            - YouTube still returns the complete caption document initially; the app limits subsequent formatting, storage, UI, and translation work rather than using unsupported network-range requests.
+            - Battery savings and the reported 22-hour video should still be confirmed on a physical phone after installing this release.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
