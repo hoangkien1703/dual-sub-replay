@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
+import com.kienhoang.dualsubreplay.data.CaptionTrackResult
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.SubtitleStore
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
@@ -20,14 +22,21 @@ import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.abs
 import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
 
@@ -249,13 +258,22 @@ class AppViewModel internal constructor(
     constructor(application: Application) : this(application, YouTubeCaptionProvider())
 
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
-    private val translator = OnDeviceTranslator()
+    private val translator = OnDeviceTranslator(File(application.cacheDir, "subtitle-translations"))
     internal val vocabulary = VocabularyRepository.get(application)
     private var loadingJob: Job? = null
     private var translationWarmupJob: Job? = null
     private var loadGeneration = 0L
     private var latestPlaybackSecondMs = 0L
-    private var rawMergedSegments: List<SubtitleSegment> = emptyList()
+    private val subtitleDirectory by lazy {
+        File(application.cacheDir, "subtitle-transcripts").apply {
+            // Cached transcripts belong to this ViewModel; discard leftovers after process death.
+            deleteRecursively()
+            mkdirs()
+        }
+    }
+    private val playbackRequests = MutableStateFlow(CaptionPlaybackRequest())
+    private var playbackKnown = false
+    private var appVisible = true
     private val liveCaptionTracker = LiveCaptionTracker()
     private var liveCaptionProgress: LiveCaptionProgress? = null
     private val liveTranslationGate = LiveTranslationGate()
@@ -365,6 +383,7 @@ class AppViewModel internal constructor(
         }
 
     override fun onCleared() {
+        loadingJob?.cancel()
         preferences.unregisterOnSharedPreferenceChangeListener(visibilityListener)
         super.onCleared()
     }
@@ -373,7 +392,31 @@ class AppViewModel internal constructor(
         videoId: String,
         paused: Boolean,
     ) {
-        _state.update { if (it.activeVideoId == videoId) it.copy(playbackPaused = paused) else it }
+        if (_state.value.activeVideoId != videoId) return
+        _state.update { it.copy(playbackPaused = paused) }
+        updatePlaybackRequest()
+    }
+
+    internal fun setAppVisible(visible: Boolean) {
+        appVisible = visible
+        updatePlaybackRequest()
+    }
+
+    private fun updatePlaybackRequest(seek: Boolean = false) {
+        playbackRequests.update {
+            CaptionPlaybackRequest(
+                // Translation scheduling needs seconds, while karaoke keeps its 33 ms clock.
+                timeMs =
+                    if (seek || !it.enabled || latestPlaybackSecondMs / 1000 != it.timeMs / 1000) {
+                        latestPlaybackSecondMs
+                    } else {
+                        it.timeMs
+                    },
+                paused = _state.value.playbackPaused,
+                enabled = appVisible && playbackKnown && _state.value.activeVideoId != null,
+                seekGeneration = it.seekGeneration + if (seek) 1 else 0,
+            )
+        }
     }
 
     init {
@@ -441,6 +484,8 @@ class AppViewModel internal constructor(
             liveCaptionProgress = null
         }
         latestPlaybackSecondMs = timeMs
+        playbackKnown = true
+        updatePlaybackRequest(seek)
         if (current.liveFallback) {
             updateLiveFallbackPlayback(videoId, liveCaption, seek)
         } else {
@@ -455,11 +500,12 @@ class AppViewModel internal constructor(
     ) {
         val current = _state.value
         updateLiveSubtitle(videoId, liveCaption, seek)
-        val accepted = liveCaption?.takeIf {
-            liveTranslationGate.key != null &&
-                liveTranslationKey(it, videoId, current.targetLanguage) == liveTranslationGate.key &&
-                it.revision != rejectedLiveRevision
-        }
+        val accepted =
+            liveCaption?.takeIf {
+                liveTranslationGate.key != null &&
+                    liveTranslationKey(it, videoId, current.targetLanguage) == liveTranslationGate.key &&
+                    it.revision != rejectedLiveRevision
+            }
         liveCaptionProgress = accepted?.let { reconcileLiveCaptionProgress(liveCaptionProgress, it) }
         _state.update {
             it.copy(activeWordIndex = if (it.wordHighlightEnabled) liveCaptionProgress?.activeWordIndex ?: -1 else -1)
@@ -473,23 +519,32 @@ class AppViewModel internal constructor(
     ) {
         val timedIndex = activeSubtitleIndex(current.segments, timeMs)
         val referenceIndex = if (timedIndex >= 0) timedIndex else nearestSegmentIndex(current.segments, timeMs)
-        val livePosition = if (shouldCaptureLiveCaptions(current.generatedCaptions, current.wordHighlightEnabled)) {
-            val sample = liveCaption?.takeIf {
-                (it.videoId == null || it.videoId == current.activeVideoId) &&
-                    (it.languageCode == null ||
-                        it.languageCode.substringBefore('-') == current.resolvedSourceLanguage?.substringBefore('-'))
+        val livePosition =
+            if (shouldCaptureLiveCaptions(current.generatedCaptions, current.wordHighlightEnabled)) {
+                val sample =
+                    liveCaption?.takeIf {
+                        (it.videoId == null || it.videoId == current.activeVideoId) &&
+                            (
+                                it.languageCode == null ||
+                                    it.languageCode.substringBefore('-') == current.resolvedSourceLanguage?.substringBefore('-')
+                            )
+                    }
+                liveCaptionTracker.resolve(sample, current.segments, referenceIndex, timeMs)
+            } else {
+                null
             }
-            liveCaptionTracker.resolve(sample, current.segments, referenceIndex, timeMs)
-        } else {
-            null
-        }
         val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
-        val timedPosition = timedIndex.takeIf { it >= 0 && timedWordIndex >= 0 }?.let {
-            KaraokePosition(it, timedWordIndex)
-        }
-        val position = effectiveKaraokePosition(
-            current.generatedCaptions, current.wordHighlightEnabled, timedPosition, livePosition,
-        )
+        val timedPosition =
+            timedIndex.takeIf { it >= 0 && timedWordIndex >= 0 }?.let {
+                KaraokePosition(it, timedWordIndex)
+            }
+        val position =
+            effectiveKaraokePosition(
+                current.generatedCaptions,
+                current.wordHighlightEnabled,
+                timedPosition,
+                livePosition,
+            )
         val index = position?.segmentIndex ?: timedIndex
         val wordIndex = position?.wordIndex ?: -1
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
@@ -585,9 +640,6 @@ class AppViewModel internal constructor(
         liveTranslationJob?.cancel()
         liveTranslationGate.reset()
         _state.update { it.copy(targetLanguage = normalized, liveTranslated = null) }
-        if (_state.value.activeVideoId != null && _state.value.segments.isNotEmpty()) {
-            retranslateCurrentSegments()
-        }
     }
 
     fun completeOnboarding(
@@ -600,9 +652,6 @@ class AppViewModel internal constructor(
         preferences.edit().putString("target_language", native).apply()
         _state.update { it.copy(sourcePreference = learning, targetLanguage = native) }
         warmTranslationModel(sourceLanguage = learning, targetLanguage = native)
-        if (_state.value.activeVideoId != null && _state.value.segments.isNotEmpty()) {
-            retranslateCurrentSegments()
-        }
         finishOnboarding()
     }
 
@@ -686,13 +735,6 @@ class AppViewModel internal constructor(
         _state.update { it.copy(captionFormat = format) }
         liveCaptionTracker.reset()
         liveCaptionProgress = null
-        refreshSplitSegments()
-    }
-
-    private fun refreshSplitSegments() {
-        if (_state.value.activeVideoId != null && rawMergedSegments.isNotEmpty()) {
-            retranslateCurrentSegments()
-        }
     }
 
     fun setLockOverlayToVideo(locked: Boolean) {
@@ -835,9 +877,7 @@ class AppViewModel internal constructor(
                 selectedLearningWord = null,
             )
         }
-        // "Reset all settings" re-enables sentence splitting, so the currently
-        // open video switches back to the default short-chunk presentation.
-        refreshSplitSegments()
+        _state.value.activeVideoId?.let { loadVideo(it, showPanel = _state.value.subtitlePanelVisible) }
     }
 
     fun retryCaptions() {
@@ -863,11 +903,15 @@ class AppViewModel internal constructor(
         latestPlaybackSecondMs = 0L
         liveCaptionTracker.reset()
         liveCaptionProgress = null
-        rawMergedSegments = emptyList()
+        playbackKnown = false
+        playbackRequests.value = CaptionPlaybackRequest()
         _state.update {
             it.copy(
                 activeVideoId = null,
-                liveFallback = false, liveOriginal = null, liveTranslated = null, retryingTranscript = false,
+                liveFallback = false,
+                liveOriginal = null,
+                liveTranslated = null,
+                retryingTranscript = false,
                 subtitlePanelVisible = true,
                 availableSourceLanguages = emptyList(),
                 resolvedSourceLanguage = null,
@@ -900,7 +944,9 @@ class AppViewModel internal constructor(
         // current position so subtitles resume exactly where playback is.
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
             latestPlaybackSecondMs = 0L
+            playbackKnown = false
         }
+        playbackRequests.value = CaptionPlaybackRequest()
         _state.update {
             it.copy(
                 liveFallback = preserveLive,
@@ -908,7 +954,7 @@ class AppViewModel internal constructor(
                 liveTranslated = if (preserveLive) it.liveTranslated else null,
                 retryingTranscript = preserveLive,
                 activeVideoId = videoId,
-                playbackPaused = false,
+                playbackPaused = if (playbackKnown) it.playbackPaused else true,
                 subtitlePanelVisible = showPanel,
                 availableSourceLanguages = emptyList(),
                 resolvedSourceLanguage = if (preserveLive) it.resolvedSourceLanguage else null,
@@ -921,18 +967,18 @@ class AppViewModel internal constructor(
                 errorMessage = null,
             )
         }
+        updatePlaybackRequest()
         loadingJob =
             viewModelScope.launch {
+                var rawStore: SubtitleStore? = null
                 try {
                     val preferredLanguages = preferredCaptionLanguages(_state.value.sourcePreference)
-                    val track = captionProvider.fetch(videoId, preferredLanguages)
-                    val merged = mergeCaptionTrack(track)
-                    if (merged.isEmpty()) {
-                        throw CaptionUnavailableException("This caption track contains no readable text.")
-                    }
+                    val natural = _state.value.naturalSubtitlesEnabled
+                    val track =
+                        withContext(Dispatchers.IO) {
+                            persistCaptionTrack(captionProvider.fetch(videoId, preferredLanguages), natural) { rawStore = it }
+                        }
                     if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
-                    val displaySegments = captionDisplaySegments(merged, _state.value.captionFormat, _state.value.naturalSubtitlesEnabled)
-                    rawMergedSegments = merged
                     liveTranslationGate.reset()
                     liveTranslationJob?.cancel()
 
@@ -951,19 +997,15 @@ class AppViewModel internal constructor(
                                 ),
                             availableSourceLanguages = track.availableLanguages,
                             generatedCaptions = track.isGenerated,
-                            segments = displaySegments,
+                            segments = emptyList(),
                             stage = LoadStage.TRANSLATING,
                             statusMessage = translationStartingMessage(current.targetLanguage),
                         )
                     }
 
-                    translateSegments(
-                        videoId = videoId,
-                        generation = generation,
-                        sourceLanguage = track.languageCode,
-                        targetLanguage = _state.value.targetLanguage,
-                        segments = displaySegments,
-                    )
+                    _state.map { it.captionFormat to it.targetLanguage }.distinctUntilChanged().collectLatest { (format, target) ->
+                        runStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, target, format, natural)
+                    }
                 } catch (error: Exception) {
                     if (error is CancellationException) throw error
                     _state.update { current ->
@@ -983,112 +1025,127 @@ class AppViewModel internal constructor(
                             errorMessage = null,
                         )
                     }
+                } finally {
+                    withContext(NonCancellable + Dispatchers.IO) { rawStore?.close() }
                 }
             }
     }
 
-    private fun mergeCaptionTrack(track: com.kienhoang.dualsubreplay.data.CaptionTrackResult) = SubtitleMerger.merge(
-        track.cues,
-        enhancedNaturalFlow = _state.value.naturalSubtitlesEnabled,
-    )
-
-    private fun retranslateCurrentSegments() {
-        val current = _state.value
-        val videoId = current.activeVideoId ?: return
-        val sourceLanguage = current.resolvedSourceLanguage ?: return
-        // Re-derive from the raw merged captions so toggling the sentence
-        // splitter (issue #25) always starts from un-split text.
-        val baseSegments = rawMergedSegments.ifEmpty { current.segments }
-        if (baseSegments.isEmpty()) return
-        val segments = captionDisplaySegments(baseSegments, current.captionFormat, current.naturalSubtitlesEnabled)
-
-        val generation = ++loadGeneration
-        loadingJob?.cancel()
-        liveCaptionTracker.reset()
-        _state.update {
-            val index = activeSubtitleIndex(segments, latestPlaybackSecondMs)
-            it.copy(
-                segments = segments.map { segment -> segment.copy(translatedText = null) },
-                currentIndex = index,
-                // Remap immediately from the current playback time when the layout changes.
-                activeWordIndex = if (it.wordHighlightEnabled) activeWordIndex(segments, index, latestPlaybackSecondMs) else -1,
-                stage = LoadStage.TRANSLATING,
-                statusMessage = translationStartingMessage(it.targetLanguage),
-                errorMessage = null,
-            )
-        }
-        loadingJob =
-            viewModelScope.launch {
-                try {
-                    translateSegments(
-                        videoId = videoId,
-                        generation = generation,
-                        sourceLanguage = sourceLanguage,
-                        targetLanguage = _state.value.targetLanguage,
-                        segments = segments,
-                    )
-                } catch (error: Exception) {
-                    if (error is CancellationException) throw error
-                    _state.update { state ->
-                        if (!isCurrentLoad(state, videoId, generation)) return@update state
-                        state.copy(
-                            stage = LoadStage.ERROR,
-                            statusMessage = null,
-                            errorMessage = error.message ?: "The subtitles could not be translated.",
-                        )
-                    }
-                }
-            }
+    private suspend fun persistCaptionTrack(
+        track: CaptionTrackResult,
+        natural: Boolean,
+        onStored: (SubtitleStore) -> Unit,
+    ): CaptionTrackResult {
+        currentCoroutineContext().ensureActive()
+        val merged = SubtitleMerger.merge(track.cues, enhancedNaturalFlow = natural)
+        if (merged.isEmpty()) throw CaptionUnavailableException("This caption track contains no readable text.")
+        onStored(SubtitleStore.create(subtitleDirectory, merged))
+        // Do not retain every raw cue across the long-lived translation coroutine.
+        return track.copy(cues = emptyList())
     }
 
-    private suspend fun translateSegments(
+    private suspend fun runStoredTranslation(
+        rawStore: SubtitleStore,
         videoId: String,
         generation: Long,
         sourceLanguage: String,
         targetLanguage: String,
-        segments: List<SubtitleSegment>,
+        format: CaptionFormat,
+        natural: Boolean,
     ) {
-        translateCaptionUnits(
-            translator = translator,
-            sourceLanguage = sourceLanguage,
-            targetLanguage = targetLanguage,
-            display = segments,
-            playbackTime = { latestPlaybackSecondMs },
-            onDownloading = { downloading ->
+        var displayStore: SubtitleStore? = null
+        liveCaptionTracker.reset()
+        _state.update {
+            it.copy(
+                segments = emptyList(),
+                currentIndex = -1,
+                activeWordIndex = -1,
+                stage = LoadStage.LOADING_CAPTIONS,
+                errorMessage = null,
+                isDownloadingTranslationModel = false,
+                statusMessage = "Preparing subtitles near playback…",
+            )
+        }
+        try {
+            withContext(Dispatchers.IO) {
+                displayStore =
+                    prepareCaptionDisplayStore(
+                        source = rawStore,
+                        directory = subtitleDirectory,
+                        format = format,
+                        natural = natural,
+                    )
+            }
+            translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
                 _state.update { current ->
-                    if (!isCurrentLoad(current, videoId, generation)) return@update current
+                    if (!isCurrentLoad(current, videoId, generation)) {
+                        current
+                    } else {
+                        current.copy(
+                            isDownloadingTranslationModel = downloading,
+                            statusMessage = if (downloading) "Downloading translation model…" else "Preparing nearby translations…",
+                        )
+                    }
+                }
+            }) { translate ->
+                translatePlaybackWindow(checkNotNull(displayStore), playbackRequests, translate) { rows, preparing ->
+                    publishSubtitleWindow(videoId, generation, rows, preparing)
+                }
+            }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            _state.update { current ->
+                if (!isCurrentLoad(current, videoId, generation)) {
+                    current
+                } else {
                     current.copy(
-                        isDownloadingTranslationModel = downloading,
-                        statusMessage =
-                            if (downloading) {
-                                "Downloading ${TranslationLanguages.displayName(
-                                    targetLanguage,
-                                )} model…"
-                            } else {
-                                current.statusMessage
-                            },
+                        stage = LoadStage.ERROR,
+                        isDownloadingTranslationModel = false,
+                        statusMessage = null,
+                        errorMessage = error.message ?: "The subtitles could not be translated. Retry to continue.",
                     )
                 }
-            },
-            onProgress = { snapshot, completed, total ->
-                _state.update { current ->
-                    if (!isCurrentLoad(current, videoId, generation)) return@update current
-                    current.copy(
-                        segments = snapshot,
-                        statusMessage = "Translating $completed of $total…",
-                    )
-                }
-            },
-        )
+            }
+        } finally {
+            withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
+        }
+    }
+
+    private fun publishSubtitleWindow(
+        videoId: String,
+        generation: Long,
+        rows: List<SubtitleSegment>,
+        preparing: Boolean,
+    ) {
+        if (_state.value.segments
+                .firstOrNull()
+                ?.id != rows.firstOrNull()?.id
+        ) {
+            liveCaptionTracker.reset()
+        }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
+            val index = activeSubtitleIndex(rows, latestPlaybackSecondMs)
+            // Preserve live karaoke corrections while only a translation changes.
+            val sameWindow = current.segments.firstOrNull()?.id == rows.firstOrNull()?.id
             current.copy(
-                stage = LoadStage.READY,
-                statusMessage =
-                    if (current.generatedCaptions) {
-                        "Using auto-generated captions"
+                segments = rows,
+                currentIndex = if (sameWindow) current.currentIndex else index,
+                activeWordIndex =
+                    if (sameWindow) {
+                        current.activeWordIndex
+                    } else if (current.wordHighlightEnabled) {
+                        activeWordIndex(rows, index, latestPlaybackSecondMs)
                     } else {
-                        "Captions ready"
+                        -1
+                    },
+                stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
+                statusMessage =
+                    when {
+                        current.playbackPaused -> "Paused · translations resume with playback"
+                        preparing -> "Preparing nearby translations…"
+                        else -> "Subtitles ready near playback"
                     },
             )
         }
