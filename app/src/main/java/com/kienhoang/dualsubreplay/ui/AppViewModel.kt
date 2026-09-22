@@ -65,6 +65,7 @@ data class DualSubUiState(
     val currentIndex: Int = -1,
     val activeWordIndex: Int = -1,
     val fontScale: Float = 1f,
+    val portraitPanelOffsetFraction: Float = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
     val landscapeSplitEnabled: Boolean = true,
     val originalColorKey: String = DEFAULT_ORIGINAL_COLOR_KEY,
     val translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
@@ -291,6 +292,13 @@ class AppViewModel internal constructor(
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
                 fontScale = preferences.getFloat("font_scale", 1f),
+                portraitPanelOffsetFraction =
+                    normalizePortraitPanelOffsetFraction(
+                        preferences.getFloat(
+                            PORTRAIT_PANEL_OFFSET_PREFERENCE,
+                            DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
+                        ),
+                    ),
                 sourcePreference =
                     storedSourcePreference(
                         preferences.getString("preferred_caption_language", "auto"),
@@ -691,6 +699,19 @@ class AppViewModel internal constructor(
         _state.update { it.copy(fontScale = safeScale) }
     }
 
+    fun setPortraitPanelOffsetFraction(offsetFraction: Float) {
+        val normalized = normalizePortraitPanelOffsetFraction(offsetFraction)
+        preferences.edit().putFloat(PORTRAIT_PANEL_OFFSET_PREFERENCE, normalized).apply()
+        _state.update { it.copy(portraitPanelOffsetFraction = normalized) }
+    }
+
+    fun resetPortraitPanelPosition() {
+        preferences.edit().remove(PORTRAIT_PANEL_OFFSET_PREFERENCE).apply()
+        _state.update {
+            it.copy(portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION)
+        }
+    }
+
     fun setLandscapeSplitEnabled(enabled: Boolean) {
         preferences.edit().putBoolean("landscape_split_enabled", enabled).apply()
         _state.update { it.copy(landscapeSplitEnabled = enabled) }
@@ -858,6 +879,7 @@ class AppViewModel internal constructor(
                 sourcePreference = "auto",
                 targetLanguage = "vi",
                 fontScale = 1f,
+                portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
                 landscapeSplitEnabled = true,
                 originalColorKey = DEFAULT_ORIGINAL_COLOR_KEY,
                 translatedColorKey = DEFAULT_TRANSLATED_COLOR_KEY,

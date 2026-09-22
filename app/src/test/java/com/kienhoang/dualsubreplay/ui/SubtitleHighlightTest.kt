@@ -155,6 +155,7 @@ class SubtitleWordHighlightTest {
         val expected =
             setOf(
                 "font_scale",
+                PORTRAIT_PANEL_OFFSET_PREFERENCE,
                 "preferred_caption_language",
                 "target_language",
                 "landscape_split_enabled",

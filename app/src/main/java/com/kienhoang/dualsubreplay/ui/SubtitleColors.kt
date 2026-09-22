@@ -130,6 +130,7 @@ internal fun effectiveHighlightColor(state: DualSubUiState): Color = if (
 val RESETTABLE_SETTING_KEYS = listOf(
     "auto_pronounce",
     "font_scale",
+    PORTRAIT_PANEL_OFFSET_PREFERENCE,
     "preferred_caption_language",
     "target_language",
     "landscape_split_enabled",
