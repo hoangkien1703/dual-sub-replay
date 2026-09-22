@@ -162,24 +162,23 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v1.0.2 highlights
+            ## v1.0.3 highlights
 
-            - **Long-video efficiency**: Only subtitles near the current playback position are prepared and translated—up to 60 seconds ahead and 30 seconds behind, with a hard cap of 96 loaded entries (#67).
-            - **Lower memory and battery use**: Source and display transcripts use temporary indexed disk storage, display formatting runs in batches, and translation stops while paused or backgrounded (#67).
-            - **Fast seeking**: Seeking replaces obsolete subtitle work and starts preparing captions near the new position instead of continuing through unwatched hours (#67).
-            - **Crash fix**: Overlapping auto-generated captions no longer trigger the “Failed requirement” error after long lines are split (#67).
-            - **Translation reuse**: Previously translated lines can be reused from the bounded persistent cache when revisiting a section (#67).
+            - **Adjustable portrait panel**: Use the Higher–Lower slider in More settings to move the portrait transcript panel from 20% higher to 20% lower (#70).
+            - **Improved default placement**: The panel now starts 1% lower to leave slightly more of the video visible (#70).
+            - **Safe resizing**: Raising the panel preserves its usual height, while lowering it reduces the visible subtitle area without moving content behind the navigation bar (#70).
+            - **Saved position**: The selected position persists across restarts, video changes, panel hide/show, and rotation, with dedicated and global reset support (#70).
+            - **Reachable subtitles**: The full bilingual timeline remains scrollable at every position, including replay controls on the final row (#70).
 
             ## Validation
 
-            - PR #67 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
-            - Regression coverage includes dense and long transcripts, large seeks, pause/resume, cancellation, batched formatting, overlapping captions, disk cleanup, and translation-cache limits.
+            - PR #70 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
+            - Regression coverage includes panel geometry limits, small windows, invalid saved values, individual and global resets, persistence, settings interaction, and final-row reachability.
             - The official APK is built with production signing and verified by this release workflow.
 
             ## Known limitations
 
-            - YouTube still returns the complete caption document initially; the app limits subsequent formatting, storage, UI, and translation work rather than using unsupported network-range requests.
-            - Battery savings and the reported 22-hour video should still be confirmed on a physical phone after installing this release.
+            - The panel-position control applies to the portrait transcript panel. Landscape layouts and compact/fullscreen captions retain their existing positioning behavior.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
