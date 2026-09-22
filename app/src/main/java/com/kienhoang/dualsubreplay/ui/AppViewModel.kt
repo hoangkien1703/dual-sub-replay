@@ -276,7 +276,9 @@ class AppViewModel internal constructor(
     private var playbackKnown = false
     private var appVisible = true
     private val liveCaptionTracker = LiveCaptionTracker()
+    private val captionHighlightResolver = CaptionHighlightResolver()
     private var liveCaptionProgress: LiveCaptionProgress? = null
+    private var playbackSessionId: String? = null
     private val liveTranslationGate = LiveTranslationGate()
     private var liveTranslationJob: Job? = null
     private var rejectedLiveRevision: Long? = null
@@ -480,15 +482,23 @@ class AppViewModel internal constructor(
         videoId: String,
         second: Float,
         liveCaption: LiveCaptionSample? = null,
+        sessionId: String = "",
     ) {
         val current = _state.value
         if (current.activeVideoId != videoId || !second.isFinite()) return
         val timeMs = (second.coerceAtLeast(0f) * 1_000).toLong()
+        val normalizedSessionId = sessionId.takeIf(String::isNotBlank)
+        val sessionChanged =
+            normalizedSessionId != null &&
+                playbackSessionId?.let { it != normalizedSessionId } == true
+        if (normalizedSessionId != null) playbackSessionId = normalizedSessionId
         val seek =
-            timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs ||
+            sessionChanged ||
+                timeMs + LIVE_CAPTION_BACKWARD_SEEK_RESET_MS < latestPlaybackSecondMs ||
                 timeMs > latestPlaybackSecondMs + 2_000L
         if (seek) {
             liveCaptionTracker.reset()
+            captionHighlightResolver.reset()
             liveCaptionProgress = null
         }
         latestPlaybackSecondMs = timeMs
@@ -542,18 +552,15 @@ class AppViewModel internal constructor(
                 null
             }
         val timedWordIndex = activeWordIndex(current.segments, timedIndex, timeMs)
-        val timedPosition =
-            timedIndex.takeIf { it >= 0 && timedWordIndex >= 0 }?.let {
-                KaraokePosition(it, timedWordIndex)
-            }
         val position =
-            effectiveKaraokePosition(
-                current.generatedCaptions,
-                current.wordHighlightEnabled,
-                timedPosition,
-                livePosition,
+            captionHighlightResolver.resolve(
+                generatedCaptions = current.generatedCaptions,
+                wordHighlightEnabled = current.wordHighlightEnabled,
+                timedSegmentIndex = timedIndex,
+                timedWordIndex = timedWordIndex,
+                livePosition = livePosition,
             )
-        val index = position?.segmentIndex ?: timedIndex
+        val index = position?.segmentIndex ?: -1
         val wordIndex = position?.wordIndex ?: -1
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
             _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
@@ -741,6 +748,7 @@ class AppViewModel internal constructor(
     fun setWordHighlightEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(WORD_HIGHLIGHT_ENABLED_PREFERENCE, enabled).apply()
         liveCaptionTracker.reset()
+        captionHighlightResolver.reset()
         liveCaptionProgress = null
         _state.update { it.copy(wordHighlightEnabled = enabled, activeWordIndex = -1) }
     }
@@ -755,6 +763,7 @@ class AppViewModel internal constructor(
         preferences.edit().putString(CAPTION_FORMAT_PREFERENCE, format.storageValue).apply()
         _state.update { it.copy(captionFormat = format) }
         liveCaptionTracker.reset()
+        captionHighlightResolver.reset()
         liveCaptionProgress = null
     }
 
@@ -873,6 +882,7 @@ class AppViewModel internal constructor(
         _state.update { it.copy(autoPronounce = true) }
         latestPlaybackSecondMs = 0L
         liveCaptionTracker.reset()
+        captionHighlightResolver.reset()
         liveCaptionProgress = null
         _state.update { current ->
             current.copy(
@@ -924,7 +934,9 @@ class AppViewModel internal constructor(
         liveTranslationGate.reset()
         latestPlaybackSecondMs = 0L
         liveCaptionTracker.reset()
+        captionHighlightResolver.reset()
         liveCaptionProgress = null
+        playbackSessionId = null
         playbackKnown = false
         playbackRequests.value = CaptionPlaybackRequest()
         _state.update {
@@ -967,6 +979,8 @@ class AppViewModel internal constructor(
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
             latestPlaybackSecondMs = 0L
             playbackKnown = false
+            playbackSessionId = null
+            captionHighlightResolver.reset()
         }
         playbackRequests.value = CaptionPlaybackRequest()
         _state.update {
@@ -1077,6 +1091,7 @@ class AppViewModel internal constructor(
     ) {
         var displayStore: SubtitleStore? = null
         liveCaptionTracker.reset()
+        captionHighlightResolver.reset()
         _state.update {
             it.copy(
                 segments = emptyList(),
@@ -1145,6 +1160,7 @@ class AppViewModel internal constructor(
                 ?.id != rows.firstOrNull()?.id
         ) {
             liveCaptionTracker.reset()
+            captionHighlightResolver.reset()
         }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current

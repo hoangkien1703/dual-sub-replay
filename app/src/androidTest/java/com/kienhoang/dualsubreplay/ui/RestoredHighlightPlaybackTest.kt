@@ -116,8 +116,16 @@ class RestoredHighlightPlaybackTest {
                     }
                     listOf(Configuration.ORIENTATION_PORTRAIT, Configuration.ORIENTATION_LANDSCAPE).forEach { value ->
                         compose.runOnIdle { orientation.value = value }
-                        listOf(0.1f to "One", 1.1f to "two", 2.1f to "three.", 0.1f to "One").forEach { (second, word) ->
-                            compose.runOnIdle { vm.onWebPlaybackSecond("abcdefghijk", second, null) }
+                        listOf(
+                            Triple(0.1f, "One", "steady"),
+                            Triple(1.1f, "two", "steady"),
+                            Triple(2.1f, "three.", "steady"),
+                            Triple(1.9f, "two", "small-rewind"),
+                            Triple(0.1f, "One", "large-rewind"),
+                        ).forEach { (second, word, sessionId) ->
+                            compose.runOnIdle {
+                                vm.onWebPlaybackSecond("abcdefghijk", second, null, sessionId)
+                            }
                             assertSpokenWord(word)
                         }
                     }

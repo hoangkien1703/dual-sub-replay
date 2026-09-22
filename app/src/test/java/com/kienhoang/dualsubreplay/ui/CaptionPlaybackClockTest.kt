@@ -46,6 +46,19 @@ class CaptionPlaybackClockTest {
         assertEquals(2033L, clock.position(333))
     }
 
+    @Test fun smallClockCorrectionsCannotMoveHighlightTimeBackwardWithinSession() {
+        val clock = CaptionPlaybackClock()
+        assertTrue(clock.accept(sample(10f, 1000, "playing"), 100, 100, 1000))
+        assertEquals(10099L, clock.position(199))
+
+        assertTrue(clock.accept(sample(10.04f, 1100, "playing"), 200, 200, 1100))
+        assertEquals(10099L, clock.position(200))
+        assertEquals(10100L, clock.position(260))
+
+        assertTrue(clock.accept(sample(2f, 1200, "seek"), 300, 300, 1200))
+        assertEquals(2000L, clock.position(300))
+    }
+
     @Test fun controlledSteadyPlaybackAddsLessThan150msAcrossPresentationRestarts() {
         repeat(3) {
             val clock = CaptionPlaybackClock()
