@@ -159,6 +159,8 @@ fun DualSubApp(
                 onSourceChange = viewModel::setSourcePreference,
                 onTargetChange = viewModel::setTargetLanguage,
                 onFontScaleChange = viewModel::setFontScale,
+                onPortraitPanelOffsetFractionChange = viewModel::setPortraitPanelOffsetFraction,
+                onResetPortraitPanelPosition = viewModel::resetPortraitPanelPosition,
                 onLandscapeSplitChange = viewModel::setLandscapeSplitEnabled,
                 onOriginalColorChange = viewModel::setOriginalSubtitleColor,
                 onTranslatedColorChange = viewModel::setTranslatedSubtitleColor,
@@ -218,6 +220,7 @@ fun DualSubApp(
 }
 
 @Composable
+@Suppress("LongMethod")
 private fun DualSubExperience(
     state: DualSubUiState,
     webController: YouTubeWebController,
@@ -238,6 +241,8 @@ private fun DualSubExperience(
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onFontScaleChange: (Float) -> Unit,
+    onPortraitPanelOffsetFractionChange: (Float) -> Unit,
+    onResetPortraitPanelPosition: () -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
     onOriginalColorChange: (String) -> Unit,
     onTranslatedColorChange: (String) -> Unit,
@@ -382,30 +387,37 @@ private fun DualSubExperience(
                 }
 
                 if (tracksVisible && !nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
-                    SubtitlePanel(
-                        state = state,
-                        modifier =
+                    val panelContent: @Composable (Modifier) -> Unit = { panelModifier ->
+                        SubtitlePanel(
+                            state = state,
+                            modifier = panelModifier.testTag("subtitle_timeline"),
+                            onHide = onHideSubtitles,
+                            onSettings = { showSettings = true },
+                            onRetry = onRetry,
+                            onWordClick = onWordClick,
+                            onReplay = { segment ->
+                                webController.replayFrom(segment.startMs / 1_000f)
+                            },
+                        )
+                    }
+                    if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        PortraitSubtitlePanelLayout(
+                            baselineHeightFraction =
+                                portraitSubtitlePanelHeightFraction(
+                                    screenWidthDp = configuration.screenWidthDp,
+                                    screenHeightDp = configuration.screenHeightDp,
+                                ),
+                            offsetFraction = state.portraitPanelOffsetFraction,
+                            content = panelContent,
+                        )
+                    } else {
+                        panelContent(
                             Modifier
                                 .align(Alignment.BottomCenter)
                                 .fillMaxWidth()
-                                .fillMaxHeight(
-                                    if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                                        portraitSubtitlePanelHeightFraction(
-                                            screenWidthDp = configuration.screenWidthDp,
-                                            screenHeightDp = configuration.screenHeightDp,
-                                        )
-                                    } else {
-                                        0.60f
-                                    },
-                                ).testTag("subtitle_timeline"),
-                        onHide = onHideSubtitles,
-                        onSettings = { showSettings = true },
-                        onRetry = onRetry,
-                        onWordClick = onWordClick,
-                        onReplay = { segment ->
-                            webController.replayFrom(segment.startMs / 1_000f)
-                        },
-                    )
+                                .fillMaxHeight(0.60f),
+                        )
+                    }
                 } else if (
                     !nativeDialogVisible && !sideBySide &&
                     state.activeVideoId != null &&
@@ -424,6 +436,9 @@ private fun DualSubExperience(
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
+            portraitPanelOffsetFraction = state.portraitPanelOffsetFraction,
+            onPortraitPanelOffsetFractionChange = onPortraitPanelOffsetFractionChange,
+            onResetPortraitPanelPosition = onResetPortraitPanelPosition,
             landscapeSplitEnabled = state.landscapeSplitEnabled,
             playerMode = playerMode,
             originalColorKey = state.originalColorKey,
@@ -590,11 +605,13 @@ private fun SubtitlePanel(
             }
             HorizontalDivider(color = Color(0xFF244044))
 
-            when {
-                state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
-                state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
-                state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
-                else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                when {
+                    state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
+                    state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
+                    state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
+                    else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+                }
             }
         }
     }
@@ -831,6 +848,27 @@ private fun SubtitleTimeline(
         }
     }
 
+    LaunchedEffect(listState, state.currentIndex) {
+        var previousViewportHeight = 0
+        var activeWasVisible = false
+        snapshotFlow {
+            listState.layoutInfo.viewportSize.height to
+                listState.layoutInfo.visibleItemsInfo.map { it.index }
+        }.collect { (viewportHeight, visibleItemIndices) ->
+            val target = state.currentIndex
+            val viewportShrank = previousViewportHeight > 0 && viewportHeight < previousViewportHeight
+            val shouldRestoreActiveRow =
+                viewportShrank && activeWasVisible && target >= 0 &&
+                    target !in visibleItemIndices && !listState.isScrollInProgress
+            previousViewportHeight = viewportHeight
+            activeWasVisible = target in visibleItemIndices
+            if (shouldRestoreActiveRow) {
+                listState.scrollToItem(target)
+                activeWasVisible = true
+            }
+        }
+    }
+
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -914,11 +952,15 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
 }
 
 @Composable
+@Suppress("LongMethod")
 internal fun SubtitleSettingsDialog(
     sourcePreference: String,
     targetLanguage: String,
     availableSourceLanguages: List<CaptionLanguage>,
     fontScale: Float,
+    portraitPanelOffsetFraction: Float = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
+    onPortraitPanelOffsetFractionChange: (Float) -> Unit = {},
+    onResetPortraitPanelPosition: () -> Unit = {},
     landscapeSplitEnabled: Boolean,
     playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
     originalColorKey: String = DEFAULT_ORIGINAL_COLOR_KEY,
@@ -1135,6 +1177,15 @@ internal fun SubtitleSettingsDialog(
                     }
 
                     if (showMoreSettings) {
+                        Spacer(Modifier.height(14.dp))
+                        HorizontalDivider()
+                        Spacer(Modifier.height(14.dp))
+                        PortraitPanelPositionSettings(
+                            offsetFraction = portraitPanelOffsetFraction,
+                            onOffsetFractionChange = onPortraitPanelOffsetFractionChange,
+                            onReset = onResetPortraitPanelPosition,
+                        )
+
                         Spacer(Modifier.height(14.dp))
                         HorizontalDivider()
                         Spacer(Modifier.height(14.dp))
