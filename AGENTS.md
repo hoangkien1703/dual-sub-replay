@@ -21,7 +21,7 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 2. Create/update a [feature spec](docs/specs/README.md) with acceptance criteria, a small plan, and validation scenarios **before coding**. New features, significant/risky fixes, architecture, migrations, CI/release changes, and measurable performance work need specs; trivial changes need only a clear PR and acceptance criteria.
 3. Record release intent before implementation where possible and resolve it before opening the PR. Existing owner authorization covers the agreed implementation; do not add a redundant approval round or invent approval. Ask about unresolved material scope/product decisions.
 4. Implement the smallest coherent solution and validate against the criteria. Record actual implementation, deviations, and passed/failed/unverified checks in the spec. Offline tests do not establish physical-device or live-YouTube success.
-5. Update relevant permanent docs in the same PR when an authorized decision changes architecture or conventions. Keep ROADMAP.md directional; PLAN.md is historical, including its outstanding QA.
+5. Update relevant permanent docs in the same PR when an authorized decision changes architecture or conventions. Keep ROADMAP.md directional and each implementation plan inside its feature spec; keep QA evidence in docs/qa/.
 6. Open a focused PR against `main` linking the spec (or explaining why none is needed). The owner remains final merge authority; do not merge, enable auto-merge, or publish releases unless explicitly instructed.
 
 ## Preparing PRs for owner merge

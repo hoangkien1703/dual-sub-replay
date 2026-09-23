@@ -4,6 +4,16 @@ A spec records the problem, intended behavior, constraints, acceptance criteria,
 release intent, and validation evidence for one coherent change. Keep ordinary specs
 short; put the implementation plan in the same file and link existing explanations.
 
+## Document map
+
+| Location | Purpose |
+| --- | --- |
+| [AGENTS.md](../../AGENTS.md) | Operational instructions shared by coding agents and contributors |
+| [docs/project/mission.md](../project/mission.md) | Stable product intent |
+| [docs/project/tech-stack.md](../project/tech-stack.md) | Technical context and architecture boundaries |
+| [ROADMAP.md](../../ROADMAP.md) | Single directional roadmap |
+| `docs/specs/YYYY-MM-DD-short-change-name.md` | One change's behavior, plan, release intent, criteria and results |
+
 ## When to write one
 
 Create or update a spec before implementation for new user-facing features,
@@ -31,8 +41,11 @@ checkable acceptance criteria. Risk and behavior matter more than line count.
 5. Link the spec in the PR. Apply/verify release metadata, report CI/preview status,
    and leave review and manual merge to the owner. Existing automation handles release.
 
-Lifecycle: idea → spec → plan → implementation → validation → PR → human review →
-merge → release (or preview only when skipped). Feedback can return work to earlier stages.
+Lifecycle: idea → feature spec (including plan and release intent) → focused branch →
+implementation → tests/validation → PR → green final-head CI and preview review →
+owner manually merges → automatic version bump and official release (or preview only
+when skipped). Put spec changes on the feature branch too; an already-active focused
+branch can be used while drafting. Feedback can return work to earlier stages.
 
 | Status | Meaning |
 | --- | --- |
@@ -46,8 +59,9 @@ A request to implement an agreed change already authorizes that implementation. 
 add an approval round just to move a status, or invent owner approval. Ask only when a
 material scope/product decision is unresolved. CI success does not approve a spec or PR.
 Keep implemented specs as historical records; a new change should link the earlier
-record rather than erase its evidence. [PLAN.md](../../PLAN.md) is an older work record,
-not a competing current global plan or roadmap.
+record rather than erase its evidence. There is no global implementation-plan file;
+each significant change owns its plan and results in its feature spec. Existing
+[QA records](../qa/issues-56-59/README.md) retain historical evidence and unresolved checks.
 
 ## Release intent is a decision, not automation
 
