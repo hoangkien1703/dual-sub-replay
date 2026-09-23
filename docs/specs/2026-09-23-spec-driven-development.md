@@ -50,7 +50,7 @@ migration rules in AGENTS.md. Preserve historical PLAN.md content and open QA ga
 - [x] PLAN.md history and unverified device/live-YouTube checks remain intact.
 - [x] Documentation links and template release-parser checks pass.
 - [x] Only Markdown changes; application, workflows, scripts and versions are unchanged.
-- [ ] PR has the actual `release:skip` label and remains open for owner review.
+- [x] PR has the actual `release:skip` label and remains open for owner review.
 
 ## Validation plan
 
@@ -99,9 +99,10 @@ No application, build, release-script/workflow, signing, version, or roadmap cha
 - Passed: diff scope is Markdown only; protected source directories are unchanged.
   PLAN.md's original scope/execution/QA content is byte-for-byte preserved below its notice.
 - Reviewed technical claims against actual source/build/CI and release metadata handling.
-- Delivery metadata verification is pending until the new PR exists. Final-head Android
-  CI and preview availability must be read from that PR; earlier CI is not evidence for
-  the new head. The owner reviews these before merging.
+- Verified [PR #74](https://github.com/hoangkien1703/dual-sub-replay/pull/74) is open and
+  has the actual `release:skip` label. Final-head Android CI and preview availability
+  remain pending at this update; earlier CI is not evidence for the new head.
+  The owner reviews these before merging.
 - Not run locally: Android unit/lint/build, managed-device, physical-device, live YouTube,
   and performance tests. This documentation-only change does not establish runtime behavior
   or close any historical QA gap. No release code/YAML/shell was modified.
