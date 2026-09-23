@@ -15,33 +15,29 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - Managed-device tests require the API 36 AOSP x86_64 system image. On headless hosts add `-Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect` (CI also passes `--no-parallel --max-workers=2`).
 - Debug APK output: `app/build/outputs/apk/debug/app-debug.apk`.
 
+## Development workflow
+
+1. Before significant work, read [mission](docs/project/mission.md), [technical context](docs/project/tech-stack.md), [ROADMAP.md](ROADMAP.md), relevant specs, and relevant source/tests. Stable intent belongs in the repository, not only chat history.
+2. Create/update a [feature spec](docs/specs/README.md) with acceptance criteria, a small plan, and validation scenarios **before coding**. New features, significant/risky fixes, architecture, migrations, CI/release changes, and measurable performance work need specs; trivial changes need only a clear PR and acceptance criteria.
+3. Record release intent before implementation where possible and resolve it before opening the PR. Existing owner authorization covers the agreed implementation; do not add a redundant approval round or invent approval. Ask about unresolved material scope/product decisions.
+4. Implement the smallest coherent solution and validate against the criteria. Record actual implementation, deviations, and passed/failed/unverified checks in the spec. Offline tests do not establish physical-device or live-YouTube success.
+5. Update relevant permanent docs in the same PR when an authorized decision changes architecture or conventions. Keep ROADMAP.md directional; PLAN.md is historical, including its outstanding QA.
+6. Open a focused PR against `main` linking the spec (or explaining why none is needed). The owner remains final merge authority; do not merge, enable auto-merge, or publish releases unless explicitly instructed.
+
 ## Preparing PRs for owner merge
 
-- When asked to create a PR, open it against `main` and leave the merge to the user unless they explicitly ask you to merge. Creating a PR does not authorize merging it or enabling auto-merge.
-- Before handing over the PR, read `.github/workflows/release-on-main.yml` and `tools/automatic_release.py`; these define the actual release behavior.
-- Choose the release intent before merge. Follow the user's explicit request; otherwise use **patch**, including feature, documentation, and workflow PRs. Do not infer a minor/major bump from the size of a change or silently skip a release. You may recommend a different bump, but apply it only when requested.
-
-| User's release intent | Set on the PR before merge |
-| --- | --- |
-| Default / patch | No override (automatic patch), or only the `release:patch` label |
-| Minor | Only the `release:minor` label |
-| Major | Only the `release:major` label |
-| Exact stable version | One standalone `Release-Version: X.Y.Z` line in the PR description, outside HTML comments and code fences; no release label |
-| No official release | Only the `release:skip` label; rolling preview still updates |
-
-- Release labels are GitHub labels, not text in the PR description. A version mentioned in chat, the PR title, a checklist, or a comment does not select it. Translate the user's request into the actual label or directive and verify it was saved.
-- Keep at most one release label OR one exact-version directive. When intent changes, remove superseded release labels/directives without disturbing unrelated labels. An exact version must exceed every existing/reserved stable version.
-- Inspect stable tags and releases (including draft reservations) and the Gradle baseline before estimating the next version; `main`'s Gradle constants are development defaults. State the selected mode, reason, and expected version in the PR's Release section and your handoff. For patch/minor/major, label the number an estimate: another release or reservation before this PR is processed can change it. If history or drafts cannot be read, report that limitation instead of promising a number.
-- Do not edit Gradle version constants or create release tags/releases in a normal feature PR. The release workflow allocates the final version and Android `versionCode` after merge.
-- Before calling a PR ready to merge, check the latest Android CI run for its final head SHA: `verify-build` and `managed-device-tests` must both succeed. Any new commit requires fresh checks. Clearly report pending, failed, skipped, or unavailable checks.
-- The handoff should say that `hoangkien1703` merges on GitHub after reviewing the preview and green checks; the subsequent **Release merged PR** workflow builds, verifies, and publishes the official APK unless skipped. Green PR CI is a prerequisite, not confirmation that publication has finished. If asked to confirm a release, verify the release workflow and published assets.
-- For a failed release, use the existing reservation/retry process below. Once reserved, changing PR labels or the description does not change that reservation's version.
+- Read `.github/workflows/release-on-main.yml` and `tools/automatic_release.py` before handoff; they define actual automation. Use the [release-intent mapping](docs/specs/README.md#release-intent-is-a-decision-not-automation).
+- Follow explicit owner release intent; otherwise preserve **patch**, including docs/workflow PRs. Recommend alternatives if useful, but do not silently infer minor/major/skip. A docs-only PR uses skip when the owner requests it.
+- Apply and verify the actual GitHub label or standalone exact-version PR-body directive. Prose/specs/checkboxes do not apply labels. Keep at most one release label OR one directive; remove superseded overrides without disturbing unrelated labels. If required metadata cannot be applied, report the missing action and do not call the PR ready to merge.
+- State intent, reason, and expected version (or why skipped/unavailable). Inspect stable tags, releases including draft reservations, and the Gradle baseline before estimating. Bump-derived numbers are estimates until reserved; exact versions must exceed all existing/reserved stable versions. Do not manually change Gradle versions or create release tags in normal PRs.
+- Before calling a PR ready to merge, verify its latest final-head Android CI run: both `verify-build` and `managed-device-tests` must succeed. New commits need fresh checks; report pending/failed/skipped/unavailable checks explicitly.
+- Handoff: owner reviews the preview and green checks, then manually merges; existing automation publishes unless skipped. Green PR CI is not proof of release publication. Verify the release workflow/assets if asked to confirm publication; use existing reservation/retry recovery below.
 
 ## Releases happen automatically after an approved PR merge
 
 - When `hoangkien1703` merges a PR into `main`, `release-on-main.yml` checks the latest Android CI run for the PR's final head and requires both `verify-build` and `managed-device-tests` to succeed. Direct pushes and other mergers do not release.
 - Default: bump the highest existing/reserved stable patch version and monotonically increase Android `versionCode`. **Do not manually bump Gradle version constants in feature PRs.**
-- Before merge, use one of `release:patch`, `release:minor`, `release:major`, `release:skip`, or a standalone `Release-Version: X.Y.Z` in the PR description. Conflicting instructions fail closed. `release:skip` keeps the rolling preview only.
+- Before merge, apply at most one GitHub label (`release:patch`, `release:minor`, `release:major`, `release:skip`) OR a standalone `Release-Version: X.Y.Z` in the PR description. Conflicting instructions fail closed. `release:skip` keeps the rolling preview only.
 - Release versions live in a release-only commit/tag based on the exact merge; only the two Gradle version constants change. `main` keeps development defaults. No bot commits to `main` or branch-protection bypass is needed.
 - Draft release metadata reserves version/name/code/source before building. Retry failed runs (or dispatch with a merged PR number) to resume that reservation. Never delete reservations or edit their hidden marker to retry. Published merges are a no-op.
 - Production signature, package, and version are verified before upload; the draft is published only with both APK and checksum present. Release notes are generated automatically. Queued runs cannot allocate the same version, and older retries cannot replace a newer Latest release.
@@ -53,9 +49,9 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 
 - Exactly one WebView exists (`SingleYouTubePage` in `ui/YouTubeBrowserScreen.kt`). Online replay seeks the native YouTube page video via a JS polling bridge. Offline video downloading and local Media3 playback are removed; never add a second online player/WebView.
 - Main-frame navigation goes through `classifyMainFrameUrl` → `YOUTUBE_WEB` (embed) / `GOOGLE_SIGN_IN` (embed during sign-in flow) / `OPEN_EXTERNAL` (browser) / `BLOCK`. JS snapshot/replay scripts must keep re-verifying the executing origin (`https:` + `*.youtube.com`); `PlaybackArchitectureTest` asserts the literal script text.
-- Captions use YouTube's undocumented Innertube transcript endpoint, deliberately isolated in `data/YouTubeCaptionProvider.kt` (host allowlist, 8 MiB response cap) so it can be replaced without touching the rest of the app.
-- Translation is on-device via ML Kit (`translation/OnDeviceTranslator.kt`); the app has no API keys.
-- First-launch flow is `OnboardingScreen` → `GuideScreen` → main experience. Preserve the guide migration behavior: if `guide_completed` is absent, users who already completed onboarding are treated as guide-complete, while brand-new users see the guide. Do not simplify this to `getBoolean("guide_completed", false)` or existing users will see the guide after upgrading.
+- Caption discovery uses watch-page metadata and undocumented Innertube player fallbacks, then timed-text downloads, isolated behind `data/CaptionProvider.kt` / `YouTubeCaptionProvider.kt` (host allowlist, 8 MiB response cap). Keep that replaceable boundary.
+- Translation is on-device via ML Kit (`translation/OnDeviceTranslator.kt`); no user-provided/developer-provisioned service key is required.
+- First-launch flow is `LanguageSetupScreen` → `GuideScreen` → main experience. Preserve the guide migration behavior: if `guide_completed` is absent, users who already completed onboarding are treated as guide-complete, while brand-new users see the guide. Do not simplify this to `getBoolean("guide_completed", false)` or existing users will see the guide after upgrading.
 
 ## Testing conventions
 

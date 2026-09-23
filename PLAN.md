@@ -1,5 +1,12 @@
 # DualSub Replay: issues #56–#59 and code quality
 
+> **Historical implementation and QA record, not the current global plan.**
+> The scope and execution log below describe the earlier issues #56–#59 work.
+> Outstanding acceptance gates, including physical-device/live-YouTube testing and
+> the recorded memory regression, remain unverified here; this notice does not close them.
+> Use [ROADMAP.md](ROADMAP.md) for direction and [feature specs](docs/specs/README.md)
+> for new work. Historical version numbers and evidence below are retained as recorded.
+
 ## Approved scope
 
 Implement on a codex feature branch, preserving other local work. Do not add Mem0,

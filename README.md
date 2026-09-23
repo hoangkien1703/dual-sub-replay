@@ -200,7 +200,7 @@ See [PRIVACY.md](PRIVACY.md) for the full privacy overview.
 
 ## Contributing and roadmap
 
-Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md), and the compact [roadmap](ROADMAP.md) before opening a pull request.
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md), and the compact [roadmap](ROADMAP.md) before opening a pull request. Humans and coding agents share the [project context](docs/project/mission.md), [technical context](docs/project/tech-stack.md), and [lightweight spec workflow](docs/specs/README.md); [AGENTS.md](AGENTS.md) gives operational instructions.
 
 ## License
 
