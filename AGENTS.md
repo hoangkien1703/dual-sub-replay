@@ -15,6 +15,28 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - Managed-device tests require the API 36 AOSP x86_64 system image. On headless hosts add `-Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect` (CI also passes `--no-parallel --max-workers=2`).
 - Debug APK output: `app/build/outputs/apk/debug/app-debug.apk`.
 
+## Preparing PRs for owner merge
+
+- When asked to create a PR, open it against `main` and leave the merge to the user unless they explicitly ask you to merge. Creating a PR does not authorize merging it or enabling auto-merge.
+- Before handing over the PR, read `.github/workflows/release-on-main.yml` and `tools/automatic_release.py`; these define the actual release behavior.
+- Choose the release intent before merge. Follow the user's explicit request; otherwise use **patch**, including feature, documentation, and workflow PRs. Do not infer a minor/major bump from the size of a change or silently skip a release. You may recommend a different bump, but apply it only when requested.
+
+| User's release intent | Set on the PR before merge |
+| --- | --- |
+| Default / patch | No override (automatic patch), or only the `release:patch` label |
+| Minor | Only the `release:minor` label |
+| Major | Only the `release:major` label |
+| Exact stable version | One standalone `Release-Version: X.Y.Z` line in the PR description, outside HTML comments and code fences; no release label |
+| No official release | Only the `release:skip` label; rolling preview still updates |
+
+- Release labels are GitHub labels, not text in the PR description. A version mentioned in chat, the PR title, a checklist, or a comment does not select it. Translate the user's request into the actual label or directive and verify it was saved.
+- Keep at most one release label OR one exact-version directive. When intent changes, remove superseded release labels/directives without disturbing unrelated labels. An exact version must exceed every existing/reserved stable version.
+- Inspect stable tags and releases (including draft reservations) and the Gradle baseline before estimating the next version; `main`'s Gradle constants are development defaults. State the selected mode, reason, and expected version in the PR's Release section and your handoff. For patch/minor/major, label the number an estimate: another release or reservation before this PR is processed can change it. If history or drafts cannot be read, report that limitation instead of promising a number.
+- Do not edit Gradle version constants or create release tags/releases in a normal feature PR. The release workflow allocates the final version and Android `versionCode` after merge.
+- Before calling a PR ready to merge, check the latest Android CI run for its final head SHA: `verify-build` and `managed-device-tests` must both succeed. Any new commit requires fresh checks. Clearly report pending, failed, skipped, or unavailable checks.
+- The handoff should say that `hoangkien1703` merges on GitHub after reviewing the preview and green checks; the subsequent **Release merged PR** workflow builds, verifies, and publishes the official APK unless skipped. Green PR CI is a prerequisite, not confirmation that publication has finished. If asked to confirm a release, verify the release workflow and published assets.
+- For a failed release, use the existing reservation/retry process below. Once reserved, changing PR labels or the description does not change that reservation's version.
+
 ## Releases happen automatically after an approved PR merge
 
 - When `hoangkien1703` merges a PR into `main`, `release-on-main.yml` checks the latest Android CI run for the PR's final head and requires both `verify-build` and `managed-device-tests` to succeed. Direct pushes and other mergers do not release.
