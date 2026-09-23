@@ -1,75 +1,132 @@
-name: Publish new main version
+name: Release merged PR
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Merged PR number to retry (uses its reserved version if one exists)
+        required: true
+        type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: publish-main
   cancel-in-progress: false
+  queue: max
 
 jobs:
-  publish-main:
-    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+  prepare:
+    if: github.repository == 'hoangkien1703/dual-sub-replay' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: read
+      issues: write # Create the optional release labels on first use.
+    outputs:
+      eligible: ${{ steps.plan.outputs.eligible }}
+      release_needed: ${{ steps.plan.outputs.release_needed }}
+      release_id: ${{ steps.plan.outputs.release_id }}
+      source_sha: ${{ steps.plan.outputs.source_sha }}
+      version: ${{ steps.plan.outputs.version }}
+      version_code: ${{ steps.plan.outputs.version_code }}
     steps:
-      - name: Check out main commit
+      - name: Check out trusted main workflow source and release history
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Determine whether this version is new
-        id: release_meta
+      - name: Ensure optional release labels exist
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          version="$(sed -n 's/^val appVersionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n 1)"
-          if [[ -z "$version" ]]; then
-            echo "Could not determine app version" >&2
-            exit 1
+          labels="$(gh label list --limit 1000 --json name --jq '.[].name')"
+          for mode in patch minor major skip; do
+            label="release:$mode"
+            if ! grep -Fxq "$label" <<< "$labels"; then
+              gh label create "$label" --color 1D76DB --description "Release automation: $mode"
+            fi
+          done
+
+      - name: Verify merge and CI, then reserve or resume the release
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_PR: ${{ inputs.pr_number }}
+        run: python3 tools/automatic_release.py prepare
+
+  publish-main:
+    needs: prepare
+    if: needs.prepare.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Skip a release already published by an earlier attempt
+        id: resume
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$RELEASE_ID" ]]; then
+            draft="$(gh api "repos/${GH_REPO}/releases/${RELEASE_ID}" --jq '.draft')"
+            if [[ "$draft" == "false" ]]; then
+              echo "build=false" >> "$GITHUB_OUTPUT"
+              echo "Release is already public; skipping all builds and uploads."
+              exit 0
+            fi
+            [[ "$draft" == "true" ]] || exit 1
           fi
-          tag="v${version}"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${tag}" >/dev/null 2>&1; then
-            echo "release_needed=false" >> "$GITHUB_OUTPUT"
-            echo "$tag already exists; no official release is needed."
-          else
-            echo "release_needed=true" >> "$GITHUB_OUTPUT"
-            echo "$tag is new; an official release will be published."
-          fi
+          echo "build=true" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the exact reserved release source
+        if: steps.resume.outputs.build == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          persist-credentials: false
 
       - name: Set up Java 17
+        if: steps.resume.outputs.build == 'true'
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Android SDK
+        if: steps.resume.outputs.build == 'true'
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
         with:
           packages: platform-tools
 
       - name: Install Android build SDK
+        if: steps.resume.outputs.build == 'true'
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle cache
+        if: steps.resume.outputs.build == 'true'
         uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
 
       - name: Restore persistent preview signing key
+        if: steps.resume.outputs.build == 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.android/debug.keystore
           key: dual-sub-replay-preview-signing-v1
 
       - name: Build main preview APK without repeating PR tests
+        if: steps.resume.outputs.build == 'true'
         run: |
           set -euo pipefail
           preview_version_code=$(( $(date -u +%s) - 1700000000 ))
@@ -80,6 +137,7 @@ jobs:
             --stacktrace
 
       - name: Verify and package main preview APK
+        if: steps.resume.outputs.build == 'true'
         run: |
           set -euo pipefail
           mkdir -p release
@@ -94,6 +152,7 @@ jobs:
           sha256sum "$preview_apk"
 
       - name: Publish rolling main preview
+        if: steps.resume.outputs.build == 'true'
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: preview
@@ -101,7 +160,7 @@ jobs:
           prerelease: true
           make_latest: false
           body: |
-            Testing build from the latest PR-verified `main` commit.
+            Testing build from a PR-verified merge into `main`.
 
             Most people should install the [latest official release](https://github.com/${{ github.repository }}/releases/latest) instead.
 
@@ -110,7 +169,7 @@ jobs:
           overwrite_files: true
 
       - name: Restore production signing key
-        if: steps.release_meta.outputs.release_needed == 'true'
+        if: steps.resume.outputs.build == 'true' && needs.prepare.outputs.release_needed == 'true'
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
         run: |
@@ -122,7 +181,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/dual-sub-replay-release.jks"
 
       - name: Build production release APK
-        if: steps.release_meta.outputs.release_needed == 'true'
+        if: steps.resume.outputs.build == 'true' && needs.prepare.outputs.release_needed == 'true'
         env:
           ANDROID_RELEASE_STORE_FILE: ${{ runner.temp }}/dual-sub-replay-release.jks
           ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
@@ -131,7 +190,10 @@ jobs:
         run: bash ./gradlew assembleRelease -PrequireReleaseSigning=true --stacktrace
 
       - name: Verify and package official APK
-        if: steps.release_meta.outputs.release_needed == 'true'
+        if: steps.resume.outputs.build == 'true' && needs.prepare.outputs.release_needed == 'true'
+        env:
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_CODE: ${{ needs.prepare.outputs.version_code }}
         run: |
           set -euo pipefail
           source_apk="app/build/outputs/apk/release/app-release.apk"
@@ -142,43 +204,33 @@ jobs:
             echo "Official APK was signed with the Android debug certificate" >&2
             exit 1
           fi
-          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$release_apk" | head -n 1
+          badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$release_apk" | head -n 1)"
+          echo "$badging"
+          if [[ "$badging" != *"name='com.kienhoang.dualsubreplay'"* ]] ||
+             [[ "$badging" != *"versionName='$EXPECTED_VERSION'"* ]] ||
+             [[ "$badging" != *"versionCode='$EXPECTED_CODE'"* ]]; then
+            echo "Official APK package/version differs from the release reservation" >&2
+            exit 1
+          fi
           sha256sum "$release_apk" | sed 's#  release/#  #' > release/DualSub-Replay.apk.sha256
 
-      - name: Publish official GitHub release
-        if: steps.release_meta.outputs.release_needed == 'true'
-        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
-        with:
-          tag_name: ${{ steps.release_meta.outputs.tag }}
-          target_commitish: ${{ github.sha }}
-          name: DualSub Replay ${{ steps.release_meta.outputs.tag }}
-          prerelease: false
-          make_latest: true
-          fail_on_unmatched_files: true
-          body: |
-            ## Download and install
+      - name: Upload verified APK and checksum to the reserved draft
+        if: steps.resume.outputs.build == 'true' && needs.prepare.outputs.release_needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: >-
+          gh release upload "v${RELEASE_VERSION}"
+          release/DualSub-Replay.apk release/DualSub-Replay.apk.sha256 --clobber
 
-            Download **DualSub-Replay.apk** below. On Android 8.0 or newer, open the downloaded file and allow your browser or file manager to install unknown apps if Android asks.
+      - name: Publish the complete official release
+        if: steps.resume.outputs.build == 'true' && needs.prepare.outputs.release_needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+        run: python3 tools/automatic_release.py publish --release-id "$RELEASE_ID"
 
-            Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
-
-            ## v1.0.4 highlights
-
-            - **Steady caption highlights**: Captions no longer jump to a previous sentence when live caption tracking briefly falls back to transcript timing or the WebView clock corrects backward (#71).
-            - **Intentional rewinds still work**: Playback sessions reset highlight continuity after seeks, including small rewinds (#71).
-            - **Natural caption gaps**: Highlighting still clears between captions and resets when the transcript is replaced (#71).
-
-            ## Validation
-
-            - PR #71 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
-            - Regression coverage includes clock corrections, live-to-timestamp fallback, delayed live captions, regressive words, caption gaps, and small rewinds.
-            - The official APK is built with production signing and verified by this release workflow.
-
-            ## Known limitations
-
-            - Spoken-word tracking on auto-generated captions depends on YouTube's webpage and may vary by video or device. Transcript timing remains available as a fallback.
-
-            The `.sha256` file can be used to verify the APK download.
-          files: |
-            release/DualSub-Replay.apk
-            release/DualSub-Replay.apk.sha256
+      - name: Remove production signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/dual-sub-replay-release.jks"

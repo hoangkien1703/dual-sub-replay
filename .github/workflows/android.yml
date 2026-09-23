@@ -46,6 +46,9 @@ jobs:
           path: ~/.android/debug.keystore
           key: dual-sub-replay-preview-signing-v1
 
+      - name: Test release automation
+        run: python3 -m unittest discover -s tools/tests -p 'test_*.py' -v
+
       - name: Verify Gradle wrapper
         run: bash ./gradlew --version
 
