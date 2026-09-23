@@ -261,7 +261,7 @@ internal fun SingleYouTubePage(
     navigationRequestId: Long,
     controller: YouTubeWebController,
     onPageChanged: (String) -> Unit,
-    onPlaybackSecond: (videoId: String, second: Float, liveCaption: LiveCaptionSample?) -> Unit,
+    onPlaybackSecond: (videoId: String, second: Float, liveCaption: LiveCaptionSample?, sessionId: String) -> Unit,
     onPlaybackPaused: (String, Boolean) -> Unit = { _, _ -> },
     liveCaptionCaptureEnabled: Boolean = false,
     suppressPageCaptions: Boolean = false,
@@ -527,7 +527,12 @@ internal fun SingleYouTubePage(
                     val selection = snapshot?.url?.takeIf { it == webView.url }?.let(::browseVideoSelection)
                     if (selection != null && position != null) {
                         currentOnPlaybackPaused(selection.videoId, snapshot.paused)
-                        currentOnPlaybackSecond(selection.videoId, position / 1000f, snapshot.liveCaption)
+                        currentOnPlaybackSecond(
+                            selection.videoId,
+                            position / 1000f,
+                            snapshot.liveCaption,
+                            snapshot.sessionId,
+                        )
                     }
                     delay(33)
                 }

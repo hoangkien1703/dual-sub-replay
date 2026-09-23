@@ -233,7 +233,7 @@ private fun DualSubExperience(
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
     onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
-    onPlaybackSecond: (String, Float, LiveCaptionSample?) -> Unit,
+    onPlaybackSecond: (String, Float, LiveCaptionSample?, String) -> Unit,
     onPlaybackPaused: (String, Boolean) -> Unit,
     onShowSubtitles: () -> Unit,
     onHideSubtitles: () -> Unit,

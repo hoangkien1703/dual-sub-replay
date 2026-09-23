@@ -42,6 +42,48 @@ internal fun effectiveKaraokePosition(
     else -> timedPosition
 }
 
+internal data class CaptionHighlightPosition(
+    val segmentIndex: Int,
+    val wordIndex: Int,
+) : Comparable<CaptionHighlightPosition> {
+    override fun compareTo(other: CaptionHighlightPosition): Int =
+        compareValuesBy(this, other, CaptionHighlightPosition::segmentIndex, CaptionHighlightPosition::wordIndex)
+}
+
+/** Keeps timestamp and live-caption arbitration monotonic between real playback discontinuities. */
+internal class CaptionHighlightResolver {
+    private var lastPosition: CaptionHighlightPosition? = null
+
+    fun reset() {
+        lastPosition = null
+    }
+
+    fun resolve(
+        generatedCaptions: Boolean,
+        wordHighlightEnabled: Boolean,
+        timedSegmentIndex: Int,
+        timedWordIndex: Int,
+        livePosition: KaraokePosition?,
+    ): CaptionHighlightPosition? {
+        val timedPosition =
+            timedSegmentIndex.takeIf { it >= 0 }?.let {
+                CaptionHighlightPosition(
+                    segmentIndex = it,
+                    wordIndex = timedWordIndex.takeIf { wordHighlightEnabled && it >= 0 } ?: -1,
+                )
+            }
+        val selected =
+            when {
+                wordHighlightEnabled && generatedCaptions && livePosition != null ->
+                    CaptionHighlightPosition(livePosition.segmentIndex, livePosition.wordIndex)
+                else -> timedPosition
+            } ?: return null
+        val resolved = lastPosition?.takeIf { selected < it } ?: selected
+        lastPosition = resolved
+        return resolved
+    }
+}
+
 internal data class LiveCaptionProgress(
     val text: String,
     val tokens: List<String>,

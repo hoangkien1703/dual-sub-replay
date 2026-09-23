@@ -23,6 +23,51 @@ class KaraokeTimingTest {
     }
 
     @Test
+    fun liveToTimestampFallbackCannotReturnToPreviousSentence() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(
+            CaptionHighlightPosition(2, 0),
+            resolver.resolve(true, true, 1, 3, KaraokePosition(2, 0)),
+        )
+        assertEquals(
+            CaptionHighlightPosition(2, 0),
+            resolver.resolve(true, true, 1, 3, null),
+        )
+    }
+
+    @Test
+    fun delayedLiveCaptionAndRegressiveWordMatchCannotMoveHighlightBackward() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(
+            CaptionHighlightPosition(3, 2),
+            resolver.resolve(true, true, 3, 2, null),
+        )
+        assertEquals(
+            CaptionHighlightPosition(3, 2),
+            resolver.resolve(true, true, 3, 3, KaraokePosition(2, 4)),
+        )
+        assertEquals(
+            CaptionHighlightPosition(3, 2),
+            resolver.resolve(true, true, 3, 1, KaraokePosition(3, 1)),
+        )
+    }
+
+    @Test
+    fun genuineGapClearsHighlightAndResetAllowsIntentionalReplay() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(
+            CaptionHighlightPosition(4, 1),
+            resolver.resolve(false, true, 4, 1, null),
+        )
+        assertNull(resolver.resolve(false, true, -1, -1, null))
+        resolver.reset()
+        assertEquals(
+            CaptionHighlightPosition(1, 0),
+            resolver.resolve(false, true, 1, 0, null),
+        )
+    }
+
+    @Test
     fun rollingCaptionProgressNeverFlashesBackToTheFirstWord() {
         val first = reconcileLiveCaptionProgress(
             null,

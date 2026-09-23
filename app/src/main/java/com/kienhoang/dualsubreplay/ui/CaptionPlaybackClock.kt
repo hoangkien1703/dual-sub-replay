@@ -8,6 +8,8 @@ internal class CaptionPlaybackClock {
     private var sampledAt = 0L
     private var lastWallSample = 0L
     private var positionMs = 0L
+    private var lastEmittedPositionMs: Long? = null
+    private var lastEmittedSessionId: String? = null
     private val retiredSessions = ArrayDeque<String>()
 
     fun accept(
@@ -43,7 +45,14 @@ internal class CaptionPlaybackClock {
         // Do not march through words when the renderer stops reporting playback.
         if (age !in 0..PLAYBACK_CLOCK_STALE_MS || sample.seeking) return null
         val advance = if (sample.paused || sample.buffering) 0 else (age * sample.playbackRate).toLong()
-        return positionMs + advance
+        val projectedPositionMs = positionMs + advance
+        if (lastEmittedSessionId != sample.sessionId) {
+            lastEmittedSessionId = sample.sessionId
+            lastEmittedPositionMs = null
+        }
+        return maxOf(projectedPositionMs, lastEmittedPositionMs ?: projectedPositionMs).also {
+            lastEmittedPositionMs = it
+        }
     }
 
     fun sample(): WebPlaybackSnapshot? = snapshot

@@ -162,23 +162,21 @@ jobs:
 
             Preview builds install separately as **DualSub Replay Preview**, so installing an official release does not require removing the preview app.
 
-            ## v1.0.3 highlights
+            ## v1.0.4 highlights
 
-            - **Adjustable portrait panel**: Use the Higher–Lower slider in More settings to move the portrait transcript panel from 20% higher to 20% lower (#70).
-            - **Improved default placement**: The panel now starts 1% lower to leave slightly more of the video visible (#70).
-            - **Safe resizing**: Raising the panel preserves its usual height, while lowering it reduces the visible subtitle area without moving content behind the navigation bar (#70).
-            - **Saved position**: The selected position persists across restarts, video changes, panel hide/show, and rotation, with dedicated and global reset support (#70).
-            - **Reachable subtitles**: The full bilingual timeline remains scrollable at every position, including replay controls on the final row (#70).
+            - **Steady caption highlights**: Captions no longer jump to a previous sentence when live caption tracking briefly falls back to transcript timing or the WebView clock corrects backward (#71).
+            - **Intentional rewinds still work**: Playback sessions reset highlight continuity after seeks, including small rewinds (#71).
+            - **Natural caption gaps**: Highlighting still clears between captions and resets when the transcript is replaced (#71).
 
             ## Validation
 
-            - PR #70 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
-            - Regression coverage includes panel geometry limits, small windows, invalid saved values, individual and global resets, persistence, settings interaction, and final-row reachability.
+            - PR #71 passed formatting, complexity, unit tests, lint, debug and Android-test builds, optimized release checks, and API 36 managed-device tests.
+            - Regression coverage includes clock corrections, live-to-timestamp fallback, delayed live captions, regressive words, caption gaps, and small rewinds.
             - The official APK is built with production signing and verified by this release workflow.
 
             ## Known limitations
 
-            - The panel-position control applies to the portrait transcript panel. Landscape layouts and compact/fullscreen captions retain their existing positioning behavior.
+            - Spoken-word tracking on auto-generated captions depends on YouTube's webpage and may vary by video or device. Transcript timing remains available as a fallback.
 
             The `.sha256` file can be used to verify the APK download.
           files: |
