@@ -559,6 +559,7 @@ class AppViewModel internal constructor(
                 timedSegmentIndex = timedIndex,
                 timedWordIndex = timedWordIndex,
                 livePosition = livePosition,
+                playbackTimeMs = timeMs,
             )
         val index = position?.segmentIndex ?: -1
         val wordIndex = position?.wordIndex ?: -1

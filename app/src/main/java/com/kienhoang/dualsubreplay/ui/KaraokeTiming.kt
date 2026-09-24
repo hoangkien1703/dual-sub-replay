@@ -25,6 +25,8 @@ internal data class LiveCaptionSample(
 internal data class KaraokePosition(
     val segmentIndex: Int,
     val wordIndex: Int,
+    /** First word YouTube revealed in the same update; equals [wordIndex] for one-word updates. */
+    val firstRevealedWordIndex: Int = wordIndex,
 ) : Comparable<KaraokePosition> {
     override fun compareTo(other: KaraokePosition): Int =
         compareValuesBy(this, other, KaraokePosition::segmentIndex, KaraokePosition::wordIndex)
@@ -50,12 +52,22 @@ internal data class CaptionHighlightPosition(
         compareValuesBy(this, other, CaptionHighlightPosition::segmentIndex, CaptionHighlightPosition::wordIndex)
 }
 
-/** Keeps timestamp and live-caption arbitration monotonic between real playback discontinuities. */
+/**
+ * Keeps timestamp and live-caption arbitration monotonic between real playback discontinuities.
+ *
+ * YouTube often reveals several auto-caption words in one update. The live position then marks
+ * only the newest word, so inside that revealed range the timestamp word decides; outside it the
+ * live range bounds the result. A position that stays behind the held one for
+ * [HIGHLIGHT_BACKWARD_CORRECTION_MS] of playback is accepted, so a wrong live match (a repeated
+ * "the" or "you") recovers without a seek while brief jitter still never moves backwards.
+ */
 internal class CaptionHighlightResolver {
     private var lastPosition: CaptionHighlightPosition? = null
+    private var behindSinceMs: Long? = null
 
     fun reset() {
         lastPosition = null
+        behindSinceMs = null
     }
 
     fun resolve(
@@ -64,6 +76,7 @@ internal class CaptionHighlightResolver {
         timedSegmentIndex: Int,
         timedWordIndex: Int,
         livePosition: KaraokePosition?,
+        playbackTimeMs: Long = 0L,
     ): CaptionHighlightPosition? {
         val timedPosition =
             timedSegmentIndex.takeIf { it >= 0 }?.let {
@@ -75,13 +88,38 @@ internal class CaptionHighlightResolver {
         val selected =
             when {
                 wordHighlightEnabled && generatedCaptions && livePosition != null ->
-                    CaptionHighlightPosition(livePosition.segmentIndex, livePosition.wordIndex)
+                    liveBoundedPosition(livePosition, timedPosition)
                 else -> timedPosition
             } ?: return null
-        val resolved = lastPosition?.takeIf { selected < it } ?: selected
+        val held = lastPosition
+        val resolved =
+            if (held != null && selected < held) {
+                val since = behindSinceMs ?: playbackTimeMs.also { behindSinceMs = it }
+                if (playbackTimeMs - since >= HIGHLIGHT_BACKWARD_CORRECTION_MS) selected else held
+            } else {
+                selected
+            }
+        if (resolved == selected) behindSinceMs = null
         lastPosition = resolved
         return resolved
     }
+}
+
+internal const val HIGHLIGHT_BACKWARD_CORRECTION_MS = 1_000L
+
+/** The live range [firstRevealedWordIndex, wordIndex] bounds the timestamp word. */
+internal fun liveBoundedPosition(
+    live: KaraokePosition,
+    timed: CaptionHighlightPosition?,
+): CaptionHighlightPosition {
+    val first = live.firstRevealedWordIndex.coerceIn(0, maxOf(0, live.wordIndex))
+    val word =
+        when {
+            timed == null || timed.segmentIndex > live.segmentIndex -> live.wordIndex
+            timed.segmentIndex < live.segmentIndex -> first
+            else -> timed.wordIndex.coerceIn(first, live.wordIndex)
+        }
+    return CaptionHighlightPosition(live.segmentIndex, word)
 }
 
 internal data class LiveCaptionProgress(
@@ -89,6 +127,8 @@ internal data class LiveCaptionProgress(
     val tokens: List<String>,
     val activeWordIndex: Int,
     val revision: Long,
+    /** First token appended by the latest update; equals [activeWordIndex] for one-token updates. */
+    val firstAppendedIndex: Int = activeWordIndex,
 )
 
 private data class TranscriptWordRef(
@@ -135,7 +175,7 @@ internal fun reconcileLiveCaptionProgress(
     val prefixGrowth = currentTokens.size > previous.tokens.size &&
         previous.tokens.indices.all { index -> previous.tokens[index] == currentTokens[index] }
     if (prefixGrowth) {
-        return LiveCaptionProgress(cleanText, currentTokens, currentTokens.lastIndex, sample.revision)
+        return LiveCaptionProgress(cleanText, currentTokens, currentTokens.lastIndex, sample.revision, previous.tokens.size)
     }
 
     val overlap = longestSuffixPrefixOverlap(previous.tokens, currentTokens)
@@ -148,7 +188,8 @@ internal fun reconcileLiveCaptionProgress(
         } else {
             mappedOldIndex.coerceAtMost(currentTokens.lastIndex)
         }
-        return LiveCaptionProgress(cleanText, currentTokens, activeIndex, sample.revision)
+        val firstAppended = if (appendedCount > 0) overlap else activeIndex
+        return LiveCaptionProgress(cleanText, currentTokens, activeIndex, sample.revision, firstAppended)
     }
 
     val previousActiveToken = previous.tokens.getOrNull(previous.activeWordIndex)
@@ -287,7 +328,8 @@ internal class LiveCaptionTracker {
                 lastPosition = null
             } else {
                 coherentRevisionCount += 1
-                lastPosition = mapped
+                val revealed = currentProgress.activeWordIndex - currentProgress.firstAppendedIndex
+                lastPosition = mapped.copy(firstRevealedWordIndex = (mapped.wordIndex - revealed).coerceIn(0, mapped.wordIndex))
                 lastMappedMediaTimeMs = sample.mediaTimeMs
             }
         }

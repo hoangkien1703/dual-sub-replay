@@ -14,6 +14,18 @@ data class SubtitleSegment(
     val originalText: String,
     val translatedText: String? = null,
     val words: List<SubtitleWord> = emptyList(),
+    val sentence: SentenceSlice? = null,
+)
+
+/**
+ * The complete sentence a short display row belongs to. [cuts] are the character offsets where the
+ * sentence's rows start (after the first) and [index] is this row. The sentence is translated once
+ * so ML Kit sees full context; every row derives the same split of that translation.
+ */
+data class SentenceSlice(
+    val text: String,
+    val cuts: List<Int>,
+    val index: Int,
 )
 
 /** A single spoken word/chunk with its absolute timing inside the video. */

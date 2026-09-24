@@ -53,6 +53,50 @@ class KaraokeTimingTest {
     }
 
     @Test
+    fun multiWordLiveUpdateFollowsTimestampsInsideTheRevealedRange() {
+        val resolver = CaptionHighlightResolver()
+        val live = KaraokePosition(3, 5, firstRevealedWordIndex = 2)
+        assertEquals(CaptionHighlightPosition(3, 3), resolver.resolve(true, true, 3, 3, live, 1_000))
+        assertEquals(CaptionHighlightPosition(3, 4), resolver.resolve(true, true, 3, 4, live, 1_200))
+        // Timestamps outside the revealed words are bounded by the live range.
+        assertEquals(CaptionHighlightPosition(3, 5), resolver.resolve(true, true, 3, 7, live, 1_400))
+        val resolver2 = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(3, 2), resolver2.resolve(true, true, 3, 0, live, 0))
+        assertEquals(CaptionHighlightPosition(3, 2), CaptionHighlightResolver().resolve(true, true, 2, 9, live, 0))
+    }
+
+    @Test
+    fun oneWordLiveUpdateKeepsTheLiveWord() {
+        assertEquals(
+            CaptionHighlightPosition(2, 4),
+            CaptionHighlightResolver().resolve(true, true, 2, 1, KaraokePosition(2, 4), 0),
+        )
+    }
+
+    @Test
+    fun wrongForwardMatchRecoversAfterSustainedDisagreementOnly() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 5, 3, null, 10_000))
+        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 4, 1, null, 10_100))
+        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 4, 2, null, 11_000))
+        assertEquals(CaptionHighlightPosition(4, 2), resolver.resolve(false, true, 4, 2, null, 11_100))
+        // Catching up clears the timer, so a later single dip is held again.
+        assertEquals(CaptionHighlightPosition(4, 3), resolver.resolve(false, true, 4, 3, null, 11_200))
+        assertEquals(CaptionHighlightPosition(4, 3), resolver.resolve(false, true, 4, 2, null, 11_300))
+    }
+
+    @Test
+    fun liveProgressRecordsEveryWordRevealedByOneUpdate() {
+        val first = reconcileLiveCaptionProgress(null, sample("look", 1, 0))
+        val grown = reconcileLiveCaptionProgress(first, sample("look at this now", 2, 300))!!
+        assertEquals(3, grown.activeWordIndex)
+        assertEquals(1, grown.firstAppendedIndex)
+        val rolled = reconcileLiveCaptionProgress(grown, sample("this now it works", 3, 600))!!
+        assertEquals(3, rolled.activeWordIndex)
+        assertEquals(2, rolled.firstAppendedIndex)
+    }
+
+    @Test
     fun genuineGapClearsHighlightAndResetAllowsIntentionalReplay() {
         val resolver = CaptionHighlightResolver()
         assertEquals(

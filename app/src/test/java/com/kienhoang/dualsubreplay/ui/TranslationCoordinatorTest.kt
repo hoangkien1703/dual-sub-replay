@@ -46,4 +46,40 @@ class TranslationCoordinatorTest {
     @Test fun unmatchedDisplaySegmentsAreNeverLost() {
         assertEquals(listOf(0, 1), sentenceCaptionUnits(display, emptyList(), true).flatMap { it.indices })
     }
+
+    @Test fun interiorSentenceEndsStartANewTranslationUnit() {
+        val rows =
+            listOf(
+                SubtitleSegment(0, 0, 4000, "The three models, but you are paying a fraction of the price. Even at, look at"),
+                SubtitleSegment(1, 4000, 5000, "this."),
+            )
+        val display = captionDisplaySegments(rows, CaptionFormat.WHOLE_SENTENCE, natural = true)
+        assertEquals(
+            listOf("The three models, but you are paying a fraction of the price.", "Even at, look at this."),
+            display.map { it.originalText },
+        )
+        assertTrue(display[1].startMs > 0)
+    }
+
+    @Test fun unpunctuatedAutoCaptionsKeepTheirUnits() {
+        val rows = listOf(SubtitleSegment(0, 0, 2000, "so we went to the beach"), SubtitleSegment(1, 5000, 6000, "and it rained"))
+        assertEquals(
+            rows.map {
+                it.originalText
+            },
+            captionDisplaySegments(rows, CaptionFormat.WHOLE_SENTENCE, natural = true).map { it.originalText },
+        )
+    }
+
+    @Test fun shortPhraseRowsRememberTheirWholeSentence() {
+        val text = "Though the catacombs did offer a space where inconvenient bodies could disappear."
+        val display = captionDisplaySegments(listOf(SubtitleSegment(0, 0, 6000, text)), CaptionFormat.SHORT_PHRASES, natural = true)
+        assertTrue(display.size > 1)
+        assertEquals(display.indices.toList(), display.map { it.sentence?.index })
+        assertTrue(display.all { it.sentence?.text == text })
+        assertEquals(display.indices.map { it.toLong() }, display.map { it.id })
+        display.drop(1).forEachIndexed { index, row ->
+            assertTrue(text.substring(display[index + 1].sentence!!.cuts[index]).startsWith(row.originalText))
+        }
+    }
 }

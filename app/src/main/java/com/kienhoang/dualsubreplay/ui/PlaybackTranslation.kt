@@ -49,12 +49,38 @@ internal suspend fun translatePlaybackWindow(
             requests.first { it != request }
             continue
         }
-        val translated = translate(rows[next].originalText).trim()
+        val sentence = rows[next].sentence
+        val translated = translate(sentence?.text ?: rows[next].originalText).trim()
+        // Translating each row's sentence prefix locates where that row ends in the full translation.
+        val prefixes = sentence?.cuts?.map { cut -> translate(sentence.text.substring(0, cut).trim()) }
         currentCoroutineContext().ensureActive()
-        rows = rows.toMutableList().also { it[next] = it[next].copy(translatedText = translated) }
+        rows = withTranslation(rows, next, translated, prefixes)
         // An in-flight task may finish after a seek/pause. Cache it, but never publish at the wrong position.
         if (requests.value.enabled && requests.value.seekGeneration == request.seekGeneration) {
             onWindow(rows, nextWindowTranslation(rows, requests.value) != null)
+        }
+    }
+}
+
+/**
+ * A short row is translated through its whole sentence, so every row of that sentence (including
+ * identical repeats in the window) receives its own slice of the one context-aware translation.
+ */
+internal fun withTranslation(
+    rows: List<SubtitleSegment>,
+    index: Int,
+    translated: String,
+    prefixTranslations: List<String>? = null,
+): List<SubtitleSegment> {
+    val sentence = rows[index].sentence
+    if (sentence == null) return rows.toMutableList().also { it[index] = it[index].copy(translatedText = translated) }
+    val slices = translationSlices(translated, sentence.text.length, sentence.cuts, prefixTranslations)
+    return rows.map { row ->
+        val other = row.sentence
+        if (other != null && other.text == sentence.text && other.cuts == sentence.cuts) {
+            row.copy(translatedText = slices.getOrElse(other.index) { "" })
+        } else {
+            row
         }
     }
 }

@@ -131,6 +131,15 @@ private fun DataOutput.writeSegment(segment: SubtitleSegment) {
         writeLong(word.startMs)
         writeLong(word.endMs)
     }
+    val sentence = segment.sentence
+    writeBoolean(sentence != null)
+    if (sentence != null) {
+        writeText(sentence.text)
+        require(sentence.cuts.size <= 16_384) { "A caption sentence has too many rows." }
+        writeInt(sentence.cuts.size)
+        sentence.cuts.forEach(::writeInt)
+        writeInt(sentence.index)
+    }
 }
 
 private fun DataInput.readSegment(): SubtitleSegment {
@@ -141,7 +150,15 @@ private fun DataInput.readSegment(): SubtitleSegment {
     val count = readInt()
     require(count in 0..16_384) { "Stored caption word count is invalid." }
     val words = List(count) { SubtitleWord(readText(), readLong(), readLong()) }
-    return SubtitleSegment(id, start, end, text, words = words)
+    val sentence = if (readBoolean()) readSentence() else null
+    return SubtitleSegment(id, start, end, text, words = words, sentence = sentence)
+}
+
+private fun DataInput.readSentence(): SentenceSlice {
+    val text = readText()
+    val count = readInt()
+    require(count in 0..16_384) { "Stored caption sentence is invalid." }
+    return SentenceSlice(text, List(count) { readInt() }, readInt())
 }
 
 private fun DataOutput.writeText(text: String) {

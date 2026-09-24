@@ -26,7 +26,9 @@ internal fun estimateWordTimings(
             text.split(Regex("\\s+")).filter(String::isNotBlank)
         }
     if (tokens.isEmpty() || endMs <= startMs) return emptyList()
-    val weights = tokens.map { token -> token.length.coerceAtLeast(1).toLong() }
+    // Spoken length follows letters, not punctuation: "price." should not outlast "price".
+    // The +1 keeps very short words ("a", "I") from collapsing to a flicker.
+    val weights = tokens.map { token -> token.count(Char::isLetterOrDigit).toLong() + 1 }
     val totalWeight = weights.sum().coerceAtLeast(1L)
     val duration = endMs - startMs
     var consumedWeight = 0L

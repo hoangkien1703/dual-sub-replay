@@ -76,6 +76,30 @@ class CaptionDocumentParserTest {
         assertTrue(words.zipWithNext().all { (left, right) -> left.startMs <= right.startMs })
     }
 
+    @Test fun overlappingAutoCaptionLinesEndTheirWordsWhenTheNextLineStarts() {
+        val json =
+            """
+            {"events":[
+              {"tStartMs":1000,"dDurationMs":5000,"segs":[
+                {"utf8":"look","tOffsetMs":0},
+                {"utf8":" at this","tOffsetMs":400}
+              ]},
+              {"tStartMs":2000,"dDurationMs":3000,"segs":[{"utf8":"next","tOffsetMs":0}]}
+            ]}
+            """.trimIndent()
+
+        val cue = CaptionDocumentParser.parse(json).first()
+        val words = cue.words
+
+        assertEquals(6_000L, cue.endMs)
+        assertEquals(listOf("look", "at", "this"), words.map { it.text })
+        assertEquals(2_000L, words.last().endMs)
+        assertTrue(words.last().startMs < 2_000L)
+        assertEquals(2_000L, CaptionDocumentParser.speechEndMs(1_000, 6_000, 2_000))
+        assertEquals(6_000L, CaptionDocumentParser.speechEndMs(1_000, 6_000, 7_000))
+        assertEquals(6_000L, CaptionDocumentParser.speechEndMs(1_000, 6_000, null))
+    }
+
     @Test fun srv3WordOffsetsProduceTimings() {
         val xml = """
             <timedtext><body>

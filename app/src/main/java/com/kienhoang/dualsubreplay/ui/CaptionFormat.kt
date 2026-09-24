@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.SentenceSlice
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
@@ -27,12 +28,20 @@ internal fun captionDisplaySegments(
     source: List<SubtitleSegment>,
     format: CaptionFormat,
     natural: Boolean,
-): List<SubtitleSegment> =
-    captionDisplaySegments(
-        source = source,
-        units = sentenceCaptionUnits(source, source, natural),
+): List<SubtitleSegment> {
+    val pieces = sentencePieces(source, natural)
+    return captionDisplaySegments(
+        source = pieces,
+        units = sentenceCaptionUnits(pieces, pieces, natural),
         format = format,
     )
+}
+
+/** Natural captions translate whole sentences, so first cut cues that contain a sentence end. */
+private fun sentencePieces(
+    source: List<SubtitleSegment>,
+    natural: Boolean,
+): List<SubtitleSegment> = if (natural) SubtitleMerger.splitAtSentenceEnds(source) else source
 
 private fun captionDisplaySegments(
     source: List<SubtitleSegment>,
@@ -49,7 +58,29 @@ private fun captionDisplaySegments(
                 words = unit.indices.flatMap { source[it].words },
             )
         }
-    return if (format == CaptionFormat.SHORT_PHRASES) SubtitleMerger.splitLongSegments(sentences) else sentences
+    if (format != CaptionFormat.SHORT_PHRASES) return sentences
+    return sentences
+        .flatMap { sentence ->
+            val rows = SubtitleMerger.splitLongSegments(listOf(sentence))
+            if (rows.size <= 1) rows else withSentenceSlices(sentence.originalText, rows)
+        }.mapIndexed { index, row -> row.copy(id = index.toLong()) }
+}
+
+/** Short rows remember their parent sentence so it is translated once, in full context. */
+internal fun withSentenceSlices(
+    sentence: String,
+    rows: List<SubtitleSegment>,
+): List<SubtitleSegment> {
+    var cursor = 0
+    val starts =
+        rows.map { row ->
+            val found = sentence.indexOf(row.originalText, cursor)
+            if (found >= 0) cursor = found + row.originalText.length
+            found
+        }
+    if (starts.any { it < 0 }) return rows
+    val cuts = starts.drop(1)
+    return rows.mapIndexed { index, row -> row.copy(sentence = SentenceSlice(sentence, cuts, index)) }
 }
 
 internal const val CAPTION_PREPARATION_BATCH_SIZE = 256
@@ -73,7 +104,7 @@ internal suspend fun prepareCaptionDisplayStore(
         var carry = emptyList<SubtitleSegment>()
         while (cursor < source.size) {
             val end = minOf(cursor + batchSize, source.size)
-            val buffered = carry + source.read(cursor until end)
+            val buffered = carry + sentencePieces(source.read(cursor until end), natural)
             val finalBatch = end == source.size
             val units = sentenceCaptionUnits(buffered, buffered, natural)
             val readyUnits =

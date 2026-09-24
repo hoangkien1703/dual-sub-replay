@@ -7,6 +7,13 @@ import org.json.JSONObject
 internal object CaptionDocumentParser {
     private data class TimedChunk(val text: String, val offsetMs: Long?)
 
+    private data class Json3Event(
+        val startMs: Long,
+        val endMs: Long,
+        val content: String,
+        val segments: JSONArray,
+    )
+
     fun parse(text: String): List<RawCaptionCue> {
         val trimmed = text.trimStart()
         if (trimmed.isBlank()) return emptyList()
@@ -15,21 +22,36 @@ internal object CaptionDocumentParser {
 
     private fun parseJson3(text: String): List<RawCaptionCue> {
         val events = JSONObject(text).optJSONArray("events") ?: return emptyList()
-        return (0 until events.length()).mapNotNull { index ->
-            val event = events.optJSONObject(index) ?: return@mapNotNull null
-            val segments = event.optJSONArray("segs") ?: return@mapNotNull null
-            val content = buildString {
-                for (segmentIndex in 0 until segments.length()) {
-                    append(segments.optJSONObject(segmentIndex)?.optString("utf8").orEmpty())
-                }
-            }.normalizeCaptionText()
-            val start = event.optLong("tStartMs", -1L)
-            if (content.isBlank() || start < 0) return@mapNotNull null
-            val duration = event.optLong("dDurationMs", 1_200L).coerceAtLeast(200L)
-            val end = start + duration
-            RawCaptionCue(start, end, content, json3Words(segments, start, end))
+        val parsed =
+            (0 until events.length()).mapNotNull { index ->
+                val event = events.optJSONObject(index) ?: return@mapNotNull null
+                val segments = event.optJSONArray("segs") ?: return@mapNotNull null
+                val content = buildString {
+                    for (segmentIndex in 0 until segments.length()) {
+                        append(segments.optJSONObject(segmentIndex)?.optString("utf8").orEmpty())
+                    }
+                }.normalizeCaptionText()
+                val start = event.optLong("tStartMs", -1L)
+                if (content.isBlank() || start < 0) return@mapNotNull null
+                val duration = event.optLong("dDurationMs", 1_200L).coerceAtLeast(200L)
+                Json3Event(start, start + duration, content, segments)
+            }
+        return parsed.mapIndexed { index, event ->
+            val wordsEnd = speechEndMs(event.startMs, event.endMs, parsed.getOrNull(index + 1)?.startMs)
+            RawCaptionCue(event.startMs, event.endMs, event.content, json3Words(event.segments, event.startMs, wordsEnd))
         }
     }
+
+    /**
+     * Auto-caption lines stay on screen after the next line starts, so an event's duration often
+     * overlaps its successor. The spoken words end when the next line's speech begins; stretching
+     * the last chunk to the display end would delay and spread its words.
+     */
+    internal fun speechEndMs(
+        startMs: Long,
+        endMs: Long,
+        nextStartMs: Long?,
+    ): Long = if (nextStartMs != null && nextStartMs in (startMs + 1) until endMs) nextStartMs else endMs
 
     /**
      * json3 carries per-chunk [tOffsetMs] offsets. A chunk is not guaranteed to
