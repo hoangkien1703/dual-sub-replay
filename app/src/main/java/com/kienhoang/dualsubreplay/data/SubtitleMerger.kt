@@ -212,7 +212,8 @@ object SubtitleMerger {
                 output += segment
                 return@forEach
             }
-            output += buildSplitSegments(segment, chunks)
+            // Misaligned word timings must not leave an unsplit long row; estimate instead.
+            output += buildSplitSegments(segment, chunks).takeIf { it.size > 1 } ?: estimateSplitSegments(segment, chunks)
         }
         // The transcript list keys segments by id, so every output segment must
         // carry a unique fresh id; keeping original ids would collide once one

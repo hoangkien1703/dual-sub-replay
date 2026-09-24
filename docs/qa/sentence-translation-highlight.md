@@ -30,4 +30,7 @@ establish translation quality or audio sync on a phone. Record results here.
 
 ## Results
 
-Not yet run.
+- **2026-09-24, owner's phone, build `de92e85`:**
+  - The underline sometimes jumped back to the previous sentence.
+  - One row was too long ("Traditional LMS … this model can That is actually 40 to 200x faster.").
+  - Both are addressed in the follow-up commit; this needs a re-check on the phone.

@@ -74,15 +74,35 @@ class KaraokeTimingTest {
     }
 
     @Test
-    fun wrongForwardMatchRecoversAfterSustainedDisagreementOnly() {
+    fun wrongLiveWordMatchRecoversInsideTheSentenceAfterSustainedDisagreementOnly() {
         val resolver = CaptionHighlightResolver()
-        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 5, 3, null, 10_000))
-        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 4, 1, null, 10_100))
-        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(false, true, 4, 2, null, 11_000))
-        assertEquals(CaptionHighlightPosition(4, 2), resolver.resolve(false, true, 4, 2, null, 11_100))
+        assertEquals(CaptionHighlightPosition(5, 6), resolver.resolve(true, true, 5, 6, KaraokePosition(5, 6), 10_000))
+        assertEquals(CaptionHighlightPosition(5, 6), resolver.resolve(true, true, 5, 2, KaraokePosition(5, 2), 10_100))
+        assertEquals(CaptionHighlightPosition(5, 6), resolver.resolve(true, true, 5, 2, KaraokePosition(5, 2), 11_000))
+        assertEquals(CaptionHighlightPosition(5, 2), resolver.resolve(true, true, 5, 2, KaraokePosition(5, 2), 11_100))
         // Catching up clears the timer, so a later single dip is held again.
-        assertEquals(CaptionHighlightPosition(4, 3), resolver.resolve(false, true, 4, 3, null, 11_200))
-        assertEquals(CaptionHighlightPosition(4, 3), resolver.resolve(false, true, 4, 2, null, 11_300))
+        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(true, true, 5, 3, KaraokePosition(5, 3), 11_200))
+        assertEquals(CaptionHighlightPosition(5, 3), resolver.resolve(true, true, 5, 2, KaraokePosition(5, 2), 11_300))
+    }
+
+    @Test
+    fun highlightNeverReturnsToThePreviousSentenceWithoutASeek() {
+        // Phone report: live captions vanish between lines while timestamps still point at the
+        // previous sentence. Neither the timestamp fallback nor a stale live match may go back.
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(6, 0), resolver.resolve(true, true, 5, 9, KaraokePosition(6, 0), 20_000))
+        listOf(20_100L, 21_500L, 23_000L, 26_000L).forEach { time ->
+            assertEquals(CaptionHighlightPosition(6, 0), resolver.resolve(true, true, 5, 9, null, time))
+            assertEquals(CaptionHighlightPosition(6, 0), resolver.resolve(true, true, 5, 9, KaraokePosition(5, 9), time + 50))
+        }
+        assertEquals(CaptionHighlightPosition(5, 9), CaptionHighlightResolver().resolve(true, true, 5, 9, null, 26_100))
+    }
+
+    @Test
+    fun timestampOnlyHighlightNeverMovesBackwardInsideASentence() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(4, 5), resolver.resolve(false, true, 4, 5, null, 0))
+        assertEquals(CaptionHighlightPosition(4, 5), resolver.resolve(false, true, 4, 2, null, 5_000))
     }
 
     @Test

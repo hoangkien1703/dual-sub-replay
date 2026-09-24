@@ -41,7 +41,7 @@ class CaptionFormatTest {
         val source = (0..20).map { SubtitleSegment(it.toLong(), it * 1000L, (it + 1) * 1000L, "another fragment") }
         val whole = captionDisplaySegments(source, CaptionFormat.WHOLE_SENTENCE, true)
         assertTrue(whole.size > 1)
-        assertTrue(whole.all { it.endMs - it.startMs <= 12000 && it.originalText.length <= 240 })
+        assertTrue(whole.all { it.endMs - it.startMs <= MAX_UNIT_DURATION_MS && it.originalText.length <= MAX_UNIT_CHARACTERS })
         assertEquals(source.joinToString(" ") { it.originalText }, whole.joinToString(" ") { it.originalText })
     }
 

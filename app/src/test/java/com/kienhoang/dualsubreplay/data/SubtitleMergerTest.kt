@@ -228,6 +228,24 @@ class SubtitleMergerTest {
         })
     }
 
+    @Test fun wordsThatCannotBeFoundInTheTextStillProduceShortRows() {
+        val text = "Traditional models can take three to over three hundred seconds to classify this"
+        val segment =
+            SubtitleSegment(
+                id = 9,
+                startMs = 0,
+                endMs = 6_000,
+                originalText = text,
+                words = listOf(SubtitleWord("[Music]", 0, 500), SubtitleWord("Traditional", 500, 900)),
+            )
+
+        val split = SubtitleMerger.splitLongSegments(listOf(segment))
+
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { it.originalText.length <= SPLIT_SENTENCE_MAX_CHARACTERS })
+        assertEquals(text, split.joinToString(" ") { it.originalText })
+    }
+
     @Test fun splitsCjkSentencesWithoutInsertingSpaces() {
         val longCjk = "这是一段特别长的中文句子需要被切成更短的片段方便学习者跟读理解每一个部分的含义并且不会丢失任何原始的时间信息与内容"
         val split = SubtitleMerger.splitLongSegments(

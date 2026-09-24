@@ -57,9 +57,11 @@ internal data class CaptionHighlightPosition(
  *
  * YouTube often reveals several auto-caption words in one update. The live position then marks
  * only the newest word, so inside that revealed range the timestamp word decides; outside it the
- * live range bounds the result. A position that stays behind the held one for
- * [HIGHLIGHT_BACKWARD_CORRECTION_MS] of playback is accepted, so a wrong live match (a repeated
- * "the" or "you") recovers without a seek while brief jitter still never moves backwards.
+ * live range bounds the result. When live progress keeps reporting an earlier word of the same
+ * sentence for [HIGHLIGHT_BACKWARD_CORRECTION_MS] of playback, it is accepted, so a wrong live match
+ * (a repeated "the" or "you") recovers without a seek. The highlight never returns to an earlier
+ * sentence without a seek: live captions briefly disappear between lines, and the timestamp
+ * fallback can still point at the previous sentence then.
  */
 internal class CaptionHighlightResolver {
     private var lastPosition: CaptionHighlightPosition? = null
@@ -85,21 +87,22 @@ internal class CaptionHighlightResolver {
                     wordIndex = timedWordIndex.takeIf { wordHighlightEnabled && it >= 0 } ?: -1,
                 )
             }
+        val fromLive = wordHighlightEnabled && generatedCaptions && livePosition != null
         val selected =
-            when {
-                wordHighlightEnabled && generatedCaptions && livePosition != null ->
-                    liveBoundedPosition(livePosition, timedPosition)
-                else -> timedPosition
-            } ?: return null
+            (if (fromLive) liveBoundedPosition(checkNotNull(livePosition), timedPosition) else timedPosition)
+                ?: return null
         val held = lastPosition
+        val correctable = fromLive && held != null && selected.segmentIndex == held.segmentIndex
         val resolved =
-            if (held != null && selected < held) {
-                val since = behindSinceMs ?: playbackTimeMs.also { behindSinceMs = it }
-                if (playbackTimeMs - since >= HIGHLIGHT_BACKWARD_CORRECTION_MS) selected else held
-            } else {
-                selected
+            when {
+                held == null || selected >= held -> selected
+                !correctable -> held
+                else -> {
+                    val since = behindSinceMs ?: playbackTimeMs.also { behindSinceMs = it }
+                    if (playbackTimeMs - since >= HIGHLIGHT_BACKWARD_CORRECTION_MS) selected else held
+                }
             }
-        if (resolved == selected) behindSinceMs = null
+        if (resolved == selected || !correctable) behindSinceMs = null
         lastPosition = resolved
         return resolved
     }

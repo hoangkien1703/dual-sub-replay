@@ -61,6 +61,19 @@ class TranslationCoordinatorTest {
         assertTrue(display[1].startMs > 0)
     }
 
+    @Test fun unpunctuatedCaptionsStopJoiningAtAReadableLength() {
+        val rows =
+            listOf(
+                SubtitleSegment(0, 0, 3000, "Traditional LMS can take three to over 300 seconds"),
+                SubtitleSegment(1, 3000, 6000, "to do the type of classification work that this model can"),
+                SubtitleSegment(2, 6000, 8000, "That is actually 40 to 200x faster."),
+            )
+        val display = captionDisplaySegments(rows, CaptionFormat.WHOLE_SENTENCE, natural = true)
+        assertTrue(display.size > 1)
+        assertTrue(display.all { it.originalText.length <= MAX_UNIT_CHARACTERS })
+        assertEquals("That is actually 40 to 200x faster.", display.last().originalText)
+    }
+
     @Test fun unpunctuatedAutoCaptionsKeepTheirUnits() {
         val rows = listOf(SubtitleSegment(0, 0, 2000, "so we went to the beach"), SubtitleSegment(1, 5000, 6000, "and it rained"))
         assertEquals(

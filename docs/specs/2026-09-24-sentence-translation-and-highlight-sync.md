@@ -53,8 +53,11 @@ opened. That request does not authorize merging or publishing.
 - **Highlight:**
   - After a multi-word caption update, the underline moves through the revealed words using
     their timestamps.
-  - A position that stays behind the held underline for 1 s of playback is accepted.
-  - Brief jitter still never moves the underline backward.
+  - If live progress keeps reporting an earlier word **of the same sentence** for 1 s of
+    playback, that word is accepted.
+  - The underline never returns to an earlier sentence without a seek, and brief jitter never
+    moves it backward.
+  - Unpunctuated captions are joined into rows of at most 120 characters and 8 s (was 240 / 12 s).
 
 ## Technical constraints / invariants
 
@@ -84,7 +87,11 @@ opened. That request does not authorize merging or publishing.
    - `liveBoundedPosition` limits the timestamp word to the range of words revealed by that
      update.
    - `CaptionHighlightResolver` accepts a backward correction after
-     `HIGHLIGHT_BACKWARD_CORRECTION_MS` (1000 ms) of playback.
+     `HIGHLIGHT_BACKWARD_CORRECTION_MS` (1000 ms) of playback, but only within the held sentence
+     and only from live progress. Timestamp-only positions never move backward.
+7. `sentenceCaptionUnits` stops joining unpunctuated captions at `MAX_UNIT_CHARACTERS` (120) and
+   `MAX_UNIT_DURATION_MS` (8 s). `splitLongSegments` falls back to estimated timings rather than
+   showing an unsplit long row when word timings cannot be aligned with the text.
 
 ## Acceptance criteria
 
@@ -101,8 +108,12 @@ opened. That request does not authorize merging or publishing.
   display end is unchanged (`CaptionDocumentParserTest`).
 - [x] Punctuation does not lengthen an estimated word (`WordTimingTest`).
 - [x] A multi-word live update follows the timestamp word within the revealed range. A
-  one-word update keeps the live word. A backward correction happens only after 1 s
-  (`KaraokeTimingTest`).
+  one-word update keeps the live word. A backward correction happens only after 1 s, only from
+  live progress, and only within the same sentence (`KaraokeTimingTest`).
+- [x] When live captions vanish while timestamps point at the previous sentence, the underline
+  stays on the current sentence (`KaraokeTimingTest.highlightNeverReturnsToThePreviousSentenceWithoutASeek`).
+- [x] Unpunctuated rows stay within 120 characters. A misaligned short-phrase split still
+  produces short rows (`TranslationCoordinatorTest`, `CaptionFormatTest`, `SubtitleMergerTest`).
 - [x] Existing seek, pause, window and highlight regression tests pass unchanged.
 - [ ] Final-head CI `verify-build` and `managed-device-tests` pass.
 - [ ] Owner phone check (see [QA notes](../qa/sentence-translation-highlight.md)).
@@ -142,11 +153,24 @@ character proportion. The tests showed this was off by about one word for Vietna
 prefix-translation word count was added as the primary estimate, with proportion as the
 fallback.
 
+## Owner phone feedback (build from `de92e85`)
+
+On 2026-09-24 the owner reported two problems from their phone:
+- **Backward jump:** the underline sometimes jumped back to the previous sentence.
+  - Cause: the first version's 1 s backward correction also applied across sentences. Between
+    caption lines YouTube's live caption disappears, and the timestamp fallback can still point
+    at the previous sentence, so after 1 s the underline went back.
+  - Fix: a correction is now limited to the same sentence and to live progress.
+- **Long rows:** some rows were too long, e.g. "Traditional LMS … that this model can That is
+  actually 40 to 200x faster.".
+  - Fix: the join limits are now 120 characters / 8 s, with the estimate fallback for
+    misaligned short-phrase splits.
+
 ## Validation result
 
 - Local (Linux, Android SDK 36, JDK 21):
   - `formatCheck`, `complexityCheck`, `testDebugUnitTest` (270 tests), `lintDebug`,
-    `assembleDebug` and `assembleDebugAndroidTest`: passed.
+    `assembleDebug` and `assembleDebugAndroidTest`: passed (274 unit tests after the phone-feedback fixes).
   - `python3 -m unittest discover -s tools/tests`: passed.
 - Managed-device tests: not run locally (no emulator); CI runs them.
 - Physical phone / live YouTube: not run; pending owner acceptance.
