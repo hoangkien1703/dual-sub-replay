@@ -166,11 +166,31 @@ On 2026-09-24 the owner reported two problems from their phone:
   - Fix: the join limits are now 120 characters / 8 s, with the estimate fallback for
     misaligned short-phrase splits.
 
+## Owner phone feedback (build from `46b3b9f`)
+
+On 2026-09-24 the owner reported that the highlight "sometimes skips words that are being
+spoken". In the screenshot, YouTube showed "worked every day. All of this sets a pretty brutal",
+but the transcript went straight from "every day." to "Pretty brutal stage…".
+
+- **Cause:** "All of this sets a" was **missing from the transcript**, so the underline had no word
+  to land on.
+  - Auto-caption lines overlap in time. `sentenceCaptionUnits` mapped each source segment onto
+    every display row inside its time range.
+  - A short sentence piece that fit inside its neighbour's overlapping range was absorbed into
+    that neighbour's unit, but the unit kept only the neighbour's text and dropped the piece.
+- **Scale:** the bug already existed on `main`, where 148 of 6000 generated tracks lost text.
+  This PR's sentence splitting made short pieces common, raising it to 1394 of 6000.
+- **Fix:** when display rows are the source itself (every production caller), each row is its own
+  starting unit. Overlapping lines (a negative gap) now count as continuous speech when joining.
+- **Tests:** `CaptionTextPreservationTest` generates 400 overlapping auto-caption tracks and checks
+  that both formats keep every word and its timing. It also covers the reported case. Both tests
+  failed before the fix.
+
 ## Validation result
 
 - Local (Linux, Android SDK 36, JDK 21):
   - `formatCheck`, `complexityCheck`, `testDebugUnitTest` (270 tests), `lintDebug`,
-    `assembleDebug` and `assembleDebugAndroidTest`: passed (274 unit tests after the phone-feedback fixes).
+    `assembleDebug` and `assembleDebugAndroidTest`: passed (276 unit tests after the second round of phone-feedback fixes).
   - `python3 -m unittest discover -s tools/tests`: passed.
 - Managed-device tests: not run locally (no emulator); CI runs them.
 - Physical phone / live YouTube: not run; pending owner acceptance.
