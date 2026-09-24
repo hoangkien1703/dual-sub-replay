@@ -212,13 +212,29 @@ object SubtitleMerger {
                 output += segment
                 return@forEach
             }
-            output += buildSplitSegments(segment, chunks)
+            // Misaligned word timings must not leave an unsplit long row; estimate instead.
+            output += buildSplitSegments(segment, chunks).takeIf { it.size > 1 } ?: estimateSplitSegments(segment, chunks)
         }
         // The transcript list keys segments by id, so every output segment must
         // carry a unique fresh id; keeping original ids would collide once one
         // parent's chunk ids overlap another unsplit segment's id.
         return output.mapIndexed { index, segment -> segment.copy(id = index.toLong()) }
     }
+
+    /**
+     * Auto captions often end one sentence and start the next inside the same cue
+     * ("…the price. Even at, look at"). Cut such segments at interior sentence ends,
+     * keeping real word timings, so translation units never straddle two sentences.
+     */
+    internal fun splitAtSentenceEnds(segments: List<SubtitleSegment>): List<SubtitleSegment> =
+        segments.flatMap { segment ->
+            val sentences =
+                segment.originalText
+                    .split(sentenceBreak)
+                    .map(String::trim)
+                    .filter(String::isNotEmpty)
+            if (sentences.size <= 1) listOf(segment) else buildSplitSegments(segment, sentences)
+        }
 
     /** Splits [text] into short chunks at sentence ends, then clause marks, then word edges. */
     internal fun splitSentenceChunks(

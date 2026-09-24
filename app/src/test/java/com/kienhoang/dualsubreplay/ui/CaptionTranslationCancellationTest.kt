@@ -228,10 +228,52 @@ class CaptionTranslationCancellationTest {
         check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = false, enabled = true)) == 0)
     }
 
-    private suspend fun withStore(block: suspend (SubtitleStore) -> Unit) {
+    @Test
+    fun shortRowsAreTranslatedThroughTheirWholeSentence() =
+        runBlocking {
+            val sentence = "The French Revolution temporarily stalled relocation efforts."
+            val display =
+                captionDisplaySegments(
+                    listOf(SubtitleSegment(0, 0, 4000, sentence)),
+                    CaptionFormat.SHORT_PHRASES,
+                    natural = true,
+                )
+            check(display.map { it.originalText } == listOf("The French Revolution temporarily stalled", "relocation efforts."))
+            val dictionary =
+                mapOf(
+                    sentence to "Cuộc Cách mạng Pháp tạm thời làm đình trệ các nỗ lực di dời.",
+                    display[0].originalText to "Cuộc Cách mạng Pháp tạm thời bị đình trệ",
+                )
+            withStore(display) { store ->
+                val requests = MutableStateFlow(CaptionPlaybackRequest(0, paused = false, enabled = true))
+                val inputs = mutableListOf<String>()
+                val ready = CompletableDeferred<List<SubtitleSegment>>()
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, { text ->
+                            inputs.add(text)
+                            dictionary.getValue(text)
+                        }) { snapshot, preparing -> if (!preparing) ready.complete(snapshot) }
+                    }
+                try {
+                    val output = withTimeout(5000) { ready.await() }
+                    check(inputs == listOf(sentence, display[0].originalText)) { inputs }
+                    check(output.map { it.translatedText } == listOf("Cuộc Cách mạng Pháp tạm thời làm đình trệ", "các nỗ lực di dời.")) {
+                        output.map { it.translatedText }
+                    }
+                } finally {
+                    job.cancelAndJoin()
+                }
+            }
+        }
+
+    private suspend fun withStore(
+        segments: List<SubtitleSegment> = rows,
+        block: suspend (SubtitleStore) -> Unit,
+    ) {
         val directory = Files.createTempDirectory("playback-window-test").toFile()
         try {
-            SubtitleStore.create(directory, rows).use { block(it) }
+            SubtitleStore.create(directory, segments).use { block(it) }
         } finally {
             directory.deleteRecursively()
         }

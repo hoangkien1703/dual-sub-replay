@@ -16,6 +16,12 @@ class WordTimingTest {
         assertEquals(3_000L, words.last().endMs)
     }
 
+    @Test fun punctuationDoesNotLengthenAnEstimatedWord() {
+        val plain = estimateWordTimings("price even", startMs = 0, endMs = 1_000)
+        val punctuated = estimateWordTimings("price. even", startMs = 0, endMs = 1_000)
+        assertEquals(plain.map { it.startMs }, punctuated.map { it.startMs })
+    }
+
     @Test fun denseBrokenCaptionEstimatesNeverRunPastCue() {
         val words = estimateWordTimings(
             "one two three four five six seven eight nine ten",

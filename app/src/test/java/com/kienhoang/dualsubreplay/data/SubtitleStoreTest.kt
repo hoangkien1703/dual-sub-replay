@@ -27,6 +27,14 @@ class SubtitleStoreTest {
         }
 
     @Test
+    fun diskRoundTripPreservesSentenceContext() =
+        runBlocking {
+            val sentence = SentenceSlice("The French Revolution temporarily stalled relocation efforts.", listOf(34), 1)
+            val rows = listOf(SubtitleSegment(7, 0, 900, "stalled relocation efforts.", sentence = sentence))
+            withStore(rows) { store -> check(store.read(0..0) == rows) }
+        }
+
+    @Test
     fun emptyTrackAndSilenceAreSafe() =
         runBlocking {
             withStore(emptyList()) { store -> check(store.read(store.windowIndices(0)).isEmpty()) }
