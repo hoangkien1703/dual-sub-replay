@@ -297,10 +297,11 @@ private fun baseLanguage(track: JSONObject): String =
 private fun JSONArray.objects(): List<JSONObject> = (0 until length()).mapNotNull(::optJSONObject)
 
 /**
- * The language actually spoken in the video. YouTube's speech recognizer only produces an
- * auto-generated track in the audio's language, so that track is the strongest signal; the
- * default audio track's default caption is a weaker fallback when auto captions are off.
- * Creator-uploaded translations (for example Arabic on an English video) never count.
+ * The language actually spoken in the video. YouTube's speech recognizer produces its
+ * auto-generated track from the audio, so that track wins even when the creator labelled the
+ * audio wrongly (a Japanese video tagged "English (US) original" still has `a.ja`). Without auto
+ * captions, the default audio track's declared language (`ja.4`) is next. The creator's default
+ * caption is a last resort only: on learning channels it is usually the English translation.
  */
 internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
     val tracks = renderer.optJSONArray("captionTracks")?.objects().orEmpty()
@@ -310,11 +311,17 @@ internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
         defaultAudio?.optJSONArray("captionTrackIndices")?.let { indices ->
             (0 until indices.length()).mapNotNull { tracks.getOrNull(indices.optInt(it, -1)) }
         }.orEmpty()
-    val generated =
-        defaultAudioCaptions.firstOrNull(::isGeneratedTrack)
-            ?: tracks.firstOrNull(::isGeneratedTrack)
-            ?: defaultAudio?.optInt("defaultCaptionTrackIndex", -1)?.let(tracks::getOrNull)
+    val generated = defaultAudioCaptions.firstOrNull(::isGeneratedTrack) ?: tracks.firstOrNull(::isGeneratedTrack)
+    val audioLanguage =
+        defaultAudio
+            ?.optString("audioTrackId")
+            ?.substringBefore('.')
+            ?.substringBefore('-')
+            ?.lowercase()
+            ?.takeIf(String::isNotBlank)
     return generated?.let(::baseLanguage)?.takeIf(String::isNotBlank)
+        ?: audioLanguage
+        ?: defaultAudio?.optInt("defaultCaptionTrackIndex", -1)?.let(tracks::getOrNull)?.let(::baseLanguage)?.takeIf(String::isNotBlank)
 }
 
 /**

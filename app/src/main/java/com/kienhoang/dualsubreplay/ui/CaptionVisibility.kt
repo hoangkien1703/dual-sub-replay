@@ -37,6 +37,14 @@ internal fun shouldCaptureCaptionsForPresentation(
     (state.subtitlePanelVisible || mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) &&
         (state.liveFallback || shouldCaptureLiveCaptions(state.generatedCaptions, state.wordHighlightEnabled))
 
+/** Only a loaded transcript sets the page's track; live fallback takes its language from the page. */
+internal fun captionTrackTarget(state: DualSubUiState): CaptionTrackTarget? {
+    if (state.liveFallback) return null
+    val videoId = state.activeVideoId ?: return null
+    val language = state.resolvedSourceLanguage ?: return null
+    return CaptionTrackTarget(videoId, language, state.generatedCaptions)
+}
+
 @Composable
 internal fun CaptionVisibilitySettings() {
     val context = LocalContext.current

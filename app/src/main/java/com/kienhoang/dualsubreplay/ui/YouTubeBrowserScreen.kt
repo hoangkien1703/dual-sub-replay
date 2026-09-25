@@ -265,6 +265,7 @@ internal fun SingleYouTubePage(
     onPlaybackPaused: (String, Boolean) -> Unit = { _, _ -> },
     liveCaptionCaptureEnabled: Boolean = false,
     suppressPageCaptions: Boolean = false,
+    captionTrackTarget: CaptionTrackTarget? = null,
     fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -276,6 +277,7 @@ internal fun SingleYouTubePage(
     val currentOnPlaybackPaused by rememberUpdatedState(onPlaybackPaused)
     val currentLiveCaptionCaptureEnabled by rememberUpdatedState(liveCaptionCaptureEnabled)
     val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
+    val currentCaptionTrackTarget by rememberUpdatedState(captionTrackTarget)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
         mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
@@ -430,6 +432,7 @@ internal fun SingleYouTubePage(
                     reportNavigation(view, url)
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         CookieManager.getInstance().flush()
+                        view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
                         view.evaluateJavascript(
                             webLiveCaptionConfigurationScript(currentLiveCaptionCaptureEnabled),
                             null,
@@ -500,6 +503,12 @@ internal fun SingleYouTubePage(
     LaunchedEffect(webView, suppressPageCaptions) {
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
+        }
+    }
+
+    LaunchedEffect(webView, captionTrackTarget) {
+        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+            webView.evaluateJavascript(webCaptionTrackSyncScript(captionTrackTarget), null)
         }
     }
 

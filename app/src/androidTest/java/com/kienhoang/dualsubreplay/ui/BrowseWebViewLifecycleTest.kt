@@ -273,6 +273,46 @@ class BrowseWebViewLifecycleTest {
         } finally { instrumentation.runOnMainSync { view.destroySafely() } }
     }
 
+    @Test
+    fun captionTrackSyncSwitchesStickyLanguageToSpokenLanguage() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val loaded = CountDownLatch(1)
+        lateinit var view: WebView
+        instrumentation.runOnMainSync {
+            view =
+                WebView(instrumentation.targetContext).apply {
+                    settings.javaScriptEnabled = true
+                    webViewClient =
+                        object : WebViewClient() {
+                            override fun onPageFinished(
+                                view: WebView,
+                                url: String?,
+                            ) {
+                                loaded.countDown()
+                            }
+                        }
+                    loadDataWithBaseURL(
+                        "https://m.youtube.com/watch?v=abcdefghijk",
+                        STICKY_CAPTION_LANGUAGE_FIXTURE,
+                        "text/html",
+                        "UTF-8",
+                        null,
+                    )
+                }
+        }
+        try {
+            assertTrue(loaded.await(10, TimeUnit.SECONDS))
+            assertEquals("true", evaluateJavascript(view, webCaptionTrackSyncScript(null)))
+            assertEquals("\".ja\"", evaluateJavascript(view, ACTIVE_CAPTION_VSS_ID))
+
+            val target = CaptionTrackTarget("abcdefghijk", "ja", generated = true)
+            assertEquals("true", evaluateJavascript(view, webCaptionTrackSyncScript(target)))
+            assertEquals("\"a.ja\"", evaluateJavascript(view, ACTIVE_CAPTION_VSS_ID))
+        } finally {
+            instrumentation.runOnMainSync { view.destroySafely() }
+        }
+    }
+
     private fun evaluateJavascript(webView: WebView, script: String): String? {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val result = AtomicReference<String?>()
@@ -287,3 +327,28 @@ class BrowseWebViewLifecycleTest {
         return result.get()
     }
 }
+
+private const val ACTIVE_CAPTION_VSS_ID = "document.getElementById('movie_player').active.vssId"
+
+/** A Japanese video whose audio is labelled English, opened while YouTube still shows English captions. */
+private val STICKY_CAPTION_LANGUAGE_FIXTURE =
+    """
+    <html><body><div id="movie_player"><video></video></div><script>
+      const tracks = [
+        {languageCode: 'en', vssId: '.en'},
+        {languageCode: 'ja', vssId: '.ja'},
+        {languageCode: 'ja', vssId: 'a.ja', kind: 'asr'}
+      ];
+      const player = document.getElementById('movie_player');
+      player.active = {languageCode: 'en', kind: '', vss_id: '.en'};
+      player.getOption = function(module, option) { return option === 'track' ? player.active : []; };
+      player.setOption = function(module, option, track) { player.active = track; };
+      player.getPlayerResponse = function() {
+        return {videoDetails: {videoId: 'abcdefghijk'}, captions: {playerCaptionsTracklistRenderer: {
+          captionTracks: tracks,
+          defaultAudioTrackIndex: 0,
+          audioTracks: [{audioTrackId: 'en-US.4', defaultCaptionTrackIndex: 0, captionTrackIndices: [0, 1, 2]}]
+        }}};
+      };
+    </script></body></html>
+    """.trimIndent()

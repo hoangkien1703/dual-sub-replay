@@ -201,11 +201,36 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun captionTrackSyncFollowsTheLoadedTranscriptOnTrustedPagesOnly() {
+        val script = webCaptionTrackSyncScript(CaptionTrackTarget("abcdefghijk", "ja", generated = false))
+
+        assertTrue(script.contains("window.location.protocol !== 'https:'"))
+        assertTrue(script.contains("currentHost.endsWith('.youtube.com')"))
+        assertTrue(script.contains("""sync.target = {"videoId":"abcdefghijk","languageCode":"ja","generated":false};"""))
+        assertTrue(webCaptionTrackSyncScript(null).contains("sync.target = null;"))
+        assertTrue(script.contains("player.setOption('captions', 'track', sync.optionTrack(player, wanted))"))
+        assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains(CAPTION_TRACK_SYNC_STATE_KEY))
+        assertTrue(webLiveCaptionConfigurationScript(true).contains("trackSync.choose(player)"))
+    }
+
+    @Test
+    fun captionTrackTargetComesOnlyFromALoadedTranscript() {
+        val loaded =
+            DualSubUiState(activeVideoId = "abcdefghijk", resolvedSourceLanguage = "ja", generatedCaptions = true)
+
+        assertEquals(CaptionTrackTarget("abcdefghijk", "ja", generated = true), captionTrackTarget(loaded))
+        assertNull(captionTrackTarget(loaded.copy(resolvedSourceLanguage = null)))
+        assertNull(captionTrackTarget(loaded.copy(activeVideoId = null)))
+        assertNull(captionTrackTarget(loaded.copy(liveFallback = true)))
+    }
+
+    @Test
     fun captionScriptsDoNotReplaceYouTubePlaybackSettings() {
         val scripts = listOf(
             WEB_PLAYBACK_SNAPSHOT_SCRIPT,
             webLiveCaptionConfigurationScript(true),
             webLiveCaptionConfigurationScript(false),
+            webCaptionTrackSyncScript(CaptionTrackTarget("abcdefghijk", "ja", generated = false)),
             webCaptionVisibilityScript(true),
             webCaptionVisibilityScript(false),
         )

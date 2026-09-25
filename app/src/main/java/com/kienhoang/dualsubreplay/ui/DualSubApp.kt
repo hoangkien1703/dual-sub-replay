@@ -347,6 +347,7 @@ private fun DualSubExperience(
                         onPlaybackPaused = onPlaybackPaused,
                         liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
                         suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
+                        captionTrackTarget = captionTrackTarget(state),
                         fullscreenOverlay = fullscreenLearningOverlay,
                         modifier =
                             Modifier
