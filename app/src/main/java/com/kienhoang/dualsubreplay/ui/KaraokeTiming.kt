@@ -57,11 +57,12 @@ internal data class CaptionHighlightPosition(
  *
  * YouTube often reveals several auto-caption words in one update. The live position then marks
  * only the newest word, so inside that revealed range the timestamp word decides; outside it the
- * live range bounds the result. When live progress keeps reporting an earlier word of the same
- * sentence for [HIGHLIGHT_BACKWARD_CORRECTION_MS] of playback, it is accepted, so a wrong live match
- * (a repeated "the" or "you") recovers without a seek. The highlight never returns to an earlier
- * sentence without a seek: live captions briefly disappear between lines, and the timestamp
- * fallback can still point at the previous sentence then.
+ * live range bounds the result. When live progress and the timestamps both keep reporting an
+ * earlier word of the same sentence for [HIGHLIGHT_BACKWARD_CORRECTION_MS] of playback, it is
+ * accepted, so a wrong live match (a repeated "the" or "you") recovers without a seek. Live progress
+ * alone never moves the highlight back: after a reset it restarts at the first word of YouTube's
+ * line. The highlight never returns to an earlier sentence without a seek: live captions briefly
+ * disappear between lines, and the timestamp fallback can still point at the previous sentence then.
  */
 internal class CaptionHighlightResolver {
     private var lastPosition: CaptionHighlightPosition? = null
@@ -70,6 +71,13 @@ internal class CaptionHighlightResolver {
     fun reset() {
         lastPosition = null
         behindSinceMs = null
+    }
+
+    /** The playback window dropped [delta] rows from its start; keep holding the same row. */
+    fun shift(delta: Int) {
+        val held = lastPosition ?: return
+        val segmentIndex = held.segmentIndex - delta
+        if (segmentIndex < 0) reset() else lastPosition = held.copy(segmentIndex = segmentIndex)
     }
 
     fun resolve(
@@ -92,7 +100,13 @@ internal class CaptionHighlightResolver {
             (if (fromLive) liveBoundedPosition(checkNotNull(livePosition), timedPosition) else timedPosition)
                 ?: return null
         val held = lastPosition
-        val correctable = fromLive && held != null && selected.segmentIndex == held.segmentIndex
+        // Live progress restarts at word 0 after a reset; only go back when the timestamps agree.
+        val timedAgrees =
+            held != null &&
+                timedPosition != null &&
+                timedPosition.segmentIndex == held.segmentIndex &&
+                timedPosition.wordIndex in 0 until held.wordIndex
+        val correctable = fromLive && timedAgrees && selected.segmentIndex == held?.segmentIndex
         val resolved =
             when {
                 held == null || selected >= held -> selected
@@ -301,6 +315,13 @@ internal class LiveCaptionTracker {
         coherentRevisionCount = 0
         lastPosition = null
         lastMappedMediaTimeMs = Long.MIN_VALUE
+    }
+
+    /** The playback window dropped [delta] rows from its start; live progress itself is unchanged. */
+    fun shift(delta: Int) {
+        val mapped = lastPosition ?: return
+        val segmentIndex = mapped.segmentIndex - delta
+        if (segmentIndex < 0) reset() else lastPosition = mapped.copy(segmentIndex = segmentIndex)
     }
 
     fun resolve(
