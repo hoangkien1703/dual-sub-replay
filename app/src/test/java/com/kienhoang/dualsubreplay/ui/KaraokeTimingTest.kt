@@ -86,6 +86,61 @@ class KaraokeTimingTest {
     }
 
     @Test
+    fun liveProgressAloneCannotPullTheHighlightBackToTheFirstWord() {
+        // PR #76 phone report: after a reset, live progress restarts at word 0 while the
+        // timestamps are still ahead. Without both signals agreeing, the highlight holds.
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(3, 5), resolver.resolve(true, true, 3, 5, KaraokePosition(3, 5), 10_000))
+        listOf(10_100L, 11_000L, 12_500L, 15_000L).forEach { time ->
+            assertEquals(CaptionHighlightPosition(3, 5), resolver.resolve(true, true, 3, 6, KaraokePosition(3, 0), time))
+        }
+        // Timestamps in the previous row do not count as agreement either.
+        listOf(15_100L, 17_000L).forEach { time ->
+            assertEquals(CaptionHighlightPosition(3, 5), resolver.resolve(true, true, 2, 4, KaraokePosition(3, 0), time))
+        }
+    }
+
+    @Test
+    fun windowShiftKeepsHoldingTheSameRow() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(6, 3), resolver.resolve(true, true, 6, 3, null, 30_000))
+        resolver.shift(2)
+        // Timestamps point at the overlapping previous row (was 5, now 3): the highlight stays.
+        assertEquals(CaptionHighlightPosition(4, 3), resolver.resolve(true, true, 3, 7, null, 30_100))
+        assertEquals(CaptionHighlightPosition(4, 4), resolver.resolve(true, true, 4, 4, null, 30_400))
+    }
+
+    @Test
+    fun windowShiftPastTheHeldRowResets() {
+        val resolver = CaptionHighlightResolver()
+        assertEquals(CaptionHighlightPosition(1, 3), resolver.resolve(false, true, 1, 3, null))
+        resolver.shift(2)
+        assertEquals(CaptionHighlightPosition(0, 0), resolver.resolve(false, true, 0, 0, null))
+    }
+
+    @Test
+    fun liveTrackerShiftKeepsProgressWithoutWarmUp() {
+        val tracker = LiveCaptionTracker()
+        val old = listOf(segment(0, 0, "we start here"), segment(1, 1_200, "you explain it kind now"))
+        tracker.resolve(sample("you explain", 1, 1_600), old, 1, 1_600)
+        assertEquals(KaraokePosition(1, 2), tracker.resolve(sample("you explain it", 2, 2_000), old, 1, 2_000))
+        tracker.shift(1)
+        val slid = old.drop(1)
+        // The next revision is emitted at once, in the shifted window, continuing forward.
+        assertEquals(KaraokePosition(0, 3), tracker.resolve(sample("you explain it kind", 3, 2_400), slid, 0, 2_400))
+    }
+
+    @Test
+    fun windowShiftFindsTheNewFirstRowInThePreviousWindow() {
+        val previous = listOf(segment(10, 0, "a"), segment(11, 1_000, "b"), segment(12, 2_000, "c"))
+        assertEquals(0, windowShift(previous, previous))
+        assertEquals(2, windowShift(previous, listOf(segment(12, 2_000, "c"), segment(13, 3_000, "d"))))
+        assertNull(windowShift(previous, listOf(segment(9, 0, "z"), segment(10, 0, "a"))))
+        assertNull(windowShift(emptyList(), previous))
+        assertNull(windowShift(previous, emptyList()))
+    }
+
+    @Test
     fun highlightNeverReturnsToThePreviousSentenceWithoutASeek() {
         // Phone report: live captions vanish between lines while timestamps still point at the
         // previous sentence. Neither the timestamp fallback nor a stale live match may go back.

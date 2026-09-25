@@ -1156,28 +1156,33 @@ class AppViewModel internal constructor(
         rows: List<SubtitleSegment>,
         preparing: Boolean,
     ) {
-        if (_state.value.segments
-                .firstOrNull()
-                ?.id != rows.firstOrNull()?.id
-        ) {
+        // The window slides forward every few rows during playback. Keep the highlight on the same
+        // row instead of recomputing it from timestamps, which can point at the previous sentence.
+        val shift = windowShift(_state.value.segments, rows)
+        if (shift == null) {
             liveCaptionTracker.reset()
             captionHighlightResolver.reset()
+        } else if (shift > 0) {
+            liveCaptionTracker.shift(shift)
+            captionHighlightResolver.shift(shift)
         }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             val index = activeSubtitleIndex(rows, latestPlaybackSecondMs)
-            // Preserve live karaoke corrections while only a translation changes.
-            val sameWindow = current.segments.firstOrNull()?.id == rows.firstOrNull()?.id
+            val keptIndex =
+                when {
+                    shift == null -> null
+                    current.currentIndex < 0 -> -1
+                    else -> (current.currentIndex - shift).takeIf { it in rows.indices }
+                }
             current.copy(
                 segments = rows,
-                currentIndex = if (sameWindow) current.currentIndex else index,
+                currentIndex = keptIndex ?: index,
                 activeWordIndex =
-                    if (sameWindow) {
-                        current.activeWordIndex
-                    } else if (current.wordHighlightEnabled) {
-                        activeWordIndex(rows, index, latestPlaybackSecondMs)
-                    } else {
-                        -1
+                    when {
+                        keptIndex != null -> current.activeWordIndex
+                        current.wordHighlightEnabled -> activeWordIndex(rows, index, latestPlaybackSecondMs)
+                        else -> -1
                     },
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
                 statusMessage =
