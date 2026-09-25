@@ -6,6 +6,7 @@ import org.json.JSONTokener
 internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 internal const val LIVE_CAPTION_CAPTURE_STATE_KEY = "__dualSubLiveCaptionV1"
 internal const val MAX_LIVE_CAPTION_TEXT_LENGTH = 4_096
+internal const val CAPTION_TRACK_SYNC_STATE_KEY = "__dualSubCaptionTrackV1"
 
 internal data class WebPlaybackSnapshot(
     val url: String,
@@ -51,6 +52,10 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
       }
       const sampledAtEpochMs = Date.now();
       const second = video && Number.isFinite(video.currentTime) ? video.currentTime : null;
+      const trackSync = window['$CAPTION_TRACK_SYNC_STATE_KEY'];
+      if (trackSync && typeof trackSync.run === 'function') {
+        try { trackSync.run(); } catch (_) {}
+      }
       const liveState = window['$LIVE_CAPTION_CAPTURE_STATE_KEY'];
       if (liveState && liveState.enabled) {
         try {
@@ -181,6 +186,12 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             }
           };
           state.availableCaptionTrack = function(player) {
+            // Turn captions on directly in the spoken language rather than YouTube's last one.
+            const trackSync = window['$CAPTION_TRACK_SYNC_STATE_KEY'];
+            try {
+              const choice = trackSync && player && trackSync.choose(player);
+              if (choice) return trackSync.optionTrack(player, choice.track);
+            } catch (_) {}
             try {
               const tracklist = player && player.getOption('captions', 'tracklist');
               if (Array.isArray(tracklist) && tracklist.length) return tracklist[0];
@@ -320,6 +331,135 @@ internal fun webReplayScript(second: Float): String {
         })();
         """.trimIndent()
 }
+
+/** The caption track the app loaded for [videoId]; YouTube's own captions follow the same track. */
+internal data class CaptionTrackTarget(
+    val videoId: String,
+    val languageCode: String,
+    val generated: Boolean,
+)
+
+/**
+ * Keeps YouTube's own caption track in the spoken language. YouTube remembers the last caption
+ * language across videos, so after an English video a Japanese one keeps English captions and the
+ * live word highlight (which reads those captions) stops matching the app's transcript.
+ *
+ * With a [target] for the current video the page shows the app's track; without one (transcript
+ * still loading or unavailable) it applies the provider's rule in JavaScript: the auto-generated
+ * track's language, then the audio track's language; creator captions beat auto-generated ones.
+ * Captions that are off stay off, and a language the user picks on the page is not overridden.
+ * [WEB_PLAYBACK_SNAPSHOT_SCRIPT] calls `run()` on every poll so late-loading tracks are handled.
+ */
+internal fun webCaptionTrackSyncScript(target: CaptionTrackTarget?): String {
+    // Fixed key order (Android's JSONObject keeps insertion order, the JVM's does not).
+    val targetLiteral =
+        target?.let {
+            "{\"videoId\":${JSONObject.quote(it.videoId)},\"languageCode\":${JSONObject.quote(it.languageCode)}," +
+                "\"generated\":${it.generated}}"
+        } ?: "null"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          const key = '$CAPTION_TRACK_SYNC_STATE_KEY';
+          const sync = window[key] || (window[key] = { key: null, matched: false, attempts: 0 });
+          sync.target = $targetLiteral;
+          $CAPTION_TRACK_SYNC_FUNCTIONS
+          sync.run();
+          return true;
+        })();
+        """.trimIndent()
+}
+
+/** `sync.*` helpers for [webCaptionTrackSyncScript]; `sync.run()` is also called by every snapshot poll. */
+private val CAPTION_TRACK_SYNC_FUNCTIONS =
+    """
+    sync.trustedOrigin = function() {
+      const currentHost = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      return window.location.protocol === 'https:' &&
+        (currentHost === 'youtube.com' || currentHost.endsWith('.youtube.com'));
+    };
+    sync.player = function() {
+      const player = document.getElementById('movie_player');
+      return player && typeof player.getOption === 'function' &&
+        typeof player.setOption === 'function' ? player : null;
+    };
+    sync.base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+    sync.isGenerated = function(track) {
+      return !!track && (track.kind === 'asr' || String(track.vssId || track.vss_id || '').indexOf('a.') === 0);
+    };
+    sync.spokenLanguage = function(renderer, tracks) {
+      const audioTracks = Array.isArray(renderer.audioTracks) ? renderer.audioTracks : [];
+      const audio = audioTracks[renderer.defaultAudioTrackIndex || 0] || null;
+      const indices = audio && Array.isArray(audio.captionTrackIndices) ? audio.captionTrackIndices : [];
+      const generated = indices.map(function(index) { return tracks[index]; }).find(sync.isGenerated) ||
+        tracks.find(sync.isGenerated);
+      if (generated) return sync.base(generated.languageCode);
+      const audioLanguage = audio && audio.audioTrackId ? sync.base(String(audio.audioTrackId).split('.')[0]) : '';
+      if (audioLanguage) return audioLanguage;
+      const fallback = audio ? tracks[audio.defaultCaptionTrackIndex] : null;
+      return fallback ? sync.base(fallback.languageCode) : '';
+    };
+    sync.choose = function(player) {
+      let response = null;
+      try { response = player.getPlayerResponse ? player.getPlayerResponse() : null; } catch (_) {}
+      const renderer = response && response.captions && response.captions.playerCaptionsTracklistRenderer;
+      const tracks = renderer && Array.isArray(renderer.captionTracks) ? renderer.captionTracks.filter(Boolean) : [];
+      const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
+      if (!tracks.length || !videoId) return null;
+      const target = sync.target && sync.target.videoId === videoId ? sync.target : null;
+      const language = target ? target.languageCode : sync.spokenLanguage(renderer, tracks);
+      if (!language) return null;
+      const generated = target ? target.generated : false;
+      const same = tracks.filter(function(track) { return sync.base(track.languageCode) === sync.base(language); });
+      const track = same.find(function(item) { return item.languageCode === language && sync.isGenerated(item) === generated; }) ||
+        same.find(function(item) { return sync.isGenerated(item) === generated; }) ||
+        same.find(function(item) { return !sync.isGenerated(item); }) || same[0];
+      return track ? { videoId: videoId, track: track } : null;
+    };
+    sync.optionTrack = function(player, track) {
+      try {
+        const list = player.getOption('captions', 'tracklist', { includeAsr: true });
+        const match = Array.isArray(list) && list.find(function(item) {
+          return item && item.languageCode === track.languageCode && sync.isGenerated(item) === sync.isGenerated(track);
+        });
+        if (match) return match;
+      } catch (_) {}
+      return track;
+    };
+    sync.run = function() {
+      if (!sync.trustedOrigin()) return 'untrusted';
+      const player = sync.player();
+      if (!player) return 'pending';
+      const choice = sync.choose(player);
+      if (!choice) return 'none';
+      let active = null;
+      try { active = player.getOption('captions', 'track'); } catch (_) {}
+      if (!active || typeof active !== 'object' || !Object.keys(active).length) return 'off';
+      const wanted = choice.track;
+      const choiceKey = choice.videoId + '|' + wanted.languageCode + '|' + sync.isGenerated(wanted);
+      if (!active.translationLanguage && active.languageCode === wanted.languageCode &&
+          sync.isGenerated(active) === sync.isGenerated(wanted)) {
+        sync.key = choiceKey;
+        sync.matched = true;
+        return 'matched';
+      }
+      // Once the page showed our choice, a different track is the user's own pick.
+      if (sync.key === choiceKey && (sync.matched || sync.attempts >= 5)) return 'kept';
+      if (sync.key !== choiceKey) {
+        sync.key = choiceKey;
+        sync.matched = false;
+        sync.attempts = 0;
+      }
+      sync.attempts += 1;
+      try {
+        if (typeof player.loadModule === 'function') player.loadModule('captions');
+        player.setOption('captions', 'track', sync.optionTrack(player, wanted));
+      } catch (_) {}
+      return 'switched';
+    };
+    """.trim()
 
 /**
  * Hides only YouTube's rendered player captions while our bilingual learning overlay is active.
