@@ -100,3 +100,16 @@ internal fun nextWindowTranslation(
         rows[it].translatedText == null && rows[it].endMs > behind && rows[it].startMs <= request.timeMs
     }
 }
+
+/**
+ * Rows [rows] dropped from the start of [previous] when the playback window slid forward, 0 for the
+ * same window, or null when [rows] does not start inside [previous] (a seek, a reload, the first window).
+ * Row ids are store indices, so equal ids are the same row in both windows.
+ */
+internal fun windowShift(
+    previous: List<SubtitleSegment>,
+    rows: List<SubtitleSegment>,
+): Int? {
+    val firstId = rows.firstOrNull()?.id ?: return null
+    return previous.indexOfFirst { it.id == firstId }.takeIf { it >= 0 }
+}
