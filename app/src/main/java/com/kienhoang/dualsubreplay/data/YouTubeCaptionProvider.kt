@@ -288,6 +288,55 @@ internal fun captionCandidateUrls(baseUrl: String): List<HttpUrl> {
     ).distinct()
 }
 
+internal fun isGeneratedTrack(track: JSONObject): Boolean =
+    track.optString("kind") == "asr" || track.optString("vssId").startsWith("a.")
+
+private fun baseLanguage(track: JSONObject): String =
+    track.optString("languageCode").substringBefore('-').lowercase()
+
+private fun JSONArray.objects(): List<JSONObject> = (0 until length()).mapNotNull(::optJSONObject)
+
+/**
+ * The language actually spoken in the video. YouTube's speech recognizer only produces an
+ * auto-generated track in the audio's language, so that track is the strongest signal; the
+ * default audio track's default caption is a weaker fallback when auto captions are off.
+ * Creator-uploaded translations (for example Arabic on an English video) never count.
+ */
+internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
+    val tracks = renderer.optJSONArray("captionTracks")?.objects().orEmpty()
+    val audioTracks = renderer.optJSONArray("audioTracks")
+    val defaultAudio = audioTracks?.optJSONObject(renderer.optInt("defaultAudioTrackIndex", 0))
+    val defaultAudioCaptions =
+        defaultAudio?.optJSONArray("captionTrackIndices")?.let { indices ->
+            (0 until indices.length()).mapNotNull { tracks.getOrNull(indices.optInt(it, -1)) }
+        }.orEmpty()
+    val generated =
+        defaultAudioCaptions.firstOrNull(::isGeneratedTrack)
+            ?: tracks.firstOrNull(::isGeneratedTrack)
+            ?: defaultAudio?.optInt("defaultCaptionTrackIndex", -1)?.let(tracks::getOrNull)
+    return generated?.let(::baseLanguage)?.takeIf(String::isNotBlank)
+}
+
+/**
+ * An explicit source-language choice wins, then the spoken language, then any other track.
+ * Within a language a creator-written track beats the auto-generated one.
+ */
+internal fun selectCaptionTrack(
+    renderer: JSONObject,
+    preferredLanguages: List<String>,
+): JSONObject? {
+    val normalized = preferredLanguages.map { it.substringBefore('-').lowercase() }
+    val spoken = spokenCaptionLanguage(renderer)
+    return renderer.optJSONArray("captionTracks")?.objects().orEmpty().maxByOrNull { track ->
+        val language = baseLanguage(track)
+        val preferenceIndex = normalized.indexOf(language)
+        val preferenceScore = if (preferenceIndex >= 0) 1_000 - preferenceIndex * 100 else 0
+        val spokenScore = if (language == spoken) 500 else 0
+        val manualScore = if (isGeneratedTrack(track)) 0 else 20
+        preferenceScore + spokenScore + manualScore
+    }
+}
+
 internal fun readUtf8WithLimit(
     input: InputStream,
     maxBytes: Int = MAX_YOUTUBE_RESPONSE_BYTES,
@@ -553,15 +602,16 @@ class YouTubeCaptionProvider(
             )
         }
 
-        val tracks =
+        val renderer =
             root
                 .optJSONObject("captions")
                 ?.optJSONObject("playerCaptionsTracklistRenderer")
-                ?.optJSONArray("captionTracks")
+        val tracks =
+            renderer?.optJSONArray("captionTracks")
                 ?: throw NoCaptionTracksException(noTracksMessage)
 
         val selected =
-            selectTrack(tracks, preferredLanguages)
+            selectCaptionTrack(renderer, preferredLanguages)
                 ?: throw NoCaptionTracksException("No compatible caption track was found.")
         val cues =
             fetchCaptionCues(
@@ -572,9 +622,7 @@ class YouTubeCaptionProvider(
 
         return CaptionTrackResult(
             languageCode = selected.optString("languageCode", "en"),
-            isGenerated =
-                selected.optString("kind") == "asr" ||
-                    selected.optString("vssId").startsWith("a."),
+            isGenerated = isGeneratedTrack(selected),
             cues = cues,
             availableLanguages = availableLanguages(tracks),
         )
@@ -656,22 +704,6 @@ class YouTubeCaptionProvider(
                 "Last failure: ${lastError?.message ?: "empty caption response"}",
             lastError,
         )
-    }
-
-    private fun selectTrack(
-        tracks: JSONArray,
-        preferredLanguages: List<String>,
-    ): JSONObject? {
-        val normalized = preferredLanguages.map { it.substringBefore('-').lowercase() }
-        return (0 until tracks.length())
-            .mapNotNull { tracks.optJSONObject(it) }
-            .maxByOrNull { track ->
-                val language = track.optString("languageCode").substringBefore('-').lowercase()
-                val preferenceIndex = normalized.indexOf(language)
-                val languageScore = if (preferenceIndex >= 0) 1_000 - preferenceIndex * 100 else 0
-                val manualScore = if (track.optString("kind") == "asr") 0 else 20
-                languageScore + manualScore
-            }
     }
 
     private suspend fun executeText(
