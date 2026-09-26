@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DualSub Replay: Dual Subtitles for YouTube on Android</title>
+  <meta name="description" content="Free, open-source Android app that shows two YouTube subtitle languages at once. Tap any sentence to replay it. On-device translation, no account or API key.">
+  <link rel="canonical" href="https://hoangkien1703.github.io/dual-sub-replay/">
+  <link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/">
+  <link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/">
+  <link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#0b1c20">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DualSub Replay">
+  <meta property="og:title" content="DualSub Replay: Dual Subtitles for YouTube on Android">
+  <meta property="og:description" content="Watch YouTube with original and translated subtitles together, then tap any sentence to replay it. Free and open source.">
+  <meta property="og:url" content="https://hoangkien1703.github.io/dual-sub-replay/">
+  <meta property="og:image" content="https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="DualSub Replay showing original and translated YouTube subtitles on an Android phone">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="vi_VN">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "DualSub Replay",
+    "alternateName": "Dual Sub Replay",
+    "description": "Free, open-source Android app that shows original and translated YouTube subtitles together and replays any sentence with one tap. Translation runs on the device with Google ML Kit.",
+    "url": "https://hoangkien1703.github.io/dual-sub-replay/",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Android 8.0 or newer",
+    "downloadUrl": "https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk",
+    "installUrl": "https://github.com/hoangkien1703/dual-sub-replay/releases/latest",
+    "screenshot": "https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-full-hd.jpg",
+    "image": "https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-social-preview.png",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "license": "https://github.com/hoangkien1703/dual-sub-replay/blob/main/LICENSE",
+    "codeRepository": "https://github.com/hoangkien1703/dual-sub-replay",
+    "inLanguage": ["en", "vi"],
+    "author": { "@type": "Person", "name": "Kien Hoang", "url": "https://github.com/hoangkien1703" },
+    "sameAs": ["https://github.com/hoangkien1703/dual-sub-replay"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is DualSub Replay free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. DualSub Replay is free and open source. There are no ads, subscriptions, accounts, or API keys." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I show two subtitles at once on YouTube for Android?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Install DualSub Replay, open a YouTube video that has captions, and choose the language you want next to the original. The app shows the original caption and its translation together under the video." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work like Language Reactor on Android?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate Android app that gives a similar two-language subtitle view for YouTube, plus tap-to-replay and saved words. It is not affiliated with Language Reactor." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which languages are supported?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Any caption language a YouTube video offers can be the original. Translations can go into 59 languages supported by Google ML Kit, including English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is DualSub Replay on Google Play?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Not yet. Download the official APK from the GitHub releases page. Android may ask you to allow installs from your browser the first time." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does translation send my subtitles to a server?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. Google ML Kit downloads the language model once, then translation runs on your phone. The project runs no server and collects no analytics." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="wrap topbar">
+    <a class="brand" href="./"><img src="favicon.svg" alt="" width="32" height="32">DualSub Replay</a>
+    <nav aria-label="Main">
+      <a class="optional" href="#features">Features</a>
+      <a class="optional" href="#faq">FAQ</a>
+      <a href="vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+      <a href="https://github.com/hoangkien1703/dual-sub-replay">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div>
+        <h1>Dual subtitles for YouTube. <span>Replay any sentence.</span></h1>
+        <p class="lead">DualSub Replay is a free, open-source Android app for learning languages with YouTube. See the original captions and a translation together, then tap any line to hear it again.</p>
+        <div class="cta">
+          <a class="button primary" href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">Download the APK</a>
+          <a class="button" href="https://github.com/hoangkien1703/dual-sub-replay">★ Star on GitHub</a>
+        </div>
+        <p class="fineprint">Android 8.0 or newer. No account, no ads, no API key.</p>
+      </div>
+      <img class="phone" src="images/dualsub-replay-preview.webp" width="560" height="1180" alt="DualSub Replay on an Android phone: a YouTube video on top and English subtitles with Vietnamese translations below, each with a replay button">
+    </div>
+
+    <section id="features">
+      <div class="wrap">
+        <h2>Learn from real YouTube videos, one sentence at a time</h2>
+        <p>Pick any captioned video, choose your language, and study it the way you would with a textbook dialogue.</p>
+        <div class="grid">
+          <div class="card">
+            <h3>Two subtitle languages at once</h3>
+            <p>Original captions and their translation sit together, so you never lose the meaning while listening.</p>
+          </div>
+          <div class="card">
+            <h3>Tap to replay</h3>
+            <p>Tap a subtitle paragraph and the video jumps back to that sentence. No scrubbing.</p>
+          </div>
+          <div class="card">
+            <h3>On-device translation</h3>
+            <p>Google ML Kit translates on your phone. Nothing you watch is sent to a project server.</p>
+          </div>
+          <div class="card">
+            <h3>Word-by-word highlight</h3>
+            <p>On auto-generated captions, the current spoken word lights up so you can follow along.</p>
+          </div>
+          <div class="card">
+            <h3>Save words and practice</h3>
+            <p>Tap a word to hear it and save it with its sentence. Review with spaced repetition or export to Anki.</p>
+          </div>
+          <div class="card">
+            <h3>The YouTube you know</h3>
+            <p>Search, Shorts, comments and recommendations stay as they are. Share any YouTube link to the app to open it.</p>
+          </div>
+        </div>
+        <img class="shot" src="images/dualsub-replay-full-hd.jpg" width="1920" height="1080" loading="lazy" alt="Landscape interview video with English subtitles and a Vietnamese translation shown below them">
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2>How to watch YouTube with dual subtitles on Android</h2>
+        <ol class="steps">
+          <li>Download <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">DualSub-Replay.apk</a> and open it. If Android asks, allow your browser to install unknown apps.</li>
+          <li>Open DualSub Replay, pick your language, and search YouTube as usual.</li>
+          <li>Choose a video with captions. The original and translated subtitles appear under the video, or beside it in landscape.</li>
+          <li>Tap any subtitle paragraph to replay that sentence. Swipe the panel away to see comments and other videos.</li>
+        </ol>
+        <img class="shot" src="images/dualsub-replay-landscape.png" width="1054" height="502" loading="lazy" alt="Landscape mode with the YouTube video on the left and replayable Japanese and English subtitles on the right">
+      </div>
+    </section>
+
+    <section id="languages">
+      <div class="wrap">
+        <h2>Learn English, Japanese, Korean, Spanish, Chinese and 50+ more</h2>
+        <p>The original can be any caption language a video offers, including auto-generated captions. Translations go into these 59 languages:</p>
+        <ul class="langs">
+          <li>Afrikaans</li>
+          <li>Albanian</li>
+          <li>Arabic</li>
+          <li>Belarusian</li>
+          <li>Bengali</li>
+          <li>Bulgarian</li>
+          <li>Catalan</li>
+          <li>Chinese</li>
+          <li>Croatian</li>
+          <li>Czech</li>
+          <li>Danish</li>
+          <li>Dutch</li>
+          <li>English</li>
+          <li>Esperanto</li>
+          <li>Estonian</li>
+          <li>Finnish</li>
+          <li>French</li>
+          <li>Galician</li>
+          <li>Georgian</li>
+          <li>German</li>
+          <li>Greek</li>
+          <li>Gujarati</li>
+          <li>Haitian</li>
+          <li>Hebrew</li>
+          <li>Hindi</li>
+          <li>Hungarian</li>
+          <li>Icelandic</li>
+          <li>Indonesian</li>
+          <li>Irish</li>
+          <li>Italian</li>
+          <li>Japanese</li>
+          <li>Kannada</li>
+          <li>Korean</li>
+          <li>Latvian</li>
+          <li>Lithuanian</li>
+          <li>Macedonian</li>
+          <li>Malay</li>
+          <li>Maltese</li>
+          <li>Marathi</li>
+          <li>Norwegian</li>
+          <li>Persian</li>
+          <li>Polish</li>
+          <li>Portuguese</li>
+          <li>Romanian</li>
+          <li>Russian</li>
+          <li>Slovak</li>
+          <li>Slovenian</li>
+          <li>Spanish</li>
+          <li>Swahili</li>
+          <li>Swedish</li>
+          <li>Tagalog</li>
+          <li>Tamil</li>
+          <li>Telugu</li>
+          <li>Thai</li>
+          <li>Turkish</li>
+          <li>Ukrainian</li>
+          <li>Urdu</li>
+          <li>Vietnamese</li>
+          <li>Welsh</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <h2>Frequently asked questions</h2>
+        <details>
+          <summary>Is DualSub Replay free?</summary>
+          <p>Yes. DualSub Replay is free and open source. There are no ads, subscriptions, accounts, or API keys.</p>
+        </details>
+        <details>
+          <summary>How do I show two subtitles at once on YouTube for Android?</summary>
+          <p>Install DualSub Replay, open a YouTube video that has captions, and choose the language you want next to the original. The app shows the original caption and its translation together under the video.</p>
+        </details>
+        <details>
+          <summary>Does it work like Language Reactor on Android?</summary>
+          <p>Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate Android app that gives a similar two-language subtitle view for YouTube, plus tap-to-replay and saved words. It is not affiliated with Language Reactor.</p>
+        </details>
+        <details>
+          <summary>Which languages are supported?</summary>
+          <p>Any caption language a YouTube video offers can be the original. Translations can go into 59 languages supported by Google ML Kit, including English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese.</p>
+        </details>
+        <details>
+          <summary>Is DualSub Replay on Google Play?</summary>
+          <p>Not yet. Download the official APK from the GitHub releases page. Android may ask you to allow installs from your browser the first time.</p>
+        </details>
+        <details>
+          <summary>Does translation send my subtitles to a server?</summary>
+          <p>No. Google ML Kit downloads the language model once, then translation runs on your phone. The project runs no server and collects no analytics.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="download">
+      <div class="wrap">
+        <h2>Start learning with YouTube today</h2>
+        <p>If DualSub Replay helps you, a star on GitHub helps other learners find it.</p>
+        <div class="cta">
+          <a class="button primary" href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">Download the APK</a>
+          <a class="button" href="https://github.com/hoangkien1703/dual-sub-replay">★ Star on GitHub</a>
+          <a class="button" href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest">Release notes</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>DualSub Replay is open source under the MIT license. <a href="https://github.com/hoangkien1703/dual-sub-replay/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/hoangkien1703/dual-sub-replay/issues">Report a problem</a></p>
+      <p>Not affiliated with YouTube, Google, or Language Reactor. Caption retrieval uses YouTube's public web pages and may break when YouTube changes them.</p>
+    </div>
+  </footer>
+</body>
+</html>
