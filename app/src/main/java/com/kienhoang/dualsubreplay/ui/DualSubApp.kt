@@ -243,6 +243,8 @@ private fun DualSubExperience(
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
+    // Gear icons on the player open a small languages popup; the sidebar opens the full page.
+    var showQuickSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val layoutPreferences =
@@ -287,7 +289,7 @@ private fun DualSubExperience(
     val liveCaptionCaptureEnabled = shouldCaptureCaptionsForPresentation(state, effectivePlayerMode)
 
     LaunchedEffect(externalSettingsRequestId) {
-        if (externalSettingsRequestId > 0L) showSettings = true
+        if (externalSettingsRequestId > 0L) showQuickSettings = true
     }
 
     AppNavigation(onPractice = onVocabulary, onSettings = {
@@ -352,7 +354,7 @@ private fun DualSubExperience(
                                     .fillMaxHeight()
                                     .testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
-                            onSettings = { showSettings = true },
+                            onSettings = { showQuickSettings = true },
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -368,7 +370,7 @@ private fun DualSubExperience(
                             state = state,
                             modifier = panelModifier.testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
-                            onSettings = { showSettings = true },
+                            onSettings = { showQuickSettings = true },
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -403,6 +405,20 @@ private fun DualSubExperience(
                 }
             }
         }
+    }
+    if (showQuickSettings) {
+        QuickLanguageSettingsDialog(
+            sourcePreference = state.sourcePreference,
+            targetLanguage = state.targetLanguage,
+            availableSourceLanguages = state.availableSourceLanguages,
+            onSourceChange = onSourceChange,
+            onTargetChange = onTargetChange,
+            onOpenAllSettings = {
+                showQuickSettings = false
+                showSettings = true
+            },
+            onDismiss = { showQuickSettings = false },
+        )
     }
     if (showSettings) {
         SubtitleSettingsDialog(

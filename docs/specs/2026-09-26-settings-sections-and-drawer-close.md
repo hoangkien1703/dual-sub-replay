@@ -97,6 +97,8 @@ screenshots show:
 - [ ] Every control previously behind "More settings" is reachable in its section, and reset still
   works (`LearningPlayerUiTest.unifiedSubtitleSettingsOffersViewAndOverlayBehavior`).
 - [ ] Language pickers and "Done" still work (`SubtitleUiTest.settingsKeepsLanguageAndTextOptionsWithoutFocus`).
+- [ ] The player gear popup shows only languages and opens the full page
+  (`SubtitleUiTest.gearPopupShowsOnlyLanguagesAndOpensFullSettings`).
 - [x] ktlint format ratchet and detekt pass.
 - [ ] Final-head CI `verify-build` and `managed-device-tests` pass.
 - [ ] Owner phone check: sidebar "x", each settings section, subtitle header text, and smooth
@@ -125,9 +127,30 @@ screenshots show:
 `release:patch`: the project default. The owner may prefer `release:minor` because the settings
 layout changes visibly, but that was not requested.
 
+## Follow-up after the owner's phone check
+
+The owner asked that the gear on the player open only the languages, as a small popup with the
+video still visible behind it, with a "Dual-subtitle settings" option that leads to the full page.
+
+- `QuickLanguageSettingsDialog` is an `AlertDialog` with the original and target language pickers
+  and a "Dual-subtitle settings" row (`open_all_settings`) that opens the full-screen page.
+- The gears on the portrait panel, the landscape side panel and the compact overlay open the popup.
+  The sidebar "Settings" item and the collapsed CC button (when both caption lines are hidden) still
+  open the full page.
+- The popup and the full page share `LanguagePickerState`, `sourceLanguageChoices`,
+  `sourceLanguageLabel` and `LanguagePickerButtons`, so language picking behaves the same in both.
+- Test: `SubtitleUiTest.gearPopupShowsOnlyLanguagesAndOpensFullSettings`.
+
+The owner also saw two Google "Is it you?" prompts during sign-in, and the second one said "This
+prompt has expired". The WebView code loads each sign-in page once: `handleMainFrameUrl` only
+records state and returns `false` for Google hosts, and the only `loadUrl` in the sign-in path runs
+after the YouTube session cookies appear, which is after the prompt was answered. Google sends that
+prompt to every phone or tablet signed in to the account, and marks the others "expired" once one
+is answered. No app change was made for it. The owner was asked whether another device is signed in.
+
 ## Implementation result
 
-Implemented as planned.
+Implemented as planned, plus the follow-up above.
 
 ## Validation result
 

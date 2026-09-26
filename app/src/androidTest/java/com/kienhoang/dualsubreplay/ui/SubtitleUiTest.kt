@@ -63,6 +63,39 @@ class SubtitleUiTest {
     }
 
     @Test
+    fun gearPopupShowsOnlyLanguagesAndOpensFullSettings() {
+        var selectedTarget: String? = null
+        var openedAllSettings = false
+        var dismissed = false
+        composeRule.setContent {
+            DualSubTheme {
+                QuickLanguageSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    onSourceChange = {},
+                    onTargetChange = { selectedTarget = it },
+                    onOpenAllSettings = { openedAllSettings = true },
+                    onDismiss = { dismissed = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Subtitle languages").assertIsDisplayed()
+        composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
+        composeRule.onNodeWithText("Text size: 100%").assertDoesNotExist()
+        composeRule.onNodeWithTag("target_language_picker").performClick()
+        composeRule.onNodeWithTag("language_search").performTextInput("English")
+        composeRule.onNodeWithTag("language_option_target_en").performClick()
+        composeRule.runOnIdle { assertEquals("en", selectedTarget) }
+        composeRule.onNodeWithText("Subtitle languages").assertIsDisplayed()
+        composeRule.onNodeWithTag("open_all_settings").performClick()
+        composeRule.runOnIdle { assertTrue(openedAllSettings) }
+        composeRule.onNodeWithText("Done").performClick()
+        composeRule.runOnIdle { assertTrue(dismissed) }
+    }
+
+    @Test
     fun webPageErrorOffersReload() {
         var reloaded = false
         composeRule.setContent {

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExpandLess
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewDay
@@ -90,7 +92,167 @@ internal fun toggleMoreSettingsSection(
     tapped: MoreSettingsSection,
 ): MoreSettingsSection? = if (open == tapped) null else tapped
 
-private enum class LanguagePickerMode { SOURCE, TARGET }
+internal enum class LanguagePickerMode { SOURCE, TARGET }
+
+/** Which language list is open, shared by the full settings page and the quick languages popup. */
+internal class LanguagePickerState {
+    var mode by mutableStateOf<LanguagePickerMode?>(null)
+        private set
+    var query by mutableStateOf("")
+
+    fun open(mode: LanguagePickerMode) {
+        this.mode = mode
+        query = ""
+    }
+
+    fun close() {
+        mode = null
+        query = ""
+    }
+}
+
+internal fun sourceLanguageChoices(availableSourceLanguages: List<CaptionLanguage>): List<LanguageChoice> =
+    listOf(LanguageChoice("auto", "Auto (recommended)")) +
+        availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
+
+internal fun sourceLanguageLabel(
+    sourcePreference: String,
+    sourceChoices: List<LanguageChoice>,
+): String =
+    if (sourcePreference == "auto") {
+        "Auto (recommended)"
+    } else {
+        sourceChoices
+            .firstOrNull {
+                TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
+            }?.label ?: TranslationLanguages.displayName(sourcePreference)
+    }
+
+/**
+ * Shows the language list while one is open and returns true, so the caller can hide its own
+ * dialog until a language is picked.
+ */
+@Composable
+private fun showLanguagePickerIfOpen(
+    picker: LanguagePickerState,
+    sourcePreference: String,
+    targetLanguage: String,
+    sourceChoices: List<LanguageChoice>,
+    onSourceChange: (String) -> Unit,
+    onTargetChange: (String) -> Unit,
+): Boolean {
+    val mode = picker.mode ?: return false
+    val source = mode == LanguagePickerMode.SOURCE
+    LanguagePickerDialog(
+        title = if (source) "Original caption language" else "Translate to",
+        choices = if (source) sourceChoices else TranslationLanguages.all.map { LanguageChoice(it.code, it.name) },
+        selectedCode = if (source) sourcePreference else targetLanguage,
+        searchQuery = picker.query,
+        onSearchQueryChange = { picker.query = it },
+        onChoice = { choice ->
+            if (source) onSourceChange(choice.code) else onTargetChange(choice.code)
+            picker.close()
+        },
+        onDismiss = picker::close,
+        testTagPrefix = mode.name.lowercase(),
+    )
+    return true
+}
+
+@Composable
+private fun LanguagePickerButtons(
+    sourceLabel: String,
+    targetLanguage: String,
+    onPick: (LanguagePickerMode) -> Unit,
+) {
+    Text("Original language")
+    Spacer(Modifier.height(6.dp))
+    OutlinedButton(
+        onClick = { onPick(LanguagePickerMode.SOURCE) },
+        modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
+    ) {
+        Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+    Spacer(Modifier.height(12.dp))
+    Text("Translate to")
+    Spacer(Modifier.height(6.dp))
+    OutlinedButton(
+        onClick = { onPick(LanguagePickerMode.TARGET) },
+        modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
+    ) {
+        Text(TranslationLanguages.displayName(targetLanguage))
+    }
+    SettingsHint("A language model downloads only when it is needed.")
+}
+
+/**
+ * The subtitle panel's gear opens this small popup with only the languages, over the video.
+ * "Dual-subtitle settings" leads to the full settings page.
+ */
+@Composable
+internal fun QuickLanguageSettingsDialog(
+    sourcePreference: String,
+    targetLanguage: String,
+    availableSourceLanguages: List<CaptionLanguage>,
+    onSourceChange: (String) -> Unit,
+    onTargetChange: (String) -> Unit,
+    onOpenAllSettings: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val languagePicker = remember { LanguagePickerState() }
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages)
+    val pickerOpen =
+        showLanguagePickerIfOpen(
+            picker = languagePicker,
+            sourcePreference = sourcePreference,
+            targetLanguage = targetLanguage,
+            sourceChoices = sourceChoices,
+            onSourceChange = onSourceChange,
+            onTargetChange = onTargetChange,
+        )
+    if (pickerOpen) return
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.Language, contentDescription = null) },
+        title = { Text("Subtitle languages") },
+        text = {
+            Column(Modifier.testTag("quick_language_settings")) {
+                LanguagePickerButtons(
+                    sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices),
+                    targetLanguage = targetLanguage,
+                    onPick = languagePicker::open,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable(role = Role.Button, onClick = onOpenAllSettings)
+                            .testTag("open_all_settings")
+                            .padding(vertical = 10.dp, horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Dual-subtitle settings", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "Text size, view, colors, overlay and more",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+    )
+}
 
 @Composable
 @Suppress("LongMethod")
@@ -140,56 +302,21 @@ internal fun SubtitleSettingsDialog(
     onAutoPronounceChange: (Boolean) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
-    var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
-    var searchQuery by remember { mutableStateOf("") }
+    val languagePicker = remember { LanguagePickerState() }
     var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     var showResetConfirmation by remember { mutableStateOf(false) }
-    val sourceChoices =
-        listOf(LanguageChoice("auto", "Auto (recommended)")) +
-            availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
-    val targetChoices = TranslationLanguages.all.map { LanguageChoice(it.code, it.name) }
-
-    val activePicker = pickerMode
-    if (activePicker != null) {
-        val choices = if (activePicker == LanguagePickerMode.SOURCE) sourceChoices else targetChoices
-        LanguagePickerDialog(
-            title =
-                if (activePicker == LanguagePickerMode.SOURCE) {
-                    "Original caption language"
-                } else {
-                    "Translate to"
-                },
-            choices = choices,
-            selectedCode = if (activePicker == LanguagePickerMode.SOURCE) sourcePreference else targetLanguage,
-            searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it },
-            onChoice = { choice ->
-                if (activePicker == LanguagePickerMode.SOURCE) {
-                    onSourceChange(choice.code)
-                } else {
-                    onTargetChange(choice.code)
-                }
-                pickerMode = null
-                searchQuery = ""
-            },
-            onDismiss = {
-                pickerMode = null
-                searchQuery = ""
-            },
-            testTagPrefix = activePicker.name.lowercase(),
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages)
+    val pickerOpen =
+        showLanguagePickerIfOpen(
+            picker = languagePicker,
+            sourcePreference = sourcePreference,
+            targetLanguage = targetLanguage,
+            sourceChoices = sourceChoices,
+            onSourceChange = onSourceChange,
+            onTargetChange = onTargetChange,
         )
-        return
-    }
-
-    val sourceLabel =
-        if (sourcePreference == "auto") {
-            "Auto (recommended)"
-        } else {
-            sourceChoices
-                .firstOrNull {
-                    TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
-                }?.label ?: TranslationLanguages.displayName(sourcePreference)
-        }
+    if (pickerOpen) return
+    val sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices)
 
     @Composable
     fun Section(
@@ -226,30 +353,7 @@ internal fun SubtitleSettingsDialog(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SettingsGroupCard(title = "Languages", icon = Icons.Default.Language) {
-                        Text("Original language")
-                        Spacer(Modifier.height(6.dp))
-                        OutlinedButton(
-                            onClick = {
-                                pickerMode = LanguagePickerMode.SOURCE
-                                searchQuery = ""
-                            },
-                            modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
-                        ) {
-                            Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        Text("Translate to")
-                        Spacer(Modifier.height(6.dp))
-                        OutlinedButton(
-                            onClick = {
-                                pickerMode = LanguagePickerMode.TARGET
-                                searchQuery = ""
-                            },
-                            modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
-                        ) {
-                            Text(TranslationLanguages.displayName(targetLanguage))
-                        }
-                        SettingsHint("A language model downloads only when it is needed.")
+                        LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
                     }
 
                     SettingsGroupCard(title = "Reading", icon = Icons.Default.TextFields) {
