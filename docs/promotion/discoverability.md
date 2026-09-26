@@ -25,7 +25,9 @@ https://hoangkien1703.github.io/dual-sub-replay/vi/ (Vietnamese).
    website URL, choose the **HTML tag** method, and copy only the `content` value.
    Save it as the repository variable `GOOGLE_SITE_VERIFICATION` (Settings → Secrets
    and variables → Actions → Variables), re-run Publish website, then press Verify.
-   Submit `sitemap.xml` and request indexing for both pages. Bing Webmaster Tools can
+   Submit `sitemap.xml` and request indexing for both pages. (Done 2026-09-26 with the
+   HTML file method instead: `site/googlea6eec9334d18b877.html`. Keep that file, or
+   Search Console loses verification.) Bing Webmaster Tools can
    import the verified site from Search Console.
 5. **Earn links from places learners already look.** Each is a backlink that helps
    ranking and a direct source of users and stars:
