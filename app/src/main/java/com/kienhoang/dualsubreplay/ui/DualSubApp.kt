@@ -1,13 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -34,37 +30,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ClosedCaption
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.WordTap
-import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -79,7 +61,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -90,17 +71,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
-import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
@@ -268,6 +243,8 @@ private fun DualSubExperience(
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
+    // Gear icons on the player open a small languages popup; the sidebar opens the full page.
+    var showQuickSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val layoutPreferences =
@@ -312,7 +289,7 @@ private fun DualSubExperience(
     val liveCaptionCaptureEnabled = shouldCaptureCaptionsForPresentation(state, effectivePlayerMode)
 
     LaunchedEffect(externalSettingsRequestId) {
-        if (externalSettingsRequestId > 0L) showSettings = true
+        if (externalSettingsRequestId > 0L) showQuickSettings = true
     }
 
     AppNavigation(onPractice = onVocabulary, onSettings = {
@@ -377,7 +354,7 @@ private fun DualSubExperience(
                                     .fillMaxHeight()
                                     .testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
-                            onSettings = { showSettings = true },
+                            onSettings = { showQuickSettings = true },
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -393,7 +370,7 @@ private fun DualSubExperience(
                             state = state,
                             modifier = panelModifier.testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
-                            onSettings = { showSettings = true },
+                            onSettings = { showQuickSettings = true },
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -428,6 +405,20 @@ private fun DualSubExperience(
                 }
             }
         }
+    }
+    if (showQuickSettings) {
+        QuickLanguageSettingsDialog(
+            sourcePreference = state.sourcePreference,
+            targetLanguage = state.targetLanguage,
+            availableSourceLanguages = state.availableSourceLanguages,
+            onSourceChange = onSourceChange,
+            onTargetChange = onTargetChange,
+            onOpenAllSettings = {
+                showQuickSettings = false
+                showSettings = true
+            },
+            onDismiss = { showQuickSettings = false },
+        )
     }
     if (showSettings) {
         SubtitleSettingsDialog(
@@ -870,6 +861,12 @@ private fun SubtitleTimeline(
         }
     }
 
+    val showOriginal = state.showOriginal()
+    val showTranslation = state.showTranslation()
+    val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
+    val originalColor = effectiveOriginalColor(state)
+    val translatedColor = effectiveTranslatedColor(state)
+    val highlightColor = effectiveHighlightColor(state)
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -877,17 +874,20 @@ private fun SubtitleTimeline(
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         itemsIndexed(state.segments, key = { _, segment -> segment.id }) { index, segment ->
+            val active = index == state.currentIndex
             CompactSubtitleCard(
                 segment = segment,
-                showOriginal = state.showOriginal(),
-                showTranslation = state.showTranslation(),
-                active = index == state.currentIndex,
+                showOriginal = showOriginal,
+                showTranslation = showTranslation,
+                active = active,
                 fontScale = state.fontScale,
                 onReplay = { onReplay(segment) },
-                activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
-                originalColor = effectiveOriginalColor(state),
-                translatedColor = effectiveTranslatedColor(state),
-                highlightColor = effectiveHighlightColor(state),
+                // Only the active row draws the spoken word. Giving the others a constant lets them
+                // skip recomposition each time the highlighted word moves.
+                activeWordIndex = if (active) activeWordIndex else -1,
+                originalColor = originalColor,
+                translatedColor = translatedColor,
+                highlightColor = highlightColor,
                 wordLearningEnabled = state.wordLearningEnabled,
                 wordLearningTarget = state.wordLearningTarget,
                 wordLearningActiveOnly = state.wordLearningActiveOnly,
@@ -952,624 +952,6 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
     }
 }
 
-@Composable
-@Suppress("LongMethod")
-internal fun SubtitleSettingsDialog(
-    sourcePreference: String,
-    targetLanguage: String,
-    availableSourceLanguages: List<CaptionLanguage>,
-    fontScale: Float,
-    portraitPanelOffsetFraction: Float = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
-    onPortraitPanelOffsetFractionChange: (Float) -> Unit = {},
-    onResetPortraitPanelPosition: () -> Unit = {},
-    landscapeSplitEnabled: Boolean,
-    playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-    originalColorKey: String = DEFAULT_ORIGINAL_COLOR_KEY,
-    translatedColorKey: String = DEFAULT_TRANSLATED_COLOR_KEY,
-    highlightColorKey: String = DEFAULT_HIGHLIGHT_COLOR_KEY,
-    wordHighlightEnabled: Boolean = true,
-    customColorsEnabled: Boolean = true,
-    captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
-    lockOverlayToVideo: Boolean = false,
-    onLockOverlayToVideoChange: (Boolean) -> Unit = {},
-    preloadModelsEnabled: Boolean = true,
-    onPreloadModelsChange: (Boolean) -> Unit = {},
-    naturalSubtitlesEnabled: Boolean = true,
-    onNaturalSubtitlesChange: (Boolean) -> Unit = {},
-    wordLearningEnabled: Boolean = true,
-    onWordLearningChange: (Boolean) -> Unit = {},
-    wordLearningTarget: String = "both",
-    onWordLearningTargetChange: (String) -> Unit = {},
-    wordLearningActiveOnly: Boolean = true,
-    onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},
-    tapToLearnEnabled: Boolean = true,
-    onTapToLearnChange: (Boolean) -> Unit = {},
-    onSourceChange: (String) -> Unit,
-    onTargetChange: (String) -> Unit,
-    onFontScaleChange: (Float) -> Unit,
-    onLandscapeSplitChange: (Boolean) -> Unit,
-    onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
-    onOriginalColorChange: (String) -> Unit = {},
-    onTranslatedColorChange: (String) -> Unit = {},
-    onHighlightColorChange: (String) -> Unit = {},
-    onWordHighlightChange: (Boolean) -> Unit = {},
-    onCustomColorsChange: (Boolean) -> Unit = {},
-    onCaptionFormatChange: (CaptionFormat) -> Unit = {},
-    onResetSettings: () -> Unit = {},
-    autoPronounce: Boolean = true,
-    onAutoPronounceChange: (Boolean) -> Unit = {},
-    onDismiss: () -> Unit,
-) {
-    var pickerMode by remember { mutableStateOf<LanguagePickerMode?>(null) }
-    var searchQuery by remember { mutableStateOf("") }
-    var showMoreSettings by remember { mutableStateOf(false) }
-    var showResetConfirmation by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val preferences = remember(context) {
-        context.getSharedPreferences("dual_sub_preferences", 0)
-    }
-    var autoOverlayFullscreen by remember {
-        mutableStateOf(preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true))
-    }
-    var autoOverlayLandscape by remember {
-        mutableStateOf(preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true))
-    }
-    var autoAvoidPlayerControls by remember {
-        mutableStateOf(preferences.getBoolean(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, true))
-    }
-    var rememberOverlayPosition by remember {
-        mutableStateOf(preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true))
-    }
-    var movableSubtitleBox by remember {
-        mutableStateOf(preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true))
-    }
-
-    DisposableEffect(preferences) {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            when (key) {
-                AUTO_OVERLAY_FULLSCREEN_PREFERENCE -> {
-                    autoOverlayFullscreen = sharedPreferences.getBoolean(key, true)
-                }
-                AUTO_OVERLAY_LANDSCAPE_PREFERENCE -> {
-                    autoOverlayLandscape = sharedPreferences.getBoolean(key, true)
-                }
-                AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE -> {
-                    autoAvoidPlayerControls = sharedPreferences.getBoolean(key, true)
-                }
-                REMEMBER_OVERLAY_POSITION_PREFERENCE -> {
-                    rememberOverlayPosition = sharedPreferences.getBoolean(key, true)
-                }
-                MOVABLE_OVERLAY_PREFERENCE -> {
-                    movableSubtitleBox = sharedPreferences.getBoolean(key, true)
-                }
-            }
-        }
-        preferences.registerOnSharedPreferenceChangeListener(listener)
-        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
-    val sourceChoices = listOf(LanguageChoice("auto", "Auto (recommended)")) +
-        availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
-    val targetChoices = TranslationLanguages.all.map { LanguageChoice(it.code, it.name) }
-
-    fun setBooleanPreference(key: String, value: Boolean) {
-        preferences.edit().putBoolean(key, value).apply()
-    }
-
-    val activePicker = pickerMode
-    if (activePicker != null) {
-        val choices = if (activePicker == LanguagePickerMode.SOURCE) sourceChoices else targetChoices
-        LanguagePickerDialog(
-            title = if (activePicker == LanguagePickerMode.SOURCE) {
-                "Original caption language"
-            } else {
-                "Translate to"
-            },
-            choices = choices,
-            selectedCode = if (activePicker == LanguagePickerMode.SOURCE) sourcePreference else targetLanguage,
-            searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it },
-            onChoice = { choice ->
-                if (activePicker == LanguagePickerMode.SOURCE) {
-                    onSourceChange(choice.code)
-                } else {
-                    onTargetChange(choice.code)
-                }
-                pickerMode = null
-                searchQuery = ""
-            },
-            onDismiss = {
-                pickerMode = null
-                searchQuery = ""
-            },
-            testTagPrefix = activePicker.name.lowercase(),
-        )
-    } else {
-        val sourceLabel = if (sourcePreference == "auto") {
-            "Auto (recommended)"
-        } else {
-            sourceChoices.firstOrNull {
-                TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
-            }?.label ?: TranslationLanguages.displayName(sourcePreference)
-        }
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Dual-subtitle settings") },
-            text = {
-                val bodyMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.68f
-                Column(
-                    modifier = Modifier
-                        .heightIn(max = bodyMaxHeight)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    Text("Captions", style = MaterialTheme.typography.titleSmall)
-                    Spacer(Modifier.height(8.dp))
-                    Text("Original language")
-                    Spacer(Modifier.height(6.dp))
-                    OutlinedButton(
-                        onClick = {
-                            pickerMode = LanguagePickerMode.SOURCE
-                            searchQuery = ""
-                        },
-                        modifier = Modifier.fillMaxWidth().testTag("source_language_picker"),
-                    ) {
-                        Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    Text("Translate to")
-                    Spacer(Modifier.height(6.dp))
-                    OutlinedButton(
-                        onClick = {
-                            pickerMode = LanguagePickerMode.TARGET
-                            searchQuery = ""
-                        },
-                        modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
-                    ) {
-                        Text(TranslationLanguages.displayName(targetLanguage))
-                    }
-                    Text(
-                        "A language model downloads only when it is needed.",
-                        modifier = Modifier.padding(top = 6.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Text("Text size: ${(fontScale * 100).toInt()}%")
-                    Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
-
-                    Spacer(Modifier.height(14.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(14.dp))
-                    Text("Appearance", style = MaterialTheme.typography.titleSmall)
-                    CaptionVisibilitySettings()
-                    SettingsSwitchRow(
-                        title = "Highlight spoken words",
-                        description = "Tint the word currently being spoken in the original subtitle so you can follow along in real time.",
-                        checked = wordHighlightEnabled,
-                        onCheckedChange = onWordHighlightChange,
-                        testTag = "word_highlight_switch",
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(14.dp))
-                    Text("Default view", style = MaterialTheme.typography.titleSmall)
-                    PlayerModeSettingsOption(
-                        mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
-                        selectedMode = playerMode,
-                        title = "Transcript panel",
-                        description = "Full dual-subtitle timeline with paragraph replay.",
-                        onModeChange = onPlayerModeChange,
-                    )
-                    HorizontalDivider()
-                    PlayerModeSettingsOption(
-                        mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
-                        selectedMode = playerMode,
-                        title = "Scroll-friendly overlay",
-                        description = "Compact bilingual captions while YouTube stays scrollable for comments and recommendations.",
-                        onModeChange = onPlayerModeChange,
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-                    OutlinedButton(
-                        onClick = { showMoreSettings = !showMoreSettings },
-                        modifier = Modifier.fillMaxWidth().testTag("more_settings_toggle"),
-                    ) {
-                        Text(if (showMoreSettings) "Hide more settings" else "More settings")
-                    }
-
-                    if (showMoreSettings) {
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        PortraitPanelPositionSettings(
-                            offsetFraction = portraitPanelOffsetFraction,
-                            onOffsetFractionChange = onPortraitPanelOffsetFractionChange,
-                            onReset = onResetPortraitPanelPosition,
-                        )
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Word Learning Mode", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow("Pronounce tapped words", "Automatically speak a word when you open its definition.",
-                            autoPronounce, onAutoPronounceChange, "auto_pronounce_switch")
-                        SettingsSwitchRow(
-                            title = "Word learning mode (POS colors)",
-                            description = "Color words by their grammatical role (nouns, verbs, adjectives, particles) to quickly understand sentence structure.",
-                            checked = wordLearningEnabled,
-                            onCheckedChange = onWordLearningChange,
-                            testTag = "word_learning_mode_switch",
-                        )
-                        if (wordLearningEnabled) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                "Colored subtitle lines",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                listOf("original" to "Original", "translation" to "Translation", "both" to "Both").forEach { (targetKey, targetLabel) ->
-                                    FilterChip(
-                                        selected = wordLearningTarget == targetKey,
-                                        onClick = { onWordLearningTargetChange(targetKey) },
-                                        label = { Text(targetLabel) },
-                                    )
-                                }
-                            }
-                            SettingsSwitchRow(
-                                title = "Tap word for definition",
-                                description = "Tap any word in dual subtitles to inspect its reading, part of speech, and instant translation popup.",
-                                checked = tapToLearnEnabled,
-                                onCheckedChange = onTapToLearnChange,
-                                testTag = "tap_to_learn_switch",
-                            )
-                            SettingsSwitchRow(
-                                title = "Highlight active sentence only",
-                                description = "Only apply POS colors to the sentence currently being spoken to keep the transcript clean and focused.",
-                                checked = wordLearningActiveOnly,
-                                onCheckedChange = onWordLearningActiveOnlyChange,
-                                testTag = "word_learning_active_only_switch",
-                            )
-                        }
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        CaptionFormatSettings(captionFormat, onCaptionFormatChange)
-
-                        Spacer(Modifier.height(8.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(8.dp))
-                        Text("Subtitle colors", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Custom subtitle colors",
-                            description = "Apply your chosen text colors below. When off, the default subtitle colors are used.",
-                            checked = customColorsEnabled,
-                            onCheckedChange = onCustomColorsChange,
-                            testTag = "custom_colors_switch",
-                        )
-                        if (customColorsEnabled) {
-                            SubtitleColorSwatchRow(
-                                title = "Original subtitle color",
-                                selectedKey = originalColorKey,
-                                enabled = true,
-                                onColorChange = onOriginalColorChange,
-                                testTagPrefix = "original_color",
-                            )
-                            SubtitleColorSwatchRow(
-                                title = "Translated subtitle color",
-                                selectedKey = translatedColorKey,
-                                enabled = true,
-                                onColorChange = onTranslatedColorChange,
-                                testTagPrefix = "translated_color",
-                            )
-                            SubtitleColorSwatchRow(
-                                title = "Spoken-word highlight",
-                                selectedKey = highlightColorKey,
-                                enabled = wordHighlightEnabled,
-                                onColorChange = onHighlightColorChange,
-                                testTagPrefix = "highlight_color",
-                            )
-                        }
-
-                        Spacer(Modifier.height(8.dp))
-                        AdvancedAppearanceSettings()
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Fullscreen & landscape", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Use overlay in fullscreen",
-                            description = "Show the compact dual-subtitle overlay automatically when YouTube enters fullscreen.",
-                            checked = autoOverlayFullscreen,
-                            onCheckedChange = {
-                                autoOverlayFullscreen = it
-                                setBooleanPreference(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, it)
-                            },
-                            testTag = "auto_overlay_fullscreen_switch",
-                        )
-                        SettingsSwitchRow(
-                            title = "Use overlay when rotated sideways",
-                            description = "Temporarily replace the transcript panel with the compact overlay in landscape.",
-                            checked = autoOverlayLandscape,
-                            onCheckedChange = {
-                                autoOverlayLandscape = it
-                                setBooleanPreference(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, it)
-                            },
-                            testTag = "auto_overlay_landscape_switch",
-                        )
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Overlay", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Movable subtitle controls",
-                            description = "Drag the dual-subtitle overlay or the collapsed CC button to the position you want. The overlay can reach the top edge in fullscreen.",
-                            checked = movableSubtitleBox,
-                            onCheckedChange = {
-                                movableSubtitleBox = it
-                                setBooleanPreference(MOVABLE_OVERLAY_PREFERENCE, it)
-                            },
-                            testTag = "movable_subtitle_box_switch",
-                        )
-                        SettingsSwitchRow(
-                            title = "Lock overlay to video player",
-                            description = "Keep the portrait subtitle overlay strictly within the video player area instead of allowing free movement down across the screen (useful for 16:9 videos).",
-                            checked = lockOverlayToVideo,
-                            onCheckedChange = onLockOverlayToVideoChange,
-                            testTag = "lock_overlay_to_video_switch",
-                        )
-                        SettingsSwitchRow(
-                            title = "Automatically avoid video controls",
-                            description = "Move subtitles upward while YouTube's seek bar and playback controls are visible.",
-                            checked = autoAvoidPlayerControls,
-                            onCheckedChange = {
-                                autoAvoidPlayerControls = it
-                                setBooleanPreference(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, it)
-                            },
-                            testTag = "auto_avoid_player_controls_switch",
-                        )
-                        SettingsSwitchRow(
-                            title = "Remember dragged position",
-                            description = "Save where you drag the subtitle overlay and collapsed CC button and reuse those positions later.",
-                            checked = rememberOverlayPosition,
-                            onCheckedChange = { enabled ->
-                                rememberOverlayPosition = enabled
-                                val editor = preferences.edit()
-                                    .putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, enabled)
-                                if (!enabled) {
-                                    editor
-                                        .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
-                                        .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
-                                        .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
-                                        .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
-                                }
-                                editor.apply()
-                            },
-                            testTag = "remember_overlay_position_switch",
-                        )
-                        Text(
-                            "Drag the subtitle overlay up, down, or sideways. When the transcript is hidden, drag the CC button anywhere too. In portrait, flicking the overlay down closes it.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        OutlinedButton(
-                            onClick = {
-                                preferences.edit()
-                                    .putFloat(
-                                        OVERLAY_VERTICAL_POSITION_PREFERENCE,
-                                        DEFAULT_OVERLAY_VERTICAL_POSITION,
-                                    )
-                                    .putFloat(
-                                        OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
-                                        DEFAULT_OVERLAY_HORIZONTAL_POSITION,
-                                    )
-                                    .putFloat(
-                                        COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
-                                        DEFAULT_COLLAPSED_CC_HORIZONTAL_POSITION,
-                                    )
-                                    .putFloat(
-                                        COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
-                                        DEFAULT_COLLAPSED_CC_VERTICAL_POSITION,
-                                    )
-                                    .apply()
-                            },
-                            modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
-                        ) {
-                            Text("Reset subtitle positions")
-                        }
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Auto-transcripts & Translation", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Natural subtitle flow & punctuation",
-                            description = "Merge auto-generated captions along speech pauses and clauses with proper capitalization for natural readability.",
-                            checked = naturalSubtitlesEnabled,
-                            onCheckedChange = onNaturalSubtitlesChange,
-                            testTag = "natural_subtitles_switch",
-                        )
-                        SettingsSwitchRow(
-                            title = "Preload translation models in background",
-                            description = "Pre-download offline translation models eagerly on launch so playback starts immediately with zero translation wait.",
-                            checked = preloadModelsEnabled,
-                            onCheckedChange = onPreloadModelsChange,
-                            testTag = "preload_models_switch",
-                        )
-
-                        Spacer(Modifier.height(14.dp))
-                        HorizontalDivider()
-                        Spacer(Modifier.height(14.dp))
-                        Text("Transcript mode", style = MaterialTheme.typography.titleSmall)
-                        SettingsSwitchRow(
-                            title = "Landscape split view",
-                            description = "When automatic landscape overlay is off, place the transcript beside the video and drag the divider to resize it.",
-                            checked = landscapeSplitEnabled,
-                            onCheckedChange = onLandscapeSplitChange,
-                            testTag = "landscape_split_switch",
-                        )
-                        Text(
-                            "Swipe the transcript header down (or right in split view) to hide it. Captions keep tracking while hidden.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-
-                    Spacer(Modifier.height(14.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(14.dp))
-                    OutlinedButton(
-                        onClick = { showResetConfirmation = true },
-                        modifier = Modifier.fillMaxWidth().testTag("reset_all_settings"),
-                    ) {
-                        Text("Reset all settings to defaults")
-                    }
-                }
-            },
-            confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
-        )
-
-        if (showResetConfirmation) {
-            AlertDialog(
-                onDismissRequest = { showResetConfirmation = false },
-                title = { Text("Reset all settings?") },
-                text = {
-                    Text(
-                        "Languages, text size, colors, view mode, and overlay options " +
-                            "will return to their defaults. Your current video stays open.",
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showResetConfirmation = false
-                            onResetSettings()
-                        },
-                        modifier = Modifier.testTag("confirm_reset_settings"),
-                    ) { Text("Reset") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showResetConfirmation = false }) { Text("Cancel") }
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun SubtitleColorSwatchRow(
-    title: String,
-    selectedKey: String,
-    enabled: Boolean,
-    onColorChange: (String) -> Unit,
-    testTagPrefix: String,
-) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-        Text(title)
-        Row(
-            modifier = Modifier.padding(top = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            SubtitleColorOption.entries.forEach { option ->
-                val selected = option.key == selectedKey
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clip(CircleShape)
-                        .background(Color(option.argb))
-                        .then(
-                            if (selected) {
-                                Modifier.border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = CircleShape,
-                                )
-                            } else {
-                                Modifier.border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    shape = CircleShape,
-                                )
-                            },
-                        )
-                        .clip(CircleShape)
-                        .clickable(enabled = enabled) { onColorChange(option.key) }
-                        .testTag("color_option_${testTagPrefix}_${option.key}"),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SettingsSwitchRow(
-    title: String,
-    description: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    testTag: String,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(title)
-            Text(
-                description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.testTag(testTag),
-        )
-    }
-}
-
-@Composable
-private fun PlayerModeSettingsOption(
-    mode: PlayerExperienceMode,
-    selectedMode: PlayerExperienceMode,
-    title: String,
-    description: String,
-    onModeChange: (PlayerExperienceMode) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onModeChange(mode) }
-            .padding(vertical = 8.dp)
-            .testTag("player_mode_${mode.storageValue}"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(
-            selected = selectedMode == mode,
-            onClick = { onModeChange(mode) },
-        )
-        Spacer(Modifier.size(8.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(
-                description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-private enum class LanguagePickerMode { SOURCE, TARGET }
-
 internal data class LanguageChoice(val code: String, val label: String)
 
 @Composable
@@ -1633,7 +1015,12 @@ private fun sourceDescription(state: DualSubUiState): String {
         state.availableSourceLanguages.firstOrNull {
             TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
         }?.name ?: TranslationLanguages.displayName(resolved)
-    } ?: "Finding captions"
-    val generated = if (state.generatedCaptions) " (auto-generated)" else ""
-    return "$source$generated  →  ${TranslationLanguages.displayName(state.targetLanguage)}"
+    }?.let { captionTrackLabel(it, state.generatedCaptions) } ?: "Finding captions"
+    return "$source  →  ${TranslationLanguages.displayName(state.targetLanguage)}"
 }
+
+/** YouTube already names generated tracks "English (auto-generated)", so only add the marker when it is missing. */
+internal fun captionTrackLabel(
+    name: String,
+    generated: Boolean,
+): String = if (generated && !name.contains("auto-generated", ignoreCase = true)) "$name (auto-generated)" else name

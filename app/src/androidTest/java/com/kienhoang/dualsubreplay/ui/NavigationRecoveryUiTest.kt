@@ -64,6 +64,19 @@ class NavigationRecoveryUiTest {
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
     }
 
+    @Test fun drawerCloseButtonDismissesTheMenu() {
+        compose.setContent {
+            MaterialTheme {
+                AppNavigation(onPractice = {}, onSettings = {}) { menu -> menu() }
+            }
+        }
+        compose.onNodeWithContentDescription("Open navigation menu").performClick()
+        compose.onNodeWithText("Practice").assertIsDisplayed()
+        compose.onNodeWithTag("close_navigation_menu").assertIsDisplayed().performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Practice").assertIsNotDisplayed()
+    }
+
     @Test fun livePanelShowsBothLanguagesAndRetriesWithoutReplay() {
         var retries = 0
         compose.setContent {

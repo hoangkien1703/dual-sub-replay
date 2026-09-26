@@ -26,6 +26,20 @@ internal fun dualSubColorScheme(accentKey: String) = darkColorScheme(
     onSurface = Color(0xFFE4F5F6),
     surfaceVariant = Color(0xFF173438),
     onSurfaceVariant = Color(0xFFB8CDD0),
+    // Material's defaults for these are purple-grey; keep drawers, dialogs, and chips in the app's teal.
+    primaryContainer = Color(0xFF0F3F45),
+    onPrimaryContainer = Color(0xFFCDF3F6),
+    secondaryContainer = Color(0xFF1B4448),
+    onSecondaryContainer = Color(0xFFD2EEF0),
+    surfaceDim = Color(0xFF041012),
+    surfaceBright = Color(0xFF1F3A3E),
+    surfaceContainerLowest = Color(0xFF030D0F),
+    surfaceContainerLow = Color(0xFF0A1C1F),
+    surfaceContainer = Color(0xFF0E2427),
+    surfaceContainerHigh = Color(0xFF132D31),
+    surfaceContainerHighest = Color(0xFF1A383C),
+    outline = Color(0xFF6F8B8F),
+    outlineVariant = Color(0xFF2A4649),
     error = Color(0xFFFFB4AB),
 )
 

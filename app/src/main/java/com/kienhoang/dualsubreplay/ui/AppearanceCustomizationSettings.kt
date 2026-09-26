@@ -32,7 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 
-/** Advanced visual customization kept behind the More settings disclosure. */
+/** Overlay box and app accent colors, shown in the "Colors & theme" settings section. */
 @Composable
 internal fun AdvancedAppearanceSettings() {
     val context = LocalContext.current

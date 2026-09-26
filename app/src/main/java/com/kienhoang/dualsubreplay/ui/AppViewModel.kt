@@ -1187,7 +1187,7 @@ class AppViewModel internal constructor(
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
                 statusMessage =
                     when {
-                        current.playbackPaused -> "Paused · translations resume with playback"
+                        current.playbackPaused -> "Paused · translation resumes on play"
                         preparing -> "Preparing nearby translations…"
                         else -> "Subtitles ready near playback"
                     },
