@@ -2,8 +2,7 @@
 
 ## Status
 
-Implemented. Offline lint and complexity checks pass locally. Final-head CI and the owner's phone
-check are pending. The owner asked for this work and a PR to test on a phone. That request does not
+Validated. CI passed, and the owner tested the preview builds on a phone and approved them. The owner asked for this work and a PR to test on a phone. That request does not
 authorize merging or publishing.
 
 ## Context / problem
@@ -92,16 +91,16 @@ screenshots show:
   (`SettingsSectionsTest`).
 - [x] Opening a section closes the other one, and tapping the open one closes it
   (`SettingsSectionsTest.toggleOpensOneSectionAtATime`).
-- [ ] The sidebar "x" closes the drawer and keeps the WebView alive
+- [x] The sidebar "x" closes the drawer and keeps the WebView alive
   (`NavigationRecoveryUiTest.drawerCloseButtonDismissesTheMenu`).
-- [ ] Every control previously behind "More settings" is reachable in its section, and reset still
+- [x] Every control previously behind "More settings" is reachable in its section, and reset still
   works (`LearningPlayerUiTest.unifiedSubtitleSettingsOffersViewAndOverlayBehavior`).
-- [ ] Language pickers and "Done" still work (`SubtitleUiTest.settingsKeepsLanguageAndTextOptionsWithoutFocus`).
-- [ ] The player gear popup shows only languages and opens the full page
+- [x] Language pickers and "Done" still work (`SubtitleUiTest.settingsKeepsLanguageAndTextOptionsWithoutFocus`).
+- [x] The player gear popup shows only languages and opens the full page
   (`SubtitleUiTest.gearPopupShowsOnlyLanguagesAndOpensFullSettings`).
 - [x] ktlint format ratchet and detekt pass.
-- [ ] Final-head CI `verify-build` and `managed-device-tests` pass.
-- [ ] Owner phone check: sidebar "x", each settings section, subtitle header text, and smooth
+- [x] Final-head CI `verify-build` and `managed-device-tests` pass.
+- [x] Owner phone check: sidebar "x", each settings section, subtitle header text, and smooth
   scrolling during playback.
 
 ## Validation plan
@@ -124,8 +123,9 @@ screenshots show:
 
 ## Release intent
 
-`release:patch`: the project default. The owner may prefer `release:minor` because the settings
-layout changes visibly, but that was not requested.
+`Release-Version: 1.1.0`. The spec first recorded the `release:patch` default. After testing the
+preview builds, the owner asked in the project chat to merge and publish official release v1.1.0.
+The PR body carries the standalone directive, and no release label is applied.
 
 ## Follow-up after the owner's phone check
 
@@ -155,6 +155,8 @@ Implemented as planned, plus the follow-up above.
 ## Validation result
 
 - Local (Linux, no Android SDK available in this environment): ktlint format ratchet and detekt
-  passed. Kotlin compilation, unit tests, lint and instrumented tests were not run locally and are
-  left to PR CI.
-- Physical phone / live YouTube: not run. Pending owner check with the PR preview APK.
+  passed. Kotlin compilation, unit tests, lint and instrumented tests ran in PR CI.
+- PR CI: `verify-build` and `managed-device-tests` passed on each pushed head, including the
+  new unit and instrumented tests.
+- Physical phone / live YouTube: the owner installed the PR preview builds, checked the new
+  settings, sidebar and subtitle panel, asked for the gear popup follow-up, and then approved.
