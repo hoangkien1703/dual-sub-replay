@@ -56,7 +56,7 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithText("Transcript panel").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
 
-        // Spoken-word highlighting stays in the main Appearance section.
+        // Spoken-word highlighting stays in the always-visible Reading group.
         composeRule.onNodeWithTag("word_highlight_switch").performScrollTo().assertIsDisplayed()
 
         composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay")
@@ -66,8 +66,10 @@ class LearningPlayerUiTest {
             assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
         }
 
-        // Custom colors and other advanced controls live behind More settings.
-        composeRule.onNodeWithTag("more_settings_toggle").performScrollTo().performClick()
+        // Advanced controls live in collapsible sections under More settings.
+        composeRule.onNodeWithText("More settings").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
+        composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
         composeRule.onNodeWithText("Portrait panel position").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("portrait_panel_position_slider")
             .performSemanticsAction(SemanticsActions.SetProgress) { setProgress ->
@@ -87,6 +89,11 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithTag("karaoke_mode_adaptive").assertDoesNotExist()
         composeRule.onNodeWithTag("karaoke_mode_youtube_live").assertDoesNotExist()
         composeRule.onNodeWithTag("karaoke_mode_transcript").assertDoesNotExist()
+        composeRule.onNodeWithTag("landscape_split_switch").performScrollTo().assertIsDisplayed()
+
+        // Opening another section closes the one that was open.
+        composeRule.onNodeWithTag("settings_section_colors").performScrollTo().performClick()
+        composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
         composeRule.onNodeWithTag("custom_colors_switch").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("color_option_box_background_deep_teal")
             .performScrollTo()
@@ -94,6 +101,9 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithTag("color_option_theme_accent_cyan")
             .performScrollTo()
             .assertIsDisplayed()
+        composeRule.onNodeWithTag("settings_section_word_learning").performScrollTo().performClick()
+        composeRule.onNodeWithTag("word_learning_mode_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("settings_section_overlay").performScrollTo().performClick()
         composeRule.onNodeWithTag("auto_overlay_fullscreen_switch")
             .performScrollTo()
             .assertIsDisplayed()
@@ -107,6 +117,8 @@ class LearningPlayerUiTest {
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("settings_section_translation").performScrollTo().performClick()
+        composeRule.onNodeWithTag("preload_models_switch").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("reset_all_settings").performScrollTo().performClick()
         composeRule.onNodeWithTag("confirm_reset_settings").performClick()
         composeRule.runOnIdle {
