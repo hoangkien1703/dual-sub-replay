@@ -14,6 +14,7 @@ version snapshot here drifts, and update relevant documentation with lasting cha
 | Translation/network | ML Kit Translate 17.0.3, OkHttp, Kotlin coroutines | [App dependencies](../../app/build.gradle.kts) |
 | Tests | JUnit4 4.13.2; Compose/Android instrumentation, API 36 AOSP x86_64 managed Pixel 2 | [App test configuration](../../app/build.gradle.kts) |
 | Performance | Separate test-only `:benchmark` module, Macrobenchmark and app Baseline Profile | [Benchmark build](../../benchmark/build.gradle.kts), [methodology](../quality-and-performance.md) |
+| Website | Static English/Vietnamese landing page in `site/`, published to GitHub Pages from `main`; offline checks in `tools/tests/test_site.py` | [Pages workflow](../../.github/workflows/pages.yml), [discoverability](../promotion/discoverability.md) |
 
 ## Component boundaries
 

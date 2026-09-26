@@ -2,6 +2,8 @@
 
 Watch YouTube with two subtitle languages at once, then tap any sentence to replay that exact moment. Translation runs on your Android device.
 
+DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, and saves words for spaced-repetition practice. No account, ads, or API key. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
+
 [![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
 [![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
 [![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
@@ -79,6 +81,16 @@ Want to test the newest development build? See the [preview release](https://git
   actions, comments, and recommendations; no second player or webpage is created.
 - Reopen the subtitle timeline and remember the subtitle text size.
 - Build, test, and publish installable APKs automatically with GitHub Actions.
+
+## FAQ
+
+**How do I watch YouTube with two subtitles at once on Android?** Install DualSub Replay, open a captioned video, and pick your language. The original caption and its translation appear together under the video, or beside it in landscape.
+
+**Which languages can I learn?** The original can be any caption language a video offers, including auto-generated captions. Translations go into the 59 languages supported by Google ML Kit, such as English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese.
+
+**Is there a Language Reactor-style tool for Android?** Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate, unaffiliated Android app with a similar two-language view, plus tap-to-replay and saved words.
+
+**Is it on Google Play?** Not yet. Install the official APK from [GitHub releases](https://github.com/hoangkien1703/dual-sub-replay/releases/latest).
 
 ## User flow
 
@@ -191,6 +203,10 @@ Release automation regression tests run in PR CI. Run them locally with:
 ```bash
 python3 -m unittest discover -s tools/tests -p 'test_*.py' -v
 ```
+
+### Website
+
+The landing page at https://hoangkien1703.github.io/dual-sub-replay/ lives in `site/` (English and Vietnamese). The **Publish website** workflow deploys it to GitHub Pages when `site/` or `docs/images/` changes on `main`; it does not affect app releases. Offline checks for its metadata, links, FAQ structured data, and language list run with the release automation tests above. See [discoverability](docs/promotion/discoverability.md) for the owner checklist.
 
 ## Privacy
 

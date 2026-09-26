@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DualSub Replay: Phụ đề song ngữ YouTube trên Android</title>
+  <meta name="description" content="Ứng dụng Android miễn phí, mã nguồn mở: xem YouTube với hai phụ đề cùng lúc, chạm vào câu để nghe lại. Dịch ngay trên điện thoại, không cần tài khoản.">
+  <link rel="canonical" href="https://hoangkien1703.github.io/dual-sub-replay/vi/">
+  <link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/">
+  <link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/">
+  <link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <meta name="theme-color" content="#0b1c20">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DualSub Replay">
+  <meta property="og:title" content="DualSub Replay: Phụ đề song ngữ YouTube trên Android">
+  <meta property="og:description" content="Xem YouTube với phụ đề gốc và bản dịch cùng lúc, chạm vào câu bất kỳ để nghe lại. Miễn phí và mã nguồn mở.">
+  <meta property="og:url" content="https://hoangkien1703.github.io/dual-sub-replay/vi/">
+  <meta property="og:image" content="https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="DualSub Replay hiển thị phụ đề YouTube gốc và bản dịch trên điện thoại Android">
+  <meta property="og:locale" content="vi_VN">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "DualSub Replay",
+    "alternateName": "Dual Sub Replay",
+    "description": "Ứng dụng Android miễn phí, mã nguồn mở hiển thị phụ đề YouTube gốc và bản dịch cùng lúc, chạm một lần để nghe lại từng câu. Bản dịch chạy ngay trên thiết bị bằng Google ML Kit.",
+    "url": "https://hoangkien1703.github.io/dual-sub-replay/vi/",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Android 8.0 trở lên",
+    "downloadUrl": "https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk",
+    "installUrl": "https://github.com/hoangkien1703/dual-sub-replay/releases/latest",
+    "screenshot": "https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-full-hd.jpg",
+    "image": "https://hoangkien1703.github.io/dual-sub-replay/images/dualsub-replay-social-preview.png",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" },
+    "license": "https://github.com/hoangkien1703/dual-sub-replay/blob/main/LICENSE",
+    "codeRepository": "https://github.com/hoangkien1703/dual-sub-replay",
+    "inLanguage": "vi",
+    "author": { "@type": "Person", "name": "Kien Hoang", "url": "https://github.com/hoangkien1703" },
+    "sameAs": ["https://github.com/hoangkien1703/dual-sub-replay"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "DualSub Replay có miễn phí không?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Có. DualSub Replay miễn phí và mã nguồn mở. Không quảng cáo, không thuê bao, không cần tài khoản hay API key." }
+      },
+      {
+        "@type": "Question",
+        "name": "Làm sao để xem YouTube với hai phụ đề cùng lúc trên Android?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Cài DualSub Replay, mở một video YouTube có phụ đề và chọn ngôn ngữ bạn muốn dịch sang. Ứng dụng hiển thị phụ đề gốc và bản dịch cùng nhau ngay dưới video." }
+      },
+      {
+        "@type": "Question",
+        "name": "Ứng dụng hỗ trợ những ngôn ngữ nào?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Phụ đề gốc có thể là bất kỳ ngôn ngữ nào video cung cấp. Bản dịch hỗ trợ 59 ngôn ngữ của Google ML Kit, gồm tiếng Việt, tiếng Anh, tiếng Nhật, tiếng Hàn, tiếng Trung, tiếng Pháp và tiếng Đức." }
+      },
+      {
+        "@type": "Question",
+        "name": "DualSub Replay có trên Google Play không?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Chưa có. Bạn tải tệp APK chính thức từ trang phát hành trên GitHub. Lần đầu cài, Android có thể hỏi bạn cho phép trình duyệt cài ứng dụng." }
+      },
+      {
+        "@type": "Question",
+        "name": "Phụ đề của tôi có bị gửi lên máy chủ để dịch không?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Không. Google ML Kit tải mô hình ngôn ngữ một lần, sau đó dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="wrap topbar">
+    <a class="brand" href="./"><img src="../favicon.svg" alt="" width="32" height="32">DualSub Replay</a>
+    <nav aria-label="Menu chính">
+      <a class="optional" href="#tinh-nang">Tính năng</a>
+      <a class="optional" href="#hoi-dap">Hỏi đáp</a>
+      <a href="../" hreflang="en" lang="en">English</a>
+      <a href="https://github.com/hoangkien1703/dual-sub-replay">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div>
+        <h1>Phụ đề song ngữ cho YouTube. <span>Chạm để nghe lại từng câu.</span></h1>
+        <p class="lead">DualSub Replay là ứng dụng Android miễn phí, mã nguồn mở giúp bạn học ngoại ngữ qua YouTube. Xem phụ đề gốc và bản dịch cùng lúc, rồi chạm vào câu bất kỳ để nghe lại.</p>
+        <div class="cta">
+          <a class="button primary" href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">Tải APK</a>
+          <a class="button" href="https://github.com/hoangkien1703/dual-sub-replay">★ Gắn sao trên GitHub</a>
+        </div>
+        <p class="fineprint">Android 8.0 trở lên. Không cần tài khoản, không quảng cáo, không cần API key.</p>
+      </div>
+      <img class="phone" src="../images/dualsub-replay-preview.webp" width="560" height="1180" alt="DualSub Replay trên điện thoại Android: video YouTube ở trên, phụ đề tiếng Anh kèm bản dịch tiếng Việt ở dưới, mỗi đoạn có nút nghe lại">
+    </div>
+
+    <section id="tinh-nang">
+      <div class="wrap">
+        <h2>Học tiếng Anh và ngoại ngữ qua video YouTube thật</h2>
+        <p>Chọn bất kỳ video nào có phụ đề, chọn ngôn ngữ của bạn và luyện nghe từng câu như với một bài hội thoại trong giáo trình.</p>
+        <div class="grid">
+          <div class="card">
+            <h3>Hai phụ đề cùng lúc</h3>
+            <p>Phụ đề gốc và bản dịch nằm cạnh nhau, vừa nghe vừa hiểu nghĩa.</p>
+          </div>
+          <div class="card">
+            <h3>Chạm để nghe lại</h3>
+            <p>Chạm vào đoạn phụ đề, video tua về đúng câu đó. Không cần kéo thanh thời gian.</p>
+          </div>
+          <div class="card">
+            <h3>Dịch ngay trên máy</h3>
+            <p>Google ML Kit dịch trực tiếp trên điện thoại. Nội dung bạn xem không bị gửi lên máy chủ của dự án.</p>
+          </div>
+          <div class="card">
+            <h3>Tô sáng từng từ</h3>
+            <p>Với phụ đề tự động, từ đang được nói sẽ sáng lên để bạn nghe theo dễ hơn.</p>
+          </div>
+          <div class="card">
+            <h3>Lưu từ vựng và ôn tập</h3>
+            <p>Chạm vào một từ để nghe phát âm và lưu kèm câu gốc. Ôn tập ngắt quãng hoặc xuất sang Anki.</p>
+          </div>
+          <div class="card">
+            <h3>Vẫn là YouTube quen thuộc</h3>
+            <p>Tìm kiếm, Shorts, bình luận và video đề xuất giữ nguyên. Chia sẻ liên kết YouTube vào ứng dụng để mở ngay.</p>
+          </div>
+        </div>
+        <img class="shot" src="../images/dualsub-replay-full-hd.jpg" width="1920" height="1080" loading="lazy" alt="Video phỏng vấn nằm ngang với phụ đề tiếng Anh và bản dịch tiếng Việt bên dưới">
+      </div>
+    </section>
+
+    <section id="cach-dung">
+      <div class="wrap">
+        <h2>Cách xem YouTube với phụ đề song ngữ trên Android</h2>
+        <ol class="steps">
+          <li>Tải <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">DualSub-Replay.apk</a> và mở tệp. Nếu Android hỏi, hãy cho phép trình duyệt cài ứng dụng không rõ nguồn.</li>
+          <li>Mở DualSub Replay, chọn ngôn ngữ và tìm video trên YouTube như bình thường.</li>
+          <li>Chọn video có phụ đề. Phụ đề gốc và bản dịch hiện dưới video, hoặc bên cạnh khi xoay ngang.</li>
+          <li>Chạm vào đoạn phụ đề để nghe lại câu đó. Vuốt bảng phụ đề sang bên để xem bình luận và video khác.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="hoi-dap">
+      <div class="wrap">
+        <h2>Câu hỏi thường gặp</h2>
+        <details>
+          <summary>DualSub Replay có miễn phí không?</summary>
+          <p>Có. DualSub Replay miễn phí và mã nguồn mở. Không quảng cáo, không thuê bao, không cần tài khoản hay API key.</p>
+        </details>
+        <details>
+          <summary>Làm sao để xem YouTube với hai phụ đề cùng lúc trên Android?</summary>
+          <p>Cài DualSub Replay, mở một video YouTube có phụ đề và chọn ngôn ngữ bạn muốn dịch sang. Ứng dụng hiển thị phụ đề gốc và bản dịch cùng nhau ngay dưới video.</p>
+        </details>
+        <details>
+          <summary>Ứng dụng hỗ trợ những ngôn ngữ nào?</summary>
+          <p>Phụ đề gốc có thể là bất kỳ ngôn ngữ nào video cung cấp. Bản dịch hỗ trợ 59 ngôn ngữ của Google ML Kit, gồm tiếng Việt, tiếng Anh, tiếng Nhật, tiếng Hàn, tiếng Trung, tiếng Pháp và tiếng Đức.</p>
+        </details>
+        <details>
+          <summary>DualSub Replay có trên Google Play không?</summary>
+          <p>Chưa có. Bạn tải tệp APK chính thức từ trang phát hành trên GitHub. Lần đầu cài, Android có thể hỏi bạn cho phép trình duyệt cài ứng dụng.</p>
+        </details>
+        <details>
+          <summary>Phụ đề của tôi có bị gửi lên máy chủ để dịch không?</summary>
+          <p>Không. Google ML Kit tải mô hình ngôn ngữ một lần, sau đó dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="tai-ve">
+      <div class="wrap">
+        <h2>Bắt đầu học ngoại ngữ với YouTube ngay hôm nay</h2>
+        <p>Nếu DualSub Replay giúp ích cho bạn, hãy gắn sao trên GitHub để nhiều người học khác tìm thấy ứng dụng.</p>
+        <div class="cta">
+          <a class="button primary" href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk">Tải APK</a>
+          <a class="button" href="https://github.com/hoangkien1703/dual-sub-replay">★ Gắn sao trên GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>DualSub Replay là phần mềm mã nguồn mở theo giấy phép MIT. <a href="https://github.com/hoangkien1703/dual-sub-replay/blob/main/PRIVACY.md">Quyền riêng tư</a> · <a href="https://github.com/hoangkien1703/dual-sub-replay/issues">Báo lỗi</a></p>
+      <p>Không liên kết với YouTube hay Google. Việc lấy phụ đề dựa trên trang web công khai của YouTube và có thể ngừng hoạt động khi YouTube thay đổi.</p>
+    </div>
+  </footer>
+</body>
+</html>

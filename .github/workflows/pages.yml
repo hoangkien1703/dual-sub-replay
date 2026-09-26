@@ -1,0 +1,73 @@
+name: Publish website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "docs/images/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'hoangkien1703/dual-sub-replay' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Assemble site
+        env:
+          # Optional repository variable holding only the content value of Google's
+          # "HTML tag" verification method for the Search Console URL-prefix property.
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+        run: |
+          set -euo pipefail
+          cp -R site _site
+          mkdir -p _site/images
+          cp docs/images/dualsub-replay-preview.webp \
+             docs/images/dualsub-replay-full-hd.jpg \
+             docs/images/dualsub-replay-landscape.png \
+             docs/images/dualsub-replay-social-preview.png \
+             _site/images/
+          if [ -n "$GOOGLE_SITE_VERIFICATION" ]; then
+            if [[ ! "$GOOGLE_SITE_VERIFICATION" =~ ^[A-Za-z0-9_-]+$ ]]; then
+              echo "::error::GOOGLE_SITE_VERIFICATION must contain only the tag's content value."
+              exit 1
+            fi
+            sed -i "s|<meta name=\"theme-color\"|<meta name=\"google-site-verification\" content=\"$GOOGLE_SITE_VERIFICATION\">\n  <meta name=\"theme-color\"|" _site/index.html
+          fi
+          find _site -type f | sort
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
