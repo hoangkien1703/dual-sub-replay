@@ -279,5 +279,70 @@ class SubtitleMergerTest {
         val alreadyPunctual = "Hôm nay trời đẹp!"
         assertEquals("Hôm nay trời đẹp!", SubtitleMerger.formatNaturalTranslation(alreadyPunctual))
     }
-}
 
+    @Test fun untimedOverlappingCuesEstimateWordsInsideTheirOwnSpeech() {
+        // Auto captions without word offsets: each line stays on screen 1.5 s after the next starts.
+        val cues =
+            listOf(
+                RawCaptionCue(10_000, 13_500, "how do we give it a realistic"),
+                RawCaptionCue(12_000, 15_500, "enough scenario so it doesn't"),
+                RawCaptionCue(14_000, 17_000, "think it's being tested?"),
+            )
+        val words = SubtitleMerger.merge(cues).single().words
+
+        assertEquals(cues.flatMap { it.text.split(" ") }, words.map { it.text })
+        val speechEnds = listOf(12_000L, 14_000L, 17_000L)
+        var index = 0
+        cues.forEachIndexed { cueIndex, cue ->
+            repeat(cue.text.split(" ").size) {
+                val word = words[index++]
+                assertTrue("$word starts inside ${cue.text}", word.startMs in cue.startMs until speechEnds[cueIndex])
+                assertTrue("$word ends by its speech end", word.endMs <= speechEnds[cueIndex])
+            }
+        }
+    }
+
+    @Test fun rowSplitInsideAnUntimedCueSeeksNearTheSpokenWord() {
+        val cues =
+            listOf(
+                RawCaptionCue(10_000, 13_500, "how do we give it a realistic"),
+                RawCaptionCue(12_000, 15_500, "enough scenario so it doesn't"),
+                RawCaptionCue(14_000, 17_000, "think it's being tested?"),
+            )
+        val rows = SubtitleMerger.splitLongSegments(SubtitleMerger.merge(cues))
+        val second = rows.first { it.originalText.startsWith("it doesn't") }
+
+        // "it" is spoken inside the second cue (12–14 s); the display-time estimate put it after 14 s.
+        assertTrue("row starts at ${second.startMs}", second.startMs in 12_000L until 14_000L)
+    }
+
+    @Test fun timedWordsKeepTheirStartsAndEndAtTheNextCue() {
+        val cues =
+            listOf(
+                RawCaptionCue(
+                    0,
+                    5_000,
+                    "look at this",
+                    listOf(SubtitleWord("look", 0, 400), SubtitleWord("at", 400, 800), SubtitleWord("this", 800, 5_000)),
+                ),
+                RawCaptionCue(2_000, 6_000, "next line", listOf(SubtitleWord("next", 2_000, 2_500), SubtitleWord("line", 2_500, 6_000))),
+            )
+        val words = SubtitleMerger.merge(cues).single().words
+
+        assertEquals(listOf(0L, 400L, 800L, 2_000L, 2_500L), words.map { it.startMs })
+        assertEquals(2_000L, words[2].endMs)
+    }
+
+    @Test fun cuesSharingAStartEndWhereTheNextLaterCueBegins() {
+        val ends =
+            SubtitleMerger.cueSpeechEnds(
+                listOf(
+                    RawCaptionCue(0, 5_000, "a"),
+                    RawCaptionCue(0, 5_000, "b"),
+                    RawCaptionCue(2_000, 3_000, "c"),
+                    RawCaptionCue(4_000, 4_500, "d"),
+                ),
+            )
+        assertEquals(listOf(2_000L, 2_000L, 3_000L, 4_500L), ends)
+    }
+}

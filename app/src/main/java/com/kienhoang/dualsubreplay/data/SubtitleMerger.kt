@@ -23,11 +23,13 @@ object SubtitleMerger {
                 .sortedBy { it.startMs }
         if (ordered.isEmpty()) return emptyList()
 
+        val speechEnds = cueSpeechEnds(ordered)
         val output = mutableListOf<SubtitleSegment>()
         var start = ordered.first().startMs
         var end = ordered.first().endMs
+        var speechEnd = speechEnds.first()
         var text = clean(ordered.first().text)
-        var pendingWords = preparedCueWords(ordered.first())
+        var pendingWords = preparedCueWords(ordered.first(), speechEnds.first())
 
         fun flush() {
             if (text.isNotBlank()) {
@@ -45,6 +47,7 @@ object SubtitleMerger {
                         segmentText = formattedText,
                         startMs = start,
                         endMs = end,
+                        speechEndMs = speechEnd,
                         collectedWords = pendingWords,
                     ),
                 )
@@ -52,7 +55,8 @@ object SubtitleMerger {
             pendingWords = emptyList()
         }
 
-        ordered.drop(1).forEach { cue ->
+        ordered.forEachIndexed { index, cue ->
+            if (index == 0) return@forEachIndexed
             val nextText = clean(cue.text)
             val gap = cue.startMs - end
             val startsWithConjunction = clauseConjunctions.containsMatchIn(nextText)
@@ -68,12 +72,14 @@ object SubtitleMerger {
                 flush()
                 start = cue.startMs
                 end = cue.endMs
+                speechEnd = speechEnds[index]
                 text = nextText
-                pendingWords = preparedCueWords(cue)
+                pendingWords = preparedCueWords(cue, speechEnds[index])
             } else {
                 text += separator(text.lastOrNull(), nextText.firstOrNull()) + nextText
                 end = maxOf(end, cue.endMs)
-                pendingWords += preparedCueWords(cue)
+                speechEnd = maxOf(speechEnd, speechEnds[index])
+                pendingWords += preparedCueWords(cue, speechEnds[index])
             }
         }
         flush()
@@ -93,11 +99,34 @@ object SubtitleMerger {
     }
 
     /**
+     * Auto-caption cues stay on screen after the next cue starts, so a cue's display end is
+     * later than the end of its speech. Word estimates must use the speech end: spreading a
+     * cue's words over its display time makes them start seconds late and interleave with the
+     * next cue's words, which also breaks every later row start in the merged line.
+     */
+    internal fun cueSpeechEnds(ordered: List<RawCaptionCue>): List<Long> {
+        val ends = LongArray(ordered.size)
+        var nextStart: Long? = null
+        for (index in ordered.indices.reversed()) {
+            val cue = ordered[index]
+            ends[index] = CaptionDocumentParser.speechEndMs(cue.startMs, cue.endMs, nextStart)
+            // Cues sharing a start time all end where the next later cue begins.
+            if (index == 0 || ordered[index - 1].startMs != cue.startMs) nextStart = cue.startMs
+        }
+        return ends.toList()
+    }
+
+    /**
      * Keep YouTube's real word timing for each cue whenever it is coherent. If
      * one noisy auto-caption cue is missing/stale, estimate only that cue instead
      * of discarding accurate timing from every neighboring cue in the merged line.
+     * Timed words may reach into the display overlap; only their ends are trimmed to
+     * [speechEndMs], so real start anchors are never moved.
      */
-    private fun preparedCueWords(cue: RawCaptionCue): List<SubtitleWord> {
+    private fun preparedCueWords(
+        cue: RawCaptionCue,
+        speechEndMs: Long,
+    ): List<SubtitleWord> {
         val cueText = clean(cue.text)
         val sorted =
             cue.words
@@ -107,14 +136,14 @@ object SubtitleMerger {
             sorted.isNotEmpty() &&
                 sorted.all { word ->
                     word.startMs >= cue.startMs &&
-                        word.startMs < cue.endMs &&
+                        word.startMs < speechEndMs &&
                         word.endMs > word.startMs &&
                         word.endMs <= cue.endMs
                 } && wordsAlignWithText(cueText, sorted)
         return if (hasUsableTimedWords) {
-            sorted
+            sorted.map { word -> if (word.endMs > speechEndMs) word.copy(endMs = speechEndMs) else word }
         } else {
-            estimateWordTimings(cueText, cue.startMs, cue.endMs)
+            estimateWordTimings(cueText, cue.startMs, speechEndMs)
         }
     }
 
@@ -127,6 +156,7 @@ object SubtitleMerger {
         segmentText: String,
         startMs: Long,
         endMs: Long,
+        speechEndMs: Long,
         collectedWords: List<SubtitleWord>,
     ): List<SubtitleWord> {
         val sorted = collectedWords.sortedBy(SubtitleWord::startMs)
@@ -141,7 +171,7 @@ object SubtitleMerger {
         return if (hasValidTimedWords) {
             sorted
         } else {
-            estimateWordTimings(segmentText, startMs, endMs)
+            estimateWordTimings(segmentText, startMs, speechEndMs)
         }
     }
 
