@@ -318,9 +318,11 @@ object LanguageAwareTokenizer {
 
             // Fallback for Latin / numbers inside Japanese text
             val start = cursor
-            while (cursor < length && !isCjk(text[cursor].toString()) && !text[cursor].isWhitespace() && text[cursor] !in "、。！？") {
+            while (cursor < length && !isCjkChar(text[cursor]) && !text[cursor].isWhitespace() && text[cursor] !in "、。！？") {
                 cursor++
             }
+            // A character no branch above takes must still be consumed, or the loop never ends.
+            if (cursor == start) cursor += Character.charCount(text.codePointAt(cursor))
             tokens += AnalyzedToken(
                 text = text.substring(start, cursor),
                 startIndex = start,
@@ -332,7 +334,12 @@ object LanguageAwareTokenizer {
         return tokens
     }
 
-    private fun isKanji(ch: Char): Boolean = ch.code in 0x4E00..0x9FAF
+    // Same ranges as CJK_REGEX, so every character it counts as CJK has a branch that consumes it.
+    private fun isCjkChar(ch: Char): Boolean = isKana(ch) || isKanji(ch)
+
+    private fun isKanji(ch: Char): Boolean = ch.code in 0x4E00..0x9FFF
+
+    private fun isKana(ch: Char): Boolean = ch.code in 0x3040..0x30FF
     private fun isHiragana(ch: Char): Boolean = ch.code in 0x3040..0x309F
     private fun isKatakana(ch: Char): Boolean = ch.code in 0x30A0..0x30FF
 
