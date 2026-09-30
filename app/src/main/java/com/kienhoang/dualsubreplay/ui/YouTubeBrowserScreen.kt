@@ -640,7 +640,7 @@ internal fun SingleYouTubePage(
     }
 
     BackHandler {
-        if (canGoBack) webView.goBack() else (context as? Activity)?.finish()
+        if (canGoBack) webView.goBack() else (context as? Activity)?.leaveKeepingState()
     }
 
     Box(modifier) {
@@ -686,6 +686,14 @@ internal fun SingleYouTubePage(
             }
         }
     }
+}
+
+/**
+ * Leaves the app the way Home does. Closing the activity would clear the ViewModel, so coming
+ * back would reload the page and fetch and prepare the transcript again.
+ */
+internal fun Activity.leaveKeepingState() {
+    if (!moveTaskToBack(true)) finish()
 }
 
 internal fun WebView.destroySafely() {
