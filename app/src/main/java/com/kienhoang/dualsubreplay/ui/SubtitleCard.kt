@@ -60,6 +60,7 @@ internal fun CompactSubtitleCard(
     resolvedSourceLanguage: String? = null,
     targetLanguage: String = "vi",
     isDownloadingTranslationModel: Boolean = false,
+    translationUnavailable: Boolean = false,
     onWordClick: (WordTap) -> Unit = {},
     replayEnabled: Boolean = true,
     showOriginal: Boolean = true,
@@ -145,7 +146,7 @@ internal fun CompactSubtitleCard(
                         tapToLearnEnabled,
                         resolvedSourceLanguage,
                         targetLanguage,
-                        isDownloadingTranslationModel,
+                        pendingTranslationText(isDownloadingTranslationModel, translationUnavailable),
                         onWordClick,
                         onReplay,
                     )
@@ -231,19 +232,13 @@ private fun TranslatedCardText(
     tapToLearnEnabled: Boolean,
     resolvedSourceLanguage: String?,
     targetLanguage: String,
-    isDownloadingTranslationModel: Boolean,
+    fallbackText: String,
     onWordClick: (WordTap) -> Unit,
     onReplay: () -> Unit,
 ) {
     val shouldHighlightTrans =
         wordLearningEnabled && isSentenceEligibleForPos && (wordLearningTarget == "translation" || wordLearningTarget == "both")
     val translatedText = segment.translatedText
-    val fallbackText =
-        if (isDownloadingTranslationModel) {
-            "Downloading translation model…"
-        } else {
-            "Translating…"
-        }
     // Tokens only feed word colors and tap-to-learn, so skip tokenizing when neither is on.
     val needsOriginalTokens = shouldHighlightTrans || (wordLearningEnabled && tapToLearnEnabled)
     val originalTokens: List<AnalyzedToken> =
@@ -296,3 +291,16 @@ private fun TranslatedCardText(
         )
     }
 }
+
+/** What a row shows under its original line until its translation arrives. */
+internal fun pendingTranslationText(
+    downloadingModel: Boolean,
+    translationUnavailable: Boolean,
+): String =
+    when {
+        translationUnavailable -> TRANSLATION_UNAVAILABLE_TEXT
+        downloadingModel -> "Downloading translation model…"
+        else -> "Translating…"
+    }
+
+internal const val TRANSLATION_UNAVAILABLE_TEXT = "Translation unavailable"

@@ -272,4 +272,29 @@ class SubtitleUiTest {
         composeRule.onNodeWithText("Original line 4").assertIsDisplayed()
         composeRule.onNodeWithTag("jump_back_pill").assertDoesNotExist()
     }
+
+    @Test
+    fun translationFailureKeepsOriginalRowsAndOffersRetry() {
+        var retries = 0
+        val state =
+            DualSubUiState(
+                activeVideoId = "video",
+                segments = listOf(SubtitleSegment(0, 0, 2000, "Original line 0")),
+                currentIndex = 0,
+                wordLearningEnabled = false,
+                translationError = "The translation model download took too long.",
+            )
+        composeRule.setContent {
+            DualSubTheme {
+                Box(Modifier.fillMaxWidth().height(360.dp)) {
+                    TranslatedSubtitleTimeline(state, onRetryTranslation = { retries++ }, onWordClick = {}, onReplay = {})
+                }
+            }
+        }
+        composeRule.onNodeWithText("Original line 0").assertIsDisplayed()
+        composeRule.onNodeWithText(TRANSLATION_UNAVAILABLE_TEXT).assertIsDisplayed()
+        composeRule.onNodeWithText("The translation model download took too long.").assertIsDisplayed()
+        composeRule.onNodeWithText("Retry translation").performClick()
+        assertEquals(1, retries)
+    }
 }
