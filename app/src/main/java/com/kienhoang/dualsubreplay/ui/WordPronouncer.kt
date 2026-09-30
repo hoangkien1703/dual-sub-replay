@@ -50,11 +50,15 @@ internal class WordPronouncer(context: Context) {
         }
     }
 
-    /** Drops the recorded speech of the last word unless the learner is still on [word]. */
+    /**
+     * Drops the recorded speech of the last word unless the learner is still on [word], and stops
+     * that word's speech if it is still being recorded or played, so it cannot start late.
+     */
     fun forgetUnless(
         word: String,
         language: String,
     ) {
+        if (!cache.holds(word, language)) stop()
         cache.keepOnly(word, language)
     }
 
