@@ -2,10 +2,11 @@
 
 ## Status
 
-Implemented; local checks and Android CI pass, the owner's phone test is pending. The owner
-asked for all three changes on 2026-09-29 in the project thread. Bundling the dictionary grew the
-release APK from 29.8 MB to 41.2 MB; on 2026-09-30 the owner chose to download it on first use
-instead.
+Released in v1.3.1 (PR #87, merged 2026-09-30). All four Android CI jobs passed on the final head
+`5f6754b`, and the owner tested the preview on their phone on 2026-09-30 and reported it works
+well. The owner asked for all three changes on 2026-09-29 in the project thread. Bundling the
+dictionary grew the release APK from 29.8 MB to 41.2 MB; on 2026-09-30 the owner chose to download
+it on first use instead.
 
 ## Context / problem
 
@@ -119,13 +120,15 @@ heuristic is used.
   voices on failure (`PronunciationTest`).
 - [x] `activeRowPlacement` reports visible, above or below, and `jumpBackPillVisible` shows the
   pill only while browsing with the spoken row off screen (`JumpBackPillTest`).
-- [ ] On the managed device, scrolling the transcript away shows the pill, it hides after the
+- [x] On the managed device, scrolling the transcript away shows the pill, it hides after the
   learner stops, returns on the next scroll, and tapping it brings the spoken line back
   (`SubtitleUiTest.jumpBackPillShowsWhileScrollingAwayAndReturnsToTheSpokenLine`), and the exact
   Maven artifact passes the pinned checksum and loads on ART (`JapaneseMorphologyDeviceTest`,
-  which installs it from a test-APK asset instead of the network).
-- [ ] Owner's phone: tapping a Japanese word selects the whole word and speaks it; tapping
-  Pronounce again replays at once; the pill behaves as described on a live video.
+  which installs it from a test-APK asset instead of the network). Passed in CI
+  `managed-device-tests`.
+- [x] Owner's phone: tapping a Japanese word selects the whole word and speaks it; tapping
+  Pronounce again replays at once; the pill behaves as described on a live video. The owner
+  tested the preview on 2026-09-30 and reported it works well.
 
 ## Validation plan
 
@@ -133,7 +136,7 @@ heuristic is used.
 | --- | --- | --- |
 | Unit tests | `./gradlew testDebugUnitTest` passes | Local Linux, CI |
 | Android lint/build | `formatCheck complexityCheck lintDebug assembleDebug assembleDebugAndroidTest` pass | Local Linux, CI |
-| Release shrink | `assembleRelease -PtestReleaseSigning=true` keeps `com.atilika.kuromoji` class names and dictionary resources | Local Linux |
+| Release shrink | `assembleRelease -PtestReleaseSigning=true` keeps `com.atilika.kuromoji` class names and contains no dictionary files (downloaded on first use) | Local Linux |
 | Managed-device/emulator | `pixel2Api36DebugAndroidTest` passes, including Kuromoji loading on device | CI `managed-device-tests` |
 | Physical-device/manual | Tap words, replay, scroll away and back | Owner's phone |
 | Live YouTube | Same on a Japanese video | Owner's phone |
@@ -151,9 +154,9 @@ heuristic is used.
 
 ## Release intent
 
-Patch is the default and no label is applied. These are new features, so the PR recommends
-`release:minor` for the owner to choose, as with v1.3.0. Estimated v1.3.1 for patch or v1.4.0 for
-minor (estimates until reserved).
+Planned: patch as the default, with `release:minor` recommended for the owner to choose because
+these are new features. Outcome: after testing on their phone, the owner asked for v1.3.1, so
+`release:patch` was applied and the merge released v1.3.1.
 
 ## Implementation result
 
@@ -196,5 +199,7 @@ As planned, with these details:
 - Not run locally: `pixel2Api36DebugAndroidTest` (no KVM on this host) and the F-Droid build
   (needs the NDK). Android CI on `4f2162a` (the download version) passed all four jobs:
   `verify-build`, `managed-device-tests` (including the jump-back pill and the on-device
-  Kuromoji load from the pinned jar), `fdroid-build` and `fdroid-device-tests`.
-- Pending: owner's phone test with live YouTube, including the first-use download.
+  Kuromoji load from the pinned jar), `fdroid-build` and `fdroid-device-tests`. They passed
+  again on the final head `5f6754b` (run 36691027357).
+- Owner's phone test with live YouTube: the owner tested the preview on 2026-09-30 and reported
+  it works well.
