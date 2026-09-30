@@ -21,12 +21,18 @@ internal class PronunciationCache(
         language: String,
     ): File? = audio?.takeIf { ready && key == keyOf(text, language) && it.isFile && it.length() > 0 }
 
+    /** Whether the cached (or still recording) speech is for [text] in [language]. */
+    fun holds(
+        text: String,
+        language: String,
+    ): Boolean = key == keyOf(text, language)
+
     /** Deletes the cached speech unless it belongs to [text] in [language]. */
     fun keepOnly(
         text: String,
         language: String,
     ) {
-        if (key != keyOf(text, language)) clear()
+        if (!holds(text, language)) clear()
     }
 
     /**

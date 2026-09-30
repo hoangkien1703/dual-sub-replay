@@ -14,17 +14,41 @@ internal data class CaptionPlaybackRequest(
     val paused: Boolean = true,
     val enabled: Boolean = false,
     val seekGeneration: Long = 0,
+    /** Raised by "Retry translation". After a failure, translation waits for this to change. */
+    val translationAttempt: Long = 0,
 )
 
-/** Event driven: sleeps when the window is ready, paused, or the app is backgrounded. */
+/** Panel status while the original captions play without translation. */
+internal const val ORIGINAL_CAPTIONS_ONLY_STATUS = "Original captions only · translation unavailable"
+
+/** A short reason for the translation bar; translator errors can be empty or very technical. */
+internal fun translationFailureMessage(error: Exception): String =
+    error.message?.trim()?.takeIf { it.isNotEmpty() && it.length <= MAX_TRANSLATION_ERROR_LENGTH }
+        ?: "Translation is unavailable right now. Check your connection, then retry."
+
+private const val MAX_TRANSLATION_ERROR_LENGTH = 160
+
+/** The stored captions are showing and only their translation stopped, so a retry need not reload them. */
+internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
+    state.translationError != null && state.errorMessage == null && !state.liveFallback && state.segments.isNotEmpty()
+
+/**
+ * Event driven: sleeps when the window is ready, paused, or the app is backgrounded.
+ *
+ * Original rows keep following playback when translation fails: [onTranslationFailure] reports the
+ * error once, and no further row is translated until [CaptionPlaybackRequest.translationAttempt]
+ * changes, so a failing model is not retried in a loop.
+ */
 internal suspend fun translatePlaybackWindow(
     store: SubtitleStore,
     requests: StateFlow<CaptionPlaybackRequest>,
     translate: suspend (String) -> String,
+    onTranslationFailure: (Exception) -> Unit = {},
     onWindow: (List<SubtitleSegment>, Boolean) -> Unit,
 ) {
     var indices = IntRange.EMPTY
     var rows = emptyList<SubtitleSegment>()
+    var failedAttempt: Long? = null
     while (true) {
         currentCoroutineContext().ensureActive()
         val request = requests.value
@@ -43,23 +67,47 @@ internal suspend fun translatePlaybackWindow(
         }
         // Reading disk can suspend across a seek. Never show the old position afterwards.
         if (requests.value != request) continue
-        val next = nextWindowTranslation(rows, request)
+        val next = nextWindowTranslation(rows, request).takeIf { failedAttempt != request.translationAttempt }
         onWindow(rows, next != null)
         if (next == null) {
             requests.first { it != request }
             continue
         }
-        val sentence = rows[next].sentence
-        val translated = translate(sentence?.text ?: rows[next].originalText).trim()
-        // Translating each row's sentence prefix locates where that row ends in the full translation.
-        val prefixes = sentence?.cuts?.map { cut -> translate(sentence.text.substring(0, cut).trim()) }
-        currentCoroutineContext().ensureActive()
-        rows = withTranslation(rows, next, translated, prefixes)
+        rows =
+            try {
+                translateRow(rows, next, translate)
+            } catch (error: Exception) {
+                // Cancelling this loop still ends it; a translator error only stops translating.
+                currentCoroutineContext().ensureActive()
+                failedAttempt = request.translationAttempt
+                onTranslationFailure(error)
+                continue
+            }
         // An in-flight task may finish after a seek/pause. Cache it, but never publish at the wrong position.
         if (requests.value.enabled && requests.value.seekGeneration == request.seekGeneration) {
             onWindow(rows, nextWindowTranslation(rows, requests.value) != null)
         }
     }
+}
+
+/** Translates row [index] through its whole sentence. A failed prefix only loses the finer row split. */
+private suspend fun translateRow(
+    rows: List<SubtitleSegment>,
+    index: Int,
+    translate: suspend (String) -> String,
+): List<SubtitleSegment> {
+    val sentence = rows[index].sentence
+    val translated = translate(sentence?.text ?: rows[index].originalText).trim()
+    // Translating each row's sentence prefix locates where that row ends in the full translation.
+    val prefixes =
+        try {
+            sentence?.cuts?.map { cut -> translate(sentence.text.substring(0, cut).trim()) }
+        } catch (_: Exception) {
+            currentCoroutineContext().ensureActive()
+            null // Split the sentence's translation proportionally instead.
+        }
+    currentCoroutineContext().ensureActive()
+    return withTranslation(rows, index, translated, prefixes)
 }
 
 /**

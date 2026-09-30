@@ -80,6 +80,41 @@ class JapaneseDictionaryStoreTest {
     }
 
     @Test
+    fun aDroppedConnectionLeavesNoPartialFile() {
+        val directory = folder.newFolder("dictionary")
+        val dropping =
+            object : java.io.InputStream() {
+                private var sent = 0
+
+                override fun read(): Int = if (sent++ < 8) 1 else throw IOException("connection reset")
+            }
+
+        assertFalse(store(directory) { dropping }.install())
+        assertTrue(directory.listFiles().orEmpty().isEmpty())
+    }
+
+    @Test
+    fun aCorruptInstalledDictionaryIsDownloadedAgainAfterItFailsToLoad() {
+        val directory = folder.newFolder("dictionary")
+        // Same size as the real file, so the cheap size check still calls it installed.
+        File(directory, JapaneseDictionaryRelease.FILE_NAME).writeBytes(ByteArray(dictionaryJar.length().toInt()))
+        var downloads = 0
+        val store =
+            store(directory) {
+                downloads++
+                dictionaryJar.inputStream()
+            }
+        assertTrue(store.isInstalled())
+
+        assertTrue(runCatching { store.loadTokenizer() }.exceptionOrNull() is IOException)
+        assertFalse(store.isInstalled())
+
+        assertTrue(store.install())
+        assertEquals(1, downloads)
+        assertEquals(listOf("日本語"), japaneseLearnerWords(store.loadTokenizer(), "日本語").map { it.text })
+    }
+
+    @Test
     fun releasePinMatchesTheMavenArtifactName() {
         assertTrue(
             JapaneseDictionaryRelease.URLS.all { it.startsWith("https://") && it.endsWith("/" + JapaneseDictionaryRelease.FILE_NAME) },

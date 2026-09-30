@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 12 and higher. Leaves out downloads the app can fetch again: the Japanese dictionary
+    (13 MB) and the F-Droid build's translation models. Keep these paths in sync with
+    backup_rules.xml and the directories AppViewModel creates.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="japanese-dictionary/" />
+        <exclude domain="file" path="translation-models/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="japanese-dictionary/" />
+        <exclude domain="file" path="translation-models/" />
+    </device-transfer>
+</data-extraction-rules>

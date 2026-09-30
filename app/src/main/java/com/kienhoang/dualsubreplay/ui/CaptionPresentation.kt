@@ -36,7 +36,7 @@ private fun unfilteredLearningOverlayContent(state: DualSubUiState): LearningOve
     if (active != null) {
         return LearningOverlayContent(
             originalText = active.originalText,
-            translatedText = active.translatedText ?: "Translating…",
+            translatedText = active.translatedText ?: pendingTranslationText(false, state.translationError != null),
             statusText = null,
             activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
             segment = active,

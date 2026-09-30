@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
-import kotlin.math.abs
 import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
 
 enum class LoadStage { IDLE, LOADING_CAPTIONS, TRANSLATING, READY, ERROR }
@@ -98,6 +97,8 @@ data class DualSubUiState(
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
+    /** Why translation stopped while the original captions keep playing, or null. */
+    val translationError: String? = null,
 )
 
 /**
@@ -173,37 +174,6 @@ internal fun activeWordIndex(
         ?.takeIf { segment -> segment.startMs <= timeMs && timeMs < segment.endMs }
         ?.let { segment -> timedActiveWordIndex(segment.words, timeMs) }
         ?: -1
-
-internal const val TRANSLATION_PUBLISH_BATCH = 8
-
-/**
- * Picks up to [batchSize] pending indices nearest to [positionIndex] by walking
- * outward from the insertion point, so translation always follows the current
- * playback position even after seeks.
- */
-internal fun nearestUntranslatedBatch(
-    pendingIndices: List<Int>,
-    positionIndex: Int,
-    batchSize: Int = TRANSLATION_PUBLISH_BATCH,
-): List<Int> {
-    if (pendingIndices.isEmpty() || batchSize <= 0) return emptyList()
-    var up = pendingIndices.binarySearch(positionIndex)
-    if (up < 0) up = -(up + 1)
-    var down = up - 1
-    val result = ArrayList<Int>(minOf(batchSize, pendingIndices.size))
-    while (result.size < batchSize && (up < pendingIndices.size || down >= 0)) {
-        val upIndex = if (up < pendingIndices.size) pendingIndices[up] else Int.MAX_VALUE
-        val downIndex = if (down >= 0) pendingIndices[down] else Int.MAX_VALUE
-        if (abs(upIndex - positionIndex) <= abs(downIndex - positionIndex)) {
-            result.add(upIndex)
-            up += 1
-        } else {
-            result.add(downIndex)
-            down -= 1
-        }
-    }
-    return result
-}
 
 internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
 
@@ -489,6 +459,7 @@ class AppViewModel internal constructor(
                 paused = _state.value.playbackPaused,
                 enabled = appVisible && playbackKnown && _state.value.activeVideoId != null,
                 seekGeneration = it.seekGeneration + if (seek) 1 else 0,
+                translationAttempt = it.translationAttempt,
             )
         }
     }
@@ -1010,8 +981,18 @@ class AppViewModel internal constructor(
         _state.value.activeVideoId?.let { loadVideo(it, showPanel = _state.value.subtitlePanelVisible) }
     }
 
+    /**
+     * Retries what failed. While the original captions are showing and only translation stopped,
+     * translation starts again from the stored captions; otherwise the video's captions reload.
+     */
     fun retryCaptions() {
-        val videoId = _state.value.activeVideoId ?: return
+        val current = _state.value
+        val videoId = current.activeVideoId ?: return
+        if (onlyTranslationFailed(current)) {
+            _state.update { it.copy(translationError = null, statusMessage = "Preparing nearby translations…") }
+            playbackRequests.update { it.copy(translationAttempt = it.translationAttempt + 1) }
+            return
+        }
         loadVideo(videoId, showPanel = true)
     }
 
@@ -1199,9 +1180,23 @@ class AppViewModel internal constructor(
                 activeWordIndex = -1,
                 stage = LoadStage.LOADING_CAPTIONS,
                 errorMessage = null,
+                translationError = null,
                 isDownloadingTranslationModel = false,
                 statusMessage = "Preparing subtitles near playback…",
             )
+        }
+        var following = false
+
+        suspend fun follow(translate: suspend (String) -> String) {
+            following = true
+            translatePlaybackWindow(
+                checkNotNull(displayStore),
+                playbackRequests,
+                translate,
+                onTranslationFailure = { error -> showTranslationUnavailable(videoId, generation, error) },
+            ) { rows, preparing ->
+                publishSubtitleWindow(videoId, generation, rows, preparing)
+            }
         }
         try {
             withContext(Dispatchers.IO) {
@@ -1213,21 +1208,23 @@ class AppViewModel internal constructor(
                         natural = natural,
                     )
             }
-            translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
-                _state.update { current ->
-                    if (!isCurrentLoad(current, videoId, generation)) {
-                        current
-                    } else {
-                        current.copy(
-                            isDownloadingTranslationModel = downloading,
-                            statusMessage = if (downloading) "Downloading translation model…" else "Preparing nearby translations…",
-                        )
+            try {
+                translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
+                    _state.update { current ->
+                        if (!isCurrentLoad(current, videoId, generation)) {
+                            current
+                        } else {
+                            current.copy(
+                                isDownloadingTranslationModel = downloading,
+                                statusMessage = if (downloading) "Downloading translation model…" else "Preparing nearby translations…",
+                            )
+                        }
                     }
-                }
-            }) { translate ->
-                translatePlaybackWindow(checkNotNull(displayStore), playbackRequests, translate) { rows, preparing ->
-                    publishSubtitleWindow(videoId, generation, rows, preparing)
-                }
+                }) { translate -> follow(translate) }
+            } catch (error: Exception) {
+                if (error is CancellationException || following) throw error
+                // The pair cannot be translated at all (an unsupported language): still show the captions.
+                follow { throw error }
             }
         } catch (error: CancellationException) {
             throw error
@@ -1240,12 +1237,27 @@ class AppViewModel internal constructor(
                         stage = LoadStage.ERROR,
                         isDownloadingTranslationModel = false,
                         statusMessage = null,
-                        errorMessage = error.message ?: "The subtitles could not be translated. Retry to continue.",
+                        errorMessage = error.message ?: "The subtitles could not be loaded. Retry to continue.",
                     )
                 }
             }
         } finally {
             withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
+        }
+    }
+
+    private fun showTranslationUnavailable(
+        videoId: String,
+        generation: Long,
+        error: Exception,
+    ) {
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) return@update current
+            current.copy(
+                isDownloadingTranslationModel = false,
+                translationError = translationFailureMessage(error),
+                statusMessage = ORIGINAL_CAPTIONS_ONLY_STATUS,
+            )
         }
     }
 
@@ -1286,6 +1298,7 @@ class AppViewModel internal constructor(
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
                 statusMessage =
                     when {
+                        current.translationError != null -> ORIGINAL_CAPTIONS_ONLY_STATUS
                         current.playbackPaused -> "Paused · translation resumes on play"
                         preparing -> "Preparing nearby translations…"
                         else -> "Subtitles ready near playback"

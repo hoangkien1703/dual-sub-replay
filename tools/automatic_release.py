@@ -13,7 +13,8 @@ OWNER = "hoangkien1703"
 GRADLE = "app/build.gradle.kts"
 VERSION = re.compile(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 MARKER = re.compile(r"<!-- automatic-release-v1 (\{[^\n]+\}) -->")
-REQUIRED_JOBS = {"verify-build", "managed-device-tests"}
+# Every job in .github/workflows/android.yml; a test keeps this list in sync with the workflow.
+REQUIRED_JOBS = {"verify-build", "managed-device-tests", "fdroid-build", "fdroid-device-tests"}
 
 
 def command(*args, input_text=None):
@@ -131,7 +132,7 @@ def verify_ci(api, pr):
     jobs = api.pages(f"actions/runs/{run['id']}/jobs?filter=latest", "jobs")
     successful = {job["name"] for job in jobs if job["conclusion"] == "success"}
     if not REQUIRED_JOBS <= successful or any(job["conclusion"] != "success" for job in jobs):
-        raise ValueError("Both required Android jobs must succeed; skipped/cancelled jobs do not qualify")
+        raise ValueError("All required Android jobs must succeed; skipped/cancelled jobs do not qualify")
     return run["id"]
 
 

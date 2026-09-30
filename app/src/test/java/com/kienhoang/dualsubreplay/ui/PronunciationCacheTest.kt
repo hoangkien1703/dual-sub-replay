@@ -56,6 +56,21 @@ class PronunciationCacheTest {
     }
 
     @Test
+    fun aWordBeingRecordedBelongsToItsSelectionUntilAnotherIsChosen() {
+        val cache = PronunciationCache(folder.newFolder("speech"))
+        assertFalse(cache.holds("春", "ja"))
+
+        // Recording has started but not finished: extending the selection to a phrase must stop it.
+        cache.prepare("春", "ja")
+        assertTrue(cache.holds(" 春 ", "ja"))
+        assertFalse(cache.holds("春ですね", "ja"))
+        assertFalse(cache.holds("春", "en"))
+
+        cache.keepOnly("春ですね", "ja")
+        assertFalse(cache.holds("春", "ja"))
+    }
+
+    @Test
     fun anUnfinishedRecordingIsNeverReplayed() {
         val cache = PronunciationCache(folder.newFolder("speech"))
         cache.prepare("春", "ja").writeText("partial")

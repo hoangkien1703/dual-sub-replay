@@ -75,10 +75,16 @@ class OnDeviceTranslator(
                         cache.put(languages.source, languages.target, text, cached)
                         cached
                     } else {
+                        // Keep the client only once its model is ready, so a retry downloads it again.
                         val active =
-                            client ?: newTranslator(languages).also {
-                                client = it
-                                ensureModelReady(languages, it, onDownloadingChange)
+                            client ?: newTranslator(languages).also { created ->
+                                try {
+                                    ensureModelReady(languages, created, onDownloadingChange)
+                                } catch (error: Throwable) {
+                                    created.close()
+                                    throw error
+                                }
+                                client = created
                             }
                         val translated = active.translate(text).awaitResult()
                         cache.put(languages.source, languages.target, text, translated)

@@ -637,7 +637,7 @@ private fun SubtitlePanel(
                     state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                     state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                     state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
-                    else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+                    else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
                 }
             }
         }
@@ -820,7 +820,7 @@ private fun SideSubtitlePanel(
                 state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
-                else -> SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+                else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
             }
         }
     }
@@ -912,6 +912,7 @@ internal fun SubtitleTimeline(
                     resolvedSourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguage = state.targetLanguage,
                     isDownloadingTranslationModel = state.isDownloadingTranslationModel,
+                    translationUnavailable = state.translationError != null,
                     onWordClick = onWordClick,
                 )
             }
@@ -1034,6 +1035,47 @@ private fun CompactLoadingPanel(message: String) {
             CircularProgressIndicator(Modifier.size(34.dp), strokeWidth = 3.dp)
             Spacer(Modifier.height(10.dp))
             Text(message, color = Color(0xFFB7CED1))
+        }
+    }
+}
+
+/** The transcript, with a retry bar above it while the original captions play untranslated. */
+@Composable
+internal fun TranslatedSubtitleTimeline(
+    state: DualSubUiState,
+    onRetryTranslation: () -> Unit,
+    onWordClick: (WordTap) -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
+) {
+    Column(Modifier.fillMaxSize()) {
+        state.translationError?.let { TranslationUnavailableBar(it, onRetryTranslation) }
+        Box(Modifier.fillMaxWidth().weight(1f)) {
+            SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+        }
+    }
+}
+
+@Composable
+internal fun TranslationUnavailableBar(
+    message: String,
+    onRetry: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp).testTag("translation_unavailable"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = message,
+            color = Color(0xFFFFB4AB),
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        TextButton(onClick = onRetry) {
+            Icon(Icons.Default.Refresh, contentDescription = null)
+            Spacer(Modifier.size(5.dp))
+            Text("Retry translation")
         }
     }
 }

@@ -1,6 +1,7 @@
 import copy
 import json
 from pathlib import Path
+import re
 import sys
 import unittest
 from unittest.mock import patch
@@ -187,6 +188,24 @@ class ReleaseTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     release.prepare(api, self.pr)
                 self.assertEqual(api.writes, [])
+
+    def test_every_android_ci_job_is_required(self):
+        workflow = (Path(__file__).resolve().parents[2] / ".github/workflows/android.yml").read_text()
+        jobs = workflow.split("\njobs:\n", 1)[1]
+        self.assertEqual(release.REQUIRED_JOBS, set(re.findall(r"^  ([A-Za-z0-9_-]+):\s*$", jobs, re.MULTILINE)))
+
+    def test_failed_pending_or_missing_fdroid_job_blocks_release(self):
+        for name in ("fdroid-build", "fdroid-device-tests"):
+            for conclusion in ("failure", None, "missing"):
+                with self.subTest(job=name, conclusion=conclusion):
+                    api = FakeGitHub()
+                    if conclusion == "missing":
+                        api.jobs = [job for job in api.jobs if job["name"] != name]
+                    else:
+                        next(job for job in api.jobs if job["name"] == name)["conclusion"] = conclusion
+                    with self.assertRaisesRegex(ValueError, "All required Android jobs"):
+                        release.prepare(api, self.pr)
+                    self.assertEqual(api.writes, [])
 
     def test_closed_unmerged_other_branch_or_other_merger_does_not_release(self):
         for field, value in [("merged", False), ("merged_by", {"login": "someone-else"}),

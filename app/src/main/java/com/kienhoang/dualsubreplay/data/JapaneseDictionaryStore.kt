@@ -65,28 +65,41 @@ internal class JapaneseDictionaryStore(
     internal fun installFrom(input: InputStream): Boolean {
         directory.mkdirs()
         val partial = File(directory, JapaneseDictionaryRelease.FILE_NAME + ".part")
-        val digest = MessageDigest.getInstance("SHA-256")
-        var total = 0L
-        partial.outputStream().use { output ->
-            val buffer = ByteArray(BUFFER_BYTES)
-            while (total <= expectedSize) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                total += read
-                digest.update(buffer, 0, read)
-                output.write(buffer, 0, read)
+        var installed = false
+        try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            var total = 0L
+            partial.outputStream().use { output ->
+                val buffer = ByteArray(BUFFER_BYTES)
+                while (total <= expectedSize) {
+                    val read = input.read(buffer)
+                    if (read < 0) break
+                    total += read
+                    digest.update(buffer, 0, read)
+                    output.write(buffer, 0, read)
+                }
             }
+            val sha256 = digest.digest().joinToString("") { "%02x".format(it) }
+            installed = total == expectedSize && sha256.equals(expectedSha256, ignoreCase = true) && partial.renameTo(file)
+            return installed
+        } finally {
+            // Also after a dropped connection or a failed write: no partial file stays behind.
+            if (!installed) partial.delete()
         }
-        val sha256 = digest.digest().joinToString("") { "%02x".format(it) }
-        if (total != expectedSize || !sha256.equals(expectedSha256, ignoreCase = true) || !partial.renameTo(file)) {
-            partial.delete()
-            return false
-        }
-        return true
     }
 
-    /** Builds Kuromoji's analyzer from the installed dictionary. Takes about a second and ~50 MB. */
-    fun loadTokenizer(): Tokenizer = ZipFile(file).use { zip -> ZipDictionaryBuilder(zip).build() }
+    /**
+     * Builds Kuromoji's analyzer from the installed dictionary. Takes about a second and ~50 MB.
+     * A file that cannot be read as the dictionary is deleted, so the next attempt downloads it
+     * again instead of failing the same way forever. Running out of memory keeps the file.
+     */
+    fun loadTokenizer(): Tokenizer =
+        try {
+            ZipFile(file).use { zip -> ZipDictionaryBuilder(zip).build() }
+        } catch (error: IOException) {
+            file.delete()
+            throw error
+        }
 
     /**
      * Kuromoji 0.9.0's IPADIC builder always reads the dictionary from its own classpath package.
@@ -122,6 +135,8 @@ internal class JapaneseDictionaryStore(
                 .Builder()
                 .connectTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
+                // Bounds the whole 13 MB transfer, so a connection that trickles cannot hold the one download forever.
+                .callTimeout(10, TimeUnit.MINUTES)
                 .build()
         }
 
