@@ -948,13 +948,18 @@ private fun KeepActiveRowOnScreen(
             val active = layout.visibleItemsInfo.firstOrNull { it.index == target }
             val revealDelta = active?.let { revealScrollDelta(it.offset, it.size, 0, viewportEnd) }
             val scrolling = listState.isScrollInProgress
+            // After a correction, act again only if the row fits now. A correction that could not
+            // fit it must not answer its own layout change, or the list scrolls forever and the
+            // main thread never gets back to drawing.
             when {
                 !scrolling && activeFitted && revealDelta != null && revealDelta != 0 -> {
                     listState.scrollBy(revealDelta.toFloat())
+                    activeFitted = listState.activeRowFits(target)
                 }
                 !scrolling && activeFitted && active == null -> {
                     val pushedDown = target > (layout.visibleItemsInfo.lastOrNull()?.index ?: -1)
                     listState.bringBackActiveRow(target, pushedDown, viewportEnd)
+                    activeFitted = listState.activeRowFits(target)
                 }
                 !scrolling && viewportShrank && activeWasVisible && active == null -> {
                     listState.scrollToItem(target)
@@ -971,8 +976,8 @@ private fun KeepActiveRowOnScreen(
 
 /**
  * The active row was pushed out in one frame. scrollToItem remeasures at once, so the row's size is
- * known before the next frame draws. A row pushed down then moves back by the free space into the
- * bottom slot, so the rows above it stay readable.
+ * known before the next frame draws. A row pushed down then moves into the bottom slot, so the rows
+ * above it stay readable.
  */
 private suspend fun LazyListState.bringBackActiveRow(
     target: Int,
@@ -982,8 +987,27 @@ private suspend fun LazyListState.bringBackActiveRow(
     scrollToItem(target)
     val row = layoutInfo.visibleItemsInfo.firstOrNull { it.index == target }
     if (pushedDown && row != null && row.size < viewportEnd) {
-        scrollBy((row.size - viewportEnd).toFloat())
+        val delta = bottomSlotScrollDelta(row.offset, row.size, viewportEnd)
+        if (delta != 0) scrollBy(delta.toFloat())
     }
+}
+
+/**
+ * Pixels to scroll so a row at [offset] with [size] ends at [viewportEnd]; negative moves it down.
+ * It starts from where the row really is: scrollToItem puts a row at the top, except among the last
+ * rows of the transcript, which cannot scroll that far and are already in the bottom slot.
+ */
+internal fun bottomSlotScrollDelta(
+    offset: Int,
+    size: Int,
+    viewportEnd: Int,
+): Int = offset + size - viewportEnd
+
+/** Whether row [target] is laid out and wholly inside the list's viewport. */
+private fun LazyListState.activeRowFits(target: Int): Boolean {
+    val layout = layoutInfo
+    val row = layout.visibleItemsInfo.firstOrNull { it.index == target } ?: return false
+    return revealScrollDelta(row.offset, row.size, 0, layout.viewportEndOffset - layout.afterContentPadding) == 0
 }
 
 /**

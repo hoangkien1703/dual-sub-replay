@@ -223,6 +223,58 @@ class SubtitleUiTest {
     }
 
     @Test
+    fun pausingOnTheLastLineAtTheEndOfAVideoKeepsItOnScreen() {
+        val segments =
+            (0 until 16).map { index ->
+                SubtitleSegment(
+                    id = index.toLong(),
+                    startMs = index * 2_000L,
+                    endMs = index * 2_000L + 1_900L,
+                    originalText = "Original line $index",
+                    translatedText = "Translated line $index, long enough to wrap onto a second line in the panel",
+                )
+            }
+        // The video reaches its last line; the list is scrolled to its end.
+        var state by mutableStateOf(
+            DualSubUiState(
+                segments = segments,
+                currentIndex = segments.lastIndex,
+                translatedVisibility = CaptionVisibility.PAUSED,
+                wordHighlightEnabled = false,
+                wordLearningEnabled = false,
+            ),
+        )
+        composeRule.setContent {
+            DualSubTheme {
+                Box(Modifier.fillMaxWidth().height(360.dp).testTag("timeline_viewport")) {
+                    SubtitleTimeline(state, onReplay = {})
+                }
+            }
+        }
+        composeRule.waitForIdle()
+
+        // The video ends and YouTube pauses it, so every row shows its translation. Before the fix
+        // the list scrolled back and forth without end here and the app stopped responding.
+        state = state.copy(playbackPaused = true)
+        composeRule.waitForIdle()
+
+        val viewport = composeRule.onNodeWithTag("timeline_viewport").getUnclippedBoundsInRoot()
+        val original = composeRule.onNodeWithText("Original line 15").getUnclippedBoundsInRoot()
+        val translation =
+            composeRule
+                .onNodeWithText("Translated line 15, long enough to wrap onto a second line in the panel")
+                .getUnclippedBoundsInRoot()
+        assertTrue(
+            "last original stays on screen: $original in $viewport",
+            original.top >= viewport.top && original.bottom <= viewport.bottom,
+        )
+        assertTrue(
+            "last translation stays on screen: $translation in $viewport",
+            translation.top >= viewport.top && translation.bottom <= viewport.bottom,
+        )
+    }
+
+    @Test
     fun jumpBackPillShowsWhileScrollingAwayAndReturnsToTheSpokenLine() {
         val segments =
             (0 until 40).map { index ->
