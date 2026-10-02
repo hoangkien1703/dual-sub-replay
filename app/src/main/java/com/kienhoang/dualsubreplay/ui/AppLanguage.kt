@@ -8,6 +8,8 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalResources
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
 
@@ -75,7 +77,13 @@ internal fun languageDisplayName(
 }
 
 /** The locale the interface is currently shown in, for formatting and language names. */
-internal fun Context.interfaceLocale(): Locale = resources.configuration.locales[0] ?: Locale.getDefault()
+internal fun Context.interfaceLocale(): Locale = resources.interfaceLocale()
+
+private fun Resources.interfaceLocale(): Locale = configuration.locales[0] ?: Locale.getDefault()
+
+/** The interface locale inside composables, read from the resources the UI's text comes from. */
+@Composable
+internal fun currentInterfaceLocale(): Locale = LocalResources.current.interfaceLocale()
 
 /**
  * Reads, saves, and applies the interface language. Android 13+ keeps the choice itself

@@ -69,6 +69,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -1136,7 +1137,7 @@ internal fun LanguagePickerDialog(
     onDismiss: () -> Unit,
     testTagPrefix: String,
 ) {
-    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val interfaceLocale = currentInterfaceLocale()
     val shownChoices =
         remember(choices, interfaceLocale) {
             choices.map { it to localizedLanguageLabel(it.code, it.label, interfaceLocale) }
@@ -1203,14 +1204,14 @@ internal fun localizedLanguageLabel(
 
 @Composable
 private fun sourceDescription(state: DualSubUiState): String {
-    val context = LocalContext.current
-    val interfaceLocale = context.interfaceLocale()
+    val resources = LocalResources.current
+    val interfaceLocale = currentInterfaceLocale()
     val source = state.resolvedSourceLanguage?.let { resolved ->
         val name = state.availableSourceLanguages.firstOrNull {
             TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
         }?.name ?: TranslationLanguages.displayName(resolved)
         captionTrackLabel(localizedLanguageLabel(resolved, name, interfaceLocale), state.generatedCaptions) {
-            context.getString(R.string.player_caption_track_auto_generated, it)
+            resources.getString(R.string.player_caption_track_auto_generated, it)
         }
     } ?: stringResource(R.string.player_finding_captions)
     return stringResource(R.string.player_source_to_target, source, languageDisplayName(state.targetLanguage, interfaceLocale))

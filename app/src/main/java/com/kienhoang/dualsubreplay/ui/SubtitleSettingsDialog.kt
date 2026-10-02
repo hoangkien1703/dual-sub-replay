@@ -168,7 +168,7 @@ private fun showLanguagePickerIfOpen(
 ): Boolean {
     val mode = picker.mode ?: return false
     val source = mode == LanguagePickerMode.SOURCE
-    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val interfaceLocale = currentInterfaceLocale()
     LanguagePickerDialog(
         title =
             stringResource(
@@ -214,7 +214,7 @@ private fun LanguagePickerButtons(
         onClick = { onPick(LanguagePickerMode.TARGET) },
         modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
     ) {
-        Text(languageDisplayName(targetLanguage, LocalContext.current.interfaceLocale()))
+        Text(languageDisplayName(targetLanguage, currentInterfaceLocale()))
     }
     SettingsHint(stringResource(R.string.settings_model_download_hint))
 }
@@ -235,7 +235,7 @@ internal fun QuickLanguageSettingsDialog(
 ) {
     val languagePicker = remember { LanguagePickerState() }
     val autoLabel = stringResource(R.string.settings_source_language_auto)
-    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val interfaceLocale = currentInterfaceLocale()
     val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
     val pickerOpen =
         showLanguagePickerIfOpen(
@@ -354,7 +354,7 @@ internal fun SubtitleSettingsDialog(
         )
     if (pickerOpen) return
     val sourceLabel =
-        sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, LocalContext.current.interfaceLocale())
+        sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, currentInterfaceLocale())
 
     @Composable
     fun Section(

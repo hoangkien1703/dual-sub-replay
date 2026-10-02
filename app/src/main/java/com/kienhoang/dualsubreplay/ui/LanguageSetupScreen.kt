@@ -46,7 +46,7 @@ fun LanguageSetupScreen(
     var learningLanguage by remember { mutableStateOf<String?>(null) }
     var pickerMode by remember { mutableStateOf<SetupPickerMode?>(null) }
     var searchQuery by remember { mutableStateOf("") }
-    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val interfaceLocale = currentInterfaceLocale()
     // The picker shows catalog names in the interface language and searches both names.
     val choices = TranslationLanguages.all.map { LanguageChoice(it.code, it.name) }
     val nativeTitle = stringResource(R.string.onboarding_language_native_title)

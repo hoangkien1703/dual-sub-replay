@@ -75,7 +75,7 @@ internal fun SavedWordsScreen(
     var revealed by remember(selected?.id, practice) { mutableStateOf(false) }
     var editedMeaning by remember(selected?.id, selected?.meaning) { mutableStateOf(selected?.meaning.orEmpty()) }
     val due = words.filter { it.dueAt <= now }.sortedBy { it.dueAt }
-    val locale = LocalContext.current.interfaceLocale()
+    val locale = currentInterfaceLocale()
     val searchLabel = stringResource(R.string.practice_search_label)
     val pronounceLabel = stringResource(R.string.practice_pronounce)
     val showMeaningLabel = stringResource(R.string.practice_show_meaning)

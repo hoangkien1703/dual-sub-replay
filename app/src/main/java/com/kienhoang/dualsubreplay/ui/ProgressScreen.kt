@@ -118,7 +118,7 @@ internal fun ProgressContent(
     var editingGoal by remember { mutableStateOf(false) }
     val totals = remember(days, today, firstDayOfWeek) { immersionTotals(days, today, firstDayOfWeek) }
     val streak = remember(days, today, goalMinutes) { currentStreak(days, today, goalMinutes) }
-    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val interfaceLocale = currentInterfaceLocale()
     val bars =
         remember(days, period, today, firstDayOfWeek, interfaceLocale) {
             periodBars(days, period, today, firstDayOfWeek, interfaceLocale)

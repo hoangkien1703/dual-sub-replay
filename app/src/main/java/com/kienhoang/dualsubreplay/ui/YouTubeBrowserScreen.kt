@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -272,6 +273,7 @@ internal fun SingleYouTubePage(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val requestInterceptor = LocalYouTubeRequestInterceptor.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
@@ -453,7 +455,7 @@ internal fun SingleYouTubePage(
                 ) {
                     super.onReceivedError(view, request, error)
                     if (request.isForMainFrame) {
-                        pageError = context.getString(R.string.player_youtube_could_not_load, error.description)
+                        pageError = resources.getString(R.string.player_youtube_could_not_load, error.description)
                     }
                 }
 
@@ -464,7 +466,7 @@ internal fun SingleYouTubePage(
                 ) {
                     super.onReceivedHttpError(view, request, errorResponse)
                     if (request.isForMainFrame && errorResponse.statusCode >= 400) {
-                        pageError = context.getString(R.string.player_youtube_http_error, errorResponse.statusCode)
+                        pageError = resources.getString(R.string.player_youtube_http_error, errorResponse.statusCode)
                     }
                 }
 
@@ -489,7 +491,7 @@ internal fun SingleYouTubePage(
                             webViewUnavailable = false
                             webViewGeneration += 1
                         } else {
-                            pageError = context.getString(reloadMessage)
+                            pageError = resources.getString(reloadMessage)
                         }
                     }
                     return true

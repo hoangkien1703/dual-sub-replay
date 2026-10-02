@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -124,7 +125,7 @@ internal fun PracticeTransferControls(
 ) {
     val context = LocalContext.current
     val resolver = context.contentResolver
-    val resources = context.resources
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val controller =
         remember(resolver, resources, repository, scope) { PracticeTransferController(resolver, resources, repository, scope) }

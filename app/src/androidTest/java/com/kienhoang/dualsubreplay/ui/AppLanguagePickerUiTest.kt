@@ -44,7 +44,7 @@ class AppLanguagePickerUiTest {
     fun drawerShowsTheChosenLanguage() {
         compose.setContent {
             val context = LocalContext.current
-            val configuration = Configuration(context.resources.configuration).apply { setLocales(LocaleList(Locale.forLanguageTag("vi"))) }
+            val configuration = Configuration(LocalConfiguration.current).apply { setLocales(LocaleList(Locale.forLanguageTag("vi"))) }
             val vietnamese = context.createConfigurationContext(configuration)
             CompositionLocalProvider(
                 LocalContext provides vietnamese,

@@ -1,9 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
-import android.content.Context
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
@@ -25,8 +25,8 @@ internal interface UiStrings {
     ): String
 }
 
-/** [UiStrings] read from this context's resources, in the interface language. */
-internal fun Context.uiStrings(): UiStrings =
+/** [UiStrings] read from these resources, in the interface language. */
+internal fun Resources.uiStrings(): UiStrings =
     object : UiStrings {
         override fun get(
             id: Int,
@@ -37,7 +37,7 @@ internal fun Context.uiStrings(): UiStrings =
 /** [learningOverlayContent] with the app's own texts in the interface language. */
 @Composable
 internal fun learningOverlayContent(state: DualSubUiState): LearningOverlayContent? =
-    learningOverlayContent(state, LocalContext.current.uiStrings())
+    learningOverlayContent(state, LocalResources.current.uiStrings())
 
 internal fun learningOverlayContent(
     state: DualSubUiState,
