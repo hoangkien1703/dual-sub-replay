@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">Practice</string>
+    <string name="practice_close">Close</string>
+    <string name="practice_cancel">Cancel</string>
+    <string name="practice_load_failed">Could not load saved words. Check storage and reopen this screen to retry.</string>
+    <string name="practice_update_failed">Could not update saved words. Check storage and try again.</string>
+    <string name="practice_example_video_title">Example video · internet required</string>
+    <string name="practice_example_video_unavailable_hint">If the video is unavailable, return to keep practicing.</string>
+    <string name="practice_return_to_practice">Return to Practice</string>
+    <string name="practice_session_complete">Session complete</string>
+    <string name="practice_session_complete_body">Your reviews are saved. Come back when more words are due.</string>
+    <string name="practice_back_to_saved_words">Back to saved words</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">Practice due words</string>
+    <string name="practice_search_label">Search words or meanings</string>
+    <string name="practice_empty_hint">Tap subtitle words, choose Translate, then Save to vocabulary to start your collection.</string>
+    <string name="practice_next_review">Next review: %1$s</string>
+    <string name="practice_pronounce">Pronounce</string>
+    <string name="practice_pronounce_item">Pronounce %1$s</string>
+    <string name="practice_speech_settings">Speech settings</string>
+    <string name="practice_show_meaning">Show meaning</string>
+    <string name="practice_meaning_label">Meaning (%1$s)</string>
+    <string name="practice_save_meaning">Save meaning</string>
+    <string name="practice_video_uses_original_sentence">Video example uses the original sentence.</string>
+    <string name="practice_play_online_example">Play online example</string>
+    <string name="practice_online_example">Online example</string>
+    <string name="practice_rating_again">Again</string>
+    <string name="practice_rating_hard">Hard</string>
+    <string name="practice_rating_good">Good</string>
+    <string name="practice_rating_easy">Easy</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10 min</string>
+    <string name="practice_delete_word">Delete word</string>
+    <string name="practice_delete_word_title">Delete %1$s?</string>
+    <string name="practice_delete_word_body">This removes its review history.</string>
+    <string name="practice_delete">Delete</string>
+    <string name="practice_keep">Keep</string>
+    <string name="practice_transfer_failed">Transfer failed. Please retry.</string>
+    <string name="practice_transfer_open_failed">Could not open the selected file.</string>
+    <string name="practice_transfer_export_too_large">Export exceeds the 8 MiB import limit.</string>
+    <string name="practice_transfer_write_failed">Could not write to the selected file.</string>
+    <string name="practice_transfer_import">Import</string>
+    <string name="practice_transfer_export">Export</string>
+    <string name="practice_transfer_cancel">Cancel transfer</string>
+    <string name="practice_import_review_title">Review import</string>
+    <string name="practice_import_preview_title">Import preview</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">Invalid records will be skipped. Existing words are kept unless you select replacement.</string>
+    <string name="practice_import_replace_duplicates">Replace duplicates, including backup review history</string>
+    <string name="practice_import_preview_button">Preview</string>
+    <string name="practice_import_words_button">Import words</string>
+    <string name="practice_import_mapping_hint">Map columns to fields. Anki text does not include review scheduling or media.</string>
+    <string name="practice_import_word_language_label">Default word language (en, ja…)</string>
+    <string name="practice_import_meaning_language_label">Default meaning language (vi, en…)</string>
+    <string name="practice_import_first_row">First row: %1$s</string>
+    <string name="practice_import_column_mapping">%1$s: %2$s</string>
+    <string name="practice_import_not_included">Not included</string>
+    <string name="practice_import_column_number">Column %1$d</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">Export Practice</string>
+    <string name="practice_export_description">Backup preserves review history. Anki text transfers words and examples, without scheduling, media or card templates.</string>
+    <string name="practice_export_full_backup">Full backup (JSON)</string>
+    <string name="practice_export_anki_text">Anki text (TSV)</string>
+    <string name="practice_word_translation_unavailable">Translation unavailable. You can enter a meaning and save the word.</string>
+    <string name="practice_example_plays_original">The example plays the original sentence, not the translated word.</string>
+    <string name="practice_save_failed">Could not save. Check your available storage and try again.</string>
+    <string name="practice_saved_to_vocabulary">Saved to your vocabulary</string>
+    <string name="practice_phrase">Phrase</string>
+    <string name="practice_saving">Saving…</string>
+    <string name="practice_saved">Saved</string>
+    <string name="practice_save_to_vocabulary">Save to vocabulary</string>
+    <string name="practice_word_by_word">Word by word</string>
+    <string name="practice_pos_noun">Noun</string>
+    <string name="practice_pos_verb">Verb</string>
+    <string name="practice_pos_adjective">Adjective</string>
+    <string name="practice_pos_adverb">Adverb</string>
+    <string name="practice_pos_pronoun">Pronoun</string>
+    <string name="practice_pos_conjunction">Conjunction</string>
+    <string name="practice_pos_preposition">Preposition</string>
+    <string name="practice_pos_particle">Particle / Grammar</string>
+    <string name="practice_pos_unaligned">Unaligned / Idiom</string>
+    <string name="practice_pos_other">Other</string>
+    <string name="practice_japanese_dictionary_downloading">Downloading the Japanese dictionary (13 MB) so taps select whole words…</string>
+    <string name="practice_japanese_dictionary_unavailable">The Japanese dictionary could not download yet. Words may split oddly until it does.</string>
+    <string name="practice_clipboard_label">Subtitle</string>
+    <string name="practice_copy">Copy</string>
+    <string name="practice_copied">Copied</string>
+    <string name="practice_translate">Translate</string>
+    <string name="practice_clear_selection">Clear selection</string>
+    <string name="practice_tap_another_word">Tap another word to select a phrase</string>
+    <string name="practice_translation_unavailable">Translation unavailable</string>
+    <string name="practice_translating">Translating…</string>
+    <string name="practice_preparing_pronunciation">Preparing pronunciation…</string>
+    <string name="practice_speech_no_voice">No voice is available for this language. Open Speech settings to add one, then tap Pronounce again.</string>
+    <string name="practice_speech_unavailable">Speech is unavailable. Open Speech settings to enable or install a speech engine, then try again.</string>
+    <string name="practice_speech_playback_failed">Could not play pronunciation. Check media volume and your connection, or choose a voice in Speech settings.</string>
+    <string name="practice_speech_invalid_language">Choose a subtitle language before pronouncing this word.</string>
+    <string name="practice_speech_settings_manual">Open Android Settings and search for Text-to-speech to install or select a voice.</string>
+    <plurals name="practice_word_count">
+        <item quantity="one">%1$d word</item>
+        <item quantity="other">%1$d words</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="one">%1$d due</item>
+        <item quantity="other">%1$d due</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="one">%1$d malformed word record was retained in storage and skipped.</item>
+        <item quantity="other">%1$d malformed word records were retained in storage and skipped.</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="one">Exported %1$d word.</item>
+        <item quantity="other">Exported %1$d words.</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="one">Imported %1$d word.</item>
+        <item quantity="other">Imported %1$d words.</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="one">%1$d valid</item>
+        <item quantity="other">%1$d valid</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="one">%1$d invalid</item>
+        <item quantity="other">%1$d invalid</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="one">%1$d duplicate</item>
+        <item quantity="other">%1$d duplicates</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="one">Full backup: %1$d readable word. Review history is included.</item>
+        <item quantity="other">Full backup: %1$d readable words. Review history is included.</item>
+    </plurals>
+</resources>

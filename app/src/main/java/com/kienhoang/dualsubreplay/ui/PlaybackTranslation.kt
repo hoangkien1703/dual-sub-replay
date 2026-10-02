@@ -18,13 +18,16 @@ internal data class CaptionPlaybackRequest(
     val translationAttempt: Long = 0,
 )
 
-/** Panel status while the original captions play without translation. */
-internal const val ORIGINAL_CAPTIONS_ONLY_STATUS = "Original captions only · translation unavailable"
-
-/** A short reason for the translation bar; translator errors can be empty or very technical. */
-internal fun translationFailureMessage(error: Exception): String =
+/**
+ * A short reason for the translation bar; translator errors can be empty or very technical, so
+ * those show [fallback] (the localized "Translation is unavailable right now…" text) instead.
+ */
+internal fun translationFailureMessage(
+    error: Exception,
+    fallback: String,
+): String =
     error.message?.trim()?.takeIf { it.isNotEmpty() && it.length <= MAX_TRANSLATION_ERROR_LENGTH }
-        ?: "Translation is unavailable right now. Check your connection, then retry."
+        ?: fallback
 
 private const val MAX_TRANSLATION_ERROR_LENGTH = 160
 

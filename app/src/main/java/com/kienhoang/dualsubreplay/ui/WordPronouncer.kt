@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,9 @@ import java.io.File
 
 internal class WordPronouncer(context: Context) {
     private val application = context.applicationContext
+
+    // The activity's resources show the chosen interface language; the application's may not before Android 13.
+    private val resources = context.resources
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val cache = PronunciationCache(File(application.cacheDir, "pronunciation"))
     private var speech: Job? = null
@@ -32,20 +36,17 @@ internal class WordPronouncer(context: Context) {
     fun speak(word: String, language: String) {
         if (disposed || word.isBlank()) return
         stop()
-        if (cache.lookup(word, language) == null) message = "Preparing pronunciation…"
+        if (cache.lookup(word, language) == null) message = resources.getString(R.string.practice_preparing_pronunciation)
         speech = scope.launch {
             val result = pronounce(word, language)
             showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
             message =
                 when (result) {
                     PronunciationResult.SPOKEN -> null
-                    PronunciationResult.NO_VOICE ->
-                        "No voice is available for this language. Open Speech settings to add one, then tap Pronounce again."
-                    PronunciationResult.UNAVAILABLE ->
-                        "Speech is unavailable. Open Speech settings to enable or install a speech engine, then try again."
-                    PronunciationResult.PLAYBACK_FAILED ->
-                        "Could not play pronunciation. Check media volume and your connection, or choose a voice in Speech settings."
-                    PronunciationResult.INVALID_LANGUAGE -> "Choose a subtitle language before pronouncing this word."
+                    PronunciationResult.NO_VOICE -> resources.getString(R.string.practice_speech_no_voice)
+                    PronunciationResult.UNAVAILABLE -> resources.getString(R.string.practice_speech_unavailable)
+                    PronunciationResult.PLAYBACK_FAILED -> resources.getString(R.string.practice_speech_playback_failed)
+                    PronunciationResult.INVALID_LANGUAGE -> resources.getString(R.string.practice_speech_invalid_language)
                 }
         }
     }
@@ -111,7 +112,7 @@ internal class WordPronouncer(context: Context) {
             }
         if (!opened) {
             showSpeechSettings = true
-            message = "Open Android Settings and search for Text-to-speech to install or select a voice."
+            message = resources.getString(R.string.practice_speech_settings_manual)
         }
     }
 

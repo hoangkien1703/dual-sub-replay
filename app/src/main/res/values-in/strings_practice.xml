@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">Latihan</string>
+    <string name="practice_close">Tutup</string>
+    <string name="practice_cancel">Batal</string>
+    <string name="practice_load_failed">Tidak dapat memuat kata tersimpan. Periksa penyimpanan, lalu buka kembali layar ini untuk mencoba lagi.</string>
+    <string name="practice_update_failed">Tidak dapat memperbarui kata tersimpan. Periksa penyimpanan, lalu coba lagi.</string>
+    <string name="practice_example_video_title">Video contoh · perlu internet</string>
+    <string name="practice_example_video_unavailable_hint">Jika video tidak tersedia, kembali untuk melanjutkan latihan.</string>
+    <string name="practice_return_to_practice">Kembali ke Latihan</string>
+    <string name="practice_session_complete">Sesi selesai</string>
+    <string name="practice_session_complete_body">Ulasan Anda sudah disimpan. Kembali lagi saat ada lebih banyak kata yang jatuh tempo.</string>
+    <string name="practice_back_to_saved_words">Kembali ke kata tersimpan</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">Latih kata jatuh tempo</string>
+    <string name="practice_search_label">Cari kata atau arti</string>
+    <string name="practice_empty_hint">Ketuk kata di subtitel, pilih Terjemahkan, lalu Simpan ke kosakata untuk memulai koleksi Anda.</string>
+    <string name="practice_next_review">Ulasan berikutnya: %1$s</string>
+    <string name="practice_pronounce">Ucapkan</string>
+    <string name="practice_pronounce_item">Ucapkan %1$s</string>
+    <string name="practice_speech_settings">Setelan ucapan</string>
+    <string name="practice_show_meaning">Tampilkan arti</string>
+    <string name="practice_meaning_label">Arti (%1$s)</string>
+    <string name="practice_save_meaning">Simpan arti</string>
+    <string name="practice_video_uses_original_sentence">Video contoh menggunakan kalimat asli.</string>
+    <string name="practice_play_online_example">Putar contoh online</string>
+    <string name="practice_online_example">Contoh online</string>
+    <string name="practice_rating_again">Lagi</string>
+    <string name="practice_rating_hard">Sulit</string>
+    <string name="practice_rating_good">Baik</string>
+    <string name="practice_rating_easy">Mudah</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10 mnt</string>
+    <string name="practice_delete_word">Hapus kata</string>
+    <string name="practice_delete_word_title">Hapus %1$s?</string>
+    <string name="practice_delete_word_body">Tindakan ini menghapus riwayat ulasannya.</string>
+    <string name="practice_delete">Hapus</string>
+    <string name="practice_keep">Pertahankan</string>
+    <string name="practice_transfer_failed">Transfer gagal. Silakan coba lagi.</string>
+    <string name="practice_transfer_open_failed">Tidak dapat membuka file yang dipilih.</string>
+    <string name="practice_transfer_export_too_large">Ekspor melebihi batas impor 8 MiB.</string>
+    <string name="practice_transfer_write_failed">Tidak dapat menulis ke file yang dipilih.</string>
+    <string name="practice_transfer_import">Impor</string>
+    <string name="practice_transfer_export">Ekspor</string>
+    <string name="practice_transfer_cancel">Batalkan transfer</string>
+    <string name="practice_import_review_title">Tinjau impor</string>
+    <string name="practice_import_preview_title">Pratinjau impor</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">Catatan yang tidak valid akan dilewati. Kata yang sudah ada tetap disimpan kecuali Anda memilih untuk menggantinya.</string>
+    <string name="practice_import_replace_duplicates">Ganti duplikat, termasuk riwayat ulasan dari cadangan</string>
+    <string name="practice_import_preview_button">Pratinjau</string>
+    <string name="practice_import_words_button">Impor kata</string>
+    <string name="practice_import_mapping_hint">Petakan kolom ke bidang. Teks Anki tidak menyertakan jadwal ulasan atau media.</string>
+    <string name="practice_import_word_language_label">Bahasa kata default (en, ja…)</string>
+    <string name="practice_import_meaning_language_label">Bahasa arti default (vi, en…)</string>
+    <string name="practice_import_first_row">Baris pertama: %1$s</string>
+    <string name="practice_import_column_mapping">%1$s: %2$s</string>
+    <string name="practice_import_not_included">Tidak disertakan</string>
+    <string name="practice_import_column_number">Kolom %1$d</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">Ekspor data Latihan</string>
+    <string name="practice_export_description">Cadangan menyimpan riwayat ulasan. Teks Anki memindahkan kata dan contoh, tanpa jadwal, media, atau template kartu.</string>
+    <string name="practice_export_full_backup">Cadangan lengkap (JSON)</string>
+    <string name="practice_export_anki_text">Teks Anki (TSV)</string>
+    <string name="practice_word_translation_unavailable">Terjemahan tidak tersedia. Anda dapat memasukkan arti dan menyimpan kata.</string>
+    <string name="practice_example_plays_original">Contoh memutar kalimat asli, bukan kata yang diterjemahkan.</string>
+    <string name="practice_save_failed">Tidak dapat menyimpan. Periksa ruang penyimpanan yang tersedia, lalu coba lagi.</string>
+    <string name="practice_saved_to_vocabulary">Disimpan ke kosakata Anda</string>
+    <string name="practice_phrase">Frasa</string>
+    <string name="practice_saving">Menyimpan…</string>
+    <string name="practice_saved">Tersimpan</string>
+    <string name="practice_save_to_vocabulary">Simpan ke kosakata</string>
+    <string name="practice_word_by_word">Kata demi kata</string>
+    <string name="practice_pos_noun">Kata benda</string>
+    <string name="practice_pos_verb">Kata kerja</string>
+    <string name="practice_pos_adjective">Kata sifat</string>
+    <string name="practice_pos_adverb">Kata keterangan</string>
+    <string name="practice_pos_pronoun">Kata ganti</string>
+    <string name="practice_pos_conjunction">Kata hubung</string>
+    <string name="practice_pos_preposition">Kata depan</string>
+    <string name="practice_pos_particle">Partikel / Tata bahasa</string>
+    <string name="practice_pos_unaligned">Tidak selaras / Idiom</string>
+    <string name="practice_pos_other">Lainnya</string>
+    <string name="practice_japanese_dictionary_downloading">Mendownload kamus bahasa Jepang (13 MB) agar ketukan memilih kata utuh…</string>
+    <string name="practice_japanese_dictionary_unavailable">Kamus bahasa Jepang belum dapat didownload. Kata mungkin terpisah secara aneh sampai kamus tersedia.</string>
+    <string name="practice_clipboard_label">Subtitel</string>
+    <string name="practice_copy">Salin</string>
+    <string name="practice_copied">Disalin</string>
+    <string name="practice_translate">Terjemahkan</string>
+    <string name="practice_clear_selection">Hapus pilihan</string>
+    <string name="practice_tap_another_word">Ketuk kata lain untuk memilih frasa</string>
+    <string name="practice_translation_unavailable">Terjemahan tidak tersedia</string>
+    <string name="practice_translating">Menerjemahkan…</string>
+    <string name="practice_preparing_pronunciation">Menyiapkan pengucapan…</string>
+    <string name="practice_speech_no_voice">Tidak ada suara yang tersedia untuk bahasa ini. Buka Setelan ucapan untuk menambahkannya, lalu ketuk Ucapkan lagi.</string>
+    <string name="practice_speech_unavailable">Ucapan tidak tersedia. Buka Setelan ucapan untuk mengaktifkan atau menginstal mesin ucapan, lalu coba lagi.</string>
+    <string name="practice_speech_playback_failed">Tidak dapat memutar pengucapan. Periksa volume media dan koneksi Anda, atau pilih suara di Setelan ucapan.</string>
+    <string name="practice_speech_invalid_language">Pilih bahasa subtitel sebelum mengucapkan kata ini.</string>
+    <string name="practice_speech_settings_manual">Buka Setelan Android dan cari Output text-to-speech untuk menginstal atau memilih suara.</string>
+    <plurals name="practice_word_count">
+        <item quantity="other">%1$d kata</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="other">%1$d jatuh tempo</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="other">%1$d hari</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="other">%1$d catatan kata yang rusak tetap disimpan di penyimpanan dan dilewati.</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="other">%1$d kata diekspor.</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="other">%1$d kata diimpor.</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="other">%1$d valid</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="other">%1$d tidak valid</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="other">%1$d duplikat</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="other">Cadangan lengkap: %1$d kata yang dapat dibaca. Riwayat ulasan disertakan.</item>
+    </plurals>
+</resources>

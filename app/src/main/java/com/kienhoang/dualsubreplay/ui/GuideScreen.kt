@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,16 +34,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.launch
 
 private data class GuidePage(
-    val title: String,
-    val body: String,
+    @StringRes val titleRes: Int,
+    @StringRes val bodyRes: Int,
     val imageRes: Int? = null,
-    val imageContentDescription: String? = null,
+    @StringRes val imageContentDescriptionRes: Int? = null,
     val imageAspectRatio: Float? = null,
     val imageCropFromTop: Boolean = false,
 )
@@ -72,7 +74,7 @@ fun GuideScreen(onFinish: () -> Unit) {
                     onClick = onFinish,
                     modifier = Modifier.testTag("guide_skip"),
                 ) {
-                    Text("Skip", color = Color(0xFFB7CED1))
+                    Text(stringResource(R.string.onboarding_skip), color = Color(0xFFB7CED1))
                 }
             }
 
@@ -108,7 +110,7 @@ fun GuideScreen(onFinish: () -> Unit) {
                     .fillMaxWidth()
                     .testTag(if (isLastPage) "guide_done" else "guide_next"),
             ) {
-                Text(if (isLastPage) "Get started" else "Next")
+                Text(stringResource(if (isLastPage) R.string.onboarding_guide_get_started else R.string.onboarding_guide_next))
             }
         }
     }
@@ -126,7 +128,7 @@ private fun GuidePageContent(page: GuidePage, modifier: Modifier = Modifier) {
         if (imageRes != null && aspectRatio != null) {
             Image(
                 painter = painterResource(imageRes),
-                contentDescription = page.imageContentDescription,
+                contentDescription = page.imageContentDescriptionRes?.let { stringResource(it) },
                 contentScale = ContentScale.Crop,
                 alignment = if (page.imageCropFromTop) Alignment.TopCenter else Alignment.Center,
                 modifier = Modifier
@@ -138,14 +140,14 @@ private fun GuidePageContent(page: GuidePage, modifier: Modifier = Modifier) {
             Spacer(Modifier.height(28.dp))
         }
         Text(
-            text = page.title,
+            text = stringResource(page.titleRes),
             style = MaterialTheme.typography.headlineSmall,
             color = Color(0xFFF3FAFA),
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(10.dp))
         Text(
-            text = page.body,
+            text = stringResource(page.bodyRes),
             style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFFB7CED1),
             textAlign = TextAlign.Center,
@@ -183,22 +185,22 @@ private fun GuidePageIndicator(
 
 private fun guidePages(): List<GuidePage> = listOf(
     GuidePage(
-        title = "Dual subtitles while you watch",
-        body = "Play any YouTube video and see the original captions with a live translation underneath.",
+        titleRes = R.string.onboarding_guide_dual_subtitles_title,
+        bodyRes = R.string.onboarding_guide_dual_subtitles_body,
         imageRes = R.drawable.guide_dual_subtitles,
-        imageContentDescription = "Video playing with original and translated subtitles overlaid",
+        imageContentDescriptionRes = R.string.onboarding_guide_dual_subtitles_image,
         imageAspectRatio = 16f / 10f,
     ),
     GuidePage(
-        title = "Replay any line instantly",
-        body = "Every spoken line is listed with its translation. Tap the play button on a line to jump the video back to that moment, and use the gear to change languages or text size.",
+        titleRes = R.string.onboarding_guide_replay_title,
+        bodyRes = R.string.onboarding_guide_replay_body,
         imageRes = R.drawable.guide_caption_panel,
-        imageContentDescription = "Caption panel listing subtitle lines with replay buttons",
+        imageContentDescriptionRes = R.string.onboarding_guide_replay_image,
         imageAspectRatio = 3f / 4f,
         imageCropFromTop = true,
     ),
     GuidePage(
-        title = "Open any video",
-        body = "Paste a YouTube link, share a video straight from the YouTube app, or just browse inside DualSub Replay.",
+        titleRes = R.string.onboarding_guide_open_video_title,
+        bodyRes = R.string.onboarding_guide_open_video_body,
     ),
 )

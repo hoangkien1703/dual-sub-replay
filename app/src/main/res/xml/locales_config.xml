@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Interface languages offered in Android 13+ Settings > Apps > Language. Keep in step with
+     APP_LANGUAGES and the translated values-* folders (AppLanguageResourcesTest checks this). -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="vi" />
+    <locale android:name="es" />
+    <locale android:name="pt-BR" />
+    <locale android:name="ja" />
+    <locale android:name="ko" />
+    <locale android:name="zh-CN" />
+    <locale android:name="id" />
+</locale-config>

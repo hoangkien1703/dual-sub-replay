@@ -64,6 +64,7 @@ Want to test the newest development build? See the [preview release](https://git
 
 ## Features
 
+- Use the app in English, Tiếng Việt, Español, Português (Brasil), 日本語, 한국어, 简体中文, or Bahasa Indonesia. It follows the phone's language and falls back to English; the globe button at the bottom of the menu picks another.
 - Browse and search the real mobile YouTube site inside the app.
 - Open watch, Shorts, live, embed, and `youtu.be` links in the same persistent YouTube WebView.
 - Play videos with YouTube's native mobile webpage player and controls.

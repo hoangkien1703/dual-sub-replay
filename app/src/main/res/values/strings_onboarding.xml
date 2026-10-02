@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_guide_next">Next</string>
+    <string name="onboarding_guide_get_started">Get started</string>
+    <string name="onboarding_guide_dual_subtitles_title">Dual subtitles while you watch</string>
+    <string name="onboarding_guide_dual_subtitles_body">Play any YouTube video and see the original captions with a live translation underneath.</string>
+    <string name="onboarding_guide_dual_subtitles_image">Video playing with original and translated subtitles overlaid</string>
+    <string name="onboarding_guide_replay_title">Replay any line instantly</string>
+    <string name="onboarding_guide_replay_body">Every spoken line is listed with its translation. Tap the play button on a line to jump the video back to that moment, and use the gear to change languages or text size.</string>
+    <string name="onboarding_guide_replay_image">Caption panel listing subtitle lines with replay buttons</string>
+    <string name="onboarding_guide_open_video_title">Open any video</string>
+    <string name="onboarding_guide_open_video_body">Paste a YouTube link, share a video straight from the YouTube app, or just browse inside DualSub Replay.</string>
+    <string name="onboarding_language_welcome">Welcome to DualSub Replay</string>
+    <string name="onboarding_language_intro">Choose your languages once. You can change them later in subtitle settings.</string>
+    <string name="onboarding_language_native_title">Your native language</string>
+    <string name="onboarding_language_native_helper">Shown as the small translated subtitle.</string>
+    <string name="onboarding_language_learning_title">Language you want to learn</string>
+    <string name="onboarding_language_learning_helper">Preferred caption track; the big subtitle follows the video.</string>
+    <string name="onboarding_language_select">Select language</string>
+    <string name="onboarding_language_continue">Continue</string>
+    <string name="onboarding_language_skip_for_now">Skip for now</string>
+    <string name="onboarding_goal_setup_title">Set a daily goal</string>
+    <string name="onboarding_goal_setup_body">How many minutes do you want to watch in your new language each day? Track your time and streak under Progress in the menu, and change the goal there anytime.</string>
+    <string name="onboarding_goal_set">Set goal</string>
+    <string name="onboarding_goal_off">Off</string>
+    <string name="onboarding_goal_dialog_title">Daily goal</string>
+    <string name="onboarding_goal_dialog_body">How long do you want to watch each day?</string>
+    <string name="onboarding_goal_save">Save</string>
+    <string name="onboarding_goal_cancel">Cancel</string>
+    <string name="onboarding_progress_title">Progress</string>
+    <string name="onboarding_progress_close">Close</string>
+    <string name="onboarding_progress_load_error">Could not load your progress. Check storage and reopen this screen to retry.</string>
+    <string name="onboarding_progress_empty">Watch a video with captions to start tracking your time.</string>
+    <string name="onboarding_progress_today">Today</string>
+    <string name="onboarding_progress_goal">Daily goal: %1$d min</string>
+    <string name="onboarding_progress_goal_reached">Daily goal of %1$d min reached</string>
+    <string name="onboarding_progress_no_goal">No daily goal</string>
+    <string name="onboarding_progress_streak_start">Start a streak today</string>
+    <string name="onboarding_progress_change_goal">Change goal</string>
+    <string name="onboarding_progress_this_week">This week</string>
+    <string name="onboarding_progress_this_month">This month</string>
+    <string name="onboarding_progress_this_year">This year</string>
+    <string name="onboarding_progress_total">Total</string>
+    <string name="onboarding_progress_period_week">Week</string>
+    <string name="onboarding_progress_period_month">Month</string>
+    <string name="onboarding_progress_period_year">Year</string>
+    <string name="onboarding_progress_period_all">All</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">Languages</string>
+    <string name="onboarding_progress_no_time_in_period">No time in this period yet.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">Time counts while a video plays in the app, for the language of its captions. It is stored only on this device.</string>
+    <string name="onboarding_duration_under_minute">&lt;1 min</string>
+    <string name="onboarding_duration_minutes">%1$d min</string>
+    <string name="onboarding_duration_hours">%1$d h</string>
+    <string name="onboarding_duration_hours_minutes">%1$d h %2$d min</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="one">%1$d-day streak</item>
+        <item quantity="other">%1$d-day streak</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="one">%1$d saved word</item>
+        <item quantity="other">%1$d saved words</item>
+    </plurals>
+</resources>

@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -67,11 +70,12 @@ internal fun CompactSubtitleCard(
     showTranslation: Boolean = true,
 ) {
     if (!showOriginal && !showTranslation) return
+    val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
     OutlinedCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .semantics { stateDescription = if (active) "Active subtitle" else "Subtitle" }
+                .semantics { stateDescription = rowState }
                 .clickable(enabled = replayEnabled, onClick = onReplay),
         border =
             BorderStroke(
@@ -101,7 +105,7 @@ internal fun CompactSubtitleCard(
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.Default.PlayArrow,
-                            contentDescription = "Replay this paragraph",
+                            contentDescription = stringResource(R.string.player_replay_paragraph),
                             modifier = Modifier.size(22.dp),
                             tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                         )
@@ -146,7 +150,7 @@ internal fun CompactSubtitleCard(
                         tapToLearnEnabled,
                         resolvedSourceLanguage,
                         targetLanguage,
-                        pendingTranslationText(isDownloadingTranslationModel, translationUnavailable),
+                        stringResource(pendingTranslationTextRes(isDownloadingTranslationModel, translationUnavailable)),
                         onWordClick,
                         onReplay,
                     )
@@ -293,14 +297,13 @@ private fun TranslatedCardText(
 }
 
 /** What a row shows under its original line until its translation arrives. */
-internal fun pendingTranslationText(
+@StringRes
+internal fun pendingTranslationTextRes(
     downloadingModel: Boolean,
     translationUnavailable: Boolean,
-): String =
+): Int =
     when {
-        translationUnavailable -> TRANSLATION_UNAVAILABLE_TEXT
-        downloadingModel -> "Downloading translation model…"
-        else -> "Translating…"
+        translationUnavailable -> R.string.player_translation_unavailable
+        downloadingModel -> R.string.player_downloading_translation_model
+        else -> R.string.player_translating
     }
-
-internal const val TRANSLATION_UNAVAILABLE_TEXT = "Translation unavailable"

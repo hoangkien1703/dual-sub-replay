@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.captionFailureCategory
 import kotlinx.coroutines.*
 import org.junit.Assert.*
@@ -66,12 +67,13 @@ class LiveSubtitleRecoveryTest {
     }
 
     @Test fun overlayUsesLiveTextWithoutInventedReplaySegment() {
-        val content = learningOverlayContent(DualSubUiState(activeVideoId = "abcdefghijk", liveFallback = true,
-            liveOriginal = "Hello", liveTranslated = "Xin chào", wordHighlightEnabled = false))!!
+        val state = DualSubUiState(activeVideoId = "abcdefghijk", liveFallback = true,
+            liveOriginal = "Hello", liveTranslated = "Xin chào", wordHighlightEnabled = false)
+        val content = learningOverlayContent(state, TestUiStrings)!!
         assertEquals("Hello", content.originalText)
         assertEquals("Xin chào", content.translatedText)
         assertNull(content.segment)
-        assertTrue(content.statusText!!.contains("Live subtitles"))
+        assertEquals(TestUiStrings.get(R.string.player_live_subtitles_status, ""), content.statusText)
     }
 
     @Test fun diagnosticsNeverExposeServerTextOrSignedUrls() {

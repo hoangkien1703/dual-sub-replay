@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -7,16 +8,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.kienhoang.dualsubreplay.R
 
 internal const val ORIGINAL_VISIBILITY = "original_caption_visibility"
 internal const val TRANSLATED_VISIBILITY = "translated_caption_visibility"
 
 enum class CaptionVisibility(
-    val label: String,
+    @StringRes val labelRes: Int,
 ) {
-    ALWAYS("Always"),
-    PAUSED("Only when paused"),
-    NEVER("Never"),
+    ALWAYS(R.string.settings_caption_visibility_always),
+    PAUSED(R.string.settings_caption_visibility_paused),
+    NEVER(R.string.settings_caption_visibility_never),
     ;
 
     fun visible(paused: Boolean): Boolean = this == ALWAYS || (this == PAUSED && paused)
@@ -50,14 +53,17 @@ internal fun CaptionVisibilitySettings() {
     val context = LocalContext.current
     val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
     Column {
-        listOf(ORIGINAL_VISIBILITY to "Original captions", TRANSLATED_VISIBILITY to "Translated captions").forEach { (key, label) ->
+        listOf(
+            ORIGINAL_VISIBILITY to R.string.settings_original_captions_visibility,
+            TRANSLATED_VISIBILITY to R.string.settings_translated_captions_visibility,
+        ).forEach { (key, labelRes) ->
             var selected by remember { mutableStateOf(storedCaptionVisibility(preferences.getString(key, null))) }
             var expanded by remember { mutableStateOf(false) }
             Column {
-                TextButton(onClick = { expanded = true }) { Text("$label: ${selected.label}") }
+                TextButton(onClick = { expanded = true }) { Text(stringResource(labelRes, stringResource(selected.labelRes))) }
                 DropdownMenu(expanded, { expanded = false }) {
                     CaptionVisibility.entries.forEach { mode ->
-                        DropdownMenuItem(text = { Text(mode.label) }, onClick = {
+                        DropdownMenuItem(text = { Text(stringResource(mode.labelRes)) }, onClick = {
                             selected = mode
                             preferences.edit().putString(key, mode.name).apply()
                             expanded = false

@@ -27,10 +27,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 
 /** Overlay box and app accent colors, shown in the "Colors & theme" settings section. */
 @Composable
@@ -76,9 +78,9 @@ internal fun AdvancedAppearanceSettings() {
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    Text("Dual-sub box background")
+    Text(stringResource(R.string.settings_box_background_title))
     Text(
-        "Choose the background color of the compact dual-subtitle box shown over the video.",
+        stringResource(R.string.settings_box_background_hint),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -97,13 +99,13 @@ internal fun AdvancedAppearanceSettings() {
     Spacer(Modifier.height(14.dp))
     HorizontalDivider()
     Spacer(Modifier.height(14.dp))
-    Text("App theme", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.settings_app_theme_title), style = MaterialTheme.typography.titleSmall)
     Text(
-        "Accent color",
+        stringResource(R.string.settings_accent_color_title),
         modifier = Modifier.padding(top = 6.dp),
     )
     Text(
-        "Changes switches, sliders, buttons, active borders, and other app accents.",
+        stringResource(R.string.settings_accent_color_hint),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -127,12 +129,15 @@ private fun SettingsColorSwatchRow(
     onColorChange: (String) -> Unit,
     testTagPrefix: String,
 ) {
+    val selectedText = stringResource(R.string.settings_color_selected)
+    val notSelectedText = stringResource(R.string.settings_color_not_selected)
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         options.forEach { option ->
             val selected = option.key == selectedKey
+            val label = stringResource(option.labelRes)
             Box(
                 modifier = Modifier
                     .size(30.dp)
@@ -156,8 +161,8 @@ private fun SettingsColorSwatchRow(
                     .clip(CircleShape)
                     .clickable { onColorChange(option.key) }
                     .semantics {
-                        contentDescription = option.label
-                        stateDescription = if (selected) "Selected" else "Not selected"
+                        contentDescription = label
+                        stateDescription = if (selected) selectedText else notSelectedText
                     }
                     .testTag("color_option_${testTagPrefix}_${option.key}"),
             )

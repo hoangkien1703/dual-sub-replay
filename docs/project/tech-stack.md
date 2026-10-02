@@ -53,6 +53,11 @@ Paths below are relative to
   `ui/PhraseSelection.kt` owns word/phrase selection in subtitle lines and its Copy /
   Translate / Pronounce bar; `ui/WordLearningSheet.kt` is the card Translate opens.
   `ui/PronunciationCache.kt` keeps the recorded speech of the last pronounced word only.
+- `ui/AppLanguage.kt` holds the interface languages and applies the chosen one: Android 13+
+  keeps it with `LocaleManager` (also shown in system settings through `res/xml/locales_config.xml`),
+  older versions keep it in app preferences and apply it in `MainActivity.attachBaseContext` and
+  for view model messages. `ui/AppLanguagePicker.kt` is the drawer button. Text lives in
+  `res/values*/strings_<area>.xml`, one translated copy per offered language.
 - `data/LanguageAwareTokenizer.kt` splits subtitle words. Japanese goes through
   `data/JapaneseMorphology.kt`, which loads Kuromoji lazily on a background thread and groups
   its morphemes into learner words; until it loads, the script-boundary heuristic is used.

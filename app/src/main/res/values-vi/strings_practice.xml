@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">Luyện tập</string>
+    <string name="practice_close">Đóng</string>
+    <string name="practice_cancel">Hủy</string>
+    <string name="practice_load_failed">Không thể tải các từ đã lưu. Hãy kiểm tra bộ nhớ và mở lại màn hình này để thử lại.</string>
+    <string name="practice_update_failed">Không thể cập nhật các từ đã lưu. Hãy kiểm tra bộ nhớ và thử lại.</string>
+    <string name="practice_example_video_title">Video ví dụ · cần kết nối internet</string>
+    <string name="practice_example_video_unavailable_hint">Nếu video không khả dụng, hãy quay lại để tiếp tục luyện tập.</string>
+    <string name="practice_return_to_practice">Quay lại Luyện tập</string>
+    <string name="practice_session_complete">Đã hoàn thành phiên ôn tập</string>
+    <string name="practice_session_complete_body">Kết quả ôn tập của bạn đã được lưu. Hãy quay lại khi có thêm từ đến hạn.</string>
+    <string name="practice_back_to_saved_words">Quay lại từ đã lưu</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">Luyện các từ đến hạn</string>
+    <string name="practice_search_label">Tìm từ hoặc nghĩa</string>
+    <string name="practice_empty_hint">Chạm vào từ trong phụ đề, chọn Dịch, rồi chọn Lưu vào từ vựng để bắt đầu bộ sưu tập của bạn.</string>
+    <string name="practice_next_review">Lần ôn tiếp theo: %1$s</string>
+    <string name="practice_pronounce">Phát âm</string>
+    <string name="practice_pronounce_item">Phát âm %1$s</string>
+    <string name="practice_speech_settings">Cài đặt giọng nói</string>
+    <string name="practice_show_meaning">Hiện nghĩa</string>
+    <string name="practice_meaning_label">Nghĩa (%1$s)</string>
+    <string name="practice_save_meaning">Lưu nghĩa</string>
+    <string name="practice_video_uses_original_sentence">Video ví dụ dùng câu gốc.</string>
+    <string name="practice_play_online_example">Phát ví dụ trực tuyến</string>
+    <string name="practice_online_example">Ví dụ trực tuyến</string>
+    <string name="practice_rating_again">Lại</string>
+    <string name="practice_rating_hard">Khó</string>
+    <string name="practice_rating_good">Tốt</string>
+    <string name="practice_rating_easy">Dễ</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10 phút</string>
+    <string name="practice_delete_word">Xóa từ</string>
+    <string name="practice_delete_word_title">Xóa %1$s?</string>
+    <string name="practice_delete_word_body">Thao tác này sẽ xóa lịch sử ôn tập của từ.</string>
+    <string name="practice_delete">Xóa</string>
+    <string name="practice_keep">Giữ lại</string>
+    <string name="practice_transfer_failed">Chuyển dữ liệu thất bại. Vui lòng thử lại.</string>
+    <string name="practice_transfer_open_failed">Không thể mở tệp đã chọn.</string>
+    <string name="practice_transfer_export_too_large">Bản xuất vượt quá giới hạn nhập 8 MiB.</string>
+    <string name="practice_transfer_write_failed">Không thể ghi vào tệp đã chọn.</string>
+    <string name="practice_transfer_import">Nhập</string>
+    <string name="practice_transfer_export">Xuất</string>
+    <string name="practice_transfer_cancel">Hủy chuyển dữ liệu</string>
+    <string name="practice_import_review_title">Xem lại dữ liệu nhập</string>
+    <string name="practice_import_preview_title">Xem trước dữ liệu nhập</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">Các bản ghi không hợp lệ sẽ bị bỏ qua. Các từ hiện có được giữ nguyên trừ khi bạn chọn thay thế.</string>
+    <string name="practice_import_replace_duplicates">Thay thế các mục trùng lặp, kể cả lịch sử ôn tập trong bản sao lưu</string>
+    <string name="practice_import_preview_button">Xem trước</string>
+    <string name="practice_import_words_button">Nhập từ</string>
+    <string name="practice_import_mapping_hint">Ghép các cột với các trường. Văn bản Anki không bao gồm lịch ôn tập hay tệp đa phương tiện.</string>
+    <string name="practice_import_word_language_label">Ngôn ngữ mặc định của từ (en, ja…)</string>
+    <string name="practice_import_meaning_language_label">Ngôn ngữ mặc định của nghĩa (vi, en…)</string>
+    <string name="practice_import_first_row">Dòng đầu tiên: %1$s</string>
+    <string name="practice_import_column_mapping">%1$s: %2$s</string>
+    <string name="practice_import_not_included">Không bao gồm</string>
+    <string name="practice_import_column_number">Cột %1$d</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">Xuất dữ liệu Luyện tập</string>
+    <string name="practice_export_description">Bản sao lưu giữ lại lịch sử ôn tập. Văn bản Anki chuyển từ và ví dụ, nhưng không có lịch ôn tập, tệp đa phương tiện hay mẫu thẻ.</string>
+    <string name="practice_export_full_backup">Sao lưu đầy đủ (JSON)</string>
+    <string name="practice_export_anki_text">Văn bản Anki (TSV)</string>
+    <string name="practice_word_translation_unavailable">Không có bản dịch. Bạn có thể tự nhập nghĩa và lưu từ.</string>
+    <string name="practice_example_plays_original">Ví dụ phát câu gốc, không phải từ đã dịch.</string>
+    <string name="practice_save_failed">Không thể lưu. Hãy kiểm tra dung lượng trống và thử lại.</string>
+    <string name="practice_saved_to_vocabulary">Đã lưu vào từ vựng của bạn</string>
+    <string name="practice_phrase">Cụm từ</string>
+    <string name="practice_saving">Đang lưu…</string>
+    <string name="practice_saved">Đã lưu</string>
+    <string name="practice_save_to_vocabulary">Lưu vào từ vựng</string>
+    <string name="practice_word_by_word">Từng từ</string>
+    <string name="practice_pos_noun">Danh từ</string>
+    <string name="practice_pos_verb">Động từ</string>
+    <string name="practice_pos_adjective">Tính từ</string>
+    <string name="practice_pos_adverb">Trạng từ</string>
+    <string name="practice_pos_pronoun">Đại từ</string>
+    <string name="practice_pos_conjunction">Liên từ</string>
+    <string name="practice_pos_preposition">Giới từ</string>
+    <string name="practice_pos_particle">Trợ từ / Ngữ pháp</string>
+    <string name="practice_pos_unaligned">Không khớp / Thành ngữ</string>
+    <string name="practice_pos_other">Khác</string>
+    <string name="practice_japanese_dictionary_downloading">Đang tải từ điển tiếng Nhật (13 MB) để mỗi lần chạm chọn được trọn từ…</string>
+    <string name="practice_japanese_dictionary_unavailable">Chưa tải được từ điển tiếng Nhật. Các từ có thể bị tách sai cho đến khi tải xong.</string>
+    <string name="practice_clipboard_label">Phụ đề</string>
+    <string name="practice_copy">Sao chép</string>
+    <string name="practice_copied">Đã sao chép</string>
+    <string name="practice_translate">Dịch</string>
+    <string name="practice_clear_selection">Bỏ chọn</string>
+    <string name="practice_tap_another_word">Chạm vào từ khác để chọn cụm từ</string>
+    <string name="practice_translation_unavailable">Không có bản dịch</string>
+    <string name="practice_translating">Đang dịch…</string>
+    <string name="practice_preparing_pronunciation">Đang chuẩn bị phát âm…</string>
+    <string name="practice_speech_no_voice">Không có giọng đọc cho ngôn ngữ này. Mở Cài đặt giọng nói để thêm giọng, rồi chạm Phát âm lại.</string>
+    <string name="practice_speech_unavailable">Không dùng được giọng nói. Mở Cài đặt giọng nói để bật hoặc cài đặt công cụ giọng nói, rồi thử lại.</string>
+    <string name="practice_speech_playback_failed">Không thể phát âm. Hãy kiểm tra âm lượng phương tiện và kết nối mạng, hoặc chọn giọng đọc trong Cài đặt giọng nói.</string>
+    <string name="practice_speech_invalid_language">Hãy chọn ngôn ngữ phụ đề trước khi phát âm từ này.</string>
+    <string name="practice_speech_settings_manual">Mở Cài đặt Android và tìm \"Chuyển văn bản thành giọng nói\" để cài đặt hoặc chọn giọng đọc.</string>
+    <plurals name="practice_word_count">
+        <item quantity="other">%1$d từ</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="other">%1$d đến hạn</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="other">%1$d ngày</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="other">%1$d bản ghi từ bị lỗi vẫn được giữ trong bộ nhớ và đã bị bỏ qua.</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="other">Đã xuất %1$d từ.</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="other">Đã nhập %1$d từ.</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="other">%1$d hợp lệ</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="other">%1$d không hợp lệ</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="other">%1$d trùng lặp</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="other">Bản sao lưu đầy đủ: %1$d từ đọc được. Có kèm lịch sử ôn tập.</item>
+    </plurals>
+</resources>

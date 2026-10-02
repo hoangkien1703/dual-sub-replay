@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">Đang chờ phụ đề YouTube và ngôn ngữ của phụ đề. Hãy phát video khi đã bật phụ đề.</string>
+    <string name="status_translating_live_captions">Đang dịch phụ đề trực tiếp…</string>
+    <string name="status_live_translation_not_supported">Chưa hỗ trợ dịch trực tiếp cho %1$s.</string>
+    <string name="status_current_captions_only">Chỉ có phụ đề hiện tại; không thể phát lại theo đoạn.</string>
+    <string name="status_live_translation_unavailable">Không thể dịch trực tiếp. Hãy kiểm tra kết nối để tải mô hình ngôn ngữ.</string>
+    <string name="status_preparing_nearby_translations">Đang chuẩn bị bản dịch gần vị trí phát…</string>
+    <string name="status_finding_caption_track">Đang tìm bản phụ đề phù hợp nhất…</string>
+    <string name="status_preparing_subtitles">Đang chuẩn bị phụ đề gần vị trí phát…</string>
+    <string name="status_downloading_translation_model">Đang tải mô hình dịch…</string>
+    <string name="status_subtitles_load_failed">Không thể tải phụ đề. Hãy thử lại để tiếp tục.</string>
+    <string name="status_original_captions_only">Chỉ phụ đề gốc · không có bản dịch</string>
+    <string name="status_paused_translation_resumes">Đã tạm dừng · bản dịch tiếp tục khi phát</string>
+    <string name="status_subtitles_ready">Phụ đề gần vị trí phát đã sẵn sàng</string>
+    <string name="status_preparing_translation">Đang chuẩn bị bản dịch sang %1$s…</string>
+    <string name="status_translation_unavailable_retry">Hiện không thể dịch. Hãy kiểm tra kết nối rồi thử lại.</string>
+    <string name="status_live_subtitles_title">Phụ đề trực tiếp</string>
+    <string name="status_retrying_full_transcript">Đang thử lại bản chép lời đầy đủ…</string>
+    <string name="status_retry_full_transcript">Thử lại bản chép lời đầy đủ</string>
+</resources>

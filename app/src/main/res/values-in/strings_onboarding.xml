@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Lewati</string>
+    <string name="onboarding_guide_next">Berikutnya</string>
+    <string name="onboarding_guide_get_started">Mulai</string>
+    <string name="onboarding_guide_dual_subtitles_title">Subtitel ganda saat Anda menonton</string>
+    <string name="onboarding_guide_dual_subtitles_body">Putar video YouTube apa pun dan lihat subtitel asli dengan terjemahan langsung di bawahnya.</string>
+    <string name="onboarding_guide_dual_subtitles_image">Video yang sedang diputar dengan subtitel asli dan subtitel terjemahan di atasnya</string>
+    <string name="onboarding_guide_replay_title">Putar ulang baris mana pun seketika</string>
+    <string name="onboarding_guide_replay_body">Setiap kalimat yang diucapkan ditampilkan beserta terjemahannya. Ketuk tombol putar pada sebuah baris untuk mengembalikan video ke momen itu, dan gunakan ikon roda gigi untuk mengubah bahasa atau ukuran teks.</string>
+    <string name="onboarding_guide_replay_image">Panel subtitel berisi daftar baris subtitel dengan tombol putar ulang</string>
+    <string name="onboarding_guide_open_video_title">Buka video apa pun</string>
+    <string name="onboarding_guide_open_video_body">Tempel tautan YouTube, bagikan video langsung dari aplikasi YouTube, atau cukup jelajahi di dalam DualSub Replay.</string>
+    <string name="onboarding_language_welcome">Selamat datang di DualSub Replay</string>
+    <string name="onboarding_language_intro">Pilih bahasa Anda sekali saja. Anda dapat mengubahnya nanti di setelan subtitel.</string>
+    <string name="onboarding_language_native_title">Bahasa ibu Anda</string>
+    <string name="onboarding_language_native_helper">Ditampilkan sebagai subtitel terjemahan berukuran kecil.</string>
+    <string name="onboarding_language_learning_title">Bahasa yang ingin Anda pelajari</string>
+    <string name="onboarding_language_learning_helper">Trek subtitel pilihan; subtitel besar mengikuti video.</string>
+    <string name="onboarding_language_select">Pilih bahasa</string>
+    <string name="onboarding_language_continue">Lanjutkan</string>
+    <string name="onboarding_language_skip_for_now">Lewati dulu</string>
+    <string name="onboarding_goal_setup_title">Tetapkan target harian</string>
+    <string name="onboarding_goal_setup_body">Berapa menit Anda ingin menonton dalam bahasa baru setiap hari? Pantau waktu dan runtutan Anda di Kemajuan pada menu, dan ubah target di sana kapan saja.</string>
+    <string name="onboarding_goal_set">Tetapkan target</string>
+    <string name="onboarding_goal_off">Nonaktif</string>
+    <string name="onboarding_goal_dialog_title">Target harian</string>
+    <string name="onboarding_goal_dialog_body">Berapa lama Anda ingin menonton setiap hari?</string>
+    <string name="onboarding_goal_save">Simpan</string>
+    <string name="onboarding_goal_cancel">Batal</string>
+    <string name="onboarding_progress_title">Kemajuan</string>
+    <string name="onboarding_progress_close">Tutup</string>
+    <string name="onboarding_progress_load_error">Tidak dapat memuat kemajuan Anda. Periksa penyimpanan, lalu buka kembali layar ini untuk mencoba lagi.</string>
+    <string name="onboarding_progress_empty">Tonton video bersubtitel untuk mulai mencatat waktu Anda.</string>
+    <string name="onboarding_progress_today">Hari ini</string>
+    <string name="onboarding_progress_goal">Target harian: %1$d mnt</string>
+    <string name="onboarding_progress_goal_reached">Target harian %1$d mnt tercapai</string>
+    <string name="onboarding_progress_no_goal">Tidak ada target harian</string>
+    <string name="onboarding_progress_streak_start">Mulai runtutan hari ini</string>
+    <string name="onboarding_progress_change_goal">Ubah target</string>
+    <string name="onboarding_progress_this_week">Minggu ini</string>
+    <string name="onboarding_progress_this_month">Bulan ini</string>
+    <string name="onboarding_progress_this_year">Tahun ini</string>
+    <string name="onboarding_progress_total">Total</string>
+    <string name="onboarding_progress_period_week">Minggu</string>
+    <string name="onboarding_progress_period_month">Bulan</string>
+    <string name="onboarding_progress_period_year">Tahun</string>
+    <string name="onboarding_progress_period_all">Semua</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">Bahasa</string>
+    <string name="onboarding_progress_no_time_in_period">Belum ada waktu pada periode ini.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">Waktu dihitung saat video diputar di aplikasi, sesuai bahasa subtitelnya. Data hanya disimpan di perangkat ini.</string>
+    <string name="onboarding_duration_under_minute">&lt;1 mnt</string>
+    <string name="onboarding_duration_minutes">%1$d mnt</string>
+    <string name="onboarding_duration_hours">%1$d jam</string>
+    <string name="onboarding_duration_hours_minutes">%1$d jam %2$d mnt</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="other">Runtutan %1$d hari</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="other">%1$d kata tersimpan</item>
+    </plurals>
+</resources>

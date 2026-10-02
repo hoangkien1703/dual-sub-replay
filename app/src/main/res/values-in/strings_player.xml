@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_tap_paragraph_to_replay">Ketuk paragraf untuk memutarnya ulang</string>
+    <string name="player_subtitle_settings">Setelan subtitel</string>
+    <string name="player_dual_subtitle_settings">Setelan subtitel ganda</string>
+    <string name="player_show_dual_subtitles">Tampilkan subtitel ganda</string>
+    <string name="player_hide_dual_subtitles">Sembunyikan subtitel ganda</string>
+    <string name="player_loading_captions">Memuat subtitel…</string>
+    <string name="player_finding_captions">Mencari subtitel</string>
+    <string name="player_source_to_target">"%1$s  →  %2$s"</string>
+    <string name="player_caption_track_auto_generated">%1$s (dibuat otomatis)</string>
+    <string name="player_video_split_state">Video %1$d persen</string>
+    <string name="player_retry_translation">Coba terjemahkan lagi</string>
+    <string name="player_retry_captions">Coba muat subtitel lagi</string>
+    <string name="player_retry_full_transcript">Coba lagi transkrip lengkap</string>
+    <string name="player_search_languages">Cari bahasa</string>
+    <string name="player_language_selected">Dipilih</string>
+    <string name="player_back">Kembali</string>
+    <string name="player_translating">Menerjemahkan…</string>
+    <string name="player_downloading_translation_model">Mengunduh model terjemahan…</string>
+    <string name="player_translation_unavailable">Terjemahan tidak tersedia</string>
+    <string name="player_live_subtitles_status">Subtitel langsung · %1$s</string>
+    <string name="player_waiting_next_caption">Menunggu subtitel berikutnya…</string>
+    <string name="player_now_playing">Sedang diputar · %1$s</string>
+    <string name="player_active_subtitle">Subtitel aktif</string>
+    <string name="player_subtitle">Subtitel</string>
+    <string name="player_replay_paragraph">Putar ulang paragraf ini</string>
+    <string name="player_youtube_unavailable">YouTube tidak tersedia</string>
+    <string name="player_youtube_could_not_load">YouTube tidak dapat dimuat: %1$s</string>
+    <string name="player_youtube_http_error">YouTube mengembalikan HTTP %1$d.</string>
+    <string name="player_webview_renderer_crashed_reload">Perender Android WebView mengalami error. Ketuk Muat ulang untuk membuatnya kembali.</string>
+    <string name="player_webview_renderer_reclaimed_reload">Android menghentikan perender WebView untuk mengosongkan memori. Ketuk Muat ulang untuk membuatnya kembali.</string>
+    <string name="player_reload">Muat ulang</string>
+</resources>

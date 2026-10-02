@@ -22,8 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.DEFAULT_DAILY_GOAL_MINUTES
 
 /** One-time step after the guide. [onFinish] receives the chosen minutes, or null when skipped. */
@@ -38,7 +40,7 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
         Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 28.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = { onFinish(null) }, modifier = Modifier.testTag("daily_goal_skip")) {
-                    Text("Skip", color = Color(0xFFB7CED1))
+                    Text(stringResource(R.string.onboarding_skip), color = Color(0xFFB7CED1))
                 }
             }
             Column(
@@ -47,15 +49,14 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    "Set a daily goal",
+                    stringResource(R.string.onboarding_goal_setup_title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color(0xFFF3FAFA),
                     textAlign = TextAlign.Center,
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "How many minutes do you want to watch in your new language each day? " +
-                        "Track your time and streak under Progress in the menu, and change the goal there anytime.",
+                    stringResource(R.string.onboarding_goal_setup_body),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFFB7CED1),
                     textAlign = TextAlign.Center,
@@ -65,7 +66,7 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
             }
             Spacer(Modifier.height(20.dp))
             Button(onClick = { onFinish(selected) }, modifier = Modifier.fillMaxWidth().testTag("daily_goal_confirm")) {
-                Text("Set goal")
+                Text(stringResource(R.string.onboarding_goal_set))
             }
         }
     }

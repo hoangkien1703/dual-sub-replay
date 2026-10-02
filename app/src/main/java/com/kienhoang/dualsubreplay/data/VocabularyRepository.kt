@@ -35,8 +35,10 @@ internal class VocabularyRepository internal constructor(
     private val mutex = Mutex()
     private val _words = MutableStateFlow<List<SavedWord>>(emptyList())
     val words = _words.asStateFlow()
-    private val _warning = MutableStateFlow<String?>(null)
-    val warning = _warning.asStateFlow()
+    private val _malformedRecords = MutableStateFlow(0)
+
+    /** How many stored records could not be read and were skipped (kept in storage); the UI words the warning. */
+    val malformedRecords = _malformedRecords.asStateFlow()
 
     internal fun close() = database.close()
 
@@ -82,12 +84,7 @@ internal class VocabularyRepository internal constructor(
                     }
                 }
             }
-        _warning.value =
-            if (malformedCount > 0) {
-                "$malformedCount malformed word records were retained in storage and skipped."
-            } else {
-                null
-            }
+        _malformedRecords.value = malformedCount
         return list
     }
 

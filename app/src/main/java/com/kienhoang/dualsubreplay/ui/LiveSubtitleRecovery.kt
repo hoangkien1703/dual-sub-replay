@@ -6,7 +6,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -81,8 +83,11 @@ internal fun LiveSubtitlePanel(
     onWordClick: (WordTap) -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(12.dp)) {
-        Text("Live subtitles", style = MaterialTheme.typography.labelMedium)
-        Text(state.statusMessage ?: "Current captions only; paragraph replay is unavailable.", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.status_live_subtitles_title), style = MaterialTheme.typography.labelMedium)
+        Text(
+            state.statusMessage ?: stringResource(R.string.status_current_captions_only),
+            style = MaterialTheme.typography.bodySmall,
+        )
         state.liveOriginal?.let { original ->
             CompactSubtitleCard(
                 segment = SubtitleSegment(0, 0, 0, original, state.liveTranslated, liveCaptionWords(original)),
@@ -102,7 +107,13 @@ internal fun LiveSubtitlePanel(
             )
         }
         TextButton(onClick = onRetry, enabled = !state.retryingTranscript) {
-            Text(if (state.retryingTranscript) "Retrying full transcript…" else "Retry full transcript")
+            Text(
+                if (state.retryingTranscript) {
+                    stringResource(R.string.status_retrying_full_transcript)
+                } else {
+                    stringResource(R.string.status_retry_full_transcript)
+                },
+            )
         }
     }
 }

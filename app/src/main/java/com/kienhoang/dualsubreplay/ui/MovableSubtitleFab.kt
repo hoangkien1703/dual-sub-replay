@@ -31,7 +31,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -339,7 +341,7 @@ internal fun MovableSubtitleFab(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {
-            Icon(Icons.Default.ClosedCaption, contentDescription = "Show dual subtitles")
+            Icon(Icons.Default.ClosedCaption, contentDescription = stringResource(R.string.player_show_dual_subtitles))
         }
     }
 }

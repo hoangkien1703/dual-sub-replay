@@ -86,8 +86,7 @@ class VocabularyRepositoryTest {
             repository.refresh()
             assertEquals(1, repository.words.value.size)
             assertEquals("valid-1", repository.words.value.single().id)
-            assertNotNull(repository.warning.value)
-            assertTrue(repository.warning.value!!.contains("malformed"))
+            assertEquals(1, repository.malformedRecords.value)
         } finally { repository.close(); context.deleteDatabase(name) }
     }
 

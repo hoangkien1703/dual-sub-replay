@@ -18,7 +18,7 @@ class CaptionVisibilityTest {
                             translatedVisibility = translation,
                             playbackPaused = paused,
                         )
-                    val overlay = learningOverlayContent(state)!!
+                    val overlay = learningOverlayContent(state, TestUiStrings)!!
                     assertEquals(original.visible(paused), overlay.originalText != null)
                     assertEquals(translation.visible(paused), overlay.translatedText != null)
                     assertEquals(state.showOriginal(), overlay.originalText != null)

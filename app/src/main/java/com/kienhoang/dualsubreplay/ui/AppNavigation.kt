@@ -17,9 +17,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -52,13 +54,13 @@ internal fun AppNavigation(
                             Spacer(Modifier.height(8.dp))
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Default.School, contentDescription = null) },
-                                label = { Text("Practice") }, selected = false,
+                                label = { Text(stringResource(R.string.navigation_practice)) }, selected = false,
                                 modifier = Modifier.testTag("open_saved_words"),
                                 onClick = { scope.launch { drawer.close(); onPractice() } },
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Default.Insights, contentDescription = null) },
-                                label = { Text("Progress") },
+                                label = { Text(stringResource(R.string.navigation_progress)) },
                                 selected = false,
                                 modifier = Modifier.testTag("open_progress"),
                                 onClick = {
@@ -70,12 +72,13 @@ internal fun AppNavigation(
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                                label = { Text("Settings") }, selected = false,
+                                label = { Text(stringResource(R.string.navigation_settings)) }, selected = false,
                                 onClick = { scope.launch { drawer.close(); onSettings() } },
                             )
                         }
                         Column(Modifier.padding(horizontal = 4.dp)) {
                             HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                            AppLanguageButton()
                             SettingsRepositoryLink(beforeOpen = { drawer.close() })
                         }
                     }
@@ -92,7 +95,7 @@ internal fun AppNavigation(
             ) {
                 Icon(
                     Icons.Default.Menu,
-                    contentDescription = "Open navigation menu",
+                    contentDescription = stringResource(R.string.navigation_open_menu),
                     modifier = Modifier.padding(start = 12.dp).size(24.dp),
                 )
             }
@@ -120,13 +123,13 @@ private fun DrawerHeader(onClose: () -> Unit) {
         Column(Modifier.weight(1f)) {
             Text("DualSub Replay", style = MaterialTheme.typography.titleLarge)
             Text(
-                "Learn languages with YouTube",
+                stringResource(R.string.navigation_tagline),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         IconButton(onClick = onClose, modifier = Modifier.testTag("close_navigation_menu")) {
-            Icon(Icons.Default.Close, contentDescription = "Close navigation menu")
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.navigation_close_menu))
         }
     }
 }

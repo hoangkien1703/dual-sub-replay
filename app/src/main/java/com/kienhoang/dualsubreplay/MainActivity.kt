@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
@@ -12,11 +13,16 @@ import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.kienhoang.dualsubreplay.ui.AppLanguageSettings
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguageSettings.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

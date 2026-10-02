@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">YouTube 자막과 자막 언어를 기다리는 중이에요. 자막을 켜고 동영상을 재생하세요.</string>
+    <string name="status_translating_live_captions">실시간 자막 번역 중…</string>
+    <string name="status_live_translation_not_supported">%1$s 실시간 번역은 지원되지 않아요.</string>
+    <string name="status_current_captions_only">현재 자막만 표시돼요. 문단 다시 재생은 사용할 수 없어요.</string>
+    <string name="status_live_translation_unavailable">실시간 번역을 사용할 수 없어요. 언어 모델을 다운로드할 수 있도록 연결을 확인하세요.</string>
+    <string name="status_preparing_nearby_translations">근처 번역 준비 중…</string>
+    <string name="status_finding_caption_track">가장 적합한 자막 트랙을 찾는 중…</string>
+    <string name="status_preparing_subtitles">재생 위치 근처 자막 준비 중…</string>
+    <string name="status_downloading_translation_model">번역 모델 다운로드 중…</string>
+    <string name="status_subtitles_load_failed">자막을 불러오지 못했어요. 다시 시도해 계속하세요.</string>
+    <string name="status_original_captions_only">원본 자막만 · 번역 사용 불가</string>
+    <string name="status_paused_translation_resumes">일시중지됨 · 재생하면 번역이 다시 시작돼요</string>
+    <string name="status_subtitles_ready">재생 위치 근처 자막 준비 완료</string>
+    <string name="status_preparing_translation">%1$s 번역 준비 중…</string>
+    <string name="status_translation_unavailable_retry">지금은 번역을 사용할 수 없어요. 연결을 확인한 후 다시 시도하세요.</string>
+    <string name="status_live_subtitles_title">실시간 자막</string>
+    <string name="status_retrying_full_transcript">전체 자막 다시 시도 중…</string>
+    <string name="status_retry_full_transcript">전체 자막 다시 시도</string>
+</resources>

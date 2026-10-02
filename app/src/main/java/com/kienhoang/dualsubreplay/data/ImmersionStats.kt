@@ -3,7 +3,10 @@ package com.kienhoang.dualsubreplay.data
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Month
+import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 /** Watched time for one local day and learning language. */
 data class ImmersionDay(
@@ -187,24 +190,16 @@ internal fun languageBreakdown(
         .sortedWith(compareByDescending<LanguageTime> { it.ms }.thenBy { it.language })
 }
 
-private val MONTH_INITIALS = listOf("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
-private val WEEKDAY_INITIALS =
-    mapOf(
-        DayOfWeek.MONDAY to "M",
-        DayOfWeek.TUESDAY to "T",
-        DayOfWeek.WEDNESDAY to "W",
-        DayOfWeek.THURSDAY to "T",
-        DayOfWeek.FRIDAY to "F",
-        DayOfWeek.SATURDAY to "S",
-        DayOfWeek.SUNDAY to "S",
-    )
-
-/** Chart buckets: week days, month days, year months, or one bar per year since the first record. */
+/**
+ * Chart buckets: week days, month days, year months, or one bar per year since the first record.
+ * Week days and months are labeled with their narrow names in [locale] ("M", "T", ... in English).
+ */
 internal fun periodBars(
     days: List<ImmersionDay>,
     period: ImmersionPeriod,
     today: LocalDate,
     firstDayOfWeek: DayOfWeek,
+    locale: Locale,
 ): List<ImmersionBar> {
     val byDay = days.groupBy { it.day }.mapValues { (_, rows) -> rows.sumOf { it.ms } }
     return when (period) {
@@ -212,7 +207,7 @@ internal fun periodBars(
             val start = startOfWeek(today, firstDayOfWeek)
             (0L until 7L).map { offset ->
                 val day = start.plusDays(offset)
-                ImmersionBar(WEEKDAY_INITIALS.getValue(day.dayOfWeek), byDay[day] ?: 0L, day == today)
+                ImmersionBar(day.dayOfWeek.getDisplayName(TextStyle.NARROW, locale), byDay[day] ?: 0L, day == today)
             }
         }
         ImmersionPeriod.MONTH ->
@@ -223,7 +218,7 @@ internal fun periodBars(
         ImmersionPeriod.YEAR ->
             (1..12).map { month ->
                 val ms = byDay.filterKeys { it.year == today.year && it.monthValue == month }.values.sum()
-                ImmersionBar(MONTH_INITIALS[month - 1], ms, month == today.monthValue)
+                ImmersionBar(Month.of(month).getDisplayName(TextStyle.NARROW, locale), ms, month == today.monthValue)
             }
         ImmersionPeriod.ALL -> {
             val firstYear = minOf(days.minOfOrNull { it.day.year } ?: today.year, today.year)
@@ -259,17 +254,29 @@ internal fun goalProgress(
     goalMinutes: Int,
 ): Float = if (goalMinutes <= 0) 0f else (todayMs.toFloat() / (goalMinutes * 60_000f)).coerceIn(0f, 1f)
 
-/** "0 min", "45 min", "1 h 5 min", "12 h". Seconds are dropped; under a minute reads "<1 min". */
-internal fun formatImmersionDuration(ms: Long): String {
+/** Which shape a watched duration is shown in; the UI turns it into localized text. */
+internal enum class ImmersionDurationStyle { UNDER_A_MINUTE, MINUTES, HOURS, HOURS_AND_MINUTES }
+
+internal data class ImmersionDuration(
+    val style: ImmersionDurationStyle,
+    val hours: Long,
+    val minutes: Long,
+)
+
+/**
+ * "0 min", "45 min", "1 h 5 min", "12 h" in English. Seconds are dropped; under a minute reads "<1 min";
+ * from 100 hours on the minutes are dropped too. [ImmersionDuration.minutes] is the rest after full hours.
+ */
+internal fun immersionDuration(ms: Long): ImmersionDuration {
     val minutes = ms.coerceAtLeast(0) / 60_000
     val hours = minutes / 60
     val rest = minutes % 60
     return when {
-        ms <= 0 -> "0 min"
-        minutes == 0L -> "<1 min"
-        hours == 0L -> "$minutes min"
-        rest == 0L || hours >= 100 -> "$hours h"
-        else -> "$hours h $rest min"
+        ms <= 0 -> ImmersionDuration(ImmersionDurationStyle.MINUTES, 0, 0)
+        minutes == 0L -> ImmersionDuration(ImmersionDurationStyle.UNDER_A_MINUTE, 0, 0)
+        hours == 0L -> ImmersionDuration(ImmersionDurationStyle.MINUTES, 0, minutes)
+        rest == 0L || hours >= 100 -> ImmersionDuration(ImmersionDurationStyle.HOURS, hours, 0)
+        else -> ImmersionDuration(ImmersionDurationStyle.HOURS_AND_MINUTES, hours, rest)
     }
 }
 

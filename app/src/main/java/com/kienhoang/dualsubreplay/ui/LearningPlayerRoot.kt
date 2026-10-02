@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
@@ -602,7 +604,7 @@ internal fun LearningSubtitleOverlay(
     onClose: () -> Unit,
 ) {
     if (content.originalText == null && content.translatedText == null && content.statusText == null) {
-        Box(modifier) { TextButton(onClick = onSettings) { Text("Subtitle settings") } }
+        Box(modifier) { TextButton(onClick = onSettings) { Text(stringResource(R.string.player_subtitle_settings)) } }
         return
     }
 
@@ -788,7 +790,7 @@ internal fun LearningSubtitleOverlay(
                     }
                 }
                 onRetryTranscript?.let { retry ->
-                    androidx.compose.material3.TextButton(onClick = retry) { Text("Retry full transcript") }
+                    androidx.compose.material3.TextButton(onClick = retry) { Text(stringResource(R.string.player_retry_full_transcript)) }
                 }
                 content.statusText?.let { status ->
                     Text(
@@ -802,10 +804,10 @@ internal fun LearningSubtitleOverlay(
             }
   if (overlayActionsVisible) {
       IconButton(onClick = onSettings) {
-          Icon(Icons.Default.Settings, contentDescription = "Dual-subtitle settings")
+          Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.player_dual_subtitle_settings))
       }
       IconButton(onClick = onClose) {
-          Icon(Icons.Default.Close, contentDescription = "Hide dual subtitles")
+          Icon(Icons.Default.Close, contentDescription = stringResource(R.string.player_hide_dual_subtitles))
       }
   }
         }

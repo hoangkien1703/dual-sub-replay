@@ -344,7 +344,7 @@ class SubtitleUiTest {
             }
         }
         composeRule.onNodeWithText("Original line 0").assertIsDisplayed()
-        composeRule.onNodeWithText(TRANSLATION_UNAVAILABLE_TEXT).assertIsDisplayed()
+        composeRule.onNodeWithText("Translation unavailable").assertIsDisplayed()
         composeRule.onNodeWithText("The translation model download took too long.").assertIsDisplayed()
         composeRule.onNodeWithText("Retry translation").performClick()
         assertEquals(1, retries)

@@ -71,6 +71,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
@@ -78,9 +79,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import java.util.Locale
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -607,7 +610,7 @@ private fun SubtitlePanel(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = state.statusMessage ?: "Tap a paragraph to replay it",
+                            text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFFB7CED1),
                             maxLines = 1,
@@ -617,14 +620,14 @@ private fun SubtitlePanel(
                     IconButton(onClick = onSettings) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = "Subtitle settings",
+                            contentDescription = stringResource(R.string.player_subtitle_settings),
                             tint = Color(0xFFE5F2F3),
                         )
                     }
                     IconButton(onClick = onHide) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Hide dual subtitles",
+                            contentDescription = stringResource(R.string.player_hide_dual_subtitles),
                             tint = Color(0xFFE5F2F3),
                         )
                     }
@@ -636,7 +639,7 @@ private fun SubtitlePanel(
                 when {
                     state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                     state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
-                    state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
+                    state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
                     else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
                 }
             }
@@ -686,12 +689,13 @@ private fun LandscapeSplitDivider(
     dragState: androidx.compose.foundation.gestures.DraggableState,
     onDragStopped: () -> Unit,
 ) {
+    val splitState = stringResource(R.string.player_video_split_state, (videoFraction * 100).roundToInt())
     Box(
         modifier = Modifier
             .width(12.dp)
             .fillMaxHeight()
             .semantics {
-                stateDescription = "Video ${(videoFraction * 100).roundToInt()} percent"
+                stateDescription = splitState
             }
             .testTag("landscape_split_divider")
             .draggable(
@@ -789,7 +793,7 @@ private fun SideSubtitlePanel(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = state.statusMessage ?: "Tap a paragraph to replay it",
+                            text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFFB7CED1),
                             maxLines = 1,
@@ -799,7 +803,7 @@ private fun SideSubtitlePanel(
                     IconButton(onClick = onSettings, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = "Subtitle settings",
+                            contentDescription = stringResource(R.string.player_subtitle_settings),
                             tint = Color(0xFFE5F2F3),
                             modifier = Modifier.size(20.dp),
                         )
@@ -807,7 +811,7 @@ private fun SideSubtitlePanel(
                     IconButton(onClick = onHide, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Hide dual subtitles",
+                            contentDescription = stringResource(R.string.player_hide_dual_subtitles),
                             tint = Color(0xFFE5F2F3),
                             modifier = Modifier.size(20.dp),
                         )
@@ -819,7 +823,7 @@ private fun SideSubtitlePanel(
             when {
                 state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
-                state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: "Loading captions…")
+                state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
                 else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
             }
         }
@@ -1099,7 +1103,7 @@ internal fun TranslationUnavailableBar(
         TextButton(onClick = onRetry) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(Modifier.size(5.dp))
-            Text("Retry translation")
+            Text(stringResource(R.string.player_retry_translation))
         }
     }
 }
@@ -1113,7 +1117,7 @@ private fun CompactErrorPanel(message: String, onRetry: () -> Unit) {
             TextButton(onClick = onRetry) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Spacer(Modifier.size(5.dp))
-                Text("Retry captions")
+                Text(stringResource(R.string.player_retry_captions))
             }
         }
     }
@@ -1132,11 +1136,12 @@ internal fun LanguagePickerDialog(
     onDismiss: () -> Unit,
     testTagPrefix: String,
 ) {
-    val filteredChoices = choices.filter { choice ->
-        searchQuery.isBlank() ||
-            choice.label.contains(searchQuery.trim(), ignoreCase = true) ||
-            choice.code.contains(searchQuery.trim(), ignoreCase = true)
-    }
+    val interfaceLocale = LocalContext.current.interfaceLocale()
+    val shownChoices =
+        remember(choices, interfaceLocale) {
+            choices.map { it to localizedLanguageLabel(it.code, it.label, interfaceLocale) }
+        }
+    val filteredChoices = shownChoices.filter { (choice, shown) -> languageChoiceMatches(choice, shown, searchQuery) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
@@ -1146,13 +1151,13 @@ internal fun LanguagePickerDialog(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth().testTag("language_search"),
-                    label = { Text("Search languages") },
+                    label = { Text(stringResource(R.string.player_search_languages)) },
                     singleLine = true,
                 )
                 Spacer(Modifier.height(8.dp))
                 val listMaxHeight = minOf(360.dp, LocalConfiguration.current.screenHeightDp.dp * 0.45f)
                 LazyColumn(Modifier.fillMaxWidth().heightIn(max = listMaxHeight)) {
-                    itemsIndexed(filteredChoices, key = { _, choice -> choice.code }) { _, choice ->
+                    itemsIndexed(filteredChoices, key = { _, item -> item.first.code }) { _, (choice, shown) ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1161,33 +1166,62 @@ internal fun LanguagePickerDialog(
                                 .padding(horizontal = 8.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(choice.label, modifier = Modifier.weight(1f))
+                            Text(shown, modifier = Modifier.weight(1f))
                             if (
                                 TranslationLanguages.normalize(choice.code) ==
                                 TranslationLanguages.normalize(selectedCode)
                             ) {
-                                Text("Selected", style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(R.string.player_language_selected), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Back") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.player_back)) } },
     )
 }
 
-private fun sourceDescription(state: DualSubUiState): String {
-    val source = state.resolvedSourceLanguage?.let { resolved ->
-        state.availableSourceLanguages.firstOrNull {
-            TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
-        }?.name ?: TranslationLanguages.displayName(resolved)
-    }?.let { captionTrackLabel(it, state.generatedCaptions) } ?: "Finding captions"
-    return "$source  →  ${TranslationLanguages.displayName(state.targetLanguage)}"
+/** Matches the shown (possibly localized) name, the English name, or the code, so either language finds it. */
+internal fun languageChoiceMatches(
+    choice: LanguageChoice,
+    shownLabel: String,
+    query: String,
+): Boolean {
+    val needle = query.trim()
+    if (needle.isEmpty()) return true
+    return listOfNotNull(shownLabel, choice.label, TranslationLanguages.find(choice.code)?.name, choice.code)
+        .any { it.contains(needle, ignoreCase = true) }
 }
 
-/** YouTube already names generated tracks "English (auto-generated)", so only add the marker when it is missing. */
+/** A catalog language name in the interface language; any other label, such as a YouTube track name, stays as is. */
+internal fun localizedLanguageLabel(
+    code: String,
+    label: String,
+    interfaceLocale: Locale,
+): String = if (label == TranslationLanguages.find(code)?.name) languageDisplayName(code, interfaceLocale) else label
+
+@Composable
+private fun sourceDescription(state: DualSubUiState): String {
+    val context = LocalContext.current
+    val interfaceLocale = context.interfaceLocale()
+    val source = state.resolvedSourceLanguage?.let { resolved ->
+        val name = state.availableSourceLanguages.firstOrNull {
+            TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
+        }?.name ?: TranslationLanguages.displayName(resolved)
+        captionTrackLabel(localizedLanguageLabel(resolved, name, interfaceLocale), state.generatedCaptions) {
+            context.getString(R.string.player_caption_track_auto_generated, it)
+        }
+    } ?: stringResource(R.string.player_finding_captions)
+    return stringResource(R.string.player_source_to_target, source, languageDisplayName(state.targetLanguage, interfaceLocale))
+}
+
+/**
+ * YouTube already names generated tracks "English (auto-generated)", so only add the marker when it is missing.
+ * [markGenerated] adds it in the interface language.
+ */
 internal fun captionTrackLabel(
     name: String,
     generated: Boolean,
-): String = if (generated && !name.contains("auto-generated", ignoreCase = true)) "$name (auto-generated)" else name
+    markGenerated: (String) -> String,
+): String = if (generated && !name.contains("auto-generated", ignoreCase = true)) markGenerated(name) else name

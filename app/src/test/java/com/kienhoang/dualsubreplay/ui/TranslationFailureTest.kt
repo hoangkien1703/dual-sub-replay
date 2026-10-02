@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
 import kotlinx.coroutines.CancellationException
@@ -198,17 +199,25 @@ class TranslationFailureTest {
 
     @Test
     fun rowsShowWhyTheirTranslationIsMissing() {
-        assertEquals("Translating…", pendingTranslationText(downloadingModel = false, translationUnavailable = false))
-        assertEquals("Downloading translation model…", pendingTranslationText(downloadingModel = true, translationUnavailable = false))
-        assertEquals(TRANSLATION_UNAVAILABLE_TEXT, pendingTranslationText(downloadingModel = true, translationUnavailable = true))
+        assertEquals(R.string.player_translating, pendingTranslationTextRes(downloadingModel = false, translationUnavailable = false))
+        assertEquals(
+            R.string.player_downloading_translation_model,
+            pendingTranslationTextRes(downloadingModel = true, translationUnavailable = false),
+        )
+        assertEquals(
+            R.string.player_translation_unavailable,
+            pendingTranslationTextRes(downloadingModel = true, translationUnavailable = true),
+        )
     }
 
     @Test
     fun failureMessagesStayShortAndReadable() {
-        assertEquals("Model missing.", translationFailureMessage(IllegalStateException(" Model missing. ")))
-        val fallback = translationFailureMessage(IllegalStateException(""))
-        assertTrue(fallback.startsWith("Translation is unavailable"))
-        assertEquals(fallback, translationFailureMessage(IllegalStateException("x".repeat(500))))
+        val fallback = "Translation is unavailable right now."
+        assertEquals("Model missing.", translationFailureMessage(IllegalStateException(" Model missing. "), fallback))
+        assertEquals(fallback, translationFailureMessage(IllegalStateException(""), fallback))
+        assertEquals(fallback, translationFailureMessage(IllegalStateException("   "), fallback))
+        assertEquals(fallback, translationFailureMessage(IllegalStateException(), fallback))
+        assertEquals(fallback, translationFailureMessage(IllegalStateException("x".repeat(500)), fallback))
     }
 
     @Test

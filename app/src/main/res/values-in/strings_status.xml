@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">Menunggu subtitel YouTube dan bahasanya. Putar video dengan subtitel diaktifkan.</string>
+    <string name="status_translating_live_captions">Menerjemahkan subtitel langsung…</string>
+    <string name="status_live_translation_not_supported">Terjemahan langsung tidak didukung untuk %1$s.</string>
+    <string name="status_current_captions_only">Hanya subtitel saat ini; putar ulang per paragraf tidak tersedia.</string>
+    <string name="status_live_translation_unavailable">Terjemahan langsung tidak tersedia. Periksa koneksi untuk mengunduh model bahasa.</string>
+    <string name="status_preparing_nearby_translations">Menyiapkan terjemahan di sekitar posisi putar…</string>
+    <string name="status_finding_caption_track">Mencari trek subtitel terbaik…</string>
+    <string name="status_preparing_subtitles">Menyiapkan subtitel di sekitar posisi putar…</string>
+    <string name="status_downloading_translation_model">Mengunduh model terjemahan…</string>
+    <string name="status_subtitles_load_failed">Subtitel tidak dapat dimuat. Coba lagi untuk melanjutkan.</string>
+    <string name="status_original_captions_only">Hanya subtitel asli · terjemahan tidak tersedia</string>
+    <string name="status_paused_translation_resumes">Dijeda · terjemahan berlanjut saat diputar</string>
+    <string name="status_subtitles_ready">Subtitel di sekitar posisi putar sudah siap</string>
+    <string name="status_preparing_translation">Menyiapkan terjemahan %1$s…</string>
+    <string name="status_translation_unavailable_retry">Terjemahan tidak tersedia saat ini. Periksa koneksi Anda, lalu coba lagi.</string>
+    <string name="status_live_subtitles_title">Subtitel langsung</string>
+    <string name="status_retrying_full_transcript">Mencoba lagi transkrip lengkap…</string>
+    <string name="status_retry_full_transcript">Coba lagi transkrip lengkap</string>
+</resources>
