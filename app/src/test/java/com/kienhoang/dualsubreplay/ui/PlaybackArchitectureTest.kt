@@ -319,6 +319,18 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun bringingBackAPushedRowMovesItFromWhereScrollToItemLeftIt() {
+        // Mid-transcript, scrollToItem puts the row at the top: move it down into the bottom slot.
+        assertEquals(-300, bottomSlotScrollDelta(offset = 0, size = 100, viewportEnd = 400))
+        // Among the last rows scrollToItem cannot lift it that far and it is already in the bottom
+        // slot. Moving it down by the free space again pushed it off screen, so the list kept
+        // scrolling back and forth and the app froze when a video ended and paused.
+        assertEquals(0, bottomSlotScrollDelta(offset = 300, size = 100, viewportEnd = 400))
+        // One more row below it: move down only by that row.
+        assertEquals(-60, bottomSlotScrollDelta(offset = 240, size = 100, viewportEnd = 400))
+    }
+
+    @Test
     fun activeSubtitleFollowsRewindsAndSkippedSeeksImmediately() {
         assertTrue(shouldFollowPlaybackSeek(previousIndex = 12, currentIndex = 5))
         assertTrue(shouldFollowPlaybackSeek(previousIndex = 4, currentIndex = 40))
