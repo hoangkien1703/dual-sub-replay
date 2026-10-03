@@ -396,7 +396,7 @@ internal fun SubtitleSettingsDialog(
 
                     SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {
                         Text(stringResource(R.string.settings_text_size, (fontScale * 100).toInt()))
-                        Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
+                        Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE)
                         CaptionVisibilitySettings()
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_highlight_spoken_words_title),

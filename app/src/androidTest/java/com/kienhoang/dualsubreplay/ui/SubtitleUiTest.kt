@@ -155,7 +155,7 @@ class SubtitleUiTest {
                 CompactSubtitleCard(
                     segment = SubtitleSegment(2, 2_000, 3_000, "Next sentence", "Câu tiếp theo"),
                     active = false,
-                    fontScale = 1.5f,
+                    fontScale = 2f,
                     onReplay = {},
                 )
             }
