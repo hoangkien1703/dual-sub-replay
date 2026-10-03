@@ -5,6 +5,7 @@ import android.webkit.WebViewClient
 import android.webkit.WebSettings
 import android.widget.FrameLayout
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.BuildConfig
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -28,7 +29,7 @@ class BrowseWebViewLifecycleTest {
                 WebSettings.MIXED_CONTENT_NEVER_ALLOW,
                 webView.settings.mixedContentMode,
             )
-            assertTrue(webView.settings.safeBrowsingEnabled)
+            assertEquals(BuildConfig.WEBVIEW_SAFE_BROWSING, webView.settings.safeBrowsingEnabled)
             webView.destroySafely()
         }
     }

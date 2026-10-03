@@ -165,7 +165,7 @@ internal fun WebSettings.applyEmbeddedSecurityPolicy() {
     allowFileAccess = false
     allowContentAccess = false
     mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-    safeBrowsingEnabled = true
+    safeBrowsingEnabled = BuildConfig.WEBVIEW_SAFE_BROWSING
 }
 
 internal fun hasAuthenticatedYouTubeCookie(cookieHeader: String?): Boolean {

@@ -13,7 +13,8 @@
 </ul>
 
 <p><b>Privacy</b></p>
-<p>No account, analytics, ads, or project server. Saved words and settings stay on your device.</p>
+<p>No app account, analytics, ads, or project server. Saved words and settings stay on your device, and translation runs on the device.</p>
+<p>Besides YouTube, the app connects only to download files it needs, once: the translation model for each language from Mozilla, and, the first time Japanese subtitles load, a Japanese dictionary from Maven Central (or Google's mirror of it). No subtitle text is sent. Signing in to YouTube is optional and happens on Google's own sign-in page inside the app.</p>
 
 <p><b>Good to know</b></p>
 <p>The app uses YouTube's website and caption data, which are not free services. Captions come from an undocumented YouTube interface that can change without notice.</p>

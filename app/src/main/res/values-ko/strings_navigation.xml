@@ -13,6 +13,6 @@
     <string name="navigation_no_browser">GitHub를 열 수 있는 브라우저가 없습니다.</string>
     <string name="navigation_licenses">오픈소스 라이선스</string>
     <string name="navigation_loading_license">라이선스를 불러오는 중…</string>
-    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. 이 결합 애플리케이션은 GPL-3.0에 따라 보증 없이 배포됩니다. 이 조건에 따라 재배포하고 수정할 수 있습니다. 원래의 MIT 고지와 종속 항목의 소스/빌드 링크는 GitHub 저장소의 THIRD_PARTY_NOTICES.md에 있습니다.</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. 이 앱은 MIT 라이선스에 따른 자유 소프트웨어이며 보증 없이 제공됩니다. 포함된 라이브러리의 라이선스는 아래에 있으며, 전체 목록은 GitHub 저장소의 THIRD_PARTY_NOTICES.md에 있습니다.</string>
     <string name="navigation_close">닫기</string>
 </resources>

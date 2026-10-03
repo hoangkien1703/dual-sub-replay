@@ -13,6 +13,6 @@
     <string name="navigation_no_browser">No hay ningún navegador disponible para abrir GitHub.</string>
     <string name="navigation_licenses">Licencias de código abierto</string>
     <string name="navigation_loading_license">Cargando licencia…</string>
-    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Esta aplicación combinada se distribuye bajo GPL-3.0 sin garantía. Puedes redistribuirla y modificarla según estos términos. Los avisos MIT originales y los enlaces al código fuente y la compilación de las dependencias están en THIRD_PARTY_NOTICES.md, en el repositorio de GitHub.</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. La aplicación es software libre bajo la licencia MIT y se ofrece sin garantía. A continuación figuran las licencias de las bibliotecas que incluye; la lista completa está en THIRD_PARTY_NOTICES.md, en el repositorio de GitHub.</string>
     <string name="navigation_close">Cerrar</string>
 </resources>

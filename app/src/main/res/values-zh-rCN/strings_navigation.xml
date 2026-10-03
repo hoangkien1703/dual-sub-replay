@@ -13,6 +13,6 @@
     <string name="navigation_no_browser">没有可用于打开 GitHub 的浏览器。</string>
     <string name="navigation_licenses">开源许可</string>
     <string name="navigation_loading_license">正在加载许可…</string>
-    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien。本组合应用依据 GPL-3.0 分发，不提供任何担保。你可以按照这些条款重新分发和修改它。原始 MIT 声明以及依赖项的源代码/构建链接位于 GitHub 仓库的 THIRD_PARTY_NOTICES.md 中。</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien。本应用是依据 MIT 许可证发布的自由软件，不提供任何担保。下方列出了所含库的许可证；完整列表位于 GitHub 仓库的 THIRD_PARTY_NOTICES.md 中。</string>
     <string name="navigation_close">关闭</string>
 </resources>

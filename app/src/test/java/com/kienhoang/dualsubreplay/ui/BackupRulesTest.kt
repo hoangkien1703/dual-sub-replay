@@ -7,17 +7,21 @@ import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-/** Backups leave out the large downloads the app can fetch again, on every Android version. */
+/**
+ * Backups leave out the large downloads the app can fetch again, and the WebView profile with the
+ * YouTube/Google sign-in cookies, on every Android version.
+ */
 class BackupRulesTest {
     private val regenerable = setOf("japanese-dictionary/", "translation-models/")
+    private val excluded = regenerable.map { "file:$it" }.toSet() + "root:app_webview/"
 
     @Test
-    fun everyBackupPathLeavesOutTheDownloadedDictionaryAndModels() {
-        assertEquals(regenerable, excludedPaths(rules("backup_rules.xml")))
+    fun everyBackupPathLeavesOutTheDownloadsAndTheWebViewProfile() {
+        assertEquals(excluded, excludedPaths(rules("backup_rules.xml")))
         val extraction = rules("data_extraction_rules.xml")
         for (section in listOf("cloud-backup", "device-transfer")) {
             val element = extraction.getElementsByTagName(section).item(0) as Element
-            assertEquals(section, regenerable, excludedPaths(element))
+            assertEquals(section, excluded, excludedPaths(element))
         }
     }
 
@@ -47,8 +51,7 @@ class BackupRulesTest {
         val excludes = parent.getElementsByTagName("exclude")
         return (0 until excludes.length)
             .map { excludes.item(it) as Element }
-            .onEach { assertEquals("file", it.getAttribute("domain")) }
-            .map { it.getAttribute("path") }
+            .map { "${it.getAttribute("domain")}:${it.getAttribute("path")}" }
             .toSet()
     }
 }

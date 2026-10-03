@@ -26,6 +26,9 @@ import kotlinx.coroutines.launch
 
 internal const val REPOSITORY_URL = "https://github.com/hoangkien1703/dual-sub-replay"
 
+/** The app's licence, the shared libraries' notices, then the build's own translation notices. */
+internal val LICENSE_ASSETS = listOf("licenses/MIT.txt", "licenses/libraries.txt", "licenses/distribution.txt")
+
 @Composable
 internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null, beforeOpen: suspend () -> Unit = {}) {
     val context = LocalContext.current
@@ -54,8 +57,9 @@ internal fun SettingsRepositoryLink(onOpen: (() -> Unit)? = null, beforeOpen: su
     if (showLicense) {
         val license by produceState(loadingLicense) {
             value = withContext(Dispatchers.IO) {
-                context.assets.open("licenses/MIT.txt").bufferedReader().use { it.readText() } + "\n\n" +
-                    context.assets.open("licenses/GPL-3.0.txt").bufferedReader().use { it.readText() }
+                LICENSE_ASSETS.joinToString("\n\n") { name ->
+                    context.assets.open(name).bufferedReader().use { it.readText() }
+                }
             }
         }
         AlertDialog(onDismissRequest = { showLicense = false }, title = { Text(stringResource(R.string.navigation_licenses)) },

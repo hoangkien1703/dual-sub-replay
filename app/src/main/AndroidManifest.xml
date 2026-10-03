@@ -22,7 +22,7 @@
 
         <meta-data
             android:name="android.webkit.WebView.EnableSafeBrowsing"
-            android:value="true" />
+            android:value="${webViewSafeBrowsing}" />
 
         <activity
             android:name=".MainActivity"
