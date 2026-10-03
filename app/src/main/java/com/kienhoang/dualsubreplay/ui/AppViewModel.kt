@@ -227,6 +227,12 @@ internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enable
 internal const val WORD_LEARNING_TARGET_PREFERENCE = "word_learning_target"
 internal const val TAP_TO_LEARN_PREFERENCE = "tap_to_learn_enabled"
 internal const val WORD_LEARNING_ACTIVE_ONLY_PREFERENCE = "word_learning_active_only"
+internal const val MIN_FONT_SCALE = 0.8f
+internal const val MAX_FONT_SCALE = 2f
+
+/** Subtitle text size multiplier; the slider and stored value share these bounds (issue #88). */
+internal fun normalizeFontScale(scale: Float): Float =
+    if (scale.isFinite()) scale.coerceIn(MIN_FONT_SCALE, MAX_FONT_SCALE) else 1f
 
 /**
  * The "guide_completed" preference only exists after the first-launch guide has
@@ -298,7 +304,7 @@ class AppViewModel internal constructor(
                         ?: YOUTUBE_HOME_URL,
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
-                fontScale = preferences.getFloat("font_scale", 1f),
+                fontScale = normalizeFontScale(preferences.getFloat("font_scale", 1f)),
                 portraitPanelOffsetFraction =
                     normalizePortraitPanelOffsetFraction(
                         preferences.getFloat(
@@ -764,7 +770,7 @@ class AppViewModel internal constructor(
     }
 
     fun setFontScale(scale: Float) {
-        val safeScale = scale.coerceIn(0.8f, 1.5f)
+        val safeScale = normalizeFontScale(scale)
         preferences.edit().putFloat("font_scale", safeScale).apply()
         _state.update { it.copy(fontScale = safeScale) }
     }

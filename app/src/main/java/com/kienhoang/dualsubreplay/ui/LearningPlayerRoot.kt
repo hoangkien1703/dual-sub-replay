@@ -158,24 +158,31 @@ internal fun fullscreenOverlayBottomPaddingDp(
     position: Float,
     screenHeightDp: Int,
     controlsLiftDp: Int = 0,
+    fontScale: Float = 1f,
 ): Int {
-    val safeHeight = screenHeightDp.coerceAtLeast(240)
-    val usable = (safeHeight - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP).coerceAtLeast(60)
+    val usable = fullscreenOverlayDragTravelDp(screenHeightDp, fontScale)
     val normalized = normalizeOverlayVerticalPosition(position)
     return ((usable * (1f - normalized)) - controlsLiftDp)
         .roundToInt()
         .coerceIn(0, usable)
 }
 
-internal fun fullscreenOverlayDragTravelDp(screenHeightDp: Int): Int =
-    (screenHeightDp.coerceAtLeast(240) - FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP).coerceAtLeast(60)
+/** Larger text makes a taller box, so the top of the drag range drops with it (issue #88). */
+internal fun fullscreenOverlayEstimatedHeightDp(fontScale: Float): Int =
+    (FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP * normalizeFontScale(fontScale).coerceAtLeast(1f)).roundToInt()
+
+internal fun fullscreenOverlayDragTravelDp(
+    screenHeightDp: Int,
+    fontScale: Float = 1f,
+): Int = (screenHeightDp.coerceAtLeast(240) - fullscreenOverlayEstimatedHeightDp(fontScale)).coerceAtLeast(60)
 
 internal fun fullscreenOverlayBottomPaddingWithControlsDp(
     position: Float,
     screenHeightDp: Int,
     controlsLiftDp: Int,
-): Int = (fullscreenOverlayBottomPaddingDp(position, screenHeightDp) + controlsLiftDp)
-    .coerceIn(0, fullscreenOverlayDragTravelDp(screenHeightDp))
+    fontScale: Float = 1f,
+): Int = (fullscreenOverlayBottomPaddingDp(position, screenHeightDp, fontScale = fontScale) + controlsLiftDp)
+    .coerceIn(0, fullscreenOverlayDragTravelDp(screenHeightDp, fontScale))
 
 internal fun playerControlsAvoidanceLiftDp(
     enabled: Boolean,
@@ -439,6 +446,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         position = fullscreenVerticalPosition,
         screenHeightDp = configuration.screenHeightDp,
         controlsLiftDp = controlsLiftDp,
+        fontScale = state.fontScale,
     ).dp
     val subtitleBoxBackgroundColor = subtitleBoxBackgroundColor(subtitleBoxBackgroundKey)
 
@@ -613,7 +621,7 @@ internal fun LearningSubtitleOverlay(
     val density = LocalDensity.current
     val dragTravelPx = with(density) {
         if (isFullscreen) {
-            fullscreenOverlayDragTravelDp(configuration.screenHeightDp).dp.toPx()
+            fullscreenOverlayDragTravelDp(configuration.screenHeightDp, fontScale).dp.toPx()
         } else if (lockToVideo) {
             (configuration.screenHeightDp.dp * 0.45f).toPx()
         } else {
