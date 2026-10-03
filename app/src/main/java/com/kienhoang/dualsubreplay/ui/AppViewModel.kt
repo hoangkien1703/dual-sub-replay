@@ -1,9 +1,12 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.app.Application
+import android.content.Context
 import android.os.SystemClock
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
@@ -628,9 +631,9 @@ class AppViewModel internal constructor(
                     if (key ==
                         null
                     ) {
-                        "Waiting for YouTube captions and their language. Play the video with captions enabled."
+                        text(R.string.status_waiting_for_captions)
                     } else {
-                        "Translating live captions…"
+                        text(R.string.status_translating_live_captions)
                     },
             )
         }
@@ -638,7 +641,7 @@ class AppViewModel internal constructor(
         if (!TranslationLanguages.isSupported(key.language)) {
             _state.update {
                 it.copy(
-                    statusMessage = "Live translation is not supported for ${TranslationLanguages.displayName(key.language)}.",
+                    statusMessage = text(R.string.status_live_translation_not_supported, languageName(key.language)),
                 )
             }
             return
@@ -659,7 +662,7 @@ class AppViewModel internal constructor(
                         _state.update {
                             it.copy(
                                 liveTranslated = translated,
-                                statusMessage = "Current captions only; paragraph replay is unavailable.",
+                                statusMessage = text(R.string.status_current_captions_only),
                             )
                         }
                     }
@@ -669,7 +672,7 @@ class AppViewModel internal constructor(
                     if (liveTranslationGate.accepts(ticket, key)) {
                         _state.update {
                             it.copy(
-                                statusMessage = "Live translation unavailable. Check the connection for the language model download.",
+                                statusMessage = text(R.string.status_live_translation_unavailable),
                             )
                         }
                     }
@@ -994,7 +997,9 @@ class AppViewModel internal constructor(
         val current = _state.value
         val videoId = current.activeVideoId ?: return
         if (onlyTranslationFailed(current)) {
-            _state.update { it.copy(translationError = null, statusMessage = "Preparing nearby translations…") }
+            _state.update {
+                it.copy(translationError = null, statusMessage = text(R.string.status_preparing_nearby_translations))
+            }
             playbackRequests.update { it.copy(translationAttempt = it.translationAttempt + 1) }
             return
         }
@@ -1085,7 +1090,7 @@ class AppViewModel internal constructor(
                 currentIndex = -1,
                 activeWordIndex = -1,
                 stage = LoadStage.LOADING_CAPTIONS,
-                statusMessage = if (preserveLive) it.statusMessage else "Finding the best caption track…",
+                statusMessage = if (preserveLive) it.statusMessage else text(R.string.status_finding_caption_track),
                 errorMessage = null,
             )
         }
@@ -1142,7 +1147,7 @@ class AppViewModel internal constructor(
                                 ) {
                                     current.statusMessage
                                 } else {
-                                    "Waiting for YouTube captions and their language. Play the video with captions enabled."
+                                    text(R.string.status_waiting_for_captions)
                                 },
                             errorMessage = null,
                         )
@@ -1187,7 +1192,7 @@ class AppViewModel internal constructor(
                 errorMessage = null,
                 translationError = null,
                 isDownloadingTranslationModel = false,
-                statusMessage = "Preparing subtitles near playback…",
+                statusMessage = text(R.string.status_preparing_subtitles),
             )
         }
         var following = false
@@ -1221,7 +1226,14 @@ class AppViewModel internal constructor(
                         } else {
                             current.copy(
                                 isDownloadingTranslationModel = downloading,
-                                statusMessage = if (downloading) "Downloading translation model…" else "Preparing nearby translations…",
+                                statusMessage =
+                                    text(
+                                        if (downloading) {
+                                            R.string.status_downloading_translation_model
+                                        } else {
+                                            R.string.status_preparing_nearby_translations
+                                        },
+                                    ),
                             )
                         }
                     }
@@ -1242,7 +1254,7 @@ class AppViewModel internal constructor(
                         stage = LoadStage.ERROR,
                         isDownloadingTranslationModel = false,
                         statusMessage = null,
-                        errorMessage = error.message ?: "The subtitles could not be loaded. Retry to continue.",
+                        errorMessage = error.message ?: text(R.string.status_subtitles_load_failed),
                     )
                 }
             }
@@ -1256,12 +1268,14 @@ class AppViewModel internal constructor(
         generation: Long,
         error: Exception,
     ) {
+        val reason = translationFailureMessage(error, text(R.string.status_translation_unavailable_retry))
+        val status = text(R.string.status_original_captions_only)
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             current.copy(
                 isDownloadingTranslationModel = false,
-                translationError = translationFailureMessage(error),
-                statusMessage = ORIGINAL_CAPTIONS_ONLY_STATUS,
+                translationError = reason,
+                statusMessage = status,
             )
         }
     }
@@ -1302,18 +1316,35 @@ class AppViewModel internal constructor(
                     },
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
                 statusMessage =
-                    when {
-                        current.translationError != null -> ORIGINAL_CAPTIONS_ONLY_STATUS
-                        current.playbackPaused -> "Paused · translation resumes on play"
-                        preparing -> "Preparing nearby translations…"
-                        else -> "Subtitles ready near playback"
-                    },
+                    text(
+                        when {
+                            current.translationError != null -> R.string.status_original_captions_only
+                            current.playbackPaused -> R.string.status_paused_translation_resumes
+                            preparing -> R.string.status_preparing_nearby_translations
+                            else -> R.string.status_subtitles_ready
+                        },
+                    ),
             )
         }
     }
 
     private fun translationStartingMessage(targetLanguage: String): String =
-        "Preparing ${TranslationLanguages.displayName(targetLanguage)} translation…"
+        text(R.string.status_preparing_translation, languageName(targetLanguage))
+
+    /**
+     * The application context showing the in-app language. Android 13+ applies it to the
+     * application itself; older versions need the wrapped context, which the plain one would miss.
+     */
+    private fun localizedContext(): Context = AppLanguageSettings.wrap(getApplication<Application>())
+
+    /** A status, error, or other user-facing message the view model writes into its state. */
+    private fun text(
+        @StringRes id: Int,
+        vararg args: Any,
+    ): String = localizedContext().getString(id, *args)
+
+    /** A language's name in the interface language, for use inside [text] messages. */
+    private fun languageName(code: String): String = languageDisplayName(code, localizedContext().interfaceLocale())
 
     private fun mobileWatchUrl(videoId: String): String = "https://m.youtube.com/watch?v=$videoId"
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_guide_next">次へ</string>
+    <string name="onboarding_guide_get_started">始める</string>
+    <string name="onboarding_guide_dual_subtitles_title">視聴しながら2つの字幕</string>
+    <string name="onboarding_guide_dual_subtitles_body">YouTube の動画を再生すると、元の字幕の下にリアルタイムの翻訳が表示されます。</string>
+    <string name="onboarding_guide_dual_subtitles_image">元の字幕と翻訳字幕が重ねて表示された再生中の動画</string>
+    <string name="onboarding_guide_replay_title">どのセリフもすぐにリプレイ</string>
+    <string name="onboarding_guide_replay_body">話されたセリフはすべて翻訳付きで一覧表示されます。セリフの再生ボタンをタップすると動画がその場面に戻り、歯車アイコンで言語や文字サイズを変更できます。</string>
+    <string name="onboarding_guide_replay_image">字幕の行とリプレイボタンが並ぶ字幕パネル</string>
+    <string name="onboarding_guide_open_video_title">好きな動画を開く</string>
+    <string name="onboarding_guide_open_video_body">YouTube のリンクを貼り付けるか、YouTube アプリから動画を共有するか、DualSub Replay 内でそのまま閲覧できます。</string>
+    <string name="onboarding_language_welcome">DualSub Replay へようこそ</string>
+    <string name="onboarding_language_intro">言語は一度選ぶだけです。あとで字幕の設定から変更できます。</string>
+    <string name="onboarding_language_native_title">あなたの母語</string>
+    <string name="onboarding_language_native_helper">小さい翻訳字幕として表示されます。</string>
+    <string name="onboarding_language_learning_title">学びたい言語</string>
+    <string name="onboarding_language_learning_helper">優先する字幕トラックです。大きい字幕は動画の字幕に従います。</string>
+    <string name="onboarding_language_select">言語を選択</string>
+    <string name="onboarding_language_continue">続ける</string>
+    <string name="onboarding_language_skip_for_now">今はスキップ</string>
+    <string name="onboarding_goal_setup_title">1日の目標を設定</string>
+    <string name="onboarding_goal_setup_body">新しい言語で毎日何分視聴しますか？視聴時間と連続日数はメニューの「進捗」で確認でき、目標もそこでいつでも変更できます。</string>
+    <string name="onboarding_goal_set">目標を設定</string>
+    <string name="onboarding_goal_off">オフ</string>
+    <string name="onboarding_goal_dialog_title">1日の目標</string>
+    <string name="onboarding_goal_dialog_body">毎日どれくらい視聴しますか？</string>
+    <string name="onboarding_goal_save">保存</string>
+    <string name="onboarding_goal_cancel">キャンセル</string>
+    <string name="onboarding_progress_title">進捗</string>
+    <string name="onboarding_progress_close">閉じる</string>
+    <string name="onboarding_progress_load_error">進捗を読み込めませんでした。ストレージを確認し、この画面を開き直して再試行してください。</string>
+    <string name="onboarding_progress_empty">字幕付きの動画を見ると、視聴時間の記録が始まります。</string>
+    <string name="onboarding_progress_today">今日</string>
+    <string name="onboarding_progress_goal">1日の目標: %1$d分</string>
+    <string name="onboarding_progress_goal_reached">1日の目標 %1$d分を達成</string>
+    <string name="onboarding_progress_no_goal">1日の目標なし</string>
+    <string name="onboarding_progress_streak_start">今日から連続日数を伸ばしましょう</string>
+    <string name="onboarding_progress_change_goal">目標を変更</string>
+    <string name="onboarding_progress_this_week">今週</string>
+    <string name="onboarding_progress_this_month">今月</string>
+    <string name="onboarding_progress_this_year">今年</string>
+    <string name="onboarding_progress_total">合計</string>
+    <string name="onboarding_progress_period_week">週</string>
+    <string name="onboarding_progress_period_month">月</string>
+    <string name="onboarding_progress_period_year">年</string>
+    <string name="onboarding_progress_period_all">すべて</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">言語</string>
+    <string name="onboarding_progress_no_time_in_period">この期間の記録はまだありません。</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">アプリで動画を再生している間、字幕の言語ごとに時間が記録されます。記録はこの端末にのみ保存されます。</string>
+    <string name="onboarding_duration_under_minute">1分未満</string>
+    <string name="onboarding_duration_minutes">%1$d分</string>
+    <string name="onboarding_duration_hours">%1$d時間</string>
+    <string name="onboarding_duration_hours_minutes">%1$d時間%2$d分</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="other">%1$d日連続</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="other">動画 %1$d本</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="other">保存した単語 %1$d件</item>
+    </plurals>
+</resources>

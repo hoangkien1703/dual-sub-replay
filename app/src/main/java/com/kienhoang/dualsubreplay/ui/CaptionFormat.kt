@@ -1,5 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SentenceSlice
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -10,10 +12,10 @@ internal const val CAPTION_FORMAT_PREFERENCE = "caption_format"
 
 enum class CaptionFormat(
     val storageValue: String,
-    val label: String,
+    @StringRes val labelRes: Int,
 ) {
-    SHORT_PHRASES("short_phrases", "Short paired phrases"),
-    WHOLE_SENTENCE("whole_sentence", "Whole sentence"),
+    SHORT_PHRASES("short_phrases", R.string.settings_caption_format_short_phrases),
+    WHOLE_SENTENCE("whole_sentence", R.string.settings_caption_format_whole_sentence),
 }
 
 internal fun storedCaptionFormat(

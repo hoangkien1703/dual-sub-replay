@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStatus
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
@@ -175,8 +176,14 @@ class PhraseSelectionTest {
 
     @Test
     fun theBarExplainsTheJapaneseDictionaryOnlyUntilItIsReady() {
-        assertTrue(japaneseDictionaryNote(JapaneseDictionaryStatus.DOWNLOADING)!!.contains("Downloading"))
-        assertTrue(japaneseDictionaryNote(JapaneseDictionaryStatus.UNAVAILABLE) != null)
+        assertEquals(
+            R.string.practice_japanese_dictionary_downloading,
+            japaneseDictionaryNote(JapaneseDictionaryStatus.DOWNLOADING),
+        )
+        assertEquals(
+            R.string.practice_japanese_dictionary_unavailable,
+            japaneseDictionaryNote(JapaneseDictionaryStatus.UNAVAILABLE),
+        )
         assertNull(japaneseDictionaryNote(JapaneseDictionaryStatus.READY))
         assertNull(japaneseDictionaryNote(JapaneseDictionaryStatus.IDLE))
     }

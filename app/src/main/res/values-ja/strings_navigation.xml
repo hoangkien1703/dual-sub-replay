@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_practice">練習</string>
+    <string name="navigation_progress">進捗</string>
+    <string name="navigation_settings">設定</string>
+    <string name="navigation_open_menu">ナビゲーションメニューを開く</string>
+    <string name="navigation_close_menu">ナビゲーションメニューを閉じる</string>
+    <string name="navigation_tagline">YouTube で語学を学ぼう</string>
+    <string name="navigation_app_language">アプリの言語</string>
+    <string name="navigation_device_language">端末の言語</string>
+    <string name="navigation_cancel">キャンセル</string>
+    <string name="navigation_latest_version">アプリの最新バージョンは %1$s で確認できます。</string>
+    <string name="navigation_no_browser">GitHub を開けるブラウザがありません。</string>
+    <string name="navigation_licenses">オープンソースライセンス</string>
+    <string name="navigation_loading_license">ライセンスを読み込んでいます…</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. この結合アプリケーションは GPL-3.0 のもと無保証で配布されています。これらの条件に従って再配布や改変ができます。元の MIT 表示と依存ライブラリのソース/ビルドへのリンクは、GitHub リポジトリの THIRD_PARTY_NOTICES.md にあります。</string>
+    <string name="navigation_close">閉じる</string>
+</resources>

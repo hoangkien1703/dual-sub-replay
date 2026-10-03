@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">연습</string>
+    <string name="practice_close">닫기</string>
+    <string name="practice_cancel">취소</string>
+    <string name="practice_load_failed">저장한 단어를 불러오지 못했어요. 저장공간을 확인하고 이 화면을 다시 열어 재시도하세요.</string>
+    <string name="practice_update_failed">저장한 단어를 업데이트하지 못했어요. 저장공간을 확인하고 다시 시도하세요.</string>
+    <string name="practice_example_video_title">예시 동영상 · 인터넷 연결 필요</string>
+    <string name="practice_example_video_unavailable_hint">동영상을 재생할 수 없으면 돌아가서 연습을 계속하세요.</string>
+    <string name="practice_return_to_practice">연습으로 돌아가기</string>
+    <string name="practice_session_complete">세션 완료</string>
+    <string name="practice_session_complete_body">복습 결과가 저장되었어요. 복습할 단어가 더 생기면 다시 오세요.</string>
+    <string name="practice_back_to_saved_words">저장한 단어로 돌아가기</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">복습할 단어 연습</string>
+    <string name="practice_search_label">단어 또는 뜻 검색</string>
+    <string name="practice_empty_hint">자막의 단어를 탭하고 번역을 선택한 다음 단어장에 저장을 눌러 나만의 단어 모음을 시작하세요.</string>
+    <string name="practice_next_review">다음 복습: %1$s</string>
+    <string name="practice_pronounce">발음</string>
+    <string name="practice_pronounce_item">%1$s 발음</string>
+    <string name="practice_speech_settings">음성 설정</string>
+    <string name="practice_show_meaning">뜻 보기</string>
+    <string name="practice_meaning_label">뜻(%1$s)</string>
+    <string name="practice_save_meaning">뜻 저장</string>
+    <string name="practice_video_uses_original_sentence">예시 동영상은 원래 문장을 사용해요.</string>
+    <string name="practice_play_online_example">온라인 예시 재생</string>
+    <string name="practice_online_example">온라인 예시</string>
+    <string name="practice_rating_again">다시</string>
+    <string name="practice_rating_hard">어려움</string>
+    <string name="practice_rating_good">좋음</string>
+    <string name="practice_rating_easy">쉬움</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10분</string>
+    <string name="practice_delete_word">단어 삭제</string>
+    <string name="practice_delete_word_title">%1$s을(를) 삭제할까요?</string>
+    <string name="practice_delete_word_body">이 단어의 복습 기록이 삭제돼요.</string>
+    <string name="practice_delete">삭제</string>
+    <string name="practice_keep">유지</string>
+    <string name="practice_transfer_failed">전송하지 못했어요. 다시 시도하세요.</string>
+    <string name="practice_transfer_open_failed">선택한 파일을 열지 못했어요.</string>
+    <string name="practice_transfer_export_too_large">내보내기 크기가 가져오기 한도인 8 MiB를 초과해요.</string>
+    <string name="practice_transfer_write_failed">선택한 파일에 쓰지 못했어요.</string>
+    <string name="practice_transfer_import">가져오기</string>
+    <string name="practice_transfer_export">내보내기</string>
+    <string name="practice_transfer_cancel">전송 취소</string>
+    <string name="practice_import_review_title">가져오기 검토</string>
+    <string name="practice_import_preview_title">가져오기 미리보기</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">유효하지 않은 기록은 건너뛰어요. 교체를 선택하지 않으면 기존 단어는 그대로 유지돼요.</string>
+    <string name="practice_import_replace_duplicates">중복 항목 교체(백업의 복습 기록 포함)</string>
+    <string name="practice_import_preview_button">미리보기</string>
+    <string name="practice_import_words_button">단어 가져오기</string>
+    <string name="practice_import_mapping_hint">열을 필드에 연결하세요. Anki 텍스트에는 복습 일정이나 미디어가 포함되지 않아요.</string>
+    <string name="practice_import_word_language_label">기본 단어 언어(en, ja…)</string>
+    <string name="practice_import_meaning_language_label">기본 뜻 언어(vi, en…)</string>
+    <string name="practice_import_first_row">첫 번째 행: %1$s</string>
+    <string name="practice_import_column_mapping">%1$s: %2$s</string>
+    <string name="practice_import_not_included">포함 안 함</string>
+    <string name="practice_import_column_number">%1$d열</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">연습 데이터 내보내기</string>
+    <string name="practice_export_description">백업은 복습 기록을 보존해요. Anki 텍스트는 단어와 예문을 옮기지만 일정, 미디어, 카드 템플릿은 포함하지 않아요.</string>
+    <string name="practice_export_full_backup">전체 백업(JSON)</string>
+    <string name="practice_export_anki_text">Anki 텍스트(TSV)</string>
+    <string name="practice_word_translation_unavailable">번역을 사용할 수 없어요. 뜻을 직접 입력하고 단어를 저장할 수 있어요.</string>
+    <string name="practice_example_plays_original">예시는 번역된 단어가 아니라 원래 문장을 재생해요.</string>
+    <string name="practice_save_failed">저장하지 못했어요. 사용 가능한 저장공간을 확인하고 다시 시도하세요.</string>
+    <string name="practice_saved_to_vocabulary">단어장에 저장했어요</string>
+    <string name="practice_phrase">구문</string>
+    <string name="practice_saving">저장 중…</string>
+    <string name="practice_saved">저장됨</string>
+    <string name="practice_save_to_vocabulary">단어장에 저장</string>
+    <string name="practice_word_by_word">단어별 보기</string>
+    <string name="practice_pos_noun">명사</string>
+    <string name="practice_pos_verb">동사</string>
+    <string name="practice_pos_adjective">형용사</string>
+    <string name="practice_pos_adverb">부사</string>
+    <string name="practice_pos_pronoun">대명사</string>
+    <string name="practice_pos_conjunction">접속사</string>
+    <string name="practice_pos_preposition">전치사</string>
+    <string name="practice_pos_particle">조사 / 문법</string>
+    <string name="practice_pos_unaligned">대응 없음 / 관용구</string>
+    <string name="practice_pos_other">기타</string>
+    <string name="practice_japanese_dictionary_downloading">탭할 때 단어 전체가 선택되도록 일본어 사전(13 MB)을 다운로드하는 중이에요…</string>
+    <string name="practice_japanese_dictionary_unavailable">아직 일본어 사전을 다운로드하지 못했어요. 다운로드될 때까지 단어가 어색하게 나뉠 수 있어요.</string>
+    <string name="practice_clipboard_label">자막</string>
+    <string name="practice_copy">복사</string>
+    <string name="practice_copied">복사됨</string>
+    <string name="practice_translate">번역</string>
+    <string name="practice_clear_selection">선택 해제</string>
+    <string name="practice_tap_another_word">다른 단어를 탭하면 구문을 선택할 수 있어요</string>
+    <string name="practice_translation_unavailable">번역을 사용할 수 없음</string>
+    <string name="practice_translating">번역 중…</string>
+    <string name="practice_preparing_pronunciation">발음을 준비하는 중…</string>
+    <string name="practice_speech_no_voice">이 언어에 사용할 수 있는 음성이 없어요. 음성 설정을 열어 음성을 추가한 다음 발음을 다시 탭하세요.</string>
+    <string name="practice_speech_unavailable">음성을 사용할 수 없어요. 음성 설정을 열어 음성 엔진을 사용 설정하거나 설치한 다음 다시 시도하세요.</string>
+    <string name="practice_speech_playback_failed">발음을 재생하지 못했어요. 미디어 볼륨과 연결 상태를 확인하거나 음성 설정에서 음성을 선택하세요.</string>
+    <string name="practice_speech_invalid_language">이 단어를 발음하기 전에 자막 언어를 선택하세요.</string>
+    <string name="practice_speech_settings_manual">Android 설정을 열고 텍스트 음성 변환을 검색해 음성을 설치하거나 선택하세요.</string>
+    <plurals name="practice_word_count">
+        <item quantity="other">단어 %1$d개</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="other">복습 예정 %1$d개</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="other">손상된 단어 기록 %1$d개를 저장공간에 그대로 두고 건너뛰었어요.</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="other">단어 %1$d개를 내보냈어요.</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="other">단어 %1$d개를 가져왔어요.</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="other">유효 %1$d개</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="other">유효하지 않음 %1$d개</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="other">중복 %1$d개</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="other">전체 백업: 읽을 수 있는 단어 %1$d개. 복습 기록이 포함돼요.</item>
+    </plurals>
+</resources>

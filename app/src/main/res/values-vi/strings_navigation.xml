@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_practice">Luyện tập</string>
+    <string name="navigation_progress">Tiến độ</string>
+    <string name="navigation_settings">Cài đặt</string>
+    <string name="navigation_open_menu">Mở menu điều hướng</string>
+    <string name="navigation_close_menu">Đóng menu điều hướng</string>
+    <string name="navigation_tagline">Học ngôn ngữ qua YouTube</string>
+    <string name="navigation_app_language">Ngôn ngữ ứng dụng</string>
+    <string name="navigation_device_language">Ngôn ngữ thiết bị</string>
+    <string name="navigation_cancel">Hủy</string>
+    <string name="navigation_latest_version">Xem phiên bản mới nhất của ứng dụng trên %1$s.</string>
+    <string name="navigation_no_browser">Không có trình duyệt nào để mở GitHub.</string>
+    <string name="navigation_licenses">Giấy phép mã nguồn mở</string>
+    <string name="navigation_loading_license">Đang tải giấy phép…</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Ứng dụng kết hợp này được phân phối theo giấy phép GPL-3.0 và không kèm bảo hành. Bạn có thể phân phối lại và chỉnh sửa ứng dụng theo các điều khoản này. Các thông báo MIT gốc cùng liên kết mã nguồn/bản dựng của các thư viện phụ thuộc nằm trong tệp THIRD_PARTY_NOTICES.md trên kho GitHub.</string>
+    <string name="navigation_close">Đóng</string>
+</resources>

@@ -6,23 +6,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import com.kienhoang.dualsubreplay.R
 
 @Composable
 internal fun CaptionFormatSettings(
     format: CaptionFormat,
     onChange: (CaptionFormat) -> Unit,
 ) {
-    Text("Caption format", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.settings_caption_format_title), style = MaterialTheme.typography.titleSmall)
     CaptionFormat.entries.forEach { option ->
         FilterChip(
             selected = format == option,
             onClick = { onChange(option) },
-            label = { Text(option.label) },
+            label = { Text(stringResource(option.labelRes)) },
             modifier = Modifier.testTag("caption_format_${option.storageValue}"),
         )
     }
     Text(
-        "Short phrases pair each phrase with its translation. Whole sentences show more context.",
+        stringResource(R.string.settings_caption_format_hint),
         style = MaterialTheme.typography.bodySmall,
     )
 }

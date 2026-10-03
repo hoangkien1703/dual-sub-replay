@@ -21,9 +21,10 @@ class SettingsSectionsTest {
 
     @Test
     fun captionTrackLabelDoesNotRepeatTheGeneratedMarker() {
-        assertEquals("English (auto-generated)", captionTrackLabel("English (auto-generated)", generated = true))
-        assertEquals("English (Auto-Generated)", captionTrackLabel("English (Auto-Generated)", generated = true))
-        assertEquals("English (auto-generated)", captionTrackLabel("English", generated = true))
-        assertEquals("English", captionTrackLabel("English", generated = false))
+        val mark: (String) -> String = { "$it (auto-generated)" }
+        assertEquals("English (auto-generated)", captionTrackLabel("English (auto-generated)", generated = true, mark))
+        assertEquals("English (Auto-Generated)", captionTrackLabel("English (Auto-Generated)", generated = true, mark))
+        assertEquals("English (auto-generated)", captionTrackLabel("English", generated = true, mark))
+        assertEquals("English", captionTrackLabel("English", generated = false, mark))
     }
 }

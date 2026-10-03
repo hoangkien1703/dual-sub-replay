@@ -1,6 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import com.kienhoang.dualsubreplay.R
 
 const val SUBTITLE_ORIGINAL_COLOR_PREFERENCE = "subtitle_original_color"
 const val SUBTITLE_TRANSLATED_COLOR_PREFERENCE = "subtitle_translated_color"
@@ -17,7 +19,9 @@ internal fun storedFeatureEnabled(raw: Boolean?, fallback: Boolean = true): Bool
 /** Common shape for the preset color swatches used by subtitle and theme settings. */
 internal interface ColorSettingOption {
     val key: String
-    val label: String
+
+    @get:StringRes
+    val labelRes: Int
     val argb: Long
 }
 
@@ -27,43 +31,43 @@ internal interface ColorSettingOption {
  */
 internal enum class SubtitleColorOption(
     override val key: String,
-    override val label: String,
+    @StringRes override val labelRes: Int,
     override val argb: Long,
 ) : ColorSettingOption {
-    ICE_WHITE("ice_white", "Ice white", 0xFFF3FAFA),
-    SKY_BLUE("sky_blue", "Sky blue", 0xFF9EDCE4),
-    MINT("mint", "Mint", 0xFF75E7C1),
-    AMBER("amber", "Amber", 0xFFFFD54F),
-    ROSE("rose", "Rose", 0xFFFF8A80),
-    LAVENDER("lavender", "Lavender", 0xFFC5A3FF),
+    ICE_WHITE("ice_white", R.string.settings_color_ice_white, 0xFFF3FAFA),
+    SKY_BLUE("sky_blue", R.string.settings_color_sky_blue, 0xFF9EDCE4),
+    MINT("mint", R.string.settings_color_mint, 0xFF75E7C1),
+    AMBER("amber", R.string.settings_color_amber, 0xFFFFD54F),
+    ROSE("rose", R.string.settings_color_rose, 0xFFFF8A80),
+    LAVENDER("lavender", R.string.settings_color_lavender, 0xFFC5A3FF),
 }
 
 /** Semi-opaque backgrounds keep subtitles readable while preserving video context. */
 internal enum class SubtitleBoxBackgroundOption(
     override val key: String,
-    override val label: String,
+    @StringRes override val labelRes: Int,
     override val argb: Long,
 ) : ColorSettingOption {
-    DEEP_TEAL("deep_teal", "Deep teal", 0xD7061719),
-    BLACK("black", "Black", 0xE6000000),
-    NAVY("navy", "Navy", 0xE6121B2D),
-    SLATE("slate", "Slate", 0xE6242A30),
-    PLUM("plum", "Plum", 0xE62A1834),
-    FOREST("forest", "Forest", 0xE6102A24),
+    DEEP_TEAL("deep_teal", R.string.settings_color_deep_teal, 0xD7061719),
+    BLACK("black", R.string.settings_color_black, 0xE6000000),
+    NAVY("navy", R.string.settings_color_navy, 0xE6121B2D),
+    SLATE("slate", R.string.settings_color_slate, 0xE6242A30),
+    PLUM("plum", R.string.settings_color_plum, 0xE62A1834),
+    FOREST("forest", R.string.settings_color_forest, 0xE6102A24),
 }
 
 /** Bright accents are used for switches, sliders, buttons, active borders, and controls. */
 internal enum class AppThemeAccentOption(
     override val key: String,
-    override val label: String,
+    @StringRes override val labelRes: Int,
     override val argb: Long,
 ) : ColorSettingOption {
-    CYAN("cyan", "Cyan", 0xFF13C6D7),
-    BLUE("blue", "Blue", 0xFF4FA3FF),
-    MINT("mint", "Mint", 0xFF5ED6A3),
-    AMBER("amber", "Amber", 0xFFFFC857),
-    ROSE("rose", "Rose", 0xFFFF7A8A),
-    LAVENDER("lavender", "Lavender", 0xFFB08CFF),
+    CYAN("cyan", R.string.settings_color_cyan, 0xFF13C6D7),
+    BLUE("blue", R.string.settings_color_blue, 0xFF4FA3FF),
+    MINT("mint", R.string.settings_color_mint, 0xFF5ED6A3),
+    AMBER("amber", R.string.settings_color_amber, 0xFFFFC857),
+    ROSE("rose", R.string.settings_color_rose, 0xFFFF7A8A),
+    LAVENDER("lavender", R.string.settings_color_lavender, 0xFFB08CFF),
 }
 
 internal val DEFAULT_ORIGINAL_COLOR_KEY = SubtitleColorOption.ICE_WHITE.key

@@ -32,8 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -171,7 +173,7 @@ internal fun JumpBackPill(
                 )
                 Spacer(Modifier.size(6.dp))
                 Text(
-                    "Now playing · ${formatPlaybackClock(startMs ?: 0)}",
+                    stringResource(R.string.player_now_playing, formatPlaybackClock(startMs ?: 0)),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                 )

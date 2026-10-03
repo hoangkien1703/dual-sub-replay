@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">YouTube の字幕とその言語を待っています。字幕をオンにして動画を再生してください。</string>
+    <string name="status_translating_live_captions">ライブ字幕を翻訳しています…</string>
+    <string name="status_live_translation_not_supported">%1$s のライブ翻訳には対応していません。</string>
+    <string name="status_current_captions_only">現在の字幕のみです。段落ごとのリプレイは利用できません。</string>
+    <string name="status_live_translation_unavailable">ライブ翻訳を利用できません。言語モデルをダウンロードするため、接続を確認してください。</string>
+    <string name="status_preparing_nearby_translations">近くの翻訳を準備しています…</string>
+    <string name="status_finding_caption_track">最適な字幕トラックを探しています…</string>
+    <string name="status_preparing_subtitles">再生位置付近の字幕を準備しています…</string>
+    <string name="status_downloading_translation_model">翻訳モデルをダウンロードしています…</string>
+    <string name="status_subtitles_load_failed">字幕を読み込めませんでした。再試行して続けてください。</string>
+    <string name="status_original_captions_only">元の字幕のみ · 翻訳は利用できません</string>
+    <string name="status_paused_translation_resumes">一時停止中 · 再生すると翻訳を再開します</string>
+    <string name="status_subtitles_ready">再生位置付近の字幕の準備ができました</string>
+    <string name="status_preparing_translation">%1$s への翻訳を準備しています…</string>
+    <string name="status_translation_unavailable_retry">現在翻訳を利用できません。接続を確認してから再試行してください。</string>
+    <string name="status_live_subtitles_title">ライブ字幕</string>
+    <string name="status_retrying_full_transcript">全文字幕を再試行しています…</string>
+    <string name="status_retry_full_transcript">全文字幕を再試行</string>
+</resources>

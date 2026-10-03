@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,10 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.validClipRange
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -38,7 +42,7 @@ internal fun WordLearningDialog(
 ) {
     var meaning by remember(selection) { mutableStateOf(existingWord?.meaning.orEmpty()) }
     var loading by remember(selection) { mutableStateOf(true) }
-    var error by remember(selection) { mutableStateOf<String?>(null) }
+    var error by remember(selection) { mutableStateOf<Int?>(null) }
     var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
     var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
@@ -52,7 +56,7 @@ internal fun WordLearningDialog(
         } catch (cancel: CancellationException) {
             throw cancel
         } catch (_: Exception) {
-            error = "Translation unavailable. You can enter a meaning and save the word."
+            error = R.string.practice_word_translation_unavailable
         } finally {
             loading = false
         }
@@ -82,19 +86,19 @@ internal fun WordLearningDialog(
                             meaning = it
                             saved = false
                         },
-                        label = { Text("Meaning (${selection.meaningLanguage})") },
+                        label = { Text(stringResource(R.string.practice_meaning_label, selection.meaningLanguage)) },
                         enabled = !loading && !saving,
                         modifier = Modifier.fillMaxWidth().testTag("word_meaning"),
                     )
-                    error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
                     if (canClip) {
-                        ClipChoice("Online example", online, {
+                        ClipChoice(stringResource(R.string.practice_online_example), online, {
                             online = it
                             saved = false
                         }, "online_clip_choice")
                         if (selection.translated) {
                             Text(
-                                "The example plays the original sentence, not the translated word.",
+                                stringResource(R.string.practice_example_plays_original),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
@@ -109,13 +113,13 @@ internal fun WordLearningDialog(
                             } catch (cancel: CancellationException) {
                                 throw cancel
                             } catch (_: Exception) {
-                                error = "Could not save. Check your available storage and try again."
+                                error = R.string.practice_save_failed
                             } finally {
                                 saving = false
                             }
                         }
                     }
-                    if (saved) Text("Saved to your vocabulary", modifier = Modifier.testTag("word_saved"))
+                    if (saved) Text(stringResource(R.string.practice_saved_to_vocabulary), modifier = Modifier.testTag("word_saved"))
                     if (selection.isPhrase) WordByWord(selection.parts, onSpeakPart)
                 }
             }
@@ -130,13 +134,15 @@ private fun WordCardDetails(
     speechMessage: String?,
     onSpeechSettings: (() -> Unit)?,
 ) {
-    Text(if (selection.isPhrase) "Phrase" else selection.token.partOfSpeech.label)
+    Text(stringResource(if (selection.isPhrase) R.string.practice_phrase else partOfSpeechLabel(selection.token.partOfSpeech)))
     selection.token.reading
         ?.takeIf { it.isNotBlank() }
         ?.let { Text(it) }
     speechMessage?.let { Text(it) }
     onSpeechSettings?.let { open ->
-        TextButton(onClick = open, modifier = Modifier.testTag("speech_settings")) { Text("Speech settings") }
+        TextButton(onClick = open, modifier = Modifier.testTag("speech_settings")) {
+            Text(stringResource(R.string.practice_speech_settings))
+        }
     }
 }
 
@@ -151,11 +157,11 @@ private fun WordCardHeader(
         Row(Modifier.weight(1f).padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(title, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f, fill = false))
             IconButton(onClick = onSpeak, modifier = Modifier.testTag("pronounce_word")) {
-                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Pronounce")
+                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = stringResource(R.string.practice_pronounce))
             }
         }
         IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.Top).testTag("close_word_card")) {
-            Icon(Icons.Default.Close, contentDescription = "Close")
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.practice_close))
         }
     }
 }
@@ -171,13 +177,15 @@ private fun SaveWordButton(
         Icon(if (saved) Icons.Default.BookmarkAdded else Icons.Default.BookmarkAdd, contentDescription = null)
         Spacer(Modifier.width(8.dp))
         Text(
-            if (saving) {
-                "Saving…"
-            } else if (saved) {
-                "Saved"
-            } else {
-                "Save to vocabulary"
-            },
+            stringResource(
+                if (saving) {
+                    R.string.practice_saving
+                } else if (saved) {
+                    R.string.practice_saved
+                } else {
+                    R.string.practice_save_to_vocabulary
+                },
+            ),
         )
     }
 }
@@ -188,16 +196,21 @@ private fun WordByWord(
     parts: List<AnalyzedToken>,
     onSpeakPart: (AnalyzedToken) -> Unit,
 ) {
-    Text("Word by word", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
+    Text(
+        stringResource(R.string.practice_word_by_word),
+        style = MaterialTheme.typography.labelLarge,
+        modifier = Modifier.padding(top = 8.dp),
+    )
     parts.forEachIndexed { index, part ->
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(part.text, style = MaterialTheme.typography.bodyLarge)
-                val details = listOfNotNull(part.partOfSpeech.label, part.reading?.takeIf { it.isNotBlank() }).joinToString(" · ")
+                val partOfSpeech = stringResource(partOfSpeechLabel(part.partOfSpeech))
+                val details = listOfNotNull(partOfSpeech, part.reading?.takeIf { it.isNotBlank() }).joinToString(" · ")
                 Text(details, style = MaterialTheme.typography.bodySmall, color = Color(part.partOfSpeech.colorHex))
             }
             IconButton(onClick = { onSpeakPart(part) }, modifier = Modifier.testTag("pronounce_part_$index")) {
-                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Pronounce ${part.text}")
+                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = stringResource(R.string.practice_pronounce_item, part.text))
             }
         }
     }
@@ -215,3 +228,19 @@ internal fun ClipChoice(
         Checkbox(checked, onChange, modifier = Modifier.testTag(tag))
     }
 }
+
+/** The shown name of a part of speech, in the interface language. */
+@StringRes
+internal fun partOfSpeechLabel(partOfSpeech: PartOfSpeech): Int =
+    when (partOfSpeech) {
+        PartOfSpeech.NOUN -> R.string.practice_pos_noun
+        PartOfSpeech.VERB -> R.string.practice_pos_verb
+        PartOfSpeech.ADJECTIVE -> R.string.practice_pos_adjective
+        PartOfSpeech.ADVERB -> R.string.practice_pos_adverb
+        PartOfSpeech.PRONOUN -> R.string.practice_pos_pronoun
+        PartOfSpeech.CONJUNCTION -> R.string.practice_pos_conjunction
+        PartOfSpeech.PREPOSITION -> R.string.practice_pos_preposition
+        PartOfSpeech.PARTICLE -> R.string.practice_pos_particle
+        PartOfSpeech.UNALIGNED -> R.string.practice_pos_unaligned
+        PartOfSpeech.OTHER -> R.string.practice_pos_other
+    }

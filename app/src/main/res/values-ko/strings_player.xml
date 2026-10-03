@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_tap_paragraph_to_replay">단락을 탭하면 다시 재생해요</string>
+    <string name="player_subtitle_settings">자막 설정</string>
+    <string name="player_dual_subtitle_settings">이중 자막 설정</string>
+    <string name="player_show_dual_subtitles">이중 자막 표시</string>
+    <string name="player_hide_dual_subtitles">이중 자막 숨기기</string>
+    <string name="player_loading_captions">자막을 불러오는 중…</string>
+    <string name="player_finding_captions">자막 찾는 중</string>
+    <string name="player_source_to_target">"%1$s  →  %2$s"</string>
+    <string name="player_caption_track_auto_generated">%1$s(자동 생성)</string>
+    <string name="player_video_split_state">동영상 %1$d퍼센트</string>
+    <string name="player_retry_translation">번역 다시 시도</string>
+    <string name="player_retry_captions">자막 다시 시도</string>
+    <string name="player_retry_full_transcript">전체 자막 다시 시도</string>
+    <string name="player_search_languages">언어 검색</string>
+    <string name="player_language_selected">선택됨</string>
+    <string name="player_back">뒤로</string>
+    <string name="player_translating">번역 중…</string>
+    <string name="player_downloading_translation_model">번역 모델 다운로드 중…</string>
+    <string name="player_translation_unavailable">번역을 사용할 수 없어요</string>
+    <string name="player_live_subtitles_status">실시간 자막 · %1$s</string>
+    <string name="player_waiting_next_caption">다음 자막을 기다리는 중…</string>
+    <string name="player_now_playing">지금 재생 중 · %1$s</string>
+    <string name="player_active_subtitle">현재 자막</string>
+    <string name="player_subtitle">자막</string>
+    <string name="player_replay_paragraph">이 단락 다시 재생</string>
+    <string name="player_youtube_unavailable">YouTube를 사용할 수 없어요</string>
+    <string name="player_youtube_could_not_load">YouTube를 불러오지 못했어요: %1$s</string>
+    <string name="player_youtube_http_error">YouTube에서 HTTP %1$d 오류를 반환했어요.</string>
+    <string name="player_webview_renderer_crashed_reload">Android WebView 렌더러가 비정상 종료됐어요. 새로고침을 탭하면 다시 만들어요.</string>
+    <string name="player_webview_renderer_reclaimed_reload">Android가 메모리를 확보하려고 WebView 렌더러를 중지했어요. 새로고침을 탭하면 다시 만들어요.</string>
+    <string name="player_reload">새로고침</string>
+</resources>

@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.SharedPreferences
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -62,6 +63,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -70,20 +72,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
+import java.util.Locale
 
 /** Collapsible groups that replace the old single "More settings" list. */
 internal enum class MoreSettingsSection(
     val key: String,
-    val title: String,
-    val summary: String,
+    @StringRes val titleRes: Int,
+    @StringRes val summaryRes: Int,
 ) {
-    LAYOUT("layout", "Layout & format", "Panel position, caption format, split view"),
-    COLORS("colors", "Colors & theme", "Subtitle colors, overlay background, app accent"),
-    WORD_LEARNING("word_learning", "Word learning", "Word colors, tap for meaning, pronunciation"),
-    OVERLAY("overlay", "Overlay & fullscreen", "Automatic overlay, dragging, saved positions"),
-    TRANSLATION("translation", "Captions & translation", "Caption flow and model preloading"),
+    LAYOUT("layout", R.string.settings_section_layout_title, R.string.settings_section_layout_summary),
+    COLORS("colors", R.string.settings_section_colors_title, R.string.settings_section_colors_summary),
+    WORD_LEARNING(
+        "word_learning",
+        R.string.settings_section_word_learning_title,
+        R.string.settings_section_word_learning_summary,
+    ),
+    OVERLAY("overlay", R.string.settings_section_overlay_title, R.string.settings_section_overlay_summary),
+    TRANSLATION(
+        "translation",
+        R.string.settings_section_translation_title,
+        R.string.settings_section_translation_summary,
+    ),
 }
 
 /** Opening a section closes the one that was open, so the page stays short. */
@@ -111,21 +123,34 @@ internal class LanguagePickerState {
     }
 }
 
-internal fun sourceLanguageChoices(availableSourceLanguages: List<CaptionLanguage>): List<LanguageChoice> =
-    listOf(LanguageChoice("auto", "Auto (recommended)")) +
+/** [autoLabel] names the "auto" choice; caption track names come from YouTube as they are. */
+internal fun sourceLanguageChoices(
+    availableSourceLanguages: List<CaptionLanguage>,
+    autoLabel: String,
+): List<LanguageChoice> =
+    listOf(LanguageChoice("auto", autoLabel)) +
         availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
 
 internal fun sourceLanguageLabel(
     sourcePreference: String,
     sourceChoices: List<LanguageChoice>,
+    autoLabel: String,
+    interfaceLocale: Locale,
 ): String =
     if (sourcePreference == "auto") {
-        "Auto (recommended)"
+        autoLabel
     } else {
         sourceChoices
             .firstOrNull {
                 TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(sourcePreference)
-            }?.label ?: TranslationLanguages.displayName(sourcePreference)
+            }?.let { choice ->
+                // A track named exactly like the catalog language is shown in the interface language.
+                if (choice.label == TranslationLanguages.find(choice.code)?.name) {
+                    languageDisplayName(choice.code, interfaceLocale)
+                } else {
+                    choice.label
+                }
+            } ?: languageDisplayName(sourcePreference, interfaceLocale)
     }
 
 /**
@@ -143,9 +168,18 @@ private fun showLanguagePickerIfOpen(
 ): Boolean {
     val mode = picker.mode ?: return false
     val source = mode == LanguagePickerMode.SOURCE
+    val interfaceLocale = currentInterfaceLocale()
     LanguagePickerDialog(
-        title = if (source) "Original caption language" else "Translate to",
-        choices = if (source) sourceChoices else TranslationLanguages.all.map { LanguageChoice(it.code, it.name) },
+        title =
+            stringResource(
+                if (source) R.string.settings_original_caption_language else R.string.settings_translate_to,
+            ),
+        choices =
+            if (source) {
+                sourceChoices
+            } else {
+                TranslationLanguages.all.map { LanguageChoice(it.code, languageDisplayName(it.code, interfaceLocale)) }
+            },
         selectedCode = if (source) sourcePreference else targetLanguage,
         searchQuery = picker.query,
         onSearchQueryChange = { picker.query = it },
@@ -165,7 +199,7 @@ private fun LanguagePickerButtons(
     targetLanguage: String,
     onPick: (LanguagePickerMode) -> Unit,
 ) {
-    Text("Original language")
+    Text(stringResource(R.string.settings_original_language))
     Spacer(Modifier.height(6.dp))
     OutlinedButton(
         onClick = { onPick(LanguagePickerMode.SOURCE) },
@@ -174,15 +208,15 @@ private fun LanguagePickerButtons(
         Text(sourceLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
     Spacer(Modifier.height(12.dp))
-    Text("Translate to")
+    Text(stringResource(R.string.settings_translate_to))
     Spacer(Modifier.height(6.dp))
     OutlinedButton(
         onClick = { onPick(LanguagePickerMode.TARGET) },
         modifier = Modifier.fillMaxWidth().testTag("target_language_picker"),
     ) {
-        Text(TranslationLanguages.displayName(targetLanguage))
+        Text(languageDisplayName(targetLanguage, currentInterfaceLocale()))
     }
-    SettingsHint("A language model downloads only when it is needed.")
+    SettingsHint(stringResource(R.string.settings_model_download_hint))
 }
 
 /**
@@ -200,7 +234,9 @@ internal fun QuickLanguageSettingsDialog(
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
-    val sourceChoices = sourceLanguageChoices(availableSourceLanguages)
+    val autoLabel = stringResource(R.string.settings_source_language_auto)
+    val interfaceLocale = currentInterfaceLocale()
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
     val pickerOpen =
         showLanguagePickerIfOpen(
             picker = languagePicker,
@@ -214,11 +250,11 @@ internal fun QuickLanguageSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.Language, contentDescription = null) },
-        title = { Text("Subtitle languages") },
+        title = { Text(stringResource(R.string.settings_subtitle_languages)) },
         text = {
             Column(Modifier.testTag("quick_language_settings")) {
                 LanguagePickerButtons(
-                    sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices),
+                    sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, interfaceLocale),
                     targetLanguage = targetLanguage,
                     onPick = languagePicker::open,
                 )
@@ -239,9 +275,9 @@ internal fun QuickLanguageSettingsDialog(
                     Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Dual-subtitle settings", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.settings_dual_subtitle_settings), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "Text size, view, colors, overlay and more",
+                            stringResource(R.string.settings_dual_subtitle_settings_summary),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -250,7 +286,7 @@ internal fun QuickLanguageSettingsDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_done)) } },
     )
 }
 
@@ -305,7 +341,8 @@ internal fun SubtitleSettingsDialog(
     val languagePicker = remember { LanguagePickerState() }
     var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     var showResetConfirmation by remember { mutableStateOf(false) }
-    val sourceChoices = sourceLanguageChoices(availableSourceLanguages)
+    val autoLabel = stringResource(R.string.settings_source_language_auto)
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
     val pickerOpen =
         showLanguagePickerIfOpen(
             picker = languagePicker,
@@ -316,7 +353,8 @@ internal fun SubtitleSettingsDialog(
             onTargetChange = onTargetChange,
         )
     if (pickerOpen) return
-    val sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices)
+    val sourceLabel =
+        sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, currentInterfaceLocale())
 
     @Composable
     fun Section(
@@ -352,43 +390,43 @@ internal fun SubtitleSettingsDialog(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    SettingsGroupCard(title = "Languages", icon = Icons.Default.Language) {
+                    SettingsGroupCard(title = stringResource(R.string.settings_group_languages), icon = Icons.Default.Language) {
                         LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
                     }
 
-                    SettingsGroupCard(title = "Reading", icon = Icons.Default.TextFields) {
-                        Text("Text size: ${(fontScale * 100).toInt()}%")
+                    SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {
+                        Text(stringResource(R.string.settings_text_size, (fontScale * 100).toInt()))
                         Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = 0.8f..1.5f)
                         CaptionVisibilitySettings()
                         SettingsSwitchRow(
-                            title = "Highlight spoken words",
-                            description = "Tint the word being spoken so you can follow along.",
+                            title = stringResource(R.string.settings_highlight_spoken_words_title),
+                            description = stringResource(R.string.settings_highlight_spoken_words_description),
                             checked = wordHighlightEnabled,
                             onCheckedChange = onWordHighlightChange,
                             testTag = "word_highlight_switch",
                         )
                     }
 
-                    SettingsGroupCard(title = "Default view", icon = Icons.Default.Dashboard) {
+                    SettingsGroupCard(title = stringResource(R.string.settings_group_default_view), icon = Icons.Default.Dashboard) {
                         PlayerModeSettingsOption(
                             mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
                             selectedMode = playerMode,
-                            title = "Transcript panel",
-                            description = "Full dual-subtitle timeline with paragraph replay.",
+                            title = stringResource(R.string.settings_transcript_panel_title),
+                            description = stringResource(R.string.settings_transcript_panel_description),
                             onModeChange = onPlayerModeChange,
                         )
                         HorizontalDivider()
                         PlayerModeSettingsOption(
                             mode = PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY,
                             selectedMode = playerMode,
-                            title = "Scroll-friendly overlay",
-                            description = "Compact captions while YouTube stays scrollable for comments and recommendations.",
+                            title = stringResource(R.string.settings_scroll_overlay_title),
+                            description = stringResource(R.string.settings_scroll_overlay_description),
                             onModeChange = onPlayerModeChange,
                         )
                     }
 
                     Text(
-                        "More settings",
+                        stringResource(R.string.settings_more_settings),
                         modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -404,42 +442,42 @@ internal fun SubtitleSettingsDialog(
                         CaptionFormatSettings(captionFormat, onCaptionFormatChange)
                         SettingsSectionDivider()
                         SettingsSwitchRow(
-                            title = "Landscape split view",
-                            description = "With the landscape overlay off, show the transcript beside the video. Drag to resize.",
+                            title = stringResource(R.string.settings_landscape_split_title),
+                            description = stringResource(R.string.settings_landscape_split_description),
                             checked = landscapeSplitEnabled,
                             onCheckedChange = onLandscapeSplitChange,
                             testTag = "landscape_split_switch",
                         )
                         SettingsHint(
-                            "Swipe the transcript header down (or right in split view) to hide it. Captions keep tracking while hidden.",
+                            stringResource(R.string.settings_hide_transcript_hint),
                         )
                     }
 
                     Section(MoreSettingsSection.COLORS, Icons.Default.Palette) {
                         SettingsSwitchRow(
-                            title = "Custom subtitle colors",
-                            description = "Use the colors below. When off, the default subtitle colors are used.",
+                            title = stringResource(R.string.settings_custom_colors_title),
+                            description = stringResource(R.string.settings_custom_colors_description),
                             checked = customColorsEnabled,
                             onCheckedChange = onCustomColorsChange,
                             testTag = "custom_colors_switch",
                         )
                         if (customColorsEnabled) {
                             SubtitleColorSwatchRow(
-                                title = "Original subtitle color",
+                                title = stringResource(R.string.settings_original_color_title),
                                 selectedKey = originalColorKey,
                                 enabled = true,
                                 onColorChange = onOriginalColorChange,
                                 testTagPrefix = "original_color",
                             )
                             SubtitleColorSwatchRow(
-                                title = "Translated subtitle color",
+                                title = stringResource(R.string.settings_translated_color_title),
                                 selectedKey = translatedColorKey,
                                 enabled = true,
                                 onColorChange = onTranslatedColorChange,
                                 testTagPrefix = "translated_color",
                             )
                             SubtitleColorSwatchRow(
-                                title = "Spoken-word highlight",
+                                title = stringResource(R.string.settings_highlight_color_title),
                                 selectedKey = highlightColorKey,
                                 enabled = wordHighlightEnabled,
                                 onColorChange = onHighlightColorChange,
@@ -471,15 +509,15 @@ internal fun SubtitleSettingsDialog(
 
                     Section(MoreSettingsSection.TRANSLATION, Icons.Default.Translate) {
                         SettingsSwitchRow(
-                            title = "Natural subtitle flow & punctuation",
-                            description = "Merge auto-generated captions along speech pauses and clauses, with proper capitalization.",
+                            title = stringResource(R.string.settings_natural_flow_title),
+                            description = stringResource(R.string.settings_natural_flow_description),
                             checked = naturalSubtitlesEnabled,
                             onCheckedChange = onNaturalSubtitlesChange,
                             testTag = "natural_subtitles_switch",
                         )
                         SettingsSwitchRow(
-                            title = "Preload translation models in background",
-                            description = "Download translation models at launch so playback starts without waiting.",
+                            title = stringResource(R.string.settings_preload_models_title),
+                            description = stringResource(R.string.settings_preload_models_description),
                             checked = preloadModelsEnabled,
                             onCheckedChange = onPreloadModelsChange,
                             testTag = "preload_models_switch",
@@ -490,7 +528,7 @@ internal fun SubtitleSettingsDialog(
                         onClick = { showResetConfirmation = true },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("reset_all_settings"),
                     ) {
-                        Text("Reset all settings to defaults", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.settings_reset_all_button), color = MaterialTheme.colorScheme.error)
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -500,12 +538,9 @@ internal fun SubtitleSettingsDialog(
         if (showResetConfirmation) {
             AlertDialog(
                 onDismissRequest = { showResetConfirmation = false },
-                title = { Text("Reset all settings?") },
+                title = { Text(stringResource(R.string.settings_reset_all_title)) },
                 text = {
-                    Text(
-                        "Languages, text size, colors, view mode, and overlay options " +
-                            "will return to their defaults. Your current video stays open.",
-                    )
+                    Text(stringResource(R.string.settings_reset_all_message))
                 },
                 confirmButton = {
                     TextButton(
@@ -514,10 +549,10 @@ internal fun SubtitleSettingsDialog(
                             onResetSettings()
                         },
                         modifier = Modifier.testTag("confirm_reset_settings"),
-                    ) { Text("Reset") }
+                    ) { Text(stringResource(R.string.settings_reset)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showResetConfirmation = false }) { Text("Cancel") }
+                    TextButton(onClick = { showResetConfirmation = false }) { Text(stringResource(R.string.settings_cancel)) }
                 },
             )
         }
@@ -531,16 +566,16 @@ private fun SettingsTopBar(onDismiss: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onDismiss, modifier = Modifier.testTag("close_settings")) {
-            Icon(Icons.Default.Close, contentDescription = "Close settings")
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_close_settings))
         }
         Text(
-            "Dual-subtitle settings",
+            stringResource(R.string.settings_dual_subtitle_settings),
             modifier = Modifier.weight(1f).padding(start = 4.dp),
             style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        TextButton(onClick = onDismiss) { Text("Done") }
+        TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_done)) }
     }
 }
 
@@ -575,6 +610,8 @@ private fun ExpandableSettingsSection(
     onToggle: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val expansionState =
+        stringResource(if (expanded) R.string.settings_section_expanded else R.string.settings_section_collapsed)
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -586,7 +623,7 @@ private fun ExpandableSettingsSection(
                     Modifier
                         .fillMaxWidth()
                         .clickable(role = Role.Button, onClick = onToggle)
-                        .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
+                        .semantics { stateDescription = expansionState }
                         .testTag("settings_section_${section.key}")
                         .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -603,9 +640,9 @@ private fun ExpandableSettingsSection(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(section.title, style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(section.titleRes), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        section.summary,
+                        stringResource(section.summaryRes),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -641,44 +678,48 @@ private fun WordLearningSettings(
     onWordLearningActiveOnlyChange: (Boolean) -> Unit,
 ) {
     SettingsSwitchRow(
-        title = "Pronounce tapped words",
-        description = "Speak a word when you tap it in the subtitles or open its definition.",
+        title = stringResource(R.string.settings_pronounce_tapped_title),
+        description = stringResource(R.string.settings_pronounce_tapped_description),
         checked = autoPronounce,
         onCheckedChange = onAutoPronounceChange,
         testTag = "auto_pronounce_switch",
     )
     SettingsSwitchRow(
-        title = "Word learning mode (POS colors)",
-        description = "Color words by grammatical role (nouns, verbs, adjectives, particles) to see sentence structure.",
+        title = stringResource(R.string.settings_word_learning_mode_title),
+        description = stringResource(R.string.settings_word_learning_mode_description),
         checked = wordLearningEnabled,
         onCheckedChange = onWordLearningChange,
         testTag = "word_learning_mode_switch",
     )
     if (!wordLearningEnabled) return
     Spacer(Modifier.height(8.dp))
-    Text("Colored subtitle lines", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+    Text(stringResource(R.string.settings_colored_lines_title), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        listOf("original" to "Original", "translation" to "Translation", "both" to "Both").forEach { (targetKey, targetLabel) ->
+        listOf(
+            "original" to R.string.settings_colored_lines_original,
+            "translation" to R.string.settings_colored_lines_translation,
+            "both" to R.string.settings_colored_lines_both,
+        ).forEach { (targetKey, targetLabelRes) ->
             FilterChip(
                 selected = wordLearningTarget == targetKey,
                 onClick = { onWordLearningTargetChange(targetKey) },
-                label = { Text(targetLabel) },
+                label = { Text(stringResource(targetLabelRes)) },
             )
         }
     }
     SettingsSwitchRow(
-        title = "Tap word for definition",
-        description = "Tap any word to see its reading, part of speech, and translation.",
+        title = stringResource(R.string.settings_tap_definition_title),
+        description = stringResource(R.string.settings_tap_definition_description),
         checked = tapToLearnEnabled,
         onCheckedChange = onTapToLearnChange,
         testTag = "tap_to_learn_switch",
     )
     SettingsSwitchRow(
-        title = "Highlight active sentence only",
-        description = "Only color the sentence being spoken to keep the transcript clean.",
+        title = stringResource(R.string.settings_active_sentence_only_title),
+        description = stringResource(R.string.settings_active_sentence_only_description),
         checked = wordLearningActiveOnly,
         onCheckedChange = onWordLearningActiveOnlyChange,
         testTag = "word_learning_active_only_switch",
@@ -730,10 +771,10 @@ private fun OverlaySettings(
         preferences.edit().putBoolean(key, value).apply()
     }
 
-    SettingsSubheading("Fullscreen & landscape")
+    SettingsSubheading(stringResource(R.string.settings_overlay_fullscreen_heading))
     SettingsSwitchRow(
-        title = "Use overlay in fullscreen",
-        description = "Show the compact dual-subtitle overlay when YouTube enters fullscreen.",
+        title = stringResource(R.string.settings_overlay_fullscreen_title),
+        description = stringResource(R.string.settings_overlay_fullscreen_description),
         checked = autoOverlayFullscreen,
         onCheckedChange = {
             autoOverlayFullscreen = it
@@ -742,8 +783,8 @@ private fun OverlaySettings(
         testTag = "auto_overlay_fullscreen_switch",
     )
     SettingsSwitchRow(
-        title = "Use overlay when rotated sideways",
-        description = "Replace the transcript panel with the compact overlay in landscape.",
+        title = stringResource(R.string.settings_overlay_landscape_title),
+        description = stringResource(R.string.settings_overlay_landscape_description),
         checked = autoOverlayLandscape,
         onCheckedChange = {
             autoOverlayLandscape = it
@@ -753,10 +794,10 @@ private fun OverlaySettings(
     )
 
     SettingsSectionDivider()
-    SettingsSubheading("Moving the overlay")
+    SettingsSubheading(stringResource(R.string.settings_overlay_moving_heading))
     SettingsSwitchRow(
-        title = "Movable subtitle controls",
-        description = "Drag the overlay or the collapsed CC button where you want. In fullscreen the overlay can reach the top edge.",
+        title = stringResource(R.string.settings_movable_controls_title),
+        description = stringResource(R.string.settings_movable_controls_description),
         checked = movableSubtitleBox,
         onCheckedChange = {
             movableSubtitleBox = it
@@ -765,15 +806,15 @@ private fun OverlaySettings(
         testTag = "movable_subtitle_box_switch",
     )
     SettingsSwitchRow(
-        title = "Lock overlay to video player",
-        description = "Keep the portrait overlay inside the video area instead of letting it move down the screen.",
+        title = stringResource(R.string.settings_lock_overlay_title),
+        description = stringResource(R.string.settings_lock_overlay_description),
         checked = lockOverlayToVideo,
         onCheckedChange = onLockOverlayToVideoChange,
         testTag = "lock_overlay_to_video_switch",
     )
     SettingsSwitchRow(
-        title = "Automatically avoid video controls",
-        description = "Move subtitles up while YouTube's seek bar and controls are visible.",
+        title = stringResource(R.string.settings_avoid_controls_title),
+        description = stringResource(R.string.settings_avoid_controls_description),
         checked = autoAvoidPlayerControls,
         onCheckedChange = {
             autoAvoidPlayerControls = it
@@ -782,8 +823,8 @@ private fun OverlaySettings(
         testTag = "auto_avoid_player_controls_switch",
     )
     SettingsSwitchRow(
-        title = "Remember dragged position",
-        description = "Save where you drag the overlay and CC button and reuse those positions.",
+        title = stringResource(R.string.settings_remember_position_title),
+        description = stringResource(R.string.settings_remember_position_description),
         checked = rememberOverlayPosition,
         onCheckedChange = { enabled ->
             rememberOverlayPosition = enabled
@@ -802,10 +843,7 @@ private fun OverlaySettings(
         },
         testTag = "remember_overlay_position_switch",
     )
-    SettingsHint(
-        "Drag the overlay up, down, or sideways. When the transcript is hidden, you can drag the CC button too. " +
-            "In portrait, flicking the overlay down closes it.",
-    )
+    SettingsHint(stringResource(R.string.settings_drag_overlay_hint))
     Spacer(Modifier.height(8.dp))
     OutlinedButton(
         onClick = {
@@ -819,7 +857,7 @@ private fun OverlaySettings(
         },
         modifier = Modifier.fillMaxWidth().testTag("reset_overlay_position"),
     ) {
-        Text("Reset subtitle positions")
+        Text(stringResource(R.string.settings_reset_subtitle_positions))
     }
 }
 

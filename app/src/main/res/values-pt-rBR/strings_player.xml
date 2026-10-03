@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_tap_paragraph_to_replay">Toque em um parágrafo para repeti-lo</string>
+    <string name="player_subtitle_settings">Configurações de legendas</string>
+    <string name="player_dual_subtitle_settings">Configurações de legendas duplas</string>
+    <string name="player_show_dual_subtitles">Mostrar legendas duplas</string>
+    <string name="player_hide_dual_subtitles">Ocultar legendas duplas</string>
+    <string name="player_loading_captions">Carregando legendas…</string>
+    <string name="player_finding_captions">Procurando legendas</string>
+    <string name="player_source_to_target">"%1$s  →  %2$s"</string>
+    <string name="player_caption_track_auto_generated">%1$s (geradas automaticamente)</string>
+    <string name="player_video_split_state">Vídeo em %1$d por cento</string>
+    <string name="player_retry_translation">Tentar traduzir novamente</string>
+    <string name="player_retry_captions">Tentar legendas novamente</string>
+    <string name="player_retry_full_transcript">Tentar transcrição completa novamente</string>
+    <string name="player_search_languages">Pesquisar idiomas</string>
+    <string name="player_language_selected">Selecionado</string>
+    <string name="player_back">Voltar</string>
+    <string name="player_translating">Traduzindo…</string>
+    <string name="player_downloading_translation_model">Baixando o modelo de tradução…</string>
+    <string name="player_translation_unavailable">Tradução indisponível</string>
+    <string name="player_live_subtitles_status">Legendas ao vivo · %1$s</string>
+    <string name="player_waiting_next_caption">Aguardando a próxima legenda…</string>
+    <string name="player_now_playing">Tocando agora · %1$s</string>
+    <string name="player_active_subtitle">Legenda ativa</string>
+    <string name="player_subtitle">Legenda</string>
+    <string name="player_replay_paragraph">Repetir este parágrafo</string>
+    <string name="player_youtube_unavailable">YouTube indisponível</string>
+    <string name="player_youtube_could_not_load">Não foi possível carregar o YouTube: %1$s</string>
+    <string name="player_youtube_http_error">O YouTube retornou HTTP %1$d.</string>
+    <string name="player_webview_renderer_crashed_reload">O renderizador do Android WebView travou. Toque em Recarregar para recriá-lo.</string>
+    <string name="player_webview_renderer_reclaimed_reload">O Android parou o renderizador do WebView para liberar memória. Toque em Recarregar para recriá-lo.</string>
+    <string name="player_reload">Recarregar</string>
+</resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_guide_next">다음</string>
+    <string name="onboarding_guide_get_started">시작하기</string>
+    <string name="onboarding_guide_dual_subtitles_title">시청하면서 보는 이중 자막</string>
+    <string name="onboarding_guide_dual_subtitles_body">YouTube 동영상을 재생하면 원본 자막 아래에 실시간 번역이 표시돼요.</string>
+    <string name="onboarding_guide_dual_subtitles_image">원본 자막과 번역 자막이 겹쳐 표시된 재생 중인 동영상</string>
+    <string name="onboarding_guide_replay_title">어떤 대사든 바로 다시 재생</string>
+    <string name="onboarding_guide_replay_body">모든 대사가 번역과 함께 목록으로 표시돼요. 대사의 재생 버튼을 탭하면 영상이 그 장면으로 돌아가고, 톱니바퀴 아이콘으로 언어나 글자 크기를 바꿀 수 있어요.</string>
+    <string name="onboarding_guide_replay_image">자막 줄과 다시 재생 버튼이 나열된 자막 패널</string>
+    <string name="onboarding_guide_open_video_title">원하는 동영상 열기</string>
+    <string name="onboarding_guide_open_video_body">YouTube 링크를 붙여넣거나, YouTube 앱에서 동영상을 바로 공유하거나, DualSub Replay 안에서 바로 둘러보세요.</string>
+    <string name="onboarding_language_welcome">DualSub Replay에 오신 것을 환영해요</string>
+    <string name="onboarding_language_intro">언어는 한 번만 선택하면 돼요. 나중에 자막 설정에서 바꿀 수 있어요.</string>
+    <string name="onboarding_language_native_title">내 모국어</string>
+    <string name="onboarding_language_native_helper">작은 번역 자막으로 표시돼요.</string>
+    <string name="onboarding_language_learning_title">배우고 싶은 언어</string>
+    <string name="onboarding_language_learning_helper">선호하는 자막 트랙이에요. 큰 자막은 동영상을 따라가요.</string>
+    <string name="onboarding_language_select">언어 선택</string>
+    <string name="onboarding_language_continue">계속</string>
+    <string name="onboarding_language_skip_for_now">나중에 하기</string>
+    <string name="onboarding_goal_setup_title">일일 목표 설정</string>
+    <string name="onboarding_goal_setup_body">매일 새 언어로 몇 분 동안 시청하고 싶나요? 메뉴의 진행 상황에서 시청 시간과 연속 기록을 확인하고, 목표도 언제든지 바꿀 수 있어요.</string>
+    <string name="onboarding_goal_set">목표 설정</string>
+    <string name="onboarding_goal_off">끄기</string>
+    <string name="onboarding_goal_dialog_title">일일 목표</string>
+    <string name="onboarding_goal_dialog_body">매일 얼마나 시청하고 싶나요?</string>
+    <string name="onboarding_goal_save">저장</string>
+    <string name="onboarding_goal_cancel">취소</string>
+    <string name="onboarding_progress_title">진행 상황</string>
+    <string name="onboarding_progress_close">닫기</string>
+    <string name="onboarding_progress_load_error">진행 상황을 불러오지 못했어요. 저장 공간을 확인한 뒤 이 화면을 다시 열어 다시 시도하세요.</string>
+    <string name="onboarding_progress_empty">자막이 있는 동영상을 보면 시청 시간 기록이 시작돼요.</string>
+    <string name="onboarding_progress_today">오늘</string>
+    <string name="onboarding_progress_goal">일일 목표: %1$d분</string>
+    <string name="onboarding_progress_goal_reached">일일 목표 %1$d분 달성</string>
+    <string name="onboarding_progress_no_goal">일일 목표 없음</string>
+    <string name="onboarding_progress_streak_start">오늘부터 연속 기록을 시작해 보세요</string>
+    <string name="onboarding_progress_change_goal">목표 변경</string>
+    <string name="onboarding_progress_this_week">이번 주</string>
+    <string name="onboarding_progress_this_month">이번 달</string>
+    <string name="onboarding_progress_this_year">올해</string>
+    <string name="onboarding_progress_total">전체</string>
+    <string name="onboarding_progress_period_week">주</string>
+    <string name="onboarding_progress_period_month">월</string>
+    <string name="onboarding_progress_period_year">연</string>
+    <string name="onboarding_progress_period_all">전체</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">언어</string>
+    <string name="onboarding_progress_no_time_in_period">이 기간에는 아직 기록이 없어요.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">앱에서 동영상이 재생되는 동안 자막 언어별로 시간이 기록돼요. 기록은 이 기기에만 저장돼요.</string>
+    <string name="onboarding_duration_under_minute">1분 미만</string>
+    <string name="onboarding_duration_minutes">%1$d분</string>
+    <string name="onboarding_duration_hours">%1$d시간</string>
+    <string name="onboarding_duration_hours_minutes">%1$d시간 %2$d분</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="other">%1$d일 연속 기록</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="other">동영상 %1$d개</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="other">저장한 단어 %1$d개</item>
+    </plurals>
+</resources>

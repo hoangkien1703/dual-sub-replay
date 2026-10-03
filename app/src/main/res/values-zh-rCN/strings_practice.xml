@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">练习</string>
+    <string name="practice_close">关闭</string>
+    <string name="practice_cancel">取消</string>
+    <string name="practice_load_failed">无法加载已保存的单词。请检查存储空间,然后重新打开此页面重试。</string>
+    <string name="practice_update_failed">无法更新已保存的单词。请检查存储空间后重试。</string>
+    <string name="practice_example_video_title">示例视频 · 需要联网</string>
+    <string name="practice_example_video_unavailable_hint">如果视频无法播放,请返回继续练习。</string>
+    <string name="practice_return_to_practice">返回练习</string>
+    <string name="practice_session_complete">本轮练习完成</string>
+    <string name="practice_session_complete_body">复习记录已保存。等有更多单词到期时再来吧。</string>
+    <string name="practice_back_to_saved_words">返回已保存的单词</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">练习到期单词</string>
+    <string name="practice_search_label">搜索单词或释义</string>
+    <string name="practice_empty_hint">点按字幕中的单词,选择“翻译”,再选择“保存到生词本”,开始积累你的生词。</string>
+    <string name="practice_next_review">下次复习:%1$s</string>
+    <string name="practice_pronounce">发音</string>
+    <string name="practice_pronounce_item">朗读 %1$s</string>
+    <string name="practice_speech_settings">语音设置</string>
+    <string name="practice_show_meaning">显示释义</string>
+    <string name="practice_meaning_label">释义(%1$s)</string>
+    <string name="practice_save_meaning">保存释义</string>
+    <string name="practice_video_uses_original_sentence">示例视频使用的是原句。</string>
+    <string name="practice_play_online_example">播放在线示例</string>
+    <string name="practice_online_example">在线示例</string>
+    <string name="practice_rating_again">重来</string>
+    <string name="practice_rating_hard">困难</string>
+    <string name="practice_rating_good">良好</string>
+    <string name="practice_rating_easy">简单</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10 分钟</string>
+    <string name="practice_delete_word">删除单词</string>
+    <string name="practice_delete_word_title">要删除“%1$s”吗?</string>
+    <string name="practice_delete_word_body">这会删除它的复习记录。</string>
+    <string name="practice_delete">删除</string>
+    <string name="practice_keep">保留</string>
+    <string name="practice_transfer_failed">传输失败,请重试。</string>
+    <string name="practice_transfer_open_failed">无法打开所选文件。</string>
+    <string name="practice_transfer_export_too_large">导出内容超过了 8 MiB 的导入上限。</string>
+    <string name="practice_transfer_write_failed">无法写入所选文件。</string>
+    <string name="practice_transfer_import">导入</string>
+    <string name="practice_transfer_export">导出</string>
+    <string name="practice_transfer_cancel">取消传输</string>
+    <string name="practice_import_review_title">检查导入内容</string>
+    <string name="practice_import_preview_title">导入预览</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">无效记录将被跳过。除非你选择替换,否则现有单词会保留。</string>
+    <string name="practice_import_replace_duplicates">替换重复项(包括备份中的复习记录)</string>
+    <string name="practice_import_preview_button">预览</string>
+    <string name="practice_import_words_button">导入单词</string>
+    <string name="practice_import_mapping_hint">将列对应到字段。Anki 文本不包含复习计划或媒体。</string>
+    <string name="practice_import_word_language_label">默认单词语言(en、ja…)</string>
+    <string name="practice_import_meaning_language_label">默认释义语言(vi、en…)</string>
+    <string name="practice_import_first_row">第一行:%1$s</string>
+    <string name="practice_import_column_mapping">%1$s:%2$s</string>
+    <string name="practice_import_not_included">不包含</string>
+    <string name="practice_import_column_number">第 %1$d 列</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">导出练习数据</string>
+    <string name="practice_export_description">备份会保留复习记录。Anki 文本会传输单词和例句,但不含复习计划、媒体或卡片模板。</string>
+    <string name="practice_export_full_backup">完整备份(JSON)</string>
+    <string name="practice_export_anki_text">Anki 文本(TSV)</string>
+    <string name="practice_word_translation_unavailable">翻译不可用。你可以输入释义并保存单词。</string>
+    <string name="practice_example_plays_original">示例播放的是原句,而不是翻译后的单词。</string>
+    <string name="practice_save_failed">无法保存。请检查可用存储空间后重试。</string>
+    <string name="practice_saved_to_vocabulary">已保存到你的生词本</string>
+    <string name="practice_phrase">短语</string>
+    <string name="practice_saving">正在保存…</string>
+    <string name="practice_saved">已保存</string>
+    <string name="practice_save_to_vocabulary">保存到生词本</string>
+    <string name="practice_word_by_word">逐词解析</string>
+    <string name="practice_pos_noun">名词</string>
+    <string name="practice_pos_verb">动词</string>
+    <string name="practice_pos_adjective">形容词</string>
+    <string name="practice_pos_adverb">副词</string>
+    <string name="practice_pos_pronoun">代词</string>
+    <string name="practice_pos_conjunction">连词</string>
+    <string name="practice_pos_preposition">介词</string>
+    <string name="practice_pos_particle">助词 / 语法</string>
+    <string name="practice_pos_unaligned">未对齐 / 习语</string>
+    <string name="practice_pos_other">其他</string>
+    <string name="practice_japanese_dictionary_downloading">正在下载日语词典(13 MB),以便点按时选中完整单词…</string>
+    <string name="practice_japanese_dictionary_unavailable">日语词典暂时无法下载。在下载完成前,单词可能会被错误拆分。</string>
+    <string name="practice_clipboard_label">字幕</string>
+    <string name="practice_copy">复制</string>
+    <string name="practice_copied">已复制</string>
+    <string name="practice_translate">翻译</string>
+    <string name="practice_clear_selection">清除选择</string>
+    <string name="practice_tap_another_word">点按另一个单词即可选择短语</string>
+    <string name="practice_translation_unavailable">翻译不可用</string>
+    <string name="practice_translating">正在翻译…</string>
+    <string name="practice_preparing_pronunciation">正在准备发音…</string>
+    <string name="practice_speech_no_voice">没有适用于此语言的语音。请打开语音设置添加语音,然后再次点按“发音”。</string>
+    <string name="practice_speech_unavailable">语音不可用。请打开语音设置启用或安装语音引擎,然后重试。</string>
+    <string name="practice_speech_playback_failed">无法播放发音。请检查媒体音量和网络连接,或在语音设置中选择一种语音。</string>
+    <string name="practice_speech_invalid_language">请先选择字幕语言,再朗读此单词。</string>
+    <string name="practice_speech_settings_manual">请打开 Android 设置并搜索“文字转语音”,以安装或选择语音。</string>
+    <plurals name="practice_word_count">
+        <item quantity="other">%1$d 个单词</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="other">%1$d 个到期</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="other">%1$d 天</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="other">已跳过 %1$d 条损坏的单词记录(仍保留在存储中)。</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="other">已导出 %1$d 个单词。</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="other">已导入 %1$d 个单词。</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="other">%1$d 条有效</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="other">%1$d 条无效</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="other">%1$d 条重复</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="other">完整备份:%1$d 个可读取的单词。包含复习记录。</item>
+    </plurals>
+</resources>

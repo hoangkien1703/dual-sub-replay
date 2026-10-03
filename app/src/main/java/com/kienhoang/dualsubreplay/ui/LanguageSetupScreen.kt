@@ -27,9 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
 private enum class SetupPickerMode { NATIVE, LEARNING }
@@ -43,16 +46,20 @@ fun LanguageSetupScreen(
     var learningLanguage by remember { mutableStateOf<String?>(null) }
     var pickerMode by remember { mutableStateOf<SetupPickerMode?>(null) }
     var searchQuery by remember { mutableStateOf("") }
+    val interfaceLocale = currentInterfaceLocale()
+    // The picker shows catalog names in the interface language and searches both names.
     val choices = TranslationLanguages.all.map { LanguageChoice(it.code, it.name) }
+    val nativeTitle = stringResource(R.string.onboarding_language_native_title)
+    val learningTitle = stringResource(R.string.onboarding_language_learning_title)
 
     val activeMode = pickerMode
     if (activeMode != null) {
         val selected = if (activeMode == SetupPickerMode.NATIVE) nativeLanguage else learningLanguage
         LanguagePickerDialog(
             title = if (activeMode == SetupPickerMode.NATIVE) {
-                "Your native language"
+                nativeTitle
             } else {
-                "Language you want to learn"
+                learningTitle
             },
             choices = choices,
             selectedCode = selected.orEmpty(),
@@ -95,22 +102,22 @@ fun LanguageSetupScreen(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Welcome to DualSub Replay",
+                text = stringResource(R.string.onboarding_language_welcome),
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color(0xFFF3FAFA),
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Choose your languages once. You can change them later in subtitle settings.",
+                text = stringResource(R.string.onboarding_language_intro),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFFB7CED1),
             )
             Spacer(Modifier.height(28.dp))
 
             SetupLanguageField(
-                label = "Your native language",
-                helper = "Shown as the small translated subtitle.",
-                selection = nativeLanguage?.let(TranslationLanguages::displayName),
+                label = nativeTitle,
+                helper = stringResource(R.string.onboarding_language_native_helper),
+                selection = nativeLanguage?.let { languageDisplayName(it, interfaceLocale) },
                 onClick = {
                     pickerMode = SetupPickerMode.NATIVE
                     searchQuery = ""
@@ -119,9 +126,9 @@ fun LanguageSetupScreen(
             )
             Spacer(Modifier.height(18.dp))
             SetupLanguageField(
-                label = "Language you want to learn",
-                helper = "Preferred caption track; the big subtitle follows the video.",
-                selection = learningLanguage?.let(TranslationLanguages::displayName),
+                label = learningTitle,
+                helper = stringResource(R.string.onboarding_language_learning_helper),
+                selection = learningLanguage?.let { languageDisplayName(it, interfaceLocale) },
                 onClick = {
                     pickerMode = SetupPickerMode.LEARNING
                     searchQuery = ""
@@ -142,7 +149,7 @@ fun LanguageSetupScreen(
                     .fillMaxWidth()
                     .testTag("onboarding_continue"),
             ) {
-                Text("Continue")
+                Text(stringResource(R.string.onboarding_language_continue))
             }
             TextButton(
                 onClick = onSkip,
@@ -151,7 +158,7 @@ fun LanguageSetupScreen(
                     .testTag("onboarding_skip"),
             ) {
                 Text(
-                    "Skip for now",
+                    stringResource(R.string.onboarding_language_skip_for_now),
                     color = Color(0xFFB7CED1),
                 )
             }
@@ -174,7 +181,7 @@ private fun SetupLanguageField(
             modifier = Modifier.fillMaxWidth().testTag(testTag),
         ) {
             Text(
-                text = selection ?: "Select language",
+                text = selection ?: stringResource(R.string.onboarding_language_select),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (selection == null) Color(0xFF9EDCE4) else Color.Unspecified,

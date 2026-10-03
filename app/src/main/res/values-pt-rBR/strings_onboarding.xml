@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_guide_next">Próximo</string>
+    <string name="onboarding_guide_get_started">Começar</string>
+    <string name="onboarding_guide_dual_subtitles_title">Legendas duplas enquanto você assiste</string>
+    <string name="onboarding_guide_dual_subtitles_body">Reproduza qualquer vídeo do YouTube e veja as legendas originais com uma tradução ao vivo logo abaixo.</string>
+    <string name="onboarding_guide_dual_subtitles_image">Vídeo em reprodução com legendas originais e traduzidas sobrepostas</string>
+    <string name="onboarding_guide_replay_title">Repita qualquer fala na hora</string>
+    <string name="onboarding_guide_replay_body">Cada fala aparece listada com a tradução. Toque no botão de reproduzir de uma fala para voltar o vídeo até aquele momento e use a engrenagem para mudar os idiomas ou o tamanho do texto.</string>
+    <string name="onboarding_guide_replay_image">Painel de legendas com a lista de falas e botões para repetir</string>
+    <string name="onboarding_guide_open_video_title">Abra qualquer vídeo</string>
+    <string name="onboarding_guide_open_video_body">Cole um link do YouTube, compartilhe um vídeo direto do app do YouTube ou simplesmente navegue dentro do DualSub Replay.</string>
+    <string name="onboarding_language_welcome">Boas-vindas ao DualSub Replay</string>
+    <string name="onboarding_language_intro">Escolha seus idiomas uma vez. Você pode alterá-los depois nas configurações de legendas.</string>
+    <string name="onboarding_language_native_title">Seu idioma nativo</string>
+    <string name="onboarding_language_native_helper">Aparece como a legenda traduzida menor.</string>
+    <string name="onboarding_language_learning_title">Idioma que você quer aprender</string>
+    <string name="onboarding_language_learning_helper">Faixa de legendas preferida; a legenda maior acompanha o vídeo.</string>
+    <string name="onboarding_language_select">Selecionar idioma</string>
+    <string name="onboarding_language_continue">Continuar</string>
+    <string name="onboarding_language_skip_for_now">Pular por enquanto</string>
+    <string name="onboarding_goal_setup_title">Defina uma meta diária</string>
+    <string name="onboarding_goal_setup_body">Quantos minutos você quer assistir no seu novo idioma por dia? Acompanhe seu tempo e sua sequência em Progresso, no menu, e mude a meta lá quando quiser.</string>
+    <string name="onboarding_goal_set">Definir meta</string>
+    <string name="onboarding_goal_off">Nenhuma</string>
+    <string name="onboarding_goal_dialog_title">Meta diária</string>
+    <string name="onboarding_goal_dialog_body">Quanto tempo você quer assistir por dia?</string>
+    <string name="onboarding_goal_save">Salvar</string>
+    <string name="onboarding_goal_cancel">Cancelar</string>
+    <string name="onboarding_progress_title">Progresso</string>
+    <string name="onboarding_progress_close">Fechar</string>
+    <string name="onboarding_progress_load_error">Não foi possível carregar seu progresso. Verifique o armazenamento e abra esta tela de novo para tentar novamente.</string>
+    <string name="onboarding_progress_empty">Assista a um vídeo com legendas para começar a acompanhar seu tempo.</string>
+    <string name="onboarding_progress_today">Hoje</string>
+    <string name="onboarding_progress_goal">Meta diária: %1$d min</string>
+    <string name="onboarding_progress_goal_reached">Meta diária de %1$d min atingida</string>
+    <string name="onboarding_progress_no_goal">Sem meta diária</string>
+    <string name="onboarding_progress_streak_start">Comece uma sequência hoje</string>
+    <string name="onboarding_progress_change_goal">Alterar meta</string>
+    <string name="onboarding_progress_this_week">Esta semana</string>
+    <string name="onboarding_progress_this_month">Este mês</string>
+    <string name="onboarding_progress_this_year">Este ano</string>
+    <string name="onboarding_progress_total">Total</string>
+    <string name="onboarding_progress_period_week">Semana</string>
+    <string name="onboarding_progress_period_month">Mês</string>
+    <string name="onboarding_progress_period_year">Ano</string>
+    <string name="onboarding_progress_period_all">Tudo</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">Idiomas</string>
+    <string name="onboarding_progress_no_time_in_period">Ainda não há tempo neste período.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">O tempo é contado enquanto um vídeo é reproduzido no app, para o idioma das legendas. Ele fica salvo apenas neste dispositivo.</string>
+    <string name="onboarding_duration_under_minute">&lt;1 min</string>
+    <string name="onboarding_duration_minutes">%1$d min</string>
+    <string name="onboarding_duration_hours">%1$d h</string>
+    <string name="onboarding_duration_hours_minutes">%1$d h %2$d min</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="one">Sequência de %1$d dia</item>
+        <item quantity="many">Sequência de %1$d dias</item>
+        <item quantity="other">Sequência de %1$d dias</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="one">%1$d vídeo</item>
+        <item quantity="many">%1$d vídeos</item>
+        <item quantity="other">%1$d vídeos</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="one">%1$d palavra salva</item>
+        <item quantity="many">%1$d palavras salvas</item>
+        <item quantity="other">%1$d palavras salvas</item>
+    </plurals>
+</resources>

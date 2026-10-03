@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_title">練習</string>
+    <string name="practice_close">閉じる</string>
+    <string name="practice_cancel">キャンセル</string>
+    <string name="practice_load_failed">保存した単語を読み込めませんでした。ストレージを確認し、この画面を開き直して再試行してください。</string>
+    <string name="practice_update_failed">保存した単語を更新できませんでした。ストレージを確認して、もう一度お試しください。</string>
+    <string name="practice_example_video_title">例の動画 · インターネット接続が必要</string>
+    <string name="practice_example_video_unavailable_hint">動画を再生できない場合は、戻って練習を続けてください。</string>
+    <string name="practice_return_to_practice">練習に戻る</string>
+    <string name="practice_session_complete">セッション完了</string>
+    <string name="practice_session_complete_body">復習結果を保存しました。復習する単語が増えたら、また来てください。</string>
+    <string name="practice_back_to_saved_words">保存した単語に戻る</string>
+    <string name="practice_word_summary">%1$s · %2$s</string>
+    <string name="practice_due_words_button">期限の単語を練習</string>
+    <string name="practice_search_label">単語や意味を検索</string>
+    <string name="practice_empty_hint">字幕の単語をタップして「翻訳」を選び、「単語帳に保存」を押すとコレクションを始められます。</string>
+    <string name="practice_next_review">次の復習: %1$s</string>
+    <string name="practice_pronounce">発音</string>
+    <string name="practice_pronounce_item">%1$s を発音</string>
+    <string name="practice_speech_settings">音声設定</string>
+    <string name="practice_show_meaning">意味を表示</string>
+    <string name="practice_meaning_label">意味(%1$s)</string>
+    <string name="practice_save_meaning">意味を保存</string>
+    <string name="practice_video_uses_original_sentence">例の動画では元の文が再生されます。</string>
+    <string name="practice_play_online_example">オンラインの例を再生</string>
+    <string name="practice_online_example">オンラインの例</string>
+    <string name="practice_rating_again">もう一度</string>
+    <string name="practice_rating_hard">難しい</string>
+    <string name="practice_rating_good">良い</string>
+    <string name="practice_rating_easy">簡単</string>
+    <string name="practice_rating_with_interval">%1$s · %2$s</string>
+    <string name="practice_interval_ten_minutes">10分</string>
+    <string name="practice_delete_word">単語を削除</string>
+    <string name="practice_delete_word_title">%1$s を削除しますか?</string>
+    <string name="practice_delete_word_body">この単語の復習履歴も削除されます。</string>
+    <string name="practice_delete">削除</string>
+    <string name="practice_keep">残す</string>
+    <string name="practice_transfer_failed">転送に失敗しました。もう一度お試しください。</string>
+    <string name="practice_transfer_open_failed">選択したファイルを開けませんでした。</string>
+    <string name="practice_transfer_export_too_large">エクスポートがインポート上限の 8 MiB を超えています。</string>
+    <string name="practice_transfer_write_failed">選択したファイルに書き込めませんでした。</string>
+    <string name="practice_transfer_import">インポート</string>
+    <string name="practice_transfer_export">エクスポート</string>
+    <string name="practice_transfer_cancel">転送をキャンセル</string>
+    <string name="practice_import_review_title">インポートの確認</string>
+    <string name="practice_import_preview_title">インポートのプレビュー</string>
+    <string name="practice_import_summary">%1$s · %2$s · %3$s</string>
+    <string name="practice_import_skip_note">無効なレコードはスキップされます。置き換えを選ばない限り、既存の単語は残ります。</string>
+    <string name="practice_import_replace_duplicates">重複を置き換える(バックアップの復習履歴を含む)</string>
+    <string name="practice_import_preview_button">プレビュー</string>
+    <string name="practice_import_words_button">単語をインポート</string>
+    <string name="practice_import_mapping_hint">列を項目に割り当ててください。Anki のテキストには復習スケジュールやメディアは含まれません。</string>
+    <string name="practice_import_word_language_label">単語の既定の言語(en、ja…)</string>
+    <string name="practice_import_meaning_language_label">意味の既定の言語(vi、en…)</string>
+    <string name="practice_import_first_row">1 行目: %1$s</string>
+    <string name="practice_import_column_mapping">%1$s: %2$s</string>
+    <string name="practice_import_not_included">含めない</string>
+    <string name="practice_import_column_number">列 %1$d</string>
+    <string name="practice_import_column_option">%1$d: %2$s</string>
+    <string name="practice_export_title">練習データをエクスポート</string>
+    <string name="practice_export_description">バックアップには復習履歴が保存されます。Anki のテキストでは単語と例文を移せますが、スケジュール、メディア、カードのテンプレートは含まれません。</string>
+    <string name="practice_export_full_backup">完全バックアップ(JSON)</string>
+    <string name="practice_export_anki_text">Anki テキスト(TSV)</string>
+    <string name="practice_word_translation_unavailable">翻訳を利用できません。意味を入力して単語を保存できます。</string>
+    <string name="practice_example_plays_original">例では翻訳後の単語ではなく、元の文が再生されます。</string>
+    <string name="practice_save_failed">保存できませんでした。空き容量を確認して、もう一度お試しください。</string>
+    <string name="practice_saved_to_vocabulary">単語帳に保存しました</string>
+    <string name="practice_phrase">フレーズ</string>
+    <string name="practice_saving">保存中…</string>
+    <string name="practice_saved">保存済み</string>
+    <string name="practice_save_to_vocabulary">単語帳に保存</string>
+    <string name="practice_word_by_word">単語ごと</string>
+    <string name="practice_pos_noun">名詞</string>
+    <string name="practice_pos_verb">動詞</string>
+    <string name="practice_pos_adjective">形容詞</string>
+    <string name="practice_pos_adverb">副詞</string>
+    <string name="practice_pos_pronoun">代名詞</string>
+    <string name="practice_pos_conjunction">接続詞</string>
+    <string name="practice_pos_preposition">前置詞</string>
+    <string name="practice_pos_particle">助詞 / 文法</string>
+    <string name="practice_pos_unaligned">対応なし / 慣用句</string>
+    <string name="practice_pos_other">その他</string>
+    <string name="practice_japanese_dictionary_downloading">タップで単語全体を選択できるよう、日本語辞書(13 MB)をダウンロードしています…</string>
+    <string name="practice_japanese_dictionary_unavailable">日本語辞書をまだダウンロードできていません。完了するまで、単語が不自然に区切られることがあります。</string>
+    <string name="practice_clipboard_label">字幕</string>
+    <string name="practice_copy">コピー</string>
+    <string name="practice_copied">コピーしました</string>
+    <string name="practice_translate">翻訳</string>
+    <string name="practice_clear_selection">選択を解除</string>
+    <string name="practice_tap_another_word">別の単語をタップするとフレーズを選択できます</string>
+    <string name="practice_translation_unavailable">翻訳を利用できません</string>
+    <string name="practice_translating">翻訳中…</string>
+    <string name="practice_preparing_pronunciation">発音を準備しています…</string>
+    <string name="practice_speech_no_voice">この言語で使える音声がありません。音声設定を開いて音声を追加してから、もう一度「発音」をタップしてください。</string>
+    <string name="practice_speech_unavailable">音声を利用できません。音声設定を開いて音声エンジンを有効にするかインストールしてから、もう一度お試しください。</string>
+    <string name="practice_speech_playback_failed">発音を再生できませんでした。メディアの音量と接続を確認するか、音声設定で音声を選んでください。</string>
+    <string name="practice_speech_invalid_language">この単語を発音する前に、字幕の言語を選んでください。</string>
+    <string name="practice_speech_settings_manual">Android の設定を開いて「テキスト読み上げ」を検索し、音声をインストールまたは選択してください。</string>
+    <plurals name="practice_word_count">
+        <item quantity="other">%1$d 語</item>
+    </plurals>
+    <plurals name="practice_due_count">
+        <item quantity="other">期限 %1$d 件</item>
+    </plurals>
+    <plurals name="practice_interval_days">
+        <item quantity="other">%1$d 日</item>
+    </plurals>
+    <plurals name="practice_malformed_records">
+        <item quantity="other">破損した単語レコード %1$d 件をストレージに残したままスキップしました。</item>
+    </plurals>
+    <plurals name="practice_transfer_exported">
+        <item quantity="other">%1$d 語をエクスポートしました。</item>
+    </plurals>
+    <plurals name="practice_transfer_imported">
+        <item quantity="other">%1$d 語をインポートしました。</item>
+    </plurals>
+    <plurals name="practice_import_valid_count">
+        <item quantity="other">有効 %1$d 件</item>
+    </plurals>
+    <plurals name="practice_import_invalid_count">
+        <item quantity="other">無効 %1$d 件</item>
+    </plurals>
+    <plurals name="practice_import_duplicate_count">
+        <item quantity="other">重複 %1$d 件</item>
+    </plurals>
+    <plurals name="practice_import_backup_summary">
+        <item quantity="other">完全バックアップ: 読み取れる単語 %1$d 語。復習履歴も含まれます。</item>
+    </plurals>
+</resources>

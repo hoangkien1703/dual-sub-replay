@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_guide_next">下一步</string>
+    <string name="onboarding_guide_get_started">开始使用</string>
+    <string name="onboarding_guide_dual_subtitles_title">观看时显示双语字幕</string>
+    <string name="onboarding_guide_dual_subtitles_body">播放任意 YouTube 视频，原文字幕下方会实时显示翻译。</string>
+    <string name="onboarding_guide_dual_subtitles_image">正在播放的视频，叠加显示原文字幕和翻译字幕</string>
+    <string name="onboarding_guide_replay_title">随时重播任意一句</string>
+    <string name="onboarding_guide_replay_body">每句台词都会连同翻译一起列出。点按某句的播放按钮即可让视频跳回那一刻，点按齿轮图标可更改语言或文字大小。</string>
+    <string name="onboarding_guide_replay_image">列出字幕行和重播按钮的字幕面板</string>
+    <string name="onboarding_guide_open_video_title">打开任意视频</string>
+    <string name="onboarding_guide_open_video_body">粘贴 YouTube 链接、直接从 YouTube 应用分享视频，或者直接在 DualSub Replay 中浏览。</string>
+    <string name="onboarding_language_welcome">欢迎使用 DualSub Replay</string>
+    <string name="onboarding_language_intro">只需选择一次语言，之后可以在字幕设置中更改。</string>
+    <string name="onboarding_language_native_title">你的母语</string>
+    <string name="onboarding_language_native_helper">显示为较小的翻译字幕。</string>
+    <string name="onboarding_language_learning_title">想学习的语言</string>
+    <string name="onboarding_language_learning_helper">首选字幕轨道；大字幕以视频为准。</string>
+    <string name="onboarding_language_select">选择语言</string>
+    <string name="onboarding_language_continue">继续</string>
+    <string name="onboarding_language_skip_for_now">暂时跳过</string>
+    <string name="onboarding_goal_setup_title">设置每日目标</string>
+    <string name="onboarding_goal_setup_body">你每天想用新语言观看多少分钟？可在菜单的“进度”中查看时长和连续天数，并随时更改目标。</string>
+    <string name="onboarding_goal_set">设置目标</string>
+    <string name="onboarding_goal_off">关闭</string>
+    <string name="onboarding_goal_dialog_title">每日目标</string>
+    <string name="onboarding_goal_dialog_body">你每天想观看多长时间？</string>
+    <string name="onboarding_goal_save">保存</string>
+    <string name="onboarding_goal_cancel">取消</string>
+    <string name="onboarding_progress_title">进度</string>
+    <string name="onboarding_progress_close">关闭</string>
+    <string name="onboarding_progress_load_error">无法加载你的进度。请检查存储空间，然后重新打开此页面重试。</string>
+    <string name="onboarding_progress_empty">观看带字幕的视频即可开始记录你的时长。</string>
+    <string name="onboarding_progress_today">今天</string>
+    <string name="onboarding_progress_goal">每日目标：%1$d 分钟</string>
+    <string name="onboarding_progress_goal_reached">已达成每日目标 %1$d 分钟</string>
+    <string name="onboarding_progress_no_goal">未设置每日目标</string>
+    <string name="onboarding_progress_streak_start">从今天开始累计连续天数</string>
+    <string name="onboarding_progress_change_goal">更改目标</string>
+    <string name="onboarding_progress_this_week">本周</string>
+    <string name="onboarding_progress_this_month">本月</string>
+    <string name="onboarding_progress_this_year">今年</string>
+    <string name="onboarding_progress_total">总计</string>
+    <string name="onboarding_progress_period_week">周</string>
+    <string name="onboarding_progress_period_month">月</string>
+    <string name="onboarding_progress_period_year">年</string>
+    <string name="onboarding_progress_period_all">全部</string>
+    <string name="onboarding_progress_bar_description">%1$s：%2$s</string>
+    <string name="onboarding_progress_languages">语言</string>
+    <string name="onboarding_progress_no_time_in_period">此期间还没有记录。</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">在应用中播放视频时，会按字幕语言计算时长。数据仅存储在此设备上。</string>
+    <string name="onboarding_duration_under_minute">不到 1 分钟</string>
+    <string name="onboarding_duration_minutes">%1$d 分钟</string>
+    <string name="onboarding_duration_hours">%1$d 小时</string>
+    <string name="onboarding_duration_hours_minutes">%1$d 小时 %2$d 分钟</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="other">连续 %1$d 天</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="other">%1$d 个视频</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="other">%1$d 个已保存的词</item>
+    </plurals>
+</resources>

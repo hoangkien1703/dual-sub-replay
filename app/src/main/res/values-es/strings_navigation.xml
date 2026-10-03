@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_practice">Práctica</string>
+    <string name="navigation_progress">Progreso</string>
+    <string name="navigation_settings">Ajustes</string>
+    <string name="navigation_open_menu">Abrir menú de navegación</string>
+    <string name="navigation_close_menu">Cerrar menú de navegación</string>
+    <string name="navigation_tagline">Aprende idiomas con YouTube</string>
+    <string name="navigation_app_language">Idioma de la app</string>
+    <string name="navigation_device_language">Idioma del dispositivo</string>
+    <string name="navigation_cancel">Cancelar</string>
+    <string name="navigation_latest_version">Consulta la versión más reciente de la app en %1$s.</string>
+    <string name="navigation_no_browser">No hay ningún navegador disponible para abrir GitHub.</string>
+    <string name="navigation_licenses">Licencias de código abierto</string>
+    <string name="navigation_loading_license">Cargando licencia…</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Esta aplicación combinada se distribuye bajo GPL-3.0 sin garantía. Puedes redistribuirla y modificarla según estos términos. Los avisos MIT originales y los enlaces al código fuente y la compilación de las dependencias están en THIRD_PARTY_NOTICES.md, en el repositorio de GitHub.</string>
+    <string name="navigation_close">Cerrar</string>
+</resources>

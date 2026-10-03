@@ -44,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -52,6 +54,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.BuildConfig
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import java.net.URI
 import java.util.Collections
@@ -270,6 +273,7 @@ internal fun SingleYouTubePage(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val requestInterceptor = LocalYouTubeRequestInterceptor.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnPageChanged by rememberUpdatedState(onPageChanged)
@@ -451,7 +455,7 @@ internal fun SingleYouTubePage(
                 ) {
                     super.onReceivedError(view, request, error)
                     if (request.isForMainFrame) {
-                        pageError = "YouTube could not load: ${error.description}"
+                        pageError = resources.getString(R.string.player_youtube_could_not_load, error.description)
                     }
                 }
 
@@ -462,7 +466,7 @@ internal fun SingleYouTubePage(
                 ) {
                     super.onReceivedHttpError(view, request, errorResponse)
                     if (request.isForMainFrame && errorResponse.statusCode >= 400) {
-                        pageError = "YouTube returned HTTP ${errorResponse.statusCode}."
+                        pageError = resources.getString(R.string.player_youtube_http_error, errorResponse.statusCode)
                     }
                 }
 
@@ -470,12 +474,15 @@ internal fun SingleYouTubePage(
                     view: WebView,
                     detail: RenderProcessGoneDetail,
                 ): Boolean {
-                    val message = if (detail.didCrash()) {
+                    val crashed = detail.didCrash()
+                    val message = if (crashed) {
                         "The Android WebView renderer crashed."
                     } else {
                         "Android stopped the WebView renderer to reclaim memory."
                     }
                     Log.e(BROWSER_LOG_TAG, message)
+                    val reloadMessage =
+                        if (crashed) R.string.player_webview_renderer_crashed_reload else R.string.player_webview_renderer_reclaimed_reload
                     webViewUnavailable = true
                     view.post {
                         view.destroySafely()
@@ -484,7 +491,7 @@ internal fun SingleYouTubePage(
                             webViewUnavailable = false
                             webViewGeneration += 1
                         } else {
-                            pageError = "$message Tap Reload to recreate it."
+                            pageError = resources.getString(reloadMessage)
                         }
                     }
                     return true
@@ -718,10 +725,10 @@ internal fun WebPageErrorCard(
         shadowElevation = 8.dp,
     ) {
         Column(Modifier.padding(20.dp)) {
-            Text("YouTube unavailable", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.player_youtube_unavailable), style = MaterialTheme.typography.titleMedium)
             Text(message, modifier = Modifier.padding(top = 8.dp, bottom = 16.dp))
             Button(onClick = onReload, modifier = Modifier.align(Alignment.End)) {
-                Text("Reload")
+                Text(stringResource(R.string.player_reload))
             }
         }
     }

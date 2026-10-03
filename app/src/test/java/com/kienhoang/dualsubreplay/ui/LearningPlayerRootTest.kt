@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.res.Configuration
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -39,11 +40,11 @@ class LearningPlayerRootTest {
         assertEquals(
             LearningOverlayContent(
                 originalText = "Second line",
-                translatedText = "Translating…",
+                translatedText = TestUiStrings.get(R.string.player_translating),
                 statusText = null,
                 segment = SubtitleSegment(2, 2_000, 3_000, "Second line", null),
             ),
-            learningOverlayContent(state),
+            learningOverlayContent(state, TestUiStrings),
         )
     }
 
@@ -63,11 +64,11 @@ class LearningPlayerRootTest {
 
         assertEquals(
             1,
-            learningOverlayContent(baseState)?.activeWordIndex,
+            learningOverlayContent(baseState, TestUiStrings)?.activeWordIndex,
         )
         assertEquals(
             -1,
-            learningOverlayContent(baseState.copy(wordHighlightEnabled = false))?.activeWordIndex,
+            learningOverlayContent(baseState.copy(wordHighlightEnabled = false), TestUiStrings)?.activeWordIndex,
         )
     }
 
@@ -80,6 +81,7 @@ class LearningPlayerRootTest {
                     activeVideoId = "dQw4w9WgXcQ",
                     statusMessage = "Loading captions…",
                 ),
+                TestUiStrings,
             ),
         )
         assertEquals(
@@ -90,9 +92,10 @@ class LearningPlayerRootTest {
                     statusMessage = "Loading captions…",
                     errorMessage = "Captions unavailable",
                 ),
+                TestUiStrings,
             ),
         )
-        assertNull(learningOverlayContent(DualSubUiState()))
+        assertNull(learningOverlayContent(DualSubUiState(), TestUiStrings))
     }
 
     @Test

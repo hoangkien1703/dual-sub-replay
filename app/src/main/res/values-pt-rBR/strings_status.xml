@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">Aguardando as legendas do YouTube e o idioma delas. Reproduza o vídeo com as legendas ativadas.</string>
+    <string name="status_translating_live_captions">Traduzindo legendas ao vivo…</string>
+    <string name="status_live_translation_not_supported">A tradução ao vivo não é compatível com %1$s.</string>
+    <string name="status_current_captions_only">Somente legendas atuais; não é possível repetir por parágrafo.</string>
+    <string name="status_live_translation_unavailable">Tradução ao vivo indisponível. Verifique a conexão para baixar o modelo de idioma.</string>
+    <string name="status_preparing_nearby_translations">Preparando traduções próximas…</string>
+    <string name="status_finding_caption_track">Procurando a melhor faixa de legendas…</string>
+    <string name="status_preparing_subtitles">Preparando legendas perto da reprodução…</string>
+    <string name="status_downloading_translation_model">Baixando modelo de tradução…</string>
+    <string name="status_subtitles_load_failed">Não foi possível carregar as legendas. Tente novamente para continuar.</string>
+    <string name="status_original_captions_only">Somente legendas originais · tradução indisponível</string>
+    <string name="status_paused_translation_resumes">Pausado · a tradução continua ao reproduzir</string>
+    <string name="status_subtitles_ready">Legendas prontas perto da reprodução</string>
+    <string name="status_preparing_translation">Preparando a tradução para %1$s…</string>
+    <string name="status_translation_unavailable_retry">A tradução está indisponível no momento. Verifique sua conexão e tente novamente.</string>
+    <string name="status_live_subtitles_title">Legendas ao vivo</string>
+    <string name="status_retrying_full_transcript">Tentando novamente a transcrição completa…</string>
+    <string name="status_retry_full_transcript">Tentar transcrição completa novamente</string>
+</resources>

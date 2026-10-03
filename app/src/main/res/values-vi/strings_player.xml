@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_tap_paragraph_to_replay">Chạm vào một đoạn để phát lại</string>
+    <string name="player_subtitle_settings">Cài đặt phụ đề</string>
+    <string name="player_dual_subtitle_settings">Cài đặt phụ đề kép</string>
+    <string name="player_show_dual_subtitles">Hiện phụ đề kép</string>
+    <string name="player_hide_dual_subtitles">Ẩn phụ đề kép</string>
+    <string name="player_loading_captions">Đang tải phụ đề…</string>
+    <string name="player_finding_captions">Đang tìm phụ đề</string>
+    <string name="player_source_to_target">"%1$s  →  %2$s"</string>
+    <string name="player_caption_track_auto_generated">%1$s (tự động tạo)</string>
+    <string name="player_video_split_state">Video %1$d phần trăm</string>
+    <string name="player_retry_translation">Thử dịch lại</string>
+    <string name="player_retry_captions">Thử tải lại phụ đề</string>
+    <string name="player_retry_full_transcript">Thử lại bản chép lời đầy đủ</string>
+    <string name="player_search_languages">Tìm ngôn ngữ</string>
+    <string name="player_language_selected">Đã chọn</string>
+    <string name="player_back">Quay lại</string>
+    <string name="player_translating">Đang dịch…</string>
+    <string name="player_downloading_translation_model">Đang tải mô hình dịch…</string>
+    <string name="player_translation_unavailable">Không có bản dịch</string>
+    <string name="player_live_subtitles_status">Phụ đề trực tiếp · %1$s</string>
+    <string name="player_waiting_next_caption">Đang chờ câu phụ đề tiếp theo…</string>
+    <string name="player_now_playing">Đang phát · %1$s</string>
+    <string name="player_active_subtitle">Phụ đề đang phát</string>
+    <string name="player_subtitle">Phụ đề</string>
+    <string name="player_replay_paragraph">Phát lại đoạn này</string>
+    <string name="player_youtube_unavailable">Không thể dùng YouTube</string>
+    <string name="player_youtube_could_not_load">Không tải được YouTube: %1$s</string>
+    <string name="player_youtube_http_error">YouTube trả về lỗi HTTP %1$d.</string>
+    <string name="player_webview_renderer_crashed_reload">Trình kết xuất Android WebView đã gặp sự cố. Chạm vào Tải lại để tạo lại.</string>
+    <string name="player_webview_renderer_reclaimed_reload">Android đã dừng trình kết xuất WebView để giải phóng bộ nhớ. Chạm vào Tải lại để tạo lại.</string>
+    <string name="player_reload">Tải lại</string>
+</resources>

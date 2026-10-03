@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">正在等待 YouTube 字幕及其语言。请在开启字幕的情况下播放视频。</string>
+    <string name="status_translating_live_captions">正在翻译实时字幕…</string>
+    <string name="status_live_translation_not_supported">不支持%1$s的实时翻译。</string>
+    <string name="status_current_captions_only">仅显示当前字幕；无法按段落重播。</string>
+    <string name="status_live_translation_unavailable">实时翻译不可用。请检查网络连接以下载语言模型。</string>
+    <string name="status_preparing_nearby_translations">正在准备附近的翻译…</string>
+    <string name="status_finding_caption_track">正在查找最佳字幕轨道…</string>
+    <string name="status_preparing_subtitles">正在准备播放位置附近的字幕…</string>
+    <string name="status_downloading_translation_model">正在下载翻译模型…</string>
+    <string name="status_subtitles_load_failed">无法加载字幕。请重试以继续。</string>
+    <string name="status_original_captions_only">仅原文字幕 · 翻译不可用</string>
+    <string name="status_paused_translation_resumes">已暂停 · 播放时继续翻译</string>
+    <string name="status_subtitles_ready">播放位置附近的字幕已就绪</string>
+    <string name="status_preparing_translation">正在准备%1$s翻译…</string>
+    <string name="status_translation_unavailable_retry">暂时无法翻译。请检查网络连接，然后重试。</string>
+    <string name="status_live_subtitles_title">实时字幕</string>
+    <string name="status_retrying_full_transcript">正在重试完整字幕…</string>
+    <string name="status_retry_full_transcript">重试完整字幕</string>
+</resources>

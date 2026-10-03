@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_guide_next">Tiếp</string>
+    <string name="onboarding_guide_get_started">Bắt đầu</string>
+    <string name="onboarding_guide_dual_subtitles_title">Phụ đề song ngữ khi bạn xem</string>
+    <string name="onboarding_guide_dual_subtitles_body">Phát bất kỳ video YouTube nào và xem phụ đề gốc cùng bản dịch trực tiếp ngay bên dưới.</string>
+    <string name="onboarding_guide_dual_subtitles_image">Video đang phát với phụ đề gốc và phụ đề dịch hiển thị chồng lên</string>
+    <string name="onboarding_guide_replay_title">Phát lại bất kỳ câu nào ngay lập tức</string>
+    <string name="onboarding_guide_replay_body">Mọi câu thoại đều được liệt kê kèm bản dịch. Nhấn nút phát trên một câu để đưa video về đúng thời điểm đó, và dùng biểu tượng bánh răng để đổi ngôn ngữ hoặc cỡ chữ.</string>
+    <string name="onboarding_guide_replay_image">Bảng phụ đề liệt kê các câu phụ đề kèm nút phát lại</string>
+    <string name="onboarding_guide_open_video_title">Mở bất kỳ video nào</string>
+    <string name="onboarding_guide_open_video_body">Dán liên kết YouTube, chia sẻ video trực tiếp từ ứng dụng YouTube, hoặc chỉ cần duyệt ngay trong DualSub Replay.</string>
+    <string name="onboarding_language_welcome">Chào mừng bạn đến với DualSub Replay</string>
+    <string name="onboarding_language_intro">Chỉ cần chọn ngôn ngữ một lần. Bạn có thể đổi lại sau trong cài đặt phụ đề.</string>
+    <string name="onboarding_language_native_title">Ngôn ngữ mẹ đẻ của bạn</string>
+    <string name="onboarding_language_native_helper">Hiển thị dưới dạng phụ đề dịch cỡ nhỏ.</string>
+    <string name="onboarding_language_learning_title">Ngôn ngữ bạn muốn học</string>
+    <string name="onboarding_language_learning_helper">Bản phụ đề ưu tiên; phụ đề lớn sẽ theo video.</string>
+    <string name="onboarding_language_select">Chọn ngôn ngữ</string>
+    <string name="onboarding_language_continue">Tiếp tục</string>
+    <string name="onboarding_language_skip_for_now">Để sau</string>
+    <string name="onboarding_goal_setup_title">Đặt mục tiêu hằng ngày</string>
+    <string name="onboarding_goal_setup_body">Mỗi ngày bạn muốn xem bao nhiêu phút bằng ngôn ngữ mới? Theo dõi thời gian và chuỗi ngày trong mục Tiến độ ở menu, và đổi mục tiêu ở đó bất cứ lúc nào.</string>
+    <string name="onboarding_goal_set">Đặt mục tiêu</string>
+    <string name="onboarding_goal_off">Tắt</string>
+    <string name="onboarding_goal_dialog_title">Mục tiêu hằng ngày</string>
+    <string name="onboarding_goal_dialog_body">Mỗi ngày bạn muốn xem trong bao lâu?</string>
+    <string name="onboarding_goal_save">Lưu</string>
+    <string name="onboarding_goal_cancel">Hủy</string>
+    <string name="onboarding_progress_title">Tiến độ</string>
+    <string name="onboarding_progress_close">Đóng</string>
+    <string name="onboarding_progress_load_error">Không thể tải tiến độ của bạn. Hãy kiểm tra bộ nhớ rồi mở lại màn hình này để thử lại.</string>
+    <string name="onboarding_progress_empty">Xem một video có phụ đề để bắt đầu theo dõi thời gian của bạn.</string>
+    <string name="onboarding_progress_today">Hôm nay</string>
+    <string name="onboarding_progress_goal">Mục tiêu hằng ngày: %1$d phút</string>
+    <string name="onboarding_progress_goal_reached">Đã đạt mục tiêu hằng ngày %1$d phút</string>
+    <string name="onboarding_progress_no_goal">Chưa có mục tiêu hằng ngày</string>
+    <string name="onboarding_progress_streak_start">Bắt đầu chuỗi ngày từ hôm nay</string>
+    <string name="onboarding_progress_change_goal">Đổi mục tiêu</string>
+    <string name="onboarding_progress_this_week">Tuần này</string>
+    <string name="onboarding_progress_this_month">Tháng này</string>
+    <string name="onboarding_progress_this_year">Năm nay</string>
+    <string name="onboarding_progress_total">Tổng cộng</string>
+    <string name="onboarding_progress_period_week">Tuần</string>
+    <string name="onboarding_progress_period_month">Tháng</string>
+    <string name="onboarding_progress_period_year">Năm</string>
+    <string name="onboarding_progress_period_all">Tất cả</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">Ngôn ngữ</string>
+    <string name="onboarding_progress_no_time_in_period">Chưa có thời gian xem trong khoảng này.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">Thời gian được tính khi video phát trong ứng dụng, theo ngôn ngữ của phụ đề. Dữ liệu chỉ được lưu trên thiết bị này.</string>
+    <string name="onboarding_duration_under_minute">&lt;1 phút</string>
+    <string name="onboarding_duration_minutes">%1$d phút</string>
+    <string name="onboarding_duration_hours">%1$d giờ</string>
+    <string name="onboarding_duration_hours_minutes">%1$d giờ %2$d phút</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="other">Chuỗi %1$d ngày</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="other">%1$d từ đã lưu</item>
+    </plurals>
+</resources>

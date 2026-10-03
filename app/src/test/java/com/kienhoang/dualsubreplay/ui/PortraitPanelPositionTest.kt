@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -72,9 +73,21 @@ class PortraitPanelPositionTest {
     }
 
     @Test fun positionLabelExplainsDirection() {
-        assertEquals("Position: Center", portraitPanelPositionLabel(0f))
-        assertEquals("Position: 1% lower", portraitPanelPositionLabel(DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION))
-        assertEquals("Position: 8% higher", portraitPanelPositionLabel(-0.08f))
-        assertEquals("Position: 20% lower", portraitPanelPositionLabel(0.2f))
+        assertEquals(
+            PortraitPanelPositionText(R.string.settings_portrait_panel_position_center, 0),
+            portraitPanelPositionText(0f),
+        )
+        assertEquals(
+            PortraitPanelPositionText(R.string.settings_portrait_panel_position_lower_percent, 1),
+            portraitPanelPositionText(DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION),
+        )
+        assertEquals(
+            PortraitPanelPositionText(R.string.settings_portrait_panel_position_higher_percent, 8),
+            portraitPanelPositionText(-0.08f),
+        )
+        assertEquals(
+            PortraitPanelPositionText(R.string.settings_portrait_panel_position_lower_percent, 20),
+            portraitPanelPositionText(0.2f),
+        )
     }
 }

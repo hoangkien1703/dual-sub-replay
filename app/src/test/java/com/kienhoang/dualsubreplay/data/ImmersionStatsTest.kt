@@ -7,6 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.Locale
 
 class ImmersionStatsTest {
     // Wednesday.
@@ -147,19 +148,20 @@ class ImmersionStatsTest {
 
     @Test fun barsCoverEveryBucketOfThePeriod() {
         val days = listOf(day(today, 10), day(today, 5, "en"), day(LocalDate.of(2026, 3, 3), 7), day(LocalDate.of(2024, 5, 5), 1))
-        val week = periodBars(days, ImmersionPeriod.WEEK, today, monday)
+        val week = periodBars(days, ImmersionPeriod.WEEK, today, monday, Locale.ENGLISH)
         assertEquals(listOf("M", "T", "W", "T", "F", "S", "S"), week.map { it.label })
         assertEquals(15 * 60_000L, week[2].ms)
         assertTrue(week[2].current)
-        assertEquals(30, periodBars(days, ImmersionPeriod.MONTH, today, monday).size)
-        val year = periodBars(days, ImmersionPeriod.YEAR, today, monday)
+        assertEquals(30, periodBars(days, ImmersionPeriod.MONTH, today, monday, Locale.ENGLISH).size)
+        val year = periodBars(days, ImmersionPeriod.YEAR, today, monday, Locale.ENGLISH)
         assertEquals(12, year.size)
+        assertEquals(listOf("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"), year.map { it.label })
         assertEquals(7 * 60_000L, year[2].ms)
         assertTrue(year[8].current)
-        val all = periodBars(days, ImmersionPeriod.ALL, today, monday)
+        val all = periodBars(days, ImmersionPeriod.ALL, today, monday, Locale.ENGLISH)
         assertEquals(listOf("2024", "2025", "2026"), all.map { it.label })
         assertEquals(listOf(60_000L, 0L, 22 * 60_000L), all.map { it.ms })
-        assertEquals(listOf("2026"), periodBars(emptyList(), ImmersionPeriod.ALL, today, monday).map { it.label })
+        assertEquals(listOf("2026"), periodBars(emptyList(), ImmersionPeriod.ALL, today, monday, Locale.ENGLISH).map { it.label })
     }
 
     @Test fun streakCountsGoalDaysAndAnUnfinishedTodayDoesNotBreakIt() {
@@ -178,12 +180,13 @@ class ImmersionStatsTest {
     }
 
     @Test fun durationsReadNaturally() {
-        assertEquals("0 min", formatImmersionDuration(0))
-        assertEquals("<1 min", formatImmersionDuration(59_000))
-        assertEquals("45 min", formatImmersionDuration(45 * 60_000L))
-        assertEquals("1 h", formatImmersionDuration(60 * 60_000L))
-        assertEquals("1 h 5 min", formatImmersionDuration(65 * 60_000L))
-        assertEquals("120 h", formatImmersionDuration(120 * 3_600_000L + 30 * 60_000L))
+        // English: "0 min", "<1 min", "45 min", "1 h", "1 h 5 min", "120 h".
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.MINUTES, 0, 0), immersionDuration(0))
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.UNDER_A_MINUTE, 0, 0), immersionDuration(59_000))
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.MINUTES, 0, 45), immersionDuration(45 * 60_000L))
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.HOURS, 1, 0), immersionDuration(60 * 60_000L))
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.HOURS_AND_MINUTES, 1, 5), immersionDuration(65 * 60_000L))
+        assertEquals(ImmersionDuration(ImmersionDurationStyle.HOURS, 120, 0), immersionDuration(120 * 3_600_000L + 30 * 60_000L))
     }
 
     @Test fun storedGoalOnlyAcceptsOfferedChoices() {

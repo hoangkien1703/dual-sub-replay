@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.content.ClipData
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -53,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStatus
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
@@ -157,10 +160,11 @@ internal fun speaksOnSelect(
 ): Boolean = autoPronounce && singleWord && text.any(Char::isLetterOrDigit)
 
 /** What the selection bar says while the Japanese dictionary is not ready, or null once it is. */
-internal fun japaneseDictionaryNote(status: JapaneseDictionaryStatus): String? =
+@StringRes
+internal fun japaneseDictionaryNote(status: JapaneseDictionaryStatus): Int? =
     when (status) {
-        JapaneseDictionaryStatus.DOWNLOADING -> "Downloading the Japanese dictionary (13 MB) so taps select whole words…"
-        JapaneseDictionaryStatus.UNAVAILABLE -> "The Japanese dictionary could not download yet. Words may split oddly until it does."
+        JapaneseDictionaryStatus.DOWNLOADING -> R.string.practice_japanese_dictionary_downloading
+        JapaneseDictionaryStatus.UNAVAILABLE -> R.string.practice_japanese_dictionary_unavailable
         else -> null
     }
 
@@ -360,7 +364,7 @@ private fun PhraseActionBar(
     phrase: String,
     singleWord: Boolean,
     speechMessage: String?,
-    dictionaryNote: String?,
+    @StringRes dictionaryNote: Int?,
     quickTranslate: (suspend () -> String)?,
     onTranslate: () -> Unit,
     onPronounce: () -> Unit,
@@ -371,6 +375,7 @@ private fun PhraseActionBar(
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     var copied by remember(phrase) { mutableStateOf(false) }
+    val clipLabel = stringResource(R.string.practice_clipboard_label)
     val provider =
         remember(selection, minTop, density) {
             PhraseBarPositionProvider(
@@ -393,19 +398,30 @@ private fun PhraseActionBar(
                 Row {
                     TextButton(
                         onClick = {
-                            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Subtitle", phrase))) }
+                            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
                             copied = true
                         },
                         modifier = Modifier.testTag("phrase_copy"),
-                    ) { Text(if (copied) "Copied" else "Copy") }
-                    TextButton(onClick = onTranslate, modifier = Modifier.testTag("phrase_translate")) { Text("Translate") }
-                    TextButton(onClick = onPronounce, modifier = Modifier.testTag("phrase_pronounce")) { Text("Pronounce") }
+                    ) { Text(stringResource(if (copied) R.string.practice_copied else R.string.practice_copy)) }
+                    TextButton(onClick = onTranslate, modifier = Modifier.testTag("phrase_translate")) {
+                        Text(stringResource(R.string.practice_translate))
+                    }
+                    TextButton(onClick = onPronounce, modifier = Modifier.testTag("phrase_pronounce")) {
+                        Text(stringResource(R.string.practice_pronounce))
+                    }
                     IconButton(onClick = onClose, modifier = Modifier.testTag("phrase_close")) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear selection", modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.practice_clear_selection),
+                            modifier = Modifier.size(18.dp),
+                        )
                     }
                 }
                 quickTranslate?.let { QuickTranslation(phrase, it) }
-                val note = speechMessage ?: dictionaryNote ?: if (singleWord) "Tap another word to select a phrase" else null
+                val note =
+                    speechMessage
+                        ?: dictionaryNote?.let { stringResource(it) }
+                        ?: if (singleWord) stringResource(R.string.practice_tap_another_word) else null
                 note?.let {
                     Text(
                         it,
@@ -426,18 +442,19 @@ private fun QuickTranslation(
     translate: suspend () -> String,
 ) {
     var meaning by remember(word) { mutableStateOf<String?>(null) }
+    val unavailable = stringResource(R.string.practice_translation_unavailable)
     LaunchedEffect(word) {
         meaning =
             try {
-                translate().ifBlank { null } ?: "Translation unavailable"
+                translate().ifBlank { null } ?: unavailable
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (_: Exception) {
-                "Translation unavailable"
+                unavailable
             }
     }
     Text(
-        meaning ?: "Translating…",
+        meaning ?: stringResource(R.string.practice_translating),
         style = MaterialTheme.typography.titleMedium,
         color = if (meaning == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp).testTag("phrase_quick_translation"),
