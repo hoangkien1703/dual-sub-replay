@@ -66,7 +66,7 @@ Default `release:patch` per AGENTS.md (no owner instruction yet). Recommended al
 
 ## Implementation result
 
-As planned, plus one owner follow-up: most users are not technical, so the README now opens with a large Download for Android button, the preview link and simple install steps, then the video and screenshots; the badges moved to For developers. The promo is 51 s (intro, dual subtitles, replay, word lookup, Practice, fullscreen, Progress, end card). The GIF dropped from 7.2 MB at 480 px to a 400 px, 14 s loop.
+As planned, plus one owner follow-up: most users are not technical, so the README now opens with a large Download for Android button, the preview link and simple install steps, then the video and screenshots; the badges moved to For developers. A second follow-up (after merging PR #102) brought the badges back under the pitch and added a second Download for Android link after the screenshots, for readers who scroll past the first button. The promo is 51 s (intro, dual subtitles, replay, word lookup, Practice, fullscreen, Progress, end card). The GIF dropped from 7.2 MB at 480 px to a 400 px, 14 s loop.
 
 ## Validation result
 
