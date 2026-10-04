@@ -66,12 +66,12 @@ Default `release:patch` per AGENTS.md (no owner instruction yet). Recommended al
 
 ## Implementation result
 
-As planned. The promo is 51 s (intro, dual subtitles, replay, word lookup, Practice, fullscreen, Progress, end card). The GIF dropped from 7.2 MB at 480 px to a 400 px, 14 s loop.
+As planned, plus one owner follow-up: most users are not technical, so the README now opens with a large Download for Android button, the preview link and simple install steps, then the video and screenshots; the badges moved to For developers. The promo is 51 s (intro, dual subtitles, replay, word lookup, Practice, fullscreen, Progress, end card). The GIF dropped from 7.2 MB at 480 px to a 400 px, 14 s loop.
 
 ## Validation result
 
 - Passed: `npm ci`, `npm run render` and `npm run validate` (24 checks) in a Linux container with local headless Chromium. Promo MP4 51 s, 13.3 MiB; GIF 400x712, 168 frames, 4.3 MiB (was 6.9 MiB).
-- Passed: `npm run validate:links`, 31 local and remote README links. The link pattern now matches only Markdown link targets, so prose in parentheses such as "Português (Brasil)" is no longer read as a path.
+- Passed: `npm run validate:links`, 32 local and remote README links. The link pattern now matches only Markdown link targets, so prose in parentheses such as "Português (Brasil)" is no longer read as a path.
 - Passed: `python3 -m unittest discover -s tools/tests -p 'test_*.py'`, 36 tests.
 - Passed: visual review of the contact sheet and sampled frames.
 - Not applicable: Android build and device tests (no app change); PR CI runs them anyway.

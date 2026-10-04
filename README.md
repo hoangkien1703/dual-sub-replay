@@ -1,14 +1,27 @@
 # DualSub Replay
 
-**Learn languages from YouTube, one sentence at a time.** Watch with two subtitle languages at once, tap any sentence to hear it again, and tap any word to learn it. Translation runs on your Android device.
+**Learn a language with YouTube.** Watch videos with subtitles in two languages, tap a sentence to hear it again, and tap a word to see what it means. Free for Android phones.
 
-DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, explains words and Japanese grammar, and saves words for spaced-repetition practice. No account, ads, or API key. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
+<p align="center">
+  <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk"><img src="https://img.shields.io/badge/Download_for_Android-Free-3ddc84?style=for-the-badge&logo=android&logoColor=white" alt="Download DualSub Replay for Android, free" height="56"></a>
+</p>
 
-[![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
-[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
-[![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
-[![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
-[![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
+<p align="center">
+  Android 8.0 or newer · No account · No ads<br>
+  Want the newest features first? <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview">Try the preview version</a> (may be less stable).
+</p>
+
+### How to install
+
+1. Tap the green **Download for Android** button above on your phone.
+2. When the download finishes, open the file `DualSub-Replay.apk`.
+3. If your phone asks, allow your browser or file manager to **install unknown apps**, then tap **Install**.
+
+Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
+
+> **About the preview version:** it installs as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
+
+## See it in action
 
 <p align="center">
   <a href="docs/media/dualsub-replay-promo.mp4">
@@ -16,13 +29,23 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
   </a>
 </p>
 
+<p align="center"><a href="docs/media/dualsub-replay-promo.mp4"><strong>▶ Watch the full video (50 seconds)</strong></a></p>
+
 <p align="center">
-  <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk"><strong>⬇ Download the latest APK</strong></a>
-  ·
-  <a href="docs/media/dualsub-replay-promo.mp4">▶ Watch the 50-second demo</a>
+  <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
 </p>
 
 ## Why DualSub Replay?
+
+DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, explains words and Japanese grammar, and saves words for spaced-repetition practice. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
 
 - **See every meaning.** The original caption and its translation stay together while you watch.
 - **Repeat without scrubbing.** Tap a subtitle line and the video jumps back to that exact moment.
@@ -69,34 +92,6 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 
 The interface is available in English, Tiếng Việt, Español, Português (Brasil), 日本語, 한국어, 简体中文 and Bahasa Indonesia. It follows your phone's language; the globe button at the bottom of the menu picks another.
 
-## Screenshots
-
-<p align="center">
-  <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
-</p>
-
-<p align="center">
-  <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
-</p>
-
-<p align="center">
-  <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
-</p>
-
-## Download and install
-
-### [Download DualSub Replay for Android](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
-
-Requires **Android 8.0 or newer**. No account or API key is required.
-
-1. Tap the download link above and open `DualSub-Replay.apk` when it finishes.
-2. If Android asks, allow your browser or file manager to **install unknown apps**.
-3. Tap **Install**, then open DualSub Replay.
-
-Android may show a standard warning because the app is downloaded directly from GitHub instead of Google Play. Official releases update the installed app in place.
-
-> **Want the newest development build?** See the [preview release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview). Preview builds may be less stable. They install separately as **DualSub Replay Preview**, so you can keep both apps; use Practice backup and transfer to move saved words between them.
-
 ## Quick start
 
 1. Open DualSub Replay, choose your native language and the language you are learning, and skim the short guide.
@@ -127,6 +122,12 @@ No account or API key is required, and the app has no analytics or advertising S
 - Videos play in YouTube's own mobile webpage player; the app does not download video. Spoken-word highlighting depends on YouTube's page and may be unavailable or less precise on some videos and phones, in which case it falls back to sentence timing.
 
 ## For developers
+
+[![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
+[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+[![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
+[![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
+[![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
 
 ### Build
 
