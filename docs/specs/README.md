@@ -67,8 +67,14 @@ each significant change owns its plan and results in its feature spec. Existing
 
 Record one intent and its reason before implementation where possible, and resolve it
 before opening the PR. Follow explicit owner instructions; otherwise preserve the
-existing patch default, including docs/workflow work. Recommend alternatives when
+existing patch default, including workflow work. Recommend alternatives when
 appropriate, but do not silently change the owner's release policy.
+
+Standing owner decision (2026-10-04): a PR whose changed files are all documentation
+or promo media (`*.md`, `docs/**`, `site/**`, `tools/promo-video/**`,
+`.github/ISSUE_TEMPLATE/**`, `.github/pull_request_template.md`) gets `release:skip`
+without asking, because the APK does not change. Any other changed file, including
+`fastlane/` store metadata, workflows and release tools, keeps the patch default.
 
 | Intent in spec | Actual PR metadata |
 | --- | --- |
