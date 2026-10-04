@@ -30,7 +30,8 @@ For docs-only work, check links/consistency/template behavior; existing PR CI st
 - Expected version: <!-- Estimate until reserved, or explain skipped/unavailable. -->
 - Actual applied GitHub label or exact-version directive: <!-- Default: no override. -->
 
-<!-- Follow explicit owner intent; otherwise default patch, including docs/workflow PRs.
+<!-- Follow explicit owner intent; otherwise default patch, including workflow PRs.
+Docs/promo-media-only PRs get release:skip automatically (see AGENTS.md).
 Use at most one actual GitHub label: release:patch / release:minor / release:major /
 release:skip, OR one standalone Release-Version: X.Y.Z line outside comments/code fences.
 Writing a label here or checking a box does NOT activate it. Verify saved metadata;
