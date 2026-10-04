@@ -1,0 +1,37 @@
+name: Send release to F-Droid
+
+# F-Droid builds only fdroid-vX.Y.Z tags (docs/fdroid/README.md). Run this from the Actions tab
+# or the GitHub app to send a published release to F-Droid.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published release to send to F-Droid, for example 1.3.6
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: send-to-fdroid
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: github.repository == 'hoangkien1703/dual-sub-replay'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the tagging script
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Tag the release fdroid-vX.Y.Z
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FDROID_VERSION: ${{ inputs.version }}
+        run: python3 tools/fdroid_tag.py

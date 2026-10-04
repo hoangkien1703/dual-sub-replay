@@ -61,7 +61,10 @@ is a draft of the recipe that goes into F-Droid's fdroiddata repository.
 ## Updates
 
 F-Droid builds only tags named `fdroid-vX.Y.Z`, so a GitHub release reaches F-Droid only when the
-owner chooses. To send release `vX.Y.Z`, tag the same commit and push the tag:
+owner chooses. To send published release `vX.Y.Z`, run the **Send release to F-Droid** workflow
+(Actions tab or the GitHub app → Run workflow → enter `X.Y.Z`). It tags the release's commit
+`fdroid-vX.Y.Z`, does nothing if that tag already points there, and never moves an existing tag
+(`tools/fdroid_tag.py`). The same from a clone:
 
 ```
 git fetch --tags
