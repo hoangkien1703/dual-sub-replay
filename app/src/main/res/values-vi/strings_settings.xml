@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">Lưu vị trí bạn kéo lớp phủ và nút CC rồi dùng lại các vị trí đó.</string>
     <string name="settings_drag_overlay_hint">Kéo lớp phủ lên, xuống hoặc sang ngang. Khi bản chép lời bị ẩn, bạn cũng có thể kéo nút CC. Ở chế độ dọc, vuốt nhanh lớp phủ xuống sẽ đóng nó.</string>
     <string name="settings_reset_subtitle_positions">Đặt lại vị trí phụ đề</string>
+    <string name="language_downloads_title">Ngôn ngữ trên thiết bị này</string>
+    <string name="language_downloads_row_description">Xem ngôn ngữ nào đã tải và tải trước các ngôn ngữ khác.</string>
+    <string name="language_downloads_hint">Ngôn ngữ đã tải được dịch ngay, kể cả khi không có mạng. Mỗi ngôn ngữ chiếm khoảng 30–60 MB.</string>
+    <string name="language_downloads_japanese_note">Gồm cả từ điển 13 MB để chạm vào từ tiếng Nhật.</string>
+    <string name="language_downloads_group_on_device">Trên thiết bị này</string>
+    <string name="language_downloads_group_available">Có thể tải</string>
+    <string name="language_downloads_built_in">Có sẵn</string>
+    <string name="language_downloads_downloaded">Đã tải</string>
+    <string name="language_downloads_not_downloaded">Chưa tải</string>
+    <string name="language_downloads_downloading">Đang tải…</string>
+    <string name="language_downloads_removing">Đang xóa…</string>
+    <string name="language_downloads_failed">Không thành công. Hãy kiểm tra kết nối rồi thử lại.</string>
+    <string name="language_downloads_download">Tải</string>
+    <string name="language_downloads_remove">Xóa</string>
+    <string name="language_downloads_loading">Đang kiểm tra ngôn ngữ đã tải…</string>
+    <string name="language_downloads_load_failed">Không tải được danh sách ngôn ngữ. Hãy kiểm tra kết nối.</string>
+    <string name="language_downloads_retry">Thử lại</string>
+    <string name="language_downloads_back">Quay lại</string>
 </resources>

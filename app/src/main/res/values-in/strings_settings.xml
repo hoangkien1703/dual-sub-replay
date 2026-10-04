@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">Simpan posisi overlay dan tombol CC yang Anda seret, lalu gunakan lagi.</string>
     <string name="settings_drag_overlay_hint">Seret overlay ke atas, bawah, atau samping. Saat transkrip disembunyikan, Anda juga bisa menyeret tombol CC. Dalam mode potret, jentikkan overlay ke bawah untuk menutupnya.</string>
     <string name="settings_reset_subtitle_positions">Atur ulang posisi subtitel</string>
+    <string name="language_downloads_title">Bahasa di perangkat ini</string>
+    <string name="language_downloads_row_description">Lihat bahasa yang sudah diunduh dan unduh bahasa lain lebih dulu.</string>
+    <string name="language_downloads_hint">Bahasa yang sudah diunduh langsung diterjemahkan, bahkan saat offline. Masing-masing memakai sekitar 30–60 MB.</string>
+    <string name="language_downloads_japanese_note">Termasuk kamus 13 MB untuk mengetuk kata bahasa Jepang.</string>
+    <string name="language_downloads_group_on_device">Di perangkat ini</string>
+    <string name="language_downloads_group_available">Tersedia untuk diunduh</string>
+    <string name="language_downloads_built_in">Bawaan</string>
+    <string name="language_downloads_downloaded">Sudah diunduh</string>
+    <string name="language_downloads_not_downloaded">Belum diunduh</string>
+    <string name="language_downloads_downloading">Mengunduh…</string>
+    <string name="language_downloads_removing">Menghapus…</string>
+    <string name="language_downloads_failed">Gagal. Periksa koneksi Anda dan coba lagi.</string>
+    <string name="language_downloads_download">Unduh</string>
+    <string name="language_downloads_remove">Hapus</string>
+    <string name="language_downloads_loading">Memeriksa bahasa yang sudah diunduh…</string>
+    <string name="language_downloads_load_failed">Daftar bahasa tidak dapat dimuat. Periksa koneksi Anda.</string>
+    <string name="language_downloads_retry">Coba lagi</string>
+    <string name="language_downloads_back">Kembali</string>
 </resources>

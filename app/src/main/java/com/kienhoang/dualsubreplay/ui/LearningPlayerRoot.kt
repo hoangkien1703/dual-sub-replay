@@ -495,7 +495,10 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     }
 
     val phraseSelection = remember { PhraseSelectionController() }
-    CompositionLocalProvider(LocalPhraseSelection provides phraseSelection) {
+    CompositionLocalProvider(
+        LocalPhraseSelection provides phraseSelection,
+        LocalLanguageDownloads provides viewModel.languageDownloads,
+    ) {
         Box(Modifier.fillMaxSize()) {
             DualSubApp(
                 viewModel = viewModel,

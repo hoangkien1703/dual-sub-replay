@@ -2,7 +2,9 @@ package com.kienhoang.dualsubreplay.translation
 
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -27,6 +29,7 @@ class OnDeviceTranslator(
     private val cache = TranslationCache()
     private val modelDownloadMutex = Mutex()
     private val preparedPairs = mutableSetOf<String>()
+    private val modelManager by lazy { RemoteModelManager.getInstance() }
 
     /**
      * Downloads the translation model ahead of time. First-launch onboarding can
@@ -111,6 +114,49 @@ class OnDeviceTranslator(
         }
     }
 
+    /** The app languages whose model this build can download. English is built in, so it is not listed. */
+    suspend fun downloadableLanguages(): List<String> =
+        TranslationLanguages.all
+            .map(TranslationLanguageOption::code)
+            .filter { it != TranslateLanguage.ENGLISH && TranslateLanguage.fromLanguageTag(it) != null }
+
+    /** The app languages whose model is on this device, English excluded. */
+    suspend fun downloadedLanguages(): Set<String> =
+        modelManager
+            .getDownloadedModels(TranslateRemoteModel::class.java)
+            .awaitResult()
+            .map { TranslationLanguages.normalize(it.language) }
+            .filter { it != TranslateLanguage.ENGLISH }
+            .toSet()
+
+    /** Downloads [languageCode]'s model now, so later translations need no network. */
+    suspend fun downloadLanguage(languageCode: String) {
+        val model = remoteModel(languageCode)
+        try {
+            withTimeout(LANGUAGE_DOWNLOAD_TIMEOUT_MS) {
+                modelManager.download(model, DownloadConditions.Builder().build()).awaitResult()
+            }
+        } catch (error: TimeoutCancellationException) {
+            throw IllegalStateException("The language download took too long. Check your internet connection and retry.", error)
+        }
+    }
+
+    /** Deletes [languageCode]'s model; it downloads again the next time it is needed. */
+    suspend fun removeLanguage(languageCode: String) {
+        val model = remoteModel(languageCode)
+        modelDownloadMutex.withLock {
+            modelManager.deleteDownloadedModel(model).awaitResult()
+            preparedPairs.removeAll { pair -> model.language in pair.split('>') }
+        }
+    }
+
+    private fun remoteModel(languageCode: String): TranslateRemoteModel {
+        val language =
+            TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(languageCode))
+                ?: throw IllegalArgumentException("${TranslationLanguages.displayName(languageCode)} translation is not supported.")
+        return TranslateRemoteModel.Builder(language).build()
+    }
+
     private fun resolveLanguages(
         sourceLanguageCode: String,
         targetLanguageCode: String,
@@ -178,5 +224,8 @@ class OnDeviceTranslator(
 
     private companion object {
         const val MODEL_DOWNLOAD_TIMEOUT_MS = 45_000L
+
+        // A settings download has no caption waiting on it, so it may take longer on slow networks.
+        const val LANGUAGE_DOWNLOAD_TIMEOUT_MS = 5 * 60_000L
     }
 }

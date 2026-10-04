@@ -344,7 +344,6 @@ internal fun SelectableSubtitleText(
                     japaneseDictionaryNote(dictionaryStatus).takeIf { LanguageAwareTokenizer.isJapanese(text, languageCode) },
                 quickTranslate =
                     controller.actions.translate
-                        ?.takeIf { words.first == words.last }
                         ?.let { translate -> { translate(text.substring(start, end), translated) } },
                 onTranslate = {
                     val tap = phraseTap(text, tokens, words, segment, translated)
@@ -435,7 +434,7 @@ private fun PhraseActionBar(
     }
 }
 
-/** A single word's meaning, shown right in the bar so one tap is enough to understand it. */
+/** The selection's meaning, shown right in the bar so no extra tap is needed to understand it. */
 @Composable
 private fun QuickTranslation(
     word: String,

@@ -48,7 +48,11 @@ internal class JapaneseDictionaryStore(
 
     fun isInstalled(): Boolean = file.isFile && file.length() == expectedSize
 
-    /** Downloads the dictionary unless it is already installed. Blocking; returns whether it is installed. */
+    /**
+     * Downloads the dictionary unless it is already installed. Blocking; returns whether it is installed.
+     * Synchronized because the settings screen and on-demand loading may both ask at once.
+     */
+    @Synchronized
     fun install(): Boolean {
         if (isInstalled()) return true
         return JapaneseDictionaryRelease.URLS.any { url ->
@@ -59,6 +63,12 @@ internal class JapaneseDictionaryStore(
                 false
             }
         }
+    }
+
+    /** Deletes the downloaded dictionary. An analyzer already loaded from it keeps working. */
+    @Synchronized
+    fun remove() {
+        file.delete()
     }
 
     /** Saves [input] as the dictionary only if it is exactly the expected file. */

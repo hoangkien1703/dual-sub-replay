@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">Salva onde você arrasta a sobreposição e o botão CC e reutiliza essas posições.</string>
     <string name="settings_drag_overlay_hint">Arraste a sobreposição para cima, para baixo ou para os lados. Quando a transcrição está oculta, você também pode arrastar o botão CC. No modo retrato, deslizar a sobreposição para baixo a fecha.</string>
     <string name="settings_reset_subtitle_positions">Redefinir posições das legendas</string>
+    <string name="language_downloads_title">Idiomas neste dispositivo</string>
+    <string name="language_downloads_row_description">Veja quais idiomas estão baixados e baixe outros com antecedência.</string>
+    <string name="language_downloads_hint">Idiomas baixados são traduzidos na hora, mesmo off-line. Cada um ocupa cerca de 30–60 MB.</string>
+    <string name="language_downloads_japanese_note">Inclui o dicionário de 13 MB para tocar em palavras em japonês.</string>
+    <string name="language_downloads_group_on_device">Neste dispositivo</string>
+    <string name="language_downloads_group_available">Disponíveis para baixar</string>
+    <string name="language_downloads_built_in">Integrado</string>
+    <string name="language_downloads_downloaded">Baixado</string>
+    <string name="language_downloads_not_downloaded">Não baixado</string>
+    <string name="language_downloads_downloading">Baixando…</string>
+    <string name="language_downloads_removing">Removendo…</string>
+    <string name="language_downloads_failed">Não deu certo. Verifique sua conexão e tente de novo.</string>
+    <string name="language_downloads_download">Baixar</string>
+    <string name="language_downloads_remove">Remover</string>
+    <string name="language_downloads_loading">Verificando idiomas baixados…</string>
+    <string name="language_downloads_load_failed">Não foi possível carregar a lista de idiomas. Verifique sua conexão.</string>
+    <string name="language_downloads_retry">Tentar de novo</string>
+    <string name="language_downloads_back">Voltar</string>
 </resources>

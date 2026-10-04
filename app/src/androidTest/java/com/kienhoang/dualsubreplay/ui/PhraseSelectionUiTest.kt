@@ -95,9 +95,12 @@ class PhraseSelectionUiTest {
         tapWord(original, " to ")
         saveUiEvidence("phrase-action-bar")
         compose.onNodeWithText("Tap another word to select a phrase").assertDoesNotExist()
-        // A phrase is not translated until Translate is pressed.
-        compose.onNodeWithTag("phrase_quick_translation").assertDoesNotExist()
-        compose.runOnIdle { assertEquals(listOf("looking" to false), translatedTexts) }
+        // A phrase shows its meaning in the bar at once too.
+        compose.onNodeWithTag("phrase_quick_translation").assertIsDisplayed()
+        compose.onNodeWithText("nghĩa của looking forward to").assertIsDisplayed()
+        compose.runOnIdle {
+            assertEquals(listOf("looking" to false, "looking forward to" to false), translatedTexts)
+        }
 
         compose.onNodeWithTag("phrase_translate").performClick()
         compose.waitForIdle()

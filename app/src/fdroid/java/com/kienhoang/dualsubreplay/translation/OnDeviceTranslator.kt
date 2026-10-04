@@ -81,6 +81,57 @@ class OnDeviceTranslator(
         }
     }
 
+    /** The app languages Mozilla has models for. English is the pivot, so it is not listed. */
+    suspend fun downloadableLanguages(): List<String> {
+        val pairs = requireStore().pairs()
+        return TranslationLanguages.all
+            .map(TranslationLanguageOption::code)
+            .filter { code -> code != BERGAMOT_PIVOT_LANGUAGE && languagePairs(code, pairs).isNotEmpty() }
+    }
+
+    /** The app languages whose models to and from English are all on this device. */
+    suspend fun downloadedLanguages(): Set<String> {
+        val modelStore = requireStore()
+        val pairs = modelStore.pairs()
+        return downloadableLanguages()
+            .filter { code -> languagePairs(code, pairs).all { modelStore.isDownloaded(it) } }
+            .toSet()
+    }
+
+    /** Downloads [languageCode]'s models to and from English now. */
+    suspend fun downloadLanguage(languageCode: String) {
+        val modelStore = requireStore()
+        val pairs = languagePairs(languageCode, modelStore.pairs())
+        if (pairs.isEmpty()) {
+            throw IllegalArgumentException("${TranslationLanguages.displayName(languageCode)} is not available for offline translation.")
+        }
+        pairs.forEach { modelStore.prepare(it, null) }
+    }
+
+    /** Deletes [languageCode]'s models; they download again the next time they are needed. */
+    suspend fun removeLanguage(languageCode: String) {
+        val modelStore = requireStore()
+        val pairs = languagePairs(languageCode, modelStore.pairs())
+        engineMutex.withLock {
+            pairs.forEach { pair ->
+                loadedModels.remove(pair)?.let(BergamotNative::releaseModel)
+                modelStore.remove(pair)
+            }
+        }
+    }
+
+    private fun languagePairs(
+        languageCode: String,
+        published: Set<BergamotPair>,
+    ): List<BergamotPair> {
+        val code = bergamotLanguageCode(languageCode) ?: return emptyList()
+        return listOf(BergamotPair(code, BERGAMOT_PIVOT_LANGUAGE), BergamotPair(BERGAMOT_PIVOT_LANGUAGE, code))
+            .filter { it in published }
+    }
+
+    private fun requireStore(): BergamotModelStore =
+        store ?: throw IllegalStateException("Offline translation has no storage for its models.")
+
     private suspend fun translateUncached(
         route: List<BergamotPair>,
         text: String,
@@ -110,7 +161,7 @@ class OnDeviceTranslator(
             loadedModels[pair] = handle
             return handle
         }
-        val modelStore = store ?: throw IllegalStateException("Offline translation has no storage for its models.")
+        val modelStore = requireStore()
         val config =
             try {
                 modelStore.prepare(pair, onDownloadingChange)

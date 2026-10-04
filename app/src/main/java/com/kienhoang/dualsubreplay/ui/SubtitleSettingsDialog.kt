@@ -341,6 +341,8 @@ internal fun SubtitleSettingsDialog(
     val languagePicker = remember { LanguagePickerState() }
     var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     var showResetConfirmation by remember { mutableStateOf(false) }
+    val languageDownloads = LocalLanguageDownloads.current
+    var showLanguageDownloads by remember { mutableStateOf(false) }
     val autoLabel = stringResource(R.string.settings_source_language_auto)
     val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
     val pickerOpen =
@@ -522,6 +524,10 @@ internal fun SubtitleSettingsDialog(
                             onCheckedChange = onPreloadModelsChange,
                             testTag = "preload_models_switch",
                         )
+                        if (languageDownloads != null) {
+                            SettingsSectionDivider()
+                            LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
+                        }
                     }
 
                     OutlinedButton(
@@ -533,6 +539,10 @@ internal fun SubtitleSettingsDialog(
                     Spacer(Modifier.height(8.dp))
                 }
             }
+        }
+
+        if (showLanguageDownloads && languageDownloads != null) {
+            LanguageDownloadsDialog(languageDownloads, onDismiss = { showLanguageDownloads = false })
         }
 
         if (showResetConfirmation) {
