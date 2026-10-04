@@ -56,6 +56,17 @@ internal object JapaneseMorphology {
         store = dictionary
     }
 
+    /** Whether the dictionary file is on this device; true when none is needed (bundled in unit tests). */
+    fun isDictionaryInstalled(): Boolean = store?.isInstalled() ?: true
+
+    /** Downloads the dictionary without loading it, for the settings screen. Blocking; returns whether it is installed. */
+    fun installDictionary(): Boolean = store?.install() ?: true
+
+    /** Deletes the downloaded dictionary to free space; it downloads again the next time Japanese is shown. */
+    fun removeDictionary() {
+        store?.remove()
+    }
+
     /** Starts downloading and loading the dictionary in the background unless it is loaded or loading. */
     fun warmUp() {
         if (tokenizer != null || System.currentTimeMillis() < retryAt) return

@@ -3,6 +3,8 @@ package com.kienhoang.dualsubreplay.translation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,10 +21,21 @@ internal class BergamotModelStore(
     private val directory: File,
     private val client: OkHttpClient = defaultClient(),
 ) {
+    @Volatile
     private var catalog: Map<BergamotPair, BergamotModel>? = null
+    private val pairLocks = mutableMapOf<BergamotPair, Mutex>()
+
+    private fun pairLock(pair: BergamotPair): Mutex = synchronized(pairLocks) { pairLocks.getOrPut(pair) { Mutex() } }
 
     /** Returns the model's local config, downloading any missing or damaged file first. */
     suspend fun prepare(
+        pair: BergamotPair,
+        onDownloadingChange: ((Boolean) -> Unit)?,
+    ): String =
+        // One download per pair at a time: a settings download and a caption translation may ask together.
+        pairLock(pair).withLock { prepareUnlocked(pair, onDownloadingChange) }
+
+    private suspend fun prepareUnlocked(
         pair: BergamotPair,
         onDownloadingChange: ((Boolean) -> Unit)?,
     ): String =
@@ -48,6 +61,22 @@ internal class BergamotModelStore(
                 targetVocabularyPath = File(pairDirectory, model.targetVocabulary.name).absolutePath,
             )
         }
+
+    /** Every pair Mozilla publishes a release model for. Needs the network unless the catalog is cached. */
+    suspend fun pairs(): Set<BergamotPair> = withContext(Dispatchers.IO) { loadCatalog().keys }
+
+    /** Whether [pair]'s current model files are all on this device. */
+    suspend fun isDownloaded(pair: BergamotPair): Boolean =
+        withContext(Dispatchers.IO) {
+            val model = loadCatalog()[pair] ?: return@withContext false
+            val pairDirectory = File(directory, "${pair.key}/${model.version}")
+            model.files.all { File(pairDirectory, it.name).isComplete(it) }
+        }
+
+    /** Deletes every downloaded version of [pair]. */
+    suspend fun remove(pair: BergamotPair) {
+        pairLock(pair).withLock { withContext(Dispatchers.IO) { File(directory, pair.key).deleteRecursively() } }
+    }
 
     private fun loadCatalog(): Map<BergamotPair, BergamotModel> {
         catalog?.let { return it }

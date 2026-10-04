@@ -270,6 +270,28 @@ class AppViewModel internal constructor(
         JapaneseMorphology.useStore(JapaneseDictionaryStore(File(application.filesDir, "japanese-dictionary")))
     }
 
+    /** Settings → Translation → Languages on this device. */
+    internal val languageDownloads =
+        LanguageDownloadsController(
+            scope = viewModelScope,
+            packs =
+                LanguagePacksWithJapaneseDictionary(
+                    models =
+                        object : LanguagePacks {
+                            override suspend fun available() = translator.downloadableLanguages()
+
+                            override suspend fun downloaded() = translator.downloadedLanguages()
+
+                            override suspend fun download(code: String) = translator.downloadLanguage(code)
+
+                            override suspend fun remove(code: String) = translator.removeLanguage(code)
+                        },
+                    dictionaryInstalled = JapaneseMorphology::isDictionaryInstalled,
+                    installDictionary = JapaneseMorphology::installDictionary,
+                    removeDictionary = JapaneseMorphology::removeDictionary,
+                ),
+        )
+
     private val immersionTracker = ImmersionTimeTracker()
     private val immersionAccumulator = ImmersionAccumulator()
     private var loadingJob: Job? = null

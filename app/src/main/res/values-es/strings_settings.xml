@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">Guarda dónde arrastras la superposición y el botón CC, y reutiliza esas posiciones.</string>
     <string name="settings_drag_overlay_hint">Arrastra la superposición hacia arriba, abajo o a los lados. Cuando la transcripción está oculta, también puedes arrastrar el botón CC. En vertical, desliza rápido la superposición hacia abajo para cerrarla.</string>
     <string name="settings_reset_subtitle_positions">Restablecer posiciones de subtítulos</string>
+    <string name="language_downloads_title">Idiomas en este dispositivo</string>
+    <string name="language_downloads_row_description">Mira qué idiomas están descargados y descarga otros con antelación.</string>
+    <string name="language_downloads_hint">Los idiomas descargados se traducen al instante, incluso sin conexión. Cada uno ocupa unos 30–60 MB.</string>
+    <string name="language_downloads_japanese_note">Incluye el diccionario de 13 MB para tocar palabras en japonés.</string>
+    <string name="language_downloads_group_on_device">En este dispositivo</string>
+    <string name="language_downloads_group_available">Disponibles para descargar</string>
+    <string name="language_downloads_built_in">Integrado</string>
+    <string name="language_downloads_downloaded">Descargado</string>
+    <string name="language_downloads_not_downloaded">No descargado</string>
+    <string name="language_downloads_downloading">Descargando…</string>
+    <string name="language_downloads_removing">Quitando…</string>
+    <string name="language_downloads_failed">No se pudo completar. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="language_downloads_download">Descargar</string>
+    <string name="language_downloads_remove">Quitar</string>
+    <string name="language_downloads_loading">Comprobando idiomas descargados…</string>
+    <string name="language_downloads_load_failed">No se pudo cargar la lista de idiomas. Revisa tu conexión.</string>
+    <string name="language_downloads_retry">Reintentar</string>
+    <string name="language_downloads_back">Atrás</string>
 </resources>

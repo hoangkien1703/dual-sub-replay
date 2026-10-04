@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">오버레이와 CC 버튼을 드래그한 위치를 저장해 다시 사용해요.</string>
     <string name="settings_drag_overlay_hint">오버레이를 위아래나 옆으로 드래그하세요. 스크립트가 숨겨져 있으면 CC 버튼도 드래그할 수 있어요. 세로 모드에서는 오버레이를 아래로 튕기면 닫혀요.</string>
     <string name="settings_reset_subtitle_positions">자막 위치 초기화</string>
+    <string name="language_downloads_title">이 기기의 언어</string>
+    <string name="language_downloads_row_description">받아 둔 언어를 확인하고 다른 언어를 미리 받을 수 있어요.</string>
+    <string name="language_downloads_hint">받아 둔 언어는 오프라인에서도 바로 번역돼요. 언어마다 약 30–60MB를 사용해요.</string>
+    <string name="language_downloads_japanese_note">일본어 단어를 탭할 때 쓰는 13MB 사전이 포함돼요.</string>
+    <string name="language_downloads_group_on_device">이 기기에 있음</string>
+    <string name="language_downloads_group_available">받을 수 있는 언어</string>
+    <string name="language_downloads_built_in">기본 제공</string>
+    <string name="language_downloads_downloaded">받음</string>
+    <string name="language_downloads_not_downloaded">받지 않음</string>
+    <string name="language_downloads_downloading">받는 중…</string>
+    <string name="language_downloads_removing">삭제하는 중…</string>
+    <string name="language_downloads_failed">완료하지 못했어요. 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="language_downloads_download">받기</string>
+    <string name="language_downloads_remove">삭제</string>
+    <string name="language_downloads_loading">받아 둔 언어를 확인하는 중…</string>
+    <string name="language_downloads_load_failed">언어 목록을 불러오지 못했어요. 연결을 확인해 주세요.</string>
+    <string name="language_downloads_retry">다시 시도</string>
+    <string name="language_downloads_back">뒤로</string>
 </resources>
