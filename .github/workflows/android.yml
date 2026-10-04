@@ -138,7 +138,7 @@ jobs:
       - name: Build unsigned F-Droid release APK
         run: bash ./gradlew lintRelease assembleRelease -Pdistribution=fdroid --stacktrace
 
-      - name: Verify F-Droid APK has the engine and no proprietary Google libraries
+      - name: Verify F-Droid APK has the engine and its notices, and no Google services
         run: |
           set -euo pipefail
           apk=app/build/outputs/apk/release/app-release-unsigned.apk
@@ -150,7 +150,10 @@ jobs:
             echo "The F-Droid APK contains proprietary Google classes" >&2
             exit 1
           fi
-          echo "Bergamot libraries present; no ML Kit, Play Services, or Firebase classes found."
+          unzip -p "$apk" assets/licenses/distribution.txt | grep "Mozilla Public License" > /dev/null
+          "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump xmltree --file AndroidManifest.xml "$apk" \
+            | grep -A1 '"android.webkit.WebView.EnableSafeBrowsing"' | grep 'value.*false' > /dev/null
+          echo "Bergamot libraries and notices present; Safe Browsing off; no ML Kit, Play Services, or Firebase classes found."
 
   fdroid-device-tests:
     runs-on: ubuntu-latest

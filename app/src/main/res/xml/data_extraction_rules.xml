@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Android 12 and higher. Leaves out downloads the app can fetch again: the Japanese dictionary
-    (13 MB) and the F-Droid build's translation models. Keep these paths in sync with
+    (13 MB) and the F-Droid build's translation models. Also leaves out the WebView profile
+    (app_webview/), whose cookies hold the YouTube/Google sign-in. Keep these paths in sync with
     backup_rules.xml and the directories AppViewModel creates.
 -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="japanese-dictionary/" />
         <exclude domain="file" path="translation-models/" />
+        <exclude domain="root" path="app_webview/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="japanese-dictionary/" />
         <exclude domain="file" path="translation-models/" />
+        <exclude domain="root" path="app_webview/" />
     </device-transfer>
 </data-extraction-rules>

@@ -60,10 +60,70 @@ val japaneseTestDictionary by tasks.registering(JapaneseTestDictionary::class) {
     output.set(layout.buildDirectory.dir("generated/japanese-test-dictionary"))
 }
 
+// The F-Droid build's licence screen shows the licence files of the native translation engine,
+// read from the submodules so they always match the compiled code. A missing file fails the build.
+val engineLicenses = listOf(
+    "Bergamot translator (mozilla/translations), MPL-2.0" to "translations/LICENSE",
+    "Marian NMT, MIT" to "translations/inference/marian-fork/LICENSE.md",
+    "ssplit-cpp, Apache-2.0" to "translations/inference/3rd_party/ssplit-cpp/LICENSE.md",
+    "PCRE2, BSD-3-Clause with the PCRE2 exception" to "pcre2/LICENCE",
+) + listOf(
+    "SentencePiece" to "sentencepiece/LICENSE",
+    "ruy" to "ruy/LICENSE",
+    "cpuinfo" to "ruy/third_party/cpuinfo/LICENSE",
+    "intgemm" to "intgemm/LICENSE",
+    "faiss" to "faiss/LICENSE",
+    "yaml-cpp" to "yaml-cpp/LICENSE",
+    "pathie-cpp" to "pathie-cpp/LICENSE",
+    "simd_utils" to "simd_utils/LICENSE",
+    "CLI11" to "CLI/LICENSE",
+    "spdlog" to "spdlog/LICENSE",
+    "phf" to "phf/LICENSE",
+    "cnpy" to "cnpy/LICENSE",
+    "mio" to "mio/LICENSE",
+    "zstr" to "zstr/LICENSE",
+    "zlib" to "zlib/README",
+).map { (name, path) -> "$name (bundled with Marian)" to "translations/inference/marian-fork/src/3rd_party/$path" }
+
+abstract class EngineLicenseNotice : DefaultTask() {
+    @get:Input
+    abstract val titles: ListProperty<String>
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val licenseFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val output: DirectoryProperty
+
+    @TaskAction
+    fun write() {
+        val sections = titles.get().zip(licenseFiles.files.toList()) { title, file ->
+            "===== $title =====\n\n${file.readText().trim()}"
+        }
+        output.file("licenses/distribution.txt").get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(
+                "TRANSLATION ENGINE\n\nThis build translates with Mozilla's Bergamot engine, built from source. " +
+                    "Its components and their licences follow.\n\n" + sections.joinToString("\n\n\n") + "\n",
+            )
+        }
+    }
+}
+
+val engineLicenseNotice by tasks.registering(EngineLicenseNotice::class) {
+    titles.set(engineLicenses.map { it.first })
+    licenseFiles.from(engineLicenses.map { "src/fdroid/cpp/${it.second}" })
+    output.set(layout.buildDirectory.dir("generated/engine-licenses"))
+}
+
 androidComponents {
     onVariants { variant ->
         variant.deviceTests.values.forEach { deviceTest ->
             deviceTest.sources.assets?.addGeneratedSourceDirectory(japaneseTestDictionary, JapaneseTestDictionary::output)
+        }
+        if (isFdroidBuild) {
+            variant.sources.assets?.addGeneratedSourceDirectory(engineLicenseNotice, EngineLicenseNotice::output)
         }
     }
 }
@@ -79,12 +139,18 @@ android {
         versionCode = previewVersionCode ?: appVersionCode
         versionName = appVersionName + previewVersionNameSuffix
 
+        // Safe Browsing sends URL checks to Google, so the F-Droid build turns it off.
+        val safeBrowsing = (!isFdroidBuild).toString()
+        buildConfigField("boolean", "WEBVIEW_SAFE_BROWSING", safeBrowsing)
+        manifestPlaceholders["webViewSafeBrowsing"] = safeBrowsing
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {
         getByName("main") {
             kotlin.srcDir("src/$distribution/java")
+            assets.srcDir("src/$distribution/assets")
         }
         if (isFdroidBuild) {
             // Device test for the native engine; CI fills the assets with

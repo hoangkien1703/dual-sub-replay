@@ -1,13 +1,12 @@
-# DRAFT fdroiddata recipe (metadata/com.kienhoang.dualsubreplay.yml).
-# Do not submit until a release tag contains the `distribution` switch and the
-# Bergamot engine. See README.md in this folder.
+# Copy of the fdroiddata recipe (metadata/com.kienhoang.dualsubreplay.yml), submitted in
+# https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50465. The version fields are
+# placeholders; fdroiddata holds the real ones. See README.md in this folder.
 AntiFeatures:
   NonFreeNet:
     en-US: Browses YouTube and downloads its captions; both are proprietary network services.
 Categories:
   - Online Media Player
   - Science & Education
-  - Translation & Dictionary
 License: MIT
 AuthorName: Hoang Trung Kien
 WebSite: https://hoangkien1703.github.io/dual-sub-replay/
@@ -23,7 +22,7 @@ Repo: https://github.com/hoangkien1703/dual-sub-replay.git
 Builds:
   - versionName: X.Y.Z # first tagged release that contains the distribution switch
     versionCode: 0 # appVersionCode at that tag
-    commit: 0000000000000000000000000000000000000000 # full commit hash of the vX.Y.Z tag, not the tag name
+    commit: 0000000000000000000000000000000000000000 # full commit hash of the fdroid-vX.Y.Z tag, not the tag name
     subdir: app
     submodules: true
     gradle:
@@ -40,7 +39,7 @@ Builds:
     ndk: r28c
 
 AutoUpdateMode: Version
-UpdateCheckMode: Tags ^v[0-9.]+$
+UpdateCheckMode: Tags ^fdroid-v[0-9.]+$
 UpdateCheckData: app/build.gradle.kts|val appVersionCode = (\d+)|.|val appVersionName = "([^"]+)"
 CurrentVersion: X.Y.Z
 CurrentVersionCode: 0

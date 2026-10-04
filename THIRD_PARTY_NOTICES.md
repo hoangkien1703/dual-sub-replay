@@ -28,6 +28,8 @@ The F-Droid build (`-Pdistribution=fdroid`) leaves out Google ML Kit Translate a
 
 It downloads Mozilla's Firefox Translations models, which are distributed under MPL-2.0.
 
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries above with the Apache-2.0 text, and the build's translation notice: the ML Kit terms in the GitHub build, or, in the F-Droid build, the licence files of the engine components, copied from the submodules when the APK is built.
+
 ## Japanese dictionary (downloaded on first use)
 
 The IPADIC dictionary that Kuromoji uses is not bundled in the APK. The first time Japanese subtitles load, the app downloads the same `kuromoji-ipadic-0.9.0.jar` from Maven Central, checks its size and SHA-256, and stores it in the app's private storage (see [PRIVACY.md](PRIVACY.md)). The jar contains data from `mecab-ipadic-2.7.0-20070801` ([source archive](http://atilika.com/releases/mecab-ipadic/mecab-ipadic-2.7.0-20070801.tar.gz)), distributed under this notice:

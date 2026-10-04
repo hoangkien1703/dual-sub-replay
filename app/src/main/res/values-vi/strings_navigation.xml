@@ -13,6 +13,6 @@
     <string name="navigation_no_browser">Không có trình duyệt nào để mở GitHub.</string>
     <string name="navigation_licenses">Giấy phép mã nguồn mở</string>
     <string name="navigation_loading_license">Đang tải giấy phép…</string>
-    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Ứng dụng kết hợp này được phân phối theo giấy phép GPL-3.0 và không kèm bảo hành. Bạn có thể phân phối lại và chỉnh sửa ứng dụng theo các điều khoản này. Các thông báo MIT gốc cùng liên kết mã nguồn/bản dựng của các thư viện phụ thuộc nằm trong tệp THIRD_PARTY_NOTICES.md trên kho GitHub.</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Ứng dụng là phần mềm tự do theo Giấy phép MIT và không kèm bảo hành. Giấy phép của các thư viện đi kèm được liệt kê bên dưới; danh sách đầy đủ nằm trong tệp THIRD_PARTY_NOTICES.md trên kho GitHub.</string>
     <string name="navigation_close">Đóng</string>
 </resources>

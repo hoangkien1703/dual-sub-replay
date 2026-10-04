@@ -13,6 +13,6 @@
     <string name="navigation_no_browser">GitHub を開けるブラウザがありません。</string>
     <string name="navigation_licenses">オープンソースライセンス</string>
     <string name="navigation_loading_license">ライセンスを読み込んでいます…</string>
-    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. この結合アプリケーションは GPL-3.0 のもと無保証で配布されています。これらの条件に従って再配布や改変ができます。元の MIT 表示と依存ライブラリのソース/ビルドへのリンクは、GitHub リポジトリの THIRD_PARTY_NOTICES.md にあります。</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. このアプリは MIT ライセンスのフリーソフトウェアで、無保証で提供されています。同梱ライブラリのライセンスを以下に示します。完全な一覧は GitHub リポジトリの THIRD_PARTY_NOTICES.md にあります。</string>
     <string name="navigation_close">閉じる</string>
 </resources>

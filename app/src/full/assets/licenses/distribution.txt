@@ -1,0 +1,5 @@
+TRANSLATION
+
+This build translates with Google ML Kit Translate, which is provided under the ML Kit Terms of
+Service (https://developers.google.com/ml-kit/terms) and the Google APIs Terms of Service
+(https://developers.google.com/terms).
