@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">保存悬浮层和 CC 按钮的拖动位置并在之后沿用。</string>
     <string name="settings_drag_overlay_hint">可上下或左右拖动悬浮层。字幕文稿隐藏时，也可以拖动 CC 按钮。竖屏时将悬浮层向下快速滑动即可关闭。</string>
     <string name="settings_reset_subtitle_positions">重置字幕位置</string>
+    <string name="language_downloads_title">此设备上的语言</string>
+    <string name="language_downloads_row_description">查看已下载的语言，并提前下载其他语言。</string>
+    <string name="language_downloads_hint">已下载的语言可立即翻译，离线也能用。每种语言约占 30–60 MB。</string>
+    <string name="language_downloads_japanese_note">包含用于点按日语单词的 13 MB 词典。</string>
+    <string name="language_downloads_group_on_device">此设备上</string>
+    <string name="language_downloads_group_available">可下载</string>
+    <string name="language_downloads_built_in">内置</string>
+    <string name="language_downloads_downloaded">已下载</string>
+    <string name="language_downloads_not_downloaded">未下载</string>
+    <string name="language_downloads_downloading">正在下载…</string>
+    <string name="language_downloads_removing">正在移除…</string>
+    <string name="language_downloads_failed">未能完成。请检查网络连接后重试。</string>
+    <string name="language_downloads_download">下载</string>
+    <string name="language_downloads_remove">移除</string>
+    <string name="language_downloads_loading">正在检查已下载的语言…</string>
+    <string name="language_downloads_load_failed">无法加载语言列表。请检查网络连接。</string>
+    <string name="language_downloads_retry">重试</string>
+    <string name="language_downloads_back">返回</string>
 </resources>

@@ -88,7 +88,7 @@ Want to test the newest development build? See the [preview release](https://git
 
 **How do I watch YouTube with two subtitles at once on Android?** Install DualSub Replay, open a captioned video, and pick your language. The original caption and its translation appear together under the video, or beside it in landscape.
 
-**Which languages can I learn?** The original can be any caption language a video offers, including auto-generated captions. Translations go into the 59 languages supported by Google ML Kit, such as English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese.
+**Which languages can I learn?** The original can be any caption language a video offers, including auto-generated captions. Translations go into the 59 languages supported by Google ML Kit, such as English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese. **Settings → Translation → Languages on this device** lists them, shows which are downloaded, and lets you download or remove each one ahead of time so translation works offline.
 
 **Is there a Language Reactor-style tool for Android?** Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate, unaffiliated Android app with a similar two-language view, plus tap-to-replay and saved words.
 
@@ -116,7 +116,7 @@ Online video playback uses the native player in YouTube's mobile webpage. Saved 
 
 ## Saved words and practice
 
-Tap a word in either subtitle line to select it; tap another word in the same line to select the whole phrase between them. A small bar above the selection offers **Copy**, **Translate** and **Pronounce**. **Translate** opens the card with the meaning of the whole phrase, each word's part of speech, and **Save to vocabulary** under the meaning. Pronunciation uses the tapped word's language, trying your preferred Android speech engine and then other installed engines. It prefers installed offline voices and can fall back to a supported network voice. If no voice works, use **Speech settings** to install or select one, then tap **Pronounce** again. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
+Tap a word in either subtitle line to select it; tap another word in the same line to select the whole phrase between them. A small bar above the selection shows its translation right away and offers **Copy**, **Translate** and **Pronounce**. **Translate** opens the card with the meaning of the whole phrase, each word's part of speech, and **Save to vocabulary** under the meaning. For Japanese, the card also explains the grammar of the selection and the particle right after it (for example に or 〜てくれました), with **Show other meanings** for points that have several uses. Pronunciation uses the tapped word's language, trying your preferred Android speech engine and then other installed engines. It prefers installed offline voices and can fall back to a supported network voice. If no voice works, use **Speech settings** to install or select one, then tap **Pronounce** again. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
 
 Each card stores an editable meaning and its original subtitle context. The Online example option replays the saved sentence in the existing YouTube page and stops at its end. A translated word's example contains the original spoken sentence, which may not literally contain the translated word.
 

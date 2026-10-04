@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">Save where you drag the overlay and CC button and reuse those positions.</string>
     <string name="settings_drag_overlay_hint">Drag the overlay up, down, or sideways. When the transcript is hidden, you can drag the CC button too. In portrait, flicking the overlay down closes it.</string>
     <string name="settings_reset_subtitle_positions">Reset subtitle positions</string>
+    <string name="language_downloads_title">Languages on this device</string>
+    <string name="language_downloads_row_description">See which languages are downloaded and download others ahead of time.</string>
+    <string name="language_downloads_hint">Downloaded languages translate right away, even offline. Each one takes about 30–60 MB of storage.</string>
+    <string name="language_downloads_japanese_note">Includes the 13 MB dictionary for tapping Japanese words.</string>
+    <string name="language_downloads_group_on_device">On this device</string>
+    <string name="language_downloads_group_available">Available to download</string>
+    <string name="language_downloads_built_in">Built in</string>
+    <string name="language_downloads_downloaded">Downloaded</string>
+    <string name="language_downloads_not_downloaded">Not downloaded</string>
+    <string name="language_downloads_downloading">Downloading…</string>
+    <string name="language_downloads_removing">Removing…</string>
+    <string name="language_downloads_failed">That did not work. Check your connection and try again.</string>
+    <string name="language_downloads_download">Download</string>
+    <string name="language_downloads_remove">Remove</string>
+    <string name="language_downloads_loading">Checking downloaded languages…</string>
+    <string name="language_downloads_load_failed">The language list could not be loaded. Check your connection.</string>
+    <string name="language_downloads_retry">Retry</string>
+    <string name="language_downloads_back">Back</string>
 </resources>

@@ -56,6 +56,17 @@ internal object JapaneseMorphology {
         store = dictionary
     }
 
+    /** Whether the dictionary file is on this device; true when none is needed (bundled in unit tests). */
+    fun isDictionaryInstalled(): Boolean = store?.isInstalled() ?: true
+
+    /** Downloads the dictionary without loading it, for the settings screen. Blocking; returns whether it is installed. */
+    fun installDictionary(): Boolean = store?.install() ?: true
+
+    /** Deletes the downloaded dictionary to free space; it downloads again the next time Japanese is shown. */
+    fun removeDictionary() {
+        store?.remove()
+    }
+
     /** Starts downloading and loading the dictionary in the background unless it is loaded or loading. */
     fun warmUp() {
         if (tokenizer != null || System.currentTimeMillis() < retryAt) return
@@ -111,6 +122,16 @@ internal object JapaneseMorphology {
         return japaneseLearnerWords(analyzer, text)
     }
 
+    /** The analyzer's morphemes of [text], or null while the analyzer is loading or unavailable. */
+    fun morphemes(text: String): List<Morpheme>? {
+        val analyzer = tokenizer
+        if (analyzer == null) {
+            warmUp()
+            return null
+        }
+        return japaneseMorphemes(analyzer, text)
+    }
+
     private const val BUNDLED_DICTIONARY_PROBE = "doubleArrayTrie.bin"
     private const val RETRY_DELAY_MS = 60_000L
     private const val POLL_MS = 20L
@@ -120,10 +141,12 @@ internal object JapaneseMorphology {
 internal fun japaneseLearnerWords(
     analyzer: Tokenizer,
     text: String,
-): List<AnalyzedToken> {
-    val morphemes = synchronized(analyzer) { analyzer.tokenize(text) }.map(::toMorpheme)
-    return groupJapaneseMorphemes(morphemes)
-}
+): List<AnalyzedToken> = groupJapaneseMorphemes(japaneseMorphemes(analyzer, text))
+
+internal fun japaneseMorphemes(
+    analyzer: Tokenizer,
+    text: String,
+): List<Morpheme> = synchronized(analyzer) { analyzer.tokenize(text) }.map(::toMorpheme)
 
 private fun toMorpheme(token: Token) =
     Morpheme(

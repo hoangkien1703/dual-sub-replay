@@ -42,7 +42,8 @@ finds confusing.
   - Tapping a word pauses the video, highlights the word and shows the bar above it (below it when
     there is no room above). With one word selected, the bar shows that word's translation under
     the buttons and says "Tap another word to select a phrase". Once the selection grows to a
-    phrase, the bar shows no translation until **Translate** is pressed.
+    phrase, the bar shows the whole phrase's translation the same way (revised 2026-10-04, see
+    below).
   - The bar uses the app's dark teal surface with a thin accent border, not a white panel.
   - Tapping another word in the same line extends the selection to every word between the two.
     Tapping a word inside the selection, tapping a blank part of that line, the bar's ✕, Back, or
@@ -98,8 +99,8 @@ finds confusing.
 - [x] Tap, extend backwards/forwards, and clear rules hold (`PhraseSelectionTest`).
 - [x] A phrase keeps the exact source text between its first and last word, including Japanese
   without spaces, and lists every word as a part (`PhraseSelectionTest`).
-- [x] A single selected word shows its translation in the bar; a phrase is not translated until
-  Translate is pressed (`PhraseSelectionUiTest`).
+- [x] A single selected word shows its translation in the bar, and a phrase shows the whole
+  phrase's translation as soon as it is selected (`PhraseSelectionUiTest`, revised 2026-10-04).
 - [x] The bar sits above the selection, flips below it near the top of the window, and stays
   inside the window horizontally (`PhraseSelectionTest`).
 - [x] A saved phrase keeps the phrase text and joined readings, and its id differs from its first
@@ -146,6 +147,23 @@ extending to more words keeps the phrase flow without translating immediately. T
 close when the video plays again: `BindPhraseActions` clears the selection when `playbackPaused`
 turns false (`PhraseSelectionTest.selectingPausesOnceAndResumingClearsTheSelection` covers the
 controller side).
+
+## Revision: phrases translate immediately (2026-10-04)
+
+The owner asked in the project thread on 2026-10-04 for a multi-word selection to show its
+translation immediately, like a single word. This reverses the 2026-09-29 choice to keep phrases
+untranslated until **Translate** is pressed.
+
+- **Acceptance criteria:** extending a selection to a phrase replaces the bar's single-word
+  translation with the phrase's translation, shown as "Translating…" until it arrives; each
+  change to the selection translates the new text once; Copy, Translate, Pronounce and the
+  learning card are unchanged.
+- **Plan:** `SelectableSubtitleText` passes `quickTranslate` for every selection instead of only
+  single words. `QuickTranslation` already restarts (cancelling the previous request) when the
+  selected text changes.
+- **Release intent:** `release:patch` (default; the owner gave no other intent).
+- **Validation:** `PhraseSelectionUiTest.tappingTwoWordsSelectsThePhraseAndTranslateSendsIt` now
+  expects the phrase's translation in the bar and both texts sent to `translate`.
 
 ## Implementation result
 

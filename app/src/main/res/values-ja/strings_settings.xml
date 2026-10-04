@@ -117,4 +117,22 @@
     <string name="settings_remember_position_description">オーバーレイと CC ボタンをドラッグした位置を保存し、次回も使います。</string>
     <string name="settings_drag_overlay_hint">オーバーレイは上下左右にドラッグできます。トランスクリプトが非表示のときは CC ボタンもドラッグできます。縦向きではオーバーレイを下へはじくと閉じます。</string>
     <string name="settings_reset_subtitle_positions">字幕の位置をリセット</string>
+    <string name="language_downloads_title">この端末の言語</string>
+    <string name="language_downloads_row_description">ダウンロード済みの言語を確認し、ほかの言語を前もってダウンロードできます。</string>
+    <string name="language_downloads_hint">ダウンロード済みの言語はオフラインでもすぐに翻訳できます。1 言語あたり約 30～60 MB を使います。</string>
+    <string name="language_downloads_japanese_note">日本語の単語をタップするための 13 MB の辞書を含みます。</string>
+    <string name="language_downloads_group_on_device">この端末にある言語</string>
+    <string name="language_downloads_group_available">ダウンロードできる言語</string>
+    <string name="language_downloads_built_in">内蔵</string>
+    <string name="language_downloads_downloaded">ダウンロード済み</string>
+    <string name="language_downloads_not_downloaded">未ダウンロード</string>
+    <string name="language_downloads_downloading">ダウンロード中…</string>
+    <string name="language_downloads_removing">削除中…</string>
+    <string name="language_downloads_failed">うまくいきませんでした。接続を確認してもう一度お試しください。</string>
+    <string name="language_downloads_download">ダウンロード</string>
+    <string name="language_downloads_remove">削除</string>
+    <string name="language_downloads_loading">ダウンロード済みの言語を確認しています…</string>
+    <string name="language_downloads_load_failed">言語の一覧を読み込めませんでした。接続を確認してください。</string>
+    <string name="language_downloads_retry">再試行</string>
+    <string name="language_downloads_back">戻る</string>
 </resources>

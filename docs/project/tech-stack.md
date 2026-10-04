@@ -45,6 +45,11 @@ Paths below are relative to
   Translations models. `translation/BergamotCatalog.kt` in main holds its testable model
   catalog and routing logic. See [F-Droid distribution](../fdroid/README.md). `ui/PlaybackTranslation.kt` and `TranslationCoordinator.kt`
   support playback-prioritized work; obsolete loads must not update current state.
+  Both translators also list, download and remove whole languages for the
+  Settings → Translation → Languages on this device screen (`ui/LanguageDownloads.kt`).
+- `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes with
+  hand-written rules; `ui/GrammarExplanations.kt` words them (`strings_grammar.xml`) in the
+  word card. Explanations are this project's own text, not copied from other grammar resources.
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`
