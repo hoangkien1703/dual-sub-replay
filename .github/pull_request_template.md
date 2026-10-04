@@ -36,7 +36,7 @@ release:skip, OR one standalone Release-Version: X.Y.Z line outside comments/cod
 Writing a label here or checking a box does NOT activate it. Verify saved metadata;
 report any required label that could not be applied before handoff. Never leave an
 active example exact-version directive. Do not manually bump Gradle version constants.
-See AGENTS.md for handoff and README.md for release recovery.
+See AGENTS.md for handoff and docs/releasing.md for release recovery.
 -->
 
 ## Notes for reviewers

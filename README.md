@@ -1,54 +1,35 @@
 # DualSub Replay
 
-Watch YouTube with two subtitle languages at once, then tap any sentence to replay that exact moment. Translation runs on your Android device.
+**Learn a language with YouTube.** Watch videos with subtitles in two languages, tap a sentence to hear it again, and tap a word to see what it means. Free for Android phones.
 
-DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, and saves words for spaced-repetition practice. No account, ads, or API key. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
+<p align="center">
+  <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk"><img src="https://img.shields.io/badge/Download_for_Android-Free-3ddc84?style=for-the-badge&logo=android&logoColor=white" alt="Download DualSub Replay for Android, free" height="56"></a>
+</p>
 
-[![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
-[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
-[![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
-[![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
-[![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
+<p align="center">
+  Android 8.0 or newer · No account · No ads<br>
+  Want the newest features first? <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview">Try the preview version</a> (may be less stable).
+</p>
+
+### How to install
+
+1. Tap the green **Download for Android** button above on your phone.
+2. When the download finishes, open the file `DualSub-Replay.apk`.
+3. If your phone asks, allow your browser or file manager to **install unknown apps**, then tap **Install**.
+
+Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
+
+> **About the preview version:** it installs as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
+
+## See it in action
 
 <p align="center">
   <a href="docs/media/dualsub-replay-promo.mp4">
-    <img src="docs/images/dualsub-replay-demo.gif" alt="DualSub Replay showing dual subtitles, tap-to-replay, and fullscreen landscape mode" width="480">
+    <img src="docs/images/dualsub-replay-demo.gif" alt="DualSub Replay showing dual subtitles on a YouTube video, then tapping a Japanese word to see its meaning, grammar and Save to vocabulary" width="400">
   </a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk"><strong>Download the latest official APK</strong></a>
-  ·
-  <a href="docs/media/dualsub-replay-promo.mp4">Watch the 30-second demo</a>
-</p>
-
-## Why DualSub Replay?
-
-- **See every meaning:** keep original and translated captions together while you watch.
-- **Repeat without scrubbing:** tap a subtitle paragraph to jump back and hear it again.
-- **Learn privately:** translate on-device with Google ML Kit; no API key is required.
-
-If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
-
-## Download
-
-### [Download DualSub Replay for Android](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
-
-Requires **Android 8.0 or newer**. No account or API key is required.
-
-### Installation
-
-1. Tap the download link above and open `DualSub-Replay.apk` when it finishes.
-2. If Android asks, allow your browser or file manager to **install unknown apps**.
-3. Tap **Install**, then open DualSub Replay.
-
-Android may show a standard warning because the app is downloaded directly from GitHub instead of Google Play.
-
-> **Installing after testing a preview?** Current preview builds install separately as **DualSub Replay Preview**, so you can keep both apps. Official releases update the existing official app. Preview settings and vocabulary remain in the preview app; use Practice backup and transfer to move saved study data.
-
-Want to test the newest development build? See the [preview release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview). Preview builds may be less stable and use a different signature.
-
-## App preview
+<p align="center"><a href="docs/media/dualsub-replay-promo.mp4"><strong>▶ Watch the full video (50 seconds)</strong></a></p>
 
 <p align="center">
   <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
@@ -62,163 +43,119 @@ Want to test the newest development build? See the [preview release](https://git
   <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
 </p>
 
+## Why DualSub Replay?
+
+DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, explains words and Japanese grammar, and saves words for spaced-repetition practice. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
+
+- **See every meaning.** The original caption and its translation stay together while you watch.
+- **Repeat without scrubbing.** Tap a subtitle line and the video jumps back to that exact moment.
+- **Learn the words you hear.** Tap a word for its meaning, part of speech, pronunciation and, for Japanese, the grammar around it.
+- **Remember them.** Save words with their original sentence and review them with spaced repetition.
+- **Stay private.** Translation happens on your phone. There is no account, no tracking, and no ads.
+
+If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
+
 ## Features
 
-- Use the app in English, Tiếng Việt, Español, Português (Brasil), 日本語, 한국어, 简体中文, or Bahasa Indonesia. It follows the phone's language and falls back to English; the globe button at the bottom of the menu picks another.
-- Browse and search the real mobile YouTube site inside the app.
-- Open watch, Shorts, live, embed, and `youtu.be` links in the same persistent YouTube WebView.
-- Play videos with YouTube's native mobile webpage player and controls.
-- Retrieve manual or auto-generated public captions automatically.
-- Parse YouTube's default timed-text XML, nested SRV3 XML, and JSON3 caption formats.
-- Choose from the caption languages offered by each video and translate into any language supported by Google ML Kit.
-- Download translation models on demand and remember the preferred target language.
-- Merge short caption cues into readable paragraphs.
-- Place the dual-subtitle timeline in a temporary bottom layer over the single YouTube page.
-- Rotate to landscape for a default-on 75/25 split favoring the video; drag the divider to resize the video between 65% and 85% of the width, and the app remembers your choice.
-- Landscape mode uses immersive edge-to-edge layout: status/navigation bars hide automatically and content can use display-cutout/camera space, while system bars remain available with a swipe.
-- Highlight the current paragraph and tap any paragraph to replay it.
-- Follow the currently spoken word on eligible YouTube auto-generated captions with Adaptive timing by default, or choose strict Live YouTube or Transcript timing in subtitle settings.
-- Swipe the panel header down in portrait or right in landscape, or use its close button, to reveal the complete YouTube page, including the same video,
-  actions, comments, and recommendations; no second player or webpage is created.
-- Reopen the subtitle timeline and remember the subtitle text size.
-- Track your immersion time under **Progress** in the menu: today against a daily goal, your streak, totals for this week, month, year and all time, a chart per period, and time per language.
-- Build, test, and publish installable APKs automatically with GitHub Actions.
+### Watch with dual subtitles
+
+- Browse and search the real mobile YouTube site inside the app, or share a YouTube link (watch, Shorts, live, embed, or `youtu.be`) to DualSub Replay.
+- Captions load automatically, manual or auto-generated, in any language the video offers.
+- Translations go into any of the 59 languages Google ML Kit supports. Download language models ahead of time in **Settings → Translation → Languages on this device** to translate offline.
+- Short caption fragments are merged into readable sentences, and the current one is highlighted. On eligible auto-generated captions, the spoken word is highlighted too.
+
+### Replay any sentence
+
+- Tap a subtitle line to jump back to its start and hear it again.
+- Swipe the subtitle panel away to see the whole YouTube page (likes, comments, recommendations) and bring it back anytime.
+- Rotate to landscape for an edge-to-edge split view: the video on the left and subtitles on the right. Drag the divider to resize it; the app remembers your choice.
+
+### Look up words and grammar
+
+- Tap a word in either subtitle line; tap another word in the same line to select the whole phrase. A small bar shows the translation right away, with **Copy**, **Translate** and **Pronounce**.
+- **Translate** opens a card with the meaning, each word's part of speech, and **Save to vocabulary**.
+- For Japanese, the card also explains the grammar of the selection and the particle right after it (for example に or 〜てくれました).
+- **Pronounce** uses the voices installed on your phone, preferring offline voices.
+
+### Practice saved words
+
+- Open **Saved words** to search, edit, or practice your cards. Each card keeps its original sentence and can replay it in the video.
+- Reviews use spaced repetition: **Again** (10 minutes), **Hard** (1 day), **Good** (3 days), or **Easy** (7 days), with intervals growing on later reviews.
+- Export a full backup or Anki text, and import it on another phone. See [Practice transfer](docs/practice-transfer.md).
+
+### Track your progress
+
+- **Progress** in the menu shows today's watch time against a daily goal, your streak, totals for the week, month, year and all time, and the time spent in each language.
+- Time counts only while a captioned video plays, and it is stored only on your device.
+
+### Use the app in your language
+
+The interface is available in English, Tiếng Việt, Español, Português (Brasil), 日本語, 한국어, 简体中文 and Bahasa Indonesia. It follows your phone's language; the globe button at the bottom of the menu picks another.
+
+## Quick start
+
+1. Open DualSub Replay, choose your native language and the language you are learning, and skim the short guide.
+2. Search YouTube and pick a video with captions.
+3. Read the original and translated subtitles below the video, or beside it in landscape.
+4. Tap a subtitle line to replay it, or tap a word to learn it.
+5. Press Back to keep browsing YouTube as usual.
 
 ## FAQ
 
 **How do I watch YouTube with two subtitles at once on Android?** Install DualSub Replay, open a captioned video, and pick your language. The original caption and its translation appear together under the video, or beside it in landscape.
 
-**Which languages can I learn?** The original can be any caption language a video offers, including auto-generated captions. Translations go into the 59 languages supported by Google ML Kit, such as English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese. **Settings → Translation → Languages on this device** lists them, shows which are downloaded, and lets you download or remove each one ahead of time so translation works offline.
+**Which languages can I learn?** The original can be any caption language a video offers, including auto-generated captions. Translations go into the 59 languages supported by Google ML Kit, such as English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese. **Settings → Translation → Languages on this device** lists them, shows which are downloaded, and lets you download or remove each one so translation works offline.
 
-**Is there a Language Reactor-style tool for Android?** Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate, unaffiliated Android app with a similar two-language view, plus tap-to-replay and saved words.
+**Is there a Language Reactor-style tool for Android?** Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate, unaffiliated Android app with a similar two-language view, plus tap-to-replay, word lookup, and saved-word practice.
 
-**Is it on Google Play?** Not yet. Install the official APK from [GitHub releases](https://github.com/hoangkien1703/dual-sub-replay/releases/latest).
+**Can I sign in to YouTube?** Experimentally. The Google sign-in flow stays inside the app and returns to your video afterwards, but Google does not officially support signing in from embedded WebViews and may reject it with a "browser or app may not be secure" message. The app never spoofs its user agent or copies cookies.
 
-## User flow
+**Is it on Google Play or F-Droid?** Not yet. Install the official APK from [GitHub releases](https://github.com/hoangkien1703/dual-sub-replay/releases/latest). A fully open-source build for F-Droid, which translates with Mozilla's Bergamot engine instead of ML Kit, is being prepared; see [F-Droid distribution](docs/fdroid/README.md).
 
-1. Open DualSub Replay; the YouTube Browse screen appears immediately.
-2. Search normally and choose a captioned video.
-3. The selected watch page stays in the same WebView while captions and translations load.
-4. The dual-subtitle timeline tracks the native webpage video's playback time, below it in portrait or beside it in landscape.
-5. Tap any subtitle paragraph to seek to its start and resume playback.
-6. Swipe the subtitle timeline down in portrait or right in landscape to like the video, read comments, or choose another video.
-7. Press Back to navigate through normal YouTube browsing history.
+## Privacy
 
-Sharing a YouTube watch, Short, live, embed, or `youtu.be` URL to DualSub Replay navigates the same WebView directly to it.
+No account or API key is required, and the app has no analytics or advertising SDKs. YouTube receives the same page, player and caption requests as a normal visit. ML Kit downloads only the language models you use, then translates on the device. Settings, saved words, and progress stay in local app storage. See [PRIVACY.md](PRIVACY.md) for details.
 
-Starting with v0.3.3, the app experimentally keeps the Google/YouTube sign-in flow inside the same WebView, persists its WebView cookies, and automatically returns to the previous YouTube page after two-step verification completes. Google officially does not support account authentication in embedded WebViews, so Google may still reject the login with a “browser or app may not be secure” message. No user-agent spoofing or cookie copying is used.
+## Limitations
 
-## Important limitations
+- YouTube's official Data API does not let ordinary viewers download captions from arbitrary public videos, so DualSub Replay reads them through YouTube's undocumented internal interfaces. They can change without notice, and their use may be restricted by YouTube's terms. That code is isolated in `YouTubeCaptionProvider` so it can be replaced.
+- Videos play in YouTube's own mobile webpage player; the app does not download video. Spoken-word highlighting depends on YouTube's page and may be unavailable or less precise on some videos and phones, in which case it falls back to sentence timing.
 
-YouTube's official Data API does not allow ordinary viewers to download captions from arbitrary public videos. To provide automatic captions, this prototype uses YouTube's undocumented Innertube transcript endpoint. It can stop working when YouTube changes its internal API, and its use may be restricted by YouTube's terms. The extraction code is isolated in `YouTubeCaptionProvider` so it can be replaced without rewriting the app.
+## For developers
 
-Online video playback uses the native player in YouTube's mobile webpage. Saved vocabulary can optionally use online examples for practice through the single YouTube WebView. Normal browsing does not download media. The subtitle layer can be hidden at any time to restore the unobstructed YouTube page.
+[![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
+[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+[![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
+[![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
+[![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
 
-## Saved words and practice
+### Build
 
-Tap a word in either subtitle line to select it; tap another word in the same line to select the whole phrase between them. A small bar above the selection shows its translation right away and offers **Copy**, **Translate** and **Pronounce**. **Translate** opens the card with the meaning of the whole phrase, each word's part of speech, and **Save to vocabulary** under the meaning. For Japanese, the card also explains the grammar of the selection and the particle right after it (for example に or 〜てくれました), with **Show other meanings** for points that have several uses. Pronunciation uses the tapped word's language, trying your preferred Android speech engine and then other installed engines. It prefers installed offline voices and can fall back to a supported network voice. If no voice works, use **Speech settings** to install or select one, then tap **Pronounce** again. Automatic pronunciation can be disabled in Settings, and the Pronounce button remains available.
-
-Each card stores an editable meaning and its original subtitle context. The Online example option replays the saved sentence in the existing YouTube page and stops at its end. A translated word's example contains the original spoken sentence, which may not literally contain the translated word.
-
-Open **Saved words** beside Settings to search, edit, delete, or practice cards. Practice reveals the meaning on request and schedules reviews with Again (10 minutes), Hard (initially 1 day), Good (3 days), or Easy (7 days). Later successful reviews expand the previous interval by 1.2, 2, or 3 respectively; Again restarts progression. This is an independent local review system, without Anki sync. Cards are due immediately when first saved; duplicate saves of the same word/languages/video/segment retain review progress.
-
-## Progress and daily goal
-
-Open **Progress** in the menu to see how long you have watched videos in the app. Time counts only while a video is actually playing with the app open, and goes to the language of its captions (or your chosen learning language while captions load). It is saved per day and language on the device only. Progress shows today's time against your daily goal, your streak (days that reached the goal, or at least one minute without a goal), totals for this week, month, year and all time, a chart for each period, and each language's time, videos and saved words. New users can pick a daily goal right after the guide or skip it; anyone can set, change or turn off the goal in Progress.
-
-Offline video downloading and local video playback have been removed to reduce APK size and simplify the app. Existing clip files from previous versions are preserved in app-private storage without being automatically deleted. Deleting a word removes its review history. Resetting Settings preserves vocabulary.
-
-## Distribution licenses
-
-Source contributed to this repository is released under the [MIT license](LICENSE). See [third-party notices and build/source information](THIRD_PARTY_NOTICES.md).
-
-Live spoken-word timing reads caption text rendered by YouTube's webpage and is available only for eligible auto-generated caption tracks. Highlighting automatically falls back to transcript timing when a reliable live word cannot be mapped; manual captions always use transcript timing. YouTube's page structure and WebView behavior can vary by video and device, so live word timing may be unavailable or less precise on some phones.
-
-Official APKs use a dedicated production signing key kept outside the repository and restored through encrypted GitHub Actions secrets. Preview APKs use a separate CI debug signature, so Android treats the preview and official release as different update lines.
-
-## Development
-
-Requirements:
-
-- Android Studio compatible with Android Gradle Plugin 9.3
-- JDK 17
-- Android SDK 36
-- An API 36 AOSP x86_64 system image for managed-device tests
-
-The Gradle 9.5 wrapper is committed, so a separate Gradle installation is not required.
-
-On Windows PowerShell:
-
-```powershell
-.\gradlew.bat testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
-.\gradlew.bat pixel2Api36DebugAndroidTest
-```
-
-On Linux or macOS:
+Requirements: Android Studio compatible with Android Gradle Plugin 9.3, JDK 17, Android SDK 36, and an API 36 AOSP x86_64 system image for managed-device tests. The Gradle 9.5 wrapper is committed, so a separate Gradle installation is not required.
 
 ```bash
 bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
 bash ./gradlew pixel2Api36DebugAndroidTest
 ```
 
-The managed-device suite uses a Pixel 2 profile with an API 36 AOSP image. Its WebView fixtures are designed to run without calls to the live YouTube site. On headless CI hosts, also pass `-Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect`.
+On Windows, use `.\gradlew.bat` instead. The managed-device suite runs on a Pixel 2 profile with offline WebView fixtures, so it never calls the live YouTube site; on headless hosts also pass `-Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect`.
 
-Debug APKs are produced at `app/build/outputs/apk/debug/app-debug.apk`. Add `-Pdistribution=fdroid` to build the F-Droid variant, which replaces Google ML Kit with Mozilla's Bergamot engine; it needs the git submodules, NDK r28c and CMake 3.22.1. See [F-Droid distribution](docs/fdroid/README.md). An official release build requires the four `ANDROID_RELEASE_*` signing environment variables and `-PrequireReleaseSigning=true`; signing credentials must never be committed.
+The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`. Add `-Pdistribution=fdroid` to build the F-Droid variant; it needs the git submodules, NDK r28c and CMake 3.22.1 ([F-Droid distribution](docs/fdroid/README.md)). Release builds need the four `ANDROID_RELEASE_*` signing variables and `-PrequireReleaseSigning=true`; never commit signing material.
 
-## Architecture
+### Architecture
 
-- `YouTubeUrlParser` normalizes shared links and extracts video IDs.
-- `YouTubeCaptionProvider` discovers and downloads timed caption cues.
-- `SubtitleMerger` converts small cues into replayable paragraphs.
-- `OnDeviceTranslator` uses Google ML Kit to translate between the selected supported languages.
-- `AppViewModel` tracks the active watch URL, caption loading, translation, and active cue.
-- `SingleYouTubePage` owns the app's only WebView and keeps normal YouTube navigation and playback intact.
-- A small JavaScript polling bridge reads the native page video's time and seeks that same video for replay.
-- `DualSubApp` places the hideable dual-subtitle timeline below the single YouTube surface in portrait or beside it in landscape.
+- `SingleYouTubePage` owns the app's only WebView and keeps normal YouTube navigation and playback intact. A small JavaScript polling bridge reads the page video's time and seeks that same video for replay.
+- `YouTubeUrlParser` normalizes shared links; `YouTubeCaptionProvider` discovers and downloads timed captions; `SubtitleMerger` turns short cues into replayable sentences.
+- `OnDeviceTranslator` translates with Google ML Kit (Bergamot in the F-Droid build).
+- `AppViewModel` tracks the active video, caption loading, translation, and the current line; `DualSubApp` places the subtitle panel below the video in portrait or beside it in landscape.
 
-## Continuous integration
+See the [technical context](docs/project/tech-stack.md) for the invariants that tests enforce.
 
-Pull requests use the committed wrapper to run formatting and complexity checks, unit tests, lint, debug and Android-test APK assembly, and an optimized release build. A second job executes the offline fixture suite on the API 36 managed device. Both jobs must pass before merging into `main`. Same-repository pull requests also publish a numbered test APK to the rolling preview release and remove it automatically when the PR is closed.
+### CI, releases, and the website
 
-### Automatic official releases
+Pull requests run formatting, complexity, unit, lint, build, and managed-device checks, and publish a numbered test APK to the rolling preview release. Merges by the owner publish an official release automatically. See [Continuous integration and releases](docs/releasing.md) for versioning, release labels, and recovery.
 
-When **hoangkien1703 merges a PR into `main`**, the **Release merged PR** workflow checks that the latest Android CI run for the PR's final commit succeeded, including all four jobs: `verify-build`, `managed-device-tests`, `fdroid-build` and `fdroid-device-tests`. It then builds the preview and a production-signed official APK. Direct pushes and merges by other accounts do not publish releases.
-
-By default, each eligible merge increments the highest existing or reserved stable patch version: `1.0.4 → 1.0.5` (and `1.0.9 → 1.0.10`). It also increments Android's internal `versionCode` above all prior stable releases and reservations. Preview tags do not affect official version selection. **Do not manually bump the Gradle constants in feature PRs.**
-
-Choose an override **before merging**:
-
-| PR instruction | Result from 1.0.4 |
-| --- | --- |
-| None, or label `release:patch` | 1.0.5 |
-| Label `release:minor` | 1.1.0 |
-| Label `release:major` | 2.0.0 |
-| A standalone `Release-Version: 1.2.0` line in the PR description | Exactly 1.2.0 |
-| Label `release:skip` | Preview only; no official release |
-
-Use at most one release label or one exact-version directive. Conflicting instructions, malformed versions, and versions no higher than the existing/reserved versions stop the release. Labels are created automatically when the new main workflow first runs; exact-version directives work without labels.
-
-The workflow creates a **draft reservation** before building. The final tag points to a release-only commit whose parent is the exact merged commit; only `appVersionName` and `appVersionCode` differ. This keeps tagged source reproducible without pushing version commits to `main` or bypassing branch protection. The constants on `main` remain development defaults; release tags and APKs contain the actual release version.
-
-The draft becomes public only after the production signature, package ID, version name/code, APK, and checksum have been verified and both assets uploaded. Release notes are generated from GitHub's merged-PR history. Releases queue one at a time (`queue: max`, up to GitHub's 100-pending-run limit) so simultaneous merges cannot reserve the same version. If runs arrive out of merge order, an older merge is prevented from publishing older source as a newer version.
-
-**Recovery:** rerun the failed workflow, or choose **Actions → Release merged PR → Run workflow**, select `main`, and enter the merged PR number. A retry resumes the same draft, version, source commit, and `versionCode`; changing labels or the PR description after reservation does not change that release. Already-published merges are a no-op. Retrying an older reserved release never replaces a newer release as Latest. Keep the draft's hidden automation marker intact, and do not delete failed reservations: they prevent version reuse. If checks were not green at merge time, finish/rerun CI and then retry the release workflow.
-
-Release automation regression tests run in PR CI. Run them locally with:
-
-```bash
-python3 -m unittest discover -s tools/tests -p 'test_*.py' -v
-```
-
-### Website
-
-The landing page at https://hoangkien1703.github.io/dual-sub-replay/ lives in `site/` (English and Vietnamese). The **Publish website** workflow deploys it to GitHub Pages when `site/` or `docs/images/` changes on `main`; it does not affect app releases. Offline checks for its metadata, links, FAQ structured data, and language list run with the release automation tests above. See [discoverability](docs/promotion/discoverability.md) for the owner checklist.
-
-## Privacy
-
-No account or API key is required. YouTube receives normal player and transcript requests. ML Kit downloads only the language models needed for selected translations, then performs translation on the device. The app stores the last Browse URL, target language, text-size setting, and landscape split ratio in local app preferences.
-
-See [PRIVACY.md](PRIVACY.md) for the full privacy overview.
+The landing page in `site/` (English and Vietnamese) deploys to GitHub Pages when `site/` or `docs/images/` changes on `main`. The demo video, README GIF, poster and social card are rendered from code in [tools/promo-video](tools/promo-video/README.md).
 
 ## Contributing and roadmap
 
@@ -226,4 +163,4 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of
 
 ## License
 
-MIT. This project is independently implemented and is not affiliated with 1Letters, YouTube, or Google.
+Source contributed to this repository is released under the [MIT license](LICENSE). See [third-party notices and build/source information](THIRD_PARTY_NOTICES.md). This project is independently implemented and is not affiliated with 1Letters, YouTube, or Google.

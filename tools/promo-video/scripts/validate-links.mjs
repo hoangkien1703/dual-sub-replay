@@ -7,7 +7,7 @@ const repoRoot = path.resolve(toolRoot, '..', '..');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
 const found = new Set();
 
-for (const pattern of [/\(([^)\s]+)(?:\s+"[^"]*")?\)/g, /<(?:a|img)\s+[^>]*(?:href|src)="([^"]+)"/g]) {
+for (const pattern of [/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, /<(?:a|img)\s+[^>]*(?:href|src)="([^"]+)"/g]) {
   for (const match of readme.matchAll(pattern)) found.add(match[1]);
 }
 

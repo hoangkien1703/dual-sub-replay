@@ -90,7 +90,7 @@ since intervening releases/reservations can advance the baseline. Inspect tags, 
 and draft releases, and the Gradle baseline before estimating; report unavailable
 history instead of promising a number. An exact version must exceed all existing/reserved
 stable versions. Do not manually edit `appVersionName` or `appVersionCode` in normal PRs.
-Once reserved, use the existing [retry procedure](../../README.md#automatic-official-releases);
+Once reserved, use the existing [retry procedure](../releasing.md#automatic-official-releases);
 editing intent does not change a reservation.
 
 ## Evidence proportional to the change
