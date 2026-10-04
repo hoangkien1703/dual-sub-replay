@@ -29,11 +29,11 @@ const renderGif = (width) => run([
   '-loop', '0', '-y', gif,
 ]);
 
-renderGif(480);
-if (statSync(gif).size > 8 * 1024 * 1024) renderGif(420);
+renderGif(400);
+if (statSync(gif).size > 6 * 1024 * 1024) renderGif(360);
 
 run([
-  '-i', promo, '-vf', 'fps=1/3,scale=270:-2:flags=lanczos,tile=5x2:padding=8:margin=8',
+  '-i', promo, '-vf', 'fps=1/3,scale=270:-2:flags=lanczos,tile=9x2:padding=8:margin=8',
   '-frames:v', '1', '-q:v', '2', '-y', path.join(out, 'promo-contact-sheet.jpg'),
 ]);
 

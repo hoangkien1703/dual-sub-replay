@@ -27,6 +27,7 @@ const probeVisual = (file, countPackets = false) => JSON.parse(execFileSync(ffpr
 const gifVideo = probeVisual(gif, true);
 const posterVideo = probeVisual(poster);
 const socialVideo = probeVisual(social);
+const stillSource = probeVisual(path.join(sourceDir, 'japanese-page.png'));
 const sourceClips = [
   ['dual-subtitles.mp4', 582, 1280],
   ['instant-replay.mp4', 582, 1280],
@@ -44,15 +45,16 @@ const checks = [
   [video?.width === 1080 && video?.height === 1920, 'Promo is 1080x1920'],
   [video?.pix_fmt === 'yuv420p', 'Promo uses yuv420p'],
   [video?.avg_frame_rate === '30/1', 'Promo is 30 fps'],
-  [duration >= 29.9 && duration <= 30.1, `Promo duration is 30 seconds (${duration})`],
+  [duration >= 50.9 && duration <= 51.1, `Promo duration is 51 seconds (${duration})`],
   [audio === undefined, 'Promo has no audio stream'],
   [statSync(promo).size < 20 * 1024 * 1024, 'Promo is under 20 MiB'],
-  [statSync(gif).size < 8 * 1024 * 1024, 'README GIF is under 8 MiB'],
-  [gifVideo?.width === 480 && gifVideo?.height === 854, 'README GIF is 480x854'],
-  [gifVideo?.avg_frame_rate === '12/1' && gifVideo?.nb_read_packets === '96', 'README GIF is 8 seconds at 12 fps'],
+  [statSync(gif).size < 6 * 1024 * 1024, 'README GIF is under 6 MiB'],
+  [gifVideo?.width === 400 && gifVideo?.height === 712, 'README GIF is 400x712'],
+  [gifVideo?.avg_frame_rate === '12/1' && gifVideo?.nb_read_packets === '168', 'README GIF is 14 seconds at 12 fps'],
   [posterVideo?.width === 1080 && posterVideo?.height === 1920, 'Poster is 1080x1920'],
   [statSync(social).size < 1024 * 1024, 'Social card is under 1 MiB'],
   [socialVideo?.width === 1280 && socialVideo?.height === 640, 'Social card is 1280x640'],
+  [stillSource?.width === 631 && stillSource?.height === 369, 'japanese-page.png is the 631x369 page crop'],
 ];
 
 const bytes = readFileSync(promo);
