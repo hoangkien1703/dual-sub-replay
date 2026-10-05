@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Subtítulos en directo</string>
     <string name="status_retrying_full_transcript">Reintentando la transcripción completa…</string>
     <string name="status_retry_full_transcript">Reintentar transcripción completa</string>
+    <string name="status_google_translate_failed_title">Google Traductor dejó de funcionar</string>
+    <string name="status_google_translate_failed_message">Los subtítulos originales siguen reproduciéndose. Vuelve a la traducción en el dispositivo o mantén Google Traductor y vuelve a intentarlo más tarde.</string>
+    <string name="status_use_on_device_translation">Usar traducción en el dispositivo</string>
+    <string name="status_keep_google_translate">Mantener Google Traductor</string>
 </resources>

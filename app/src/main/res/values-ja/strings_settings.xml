@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">言語の一覧を読み込めませんでした。接続を確認してください。</string>
     <string name="language_downloads_retry">再試行</string>
     <string name="language_downloads_back">戻る</string>
+    <string name="settings_google_translate_title">Google 翻訳（オンライン）</string>
+    <string name="settings_google_translate_description">特に日本語の翻訳がより自然になります。字幕のテキストを Google に送信します。Google の公式サービスではないため、使えなくなることがあります。その場合は元に戻すよう案内します。</string>
 </resources>

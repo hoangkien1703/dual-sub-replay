@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">ライブ字幕</string>
     <string name="status_retrying_full_transcript">全文字幕を再試行しています…</string>
     <string name="status_retry_full_transcript">全文字幕を再試行</string>
+    <string name="status_google_translate_failed_title">Google 翻訳が使えなくなりました</string>
+    <string name="status_google_translate_failed_message">元の字幕はそのまま再生されます。端末上の翻訳に戻すか、Google 翻訳のまま後で再試行してください。</string>
+    <string name="status_use_on_device_translation">端末上の翻訳を使う</string>
+    <string name="status_keep_google_translate">Google 翻訳を続ける</string>
 </resources>

@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">实时字幕</string>
     <string name="status_retrying_full_transcript">正在重试完整字幕…</string>
     <string name="status_retry_full_transcript">重试完整字幕</string>
+    <string name="status_google_translate_failed_title">Google 翻译已停止工作</string>
+    <string name="status_google_translate_failed_message">原始字幕会继续播放。切换回设备端翻译，或保留 Google 翻译稍后重试。</string>
+    <string name="status_use_on_device_translation">使用设备端翻译</string>
+    <string name="status_keep_google_translate">保留 Google 翻译</string>
 </resources>

@@ -31,4 +31,5 @@
     <string name="player_webview_renderer_crashed_reload">Android WebView のレンダラーがクラッシュしました。[再読み込み] をタップして再作成してください。</string>
     <string name="player_webview_renderer_reclaimed_reload">Android がメモリを確保するため WebView のレンダラーを停止しました。[再読み込み] をタップして再作成してください。</string>
     <string name="player_reload">再読み込み</string>
+    <string name="player_use_on_device_short">端末で翻訳</string>
 </resources>

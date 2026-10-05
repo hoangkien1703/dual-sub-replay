@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Legendas ao vivo</string>
     <string name="status_retrying_full_transcript">Tentando novamente a transcrição completa…</string>
     <string name="status_retry_full_transcript">Tentar transcrição completa novamente</string>
+    <string name="status_google_translate_failed_title">O Google Tradutor parou de funcionar</string>
+    <string name="status_google_translate_failed_message">As legendas originais continuam. Volte para a tradução no dispositivo ou mantenha o Google Tradutor e tente novamente mais tarde.</string>
+    <string name="status_use_on_device_translation">Usar tradução no dispositivo</string>
+    <string name="status_keep_google_translate">Manter Google Tradutor</string>
 </resources>

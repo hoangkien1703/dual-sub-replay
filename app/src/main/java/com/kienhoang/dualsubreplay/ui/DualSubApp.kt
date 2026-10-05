@@ -84,6 +84,7 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import java.util.Locale
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -484,6 +485,8 @@ private fun DualSubExperience(
             onPreloadModelsChange = onPreloadModelsChange,
             naturalSubtitlesEnabled = state.naturalSubtitlesEnabled,
             onNaturalSubtitlesChange = onNaturalSubtitlesChange,
+            onlineTranslationAvailable = state.onlineTranslationAvailable,
+            translationEngine = state.translationEngine,
             wordLearningEnabled = state.wordLearningEnabled,
             onWordLearningChange = onWordLearningChange,
             wordLearningTarget = state.wordLearningTarget,
@@ -1076,8 +1079,11 @@ internal fun TranslatedSubtitleTimeline(
     onWordClick: (WordTap) -> Unit,
     onReplay: (SubtitleSegment) -> Unit,
 ) {
+    // After a Google failure the bar also offers to switch back to on-device translation.
+    val engineActions = LocalTranslationEngineActions.current?.takeIf { state.translationEngine == TranslationEngine.GOOGLE_WEB }
+    val useOnDevice = engineActions?.let { actions -> { actions.useOnDevice() } }
     Column(Modifier.fillMaxSize()) {
-        state.translationError?.let { TranslationUnavailableBar(it, onRetryTranslation) }
+        state.translationError?.let { TranslationUnavailableBar(it, onRetryTranslation, useOnDevice) }
         Box(Modifier.fillMaxWidth().weight(1f)) {
             SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
         }
@@ -1088,23 +1094,32 @@ internal fun TranslatedSubtitleTimeline(
 internal fun TranslationUnavailableBar(
     message: String,
     onRetry: () -> Unit,
+    onUseOnDevice: (() -> Unit)? = null,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp).testTag("translation_unavailable"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = message,
-            color = Color(0xFFFFB4AB),
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-        TextButton(onClick = onRetry) {
-            Icon(Icons.Default.Refresh, contentDescription = null)
-            Spacer(Modifier.size(5.dp))
-            Text(stringResource(R.string.player_retry_translation))
+    Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp).testTag("translation_unavailable")) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = message,
+                color = Color(0xFFFFB4AB),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onRetry) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+                Spacer(Modifier.size(5.dp))
+                Text(stringResource(R.string.player_retry_translation))
+            }
+        }
+        // Its own line, so long translated labels never squeeze the message.
+        onUseOnDevice?.let { useOnDevice ->
+            TextButton(
+                onClick = useOnDevice,
+                modifier = Modifier.align(Alignment.End).testTag("bar_use_on_device_translation"),
+            ) {
+                Text(stringResource(R.string.player_use_on_device_short))
+            }
         }
     }
 }

@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">실시간 자막</string>
     <string name="status_retrying_full_transcript">전체 자막 다시 시도 중…</string>
     <string name="status_retry_full_transcript">전체 자막 다시 시도</string>
+    <string name="status_google_translate_failed_title">Google 번역이 작동하지 않습니다</string>
+    <string name="status_google_translate_failed_message">원본 자막은 계속 재생됩니다. 기기 내 번역으로 돌아가거나 Google 번역을 유지하고 나중에 다시 시도하세요.</string>
+    <string name="status_use_on_device_translation">기기 내 번역 사용</string>
+    <string name="status_keep_google_translate">Google 번역 유지</string>
 </resources>

@@ -31,4 +31,5 @@
     <string name="player_webview_renderer_crashed_reload">The Android WebView renderer crashed. Tap Reload to recreate it.</string>
     <string name="player_webview_renderer_reclaimed_reload">Android stopped the WebView renderer to reclaim memory. Tap Reload to recreate it.</string>
     <string name="player_reload">Reload</string>
+    <string name="player_use_on_device_short">Use on-device</string>
 </resources>

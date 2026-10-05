@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Subtitel langsung</string>
     <string name="status_retrying_full_transcript">Mencoba lagi transkrip lengkap…</string>
     <string name="status_retry_full_transcript">Coba lagi transkrip lengkap</string>
+    <string name="status_google_translate_failed_title">Google Terjemahan berhenti berfungsi</string>
+    <string name="status_google_translate_failed_message">Subtitle asli tetap diputar. Beralih kembali ke terjemahan di perangkat, atau tetap gunakan Google Terjemahan dan coba lagi nanti.</string>
+    <string name="status_use_on_device_translation">Gunakan terjemahan di perangkat</string>
+    <string name="status_keep_google_translate">Tetap gunakan Google Terjemahan</string>
 </resources>

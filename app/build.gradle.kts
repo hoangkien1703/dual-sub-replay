@@ -143,6 +143,8 @@ android {
         val safeBrowsing = (!isFdroidBuild).toString()
         buildConfigField("boolean", "WEBVIEW_SAFE_BROWSING", safeBrowsing)
         manifestPlaceholders["webViewSafeBrowsing"] = safeBrowsing
+        // The opt-in Google Translate (online) engine sends subtitle text to Google; F-Droid never offers it.
+        buildConfigField("boolean", "ONLINE_TRANSLATION", (!isFdroidBuild).toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Phụ đề trực tiếp</string>
     <string name="status_retrying_full_transcript">Đang thử lại bản chép lời đầy đủ…</string>
     <string name="status_retry_full_transcript">Thử lại bản chép lời đầy đủ</string>
+    <string name="status_google_translate_failed_title">Google Dịch đã ngừng hoạt động</string>
+    <string name="status_google_translate_failed_message">Phụ đề gốc vẫn tiếp tục phát. Chuyển lại dịch trên thiết bị, hoặc giữ Google Dịch và thử lại sau.</string>
+    <string name="status_use_on_device_translation">Dùng dịch trên thiết bị</string>
+    <string name="status_keep_google_translate">Giữ Google Dịch</string>
 </resources>

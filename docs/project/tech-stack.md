@@ -47,6 +47,12 @@ Paths below are relative to
   support playback-prioritized work; obsolete loads must not update current state.
   Both translators also list, download and remove whole languages for the
   Settings → Translation → Languages on this device screen (`ui/LanguageDownloads.kt`).
+- `translation/GoogleWebTranslator.kt` is the opt-in online engine (Settings → Translation →
+  Google Translate, `translation/TranslationEngine.kt`). It calls Google Translate's unofficial
+  web endpoint with its own caches; `AppViewModel.translateText` routes every translation through
+  the chosen engine. A failure shows `ui/OnlineTranslationNotice.kt`'s dialog and a switch-back
+  button on the transcript bar. `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build.
+  See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes with
   hand-written rules; `ui/GrammarExplanations.kt` words them (`strings_grammar.xml`) in the
   word card. Explanations are this project's own text, not copied from other grammar resources.
@@ -80,8 +86,9 @@ Paths below are relative to
 - Keep caption-provider host allowlists, response limits (currently 8 MiB), timeout
   budgets, and cancellation. Undocumented YouTube behavior belongs behind the provider
   boundary so it can change without rewriting the learning UI.
-- Translation stays on-device; no user-provided/developer-provisioned service key is
-  required. YouTube's internal client key handling is an extraction detail, not a
+- Translation stays on-device by default; no user-provided/developer-provisioned service key is
+  required. The only online engine is the opt-in Google Translate switch (off by default, never in
+  the F-Droid build), which must keep offering a switch back to on-device when it fails. YouTube's internal client key handling is an extraction detail, not a
   new application API-key setup requirement.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding
   completion for existing users; new users still see the guide. Preserve vocabulary,

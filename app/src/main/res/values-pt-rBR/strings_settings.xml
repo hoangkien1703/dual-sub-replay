@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">Não foi possível carregar a lista de idiomas. Verifique sua conexão.</string>
     <string name="language_downloads_retry">Tentar de novo</string>
     <string name="language_downloads_back">Voltar</string>
+    <string name="settings_google_translate_title">Google Tradutor (online)</string>
+    <string name="settings_google_translate_description">Traduções melhores, principalmente do japonês. Envia o texto das legendas ao Google. Não é um serviço oficial do Google, então pode parar de funcionar; nesse caso o app oferece voltar.</string>
 </resources>

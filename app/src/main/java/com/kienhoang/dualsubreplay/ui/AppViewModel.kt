@@ -6,6 +6,7 @@ import android.os.SystemClock
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
@@ -32,8 +33,12 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
+import com.kienhoang.dualsubreplay.translation.GoogleWebTranslator
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
+import com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE
+import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
+import com.kienhoang.dualsubreplay.translation.storedTranslationEngine
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -103,6 +108,11 @@ data class DualSubUiState(
     val errorMessage: String? = null,
     /** Why translation stopped while the original captions keep playing, or null. */
     val translationError: String? = null,
+    val translationEngine: TranslationEngine = TranslationEngine.ON_DEVICE,
+    /** False in the F-Droid build, which never offers the online engine. */
+    val onlineTranslationAvailable: Boolean = false,
+    /** Google Translate just failed; the player asks whether to switch back to on-device translation. */
+    val onlineTranslationFailed: Boolean = false,
 )
 
 /**
@@ -262,6 +272,10 @@ class AppViewModel internal constructor(
             cacheDirectory = File(application.cacheDir, "subtitle-translations"),
             modelDirectory = File(application.filesDir, "translation-models"),
         )
+    private val googleTranslator = GoogleWebTranslator(cacheDirectory = File(application.cacheDir, "google-translations"))
+
+    /** "Keep Google Translate" was chosen; live captions fail line after line, so do not ask again until a retry. */
+    private var onlineFailureDismissed = false
     internal val vocabulary = VocabularyRepository.get(application)
     internal val immersion = ImmersionRepository.get(application)
 
@@ -421,6 +435,12 @@ class AppViewModel internal constructor(
                     storedFeatureEnabled(
                         preferences.getBoolean(TAP_TO_LEARN_PREFERENCE, true),
                     ),
+                translationEngine =
+                    storedTranslationEngine(
+                        preferences.getString(TRANSLATION_ENGINE_PREFERENCE, null),
+                        BuildConfig.ONLINE_TRANSLATION,
+                    ),
+                onlineTranslationAvailable = BuildConfig.ONLINE_TRANSLATION,
             ),
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -684,7 +704,7 @@ class AppViewModel internal constructor(
                                 liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback &&
                                     _state.value.activeVideoId == videoId
                             },
-                            translate = translator::translateSingle,
+                            translate = ::translateText,
                         ) ?: return@launch
                     if (liveTranslationGate.accepts(ticket, key) && _state.value.liveFallback && _state.value.activeVideoId == videoId) {
                         _state.update {
@@ -701,6 +721,7 @@ class AppViewModel internal constructor(
                         _state.update {
                             it.copy(
                                 statusMessage = text(R.string.status_live_translation_unavailable),
+                                onlineTranslationFailed = asksAboutOnlineFailure(it),
                             )
                         }
                     }
@@ -932,14 +953,14 @@ class AppViewModel internal constructor(
         val current = _state.value
         val source = com.kienhoang.dualsubreplay.data.learningSourceLanguage(current.resolvedSourceLanguage, current.sourcePreference)
         return if (translated) {
-            translator.translateSingle(current.targetLanguage, source, text)
+            translateText(current.targetLanguage, source, text)
         } else {
-            translator.translateSingle(source, current.targetLanguage, text)
+            translateText(source, current.targetLanguage, text)
         }
     }
 
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
-        translator.translateSingle(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
+        translateText(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
 
     internal suspend fun saveWord(
         selection: LearningWordSelection,
@@ -950,8 +971,43 @@ class AppViewModel internal constructor(
     suspend fun translateWord(word: String): String {
         val current = _state.value
         val source = current.resolvedSourceLanguage ?: current.sourcePreference.takeUnless { it == "auto" } ?: "en"
-        return translator.translateSingle(source, current.targetLanguage, word)
+        return translateText(source, current.targetLanguage, word)
     }
+
+    /** One text through the chosen engine. Subtitle rows use [runStoredTranslation]'s session instead. */
+    private suspend fun translateText(
+        source: String,
+        target: String,
+        text: String,
+    ): String =
+        if (_state.value.translationEngine == TranslationEngine.GOOGLE_WEB) {
+            googleTranslator.translate(source, target, text)
+        } else {
+            translator.translateSingle(source, target, text)
+        }
+
+    /** Settings → Translation → Google Translate (online). Reloads the current video's translations. */
+    fun setTranslationEngine(engine: TranslationEngine) {
+        val chosen = storedTranslationEngine(engine.storageValue, BuildConfig.ONLINE_TRANSLATION)
+        preferences.edit().putString(TRANSLATION_ENGINE_PREFERENCE, chosen.storageValue).apply()
+        val changed = _state.value.translationEngine != chosen
+        onlineFailureDismissed = false
+        _state.update { it.copy(translationEngine = chosen, onlineTranslationFailed = false) }
+        val videoId = _state.value.activeVideoId
+        if (changed && videoId != null) loadVideo(videoId = videoId, showPanel = _state.value.subtitlePanelVisible)
+    }
+
+    /** The "Google Translate stopped working" notice's switch-back choice. */
+    fun useOnDeviceTranslation() = setTranslationEngine(TranslationEngine.ON_DEVICE)
+
+    /** Keeps Google Translate after a failure; the transcript bar still offers retry and switch-back. */
+    fun dismissOnlineTranslationFailure() {
+        onlineFailureDismissed = true
+        _state.update { it.copy(onlineTranslationFailed = false) }
+    }
+
+    private fun asksAboutOnlineFailure(state: DualSubUiState): Boolean =
+        state.translationEngine == TranslationEngine.GOOGLE_WEB && !onlineFailureDismissed
 
     private fun setSubtitleColorKey(
         preferenceKey: String,
@@ -1012,6 +1068,8 @@ class AppViewModel internal constructor(
                 wordLearningActiveOnly = true,
                 tapToLearnEnabled = true,
                 selectedLearningWord = null,
+                translationEngine = TranslationEngine.ON_DEVICE,
+                onlineTranslationFailed = false,
             )
         }
         _state.value.activeVideoId?.let { loadVideo(it, showPanel = _state.value.subtitlePanelVisible) }
@@ -1024,6 +1082,7 @@ class AppViewModel internal constructor(
     fun retryCaptions() {
         val current = _state.value
         val videoId = current.activeVideoId ?: return
+        onlineFailureDismissed = false
         if (onlyTranslationFailed(current)) {
             _state.update {
                 it.copy(translationError = null, statusMessage = text(R.string.status_preparing_nearby_translations))
@@ -1247,6 +1306,10 @@ class AppViewModel internal constructor(
                     )
             }
             try {
+                if (_state.value.translationEngine == TranslationEngine.GOOGLE_WEB) {
+                    follow { text -> googleTranslator.translate(sourceLanguage, targetLanguage, text) }
+                    return
+                }
                 translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
                     _state.update { current ->
                         if (!isCurrentLoad(current, videoId, generation)) {
@@ -1297,13 +1360,16 @@ class AppViewModel internal constructor(
         error: Exception,
     ) {
         val reason = translationFailureMessage(error, text(R.string.status_translation_unavailable_retry))
+        val onlineReason = text(R.string.status_google_translate_failed_title)
         val status = text(R.string.status_original_captions_only)
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
+            val online = current.translationEngine == TranslationEngine.GOOGLE_WEB
             current.copy(
                 isDownloadingTranslationModel = false,
-                translationError = reason,
+                translationError = if (online) onlineReason else reason,
                 statusMessage = status,
+                onlineTranslationFailed = asksAboutOnlineFailure(current),
             )
         }
     }

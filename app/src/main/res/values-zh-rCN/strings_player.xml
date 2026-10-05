@@ -31,4 +31,5 @@
     <string name="player_webview_renderer_crashed_reload">Android WebView 渲染器已崩溃。点按“重新加载”即可重新创建。</string>
     <string name="player_webview_renderer_reclaimed_reload">Android 已停止 WebView 渲染器以回收内存。点按“重新加载”即可重新创建。</string>
     <string name="player_reload">重新加载</string>
+    <string name="player_use_on_device_short">设备端翻译</string>
 </resources>

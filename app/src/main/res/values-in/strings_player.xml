@@ -31,4 +31,5 @@
     <string name="player_webview_renderer_crashed_reload">Perender Android WebView mengalami error. Ketuk Muat ulang untuk membuatnya kembali.</string>
     <string name="player_webview_renderer_reclaimed_reload">Android menghentikan perender WebView untuk mengosongkan memori. Ketuk Muat ulang untuk membuatnya kembali.</string>
     <string name="player_reload">Muat ulang</string>
+    <string name="player_use_on_device_short">Di perangkat</string>
 </resources>
