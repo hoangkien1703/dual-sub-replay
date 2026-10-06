@@ -257,6 +257,18 @@ class SubtitleMergerTest {
         assertEquals(longCjk.length, split.sumOf { it.originalText.length })
     }
 
+    @Test fun japaneseSentenceEndsWithoutASpaceStartANewSentence() {
+        val cue = SubtitleSegment(0, 0, 6_000, "そしてうっかり何々ちゃったって使うことが多いです。これはかなり自然な日本語な")
+        val split = SubtitleMerger.splitAtSentenceEnds(listOf(cue))
+        assertEquals(listOf("そしてうっかり何々ちゃったって使うことが多いです。", "これはかなり自然な日本語な"), split.map { it.originalText })
+        assertTrue(split[0].endMs <= split[1].startMs)
+    }
+
+    @Test fun aQuoteClosingAfterTheSentenceMarkStaysTogether() {
+        val cue = SubtitleSegment(0, 0, 4_000, "「もうダメだ。」と思いました。")
+        assertEquals(listOf("「もうダメだ。」と思いました。"), SubtitleMerger.splitAtSentenceEnds(listOf(cue)).map { it.originalText })
+    }
+
     @Test fun longJapaneseRowsSplitAtCommasIntoShortRows() {
         val text = "皆さんもあると思うんですけど、日本語を話しているときに、すごい間違えたりとか、"
         val split = SubtitleMerger.splitSentenceChunks(text, SPLIT_SENTENCE_MAX_CHARACTERS)

@@ -80,3 +80,23 @@ slice of the one sentence translation.
 - Local (Linux, Android SDK 36): `formatCheck complexityCheck testDebugUnitTest lintDebug
   assembleDebug assembleDebugAndroidTest` passed; 448 unit tests, 0 failures.
 - Managed-device tests: CI. Physical phone: pending the owner's check.
+
+## Revision: Japanese sentence ends without a space (2026-10-06)
+
+The owner saw one translation spread across the wrong rows: "And I often use it accidentally.
+This is quite" / "natural" / "Japanese." under the rows "…使うことが" / "多いです。" /
+"これはかなり自然な日本語な" / "ので是非覚えておいてください。". Auto-generated Japanese captions
+put no space after 。, and `sentenceBreak` only split on whitespace, so "…多いです。これは…"
+stayed one translation unit holding two sentences; the 8-second unit cap then cut it at "な|ので".
+
+- `sentenceBreak` now also breaks right after 。！？ when no space follows, unless a closing quote
+  or bracket (」』）"'’”) or another end mark follows.
+- Acceptance: each Japanese sentence gets its own translation, and a quote closing after 。 stays
+  in its sentence.
+- Tests: `SubtitleMergerTest.japaneseSentenceEndsWithoutASpaceStartANewSentence`,
+  `SubtitleMergerTest.aQuoteClosingAfterTheSentenceMarkStaysTogether`,
+  `TranslationSlicingTest.japaneseTranslationUnitsFollowSentenceEndsNotCueEnds`.
+- Validation: the CI-parity Gradle command and `tools/tests` passed locally. Managed-device tests:
+  CI. Physical phone: pending the owner's check.
+- Still open: inside one sentence, verb-final Japanese can still put an English word on the
+  neighbouring row (see Risks).

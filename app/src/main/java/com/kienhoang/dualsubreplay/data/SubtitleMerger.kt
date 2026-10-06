@@ -520,10 +520,12 @@ private const val KATAKANA_CONTINUATIONS = "ーァィゥェォッャュョヮヵ
 /** A row may end after 、，。 and similar marks; the mark stays with the text before it. */
 private val cjkClauseBreak = Regex("(?<=[、，,；;：:。！？!?])")
 
-// Keep Android's regex engine happy: both lookbehinds have fixed width.
+// Keep Android's regex engine happy: every lookbehind has a fixed width.
 // The previous `*` inside lookbehind could throw PatternSyntaxException at runtime.
+// Japanese and Chinese put no space after 。！？, so the last form breaks right after the mark
+// unless a closing quote or bracket follows.
 private val sentenceBreak =
     Regex(
-        "(?<=[.!?。！？…])\\s+|(?<=[.!?。！？…][\\\"'’”)])\\s+",
+        "(?<=[.!?。！？…])\\s+|(?<=[.!?。！？…][\\\"'’”)])\\s+|(?<=[。！？])(?=[^\\s」』）)\\\"'’”。！？…])",
     )
 private val clauseBreak = Regex("(?<=[,;:])\\s+")
