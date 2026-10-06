@@ -115,6 +115,8 @@ data class DualSubUiState(
     val onlineTranslationAvailable: Boolean = false,
     /** Google Translate just failed; the player asks whether to switch back to on-device translation. */
     val onlineTranslationFailed: Boolean = false,
+    /** Why Google failed (English diagnostic text, e.g. the HTTP status), shown small in that dialog. */
+    val onlineTranslationFailureDetail: String? = null,
     /** Settings → Translation: on a Google failure, use on-device translation for that video without asking. */
     val autoSwitchToOnDevice: Boolean = false,
     /** Google failed with [autoSwitchToOnDevice] on, so this video translates on the device. The saved engine is unchanged. */
@@ -731,12 +733,13 @@ class AppViewModel internal constructor(
                     }
                 } catch (error: CancellationException) {
                     throw error
-                } catch (_: Exception) {
+                } catch (error: Exception) {
                     if (liveTranslationGate.accepts(ticket, key)) {
                         _state.update {
                             it.copy(
                                 statusMessage = text(R.string.status_live_translation_unavailable),
                                 onlineTranslationFailed = asksAboutOnlineFailure(it),
+                                onlineTranslationFailureDetail = error.message,
                             )
                         }
                     }
@@ -1341,13 +1344,17 @@ class AppViewModel internal constructor(
         }
         var following = false
 
-        suspend fun follow(translate: suspend (String) -> String) {
+        suspend fun follow(
+            prefetch: (suspend (List<String>) -> Unit)? = null,
+            translate: suspend (String) -> String,
+        ) {
             following = true
             translatePlaybackWindow(
                 checkNotNull(displayStore),
                 playbackRequests,
                 translate,
                 onTranslationFailure = { error -> showTranslationUnavailable(videoId, generation, error) },
+                prefetch = prefetch,
             ) { rows, preparing ->
                 publishSubtitleWindow(videoId, generation, rows, preparing)
             }
@@ -1364,7 +1371,10 @@ class AppViewModel internal constructor(
             }
             try {
                 if (_state.value.translatesWithGoogle()) {
-                    follow { text -> googleTranslator.translate(sourceLanguage, targetLanguage, text) }
+                    // Upcoming sentences go to Google in one request; rows then read them from the cache.
+                    follow(prefetch = { texts -> googleTranslator.translateAll(sourceLanguage, targetLanguage, texts) }) { text ->
+                        googleTranslator.translate(sourceLanguage, targetLanguage, text)
+                    }
                     return
                 }
                 translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
@@ -1385,7 +1395,7 @@ class AppViewModel internal constructor(
                             )
                         }
                     }
-                }) { translate -> follow(translate) }
+                }) { translate -> follow(translate = translate) }
             } catch (error: Exception) {
                 if (error is CancellationException || following) throw error
                 // The pair cannot be translated at all (an unsupported language): still show the captions.
@@ -1429,6 +1439,7 @@ class AppViewModel internal constructor(
                 translationError = if (online) onlineReason else reason,
                 statusMessage = status,
                 onlineTranslationFailed = asksAboutOnlineFailure(current),
+                onlineTranslationFailureDetail = error.message,
             )
         }
     }

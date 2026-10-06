@@ -576,6 +576,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 OnlineTranslationFailedDialog(
                     onUseOnDevice = viewModel::useOnDeviceTranslation,
                     onKeepGoogle = viewModel::dismissOnlineTranslationFailure,
+                    detail = state.onlineTranslationFailureDetail,
                 )
             }
             OnDeviceFallbackNotice(state.onDeviceFallbackNotice, viewModel::consumeOnDeviceFallbackNotice)

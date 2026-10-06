@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -107,9 +108,14 @@ class OnlineTranslationUiTest {
         var keptGoogle = 0
         composeRule.setContent {
             DualSubTheme {
-                OnlineTranslationFailedDialog(onUseOnDevice = { usedOnDevice++ }, onKeepGoogle = { keptGoogle++ })
+                OnlineTranslationFailedDialog(
+                    onUseOnDevice = { usedOnDevice++ },
+                    onKeepGoogle = { keptGoogle++ },
+                    detail = "Google Translate refused the request (HTTP 429 or 403).",
+                )
             }
         }
+        composeRule.onNodeWithTag("online_translation_failure_detail").assertIsDisplayed()
         composeRule.onNodeWithTag("keep_google_translate").performClick()
         composeRule.onNodeWithTag("use_on_device_translation").performClick()
         assertEquals(1, keptGoogle)

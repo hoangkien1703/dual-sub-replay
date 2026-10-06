@@ -49,7 +49,8 @@ Paths below are relative to
   Settings → Translation → Languages on this device screen (`ui/LanguageDownloads.kt`).
 - `translation/GoogleWebTranslator.kt` is the default engine in the GitHub build (Settings →
   Translation → Google Translate, `translation/TranslationEngine.kt`). It calls Google Translate's
-  unofficial web endpoint with its own caches; `AppViewModel.translateText` routes every
+  unofficial web endpoints with its own caches, sending upcoming sentences in one batch request
+  (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
   translation through the chosen engine. A failure shows `ui/OnlineTranslationNotice.kt`'s dialog
   and a switch-back button on the transcript bar, or, with "Switch to on-device automatically"
   on, moves that video to on-device translation (`DualSubUiState.onDeviceFallback`).

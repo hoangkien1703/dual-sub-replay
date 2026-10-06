@@ -183,6 +183,58 @@ be reasonable if the owner prefers.
   and subtitles continue with on-device translation (after the model download if needed).
 - [ ] Final-head CI: all four Android CI jobs pass.
 
+## Revision: fewer requests and a dark dialog
+
+The owner's phone test (2026-10-06) showed "Google Translate stopped working" after a few minutes,
+and the dialog appeared in Material's light default colors. They asked why other projects keep
+working and for a dialog that suits the dark theme.
+
+### Cause
+
+- Every subtitle row cost one request for its sentence plus one per row prefix, sent back to back
+  (often 3 to 4 requests per sentence). Google throttles bursts from one client with HTTP 429.
+- One failed request (a 429, a timeout on mobile data) stopped translation for the rest of the
+  video. There was no retry.
+- The player root is not wrapped in `DualSubTheme`, so the dialog used Material's light defaults.
+
+### What other projects do
+
+Subtitle and page-translation extensions send many texts per request to the same free endpoints
+(`translate_a/t`, which takes repeated `q` fields and answers a JSON array), cache results, and
+retry later instead of giving up. Tested from the dev machine on 2026-10-06: `translate_a/t` with
+`client=gtx` answered 200 to 60 quick batch requests, `clients5.google.com/translate_a/t` with
+`client=dict-chrome-ex` also works, while `translate_a/single` with `client=gtx` answered 429.
+Chrome's own `translate-pa.googleapis.com/v1/translateHtml` also works but needs Chrome's API key,
+so it is not used.
+
+### Changes
+
+1. `GoogleWebTranslator.translateAll`: cached texts are skipped, the rest go in batches of up to
+   32 texts / 4,000 characters to `translate_a/t` (`gtx`), then `clients5` (`dict-chrome-ex`), then
+   the old one-text `translate_a/single` (`at`) when an endpoint answers 403/429. The working
+   endpoint is remembered.
+2. Throttling (all endpoints refused), HTTP 5xx and network errors are retried after 2 s and 6 s
+   before the failure is shown. Other errors are not retried.
+3. `translatePlaybackWindow` gets an optional `prefetch`: before a row is translated, the Google
+   engine receives that row's sentence and prefixes plus the next untranslated sentences in the
+   window (up to 8 sentences) in one request. Rows then read their texts from the cache, so a video
+   costs roughly one request per 8 sentences instead of 3 to 4 per sentence.
+4. The failure dialog applies `DualSubTheme` itself (dark teal surface, accent buttons), shows a
+   cloud-off icon, makes "Use on-device translation" the filled button, and shows the English
+   diagnostic reason (for example the HTTP status) in small text so a report says why it failed.
+
+### Acceptance criteria
+
+- [x] Many texts go in one request, repeats and cached texts are not sent, and later calls only
+  send new texts (`GoogleWebTranslatorTest`).
+- [x] A refused endpoint hands over to the next and is remembered; short outages are retried;
+  throttling that outlasts the retries fails; client errors are not retried (`GoogleWebTranslatorTest`).
+- [x] The prefetch sends the row's sentence, its prefixes and the next untranslated sentences once
+  each (`TranslationPrefetchTest`).
+- [ ] The dialog shows the failure detail (`OnlineTranslationUiTest`, managed device in CI).
+- [ ] Owner phone check: a long Japanese video keeps translating with Google; the dialog matches
+  the dark theme.
+
 ## Implementation result
 
 Implemented as planned, with these details:
@@ -217,3 +269,9 @@ Implemented as planned, with these details:
 - Managed-device tests, the F-Droid build and the owner's phone check: run by CI and the owner.
 - The F-Droid jobs on the first version's CI run were cancelled without ever getting a runner
   (no steps, no logs), so they say nothing about this change.
+
+### Fewer-requests revision validation result
+
+- Local (Linux, Android SDK 36): `formatCheck complexityCheck testDebugUnitTest lintDebug
+  assembleDebug assembleDebugAndroidTest` and `tools/tests` passed; 443 unit tests, 0 failures.
+- Managed-device tests and the owner's phone check: CI and the owner.

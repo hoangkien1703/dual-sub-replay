@@ -41,12 +41,16 @@ internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
  * Original rows keep following playback when translation fails: [onTranslationFailure] reports the
  * error once, and no further row is translated until [CaptionPlaybackRequest.translationAttempt]
  * changes, so a failing model is not retried in a loop.
+ *
+ * [prefetch], when given, receives the texts of the next row and of the upcoming sentences first, so an
+ * online engine can translate them in one request and [translate] then finds them cached.
  */
 internal suspend fun translatePlaybackWindow(
     store: SubtitleStore,
     requests: StateFlow<CaptionPlaybackRequest>,
     translate: suspend (String) -> String,
     onTranslationFailure: (Exception) -> Unit = {},
+    prefetch: (suspend (List<String>) -> Unit)? = null,
     onWindow: (List<SubtitleSegment>, Boolean) -> Unit,
 ) {
     var indices = IntRange.EMPTY
@@ -78,6 +82,7 @@ internal suspend fun translatePlaybackWindow(
         }
         rows =
             try {
+                prefetch?.invoke(upcomingTranslationTexts(rows, next))
                 translateRow(rows, next, translate)
             } catch (error: Exception) {
                 // Cancelling this loop still ends it; a translator error only stops translating.
@@ -100,17 +105,43 @@ private suspend fun translateRow(
     translate: suspend (String) -> String,
 ): List<SubtitleSegment> {
     val sentence = rows[index].sentence
-    val translated = translate(sentence?.text ?: rows[index].originalText).trim()
+    val texts = rowTranslationTexts(rows[index])
+    val translated = translate(texts.first()).trim()
     // Translating each row's sentence prefix locates where that row ends in the full translation.
     val prefixes =
         try {
-            sentence?.cuts?.map { cut -> translate(sentence.text.substring(0, cut).trim()) }
+            sentence?.let { texts.drop(1).map { prefix -> translate(prefix) } }
         } catch (_: Exception) {
             currentCoroutineContext().ensureActive()
             null // Split the sentence's translation proportionally instead.
         }
     currentCoroutineContext().ensureActive()
     return withTranslation(rows, index, translated, prefixes)
+}
+
+/** What translating [row] sends: its whole sentence, then each row's sentence prefix (or just the row's text). */
+internal fun rowTranslationTexts(row: SubtitleSegment): List<String> {
+    val sentence = row.sentence ?: return listOf(row.originalText)
+    return listOf(sentence.text) + sentence.cuts.map { cut -> sentence.text.substring(0, cut).trim() }
+}
+
+/** Sentences an online engine translates in one request: row [index]'s and the next untranslated ones. */
+internal const val PREFETCH_SENTENCES = 8
+
+/** The texts of row [index] and of up to [PREFETCH_SENTENCES] − 1 later untranslated sentences in the window. */
+internal fun upcomingTranslationTexts(
+    rows: List<SubtitleSegment>,
+    index: Int,
+    maxSentences: Int = PREFETCH_SENTENCES,
+): List<String> {
+    val sentences = LinkedHashMap<String, SubtitleSegment>()
+    for (position in index..rows.lastIndex) {
+        val row = rows[position]
+        if (position != index && row.translatedText != null) continue
+        sentences.putIfAbsent(row.sentence?.text ?: row.originalText, row)
+        if (sentences.size >= maxSentences) break
+    }
+    return sentences.values.flatMap(::rowTranslationTexts).distinct()
 }
 
 /**
