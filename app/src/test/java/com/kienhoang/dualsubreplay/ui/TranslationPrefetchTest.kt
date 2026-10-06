@@ -14,21 +14,21 @@ class TranslationPrefetchTest {
         assertEquals(listOf("Plain row"), rowTranslationTexts(SubtitleSegment(1, 0, 1000, "Plain row")))
     }
 
-    @Test fun upcomingSentencesAreSentOnceSkippingTranslatedRows() {
+    @Test fun theNextMinuteOfUntranslatedSentencesIsSentOnce() {
         val rows =
             listOf(
-                SubtitleSegment(0, 0, 1000, "Earlier", translatedText = null),
-                SubtitleSegment(1, 1000, 2000, "Hello there,", sentence = sentence),
-                SubtitleSegment(2, 2000, 3000, "my friend.", sentence = sentence.copy(index = 1)),
-                SubtitleSegment(3, 3000, 4000, "Done", translatedText = "Xong"),
-                SubtitleSegment(4, 4000, 5000, "Next one"),
-                SubtitleSegment(5, 5000, 6000, "And another"),
+                SubtitleSegment(0, 0, 1000, "Earlier"),
+                SubtitleSegment(1, 1_000, 2_000, "Hello there,", sentence = sentence),
+                SubtitleSegment(2, 2_000, 3_000, "my friend.", sentence = sentence.copy(index = 1)),
+                SubtitleSegment(3, 3_000, 4_000, "Done", translatedText = "Xong"),
+                SubtitleSegment(4, 30_000, 31_000, "Half a minute later"),
+                SubtitleSegment(5, 61_000, 62_000, "Exactly one minute later"),
+                SubtitleSegment(6, 61_001, 63_000, "Too far ahead"),
             )
         assertEquals(
-            listOf("Hello there, my friend.", "Hello there,", "Next one", "And another"),
+            listOf("Hello there, my friend.", "Hello there,", "Half a minute later", "Exactly one minute later"),
             upcomingTranslationTexts(rows, 1),
         )
-        // The limit counts sentences, starting with the row being translated.
-        assertEquals(listOf("Hello there, my friend.", "Hello there,", "Next one"), upcomingTranslationTexts(rows, 1, maxSentences = 2))
+        assertEquals(listOf("Hello there, my friend.", "Hello there,"), upcomingTranslationTexts(rows, 1, aheadMs = 5_000))
     }
 }

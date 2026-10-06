@@ -272,6 +272,7 @@ object SubtitleMerger {
         maxCharacters: Int,
     ): List<String> {
         val safeMax = maxCharacters.coerceAtLeast(16)
+        if (isMostlyJapaneseOrChinese(text)) return splitCjkChunks(text, cjkMaxCharacters(safeMax))
         val pieces = mutableListOf<String>()
         text.split(sentenceBreak).forEach { sentence ->
             val trimmed = sentence.trim()
@@ -287,6 +288,85 @@ object SubtitleMerger {
             }
         }
         return mergeTinyTrailingChunk(pieces, safeMax)
+    }
+
+    /**
+     * Japanese and Chinese rows: a glyph is about twice as wide as a Latin letter, so rows hold half as
+     * many characters. Cuts follow 、，。 first, then a kana-to-kanji (or katakana) change, which
+     * usually starts a new word, and only then a fixed width. A very short clause ("でも、") shares a
+     * row with its neighbour when they fit together; other clauses keep a row each.
+     */
+    private fun splitCjkChunks(
+        text: String,
+        max: Int,
+    ): List<String> {
+        // Pieces keep their spaces until the end, so every row stays an exact slice of the sentence.
+        val packed = mutableListOf<String>()
+        text.split(cjkClauseBreak).flatMap { cutCjkClause(it, max) }.forEach { piece ->
+            val last = packed.lastOrNull()
+            if (last != null && joinsCjkPiece(last, piece, max)) packed[packed.lastIndex] = last + piece else packed += piece
+        }
+        return packed.map(String::trim).filter(String::isNotEmpty)
+    }
+
+    /** Spaces always join; otherwise a very short clause joins its neighbour when both fit and no sentence ends between. */
+    private fun joinsCjkPiece(
+        last: String,
+        piece: String,
+        max: Int,
+    ): Boolean {
+        if (piece.isBlank() || last.isBlank()) return true
+        val tiny = minOf(last.trim().length, piece.trim().length) < max / 3
+        val fits = last.length + piece.length <= max
+        return tiny && fits && last.trimEnd().last() !in CJK_SENTENCE_ENDS
+    }
+
+    private fun cutCjkClause(
+        clause: String,
+        max: Int,
+    ): List<String> {
+        val pieces = mutableListOf<String>()
+        var start = 0
+        while (clause.length - start > max) {
+            val cut =
+                (start + max downTo start + max / 2 + 1).firstOrNull { startsCjkWord(clause, it) }
+                    ?: (start + max)
+            pieces += clause.substring(start, cut)
+            start = cut
+        }
+        pieces += clause.substring(start)
+        return pieces
+    }
+
+    /** A kanji or katakana word after hiragana (a particle or verb ending) is a natural place to cut. */
+    private fun startsCjkWord(
+        text: String,
+        index: Int,
+    ): Boolean {
+        if (index <= 0 || index >= text.length) return false
+        val before = Character.UnicodeScript.of(text[index - 1].code)
+        val after = text[index]
+        val afterScript = Character.UnicodeScript.of(after.code)
+        val katakanaWord = afterScript == Character.UnicodeScript.KATAKANA && after !in KATAKANA_CONTINUATIONS
+        val wordStart = afterScript == Character.UnicodeScript.HAN || katakanaWord
+        return before == Character.UnicodeScript.HIRAGANA && wordStart
+    }
+
+    /** Japanese or Chinese text (not Korean, which spaces its words and keeps the regular rules). */
+    private fun isMostlyJapaneseOrChinese(text: String): Boolean {
+        val letters = text.filter(Char::isLetter)
+        if (letters.isEmpty()) return false
+        val cjk =
+            letters.count {
+                when (Character.UnicodeScript.of(it.code)) {
+                    Character.UnicodeScript.HAN,
+                    Character.UnicodeScript.HIRAGANA,
+                    Character.UnicodeScript.KATAKANA,
+                    -> true
+                    else -> false
+                }
+            }
+        return cjk * 2 > letters.length
     }
 
     private fun mergeTinyTrailingChunk(
@@ -428,6 +508,17 @@ object SubtitleMerger {
 }
 
 internal const val SPLIT_SENTENCE_MAX_CHARACTERS = 48
+
+/** Japanese and Chinese rows hold half as many characters as [SPLIT_SENTENCE_MAX_CHARACTERS], never fewer than 12. */
+internal fun cjkMaxCharacters(maxCharacters: Int): Int = (maxCharacters / 2).coerceAtLeast(12)
+
+private const val CJK_SENTENCE_ENDS = "。！？!?"
+
+/** Long-vowel marks and small katakana continue the previous sound, so a row never starts with one. */
+private const val KATAKANA_CONTINUATIONS = "ーァィゥェォッャュョヮヵヶ"
+
+/** A row may end after 、，。 and similar marks; the mark stays with the text before it. */
+private val cjkClauseBreak = Regex("(?<=[、，,；;：:。！？!?])")
 
 // Keep Android's regex engine happy: both lookbehinds have fixed width.
 // The previous `*` inside lookbehind could throw PatternSyntaxException at runtime.

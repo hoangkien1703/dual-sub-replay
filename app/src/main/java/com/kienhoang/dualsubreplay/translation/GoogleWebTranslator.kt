@@ -33,8 +33,8 @@ internal const val MAX_GOOGLE_RESPONSE_BYTES = 1024 * 1024
 private const val GOOGLE_REQUEST_TIMEOUT_MS = 15_000L
 
 /** One request carries at most this many texts and characters, well under the endpoints' limits. */
-internal const val MAX_GOOGLE_BATCH_TEXTS = 32
-internal const val MAX_GOOGLE_BATCH_CHARS = 4_000
+internal const val MAX_GOOGLE_BATCH_TEXTS = 128
+internal const val MAX_GOOGLE_BATCH_CHARS = 5_000
 
 /** Pauses before retrying a throttled, failing or unreachable Google; after the last one the error is shown. */
 internal val GOOGLE_RETRY_DELAYS_MS = listOf(2_000L, 6_000L)

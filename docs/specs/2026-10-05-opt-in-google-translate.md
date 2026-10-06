@@ -270,8 +270,20 @@ Implemented as planned, with these details:
 - The F-Droid jobs on the first version's CI run were cancelled without ever getting a runner
   (no steps, no logs), so they say nothing about this change.
 
+### One minute ahead (2026-10-06)
+
+The owner confirmed the batched build "worked better" and asked to translate the next minute of
+subtitles too. The prefetch now covers every untranslated sentence starting within 60 s of the row
+being translated (`PREFETCH_AHEAD_MS`) instead of 8 sentences, and a batch may hold up to 128 texts
+and 5,000 characters. On 2026-10-06 the batch endpoint answered 120 texts and an 8,000-character
+text in single requests, so these limits leave room. A minute of speech is usually one request.
+The window already follows playback 60 s ahead (`SUBTITLE_LOOK_AHEAD_MS`), so rows fill from the
+cache as playback reaches them. `TranslationPrefetchTest` covers the horizon.
+
 ### Fewer-requests revision validation result
 
 - Local (Linux, Android SDK 36): `formatCheck complexityCheck testDebugUnitTest lintDebug
   assembleDebug assembleDebugAndroidTest` and `tools/tests` passed; 443 unit tests, 0 failures.
+- With the one-minute prefetch and [shorter Japanese rows](2026-10-06-japanese-short-rows.md): the
+  same commands passed; 448 unit tests, 0 failures.
 - Managed-device tests and the owner's phone check: CI and the owner.

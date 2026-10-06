@@ -42,8 +42,8 @@ internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
  * error once, and no further row is translated until [CaptionPlaybackRequest.translationAttempt]
  * changes, so a failing model is not retried in a loop.
  *
- * [prefetch], when given, receives the texts of the next row and of the upcoming sentences first, so an
- * online engine can translate them in one request and [translate] then finds them cached.
+ * [prefetch], when given, receives the texts of the next row and of the next minute's sentences first,
+ * so an online engine can translate them in one request and [translate] then finds them cached.
  */
 internal suspend fun translatePlaybackWindow(
     store: SubtitleStore,
@@ -125,21 +125,25 @@ internal fun rowTranslationTexts(row: SubtitleSegment): List<String> {
     return listOf(sentence.text) + sentence.cuts.map { cut -> sentence.text.substring(0, cut).trim() }
 }
 
-/** Sentences an online engine translates in one request: row [index]'s and the next untranslated ones. */
-internal const val PREFETCH_SENTENCES = 8
+/** How far past the row being translated an online engine translates in the same request. */
+internal const val PREFETCH_AHEAD_MS = 60_000L
 
-/** The texts of row [index] and of up to [PREFETCH_SENTENCES] − 1 later untranslated sentences in the window. */
+/**
+ * The texts of row [index] and of every later untranslated sentence that starts within [aheadMs] of
+ * it (in practice the next minute of the window), each sentence once.
+ */
 internal fun upcomingTranslationTexts(
     rows: List<SubtitleSegment>,
     index: Int,
-    maxSentences: Int = PREFETCH_SENTENCES,
+    aheadMs: Long = PREFETCH_AHEAD_MS,
 ): List<String> {
+    val horizon = rows[index].startMs + aheadMs
     val sentences = LinkedHashMap<String, SubtitleSegment>()
     for (position in index..rows.lastIndex) {
         val row = rows[position]
+        if (row.startMs > horizon) break
         if (position != index && row.translatedText != null) continue
         sentences.putIfAbsent(row.sentence?.text ?: row.originalText, row)
-        if (sentences.size >= maxSentences) break
     }
     return sentences.values.flatMap(::rowTranslationTexts).distinct()
 }
