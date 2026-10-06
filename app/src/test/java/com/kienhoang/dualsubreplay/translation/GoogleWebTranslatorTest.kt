@@ -153,12 +153,16 @@ class GoogleWebTranslatorTest {
             assertEquals(2, calls)
         }
 
-    @Test fun throttlingThatOutlastsTheRetriesFails() =
+    @Test fun retriesWaitOneThreeAndSevenSeconds() {
+        assertEquals(listOf(1_000L, 3_000L, 7_000L), GOOGLE_RETRY_DELAYS_MS)
+    }
+
+    @Test fun aBlockOnEveryEndpointFailsWithoutWaitingForRetries() =
         runBlocking {
             var calls = 0
             val refused =
                 GoogleWebTranslator(
-                    retryDelaysMs = listOf(0L, 0L),
+                    retryDelaysMs = listOf(0L, 0L, 0L),
                     client =
                         fakeGoogle { _, _ ->
                             calls++
@@ -167,9 +171,53 @@ class GoogleWebTranslatorTest {
                 )
             val refusal = runCatching { refused.translate("ja", "en", "テスト") }.exceptionOrNull()
             assertTrue(refusal is GoogleTranslateException)
-            assertTrue(refusal!!.message!!.contains("429"))
-            // Every endpoint, three times (the first try and two retries).
-            assertEquals(GoogleEndpoint.entries.size * 3, calls)
+            assertTrue((refusal as GoogleTranslateException).blocked)
+            assertTrue(refusal.message!!.contains("HTTP 429"))
+            // Each endpoint once: waiting a few seconds does not lift a block.
+            assertEquals(GoogleEndpoint.entries.size, calls)
+        }
+
+    @Test fun serverErrorsThatOutlastTheRetriesFail() =
+        runBlocking {
+            var calls = 0
+            val failing =
+                GoogleWebTranslator(
+                    retryDelaysMs = listOf(0L, 0L, 0L),
+                    client =
+                        fakeGoogle { _, _ ->
+                            calls++
+                            503 to ""
+                        },
+                )
+            val failure = runCatching { failing.translate("ja", "en", "テスト") }.exceptionOrNull()
+            assertTrue(failure is GoogleTranslateException)
+            assertTrue(failure!!.message!!.contains("503"))
+            // The first try and three retries.
+            assertEquals(4, calls)
+        }
+
+    @Test fun recheckSendsOneRequestPastTheCacheAndCachesTheResult() =
+        runBlocking {
+            var blocked = true
+            var calls = 0
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = listOf(0L, 0L, 0L),
+                    client =
+                        fakeGoogle { _, texts ->
+                            calls++
+                            if (blocked) 429 to "" else 200 to batchReply(texts.map { "en:$it" })
+                        },
+                )
+            assertFalse(translator.responds("ja", "en", "テスト"))
+            assertEquals(GoogleEndpoint.entries.size, calls)
+            assertEquals(null, translator.cachedTranslation("ja", "en", "テスト"))
+            blocked = false
+            assertTrue(translator.responds("ja", "en", "テスト"))
+            assertEquals("en:テスト", translator.cachedTranslation("ja", "en", "テスト"))
+            // The cached text is still sent again: the check must reach Google.
+            assertTrue(translator.responds("ja", "en", "テスト"))
+            assertEquals(GoogleEndpoint.entries.size + 2, calls)
         }
 
     @Test fun clientErrorsAreNotRetried() =

@@ -18,9 +18,8 @@
     <string name="status_live_subtitles_title">ライブ字幕</string>
     <string name="status_retrying_full_transcript">全文字幕を再試行しています…</string>
     <string name="status_retry_full_transcript">全文字幕を再試行</string>
-    <string name="status_google_translate_failed_title">Google 翻訳が使えなくなりました</string>
-    <string name="status_google_translate_failed_message">元の字幕はそのまま再生されます。端末上の翻訳に戻すか、Google 翻訳のまま後で再試行してください。</string>
-    <string name="status_use_on_device_translation">端末上の翻訳を使う</string>
-    <string name="status_keep_google_translate">Google 翻訳を続ける</string>
-    <string name="status_switched_to_on_device">Google 翻訳が使えなくなったため、この動画は端末上の翻訳に切り替えました。</string>
+    <string name="translation_issue_button">翻訳の問題</string>
+    <string name="translation_issue_on_device_title">端末上の翻訳を使用中</string>
+    <string name="translation_issue_on_device_message">Google 翻訳が現在使えないため、この動画は端末上で翻訳しています。2 分ごとと次の動画で Google をもう一度試します。</string>
+    <string name="translation_issue_try_google">Google をもう一度試す</string>
 </resources>

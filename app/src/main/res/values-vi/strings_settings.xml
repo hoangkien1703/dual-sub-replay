@@ -136,7 +136,5 @@
     <string name="language_downloads_retry">Thử lại</string>
     <string name="language_downloads_back">Quay lại</string>
     <string name="settings_google_translate_title">Google Dịch (trực tuyến)</string>
-    <string name="settings_google_translate_description">Bật theo mặc định. Bản dịch tốt hơn, nhất là tiếng Nhật. Gửi nội dung phụ đề tới Google. Đây không phải dịch vụ chính thức của Google nên có thể ngừng hoạt động. Tắt để dịch trên thiết bị của bạn.</string>
-    <string name="settings_auto_switch_on_device_title">Tự động chuyển sang dịch trên thiết bị</string>
-    <string name="settings_auto_switch_on_device_description">Khi Google Dịch ngừng hoạt động, dùng dịch trên thiết bị cho video đó mà không hỏi.</string>
+    <string name="settings_google_translate_description">Bật theo mặc định. Bản dịch tốt hơn, nhất là tiếng Nhật. Gửi nội dung phụ đề tới Google. Đây không phải dịch vụ chính thức của Google nên có thể ngừng hoạt động; khi đó ứng dụng dịch trên thiết bị cho đến khi Google hoạt động lại. Tắt để luôn dịch trên thiết bị của bạn.</string>
 </resources>

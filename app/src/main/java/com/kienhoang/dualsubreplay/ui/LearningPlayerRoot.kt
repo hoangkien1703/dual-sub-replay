@@ -496,7 +496,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     val phraseSelection = remember { PhraseSelectionController() }
     val translationEngineActions =
-        remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine, viewModel::setAutoSwitchToOnDevice) }
+        remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine, viewModel::tryGoogleTranslationAgain) }
     CompositionLocalProvider(
         LocalPhraseSelection provides phraseSelection,
         LocalLanguageDownloads provides viewModel.languageDownloads,
@@ -572,14 +572,6 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 }
             }
 
-            if (state.onlineTranslationFailed && state.translatesWithGoogle()) {
-                OnlineTranslationFailedDialog(
-                    onUseOnDevice = viewModel::useOnDeviceTranslation,
-                    onKeepGoogle = viewModel::dismissOnlineTranslationFailure,
-                    detail = state.onlineTranslationFailureDetail,
-                )
-            }
-            OnDeviceFallbackNotice(state.onDeviceFallbackNotice, viewModel::consumeOnDeviceFallbackNotice)
 
 
         }

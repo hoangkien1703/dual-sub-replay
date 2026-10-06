@@ -2,9 +2,6 @@ package com.kienhoang.dualsubreplay.translation
 
 internal const val TRANSLATION_ENGINE_PREFERENCE = "translation_engine"
 
-/** Settings → Translation: when Google fails, quietly use on-device translation for that video. Off by default. */
-internal const val AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE = "auto_switch_to_on_device"
-
 /** Which engine translates subtitles. Google online is the default where the build offers it. */
 enum class TranslationEngine(
     val storageValue: String,

@@ -51,9 +51,9 @@ Paths below are relative to
   Translation → Google Translate, `translation/TranslationEngine.kt`). It calls Google Translate's
   unofficial web endpoints with its own caches, sending upcoming sentences in one batch request
   (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
-  translation through the chosen engine. A failure shows `ui/OnlineTranslationNotice.kt`'s dialog
-  and a switch-back button on the transcript bar, or, with "Switch to on-device automatically"
-  on, moves that video to on-device translation (`DualSubUiState.onDeviceFallback`).
+  translation through the chosen engine. A failure moves that video to on-device translation
+  (`DualSubUiState.onDeviceFallback`), shows `ui/OnlineTranslationNotice.kt`'s top-right icon, and
+  checks Google again every 2 minutes; the next load tries Google first.
   `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build, which stays on-device.
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes with
@@ -91,7 +91,7 @@ Paths below are relative to
   boundary so it can change without rewriting the learning UI.
 - No user-provided/developer-provisioned service key is required for translation. The GitHub
   build translates with Google Translate online by default (owner decision 2026-10-05) and must
-  keep a Settings switch to on-device translation and a switch back when Google fails. The
+  keep a Settings switch to on-device translation and fall back to it when Google fails. The
   F-Droid build never translates online. YouTube's internal client key handling is an extraction detail, not a
   new application API-key setup requirement.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding

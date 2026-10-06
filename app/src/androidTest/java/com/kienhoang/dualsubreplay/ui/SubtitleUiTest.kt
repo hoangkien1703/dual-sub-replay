@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.getValue
@@ -338,13 +339,16 @@ class SubtitleUiTest {
             )
         composeRule.setContent {
             DualSubTheme {
-                Box(Modifier.fillMaxWidth().height(360.dp)) {
-                    TranslatedSubtitleTimeline(state, onRetryTranslation = { retries++ }, onWordClick = {}, onReplay = {})
+                Column {
+                    TranslationIssueButton(state.translationIssue(), onTryGoogleAgain = {}, onRetryTranslation = { retries++ })
+                    Box(Modifier.fillMaxWidth().height(360.dp)) {
+                        TranslatedSubtitleTimeline(state, onWordClick = {}, onReplay = {})
+                    }
                 }
             }
         }
         composeRule.onNodeWithText("Original line 0").assertIsDisplayed()
-        composeRule.onNodeWithText("Translation unavailable").assertIsDisplayed()
+        composeRule.onNodeWithTag("translation_issue_button").performClick()
         composeRule.onNodeWithText("The translation model download took too long.").assertIsDisplayed()
         composeRule.onNodeWithText("Retry translation").performClick()
         assertEquals(1, retries)

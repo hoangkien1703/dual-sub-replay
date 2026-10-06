@@ -136,7 +136,5 @@
     <string name="language_downloads_retry">Coba lagi</string>
     <string name="language_downloads_back">Kembali</string>
     <string name="settings_google_translate_title">Google Terjemahan (online)</string>
-    <string name="settings_google_translate_description">Aktif secara default. Terjemahan lebih baik, terutama untuk bahasa Jepang. Mengirim teks subtitle ke Google. Ini bukan layanan resmi Google sehingga bisa berhenti berfungsi. Nonaktifkan untuk menerjemahkan di perangkat Anda.</string>
-    <string name="settings_auto_switch_on_device_title">Beralih ke perangkat secara otomatis</string>
-    <string name="settings_auto_switch_on_device_description">Saat Google Terjemahan berhenti berfungsi, gunakan terjemahan di perangkat untuk video itu tanpa bertanya.</string>
+    <string name="settings_google_translate_description">Aktif secara default. Terjemahan lebih baik, terutama untuk bahasa Jepang. Mengirim teks subtitle ke Google. Ini bukan layanan resmi Google sehingga bisa berhenti berfungsi; saat itu aplikasi menerjemahkan di perangkat Anda sampai Google berfungsi lagi. Nonaktifkan untuk selalu menerjemahkan di perangkat Anda.</string>
 </resources>

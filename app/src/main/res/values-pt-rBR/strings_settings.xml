@@ -136,7 +136,5 @@
     <string name="language_downloads_retry">Tentar de novo</string>
     <string name="language_downloads_back">Voltar</string>
     <string name="settings_google_translate_title">Google Tradutor (online)</string>
-    <string name="settings_google_translate_description">Ativado por padrão. Traduções melhores, principalmente do japonês. Envia o texto das legendas ao Google. Não é um serviço oficial do Google, então pode parar de funcionar. Desative para traduzir no seu dispositivo.</string>
-    <string name="settings_auto_switch_on_device_title">Mudar para o dispositivo automaticamente</string>
-    <string name="settings_auto_switch_on_device_description">Quando o Google Tradutor parar de funcionar, usa a tradução no dispositivo para esse vídeo sem perguntar.</string>
+    <string name="settings_google_translate_description">Ativado por padrão. Traduções melhores, principalmente do japonês. Envia o texto das legendas ao Google. Não é um serviço oficial do Google, então pode parar de funcionar; nesse caso, o app traduz no seu dispositivo até o Google voltar a funcionar. Desative para sempre traduzir no seu dispositivo.</string>
 </resources>

@@ -18,9 +18,8 @@
     <string name="status_live_subtitles_title">Subtítulos en directo</string>
     <string name="status_retrying_full_transcript">Reintentando la transcripción completa…</string>
     <string name="status_retry_full_transcript">Reintentar transcripción completa</string>
-    <string name="status_google_translate_failed_title">Google Traductor dejó de funcionar</string>
-    <string name="status_google_translate_failed_message">Los subtítulos originales siguen reproduciéndose. Vuelve a la traducción en el dispositivo o mantén Google Traductor y vuelve a intentarlo más tarde.</string>
-    <string name="status_use_on_device_translation">Usar traducción en el dispositivo</string>
-    <string name="status_keep_google_translate">Mantener Google Traductor</string>
-    <string name="status_switched_to_on_device">Google Traductor dejó de funcionar, así que este video ahora usa la traducción en el dispositivo.</string>
+    <string name="translation_issue_button">Problema de traducción</string>
+    <string name="translation_issue_on_device_title">Usando la traducción en el dispositivo</string>
+    <string name="translation_issue_on_device_message">Google Traductor no funciona en este momento, así que este video se traduce en tu dispositivo. La app vuelve a probar Google cada 2 minutos y en el siguiente video.</string>
+    <string name="translation_issue_try_google">Volver a probar Google</string>
 </resources>

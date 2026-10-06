@@ -12,6 +12,11 @@ automatically, which is off by default)". The [default-engine revision](#revisio
 below supersedes the "off by default" goals and behavior in the original sections, which are kept
 as the history of the first version.
 
+**Revised again on 2026-10-06, before merge.** The owner dropped the dialog and the automatic-switch
+setting: Google retries, then quietly falls back to on-device, and problems show as a top-right
+icon. The [quiet fallback revision](#revision-quiet-fallback-and-a-top-right-icon-2026-10-06)
+supersedes every dialog, transcript-bar and "Switch to on-device automatically" behavior above.
+
 ## Context / problem
 
 - The owner reports that translation is often poor, especially Japanese. In their screenshot
@@ -287,3 +292,52 @@ cache as playback reaches them. `TranslationPrefetchTest` covers the horizon.
 - With the one-minute prefetch and [shorter Japanese rows](2026-10-06-japanese-short-rows.md): the
   same commands passed; 448 unit tests, 0 failures.
 - Managed-device tests and the owner's phone check: CI and the owner.
+
+## Revision: quiet fallback and a top-right icon (2026-10-06)
+
+The owner asked: "now i don't want to show any big dialog, The Google translate will be default,
+and after try up to 3 time (after 1s, 3s, 7s) it will use local engine. when user try to reload
+video or move to next video, app will try Google translate cloud again. all the error like this now
+will be shown in the far top Right of the portrait mode of the app when happen, and users can click
+in to that to show more details". They approved Claude's three recommendations (remove the
+automatic-switch setting, the icon covers translation errors only, the details offer "Try Google
+again") and, on a decision card, two more: switch right away when Google blocks the app, and check
+Google again every 2 minutes.
+
+### Behavior
+
+- No dialog, toast or transcript bar. "Switch to on-device automatically" and its preference are
+  removed (they never shipped).
+- A failing request is retried after 1 s, 3 s and 7 s (`GOOGLE_RETRY_DELAYS_MS`) when Google
+  answered 5xx or could not be reached. When every endpoint answers 403/429 (a block), the error is
+  thrown at once (`GoogleTranslateException.blocked`), since a few seconds do not lift a block.
+- After that, the video translates on the device (`DualSubUiState.onDeviceFallback`). Rows Google
+  already translated keep Google's text from its cache (`GoogleWebTranslator.cachedTranslation`).
+- While falling back, the app sends the current row to Google every 2 minutes during playback
+  (`GOOGLE_RECHECK_INTERVAL_MS`, `GoogleWebTranslator.responds`, no cache, no retries). When Google
+  answers, the video goes back to Google and the icon disappears.
+- Every load (the next video, a language or settings change, a captions retry) tries Google again.
+- A small icon at the end of the app's top bar (`TranslationIssueButton`) shows while there is a
+  translation problem: amber cloud-off for the on-device fallback, red for translation stopped.
+  Tapping it shows the title, an explanation, the English diagnostic detail (for example
+  "HTTP 429"), and one action: **Try Google again** or **Retry translation**. The top bar is the
+  same in landscape, so the icon shows there too; fullscreen hides it like the rest of the bar.
+
+### Acceptance criteria
+
+- Retry delays are 1 s, 3 s and 7 s; a block on every endpoint is not retried; 5xx is tried four
+  times in all (`GoogleWebTranslatorTest`).
+- The recheck bypasses the cache, sends one request and caches a success (`GoogleWebTranslatorTest`).
+- The icon reports nothing without a video or a problem, the fallback with its detail, and a
+  stopped translation before the fallback (`TranslationIssueTest`).
+- The icon opens the details; its action calls "Try Google again" or "Retry translation"
+  (`OnlineTranslationUiTest`, `SubtitleUiTest`, managed device).
+- New strings exist in all 8 locales; removed strings are gone from all of them.
+
+### Quiet-fallback validation result
+
+- Local (Linux, Android SDK 36): `formatCheck complexityCheck testDebugUnitTest lintDebug
+  assembleDebug assembleDebugAndroidTest` and `tools/tests` passed; 458 unit tests, 0 failures.
+- `DualSubApp` reached the 100-line limit, so "Try Google again" reaches the top bar through
+  `TranslationEngineActions` instead of a new parameter.
+- Managed-device tests and the F-Droid build: CI. Physical phone: pending the owner's check.

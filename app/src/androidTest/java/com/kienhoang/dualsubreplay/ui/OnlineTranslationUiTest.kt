@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
@@ -78,69 +79,59 @@ class OnlineTranslationUiTest {
     fun googleSwitchIsHiddenWhenTheBuildCannotTranslateOnline() {
         showTranslationSettings(OnlineTranslationSettings(available = false, engine = TranslationEngine.GOOGLE_WEB))
         composeRule.onNodeWithTag("google_translate_switch").assertDoesNotExist()
-        composeRule.onNodeWithTag("auto_switch_on_device_switch").assertDoesNotExist()
     }
 
     @Test
-    fun autoSwitchIsOffByDefaultAndCanBeTurnedOn() {
-        val autoSwitch = mutableListOf<Boolean>()
-        showTranslationSettings(
-            OnlineTranslationSettings(available = true, engine = TranslationEngine.GOOGLE_WEB),
-            TranslationEngineActions(select = {}, setAutoSwitchToOnDevice = { autoSwitch += it }),
-        )
-        composeRule
-            .onNodeWithTag("auto_switch_on_device_switch")
-            .performScrollTo()
-            .assertIsOff()
-            .performClick()
-        assertEquals(listOf(true), autoSwitch)
-    }
-
-    @Test
-    fun autoSwitchIsHiddenWhileTranslatingOnDevice() {
-        showTranslationSettings(OnlineTranslationSettings(available = true, engine = TranslationEngine.ON_DEVICE))
-        composeRule.onNodeWithTag("auto_switch_on_device_switch").assertDoesNotExist()
-    }
-
-    @Test
-    fun failureDialogOffersBothChoices() {
-        var usedOnDevice = 0
-        var keptGoogle = 0
+    fun fallbackIconShowsWhyAndTriesGoogleAgain() {
+        var triedGoogle = 0
+        var retried = 0
         composeRule.setContent {
             DualSubTheme {
-                OnlineTranslationFailedDialog(
-                    onUseOnDevice = { usedOnDevice++ },
-                    onKeepGoogle = { keptGoogle++ },
-                    detail = "Google Translate refused the request (HTTP 429 or 403).",
+                TranslationIssueButton(
+                    TranslationIssue.OnDeviceFallback("Google Translate refused the request (HTTP 429)."),
+                    onTryGoogleAgain = { triedGoogle++ },
+                    onRetryTranslation = { retried++ },
                 )
             }
         }
-        composeRule.onNodeWithTag("online_translation_failure_detail").assertIsDisplayed()
-        composeRule.onNodeWithTag("keep_google_translate").performClick()
-        composeRule.onNodeWithTag("use_on_device_translation").performClick()
-        assertEquals(1, keptGoogle)
-        assertEquals(1, usedOnDevice)
+        composeRule.onNodeWithTag("translation_issue_details").assertDoesNotExist()
+        composeRule.onNodeWithTag("translation_issue_button").performClick()
+        composeRule.onNodeWithText("Using on-device translation").assertIsDisplayed()
+        composeRule.onNodeWithText("Google Translate refused the request (HTTP 429).").assertIsDisplayed()
+        composeRule.onNodeWithText("Try Google again").performClick()
+        assertEquals(1, triedGoogle)
+        assertEquals(0, retried)
+        composeRule.onNodeWithTag("translation_issue_details").assertDoesNotExist()
     }
 
     @Test
-    fun unavailableBarOffersOnDeviceOnlyAfterAGoogleFailure() {
-        var usedOnDevice = 0
+    fun unavailableIconShowsTheReasonAndRetries() {
+        var triedGoogle = 0
+        var retried = 0
         composeRule.setContent {
             DualSubTheme {
-                TranslationUnavailableBar("Google Translate stopped working", onRetry = {}, onUseOnDevice = { usedOnDevice++ })
+                TranslationIssueButton(
+                    TranslationIssue.Unavailable("The translation model download took too long."),
+                    onTryGoogleAgain = { triedGoogle++ },
+                    onRetryTranslation = { retried++ },
+                )
             }
         }
-        composeRule.onNodeWithTag("bar_use_on_device_translation").performClick()
-        assertEquals(1, usedOnDevice)
+        composeRule.onNodeWithTag("translation_issue_button").performClick()
+        composeRule.onNodeWithText("Translation unavailable").assertIsDisplayed()
+        composeRule.onNodeWithText("The translation model download took too long.").assertIsDisplayed()
+        composeRule.onNodeWithText("Retry translation").performClick()
+        assertEquals(0, triedGoogle)
+        assertEquals(1, retried)
     }
 
     @Test
-    fun unavailableBarHasNoSwitchBackForOnDeviceFailures() {
+    fun noIconWhileTranslationWorks() {
         composeRule.setContent {
             DualSubTheme {
-                TranslationUnavailableBar("Translation is unavailable right now.", onRetry = {})
+                TranslationIssueButton(null, onTryGoogleAgain = {}, onRetryTranslation = {})
             }
         }
-        composeRule.onNodeWithTag("bar_use_on_device_translation").assertDoesNotExist()
+        composeRule.onNodeWithTag("translation_issue_button").assertDoesNotExist()
     }
 }

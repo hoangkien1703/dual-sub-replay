@@ -31,5 +31,4 @@
     <string name="player_webview_renderer_crashed_reload">O renderizador do Android WebView travou. Toque em Recarregar para recriá-lo.</string>
     <string name="player_webview_renderer_reclaimed_reload">O Android parou o renderizador do WebView para liberar memória. Toque em Recarregar para recriá-lo.</string>
     <string name="player_reload">Recarregar</string>
-    <string name="player_use_on_device_short">No dispositivo</string>
 </resources>

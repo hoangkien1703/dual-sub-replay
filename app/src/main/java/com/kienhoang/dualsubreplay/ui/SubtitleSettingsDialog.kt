@@ -956,15 +956,6 @@ private fun OnlineTranslationSettingsRows(
         },
         testTag = "google_translate_switch",
     )
-    if (google) {
-        SettingsSwitchRow(
-            title = stringResource(R.string.settings_auto_switch_on_device_title),
-            description = stringResource(R.string.settings_auto_switch_on_device_description),
-            checked = settings.autoSwitchToOnDevice,
-            onCheckedChange = actions.setAutoSwitchToOnDevice,
-            testTag = "auto_switch_on_device_switch",
-        )
-    }
 }
 
 @Composable

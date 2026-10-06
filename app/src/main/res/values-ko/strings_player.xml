@@ -31,5 +31,4 @@
     <string name="player_webview_renderer_crashed_reload">Android WebView 렌더러가 비정상 종료됐어요. 새로고침을 탭하면 다시 만들어요.</string>
     <string name="player_webview_renderer_reclaimed_reload">Android가 메모리를 확보하려고 WebView 렌더러를 중지했어요. 새로고침을 탭하면 다시 만들어요.</string>
     <string name="player_reload">새로고침</string>
-    <string name="player_use_on_device_short">기기 번역</string>
 </resources>

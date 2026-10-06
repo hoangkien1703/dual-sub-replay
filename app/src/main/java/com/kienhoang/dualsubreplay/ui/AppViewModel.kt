@@ -33,7 +33,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
-import com.kienhoang.dualsubreplay.translation.AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE
+import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
 import com.kienhoang.dualsubreplay.translation.GoogleWebTranslator
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
 import com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE
@@ -45,7 +45,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -113,23 +115,20 @@ data class DualSubUiState(
     val translationEngine: TranslationEngine = TranslationEngine.ON_DEVICE,
     /** False in the F-Droid build, which never offers the online engine. */
     val onlineTranslationAvailable: Boolean = false,
-    /** Google Translate just failed; the player asks whether to switch back to on-device translation. */
-    val onlineTranslationFailed: Boolean = false,
-    /** Why Google failed (English diagnostic text, e.g. the HTTP status), shown small in that dialog. */
-    val onlineTranslationFailureDetail: String? = null,
-    /** Settings → Translation: on a Google failure, use on-device translation for that video without asking. */
-    val autoSwitchToOnDevice: Boolean = false,
-    /** Google failed with [autoSwitchToOnDevice] on, so this video translates on the device. The saved engine is unchanged. */
+    /**
+     * Google failed, so this video translates on the device. The saved engine is unchanged: Google is
+     * checked again every [GOOGLE_RECHECK_INTERVAL_MS] and tried again on the next load.
+     */
     val onDeviceFallback: Boolean = false,
-    /** The one-time "switched to on-device" notice is waiting to be shown. */
-    val onDeviceFallbackNotice: Boolean = false,
+    /** Why Google failed (English diagnostic text, e.g. the HTTP status), shown in the top-right problem details. */
+    val onlineTranslationFailureDetail: String? = null,
 )
 
 /** The engine actually translating right now: Google, unless this video fell back to on-device. */
 internal fun DualSubUiState.translatesWithGoogle(): Boolean = translationEngine == TranslationEngine.GOOGLE_WEB && !onDeviceFallback
 
 internal fun DualSubUiState.onlineTranslationSettings() =
-    OnlineTranslationSettings(onlineTranslationAvailable, translationEngine, autoSwitchToOnDevice)
+    OnlineTranslationSettings(onlineTranslationAvailable, translationEngine)
 
 /**
  * A source-language choice is only rejected when the video's track list is
@@ -290,8 +289,6 @@ class AppViewModel internal constructor(
         )
     private val googleTranslator = GoogleWebTranslator(cacheDirectory = File(application.cacheDir, "google-translations"))
 
-    /** "Keep Google Translate" was chosen; live captions fail line after line, so do not ask again until a retry. */
-    private var onlineFailureDismissed = false
     internal val vocabulary = VocabularyRepository.get(application)
     internal val immersion = ImmersionRepository.get(application)
 
@@ -457,7 +454,6 @@ class AppViewModel internal constructor(
                         BuildConfig.ONLINE_TRANSLATION,
                     ),
                 onlineTranslationAvailable = BuildConfig.ONLINE_TRANSLATION,
-                autoSwitchToOnDevice = preferences.getBoolean(AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE, false),
             ),
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -738,8 +734,6 @@ class AppViewModel internal constructor(
                         _state.update {
                             it.copy(
                                 statusMessage = text(R.string.status_live_translation_unavailable),
-                                onlineTranslationFailed = asksAboutOnlineFailure(it),
-                                onlineTranslationFailureDetail = error.message,
                             )
                         }
                     }
@@ -1004,8 +998,7 @@ class AppViewModel internal constructor(
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            if (!_state.value.autoSwitchToOnDevice) throw error
-            _state.update { it.copy(onDeviceFallback = true, onDeviceFallbackNotice = !it.onDeviceFallback) }
+            fallBackToOnDevice(error)
             translator.translateSingle(source, target, text)
         }
     }
@@ -1015,39 +1008,23 @@ class AppViewModel internal constructor(
         val chosen = storedTranslationEngine(engine.storageValue, BuildConfig.ONLINE_TRANSLATION)
         preferences.edit().putString(TRANSLATION_ENGINE_PREFERENCE, chosen.storageValue).apply()
         val changed = _state.value.translationEngine != chosen || _state.value.onDeviceFallback
-        onlineFailureDismissed = false
-        _state.update { it.copy(translationEngine = chosen, onlineTranslationFailed = false, onDeviceFallback = false) }
+        _state.update { it.copy(translationEngine = chosen) }
         val videoId = _state.value.activeVideoId
         if (changed && videoId != null) loadVideo(videoId = videoId, showPanel = _state.value.subtitlePanelVisible)
     }
 
-    /** The "Google Translate stopped working" notice's switch-back choice. */
-    fun useOnDeviceTranslation() = setTranslationEngine(TranslationEngine.ON_DEVICE)
-
-    /** Keeps Google Translate after a failure; the transcript bar still offers retry and switch-back. */
-    fun dismissOnlineTranslationFailure() {
-        onlineFailureDismissed = true
-        _state.update { it.copy(onlineTranslationFailed = false) }
+    /**
+     * Google failed even after its retries: this video translates on the device now (the translation
+     * flow follows [DualSubUiState.onDeviceFallback]) and the top-right icon explains why.
+     */
+    private fun fallBackToOnDevice(error: Exception) {
+        _state.update { it.copy(onDeviceFallback = true, onlineTranslationFailureDetail = error.message) }
     }
 
-    /** Settings → Translation → Switch to on-device automatically. Turning it off tries Google again for this video. */
-    fun setAutoSwitchToOnDevice(enabled: Boolean) {
-        preferences.edit().putBoolean(AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE, enabled).apply()
-        _state.update {
-            it.copy(
-                autoSwitchToOnDevice = enabled,
-                onDeviceFallback = enabled && it.onDeviceFallback,
-                onlineTranslationFailed = it.onlineTranslationFailed && !enabled,
-            )
-        }
+    /** The problem details' "Try Google again", and the periodic check once Google answers again. */
+    fun tryGoogleTranslationAgain() {
+        _state.update { it.copy(onDeviceFallback = false, onlineTranslationFailureDetail = null, translationError = null) }
     }
-
-    fun consumeOnDeviceFallbackNotice() {
-        _state.update { it.copy(onDeviceFallbackNotice = false) }
-    }
-
-    private fun asksAboutOnlineFailure(state: DualSubUiState): Boolean =
-        state.translatesWithGoogle() && !state.autoSwitchToOnDevice && !onlineFailureDismissed
 
     private fun setSubtitleColorKey(
         preferenceKey: String,
@@ -1109,9 +1086,8 @@ class AppViewModel internal constructor(
                 tapToLearnEnabled = true,
                 selectedLearningWord = null,
                 translationEngine = defaultTranslationEngine(BuildConfig.ONLINE_TRANSLATION),
-                onlineTranslationFailed = false,
-                autoSwitchToOnDevice = false,
                 onDeviceFallback = false,
+                onlineTranslationFailureDetail = null,
             )
         }
         _state.value.activeVideoId?.let { loadVideo(it, showPanel = _state.value.subtitlePanelVisible) }
@@ -1124,7 +1100,6 @@ class AppViewModel internal constructor(
     fun retryCaptions() {
         val current = _state.value
         val videoId = current.activeVideoId ?: return
-        onlineFailureDismissed = false
         if (onlyTranslationFailed(current)) {
             _state.update {
                 it.copy(translationError = null, statusMessage = text(R.string.status_preparing_nearby_translations))
@@ -1221,7 +1196,9 @@ class AppViewModel internal constructor(
                 stage = LoadStage.LOADING_CAPTIONS,
                 statusMessage = if (preserveLive) it.statusMessage else text(R.string.status_finding_caption_track),
                 errorMessage = null,
-                onDeviceFallback = it.onDeviceFallback && it.activeVideoId == videoId,
+                // Every load, of this video again or the next one, tries Google first.
+                onDeviceFallback = false,
+                onlineTranslationFailureDetail = null,
             )
         }
         updatePlaybackRequest()
@@ -1301,7 +1278,7 @@ class AppViewModel internal constructor(
 
     /**
      * Translates the stored track again whenever the format, target language or on-device fallback changes.
-     * A new video tries Google again ([loadVideo] clears the fallback); reloading the same video keeps it.
+     * Every load tries Google again ([loadVideo] clears the fallback).
      */
     private suspend fun followStoredTranslation(
         rawStore: SubtitleStore,
@@ -1377,25 +1354,20 @@ class AppViewModel internal constructor(
                     }
                     return
                 }
-                translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
-                    _state.update { current ->
-                        if (!isCurrentLoad(current, videoId, generation)) {
-                            current
+                val fallback = _state.value.onDeviceFallback
+                coroutineScope {
+                    if (fallback) launch { recheckGoogle(sourceLanguage, targetLanguage) }
+                    translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
+                        showTranslationModelDownload(videoId, generation, downloading)
+                    }) { translate ->
+                        if (fallback) {
+                            // Rows Google already translated keep its translation; the rest translate on the device.
+                            follow { text -> googleTranslator.cachedTranslation(sourceLanguage, targetLanguage, text) ?: translate(text) }
                         } else {
-                            current.copy(
-                                isDownloadingTranslationModel = downloading,
-                                statusMessage =
-                                    text(
-                                        if (downloading) {
-                                            R.string.status_downloading_translation_model
-                                        } else {
-                                            R.string.status_preparing_nearby_translations
-                                        },
-                                    ),
-                            )
+                            follow(translate = translate)
                         }
                     }
-                }) { translate -> follow(translate = translate) }
+                }
             } catch (error: Exception) {
                 if (error is CancellationException || following) throw error
                 // The pair cannot be translated at all (an unsupported language): still show the captions.
@@ -1421,25 +1393,65 @@ class AppViewModel internal constructor(
         }
     }
 
+    private fun showTranslationModelDownload(
+        videoId: String,
+        generation: Long,
+        downloading: Boolean,
+    ) {
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) {
+                current
+            } else {
+                current.copy(
+                    isDownloadingTranslationModel = downloading,
+                    statusMessage =
+                        text(
+                            if (downloading) {
+                                R.string.status_downloading_translation_model
+                            } else {
+                                R.string.status_preparing_nearby_translations
+                            },
+                        ),
+                )
+            }
+        }
+    }
+
+    /**
+     * While this video translates on the device after a Google failure, asks Google again every
+     * [GOOGLE_RECHECK_INTERVAL_MS] during playback with the current row, and goes back to Google once it answers.
+     */
+    private suspend fun recheckGoogle(
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
+        while (true) {
+            delay(GOOGLE_RECHECK_INTERVAL_MS)
+            val current = _state.value
+            if (current.playbackPaused) continue
+            val probe = current.segments.getOrNull(current.currentIndex)?.originalText ?: continue
+            if (googleTranslator.responds(sourceLanguage, targetLanguage, probe)) {
+                tryGoogleTranslationAgain()
+                return
+            }
+        }
+    }
+
     private fun showTranslationUnavailable(
         videoId: String,
         generation: Long,
         error: Exception,
     ) {
         val reason = translationFailureMessage(error, text(R.string.status_translation_unavailable_retry))
-        val onlineReason = text(R.string.status_google_translate_failed_title)
         val status = text(R.string.status_original_captions_only)
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
-            val online = current.translatesWithGoogle()
             // Restarts this video's translation on the device (the translation flow follows onDeviceFallback).
-            if (online && current.autoSwitchToOnDevice) return@update current.copy(onDeviceFallback = true, onDeviceFallbackNotice = true)
+            if (current.translatesWithGoogle()) return@update current.copy(onDeviceFallback = true, onlineTranslationFailureDetail = error.message)
             current.copy(
                 isDownloadingTranslationModel = false,
-                translationError = if (online) onlineReason else reason,
+                translationError = reason,
                 statusMessage = status,
-                onlineTranslationFailed = asksAboutOnlineFailure(current),
-                onlineTranslationFailureDetail = error.message,
             )
         }
     }
