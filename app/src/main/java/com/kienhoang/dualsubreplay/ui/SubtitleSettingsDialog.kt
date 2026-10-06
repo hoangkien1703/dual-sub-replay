@@ -315,8 +315,7 @@ internal fun SubtitleSettingsDialog(
     onPreloadModelsChange: (Boolean) -> Unit = {},
     naturalSubtitlesEnabled: Boolean = true,
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
-    onlineTranslationAvailable: Boolean = false,
-    translationEngine: TranslationEngine = TranslationEngine.ON_DEVICE,
+    onlineTranslation: OnlineTranslationSettings = OnlineTranslationSettings(),
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "both",
@@ -514,17 +513,8 @@ internal fun SubtitleSettingsDialog(
                     }
 
                     Section(MoreSettingsSection.TRANSLATION, Icons.Default.Translate) {
-                        if (onlineTranslationAvailable && translationEngineActions != null) {
-                            SettingsSwitchRow(
-                                title = stringResource(R.string.settings_google_translate_title),
-                                description = stringResource(R.string.settings_google_translate_description),
-                                checked = translationEngine == TranslationEngine.GOOGLE_WEB,
-                                onCheckedChange = { enabled ->
-                                    val engine = if (enabled) TranslationEngine.GOOGLE_WEB else TranslationEngine.ON_DEVICE
-                                    translationEngineActions.select(engine)
-                                },
-                                testTag = "google_translate_switch",
-                            )
+                        if (onlineTranslation.available && translationEngineActions != null) {
+                            OnlineTranslationSettingsRows(onlineTranslation, translationEngineActions)
                         }
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_natural_flow_title),
@@ -947,6 +937,33 @@ private fun SubtitleColorSwatchRow(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun OnlineTranslationSettingsRows(
+    settings: OnlineTranslationSettings,
+    actions: TranslationEngineActions,
+) {
+    val google = settings.engine == TranslationEngine.GOOGLE_WEB
+    SettingsSwitchRow(
+        title = stringResource(R.string.settings_google_translate_title),
+        description = stringResource(R.string.settings_google_translate_description),
+        checked = google,
+        onCheckedChange = { enabled ->
+            val engine = if (enabled) TranslationEngine.GOOGLE_WEB else TranslationEngine.ON_DEVICE
+            actions.select(engine)
+        },
+        testTag = "google_translate_switch",
+    )
+    if (google) {
+        SettingsSwitchRow(
+            title = stringResource(R.string.settings_auto_switch_on_device_title),
+            description = stringResource(R.string.settings_auto_switch_on_device_description),
+            checked = settings.autoSwitchToOnDevice,
+            onCheckedChange = actions.setAutoSwitchToOnDevice,
+            testTag = "auto_switch_on_device_switch",
+        )
     }
 }
 

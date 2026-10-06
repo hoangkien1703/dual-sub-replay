@@ -1,11 +1,14 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.widget.Toast
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
@@ -14,9 +17,18 @@ import com.kienhoang.dualsubreplay.translation.TranslationEngine
 /** Chooses the translation engine from Settings, the failure dialog, or the transcript's "translation unavailable" bar. */
 internal class TranslationEngineActions(
     val select: (TranslationEngine) -> Unit,
+    val setAutoSwitchToOnDevice: (Boolean) -> Unit = {},
 ) {
     fun useOnDevice() = select(TranslationEngine.ON_DEVICE)
 }
+
+/** What Settings → Translation shows about the online engine. */
+internal data class OnlineTranslationSettings(
+    /** False in the F-Droid build, which never offers the online engine. */
+    val available: Boolean = false,
+    val engine: TranslationEngine = TranslationEngine.ON_DEVICE,
+    val autoSwitchToOnDevice: Boolean = false,
+)
 
 internal val LocalTranslationEngineActions = staticCompositionLocalOf<TranslationEngineActions?> { null }
 
@@ -42,4 +54,19 @@ internal fun OnlineTranslationFailedDialog(
             }
         },
     )
+}
+
+/** A short notice when Google failed and the automatic switch moved this video to on-device translation. */
+@Composable
+internal fun OnDeviceFallbackNotice(
+    show: Boolean,
+    onShown: () -> Unit,
+) {
+    val context = LocalContext.current
+    LaunchedEffect(show) {
+        if (show) {
+            Toast.makeText(context, R.string.status_switched_to_on_device, Toast.LENGTH_LONG).show()
+            onShown()
+        }
+    }
 }

@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">元の字幕はそのまま再生されます。端末上の翻訳に戻すか、Google 翻訳のまま後で再試行してください。</string>
     <string name="status_use_on_device_translation">端末上の翻訳を使う</string>
     <string name="status_keep_google_translate">Google 翻訳を続ける</string>
+    <string name="status_switched_to_on_device">Google 翻訳が使えなくなったため、この動画は端末上の翻訳に切り替えました。</string>
 </resources>

@@ -188,6 +188,7 @@ class SubtitleWordHighlightTest {
                 TAP_TO_LEARN_PREFERENCE,
                 WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
                 com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
+                com.kienhoang.dualsubreplay.translation.AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE,
                 "auto_pronounce",
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())

@@ -84,7 +84,6 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
-import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import java.util.Locale
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -485,8 +484,7 @@ private fun DualSubExperience(
             onPreloadModelsChange = onPreloadModelsChange,
             naturalSubtitlesEnabled = state.naturalSubtitlesEnabled,
             onNaturalSubtitlesChange = onNaturalSubtitlesChange,
-            onlineTranslationAvailable = state.onlineTranslationAvailable,
-            translationEngine = state.translationEngine,
+            onlineTranslation = state.onlineTranslationSettings(),
             wordLearningEnabled = state.wordLearningEnabled,
             onWordLearningChange = onWordLearningChange,
             wordLearningTarget = state.wordLearningTarget,
@@ -1080,7 +1078,7 @@ internal fun TranslatedSubtitleTimeline(
     onReplay: (SubtitleSegment) -> Unit,
 ) {
     // After a Google failure the bar also offers to switch back to on-device translation.
-    val engineActions = LocalTranslationEngineActions.current?.takeIf { state.translationEngine == TranslationEngine.GOOGLE_WEB }
+    val engineActions = LocalTranslationEngineActions.current?.takeIf { state.translatesWithGoogle() }
     val useOnDevice = engineActions?.let { actions -> { actions.useOnDevice() } }
     Column(Modifier.fillMaxSize()) {
         state.translationError?.let { TranslationUnavailableBar(it, onRetryTranslation, useOnDevice) }

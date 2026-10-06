@@ -1,10 +1,16 @@
-# Opt-in Google Translate (online) engine
+# Google Translate (online) engine
 
 ## Status
 
 Implemented. The owner asked for this on 2026-10-05: "users have to turn on it in setting, by
 default app still use old engine, and if Google fail then show notifications and option to
 switch back. create pr for this". That request does not authorize merging or publishing.
+
+**Revised the same day, before merge.** The owner changed their mind: "let make Google translate
+online become default, and have setting to change to local engine (including opinion to switch
+automatically, which is off by default)". The [default-engine revision](#revision-google-by-default)
+below supersedes the "off by default" goals and behavior in the original sections, which are kept
+as the history of the first version.
 
 ## Context / problem
 
@@ -122,8 +128,60 @@ switch back. create pr for this". That request does not authorize merging or pub
 
 ## Release intent
 
-`release:patch` (project default; no override label). The owner did not state an intent. This adds
-a user-visible opt-in setting, so `release:minor` would also be reasonable if the owner prefers.
+`release:patch` (project default; no override label). The owner did not state an intent. This
+changes the default translation engine for every GitHub-build user, so `release:minor` would also
+be reasonable if the owner prefers.
+
+## Revision: Google by default
+
+### Goals
+
+- In the GitHub build, Google Translate (online) is the default engine. The Settings → Translation
+  switch stays and turning it off translates on the device (ML Kit).
+- New switch under it, **Switch to on-device automatically**, off by default and shown only while
+  Google is the engine. When on, a Google failure moves the current video to on-device translation
+  without the dialog, and a short notice (Android toast) says so.
+- With the automatic switch off, failures behave as in the first version: dialog plus the bar's
+  switch-back button.
+- F-Droid build unchanged: no switch, never online.
+
+### Decisions (defaults Claude picked where the request did not say)
+
+- **Scope of the automatic switch:** only the current video. The saved engine stays Google, so the
+  next video tries Google again, because blocks and network loss are often temporary. Reloading the
+  same video (language or format change) keeps the fallback; turning the automatic switch off tries
+  Google again for the video.
+- **Existing users:** anyone without a saved choice gets Google after upgrading, including every
+  user of an earlier release (the first version never shipped). "Reset all settings" also returns
+  to Google and turns the automatic switch off.
+- **Description:** the Google switch now says it is on by default and that turning it off
+  translates on the device.
+
+### Plan
+
+1. `TranslationEngine.kt`: `defaultTranslationEngine(onlineAvailable)`; `storedTranslationEngine`
+   falls back to it. New `AUTO_SWITCH_TO_ON_DEVICE_PREFERENCE` (resettable).
+2. `AppViewModel`: `autoSwitchToOnDevice`, `onDeviceFallback`, `onDeviceFallbackNotice` state;
+   `translatesWithGoogle()` is the engine actually in use. With the switch on, a stored-subtitle
+   failure sets the fallback and the translation flow (keyed on it) restarts on the device;
+   `translateText` (live captions, phrase bar, word card) translates that text on the device.
+   A new video clears the fallback.
+3. UI: `OnlineTranslationSettings` replaces the two dialog parameters; the second switch;
+   `OnDeviceFallbackNotice` toast.
+4. Strings in all 8 locales; AGENTS.md, tech-stack, mission, README, PRIVACY.md and the website.
+
+### Acceptance criteria
+
+- [x] With no saved choice the GitHub build uses Google; the F-Droid build always uses on-device,
+  even with a restored Google choice (`TranslationEngineTest`).
+- [x] The automatic-switch preference is cleared by "Reset all settings" (`SubtitleHighlightTest`).
+- [ ] The Google switch is on for the default engine and turning it off chooses on-device; the
+  automatic switch is off by default, can be turned on, and is hidden while on-device or when the
+  build cannot translate online (`OnlineTranslationUiTest`, managed device in CI).
+- [ ] Owner phone check: a fresh install translates Japanese with Google without touching
+  Settings; with airplane mode the dialog appears; with the automatic switch on, the toast appears
+  and subtitles continue with on-device translation (after the model download if needed).
+- [ ] Final-head CI: all four Android CI jobs pass.
 
 ## Implementation result
 
@@ -149,3 +207,13 @@ Implemented as planned, with these details:
 - Managed-device tests (`OnlineTranslationUiTest`) and the F-Droid build: not run locally (no
   emulator or NDK); CI runs them.
 - Physical phone: not run; pending the owner's check above.
+
+### Revision validation result
+
+- Local (Linux, Android SDK 36): `formatCheck complexityCheck testDebugUnitTest lintDebug
+  assembleDebug assembleDebugAndroidTest` passed; 435 unit tests, 0 failures.
+- `loadVideo` hit the 100-line complexity limit, so the translation flow moved into
+  `followStoredTranslation`.
+- Managed-device tests, the F-Droid build and the owner's phone check: run by CI and the owner.
+- The F-Droid jobs on the first version's CI run were cancelled without ever getting a runner
+  (no steps, no logs), so they say nothing about this change.

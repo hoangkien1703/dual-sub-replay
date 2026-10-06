@@ -136,5 +136,7 @@
     <string name="language_downloads_retry">Retry</string>
     <string name="language_downloads_back">Back</string>
     <string name="settings_google_translate_title">Google Translate (online)</string>
-    <string name="settings_google_translate_description">Better translations, especially for Japanese. Sends subtitle text to Google. This is not an official Google service, so it can stop working; the app then offers to switch back.</string>
+    <string name="settings_google_translate_description">On by default. Better translations, especially for Japanese. Sends subtitle text to Google. This is not an official Google service, so it can stop working. Turn off to translate on your device.</string>
+    <string name="settings_auto_switch_on_device_title">Switch to on-device automatically</string>
+    <string name="settings_auto_switch_on_device_description">When Google Translate stops working, use on-device translation for that video instead of asking.</string>
 </resources>

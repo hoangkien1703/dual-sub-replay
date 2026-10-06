@@ -136,5 +136,7 @@
     <string name="language_downloads_retry">Reintentar</string>
     <string name="language_downloads_back">Atrás</string>
     <string name="settings_google_translate_title">Google Traductor (en línea)</string>
-    <string name="settings_google_translate_description">Traducciones mejores, sobre todo del japonés. Envía el texto de los subtítulos a Google. No es un servicio oficial de Google, así que puede dejar de funcionar; entonces la app te ofrecerá volver atrás.</string>
+    <string name="settings_google_translate_description">Activado de forma predeterminada. Traducciones mejores, sobre todo del japonés. Envía el texto de los subtítulos a Google. No es un servicio oficial de Google, así que puede dejar de funcionar. Desactívalo para traducir en tu dispositivo.</string>
+    <string name="settings_auto_switch_on_device_title">Cambiar al dispositivo automáticamente</string>
+    <string name="settings_auto_switch_on_device_description">Si Google Traductor deja de funcionar, usa la traducción en el dispositivo para ese video sin preguntar.</string>
 </resources>

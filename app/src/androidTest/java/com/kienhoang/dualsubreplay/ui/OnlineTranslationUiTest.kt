@@ -17,19 +17,20 @@ class OnlineTranslationUiTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    @Test
-    fun googleSwitchIsOffByDefaultAndChoosesTheEngine() {
-        val chosen = mutableListOf<TranslationEngine>()
+    private fun showTranslationSettings(
+        settings: OnlineTranslationSettings,
+        actions: TranslationEngineActions = TranslationEngineActions(select = {}),
+    ) {
         composeRule.setContent {
             DualSubTheme {
-                CompositionLocalProvider(LocalTranslationEngineActions provides TranslationEngineActions { chosen += it }) {
+                CompositionLocalProvider(LocalTranslationEngineActions provides actions) {
                     SubtitleSettingsDialog(
                         sourcePreference = "ja",
                         targetLanguage = "en",
                         availableSourceLanguages = emptyList(),
                         fontScale = 1f,
                         landscapeSplitEnabled = true,
-                        onlineTranslationAvailable = true,
+                        onlineTranslation = settings,
                         onSourceChange = {},
                         onTargetChange = {},
                         onFontScaleChange = {},
@@ -40,6 +41,30 @@ class OnlineTranslationUiTest {
             }
         }
         composeRule.onNodeWithTag("settings_section_translation").performScrollTo().performClick()
+    }
+
+    @Test
+    fun googleSwitchIsOnForTheDefaultEngineAndTurnsOffToOnDevice() {
+        val chosen = mutableListOf<TranslationEngine>()
+        showTranslationSettings(
+            OnlineTranslationSettings(available = true, engine = TranslationEngine.GOOGLE_WEB),
+            TranslationEngineActions(select = { chosen += it }),
+        )
+        composeRule
+            .onNodeWithTag("google_translate_switch")
+            .performScrollTo()
+            .assertIsOn()
+            .performClick()
+        assertEquals(listOf(TranslationEngine.ON_DEVICE), chosen)
+    }
+
+    @Test
+    fun googleSwitchTurnsOnToChooseGoogle() {
+        val chosen = mutableListOf<TranslationEngine>()
+        showTranslationSettings(
+            OnlineTranslationSettings(available = true, engine = TranslationEngine.ON_DEVICE),
+            TranslationEngineActions(select = { chosen += it }),
+        )
         composeRule
             .onNodeWithTag("google_translate_switch")
             .performScrollTo()
@@ -50,54 +75,30 @@ class OnlineTranslationUiTest {
 
     @Test
     fun googleSwitchIsHiddenWhenTheBuildCannotTranslateOnline() {
-        composeRule.setContent {
-            DualSubTheme {
-                CompositionLocalProvider(LocalTranslationEngineActions provides TranslationEngineActions {}) {
-                    SubtitleSettingsDialog(
-                        sourcePreference = "ja",
-                        targetLanguage = "en",
-                        availableSourceLanguages = emptyList(),
-                        fontScale = 1f,
-                        landscapeSplitEnabled = true,
-                        onlineTranslationAvailable = false,
-                        translationEngine = TranslationEngine.GOOGLE_WEB,
-                        onSourceChange = {},
-                        onTargetChange = {},
-                        onFontScaleChange = {},
-                        onLandscapeSplitChange = {},
-                        onDismiss = {},
-                    )
-                }
-            }
-        }
-        composeRule.onNodeWithTag("settings_section_translation").performScrollTo().performClick()
+        showTranslationSettings(OnlineTranslationSettings(available = false, engine = TranslationEngine.GOOGLE_WEB))
         composeRule.onNodeWithTag("google_translate_switch").assertDoesNotExist()
+        composeRule.onNodeWithTag("auto_switch_on_device_switch").assertDoesNotExist()
     }
 
     @Test
-    fun googleSwitchShowsTheCurrentChoice() {
-        composeRule.setContent {
-            DualSubTheme {
-                CompositionLocalProvider(LocalTranslationEngineActions provides TranslationEngineActions {}) {
-                    SubtitleSettingsDialog(
-                        sourcePreference = "ja",
-                        targetLanguage = "en",
-                        availableSourceLanguages = emptyList(),
-                        fontScale = 1f,
-                        landscapeSplitEnabled = true,
-                        onlineTranslationAvailable = true,
-                        translationEngine = TranslationEngine.GOOGLE_WEB,
-                        onSourceChange = {},
-                        onTargetChange = {},
-                        onFontScaleChange = {},
-                        onLandscapeSplitChange = {},
-                        onDismiss = {},
-                    )
-                }
-            }
-        }
-        composeRule.onNodeWithTag("settings_section_translation").performScrollTo().performClick()
-        composeRule.onNodeWithTag("google_translate_switch").performScrollTo().assertIsOn()
+    fun autoSwitchIsOffByDefaultAndCanBeTurnedOn() {
+        val autoSwitch = mutableListOf<Boolean>()
+        showTranslationSettings(
+            OnlineTranslationSettings(available = true, engine = TranslationEngine.GOOGLE_WEB),
+            TranslationEngineActions(select = {}, setAutoSwitchToOnDevice = { autoSwitch += it }),
+        )
+        composeRule
+            .onNodeWithTag("auto_switch_on_device_switch")
+            .performScrollTo()
+            .assertIsOff()
+            .performClick()
+        assertEquals(listOf(true), autoSwitch)
+    }
+
+    @Test
+    fun autoSwitchIsHiddenWhileTranslatingOnDevice() {
+        showTranslationSettings(OnlineTranslationSettings(available = true, engine = TranslationEngine.ON_DEVICE))
+        composeRule.onNodeWithTag("auto_switch_on_device_switch").assertDoesNotExist()
     }
 
     @Test

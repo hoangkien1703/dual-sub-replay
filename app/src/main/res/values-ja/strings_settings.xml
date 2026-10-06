@@ -136,5 +136,7 @@
     <string name="language_downloads_retry">再試行</string>
     <string name="language_downloads_back">戻る</string>
     <string name="settings_google_translate_title">Google 翻訳（オンライン）</string>
-    <string name="settings_google_translate_description">特に日本語の翻訳がより自然になります。字幕のテキストを Google に送信します。Google の公式サービスではないため、使えなくなることがあります。その場合は元に戻すよう案内します。</string>
+    <string name="settings_google_translate_description">初期設定でオンです。特に日本語の翻訳がより自然になります。字幕のテキストを Google に送信します。Google の公式サービスではないため、使えなくなることがあります。オフにすると端末上で翻訳します。</string>
+    <string name="settings_auto_switch_on_device_title">自動で端末上の翻訳に切り替える</string>
+    <string name="settings_auto_switch_on_device_description">Google 翻訳が使えなくなったとき、確認せずにその動画を端末上の翻訳に切り替えます。</string>
 </resources>

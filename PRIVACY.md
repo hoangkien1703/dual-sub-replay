@@ -7,7 +7,7 @@ DualSub Replay is designed without an application account, analytics SDK, advert
 - The embedded YouTube website receives normal browsing and playback requests, subject to Google's and YouTube's policies.
 - The app requests public caption data from YouTube to build the replayable subtitle timeline. It keeps the caption tracks of up to six recently watched videos in its private cache for a day, so reopening one does not download it again; Android may clear that cache at any time.
 - Google ML Kit may download the language models you select. Translation then runs on the device.
-- If you turn on Settings → Translation → Google Translate (online), which is off by default, the subtitle text and words being translated are sent to Google Translate (`translate.googleapis.com`) with the source and target language, and Google's privacy policy applies to them. This uses Google's free web endpoint, not an official API, so Google may limit or stop it. Translations are cached in the app's private cache. Turning the switch off sends nothing more. The F-Droid build does not have this switch.
+- In the GitHub build, Settings → Translation → Google Translate (online) is on by default: the subtitle text and words being translated are sent to Google Translate (`translate.googleapis.com`) with the source and target language, and Google's privacy policy applies to them. This uses Google's free web endpoint, not an official API, so Google may limit or stop it. Translations are cached in the app's private cache. Turning the switch off sends nothing more and translates on the device. The F-Droid build does not have this switch and never sends subtitle text to Google.
 - The F-Droid build does not include ML Kit. It downloads Mozilla's Firefox Translations models from Mozilla's servers the first time you translate a language, then translates on the device. Only model files are downloaded; subtitle text is not sent.
 - The first time Japanese subtitles load, the app downloads the Japanese word dictionary (the unchanged 13 MB Kuromoji IPADIC file) from Maven Central (`repo1.maven.org`) or, if that fails, Google's mirror of it (`maven-central.storage-download.googleapis.com`). The request asks only for that file; no subtitle text is sent. The file is checked against a pinned SHA-256 checksum, kept in the app's private storage, and used to split Japanese text into words on the device.
 - The app stores the last Browse URL, target language, subtitle text size, and landscape split ratio in local Android preferences.
@@ -22,7 +22,7 @@ DualSub Replay is designed without an application account, analytics SDK, advert
 ## What the project does not do
 
 - It does not require an API key or DualSub Replay account.
-- It does not send subtitle text or translation requests to a server operated by this project. Subtitle text goes to Google only while you have Google Translate (online) turned on.
+- It does not send subtitle text or translation requests to a server operated by this project. Subtitle text goes to Google only while Google Translate (online) is on, which is the GitHub build's default.
 - It does not download video or audio from YouTube.
 - It does not intentionally collect analytics, advertising identifiers, or crash telemetry.
 

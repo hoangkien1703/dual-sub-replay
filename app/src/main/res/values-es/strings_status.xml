@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">Los subtítulos originales siguen reproduciéndose. Vuelve a la traducción en el dispositivo o mantén Google Traductor y vuelve a intentarlo más tarde.</string>
     <string name="status_use_on_device_translation">Usar traducción en el dispositivo</string>
     <string name="status_keep_google_translate">Mantener Google Traductor</string>
+    <string name="status_switched_to_on_device">Google Traductor dejó de funcionar, así que este video ahora usa la traducción en el dispositivo.</string>
 </resources>

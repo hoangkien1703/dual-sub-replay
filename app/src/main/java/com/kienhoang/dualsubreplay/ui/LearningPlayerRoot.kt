@@ -65,7 +65,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
-import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 
@@ -496,7 +495,8 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     }
 
     val phraseSelection = remember { PhraseSelectionController() }
-    val translationEngineActions = remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine) }
+    val translationEngineActions =
+        remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine, viewModel::setAutoSwitchToOnDevice) }
     CompositionLocalProvider(
         LocalPhraseSelection provides phraseSelection,
         LocalLanguageDownloads provides viewModel.languageDownloads,
@@ -572,12 +572,13 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 }
             }
 
-            if (state.onlineTranslationFailed && state.translationEngine == TranslationEngine.GOOGLE_WEB) {
+            if (state.onlineTranslationFailed && state.translatesWithGoogle()) {
                 OnlineTranslationFailedDialog(
                     onUseOnDevice = viewModel::useOnDeviceTranslation,
                     onKeepGoogle = viewModel::dismissOnlineTranslationFailure,
                 )
             }
+            OnDeviceFallbackNotice(state.onDeviceFallbackNotice, viewModel::consumeOnDeviceFallbackNotice)
 
 
         }

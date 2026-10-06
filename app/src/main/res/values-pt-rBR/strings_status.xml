@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">As legendas originais continuam. Volte para a tradução no dispositivo ou mantenha o Google Tradutor e tente novamente mais tarde.</string>
     <string name="status_use_on_device_translation">Usar tradução no dispositivo</string>
     <string name="status_keep_google_translate">Manter Google Tradutor</string>
+    <string name="status_switched_to_on_device">O Google Tradutor parou de funcionar, então este vídeo agora usa a tradução no dispositivo.</string>
 </resources>

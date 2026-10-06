@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">原始字幕会继续播放。切换回设备端翻译，或保留 Google 翻译稍后重试。</string>
     <string name="status_use_on_device_translation">使用设备端翻译</string>
     <string name="status_keep_google_translate">保留 Google 翻译</string>
+    <string name="status_switched_to_on_device">Google 翻译已停止工作，此视频现已改用设备端翻译。</string>
 </resources>

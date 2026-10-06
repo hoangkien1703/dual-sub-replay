@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">Subtitle asli tetap diputar. Beralih kembali ke terjemahan di perangkat, atau tetap gunakan Google Terjemahan dan coba lagi nanti.</string>
     <string name="status_use_on_device_translation">Gunakan terjemahan di perangkat</string>
     <string name="status_keep_google_translate">Tetap gunakan Google Terjemahan</string>
+    <string name="status_switched_to_on_device">Google Terjemahan berhenti berfungsi, jadi video ini sekarang memakai terjemahan di perangkat.</string>
 </resources>

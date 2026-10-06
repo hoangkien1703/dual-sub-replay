@@ -22,4 +22,5 @@
     <string name="status_google_translate_failed_message">Original subtitles keep playing. Switch back to on-device translation, or keep Google Translate and retry later.</string>
     <string name="status_use_on_device_translation">Use on-device translation</string>
     <string name="status_keep_google_translate">Keep Google Translate</string>
+    <string name="status_switched_to_on_device">Google Translate stopped working, so this video now uses on-device translation.</string>
 </resources>

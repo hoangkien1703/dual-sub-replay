@@ -124,7 +124,7 @@ The interface is available in English, Tiếng Việt, Español, Português (Bra
 
 ## Privacy
 
-No account or API key is required, and the app has no analytics or advertising SDKs. YouTube receives the same page, player and caption requests as a normal visit. ML Kit downloads only the language models you use, then translates on the device. If you turn on Settings → Translation → Google Translate (online), subtitle text is sent to Google instead; it is off by default. Settings, saved words, and progress stay in local app storage. See [PRIVACY.md](PRIVACY.md) for details.
+No account or API key is required, and the app has no analytics or advertising SDKs. YouTube receives the same page, player and caption requests as a normal visit. By default the GitHub build sends subtitle text to Google Translate (online) for better translations. Turn off Settings → Translation → Google Translate (online) to translate on the device instead: ML Kit downloads only the language models you use, then translates on the device. The F-Droid build always translates on the device. Settings, saved words, and progress stay in local app storage. See [PRIVACY.md](PRIVACY.md) for details.
 
 ## Limitations
 
