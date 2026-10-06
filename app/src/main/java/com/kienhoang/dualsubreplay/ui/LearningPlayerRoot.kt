@@ -495,9 +495,12 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     }
 
     val phraseSelection = remember { PhraseSelectionController() }
+    val translationEngineActions =
+        remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine, viewModel::tryGoogleTranslationAgain) }
     CompositionLocalProvider(
         LocalPhraseSelection provides phraseSelection,
         LocalLanguageDownloads provides viewModel.languageDownloads,
+        LocalTranslationEngineActions provides translationEngineActions,
     ) {
         Box(Modifier.fillMaxSize()) {
             DualSubApp(
@@ -568,6 +571,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     )
                 }
             }
+
 
 
         }

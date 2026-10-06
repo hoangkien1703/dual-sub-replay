@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">The language list could not be loaded. Check your connection.</string>
     <string name="language_downloads_retry">Retry</string>
     <string name="language_downloads_back">Back</string>
+    <string name="settings_google_translate_title">Google Translate (online)</string>
+    <string name="settings_google_translate_description">On by default. Better translations, especially for Japanese. Sends subtitle text to Google. This is not an official Google service, so it can stop working; the app then translates on your device until Google works again. Turn off to always translate on your device.</string>
 </resources>

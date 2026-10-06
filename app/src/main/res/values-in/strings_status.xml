@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Subtitel langsung</string>
     <string name="status_retrying_full_transcript">Mencoba lagi transkrip lengkap…</string>
     <string name="status_retry_full_transcript">Coba lagi transkrip lengkap</string>
+    <string name="translation_issue_button">Masalah terjemahan</string>
+    <string name="translation_issue_on_device_title">Memakai terjemahan di perangkat</string>
+    <string name="translation_issue_on_device_message">Google Terjemahan sedang tidak berfungsi, jadi video ini diterjemahkan di perangkat Anda. Aplikasi mencoba Google lagi setiap 2 menit dan pada video berikutnya.</string>
+    <string name="translation_issue_try_google">Coba Google lagi</string>
 </resources>

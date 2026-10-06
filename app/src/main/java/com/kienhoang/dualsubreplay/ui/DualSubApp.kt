@@ -336,8 +336,12 @@ private fun DualSubExperience(
     }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
         Scaffold(contentWindowInsets = contentInsets, topBar = {
             Surface {
-                Row(Modifier.fillMaxWidth().statusBarsPadding(), horizontalArrangement = Arrangement.Start) {
+                Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                     menuButton()
+                    Spacer(Modifier.weight(1f))
+                    // Translation problems show here instead of interrupting the video.
+                    val tryGoogleAgain = LocalTranslationEngineActions.current?.tryGoogleAgain ?: {}
+                    TranslationIssueButton(state.translationIssue(), tryGoogleAgain, onRetry)
                 }
             }
         }) { innerPadding ->
@@ -484,6 +488,7 @@ private fun DualSubExperience(
             onPreloadModelsChange = onPreloadModelsChange,
             naturalSubtitlesEnabled = state.naturalSubtitlesEnabled,
             onNaturalSubtitlesChange = onNaturalSubtitlesChange,
+            onlineTranslation = state.onlineTranslationSettings(),
             wordLearningEnabled = state.wordLearningEnabled,
             onWordLearningChange = onWordLearningChange,
             wordLearningTarget = state.wordLearningTarget,
@@ -641,7 +646,7 @@ private fun SubtitlePanel(
                     state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                     state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                     state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
-                    else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
+                    else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
                 }
             }
         }
@@ -825,7 +830,7 @@ private fun SideSubtitlePanel(
                 state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
-                else -> TranslatedSubtitleTimeline(state, onRetry, onWordClick, onReplay)
+                else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
             }
         }
     }
@@ -1068,45 +1073,14 @@ private fun CompactLoadingPanel(message: String) {
     }
 }
 
-/** The transcript, with a retry bar above it while the original captions play untranslated. */
+/** The transcript; translation problems show in the top-right icon ([TranslationIssueButton]). */
 @Composable
 internal fun TranslatedSubtitleTimeline(
     state: DualSubUiState,
-    onRetryTranslation: () -> Unit,
     onWordClick: (WordTap) -> Unit,
     onReplay: (SubtitleSegment) -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
-        state.translationError?.let { TranslationUnavailableBar(it, onRetryTranslation) }
-        Box(Modifier.fillMaxWidth().weight(1f)) {
-            SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
-        }
-    }
-}
-
-@Composable
-internal fun TranslationUnavailableBar(
-    message: String,
-    onRetry: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp).testTag("translation_unavailable"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = message,
-            color = Color(0xFFFFB4AB),
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-        TextButton(onClick = onRetry) {
-            Icon(Icons.Default.Refresh, contentDescription = null)
-            Spacer(Modifier.size(5.dp))
-            Text(stringResource(R.string.player_retry_translation))
-        }
-    }
+    SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
 }
 
 @Composable

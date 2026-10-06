@@ -47,6 +47,15 @@ Paths below are relative to
   support playback-prioritized work; obsolete loads must not update current state.
   Both translators also list, download and remove whole languages for the
   Settings → Translation → Languages on this device screen (`ui/LanguageDownloads.kt`).
+- `translation/GoogleWebTranslator.kt` is the default engine in the GitHub build (Settings →
+  Translation → Google Translate, `translation/TranslationEngine.kt`). It calls Google Translate's
+  unofficial web endpoints with its own caches, sending upcoming sentences in one batch request
+  (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
+  translation through the chosen engine. A failure moves that video to on-device translation
+  (`DualSubUiState.onDeviceFallback`), shows `ui/OnlineTranslationNotice.kt`'s top-right icon, and
+  checks Google again every 2 minutes; the next load tries Google first.
+  `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build, which stays on-device.
+  See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes with
   hand-written rules; `ui/GrammarExplanations.kt` words them (`strings_grammar.xml`) in the
   word card. Explanations are this project's own text, not copied from other grammar resources.
@@ -80,8 +89,10 @@ Paths below are relative to
 - Keep caption-provider host allowlists, response limits (currently 8 MiB), timeout
   budgets, and cancellation. Undocumented YouTube behavior belongs behind the provider
   boundary so it can change without rewriting the learning UI.
-- Translation stays on-device; no user-provided/developer-provisioned service key is
-  required. YouTube's internal client key handling is an extraction detail, not a
+- No user-provided/developer-provisioned service key is required for translation. The GitHub
+  build translates with Google Translate online by default (owner decision 2026-10-05) and must
+  keep a Settings switch to on-device translation and fall back to it when Google fails. The
+  F-Droid build never translates online. YouTube's internal client key handling is an extraction detail, not a
   new application API-key setup requirement.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding
   completion for existing users; new users still see the guide. Preserve vocabulary,

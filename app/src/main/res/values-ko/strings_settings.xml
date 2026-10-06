@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">언어 목록을 불러오지 못했어요. 연결을 확인해 주세요.</string>
     <string name="language_downloads_retry">다시 시도</string>
     <string name="language_downloads_back">뒤로</string>
+    <string name="settings_google_translate_title">Google 번역(온라인)</string>
+    <string name="settings_google_translate_description">기본으로 켜져 있습니다. 특히 일본어 번역 품질이 더 좋습니다. 자막 텍스트를 Google로 보냅니다. Google 공식 서비스가 아니므로 작동이 멈출 수 있으며, 그때는 Google이 다시 작동할 때까지 기기에서 번역합니다. 끄면 항상 기기에서 번역합니다.</string>
 </resources>

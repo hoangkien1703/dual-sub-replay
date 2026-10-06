@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">实时字幕</string>
     <string name="status_retrying_full_transcript">正在重试完整字幕…</string>
     <string name="status_retry_full_transcript">重试完整字幕</string>
+    <string name="translation_issue_button">翻译出现问题</string>
+    <string name="translation_issue_on_device_title">正在使用设备端翻译</string>
+    <string name="translation_issue_on_device_message">Google 翻译目前无法使用，此视频改为在设备上翻译。应用每 2 分钟以及在下一个视频时会再次尝试 Google。</string>
+    <string name="translation_issue_try_google">再次尝试 Google</string>
 </resources>

@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">No se pudo cargar la lista de idiomas. Revisa tu conexión.</string>
     <string name="language_downloads_retry">Reintentar</string>
     <string name="language_downloads_back">Atrás</string>
+    <string name="settings_google_translate_title">Google Traductor (en línea)</string>
+    <string name="settings_google_translate_description">Activado de forma predeterminada. Traducciones mejores, sobre todo del japonés. Envía el texto de los subtítulos a Google. No es un servicio oficial de Google, así que puede dejar de funcionar; entonces la app traduce en tu dispositivo hasta que Google vuelva a funcionar. Desactívalo para traducir siempre en tu dispositivo.</string>
 </resources>

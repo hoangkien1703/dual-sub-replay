@@ -257,6 +257,59 @@ class SubtitleMergerTest {
         assertEquals(longCjk.length, split.sumOf { it.originalText.length })
     }
 
+    @Test fun japaneseSentenceEndsWithoutASpaceStartANewSentence() {
+        val cue = SubtitleSegment(0, 0, 6_000, "そしてうっかり何々ちゃったって使うことが多いです。これはかなり自然な日本語な")
+        val split = SubtitleMerger.splitAtSentenceEnds(listOf(cue))
+        assertEquals(listOf("そしてうっかり何々ちゃったって使うことが多いです。", "これはかなり自然な日本語な"), split.map { it.originalText })
+        assertTrue(split[0].endMs <= split[1].startMs)
+    }
+
+    @Test fun aQuoteClosingAfterTheSentenceMarkStaysTogether() {
+        val cue = SubtitleSegment(0, 0, 4_000, "「もうダメだ。」と思いました。")
+        assertEquals(listOf("「もうダメだ。」と思いました。"), SubtitleMerger.splitAtSentenceEnds(listOf(cue)).map { it.originalText })
+    }
+
+    @Test fun longJapaneseRowsSplitAtCommasIntoShortRows() {
+        val text = "皆さんもあると思うんですけど、日本語を話しているときに、すごい間違えたりとか、"
+        val split = SubtitleMerger.splitSentenceChunks(text, SPLIT_SENTENCE_MAX_CHARACTERS)
+        assertEquals(listOf("皆さんもあると思うんですけど、", "日本語を話しているときに、", "すごい間違えたりとか、"), split)
+    }
+
+    @Test fun shortJapaneseClausesShareARow() {
+        val text = "でも、やっぱり、日本語を話しているときに、すごい間違えたりとかしますよね。"
+        val split = SubtitleMerger.splitSentenceChunks(text, SPLIT_SENTENCE_MAX_CHARACTERS)
+        assertEquals(listOf("でも、やっぱり、", "日本語を話しているときに、", "すごい間違えたりとかしますよね。"), split)
+        assertEquals(text, split.joinToString(""))
+    }
+
+    @Test fun japaneseWithoutCommasCutsWhereAWordStarts() {
+        val text = "今日は天気がいいので友達と一緒に公園まで散歩に行こうと思っています"
+        val split = SubtitleMerger.splitSentenceChunks(text, SPLIT_SENTENCE_MAX_CHARACTERS)
+        assertTrue(split.size >= 2)
+        assertTrue(split.all { it.length <= cjkMaxCharacters(SPLIT_SENTENCE_MAX_CHARACTERS) })
+        assertEquals(text, split.joinToString(""))
+        // Every row after the first starts with a kanji word, not in the middle of one.
+        split.drop(1).forEach { assertEquals(Character.UnicodeScript.HAN, Character.UnicodeScript.of(it.first().code)) }
+    }
+
+    @Test fun japaneseRowsStayExactSlicesWhenTheCaptionHasSpaces() {
+        val text = "皆さんもあると思うんですけど、 日本語を話しているときに、 すごい間違えたりとか。"
+        val split = SubtitleMerger.splitSentenceChunks(text, SPLIT_SENTENCE_MAX_CHARACTERS)
+        assertEquals(3, split.size)
+        var cursor = 0
+        split.forEach { row ->
+            val found = text.indexOf(row, cursor)
+            assertTrue(row, found >= 0)
+            cursor = found + row.length
+        }
+    }
+
+    @Test fun shortJapaneseRowsAndKoreanKeepTheirOldRules() {
+        assertEquals(listOf("すごい間違えたりとか、"), SubtitleMerger.splitSentenceChunks("すごい間違えたりとか、", SPLIT_SENTENCE_MAX_CHARACTERS))
+        val korean = "오늘은 날씨가 좋아서 친구와 함께 공원까지 산책하러 가려고 합니다"
+        assertEquals(listOf(korean), SubtitleMerger.splitSentenceChunks(korean, SPLIT_SENTENCE_MAX_CHARACTERS))
+    }
+
     @Test fun enhancedNaturalFlowMergesAutoTranscriptsAtPausesAndCapitalizes() {
         val cues = listOf(
             RawCaptionCue(startMs = 0, endMs = 800, text = "i was walking home"),

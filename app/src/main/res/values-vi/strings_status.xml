@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Phụ đề trực tiếp</string>
     <string name="status_retrying_full_transcript">Đang thử lại bản chép lời đầy đủ…</string>
     <string name="status_retry_full_transcript">Thử lại bản chép lời đầy đủ</string>
+    <string name="translation_issue_button">Lỗi dịch</string>
+    <string name="translation_issue_on_device_title">Đang dùng dịch trên thiết bị</string>
+    <string name="translation_issue_on_device_message">Google Dịch hiện không hoạt động nên video này được dịch trên thiết bị của bạn. Ứng dụng sẽ thử lại Google mỗi 2 phút và ở video tiếp theo.</string>
+    <string name="translation_issue_try_google">Thử lại Google</string>
 </resources>

@@ -69,4 +69,19 @@ class TranslationSlicingTest {
             filled.joinToString(" ") { it.translatedText.orEmpty() },
         )
     }
+
+    @Test fun japaneseTranslationUnitsFollowSentenceEndsNotCueEnds() {
+        // Auto-generated cues end mid-sentence and hold the next sentence's start after 。 with no space.
+        val cues =
+            listOf(
+                SubtitleSegment(0, 0, 5_000, "そしてうっかり何々ちゃったって使うことが多いです。これはかなり自然な日本語な"),
+                SubtitleSegment(1, 5_000, 8_000, "ので是非覚えておいてください。"),
+            )
+        val rows = captionDisplaySegments(cues, CaptionFormat.SHORT_PHRASES, natural = true)
+        val sentences = rows.map { it.sentence?.text ?: it.originalText }.distinct()
+        assertEquals(
+            listOf("そしてうっかり何々ちゃったって使うことが多いです。", "これはかなり自然な日本語なので是非覚えておいてください。"),
+            sentences,
+        )
+    }
 }

@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">无法加载语言列表。请检查网络连接。</string>
     <string name="language_downloads_retry">重试</string>
     <string name="language_downloads_back">返回</string>
+    <string name="settings_google_translate_title">Google 翻译（在线）</string>
+    <string name="settings_google_translate_description">默认开启。翻译质量更好，尤其是日语。会将字幕文本发送给 Google。这不是 Google 的官方服务，可能会停止工作；届时应用会在设备上翻译，直到 Google 恢复。关闭后将始终在设备上翻译。</string>
 </resources>

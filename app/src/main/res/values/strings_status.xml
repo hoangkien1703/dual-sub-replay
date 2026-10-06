@@ -18,4 +18,8 @@
     <string name="status_live_subtitles_title">Live subtitles</string>
     <string name="status_retrying_full_transcript">Retrying full transcript…</string>
     <string name="status_retry_full_transcript">Retry full transcript</string>
+    <string name="translation_issue_button">Translation problem</string>
+    <string name="translation_issue_on_device_title">Using on-device translation</string>
+    <string name="translation_issue_on_device_message">Google Translate isn\'t working right now, so this video is translated on your device. The app checks Google again every 2 minutes and on the next video.</string>
+    <string name="translation_issue_try_google">Try Google again</string>
 </resources>

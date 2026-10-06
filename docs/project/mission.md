@@ -9,9 +9,12 @@ context for later practice. See the [product guide](../../README.md) for feature
 - Keep YouTube playback, captions, and replay reliable. The learning controls build
   on the existing YouTube page; this is a language-learning app, not a project to
   replace YouTube's general browsing/player experience.
-- Keep translation on-device with downloadable ML Kit models and study data local.
-  No project-operated backend, application account, or user-provided API key is
-  required. Avoid adding unnecessary service dependencies.
+- Keep study data local and on-device translation always available with downloadable
+  ML Kit models. No project-operated backend, application account, or user-provided API
+  key is required. Avoid adding unnecessary service dependencies. The owner approved one
+  exception on 2026-10-05: the GitHub build translates with Google Translate (online) by
+  default for better quality, with a setting to translate on the device instead, and it
+  offers on-device again when Google fails. The F-Droid build stays on-device.
 - Be precise about privacy: YouTube browsing/captions and model downloads use the
   network; speech engines may use online voices. On-device translation does not
   make the entire app offline or prevent Android backup of local study data.

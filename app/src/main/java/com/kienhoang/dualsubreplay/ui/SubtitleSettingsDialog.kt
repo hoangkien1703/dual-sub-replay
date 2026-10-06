@@ -74,6 +74,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
 
@@ -314,6 +315,7 @@ internal fun SubtitleSettingsDialog(
     onPreloadModelsChange: (Boolean) -> Unit = {},
     naturalSubtitlesEnabled: Boolean = true,
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
+    onlineTranslation: OnlineTranslationSettings = OnlineTranslationSettings(),
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
     wordLearningTarget: String = "both",
@@ -342,6 +344,7 @@ internal fun SubtitleSettingsDialog(
     var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     var showResetConfirmation by remember { mutableStateOf(false) }
     val languageDownloads = LocalLanguageDownloads.current
+    val translationEngineActions = LocalTranslationEngineActions.current
     var showLanguageDownloads by remember { mutableStateOf(false) }
     val autoLabel = stringResource(R.string.settings_source_language_auto)
     val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
@@ -510,6 +513,9 @@ internal fun SubtitleSettingsDialog(
                     }
 
                     Section(MoreSettingsSection.TRANSLATION, Icons.Default.Translate) {
+                        if (onlineTranslation.available && translationEngineActions != null) {
+                            OnlineTranslationSettingsRows(onlineTranslation, translationEngineActions)
+                        }
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_natural_flow_title),
                             description = stringResource(R.string.settings_natural_flow_description),
@@ -932,6 +938,24 @@ private fun SubtitleColorSwatchRow(
             }
         }
     }
+}
+
+@Composable
+private fun OnlineTranslationSettingsRows(
+    settings: OnlineTranslationSettings,
+    actions: TranslationEngineActions,
+) {
+    val google = settings.engine == TranslationEngine.GOOGLE_WEB
+    SettingsSwitchRow(
+        title = stringResource(R.string.settings_google_translate_title),
+        description = stringResource(R.string.settings_google_translate_description),
+        checked = google,
+        onCheckedChange = { enabled ->
+            val engine = if (enabled) TranslationEngine.GOOGLE_WEB else TranslationEngine.ON_DEVICE
+            actions.select(engine)
+        },
+        testTag = "google_translate_switch",
+    )
 }
 
 @Composable

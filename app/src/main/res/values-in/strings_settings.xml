@@ -135,4 +135,6 @@
     <string name="language_downloads_load_failed">Daftar bahasa tidak dapat dimuat. Periksa koneksi Anda.</string>
     <string name="language_downloads_retry">Coba lagi</string>
     <string name="language_downloads_back">Kembali</string>
+    <string name="settings_google_translate_title">Google Terjemahan (online)</string>
+    <string name="settings_google_translate_description">Aktif secara default. Terjemahan lebih baik, terutama untuk bahasa Jepang. Mengirim teks subtitle ke Google. Ini bukan layanan resmi Google sehingga bisa berhenti berfungsi; saat itu aplikasi menerjemahkan di perangkat Anda sampai Google berfungsi lagi. Nonaktifkan untuk selalu menerjemahkan di perangkat Anda.</string>
 </resources>
