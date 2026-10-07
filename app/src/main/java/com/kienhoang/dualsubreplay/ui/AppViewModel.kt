@@ -206,6 +206,9 @@ internal fun activeWordIndex(
 
 internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
 
+/** The language chosen as "learning" at onboarding; see [storedLearningLanguage]. */
+private const val LEARNING_LANGUAGE_PREFERENCE = "learning_language"
+
 internal fun preferredCaptionLanguages(sourcePreference: String): List<String> =
     sourcePreference.takeUnless { it == "auto" }?.let(::listOf).orEmpty()
 
@@ -216,6 +219,19 @@ internal fun resolvedSourcePreference(
     requested.takeIf {
         it == "auto" || TranslationLanguages.normalize(it) == TranslationLanguages.normalize(resolved)
     } ?: "auto"
+
+/**
+ * The language the user studies, which Auto uses when a video gives no clearer sign of its spoken
+ * language: the onboarding choice, or else the caption language they last picked by hand. Unlike
+ * the source preference it never falls back to Auto after a video without that language.
+ */
+internal fun storedLearningLanguage(
+    learning: String?,
+    preferredCaption: String?,
+): String? =
+    listOf(learning, preferredCaption).firstNotNullOfOrNull { raw ->
+        raw?.takeIf { it != "auto" }?.let(::normalizeSupportedLanguage)
+    }
 
 internal fun storedSourcePreference(raw: String?): String =
     raw
@@ -754,6 +770,16 @@ class AppViewModel internal constructor(
         loadVideo(videoId, showPanel = true)
     }
 
+    /** Fetches [videoId]'s captions in the chosen original language, or Auto's pick when none is chosen. */
+    private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult =
+        captionProvider.fetch(videoId, preferredCaptionLanguages(_state.value.sourcePreference), learningLanguage())
+
+    private fun learningLanguage(): String? =
+        storedLearningLanguage(
+            preferences.getString(LEARNING_LANGUAGE_PREFERENCE, null),
+            preferences.getString("preferred_caption_language", null),
+        )
+
     fun setTargetLanguage(language: String) {
         val normalized = TranslationLanguages.normalize(language)
         if (!TranslationLanguages.isSupported(normalized) || _state.value.targetLanguage == normalized) return
@@ -769,7 +795,7 @@ class AppViewModel internal constructor(
     ) {
         val languages = normalizedOnboardingLanguages(nativeLanguage, learningLanguage) ?: return
         val (native, learning) = languages
-        preferences.edit().putString("preferred_caption_language", learning).apply()
+        preferences.edit().putString("preferred_caption_language", learning).putString(LEARNING_LANGUAGE_PREFERENCE, learning).apply()
         preferences.edit().putString("target_language", native).apply()
         _state.update { it.copy(sourcePreference = learning, targetLanguage = native) }
         warmTranslationModel(sourceLanguage = learning, targetLanguage = native)
@@ -1206,12 +1232,8 @@ class AppViewModel internal constructor(
             viewModelScope.launch {
                 var rawStore: SubtitleStore? = null
                 try {
-                    val preferredLanguages = preferredCaptionLanguages(_state.value.sourcePreference)
                     val natural = _state.value.naturalSubtitlesEnabled
-                    val track =
-                        withContext(Dispatchers.IO) {
-                            persistCaptionTrack(captionProvider.fetch(videoId, preferredLanguages), natural) { rawStore = it }
-                        }
+                    val track = withContext(Dispatchers.IO) { persistCaptionTrack(fetchCaptionTrack(videoId), natural) { rawStore = it } }
                     if (!isCurrentLoad(_state.value, videoId, generation)) return@launch
                     liveTranslationGate.reset()
                     liveTranslationJob?.cancel()

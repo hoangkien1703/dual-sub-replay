@@ -296,15 +296,88 @@ private fun baseLanguage(track: JSONObject): String =
 
 private fun JSONArray.objects(): List<JSONObject> = (0 until length()).mapNotNull(::optJSONObject)
 
+/** The user's explicit source languages (empty for Auto) and the language they study, if known. */
+internal data class CaptionLanguageChoice(
+    val preferred: List<String>,
+    val learning: String?,
+)
+
 /**
- * The language actually spoken in the video. YouTube's speech recognizer produces its
- * auto-generated track from the audio, so that track wins even when the creator labelled the
- * audio wrongly (a Japanese video tagged "English (US) original" still has `a.ja`). Without auto
- * captions, the default audio track's declared language (`ja.4`) is next. The creator's default
- * caption is a last resort only: on learning channels it is usually the English translation.
+ * Writing systems that point to a language, with the languages to try in order. Latin letters are
+ * left out on purpose: many Japanese-learning channels title their videos in English.
  */
-internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
+private val SCRIPT_LANGUAGES: Map<Character.UnicodeScript, List<String>> =
+    mapOf(
+        Character.UnicodeScript.HIRAGANA to listOf("ja"),
+        Character.UnicodeScript.KATAKANA to listOf("ja"),
+        Character.UnicodeScript.HANGUL to listOf("ko"),
+        Character.UnicodeScript.HAN to listOf("zh", "ja"),
+        Character.UnicodeScript.THAI to listOf("th"),
+        Character.UnicodeScript.ARABIC to listOf("ar", "fa", "ur"),
+        Character.UnicodeScript.HEBREW to listOf("he", "iw"),
+        Character.UnicodeScript.DEVANAGARI to listOf("hi", "mr", "ne"),
+        Character.UnicodeScript.CYRILLIC to listOf("ru", "uk", "bg", "sr"),
+        Character.UnicodeScript.GREEK to listOf("el"),
+    )
+
+/**
+ * The languages a title or description is written in, likeliest first, judged only from
+ * non-Latin scripts. Any kana means Japanese (a Japanese title often mixes in kanji and English);
+ * otherwise the script with the most letters wins. With [mustDominate], those letters also have
+ * to outnumber Latin ones, which suits descriptions that mix languages.
+ */
+internal fun textScriptLanguages(
+    text: String,
+    mustDominate: Boolean = false,
+): List<String> {
+    val counts = mutableMapOf<Character.UnicodeScript, Int>()
+    text.codePoints().filter(Character::isLetter).forEach { codePoint ->
+        val script = Character.UnicodeScript.of(codePoint)
+        counts[script] = (counts[script] ?: 0) + 1
+    }
+    val latin = counts[Character.UnicodeScript.LATIN] ?: 0
+    val kana = (counts[Character.UnicodeScript.HIRAGANA] ?: 0) + (counts[Character.UnicodeScript.KATAKANA] ?: 0)
+    val (script, letters) =
+        if (kana >= MIN_SCRIPT_LETTERS) {
+            Character.UnicodeScript.HIRAGANA to kana
+        } else {
+            counts.filterKeys(SCRIPT_LANGUAGES::containsKey).maxByOrNull { it.value }?.toPair() ?: return emptyList()
+        }
+    if (letters < MIN_SCRIPT_LETTERS || (mustDominate && letters <= latin)) return emptyList()
+    return SCRIPT_LANGUAGES.getValue(script)
+}
+
+private const val MIN_SCRIPT_LETTERS = 2
+
+/** The first language the title (or, failing that, a mostly non-Latin description) points to that has a track. */
+private fun titleCaptionLanguage(
+    videoDetails: JSONObject?,
+    trackLanguages: Set<String>,
+): String? {
+    val title = videoDetails?.optString("title").orEmpty()
+    val description = videoDetails?.optString("shortDescription").orEmpty()
+    val candidates = textScriptLanguages(title).ifEmpty { textScriptLanguages(description, mustDominate = true) }
+    return candidates.firstOrNull { it in trackLanguages }
+}
+
+/**
+ * The language actually spoken in the video, from the strongest signal to the weakest:
+ * 1. YouTube's speech recognizer builds the auto-generated track from the audio, so that track wins
+ *    even when the creator labelled the audio wrongly (a Japanese video tagged "English (US)" still
+ *    has `a.ja`).
+ * 2. The script of the title (or description), when a track exists in that language: a Japanese
+ *    title with Japanese and English creator tracks means Japanese speech.
+ * 3. The default audio track's declared language (`ja.4`).
+ * 4. The language the user is learning ([learningLanguage]), when the video has a track in it.
+ * 5. The creator's default caption, last: on learning channels it is usually the English translation.
+ */
+internal fun spokenCaptionLanguage(
+    renderer: JSONObject,
+    videoDetails: JSONObject? = null,
+    learningLanguage: String? = null,
+): String? {
     val tracks = renderer.optJSONArray("captionTracks")?.objects().orEmpty()
+    val trackLanguages = tracks.map(::baseLanguage).filter(String::isNotBlank).toSet()
     val audioTracks = renderer.optJSONArray("audioTracks")
     val defaultAudio = audioTracks?.optJSONObject(renderer.optInt("defaultAudioTrackIndex", 0))
     val defaultAudioCaptions =
@@ -319,8 +392,11 @@ internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
             ?.substringBefore('-')
             ?.lowercase()
             ?.takeIf(String::isNotBlank)
+    val learning = learningLanguage?.substringBefore('-')?.lowercase()?.takeIf { it in trackLanguages }
     return generated?.let(::baseLanguage)?.takeIf(String::isNotBlank)
+        ?: titleCaptionLanguage(videoDetails, trackLanguages)
         ?: audioLanguage
+        ?: learning
         ?: defaultAudio?.optInt("defaultCaptionTrackIndex", -1)?.let(tracks::getOrNull)?.let(::baseLanguage)?.takeIf(String::isNotBlank)
 }
 
@@ -331,9 +407,11 @@ internal fun spokenCaptionLanguage(renderer: JSONObject): String? {
 internal fun selectCaptionTrack(
     renderer: JSONObject,
     preferredLanguages: List<String>,
+    videoDetails: JSONObject? = null,
+    learningLanguage: String? = null,
 ): JSONObject? {
     val normalized = preferredLanguages.map { it.substringBefore('-').lowercase() }
-    val spoken = spokenCaptionLanguage(renderer)
+    val spoken = spokenCaptionLanguage(renderer, videoDetails, learningLanguage)
     return renderer.optJSONArray("captionTracks")?.objects().orEmpty().maxByOrNull { track ->
         val language = baseLanguage(track)
         val preferenceIndex = normalized.indexOf(language)
@@ -400,13 +478,14 @@ class YouTubeCaptionProvider(
     override suspend fun fetch(
         videoId: String,
         preferredLanguages: List<String>,
+        learningLanguage: String?,
     ): CaptionTrackResult =
         withContext(Dispatchers.IO) {
             val deadlineNanos =
                 System.nanoTime() +
                     TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
             try {
-                fetchInternal(videoId, preferredLanguages, deadlineNanos)
+                fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), deadlineNanos)
             } catch (error: CancellationException) {
                 // Never turn a cancelled/replaced load into a caption failure. The
                 // ViewModel uses cancellation whenever the video or language changes.
@@ -429,7 +508,7 @@ class YouTubeCaptionProvider(
 
     private suspend fun fetchInternal(
         videoId: String,
-        preferredLanguages: List<String>,
+        languages: CaptionLanguageChoice,
         deadlineNanos: Long,
     ): CaptionTrackResult {
         ensureLookupTimeRemaining(deadlineNanos, "starting caption discovery")
@@ -457,7 +536,7 @@ class YouTubeCaptionProvider(
             try {
                 return captionResultFromPlayerResponse(
                     root = embeddedPlayer,
-                    preferredLanguages = preferredLanguages,
+                    languages = languages,
                     userAgent = WEB_USER_AGENT,
                     deadlineNanos = deadlineNanos,
                     noTracksMessage = "The watch page embedded no public caption track.",
@@ -487,7 +566,7 @@ class YouTubeCaptionProvider(
             try {
                 return fetchWithClient(
                     videoId = videoId,
-                    preferredLanguages = preferredLanguages,
+                    languages = languages,
                     apiKey = apiKey,
                     profile = profile,
                     deadlineNanos = deadlineNanos,
@@ -543,7 +622,7 @@ class YouTubeCaptionProvider(
 
     private suspend fun fetchWithClient(
         videoId: String,
-        preferredLanguages: List<String>,
+        languages: CaptionLanguageChoice,
         apiKey: String,
         profile: YouTubePlayerClient,
         deadlineNanos: Long,
@@ -571,7 +650,7 @@ class YouTubeCaptionProvider(
                     )
                 return captionResultFromPlayerResponse(
                     root = JSONObject(playerJson),
-                    preferredLanguages = preferredLanguages,
+                    languages = languages,
                     userAgent = profile.userAgent,
                     deadlineNanos = deadlineNanos,
                     noTracksMessage = "This client returned no public caption track.",
@@ -591,7 +670,7 @@ class YouTubeCaptionProvider(
 
     private suspend fun captionResultFromPlayerResponse(
         root: JSONObject,
-        preferredLanguages: List<String>,
+        languages: CaptionLanguageChoice,
         userAgent: String,
         deadlineNanos: Long,
         noTracksMessage: String,
@@ -618,7 +697,7 @@ class YouTubeCaptionProvider(
                 ?: throw NoCaptionTracksException(noTracksMessage)
 
         val selected =
-            selectCaptionTrack(renderer, preferredLanguages)
+            selectCaptionTrack(renderer, languages.preferred, root.optJSONObject("videoDetails"), languages.learning)
                 ?: throw NoCaptionTracksException("No compatible caption track was found.")
         val cues =
             fetchCaptionCues(

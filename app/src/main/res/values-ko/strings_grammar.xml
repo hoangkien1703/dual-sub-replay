@@ -3,6 +3,8 @@
     <string name="grammar_title">문법</string>
     <string name="grammar_show_alternates">다른 뜻 보기</string>
     <string name="grammar_hide_alternates">다른 뜻 숨기기</string>
+    <string name="grammar_jlpt_level">N%1$d</string>
+    <string name="grammar_jlpt_level_description">JLPT N%1$d 수준</string>
     <string name="grammar_topic">A는 (A가 화제임을 나타냄)</string>
     <string name="grammar_contrast">대조: 적어도 A는 (다른 것과 달리)</string>
     <string name="grammar_subject">A가 주어임을 나타냄 (누가·무엇이 하는지)</string>

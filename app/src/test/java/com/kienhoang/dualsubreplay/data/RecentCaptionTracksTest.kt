@@ -112,6 +112,19 @@ class RecentCaptionTracksTest {
             assertTrue(directory.listFiles().orEmpty().isEmpty())
         }
 
+    @Test
+    fun aDifferentLearningLanguageIsADifferentEntry() =
+        withDirectory { directory ->
+            val network = CountingProvider(track)
+            val tracks = RecentCaptionTracks(network, directory)
+            runBlocking {
+                tracks.fetch("video1", emptyList(), "ja")
+                tracks.fetch("video1", emptyList(), "ja")
+                tracks.fetch("video1", emptyList(), "ko")
+            }
+            assertEquals(2, network.calls)
+        }
+
     private class CountingProvider(
         private val track: CaptionTrackResult,
         private var failures: Int = 0,
@@ -121,6 +134,7 @@ class RecentCaptionTracksTest {
         override suspend fun fetch(
             videoId: String,
             preferredLanguages: List<String>,
+            learningLanguage: String?,
         ): CaptionTrackResult {
             calls += 1
             if (failures > 0) {

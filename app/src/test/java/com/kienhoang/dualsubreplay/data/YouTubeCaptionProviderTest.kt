@@ -190,6 +190,72 @@ class YouTubeCaptionProviderTest {
         assertEquals(".ar", selectCaptionTrack(renderer, emptyList())?.optString("vssId"))
     }
 
+    @Test
+    fun japaneseTitleBeatsAnEnglishDefaultCaption() {
+        // The owner's screenshot: only creator-written English and Japanese tracks, English default.
+        val renderer =
+            captionRenderer(manual("en"), manual("ja"))
+                .put("audioTracks", JSONArray().put(JSONObject().put("defaultCaptionTrackIndex", 0)))
+        val details = JSONObject().put("title", "昔の人は江戸から京都まで歩いて行った")
+
+        assertEquals("ja", spokenCaptionLanguage(renderer, details))
+        assertEquals(".ja", selectCaptionTrack(renderer, emptyList(), details)?.optString("vssId"))
+    }
+
+    @Test
+    fun titleScriptBeatsMislabelledAudioButNotTheSpeechRecognizer() {
+        val details = JSONObject().put("title", "東京の夜を歩く")
+        val mislabelled =
+            captionRenderer(manual("en"), manual("ja"))
+                .put("audioTracks", JSONArray().put(JSONObject().put("audioTrackId", "en-US.4")))
+        val recognized = captionRenderer(manual("en"), manual("ja"), generated("en"))
+
+        assertEquals("ja", spokenCaptionLanguage(mislabelled, details))
+        assertEquals("en", spokenCaptionLanguage(recognized, details))
+    }
+
+    @Test
+    fun titleScriptCountsOnlyForALanguageWithATrack() {
+        val renderer =
+            captionRenderer(manual("en"), manual("es"))
+                .put("audioTracks", JSONArray().put(JSONObject().put("defaultCaptionTrackIndex", 0)))
+
+        assertEquals("en", spokenCaptionLanguage(renderer, JSONObject().put("title", "日本語の動画")))
+    }
+
+    @Test
+    fun aMostlyJapaneseDescriptionHelpsWhenTheTitleIsEnglish() {
+        val renderer = captionRenderer(manual("en"), manual("ja"))
+        val japanese = JSONObject().put("title", "Walk vlog").put("shortDescription", "今日は江戸から京都まで歩いてみました。")
+        val mixed = JSONObject().put("title", "Japan trip").put("shortDescription", "My trip to Tokyo 東京 and Kyoto 京都, with lots of fun")
+
+        assertEquals("ja", spokenCaptionLanguage(renderer, japanese))
+        assertNull(spokenCaptionLanguage(renderer, mixed))
+    }
+
+    @Test
+    fun learningLanguageDecidesOnlyWhenTheVideoGivesNoBetterSign() {
+        val noSignal =
+            captionRenderer(manual("en"), manual("ja"))
+                .put("audioTracks", JSONArray().put(JSONObject().put("defaultCaptionTrackIndex", 0)))
+        val labelledAudio =
+            captionRenderer(manual("en"), manual("ja"))
+                .put("audioTracks", JSONArray().put(JSONObject().put("audioTrackId", "en.4")))
+
+        assertEquals(".ja", selectCaptionTrack(noSignal, emptyList(), null, "ja")?.optString("vssId"))
+        assertEquals(".en", selectCaptionTrack(noSignal, emptyList(), null, "ko")?.optString("vssId"))
+        assertEquals(".en", selectCaptionTrack(labelledAudio, emptyList(), null, "ja")?.optString("vssId"))
+    }
+
+    @Test
+    fun textScriptLanguagesReadsNonLatinScriptsOnly() {
+        assertEquals(listOf("ja"), textScriptLanguages("【京都】Walking Vlog ひとり旅"))
+        assertEquals(listOf("ko"), textScriptLanguages("서울 여행 브이로그"))
+        assertEquals(listOf("zh", "ja"), textScriptLanguages("北京旅行"))
+        assertEquals(emptyList<String>(), textScriptLanguages("Learn Japanese in 10 minutes"))
+        assertEquals(emptyList<String>(), textScriptLanguages("Tokyo 東京 and Kyoto 京都 trip", mustDominate = true))
+    }
+
     private fun captionRenderer(vararg tracks: JSONObject): JSONObject {
         val list = JSONArray()
         tracks.forEach { list.put(it) }

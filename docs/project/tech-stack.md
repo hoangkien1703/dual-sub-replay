@@ -56,9 +56,13 @@ Paths below are relative to
   checks Google again every 2 minutes; the next load tries Google first.
   `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build, which stays on-device.
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
-- `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes with
-  hand-written rules; `ui/GrammarExplanations.kt` words them (`strings_grammar.xml`) in the
-  word card. Explanations are this project's own text, not copied from other grammar resources.
+- `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes: a data
+  catalogue of N5 to N1 patterns (`JapaneseGrammarCatalogue.kt`, matched by `GrammarPattern.kt`)
+  plus hand-written rules for context-dependent points. Every catalogue point needs an example
+  sentence in `JapaneseGrammarCatalogueTest`. `ui/GrammarExplanations.kt` words them
+  (`strings_grammar.xml`, `strings_grammar_points.xml`) with a JLPT badge in the word card.
+  Explanations are this project's own text, not copied from other grammar resources.
+  See the [N1 spec](../specs/2026-10-07-grammar-to-n1-and-auto-caption-language.md).
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`

@@ -34,6 +34,14 @@ class OnboardingPreferencesTest {
         assertEquals("he", storedSourcePreference("iw"))
     }
 
+    @Test fun learningLanguageComesFromOnboardingThenTheSavedCaptionLanguage() {
+        assertEquals("ja", storedLearningLanguage("ja", "en"))
+        assertEquals("ko", storedLearningLanguage(null, "ko"))
+        assertEquals("ja", storedLearningLanguage("klingon", "ja"))
+        assertNull(storedLearningLanguage(null, "auto"))
+        assertNull(storedLearningLanguage(null, null))
+    }
+
     @Test fun initialGuideCompletedShowsForNewUsers() {
         assertEquals(
             false,

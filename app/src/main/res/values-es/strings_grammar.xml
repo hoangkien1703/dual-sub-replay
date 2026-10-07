@@ -3,6 +3,8 @@
     <string name="grammar_title">Gramática</string>
     <string name="grammar_show_alternates">Ver otros significados</string>
     <string name="grammar_hide_alternates">Ocultar otros significados</string>
+    <string name="grammar_jlpt_level">N%1$d</string>
+    <string name="grammar_jlpt_level_description">Nivel JLPT N%1$d</string>
     <string name="grammar_topic">En cuanto a A; marca A como el tema</string>
     <string name="grammar_contrast">Contraste: A, al menos (a diferencia de otros)</string>
     <string name="grammar_subject">Marca A como el sujeto (quién o qué lo hace)</string>
