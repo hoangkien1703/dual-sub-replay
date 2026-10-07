@@ -3,6 +3,8 @@
     <string name="grammar_title">Ngữ pháp</string>
     <string name="grammar_show_alternates">Xem nghĩa khác</string>
     <string name="grammar_hide_alternates">Ẩn nghĩa khác</string>
+    <string name="grammar_jlpt_level">N%1$d</string>
+    <string name="grammar_jlpt_level_description">Trình độ JLPT N%1$d</string>
     <string name="grammar_topic">Còn về A; đánh dấu A là chủ đề</string>
     <string name="grammar_contrast">Đối chiếu: ít nhất thì A (khác với những cái khác)</string>
     <string name="grammar_subject">Đánh dấu A là chủ ngữ (ai hoặc cái gì làm)</string>

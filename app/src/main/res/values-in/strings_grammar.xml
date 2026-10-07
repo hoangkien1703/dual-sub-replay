@@ -3,6 +3,8 @@
     <string name="grammar_title">Tata bahasa</string>
     <string name="grammar_show_alternates">Lihat arti lain</string>
     <string name="grammar_hide_alternates">Sembunyikan arti lain</string>
+    <string name="grammar_jlpt_level">N%1$d</string>
+    <string name="grammar_jlpt_level_description">Level JLPT N%1$d</string>
     <string name="grammar_topic">Mengenai A; menandai A sebagai topik</string>
     <string name="grammar_contrast">Kontras: A, setidaknya (berbeda dari yang lain)</string>
     <string name="grammar_subject">Menandai A sebagai subjek (siapa atau apa yang melakukan)</string>

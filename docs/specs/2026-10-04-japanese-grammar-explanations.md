@@ -2,6 +2,9 @@
 
 ## Status
 
+Extended by [grammar up to N1](2026-10-07-grammar-to-n1-and-auto-caption-language.md), which adds a pattern
+catalogue, JLPT badges, and drops any hit that overlaps a longer one.
+
 Implemented. The owner asked for this in the project thread on 2026-10-04, asked for research
 into how other apps do it, and chose "On-device rules" on the decision card after it. The owner
 asked for this, phrase translation and language downloads to ship in one PR (#99).

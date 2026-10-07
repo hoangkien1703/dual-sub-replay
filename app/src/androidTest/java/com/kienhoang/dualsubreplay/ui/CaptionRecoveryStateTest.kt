@@ -17,7 +17,11 @@ class CaptionRecoveryStateTest {
         var attempts = 0
         val retryResult = CompletableDeferred<CaptionTrackResult>()
         val provider = object : CaptionProvider {
-            override suspend fun fetch(videoId: String, preferredLanguages: List<String>): CaptionTrackResult {
+            override suspend fun fetch(
+                videoId: String,
+                preferredLanguages: List<String>,
+                learningLanguage: String?,
+            ): CaptionTrackResult {
                 attempts++
                 if (attempts == 1) throw CaptionUnavailableException("Simulated HTTP 429")
                 return retryResult.await()

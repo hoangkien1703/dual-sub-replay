@@ -43,6 +43,7 @@ class RestoredHighlightPlaybackTest {
                     override suspend fun fetch(
                         videoId: String,
                         preferredLanguages: List<String>,
+                        learningLanguage: String?,
                     ): CaptionTrackResult =
                         CaptionTrackResult(
                             "en",

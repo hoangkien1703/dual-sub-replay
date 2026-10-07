@@ -3,6 +3,8 @@
     <string name="grammar_title">Grammar</string>
     <string name="grammar_show_alternates">Show other meanings</string>
     <string name="grammar_hide_alternates">Hide other meanings</string>
+    <string name="grammar_jlpt_level">N%1$d</string>
+    <string name="grammar_jlpt_level_description">JLPT level N%1$d</string>
     <string name="grammar_topic">As for A; marks A as the topic</string>
     <string name="grammar_contrast">Contrast: A, at least (unlike others)</string>
     <string name="grammar_subject">Marks A as the subject (who or what does it)</string>

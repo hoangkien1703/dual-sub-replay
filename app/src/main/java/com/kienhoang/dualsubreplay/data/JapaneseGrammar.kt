@@ -1,106 +1,16 @@
 package com.kienhoang.dualsubreplay.data
 
 /**
- * What a Japanese grammar point can mean. The UI words each one (strings_grammar.xml), so this
- * file holds no learner-facing text. "A" in those texts is the word the point attaches to.
- */
-internal enum class GrammarMeaning {
-    TOPIC,
-    CONTRAST,
-    SUBJECT,
-    OBJECT_OF_FEELING,
-    BUT,
-    OBJECT,
-    THROUGH,
-    PLACE_EXIST,
-    TIME,
-    DESTINATION,
-    RECIPIENT,
-    PURPOSE,
-    BY_PASSIVE,
-    PLACE_OF_ACTION,
-    MEANS,
-    CAUSE,
-    LIMIT,
-    TOWARD,
-    WITH_AND,
-    QUOTE,
-    WHEN_NATURAL,
-    ALSO,
-    EVEN,
-    FROM,
-    BECAUSE,
-    UNTIL,
-    THAN,
-    FROM_FORMAL,
-    POSSESSIVE,
-    NOMINALIZER,
-    EXPLAIN,
-    AND_AMONG,
-    QUESTION,
-    OR,
-    SEEK_AGREEMENT,
-    NEW_INFO,
-    ALTHOUGH,
-    SO,
-    EVEN_THOUGH,
-    WHILE,
-    THINGS_LIKE,
-    ONLY_NEGATIVE,
-    ONLY,
-    IF,
-    TE_AND,
-    IN_AT_FORMAL,
-    ABOUT,
-    BY_DEPENDING,
-    AS_ROLE,
-    FOR_VIEWPOINT,
-    TOWARD_CONTRAST,
-    MUST,
-    MUST_NOT,
-    MAY,
-    CAN,
-    PROGRESSIVE,
-    COMPLETION,
-    FAVOR_RECEIVE,
-    FAVOR_GIVE,
-    FAVOR_HAVE,
-    PLEASE,
-    TRY,
-    IN_ADVANCE,
-    RESULT_STATE,
-    CHANGE_COMING,
-    CHANGE_GOING,
-    POLITE,
-    POLITE_PAST,
-    POLITE_NEGATIVE,
-    POLITE_NEGATIVE_PAST,
-    LETS_POLITE,
-    PROBABLY,
-    IF_WHEN,
-    PAST,
-    NEGATIVE,
-    WANT,
-    PASSIVE,
-    POTENTIAL,
-    RESPECT,
-    CAUSATIVE,
-    VOLITIONAL,
-    LOOKS_LIKE,
-    COPULA_POLITE,
-    COPULA,
-    NA_ADJECTIVE,
-}
-
-/**
  * One grammar point in a sentence: its usual written [form] (〜 stands for the word it attaches
- * to), the characters it covers, and its [meanings], the likeliest in this sentence first.
+ * to), the characters it covers, its [meanings] (the likeliest in this sentence first) and the
+ * JLPT [level] it is taught at.
  */
 internal data class GrammarMatch(
     val form: String,
     val start: Int,
     val end: Int,
     val meanings: List<GrammarMeaning>,
+    val level: JlptLevel = JlptLevel.N5,
 )
 
 /** A rule's hit: how many morphemes from the start index it covers, and what it is. */
@@ -108,6 +18,7 @@ private class RuleHit(
     val length: Int,
     val form: String,
     val meanings: List<GrammarMeaning>,
+    val level: JlptLevel? = null,
 )
 
 private typealias GrammarRule = (List<Morpheme>, Int) -> RuleHit?
@@ -122,28 +33,90 @@ private const val SUFFIX = "接尾"
 private const val CASE = "格助詞"
 private const val CONJUNCTIVE = "接続助詞"
 
+/** A point found at [index]; a lower [priority] wins between hits of the same length. */
+private class Candidate(
+    val priority: Int,
+    val index: Int,
+    val hit: RuleHit,
+)
+
 /**
  * Finds the grammar points of a sentence from its analyzer morphemes, the way Renshuu and
- * ichi.moe do: the analyzer tags each piece, and a hand-written list of patterns names them.
- * Longer patterns win, so the た of 〜ました or the て of 〜てくれる is not listed again on its own.
+ * ichi.moe do: the analyzer tags each piece, and a list of patterns names them. The catalogue
+ * (`JapaneseGrammarCatalogue.kt`) holds most points as data; the rules below handle the few whose
+ * meaning depends on the words around them. Longer points win and each morpheme belongs to one
+ * point, so the た of 〜ました or the parts of 〜わけにはいかない are not listed again on their own.
  */
 internal fun japaneseGrammar(morphemes: List<Morpheme>): List<GrammarMatch> {
-    val hits =
+    val catalogue =
+        GRAMMAR_CATALOGUE.flatMapIndexed { priority, pattern ->
+            morphemes.indices.mapNotNull { index ->
+                pattern
+                    .lengthAt(morphemes, index)
+                    .takeIf { it > 0 }
+                    ?.let { Candidate(priority, index, RuleHit(it, pattern.form, pattern.meanings, pattern.level)) }
+            }
+        }
+    val rules =
         GRAMMAR_RULES.flatMapIndexed { priority, rule ->
             morphemes.indices.mapNotNull { index ->
-                rule(morphemes, index)?.let { hit -> Triple(priority, index, hit) }
+                rule(morphemes, index)?.let { hit -> Candidate(GRAMMAR_CATALOGUE.size + priority, index, hit) }
             }
         }
     val accepted = mutableListOf<Pair<IntRange, GrammarMatch>>()
-    for ((_, index, hit) in hits.sortedWith(compareBy({ it.first }, { it.second }))) {
-        val range = index until index + hit.length
-        if (accepted.any { (taken, _) -> range.first >= taken.first && range.last <= taken.last }) continue
-        val first = morphemes[range.first]
-        val last = morphemes[range.last]
-        accepted += range to GrammarMatch(hit.form, first.start, last.end, hit.meanings)
+    val ordered = (catalogue + rules).sortedWith(compareBy({ -it.hit.length }, { it.priority }, { it.index }))
+    for (candidate in ordered) {
+        val range = candidate.index until candidate.index + candidate.hit.length
+        if (accepted.any { (taken, _) -> range.first <= taken.last && range.last >= taken.first }) continue
+        val hit = candidate.hit
+        val level = hit.level ?: RULE_LEVELS[hit.form] ?: JlptLevel.N5
+        accepted += range to GrammarMatch(hit.form, morphemes[range.first].start, morphemes[range.last].end, hit.meanings, level)
     }
     return accepted.map { it.second }.sortedWith(compareBy({ it.start }, { it.end }))
 }
+
+/** The JLPT level of the points the rules below find; any form not listed is N5. */
+private val RULE_LEVELS =
+    mapOf(
+        "〜なきゃ" to JlptLevel.N4,
+        "〜なければならない" to JlptLevel.N4,
+        "〜なければいけない" to JlptLevel.N4,
+        "〜なくてはいけない" to JlptLevel.N4,
+        "〜ことができる" to JlptLevel.N4,
+        "〜てしまう" to JlptLevel.N4,
+        "〜てくれる" to JlptLevel.N4,
+        "〜てあげる" to JlptLevel.N4,
+        "〜てもらう" to JlptLevel.N4,
+        "〜てみる" to JlptLevel.N4,
+        "〜ておく" to JlptLevel.N4,
+        "〜てある" to JlptLevel.N4,
+        "〜てくる" to JlptLevel.N4,
+        "〜ていく" to JlptLevel.N4,
+        "〜てる" to JlptLevel.N4,
+        "〜ちゃう" to JlptLevel.N4,
+        "〜とく" to JlptLevel.N4,
+        "だろう" to JlptLevel.N4,
+        "〜たら" to JlptLevel.N4,
+        "〜(よ)う" to JlptLevel.N4,
+        "〜(ら)れる" to JlptLevel.N4,
+        "〜(さ)せる" to JlptLevel.N4,
+        "〜そう" to JlptLevel.N4,
+        "ば" to JlptLevel.N4,
+        "たり" to JlptLevel.N4,
+        "のに" to JlptLevel.N4,
+        "〜の" to JlptLevel.N4,
+        "において" to JlptLevel.N3,
+        "における" to JlptLevel.N3,
+        "について" to JlptLevel.N3,
+        "についての" to JlptLevel.N3,
+        "によって" to JlptLevel.N3,
+        "により" to JlptLevel.N3,
+        "による" to JlptLevel.N3,
+        "として" to JlptLevel.N3,
+        "にとって" to JlptLevel.N3,
+        "に対して" to JlptLevel.N3,
+        "に対する" to JlptLevel.N3,
+    )
 
 /**
  * The grammar points that belong to a selection from [start] to [end]: those inside or overlapping
@@ -277,7 +250,9 @@ private val TE_HELPERS =
         "おく" to ("〜ておく" to GrammarMeaning.IN_ADVANCE),
         "ある" to ("〜てある" to GrammarMeaning.RESULT_STATE),
         "くる" to ("〜てくる" to GrammarMeaning.CHANGE_COMING),
+        "来る" to ("〜てくる" to GrammarMeaning.CHANGE_COMING),
         "いく" to ("〜ていく" to GrammarMeaning.CHANGE_GOING),
+        "行く" to ("〜ていく" to GrammarMeaning.CHANGE_GOING),
     )
 
 /** Casual contractions that already include the て: 見てる, 食べちゃう, やっとく. */
@@ -501,7 +476,7 @@ private fun nominalizerRule(
     }
 }
 
-/** In priority order: earlier, longer patterns hide the shorter ones inside them. */
+/** In priority order: between hits of the same length, the earlier rule wins. */
 private val GRAMMAR_RULES: List<GrammarRule> =
     listOf(
         ::mustRule,

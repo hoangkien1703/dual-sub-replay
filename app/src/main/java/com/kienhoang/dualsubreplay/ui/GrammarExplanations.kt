@@ -16,22 +16,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
+import com.kienhoang.dualsubreplay.data.JlptLevel
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.grammarForSelection
 import com.kienhoang.dualsubreplay.data.japaneseGrammar
 
-/** How each grammar meaning reads to the learner. */
-internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> =
+/** How each grammar meaning reads to the learner: the rule points here, the catalogue in [GRAMMAR_POINT_TEXT]. */
+internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy { GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT }
+
+private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
     mapOf(
         GrammarMeaning.TOPIC to R.string.grammar_topic,
         GrammarMeaning.CONTRAST to R.string.grammar_contrast,
@@ -168,6 +175,24 @@ internal fun GrammarPointList(matches: List<GrammarMatch>) {
     }
 }
 
+/** A small "N3" label, so learners see how advanced each point is. */
+@Composable
+private fun JlptBadge(level: JlptLevel) {
+    val description = stringResource(R.string.grammar_jlpt_level_description, level.number)
+    Surface(
+        modifier = Modifier.padding(top = 2.dp).testTag("grammar_level").semantics { contentDescription = description },
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+    ) {
+        Text(
+            stringResource(R.string.grammar_jlpt_level, level.number),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp).clearAndSetSemantics { },
+        )
+    }
+}
+
 @Composable
 private fun GrammarPointCard(match: GrammarMatch) {
     var showAll by remember(match) { mutableStateOf(false) }
@@ -178,8 +203,11 @@ private fun GrammarPointCard(match: GrammarMatch) {
     ) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(match.form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                Text(stringResource(meaningText(match.meanings.first())))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(match.form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    JlptBadge(match.level)
+                }
+                Text(stringResource(meaningText(match.meanings.first())), modifier = Modifier.weight(1f))
             }
             val others = match.meanings.drop(1)
             if (others.isNotEmpty()) {

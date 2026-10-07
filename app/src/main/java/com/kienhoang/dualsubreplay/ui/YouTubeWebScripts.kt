@@ -389,13 +389,42 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
     sync.isGenerated = function(track) {
       return !!track && (track.kind === 'asr' || String(track.vssId || track.vss_id || '').indexOf('a.') === 0);
     };
-    sync.spokenLanguage = function(renderer, tracks) {
+    // Same order as spokenCaptionLanguage in YouTubeCaptionProvider.kt, without the learning language.
+    sync.scripts = [['Hangul', ['ko']], ['Han', ['zh', 'ja']], ['Thai', ['th']], ['Arabic', ['ar', 'fa', 'ur']],
+      ['Hebrew', ['he', 'iw']], ['Devanagari', ['hi', 'mr', 'ne']], ['Cyrillic', ['ru', 'uk', 'bg', 'sr']], ['Greek', ['el']]];
+    sync.scriptLanguages = function(text, mustDominate) {
+      const value = String(text || '');
+      const count = function(script) {
+        const found = value.match(new RegExp('\\p{Script=' + script + '}', 'gu'));
+        return found ? found.length : 0;
+      };
+      const kana = count('Hiragana') + count('Katakana');
+      let best = kana >= 2 ? ['ja'] : null;
+      let letters = kana;
+      if (!best) {
+        sync.scripts.forEach(function(entry) {
+          const found = count(entry[0]);
+          if (found > letters) { letters = found; best = entry[1]; }
+        });
+      }
+      if (!best || letters < 2 || (mustDominate && letters <= count('Latin'))) return [];
+      return best;
+    };
+    sync.titleLanguage = function(details, tracks) {
+      const available = tracks.map(function(track) { return sync.base(track.languageCode); });
+      let candidates = sync.scriptLanguages(details && details.title, false);
+      if (!candidates.length) candidates = sync.scriptLanguages(details && details.shortDescription, true);
+      return candidates.find(function(language) { return available.indexOf(language) >= 0; }) || '';
+    };
+    sync.spokenLanguage = function(renderer, tracks, details) {
       const audioTracks = Array.isArray(renderer.audioTracks) ? renderer.audioTracks : [];
       const audio = audioTracks[renderer.defaultAudioTrackIndex || 0] || null;
       const indices = audio && Array.isArray(audio.captionTrackIndices) ? audio.captionTrackIndices : [];
       const generated = indices.map(function(index) { return tracks[index]; }).find(sync.isGenerated) ||
         tracks.find(sync.isGenerated);
       if (generated) return sync.base(generated.languageCode);
+      const titled = sync.titleLanguage(details, tracks);
+      if (titled) return titled;
       const audioLanguage = audio && audio.audioTrackId ? sync.base(String(audio.audioTrackId).split('.')[0]) : '';
       if (audioLanguage) return audioLanguage;
       const fallback = audio ? tracks[audio.defaultCaptionTrackIndex] : null;
@@ -409,7 +438,7 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
       const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
       if (!tracks.length || !videoId) return null;
       const target = sync.target && sync.target.videoId === videoId ? sync.target : null;
-      const language = target ? target.languageCode : sync.spokenLanguage(renderer, tracks);
+      const language = target ? target.languageCode : sync.spokenLanguage(renderer, tracks, response.videoDetails);
       if (!language) return null;
       const generated = target ? target.generated : false;
       const same = tracks.filter(function(track) { return sync.base(track.languageCode) === sync.base(language); });

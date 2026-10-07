@@ -24,11 +24,14 @@ internal class RecentCaptionTracks(
     override suspend fun fetch(
         videoId: String,
         preferredLanguages: List<String>,
+        learningLanguage: String?,
     ): CaptionTrackResult {
-        val key = key(videoId, preferredLanguages)
-        read(key, videoId, preferredLanguages)?.let { return it }
-        val track = delegate.fetch(videoId, preferredLanguages)
-        write(key, videoId, preferredLanguages, track)
+        // The learning language can change which track Auto picks, so it is part of the entry.
+        val languages = preferredLanguages + listOfNotNull(learningLanguage?.let { "learning:$it" })
+        val key = key(videoId, languages)
+        read(key, videoId, languages)?.let { return it }
+        val track = delegate.fetch(videoId, preferredLanguages, learningLanguage)
+        write(key, videoId, languages, track)
         return track
     }
 
@@ -117,7 +120,8 @@ internal class RecentCaptionTracks(
     }
 
     private companion object {
-        const val VERSION = 1
+        // 2: Auto also weighs the title's script and the learning language; older picks are dropped.
+        const val VERSION = 2
         val KEY_PATTERN = Regex("[a-f0-9]{64}")
     }
 }

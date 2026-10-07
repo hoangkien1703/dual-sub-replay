@@ -138,4 +138,44 @@ class JapaneseGrammarTest {
     fun aSelectionWithoutGrammarFindsNothing() {
         assertTrue(selected("新しい", "新しい").isEmpty())
     }
+
+    @Test
+    fun hearsayRashiiIsListedBesideTheCopula() {
+        // The owner's screenshot: tapping らしいです showed only です.
+        val line = "昔の人は江戸から京都まで歩いて行ったらしいです。"
+        assertEquals(
+            listOf("〜らしい" to GrammarMeaning.APPARENTLY, "です" to GrammarMeaning.COPULA_POLITE),
+            selected(line, "らしいです"),
+        )
+        assertTrue("〜ていく" to GrammarMeaning.CHANGE_GOING in points(line))
+    }
+
+    @Test
+    fun aMultiWordPatternIsOneCardWithItsLevel() {
+        val matches = grammar("約束したから、行かないわけにはいかない。")
+        val point = matches.single { GrammarMeaning.CANNOT_AFFORD in it.meanings }
+
+        assertEquals("〜わけにはいかない", point.form)
+        assertEquals(JlptLevel.N3, point.level)
+        assertTrue(matches.none { it.form == "は" || it.form == "に" })
+        assertEquals("〜ざるを得ない" to JlptLevel.N2, grammar("やらざるを得ない。").single().let { it.form to it.level })
+    }
+
+    @Test
+    fun rulePointsKeepTheirLevels() {
+        assertEquals(JlptLevel.N5, grammar("日本に行く").single { it.form == "に" }.level)
+        assertEquals(JlptLevel.N4, grammar("見てしまった").first { it.form == "〜てしまう" }.level)
+    }
+
+    @Test
+    fun aLongerRulePointBeatsAShorterCataloguePoint() {
+        // 〜てもいい (a rule) contains 〜ても (the catalogue's "even if").
+        assertEquals("〜てもいい" to GrammarMeaning.MAY, points("窓を開けてもいいですか。")[1])
+    }
+
+    @Test
+    fun quotingWithIuIsNotCalled() {
+        assertTrue(points("先生になりたいと言っていた。").none { it.second == GrammarMeaning.CALLED })
+        assertTrue(points("田中という人が来た。").any { it.second == GrammarMeaning.CALLED })
+    }
 }

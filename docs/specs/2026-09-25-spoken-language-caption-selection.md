@@ -2,6 +2,9 @@
 
 ## Status
 
+Extended by [grammar up to N1 and Auto caption language](2026-10-07-grammar-to-n1-and-auto-caption-language.md),
+which adds the title script and the learning language to the spoken-language order.
+
 Implemented. Local unit tests, format and complexity checks, lint, and the debug and
 android-test builds pass. Final-head GitHub Android CI and the live-YouTube check on a phone are
 still pending. The owner asked for this fix and a PR, and refined the goal in review. That request
