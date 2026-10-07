@@ -197,7 +197,7 @@ class SubtitleWordHighlightTest {
     @Test fun wordLearningModeDefaultsToEnabled() {
         val state = DualSubUiState()
         assertTrue("Word Learning Mode should be enabled by default", state.wordLearningEnabled)
-        assertEquals("both", state.wordLearningTarget)
+        assertEquals("original", state.wordLearningTarget)
         assertTrue(state.wordLearningActiveOnly)
         assertTrue(state.tapToLearnEnabled)
     }

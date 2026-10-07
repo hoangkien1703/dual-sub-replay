@@ -318,7 +318,7 @@ internal fun SubtitleSettingsDialog(
     onlineTranslation: OnlineTranslationSettings = OnlineTranslationSettings(),
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
-    wordLearningTarget: String = "both",
+    wordLearningTarget: String = DEFAULT_WORD_LEARNING_TARGET,
     onWordLearningTargetChange: (String) -> Unit = {},
     wordLearningActiveOnly: Boolean = true,
     onWordLearningActiveOnlyChange: (Boolean) -> Unit = {},

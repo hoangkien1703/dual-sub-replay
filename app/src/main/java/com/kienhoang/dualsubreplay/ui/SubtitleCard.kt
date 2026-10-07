@@ -57,7 +57,7 @@ internal fun CompactSubtitleCard(
     translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
     highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
     wordLearningEnabled: Boolean = false,
-    wordLearningTarget: String = "both",
+    wordLearningTarget: String = DEFAULT_WORD_LEARNING_TARGET,
     wordLearningActiveOnly: Boolean = true,
     tapToLearnEnabled: Boolean = true,
     resolvedSourceLanguage: String? = null,
