@@ -113,5 +113,28 @@ class LanguageAwareTokenizerTest {
         assertEquals(PartOfSpeech.CONJUNCTION, tokens[2].partOfSpeech)
         assertEquals(PartOfSpeech.PRONOUN, tokens[3].partOfSpeech)
     }
-}
 
+    @Test
+    fun keepsWordsNextToInvisibleFormatCharacters() {
+        // Caption text can carry zero-width spaces, word joiners and direction marks after a word.
+        listOf('\u200B', '\u2060', '\u200E', '\uFEFF').forEach { mark ->
+            val text = "there's plenty$mark of situations of people$mark"
+            val words = LanguageAwareTokenizer.tokenize(text, "en").map { it.text }
+            assertEquals(listOf("there's", "plenty", "of", "situations", "of", "people"), words)
+        }
+    }
+
+    @Test
+    fun keepsCurlyApostropheWordsWhole() {
+        val tokens = LanguageAwareTokenizer.tokenize("I don\u2019t think there\u2019s time", "en")
+
+        assertEquals(listOf("I", "don\u2019t", "think", "there\u2019s", "time"), tokens.map { it.text })
+    }
+
+    @Test
+    fun keepsAccentedLatinWordsWhole() {
+        val tokens = LanguageAwareTokenizer.tokenize("Un café très naïf", "fr")
+
+        assertEquals(listOf("Un", "café", "très", "naïf"), tokens.map { it.text })
+    }
+}

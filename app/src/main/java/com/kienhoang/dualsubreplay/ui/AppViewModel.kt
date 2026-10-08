@@ -102,7 +102,7 @@ data class DualSubUiState(
     val preloadModelsEnabled: Boolean = true,
     val naturalSubtitlesEnabled: Boolean = true,
     val wordLearningEnabled: Boolean = true,
-    val wordLearningTarget: String = "both",
+    val wordLearningTarget: String = DEFAULT_WORD_LEARNING_TARGET,
     val wordLearningActiveOnly: Boolean = true,
     val tapToLearnEnabled: Boolean = true,
     val selectedLearningWord: LearningWordSelection? = null,
@@ -266,6 +266,9 @@ internal const val PRELOAD_MODELS_ENABLED_PREFERENCE = "preload_translation_mode
 internal const val NATURAL_SUBTITLES_PREFERENCE = "enhanced_natural_subtitles"
 internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enabled"
 internal const val WORD_LEARNING_TARGET_PREFERENCE = "word_learning_target"
+
+/** POS colors go on the original line only until the learner picks Translation or Both. */
+internal const val DEFAULT_WORD_LEARNING_TARGET = "original"
 internal const val TAP_TO_LEARN_PREFERENCE = "tap_to_learn_enabled"
 internal const val WORD_LEARNING_ACTIVE_ONLY_PREFERENCE = "word_learning_active_only"
 internal const val MIN_FONT_SCALE = 0.8f
@@ -453,8 +456,8 @@ class AppViewModel internal constructor(
                 wordLearningTarget =
                     preferences.getString(
                         WORD_LEARNING_TARGET_PREFERENCE,
-                        "both",
-                    ) ?: "both",
+                        DEFAULT_WORD_LEARNING_TARGET,
+                    ) ?: DEFAULT_WORD_LEARNING_TARGET,
                 wordLearningActiveOnly =
                     storedFeatureEnabled(
                         preferences.getBoolean(WORD_LEARNING_ACTIVE_ONLY_PREFERENCE, true),
@@ -1107,7 +1110,7 @@ class AppViewModel internal constructor(
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,
                 wordLearningEnabled = true,
-                wordLearningTarget = "both",
+                wordLearningTarget = DEFAULT_WORD_LEARNING_TARGET,
                 wordLearningActiveOnly = true,
                 tapToLearnEnabled = true,
                 selectedLearningWord = null,

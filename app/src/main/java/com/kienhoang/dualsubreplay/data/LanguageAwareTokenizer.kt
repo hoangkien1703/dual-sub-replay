@@ -49,6 +49,14 @@ object LanguageAwareTokenizer {
     private val KATAKANA_REGEX = Regex("[\\u30A0-\\u30FF]")
     private val KANA_REGEX = Regex("[\\u3040-\\u30FF]")
 
+    /**
+     * A word is letters, marks and digits, joined by apostrophes (straight or curly) or hyphens.
+     * No `\b`: Android's ICU engine finds no word boundary before an invisible format character
+     * such as a zero-width space, so `\b[\w'-]+\b` silently dropped the word in front of one
+     * and that word could not be colored or tapped.
+     */
+    private val SPACED_WORD_REGEX = Regex("[\\p{L}\\p{M}\\p{N}_]+(?:['\u2019-]+[\\p{L}\\p{M}\\p{N}_]+)*")
+
     // Common Japanese particles and auxiliary grammar words
     private val JAPANESE_PARTICLES = setOf(
         "は", "が", "を", "に", "で", "へ", "と", "も", "から", "まで",
@@ -356,10 +364,9 @@ object LanguageAwareTokenizer {
      */
     private fun tokenizeSpacedLanguage(text: String): List<AnalyzedToken> {
         val tokens = mutableListOf<AnalyzedToken>()
-        val regex = Regex("\\b[\\w'-]+\\b")
-        regex.findAll(text).forEach { match ->
+        SPACED_WORD_REGEX.findAll(text).forEach { match ->
             val word = match.value
-            val cleanWord = word.lowercase(Locale.ROOT)
+            val cleanWord = word.lowercase(Locale.ROOT).replace('\u2019', '\'')
             val pos = classifyEnglishWord(cleanWord, word)
             tokens += AnalyzedToken(
                 text = word,

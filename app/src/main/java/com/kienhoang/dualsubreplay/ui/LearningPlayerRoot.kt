@@ -775,7 +775,7 @@ internal fun LearningSubtitleOverlay(
                     } else {
                         AnnotatedString(translated)
                     }
-                    if (shouldHighlightPos && tapToLearnEnabled) {
+                    if (wordLearningEnabled && tapToLearnEnabled) {
                         SelectableSubtitleText(
                             text = translated,
                             annotated = annotated,
