@@ -81,6 +81,12 @@ class AiChatClientTest {
     fun httpStatusesMapToTheirOwnMessages() {
         assertEquals(AiErrorKind.INVALID_KEY, aiErrorKindForStatus(401, null))
         assertEquals(AiErrorKind.INVALID_KEY, aiErrorKindForStatus(403, null))
+        assertEquals(AiErrorKind.INVALID_KEY, aiErrorKindForStatus(403, "Method doesn't allow unregistered callers."))
+        // OpenRouter keeps some free models for coding apps; that is not a key problem.
+        assertEquals(
+            AiErrorKind.BAD_REQUEST,
+            aiErrorKindForStatus(403, "thinkingmachines/inkling:free is only available on agentic harnesses."),
+        )
         assertEquals(AiErrorKind.INVALID_KEY, aiErrorKindForStatus(400, "API key not valid. Please pass a valid API key."))
         assertEquals(AiErrorKind.NO_CREDIT, aiErrorKindForStatus(402, null))
         assertEquals(AiErrorKind.NO_CREDIT, aiErrorKindForStatus(429, "You exceeded your current quota"))

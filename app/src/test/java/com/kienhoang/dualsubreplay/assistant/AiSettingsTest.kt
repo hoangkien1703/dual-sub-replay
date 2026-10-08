@@ -81,6 +81,8 @@ class AiSettingsTest {
     @Test
     fun pastedKeysAreRecognizedByTheirStart() {
         assertEquals(AiProvider.GEMINI, aiProviderForKey(" AIza-FAKE-test-key-for-unit-tests-rstu ", AiProvider.OPENAI))
+        // Google AI Studio's newer key format.
+        assertEquals(AiProvider.GEMINI, aiProviderForKey("AQ.FAKE-test-key-for-unit-tests-0123456789", AiProvider.OPENROUTER))
         assertEquals(AiProvider.OPENROUTER, aiProviderForKey("sk-or-v1-0123456789abcdef", AiProvider.GEMINI))
         assertEquals(AiProvider.OPENAI, aiProviderForKey("sk-proj-0123456789abcdef", AiProvider.OPENCODE_ZEN))
         assertEquals(AiProvider.GEMINI, aiProviderForKey("gsk_0123456789abcdefghij", AiProvider.GEMINI))

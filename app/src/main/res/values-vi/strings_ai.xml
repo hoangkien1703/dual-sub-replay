@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">Dịch vụ AI không nhận ra mô hình này. Hãy kiểm tra tên mô hình trong Cài đặt AI.</string>
     <string name="ai_error_rate_limited">Quá nhiều câu hỏi cùng lúc. Hãy đợi một phút rồi thử lại.</string>
     <string name="ai_error_bad_request">Dịch vụ AI đã từ chối câu hỏi.</string>
-    <string name="ai_error_server">Dịch vụ AI đang gặp sự cố. Hãy thử lại sau.</string>
+    <string name="ai_error_server">Dịch vụ AI đang quá tải hoặc gặp sự cố. Hãy thử lại sau ít phút, hoặc chọn mô hình khác bên dưới ô chat.</string>
     <string name="ai_error_network">Không kết nối được tới dịch vụ AI. Hãy kiểm tra kết nối mạng.</string>
     <string name="ai_error_bad_reply">Dịch vụ AI gửi câu trả lời mà ứng dụng không đọc được.</string>
     <string name="ai_settings_enabled_title">Trợ lý AI</string>
@@ -123,4 +123,5 @@
     <string name="ai_attachment_limit">Mỗi câu hỏi được kèm tối đa %1$d ảnh hoặc tệp.</string>
     <string name="ai_attachment_question">Hãy giải thích nội dung này.</string>
     <string name="ai_error_unsupported_attachment">Mô hình này không đọc được ảnh hoặc PDF. Hãy chọn mô hình khác bên dưới ô chat rồi bấm Thử lại, hoặc hỏi mà không kèm chúng.</string>
+    <string name="ai_setup_step_create_opencode">Trên trang workspace, mở API Keys, bấm Create API Key rồi sao chép khóa.</string>
 </resources>

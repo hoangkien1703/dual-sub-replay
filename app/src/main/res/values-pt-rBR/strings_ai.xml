@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">O serviço de IA não conhece este modelo. Confira o nome do modelo nas configurações de IA.</string>
     <string name="ai_error_rate_limited">Muitas perguntas de uma vez. Espere um minuto e tente de novo.</string>
     <string name="ai_error_bad_request">O serviço de IA recusou a pergunta.</string>
-    <string name="ai_error_server">O serviço de IA está com um problema agora. Tente mais tarde.</string>
+    <string name="ai_error_server">O serviço de IA está sobrecarregado ou com um problema agora. Tente de novo em instantes ou escolha outro modelo abaixo da caixa de mensagem.</string>
     <string name="ai_error_network">Não foi possível acessar o serviço de IA. Verifique sua conexão.</string>
     <string name="ai_error_bad_reply">O serviço de IA enviou uma resposta que o app não conseguiu ler.</string>
     <string name="ai_settings_enabled_title">Assistente de IA</string>
@@ -123,4 +123,5 @@
     <string name="ai_attachment_limit">Uma pergunta pode levar até %1$d imagens ou arquivos.</string>
     <string name="ai_attachment_question">Explique isto, por favor.</string>
     <string name="ai_error_unsupported_attachment">Este modelo não lê imagens nem PDFs. Escolha outro modelo abaixo da caixa de mensagem e toque em Tentar de novo, ou pergunte sem eles.</string>
+    <string name="ai_setup_step_create_opencode">Na página do seu workspace, abra API Keys, toque em Create API Key e copie a chave.</string>
 </resources>

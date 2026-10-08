@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">AI サービスがこのモデルを認識できません。AI 設定でモデル名を確認してください。</string>
     <string name="ai_error_rate_limited">質問が多すぎます。1 分待ってからもう一度試してください。</string>
     <string name="ai_error_bad_request">AI サービスが質問を受け付けませんでした。</string>
-    <string name="ai_error_server">AI サービスで問題が起きています。後でもう一度試してください。</string>
+    <string name="ai_error_server">AI サービスが混雑しているか、問題が起きています。少し待ってからもう一度試すか、チャット欄の下で別のモデルを選んでください。</string>
     <string name="ai_error_network">AI サービスに接続できませんでした。接続を確認してください。</string>
     <string name="ai_error_bad_reply">AI サービスからアプリが読み取れない返信が届きました。</string>
     <string name="ai_settings_enabled_title">AI アシスタント</string>
@@ -123,4 +123,5 @@
     <string name="ai_attachment_limit">1 つの質問に添付できる画像やファイルは %1$d 個までです。</string>
     <string name="ai_attachment_question">これを説明してください。</string>
     <string name="ai_error_unsupported_attachment">このモデルは画像や PDF を読めません。チャット欄の下で別のモデルを選んで「もう一度試す」をタップするか、添付なしで質問してください。</string>
+    <string name="ai_setup_step_create_opencode">ワークスペースのページで API Keys を開き、Create API Key をタップしてキーをコピーします。</string>
 </resources>

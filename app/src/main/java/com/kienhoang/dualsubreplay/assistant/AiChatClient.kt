@@ -265,6 +265,9 @@ internal fun aiReplyStatus(
     return error.optInt("code").takeIf { it in 400..599 } ?: 502
 }
 
+/** Words in a 403 that mean the key itself was refused. */
+private val KEY_ERROR_WORDS = listOf("key", "auth", "credential", "permission", "unregistered", "forbidden")
+
 /** Words in a refusal that mean the model cannot take the pictures or files that were sent. */
 private val ATTACHMENT_ERROR_WORDS = listOf("image", "vision", "multimodal", "modalit", "file", "pdf", "content type")
 
@@ -300,7 +303,10 @@ internal fun aiErrorKindForStatus(
     val lower = message.orEmpty().lowercase()
     unsupportedExtra(code, lower, sentThinking, sentAttachments)?.let { return it }
     return when {
-        code == 401 || code == 403 -> AiErrorKind.INVALID_KEY
+        code == 401 -> AiErrorKind.INVALID_KEY
+        // OpenRouter also answers 403 for a model it keeps for coding apps; only a key problem names the key.
+        code == 403 && (message.isNullOrBlank() || KEY_ERROR_WORDS.any { it in lower }) -> AiErrorKind.INVALID_KEY
+        code == 403 -> AiErrorKind.BAD_REQUEST
         code == 402 -> AiErrorKind.NO_CREDIT
         code == 404 -> AiErrorKind.UNKNOWN_MODEL
         code == 429 && ("quota" in lower || "credit" in lower || "billing" in lower) -> AiErrorKind.NO_CREDIT

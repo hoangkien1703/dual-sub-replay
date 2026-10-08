@@ -264,6 +264,25 @@ check; a 200 reply that carries only an error object (OpenRouter) showed as "no 
 its own error; a failed Test connection still said "Connected"; Try again showed while the key
 needed a new check.
 
+## Changes after the owner's second phone test (2026-10-08)
+
+OpenRouter worked; Gemini still did not, some free OpenRouter models could not be chosen, and the
+OpenCode key page was unclear.
+
+- **Gemini:** replaying the app's exact key check with the owner's key showed that the key and the
+  request were right. Google answered 503 "This model is currently experiencing high demand" for
+  `gemini-flash-latest` on 2 of 3 tries, so the check failed and chat never opened. Offline tests
+  and CI use a fake service, so they could not see this. The app now asks a busy service (503 or
+  429 rate limit) again after 1 s and 3 s, a key check that only finds the model busy counts as
+  passed (a refused key fails before that), and the busy message suggests another model.
+  `gemini-pro-latest` left the suggestions because free keys have no quota for it
+  (`gemini-2.5-flash` replaces it). Keys starting with `AQ.` (AI Studio's newer format) are
+  recognised as Gemini keys.
+- **OpenRouter free models:** some are reserved for coding apps (403 "only available on agentic
+  harnesses") and some providers were rate-limited (429). A 403 that does not name the key now
+  shows the service's reason instead of "rejected the key".
+- **OpenCode:** the steps now say where the key is: workspace page, API Keys, Create API Key.
+
 ## Validation result
 
 Local, on Linux with JDK 21 (2026-10-08, after the model bar and attachments):

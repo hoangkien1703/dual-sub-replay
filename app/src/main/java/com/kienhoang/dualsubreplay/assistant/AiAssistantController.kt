@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -108,6 +109,15 @@ private val SETUP_PROBLEMS =
         AiErrorKind.BAD_REQUEST,
     )
 
+/**
+ * A busy model (HTTP 503 "high demand") or a short rate limit is asked again after these waits.
+ * Gemini's free `gemini-flash-latest` answers 503 to about half of all requests at busy times.
+ */
+internal val AI_BUSY_RETRY_DELAYS_MS = listOf(1_000L, 3_000L)
+
+/** The service answered but was busy: it accepted the key before it looked for a free model. */
+private val BUSY_PROBLEMS = setOf(AiErrorKind.SERVER, AiErrorKind.RATE_LIMITED)
+
 private val KEY_CHECK_MESSAGES =
     listOf(AiWireMessage(AiRole.SYSTEM, "Reply with the single word OK."), AiWireMessage(AiRole.USER, "OK?"))
 
@@ -158,6 +168,8 @@ internal class AiAssistantController(
     private val clock: () -> Long = System::currentTimeMillis,
     private val newId: () -> String = { UUID.randomUUID().toString() },
     private val modelLister: AiModelLister = AiModelLister { _, _ -> emptyList() },
+    /** Waits before asking a busy service again; each entry is one more try. */
+    private val busyRetryDelaysMs: List<Long> = AI_BUSY_RETRY_DELAYS_MS,
 ) {
     private val _state = MutableStateFlow(AiAssistantUiState())
     val state: StateFlow<AiAssistantUiState> = _state.asStateFlow()
@@ -353,7 +365,14 @@ internal class AiAssistantController(
                         request(settings, KEY_CHECK_MESSAGES, AI_TEST_TIMEOUT_MS)
                         AiConnectionTest.Passed
                     } catch (error: AiChatException) {
-                        AiConnectionTest.Failed(AiFailure(error.kind, error.detail))
+                        // A key the service rejects fails before it is busy, so busy still means the key works.
+                        if (error.kind in
+                            BUSY_PROBLEMS
+                        ) {
+                            AiConnectionTest.Passed
+                        } else {
+                            AiConnectionTest.Failed(AiFailure(error.kind, error.detail))
+                        }
                     }
                 if (generation != keyGeneration) return@launch
                 when {
@@ -496,6 +515,14 @@ internal class AiAssistantController(
         if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
         val key = unlockKey(provider)
         val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort)
+        for (wait in busyRetryDelaysMs) {
+            try {
+                return withContext(io) { aiCall { transport.complete(request) } }
+            } catch (error: AiChatException) {
+                if (error.kind !in BUSY_PROBLEMS) throw error
+            }
+            delay(wait)
+        }
         return withContext(io) { aiCall { transport.complete(request) } }
     }
 

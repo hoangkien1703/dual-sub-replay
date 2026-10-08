@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">Layanan AI tidak mengenal model ini. Periksa nama model di setelan AI.</string>
     <string name="ai_error_rate_limited">Terlalu banyak pertanyaan sekaligus. Tunggu satu menit lalu coba lagi.</string>
     <string name="ai_error_bad_request">Layanan AI menolak pertanyaan ini.</string>
-    <string name="ai_error_server">Layanan AI sedang bermasalah. Coba lagi nanti.</string>
+    <string name="ai_error_server">Layanan AI sedang sibuk atau bermasalah. Coba lagi sebentar lagi, atau pilih model lain di bawah kotak obrolan.</string>
     <string name="ai_error_network">Tidak dapat menghubungi layanan AI. Periksa koneksi Anda.</string>
     <string name="ai_error_bad_reply">Layanan AI mengirim balasan yang tidak dapat dibaca aplikasi.</string>
     <string name="ai_settings_enabled_title">Asisten AI</string>
@@ -123,4 +123,5 @@
     <string name="ai_attachment_limit">Satu pertanyaan bisa membawa hingga %1$d gambar atau file.</string>
     <string name="ai_attachment_question">Tolong jelaskan ini.</string>
     <string name="ai_error_unsupported_attachment">Model ini tidak bisa membaca gambar atau PDF. Pilih model lain di bawah kotak obrolan lalu ketuk Coba lagi, atau bertanya tanpa lampiran.</string>
+    <string name="ai_setup_step_create_opencode">Di halaman workspace, buka API Keys, ketuk Create API Key, lalu salin kuncinya.</string>
 </resources>

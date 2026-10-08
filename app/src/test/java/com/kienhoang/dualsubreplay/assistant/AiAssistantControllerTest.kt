@@ -46,8 +46,12 @@ private class FakeTransport : AiChatTransport {
     var failure: AiChatException? = null
     var pending: CompletableDeferred<String>? = null
 
+    /** Thrown once each, before [failure], as a busy service would. */
+    val failOnce = ArrayDeque<AiChatException>()
+
     override suspend fun complete(request: AiChatRequest): String {
         requests += request
+        failOnce.removeFirstOrNull()?.let { throw it }
         failure?.let { throw it }
         return pending?.await() ?: reply
     }
@@ -67,6 +71,9 @@ class AiAssistantControllerTest {
     private val history = MemoryHistory()
 
     private val listedModels = mutableListOf<String>()
+
+    /** No waiting and, unless a test sets it, no second try for a busy service. */
+    private var busyRetries = emptyList<Long>()
     private var modelListFailure: AiChatException? = null
 
     private fun controller() =
@@ -84,6 +91,7 @@ class AiAssistantControllerTest {
                 modelListFailure?.let { throw it }
                 listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemini-pro-latest"), AiModelInfo("text-embedding-004"))
             },
+            busyRetryDelaysMs = busyRetries,
         )
 
     private fun savedChat(
@@ -557,5 +565,34 @@ class AiAssistantControllerTest {
                 .attachments
                 .map { it.name },
         )
+    }
+
+    @Test
+    fun aBusyModelIsAskedAgainBeforeTheQuestionFails() {
+        checkedGeminiKey()
+        busyRetries = listOf(0L, 0L)
+        val controller = controller()
+        transport.failOnce += AiChatException(AiErrorKind.SERVER, "This model is currently experiencing high demand.")
+        transport.failOnce += AiChatException(AiErrorKind.SERVER, "This model is currently experiencing high demand.")
+        controller.send("Why?", "guide")
+        assertNull(controller.state.value.failure)
+        assertEquals(3, transport.requests.size)
+        // A wrong key is not asked again.
+        transport.failure = AiChatException(AiErrorKind.INVALID_KEY)
+        controller.send("Again?", "guide")
+        assertEquals(4, transport.requests.size)
+    }
+
+    @Test
+    fun aKeyCheckThatOnlyFindsTheModelBusyStillPasses() {
+        keyStore.save(AiProvider.GEMINI, geminiKey)
+        val controller = controller()
+        transport.failure = AiChatException(AiErrorKind.SERVER, "This model is currently experiencing high demand.")
+        controller.testConnection()
+        assertTrue(controller.state.value.ready)
+        assertEquals(aiCheckedSetup(settings.value, AiProvider.GEMINI), keyStore.checkedSetup(AiProvider.GEMINI))
+        transport.failure = AiChatException(AiErrorKind.INVALID_KEY)
+        controller.testConnection()
+        assertFalse(controller.state.value.ready)
     }
 }

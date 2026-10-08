@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">The AI service doesn\'t know this model. Check the model name in AI settings.</string>
     <string name="ai_error_rate_limited">Too many questions at once. Wait a minute and try again.</string>
     <string name="ai_error_bad_request">The AI service refused the question.</string>
-    <string name="ai_error_server">The AI service has a problem right now. Try again later.</string>
+    <string name="ai_error_server">The AI service is busy or has a problem right now. Try again in a moment, or choose another model under the chat box.</string>
     <string name="ai_error_network">Couldn\'t reach the AI service. Check your connection.</string>
     <string name="ai_error_bad_reply">The AI service sent a reply the app couldn\'t read.</string>
     <string name="ai_settings_enabled_title">AI assistant</string>
@@ -128,4 +128,5 @@
     <string name="ai_attachment_limit">One question can carry up to %1$d pictures or files.</string>
     <string name="ai_attachment_question">Please explain this.</string>
     <string name="ai_error_unsupported_attachment">This model can\'t read pictures or PDFs. Choose another model under the chat box and tap Try again, or ask without them.</string>
+    <string name="ai_setup_step_create_opencode">On your workspace page, open API Keys, tap Create API Key, then copy the key.</string>
 </resources>

@@ -37,7 +37,8 @@ internal enum class AiProvider(
         getKeyStepRes = R.string.ai_setup_step_get_google,
         createKeyStepRes = R.string.ai_setup_step_create,
         // Google's "latest" names follow each new release, so they do not expire.
-        suggestedModels = listOf("gemini-flash-latest", "gemini-flash-lite-latest", "gemini-pro-latest"),
+        // gemini-pro-latest is left out: free keys have no quota for it.
+        suggestedModels = listOf("gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2.5-flash"),
     ),
     OPENROUTER(
         key = "openrouter",
@@ -75,7 +76,7 @@ internal enum class AiProvider(
         keyPageUrl = "https://opencode.ai/auth",
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_zen,
-        createKeyStepRes = R.string.ai_setup_step_create_generic,
+        createKeyStepRes = R.string.ai_setup_step_create_opencode,
         suggestedModels = listOf("big-pickle", "deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
     ),
 
@@ -89,7 +90,7 @@ internal enum class AiProvider(
         keyPageUrl = "https://opencode.ai/auth",
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_go,
-        createKeyStepRes = R.string.ai_setup_step_create_generic,
+        createKeyStepRes = R.string.ai_setup_step_create_opencode,
         suggestedModels = listOf("deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
     ),
     CUSTOM(
@@ -134,7 +135,8 @@ internal fun aiProviderForKey(
     val key = text.trim()
     return when {
         current == AiProvider.CUSTOM -> current
-        key.startsWith("AIza") -> AiProvider.GEMINI
+        // Google AI Studio's keys start with "AIza", and its newer ones with "AQ.".
+        key.startsWith("AIza") || key.startsWith("AQ.") -> AiProvider.GEMINI
         key.startsWith("sk-or-") -> AiProvider.OPENROUTER
         key.startsWith("sk-proj-") || key.startsWith("sk-svcacct-") -> AiProvider.OPENAI
         key.startsWith("sk-") && current in SK_KEY_PROVIDERS -> current

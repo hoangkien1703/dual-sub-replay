@@ -43,7 +43,7 @@
     <string name="ai_error_unknown_model">AI 服务不认识这个模型。请在 AI 设置中检查模型名称。</string>
     <string name="ai_error_rate_limited">提问太频繁。请等一分钟后再试。</string>
     <string name="ai_error_bad_request">AI 服务拒绝了这个问题。</string>
-    <string name="ai_error_server">AI 服务目前出现问题。请稍后再试。</string>
+    <string name="ai_error_server">AI 服务目前繁忙或出现问题。请稍后再试，或在聊天框下方选择其他模型。</string>
     <string name="ai_error_network">无法连接 AI 服务。请检查网络连接。</string>
     <string name="ai_error_bad_reply">AI 服务发来的回复应用无法读取。</string>
     <string name="ai_settings_enabled_title">AI 助手</string>
@@ -123,4 +123,5 @@
     <string name="ai_attachment_limit">每个问题最多可附带 %1$d 张图片或文件。</string>
     <string name="ai_attachment_question">请解释一下这个。</string>
     <string name="ai_error_unsupported_attachment">此模型无法读取图片或 PDF。请在聊天框下方选择其他模型并点按“重试”，或不带附件提问。</string>
+    <string name="ai_setup_step_create_opencode">在工作区页面打开 API Keys，点按 Create API Key，然后复制密钥。</string>
 </resources>
