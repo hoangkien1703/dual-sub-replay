@@ -578,6 +578,22 @@ internal fun webPauseScript(): String =
     })();
     """.trimIndent()
 
+/** Sets the page video's speed (0.25 to 2); the assistant's playback speed action. */
+internal fun webPlaybackSpeedScript(rate: Float): String {
+    val safeRate = rate.takeIf { it.isFinite() }?.coerceIn(MIN_WEB_PLAYBACK_SPEED, MAX_WEB_PLAYBACK_SPEED) ?: 1f
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          document.querySelectorAll('video').forEach(function(video) { video.playbackRate = $safeRate; });
+          return true;
+        })();
+        """.trimIndent()
+}
+
+internal const val MIN_WEB_PLAYBACK_SPEED = 0.25f
+internal const val MAX_WEB_PLAYBACK_SPEED = 2f
+
 internal fun webClipReplayScript(
     videoId: String,
     startMs: Long,

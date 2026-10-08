@@ -187,6 +187,16 @@ internal class AiAssistantController(
     private var modelJob: Job? = null
     private var listJob: Job? = null
 
+    /** The app's actions; the panel binds them while it is shown. Without them no actions are offered. */
+    @Volatile var appActions: AiAppActions? = null
+
+    /** Service, address and model combinations that refused actions; asked without them from then on. */
+    private val noToolSetups = mutableSetOf<String>()
+
+    /** The actions that undo done actions, and the actions behind waiting cards, by record id; lost when the app closes. */
+    private val undos = mutableMapOf<String, List<AiAction>>()
+    private val waitingActions = mutableMapOf<String, AiAction>()
+
     /** Changes with every saved or removed key, so a check that was already running cannot count for a new key. */
     @Volatile private var keyGeneration = 0
 
@@ -486,21 +496,23 @@ internal class AiAssistantController(
 
     private fun ask(systemPrompt: String) {
         val history = _state.value.messages
+        val chatId = _state.value.chat?.id
         val settings = _state.value.settings
         val generation = keyGeneration
+        val setup = aiCheckedSetup(settings, settings.provider)
+        val run =
+            AiAnswerRun(appActions, history, setup !in noToolSetups, newId) { messages, tools ->
+                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, tools)
+            }
         _state.update { it.copy(sending = true, failure = null) }
         sendJob =
             scope.launch {
                 try {
-                    val messages = buildAiRequestMessages(systemPrompt, history)
-                    val reply = request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort)
-                    val now = clock()
-                    _state.update { current ->
-                        val chat = current.chat ?: return@update current.copy(sending = false)
-                        val answer = AiChatMessage(newId(), AiRole.ASSISTANT, reply, now)
-                        current.copy(chat = chat.copy(updatedMs = now, messages = chat.messages + answer), sending = false)
-                    }
+                    run.run(systemPrompt)
+                    addAnswer(run, chatId)
                 } catch (error: AiChatException) {
+                    // Actions that already ran still show, with their Undo.
+                    if (run.records.isNotEmpty()) addAnswer(run, chatId)
                     val failure = AiFailure(error.kind, error.detail)
                     _state.update { it.copy(sending = false, failure = failure) }
                     // A key that stopped working goes back to the check card, which says why, unless
@@ -512,11 +524,82 @@ internal class AiAssistantController(
                         }
                     }
                 } catch (cancelled: CancellationException) {
+                    if (run.records.isNotEmpty()) addAnswer(run, chatId)
                     _state.update { it.copy(sending = false) }
                     throw cancelled
+                } finally {
+                    if (run.toolsRefused) noToolSetups += setup
                 }
                 persistChats()
             }
+    }
+
+    /** Adds the answer to the chat it was asked in, if that chat is still open. */
+    private fun addAnswer(
+        run: AiAnswerRun,
+        chatId: String?,
+    ) {
+        undos += run.undos
+        waitingActions += run.waiting
+        val now = clock()
+        _state.update { current ->
+            val chat = current.chat?.takeIf { it.id == chatId } ?: return@update current.copy(sending = false)
+            val answer = AiChatMessage(newId(), AiRole.ASSISTANT, run.text, now, actions = run.records.toList())
+            current.copy(chat = chat.copy(updatedMs = now, messages = chat.messages + answer), sending = false)
+        }
+    }
+
+    /** The button on a waiting card: runs the action now. */
+    fun confirmAction(actionId: String) {
+        val app = appActions ?: return
+        val action = waitingActions.remove(actionId) ?: return
+        scope.launch {
+            when (val outcome = app.perform(action)) {
+                is AiActionOutcome.Done -> {
+                    val undoable = outcome.undo.isNotEmpty()
+                    if (undoable) undos[actionId] = outcome.undo
+                    updateAction(actionId) {
+                        it.copy(state = AiActionState.DONE, label = outcome.label, note = outcome.note, undoable = undoable)
+                    }
+                }
+                is AiActionOutcome.Refused -> updateAction(actionId) { it.copy(state = AiActionState.FAILED) }
+            }
+            persistChats()
+        }
+    }
+
+    fun cancelAction(actionId: String) {
+        waitingActions.remove(actionId) ?: return
+        updateAction(actionId) { it.copy(state = AiActionState.CANCELLED) }
+        persistChats()
+    }
+
+    /** Puts back what an action changed, through the actions bound now. */
+    fun undoAction(actionId: String) {
+        val app = appActions ?: return
+        val undo = undos.remove(actionId) ?: return
+        scope.launch {
+            // An Undo the app refuses now (the video was closed, for example) only loses its button.
+            val undone = undo.map { app.perform(it) }.all { it is AiActionOutcome.Done }
+            updateAction(actionId) { it.copy(state = if (undone) AiActionState.UNDONE else it.state, undoable = false) }
+            persistChats()
+        }
+    }
+
+    private fun updateAction(
+        actionId: String,
+        change: (AiActionRecord) -> AiActionRecord,
+    ) = _state.update { current ->
+        val chat = current.chat ?: return@update current
+        val messages =
+            chat.messages.map { message ->
+                if (message.actions.none { it.id == actionId }) {
+                    message
+                } else {
+                    message.copy(actions = message.actions.map { if (it.id == actionId) change(it) else it })
+                }
+            }
+        current.copy(chat = chat.copy(messages = messages))
     }
 
     /** Unlocks the key for this one request only; it is never kept in the state. */
@@ -525,12 +608,13 @@ internal class AiAssistantController(
         messages: List<AiWireMessage>,
         timeoutMs: Long,
         reasoningEffort: String? = null,
-    ): String {
+        tools: List<AiTool> = emptyList(),
+    ): AiReply {
         val provider = settings.provider
         val baseUrl = settings.baseUrlFor(provider)
         if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
         val key = unlockKey(provider)
-        val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort)
+        val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort, tools)
         val busyWaits = busyRetryDelaysMs.iterator()
         var wrongModelAnswers = 0
         while (true) {

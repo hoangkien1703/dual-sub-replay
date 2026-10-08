@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">これを説明してください。</string>
     <string name="ai_error_unsupported_attachment">このモデルは画像や PDF を読めません。チャット欄の下で別のモデルを選んで「もう一度試す」をタップするか、添付なしで質問してください。</string>
     <string name="ai_setup_step_create_opencode">ワークスペースのページで API Keys を開き、Create API Key をタップしてキーをコピーします。</string>
+    <string name="ai_action_on">オン</string>
+    <string name="ai_action_off">オフ</string>
+    <string name="ai_action_setting">%1$s：%2$s</string>
+    <string name="ai_action_speed_title">再生速度</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">今の行をもう一度再生しました</string>
+    <string name="ai_action_replay_previous">前の行をもう一度再生しました</string>
+    <string name="ai_action_pause">動画を一時停止しました</string>
+    <string name="ai_action_look">画面の字幕を読みました</string>
+    <string name="ai_action_save_word">「%1$s」を単語帳に保存しました</string>
+    <string name="ai_action_word_already_saved">「%1$s」はもう単語帳にあります</string>
+    <string name="ai_action_search">YouTube で「%1$s」を検索</string>
+    <string name="ai_action_search_button">検索</string>
+    <string name="ai_action_open_video">この YouTube 動画を開く</string>
+    <string name="ai_action_open_button">開く</string>
+    <string name="ai_action_target_language">%1$sに翻訳</string>
+    <string name="ai_action_change_button">変更</string>
+    <string name="ai_action_apply">適用</string>
+    <string name="ai_action_cancel">キャンセル</string>
+    <string name="ai_action_undo">元に戻す</string>
+    <string name="ai_action_undone">元に戻しました</string>
+    <string name="ai_action_not_done">実行しませんでした</string>
+    <string name="ai_action_failed">できませんでした</string>
 </resources>

@@ -57,7 +57,17 @@ private fun encodeMessage(message: AiChatMessage): JSONObject =
                     JSONArray().apply { message.attachments.forEach { put(JSONObject().put("name", it.name).put("kind", it.kind.key)) } },
                 )
             }
+            if (message.actions.isNotEmpty()) put("actions", JSONArray().apply { message.actions.forEach { put(encodeAction(it)) } })
         }
+
+private fun encodeAction(action: AiActionRecord): JSONObject =
+    JSONObject()
+        .put("id", action.id)
+        .put("kind", action.kind.key)
+        .put("label", action.label)
+        .put("note", action.note)
+        .put("state", action.state.key)
+        .apply { action.button?.let { put("button", it) } }
 
 /** Reads [encodeAiChats] output; anything unreadable is skipped rather than failing the whole file. */
 internal fun decodeAiChats(text: String): List<AiChat> {
@@ -91,7 +101,26 @@ private fun decodeMessage(json: JSONObject?): AiChatMessage? {
         context = json.optString("context").takeIf { json.has("context") },
         contextLabel = json.optString("contextLabel").takeIf { json.has("contextLabel") },
         attachments = decodeAttachmentNames(json.optJSONArray("attachments")),
+        actions = decodeActions(json.optJSONArray("actions")),
     )
+}
+
+/** Undo and waiting cards only work while the app runs: after a restart, a card that was never answered is not done. */
+private fun decodeActions(json: JSONArray?): List<AiActionRecord> {
+    if (json == null) return emptyList()
+    return (0 until json.length()).mapNotNull { index ->
+        val action = json.optJSONObject(index) ?: return@mapNotNull null
+        val kind = AiActionKind.entries.firstOrNull { it.key == action.optString("kind") } ?: return@mapNotNull null
+        val state = AiActionState.entries.firstOrNull { it.key == action.optString("state") } ?: return@mapNotNull null
+        AiActionRecord(
+            id = action.optString("id").ifEmpty { return@mapNotNull null },
+            kind = kind,
+            label = action.optString("label"),
+            note = action.optString("note"),
+            state = if (state == AiActionState.WAITING) AiActionState.CANCELLED else state,
+            button = action.optString("button").takeIf { action.has("button") },
+        )
+    }
 }
 
 private fun decodeAttachmentNames(json: JSONArray?): List<AiAttachment> {

@@ -581,6 +581,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
             // Last, so the panel covers the player and the subtitle overlay.
             aiAssistant?.let { host ->
+                BindAiAppActions(host, viewModel, mode, ::selectMode)
                 AiAssistantOverlay(
                     host = host,
                     state = state,

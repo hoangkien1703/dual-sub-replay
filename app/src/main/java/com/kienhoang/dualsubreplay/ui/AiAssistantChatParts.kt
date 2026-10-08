@@ -124,9 +124,19 @@ internal fun AiWelcome(
     }
 }
 
+/** A message, and under an answer what it did in the app ([AiActionList]). */
+@Composable
+internal fun AiMessageBubble(
+    message: AiChatMessage,
+    handlers: AiActionHandlers,
+) {
+    if (message.role == AiRole.USER || message.text.isNotEmpty()) AiMessageText(message)
+    if (message.actions.isNotEmpty()) AiActionList(message.actions, handlers)
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun AiMessageBubble(message: AiChatMessage) {
+private fun AiMessageText(message: AiChatMessage) {
     val user = message.role == AiRole.USER
     Box(Modifier.fillMaxWidth(), contentAlignment = if (user) Alignment.CenterEnd else Alignment.CenterStart) {
         Surface(

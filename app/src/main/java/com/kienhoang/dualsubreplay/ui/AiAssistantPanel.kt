@@ -57,6 +57,7 @@ import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiAssistantUiState
 import com.kienhoang.dualsubreplay.assistant.AiPanelPage
+import com.kienhoang.dualsubreplay.assistant.AiRole
 import com.kienhoang.dualsubreplay.assistant.ChatHistoryRetention
 import com.kienhoang.dualsubreplay.assistant.aiProblemContext
 import com.kienhoang.dualsubreplay.assistant.aiSystemPrompt
@@ -252,15 +253,20 @@ private fun AiChatContent(
         } else if (messages.isEmpty()) {
             item(key = "welcome") { AiWelcome(currentLineQuestion, enabled = !aiState.sending, onAsk = onAsk) }
         }
-        aiMessages(aiState, onRetry)
+        aiMessages(aiState, AiActionHandlers(controller::undoAction, controller::confirmAction, controller::cancelAction), onRetry)
     }
 }
 
 private fun LazyListScope.aiMessages(
     aiState: AiAssistantUiState,
+    handlers: AiActionHandlers,
     onRetry: () -> Unit,
 ) {
-    items(aiState.messages, key = { it.id }) { message -> AiMessageBubble(message) }
+    items(aiState.messages, key = { it.id }) { message ->
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { AiMessageBubble(message, handlers) }
+    }
     if (aiState.sending) item(key = "thinking") { AiThinkingRow() }
-    aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry.takeIf { aiState.ready }) } }
+    // After actions that ran, the question has an answer, so asking it again is left to the user.
+    val canRetry = aiState.ready && aiState.messages.lastOrNull()?.role == AiRole.USER
+    aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry.takeIf { canRetry }) } }
 }

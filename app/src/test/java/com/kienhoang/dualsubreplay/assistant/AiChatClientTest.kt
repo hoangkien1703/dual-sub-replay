@@ -35,10 +35,10 @@ class AiChatClientTest {
 
     @Test
     fun repliesAreReadAsTextOrTextParts() {
-        assertEquals("Hello", parseChatReply("""{"choices":[{"message":{"role":"assistant","content":" Hello "}}]}"""))
+        assertEquals("Hello", parseAiReply("""{"choices":[{"message":{"role":"assistant","content":" Hello "}}]}""").text)
         assertEquals(
             "Hello world",
-            parseChatReply("""{"choices":[{"message":{"content":[{"type":"text","text":"Hello "},{"type":"text","text":"world"}]}}]}"""),
+            parseAiReply("""{"choices":[{"message":{"content":[{"type":"text","text":"Hello "},{"type":"text","text":"world"}]}}]}""").text,
         )
     }
 
@@ -46,7 +46,7 @@ class AiChatClientTest {
     fun anEmptyOrUnreadableReplyIsABadReply() {
         for (body in listOf("""{"choices":[]}""", """{"choices":[{"message":{"content":""}}]}""", "<html>", "")) {
             try {
-                parseChatReply(body)
+                parseAiReply(body)
                 fail(body)
             } catch (error: AiChatException) {
                 assertEquals(body, AiErrorKind.BAD_REPLY, error.kind)
@@ -190,7 +190,7 @@ class AiChatClientTest {
         // What openrouter/free sent back when it picked a safety checker for a question with a picture.
         val checker =
             """{"model":"nvidia/nemotron-3.5-content-safety:free","choices":[{"message":{"content":"User Safety: safe"}}]}"""
-        val error = assertThrows(AiChatException::class.java) { parseChatReply(checker) }
+        val error = assertThrows(AiChatException::class.java) { parseAiReply(checker) }
         assertEquals(AiErrorKind.NOT_A_CHAT_MODEL, error.kind)
         // Without the model's name, the labels alone give it away.
         assertTrue(aiSafetyCheckerAnswered("", "User Safety: safe\nResponse Safety: safe"))
@@ -199,7 +199,9 @@ class AiChatClientTest {
         assertFalse(aiSafetyCheckerAnswered("", "User Safety: safe is a label some checkers print. Here is the answer."))
         assertEquals(
             "Red",
-            parseChatReply("""{"model":"nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free","choices":[{"message":{"content":"Red"}}]}"""),
+            parseAiReply(
+                """{"model":"nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free","choices":[{"message":{"content":"Red"}}]}""",
+            ).text,
         )
     }
 

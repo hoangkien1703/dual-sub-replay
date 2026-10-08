@@ -24,6 +24,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
+import com.kienhoang.dualsubreplay.assistant.AI_SEARCH_TOOL
+import com.kienhoang.dualsubreplay.assistant.AI_SETTING_TOOL
+import com.kienhoang.dualsubreplay.assistant.AiAction
+import com.kienhoang.dualsubreplay.assistant.AiActionOutcome
+import com.kienhoang.dualsubreplay.assistant.AiActionText
+import com.kienhoang.dualsubreplay.assistant.AiAppActions
 import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiAssistantSettings
@@ -38,10 +44,14 @@ import com.kienhoang.dualsubreplay.assistant.AiHistoryStorage
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
 import com.kienhoang.dualsubreplay.assistant.AiModelInfo
 import com.kienhoang.dualsubreplay.assistant.AiProvider
+import com.kienhoang.dualsubreplay.assistant.AiReply
+import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
 import com.kienhoang.dualsubreplay.assistant.AiThinking
+import com.kienhoang.dualsubreplay.assistant.AiToolCall
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
+import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.assistant.aiCheckedSetup
 import com.kienhoang.dualsubreplay.assistant.aiDataUrl
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
@@ -67,6 +77,9 @@ class AiAssistantPanelUiTest {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
     private val requests = mutableListOf<AiChatRequest>()
     private var failure: AiChatException? = null
+
+    /** Answers given before the usual one, for example a tool call. */
+    private val replies = ArrayDeque<AiReply>()
     private val secrets = mutableMapOf<String, String>()
 
     /** Past the first page that introduces the assistant, unless a test starts before it. */
@@ -99,7 +112,7 @@ class AiAssistantPanelUiTest {
                 AiChatTransport { request ->
                     requests += request
                     failure?.let { throw it }
-                    "**に** marks where you go."
+                    replies.removeFirstOrNull() ?: AiReply("**に** marks where you go.")
                 },
             keyStore = keyStore,
             settingsStorage =
@@ -295,6 +308,82 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithText("How can I help?").assertIsDisplayed()
         assertEquals(2, requests.size)
         assertTrue(requests.all { it.messages.last().content == "OK?" })
+    }
+
+    /** Runs the assistant's actions at once and records them, with labels like the app's. */
+    private class RecordingActions : AiAppActions {
+        val performed = mutableListOf<AiAction>()
+
+        override fun lookAtVideo(linesAround: Int) = "No video is open."
+
+        override fun refusal(action: AiAction): String? = null
+
+        override fun describe(action: AiAction) =
+            when (action) {
+                is AiAction.SearchYouTube -> AiActionText("Search YouTube for “${action.query}”", "Search")
+                else -> AiActionText("Text size: 150%", "Apply")
+            }
+
+        override suspend fun perform(action: AiAction): AiActionOutcome {
+            performed += action
+            val undo = if (action is AiAction.ChangeSetting) listOf(action.copy(value = "100")) else emptyList()
+            return AiActionOutcome.Done(describe(action).label, aiActionNote(action), undo)
+        }
+    }
+
+    private fun call(
+        name: String,
+        arguments: String,
+    ) = AiToolCall("call_$name", name, arguments, """{"id":"call_$name","type":"function","function":{"name":"$name"}}""")
+
+    @Test
+    fun aSettingChangeShowsAChipWithUndo() {
+        checkedGeminiKey()
+        val actions = RecordingActions()
+        controller.appActions = actions
+        replies += AiReply("", listOf(call(AI_SETTING_TOOL, """{"setting":"text_size","value":"150"}""")))
+        replies += AiReply("Done! The subtitles are bigger now.")
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_input").performTextInput("Make the subtitles bigger")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithText("Done! The subtitles are bigger now.").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_action_chip").assertIsDisplayed().assertTextContains("Text size: 150%")
+        assertEquals(1, actions.performed.size)
+        saveUiEvidence("ai_panel_action_chip")
+        composeRule.onNodeWithTag("ai_action_undo").performClick()
+        composeRule.onNodeWithText("Undone").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_action_undo").assertDoesNotExist()
+        assertEquals(AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "100"), actions.performed.last())
+        // The tool result went back to the model in the second request.
+        assertEquals(2, requests.size)
+        assertTrue(
+            requests[1]
+                .messages
+                .last()
+                .content
+                .startsWith("Done: Set text_size to 150."),
+        )
+    }
+
+    @Test
+    fun aSearchWaitsForItsButton() {
+        checkedGeminiKey()
+        val actions = RecordingActions()
+        controller.appActions = actions
+        replies += AiReply("", listOf(call(AI_SEARCH_TOOL, """{"query":"Japanese cooking"}""")))
+        replies += AiReply("Tap Search to see the videos.")
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_input").performTextInput("Find Japanese cooking videos")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithTag("ai_action_card").assertIsDisplayed().assertTextContains("Search YouTube for “Japanese cooking”")
+        assertTrue(actions.performed.isEmpty())
+        saveUiEvidence("ai_panel_action_card")
+        composeRule.onNodeWithTag("ai_action_confirm").assertTextEquals("Search").performClick()
+        composeRule.onNodeWithTag("ai_action_card").assertDoesNotExist()
+        assertEquals(listOf<AiAction>(AiAction.SearchYouTube("Japanese cooking")), actions.performed)
+        composeRule.onNodeWithTag("ai_action_chip").assertIsDisplayed()
     }
 
     @Test

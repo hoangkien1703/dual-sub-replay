@@ -248,6 +248,10 @@ internal class YouTubeWebController {
         pause()
         replayAction?.invoke(second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f)
     }
+
+    fun setPlaybackSpeed(rate: Float) {
+        scriptAction?.invoke(webPlaybackSpeedScript(rate))
+    }
 }
 
 @Composable

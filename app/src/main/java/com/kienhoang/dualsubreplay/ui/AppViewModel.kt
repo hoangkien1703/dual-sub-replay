@@ -925,6 +925,22 @@ class AppViewModel internal constructor(
         _state.update { it.copy(lockOverlayToVideo = locked) }
     }
 
+    /** When original or translated captions show; the settings page writes the same preferences. */
+    fun setCaptionVisibility(
+        original: Boolean,
+        visibility: CaptionVisibility,
+    ) {
+        preferences.edit().putString(if (original) ORIGINAL_VISIBILITY else TRANSLATED_VISIBILITY, visibility.name).apply()
+        _state.update { if (original) it.copy(originalVisibility = visibility) else it.copy(translatedVisibility = visibility) }
+    }
+
+    /** Opens a YouTube page in the app's one YouTube view, for example a search the assistant offered. */
+    fun openYouTubePage(url: String) {
+        if (!isYouTubeWebUrl(url)) return
+        preferences.edit().putString("last_browser_url", url).apply()
+        _state.update { it.copy(browserUrl = url, browserNavigationRequestId = it.browserNavigationRequestId + 1) }
+    }
+
     fun setPreloadModelsEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(PRELOAD_MODELS_ENABLED_PREFERENCE, enabled).apply()
         _state.update { it.copy(preloadModelsEnabled = enabled) }
