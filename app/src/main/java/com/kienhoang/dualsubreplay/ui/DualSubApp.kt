@@ -282,6 +282,7 @@ private fun DualSubExperience(
     onResetSettings: () -> Unit,
 ) {
     var showSettings by remember { mutableStateOf(false) }
+    var settingsSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     // Gear icons on the player open a small languages popup; the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
@@ -330,6 +331,10 @@ private fun DualSubExperience(
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showQuickSettings = true
     }
+    AiSettingsRequestEffect {
+        settingsSection = MoreSettingsSection.AI_ASSISTANT
+        showSettings = true
+    }
 
     AppNavigation(onPractice = onVocabulary, onProgress = onProgress, onSettings = {
         showSettings = true
@@ -339,9 +344,10 @@ private fun DualSubExperience(
                 Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                     menuButton()
                     Spacer(Modifier.weight(1f))
-                    // Translation problems show here instead of interrupting the video.
+                    // Translation problems show here instead of interrupting the video: in the
+                    // assistant panel when the assistant is on, otherwise in their own icon.
                     val tryGoogleAgain = LocalTranslationEngineActions.current?.tryGoogleAgain ?: {}
-                    TranslationIssueButton(state.translationIssue(), tryGoogleAgain, onRetry)
+                    TopBarAssistantOrIssueButton(state, appProblems(state, tryGoogleAgain, onRetry), tryGoogleAgain, onRetry)
                 }
             }
         }) { innerPadding ->
@@ -510,9 +516,14 @@ private fun DualSubExperience(
             onCaptionFormatChange = onCaptionFormatChange,
             onResetSettings = {
                 showSettings = false
+                settingsSection = null
                 onResetSettings()
             },
-            onDismiss = { showSettings = false },
+            initialSection = settingsSection,
+            onDismiss = {
+                showSettings = false
+                settingsSection = null
+            },
         )
     }
 }

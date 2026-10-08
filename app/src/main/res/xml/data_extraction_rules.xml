@@ -2,18 +2,23 @@
 <!--
     Android 12 and higher. Leaves out downloads the app can fetch again: the Japanese dictionary
     (13 MB) and the F-Droid build's translation models. Also leaves out the WebView profile
-    (app_webview/), whose cookies hold the YouTube/Google sign-in. Keep these paths in sync with
-    backup_rules.xml and the directories AppViewModel creates.
+    (app_webview/), whose cookies hold the YouTube/Google sign-in, and the AI assistant's encrypted
+    keys (useless without this phone's Keystore) and saved chats. Keep these paths in sync with
+    backup_rules.xml and the directories AppViewModel and AiAssistantViewModel create.
 -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="japanese-dictionary/" />
         <exclude domain="file" path="translation-models/" />
         <exclude domain="root" path="app_webview/" />
+        <exclude domain="sharedpref" path="ai_assistant_keys.xml" />
+        <exclude domain="file" path="ai-chats/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="japanese-dictionary/" />
         <exclude domain="file" path="translation-models/" />
         <exclude domain="root" path="app_webview/" />
+        <exclude domain="sharedpref" path="ai_assistant_keys.xml" />
+        <exclude domain="file" path="ai-chats/" />
     </device-transfer>
 </data-extraction-rules>

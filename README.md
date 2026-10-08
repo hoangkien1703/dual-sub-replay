@@ -93,6 +93,13 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Reviews use spaced repetition: **Again** (10 minutes), **Hard** (1 day), **Good** (3 days), or **Easy** (7 days), with intervals growing on later reviews.
 - Export a full backup or Anki text, and import it on another phone. See [Practice transfer](docs/practice-transfer.md).
 
+### Ask the AI assistant
+
+- The ✨ button at the top right opens an assistant from the right side. Ask where a setting is, what a word or sentence means, or tap **Explain the current line**.
+- Problems such as Google Translate failing or subtitles not loading show at the top of the panel, with **Ask AI about this**.
+- It uses your own free or paid API key from Google Gemini, OpenAI, OpenRouter, or another OpenAI-compatible service. **Get a free key** walks you through Google's in three steps, and **Paste key** recognises the service by itself.
+- Your key is encrypted on the phone and never backed up. Chats stay on the phone for 7 days by default. Turn the assistant off completely in **More settings → AI assistant**. The F-Droid build has no assistant.
+
 ### Track your progress
 
 - **Progress** in the menu shows today's watch time against a daily goal, your streak, totals for the week, month, year and all time, and the time spent in each language.
@@ -124,7 +131,7 @@ The interface is available in English, Tiếng Việt, Español, Português (Bra
 
 ## Privacy
 
-No account or API key is required, and the app has no analytics or advertising SDKs. YouTube receives the same page, player and caption requests as a normal visit. By default the GitHub build sends subtitle text to Google Translate (online) for better translations. Turn off Settings → Translation → Google Translate (online) to translate on the device instead: ML Kit downloads only the language models you use, then translates on the device. The F-Droid build always translates on the device. Settings, saved words, and progress stay in local app storage. See [PRIVACY.md](PRIVACY.md) for details.
+No account or API key is required, and the app has no analytics or advertising SDKs. The optional AI assistant sends nothing until you add your own key and ask it something; questions then go to the AI service you chose. YouTube receives the same page, player and caption requests as a normal visit. By default the GitHub build sends subtitle text to Google Translate (online) for better translations. Turn off Settings → Translation → Google Translate (online) to translate on the device instead: ML Kit downloads only the language models you use, then translates on the device. The F-Droid build always translates on the device. Settings, saved words, and progress stay in local app storage. See [PRIVACY.md](PRIVACY.md) for details.
 
 ## Limitations
 

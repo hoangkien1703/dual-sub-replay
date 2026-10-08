@@ -15,8 +15,14 @@ context for later practice. See the [product guide](../../README.md) for feature
   exception on 2026-10-05: the GitHub build translates with Google Translate (online) by
   default for better quality, with a setting to translate on the device instead, and it
   offers on-device again when Google fails. The F-Droid build stays on-device.
+  On 2026-10-08 the owner approved a second, optional exception: the GitHub build's AI
+  assistant uses a key the user brings from the AI service of their choice. It is on by
+  default but sends nothing until a key is added, can be turned off completely, and every
+  other feature keeps working without it. The project still runs no server and holds no
+  shared key. The F-Droid build has no assistant.
 - Be precise about privacy: YouTube browsing/captions and model downloads use the
-  network; speech engines may use online voices. On-device translation does not
+  network; speech engines may use online voices; AI assistant questions go to the
+  service whose key the user added. On-device translation does not
   make the entire app offline or prevent Android backup of local study data.
 - Preserve existing users' vocabulary, review progress, settings, and migrations.
   Keep production signing continuity so official releases can update installed apps.
