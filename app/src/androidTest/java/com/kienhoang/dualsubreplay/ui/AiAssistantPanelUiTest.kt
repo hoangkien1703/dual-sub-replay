@@ -127,7 +127,7 @@ class AiAssistantPanelUiTest {
     @Test
     fun withoutAKeyThePanelShowsTheProblemAndHowToConnect() {
         showTopBarAndPanel()
-        composeRule.onNodeWithTag("ai_assistant_problem_dot").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_assistant_problem_dot", useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithTag("ai_panel").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
         composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
@@ -166,7 +166,7 @@ class AiAssistantPanelUiTest {
     fun aTypedQuestionGetsAnAnswer() {
         keyStore.save(AiProvider.GEMINI, "AIza-FAKE-test-key-for-unit-tests-rstu")
         showTopBarAndPanel(DualSubUiState())
-        composeRule.onNodeWithTag("ai_assistant_problem_dot").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_assistant_problem_dot", useUnmergedTree = true).assertDoesNotExist()
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
         composeRule.onNodeWithText("How can I help?").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_input").performTextInput("What does に mean?")
