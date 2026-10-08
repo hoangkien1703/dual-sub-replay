@@ -14,6 +14,7 @@ class AiAssistantViewModel(
 ) : AndroidViewModel(application) {
     private val settingsPreferences = application.getSharedPreferences(AI_SETTINGS_PREFERENCES, 0)
     private val chatHistory = AiChatHistoryStore(File(application.filesDir, AI_CHATS_DIRECTORY))
+    private val memory = AiMemoryStore(File(application.filesDir, AI_MEMORY_DIRECTORY))
 
     /** Read once, the first time a question is asked. */
     internal val guide: String by lazy {
@@ -49,5 +50,11 @@ class AiAssistantViewModel(
                     override fun clear() = chatHistory.clear()
                 },
             modelLister = transport,
+            memoryStorage =
+                object : AiMemoryStorage {
+                    override fun load() = memory.load()
+
+                    override fun save(data: AiMemoryData) = memory.save(data)
+                },
         )
 }

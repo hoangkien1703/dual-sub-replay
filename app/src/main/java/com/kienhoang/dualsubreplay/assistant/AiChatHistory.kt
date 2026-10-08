@@ -35,7 +35,8 @@ internal fun encodeAiChats(chats: List<AiChat>): String =
                             .put("id", chat.id)
                             .put("created", chat.createdMs)
                             .put("updated", chat.updatedMs)
-                            .put("messages", JSONArray().apply { chat.messages.forEach { put(encodeMessage(it)) } }),
+                            .put("messages", JSONArray().apply { chat.messages.forEach { put(encodeMessage(it)) } })
+                            .apply { if (!chat.memory) put("memory", false) },
                     )
                 }
             },
@@ -86,6 +87,7 @@ internal fun decodeAiChats(text: String): List<AiChat> {
             createdMs = chat.optLong("created"),
             updatedMs = chat.optLong("updated"),
             messages = (0 until messages.length()).mapNotNull { decodeMessage(messages.optJSONObject(it)) },
+            memory = chat.optBoolean("memory", true),
         )
     }
 }

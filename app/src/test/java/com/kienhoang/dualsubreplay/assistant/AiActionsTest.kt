@@ -110,6 +110,43 @@ class AiActionsTest {
         assertTrue(AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "150").asksAfterOtherText)
         assertTrue(!AiAction.SaveWord("a", "b", null).asksAfterOtherText)
         assertTrue(!AiAction.Playback(AiPlayback.PAUSE).asksAfterOtherText)
+        assertTrue(AiAction.SaveMemory("Studies for JLPT N3").asksAfterOtherText)
+        assertTrue(AiAction.ForgetMemory(AiMemory("m", "x", 0)).asksAfterOtherText)
+        assertTrue(!AiAction.SaveMemory("Studies for JLPT N3").alwaysAsks)
+    }
+
+    @Test
+    fun memoryCallsTakeOneShortSentenceAndANumberFromTheList() {
+        val memories = listOf(AiMemory("m1", "Studies for JLPT N4", 1), AiMemory("m2", "Likes short answers", 2))
+
+        fun parse(
+            name: String,
+            arguments: String,
+        ) = parseAiAction(call(name, arguments), memories)
+        assertEquals(
+            AiActionParse.Valid(AiAction.SaveMemory("Studies for JLPT N3")),
+            parse(AI_SAVE_MEMORY_TOOL, """{"text":" Studies for\nJLPT N3 "}"""),
+        )
+        assertEquals(
+            AiActionParse.Valid(AiAction.SaveMemory("Studies for JLPT N3", memories[0])),
+            parse(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3","replaces":"1"}"""),
+        )
+        assertEquals(AiActionParse.Valid(AiAction.ForgetMemory(memories[1])), parse(AI_FORGET_MEMORY_TOOL, """{"number":2.0}"""))
+        assertEquals(
+            AiActionParse.Invalid("Give the memory as one short sentence of at most 200 characters."),
+            parse(AI_SAVE_MEMORY_TOOL, """{"text":"${"a".repeat(201)}"}"""),
+        )
+        assertEquals(AiActionParse.Invalid("Give the number of a saved memory, 1 to 2."), parse(AI_FORGET_MEMORY_TOOL, """{"number":0}"""))
+        assertEquals(
+            AiActionParse.Invalid("Give the number of a saved memory, 1 to 2."),
+            parse(AI_SAVE_MEMORY_TOOL, """{"text":"x","replaces":1.5}"""),
+        )
+        assertEquals("There are no saved memories.", refused(AI_FORGET_MEMORY_TOOL, """{"number":1}"""))
+        assertEquals(AiActionKind.MEMORY, AiAction.RestoreMemory(memories[0]).kind)
+        assertEquals(
+            "Save the memory \"Studies for JLPT N3\" in place of \"Studies for JLPT N4\"",
+            aiActionNote(AiAction.SaveMemory("Studies for JLPT N3", memories[0])),
+        )
     }
 
     @Test

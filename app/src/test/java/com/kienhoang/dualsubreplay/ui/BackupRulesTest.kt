@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.assistant.AI_CHATS_DIRECTORY
 import com.kienhoang.dualsubreplay.assistant.AI_KEYS_PREFERENCES
+import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_DIRECTORY
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -15,7 +16,8 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class BackupRulesTest {
     private val regenerable = setOf("japanese-dictionary/", "translation-models/")
-    private val aiPrivate = setOf("sharedpref:$AI_KEYS_PREFERENCES.xml", "file:$AI_CHATS_DIRECTORY/")
+    private val aiPrivate =
+        setOf("sharedpref:$AI_KEYS_PREFERENCES.xml", "file:$AI_CHATS_DIRECTORY/", "file:$AI_MEMORY_DIRECTORY/")
     private val excluded = regenerable.map { "file:$it" }.toSet() + "root:app_webview/" + aiPrivate
 
     @Test

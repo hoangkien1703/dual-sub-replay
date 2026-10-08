@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
@@ -46,6 +47,7 @@ private val AI_INTRO_POINTS =
     listOf(
         AiIntroPoint(Icons.Default.Translate, R.string.ai_intro_words),
         AiIntroPoint(Icons.Default.Tune, R.string.ai_intro_settings),
+        AiIntroPoint(Icons.Default.Psychology, R.string.ai_intro_memory),
         AiIntroPoint(Icons.Default.Build, R.string.ai_intro_problems),
         AiIntroPoint(Icons.Default.Image, R.string.ai_intro_files),
     )

@@ -13,6 +13,11 @@ class AiSettingsTest {
         assertTrue(settings.enabled)
         assertEquals(AiProvider.GEMINI, settings.provider)
         assertEquals(ChatHistoryRetention.WEEK, settings.historyRetention)
+        assertTrue(settings.memoryEnabled)
+        // Nobody has seen the intro yet, so there is nothing new to tell.
+        assertFalse(settings.showsNews)
+        assertTrue(settings.copy(introSeen = true).showsNews)
+        assertFalse(settings.copy(introSeen = true, newsSeen = AI_NEWS_VERSION).showsNews)
         assertEquals(ChatHistoryRetention.WEEK, storedChatHistoryRetention(null))
         assertEquals(ChatHistoryRetention.WEEK, storedChatHistoryRetention("bogus"))
         assertEquals(AiProvider.GEMINI, storedAiProvider("bogus"))

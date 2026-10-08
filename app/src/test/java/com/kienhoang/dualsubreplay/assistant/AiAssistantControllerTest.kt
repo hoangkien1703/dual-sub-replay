@@ -74,6 +74,7 @@ class AiAssistantControllerTest {
     private val keyStore = AiKeyStore(secrets, FakeCipher())
     private val settings = MemorySettings()
     private val history = MemoryHistory()
+    private val memoryStore = InMemoryAiMemoryStorage()
 
     private val listedModels = mutableListOf<String>()
 
@@ -97,6 +98,7 @@ class AiAssistantControllerTest {
                 listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemini-pro-latest"), AiModelInfo("text-embedding-004"))
             },
             busyRetryDelaysMs = busyRetries,
+            memoryStorage = memoryStore,
         )
 
     private fun savedChat(
@@ -274,7 +276,8 @@ class AiAssistantControllerTest {
         assertEquals("Current line", state.messages.first().contextLabel)
         assertEquals("It marks the target.", state.messages.last().text)
         val sent = transport.requests.single().messages
-        assertEquals("guide", sent.first().content)
+        // The guide, then what memory holds.
+        assertEquals("guide\n\nSaved memories: none yet.", sent.first().content)
         assertEquals("What does に mean?\n\nline: 学校に行く", sent.last().content)
         assertEquals(listOf(state.chat), history.chats)
         assertEquals(listOf(state.chat), state.savedChats)
@@ -602,6 +605,23 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun whatsNewShowsOnceForPeopleWhoSawTheIntroBefore() {
+        val newUser = controller()
+        newUser.finishIntro()
+        assertFalse(newUser.state.value.settings.showsNews)
+
+        settings.value = AiAssistantSettings(introSeen = true)
+        val existing = controller()
+        assertTrue(existing.state.value.settings.showsNews)
+        existing.dismissNews()
+        assertFalse(existing.state.value.settings.showsNews)
+        assertFalse(
+            controller()
+                .state.value.settings.showsNews,
+        )
+    }
+
+    @Test
     fun theFirstPageIsAnsweredOnceWithLetsStartOrDontUseAi() {
         val controller = controller()
         assertFalse(controller.state.value.settings.introSeen)
@@ -685,7 +705,7 @@ class AiAssistantControllerTest {
         val action = answer.actions.single()
         assertEquals(AiActionState.DONE, action.state)
         assertTrue(action.undoable)
-        assertEquals(AI_TOOLS, transport.requests.first().tools)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, transport.requests.first().tools)
 
         controller.undoAction(action.id)
         assertEquals(
@@ -846,5 +866,166 @@ class AiAssistantControllerTest {
         )
         controller.send("Again", "guide")
         assertEquals(listOf(true, false, false), transport.requests.map { it.tools.isNotEmpty() })
+    }
+
+    /** Changes memory through the controller, as the app's actions do. */
+    private class MemoryApp(
+        private val keeper: AiMemoryKeeper,
+    ) : AiAppActions {
+        override fun lookAtVideo(linesAround: Int) = "No video is open."
+
+        override fun refusal(action: AiAction) = keeper.memoryRefusal(action)
+
+        override fun describe(action: AiAction) = AiActionText(aiActionNote(action), "Save")
+
+        override suspend fun perform(action: AiAction): AiActionOutcome =
+            when (val change = keeper.changeMemory(action)) {
+                is AiMemoryChange.Refused -> AiActionOutcome.Refused(change.reason)
+                is AiMemoryChange.Done -> AiActionOutcome.Done(change.event.name, change.note, change.undo)
+            }
+    }
+
+    private fun AiAssistantController.lastActions() =
+        state.value.messages
+            .last()
+            .actions
+
+    private fun systemPrompt(request: AiChatRequest) = request.messages.first().content
+
+    @Test
+    fun aSavedMemoryShowsWithUndoAndTheNextQuestionSeesIt() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.appActions = MemoryApp(controller)
+        transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3"}""")))
+        transport.reply = "Good luck!"
+        controller.send("I'm studying for JLPT N3", "guide")
+        assertTrue("Saved memories: none yet." in systemPrompt(transport.requests.first()))
+        val saved = controller.lastActions().single()
+        assertEquals(AiActionKind.MEMORY, saved.kind)
+        assertEquals("SAVED", saved.label)
+        assertTrue(saved.undoable)
+        assertEquals(listOf("Studies for JLPT N3"), memoryStore.data.memories.map { it.text })
+
+        controller.undoAction(saved.id)
+        assertTrue(memoryStore.data.memories.isEmpty())
+        assertEquals(AiActionState.UNDONE, controller.lastActions().single().state)
+
+        transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3 in December"}""")))
+        controller.send("The exam is in December", "guide")
+        controller.newChat()
+        controller.send("What level am I?", "guide")
+        val prompt = systemPrompt(transport.requests.last())
+        assertTrue(prompt, prompt.startsWith("guide"))
+        assertTrue(prompt, "(notes from what the user told you earlier; 1 of 30 used):\n1. Studies for JLPT N3 in December" in prompt)
+    }
+
+    @Test
+    fun updatesAndForgetsUseTheNumberedListAndUndoPutsItBack() {
+        val n4 = AiMemory("m1", "Studies for JLPT N4", 1)
+        val short = AiMemory("m2", "Likes short answers", 2)
+        memoryStore.data = AiMemoryData(memories = listOf(n4, short))
+        checkedGeminiKey()
+        val controller = controller()
+        controller.appActions = MemoryApp(controller)
+        transport.replies +=
+            AiReply(
+                "",
+                listOf(
+                    toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3","replaces":1}"""),
+                    toolCall(AI_FORGET_MEMORY_TOOL, """{"number":2}"""),
+                ),
+            )
+        controller.send("I passed N4, now it's N3. Forget that I like short answers.", "guide")
+        assertTrue("1. Studies for JLPT N4\n2. Likes short answers" in systemPrompt(transport.requests.first()))
+        assertEquals(listOf("Studies for JLPT N3"), memoryStore.data.memories.map { it.text })
+        val (updated, forgot) = controller.lastActions()
+        assertEquals(listOf("UPDATED", "FORGOT"), listOf(updated.label, forgot.label))
+
+        controller.undoAction(forgot.id)
+        controller.undoAction(updated.id)
+        assertEquals(listOf(n4, short), memoryStore.data.memories)
+    }
+
+    @Test
+    fun aFullMemoryAsksWhichToReplaceAndADuplicateIsNotSavedTwice() {
+        memoryStore.data = AiMemoryData(memories = (1..MAX_AI_MEMORIES).map { AiMemory("m$it", "Memory $it", it.toLong()) })
+        checkedGeminiKey()
+        val controller = controller()
+        controller.appActions = MemoryApp(controller)
+        transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"A new fact"}""")))
+        transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"memory  3"}""")))
+        controller.send("Remember a new fact", "guide")
+        val results = transport.requests[1].messages.filter { it.role == AiRole.TOOL }
+        assertTrue(results.first().content, results.first().content.startsWith("Not done: Memory is full (30 saved)."))
+        val already = controller.lastActions().single()
+        assertEquals("ALREADY_SAVED", already.label)
+        assertFalse(already.undoable)
+        assertEquals(MAX_AI_MEMORIES, memoryStore.data.memories.size)
+    }
+
+    @Test
+    fun withMemoryOffOrAChatWithoutItOnlyTheInstructionsAreSent() {
+        memoryStore.data = AiMemoryData("Explain in Vietnamese.", listOf(AiMemory("m1", "Studies for JLPT N3", 1)))
+        checkedGeminiKey()
+        val controller = controller()
+        controller.appActions = MemoryApp(controller)
+        controller.setMemoryEnabled(false)
+        controller.send("Hi", "guide")
+        val off = transport.requests.last()
+        assertEquals(AI_TOOLS, off.tools)
+        assertTrue("Explain in Vietnamese." in systemPrompt(off))
+        assertTrue("Memory is off in AI settings" in systemPrompt(off))
+        assertFalse("JLPT" in systemPrompt(off))
+
+        controller.setMemoryEnabled(true)
+        controller.newChat()
+        controller.setNewChatMemory(false)
+        assertEquals(AiMemoryUse.OFF_IN_CHAT, controller.state.value.memoryUse)
+        // A model that saves anyway is refused.
+        transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"Likes cats"}""")))
+        controller.send("I like cats", "guide")
+        val chatOff = transport.requests[transport.requests.size - 2]
+        assertEquals(AI_TOOLS, chatOff.tools)
+        assertTrue("Explain in Vietnamese." in systemPrompt(chatOff))
+        assertTrue("Memory is off for this chat" in systemPrompt(chatOff))
+        assertFalse("JLPT" in systemPrompt(chatOff))
+        assertEquals(
+            "Not done: Memory is off for this chat.",
+            transport.requests
+                .last()
+                .messages
+                .last()
+                .content,
+        )
+        assertEquals(listOf("Studies for JLPT N3"), memoryStore.data.memories.map { it.text })
+        assertFalse(history.chats.first().memory)
+
+        // The next new chat uses memory again.
+        controller.newChat()
+        assertEquals(AiMemoryUse.ON, controller.state.value.memoryUse)
+    }
+
+    @Test
+    fun memoriesAndInstructionsAreEditedAndSurviveARestart() {
+        memoryStore.data = AiMemoryData(memories = listOf(AiMemory("m1", "Studies for JLPT N4", 1), AiMemory("m2", "Likes cats", 2)))
+        val controller = controller()
+        controller.setInstructions("  Keep answers short.  ")
+        assertTrue(controller.editMemory("m1", "Studies for  JLPT N3"))
+        assertFalse(controller.editMemory("m1", " "))
+        controller.deleteMemory("m2")
+        val restarted = controller().state.value.memory
+        assertEquals("Keep answers short.", restarted.instructions)
+        assertEquals(listOf(AiMemory("m1", "Studies for JLPT N3", 1)), restarted.memories)
+
+        controller.setInstructions("x".repeat(MAX_AI_INSTRUCTIONS_CHARS + 10))
+        assertEquals(MAX_AI_INSTRUCTIONS_CHARS, memoryStore.data.instructions.length)
+        controller.deleteAllMemories()
+        assertTrue(memoryStore.data.memories.isEmpty())
+        assertEquals(
+            MAX_AI_INSTRUCTIONS_CHARS,
+            controller()
+                .state.value.memory.instructions.length,
+        )
     }
 }
