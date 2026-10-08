@@ -107,10 +107,10 @@ page once got ChatGPT to save false memories, and here a video's subtitles could
   instructions are still sent (unit test).
 - [x] Memories and instructions survive a restart, and the chat's memory flag survives in history
   (unit test); `files/ai-memory/` is excluded from backups (`BackupRulesTest`).
-- [ ] The Memory page lists, edits and deletes memories and edits instructions (UI test).
+- [x] The Memory page lists, edits and deletes memories and edits instructions (UI test).
 - [x] The what's-new card shows once for people who saw the intro before, and not for new users
   (unit test).
-- [ ] All new text exists in the 8 interface languages; the chip, Memory page and card use the app
+- [x] All new text exists in the 8 interface languages; the chip, Memory page and card use the app
   theme (screenshot check).
 
 ## Validation plan
@@ -172,7 +172,9 @@ intent for this one.
   restart, what's-new), `AiChatHistoryTest`, `AiSettingsTest`, `AiAssistantPromptTest`,
   `BackupRulesTest`.
 - `AiAssistantPanelUiTest` (memory chip, Manage, edit, instructions, Undo, delete, Delete all,
-  switch, chat without memory, what's-new card and the three screenshots) runs on the CI managed
-  device; the Memory page criterion and the screenshot check stay open until it passes there.
+  switch, chat without memory, what's-new card) passed on the CI managed device with all four
+  Android CI jobs on 4303736 ([run 37814924770](https://github.com/hoangkien1703/dual-sub-replay/actions/runs/37814924770)).
+  The `ai_panel_memory_chip`, `ai_panel_memory_page` and `ai_panel_whats_new` screenshots use the
+  app's dark teal theme and match the chat and settings pages around them.
 - Not verified: a live round trip with a real AI service (the owner's key from the chat may not
   be used in this session) and the on-phone scenarios in the validation plan.
