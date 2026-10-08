@@ -17,6 +17,16 @@
     <string name="ai_message_about">관련 내용: %1$s</string>
     <string name="ai_welcome_title">무엇을 도와드릴까요?</string>
     <string name="ai_welcome_message">설정, 단어, 문장, 앱 문제에 대해 물어보세요.</string>
+    <string name="ai_intro_title">AI 도우미를 소개합니다</string>
+    <string name="ai_intro_message">영상을 보면서 무엇이든 편하게 물어보세요.</string>
+    <string name="ai_intro_words">단어, 문법, 지금 보고 있는 자막 줄을 설명해 줍니다</string>
+    <string name="ai_intro_settings">설정이 어떻게 작동하는지, 무엇을 바꾸면 되는지 알려 줍니다</string>
+    <string name="ai_intro_problems">번역이나 자막이 작동하지 않을 때 도와줍니다</string>
+    <string name="ai_intro_files">추가한 사진과 파일을 읽습니다</string>
+    <string name="ai_intro_privacy">선택한 서비스의 내 API 키를 사용합니다. Google Gemini와 OpenRouter는 무료 키를 제공합니다. 질문하기 전에는 아무것도 전송되지 않습니다. AI는 실수할 수 있으니 중요한 답은 꼭 확인하세요.</string>
+    <string name="ai_intro_start">시작하기</string>
+    <string name="ai_intro_decline">AI 사용 안 함</string>
+    <string name="ai_intro_decline_note">나중에 %1$s → %2$s에서 다시 켤 수 있습니다.</string>
     <string name="ai_chip_features">이 앱으로 무엇을 할 수 있나요?</string>
     <string name="ai_chip_bigger_subtitles">자막을 크게 하려면?</string>
     <string name="ai_chip_explain_line">지금 줄 설명해 줘</string>

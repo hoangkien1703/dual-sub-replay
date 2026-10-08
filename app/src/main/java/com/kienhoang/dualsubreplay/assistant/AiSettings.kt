@@ -14,6 +14,7 @@ internal const val AI_PROVIDER_PREFERENCE = "ai_provider"
 internal const val AI_CUSTOM_BASE_URL_PREFERENCE = "ai_custom_base_url"
 internal const val AI_HISTORY_RETENTION_PREFERENCE = "ai_history_retention"
 internal const val AI_THINKING_PREFERENCE = "ai_thinking"
+internal const val AI_INTRO_SEEN_PREFERENCE = "ai_intro_seen"
 private const val AI_MODEL_PREFERENCE_PREFIX = "ai_model_"
 
 private const val DAY_MS = 24L * 60 * 60 * 1000
@@ -67,6 +68,8 @@ internal data class AiAssistantSettings(
     val customBaseUrl: String = "",
     val historyRetention: ChatHistoryRetention = DEFAULT_CHAT_HISTORY_RETENTION,
     val thinking: AiThinking = AiThinking.AUTO,
+    /** The panel's first page, which introduces the assistant, was answered with Let's start or Don't use AI. */
+    val introSeen: Boolean = false,
 ) {
     fun modelFor(provider: AiProvider): String = models[provider]?.trim()?.takeIf { it.isNotEmpty() } ?: provider.defaultModel
 
@@ -85,6 +88,7 @@ internal fun readAiAssistantSettings(preferences: SharedPreferences): AiAssistan
         customBaseUrl = preferences.getString(AI_CUSTOM_BASE_URL_PREFERENCE, null).orEmpty(),
         historyRetention = storedChatHistoryRetention(preferences.getString(AI_HISTORY_RETENTION_PREFERENCE, null)),
         thinking = storedAiThinking(preferences.getString(AI_THINKING_PREFERENCE, null)),
+        introSeen = preferences.getBoolean(AI_INTRO_SEEN_PREFERENCE, false),
     )
 
 internal fun writeAiAssistantSettings(
@@ -97,6 +101,7 @@ internal fun writeAiAssistantSettings(
         putString(AI_CUSTOM_BASE_URL_PREFERENCE, settings.customBaseUrl)
         putString(AI_HISTORY_RETENTION_PREFERENCE, settings.historyRetention.key)
         putString(AI_THINKING_PREFERENCE, settings.thinking.key)
+        putBoolean(AI_INTRO_SEEN_PREFERENCE, settings.introSeen)
         AiProvider.entries.forEach { provider ->
             val model = settings.models[provider]
             if (model == null) {

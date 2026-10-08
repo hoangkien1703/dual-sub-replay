@@ -17,6 +17,16 @@
     <string name="ai_message_about">Tentang: %1$s</string>
     <string name="ai_welcome_title">Ada yang bisa dibantu?</string>
     <string name="ai_welcome_message">Tanyakan tentang setelan, kata, kalimat, atau masalah di aplikasi.</string>
+    <string name="ai_intro_title">Kenalan dengan asisten AI</string>
+    <string name="ai_intro_message">Tanyakan apa saja sambil menonton, dengan kata-katamu sendiri.</string>
+    <string name="ai_intro_words">Menjelaskan kata, tata bahasa, dan baris subtitel yang sedang tampil</string>
+    <string name="ai_intro_settings">Menjelaskan cara kerja setelan dan mana yang perlu diubah</string>
+    <string name="ai_intro_problems">Membantu saat terjemahan atau subtitel tidak berfungsi</string>
+    <string name="ai_intro_files">Membaca foto dan file yang kamu tambahkan</string>
+    <string name="ai_intro_privacy">Asisten memakai kunci API milikmu dari layanan yang kamu pilih. Google Gemini dan OpenRouter punya kunci gratis. Tidak ada yang dikirim sampai kamu mengajukan pertanyaan. AI bisa keliru, jadi periksa jawaban yang penting.</string>
+    <string name="ai_intro_start">Ayo mulai</string>
+    <string name="ai_intro_decline">Jangan pakai AI</string>
+    <string name="ai_intro_decline_note">Kamu bisa menyalakannya lagi di %1$s → %2$s.</string>
     <string name="ai_chip_features">Apa saja yang bisa dilakukan aplikasi ini?</string>
     <string name="ai_chip_bigger_subtitles">Bagaimana cara memperbesar subtitel?</string>
     <string name="ai_chip_explain_line">Jelaskan baris saat ini</string>

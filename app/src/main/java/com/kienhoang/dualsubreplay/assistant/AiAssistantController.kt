@@ -118,6 +118,15 @@ internal val AI_BUSY_RETRY_DELAYS_MS = listOf(1_000L, 3_000L)
 /** The service answered but was busy: it accepted the key before it looked for a free model. */
 private val BUSY_PROBLEMS = setOf(AiErrorKind.SERVER, AiErrorKind.RATE_LIMITED)
 
+/**
+ * OpenRouter's free model picker chooses at random and, for a question with a picture, picks a
+ * safety checker about two times in five, so the same question is asked again at once.
+ */
+internal const val AI_NOT_A_CHAT_MODEL_RETRIES = 4
+
+/** Answers that still prove the key works. */
+private val KEY_WORKS_PROBLEMS = BUSY_PROBLEMS + AiErrorKind.NOT_A_CHAT_MODEL
+
 private val KEY_CHECK_MESSAGES =
     listOf(AiWireMessage(AiRole.SYSTEM, "Reply with the single word OK."), AiWireMessage(AiRole.USER, "OK?"))
 
@@ -227,6 +236,15 @@ internal class AiAssistantController(
                 )
             }
         }
+    }
+
+    /** Let's start on the first page: the panel shows the key setup or the chat from now on. */
+    fun finishIntro() = updateSettings { it.copy(introSeen = true) }
+
+    /** Don't use AI on the first page: the assistant turns off until it is turned on in More settings. */
+    fun declineIntro() {
+        updateSettings { it.copy(introSeen = true) }
+        setEnabled(false)
     }
 
     fun selectProvider(provider: AiProvider) {
@@ -366,9 +384,7 @@ internal class AiAssistantController(
                         AiConnectionTest.Passed
                     } catch (error: AiChatException) {
                         // A key the service rejects fails before it is busy, so busy still means the key works.
-                        if (error.kind in
-                            BUSY_PROBLEMS
-                        ) {
+                        if (error.kind in KEY_WORKS_PROBLEMS) {
                             AiConnectionTest.Passed
                         } else {
                             AiConnectionTest.Failed(AiFailure(error.kind, error.detail))
@@ -515,15 +531,19 @@ internal class AiAssistantController(
         if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
         val key = unlockKey(provider)
         val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort)
-        for (wait in busyRetryDelaysMs) {
+        val busyWaits = busyRetryDelaysMs.iterator()
+        var wrongModelAnswers = 0
+        while (true) {
             try {
                 return withContext(io) { aiCall { transport.complete(request) } }
             } catch (error: AiChatException) {
-                if (error.kind !in BUSY_PROBLEMS) throw error
+                when {
+                    error.kind == AiErrorKind.NOT_A_CHAT_MODEL && wrongModelAnswers++ < AI_NOT_A_CHAT_MODEL_RETRIES -> Unit
+                    error.kind in BUSY_PROBLEMS && busyWaits.hasNext() -> delay(busyWaits.next())
+                    else -> throw error
+                }
             }
-            delay(wait)
         }
-        return withContext(io) { aiCall { transport.complete(request) } }
     }
 
     /** Any network error becomes an [AiChatException], so no request can crash the app. */

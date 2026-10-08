@@ -72,9 +72,10 @@ internal data class AiQuickQuestion(
 )
 
 /**
- * The assistant panel: slides in from the right over a dim background. Problems come first,
- * then the setup or key-check card, or the chat. The gear opens the AI settings inside the panel;
- * Back returns from settings or history, then closes the panel.
+ * The assistant panel: slides in from the right over a dim background. The first time, it shows
+ * what the assistant does ([AiIntro]). Then problems come first, then the setup or key-check card,
+ * or the chat. The gear opens the AI settings inside the panel; Back returns from settings or
+ * history, then closes the panel.
  */
 @Composable
 internal fun AiAssistantPanel(
@@ -131,25 +132,32 @@ internal fun AiAssistantPanel(
                                     .testTag("ai_settings_page"),
                             ) { AiAssistantSettingsSection(host) }
                         AiPanelPage.MODELS -> AiModelsPage(aiState, controller, Modifier.weight(1f))
-                        AiPanelPage.CHAT -> {
-                            AiChatContent(
-                                aiState = aiState,
-                                controller = controller,
-                                problems = problems,
-                                currentLineQuestion = currentLineQuestion,
-                                onAsk = { question ->
-                                    controller.send(question.text, systemPrompt(), question.context, question.contextLabel)
-                                },
-                                onRetry = { controller.retry(systemPrompt()) },
-                                modifier = Modifier.weight(1f),
-                            )
-                            if (aiState.ready) {
-                                AiComposer(
-                                    aiState,
-                                    controller,
-                                ) { text, files -> controller.send(text, systemPrompt(), attachments = files) }
+                        AiPanelPage.CHAT ->
+                            if (!aiState.settings.introSeen) {
+                                AiIntro(
+                                    onStart = controller::finishIntro,
+                                    onDecline = controller::declineIntro,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            } else {
+                                AiChatContent(
+                                    aiState = aiState,
+                                    controller = controller,
+                                    problems = problems,
+                                    currentLineQuestion = currentLineQuestion,
+                                    onAsk = { question ->
+                                        controller.send(question.text, systemPrompt(), question.context, question.contextLabel)
+                                    },
+                                    onRetry = { controller.retry(systemPrompt()) },
+                                    modifier = Modifier.weight(1f),
+                                )
+                                if (aiState.ready) {
+                                    AiComposer(
+                                        aiState,
+                                        controller,
+                                    ) { text, files -> controller.send(text, systemPrompt(), attachments = files) }
+                                }
                             }
-                        }
                     }
                 }
             }
@@ -186,7 +194,7 @@ private fun AiPanelHeader(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (page == AiPanelPage.CHAT) {
+        if (page == AiPanelPage.CHAT && aiState.settings.introSeen) {
             if (aiState.settings.historyRetention != ChatHistoryRetention.OFF) {
                 IconButton(onClick = { controller.showPage(AiPanelPage.HISTORY) }, modifier = Modifier.testTag("ai_history_button")) {
                     Icon(Icons.Default.History, contentDescription = stringResource(R.string.ai_history))

@@ -59,6 +59,9 @@ internal enum class AiErrorKind {
 
     /** The model cannot read pictures or files. */
     UNSUPPORTED_ATTACHMENT,
+
+    /** A model that only labels text as safe or unsafe answered, not a chat model. */
+    NOT_A_CHAT_MODEL,
 }
 
 /** [detail] is the service's own English message, with the key removed, for reports. */
@@ -197,6 +200,8 @@ private val NON_CHAT_MODEL_WORDS =
         "babbage",
         "computer-use",
         "audio",
+        "safety",
+        "guard",
     )
 
 /** OpenCode serves these model families through its other APIs, not `/chat/completions`. */
@@ -232,7 +237,25 @@ internal fun parseChatReply(body: String): String {
             else -> ""
         }.trim()
     if (text.isEmpty()) throw AiChatException(AiErrorKind.BAD_REPLY, "The reply had no text.")
+    if (aiSafetyCheckerAnswered(root.optString("model"), text)) {
+        throw AiChatException(AiErrorKind.NOT_A_CHAT_MODEL, "A safety checker answered instead of a chat model.")
+    }
     return text
+}
+
+/** A safety checker's whole answer, for example "User Safety: safe" and "Response Safety: unsafe". */
+private val SAFETY_LABELS = Regex("""^(\s*(User|Response) Safety:\s*\S+)+\s*$""", RegexOption.IGNORE_CASE)
+
+/**
+ * Whether a model that only labels text as safe or unsafe answered. OpenRouter's `openrouter/free`
+ * picks a free model at random, and for questions with pictures it often picks one of these.
+ */
+internal fun aiSafetyCheckerAnswered(
+    model: String,
+    text: String,
+): Boolean {
+    val lower = model.lowercase()
+    return "safety" in lower || "guard" in lower || SAFETY_LABELS.matches(text)
 }
 
 /** The service's error message from `{"error": {"message": …}}`, Gemini's `[{"error": …}]`, or null. */

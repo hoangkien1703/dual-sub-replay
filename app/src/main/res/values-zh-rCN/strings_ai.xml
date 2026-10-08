@@ -17,6 +17,16 @@
     <string name="ai_message_about">关于：%1$s</string>
     <string name="ai_welcome_title">需要什么帮助？</string>
     <string name="ai_welcome_message">可以询问设置、词语、句子或应用中的问题。</string>
+    <string name="ai_intro_title">认识你的 AI 助手</string>
+    <string name="ai_intro_message">边看边问，用你自己的话问什么都行。</string>
+    <string name="ai_intro_words">讲解单词、语法和当前这行字幕</string>
+    <string name="ai_intro_settings">告诉你设置怎么用、该改哪一项</string>
+    <string name="ai_intro_problems">翻译或字幕出问题时帮你解决</string>
+    <string name="ai_intro_files">读取你添加的照片和文件</string>
+    <string name="ai_intro_privacy">它使用你自己在所选服务申请的 API 密钥。Google Gemini 和 OpenRouter 提供免费密钥。在你提问之前，不会发送任何内容。AI 可能会出错，重要的回答请自行核对。</string>
+    <string name="ai_intro_start">开始吧</string>
+    <string name="ai_intro_decline">不使用 AI</string>
+    <string name="ai_intro_decline_note">之后可以在 %1$s → %2$s 中重新开启。</string>
     <string name="ai_chip_features">这个应用能做什么？</string>
     <string name="ai_chip_bigger_subtitles">怎样把字幕调大？</string>
     <string name="ai_chip_explain_line">解释当前这一行</string>

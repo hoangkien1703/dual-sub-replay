@@ -17,6 +17,16 @@
     <string name="ai_message_about">Về: %1$s</string>
     <string name="ai_welcome_title">Tôi có thể giúp gì?</string>
     <string name="ai_welcome_message">Hãy hỏi về một cài đặt, một từ, một câu hoặc một sự cố trong ứng dụng.</string>
+    <string name="ai_intro_title">Làm quen với trợ lý AI</string>
+    <string name="ai_intro_message">Hỏi bất cứ điều gì khi đang xem, bằng lời của bạn.</string>
+    <string name="ai_intro_words">Giải thích từ, ngữ pháp và dòng phụ đề đang xem</string>
+    <string name="ai_intro_settings">Cho biết cách dùng cài đặt và nên đổi cài đặt nào</string>
+    <string name="ai_intro_problems">Giúp khi bản dịch hoặc phụ đề không hoạt động</string>
+    <string name="ai_intro_files">Đọc ảnh và tệp bạn thêm vào</string>
+    <string name="ai_intro_privacy">Trợ lý dùng API key của chính bạn, từ dịch vụ bạn chọn. Google Gemini và OpenRouter có key miễn phí. Không có gì được gửi đi cho đến khi bạn đặt câu hỏi. AI có thể sai, nên hãy kiểm tra lại những câu trả lời quan trọng.</string>
+    <string name="ai_intro_start">Bắt đầu nào</string>
+    <string name="ai_intro_decline">Không dùng AI</string>
+    <string name="ai_intro_decline_note">Bạn có thể bật lại trong %1$s → %2$s.</string>
     <string name="ai_chip_features">Ứng dụng này làm được gì?</string>
     <string name="ai_chip_bigger_subtitles">Làm sao để phụ đề lớn hơn?</string>
     <string name="ai_chip_explain_line">Giải thích dòng hiện tại</string>

@@ -68,7 +68,9 @@ class AiAssistantPanelUiTest {
     private val requests = mutableListOf<AiChatRequest>()
     private var failure: AiChatException? = null
     private val secrets = mutableMapOf<String, String>()
-    private var settings = AiAssistantSettings()
+
+    /** Past the first page that introduces the assistant, unless a test starts before it. */
+    private var settings = AiAssistantSettings(introSeen = true)
 
     private val keyStore =
         AiKeyStore(
@@ -152,6 +154,43 @@ class AiAssistantPanelUiTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun theFirstOpenIntroducesTheAssistantThenLetsStartShowsTheSetup() {
+        settings = AiAssistantSettings()
+        showTopBarAndPanel()
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_intro").assertIsDisplayed()
+        composeRule.onNodeWithText("Meet your AI assistant").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_setup_card").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_settings_button").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_intro_decline").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("You can turn it on again in More settings → AI assistant.").assertExists()
+        saveUiEvidence("ai_panel_intro")
+        composeRule.onNodeWithTag("ai_intro_start").performScrollTo().performClick()
+        assertTrue(settings.introSeen)
+        assertTrue(settings.enabled)
+        composeRule.onNodeWithTag("ai_intro").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_setup_card").performScrollTo().assertIsDisplayed()
+        // The next time, the panel opens straight to the setup or the chat.
+        composeRule.onNodeWithTag("ai_close_button").performClick()
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_intro").assertDoesNotExist()
+        assertTrue(requests.isEmpty())
+    }
+
+    @Test
+    fun dontUseAiOnTheFirstPageTurnsTheAssistantOff() {
+        settings = AiAssistantSettings()
+        showTopBarAndPanel()
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_intro_decline").performScrollTo().performClick()
+        assertFalse(settings.enabled)
+        assertTrue(settings.introSeen)
+        composeRule.onNodeWithTag("ai_panel").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_assistant_button").assertDoesNotExist()
+        assertTrue(requests.isEmpty())
     }
 
     @Test

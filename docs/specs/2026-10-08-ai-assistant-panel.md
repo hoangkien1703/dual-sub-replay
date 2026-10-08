@@ -283,14 +283,39 @@ OpenCode key page was unclear.
   shows the service's reason instead of "rejected the key".
 - **OpenCode:** the steps now say where the key is: workspace page, API Keys, Create API Key.
 
+## Changes after the owner's third phone test (2026-10-08)
+
+Some answers on OpenRouter were only "User Safety: safe / Response Safety: safe".
+
+- **Cause:** `openrouter/free` picks a free model at random among those that support the request.
+  One of them is `nvidia/nemotron-3.5-content-safety:free`, a safety checker that only labels text.
+  Replaying a question with a picture against the real service, it answered 2 of 5 and 3 of 8 times.
+- **Fix:** a reply whose `model` names a safety checker (`safety`, `guard`), or whose whole text is
+  those labels, is not shown. The app asks the same question again at once, up to 4 times
+  (`AI_NOT_A_CHAT_MODEL_RETRIES`), and then shows the busy message that suggests another model. A
+  key check that only reaches a safety checker still passes. Safety checkers are also left out of
+  the model list. In the live replay of the fix, every question got a real answer by its second try.
+- **First page:** the first time the panel opens, it introduces the assistant instead of the key
+  setup: what it does (words and grammar, settings, app problems, photos and files), that it uses
+  the user's own key and sends nothing until a question is asked, that AI can make mistakes,
+  then **Let's start** and a
+  smaller **Don't use AI** with "You can turn it on again in More settings → AI assistant." Either
+  answer is saved (`ai_intro_seen`), so the page shows once. Don't use AI turns the assistant off
+  and closes the panel, so the top right shows the old translation icon again. The header hides
+  history, new chat and the gear on this page.
+- **Next (not in this PR):** the owner asked for the assistant to change settings and open videos
+  itself, and for automatic memory and written instructions. The comparison with other AI chat
+  apps and the recommended picks are in the doc "AI assistant: actions and memory"; they are built
+  in later PRs once the owner decides.
+
 ## Validation result
 
-Local, on Linux with JDK 21 (2026-10-08, after the model bar and attachments):
+Local, on Linux with JDK 21 (2026-10-08, after the safety-checker fix and the intro page):
 
 | Check | Result |
 | --- | --- |
 | `formatCheck complexityCheck` | Passed. Files this PR adds have zero ktlint violations; detekt finds no smells. |
-| `testDebugUnitTest` | Passed: 564 tests, 0 failures. AI tests cover key checks and their persistence, IPv4-first DNS, timeouts, thinking levels, model lists, error-only 200 replies, attachment kinds, text cuts, picture sizing, data URLs, request parts and budget, history keeping only file names, the attachment notices, and the controller's model switch and draft files. `AppLanguageTest` passes with `strings_ai.xml` in all 8 languages. |
+| `testDebugUnitTest` | Passed: 569 tests, 0 failures. AI tests cover safety-checker replies and their retries, the intro answers, key checks and their persistence, IPv4-first DNS, timeouts, thinking levels, model lists, error-only 200 replies, attachment kinds, text cuts, picture sizing, data URLs, request parts and budget, history keeping only file names, the attachment notices, and the controller's model switch and draft files. `AppLanguageTest` passes with `strings_ai.xml` in all 8 languages. |
 | `lintDebug` | Passed; no warnings in the AI files, no `MissingTranslation`. |
 | `assembleDebug assembleDebugAndroidTest` | Passed. |
 | `AiAssistantPanelUiTest` (managed device) | Not run locally (no emulator here); runs in CI `managed-device-tests`. CI on the previous push failed two tests that clicked the off-screen Save button; both now scroll to it first. |

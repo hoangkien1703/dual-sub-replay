@@ -5,6 +5,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
@@ -178,6 +179,28 @@ class AiChatClientTest {
         assertFalse(aiModelCanChat(AiProvider.OPENCODE_GO, "gpt-6-luna"))
         assertTrue(aiModelCanChat(AiProvider.OPENCODE_ZEN, "big-pickle"))
         assertTrue(aiModelCanChat(AiProvider.OPENROUTER, "anthropic/claude-haiku-5.5"))
+        // Safety checkers only label text as safe or unsafe.
+        assertFalse(aiModelCanChat(AiProvider.OPENROUTER, "nvidia/nemotron-3.5-content-safety:free"))
+        assertFalse(aiModelCanChat(AiProvider.OPENROUTER, "meta-llama/llama-guard-4-12b"))
+        assertFalse(aiModelCanChat(AiProvider.OPENROUTER, "openai/gpt-oss-safeguard-20b"))
+    }
+
+    @Test
+    fun aSafetyCheckerAnswerIsNotShownAsTheReply() {
+        // What openrouter/free sent back when it picked a safety checker for a question with a picture.
+        val checker =
+            """{"model":"nvidia/nemotron-3.5-content-safety:free","choices":[{"message":{"content":"User Safety: safe"}}]}"""
+        val error = assertThrows(AiChatException::class.java) { parseChatReply(checker) }
+        assertEquals(AiErrorKind.NOT_A_CHAT_MODEL, error.kind)
+        // Without the model's name, the labels alone give it away.
+        assertTrue(aiSafetyCheckerAnswered("", "User Safety: safe\nResponse Safety: safe"))
+        assertTrue(aiSafetyCheckerAnswered("", "user safety: unsafe"))
+        assertFalse(aiSafetyCheckerAnswered("nvidia/nemotron-3-super-120b-a12b:free", "Red"))
+        assertFalse(aiSafetyCheckerAnswered("", "User Safety: safe is a label some checkers print. Here is the answer."))
+        assertEquals(
+            "Red",
+            parseChatReply("""{"model":"nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free","choices":[{"message":{"content":"Red"}}]}"""),
+        )
     }
 
     @Test

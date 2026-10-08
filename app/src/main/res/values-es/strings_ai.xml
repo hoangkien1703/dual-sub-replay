@@ -17,6 +17,16 @@
     <string name="ai_message_about">Sobre: %1$s</string>
     <string name="ai_welcome_title">¿En qué te ayudo?</string>
     <string name="ai_welcome_message">Pregunta por un ajuste, una palabra, una frase o un problema de la app.</string>
+    <string name="ai_intro_title">Conoce a tu asistente de IA</string>
+    <string name="ai_intro_message">Pregunta lo que quieras mientras ves, con tus propias palabras.</string>
+    <string name="ai_intro_words">Explica palabras, gramática y la línea de subtítulos actual</string>
+    <string name="ai_intro_settings">Te dice cómo funcionan los ajustes y cuál cambiar</string>
+    <string name="ai_intro_problems">Te ayuda cuando la traducción o los subtítulos dejan de funcionar</string>
+    <string name="ai_intro_files">Lee las fotos y los archivos que añadas</string>
+    <string name="ai_intro_privacy">Usa tu propia clave de API de un servicio que elijas. Google Gemini y OpenRouter tienen claves gratuitas. No se envía nada hasta que haces una pregunta. La IA puede equivocarse, así que comprueba las respuestas importantes.</string>
+    <string name="ai_intro_start">Empezar</string>
+    <string name="ai_intro_decline">No usar IA</string>
+    <string name="ai_intro_decline_note">Puedes volver a activarlo en %1$s → %2$s.</string>
     <string name="ai_chip_features">¿Qué puede hacer esta app?</string>
     <string name="ai_chip_bigger_subtitles">¿Cómo agrando los subtítulos?</string>
     <string name="ai_chip_explain_line">Explica la línea actual</string>

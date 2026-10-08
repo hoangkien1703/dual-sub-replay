@@ -164,7 +164,7 @@ internal fun AiErrorKind.messageRes(): Int =
         AiErrorKind.UNKNOWN_MODEL -> R.string.ai_error_unknown_model
         AiErrorKind.RATE_LIMITED -> R.string.ai_error_rate_limited
         AiErrorKind.BAD_REQUEST -> R.string.ai_error_bad_request
-        AiErrorKind.SERVER -> R.string.ai_error_server
+        AiErrorKind.SERVER, AiErrorKind.NOT_A_CHAT_MODEL -> R.string.ai_error_server
         AiErrorKind.NETWORK -> R.string.ai_error_network
         AiErrorKind.TIMEOUT -> R.string.ai_error_timeout
         AiErrorKind.BAD_REPLY -> R.string.ai_error_bad_reply

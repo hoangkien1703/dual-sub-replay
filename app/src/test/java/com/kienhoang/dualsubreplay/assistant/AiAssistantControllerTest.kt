@@ -595,4 +595,49 @@ class AiAssistantControllerTest {
         controller.testConnection()
         assertFalse(controller.state.value.ready)
     }
+
+    @Test
+    fun theFirstPageIsAnsweredOnceWithLetsStartOrDontUseAi() {
+        val controller = controller()
+        assertFalse(controller.state.value.settings.introSeen)
+        controller.openPanel()
+        controller.finishIntro()
+        assertTrue(settings.value.introSeen)
+        assertTrue(settings.value.enabled)
+        assertTrue(controller.state.value.panelOpen)
+
+        settings.value = AiAssistantSettings()
+        val declining = controller()
+        declining.openPanel()
+        declining.declineIntro()
+        assertTrue(settings.value.introSeen)
+        assertFalse(settings.value.enabled)
+        assertFalse(declining.state.value.panelOpen)
+        assertTrue(transport.requests.isEmpty())
+    }
+
+    @Test
+    fun aSafetyCheckerAnswerIsAskedAgainAtOnce() {
+        checkedGeminiKey()
+        val controller = controller()
+        repeat(AI_NOT_A_CHAT_MODEL_RETRIES) { transport.failOnce += AiChatException(AiErrorKind.NOT_A_CHAT_MODEL) }
+        controller.send("What is in this picture?", "guide")
+        assertNull(controller.state.value.failure)
+        assertEquals(
+            "OK",
+            controller.state.value.messages
+                .last()
+                .text,
+        )
+        assertEquals(AI_NOT_A_CHAT_MODEL_RETRIES + 1, transport.requests.size)
+        // A model that only ever labels text gives up and suggests another model.
+        transport.failure = AiChatException(AiErrorKind.NOT_A_CHAT_MODEL)
+        controller.send("Again?", "guide")
+        assertEquals(
+            AiErrorKind.NOT_A_CHAT_MODEL,
+            controller.state.value.failure
+                ?.kind,
+        )
+        assertEquals(2 * (AI_NOT_A_CHAT_MODEL_RETRIES + 1), transport.requests.size)
+    }
 }

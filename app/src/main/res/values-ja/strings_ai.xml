@@ -17,6 +17,16 @@
     <string name="ai_message_about">対象: %1$s</string>
     <string name="ai_welcome_title">何をお手伝いしましょうか?</string>
     <string name="ai_welcome_message">設定、単語、文、アプリの問題について質問できます。</string>
+    <string name="ai_intro_title">AI アシスタントのご紹介</string>
+    <string name="ai_intro_message">動画を見ながら、なんでも自分の言葉で質問できます。</string>
+    <string name="ai_intro_words">単語や文法、今の字幕の行を説明します</string>
+    <string name="ai_intro_settings">設定の使い方や、どれを変えればよいかを答えます</string>
+    <string name="ai_intro_problems">翻訳や字幕が動かないときに助けます</string>
+    <string name="ai_intro_files">追加した写真やファイルを読みます</string>
+    <string name="ai_intro_privacy">選んだサービスのあなた自身の API キーを使います。Google Gemini と OpenRouter には無料のキーがあります。質問するまで何も送信されません。AI は間違えることがあるので、大事な答えは確かめてください。</string>
+    <string name="ai_intro_start">はじめる</string>
+    <string name="ai_intro_decline">AI を使わない</string>
+    <string name="ai_intro_decline_note">あとで %1$s → %2$s からオンにできます。</string>
     <string name="ai_chip_features">このアプリで何ができる?</string>
     <string name="ai_chip_bigger_subtitles">字幕を大きくするには?</string>
     <string name="ai_chip_explain_line">今の行を説明して</string>
