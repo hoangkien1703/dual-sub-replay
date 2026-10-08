@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">请解释一下这个。</string>
     <string name="ai_error_unsupported_attachment">此模型无法读取图片或 PDF。请在聊天框下方选择其他模型并点按“重试”，或不带附件提问。</string>
     <string name="ai_setup_step_create_opencode">在工作区页面打开 API Keys，点按 Create API Key，然后复制密钥。</string>
+    <string name="ai_action_on">开</string>
+    <string name="ai_action_off">关</string>
+    <string name="ai_action_setting">%1$s：%2$s</string>
+    <string name="ai_action_speed_title">播放速度</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">已重播当前这一行</string>
+    <string name="ai_action_replay_previous">已重播上一行</string>
+    <string name="ai_action_pause">已暂停视频</string>
+    <string name="ai_action_look">已读取屏幕上的字幕</string>
+    <string name="ai_action_save_word">已将“%1$s”保存到你的生词本</string>
+    <string name="ai_action_word_already_saved">“%1$s”已在你的生词本中</string>
+    <string name="ai_action_search">在 YouTube 上搜索“%1$s”</string>
+    <string name="ai_action_search_button">搜索</string>
+    <string name="ai_action_open_video">打开这个 YouTube 视频</string>
+    <string name="ai_action_open_button">打开</string>
+    <string name="ai_action_target_language">翻译成%1$s</string>
+    <string name="ai_action_change_button">更改</string>
+    <string name="ai_action_apply">应用</string>
+    <string name="ai_action_cancel">取消</string>
+    <string name="ai_action_undo">撤销</string>
+    <string name="ai_action_undone">已撤销</string>
+    <string name="ai_action_not_done">未执行</string>
+    <string name="ai_action_failed">无法完成</string>
 </resources>

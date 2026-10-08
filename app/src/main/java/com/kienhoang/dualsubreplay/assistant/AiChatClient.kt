@@ -62,6 +62,9 @@ internal enum class AiErrorKind {
 
     /** A model that only labels text as safe or unsafe answered, not a chat model. */
     NOT_A_CHAT_MODEL,
+
+    /** The model cannot take the app's actions; the question is asked again without them. */
+    UNSUPPORTED_TOOLS,
 }
 
 /** [detail] is the service's own English message, with the key removed, for reports. */
@@ -77,6 +80,9 @@ internal enum class AiRole(
     SYSTEM("system"),
     USER("user"),
     ASSISTANT("assistant"),
+
+    /** The result of an action the model asked for; only sent within one answer, never saved. */
+    TOOL("tool"),
 }
 
 internal data class AiWireMessage(
@@ -84,6 +90,10 @@ internal data class AiWireMessage(
     val content: String,
     /** Pictures and PDFs; text files are part of [content]. */
     val attachments: List<AiAttachment> = emptyList(),
+    /** The actions an assistant message asked for. */
+    val toolCalls: List<AiToolCall> = emptyList(),
+    /** For a [AiRole.TOOL] message, the call it answers. */
+    val toolCallId: String? = null,
 )
 
 internal data class AiChatRequest(
@@ -94,11 +104,13 @@ internal data class AiChatRequest(
     val timeoutMs: Long = AI_CHAT_TIMEOUT_MS,
     /** `low`, `medium` or `high`; null lets the model decide. */
     val reasoningEffort: String? = null,
+    /** The actions the model may ask for; empty sends none. */
+    val tools: List<AiTool> = emptyList(),
 )
 
-/** Sends one chat request and returns the reply text, or throws [AiChatException]. */
+/** Sends one chat request and returns the reply, or throws [AiChatException]. */
 internal fun interface AiChatTransport {
-    suspend fun complete(request: AiChatRequest): String
+    suspend fun complete(request: AiChatRequest): AiReply
 }
 
 /** A model a service offers; [free] and [pictures] are only known when the service says so. */
@@ -118,22 +130,34 @@ internal fun interface AiModelLister {
 
 /**
  * `{"model": …, "messages": [{"role": …, "content": …}, …]}`, plus `reasoning_effort` when a
- * thinking level is chosen. No sampling options, which some models reject.
+ * thinking level is chosen and `tools` when actions are offered. No sampling options, which some
+ * models reject.
  */
 internal fun chatRequestBody(
     model: String,
     messages: List<AiWireMessage>,
     reasoningEffort: String? = null,
+    tools: List<AiTool> = emptyList(),
 ): String =
     JSONObject()
         .put("model", model)
-        .put(
-            "messages",
-            JSONArray().apply {
-                messages.forEach { put(JSONObject().put("role", it.role.wire).put("content", wireContent(it))) }
-            },
-        ).apply { if (reasoningEffort != null) put("reasoning_effort", reasoningEffort) }
-        .toString()
+        .put("messages", JSONArray().apply { messages.forEach { put(wireMessage(it)) } })
+        .apply {
+            if (reasoningEffort != null) put("reasoning_effort", reasoningEffort)
+            if (tools.isNotEmpty()) put("tools", aiToolsJson(tools))
+        }.toString()
+
+private fun wireMessage(message: AiWireMessage): JSONObject =
+    JSONObject().put("role", message.role.wire).apply {
+        if (message.toolCalls.isNotEmpty()) {
+            // An assistant message that only asks for actions has no text.
+            put("content", message.content.ifEmpty { null } ?: JSONObject.NULL)
+            put("tool_calls", aiToolCallsJson(message.toolCalls))
+        } else {
+            put("content", wireContent(message))
+        }
+        message.toolCallId?.let { put("tool_call_id", it) }
+    }
 
 /**
  * Plain text, or with pictures and PDFs the OpenAI list of parts: the text, then an `image_url`
@@ -218,8 +242,8 @@ internal fun aiModelCanChat(
     return !(opencode && OPENCODE_OTHER_API_PREFIXES.any { lower.startsWith(it) })
 }
 
-/** The first choice's text. Some services send content as a list of text parts. */
-internal fun parseChatReply(body: String): String {
+/** The first choice's text and actions. Some services send content as a list of text parts. */
+internal fun parseAiReply(body: String): AiReply {
     val root =
         try {
             JSONObject(body)
@@ -236,11 +260,13 @@ internal fun parseChatReply(body: String): String {
                 }
             else -> ""
         }.trim()
-    if (text.isEmpty()) throw AiChatException(AiErrorKind.BAD_REPLY, "The reply had no text.")
-    if (aiSafetyCheckerAnswered(root.optString("model"), text)) {
+    val calls = parseAiToolCalls(message)
+    if (text.isEmpty() && calls.isEmpty()) throw AiChatException(AiErrorKind.BAD_REPLY, "The reply had no text.")
+    val model = root.optString("model")
+    if (aiSafetyCheckerAnswered(model, text)) {
         throw AiChatException(AiErrorKind.NOT_A_CHAT_MODEL, "A safety checker answered instead of a chat model.")
     }
-    return text
+    return AiReply(text, calls, model)
 }
 
 /** A safety checker's whole answer, for example "User Safety: safe" and "Response Safety: unsafe". */
@@ -303,14 +329,18 @@ internal fun redactApiKey(
     return if (redacted.length > MAX_AI_ERROR_DETAIL_CHARS) redacted.take(MAX_AI_ERROR_DETAIL_CHARS) + "…" else redacted
 }
 
-/** A refusal of what came with the question (pictures and files, or a thinking level), or null. */
+/** A refusal of what came with the question (actions, pictures and files, or a thinking level), or null. */
 private fun unsupportedExtra(
     code: Int,
     lower: String,
     sentThinking: Boolean,
     sentAttachments: Boolean,
+    sentTools: Boolean,
 ): AiErrorKind? =
     when {
+        // OpenRouter answers 404 "No endpoints found that support tool use" for such a model.
+        sentTools && code in 400..499 && code !in setOf(401, 402, 403, 429) && ("tool" in lower || "function" in lower) ->
+            AiErrorKind.UNSUPPORTED_TOOLS
         sentAttachments && code in 400..499 && code !in setOf(401, 403, 429) && ATTACHMENT_ERROR_WORDS.any { it in lower } ->
             AiErrorKind.UNSUPPORTED_ATTACHMENT
         sentThinking && (code == 400 || code == 422) && ("reasoning" in lower || "thinking" in lower) -> AiErrorKind.UNSUPPORTED_THINKING
@@ -322,9 +352,10 @@ internal fun aiErrorKindForStatus(
     message: String?,
     sentThinking: Boolean = false,
     sentAttachments: Boolean = false,
+    sentTools: Boolean = false,
 ): AiErrorKind {
     val lower = message.orEmpty().lowercase()
-    unsupportedExtra(code, lower, sentThinking, sentAttachments)?.let { return it }
+    unsupportedExtra(code, lower, sentThinking, sentAttachments, sentTools)?.let { return it }
     return when {
         code == 401 -> AiErrorKind.INVALID_KEY
         // OpenRouter also answers 403 for a model it keeps for coding apps; only a key problem names the key.
@@ -378,17 +409,18 @@ internal class OpenAiCompatibleTransport(
             .build(),
 ) : AiChatTransport,
     AiModelLister {
-    override suspend fun complete(request: AiChatRequest): String {
+    override suspend fun complete(request: AiChatRequest): AiReply {
         val url = chatCompletionsUrl(request.baseUrl) ?: throw AiChatException(AiErrorKind.BAD_ADDRESS)
-        val body = chatRequestBody(request.model, request.messages, request.reasoningEffort).toRequestBody(JSON_MEDIA_TYPE)
+        val body =
+            chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools).toRequestBody(JSON_MEDIA_TYPE)
         val httpRequest = authorized(request.apiKey) { url(url).post(body) }
         val (code, reply) = execute(httpRequest, request.timeoutMs, MAX_AI_RESPONSE_BYTES)
         val status = aiReplyStatus(code, reply)
         if (status !in 200..299) {
             val sentAttachments = request.messages.any { it.attachments.isNotEmpty() }
-            throw statusFailure(status, reply, request.apiKey, request.reasoningEffort != null, sentAttachments)
+            throw statusFailure(status, reply, request.apiKey, request.reasoningEffort != null, sentAttachments, request.tools.isNotEmpty())
         }
-        return parseChatReply(reply)
+        return parseAiReply(reply)
     }
 
     override suspend fun listModels(
@@ -424,9 +456,10 @@ internal class OpenAiCompatibleTransport(
         apiKey: String,
         sentThinking: Boolean,
         sentAttachments: Boolean,
+        sentTools: Boolean = false,
     ): AiChatException {
         val message = providerErrorMessage(body)?.let { redactApiKey(it, apiKey) }
-        return AiChatException(aiErrorKindForStatus(code, message, sentThinking, sentAttachments), message ?: "HTTP $code")
+        return AiChatException(aiErrorKindForStatus(code, message, sentThinking, sentAttachments, sentTools), message ?: "HTTP $code")
     }
 
     private suspend fun execute(

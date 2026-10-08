@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">Tolong jelaskan ini.</string>
     <string name="ai_error_unsupported_attachment">Model ini tidak bisa membaca gambar atau PDF. Pilih model lain di bawah kotak obrolan lalu ketuk Coba lagi, atau bertanya tanpa lampiran.</string>
     <string name="ai_setup_step_create_opencode">Di halaman workspace, buka API Keys, ketuk Create API Key, lalu salin kuncinya.</string>
+    <string name="ai_action_on">Aktif</string>
+    <string name="ai_action_off">Nonaktif</string>
+    <string name="ai_action_setting">%1$s: %2$s</string>
+    <string name="ai_action_speed_title">Kecepatan putar</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">Baris saat ini diputar ulang</string>
+    <string name="ai_action_replay_previous">Baris sebelumnya diputar ulang</string>
+    <string name="ai_action_pause">Video dijeda</string>
+    <string name="ai_action_look">Membaca subtitle di layar</string>
+    <string name="ai_action_save_word">“%1$s” disimpan ke kosakata Anda</string>
+    <string name="ai_action_word_already_saved">“%1$s” sudah ada di kosakata Anda</string>
+    <string name="ai_action_search">Cari “%1$s” di YouTube</string>
+    <string name="ai_action_search_button">Cari</string>
+    <string name="ai_action_open_video">Buka video YouTube ini</string>
+    <string name="ai_action_open_button">Buka</string>
+    <string name="ai_action_target_language">Terjemahkan ke %1$s</string>
+    <string name="ai_action_change_button">Ubah</string>
+    <string name="ai_action_apply">Terapkan</string>
+    <string name="ai_action_cancel">Batal</string>
+    <string name="ai_action_undo">Urungkan</string>
+    <string name="ai_action_undone">Diurungkan</string>
+    <string name="ai_action_not_done">Tidak dilakukan</string>
+    <string name="ai_action_failed">Tidak bisa dilakukan</string>
 </resources>

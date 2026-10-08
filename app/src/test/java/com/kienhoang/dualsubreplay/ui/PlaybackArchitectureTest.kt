@@ -198,6 +198,12 @@ class PlaybackArchitectureTest {
         assertTrue(enabled.contains("state.ensureCaptions()"))
         assertTrue(disabled.contains("existing.restoreCaptions()"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains(LIVE_CAPTION_CAPTURE_STATE_KEY))
+        val speed = webPlaybackSpeedScript(0.75f)
+        assertTrue(speed.contains("window.location.protocol !== 'https:'"))
+        assertTrue(speed.contains("host.endsWith('.youtube.com')"))
+        assertTrue(speed.contains("video.playbackRate = 0.75;"))
+        assertTrue(webPlaybackSpeedScript(9f).contains("video.playbackRate = 2.0;"))
+        assertTrue(webPlaybackSpeedScript(Float.NaN).contains("video.playbackRate = 1.0;"))
     }
 
     @Test

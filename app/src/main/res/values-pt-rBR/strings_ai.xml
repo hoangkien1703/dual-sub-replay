@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">Explique isto, por favor.</string>
     <string name="ai_error_unsupported_attachment">Este modelo não lê imagens nem PDFs. Escolha outro modelo abaixo da caixa de mensagem e toque em Tentar de novo, ou pergunte sem eles.</string>
     <string name="ai_setup_step_create_opencode">Na página do seu workspace, abra API Keys, toque em Create API Key e copie a chave.</string>
+    <string name="ai_action_on">Ativado</string>
+    <string name="ai_action_off">Desativado</string>
+    <string name="ai_action_setting">%1$s: %2$s</string>
+    <string name="ai_action_speed_title">Velocidade de reprodução</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">A linha atual foi repetida</string>
+    <string name="ai_action_replay_previous">A linha anterior foi repetida</string>
+    <string name="ai_action_pause">O vídeo foi pausado</string>
+    <string name="ai_action_look">Leu as legendas na tela</string>
+    <string name="ai_action_save_word">“%1$s” foi salva no seu vocabulário</string>
+    <string name="ai_action_word_already_saved">“%1$s” já está no seu vocabulário</string>
+    <string name="ai_action_search">Pesquisar “%1$s” no YouTube</string>
+    <string name="ai_action_search_button">Pesquisar</string>
+    <string name="ai_action_open_video">Abrir este vídeo do YouTube</string>
+    <string name="ai_action_open_button">Abrir</string>
+    <string name="ai_action_target_language">Traduzir para %1$s</string>
+    <string name="ai_action_change_button">Alterar</string>
+    <string name="ai_action_apply">Aplicar</string>
+    <string name="ai_action_cancel">Cancelar</string>
+    <string name="ai_action_undo">Desfazer</string>
+    <string name="ai_action_undone">Desfeito</string>
+    <string name="ai_action_not_done">Não feito</string>
+    <string name="ai_action_failed">Não foi possível fazer</string>
 </resources>

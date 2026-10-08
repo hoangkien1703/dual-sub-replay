@@ -139,4 +139,27 @@
     <string name="ai_attachment_question">Please explain this.</string>
     <string name="ai_error_unsupported_attachment">This model can\'t read pictures or PDFs. Choose another model under the chat box and tap Try again, or ask without them.</string>
     <string name="ai_setup_step_create_opencode">On your workspace page, open API Keys, tap Create API Key, then copy the key.</string>
+    <string name="ai_action_on">On</string>
+    <string name="ai_action_off">Off</string>
+    <string name="ai_action_setting">%1$s: %2$s</string>
+    <string name="ai_action_speed_title">Playback speed</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">Replayed the current line</string>
+    <string name="ai_action_replay_previous">Replayed the previous line</string>
+    <string name="ai_action_pause">Paused the video</string>
+    <string name="ai_action_look">Read the subtitles on screen</string>
+    <string name="ai_action_save_word">Saved “%1$s” to your vocabulary</string>
+    <string name="ai_action_word_already_saved">“%1$s” is already in your vocabulary</string>
+    <string name="ai_action_search">Search YouTube for “%1$s”</string>
+    <string name="ai_action_search_button">Search</string>
+    <string name="ai_action_open_video">Open this YouTube video</string>
+    <string name="ai_action_open_button">Open</string>
+    <string name="ai_action_target_language">Translate to %1$s</string>
+    <string name="ai_action_change_button">Change</string>
+    <string name="ai_action_apply">Apply</string>
+    <string name="ai_action_cancel">Cancel</string>
+    <string name="ai_action_undo">Undo</string>
+    <string name="ai_action_undone">Undone</string>
+    <string name="ai_action_not_done">Not done</string>
+    <string name="ai_action_failed">Couldn\'t do this</string>
 </resources>

@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">Hãy giải thích nội dung này.</string>
     <string name="ai_error_unsupported_attachment">Mô hình này không đọc được ảnh hoặc PDF. Hãy chọn mô hình khác bên dưới ô chat rồi bấm Thử lại, hoặc hỏi mà không kèm chúng.</string>
     <string name="ai_setup_step_create_opencode">Trên trang workspace, mở API Keys, bấm Create API Key rồi sao chép khóa.</string>
+    <string name="ai_action_on">Bật</string>
+    <string name="ai_action_off">Tắt</string>
+    <string name="ai_action_setting">%1$s: %2$s</string>
+    <string name="ai_action_speed_title">Tốc độ phát</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">Đã phát lại dòng hiện tại</string>
+    <string name="ai_action_replay_previous">Đã phát lại dòng trước</string>
+    <string name="ai_action_pause">Đã tạm dừng video</string>
+    <string name="ai_action_look">Đã đọc phụ đề trên màn hình</string>
+    <string name="ai_action_save_word">Đã lưu “%1$s” vào từ vựng của bạn</string>
+    <string name="ai_action_word_already_saved">“%1$s” đã có trong từ vựng của bạn</string>
+    <string name="ai_action_search">Tìm “%1$s” trên YouTube</string>
+    <string name="ai_action_search_button">Tìm</string>
+    <string name="ai_action_open_video">Mở video YouTube này</string>
+    <string name="ai_action_open_button">Mở</string>
+    <string name="ai_action_target_language">Dịch sang %1$s</string>
+    <string name="ai_action_change_button">Đổi</string>
+    <string name="ai_action_apply">Áp dụng</string>
+    <string name="ai_action_cancel">Hủy</string>
+    <string name="ai_action_undo">Hoàn tác</string>
+    <string name="ai_action_undone">Đã hoàn tác</string>
+    <string name="ai_action_not_done">Chưa thực hiện</string>
+    <string name="ai_action_failed">Không làm được</string>
 </resources>

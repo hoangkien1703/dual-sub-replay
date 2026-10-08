@@ -281,6 +281,8 @@ private fun DualSubExperience(
     onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
 ) {
+    // The assistant panel beside the app may pause, replay and change the speed of the page video.
+    BindAiPlayerControls(webController)
     var showSettings by remember { mutableStateOf(false) }
     // Gear icons on the player open a small languages popup; the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }

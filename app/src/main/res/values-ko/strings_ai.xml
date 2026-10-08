@@ -134,4 +134,27 @@
     <string name="ai_attachment_question">이것을 설명해 주세요.</string>
     <string name="ai_error_unsupported_attachment">이 모델은 이미지나 PDF를 읽을 수 없습니다. 채팅 입력란 아래에서 다른 모델을 선택하고 다시 시도를 누르거나, 첨부 없이 질문하세요.</string>
     <string name="ai_setup_step_create_opencode">워크스페이스 페이지에서 API Keys를 열고 Create API Key를 누른 다음 키를 복사하세요.</string>
+    <string name="ai_action_on">켜기</string>
+    <string name="ai_action_off">끄기</string>
+    <string name="ai_action_setting">%1$s: %2$s</string>
+    <string name="ai_action_speed_title">재생 속도</string>
+    <string name="ai_action_speed_value">%1$s×</string>
+    <string name="ai_action_replay_line">현재 줄을 다시 재생했어요</string>
+    <string name="ai_action_replay_previous">이전 줄을 다시 재생했어요</string>
+    <string name="ai_action_pause">동영상을 일시정지했어요</string>
+    <string name="ai_action_look">화면의 자막을 읽었어요</string>
+    <string name="ai_action_save_word">“%1$s”을(를) 단어장에 저장했어요</string>
+    <string name="ai_action_word_already_saved">“%1$s”은(는) 이미 단어장에 있어요</string>
+    <string name="ai_action_search">YouTube에서 “%1$s” 검색</string>
+    <string name="ai_action_search_button">검색</string>
+    <string name="ai_action_open_video">이 YouTube 동영상 열기</string>
+    <string name="ai_action_open_button">열기</string>
+    <string name="ai_action_target_language">%1$s(으)로 번역</string>
+    <string name="ai_action_change_button">변경</string>
+    <string name="ai_action_apply">적용</string>
+    <string name="ai_action_cancel">취소</string>
+    <string name="ai_action_undo">실행 취소</string>
+    <string name="ai_action_undone">취소됨</string>
+    <string name="ai_action_not_done">실행하지 않음</string>
+    <string name="ai_action_failed">실행하지 못했어요</string>
 </resources>

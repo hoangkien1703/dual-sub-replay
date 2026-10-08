@@ -39,21 +39,26 @@ private class MemoryHistory(
     }
 }
 
-/** Answers every request at once with [reply], or fails with [failure]; or waits for [pending]. */
+/**
+ * Answers every request at once with [reply], or fails with [failure]; or waits for [pending].
+ * Queued [replies] (for example tool calls) are used first, before any failure.
+ */
 private class FakeTransport : AiChatTransport {
     val requests = mutableListOf<AiChatRequest>()
     var reply = "OK"
     var failure: AiChatException? = null
     var pending: CompletableDeferred<String>? = null
+    val replies = ArrayDeque<AiReply>()
 
     /** Thrown once each, before [failure], as a busy service would. */
     val failOnce = ArrayDeque<AiChatException>()
 
-    override suspend fun complete(request: AiChatRequest): String {
+    override suspend fun complete(request: AiChatRequest): AiReply {
         requests += request
+        replies.removeFirstOrNull()?.let { return it }
         failOnce.removeFirstOrNull()?.let { throw it }
         failure?.let { throw it }
-        return pending?.await() ?: reply
+        return AiReply(pending?.await() ?: reply)
     }
 }
 
@@ -639,5 +644,207 @@ class AiAssistantControllerTest {
                 ?.kind,
         )
         assertEquals(2 * (AI_NOT_A_CHAT_MODEL_RETRIES + 1), transport.requests.size)
+    }
+
+    /** Runs every action at once; a setting change can be undone by setting it back to 100. */
+    private class RecordingApp : AiAppActions {
+        val performed = mutableListOf<AiAction>()
+        var refusal: String? = null
+
+        override fun lookAtVideo(linesAround: Int) = "No video is open."
+
+        override fun refusal(action: AiAction): String? = null
+
+        override fun describe(action: AiAction) = AiActionText(aiActionNote(action), "Go")
+
+        override suspend fun perform(action: AiAction): AiActionOutcome {
+            refusal?.let { return AiActionOutcome.Refused(it) }
+            performed += action
+            val undo = if (action is AiAction.ChangeSetting) listOf(action.copy(value = "100")) else emptyList()
+            return AiActionOutcome.Done("did: ${aiActionNote(action)}", aiActionNote(action), undo)
+        }
+    }
+
+    private fun toolCall(
+        name: String,
+        arguments: String,
+    ) = AiToolCall("t$name", name, arguments, """{"id":"t$name","type":"function","function":{"name":"$name","arguments":"{}"}}""")
+
+    @Test
+    fun anActionShowsUnderTheAnswerAndUndoPutsItBack() {
+        checkedGeminiKey()
+        val app = RecordingApp()
+        val controller = controller().also { it.appActions = app }
+        transport.replies += AiReply("", listOf(toolCall(AI_SETTING_TOOL, """{"setting":"text_size","value":"150"}""")))
+        transport.reply = "Bigger now."
+        controller.send("Bigger subtitles", "guide")
+        val answer =
+            controller.state.value.messages
+                .last()
+        assertEquals("Bigger now.", answer.text)
+        val action = answer.actions.single()
+        assertEquals(AiActionState.DONE, action.state)
+        assertTrue(action.undoable)
+        assertEquals(AI_TOOLS, transport.requests.first().tools)
+
+        controller.undoAction(action.id)
+        assertEquals(
+            listOf<AiAction>(AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "150"), AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "100")),
+            app.performed,
+        )
+        val undone =
+            controller.state.value.messages
+                .last()
+                .actions
+                .single()
+        assertEquals(AiActionState.UNDONE, undone.state)
+        assertFalse(undone.undoable)
+        // A second tap does nothing, and the saved chat keeps what happened.
+        controller.undoAction(action.id)
+        assertEquals(2, app.performed.size)
+        assertEquals(
+            AiActionState.UNDONE,
+            history.chats
+                .single()
+                .messages
+                .last()
+                .actions
+                .single()
+                .state,
+        )
+    }
+
+    @Test
+    fun undoRunsThroughTheActionsBoundAtThatTime() {
+        checkedGeminiKey()
+        val before = RecordingApp()
+        val controller = controller().also { it.appActions = before }
+        transport.replies +=
+            AiReply(
+                "",
+                listOf(
+                    toolCall(AI_SETTING_TOOL, """{"setting":"text_size","value":"150"}"""),
+                    toolCall(AI_PLAYBACK_TOOL, """{"action":"pause"}"""),
+                ),
+            )
+        controller.send("Bigger subtitles and pause", "guide")
+        val (size, pause) =
+            controller.state.value.messages
+                .last()
+                .actions
+        assertFalse(pause.undoable)
+
+        // The screen was rebuilt: without actions bound, Undo waits; after, the new screen's actions run it.
+        controller.appActions = null
+        controller.undoAction(size.id)
+        val after = RecordingApp()
+        controller.appActions = after
+        controller.undoAction(size.id)
+        assertEquals(2, before.performed.size)
+        assertEquals(listOf<AiAction>(AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "100")), after.performed)
+    }
+
+    @Test
+    fun anUndoTheAppRefusesOnlyLosesItsButton() {
+        checkedGeminiKey()
+        val app = RecordingApp()
+        val controller = controller().also { it.appActions = app }
+        transport.replies += AiReply("", listOf(toolCall(AI_SETTING_TOOL, """{"setting":"playback_speed","value":"0.5"}""")))
+        controller.send("Slower", "guide")
+        val action =
+            controller.state.value.messages
+                .last()
+                .actions
+                .single()
+        app.refusal = "No video is open."
+        controller.undoAction(action.id)
+        val after =
+            controller.state.value.messages
+                .last()
+                .actions
+                .single()
+        assertEquals(AiActionState.DONE, after.state)
+        assertFalse(after.undoable)
+    }
+
+    @Test
+    fun aCardRunsItsActionOnlyWhenTapped() {
+        checkedGeminiKey()
+        val app = RecordingApp()
+        val controller = controller().also { it.appActions = app }
+        transport.replies +=
+            AiReply(
+                "",
+                listOf(toolCall(AI_SEARCH_TOOL, """{"query":"cats"}"""), toolCall(AI_TRANSLATION_TOOL, """{"target_language":"en"}""")),
+            )
+        controller.send("Find cat videos and translate to English", "guide")
+        val (search, translation) =
+            controller.state.value.messages
+                .last()
+                .actions
+        assertEquals(AiActionState.WAITING, search.state)
+        assertTrue(app.performed.isEmpty())
+
+        controller.confirmAction(search.id)
+        assertEquals(listOf<AiAction>(AiAction.SearchYouTube("cats")), app.performed)
+        controller.cancelAction(translation.id)
+        controller.confirmAction(translation.id)
+        assertEquals(1, app.performed.size)
+        assertEquals(
+            listOf(AiActionState.DONE, AiActionState.CANCELLED),
+            controller.state.value.messages
+                .last()
+                .actions
+                .map { it.state },
+        )
+
+        // Read back from the file after a restart, nothing can be undone and an unanswered card is not done.
+        transport.replies += AiReply("", listOf(toolCall(AI_SEARCH_TOOL, """{"query":"dogs"}""")))
+        controller.send("Dogs too", "guide")
+        val saved = decodeAiChats(encodeAiChats(history.chats)).single().messages.filter { it.role == AiRole.ASSISTANT }
+        assertEquals(listOf(AiActionState.DONE, AiActionState.CANCELLED), saved[0].actions.map { it.state })
+        assertFalse(saved[0].actions[0].undoable)
+        assertEquals("did: Search YouTube for \"cats\"", saved[0].actions[0].label)
+        assertEquals("Go", saved[0].actions[0].button)
+        assertEquals(AiActionKind.VIDEO, saved[0].actions[0].kind)
+        assertEquals(AiActionState.CANCELLED, saved[1].actions.single().state)
+    }
+
+    @Test
+    fun anActionThatRanStaysVisibleWhenTheAnswerFails() {
+        checkedGeminiKey()
+        val app = RecordingApp()
+        val controller = controller().also { it.appActions = app }
+        transport.replies += AiReply("", listOf(toolCall(AI_PLAYBACK_TOOL, """{"action":"pause"}""")))
+        transport.failOnce += AiChatException(AiErrorKind.NETWORK)
+        controller.send("Pause it", "guide")
+        val state = controller.state.value
+        assertEquals(AiErrorKind.NETWORK, state.failure?.kind)
+        assertEquals(
+            AiActionState.DONE,
+            state.messages
+                .last()
+                .actions
+                .single()
+                .state,
+        )
+        assertEquals(listOf<AiAction>(AiAction.Playback(AiPlayback.PAUSE)), app.performed)
+        assertFalse(state.sending)
+    }
+
+    @Test
+    fun aModelThatRefusedActionsIsAskedWithoutThemFromThenOn() {
+        checkedGeminiKey()
+        val controller = controller().also { it.appActions = RecordingApp() }
+        transport.failOnce += AiChatException(AiErrorKind.UNSUPPORTED_TOOLS)
+        controller.send("Hi", "guide")
+        assertEquals(
+            "OK",
+            controller.state.value.messages
+                .last()
+                .text,
+        )
+        controller.send("Again", "guide")
+        assertEquals(listOf(true, false, false), transport.requests.map { it.tools.isNotEmpty() })
     }
 }

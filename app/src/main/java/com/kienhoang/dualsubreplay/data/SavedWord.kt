@@ -81,13 +81,24 @@ internal fun reviewWord(word: SavedWord, rating: ReviewRating, now: Long): Saved
 internal fun validClipRange(videoId: String?, start: Long, end: Long): Boolean =
     videoId?.matches(Regex("[A-Za-z0-9_-]{11}")) == true && start >= 0 && end > start
 
+/** The same word from the same line gets the same id, so saving it again updates it instead of adding a copy. */
+internal fun savedWordId(
+    word: String,
+    wordLanguage: String,
+    meaningLanguage: String,
+    videoId: String?,
+    segment: SubtitleSegment?,
+): String {
+    val key = listOf(word.lowercase(Locale.ROOT), wordLanguage, meaningLanguage,
+        videoId.orEmpty(), segment?.startMs.toString(), segment?.endMs.toString()).joinToString("\u0000")
+    return MessageDigest.getInstance("SHA-256").digest(key.toByteArray(Charsets.UTF_8))
+        .joinToString("") { "%02x".format(it) }
+}
+
 internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, online: Boolean): SavedWord {
     val segment = selection.segment
     val word = selection.token.text.trim()
-    val key = listOf(word.lowercase(Locale.ROOT), selection.wordLanguage, selection.meaningLanguage,
-        selection.videoId.orEmpty(), segment?.startMs.toString(), segment?.endMs.toString()).joinToString("\u0000")
-    val id = MessageDigest.getInstance("SHA-256").digest(key.toByteArray(Charsets.UTF_8))
-        .joinToString("") { "%02x".format(it) }
+    val id = savedWordId(word, selection.wordLanguage, selection.meaningLanguage, selection.videoId, segment)
     val hasClip = validClipRange(selection.videoId, segment?.startMs ?: -1, segment?.endMs ?: -1)
     return SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
         meaning.trim(), segment?.originalText.orEmpty(), segment?.translatedText, selection.videoId,
