@@ -145,6 +145,8 @@ android {
         manifestPlaceholders["webViewSafeBrowsing"] = safeBrowsing
         // The opt-in Google Translate (online) engine sends subtitle text to Google; F-Droid never offers it.
         buildConfigField("boolean", "ONLINE_TRANSLATION", (!isFdroidBuild).toString())
+        // The AI assistant sends questions to an AI service with the user's own key; F-Droid leaves it out.
+        buildConfigField("boolean", "AI_ASSISTANT", (!isFdroidBuild).toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

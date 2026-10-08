@@ -339,9 +339,10 @@ private fun DualSubExperience(
                 Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                     menuButton()
                     Spacer(Modifier.weight(1f))
-                    // Translation problems show here instead of interrupting the video.
+                    // Translation problems show here instead of interrupting the video: in the
+                    // assistant panel when the assistant is on, otherwise in their own icon.
                     val tryGoogleAgain = LocalTranslationEngineActions.current?.tryGoogleAgain ?: {}
-                    TranslationIssueButton(state.translationIssue(), tryGoogleAgain, onRetry)
+                    TopBarAssistantOrIssueButton(state, appProblems(state, tryGoogleAgain, onRetry), tryGoogleAgain, onRetry)
                 }
             }
         }) { innerPadding ->

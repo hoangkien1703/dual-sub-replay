@@ -1,5 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.assistant.AI_CHATS_DIRECTORY
+import com.kienhoang.dualsubreplay.assistant.AI_KEYS_PREFERENCES
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -8,15 +10,16 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * Backups leave out the large downloads the app can fetch again, and the WebView profile with the
- * YouTube/Google sign-in cookies, on every Android version.
+ * Backups leave out the large downloads the app can fetch again, the WebView profile with the
+ * YouTube/Google sign-in cookies, and the AI assistant's keys and chats, on every Android version.
  */
 class BackupRulesTest {
     private val regenerable = setOf("japanese-dictionary/", "translation-models/")
-    private val excluded = regenerable.map { "file:$it" }.toSet() + "root:app_webview/"
+    private val aiPrivate = setOf("sharedpref:$AI_KEYS_PREFERENCES.xml", "file:$AI_CHATS_DIRECTORY/")
+    private val excluded = regenerable.map { "file:$it" }.toSet() + "root:app_webview/" + aiPrivate
 
     @Test
-    fun everyBackupPathLeavesOutTheDownloadsAndTheWebViewProfile() {
+    fun everyBackupPathLeavesOutTheDownloadsTheWebViewProfileAndAiData() {
         assertEquals(excluded, excludedPaths(rules("backup_rules.xml")))
         val extraction = rules("data_extraction_rules.xml")
         for (section in listOf("cloud-backup", "device-transfer")) {

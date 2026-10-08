@@ -56,6 +56,19 @@ Paths below are relative to
   checks Google again every 2 minutes; the next load tries Google first.
   `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build, which stays on-device.
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
+- `assistant/` is the AI assistant (GitHub build only, `BuildConfig.AI_ASSISTANT`).
+  `AiChatClient.kt` speaks the OpenAI-compatible `/chat/completions` format over OkHttp (HTTPS
+  only, no redirects, IPv4 first, 1 MiB response cap) for Gemini, OpenRouter, OpenAI, OpenCode Zen
+  and Go, or a custom address (`AiProvider.kt`), and lists the service's models from `/models`.
+  `AiAttachmentReader.kt` turns chosen pictures (scaled JPEG), PDFs and text files into message
+  parts that live only in memory. `AiKeyStore.kt` keeps one key per service, AES-GCM encrypted with an Android
+  Keystore key, in the `ai_assistant_keys` preferences; `AiChatHistory.kt` keeps chats in
+  `files/ai-chats/` for the chosen retention (7 days by default). Both are excluded from backups.
+  `AiAssistantController.kt` holds the state and unlocks the key only for each request.
+  The model reads `assets/ai/assistant-guide.md` plus `ui/AiAssistantSnapshot.kt`'s English
+  summary of the current settings. `ui/AiAssistantUi.kt` puts the button at the top right (the
+  translation icon returns when the assistant is off) and `ui/AiAssistantPanel.kt` is the
+  right-side panel with the app's problems first. See the [spec](../specs/2026-10-08-ai-assistant-panel.md).
 - `data/JapaneseGrammar.kt` finds Japanese grammar points from Kuromoji morphemes: a data
   catalogue of N5 to N1 patterns (`JapaneseGrammarCatalogue.kt`, matched by `GrammarPattern.kt`)
   plus hand-written rules for context-dependent points. Every catalogue point needs an example
@@ -98,6 +111,11 @@ Paths below are relative to
   keep a Settings switch to on-device translation and fall back to it when Google fails. The
   F-Droid build never translates online. YouTube's internal client key handling is an extraction detail, not a
   new application API-key setup requirement.
+- The AI assistant is the only feature that takes a user's own API key (owner decision
+  2026-10-08). It sends nothing without a key and a question, never runs on a project server or
+  shared key, stores keys only Keystore-encrypted and outside backups, and treats subtitle and
+  error text as quoted data in its prompts. Turning it off restores the translation problem icon.
+  It cannot change settings by itself; a later setting-change feature must ask for confirmation.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding
   completion for existing users; new users still see the guide. Preserve vocabulary,
   review scheduling, backup/import compatibility, and retained legacy clip files.

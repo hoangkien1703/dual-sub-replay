@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExpandLess
@@ -97,6 +98,9 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_translation_title,
         R.string.settings_section_translation_summary,
     ),
+
+    /** Only in builds with the assistant ([LocalAiAssistant] is set). */
+    AI_ASSISTANT("ai_assistant", R.string.settings_section_ai_title, R.string.settings_section_ai_summary),
 }
 
 /** Opening a section closes the one that was open, so the page stays short. */
@@ -342,6 +346,7 @@ internal fun SubtitleSettingsDialog(
 ) {
     val languagePicker = remember { LanguagePickerState() }
     var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
+    val aiAssistant = LocalAiAssistant.current
     var showResetConfirmation by remember { mutableStateOf(false) }
     val languageDownloads = LocalLanguageDownloads.current
     val translationEngineActions = LocalTranslationEngineActions.current
@@ -533,6 +538,12 @@ internal fun SubtitleSettingsDialog(
                         if (languageDownloads != null) {
                             SettingsSectionDivider()
                             LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
+                        }
+                    }
+
+                    if (aiAssistant != null) {
+                        Section(MoreSettingsSection.AI_ASSISTANT, Icons.Default.AutoAwesome) {
+                            AiAssistantSettingsSection(aiAssistant)
                         }
                     }
 
@@ -878,7 +889,7 @@ private fun OverlaySettings(
 }
 
 @Composable
-private fun SettingsSubheading(text: String) {
+internal fun SettingsSubheading(text: String) {
     Text(
         text,
         modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
@@ -888,7 +899,7 @@ private fun SettingsSubheading(text: String) {
 }
 
 @Composable
-private fun SettingsHint(text: String) {
+internal fun SettingsHint(text: String) {
     Text(
         text,
         modifier = Modifier.padding(top = 6.dp),
@@ -898,7 +909,7 @@ private fun SettingsHint(text: String) {
 }
 
 @Composable
-private fun SettingsSectionDivider() {
+internal fun SettingsSectionDivider() {
     HorizontalDivider(
         modifier = Modifier.padding(vertical = 12.dp),
         color = MaterialTheme.colorScheme.outlineVariant,
@@ -959,7 +970,7 @@ private fun OnlineTranslationSettingsRows(
 }
 
 @Composable
-private fun SettingsSwitchRow(
+internal fun SettingsSwitchRow(
     title: String,
     description: String,
     checked: Boolean,
