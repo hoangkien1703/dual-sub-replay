@@ -168,6 +168,8 @@ internal fun AiErrorKind.messageRes(): Int =
         AiErrorKind.NETWORK -> R.string.ai_error_network
         AiErrorKind.TIMEOUT -> R.string.ai_error_timeout
         AiErrorKind.BAD_REPLY -> R.string.ai_error_bad_reply
+        AiErrorKind.UNSUPPORTED_THINKING -> R.string.ai_error_unsupported_thinking
+        AiErrorKind.UNSUPPORTED_ATTACHMENT -> R.string.ai_error_unsupported_attachment
     }
 
 /** Opens [url] in the browser; false when no browser can open it. */

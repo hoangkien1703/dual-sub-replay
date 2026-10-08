@@ -13,6 +13,7 @@ internal const val AI_ENABLED_PREFERENCE = "ai_enabled"
 internal const val AI_PROVIDER_PREFERENCE = "ai_provider"
 internal const val AI_CUSTOM_BASE_URL_PREFERENCE = "ai_custom_base_url"
 internal const val AI_HISTORY_RETENTION_PREFERENCE = "ai_history_retention"
+internal const val AI_THINKING_PREFERENCE = "ai_thinking"
 private const val AI_MODEL_PREFERENCE_PREFIX = "ai_model_"
 
 private const val DAY_MS = 24L * 60 * 60 * 1000
@@ -36,6 +37,24 @@ internal enum class ChatHistoryRetention(
 
 internal val DEFAULT_CHAT_HISTORY_RETENTION = ChatHistoryRetention.WEEK
 
+/**
+ * How long the model thinks before it answers, sent as `reasoning_effort`. [AUTO] sends nothing, so
+ * the model uses its own default; the other levels are the ones Gemini, OpenAI and OpenRouter share.
+ */
+internal enum class AiThinking(
+    val key: String,
+    @StringRes val labelRes: Int,
+    @StringRes val noteRes: Int,
+    val effort: String?,
+) {
+    AUTO("auto", R.string.ai_effort_auto, R.string.ai_effort_auto_note, null),
+    LOW("low", R.string.ai_effort_low, R.string.ai_effort_low_note, "low"),
+    MEDIUM("medium", R.string.ai_effort_medium, R.string.ai_effort_medium_note, "medium"),
+    HIGH("high", R.string.ai_effort_high, R.string.ai_effort_high_note, "high"),
+}
+
+internal fun storedAiThinking(raw: String?): AiThinking = AiThinking.entries.firstOrNull { it.key == raw } ?: AiThinking.AUTO
+
 internal fun storedChatHistoryRetention(raw: String?): ChatHistoryRetention =
     ChatHistoryRetention.entries.firstOrNull { it.key == raw } ?: DEFAULT_CHAT_HISTORY_RETENTION
 
@@ -47,6 +66,7 @@ internal data class AiAssistantSettings(
     val models: Map<AiProvider, String> = emptyMap(),
     val customBaseUrl: String = "",
     val historyRetention: ChatHistoryRetention = DEFAULT_CHAT_HISTORY_RETENTION,
+    val thinking: AiThinking = AiThinking.AUTO,
 ) {
     fun modelFor(provider: AiProvider): String = models[provider]?.trim()?.takeIf { it.isNotEmpty() } ?: provider.defaultModel
 
@@ -64,6 +84,7 @@ internal fun readAiAssistantSettings(preferences: SharedPreferences): AiAssistan
                 }.toMap(),
         customBaseUrl = preferences.getString(AI_CUSTOM_BASE_URL_PREFERENCE, null).orEmpty(),
         historyRetention = storedChatHistoryRetention(preferences.getString(AI_HISTORY_RETENTION_PREFERENCE, null)),
+        thinking = storedAiThinking(preferences.getString(AI_THINKING_PREFERENCE, null)),
     )
 
 internal fun writeAiAssistantSettings(
@@ -75,6 +96,7 @@ internal fun writeAiAssistantSettings(
         putString(AI_PROVIDER_PREFERENCE, settings.provider.key)
         putString(AI_CUSTOM_BASE_URL_PREFERENCE, settings.customBaseUrl)
         putString(AI_HISTORY_RETENTION_PREFERENCE, settings.historyRetention.key)
+        putString(AI_THINKING_PREFERENCE, settings.thinking.key)
         AiProvider.entries.forEach { provider ->
             val model = settings.models[provider]
             if (model == null) {
@@ -91,7 +113,15 @@ internal fun writeAiAssistantSettings(
  * address: no user name or password in it, no query and no fragment. The key travels in a header,
  * so it must never go over cleartext or to an address that hides another host.
  */
-internal fun chatCompletionsUrl(baseUrl: String): HttpUrl? {
+internal fun chatCompletionsUrl(baseUrl: String): HttpUrl? = aiServiceUrl(baseUrl, "chat", "completions")
+
+/** The `models` list under [baseUrl], with the same rules as [chatCompletionsUrl]. */
+internal fun modelsUrl(baseUrl: String): HttpUrl? = aiServiceUrl(baseUrl, "models")
+
+private fun aiServiceUrl(
+    baseUrl: String,
+    vararg path: String,
+): HttpUrl? {
     val url = baseUrl.trim().toHttpUrlOrNull() ?: return null
     if (!url.isHttps || url.username.isNotEmpty() || url.password.isNotEmpty()) return null
     if (url.query != null || url.fragment != null) return null
@@ -99,7 +129,7 @@ internal fun chatCompletionsUrl(baseUrl: String): HttpUrl? {
     return url
         .newBuilder()
         .encodedPath("/")
-        .apply { (segments + listOf("chat", "completions")).forEach(::addPathSegment) }
+        .apply { (segments + path).forEach(::addPathSegment) }
         .build()
 }
 

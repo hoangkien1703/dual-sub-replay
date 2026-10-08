@@ -23,10 +23,12 @@ class AiAssistantViewModel(
             .use { it.readText() }
     }
 
+    private val transport = OpenAiCompatibleTransport()
+
     internal val controller =
         AiAssistantController(
             scope = viewModelScope,
-            transport = OpenAiCompatibleTransport(),
+            transport = transport,
             keyStore =
                 AiKeyStore(
                     SharedPreferencesSecretStorage(application.getSharedPreferences(AI_KEYS_PREFERENCES, 0)),
@@ -46,5 +48,6 @@ class AiAssistantViewModel(
 
                     override fun clear() = chatHistory.clear()
                 },
+            modelLister = transport,
         )
 }

@@ -332,7 +332,7 @@ private fun AiTypedKeyField(controller: AiAssistantController) {
     ) { Text(stringResource(R.string.ai_settings_save_key)) }
 }
 
-/** Checking, ready, why the last check failed, or not checked yet (a new key, model or address). */
+/** Checking, why the last check failed, ready, or not checked yet (a new key, model or address). */
 @Composable
 private fun AiConnectionStatus(aiState: AiAssistantUiState) {
     val test = aiState.connectionTest
@@ -340,18 +340,18 @@ private fun AiConnectionStatus(aiState: AiAssistantUiState) {
     val text =
         when {
             test == AiConnectionTest.Testing -> stringResource(R.string.ai_checking)
-            aiState.keyChecked -> stringResource(R.string.ai_settings_test_passed)
             failure != null -> stringResource(failure.kind.messageRes())
+            aiState.keyChecked -> stringResource(R.string.ai_settings_test_passed)
             else -> stringResource(R.string.ai_settings_not_checked)
         }
     val color =
         when {
-            failure != null && !aiState.keyChecked -> MaterialTheme.colorScheme.error
+            failure != null -> MaterialTheme.colorScheme.error
             test == AiConnectionTest.Testing || aiState.keyChecked -> MaterialTheme.colorScheme.primary
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
     Text(text, color = color, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp).testTag("ai_test_result"))
-    if (failure != null && !aiState.keyChecked) failure.detail?.let { SettingsHint(it) }
+    failure?.detail?.let { SettingsHint(it) }
 }
 
 @OptIn(ExperimentalLayoutApi::class)

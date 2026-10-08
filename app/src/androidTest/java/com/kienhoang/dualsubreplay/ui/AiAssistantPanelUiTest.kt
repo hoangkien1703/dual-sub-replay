@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
@@ -9,18 +10,25 @@ import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.Espresso
 import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiAssistantSettings
+import com.kienhoang.dualsubreplay.assistant.AiAttachment
+import com.kienhoang.dualsubreplay.assistant.AiAttachmentKind
 import com.kienhoang.dualsubreplay.assistant.AiChat
 import com.kienhoang.dualsubreplay.assistant.AiChatException
 import com.kienhoang.dualsubreplay.assistant.AiChatRequest
@@ -28,11 +36,14 @@ import com.kienhoang.dualsubreplay.assistant.AiChatTransport
 import com.kienhoang.dualsubreplay.assistant.AiErrorKind
 import com.kienhoang.dualsubreplay.assistant.AiHistoryStorage
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
+import com.kienhoang.dualsubreplay.assistant.AiModelInfo
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
+import com.kienhoang.dualsubreplay.assistant.AiThinking
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
 import com.kienhoang.dualsubreplay.assistant.aiCheckedSetup
+import com.kienhoang.dualsubreplay.assistant.aiDataUrl
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import com.kienhoang.dualsubreplay.ui.theme.dualSubColorScheme
@@ -46,6 +57,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 
 /** The top-right assistant button, its right-side panel, and the AI section in More settings; no network. */
 class AiAssistantPanelUiTest {
@@ -105,6 +117,7 @@ class AiAssistantPanelUiTest {
                     override fun clear() = Unit
                 },
             io = Dispatchers.Unconfined,
+            modelLister = { _, _ -> listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemma-4-31b-it", free = true)) },
         )
     }
 
@@ -227,7 +240,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_settings_button").performClick()
         composeRule.onNodeWithTag("ai_settings_page").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_key_field").performScrollTo().performTextInput("AIza-FAKE-test-key-for-unit-tests-rstu")
-        composeRule.onNodeWithTag("ai_save_key").performClick()
+        composeRule.onNodeWithTag("ai_save_key").performScrollTo().performClick()
         composeRule
             .onNodeWithTag(
                 "ai_test_result",
@@ -255,6 +268,69 @@ class AiAssistantPanelUiTest {
         val pixels = composeRule.onNodeWithTag("ai_panel").captureToImage().toPixelMap()
         val panelBackground = pixels[pixels.width - 3, pixels.height / 2]
         assertEquals(dualSubColorScheme(DEFAULT_APP_THEME_ACCENT_KEY).surfaceContainer.toArgb(), panelBackground.toArgb())
+    }
+
+    @Test
+    fun theBarUnderTheChatBoxChangesTheModelAndThinkingLevel() {
+        checkedGeminiKey()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_model_button").assertTextContains("gemini-flash-latest")
+        composeRule.onNodeWithTag("ai_model_button").performClick()
+        composeRule.onNodeWithText("gemini-pro-latest").performClick()
+        composeRule.onNodeWithTag("ai_model_button").assertTextContains("gemini-pro-latest")
+        assertEquals("gemini-pro-latest", requests.last().model)
+        composeRule.onNodeWithTag("ai_effort_button").performClick()
+        composeRule.onNodeWithTag("ai_effort_high").performClick()
+        assertEquals(AiThinking.HIGH, settings.thinking)
+        composeRule.onNodeWithTag("ai_effort_button").assertTextContains("High")
+        composeRule.onNodeWithContentDescription("Thinking: High").assertIsDisplayed()
+        saveUiEvidence("ai_panel_model_bar")
+        composeRule.onNodeWithTag("ai_model_button").performClick()
+        composeRule.onNodeWithTag("ai_models_more").performClick()
+        composeRule.onNodeWithText("Choose a model").assertIsDisplayed()
+        composeRule.onNodeWithText("gemma-4-31b-it").assertIsDisplayed()
+        composeRule.onNodeWithText("Free").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_models_search").performTextInput("my-own-model")
+        composeRule.onNodeWithTag("ai_models_use_typed").performClick()
+        composeRule.onNodeWithTag("ai_model_button").assertTextContains("my-own-model")
+        assertEquals("my-own-model", settings.modelFor(AiProvider.GEMINI))
+    }
+
+    @Test
+    fun picturesAndFilesWaitAboveTheChatBoxThenGoWithTheQuestion() {
+        checkedGeminiKey()
+        val pixels = Bitmap.createBitmap(64, 48, Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLUE) }
+        val jpeg = ByteArrayOutputStream().also { pixels.compress(Bitmap.CompressFormat.JPEG, 90, it) }.toByteArray()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_attach_button").performClick()
+        composeRule.onNodeWithTag("ai_attach_photo").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_attach_file").assertIsDisplayed()
+        // The pickers belong to the system, so the test closes the menu and adds files directly.
+        Espresso.pressBack()
+        composeRule.onNodeWithTag("ai_attach_photo").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
+        composeRule.runOnIdle {
+            controller.addAttachments(
+                listOf(
+                    AiAttachment("page.jpg", AiAttachmentKind.PICTURE, aiDataUrl("image/jpeg", jpeg)),
+                    AiAttachment("episode.srt", AiAttachmentKind.TEXT, "こんにちは"),
+                ),
+            )
+        }
+        composeRule.onNodeWithTag("ai_draft_attachments").assertIsDisplayed()
+        composeRule.onNodeWithText("page.jpg").assertIsDisplayed()
+        saveUiEvidence("ai_panel_attachments")
+        composeRule.onNodeWithContentDescription("Remove episode.srt").performClick()
+        composeRule.onNodeWithText("episode.srt").assertDoesNotExist()
+        // A picture alone can be sent; the question then asks to explain it.
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        val question = requests.last().messages.last()
+        assertEquals("Please explain this.", question.content)
+        assertEquals(listOf("page.jpg"), question.attachments.map { it.name })
+        composeRule.onNodeWithTag("ai_draft_attachments").assertDoesNotExist()
+        composeRule.onNode(hasText("page.jpg") and hasAnyAncestor(hasTestTag("ai_user_message"))).assertIsDisplayed()
     }
 
     @Test
@@ -290,7 +366,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("settings_section_ai_assistant").performScrollTo().performClick()
         composeRule.onNodeWithTag("ai_provider_openrouter").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("ai_key_field").performScrollTo().performTextInput("sk-or-v1-abcdefghijklmnopqrstuvwxyz")
-        composeRule.onNodeWithTag("ai_save_key").performClick()
+        composeRule.onNodeWithTag("ai_save_key").performScrollTo().performClick()
         composeRule.onNodeWithTag("ai_key_saved").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("ai_test_result").assertIsDisplayed()
         assertEquals(AiProvider.OPENROUTER, settings.provider)

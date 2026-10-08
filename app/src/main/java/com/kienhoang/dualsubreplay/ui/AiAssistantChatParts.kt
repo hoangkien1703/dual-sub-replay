@@ -124,6 +124,7 @@ internal fun AiWelcome(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AiMessageBubble(message: AiChatMessage) {
     val user = message.role == AiRole.USER
@@ -135,6 +136,13 @@ internal fun AiMessageBubble(message: AiChatMessage) {
             contentColor = if (user) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
         ) {
             Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                if (message.attachments.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.padding(bottom = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) { message.attachments.forEach { AiAttachmentChip(it, onRemove = null) } }
+                }
                 message.contextLabel?.let {
                     Text(
                         stringResource(R.string.ai_message_about, it),
@@ -179,16 +187,19 @@ internal fun AiThinkingRow() {
     }
 }
 
+/** Why the last question got no answer. [onRetry] is null while the key needs a new check first. */
 @Composable
 internal fun AiFailureRow(
     failure: AiFailure,
-    onRetry: () -> Unit,
+    onRetry: (() -> Unit)?,
 ) {
     Column(Modifier.fillMaxWidth().testTag("ai_failure")) {
         Text(stringResource(failure.kind.messageRes()), color = MaterialTheme.colorScheme.error)
         failure.detail?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline) }
-        OutlinedButton(onClick = onRetry, modifier = Modifier.padding(top = 4.dp).testTag("ai_retry")) {
-            Text(stringResource(R.string.ai_retry))
+        if (onRetry != null) {
+            OutlinedButton(onClick = onRetry, modifier = Modifier.padding(top = 4.dp).testTag("ai_retry")) {
+                Text(stringResource(R.string.ai_retry))
+            }
         }
     }
 }

@@ -23,6 +23,8 @@ internal enum class AiProvider(
     /** The setup steps before "Paste key": open the key page, then create and copy a key. */
     @StringRes val getKeyStepRes: Int,
     @StringRes val createKeyStepRes: Int,
+    /** A few models to offer first in the model menu; the full list comes from the service. */
+    val suggestedModels: List<String>,
 ) {
     GEMINI(
         key = "gemini",
@@ -34,6 +36,8 @@ internal enum class AiProvider(
         freeKeys = true,
         getKeyStepRes = R.string.ai_setup_step_get_google,
         createKeyStepRes = R.string.ai_setup_step_create,
+        // Google's "latest" names follow each new release, so they do not expire.
+        suggestedModels = listOf("gemini-flash-latest", "gemini-flash-lite-latest", "gemini-pro-latest"),
     ),
     OPENROUTER(
         key = "openrouter",
@@ -46,6 +50,7 @@ internal enum class AiProvider(
         freeKeys = true,
         getKeyStepRes = R.string.ai_setup_step_get_openrouter,
         createKeyStepRes = R.string.ai_setup_step_create,
+        suggestedModels = listOf("openrouter/free", "openrouter/auto"),
     ),
     OPENAI(
         key = "openai",
@@ -57,6 +62,7 @@ internal enum class AiProvider(
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_openai,
         createKeyStepRes = R.string.ai_setup_step_create_openai,
+        suggestedModels = listOf("gpt-5-mini", "gpt-5-nano", "gpt-5"),
     ),
 
     /** OpenCode's pay-per-use gateway, with a few free models; only its chat/completions models work here. */
@@ -70,6 +76,7 @@ internal enum class AiProvider(
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_zen,
         createKeyStepRes = R.string.ai_setup_step_create_generic,
+        suggestedModels = listOf("big-pickle", "deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
     ),
 
     /** OpenCode's monthly plan for open models, with the same kind of key as Zen. */
@@ -83,6 +90,7 @@ internal enum class AiProvider(
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_go,
         createKeyStepRes = R.string.ai_setup_step_create_generic,
+        suggestedModels = listOf("deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
     ),
     CUSTOM(
         key = "custom",
@@ -94,6 +102,7 @@ internal enum class AiProvider(
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_create_generic,
         createKeyStepRes = R.string.ai_setup_step_create_generic,
+        suggestedModels = emptyList(),
     ),
 }
 

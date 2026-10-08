@@ -66,6 +66,9 @@ class AiAssistantControllerTest {
     private val settings = MemorySettings()
     private val history = MemoryHistory()
 
+    private val listedModels = mutableListOf<String>()
+    private var modelListFailure: AiChatException? = null
+
     private fun controller() =
         AiAssistantController(
             scope = scope,
@@ -76,6 +79,11 @@ class AiAssistantControllerTest {
             io = Dispatchers.Unconfined,
             clock = { now },
             newId = { "id${ids++}" },
+            modelLister = { baseUrl, apiKey ->
+                listedModels += "$baseUrl $apiKey"
+                modelListFailure?.let { throw it }
+                listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemini-pro-latest"), AiModelInfo("text-embedding-004"))
+            },
         )
 
     private fun savedChat(
@@ -413,5 +421,141 @@ class AiAssistantControllerTest {
         controller.testConnection()
         assertEquals(AiConnectionTest.Failed(AiFailure(AiErrorKind.BAD_ADDRESS)), controller.state.value.connectionTest)
         assertTrue(transport.requests.isEmpty())
+    }
+
+    @Test
+    fun aChosenModelIsTriedFirstAndOnlyUsedIfItAnswers() {
+        checkedGeminiKey()
+        val controller = controller()
+        transport.failure = AiChatException(AiErrorKind.UNKNOWN_MODEL, "models/gemini-9 is not found.")
+        controller.chooseModel("gemini-9")
+        var state = controller.state.value
+        assertEquals(
+            AiModelCheck.Failed("gemini-9", AiFailure(AiErrorKind.UNKNOWN_MODEL, "models/gemini-9 is not found.")),
+            state.modelCheck,
+        )
+        assertEquals("gemini-flash-latest", state.settings.modelFor(AiProvider.GEMINI))
+        assertTrue(state.ready)
+        transport.failure = null
+        controller.chooseModel(" gemini-pro-latest ")
+        state = controller.state.value
+        assertNull(state.modelCheck)
+        assertEquals("gemini-pro-latest", settings.value.modelFor(AiProvider.GEMINI))
+        assertTrue(state.ready)
+        assertEquals(aiCheckedSetup(settings.value, AiProvider.GEMINI), keyStore.checkedSetup(AiProvider.GEMINI))
+        assertEquals(listOf("gemini-9", "gemini-pro-latest"), transport.requests.map { it.model })
+    }
+
+    @Test
+    fun theChosenThinkingLevelGoesWithEveryQuestionButNotTheChecks() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.setThinking(AiThinking.HIGH)
+        assertEquals(AiThinking.HIGH, settings.value.thinking)
+        controller.send("Why?", "guide")
+        assertEquals("high", transport.requests.last().reasoningEffort)
+        controller.testConnection()
+        assertNull(transport.requests.last().reasoningEffort)
+    }
+
+    @Test
+    fun theModelListComesFromTheServiceWithoutModelsThatCannotChat() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.loadModels()
+        assertEquals(
+            AiModelList.Loaded(AiProvider.GEMINI, listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemini-pro-latest"))),
+            controller.state.value.modelList,
+        )
+        assertEquals(listOf("${AiProvider.GEMINI.baseUrl} $geminiKey"), listedModels)
+        modelListFailure = AiChatException(AiErrorKind.NETWORK, "UnknownHostException")
+        controller.loadModels()
+        assertEquals(AiModelList.Failed(AiFailure(AiErrorKind.NETWORK, "UnknownHostException")), controller.state.value.modelList)
+    }
+
+    private fun picture(name: String) = AiAttachment(name, AiAttachmentKind.PICTURE, "data:image/jpeg;base64,AAAA")
+
+    @Test
+    fun chosenFilesWaitUnderTheChatBoxUpToTheLimit() {
+        val controller = controller()
+        assertTrue(controller.addAttachments(listOf(picture("1.jpg"), picture("2.jpg"))))
+        assertFalse(controller.addAttachments((3..5).map { picture("$it.jpg") }))
+        assertEquals(
+            listOf("1.jpg", "2.jpg", "3.jpg", "4.jpg"),
+            controller.state.value.draftAttachments
+                .map { it.name },
+        )
+        controller.removeAttachment(1)
+        assertEquals(
+            listOf("1.jpg", "3.jpg", "4.jpg"),
+            controller.state.value.draftAttachments
+                .map { it.name },
+        )
+    }
+
+    @Test
+    fun filesGoWithTheirQuestionAndLeaveTheChatBox() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.addAttachments(listOf(picture("page.jpg")))
+        controller.send("What does this say?", "guide", attachments = controller.state.value.draftAttachments)
+        assertTrue(
+            controller.state.value.draftAttachments
+                .isEmpty(),
+        )
+        val question =
+            transport.requests
+                .last()
+                .messages
+                .last()
+        assertEquals("What does this say?", question.content)
+        assertEquals(listOf("page.jpg"), question.attachments.map { it.name })
+        assertEquals(
+            listOf("page.jpg"),
+            controller.state.value.messages
+                .first()
+                .attachments
+                .map { it.name },
+        )
+    }
+
+    @Test
+    fun afterAModelRefusesPicturesTheChatGoesOnWithoutThem() {
+        checkedGeminiKey()
+        val controller = controller()
+        transport.failure = AiChatException(AiErrorKind.UNSUPPORTED_ATTACHMENT, "No endpoints found that support image input")
+        controller.send("What is this?", "guide", attachments = listOf(picture("page.jpg")))
+        assertEquals(
+            AiErrorKind.UNSUPPORTED_ATTACHMENT,
+            controller.state.value.failure
+                ?.kind,
+        )
+        // Try again sends the picture again, for a model that has just been changed to one that reads pictures.
+        controller.retry("guide")
+        assertEquals(
+            listOf("page.jpg"),
+            transport.requests
+                .last()
+                .messages
+                .last()
+                .attachments
+                .map { it.name },
+        )
+        transport.failure = null
+        controller.send("Then just say hello", "guide")
+        assertTrue(
+            transport.requests
+                .last()
+                .messages
+                .all { it.attachments.isEmpty() },
+        )
+        // The message still shows which picture was sent.
+        assertEquals(
+            listOf("page.jpg"),
+            controller.state.value.messages
+                .first()
+                .attachments
+                .map { it.name },
+        )
     }
 }

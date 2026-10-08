@@ -58,8 +58,10 @@ Paths below are relative to
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `assistant/` is the AI assistant (GitHub build only, `BuildConfig.AI_ASSISTANT`).
   `AiChatClient.kt` speaks the OpenAI-compatible `/chat/completions` format over OkHttp (HTTPS
-  only, no redirects, 1 MiB response cap) for Gemini, OpenAI, OpenRouter, or a custom address
-  (`AiProvider.kt`). `AiKeyStore.kt` keeps one key per service, AES-GCM encrypted with an Android
+  only, no redirects, IPv4 first, 1 MiB response cap) for Gemini, OpenRouter, OpenAI, OpenCode Zen
+  and Go, or a custom address (`AiProvider.kt`), and lists the service's models from `/models`.
+  `AiAttachmentReader.kt` turns chosen pictures (scaled JPEG), PDFs and text files into message
+  parts that live only in memory. `AiKeyStore.kt` keeps one key per service, AES-GCM encrypted with an Android
   Keystore key, in the `ai_assistant_keys` preferences; `AiChatHistory.kt` keeps chats in
   `files/ai-chats/` for the chosen retention (7 days by default). Both are excluded from backups.
   `AiAssistantController.kt` holds the state and unlocks the key only for each request.

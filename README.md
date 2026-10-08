@@ -97,7 +97,8 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 
 - The ✨ button at the top right opens an assistant from the right side. Ask where a setting is, what a word or sentence means, or tap **Explain the current line**.
 - Problems such as Google Translate failing or subtitles not loading show at the top of the panel, with **Ask AI about this**.
-- It uses your own free or paid API key from Google Gemini, OpenAI, OpenRouter, or another OpenAI-compatible service. **Get a free key** walks you through Google's in three steps, and **Paste key** recognises the service by itself.
+- It uses your own free or paid API key from Google Gemini, OpenRouter, OpenAI, OpenCode, or another OpenAI-compatible service. Pick a service in the panel, and **Get a key** opens the page that gives you one. The key is checked before the first question.
+- Under the chat box, **+** adds photos and files (pictures, PDFs, subtitle and text files), and you can switch the model and how long it thinks, as in other chat apps.
 - Your key is encrypted on the phone and never backed up. Chats stay on the phone for 7 days by default. Turn the assistant off completely in **More settings → AI assistant**. The F-Droid build has no assistant.
 
 ### Track your progress

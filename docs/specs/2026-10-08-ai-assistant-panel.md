@@ -38,7 +38,8 @@ completely in More settings.
 
 - The AI changing settings (a later PR, with a confirmation card and Undo).
 - "Ask AI" in the word card and phrase bar, "Save to my words", answer cache (word-help PR).
-- Pictures, on-device Gemini Nano, streaming replies, the button in fullscreen video.
+- App screenshots taken by the assistant, on-device Gemini Nano, streaming replies, the button in
+  fullscreen video.
 - Any project-operated server or shared key.
 - The F-Droid build: it has no AI assistant (`BuildConfig.AI_ASSISTANT` is false).
 
@@ -52,7 +53,9 @@ completely in More settings.
 - **Panel:** slides in from the right over a dim background (about 88% of the width in portrait,
   420 dp at most), closes with the close button, a tap outside, or Back. The video keeps playing.
   Top to bottom: header (History, New chat, AI settings, Close); problem cards; chat; suggestion
-  chips when the chat is empty; input box with Send. The whole panel uses the app's dark teal theme.
+  chips when the chat is empty; input box with Send, and under it the + button (Photo or File), the
+  model and the thinking level, as in other chat apps. The whole panel uses the app's dark teal
+  theme.
 - **No key yet:** the panel shows a setup card: a service picker (Google Gemini, OpenRouter,
   OpenAI, OpenCode Zen, OpenCode Go, each with one line on what it costs), that service's three
   steps, "Get a free key" (Gemini, OpenRouter) or "Get a key" opening the service's key page, and
@@ -71,6 +74,19 @@ completely in More settings.
 - **Chat:** replies render natively (bold, code, lists) and can be selected and copied. While
   waiting, "Thinking…" shows. A failure shows a short, translated reason (wrong key, no credit,
   unknown model, too many requests, no connection, service problem) and Try again.
+- **Model and thinking level:** the model button lists the current model, the service's suggested
+  models, and "All <service> models…", a searchable page of the service's own model list (marked
+  Free or Pictures where OpenRouter says so) where any typed name can be used too. A new model
+  answers one tiny request before the chat switches to it; if it fails, the chat stays on the old
+  model and says why. Thinking is Auto (nothing sent), Low, Medium or High (`reasoning_effort`); a
+  model that refuses it says to choose Auto.
+- **Pictures and files:** + opens the system photo picker or file picker. Up to 4 pictures or files
+  per question wait above the input box with a thumbnail or icon and a remove button; a question
+  can be only files ("Please explain this."). Pictures are scaled to at most 1568 px and sent as
+  JPEG, PDFs up to 8 MB as they are, and text and subtitle files up to 2 MB as quoted text (the
+  first 20 000 characters). Other files, and larger ones, are refused with the file's name. Sent
+  messages show the files' names. A model that cannot read pictures or PDFs says so; Try again
+  resends them (after choosing another model), and the next question goes on without them.
 - **Suggestion chips:** "What can this app do?", "How do I make subtitles bigger?", and, while a
   subtitle line is active, "Explain the current line" (sends that line and its translation).
 - **History:** each chat is saved after every reply. The History view lists saved chats (newest
@@ -94,8 +110,12 @@ completely in More settings.
   never appear in logs, error details, the AI's context, chat history or practice exports.
   Provider error text is redacted for the key before it is shown.
 - Network: OkHttp, HTTPS only (cleartext is already off in the manifest), one host per request
-  (the chosen service), 15 s connect / 90 s read / 120 s call timeouts, 1 MiB response cap,
-  cancellation on New chat. A custom address must be `https://` without user info.
+  (the chosen service), IPv4 addresses first, 10 s connect / 15 s write / 90 s read timeouts, 30 s
+  for a key check or model list and 100 s for a question, a 1 MiB reply cap (4 MiB for a model
+  list), cancellation on New chat. A custom address must be `https://` without user info.
+- Pictures and files live only in the open chat's memory. Saved chats keep their names, never their
+  content, so reopening a chat sends nothing old. One request carries at most 16 MiB of base64
+  pictures and PDFs, newest first.
 - Chat history lives in `files/ai-chats/` (excluded from backup), written atomically, at most 100
   chats.
 - Unit tests stay plain JUnit4 without Android: Keystore and SharedPreferences sit behind small
@@ -134,6 +154,10 @@ completely in More settings.
 - [ ] Sending a question returns the provider's reply; wrong key, unknown model, no credit, rate
   limit, no connection and server errors each show their own translated message and Try again.
 - [ ] Test connection reports success or the same error messages.
+- [ ] The bar under the input box changes the model (after a test request) and the thinking level;
+  the model page lists the service's chat models and accepts a typed name.
+- [ ] + adds up to 4 pictures or files; they show above the input box, can be removed, go with the
+  next question as image, PDF or quoted-text parts, and are not saved in chat history.
 - [ ] With a translation fallback or failure or a caption error, the button shows a dot and the panel
   shows the problem card with its existing action and "Ask AI about this".
 - [ ] AI off: today's translation problem icon and popup are unchanged and no AI request is made.
@@ -148,7 +172,7 @@ completely in More settings.
 | --- | --- | --- |
 | Unit tests | `testDebugUnitTest`: key store with a fake cipher, request/reply/error parsing and redaction, URL validation, request budget, history retention and JSON round trip, markdown spans, backup rules, strings in every language | Local and CI |
 | Android lint/build | `formatCheck complexityCheck lintDebug assembleDebug assembleDebugAndroidTest` pass | Local and CI |
-| Managed-device/emulator | `AiAssistantPanelUiTest`: button opens the panel, setup card and service picker without a key, a key typed in the panel's settings fails then passes its check before the input box appears, the panel background is the theme color, problem card with "Ask AI about this", a fake reply appears, AI off shows the old icon | CI managed device |
+| Managed-device/emulator | `AiAssistantPanelUiTest`: button opens the panel, setup card and service picker without a key, a key typed in the panel's settings fails then passes its check before the input box appears, the panel background is the theme color, problem card with "Ask AI about this", a fake reply appears, the model and thinking bar, files above the input box sent with a question, AI off shows the old icon | CI managed device |
 | F-Droid | `fdroid-build` and `fdroid-device-tests` stay green; APK has no AI button | CI |
 | Physical-device/manual | Preview APK on a phone with a real Gemini (free) key: ask a question, wrong key message, test connection, history after restart | Owner, preview APK |
 | Live YouTube | Problem card during a real Google Translate fallback | Owner, opportunistic |
@@ -163,7 +187,12 @@ completely in More settings.
 - Model names change: defaults live in `AiProvider`; the model field overrides them.
 - Subtitle text is written by strangers: the system prompt marks it as quoted content, and the
   assistant cannot change anything in this PR.
-- Cost: only the last 16 messages and about 24 000 characters are sent per request.
+- Cost: only the last 16 messages and about 24 000 characters are sent per request, plus at most
+  16 MiB of pictures and PDFs, newest first.
+- Not every model reads pictures or PDFs (OpenAI's chat endpoint reads PDFs, Gemini's and
+  OpenRouter's read both, many open models read neither): the refusal gets its own message, and the
+  chat can go on without the files.
+- Big PDFs use memory while they are encoded: they are capped at 8 MB each.
 
 ## Release intent
 
@@ -226,23 +255,28 @@ The owner tried preview build 383 with a real key and reported three problems an
   Claude, Gemini or Qwen models); others fail the key check with the service's message. A plain
   `sk-` key stays with the chosen OpenAI or OpenCode service.
 
-Next in this PR (asked for on 2026-10-08): model and thinking-level pickers under the input box,
-and sending pictures and files.
+Also asked for on 2026-10-08 and built in this PR: the model and thinking-level bar under the
+input box with the searchable model page, and sending pictures and files (see "User-visible
+behavior"). The code review before pushing also found and fixed: a reply body that timed out after
+its headers could escape as a raw `IOException`; a rejected key in a question sent before a
+service switch could wipe the new service's passed check; a used-up free limit (429) wiped a passed
+check; a 200 reply that carries only an error object (OpenRouter) showed as "no text" instead of
+its own error; a failed Test connection still said "Connected"; Try again showed while the key
+needed a new check.
 
 ## Validation result
 
-Local, on Linux with JDK 21 (2026-10-08):
+Local, on Linux with JDK 21 (2026-10-08, after the model bar and attachments):
 
 | Check | Result |
 | --- | --- |
-| `formatCheck complexityCheck` | Passed. New files have zero ktlint violations; `DualSubApp`/`DualSubExperience` stay within the detekt limits. |
-| `testDebugUnitTest` | Passed: 528 tests, 0 failures. New: `AiSettingsTest` (7), `AiKeyStoreTest` (4), `AiChatClientTest` (6), `AiConversationTest` (4), `AiChatHistoryTest` (5), `AiMarkdownTest` (4), `AiAssistantControllerTest` (15), `AiAssistantPromptTest` (6), plus the updated `BackupRulesTest`. `AppLanguageTest` passes with `strings_ai.xml` in all 8 languages. |
-| `lintDebug` | Passed; no warnings in the new files, no `MissingTranslation`. |
+| `formatCheck complexityCheck` | Passed. Files this PR adds have zero ktlint violations; detekt finds no smells. |
+| `testDebugUnitTest` | Passed: 564 tests, 0 failures. AI tests cover key checks and their persistence, IPv4-first DNS, timeouts, thinking levels, model lists, error-only 200 replies, attachment kinds, text cuts, picture sizing, data URLs, request parts and budget, history keeping only file names, the attachment notices, and the controller's model switch and draft files. `AppLanguageTest` passes with `strings_ai.xml` in all 8 languages. |
+| `lintDebug` | Passed; no warnings in the AI files, no `MissingTranslation`. |
 | `assembleDebug assembleDebugAndroidTest` | Passed. |
-| `AiAssistantPanelUiTest` (5 managed-device tests) | Not run locally (no emulator here); runs in CI `managed-device-tests`. |
+| `AiAssistantPanelUiTest` (managed device) | Not run locally (no emulator here); runs in CI `managed-device-tests`. CI on the previous push failed two tests that clicked the off-screen Save button; both now scroll to it first. |
 | F-Droid build and device tests | Not run locally (needs the NDK and submodules); runs in CI `fdroid-build` and `fdroid-device-tests`. |
-| Real provider key, physical phone, live Google Translate fallback | Not verified; needs the owner's preview APK test with a free Gemini key. |
+| Real provider key, physical phone, photo and file pickers, live Google Translate fallback | Not verified; needs the owner's preview APK test with a real key. Whether Gemini's OpenAI-compatible endpoint accepts PDF `file` parts is also unverified; a refusal shows the "can't read pictures or PDFs" message. |
 
-Criteria checked above are proven by the offline tests. The others are covered by
-`AiAssistantPanelUiTest` and the controller tests offline, and stay open until CI's managed-device
-run and the owner's phone test confirm them.
+The offline tests prove the logic; the panel's behavior on a phone and with real services stays
+open until CI's managed-device run and the owner's phone test confirm it.

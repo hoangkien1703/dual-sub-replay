@@ -50,6 +50,13 @@ private fun encodeMessage(message: AiChatMessage): JSONObject =
         .apply {
             message.context?.let { put("context", it) }
             message.contextLabel?.let { put("contextLabel", it) }
+            // Only the names: pictures and files are never written to the phone's storage.
+            if (message.attachments.isNotEmpty()) {
+                put(
+                    "attachments",
+                    JSONArray().apply { message.attachments.forEach { put(JSONObject().put("name", it.name).put("kind", it.kind.key)) } },
+                )
+            }
         }
 
 /** Reads [encodeAiChats] output; anything unreadable is skipped rather than failing the whole file. */
@@ -83,7 +90,17 @@ private fun decodeMessage(json: JSONObject?): AiChatMessage? {
         timeMs = json.optLong("time"),
         context = json.optString("context").takeIf { json.has("context") },
         contextLabel = json.optString("contextLabel").takeIf { json.has("contextLabel") },
+        attachments = decodeAttachmentNames(json.optJSONArray("attachments")),
     )
+}
+
+private fun decodeAttachmentNames(json: JSONArray?): List<AiAttachment> {
+    if (json == null) return emptyList()
+    return (0 until json.length()).mapNotNull { index ->
+        val file = json.optJSONObject(index) ?: return@mapNotNull null
+        val kind = AiAttachmentKind.entries.firstOrNull { it.key == file.optString("kind") } ?: return@mapNotNull null
+        AiAttachment(file.optString("name"), kind, data = "")
+    }
 }
 
 /**

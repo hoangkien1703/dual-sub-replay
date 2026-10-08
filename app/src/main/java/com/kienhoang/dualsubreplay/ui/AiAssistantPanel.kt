@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
@@ -40,16 +39,12 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -135,6 +130,7 @@ internal fun AiAssistantPanel(
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
                                     .testTag("ai_settings_page"),
                             ) { AiAssistantSettingsSection(host) }
+                        AiPanelPage.MODELS -> AiModelsPage(aiState, controller, Modifier.weight(1f))
                         AiPanelPage.CHAT -> {
                             AiChatContent(
                                 aiState = aiState,
@@ -147,7 +143,12 @@ internal fun AiAssistantPanel(
                                 onRetry = { controller.retry(systemPrompt()) },
                                 modifier = Modifier.weight(1f),
                             )
-                            if (aiState.ready) AiInputRow(sending = aiState.sending, onSend = { controller.send(it, systemPrompt()) })
+                            if (aiState.ready) {
+                                AiComposer(
+                                    aiState,
+                                    controller,
+                                ) { text, files -> controller.send(text, systemPrompt(), attachments = files) }
+                            }
                         }
                     }
                 }
@@ -177,6 +178,7 @@ private fun AiPanelHeader(
                     AiPanelPage.CHAT -> R.string.ai_panel_title
                     AiPanelPage.HISTORY -> R.string.ai_history
                     AiPanelPage.SETTINGS -> R.string.ai_open_settings
+                    AiPanelPage.MODELS -> R.string.ai_models_title
                 },
             ),
             style = MaterialTheme.typography.titleLarge,
@@ -252,33 +254,5 @@ private fun LazyListScope.aiMessages(
 ) {
     items(aiState.messages, key = { it.id }) { message -> AiMessageBubble(message) }
     if (aiState.sending) item(key = "thinking") { AiThinkingRow() }
-    aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry) } }
-}
-
-@Composable
-private fun AiInputRow(
-    sending: Boolean,
-    onSend: (String) -> Unit,
-) {
-    var text by rememberSaveable { mutableStateOf("") }
-    Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            modifier = Modifier.weight(1f).testTag("ai_input"),
-            placeholder = { Text(stringResource(R.string.ai_input_hint)) },
-            maxLines = 5,
-            shape = RoundedCornerShape(20.dp),
-        )
-        IconButton(
-            onClick = {
-                onSend(text)
-                text = ""
-            },
-            enabled = !sending && text.isNotBlank(),
-            modifier = Modifier.testTag("ai_send_button"),
-        ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.ai_send))
-        }
-    }
+    aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry.takeIf { aiState.ready }) } }
 }

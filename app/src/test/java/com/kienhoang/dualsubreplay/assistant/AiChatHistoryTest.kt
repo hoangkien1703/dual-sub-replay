@@ -54,6 +54,27 @@ class AiChatHistoryTest {
     }
 
     @Test
+    fun savedChatsKeepFileNamesButNeverTheFiles() {
+        val files =
+            listOf(
+                AiAttachment("page.jpg", AiAttachmentKind.PICTURE, "data:image/jpeg;base64,AAAA"),
+                AiAttachment("ep1.srt", AiAttachmentKind.TEXT, "こんにちは"),
+            )
+        val chat = AiChat("c1", 10, 20, listOf(AiChatMessage("u", AiRole.USER, "What is this?", 11, attachments = files)))
+        val encoded = encodeAiChats(listOf(chat))
+        assertFalse("AAAA" in encoded)
+        assertFalse("こんにちは" in encoded)
+        val saved =
+            decodeAiChats(encoded)
+                .single()
+                .messages
+                .single()
+                .attachments
+        assertEquals(listOf("page.jpg" to AiAttachmentKind.PICTURE, "ep1.srt" to AiAttachmentKind.TEXT), saved.map { it.name to it.kind })
+        assertTrue(saved.none { it.available })
+    }
+
+    @Test
     fun unreadableHistoryIsSkippedNotFatal() {
         assertTrue(decodeAiChats("not json").isEmpty())
         assertTrue(decodeAiChats("""{"chats":[{"messages":[]}]}""").isEmpty())

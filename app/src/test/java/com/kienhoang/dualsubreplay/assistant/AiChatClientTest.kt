@@ -116,4 +116,105 @@ class AiChatClientTest {
             )
         assertEquals(listOf(ipv4, ipv6), dns.lookup("generativelanguage.googleapis.com"))
     }
+
+    @Test
+    fun aThinkingLevelIsSentOnlyWhenChosen() {
+        val body = JSONObject(chatRequestBody("gpt-5-mini", listOf(AiWireMessage(AiRole.USER, "Hi")), "high"))
+        assertEquals("high", body.getString("reasoning_effort"))
+        assertFalse(JSONObject(chatRequestBody("gpt-5-mini", listOf(AiWireMessage(AiRole.USER, "Hi")))).has("reasoning_effort"))
+        assertEquals(
+            AiErrorKind.UNSUPPORTED_THINKING,
+            aiErrorKindForStatus(400, "Unsupported parameter: 'reasoning_effort' is not supported with this model.", sentThinking = true),
+        )
+        assertEquals(AiErrorKind.BAD_REQUEST, aiErrorKindForStatus(400, "Thinking is not enabled.", sentThinking = false))
+    }
+
+    @Test
+    fun modelListsAreReadSortedWithFreeAndPictureModelsMarked() {
+        val body =
+            """
+            {"data": [
+              {"id": "openai/gpt-5-mini", "pricing": {"prompt": "0.00000025", "completion": "0.000002"},
+               "architecture": {"input_modalities": ["text", "image"]}},
+              {"id": "google/gemma-4-31b-it:free"},
+              {"id": "openrouter/free", "pricing": {"prompt": "0", "completion": "0"}},
+              {"id": "models/gemini-flash-latest"},
+              {"id": ""},
+              {"id": "google/gemma-4-31b-it:free"}
+            ]}
+            """.trimIndent()
+        assertEquals(
+            listOf(
+                AiModelInfo("gemini-flash-latest"),
+                AiModelInfo("google/gemma-4-31b-it:free", free = true),
+                AiModelInfo("openai/gpt-5-mini", pictures = true),
+                AiModelInfo("openrouter/free", free = true),
+            ),
+            parseAiModelList(body),
+        )
+        try {
+            parseAiModelList("<html>")
+            fail()
+        } catch (error: AiChatException) {
+            assertEquals(AiErrorKind.BAD_REPLY, error.kind)
+        }
+    }
+
+    @Test
+    fun onlyModelsThatCanChatHereAreOffered() {
+        assertTrue(aiModelCanChat(AiProvider.OPENAI, "gpt-5-mini"))
+        assertFalse(aiModelCanChat(AiProvider.OPENAI, "text-embedding-3-small"))
+        assertFalse(aiModelCanChat(AiProvider.OPENAI, "gpt-4o-mini-tts"))
+        assertFalse(aiModelCanChat(AiProvider.GEMINI, "gemini-2.5-flash-image"))
+        assertTrue(aiModelCanChat(AiProvider.GEMINI, "gemini-flash-latest"))
+        // OpenCode serves these through other APIs, so this client cannot use them.
+        assertFalse(aiModelCanChat(AiProvider.OPENCODE_ZEN, "claude-sonnet-5"))
+        assertFalse(aiModelCanChat(AiProvider.OPENCODE_GO, "gpt-6-luna"))
+        assertTrue(aiModelCanChat(AiProvider.OPENCODE_ZEN, "big-pickle"))
+        assertTrue(aiModelCanChat(AiProvider.OPENROUTER, "anthropic/claude-haiku-5.5"))
+    }
+
+    @Test
+    fun picturesAndPdfsGoAsPartsAfterTheText() {
+        val files =
+            listOf(
+                AiAttachment("page.jpg", AiAttachmentKind.PICTURE, "data:image/jpeg;base64,AAAA"),
+                AiAttachment("lesson.pdf", AiAttachmentKind.PDF, "data:application/pdf;base64,BBBB"),
+            )
+        val body = JSONObject(chatRequestBody("gemini-flash-latest", listOf(AiWireMessage(AiRole.USER, "What is this?", files))))
+        val parts = body.getJSONArray("messages").getJSONObject(0).getJSONArray("content")
+        assertEquals(3, parts.length())
+        assertEquals("text", parts.getJSONObject(0).getString("type"))
+        assertEquals("What is this?", parts.getJSONObject(0).getString("text"))
+        assertEquals("data:image/jpeg;base64,AAAA", parts.getJSONObject(1).getJSONObject("image_url").getString("url"))
+        val pdf = parts.getJSONObject(2).getJSONObject("file")
+        assertEquals("lesson.pdf", pdf.getString("filename"))
+        assertEquals("data:application/pdf;base64,BBBB", pdf.getString("file_data"))
+        // A message without files stays plain text, which every service accepts.
+        val plain = JSONObject(chatRequestBody("m", listOf(AiWireMessage(AiRole.USER, "Hi"))))
+        assertEquals("Hi", plain.getJSONArray("messages").getJSONObject(0).getString("content"))
+    }
+
+    @Test
+    fun aModelThatCannotReadPicturesSaysSo() {
+        val refusal = "No endpoints found that support image input"
+        assertEquals(AiErrorKind.UNSUPPORTED_ATTACHMENT, aiErrorKindForStatus(404, refusal, sentAttachments = true))
+        assertEquals(
+            AiErrorKind.UNSUPPORTED_ATTACHMENT,
+            aiErrorKindForStatus(400, "Invalid content type: image_url", sentAttachments = true),
+        )
+        // Without files, or for a key or limit problem, the usual message stays.
+        assertEquals(AiErrorKind.UNKNOWN_MODEL, aiErrorKindForStatus(404, refusal))
+        assertEquals(AiErrorKind.INVALID_KEY, aiErrorKindForStatus(401, "image", sentAttachments = true))
+        assertEquals(AiErrorKind.RATE_LIMITED, aiErrorKindForStatus(429, "image", sentAttachments = true))
+    }
+
+    @Test
+    fun aSuccessfulStatusWithOnlyAnErrorIsThatError() {
+        assertEquals(429, aiReplyStatus(200, """{"error":{"code":429,"message":"Rate limit exceeded"}}"""))
+        assertEquals(502, aiReplyStatus(200, """{"error":{"message":"Provider returned error"}}"""))
+        assertEquals(200, aiReplyStatus(200, """{"choices":[{"message":{"content":"Hi"}}]}"""))
+        assertEquals(200, aiReplyStatus(200, "not json"))
+        assertEquals(404, aiReplyStatus(404, """{"error":{"code":429}}"""))
+    }
 }

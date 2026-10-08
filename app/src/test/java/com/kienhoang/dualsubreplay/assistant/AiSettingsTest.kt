@@ -53,6 +53,20 @@ class AiSettingsTest {
     }
 
     @Test
+    fun theModelListSitsNextToTheChatAddress() {
+        assertEquals("https://opencode.ai/zen/v1/models", modelsUrl(AiProvider.OPENCODE_ZEN.baseUrl).toString())
+        assertEquals("https://opencode.ai/zen/go/v1/chat/completions", chatCompletionsUrl(AiProvider.OPENCODE_GO.baseUrl).toString())
+        assertNull(modelsUrl("http://192.168.1.2:11434/v1"))
+        AiProvider.entries.forEach { provider ->
+            assertTrue(provider.name, provider.defaultModel.isEmpty() || provider.defaultModel in provider.suggestedModels)
+        }
+        assertEquals(AiThinking.AUTO, AiAssistantSettings().thinking)
+        assertNull(AiThinking.AUTO.effort)
+        assertEquals(AiThinking.HIGH, storedAiThinking("high"))
+        assertEquals(AiThinking.AUTO, storedAiThinking("bogus"))
+    }
+
+    @Test
     fun onlyPlainHttpsAddressesAreAccepted() {
         assertEquals("https://ai.example.com/v1/chat/completions", chatCompletionsUrl("https://ai.example.com/v1/").toString())
         assertEquals("https://ai.example.com/chat/completions", chatCompletionsUrl("https://ai.example.com").toString())
