@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,7 +53,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,7 +77,6 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 /** Collapsible groups that replace the old single "More settings" list. */
@@ -106,8 +102,6 @@ internal enum class MoreSettingsSection(
     /** Only in builds with the assistant ([LocalAiAssistant] is set). */
     AI_ASSISTANT("ai_assistant", R.string.settings_section_ai_title, R.string.settings_section_ai_summary),
 }
-
-private const val SECTION_EXPAND_SETTLE_MS = 350L
 
 /** Opening a section closes the one that was open, so the page stays short. */
 internal fun toggleMoreSettingsSection(
@@ -348,12 +342,10 @@ internal fun SubtitleSettingsDialog(
     onResetSettings: () -> Unit = {},
     autoPronounce: Boolean = true,
     onAutoPronounceChange: (Boolean) -> Unit = {},
-    /** The section to open and scroll to, for example from the assistant panel. */
-    initialSection: MoreSettingsSection? = null,
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
-    var openSection by remember { mutableStateOf(initialSection) }
+    var openSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
     val aiAssistant = LocalAiAssistant.current
     var showResetConfirmation by remember { mutableStateOf(false) }
     val languageDownloads = LocalLanguageDownloads.current
@@ -383,7 +375,6 @@ internal fun SubtitleSettingsDialog(
         ExpandableSettingsSection(
             section = section,
             icon = icon,
-            scrollIntoView = section == initialSection,
             expanded = openSection == section,
             onToggle = { openSection = toggleMoreSettingsSection(openSection, section) },
             content = content,
@@ -644,21 +635,12 @@ private fun ExpandableSettingsSection(
     icon: ImageVector,
     expanded: Boolean,
     onToggle: () -> Unit,
-    scrollIntoView: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val expansionState =
         stringResource(if (expanded) R.string.settings_section_expanded else R.string.settings_section_collapsed)
-    val bringIntoView = remember { BringIntoViewRequester() }
-    LaunchedEffect(scrollIntoView) {
-        if (scrollIntoView) {
-            // Let the section finish expanding first, so its whole content scrolls into view.
-            delay(SECTION_EXPAND_SETTLE_MS)
-            bringIntoView.bringIntoView()
-        }
-    }
     Surface(
-        modifier = Modifier.fillMaxWidth().bringIntoViewRequester(bringIntoView),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {

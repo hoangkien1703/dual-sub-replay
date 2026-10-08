@@ -24,8 +24,9 @@ completely in More settings.
 ## Goals
 
 - A top-right AI button in the GitHub build that opens a right-side chat panel.
-- Bring-your-own-key setup for Gemini, OpenAI, OpenRouter and a custom OpenAI-compatible
-  address, with a "Get a free key" link, a model field and "Test connection".
+- Bring-your-own-key setup for Gemini, OpenRouter, OpenAI, OpenCode Zen, OpenCode Go and a custom
+  OpenAI-compatible address, with a service picker, each service's key link, a model field and
+  "Test connection". Chat opens only after the key has answered once.
 - API keys encrypted with the Android Keystore and kept out of backups.
 - The app's current problems (translation fallback, translation stopped, caption load failure)
   shown at the top of the panel with their existing action and "Ask AI about this".
@@ -50,12 +51,20 @@ completely in More settings.
   its popup. Nothing is ever sent to an AI service.
 - **Panel:** slides in from the right over a dim background (about 88% of the width in portrait,
   420 dp at most), closes with the close button, a tap outside, or Back. The video keeps playing.
-  Top to bottom: header (History, New chat, Close); problem cards; chat; suggestion chips when the
-  chat is empty; input box with Send.
-- **No key yet:** the panel shows a setup card with the service choice, a key field, Save, a
-  "Get a free key" link (Gemini, OpenRouter) or "Get a key" (OpenAI), and a short note on what is
-  sent. More settings → AI assistant has the same controls plus model, server address (Other),
-  Test connection and chat history.
+  Top to bottom: header (History, New chat, AI settings, Close); problem cards; chat; suggestion
+  chips when the chat is empty; input box with Send. The whole panel uses the app's dark teal theme.
+- **No key yet:** the panel shows a setup card: a service picker (Google Gemini, OpenRouter,
+  OpenAI, OpenCode Zen, OpenCode Go, each with one line on what it costs), that service's three
+  steps, "Get a free key" (Gemini, OpenRouter) or "Get a key" opening the service's key page, and
+  Paste key.
+- **Key check:** a saved key opens chat only after it answers one tiny request through the chosen
+  service, address and model. Until then the panel shows "Checking your key…", why the check
+  failed with Try again and the key buttons, or a "Check key" button (a key saved by an earlier
+  build, or a new model or address). A key rejected later goes back to this card.
+- **AI settings:** the gear in the panel header opens the AI settings inside the panel, with Back
+  to return; More settings → AI assistant shows the same controls: switch, service (plus Other
+  with its HTTPS address), key (paste, type, test, remove), chat history, and the model under
+  Advanced.
 - **Problem cards:** the same title, message, diagnostic detail and action as today's popup
   ("Try Google again" / "Retry translation"), or "Subtitles couldn't load" with Retry; each has
   "Ask AI about this", which sends the problem with its English diagnostic detail.
@@ -114,7 +123,12 @@ completely in More settings.
 
 - [ ] GitHub build, AI on (default): the top-right AI button opens the panel; Back, the close
   button and a tap outside close it.
-- [ ] With no key, the panel and settings offer service, key, Save and the key link; nothing is sent.
+- [ ] With no key, the panel and settings offer the service picker, each service's steps and key
+  link, and Paste key; nothing is sent.
+- [ ] A new key, model or address must pass the key check before the input box appears; a network
+  timeout during a later check keeps an earlier pass, a rejected key does not.
+- [ ] The panel uses the app theme's colors, also where it is drawn outside `DualSubApp`.
+- [ ] The panel's gear opens the AI settings inside the panel; Back returns to the chat.
 - [ ] A saved key is stored only encrypted, shows as "ending in abcd", survives an app restart, and
   Remove deletes it. Backup rules exclude `ai_assistant_keys.xml` and `ai-chats/`.
 - [ ] Sending a question returns the provider's reply; wrong key, unknown model, no credit, rate
@@ -134,7 +148,7 @@ completely in More settings.
 | --- | --- | --- |
 | Unit tests | `testDebugUnitTest`: key store with a fake cipher, request/reply/error parsing and redaction, URL validation, request budget, history retention and JSON round trip, markdown spans, backup rules, strings in every language | Local and CI |
 | Android lint/build | `formatCheck complexityCheck lintDebug assembleDebug assembleDebugAndroidTest` pass | Local and CI |
-| Managed-device/emulator | `AiAssistantPanelUiTest`: button opens the panel, setup card without a key, problem card with "Ask AI about this", a fake reply appears, AI off shows the old icon | CI managed device |
+| Managed-device/emulator | `AiAssistantPanelUiTest`: button opens the panel, setup card and service picker without a key, a key typed in the panel's settings fails then passes its check before the input box appears, the panel background is the theme color, problem card with "Ask AI about this", a fake reply appears, AI off shows the old icon | CI managed device |
 | F-Droid | `fdroid-build` and `fdroid-device-tests` stay green; APK has no AI button | CI |
 | Physical-device/manual | Preview APK on a phone with a real Gemini (free) key: ask a question, wrong key message, test connection, history after restart | Owner, preview APK |
 | Live YouTube | Problem card during a real Google Translate fallback | Owner, opportunistic |
@@ -173,7 +187,7 @@ PR 1 of the plan, as approved:
   panel with problem cards, the setup card (Get a free key, Paste key that detects the service
   and tests the connection), the welcome chips, "Explain the current line", chat bubbles,
   retry, and history (`ui/AiAssistantPanel.kt`, `ui/AiAssistantChatParts.kt`); More settings →
-  AI assistant (`ui/AiAssistantSettings.kt`), opened directly from the panel.
+  AI assistant (`ui/AiAssistantSettings.kt`), also shown inside the panel.
 - `BuildConfig.AI_ASSISTANT` is false in the F-Droid build, so it has no view model, button, or
   section.
 - Backup rules exclude `sharedpref:ai_assistant_keys.xml` and `file:ai-chats/`.
@@ -181,8 +195,39 @@ PR 1 of the plan, as approved:
   7 other interface languages.
 - Deviations: the custom address must be HTTPS, so a local Ollama server over plain HTTP is not
   supported yet. "Reset all settings" leaves the assistant's settings, keys, and chats alone.
-  The settings-open request goes through `AiAssistantHost` rather than a new `DualSubApp`
-  parameter, to stay within the detekt limits.
+  The panel shows the AI settings itself instead of opening More settings, which keeps
+  `DualSubApp` unchanged apart from the top-right button.
+
+## Changes after the owner's first phone test (2026-10-08)
+
+The owner tried preview build 383 with a real key and reported three problems and three requests.
+
+- **Light purple panel.** `LearningPlayerRoot` draws the panel beside `DualSubApp`, outside
+  `DualSubTheme`, so Material's light defaults showed. `AiAssistantOverlay` now wraps itself in
+  `DualSubTheme`, the scrim and problem colors come from the theme, and AGENTS.md has a new "UI
+  conventions" section so later features follow the theme.
+- **Saved key never worked** ("Testing…" forever, then `InterruptedIOException` in chat). With
+  fake keys all three services answer within about 1 s from a server, so the address and request
+  are right; the 120 s whole-call timeout fired on the phone. The likely cause (inferred, not
+  reproduced) is the one the caption client already works around: OkHttp 4 tries a host's
+  addresses one by one, and on a network with a broken IPv6 route each IPv6 attempt stalls until
+  it times out, while the WebView races IPv4 and IPv6. The AI client now resolves IPv4 first
+  (`PreferIpv4Dns`, IPv6 kept as the fallback), connects within 10 s, gives the key check 30 s and a
+  question 100 s, and reports a timeout as its own message ("didn't answer in time") with the
+  exception text as detail. Keys with characters an HTTP header cannot carry are refused when
+  pasted.
+- **Chat before the key works.** Chat now opens only after the key check passes (see "Key check").
+  The passed setup (address and model) is stored next to the key in the excluded-from-backup key
+  file, so it survives restarts and a new key, model or address is checked again.
+- **Settings button in the panel**, **service picker with key links**, and **OpenCode support**:
+  as described above. OpenRouter's default model is now `openrouter/free` (free models only), so a
+  new free key works without credit; OpenCode Zen defaults to its free `big-pickle`, OpenCode Go to
+  `deepseek-v4-flash`. OpenCode only serves some models through `/chat/completions` (not its GPT,
+  Claude, Gemini or Qwen models); others fail the key check with the service's message. A plain
+  `sk-` key stays with the chosen OpenAI or OpenCode service.
+
+Next in this PR (asked for on 2026-10-08): model and thinking-level pickers under the input box,
+and sending pictures and files.
 
 ## Validation result
 

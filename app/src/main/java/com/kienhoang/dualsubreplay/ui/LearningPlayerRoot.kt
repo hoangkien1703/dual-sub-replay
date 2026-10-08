@@ -588,7 +588,6 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     fullscreen = youtubeFullscreen,
                     onTryGoogleAgain = viewModel::tryGoogleTranslationAgain,
                     onRetry = viewModel::retryCaptions,
-                    onOpenSettings = host::requestSettings,
                 )
             }
         }

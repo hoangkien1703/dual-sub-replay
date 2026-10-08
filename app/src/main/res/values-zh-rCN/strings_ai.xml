@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">问问 AI</string>
     <string name="ai_problem_ask_message">为什么会这样？我该怎么办？</string>
     <string name="ai_setup_title">连接 AI</string>
-    <string name="ai_setup_message">助手通过 AI 服务和你自己的 AI 密钥（API key）工作。获取免费密钥大约只需一分钟：</string>
     <string name="ai_setup_step_get_google">点按“获取免费密钥”，并用 Google 帐号登录。</string>
-    <string name="ai_setup_step_get">点按“获取密钥”并登录。</string>
     <string name="ai_setup_step_create">点按“Create API key”（创建 API 密钥），然后复制密钥。</string>
     <string name="ai_setup_step_paste">回到这里，点按“粘贴密钥”。</string>
     <string name="ai_setup_custom_address">请在 AI 设置中输入服务地址和密钥。</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">已保存 %1$s 密钥，结尾为 %2$s</string>
     <string name="ai_settings_remove_key">移除密钥</string>
     <string name="ai_settings_test">测试连接</string>
-    <string name="ai_settings_testing">正在测试…</string>
     <string name="ai_settings_test_passed">已连接，助手可以使用了。</string>
     <string name="ai_settings_key_label">AI 密钥（API key）</string>
     <string name="ai_settings_save_key">保存密钥</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">服务地址（https://…/v1）</string>
     <string name="ai_settings_model">模型</string>
     <string name="ai_settings_openrouter_note">名称以 :free 结尾的模型免费。</string>
+    <string name="ai_back">返回</string>
+    <string name="ai_setup_intro">助手通过 AI 服务和你自己的 AI 密钥（API key）工作。请选择一个服务：</string>
+    <string name="ai_provider_gemini_note">用 Google 帐号获取免费密钥</string>
+    <string name="ai_provider_openrouter_note">模型众多，部分免费</string>
+    <string name="ai_provider_openai_note">付费，ChatGPT 的开发者</string>
+    <string name="ai_provider_opencode_zen_note">按用量付费，有少量免费模型</string>
+    <string name="ai_provider_opencode_go_note">开放模型的月度套餐</string>
+    <string name="ai_provider_custom_note">任何兼容 OpenAI 的地址</string>
+    <string name="ai_setup_step_get_openrouter">点按“获取免费密钥”，然后登录或注册帐号。</string>
+    <string name="ai_setup_step_get_openai">点按“获取密钥”并登录。OpenAI 按用量收费，请先充值。</string>
+    <string name="ai_setup_step_get_opencode_zen">点按“获取密钥”，登录并添加付款信息。</string>
+    <string name="ai_setup_step_get_opencode_go">点按“获取密钥”，登录并订阅 OpenCode Go。</string>
+    <string name="ai_setup_step_create_openai">点按“Create new secret key”（创建新的密钥），然后复制密钥。</string>
+    <string name="ai_setup_step_create_generic">创建一个 API 密钥，然后复制它。</string>
+    <string name="ai_check_title">检查你的密钥</string>
+    <string name="ai_check_message">在你提出第一个问题前，助手会先确认密钥可用。</string>
+    <string name="ai_check_key">检查密钥</string>
+    <string name="ai_checking">正在检查你的密钥…</string>
+    <string name="ai_check_failed_title">密钥无法使用</string>
+    <string name="ai_settings_not_checked">尚未检查。聊天前请点按“测试连接”。</string>
+    <string name="ai_error_timeout">AI 服务没有及时回应。请检查网络连接后重试。</string>
 </resources>

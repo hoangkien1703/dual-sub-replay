@@ -13,11 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,20 +32,13 @@ import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiErrorKind
 import com.kienhoang.dualsubreplay.assistant.aiSubtitleLineContext
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
+import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 
 /** The assistant and the bundled app guide it reads. Null in the F-Droid build, which has no assistant. */
 internal class AiAssistantHost(
     val controller: AiAssistantController,
     val guide: () -> String,
-) {
-    /** Increases each time the panel asks to open More settings → AI assistant. */
-    var settingsRequestId by mutableLongStateOf(0L)
-        private set
-
-    fun requestSettings() {
-        settingsRequestId++
-    }
-}
+)
 
 internal val LocalAiAssistant = staticCompositionLocalOf<AiAssistantHost?> { null }
 
@@ -63,8 +55,8 @@ internal data class AppProblem(
     val mild: Boolean,
 )
 
-private val MildProblemTint = Color(0xFFFFC857)
-private val ProblemTint = Color(0xFFFFB4AB)
+/** The amber of the translation fallback notice: translation still works on the device. */
+internal val MildProblemTint = Color(0xFFFFC857)
 
 @Composable
 internal fun appProblems(
@@ -138,7 +130,7 @@ internal fun TopBarAssistantOrIssueButton(
         when {
             problems.isEmpty() -> null
             problems.all { it.mild } -> MildProblemTint
-            else -> ProblemTint
+            else -> MaterialTheme.colorScheme.error
         }
     IconButton(onClick = host.controller::openPanel, modifier = Modifier.testTag("ai_assistant_button")) {
         Box {
@@ -161,13 +153,6 @@ internal fun TopBarAssistantOrIssueButton(
     }
 }
 
-/** Calls [onOpen] each time the assistant panel asks to open More settings → AI assistant. */
-@Composable
-internal fun AiSettingsRequestEffect(onOpen: () -> Unit) {
-    val requestId = LocalAiAssistant.current?.settingsRequestId ?: 0L
-    LaunchedEffect(requestId) { if (requestId > 0L) onOpen() }
-}
-
 @StringRes
 internal fun AiErrorKind.messageRes(): Int =
     when (this) {
@@ -181,6 +166,7 @@ internal fun AiErrorKind.messageRes(): Int =
         AiErrorKind.BAD_REQUEST -> R.string.ai_error_bad_request
         AiErrorKind.SERVER -> R.string.ai_error_server
         AiErrorKind.NETWORK -> R.string.ai_error_network
+        AiErrorKind.TIMEOUT -> R.string.ai_error_timeout
         AiErrorKind.BAD_REPLY -> R.string.ai_error_bad_reply
     }
 
@@ -196,7 +182,11 @@ internal fun openExternalPage(
         false
     }
 
-/** The panel with this screen's problems, the current subtitle line, and what the app knows right now. */
+/**
+ * The panel with this screen's problems, the current subtitle line, and what the app knows right
+ * now. It sits next to [DualSubApp] rather than inside it, so it applies the app theme itself;
+ * without it, Material's light purple defaults would show.
+ */
 @Composable
 internal fun AiAssistantOverlay(
     host: AiAssistantHost,
@@ -205,8 +195,7 @@ internal fun AiAssistantOverlay(
     fullscreen: Boolean,
     onTryGoogleAgain: () -> Unit,
     onRetry: () -> Unit,
-    onOpenSettings: () -> Unit,
-) {
+) = DualSubTheme {
     // The button is not reachable in fullscreen video, so the panel does not stay over it either.
     LaunchedEffect(fullscreen) { if (fullscreen) host.controller.closePanel() }
     val locale = currentInterfaceLocale()
@@ -230,6 +219,5 @@ internal fun AiAssistantOverlay(
         problems = appProblems(state, onTryGoogleAgain, onRetry),
         snapshot = { aiAppSnapshot(state, playerMode, locale, BuildConfig.VERSION_NAME) },
         currentLineQuestion = currentLine,
-        onOpenSettings = onOpenSettings,
     )
 }

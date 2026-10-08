@@ -1,10 +1,12 @@
 package com.kienhoang.dualsubreplay.assistant
 
 import com.kienhoang.dualsubreplay.data.ResponseLimitExceededException
+import com.kienhoang.dualsubreplay.data.preferIpv4Addresses
 import com.kienhoang.dualsubreplay.data.readUtf8WithLimit
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Dns
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,14 +17,22 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.IOException
+import java.io.InterruptedIOException
+import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 internal const val MAX_AI_RESPONSE_BYTES = 1024 * 1024
-private const val AI_CONNECT_TIMEOUT_MS = 15_000L
+private const val AI_CONNECT_TIMEOUT_MS = 10_000L
+private const val AI_WRITE_TIMEOUT_MS = 15_000L
 private const val AI_READ_TIMEOUT_MS = 90_000L
-private const val AI_CALL_TIMEOUT_MS = 120_000L
+
+/** A whole question, including a slow model thinking before it answers. */
+internal const val AI_CHAT_TIMEOUT_MS = 100_000L
+
+/** The key check asks for one word, so a longer wait means the connection is not working. */
+internal const val AI_TEST_TIMEOUT_MS = 30_000L
 private const val MAX_AI_ERROR_DETAIL_CHARS = 300
 private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
@@ -38,6 +48,7 @@ internal enum class AiErrorKind {
     BAD_REQUEST,
     SERVER,
     NETWORK,
+    TIMEOUT,
     BAD_REPLY,
 }
 
@@ -66,6 +77,7 @@ internal data class AiChatRequest(
     val model: String,
     val apiKey: String,
     val messages: List<AiWireMessage>,
+    val timeoutMs: Long = AI_CHAT_TIMEOUT_MS,
 )
 
 /** Sends one chat request and returns the reply text, or throws [AiChatException]. */
@@ -150,14 +162,38 @@ internal fun aiErrorKindForStatus(
     }
 }
 
+/**
+ * A connection that failed or never answered. Every timeout is an [InterruptedIOException]
+ * (a socket timeout and the whole-call deadline alike); anything else is a network error.
+ */
+internal fun aiConnectionFailure(error: IOException): AiChatException {
+    if (error is AiChatException) return error
+    val detail = listOfNotNull(error.javaClass.simpleName, error.message?.takeIf { it.isNotBlank() }).joinToString(": ")
+    val kind = if (error is InterruptedIOException) AiErrorKind.TIMEOUT else AiErrorKind.NETWORK
+    return AiChatException(kind, redactApiKey(detail, ""), error)
+}
+
+/**
+ * Tries IPv4 addresses first, as the caption client does. OkHttp 4 tries addresses one after
+ * another, so on a network whose IPv6 route is broken every request waited until it timed out,
+ * while the browser and WebView, which race both, worked. IPv6 stays as the fallback.
+ */
+internal class PreferIpv4Dns(
+    private val system: Dns = Dns.SYSTEM,
+) : Dns {
+    override fun lookup(hostname: String): List<InetAddress> = preferIpv4Addresses(system.lookup(hostname))
+}
+
 /** The OpenAI-compatible `chat/completions` client shared by every service. */
 internal class OpenAiCompatibleTransport(
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
+            .dns(PreferIpv4Dns())
             .connectTimeout(AI_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .writeTimeout(AI_WRITE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .readTimeout(AI_READ_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-            .callTimeout(AI_CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .callTimeout(AI_CHAT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .followRedirects(false)
             .followSslRedirects(false)
             .build(),
@@ -165,14 +201,19 @@ internal class OpenAiCompatibleTransport(
     override suspend fun complete(request: AiChatRequest): String {
         val url = chatCompletionsUrl(request.baseUrl) ?: throw AiChatException(AiErrorKind.BAD_ADDRESS)
         val httpRequest =
-            Request
-                .Builder()
-                .url(url)
-                .header("Authorization", "Bearer ${request.apiKey}")
-                .header("Accept", "application/json")
-                .post(chatRequestBody(request.model, request.messages).toRequestBody(JSON_MEDIA_TYPE))
-                .build()
-        val (code, body) = execute(httpRequest)
+            try {
+                Request
+                    .Builder()
+                    .url(url)
+                    .header("Authorization", "Bearer ${request.apiKey}")
+                    .header("Accept", "application/json")
+                    .post(chatRequestBody(request.model, request.messages).toRequestBody(JSON_MEDIA_TYPE))
+                    .build()
+            } catch (error: IllegalArgumentException) {
+                // OkHttp refuses header characters outside printable ASCII; such a key cannot be valid.
+                throw AiChatException(AiErrorKind.INVALID_KEY, "The key has characters an API key cannot have.", error)
+            }
+        val (code, body) = execute(httpRequest, request.timeoutMs)
         if (code !in 200..299) {
             val message = providerErrorMessage(body)?.let { redactApiKey(it, request.apiKey) }
             throw AiChatException(aiErrorKindForStatus(code, message), message ?: "HTTP $code")
@@ -180,9 +221,13 @@ internal class OpenAiCompatibleTransport(
         return parseChatReply(body)
     }
 
-    private suspend fun execute(request: Request): Pair<Int, String> =
+    private suspend fun execute(
+        request: Request,
+        timeoutMs: Long,
+    ): Pair<Int, String> =
         suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
+            call.timeout().timeout(timeoutMs, TimeUnit.MILLISECONDS)
             continuation.invokeOnCancellation { call.cancel() }
             call.enqueue(
                 object : Callback {
@@ -191,7 +236,7 @@ internal class OpenAiCompatibleTransport(
                         error: IOException,
                     ) {
                         if (continuation.isActive) {
-                            continuation.resumeWithException(AiChatException(AiErrorKind.NETWORK, error.javaClass.simpleName, error))
+                            continuation.resumeWithException(aiConnectionFailure(error))
                         }
                     }
 

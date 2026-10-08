@@ -20,6 +20,7 @@ internal const val AI_KEYS_PREFERENCES = "ai_assistant_keys"
 
 private const val KEY_PREFIX = "key_"
 private const val HINT_PREFIX = "hint_"
+private const val CHECKED_PREFIX = "checked_"
 private const val HINT_LENGTH = 4
 
 /** Locks and unlocks small secrets. The app uses [KeystoreSecretCipher]; tests use a stand-in. */
@@ -110,7 +111,10 @@ internal sealed interface StoredAiKey {
     data object Unreadable : StoredAiKey
 }
 
-/** One API key per service, encrypted; the last 4 characters are kept apart to show which key it is. */
+/**
+ * One API key per service, encrypted; the last 4 characters are kept apart to show which key it is.
+ * Next to each key is the setup it last answered with (see [aiCheckedSetup]); a new key starts unchecked.
+ */
 internal class AiKeyStore(
     private val storage: SecretStorage,
     private val cipher: SecretCipher,
@@ -122,7 +126,13 @@ internal class AiKeyStore(
         val trimmed = apiKey.trim()
         require(trimmed.isNotEmpty())
         val sealed = Base64.getEncoder().encodeToString(cipher.encrypt(trimmed.toByteArray(Charsets.UTF_8)))
-        storage.put(mapOf(KEY_PREFIX + provider.key to sealed, HINT_PREFIX + provider.key to trimmed.takeLast(HINT_LENGTH)))
+        storage.put(
+            mapOf(
+                KEY_PREFIX + provider.key to sealed,
+                HINT_PREFIX + provider.key to trimmed.takeLast(HINT_LENGTH),
+                CHECKED_PREFIX + provider.key to "",
+            ),
+        )
     }
 
     fun load(provider: AiProvider): StoredAiKey {
@@ -142,7 +152,22 @@ internal class AiKeyStore(
     fun hint(provider: AiProvider): String? =
         storage.get(KEY_PREFIX + provider.key)?.let { storage.get(HINT_PREFIX + provider.key).orEmpty() }
 
+    /** The setup the saved key last worked with, or null when it has not been checked since it was saved. */
+    fun checkedSetup(provider: AiProvider): String? =
+        storage.get(CHECKED_PREFIX + provider.key)?.takeIf { it.isNotEmpty() && storage.get(KEY_PREFIX + provider.key) != null }
+
+    fun markChecked(
+        provider: AiProvider,
+        setup: String,
+    ) {
+        storage.put(mapOf(CHECKED_PREFIX + provider.key to setup))
+    }
+
+    fun clearChecked(provider: AiProvider) {
+        storage.remove(listOf(CHECKED_PREFIX + provider.key))
+    }
+
     fun remove(provider: AiProvider) {
-        storage.remove(listOf(KEY_PREFIX + provider.key, HINT_PREFIX + provider.key))
+        storage.remove(listOf(KEY_PREFIX + provider.key, HINT_PREFIX + provider.key, CHECKED_PREFIX + provider.key))
     }
 }

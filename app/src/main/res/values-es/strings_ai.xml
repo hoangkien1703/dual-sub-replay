@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">Preguntar a la IA</string>
     <string name="ai_problem_ask_message">¿Por qué pasó esto y qué puedo hacer?</string>
     <string name="ai_setup_title">Conectar IA</string>
-    <string name="ai_setup_message">El asistente funciona con un servicio de IA y tu propia clave de IA (API key). Conseguir una clave gratis lleva un minuto:</string>
     <string name="ai_setup_step_get_google">Toca «Conseguir clave gratis» e inicia sesión con tu cuenta de Google.</string>
-    <string name="ai_setup_step_get">Toca «Conseguir clave» e inicia sesión.</string>
     <string name="ai_setup_step_create">Toca «Create API key» (Crear clave de API) y copia la clave.</string>
     <string name="ai_setup_step_paste">Vuelve aquí y toca «Pegar clave».</string>
     <string name="ai_setup_custom_address">Escribe la dirección y la clave de tu servicio en los ajustes de IA.</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">Clave de %1$s guardada, termina en %2$s</string>
     <string name="ai_settings_remove_key">Quitar clave</string>
     <string name="ai_settings_test">Probar conexión</string>
-    <string name="ai_settings_testing">Probando…</string>
     <string name="ai_settings_test_passed">Conectado. El asistente está listo.</string>
     <string name="ai_settings_key_label">Clave de IA (API key)</string>
     <string name="ai_settings_save_key">Guardar clave</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">Dirección del servicio (https://…/v1)</string>
     <string name="ai_settings_model">Modelo</string>
     <string name="ai_settings_openrouter_note">Los modelos que terminan en :free no cuestan nada.</string>
+    <string name="ai_back">Atrás</string>
+    <string name="ai_setup_intro">El asistente funciona con un servicio de IA y tu propia clave de IA (API key). Elige un servicio:</string>
+    <string name="ai_provider_gemini_note">Clave gratis con una cuenta de Google</string>
+    <string name="ai_provider_openrouter_note">Muchos modelos, algunos gratis</string>
+    <string name="ai_provider_openai_note">De pago, de los creadores de ChatGPT</string>
+    <string name="ai_provider_opencode_zen_note">Pago por uso, con algunos modelos gratis</string>
+    <string name="ai_provider_opencode_go_note">Plan mensual para modelos abiertos</string>
+    <string name="ai_provider_custom_note">Cualquier dirección compatible con OpenAI</string>
+    <string name="ai_setup_step_get_openrouter">Toca «Conseguir clave gratis» e inicia sesión o crea una cuenta.</string>
+    <string name="ai_setup_step_get_openai">Toca «Conseguir clave» e inicia sesión. OpenAI cobra por el uso, así que añade saldo primero.</string>
+    <string name="ai_setup_step_get_opencode_zen">Toca «Conseguir clave», inicia sesión y añade tus datos de pago.</string>
+    <string name="ai_setup_step_get_opencode_go">Toca «Conseguir clave», inicia sesión y suscríbete a OpenCode Go.</string>
+    <string name="ai_setup_step_create_openai">Toca «Create new secret key» (Crear nueva clave secreta) y copia la clave.</string>
+    <string name="ai_setup_step_create_generic">Crea una clave de API y cópiala.</string>
+    <string name="ai_check_title">Comprueba tu clave</string>
+    <string name="ai_check_message">El asistente comprueba que tu clave funciona antes de tu primera pregunta.</string>
+    <string name="ai_check_key">Comprobar clave</string>
+    <string name="ai_checking">Comprobando tu clave…</string>
+    <string name="ai_check_failed_title">La clave no funcionó</string>
+    <string name="ai_settings_not_checked">Aún sin comprobar. Toca Probar conexión antes de chatear.</string>
+    <string name="ai_error_timeout">El servicio de IA no respondió a tiempo. Revisa tu conexión a internet y vuelve a intentarlo.</string>
 </resources>

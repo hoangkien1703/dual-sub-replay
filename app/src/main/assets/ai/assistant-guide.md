@@ -35,6 +35,6 @@ Where settings are (menu at the top left, then Settings):
 - More settings, Word learning: Pronounce tapped words, Word learning mode (colors words by part of speech) and which lines get colors, Tap word for definition, Highlight active sentence only.
 - More settings, Overlay & fullscreen: overlay in fullscreen or landscape, movable subtitle controls, lock overlay to video player, avoid video controls, remember dragged position, reset positions.
 - More settings, Captions & translation: Google Translate (online) switch, Natural subtitle flow & punctuation, Preload translation models, Languages on this device.
-- More settings, AI assistant: this assistant's switch, AI service, API key, model, Test connection, chat history.
+- More settings, AI assistant: this assistant's switch, AI service (Google Gemini, OpenRouter, OpenAI, OpenCode Zen, OpenCode Go, or another OpenAI-compatible address), API key, Test connection, chat history, and the model under Advanced. A new key, model or address is checked before chatting. The gear at the top of this panel opens the same settings.
 - "Reset all settings to defaults" is at the bottom of Settings.
 - The app's interface language is at the bottom of the menu at the top left.

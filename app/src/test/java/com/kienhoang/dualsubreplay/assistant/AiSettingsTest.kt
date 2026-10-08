@@ -66,10 +66,33 @@ class AiSettingsTest {
 
     @Test
     fun pastedKeysAreRecognizedByTheirStart() {
-        assertEquals(AiProvider.GEMINI, aiProviderForKey(" AIza-FAKE-test-key-for-unit-tests-rstu "))
-        assertEquals(AiProvider.OPENROUTER, aiProviderForKey("sk-or-v1-0123456789abcdef"))
-        assertEquals(AiProvider.OPENAI, aiProviderForKey("sk-proj-0123456789abcdef"))
-        assertNull(aiProviderForKey("gsk_0123456789abcdefghij"))
+        assertEquals(AiProvider.GEMINI, aiProviderForKey(" AIza-FAKE-test-key-for-unit-tests-rstu ", AiProvider.OPENAI))
+        assertEquals(AiProvider.OPENROUTER, aiProviderForKey("sk-or-v1-0123456789abcdef", AiProvider.GEMINI))
+        assertEquals(AiProvider.OPENAI, aiProviderForKey("sk-proj-0123456789abcdef", AiProvider.OPENCODE_ZEN))
+        assertEquals(AiProvider.GEMINI, aiProviderForKey("gsk_0123456789abcdefghij", AiProvider.GEMINI))
+        assertEquals(AiProvider.CUSTOM, aiProviderForKey("AIza-FAKE-test-key-for-unit-tests-rstu", AiProvider.CUSTOM))
+    }
+
+    @Test
+    fun aPlainSkKeyStaysWithOpenCodeButOtherwiseMeansOpenAi() {
+        val key = "sk-0123456789abcdefghijklmnop"
+        assertEquals(AiProvider.OPENCODE_ZEN, aiProviderForKey(key, AiProvider.OPENCODE_ZEN))
+        assertEquals(AiProvider.OPENCODE_GO, aiProviderForKey(key, AiProvider.OPENCODE_GO))
+        assertEquals(AiProvider.OPENAI, aiProviderForKey(key, AiProvider.GEMINI))
+        assertEquals(AiProvider.OPENAI, aiProviderForKey(key, AiProvider.OPENROUTER))
+    }
+
+    @Test
+    fun aCheckCoversTheAddressAndModel() {
+        val settings = AiAssistantSettings()
+        val checked = aiCheckedSetup(settings, AiProvider.GEMINI)
+        assertEquals(checked, aiCheckedSetup(settings.copy(models = mapOf(AiProvider.GEMINI to " ")), AiProvider.GEMINI))
+        assertFalse(checked == aiCheckedSetup(settings.copy(models = mapOf(AiProvider.GEMINI to "gemini-pro-latest")), AiProvider.GEMINI))
+        val custom = settings.copy(customBaseUrl = "https://a.example/v1")
+        assertFalse(
+            aiCheckedSetup(custom, AiProvider.CUSTOM) ==
+                aiCheckedSetup(custom.copy(customBaseUrl = "https://b.example/v1"), AiProvider.CUSTOM),
+        )
     }
 
     @Test
@@ -79,5 +102,8 @@ class AiSettingsTest {
         assertFalse(looksLikeAiKey("AIzaSyA123"))
         assertFalse(looksLikeAiKey("this is a sentence, not a key at all"))
         assertFalse(looksLikeAiKey(""))
+        // Invisible or non-ASCII characters copied from a web page cannot go in an HTTP header.
+        assertFalse(looksLikeAiKey("AIza-FAKE-test-key\u200B-for-unit-tests"))
+        assertFalse(looksLikeAiKey("AIza-FAKE-test-key-for-unit-tests-é"))
     }
 }

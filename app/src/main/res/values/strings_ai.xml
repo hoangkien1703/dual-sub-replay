@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">Ask AI about this</string>
     <string name="ai_problem_ask_message">Why did this happen, and what can I do?</string>
     <string name="ai_setup_title">Connect AI</string>
-    <string name="ai_setup_message">The assistant works with an AI service and your own AI key (API key). Getting a free key takes about a minute:</string>
     <string name="ai_setup_step_get_google">Tap “Get a free key” and sign in with your Google account.</string>
-    <string name="ai_setup_step_get">Tap “Get a key” and sign in.</string>
     <string name="ai_setup_step_create">Tap “Create API key”, then copy the key.</string>
     <string name="ai_setup_step_paste">Come back here and tap “Paste key”.</string>
     <string name="ai_setup_custom_address">Enter your service\'s address and key in AI settings.</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">%1$s key saved, ending in %2$s</string>
     <string name="ai_settings_remove_key">Remove key</string>
     <string name="ai_settings_test">Test connection</string>
-    <string name="ai_settings_testing">Testing…</string>
     <string name="ai_settings_test_passed">Connected. The assistant is ready.</string>
     <string name="ai_settings_key_label">AI key (API key)</string>
     <string name="ai_settings_save_key">Save key</string>
@@ -77,4 +74,27 @@
     <string name="ai_settings_base_url">Service address (https://…/v1)</string>
     <string name="ai_settings_model">Model</string>
     <string name="ai_settings_openrouter_note">Models ending in :free cost nothing.</string>
+    <string name="ai_provider_opencode_zen" translatable="false">OpenCode Zen</string>
+    <string name="ai_provider_opencode_go" translatable="false">OpenCode Go</string>
+    <string name="ai_back">Back</string>
+    <string name="ai_setup_intro">The assistant works with an AI service and your own AI key (API key). Choose a service:</string>
+    <string name="ai_provider_gemini_note">Free key with a Google account</string>
+    <string name="ai_provider_openrouter_note">Many models, some of them free</string>
+    <string name="ai_provider_openai_note">Paid, from the makers of ChatGPT</string>
+    <string name="ai_provider_opencode_zen_note">Pay as you go, with a few free models</string>
+    <string name="ai_provider_opencode_go_note">Monthly plan for open models</string>
+    <string name="ai_provider_custom_note">Any OpenAI-compatible address</string>
+    <string name="ai_setup_step_get_openrouter">Tap “Get a free key” and sign in or create an account.</string>
+    <string name="ai_setup_step_get_openai">Tap “Get a key” and sign in. OpenAI charges for use, so add credit first.</string>
+    <string name="ai_setup_step_get_opencode_zen">Tap “Get a key”, sign in and add billing details.</string>
+    <string name="ai_setup_step_get_opencode_go">Tap “Get a key”, sign in and subscribe to OpenCode Go.</string>
+    <string name="ai_setup_step_create_openai">Tap “Create new secret key”, then copy the key.</string>
+    <string name="ai_setup_step_create_generic">Create an API key, then copy it.</string>
+    <string name="ai_check_title">Check your key</string>
+    <string name="ai_check_message">The assistant makes sure your key works before your first question.</string>
+    <string name="ai_check_key">Check key</string>
+    <string name="ai_checking">Checking your key…</string>
+    <string name="ai_check_failed_title">The key didn\'t work</string>
+    <string name="ai_settings_not_checked">Not checked yet. Tap Test connection before chatting.</string>
+    <string name="ai_error_timeout">The AI service didn\'t answer in time. Check your internet connection and try again.</string>
 </resources>

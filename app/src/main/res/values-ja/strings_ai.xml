@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">AI に聞く</string>
     <string name="ai_problem_ask_message">なぜこうなったのか、どうすればよいですか?</string>
     <string name="ai_setup_title">AI をつなぐ</string>
-    <string name="ai_setup_message">アシスタントは AI サービスとあなた自身の AI キー (API キー) で動きます。無料のキーは 1 分ほどで取得できます:</string>
     <string name="ai_setup_step_get_google">「無料のキーを取得」をタップし、Google アカウントでログインします。</string>
-    <string name="ai_setup_step_get">「キーを取得」をタップしてログインします。</string>
     <string name="ai_setup_step_create">「Create API key」(API キーを作成) をタップし、キーをコピーします。</string>
     <string name="ai_setup_step_paste">ここに戻って「キーを貼り付け」をタップします。</string>
     <string name="ai_setup_custom_address">AI 設定でサービスのアドレスとキーを入力してください。</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">%1$s のキーを保存済み (末尾 %2$s)</string>
     <string name="ai_settings_remove_key">キーを削除</string>
     <string name="ai_settings_test">接続をテスト</string>
-    <string name="ai_settings_testing">テスト中…</string>
     <string name="ai_settings_test_passed">接続しました。アシスタントを使えます。</string>
     <string name="ai_settings_key_label">AI キー (API キー)</string>
     <string name="ai_settings_save_key">キーを保存</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">サービスのアドレス (https://…/v1)</string>
     <string name="ai_settings_model">モデル</string>
     <string name="ai_settings_openrouter_note">名前が :free で終わるモデルは無料です。</string>
+    <string name="ai_back">戻る</string>
+    <string name="ai_setup_intro">アシスタントは AI サービスとあなた自身の AI キー (API キー) で動きます。サービスを選んでください:</string>
+    <string name="ai_provider_gemini_note">Google アカウントで無料のキー</string>
+    <string name="ai_provider_openrouter_note">多くのモデル、一部は無料</string>
+    <string name="ai_provider_openai_note">有料、ChatGPT の開発元</string>
+    <string name="ai_provider_opencode_zen_note">使った分だけ支払い、無料モデルもあり</string>
+    <string name="ai_provider_opencode_go_note">オープンモデル向けの月額プラン</string>
+    <string name="ai_provider_custom_note">OpenAI 互換の任意のアドレス</string>
+    <string name="ai_setup_step_get_openrouter">「無料のキーを取得」をタップし、ログインするかアカウントを作成します。</string>
+    <string name="ai_setup_step_get_openai">「キーを取得」をタップしてログインします。OpenAI は有料なので、先にクレジットを追加してください。</string>
+    <string name="ai_setup_step_get_opencode_zen">「キーを取得」をタップしてログインし、支払い情報を追加します。</string>
+    <string name="ai_setup_step_get_opencode_go">「キーを取得」をタップしてログインし、OpenCode Go に登録します。</string>
+    <string name="ai_setup_step_create_openai">「Create new secret key」(新しいシークレットキーを作成) をタップし、キーをコピーします。</string>
+    <string name="ai_setup_step_create_generic">API キーを作成してコピーします。</string>
+    <string name="ai_check_title">キーを確認</string>
+    <string name="ai_check_message">最初の質問の前に、アシスタントがキーが使えるか確認します。</string>
+    <string name="ai_check_key">キーを確認</string>
+    <string name="ai_checking">キーを確認しています…</string>
+    <string name="ai_check_failed_title">キーが使えませんでした</string>
+    <string name="ai_settings_not_checked">まだ確認していません。チャットの前に「接続をテスト」をタップしてください。</string>
+    <string name="ai_error_timeout">AI サービスが時間内に応答しませんでした。インターネット接続を確認して、もう一度お試しください。</string>
 </resources>

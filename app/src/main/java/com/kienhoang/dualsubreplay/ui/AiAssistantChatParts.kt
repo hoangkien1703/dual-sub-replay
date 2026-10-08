@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -70,7 +69,7 @@ internal fun AppProblemCard(
                 Icon(
                     Icons.Default.ErrorOutline,
                     contentDescription = null,
-                    tint = if (problem.mild) Color(0xFFFFC857) else MaterialTheme.colorScheme.error,
+                    tint = if (problem.mild) MildProblemTint else MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.width(8.dp))

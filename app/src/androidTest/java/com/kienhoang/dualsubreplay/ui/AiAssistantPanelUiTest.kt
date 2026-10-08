@@ -4,8 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -17,16 +22,20 @@ import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiAssistantSettings
 import com.kienhoang.dualsubreplay.assistant.AiChat
+import com.kienhoang.dualsubreplay.assistant.AiChatException
 import com.kienhoang.dualsubreplay.assistant.AiChatRequest
 import com.kienhoang.dualsubreplay.assistant.AiChatTransport
+import com.kienhoang.dualsubreplay.assistant.AiErrorKind
 import com.kienhoang.dualsubreplay.assistant.AiHistoryStorage
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
+import com.kienhoang.dualsubreplay.assistant.aiCheckedSetup
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import com.kienhoang.dualsubreplay.ui.theme.dualSubColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,6 +54,7 @@ class AiAssistantPanelUiTest {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
     private val requests = mutableListOf<AiChatRequest>()
+    private var failure: AiChatException? = null
     private val secrets = mutableMapOf<String, String>()
     private var settings = AiAssistantSettings()
 
@@ -74,6 +84,7 @@ class AiAssistantPanelUiTest {
             transport =
                 AiChatTransport { request ->
                     requests += request
+                    failure?.let { throw it }
                     "**に** marks where you go."
                 },
             keyStore = keyStore,
@@ -110,6 +121,12 @@ class AiAssistantPanelUiTest {
     @After
     fun tearDown() = scope.cancel()
 
+    /** A key that already answered, as after a passed check. */
+    private fun checkedGeminiKey() {
+        keyStore.save(AiProvider.GEMINI, "AIza-FAKE-test-key-for-unit-tests-rstu")
+        keyStore.markChecked(AiProvider.GEMINI, aiCheckedSetup(settings, AiProvider.GEMINI))
+    }
+
     private fun showTopBarAndPanel(state: DualSubUiState = fallback) {
         composeRule.setContent {
             DualSubTheme {
@@ -117,7 +134,7 @@ class AiAssistantPanelUiTest {
                     Box(Modifier.fillMaxSize()) {
                         val problems = appProblems(state, onTryGoogleAgain = {}, onRetry = {})
                         TopBarAssistantOrIssueButton(state, problems, onTryGoogleAgain = {}, onRetry = {})
-                        AiAssistantPanel(host, problems, { snapshot }, currentLineQuestion = null, onOpenSettings = {})
+                        AiAssistantPanel(host, problems, { snapshot }, currentLineQuestion = null)
                     }
                 }
             }
@@ -136,7 +153,16 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_problem_ask").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_setup_card").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("ai_input").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_provider_gemini").assertIsSelected()
+        composeRule.onNodeWithText("Get a free key").assertExists()
         saveUiEvidence("ai_panel_setup")
+        composeRule.onNodeWithTag("ai_provider_openai").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_provider_openai").assertIsSelected()
+        composeRule.onNodeWithText("Get a key").assertExists()
+        composeRule.onNode(hasText("Create new secret key", substring = true)).assertExists()
+        assertEquals(AiProvider.OPENAI, settings.provider)
+        composeRule.onNodeWithTag("ai_provider_opencode_zen").performScrollTo().performClick()
+        assertEquals(AiProvider.OPENCODE_ZEN, settings.provider)
         composeRule.onNodeWithTag("ai_close_button").performClick()
         composeRule.onNodeWithTag("ai_panel").assertDoesNotExist()
         assertTrue(requests.isEmpty())
@@ -144,7 +170,7 @@ class AiAssistantPanelUiTest {
 
     @Test
     fun askAiAboutAProblemSendsItAndShowsTheAnswer() {
-        keyStore.save(AiProvider.GEMINI, "AIza-FAKE-test-key-for-unit-tests-rstu")
+        checkedGeminiKey()
         showTopBarAndPanel()
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
         composeRule.onNodeWithTag("ai_problem_ask").performClick()
@@ -164,7 +190,7 @@ class AiAssistantPanelUiTest {
 
     @Test
     fun aTypedQuestionGetsAnAnswer() {
-        keyStore.save(AiProvider.GEMINI, "AIza-FAKE-test-key-for-unit-tests-rstu")
+        checkedGeminiKey()
         showTopBarAndPanel(DualSubUiState())
         composeRule.onNodeWithTag("ai_assistant_problem_dot", useUnmergedTree = true).assertDoesNotExist()
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
@@ -194,6 +220,44 @@ class AiAssistantPanelUiTest {
     }
 
     @Test
+    fun aKeyAddedInThePanelSettingsIsCheckedBeforeChatOpens() {
+        failure = AiChatException(AiErrorKind.INVALID_KEY, "API key not valid.")
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_settings_button").performClick()
+        composeRule.onNodeWithTag("ai_settings_page").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_key_field").performScrollTo().performTextInput("AIza-FAKE-test-key-for-unit-tests-rstu")
+        composeRule.onNodeWithTag("ai_save_key").performClick()
+        composeRule
+            .onNodeWithTag(
+                "ai_test_result",
+            ).performScrollTo()
+            .assertTextEquals("The AI service rejected the key. Check that you copied all of it.")
+        composeRule.onNodeWithTag("ai_back_button").performClick()
+        composeRule.onNodeWithTag("ai_key_check_failed").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_input").assertDoesNotExist()
+        saveUiEvidence("ai_panel_key_failed")
+        failure = null
+        composeRule.onNodeWithTag("ai_check_key").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_input").assertIsDisplayed()
+        composeRule.onNodeWithText("How can I help?").assertIsDisplayed()
+        assertEquals(2, requests.size)
+        assertTrue(requests.all { it.messages.last().content == "OK?" })
+    }
+
+    @Test
+    fun thePanelUsesTheAppThemeEvenOutsideTheAppScreen() {
+        // LearningPlayerRoot draws the overlay beside DualSubApp, outside its theme.
+        composeRule.setContent {
+            AiAssistantOverlay(host, DualSubUiState(), PlayerExperienceMode.TRANSCRIPT_PANEL, false, onTryGoogleAgain = {}, onRetry = {})
+        }
+        composeRule.runOnIdle { controller.openPanel() }
+        val pixels = composeRule.onNodeWithTag("ai_panel").captureToImage().toPixelMap()
+        val panelBackground = pixels[pixels.width - 3, pixels.height / 2]
+        assertEquals(dualSubColorScheme(DEFAULT_APP_THEME_ACCENT_KEY).surfaceContainer.toArgb(), panelBackground.toArgb())
+    }
+
+    @Test
     fun turningTheAssistantOffBringsBackTheTranslationIcon() {
         showTopBarAndPanel()
         composeRule.onNodeWithTag("ai_assistant_button").assertIsDisplayed()
@@ -219,11 +283,12 @@ class AiAssistantPanelUiTest {
                         onFontScaleChange = {},
                         onLandscapeSplitChange = {},
                         onDismiss = {},
-                        initialSection = MoreSettingsSection.AI_ASSISTANT,
                     )
                 }
             }
         }
+        composeRule.onNodeWithTag("settings_section_ai_assistant").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_provider_openrouter").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("ai_key_field").performScrollTo().performTextInput("sk-or-v1-abcdefghijklmnopqrstuvwxyz")
         composeRule.onNodeWithTag("ai_save_key").performClick()
         composeRule.onNodeWithTag("ai_key_saved").performScrollTo().assertIsDisplayed()

@@ -60,11 +60,31 @@ class AiKeyStoreTest {
     }
 
     @Test
+    fun aKeyIsUncheckedUntilItAnswersAndANewKeyStartsUncheckedAgain() {
+        val storage = MapStorage()
+        val store = AiKeyStore(storage, FakeCipher())
+        store.save(AiProvider.GEMINI, key)
+        assertNull(store.checkedSetup(AiProvider.GEMINI))
+        store.markChecked(AiProvider.GEMINI, "setup")
+        assertEquals("setup", store.checkedSetup(AiProvider.GEMINI))
+        store.save(AiProvider.GEMINI, "AIza-FAKE-another-key-for-unit-tests")
+        assertNull(store.checkedSetup(AiProvider.GEMINI))
+        store.markChecked(AiProvider.GEMINI, "setup")
+        store.clearChecked(AiProvider.GEMINI)
+        assertNull(store.checkedSetup(AiProvider.GEMINI))
+        store.markChecked(AiProvider.GEMINI, "setup")
+        store.remove(AiProvider.GEMINI)
+        assertNull(store.checkedSetup(AiProvider.GEMINI))
+        assertTrue(storage.values.isEmpty())
+    }
+
+    @Test
     fun aKeyThePhoneCanNoLongerUnlockIsRemoved() {
         val storage = MapStorage()
         val cipher = FakeCipher()
         val store = AiKeyStore(storage, cipher)
         store.save(AiProvider.GEMINI, key)
+        store.markChecked(AiProvider.GEMINI, "setup")
         cipher.broken = true
         assertEquals(StoredAiKey.Unreadable, store.load(AiProvider.GEMINI))
         assertTrue(storage.values.isEmpty())

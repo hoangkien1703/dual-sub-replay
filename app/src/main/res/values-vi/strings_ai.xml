@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">Hỏi AI về việc này</string>
     <string name="ai_problem_ask_message">Vì sao lại xảy ra chuyện này và tôi có thể làm gì?</string>
     <string name="ai_setup_title">Kết nối AI</string>
-    <string name="ai_setup_message">Trợ lý hoạt động với một dịch vụ AI và khóa AI (API key) của riêng bạn. Lấy khóa miễn phí chỉ mất khoảng một phút:</string>
     <string name="ai_setup_step_get_google">Nhấn “Lấy khóa miễn phí” và đăng nhập bằng tài khoản Google của bạn.</string>
-    <string name="ai_setup_step_get">Nhấn “Lấy khóa” và đăng nhập.</string>
     <string name="ai_setup_step_create">Nhấn “Create API key” (Tạo khóa API), rồi sao chép khóa.</string>
     <string name="ai_setup_step_paste">Quay lại đây và nhấn “Dán khóa”.</string>
     <string name="ai_setup_custom_address">Nhập địa chỉ và khóa của dịch vụ trong Cài đặt AI.</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">Đã lưu khóa %1$s, kết thúc bằng %2$s</string>
     <string name="ai_settings_remove_key">Xóa khóa</string>
     <string name="ai_settings_test">Kiểm tra kết nối</string>
-    <string name="ai_settings_testing">Đang kiểm tra…</string>
     <string name="ai_settings_test_passed">Đã kết nối. Trợ lý đã sẵn sàng.</string>
     <string name="ai_settings_key_label">Khóa AI (API key)</string>
     <string name="ai_settings_save_key">Lưu khóa</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">Địa chỉ dịch vụ (https://…/v1)</string>
     <string name="ai_settings_model">Mô hình</string>
     <string name="ai_settings_openrouter_note">Các mô hình có đuôi :free thì miễn phí.</string>
+    <string name="ai_back">Quay lại</string>
+    <string name="ai_setup_intro">Trợ lý hoạt động với một dịch vụ AI và khóa AI (API key) của riêng bạn. Chọn một dịch vụ:</string>
+    <string name="ai_provider_gemini_note">Khóa miễn phí với tài khoản Google</string>
+    <string name="ai_provider_openrouter_note">Nhiều mô hình, có mô hình miễn phí</string>
+    <string name="ai_provider_openai_note">Trả phí, của nhà phát triển ChatGPT</string>
+    <string name="ai_provider_opencode_zen_note">Dùng bao nhiêu trả bấy nhiêu, có vài mô hình miễn phí</string>
+    <string name="ai_provider_opencode_go_note">Gói tháng cho các mô hình mở</string>
+    <string name="ai_provider_custom_note">Bất kỳ địa chỉ nào tương thích OpenAI</string>
+    <string name="ai_setup_step_get_openrouter">Nhấn “Lấy khóa miễn phí” rồi đăng nhập hoặc tạo tài khoản.</string>
+    <string name="ai_setup_step_get_openai">Nhấn “Lấy khóa” và đăng nhập. OpenAI tính phí khi dùng, nên hãy nạp tiền trước.</string>
+    <string name="ai_setup_step_get_opencode_zen">Nhấn “Lấy khóa”, đăng nhập và thêm thông tin thanh toán.</string>
+    <string name="ai_setup_step_get_opencode_go">Nhấn “Lấy khóa”, đăng nhập và đăng ký OpenCode Go.</string>
+    <string name="ai_setup_step_create_openai">Nhấn “Create new secret key” (Tạo khóa bí mật mới), rồi sao chép khóa.</string>
+    <string name="ai_setup_step_create_generic">Tạo một khóa API, rồi sao chép nó.</string>
+    <string name="ai_check_title">Kiểm tra khóa của bạn</string>
+    <string name="ai_check_message">Trợ lý sẽ kiểm tra khóa của bạn hoạt động trước câu hỏi đầu tiên.</string>
+    <string name="ai_check_key">Kiểm tra khóa</string>
+    <string name="ai_checking">Đang kiểm tra khóa…</string>
+    <string name="ai_check_failed_title">Khóa không hoạt động</string>
+    <string name="ai_settings_not_checked">Chưa kiểm tra. Hãy nhấn Kiểm tra kết nối trước khi trò chuyện.</string>
+    <string name="ai_error_timeout">Dịch vụ AI không trả lời kịp. Hãy kiểm tra kết nối Internet rồi thử lại.</string>
 </resources>

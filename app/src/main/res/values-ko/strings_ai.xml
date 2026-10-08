@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">AI에게 물어보기</string>
     <string name="ai_problem_ask_message">왜 이런 일이 생겼고 어떻게 하면 되나요?</string>
     <string name="ai_setup_title">AI 연결</string>
-    <string name="ai_setup_message">도우미는 AI 서비스와 내 AI 키(API 키)로 작동합니다. 무료 키는 1분 정도면 받을 수 있습니다:</string>
     <string name="ai_setup_step_get_google">“무료 키 받기”를 누르고 Google 계정으로 로그인하세요.</string>
-    <string name="ai_setup_step_get">“키 받기”를 누르고 로그인하세요.</string>
     <string name="ai_setup_step_create">“Create API key”(API 키 만들기)를 누른 다음 키를 복사하세요.</string>
     <string name="ai_setup_step_paste">여기로 돌아와 “키 붙여넣기”를 누르세요.</string>
     <string name="ai_setup_custom_address">AI 설정에서 서비스 주소와 키를 입력하세요.</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">%1$s 키 저장됨, 끝자리 %2$s</string>
     <string name="ai_settings_remove_key">키 삭제</string>
     <string name="ai_settings_test">연결 테스트</string>
-    <string name="ai_settings_testing">테스트 중…</string>
     <string name="ai_settings_test_passed">연결되었습니다. 도우미를 사용할 수 있습니다.</string>
     <string name="ai_settings_key_label">AI 키(API 키)</string>
     <string name="ai_settings_save_key">키 저장</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">서비스 주소(https://…/v1)</string>
     <string name="ai_settings_model">모델</string>
     <string name="ai_settings_openrouter_note">이름이 :free로 끝나는 모델은 무료입니다.</string>
+    <string name="ai_back">뒤로</string>
+    <string name="ai_setup_intro">도우미는 AI 서비스와 내 AI 키(API 키)로 작동합니다. 서비스를 선택하세요:</string>
+    <string name="ai_provider_gemini_note">Google 계정으로 받는 무료 키</string>
+    <string name="ai_provider_openrouter_note">다양한 모델, 일부는 무료</string>
+    <string name="ai_provider_openai_note">유료, ChatGPT 개발사</string>
+    <string name="ai_provider_opencode_zen_note">사용한 만큼 결제, 일부 무료 모델</string>
+    <string name="ai_provider_opencode_go_note">오픈 모델용 월간 요금제</string>
+    <string name="ai_provider_custom_note">OpenAI 호환 주소 아무거나</string>
+    <string name="ai_setup_step_get_openrouter">“무료 키 받기”를 누르고 로그인하거나 계정을 만드세요.</string>
+    <string name="ai_setup_step_get_openai">“키 받기”를 누르고 로그인하세요. OpenAI는 유료이므로 먼저 크레딧을 충전하세요.</string>
+    <string name="ai_setup_step_get_opencode_zen">“키 받기”를 누르고 로그인한 다음 결제 정보를 추가하세요.</string>
+    <string name="ai_setup_step_get_opencode_go">“키 받기”를 누르고 로그인한 다음 OpenCode Go를 구독하세요.</string>
+    <string name="ai_setup_step_create_openai">“Create new secret key”(새 비밀 키 만들기)를 누른 다음 키를 복사하세요.</string>
+    <string name="ai_setup_step_create_generic">API 키를 만든 다음 복사하세요.</string>
+    <string name="ai_check_title">키 확인</string>
+    <string name="ai_check_message">첫 질문 전에 도우미가 키가 작동하는지 확인합니다.</string>
+    <string name="ai_check_key">키 확인</string>
+    <string name="ai_checking">키를 확인하는 중…</string>
+    <string name="ai_check_failed_title">키가 작동하지 않았습니다</string>
+    <string name="ai_settings_not_checked">아직 확인하지 않았습니다. 채팅 전에 연결 테스트를 누르세요.</string>
+    <string name="ai_error_timeout">AI 서비스가 제때 응답하지 않았습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
 </resources>

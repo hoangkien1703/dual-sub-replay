@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,12 +27,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +52,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,6 +61,7 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiAssistantController
 import com.kienhoang.dualsubreplay.assistant.AiAssistantUiState
+import com.kienhoang.dualsubreplay.assistant.AiPanelPage
 import com.kienhoang.dualsubreplay.assistant.ChatHistoryRetention
 import com.kienhoang.dualsubreplay.assistant.aiProblemContext
 import com.kienhoang.dualsubreplay.assistant.aiSystemPrompt
@@ -73,7 +78,8 @@ internal data class AiQuickQuestion(
 
 /**
  * The assistant panel: slides in from the right over a dim background. Problems come first,
- * then the setup card (no key yet) or the chat. Back closes the history list, then the panel.
+ * then the setup or key-check card, or the chat. The gear opens the AI settings inside the panel;
+ * Back returns from settings or history, then closes the panel.
  */
 @Composable
 internal fun AiAssistantPanel(
@@ -81,18 +87,17 @@ internal fun AiAssistantPanel(
     problems: List<AppProblem>,
     snapshot: () -> AiAppSnapshot,
     currentLineQuestion: AiQuickQuestion?,
-    onOpenSettings: () -> Unit,
 ) {
     val controller = host.controller
     val aiState by controller.state.collectAsStateWithLifecycle()
     val open = aiState.panelOpen && aiState.settings.enabled
     val systemPrompt = { aiSystemPrompt(host.guide(), snapshot()) }
-    BackHandler(open) { if (aiState.showingHistory) controller.showHistory(false) else controller.closePanel() }
+    BackHandler(open) { if (aiState.page != AiPanelPage.CHAT) controller.showPage(AiPanelPage.CHAT) else controller.closePanel() }
     AnimatedVisibility(visible = open, enter = fadeIn(), exit = fadeOut()) {
         Box(
             Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f))
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f))
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = controller::closePanel)
                 .testTag("ai_panel_scrim"),
         )
@@ -112,28 +117,38 @@ internal fun AiAssistantPanel(
                 shadowElevation = 12.dp,
             ) {
                 Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding()) {
-                    AiPanelHeader(aiState, onHistory = {
-                        controller.showHistory(!aiState.showingHistory)
-                    }, onNewChat = controller::newChat, onClose = controller::closePanel)
-                    if (aiState.showingHistory) {
-                        AiChatHistoryList(
-                            aiState.savedChats,
-                            onOpen = controller::openChat,
-                            onDelete = controller::deleteChat,
-                            modifier = Modifier.weight(1f),
-                        )
-                    } else {
-                        AiChatContent(
-                            aiState = aiState,
-                            controller = controller,
-                            problems = problems,
-                            currentLineQuestion = currentLineQuestion,
-                            onAsk = { question -> controller.send(question.text, systemPrompt(), question.context, question.contextLabel) },
-                            onRetry = { controller.retry(systemPrompt()) },
-                            onOpenSettings = onOpenSettings,
-                            modifier = Modifier.weight(1f),
-                        )
-                        if (aiState.ready) AiInputRow(sending = aiState.sending, onSend = { controller.send(it, systemPrompt()) })
+                    AiPanelHeader(aiState, controller)
+                    when (aiState.page) {
+                        AiPanelPage.HISTORY ->
+                            AiChatHistoryList(
+                                aiState.savedChats,
+                                onOpen = controller::openChat,
+                                onDelete = controller::deleteChat,
+                                modifier = Modifier.weight(1f),
+                            )
+                        AiPanelPage.SETTINGS ->
+                            Column(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .verticalScroll(rememberScrollState())
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .testTag("ai_settings_page"),
+                            ) { AiAssistantSettingsSection(host) }
+                        AiPanelPage.CHAT -> {
+                            AiChatContent(
+                                aiState = aiState,
+                                controller = controller,
+                                problems = problems,
+                                currentLineQuestion = currentLineQuestion,
+                                onAsk = { question ->
+                                    controller.send(question.text, systemPrompt(), question.context, question.contextLabel)
+                                },
+                                onRetry = { controller.retry(systemPrompt()) },
+                                modifier = Modifier.weight(1f),
+                            )
+                            if (aiState.ready) AiInputRow(sending = aiState.sending, onSend = { controller.send(it, systemPrompt()) })
+                        }
                     }
                 }
             }
@@ -141,30 +156,48 @@ internal fun AiAssistantPanel(
     }
 }
 
+/** The chat page shows history, new chat and settings; the other pages show Back and their title. */
 @Composable
 private fun AiPanelHeader(
     aiState: AiAssistantUiState,
-    onHistory: () -> Unit,
-    onNewChat: () -> Unit,
-    onClose: () -> Unit,
+    controller: AiAssistantController,
 ) {
-    Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    val page = aiState.page
+    Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (page == AiPanelPage.CHAT) {
+            Spacer(Modifier.width(12.dp))
+        } else {
+            IconButton(onClick = { controller.showPage(AiPanelPage.CHAT) }, modifier = Modifier.testTag("ai_back_button")) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ai_back))
+            }
+        }
         Text(
-            stringResource(if (aiState.showingHistory) R.string.ai_history else R.string.ai_panel_title),
+            stringResource(
+                when (page) {
+                    AiPanelPage.CHAT -> R.string.ai_panel_title
+                    AiPanelPage.HISTORY -> R.string.ai_history
+                    AiPanelPage.SETTINGS -> R.string.ai_open_settings
+                },
+            ),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (aiState.settings.historyRetention != ChatHistoryRetention.OFF) {
-            IconButton(onClick = onHistory, modifier = Modifier.testTag("ai_history_button")) {
-                Icon(Icons.Default.History, contentDescription = stringResource(R.string.ai_history))
+        if (page == AiPanelPage.CHAT) {
+            if (aiState.settings.historyRetention != ChatHistoryRetention.OFF) {
+                IconButton(onClick = { controller.showPage(AiPanelPage.HISTORY) }, modifier = Modifier.testTag("ai_history_button")) {
+                    Icon(Icons.Default.History, contentDescription = stringResource(R.string.ai_history))
+                }
+            }
+            IconButton(onClick = controller::newChat, enabled = aiState.chat != null, modifier = Modifier.testTag("ai_new_chat_button")) {
+                Icon(Icons.Default.AddComment, contentDescription = stringResource(R.string.ai_new_chat))
+            }
+            IconButton(onClick = { controller.showPage(AiPanelPage.SETTINGS) }, modifier = Modifier.testTag("ai_settings_button")) {
+                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.ai_open_settings))
             }
         }
-        IconButton(onClick = onNewChat, enabled = aiState.chat != null, modifier = Modifier.testTag("ai_new_chat_button")) {
-            Icon(Icons.Default.AddComment, contentDescription = stringResource(R.string.ai_new_chat))
-        }
-        IconButton(onClick = onClose, modifier = Modifier.testTag("ai_close_button")) {
+        IconButton(onClick = controller::closePanel, modifier = Modifier.testTag("ai_close_button")) {
             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.ai_panel_close))
         }
     }
@@ -178,7 +211,6 @@ private fun AiChatContent(
     currentLineQuestion: AiQuickQuestion?,
     onAsk: (AiQuickQuestion) -> Unit,
     onRetry: () -> Unit,
-    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -206,7 +238,7 @@ private fun AiChatContent(
             )
         }
         if (!aiState.ready) {
-            item(key = "setup") { AiSetupCard(aiState, controller, onOpenSettings) }
+            item(key = "setup") { AiConnectCard(aiState, controller) { controller.showPage(AiPanelPage.SETTINGS) } }
         } else if (messages.isEmpty()) {
             item(key = "welcome") { AiWelcome(currentLineQuestion, enabled = !aiState.sending, onAsk = onAsk) }
         }

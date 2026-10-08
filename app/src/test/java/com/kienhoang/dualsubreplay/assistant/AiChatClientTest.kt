@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import okhttp3.Dns
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -7,6 +8,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import java.io.IOException
+import java.io.InterruptedIOException
+import java.net.InetAddress
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class AiChatClientTest {
     @Test
@@ -83,5 +89,31 @@ class AiChatClientTest {
         assertEquals(AiErrorKind.UNKNOWN_MODEL, aiErrorKindForStatus(400, "models/foo is not found"))
         assertEquals(AiErrorKind.BAD_REQUEST, aiErrorKindForStatus(400, "Bad input"))
         assertEquals(AiErrorKind.SERVER, aiErrorKindForStatus(503, null))
+    }
+
+    @Test
+    fun timeoutsAreToldApartFromOtherNetworkErrors() {
+        // OkHttp's whole-call deadline throws InterruptedIOException("timeout"); a socket timeout is a subclass.
+        assertEquals(AiErrorKind.TIMEOUT, aiConnectionFailure(InterruptedIOException("timeout")).kind)
+        assertEquals(AiErrorKind.TIMEOUT, aiConnectionFailure(SocketTimeoutException("Read timed out")).kind)
+        val offline = aiConnectionFailure(UnknownHostException("Unable to resolve host \"api.openai.com\""))
+        assertEquals(AiErrorKind.NETWORK, offline.kind)
+        assertEquals("UnknownHostException: Unable to resolve host \"api.openai.com\"", offline.detail)
+        assertEquals("IOException", aiConnectionFailure(IOException()).detail)
+        val known = AiChatException(AiErrorKind.BAD_REPLY)
+        assertTrue(known === aiConnectionFailure(known))
+    }
+
+    @Test
+    fun ipv4AddressesAreTriedFirst() {
+        val ipv6 = InetAddress.getByName("2001:db8::1")
+        val ipv4 = InetAddress.getByName("192.0.2.1")
+        val dns =
+            PreferIpv4Dns(
+                object : Dns {
+                    override fun lookup(hostname: String) = listOf(ipv6, ipv4)
+                },
+            )
+        assertEquals(listOf(ipv4, ipv6), dns.lookup("generativelanguage.googleapis.com"))
     }
 }

@@ -83,6 +83,12 @@ class AiAssistantControllerTest {
         daysAgo: Int,
     ) = AiChat(id, now - daysAgo * day, now - daysAgo * day, listOf(AiChatMessage("$id-q", AiRole.USER, "q", now - daysAgo * day)))
 
+    /** A Gemini key that already answered through the current settings, as after a passed check. */
+    private fun checkedGeminiKey() {
+        keyStore.save(AiProvider.GEMINI, geminiKey)
+        keyStore.markChecked(AiProvider.GEMINI, aiCheckedSetup(settings.value, AiProvider.GEMINI))
+    }
+
     @After
     fun tearDown() = scope.cancel()
 
@@ -91,12 +97,95 @@ class AiAssistantControllerTest {
         val controller = controller()
         assertFalse(controller.state.value.ready)
         controller.send("What does に mean?", "guide")
-        assertEquals(
-            AiErrorKind.NO_KEY,
-            controller.state.value.failure
-                ?.kind,
+        assertTrue(
+            controller.state.value.messages
+                .isEmpty(),
         )
         assertTrue(transport.requests.isEmpty())
+    }
+
+    @Test
+    fun aKeyThatHasNotAnsweredYetCannotChatUntilItsCheckPasses() {
+        keyStore.save(AiProvider.GEMINI, geminiKey)
+        val controller = controller()
+        assertTrue(controller.state.value.hasKey)
+        assertFalse(controller.state.value.ready)
+        controller.send("Hi", "guide")
+        assertTrue(transport.requests.isEmpty())
+        controller.testConnection()
+        assertTrue(controller.state.value.ready)
+        assertEquals(AI_TEST_TIMEOUT_MS, transport.requests.single().timeoutMs)
+        controller.send("Hi", "guide")
+        assertEquals(AI_CHAT_TIMEOUT_MS, transport.requests.last().timeoutMs)
+        assertEquals(2, controller.state.value.messages.size)
+    }
+
+    @Test
+    fun aPassedCheckIsRememberedAfterARestart() {
+        controller().saveKey(geminiKey)
+        assertEquals(aiCheckedSetup(settings.value, AiProvider.GEMINI), keyStore.checkedSetup(AiProvider.GEMINI))
+        assertTrue(controller().state.value.ready)
+        assertEquals(1, transport.requests.size)
+    }
+
+    @Test
+    fun aFailedCheckKeepsChatClosedAndSaysWhy() {
+        transport.failure = AiChatException(AiErrorKind.TIMEOUT, "InterruptedIOException: timeout")
+        val controller = controller()
+        controller.saveKey(geminiKey)
+        val state = controller.state.value
+        assertFalse(state.ready)
+        assertEquals(AiConnectionTest.Failed(AiFailure(AiErrorKind.TIMEOUT, "InterruptedIOException: timeout")), state.connectionTest)
+        transport.failure = null
+        controller.testConnection()
+        assertTrue(controller.state.value.ready)
+    }
+
+    @Test
+    fun aNewModelIsCheckedAgainButANetworkHiccupKeepsAnEarlierPass() {
+        checkedGeminiKey()
+        val controller = controller()
+        assertTrue(controller.state.value.ready)
+        transport.failure = AiChatException(AiErrorKind.TIMEOUT)
+        controller.testConnection()
+        assertTrue(controller.state.value.ready)
+        transport.failure = null
+        controller.setModel(AiProvider.GEMINI, "gemini-pro-latest")
+        assertFalse(controller.state.value.ready)
+        assertEquals(AiConnectionTest.Idle, controller.state.value.connectionTest)
+        controller.testConnection()
+        assertTrue(controller.state.value.ready)
+        assertEquals("gemini-pro-latest", transport.requests.last().model)
+        transport.failure = AiChatException(AiErrorKind.UNKNOWN_MODEL)
+        controller.testConnection()
+        assertFalse(controller.state.value.ready)
+        assertNull(keyStore.checkedSetup(AiProvider.GEMINI))
+    }
+
+    @Test
+    fun aKeyRejectedDuringChatGoesBackToTheCheck() {
+        checkedGeminiKey()
+        val controller = controller()
+        transport.failure = AiChatException(AiErrorKind.INVALID_KEY, "API key expired.")
+        controller.send("Hi", "guide")
+        val state = controller.state.value
+        assertFalse(state.ready)
+        assertTrue(state.hasKey)
+        assertEquals(AiConnectionTest.Failed(AiFailure(AiErrorKind.INVALID_KEY, "API key expired.")), state.connectionTest)
+        assertNull(keyStore.checkedSetup(AiProvider.GEMINI))
+    }
+
+    @Test
+    fun choosingAServiceInThePickerKeepsItsOwnKeyAndCheck() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.selectProvider(AiProvider.OPENCODE_ZEN)
+        assertFalse(controller.state.value.hasKey)
+        assertEquals(AiProvider.OPENCODE_ZEN, controller.saveKey("sk-0123456789abcdefghijklmnop"))
+        assertEquals(AiProvider.OPENCODE_ZEN.baseUrl, transport.requests.last().baseUrl)
+        assertEquals("big-pickle", transport.requests.last().model)
+        controller.selectProvider(AiProvider.GEMINI)
+        assertTrue(controller.state.value.ready)
     }
 
     @Test
@@ -108,6 +197,7 @@ class AiAssistantControllerTest {
         assertEquals(AiProvider.GEMINI, state.settings.provider)
         assertEquals(AiProvider.GEMINI, settings.value.provider)
         assertEquals(mapOf(AiProvider.GEMINI to "rstu"), state.keyHints)
+        assertTrue(state.keyChecked)
         assertTrue(state.ready)
         assertEquals(AiConnectionTest.Passed, state.connectionTest)
         val test = transport.requests.single()
@@ -146,11 +236,12 @@ class AiAssistantControllerTest {
             AiConnectionTest.Failed(AiFailure(AiErrorKind.INVALID_KEY, "API key not valid.")),
             controller.state.value.connectionTest,
         )
+        assertFalse(controller.state.value.ready)
     }
 
     @Test
     fun aQuestionGetsAnAnswerAndTheChatIsSaved() {
-        keyStore.save(AiProvider.GEMINI, geminiKey)
+        checkedGeminiKey()
         val controller = controller()
         transport.reply = "It marks the target."
         controller.send("  What does に mean?  ", "guide", context = "line: 学校に行く", contextLabel = "Current line")
@@ -170,7 +261,7 @@ class AiAssistantControllerTest {
 
     @Test
     fun aFailureKeepsTheQuestionAndRetryAsksAgain() {
-        keyStore.save(AiProvider.GEMINI, geminiKey)
+        checkedGeminiKey()
         val controller = controller()
         transport.failure = AiChatException(AiErrorKind.RATE_LIMITED)
         controller.send("Why?", "guide")
@@ -193,7 +284,7 @@ class AiAssistantControllerTest {
 
     @Test
     fun oneQuestionAtATimeAndTurningOffCancelsIt() {
-        keyStore.save(AiProvider.GEMINI, geminiKey)
+        checkedGeminiKey()
         val controller = controller()
         controller.openPanel()
         transport.pending = CompletableDeferred()
@@ -219,6 +310,7 @@ class AiAssistantControllerTest {
         val cipher = FakeCipher()
         val store = AiKeyStore(secrets, cipher)
         store.save(AiProvider.GEMINI, geminiKey)
+        store.markChecked(AiProvider.GEMINI, aiCheckedSetup(settings.value, AiProvider.GEMINI))
         val controller =
             AiAssistantController(scope, transport, store, settings, history, Dispatchers.Unconfined, { now }, { "id${ids++}" })
         assertTrue(controller.state.value.hasKey)
@@ -230,6 +322,7 @@ class AiAssistantControllerTest {
                 ?.kind,
         )
         assertFalse(controller.state.value.hasKey)
+        assertFalse(controller.state.value.ready)
         assertTrue(transport.requests.isEmpty())
     }
 
@@ -265,7 +358,7 @@ class AiAssistantControllerTest {
     @Test
     fun withHistoryOffTheOpenChatStaysButNothingIsWritten() {
         settings.value = AiAssistantSettings(historyRetention = ChatHistoryRetention.OFF)
-        keyStore.save(AiProvider.GEMINI, geminiKey)
+        checkedGeminiKey()
         val controller = controller()
         controller.send("Hi", "guide")
         assertEquals(2, controller.state.value.messages.size)
@@ -281,14 +374,14 @@ class AiAssistantControllerTest {
         settings.value = AiAssistantSettings(historyRetention = ChatHistoryRetention.FOREVER)
         history.chats = listOf(savedChat("a", 1), savedChat("b", 2))
         val controller = controller()
-        controller.showHistory(true)
+        controller.showPage(AiPanelPage.HISTORY)
         controller.openChat("b")
         assertEquals(
             "b",
             controller.state.value.chat
                 ?.id,
         )
-        assertFalse(controller.state.value.showingHistory)
+        assertEquals(AiPanelPage.CHAT, controller.state.value.page)
         controller.deleteChat("b")
         assertNull(controller.state.value.chat)
         assertEquals(listOf("a"), history.chats.map { it.id })
@@ -302,11 +395,13 @@ class AiAssistantControllerTest {
 
     @Test
     fun removingAKeyForgetsIt() {
-        keyStore.save(AiProvider.GEMINI, geminiKey)
+        checkedGeminiKey()
         val controller = controller()
         controller.removeKey(AiProvider.GEMINI)
         assertFalse(controller.state.value.hasKey)
+        assertFalse(controller.state.value.ready)
         assertEquals(StoredAiKey.Missing, keyStore.load(AiProvider.GEMINI))
+        assertNull(keyStore.checkedSetup(AiProvider.GEMINI))
     }
 
     @Test

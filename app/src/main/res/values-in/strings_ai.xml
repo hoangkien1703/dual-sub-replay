@@ -25,9 +25,7 @@
     <string name="ai_problem_ask">Tanya AI tentang ini</string>
     <string name="ai_problem_ask_message">Kenapa ini terjadi, dan apa yang bisa saya lakukan?</string>
     <string name="ai_setup_title">Hubungkan AI</string>
-    <string name="ai_setup_message">Asisten bekerja dengan layanan AI dan kunci AI (API key) milik Anda sendiri. Mendapatkan kunci gratis hanya butuh sekitar satu menit:</string>
     <string name="ai_setup_step_get_google">Ketuk “Dapatkan kunci gratis” lalu masuk dengan akun Google Anda.</string>
-    <string name="ai_setup_step_get">Ketuk “Dapatkan kunci” lalu masuk.</string>
     <string name="ai_setup_step_create">Ketuk “Create API key” (Buat kunci API), lalu salin kuncinya.</string>
     <string name="ai_setup_step_paste">Kembali ke sini dan ketuk “Tempel kunci”.</string>
     <string name="ai_setup_custom_address">Masukkan alamat dan kunci layanan Anda di setelan AI.</string>
@@ -54,7 +52,6 @@
     <string name="ai_settings_key_saved">Kunci %1$s tersimpan, berakhiran %2$s</string>
     <string name="ai_settings_remove_key">Hapus kunci</string>
     <string name="ai_settings_test">Uji koneksi</string>
-    <string name="ai_settings_testing">Menguji…</string>
     <string name="ai_settings_test_passed">Terhubung. Asisten siap digunakan.</string>
     <string name="ai_settings_key_label">Kunci AI (API key)</string>
     <string name="ai_settings_save_key">Simpan kunci</string>
@@ -74,4 +71,25 @@
     <string name="ai_settings_base_url">Alamat layanan (https://…/v1)</string>
     <string name="ai_settings_model">Model</string>
     <string name="ai_settings_openrouter_note">Model yang berakhiran :free gratis.</string>
+    <string name="ai_back">Kembali</string>
+    <string name="ai_setup_intro">Asisten bekerja dengan layanan AI dan kunci AI (API key) milik Anda sendiri. Pilih layanan:</string>
+    <string name="ai_provider_gemini_note">Kunci gratis dengan akun Google</string>
+    <string name="ai_provider_openrouter_note">Banyak model, sebagian gratis</string>
+    <string name="ai_provider_openai_note">Berbayar, dari pembuat ChatGPT</string>
+    <string name="ai_provider_opencode_zen_note">Bayar sesuai pemakaian, ada beberapa model gratis</string>
+    <string name="ai_provider_opencode_go_note">Paket bulanan untuk model terbuka</string>
+    <string name="ai_provider_custom_note">Alamat apa pun yang kompatibel dengan OpenAI</string>
+    <string name="ai_setup_step_get_openrouter">Ketuk “Dapatkan kunci gratis” lalu masuk atau buat akun.</string>
+    <string name="ai_setup_step_get_openai">Ketuk “Dapatkan kunci” lalu masuk. OpenAI berbayar, jadi isi saldo terlebih dahulu.</string>
+    <string name="ai_setup_step_get_opencode_zen">Ketuk “Dapatkan kunci”, masuk, lalu tambahkan detail pembayaran.</string>
+    <string name="ai_setup_step_get_opencode_go">Ketuk “Dapatkan kunci”, masuk, lalu berlangganan OpenCode Go.</string>
+    <string name="ai_setup_step_create_openai">Ketuk “Create new secret key” (Buat kunci rahasia baru), lalu salin kuncinya.</string>
+    <string name="ai_setup_step_create_generic">Buat kunci API, lalu salin.</string>
+    <string name="ai_check_title">Periksa kunci Anda</string>
+    <string name="ai_check_message">Asisten memastikan kunci Anda berfungsi sebelum pertanyaan pertama.</string>
+    <string name="ai_check_key">Periksa kunci</string>
+    <string name="ai_checking">Memeriksa kunci Anda…</string>
+    <string name="ai_check_failed_title">Kunci tidak berfungsi</string>
+    <string name="ai_settings_not_checked">Belum diperiksa. Ketuk Uji koneksi sebelum mengobrol.</string>
+    <string name="ai_error_timeout">Layanan AI tidak menjawab tepat waktu. Periksa koneksi internet Anda lalu coba lagi.</string>
 </resources>

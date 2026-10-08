@@ -102,3 +102,12 @@ internal fun chatCompletionsUrl(baseUrl: String): HttpUrl? {
         .apply { (segments + listOf("chat", "completions")).forEach(::addPathSegment) }
         .build()
 }
+
+/**
+ * What a key check covers: the address and the model it answered through. A key counts as checked
+ * only while both stay the same, so a new model or address is checked again before chatting.
+ */
+internal fun aiCheckedSetup(
+    settings: AiAssistantSettings,
+    provider: AiProvider,
+): String = settings.baseUrlFor(provider) + "\n" + settings.modelFor(provider)

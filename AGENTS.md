@@ -56,6 +56,12 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - User-visible text lives in `app/src/main/res/values/strings_<area>.xml` (English, the default) with the same file in every translated `values-*` folder; never add a UI string literal in Kotlin. The offered interface languages are `APP_LANGUAGES` in `ui/AppLanguage.kt` and `res/xml/locales_config.xml`; with no saved choice the app follows the device. `AppLanguageTest` and lint `MissingTranslation` fail when a language lacks a string or a placeholder differs. Diagnostic exception text in `data/` and `translation/` stays English. See the [interface languages spec](docs/specs/2026-10-02-app-interface-languages.md).
 - First-launch flow is `LanguageSetupScreen` → `GuideScreen` → main experience. Preserve the guide migration behavior: if `guide_completed` is absent, users who already completed onboarding are treated as guide-complete, while brand-new users see the guide. Do not simplify this to `getBoolean("guide_completed", false)` or existing users will see the guide after upgrading.
 
+## UI conventions
+
+- Every screen, panel, dialog, sheet and overlay uses the app theme: `DualSubTheme` (dark teal with the user's accent, `ui/theme/Theme.kt`). UI drawn outside `DualSubApp`, such as overlays that `LearningPlayerRoot` places beside it, wraps itself in `DualSubTheme`; otherwise Material's light purple defaults show (`AiAssistantPanelUiTest` checks the assistant panel's color).
+- Take colors from `MaterialTheme.colorScheme` roles, never from Material's defaults or new hex literals. If a component needs a role that `dualSubColorScheme` leaves at Material's purple default (for example `tertiary`), set that role in `Theme.kt` instead of coloring the component directly. The amber/red problem tints in `OnlineTranslationNotice.kt` and `AiAssistantUi.kt` are the only shared status colors.
+- Before handing off a UI change, look at it in the screenshots the Compose tests save (`saveUiEvidence`) or on a device, and check that it matches the screens around it.
+
 ## Testing conventions
 
 - Unit tests are plain JUnit4 — no Robolectric or mocking library. They call `internal` top-level functions directly (same package), so keep new logic in small testable `internal` functions. `org.json` is a unit-test-only dependency.
