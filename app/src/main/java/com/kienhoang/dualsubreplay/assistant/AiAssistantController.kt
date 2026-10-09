@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
@@ -31,11 +33,38 @@ internal interface AiHistoryStorage {
     fun clear()
 }
 
+/** Where memories and instructions live; [AiMemoryStore] in the app. */
+internal interface AiMemoryStorage {
+    fun load(): AiMemoryData
+
+    fun save(data: AiMemoryData)
+}
+
+/** Keeps memory only while the app runs; for tests and previews. */
+internal class InMemoryAiMemoryStorage(
+    var data: AiMemoryData = AiMemoryData(),
+) : AiMemoryStorage {
+    override fun load() = data
+
+    override fun save(data: AiMemoryData) {
+        this.data = data
+    }
+}
+
+/** Memory changes from the assistant's actions and their Undo; [AiAssistantController] in the app. */
+internal interface AiMemoryKeeper {
+    /** Why [action] cannot change memory now, in English, or null. */
+    fun memoryRefusal(action: AiAction): String?
+
+    fun changeMemory(action: AiAction): AiMemoryChange
+}
+
 private class LoadedAiState(
     val settings: AiAssistantSettings,
     val keyHints: Map<AiProvider, String>,
     val checkedSetups: Map<AiProvider, String>,
     val savedChats: List<AiChat>,
+    val memory: AiMemoryData,
 )
 
 internal data class AiFailure(
@@ -63,6 +92,9 @@ internal enum class AiPanelPage {
 
     /** Every model the service offers, with search. */
     MODELS,
+
+    /** Saved memories, the instructions box and the Use memory switch. */
+    MEMORY,
 }
 
 /** A model chosen in the model menu, tried before the chat switches to it. */
@@ -149,6 +181,9 @@ internal data class AiAssistantUiState(
     val modelList: AiModelList = AiModelList.Idle,
     /** Pictures and files chosen for the next question. */
     val draftAttachments: List<AiAttachment> = emptyList(),
+    val memory: AiMemoryData = AiMemoryData(),
+    /** Whether the next new chat reads and saves memories; the open chat keeps its own choice. */
+    val newChatMemory: Boolean = true,
 ) {
     val hasKey: Boolean get() = settings.provider in keyHints
     val messages: List<AiChatMessage> get() = chat?.messages.orEmpty()
@@ -161,6 +196,9 @@ internal data class AiAssistantUiState(
     /** The assistant can be asked: on, with a key that has answered through the current setup. */
     val ready: Boolean
         get() = settings.enabled && keyChecked && addressValid
+
+    /** Whether the open chat, or the next new one, reads and saves memories. */
+    val memoryUse: AiMemoryUse get() = aiMemoryUse(settings.memoryEnabled, chat?.memory ?: newChatMemory)
 }
 
 /**
@@ -179,7 +217,8 @@ internal class AiAssistantController(
     private val modelLister: AiModelLister = AiModelLister { _, _ -> emptyList() },
     /** Waits before asking a busy service again; each entry is one more try. */
     private val busyRetryDelaysMs: List<Long> = AI_BUSY_RETRY_DELAYS_MS,
-) {
+    private val memoryStorage: AiMemoryStorage = InMemoryAiMemoryStorage(),
+) : AiMemoryKeeper {
     private val _state = MutableStateFlow(AiAssistantUiState())
     val state: StateFlow<AiAssistantUiState> = _state.asStateFlow()
     private var sendJob: Job? = null
@@ -200,6 +239,9 @@ internal class AiAssistantController(
     /** Changes with every saved or removed key, so a check that was already running cannot count for a new key. */
     @Volatile private var keyGeneration = 0
 
+    /** One memory write at a time, each writing the newest memory, so an older one never lands last. */
+    private val memoryWrites = Mutex()
+
     init {
         scope.launch {
             val loaded =
@@ -211,7 +253,7 @@ internal class AiAssistantController(
                     val stored = historyStorage.load()
                     val kept = keptAiChats(stored, settings.historyRetention, clock())
                     if (kept != stored) historyStorage.save(kept)
-                    LoadedAiState(settings, hints, checked, kept)
+                    LoadedAiState(settings, hints, checked, kept, memoryStorage.load())
                 }
             _state.update {
                 it.copy(
@@ -219,6 +261,7 @@ internal class AiAssistantController(
                     keyHints = loaded.keyHints,
                     checkedSetups = loaded.checkedSetups,
                     savedChats = loaded.savedChats,
+                    memory = loaded.memory,
                 )
             }
         }
@@ -248,13 +291,47 @@ internal class AiAssistantController(
         }
     }
 
-    /** Let's start on the first page: the panel shows the key setup or the chat from now on. */
-    fun finishIntro() = updateSettings { it.copy(introSeen = true) }
+    /** Let's start on the first page: the panel shows the key setup or the chat from now on. The page already told what is new. */
+    fun finishIntro() = updateSettings { it.copy(introSeen = true, newsSeen = AI_NEWS_VERSION) }
 
     /** Don't use AI on the first page: the assistant turns off until it is turned on in More settings. */
     fun declineIntro() {
-        updateSettings { it.copy(introSeen = true) }
+        updateSettings { it.copy(introSeen = true, newsSeen = AI_NEWS_VERSION) }
         setEnabled(false)
+    }
+
+    /** Got it, or Manage memory, on the what's-new card. */
+    fun dismissNews() = updateSettings { it.copy(newsSeen = AI_NEWS_VERSION) }
+
+    /** Off: the assistant neither reads nor saves memories; the saved ones stay until deleted. */
+    fun setMemoryEnabled(enabled: Boolean) = updateSettings { it.copy(memoryEnabled = enabled) }
+
+    /** The chip on a new, empty chat. */
+    fun setNewChatMemory(enabled: Boolean) = _state.update { it.copy(newChatMemory = enabled) }
+
+    fun setInstructions(text: String) = updateMemory { it.copy(instructions = text.trim().take(MAX_AI_INSTRUCTIONS_CHARS)) }
+
+    /** Saves the user's edit; returns false when [text] is empty or too long. */
+    fun editMemory(
+        id: String,
+        text: String,
+    ): Boolean {
+        val clean = aiMemoryText(text) ?: return false
+        updateMemory { data -> data.copy(memories = data.memories.map { if (it.id == id) it.copy(text = clean) else it }) }
+        return true
+    }
+
+    fun deleteMemory(id: String) = updateMemory { data -> data.copy(memories = data.memories.filterNot { it.id == id }) }
+
+    fun deleteAllMemories() = updateMemory { it.copy(memories = emptyList()) }
+
+    override fun memoryRefusal(action: AiAction): String? = _state.value.let { aiMemoryRefusal(it.memory, action, it.memoryUse) }
+
+    override fun changeMemory(action: AiAction): AiMemoryChange {
+        memoryRefusal(action)?.let { return AiMemoryChange.Refused(it) }
+        val change = changeAiMemory(_state.value.memory, action, newId, clock())
+        if (change is AiMemoryChange.Done) updateMemory { change.data }
+        return change
     }
 
     fun selectProvider(provider: AiProvider) {
@@ -424,7 +501,7 @@ internal class AiAssistantController(
 
     fun newChat() {
         cancelRequests()
-        _state.update { it.copy(chat = null, failure = null, page = AiPanelPage.CHAT) }
+        _state.update { it.copy(chat = null, failure = null, page = AiPanelPage.CHAT, newChatMemory = true) }
     }
 
     fun openChat(id: String) {
@@ -460,7 +537,7 @@ internal class AiAssistantController(
         val now = clock()
         val message = AiChatMessage(newId(), AiRole.USER, question, now, context, contextLabel, attachments.take(MAX_AI_ATTACHMENTS))
         _state.update { current ->
-            val chat = current.chat ?: AiChat(newId(), now, now, emptyList())
+            val chat = current.chat ?: AiChat(newId(), now, now, emptyList(), memory = current.newChatMemory)
             // The model could not read the earlier pictures, so the chat goes on without them.
             val earlier =
                 if (current.failure?.kind ==
@@ -495,20 +572,30 @@ internal class AiAssistantController(
     }
 
     private fun ask(systemPrompt: String) {
-        val history = _state.value.messages
-        val chatId = _state.value.chat?.id
-        val settings = _state.value.settings
+        val current = _state.value
+        val history = current.messages
+        val chatId = current.chat?.id
+        val settings = current.settings
         val generation = keyGeneration
         val setup = aiCheckedSetup(settings, settings.provider)
+        val memoryUse = current.memoryUse
+        val memories = if (memoryUse == AiMemoryUse.ON) current.memory.memories else emptyList()
+        val tools =
+            when {
+                setup in noToolSetups -> emptyList()
+                memoryUse == AiMemoryUse.ON -> AI_TOOLS + AI_MEMORY_TOOLS
+                else -> AI_TOOLS
+            }
+        val prompt = systemPrompt + aiMemoryPrompt(current.memory.instructions, memories, memoryUse)
         val run =
-            AiAnswerRun(appActions, history, setup !in noToolSetups, newId) { messages, tools ->
-                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, tools)
+            AiAnswerRun(appActions, history, tools, memories, newId) { messages, offered ->
+                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered)
             }
         _state.update { it.copy(sending = true, failure = null) }
         sendJob =
             scope.launch {
                 try {
-                    run.run(systemPrompt)
+                    run.run(prompt)
                     addAnswer(run, chatId)
                 } catch (error: AiChatException) {
                     // Actions that already ran still show, with their Undo.
@@ -671,6 +758,12 @@ internal class AiAssistantController(
         testJob?.cancel()
         updateSettings(change)
         _state.update { it.copy(connectionTest = AiConnectionTest.Idle) }
+    }
+
+    /** Changes memory or instructions and writes them; the newest state is what lands in the file. */
+    private fun updateMemory(change: (AiMemoryData) -> AiMemoryData) {
+        _state.update { it.copy(memory = change(it.memory)) }
+        scope.launch { memoryWrites.withLock { withContext(io) { memoryStorage.save(_state.value.memory) } } }
     }
 
     private fun updateSettings(change: (AiAssistantSettings) -> AiAssistantSettings) {

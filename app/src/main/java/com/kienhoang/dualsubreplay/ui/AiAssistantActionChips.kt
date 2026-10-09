@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.OndemandVideo
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.Translate
@@ -39,11 +40,12 @@ import com.kienhoang.dualsubreplay.assistant.AiActionKind
 import com.kienhoang.dualsubreplay.assistant.AiActionRecord
 import com.kienhoang.dualsubreplay.assistant.AiActionState
 
-/** Undo, the card's button, and Cancel, each with the action's id. */
+/** Undo, the card's button, and Cancel, each with the action's id; Manage on a memory chip opens the Memory page. */
 internal class AiActionHandlers(
     val onUndo: (String) -> Unit,
     val onConfirm: (String) -> Unit,
     val onCancel: (String) -> Unit,
+    val onManageMemory: () -> Unit = {},
 )
 
 private val AiActionKind.icon: ImageVector
@@ -55,6 +57,7 @@ private val AiActionKind.icon: ImageVector
             AiActionKind.WORD -> Icons.Default.BookmarkAdd
             AiActionKind.VIDEO -> Icons.Default.OndemandVideo
             AiActionKind.TRANSLATION -> Icons.Default.Translate
+            AiActionKind.MEMORY -> Icons.Default.Psychology
         }
 
 /** What an answer did or wants to do: chips for actions that ran, cards for those waiting for a tap. */
@@ -119,6 +122,7 @@ private fun AiActionChip(
             AiActionState.FAILED -> R.string.ai_action_failed
             AiActionState.DONE, AiActionState.WAITING -> null
         }
+    val manage = action.kind == AiActionKind.MEMORY && action.state == AiActionState.DONE
     Surface(
         modifier = Modifier.semantics(mergeDescendants = true) {}.testTag("ai_action_chip"),
         shape = RoundedCornerShape(12.dp),
@@ -126,7 +130,7 @@ private fun AiActionChip(
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
         Row(
-            Modifier.padding(start = 10.dp, end = if (action.undoable) 2.dp else 12.dp, top = 2.dp, bottom = 2.dp),
+            Modifier.padding(start = 10.dp, end = if (action.undoable || manage) 2.dp else 12.dp, top = 2.dp, bottom = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
@@ -148,6 +152,11 @@ private fun AiActionChip(
             if (action.undoable && action.state == AiActionState.DONE) {
                 TextButton(onClick = { handlers.onUndo(action.id) }, modifier = Modifier.testTag("ai_action_undo")) {
                     Text(stringResource(R.string.ai_action_undo))
+                }
+            }
+            if (manage) {
+                TextButton(onClick = handlers.onManageMemory, modifier = Modifier.testTag("ai_action_manage")) {
+                    Text(stringResource(R.string.ai_action_manage))
                 }
             }
         }

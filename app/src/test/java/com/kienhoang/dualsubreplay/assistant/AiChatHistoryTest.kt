@@ -51,6 +51,10 @@ class AiChatHistoryTest {
                 ),
             )
         assertEquals(listOf(chat), decodeAiChats(encodeAiChats(listOf(chat))))
+        // A chat started without memory stays without it after a restart.
+        val withoutMemory = chat.copy(id = "c2", memory = false)
+        assertEquals(listOf(chat, withoutMemory), decodeAiChats(encodeAiChats(listOf(chat, withoutMemory))))
+        assertFalse("memory" in encodeAiChats(listOf(chat)))
     }
 
     @Test

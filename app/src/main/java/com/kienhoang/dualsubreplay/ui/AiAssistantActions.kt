@@ -13,6 +13,9 @@ import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiActionOutcome
 import com.kienhoang.dualsubreplay.assistant.AiActionText
 import com.kienhoang.dualsubreplay.assistant.AiAppActions
+import com.kienhoang.dualsubreplay.assistant.AiMemoryChange
+import com.kienhoang.dualsubreplay.assistant.AiMemoryEvent
+import com.kienhoang.dualsubreplay.assistant.AiMemoryKeeper
 import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
@@ -97,7 +100,8 @@ internal fun BindAiAppActions(
     val mode by rememberUpdatedState(playerMode)
     val changeMode by rememberUpdatedState(onPlayerModeChange)
     DisposableEffect(host, viewModel, context) {
-        val actions = AppAiActions(context, viewModel, host.player, { mode }, { changeMode(it) }, host.controller::closePanel)
+        val actions =
+            AppAiActions(context, viewModel, host.player, { mode }, { changeMode(it) }, host.controller::closePanel, host.controller)
         host.controller.appActions = actions
         onDispose { if (host.controller.appActions === actions) host.controller.appActions = null }
     }
@@ -253,6 +257,7 @@ internal class AppAiActions(
     private val playerMode: () -> PlayerExperienceMode,
     private val setPlayerMode: (PlayerExperienceMode) -> Unit,
     private val closePanel: () -> Unit,
+    private val memory: AiMemoryKeeper,
 ) : AiAppActions {
     private val state: DualSubUiState get() = viewModel.state.value
 
@@ -264,6 +269,7 @@ internal class AppAiActions(
     override fun lookAtVideo(linesAround: Int): String = aiVideoLook(state, linesAround)
 
     override fun refusal(action: AiAction): String? {
+        memory.memoryRefusal(action)?.let { return it }
         val needsPlayer =
             action is AiAction.Playback || (action is AiAction.ChangeSetting && action.setting == AiSetting.PLAYBACK_SPEED)
         if (needsPlayer && !player.bound) return "The video player is not ready."
@@ -285,6 +291,37 @@ internal class AppAiActions(
             is AiAction.ChangeTranslation -> AiActionText(translationLabel(action), string(R.string.ai_action_change_button))
             // Only Undo runs it, and Undo shows on the save's own chip.
             is AiAction.RemoveSavedWord -> AiActionText(action.word)
+            is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> memoryText(action)
+        }
+
+    private fun memoryText(action: AiAction): AiActionText =
+        when (action) {
+            is AiAction.SaveMemory ->
+                AiActionText(
+                    string(if (action.replaces == null) R.string.ai_action_memory_save else R.string.ai_action_memory_update, action.text),
+                    string(R.string.ai_action_memory_save_button),
+                )
+            is AiAction.ForgetMemory ->
+                AiActionText(string(R.string.ai_action_memory_forget, action.memory.text), string(R.string.ai_action_memory_forget_button))
+            // Only Undo runs the other two, and Undo shows on the change's own chip.
+            else -> AiActionText(string(R.string.ai_memory_title))
+        }
+
+    /** Saves or forgets through the assistant's memory; the chip says what happened in the user's language. */
+    private fun changeMemory(action: AiAction): AiActionOutcome =
+        when (val change = memory.changeMemory(action)) {
+            is AiMemoryChange.Refused -> AiActionOutcome.Refused(change.reason)
+            is AiMemoryChange.Done -> {
+                val label =
+                    when (change.event) {
+                        AiMemoryEvent.SAVED -> string(R.string.ai_action_memory_saved, change.text)
+                        AiMemoryEvent.UPDATED -> string(R.string.ai_action_memory_updated, change.text)
+                        AiMemoryEvent.FORGOT -> string(R.string.ai_action_memory_forgot, change.text)
+                        AiMemoryEvent.ALREADY_SAVED -> string(R.string.ai_action_memory_already, change.text)
+                        AiMemoryEvent.PUT_BACK -> memoryText(action).label
+                    }
+                AiActionOutcome.Done(label, change.note, change.undo)
+            }
         }
 
     override suspend fun perform(action: AiAction): AiActionOutcome {
@@ -307,6 +344,7 @@ internal class AppAiActions(
             }
             is AiAction.ChangeTranslation -> changeTranslation(action, label)
             is AiAction.RemoveSavedWord -> removeWord(action, label)
+            is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> changeMemory(action)
         }
     }
 

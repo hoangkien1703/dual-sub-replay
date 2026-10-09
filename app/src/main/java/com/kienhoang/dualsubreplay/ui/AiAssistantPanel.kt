@@ -133,6 +133,7 @@ internal fun AiAssistantPanel(
                                     .testTag("ai_settings_page"),
                             ) { AiAssistantSettingsSection(host) }
                         AiPanelPage.MODELS -> AiModelsPage(aiState, controller, Modifier.weight(1f))
+                        AiPanelPage.MEMORY -> AiMemoryPage(aiState, controller, Modifier.weight(1f))
                         AiPanelPage.CHAT ->
                             if (!aiState.settings.introSeen) {
                                 AiIntro(
@@ -188,6 +189,7 @@ private fun AiPanelHeader(
                     AiPanelPage.HISTORY -> R.string.ai_history
                     AiPanelPage.SETTINGS -> R.string.ai_open_settings
                     AiPanelPage.MODELS -> R.string.ai_models_title
+                    AiPanelPage.MEMORY -> R.string.ai_memory_title
                 },
             ),
             style = MaterialTheme.typography.titleLarge,
@@ -248,12 +250,18 @@ private fun AiChatContent(
                 },
             )
         }
+        if (aiState.settings.showsNews) item(key = "news") { AiNewsCard(controller) }
         if (!aiState.ready) {
             item(key = "setup") { AiConnectCard(aiState, controller) { controller.showPage(AiPanelPage.SETTINGS) } }
-        } else if (messages.isEmpty()) {
-            item(key = "welcome") { AiWelcome(currentLineQuestion, enabled = !aiState.sending, onAsk = onAsk) }
+        } else {
+            if (messages.isEmpty()) item(key = "welcome") { AiWelcome(currentLineQuestion, enabled = !aiState.sending, onAsk = onAsk) }
+            if (aiChatMemoryShown(aiState)) item(key = "memory") { AiChatMemoryChip(aiState, controller) }
         }
-        aiMessages(aiState, AiActionHandlers(controller::undoAction, controller::confirmAction, controller::cancelAction), onRetry)
+        val handlers =
+            AiActionHandlers(controller::undoAction, controller::confirmAction, controller::cancelAction) {
+                controller.showPage(AiPanelPage.MEMORY)
+            }
+        aiMessages(aiState, handlers, onRetry)
     }
 }
 

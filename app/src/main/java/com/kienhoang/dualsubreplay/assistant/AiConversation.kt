@@ -60,6 +60,8 @@ internal data class AiChat(
     val createdMs: Long,
     val updatedMs: Long,
     val messages: List<AiChatMessage>,
+    /** Off when the chat was started without memory: it neither reads nor saves memories. */
+    val memory: Boolean = true,
 ) {
     /** The first question, shortened, names the chat in the history list. */
     val title: String

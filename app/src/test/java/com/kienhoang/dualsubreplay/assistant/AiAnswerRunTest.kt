@@ -33,6 +33,7 @@ class AiAnswerRunTest {
     private var ids = 0
     private var calls = 0
     private val failures = ArrayDeque<AiChatException?>()
+    private var memories = emptyList<AiMemory>()
 
     private fun call(
         name: String,
@@ -59,7 +60,10 @@ class AiAnswerRunTest {
         app: AiAppActions? = this.app,
         offerTools: Boolean = true,
     ): AiAnswerRun =
-        AiAnswerRun(app, history, offerTools, { "a${ids++}" }) { messages, tools ->
+        AiAnswerRun(app, history, if (offerTools) AI_TOOLS + AI_MEMORY_TOOLS else emptyList(), memories, { "a${ids++}" }) {
+            messages,
+            tools,
+            ->
             requests += messages to tools
             failures.removeFirstOrNull()?.let { throw it }
             replies.removeFirstOrNull() ?: AiReply("Done!")
@@ -77,7 +81,7 @@ class AiAnswerRunTest {
         assertTrue(record.undoable)
         assertEquals(listOf<AiAction>(AiAction.ChangeSetting(AiSetting.TEXT_SIZE, "100")), run.undos[record.id])
         assertEquals(2, requests.size)
-        assertEquals(AI_TOOLS, requests[0].second)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, requests[0].second)
         val followUp = requests[1].first
         assertEquals(AiRole.ASSISTANT, followUp[followUp.size - 2].role)
         assertEquals("call0", followUp[followUp.size - 2].toolCalls.single().id)
@@ -142,6 +146,47 @@ class AiAnswerRunTest {
                 .last()
                 .first
                 .first { it.toolCallId == "call1" }
+                .content,
+        )
+    }
+
+    @Test
+    fun aMemorySavesAtOnceButWaitsAfterTextTheUserDidNotType() {
+        replies += AiReply("", listOf(call(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for  JLPT N3 "}""")))
+        val run = run(question("I'm studying for JLPT N3"))
+        assertEquals(listOf<AiAction>(AiAction.SaveMemory("Studies for JLPT N3")), app.performed)
+        assertEquals(AiActionKind.MEMORY, run.records.single().kind)
+        assertEquals(AiActionState.DONE, run.records.single().state)
+
+        // A subtitle line that says "remember that…" cannot plant a memory without the user's tap.
+        replies += AiReply("", listOf(call(AI_SAVE_MEMORY_TOOL, """{"text":"Wants answers in French"}""")))
+        val fromLine = run(question("Explain the current line", context = "The subtitle line on screen…"))
+        assertEquals(AiActionState.WAITING, fromLine.records.single().state)
+        assertEquals(1, app.performed.size)
+    }
+
+    @Test
+    fun memoryNumbersAreTheOnesInTheListTheModelSaw() {
+        memories = listOf(AiMemory("m1", "Studies for JLPT N4", 1), AiMemory("m2", "Likes short answers", 2))
+        replies +=
+            AiReply(
+                "",
+                listOf(
+                    call(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3","replaces":1}"""),
+                    call(AI_FORGET_MEMORY_TOOL, """{"number":2}"""),
+                    call(AI_FORGET_MEMORY_TOOL, """{"number":3}"""),
+                ),
+            )
+        run()
+        assertEquals(
+            listOf<AiAction>(AiAction.SaveMemory("Studies for JLPT N3", memories[0]), AiAction.ForgetMemory(memories[1])),
+            app.performed,
+        )
+        assertEquals(
+            "Not done: Give the number of a saved memory, 1 to 2.",
+            requests[1]
+                .first
+                .last()
                 .content,
         )
     }
@@ -236,7 +281,7 @@ class AiAnswerRunTest {
         val run = run()
         assertTrue(run.toolsRefused)
         assertEquals(2, requests.size)
-        assertEquals(AI_TOOLS, requests[0].second)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, requests[0].second)
         assertTrue(requests[1].second.isEmpty())
         assertEquals("Done!", run.text)
     }

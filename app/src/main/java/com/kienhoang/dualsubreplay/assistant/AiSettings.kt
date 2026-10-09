@@ -15,9 +15,17 @@ internal const val AI_CUSTOM_BASE_URL_PREFERENCE = "ai_custom_base_url"
 internal const val AI_HISTORY_RETENTION_PREFERENCE = "ai_history_retention"
 internal const val AI_THINKING_PREFERENCE = "ai_thinking"
 internal const val AI_INTRO_SEEN_PREFERENCE = "ai_intro_seen"
+internal const val AI_MEMORY_ENABLED_PREFERENCE = "ai_memory_enabled"
+internal const val AI_NEWS_SEEN_PREFERENCE = "ai_news_seen"
 private const val AI_MODEL_PREFERENCE_PREFIX = "ai_model_"
 
 private const val DAY_MS = 24L * 60 * 60 * 1000
+
+/**
+ * The "what's new" note people who already answered the intro see once. Raise it to show a new
+ * note; the intro marks the current one as seen, so new users never get it.
+ */
+internal const val AI_NEWS_VERSION = 1
 
 /** How long saved chats are kept on the phone. [OFF] keeps the open chat in memory only. */
 internal enum class ChatHistoryRetention(
@@ -70,7 +78,14 @@ internal data class AiAssistantSettings(
     val thinking: AiThinking = AiThinking.AUTO,
     /** The panel's first page, which introduces the assistant, was answered with Let's start or Don't use AI. */
     val introSeen: Boolean = false,
+    /** Use memory: off, the assistant neither reads nor saves memories; the list stays. */
+    val memoryEnabled: Boolean = true,
+    /** The last "what's new" note seen, up to [AI_NEWS_VERSION]. */
+    val newsSeen: Int = 0,
 ) {
+    /** People who answered the intro before the current note see it once at the top of the chat. */
+    val showsNews: Boolean get() = enabled && introSeen && newsSeen < AI_NEWS_VERSION
+
     fun modelFor(provider: AiProvider): String = models[provider]?.trim()?.takeIf { it.isNotEmpty() } ?: provider.defaultModel
 
     fun baseUrlFor(provider: AiProvider): String = if (provider == AiProvider.CUSTOM) customBaseUrl.trim() else provider.baseUrl
@@ -89,6 +104,8 @@ internal fun readAiAssistantSettings(preferences: SharedPreferences): AiAssistan
         historyRetention = storedChatHistoryRetention(preferences.getString(AI_HISTORY_RETENTION_PREFERENCE, null)),
         thinking = storedAiThinking(preferences.getString(AI_THINKING_PREFERENCE, null)),
         introSeen = preferences.getBoolean(AI_INTRO_SEEN_PREFERENCE, false),
+        memoryEnabled = preferences.getBoolean(AI_MEMORY_ENABLED_PREFERENCE, true),
+        newsSeen = preferences.getInt(AI_NEWS_SEEN_PREFERENCE, 0),
     )
 
 internal fun writeAiAssistantSettings(
@@ -102,6 +119,8 @@ internal fun writeAiAssistantSettings(
         putString(AI_HISTORY_RETENTION_PREFERENCE, settings.historyRetention.key)
         putString(AI_THINKING_PREFERENCE, settings.thinking.key)
         putBoolean(AI_INTRO_SEEN_PREFERENCE, settings.introSeen)
+        putBoolean(AI_MEMORY_ENABLED_PREFERENCE, settings.memoryEnabled)
+        putInt(AI_NEWS_SEEN_PREFERENCE, settings.newsSeen)
         AiProvider.entries.forEach { provider ->
             val model = settings.models[provider]
             if (model == null) {

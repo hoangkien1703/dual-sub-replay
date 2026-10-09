@@ -7,7 +7,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
@@ -17,15 +19,21 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
+import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_TOOLS
+import com.kienhoang.dualsubreplay.assistant.AI_NEWS_VERSION
+import com.kienhoang.dualsubreplay.assistant.AI_SAVE_MEMORY_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_SEARCH_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_SETTING_TOOL
+import com.kienhoang.dualsubreplay.assistant.AI_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiActionOutcome
 import com.kienhoang.dualsubreplay.assistant.AiActionText
@@ -42,13 +50,19 @@ import com.kienhoang.dualsubreplay.assistant.AiChatTransport
 import com.kienhoang.dualsubreplay.assistant.AiErrorKind
 import com.kienhoang.dualsubreplay.assistant.AiHistoryStorage
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
+import com.kienhoang.dualsubreplay.assistant.AiMemory
+import com.kienhoang.dualsubreplay.assistant.AiMemoryChange
+import com.kienhoang.dualsubreplay.assistant.AiMemoryData
+import com.kienhoang.dualsubreplay.assistant.AiMemoryKeeper
 import com.kienhoang.dualsubreplay.assistant.AiModelInfo
+import com.kienhoang.dualsubreplay.assistant.AiPanelPage
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiReply
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
 import com.kienhoang.dualsubreplay.assistant.AiThinking
 import com.kienhoang.dualsubreplay.assistant.AiToolCall
+import com.kienhoang.dualsubreplay.assistant.InMemoryAiMemoryStorage
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
@@ -83,7 +97,8 @@ class AiAssistantPanelUiTest {
     private val secrets = mutableMapOf<String, String>()
 
     /** Past the first page that introduces the assistant, unless a test starts before it. */
-    private var settings = AiAssistantSettings(introSeen = true)
+    private var settings = AiAssistantSettings(introSeen = true, newsSeen = AI_NEWS_VERSION)
+    private val memory = InMemoryAiMemoryStorage()
 
     private val keyStore =
         AiKeyStore(
@@ -133,6 +148,7 @@ class AiAssistantPanelUiTest {
                 },
             io = Dispatchers.Unconfined,
             modelLister = { _, _ -> listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemma-4-31b-it", free = true)) },
+            memoryStorage = memory,
         )
     }
 
@@ -508,5 +524,124 @@ class AiAssistantPanelUiTest {
             .performClick()
         assertFalse(settings.enabled)
         composeRule.onNodeWithTag("ai_key_field").assertDoesNotExist()
+    }
+
+    /** Saves and forgets through the controller, as the app's actions do, with the app's English labels. */
+    private class MemoryActions(
+        private val keeper: AiMemoryKeeper,
+    ) : AiAppActions {
+        override fun lookAtVideo(linesAround: Int) = "No video is open."
+
+        override fun refusal(action: AiAction) = keeper.memoryRefusal(action)
+
+        override fun describe(action: AiAction) = AiActionText("Save to memory: “${(action as? AiAction.SaveMemory)?.text}”", "Save")
+
+        override suspend fun perform(action: AiAction): AiActionOutcome =
+            when (val change = keeper.changeMemory(action)) {
+                is AiMemoryChange.Refused -> AiActionOutcome.Refused(change.reason)
+                is AiMemoryChange.Done -> AiActionOutcome.Done("Saved to memory: “${change.text}”", change.note, change.undo)
+            }
+    }
+
+    @Test
+    fun aSavedMemoryShowsAChipWhoseManageOpensTheMemoryPage() {
+        checkedGeminiKey()
+        controller.appActions = MemoryActions(controller)
+        replies += AiReply("", listOf(call(AI_SAVE_MEMORY_TOOL, """{"text":"Studies for JLPT N3, exam in December"}""")))
+        replies += AiReply("Good luck with N3! I'll keep that in mind.")
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_chat_memory_chip").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_input").performTextInput("I'm studying for JLPT N3. The exam is in December.")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithText("Good luck with N3! I'll keep that in mind.").assertIsDisplayed()
+        composeRule
+            .onNodeWithTag(
+                "ai_action_chip",
+            ).assertIsDisplayed()
+            .assertTextContains("Saved to memory: “Studies for JLPT N3, exam in December”")
+        composeRule.onNodeWithTag("ai_action_undo").assertIsDisplayed()
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, requests.first().tools)
+        saveUiEvidence("ai_panel_memory_chip")
+
+        composeRule.onNodeWithTag("ai_action_manage").performClick()
+        composeRule.onNodeWithTag("ai_memory_page").assertIsDisplayed()
+        composeRule.onNodeWithText("Memory").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_memory_switch").assertIsOn()
+        composeRule.onNodeWithTag("ai_memory_edit").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_memory_edit_field").performTextClearance()
+        composeRule.onNodeWithTag("ai_memory_edit_field").performTextInput("Studies for JLPT N3, exam on December 7")
+        composeRule.onNodeWithTag("ai_memory_edit_save").performClick()
+        composeRule.onNodeWithText("Studies for JLPT N3, exam on December 7").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_instructions").performScrollTo().performTextInput("Explain in Vietnamese. Keep answers short.")
+        composeRule.onNodeWithTag("ai_instructions_save").performClick()
+        assertEquals("Explain in Vietnamese. Keep answers short.", memory.data.instructions)
+        Espresso.closeSoftKeyboard()
+        composeRule.onNodeWithTag("ai_memory_switch").performScrollTo()
+        saveUiEvidence("ai_panel_memory_page")
+
+        // Undo on the chip removes the memory, also after an edit.
+        composeRule.onNodeWithTag("ai_back_button").performClick()
+        composeRule.onNodeWithTag("ai_action_undo").performClick()
+        composeRule.onNodeWithText("Undone").assertIsDisplayed()
+        assertTrue(memory.data.memories.isEmpty())
+    }
+
+    @Test
+    fun theMemoryPageDeletesAndTurnsMemoryOff() {
+        memory.data =
+            AiMemoryData(memories = listOf(AiMemory("m1", "Studies for JLPT N4", 1), AiMemory("m2", "Likes short answers", 2)))
+        checkedGeminiKey()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.runOnIdle {
+            controller.openPanel()
+            controller.showPage(AiPanelPage.MEMORY)
+        }
+        composeRule.onAllNodesWithTag("ai_memory_item").assertCountEquals(2)
+        composeRule.onAllNodesWithTag("ai_memory_delete")[1].performClick()
+        assertEquals(listOf("Studies for JLPT N4"), memory.data.memories.map { it.text })
+        composeRule.onNodeWithTag("ai_memory_clear").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_memory_clear_confirm").performClick()
+        assertTrue(memory.data.memories.isEmpty())
+        composeRule.onNodeWithTag("ai_memory_item").assertDoesNotExist()
+        composeRule
+            .onNodeWithTag("ai_memory_switch")
+            .performScrollTo()
+            .performClick()
+            .assertIsOff()
+        assertFalse(settings.memoryEnabled)
+        // With memory off, a new chat has no memory chip.
+        composeRule.onNodeWithTag("ai_back_button").performClick()
+        composeRule.onNodeWithTag("ai_chat_memory_chip").assertDoesNotExist()
+    }
+
+    @Test
+    fun aChatWithoutMemorySendsNoMemoryActions() {
+        checkedGeminiKey()
+        controller.appActions = MemoryActions(controller)
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_chat_memory_chip").performClick()
+        composeRule.onNodeWithTag("ai_input").performTextInput("Hi")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithTag("ai_chat_memory_off").assertIsDisplayed()
+        assertEquals(AI_TOOLS, requests.single().tools)
+    }
+
+    @Test
+    fun peopleWhoUsedTheAssistantBeforeSeeWhatsNewOnce() {
+        settings = AiAssistantSettings(introSeen = true)
+        checkedGeminiKey()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_news_card").assertIsDisplayed()
+        composeRule.onNodeWithText("New: actions and memory").assertIsDisplayed()
+        saveUiEvidence("ai_panel_whats_new")
+        composeRule.onNodeWithTag("ai_news_manage").performClick()
+        assertEquals(AI_NEWS_VERSION, settings.newsSeen)
+        composeRule.onNodeWithTag("ai_memory_page").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_back_button").performClick()
+        composeRule.onNodeWithTag("ai_news_card").assertDoesNotExist()
+        assertTrue(requests.isEmpty())
     }
 }

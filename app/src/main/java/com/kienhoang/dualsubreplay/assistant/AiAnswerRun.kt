@@ -3,12 +3,14 @@ package com.kienhoang.dualsubreplay.assistant
 /**
  * One answer: asks the service, runs the actions it asks for, and asks again with their results,
  * at most [MAX_AI_REQUESTS_PER_ANSWER] times. What it has done so far stays readable after a
- * failure, so an action that already ran still shows with its Undo.
+ * failure, so an action that already ran still shows with its Undo. [tools] are offered only with
+ * [app]; [memories] is the numbered list of saved memories the model sees with this answer.
  */
 internal class AiAnswerRun(
     private val app: AiAppActions?,
     private val history: List<AiChatMessage>,
-    offerTools: Boolean,
+    tools: List<AiTool>,
+    private val memories: List<AiMemory>,
     private val newId: () -> String,
     private val ask: suspend (messages: List<AiWireMessage>, tools: List<AiTool>) -> AiReply,
 ) {
@@ -25,7 +27,7 @@ internal class AiAnswerRun(
     var toolsRefused = false
         private set
 
-    private var tools = if (app != null && offerTools) AI_TOOLS else emptyList()
+    private var tools = if (app != null) tools else emptyList()
 
     /** Subtitle lines, problem details, files or pictures came with the question or were read while answering. */
     private var otherText = history.lastOrNull()?.let { it.context != null || it.attachments.isNotEmpty() } == true
@@ -69,7 +71,7 @@ internal class AiAnswerRun(
     private suspend fun handle(call: AiToolCall): String {
         val app = app ?: return "Not done: actions are not available here."
         val action =
-            when (val parsed = parseAiAction(call)) {
+            when (val parsed = parseAiAction(call, memories)) {
                 is AiActionParse.Invalid -> return "Not done: ${parsed.reason}"
                 is AiActionParse.Valid -> parsed.action
             }
