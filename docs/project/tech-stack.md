@@ -51,9 +51,12 @@ Paths below are relative to
   Translation → Google Translate, `translation/TranslationEngine.kt`). It calls Google Translate's
   unofficial web endpoints with its own caches, sending upcoming sentences in one batch request
   (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
-  translation through the chosen engine. A failure moves that video to on-device translation
+  translation through the chosen engine. `prefetchInBackground` translates minutes 2 to 5 one request
+  at a time. A line Google leaves blank is asked again alone and, if still blank, translated on the
+  device by itself. A failure moves that video to on-device translation
   (`DualSubUiState.onDeviceFallback`), shows `ui/OnlineTranslationNotice.kt`'s top-right icon, and
-  checks Google again every 2 minutes; the next load tries Google first.
+  checks Google again every 2 minutes; the next load tries Google first. See the
+  [blank-lines spec](../specs/2026-10-09-google-blank-lines-and-five-minutes-ahead.md).
   `BuildConfig.ONLINE_TRANSLATION` is false in the F-Droid build, which stays on-device.
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `assistant/` is the AI assistant (GitHub build only, `BuildConfig.AI_ASSISTANT`).

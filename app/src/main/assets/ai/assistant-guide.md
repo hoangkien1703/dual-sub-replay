@@ -33,7 +33,7 @@ What the app does:
 - Swiping the transcript header down hides the transcript; the subtitle (CC) button brings it back. In landscape the transcript can sit beside the video (split view).
 
 Translation:
-- GitHub build: Google Translate (online) is used by default. It is Google's free web service, not an official API, so it can stop working. Then the app translates that video on the phone and checks Google again every 2 minutes and on the next video. The problem shows at the top right, with "Try Google again".
+- GitHub build: Google Translate (online) is used by default. It translates about 5 minutes ahead while a video plays. It is Google's free web service, not an official API, so it can stop working. Then the app translates that video on the phone and checks Google again every 2 minutes and on the next video. The problem shows at the top right, with "Try Google again". If Google leaves a single line blank, only that line is translated on the phone.
 - The on-device engine needs a downloaded language model (about 30-60 MB each). Settings, More settings, Captions & translation, Languages on this device downloads or removes them.
 - If translation stops completely, the original captions keep playing; "Retry translation" tries again.
 - If subtitles cannot load, the video may have no captions, YouTube may have changed, or the connection failed. "Retry" loads them again.

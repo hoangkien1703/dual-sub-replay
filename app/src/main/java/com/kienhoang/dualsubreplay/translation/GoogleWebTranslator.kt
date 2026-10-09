@@ -25,8 +25,10 @@ import kotlin.coroutines.resumeWithException
 /*
  * Online engine: Google Translate's free web endpoints, the ones many browser extensions use. They
  * need no key but are not an official API, so Google can throttle or block them at any time. Like
- * those extensions, the app sends many texts per request and retries short outages. When Google
- * still fails, the player translates that video on the device and checks Google again later.
+ * those extensions, the app sends many texts per request and retries short outages. A line Google
+ * leaves blank is asked again alone and otherwise translated on the device by the caller; the other
+ * lines keep Google's translation. When Google still fails, the player translates that video on the
+ * device and checks Google again later.
  */
 
 internal const val MAX_GOOGLE_RESPONSE_BYTES = 1024 * 1024
@@ -59,6 +61,10 @@ internal enum class GoogleEndpoint(
 
     /** One text per request; since September 2026 `gtx` is refused here for some users, so it uses `at`. */
     SINGLE("https://translate.googleapis.com/translate_a/single", "at", batch = false),
+    ;
+
+    /** Host and path, so the problem details say which address failed. */
+    val label: String get() = url.removePrefix("https://")
 }
 
 class GoogleTranslateException(
@@ -66,9 +72,21 @@ class GoogleTranslateException(
     cause: Throwable? = null,
     /** A server error or no connection: worth retrying after a pause. */
     val retryable: Boolean = false,
-    /** The endpoint refused the client (HTTP 403/429); another endpoint may still work. */
+    /** The endpoint refused the client (HTTP 403/429) or left every line blank; another endpoint may still work. */
     val blocked: Boolean = false,
+    /** The HTTP status Google answered with, when it answered with an error. */
+    val status: Int? = null,
 ) : IOException(message, cause)
+
+/** The same error naming [endpoint], so the problem details say which Google address failed. */
+private fun GoogleTranslateException.at(endpoint: GoogleEndpoint): GoogleTranslateException =
+    GoogleTranslateException("${message.orEmpty().removeSuffix(".")} (${endpoint.label}).", cause, retryable, blocked, status)
+
+/** Every address refused or answered blank: the detail lists each one with its status. */
+internal fun googleRefusedEverywhere(refusals: List<Pair<GoogleEndpoint, GoogleTranslateException>>): GoogleTranslateException {
+    val answers = refusals.map { (endpoint, error) -> "${endpoint.label} ${error.status?.let { "HTTP $it" } ?: "blank reply"}" }
+    return GoogleTranslateException("Google Translate refused on every address: ${answers.joinToString(", ")}.", blocked = true)
+}
 
 /** Google's language codes match the app's except for Chinese. */
 internal fun googleLanguageCode(appCode: String): String =
@@ -108,11 +126,14 @@ internal fun googleBatches(
     return batches
 }
 
-/** Reads a batch reply: one entry per text, either the translation or `[translation, detected language]`. */
+/**
+ * Reads a batch reply: one entry per text, either the translation or `[translation, detected language]`.
+ * A line Google left blank is null, so the other lines are kept.
+ */
 internal fun parseGoogleBatchTranslation(
     body: String,
     count: Int,
-): List<String> {
+): List<String?> {
     val trimmed = body.trimStart()
     if (!trimmed.startsWith("[")) throw GoogleTranslateException("Google Translate returned a web page instead of a translation.")
     val entries =
@@ -125,12 +146,12 @@ internal fun parseGoogleBatchTranslation(
     return (0 until count).map { index ->
         val entry = entries.opt(index)
         val text = (if (entry is JSONArray) entry.opt(0) else entry) as? String
-        text?.trim()?.takeIf { it.isNotEmpty() } ?: throw GoogleTranslateException("Google Translate returned an empty translation.")
+        text?.trim()?.takeIf { it.isNotEmpty() }
     }
 }
 
-/** Joins the translated text of every sentence segment in Google's `[[["text","source",…],…],…]` reply. */
-internal fun parseGoogleTranslation(body: String): String {
+/** Joins the translated text of every sentence segment in Google's `[[["text","source",…],…],…]` reply; null when blank. */
+internal fun parseGoogleTranslation(body: String): String? {
     val trimmed = body.trimStart()
     if (!trimmed.startsWith("[")) throw GoogleTranslateException("Google Translate returned a web page instead of a translation.")
     val segments =
@@ -138,7 +159,7 @@ internal fun parseGoogleTranslation(body: String): String {
             JSONArray(trimmed).optJSONArray(0)
         } catch (error: JSONException) {
             throw GoogleTranslateException("Google Translate returned an unreadable reply.", error)
-        } ?: throw GoogleTranslateException("Google Translate returned no translation.")
+        } ?: return null
     val translated =
         buildString {
             for (index in 0 until segments.length()) {
@@ -146,8 +167,7 @@ internal fun parseGoogleTranslation(body: String): String {
                 if (!segment.isNull(0)) append(segment.optString(0))
             }
         }.trim()
-    if (translated.isEmpty()) throw GoogleTranslateException("Google Translate returned an empty translation.")
-    return translated
+    return translated.takeIf { it.isNotEmpty() }
 }
 
 internal fun googleTranslateUrl(
@@ -177,22 +197,34 @@ class GoogleWebTranslator(
 ) {
     // Separate from the on-device caches, so switching engines never shows the other engine's result.
     private val diskCache = cacheDirectory?.let { TranslationDiskCache(it) }
-    private val cache = TranslationCache()
+
+    // Five minutes ahead, with row prefixes, is a few hundred texts; keep them all in memory.
+    private val cache = TranslationCache(maxEntries = 1_024, maxCharacters = 256_000)
 
     @Volatile private var preferredEndpoint = 0
 
+    /** [text] through Google, or null when every Google address leaves it blank. */
     suspend fun translate(
         sourceLanguageCode: String,
         targetLanguageCode: String,
         text: String,
-    ): String = translateAll(sourceLanguageCode, targetLanguageCode, listOf(text)).single()
+    ): String? =
+        translateAll(sourceLanguageCode, targetLanguageCode, listOf(text)).single()
+            ?: askOtherAddresses(
+                TranslationLanguages.normalize(sourceLanguageCode),
+                TranslationLanguages.normalize(targetLanguageCode),
+                text,
+            )
 
-    /** Translates [texts] in as few requests as possible; cached and repeated texts are not sent again. */
+    /**
+     * Translates [texts] in as few requests as possible; cached and repeated texts are not sent again.
+     * A line Google left blank is null and stays uncached, so a later call asks for it again.
+     */
     suspend fun translateAll(
         sourceLanguageCode: String,
         targetLanguageCode: String,
         texts: List<String>,
-    ): List<String> {
+    ): List<String?> {
         val source = TranslationLanguages.normalize(sourceLanguageCode)
         val target = TranslationLanguages.normalize(targetLanguageCode)
         if (source == target) return texts
@@ -204,10 +236,50 @@ class GoogleWebTranslator(
         }
         for (batch in googleBatches(missing.toList())) {
             val translated = requestWithRetry(googleLanguageCode(source), googleLanguageCode(target), batch)
-            batch.zip(translated).forEach { (text, translation) -> results[text] = translation }
+            batch.zip(translated).forEach { (text, translation) -> if (translation != null) results[text] = translation }
             remember(source, target, batch, translated)
         }
-        return texts.map(results::getValue)
+        return texts.map(results::get)
+    }
+
+    /**
+     * Sends one batch at most: the first [texts] not cached yet, without retries, and returns the texts it
+     * sent (none when every text was cached). A background prefetch calls this a step at a time.
+     */
+    suspend fun translateNextBatch(
+        sourceLanguageCode: String,
+        targetLanguageCode: String,
+        texts: List<String>,
+    ): List<String> {
+        val source = TranslationLanguages.normalize(sourceLanguageCode)
+        val target = TranslationLanguages.normalize(targetLanguageCode)
+        if (source == target) return emptyList()
+        val missing = texts.distinct().filter { !it.isBlank() && cached(source, target, it) == null }
+        val batch = googleBatches(missing).firstOrNull() ?: return emptyList()
+        remember(source, target, batch, request(googleLanguageCode(source), googleLanguageCode(target), batch))
+        return batch
+    }
+
+    /** A line the last working address left blank, sent alone to each other address until one translates it. */
+    private suspend fun askOtherAddresses(
+        source: String,
+        target: String,
+        text: String,
+    ): String? {
+        val endpoints = GoogleEndpoint.entries
+        for (index in googleClientOrder(preferredEndpoint, endpoints.size).drop(1)) {
+            val translated =
+                try {
+                    sendAll(endpoints[index], googleLanguageCode(source), googleLanguageCode(target), listOf(text)).single()
+                } catch (_: GoogleTranslateException) {
+                    null
+                }
+            if (translated != null) {
+                remember(source, target, listOf(text), listOf(translated))
+                return translated
+            }
+        }
+        return null
     }
 
     /** What Google translated earlier for [text], or null; never sends a request. */
@@ -234,7 +306,7 @@ class GoogleWebTranslator(
         return try {
             val translated = request(googleLanguageCode(source), googleLanguageCode(target), listOf(text))
             remember(source, target, listOf(text), translated)
-            true
+            translated.single() != null
         } catch (_: GoogleTranslateException) {
             false
         }
@@ -244,11 +316,12 @@ class GoogleWebTranslator(
         source: String,
         target: String,
         texts: List<String>,
-        translated: List<String>,
+        translated: List<String?>,
     ) {
-        texts.zip(translated).forEach { (text, translation) -> cache.put(source, target, text, translation) }
+        val found = texts.zip(translated).mapNotNull { (text, translation) -> translation?.let { text to it } }
+        found.forEach { (text, translation) -> cache.put(source, target, text, translation) }
         withContext(Dispatchers.IO) {
-            texts.zip(translated).forEach { (text, translation) -> diskCache?.put(source, target, text, translation) }
+            found.forEach { (text, translation) -> diskCache?.put(source, target, text, translation) }
         }
     }
 
@@ -264,7 +337,7 @@ class GoogleWebTranslator(
         source: String,
         target: String,
         texts: List<String>,
-    ): List<String> {
+    ): List<String?> {
         var attempt = 0
         while (true) {
             try {
@@ -280,8 +353,8 @@ class GoogleWebTranslator(
         source: String,
         target: String,
         texts: List<String>,
-    ): List<String> {
-        var refused: GoogleTranslateException? = null
+    ): List<String?> {
+        val refusals = mutableListOf<Pair<GoogleEndpoint, GoogleTranslateException>>()
         val endpoints = GoogleEndpoint.entries
         for (index in googleClientOrder(preferredEndpoint, endpoints.size)) {
             val translated =
@@ -289,27 +362,38 @@ class GoogleWebTranslator(
                     sendAll(endpoints[index], source, target, texts)
                 } catch (error: GoogleTranslateException) {
                     if (!error.blocked) throw error
-                    refused = error
+                    refusals += endpoints[index] to error
                     continue
                 }
             preferredEndpoint = index
             return translated
         }
-        throw checkNotNull(refused)
+        throw googleRefusedEverywhere(refusals)
     }
 
-    /** One request for a batch endpoint, one per text for the other. */
+    /** One request for a batch endpoint, one per text for the other. Errors name the address. */
     private suspend fun sendAll(
         endpoint: GoogleEndpoint,
         source: String,
         target: String,
         texts: List<String>,
-    ): List<String> =
-        if (endpoint.batch) {
-            parseGoogleBatchTranslation(send(endpoint, source, target, texts), texts.size)
-        } else {
-            texts.map { text -> parseGoogleTranslation(send(endpoint, source, target, listOf(text))) }
+    ): List<String?> {
+        val translated =
+            try {
+                if (endpoint.batch) {
+                    parseGoogleBatchTranslation(send(endpoint, source, target, texts), texts.size)
+                } else {
+                    texts.map { text -> parseGoogleTranslation(send(endpoint, source, target, listOf(text))) }
+                }
+            } catch (error: GoogleTranslateException) {
+                throw error.at(endpoint)
+            }
+        // Every line blank is a broken answer rather than untranslatable lines: another address may still work.
+        if (texts.size > 1 && translated.all { it == null }) {
+            throw GoogleTranslateException("Google Translate answered with only blank lines (${endpoint.label}).", blocked = true)
         }
+        return translated
+    }
 
     /** The reply body; a refusal throws a [GoogleTranslateException] marked [GoogleTranslateException.blocked]. */
     private suspend fun send(
@@ -326,13 +410,14 @@ class GoogleWebTranslator(
                 .post(form)
                 .build()
         val (code, body) = execute(request)
-        if (isBlockedGoogleStatus(
-                code,
-            )
-        ) {
-            throw GoogleTranslateException("Google Translate refused the request (HTTP $code).", blocked = true)
+        if (isBlockedGoogleStatus(code)) {
+            throw GoogleTranslateException("Google Translate refused the request with HTTP $code.", blocked = true, status = code)
         }
-        if (code !in 200..299) throw GoogleTranslateException("Google Translate returned HTTP $code.", retryable = code >= 500)
+        if (code !in
+            200..299
+        ) {
+            throw GoogleTranslateException("Google Translate returned HTTP $code.", retryable = code >= 500, status = code)
+        }
         return body
     }
 

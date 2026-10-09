@@ -58,6 +58,20 @@ class SubtitleStoreTest {
         }
 
     @Test
+    fun rowsBetweenTwoTimesStartAfterTheFirstAndAreCapped() =
+        runBlocking {
+            val rows = List(10) { SubtitleSegment(it.toLong(), it * 1_000L, (it + 1) * 1_000L, "Row $it") }
+            withStore(rows) { store ->
+                // Rows starting after 2 s, up to and including 5 s.
+                check(store.indicesBetween(2_000, 5_000, maxRows = 100) == 3..5)
+                check(store.indicesBetween(2_000, 5_000, maxRows = 2) == 3..4)
+                check(store.indicesBetween(9_000, 60_000, maxRows = 100).isEmpty())
+                check(store.indicesBetween(2_500, 2_900, maxRows = 100).isEmpty())
+            }
+            withStore(emptyList()) { store -> check(store.indicesBetween(0, 60_000, maxRows = 100).isEmpty()) }
+        }
+
+    @Test
     fun closingAStoreDeletesItsTranscriptFile() =
         runBlocking {
             val directory = Files.createTempDirectory("subtitle-close-test").toFile()
