@@ -34,6 +34,17 @@ internal class SubtitleStore private constructor(
         return first..maxOf(first, last)
     }
 
+    /** Rows starting after [fromMs] and up to [toMs], at most [maxRows] of them. */
+    fun indicesBetween(
+        fromMs: Long,
+        toMs: Long,
+        maxRows: Int,
+    ): IntRange {
+        val first = upperBound(fromMs)
+        val last = minOf(upperBound(toMs) - 1, first + maxRows - 1)
+        return if (first > last) IntRange.EMPTY else first..last
+    }
+
     private fun upperBound(timeMs: Long): Int {
         var low = 0
         var high = size

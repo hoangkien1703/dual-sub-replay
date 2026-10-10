@@ -31,4 +31,15 @@ class TranslationPrefetchTest {
         )
         assertEquals(listOf("Hello there, my friend.", "Hello there,"), upcomingTranslationTexts(rows, 1, aheadMs = 5_000))
     }
+
+    @Test fun everySentenceIsSentOnceWithItsRowPrefixes() {
+        val rows =
+            listOf(
+                SubtitleSegment(0, 0, 1_000, "Hello there,", sentence = sentence),
+                SubtitleSegment(1, 1_000, 2_000, "my friend.", sentence = sentence.copy(index = 1)),
+                SubtitleSegment(2, 2_000, 3_000, "Alone"),
+                SubtitleSegment(3, 3_000, 4_000, "Alone"),
+            )
+        assertEquals(listOf("Hello there, my friend.", "Hello there,", "Alone"), translationTexts(rows))
+    }
 }

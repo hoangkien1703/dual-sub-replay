@@ -1038,14 +1038,17 @@ class AppViewModel internal constructor(
         text: String,
     ): String {
         if (!_state.value.translatesWithGoogle()) return translator.translateSingle(source, target, text)
-        return try {
-            googleTranslator.translate(source, target, text)
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Exception) {
-            fallBackToOnDevice(error)
-            translator.translateSingle(source, target, text)
-        }
+        val translated =
+            try {
+                googleTranslator.translate(source, target, text)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                fallBackToOnDevice(error)
+                null
+            }
+        // A text Google leaves blank is translated on the device; only a failure moves the video off Google.
+        return translated ?: translator.translateSingle(source, target, text)
     }
 
     /** Settings → Translation → Google Translate (online). Reloads the current video's translations. */
@@ -1389,9 +1392,9 @@ class AppViewModel internal constructor(
             }
             try {
                 if (_state.value.translatesWithGoogle()) {
-                    // Upcoming sentences go to Google in one request; rows then read them from the cache.
-                    follow(prefetch = { texts -> googleTranslator.translateAll(sourceLanguage, targetLanguage, texts) }) { text ->
-                        googleTranslator.translate(sourceLanguage, targetLanguage, text)
+                    val store = checkNotNull(displayStore)
+                    followGoogleTranslation(store, videoId, generation, sourceLanguage, targetLanguage) { prefetch, translate ->
+                        follow(prefetch, translate)
                     }
                     return
                 }
@@ -1432,6 +1435,38 @@ class AppViewModel internal constructor(
         } finally {
             withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
         }
+    }
+
+    /**
+     * The Google half of [runStoredTranslation]: [follow] translates the playing minute, sending upcoming
+     * sentences in one request that rows then read from the cache, while minutes 2 to 5 fill in the
+     * background one request at a time.
+     */
+    private suspend fun followGoogleTranslation(
+        store: SubtitleStore,
+        videoId: String,
+        generation: Long,
+        source: String,
+        target: String,
+        follow: suspend (prefetch: suspend (List<String>) -> Unit, translate: suspend (String) -> String) -> Unit,
+    ) = coroutineScope {
+        launch { prefetchInBackground(store, playbackRequests) { texts -> googleTranslator.translateNextBatch(source, target, texts) } }
+        follow({ texts -> googleTranslator.translateAll(source, target, texts) }) { text ->
+            // A line Google leaves blank on every address is translated on the device; the rest stays on Google.
+            googleTranslator.translate(source, target, text) ?: translateOnDevice(videoId, generation, source, target, text)
+        }
+    }
+
+    /** One text Google left blank, translated on the device without moving the video off Google. */
+    private suspend fun translateOnDevice(
+        videoId: String,
+        generation: Long,
+        source: String,
+        target: String,
+        text: String,
+    ): String {
+        val onDownloadingChange = { downloading: Boolean -> showTranslationModelDownload(videoId, generation, downloading) }
+        return translator.withSession(source, target, onDownloadingChange) { translate -> translate(text) }
     }
 
     private fun showTranslationModelDownload(

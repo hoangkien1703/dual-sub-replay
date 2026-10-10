@@ -11,6 +11,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -27,12 +28,12 @@ class GoogleWebTranslatorTest {
         assertEquals("Hi.", parseGoogleTranslation(reply))
     }
 
-    @Test fun rejectsPagesEmptyAndMalformedReplies() {
+    @Test fun rejectsPagesAndMalformedRepliesButReadsABlankOneAsNull() {
         val sorry = "<html><title>Sorry...</title><p>automated queries</p></html>"
         assertThrows(GoogleTranslateException::class.java) { parseGoogleTranslation(sorry) }
-        assertThrows(GoogleTranslateException::class.java) { parseGoogleTranslation("[null]") }
-        assertThrows(GoogleTranslateException::class.java) { parseGoogleTranslation("""[[["  ","x"]]]""") }
         assertThrows(GoogleTranslateException::class.java) { parseGoogleTranslation("[[[") }
+        assertNull(parseGoogleTranslation("[null]"))
+        assertNull(parseGoogleTranslation("""[[["  ","x"]]]"""))
     }
 
     @Test fun mapsAppLanguageCodesToGoogleCodes() {
@@ -51,10 +52,15 @@ class GoogleWebTranslatorTest {
 
     @Test fun rejectsBatchRepliesThatDoNotMatchTheRequest() {
         assertThrows(GoogleTranslateException::class.java) { parseGoogleBatchTranslation("""["Hello"]""", 2) }
-        assertThrows(GoogleTranslateException::class.java) { parseGoogleBatchTranslation("""["Hello",""]""", 2) }
-        assertThrows(GoogleTranslateException::class.java) { parseGoogleBatchTranslation("""["Hello",null]""", 2) }
         assertThrows(GoogleTranslateException::class.java) { parseGoogleBatchTranslation("<html>Sorry</html>", 1) }
         assertThrows(GoogleTranslateException::class.java) { parseGoogleBatchTranslation("[\"x\"", 1) }
+    }
+
+    @Test fun aBlankBatchLineIsNullAndTheOthersAreKept() {
+        assertEquals(listOf("Hello", null), parseGoogleBatchTranslation("""["Hello",""]""", 2))
+        assertEquals(listOf("Hello", null), parseGoogleBatchTranslation("""["Hello",null]""", 2))
+        // A caption that is only "&nbsp;" comes back as a no-break space.
+        assertEquals(listOf(null, "Bye"), parseGoogleBatchTranslation("""[["\u00a0","ja"],["Bye","ja"]]""", 2))
     }
 
     @Test fun batchesRespectTextAndCharacterLimits() {
@@ -172,9 +178,113 @@ class GoogleWebTranslatorTest {
             val refusal = runCatching { refused.translate("ja", "en", "テスト") }.exceptionOrNull()
             assertTrue(refusal is GoogleTranslateException)
             assertTrue((refusal as GoogleTranslateException).blocked)
-            assertTrue(refusal.message!!.contains("HTTP 429"))
+            assertEquals(
+                "Google Translate refused on every address: translate.googleapis.com/translate_a/t HTTP 429, " +
+                    "clients5.google.com/translate_a/t HTTP 429, translate.googleapis.com/translate_a/single HTTP 429.",
+                refusal.message,
+            )
             // Each endpoint once: waiting a few seconds does not lift a block.
             assertEquals(GoogleEndpoint.entries.size, calls)
+        }
+
+    @Test fun aBlankLineKeepsTheOthersAndIsAskedAgainAloneElsewhere() =
+        runBlocking {
+            val seen = mutableListOf<String>()
+            val translator =
+                GoogleWebTranslator(
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            seen += "${endpoint.client}:${texts.joinToString()}"
+                            val blank = endpoint == GoogleEndpoint.BATCH
+                            200 to batchReply(texts.map { if (blank && it == "空") "" else "en:$it" })
+                        },
+                )
+            assertEquals(listOf("en:一つ", null, "en:二つ"), translator.translateAll("ja", "en", listOf("一つ", "空", "二つ")))
+            assertEquals("en:一つ", translator.cachedTranslation("ja", "en", "一つ"))
+            assertNull(translator.cachedTranslation("ja", "en", "空"))
+            // Playback reaches the blank line: it is sent alone, then to the next address.
+            assertEquals("en:空", translator.translate("ja", "en", "空"))
+            assertEquals(listOf("gtx:一つ, 空, 二つ", "gtx:空", "dict-chrome-ex:空"), seen)
+            assertEquals("en:空", translator.cachedTranslation("ja", "en", "空"))
+        }
+
+    @Test fun aLineBlankOnEveryAddressIsNullAndNotCached() =
+        runBlocking {
+            val seen = mutableListOf<String>()
+            val translator =
+                GoogleWebTranslator(
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            seen += endpoint.client
+                            when (endpoint) {
+                                GoogleEndpoint.SINGLE -> 200 to """[[["","${texts.single()}"]]]"""
+                                else -> 200 to batchReply(texts.map { "" })
+                            }
+                        },
+                )
+            assertNull(translator.translate("ja", "en", "空"))
+            assertEquals(listOf("gtx", "dict-chrome-ex", "at"), seen)
+            assertNull(translator.cachedTranslation("ja", "en", "空"))
+            assertFalse(translator.responds("ja", "en", "空"))
+        }
+
+    @Test fun aReplyWithEveryLineBlankMovesToTheNextAddress() =
+        runBlocking {
+            val seen = mutableListOf<String>()
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = listOf(0L, 0L, 0L),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            seen += endpoint.client
+                            if (endpoint ==
+                                GoogleEndpoint.BATCH
+                            ) {
+                                200 to batchReply(texts.map { "" })
+                            } else {
+                                200 to batchReply(texts.map { "en:$it" })
+                            }
+                        },
+                )
+            assertEquals(listOf("en:一つ", "en:二つ"), translator.translateAll("ja", "en", listOf("一つ", "二つ")))
+            assertEquals(listOf("gtx", "dict-chrome-ex"), seen)
+            // The address that answered is tried first next time.
+            translator.translateAll("ja", "en", listOf("三つ", "四つ"))
+            assertEquals(listOf("gtx", "dict-chrome-ex", "dict-chrome-ex"), seen)
+
+            val blankEverywhere =
+                GoogleWebTranslator(
+                    retryDelaysMs = listOf(0L, 0L, 0L),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            if (endpoint == GoogleEndpoint.SINGLE) 200 to """[[["","x"]]]""" else 200 to batchReply(texts.map { "" })
+                        },
+                )
+            val failure = runCatching { blankEverywhere.translateAll("ja", "en", listOf("一つ", "二つ")) }.exceptionOrNull()
+            assertTrue(failure is GoogleTranslateException)
+            assertTrue((failure as GoogleTranslateException).blocked)
+            assertTrue(failure.message!!.contains("translate.googleapis.com/translate_a/t blank reply"))
+        }
+
+    @Test fun translateNextBatchSendsOneBatchOfUncachedTexts() =
+        runBlocking {
+            val requests = mutableListOf<List<String>>()
+            val translator =
+                GoogleWebTranslator(
+                    client =
+                        fakeGoogle { _, texts ->
+                            requests += texts
+                            200 to batchReply(texts.map { "en:$it" })
+                        },
+                )
+            translator.translateAll("ja", "en", listOf("cached"))
+            val texts = listOf("cached") + List(MAX_GOOGLE_BATCH_TEXTS + 2) { "text $it" }
+            assertEquals(List(MAX_GOOGLE_BATCH_TEXTS) { "text $it" }, translator.translateNextBatch("ja", "en", texts))
+            assertEquals(listOf("text 128", "text 129"), translator.translateNextBatch("ja", "en", texts))
+            assertEquals(emptyList<String>(), translator.translateNextBatch("ja", "en", texts))
+            assertEquals(listOf(1, MAX_GOOGLE_BATCH_TEXTS, 2), requests.map { it.size })
+            assertEquals("en:text 129", translator.cachedTranslation("ja", "en", "text 129"))
+            assertEquals(emptyList<String>(), translator.translateNextBatch("ja", "ja", listOf("same language")))
         }
 
     @Test fun serverErrorsThatOutlastTheRetriesFail() =
@@ -191,7 +301,9 @@ class GoogleWebTranslatorTest {
                 )
             val failure = runCatching { failing.translate("ja", "en", "テスト") }.exceptionOrNull()
             assertTrue(failure is GoogleTranslateException)
-            assertTrue(failure!!.message!!.contains("503"))
+            // The details name the status and the address that gave it.
+            assertEquals("Google Translate returned HTTP 503 (translate.googleapis.com/translate_a/t).", failure!!.message)
+            assertEquals(503, (failure as GoogleTranslateException).status)
             // The first try and three retries.
             assertEquals(4, calls)
         }

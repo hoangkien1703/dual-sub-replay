@@ -2,8 +2,11 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
+import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -138,14 +141,72 @@ internal fun upcomingTranslationTexts(
     aheadMs: Long = PREFETCH_AHEAD_MS,
 ): List<String> {
     val horizon = rows[index].startMs + aheadMs
-    val sentences = LinkedHashMap<String, SubtitleSegment>()
-    for (position in index..rows.lastIndex) {
-        val row = rows[position]
-        if (row.startMs > horizon) break
-        if (position != index && row.translatedText != null) continue
-        sentences.putIfAbsent(row.sentence?.text ?: row.originalText, row)
+    val upcoming = (index..rows.lastIndex).map(rows::get).takeWhile { it.startMs <= horizon }
+    return translationTexts(upcoming.filterIndexed { position, row -> position == 0 || row.translatedText == null })
+}
+
+/** Everything translating [rows] sends: each sentence (or lone row) once, with its row prefixes. */
+internal fun translationTexts(rows: List<SubtitleSegment>): List<String> =
+    rows.distinctBy { it.sentence?.text ?: it.originalText }.flatMap(::rowTranslationTexts).distinct()
+
+/** How far ahead the online engine translates in the background, past the [PREFETCH_AHEAD_MS] the window asks for. */
+internal const val BACKGROUND_PREFETCH_AHEAD_MS = 5 * 60_000L
+
+/** The wait before each background request, so filling minutes 2 to 5 never sends a burst. */
+internal const val BACKGROUND_PREFETCH_PAUSE_MS = 3_000L
+
+/** Once everything ahead is translated, the background waits for this much playback (or a seek) before looking again. */
+internal const val BACKGROUND_PREFETCH_STEP_MS = 30_000L
+
+/** Five minutes of speech is far fewer rows; this only bounds one read. */
+private const val MAX_BACKGROUND_PREFETCH_ROWS = 400
+
+/**
+ * While the video plays, hands the sentences starting 1 to 5 minutes ahead to [fetch], one step at a
+ * time with [pauseMs] before each. [fetch] sends one request for the texts not translated yet and
+ * returns the texts it sent (none when all were translated); a text is handed over at most once, so a
+ * line Google leaves blank is not asked again here. A failed step waits [restMs]: the playing minute,
+ * not this prefetch, decides when Google has stopped working.
+ */
+internal suspend fun prefetchInBackground(
+    store: SubtitleStore,
+    requests: StateFlow<CaptionPlaybackRequest>,
+    pauseMs: Long = BACKGROUND_PREFETCH_PAUSE_MS,
+    restMs: Long = GOOGLE_RECHECK_INTERVAL_MS,
+    fetch: suspend (List<String>) -> List<String>,
+) {
+    val sent = HashSet<String>()
+    while (true) {
+        delay(pauseMs)
+        val request = requests.value
+        if (!request.enabled || request.paused) {
+            requests.first { it.enabled && !it.paused }
+            continue
+        }
+        val fetched =
+            try {
+                val indices =
+                    store.indicesBetween(
+                        request.timeMs + PREFETCH_AHEAD_MS,
+                        request.timeMs + BACKGROUND_PREFETCH_AHEAD_MS,
+                        MAX_BACKGROUND_PREFETCH_ROWS,
+                    )
+                val rows = withContext(Dispatchers.IO) { store.read(indices) }
+                fetch(translationTexts(rows).filterNot(sent::contains))
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                delay(restMs)
+                continue
+            }
+        sent += fetched
+        if (fetched.isEmpty()) {
+            requests.first {
+                it.seekGeneration != request.seekGeneration ||
+                    it.timeMs !in request.timeMs until request.timeMs + BACKGROUND_PREFETCH_STEP_MS
+            }
+        }
     }
-    return sentences.values.flatMap(::rowTranslationTexts).distinct()
 }
 
 /**
