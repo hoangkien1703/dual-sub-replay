@@ -209,6 +209,26 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun nativeModePlayerScriptsRecheckTheOriginAndOnlyRestyleThePage() {
+        val on = webNativePlayerOnlyScript(enabled = true)
+        val off = webNativePlayerOnlyScript(enabled = false)
+        for (script in listOf(on, off, webResumeScript())) {
+            assertTrue(script.contains("window.location.protocol !== 'https:'"))
+            assertTrue(script.contains("host.endsWith('.youtube.com')"))
+        }
+        assertTrue(on.contains("if (true)"))
+        assertTrue(off.contains("if (false)"))
+        assertTrue(on.contains(NATIVE_MODE_PLAYER_STYLE_ID))
+        assertTrue(on.contains("existing.remove()"))
+        // YouTube's own menus stay above the enlarged player.
+        assertTrue(on.contains("[role=\"dialog\"][aria-modal=\"true\"]"))
+        // The page keeps its own player: no new video element, source or second page.
+        assertFalse(on.contains("createElement('video')"))
+        assertFalse(on.contains(".src ="))
+        assertTrue(webResumeScript().contains("video.play()"))
+    }
+
+    @Test
     fun captionTrackSyncFollowsTheLoadedTranscriptOnTrustedPagesOnly() {
         val script = webCaptionTrackSyncScript(CaptionTrackTarget("abcdefghijk", "ja", generated = false))
 

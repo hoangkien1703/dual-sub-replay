@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">Modo nativo</string>
+    <string name="native_mode_beta">Beta</string>
+    <string name="native_mode_drawer_description">Un aspecto de app de YouTube para buscar, ver canales y comentarios. Aún en pruebas: desactívalo para volver a la página clásica de YouTube.</string>
+    <string name="native_mode_beta_notice">El modo nativo está en beta, así que algunas cosas pueden no funcionar todavía.</string>
+    <string name="native_mode_switch_back">Volver al clásico</string>
+    <string name="native_search_hint">Buscar en YouTube</string>
+    <string name="native_clear_search">Borrar búsqueda</string>
+    <string name="native_recent_searches">Búsquedas recientes</string>
+    <string name="native_forget_search">Quitar de búsquedas recientes</string>
+    <string name="native_home">Inicio</string>
+    <string name="native_library">Biblioteca</string>
+    <string name="native_back">Atrás</string>
+    <string name="native_home_continue">Seguir viendo</string>
+    <string name="native_home_subscriptions">De tus suscripciones</string>
+    <string name="native_home_for_you">Porque viste %1$s</string>
+    <string name="native_home_recommended">Recomendado para ti</string>
+    <string name="native_home_empty_title">Busca algo para ver</string>
+    <string name="native_home_empty_body">Aquí aparecerán videos de los canales a los que te suscribes e ideas basadas en lo que ves.</string>
+    <string name="native_loading_failed">No se pudo cargar esto desde YouTube.</string>
+    <string name="native_retry">Reintentar</string>
+    <string name="native_no_results">Sin resultados</string>
+    <string name="native_live">EN VIVO</string>
+    <string name="native_subscribe">Suscribirse</string>
+    <string name="native_subscribed">Suscrito</string>
+    <string name="native_watch_later">Ver más tarde</string>
+    <string name="native_saved">Guardado</string>
+    <string name="native_share">Compartir</string>
+    <string name="native_classic_page">Página clásica</string>
+    <string name="native_tab_subtitles">Subtítulos</string>
+    <string name="native_tab_up_next">A continuación</string>
+    <string name="native_tab_comments">Comentarios</string>
+    <string name="native_tab_about">Información</string>
+    <string name="native_comments_read_only">Aquí los comentarios son solo de lectura. Para dar me gusta o responder, abre la página clásica.</string>
+    <plurals name="native_replies">
+        <item quantity="one">%1$d respuesta</item>
+        <item quantity="many">%1$d respuestas</item>
+        <item quantity="other">%1$d respuestas</item>
+    </plurals>
+    <string name="native_hide_replies">Ocultar respuestas</string>
+    <string name="native_pinned">Fijado</string>
+    <string name="native_no_comments">No hay comentarios para mostrar.</string>
+    <string name="native_no_description">Sin descripción.</string>
+    <string name="native_library_history">Historial</string>
+    <string name="native_library_subscriptions">Suscripciones</string>
+    <string name="native_library_clear_history">Borrar historial</string>
+    <string name="native_library_empty">Aún no hay nada aquí.</string>
+    <string name="native_remove_from_history">Quitar del historial</string>
+    <string name="native_remove_from_watch_later">Quitar de Ver más tarde</string>
+    <string name="native_channel_videos">Videos</string>
+    <string name="native_play">Reproducir</string>
+    <string name="native_pause">Pausar</string>
+    <string name="native_close_player">Detener y cerrar</string>
+    <string name="native_share_video">Compartir video</string>
+</resources>

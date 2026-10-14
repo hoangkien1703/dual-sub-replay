@@ -226,6 +226,10 @@ internal class YouTubeWebController {
         playingClipVideo = null
         scriptAction?.invoke(webPauseScript())
     }
+
+    fun resume() {
+        scriptAction?.invoke(webResumeScript())
+    }
     fun replayClip(word: com.kienhoang.dualsubreplay.data.SavedWord) {
         pause()
         pendingClip = word
@@ -288,6 +292,7 @@ internal fun SingleYouTubePage(
     liveCaptionCaptureEnabled: Boolean = false,
     suppressPageCaptions: Boolean = false,
     captionTrackTarget: CaptionTrackTarget? = null,
+    nativePlayerOnly: Boolean = false,
     fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -300,6 +305,7 @@ internal fun SingleYouTubePage(
     val currentOnPlaybackPaused by rememberUpdatedState(onPlaybackPaused)
     val currentLiveCaptionCaptureEnabled by rememberUpdatedState(liveCaptionCaptureEnabled)
     val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
+    val currentNativePlayerOnly by rememberUpdatedState(nativePlayerOnly)
     val currentCaptionTrackTarget by rememberUpdatedState(captionTrackTarget)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
@@ -472,6 +478,7 @@ internal fun SingleYouTubePage(
                             webCaptionVisibilityScript(currentSuppressPageCaptions),
                             null,
                         )
+                        if (currentNativePlayerOnly) view.evaluateJavascript(webNativePlayerOnlyScript(true), null)
                     }
                 }
 
@@ -537,6 +544,12 @@ internal fun SingleYouTubePage(
     LaunchedEffect(webView, suppressPageCaptions) {
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
+        }
+    }
+
+    LaunchedEffect(webView, nativePlayerOnly) {
+        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+            webView.evaluateJavascript(webNativePlayerOnlyScript(nativePlayerOnly), null)
         }
     }
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">ネイティブモード</string>
+    <string name="native_mode_beta">ベータ</string>
+    <string name="native_mode_drawer_description">検索、チャンネル、コメントを YouTube アプリ風の画面で表示します。まだテスト中です。オフにすると従来の YouTube ページに戻ります。</string>
+    <string name="native_mode_beta_notice">ネイティブモードはベータ版のため、一部の機能がまだ動かないことがあります。</string>
+    <string name="native_mode_switch_back">元に戻す</string>
+    <string name="native_search_hint">YouTube を検索</string>
+    <string name="native_clear_search">検索をクリア</string>
+    <string name="native_recent_searches">最近の検索</string>
+    <string name="native_forget_search">最近の検索から削除</string>
+    <string name="native_home">ホーム</string>
+    <string name="native_library">ライブラリ</string>
+    <string name="native_back">戻る</string>
+    <string name="native_home_continue">続きを見る</string>
+    <string name="native_home_subscriptions">登録チャンネルの新着</string>
+    <string name="native_home_for_you">「%1$s」を見たあなたへ</string>
+    <string name="native_home_recommended">あなたへのおすすめ</string>
+    <string name="native_home_empty_title">見たい動画を検索しましょう</string>
+    <string name="native_home_empty_body">登録したチャンネルの動画や、視聴した動画に基づくおすすめがここに表示されます。</string>
+    <string name="native_loading_failed">YouTube から読み込めませんでした。</string>
+    <string name="native_retry">再試行</string>
+    <string name="native_no_results">結果がありません</string>
+    <string name="native_live">ライブ</string>
+    <string name="native_subscribe">チャンネル登録</string>
+    <string name="native_subscribed">登録済み</string>
+    <string name="native_watch_later">後で見る</string>
+    <string name="native_saved">保存済み</string>
+    <string name="native_share">共有</string>
+    <string name="native_classic_page">従来のページ</string>
+    <string name="native_tab_subtitles">字幕</string>
+    <string name="native_tab_up_next">次の動画</string>
+    <string name="native_tab_comments">コメント</string>
+    <string name="native_tab_about">概要</string>
+    <string name="native_comments_read_only">ここではコメントは閲覧のみです。高評価や返信は従来のページで行えます。</string>
+    <plurals name="native_replies">
+        <item quantity="other">返信 %1$d 件</item>
+    </plurals>
+    <string name="native_hide_replies">返信を非表示</string>
+    <string name="native_pinned">固定済み</string>
+    <string name="native_no_comments">表示できるコメントはありません。</string>
+    <string name="native_no_description">説明はありません。</string>
+    <string name="native_library_history">履歴</string>
+    <string name="native_library_subscriptions">登録チャンネル</string>
+    <string name="native_library_clear_history">履歴を消去</string>
+    <string name="native_library_empty">まだ何もありません。</string>
+    <string name="native_remove_from_history">履歴から削除</string>
+    <string name="native_remove_from_watch_later">「後で見る」から削除</string>
+    <string name="native_channel_videos">動画</string>
+    <string name="native_play">再生</string>
+    <string name="native_pause">一時停止</string>
+    <string name="native_close_player">停止して閉じる</string>
+    <string name="native_share_video">動画を共有</string>
+</resources>

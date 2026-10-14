@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">Native mode</string>
+    <string name="native_mode_beta">Beta</string>
+    <string name="native_mode_drawer_description">A YouTube app look for search, channels and comments. Still in testing: turn it off to go back to the classic YouTube page.</string>
+    <string name="native_mode_beta_notice">Native mode is in beta, so some things may not work yet.</string>
+    <string name="native_mode_switch_back">Switch back</string>
+    <string name="native_search_hint">Search YouTube</string>
+    <string name="native_clear_search">Clear search</string>
+    <string name="native_recent_searches">Recent searches</string>
+    <string name="native_forget_search">Remove from recent searches</string>
+    <string name="native_home">Home</string>
+    <string name="native_library">Library</string>
+    <string name="native_back">Back</string>
+    <string name="native_home_continue">Continue watching</string>
+    <string name="native_home_subscriptions">From your subscriptions</string>
+    <string name="native_home_for_you">Because you watched %1$s</string>
+    <string name="native_home_recommended">Recommended for you</string>
+    <string name="native_home_empty_title">Search for something to watch</string>
+    <string name="native_home_empty_body">Videos from channels you subscribe to, and ideas based on what you watch, will show up here.</string>
+    <string name="native_loading_failed">Couldn\'t load this from YouTube.</string>
+    <string name="native_retry">Try again</string>
+    <string name="native_no_results">No results</string>
+    <string name="native_live">LIVE</string>
+    <string name="native_subscribe">Subscribe</string>
+    <string name="native_subscribed">Subscribed</string>
+    <string name="native_watch_later">Watch later</string>
+    <string name="native_saved">Saved</string>
+    <string name="native_share">Share</string>
+    <string name="native_classic_page">Classic page</string>
+    <string name="native_tab_subtitles">Subtitles</string>
+    <string name="native_tab_up_next">Up next</string>
+    <string name="native_tab_comments">Comments</string>
+    <string name="native_tab_about">About</string>
+    <string name="native_comments_read_only">Comments are read-only here. To like or reply, open the classic page.</string>
+    <plurals name="native_replies">
+        <item quantity="one">%1$d reply</item>
+        <item quantity="other">%1$d replies</item>
+    </plurals>
+    <string name="native_hide_replies">Hide replies</string>
+    <string name="native_pinned">Pinned</string>
+    <string name="native_no_comments">No comments to show.</string>
+    <string name="native_no_description">No description.</string>
+    <string name="native_library_history">History</string>
+    <string name="native_library_subscriptions">Subscriptions</string>
+    <string name="native_library_clear_history">Clear history</string>
+    <string name="native_library_empty">Nothing here yet.</string>
+    <string name="native_remove_from_history">Remove from history</string>
+    <string name="native_remove_from_watch_later">Remove from Watch later</string>
+    <string name="native_channel_videos">Videos</string>
+    <string name="native_play">Play</string>
+    <string name="native_pause">Pause</string>
+    <string name="native_close_player">Stop and close</string>
+    <string name="native_share_video">Share video</string>
+</resources>

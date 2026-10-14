@@ -230,6 +230,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val youtubeControlsVisible by youtubePlayerControlsVisible.collectAsStateWithLifecycle()
     val youtubeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
     val youtubeFullscreen by youtubeFullscreenActive.collectAsStateWithLifecycle()
+    val nativeScreenCoversPage by nativeModeCoversPage.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val preferences = remember(context) {
@@ -519,7 +520,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             )
 
             if (
-                !youtubeDialogVisible && !navigationOpen && state.onboardingCompleted &&
+                !youtubeDialogVisible && !navigationOpen && !nativeScreenCoversPage && state.onboardingCompleted &&
                 state.guideCompleted && state.dailyGoalPromptCompleted &&
                 state.activeVideoId != null &&
                 effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY

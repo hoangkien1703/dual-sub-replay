@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,6 +32,8 @@ internal fun AppNavigation(
     onSettings: () -> Unit,
     onProgress: () -> Unit = {},
     onVisibilityChange: (Boolean) -> Unit = {},
+    nativeModeEnabled: Boolean = false,
+    onNativeModeChange: ((Boolean) -> Unit)? = null,
     content: @Composable (menuButton: @Composable () -> Unit) -> Unit,
 ) {
     val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -75,6 +79,15 @@ internal fun AppNavigation(
                                 label = { Text(stringResource(R.string.navigation_settings)) }, selected = false,
                                 onClick = { scope.launch { drawer.close(); onSettings() } },
                             )
+                            if (onNativeModeChange != null) {
+                                HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                                NativeModeDrawerItem(nativeModeEnabled) { enabled ->
+                                    scope.launch {
+                                        drawer.close()
+                                        onNativeModeChange(enabled)
+                                    }
+                                }
+                            }
                         }
                         Column(Modifier.padding(horizontal = 4.dp)) {
                             HorizontalDivider(Modifier.padding(vertical = 16.dp))
@@ -131,5 +144,47 @@ private fun DrawerHeader(onClose: () -> Unit) {
         IconButton(onClick = onClose, modifier = Modifier.testTag("close_navigation_menu")) {
             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.navigation_close_menu))
         }
+    }
+}
+
+/** The left-bar switch for native mode, marked as beta so people know they can switch back. */
+@Composable
+private fun NativeModeDrawerItem(
+    enabled: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .toggleable(value = enabled, role = Role.Switch, onValueChange = onChange)
+            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+            .testTag("native_mode_drawer_item"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Default.SmartDisplay, contentDescription = null)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.native_mode_title), style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.width(8.dp))
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Text(
+                        stringResource(R.string.native_mode_beta),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.native_mode_drawer_description),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = enabled, onCheckedChange = null, modifier = Modifier.padding(start = 8.dp).testTag("native_mode_switch"))
     }
 }

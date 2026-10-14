@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">Mode native</string>
+    <string name="native_mode_beta">Beta</string>
+    <string name="native_mode_drawer_description">Tampilan seperti aplikasi YouTube untuk penelusuran, channel, dan komentar. Masih dalam pengujian: matikan untuk kembali ke halaman YouTube klasik.</string>
+    <string name="native_mode_beta_notice">Mode native masih beta, jadi beberapa hal mungkin belum berfungsi.</string>
+    <string name="native_mode_switch_back">Kembali ke klasik</string>
+    <string name="native_search_hint">Telusuri YouTube</string>
+    <string name="native_clear_search">Hapus penelusuran</string>
+    <string name="native_recent_searches">Penelusuran terbaru</string>
+    <string name="native_forget_search">Hapus dari penelusuran terbaru</string>
+    <string name="native_home">Beranda</string>
+    <string name="native_library">Koleksi</string>
+    <string name="native_back">Kembali</string>
+    <string name="native_home_continue">Lanjutkan menonton</string>
+    <string name="native_home_subscriptions">Dari langganan Anda</string>
+    <string name="native_home_for_you">Karena Anda menonton %1$s</string>
+    <string name="native_home_recommended">Rekomendasi untuk Anda</string>
+    <string name="native_home_empty_title">Telusuri sesuatu untuk ditonton</string>
+    <string name="native_home_empty_body">Video dari channel yang Anda langgani, dan ide berdasarkan yang Anda tonton, akan muncul di sini.</string>
+    <string name="native_loading_failed">Tidak dapat memuat ini dari YouTube.</string>
+    <string name="native_retry">Coba lagi</string>
+    <string name="native_no_results">Tidak ada hasil</string>
+    <string name="native_live">LIVE</string>
+    <string name="native_subscribe">Berlangganan</string>
+    <string name="native_subscribed">Sudah berlangganan</string>
+    <string name="native_watch_later">Tonton nanti</string>
+    <string name="native_saved">Disimpan</string>
+    <string name="native_share">Bagikan</string>
+    <string name="native_classic_page">Halaman klasik</string>
+    <string name="native_tab_subtitles">Subtitle</string>
+    <string name="native_tab_up_next">Berikutnya</string>
+    <string name="native_tab_comments">Komentar</string>
+    <string name="native_tab_about">Tentang</string>
+    <string name="native_comments_read_only">Komentar hanya bisa dibaca di sini. Untuk menyukai atau membalas, buka halaman klasik.</string>
+    <plurals name="native_replies">
+        <item quantity="other">%1$d balasan</item>
+    </plurals>
+    <string name="native_hide_replies">Sembunyikan balasan</string>
+    <string name="native_pinned">Disematkan</string>
+    <string name="native_no_comments">Tidak ada komentar untuk ditampilkan.</string>
+    <string name="native_no_description">Tidak ada deskripsi.</string>
+    <string name="native_library_history">Riwayat</string>
+    <string name="native_library_subscriptions">Langganan</string>
+    <string name="native_library_clear_history">Hapus riwayat</string>
+    <string name="native_library_empty">Belum ada apa-apa di sini.</string>
+    <string name="native_remove_from_history">Hapus dari riwayat</string>
+    <string name="native_remove_from_watch_later">Hapus dari Tonton nanti</string>
+    <string name="native_channel_videos">Video</string>
+    <string name="native_play">Putar</string>
+    <string name="native_pause">Jeda</string>
+    <string name="native_close_player">Hentikan dan tutup</string>
+    <string name="native_share_video">Bagikan video</string>
+</resources>

@@ -38,6 +38,13 @@ Paths below are relative to
   the screen, and `WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT` always tells YouTube's page it is visible
   so it keeps playing without Premium too (owner decision 2026-10-13). See the
   [spec](../specs/2026-10-13-background-play-and-earphone-controls.md).
+- Native mode (beta, owner decision 2026-10-14) is an opt-in YouTube-app look.
+  `ui/NativeModeViewModel.kt` keeps its screen stack and loads; `ui/NativeModeScreens.kt`,
+  `ui/NativeWatchScreen.kt` and `ui/NativeModeComponents.kt` draw Home, Search, Watch, Channel,
+  Playlist and Library over `SingleYouTubePage`, which then shows only its player. Its data comes
+  from YouTube's public web endpoints and channel RSS feeds behind `data/NativeYouTubeSource.kt`
+  and `data/NativeYouTubeParser.kt`; `data/NativeLibrary.kt` keeps history, Watch later,
+  subscriptions and searches on the phone. See the [spec](../specs/2026-10-14-native-mode-beta.md).
 - `data/CaptionProvider.kt` is the provider interface. `YouTubeCaptionProvider.kt`
   discovers caption tracks from watch-page player metadata and undocumented
   Innertube player fallbacks, then fetches timed text. `CaptionDocumentParser.kt`
@@ -108,8 +115,8 @@ Paths below are relative to
 
 ## Architecture invariants
 
-- Keep exactly one online WebView/player. Replay and online vocabulary examples seek
-  the same YouTube page video. Offline media downloading/local Media3 playback were
+- Keep exactly one online WebView/player. Replay, online vocabulary examples and native
+  mode's watch screen use the same YouTube page video. Offline media downloading/local Media3 playback were
   removed; do not reintroduce another player as a shortcut.
 - Preserve `classifyMainFrameUrl` navigation decisions and HTTPS YouTube origin checks
   inside executing JS, including asynchronous callbacks. Sign-in pages are a distinct

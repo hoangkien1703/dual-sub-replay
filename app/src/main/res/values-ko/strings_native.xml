@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">네이티브 모드</string>
+    <string name="native_mode_beta">베타</string>
+    <string name="native_mode_drawer_description">검색, 채널, 댓글을 YouTube 앱처럼 보여 줍니다. 아직 테스트 중이며, 끄면 기존 YouTube 페이지로 돌아갑니다.</string>
+    <string name="native_mode_beta_notice">네이티브 모드는 베타 버전이라 일부 기능이 아직 작동하지 않을 수 있습니다.</string>
+    <string name="native_mode_switch_back">이전 화면으로 전환</string>
+    <string name="native_search_hint">YouTube 검색</string>
+    <string name="native_clear_search">검색어 지우기</string>
+    <string name="native_recent_searches">최근 검색어</string>
+    <string name="native_forget_search">최근 검색어에서 삭제</string>
+    <string name="native_home">홈</string>
+    <string name="native_library">보관함</string>
+    <string name="native_back">뒤로</string>
+    <string name="native_home_continue">이어서 보기</string>
+    <string name="native_home_subscriptions">구독 채널의 새 동영상</string>
+    <string name="native_home_for_you">%1$s 시청 기반 추천</string>
+    <string name="native_home_recommended">추천 동영상</string>
+    <string name="native_home_empty_title">볼 동영상을 검색해 보세요</string>
+    <string name="native_home_empty_body">구독한 채널의 동영상과 시청한 동영상을 바탕으로 한 추천이 여기에 표시됩니다.</string>
+    <string name="native_loading_failed">YouTube에서 불러오지 못했습니다.</string>
+    <string name="native_retry">다시 시도</string>
+    <string name="native_no_results">결과 없음</string>
+    <string name="native_live">실시간</string>
+    <string name="native_subscribe">구독</string>
+    <string name="native_subscribed">구독중</string>
+    <string name="native_watch_later">나중에 볼 동영상</string>
+    <string name="native_saved">저장됨</string>
+    <string name="native_share">공유</string>
+    <string name="native_classic_page">기존 페이지</string>
+    <string name="native_tab_subtitles">자막</string>
+    <string name="native_tab_up_next">다음 동영상</string>
+    <string name="native_tab_comments">댓글</string>
+    <string name="native_tab_about">정보</string>
+    <string name="native_comments_read_only">여기서는 댓글을 읽기만 할 수 있습니다. 좋아요나 답글은 기존 페이지에서 할 수 있습니다.</string>
+    <plurals name="native_replies">
+        <item quantity="other">답글 %1$d개</item>
+    </plurals>
+    <string name="native_hide_replies">답글 숨기기</string>
+    <string name="native_pinned">고정됨</string>
+    <string name="native_no_comments">표시할 댓글이 없습니다.</string>
+    <string name="native_no_description">설명이 없습니다.</string>
+    <string name="native_library_history">시청 기록</string>
+    <string name="native_library_subscriptions">구독</string>
+    <string name="native_library_clear_history">기록 지우기</string>
+    <string name="native_library_empty">아직 아무것도 없습니다.</string>
+    <string name="native_remove_from_history">기록에서 삭제</string>
+    <string name="native_remove_from_watch_later">나중에 볼 동영상에서 삭제</string>
+    <string name="native_channel_videos">동영상</string>
+    <string name="native_play">재생</string>
+    <string name="native_pause">일시중지</string>
+    <string name="native_close_player">정지하고 닫기</string>
+    <string name="native_share_video">동영상 공유</string>
+</resources>

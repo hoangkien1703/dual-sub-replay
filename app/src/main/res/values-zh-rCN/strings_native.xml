@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">原生模式</string>
+    <string name="native_mode_beta">测试版</string>
+    <string name="native_mode_drawer_description">以 YouTube 应用的样式浏览搜索、频道和评论。仍在测试中：关闭后即可回到经典 YouTube 页面。</string>
+    <string name="native_mode_beta_notice">原生模式仍是测试版，部分功能可能还不能正常使用。</string>
+    <string name="native_mode_switch_back">切换回去</string>
+    <string name="native_search_hint">搜索 YouTube</string>
+    <string name="native_clear_search">清除搜索</string>
+    <string name="native_recent_searches">最近搜索</string>
+    <string name="native_forget_search">从最近搜索中移除</string>
+    <string name="native_home">首页</string>
+    <string name="native_library">媒体库</string>
+    <string name="native_back">返回</string>
+    <string name="native_home_continue">继续观看</string>
+    <string name="native_home_subscriptions">来自你的订阅</string>
+    <string name="native_home_for_you">因为你看过 %1$s</string>
+    <string name="native_home_recommended">为你推荐</string>
+    <string name="native_home_empty_title">搜索想看的视频</string>
+    <string name="native_home_empty_body">你订阅的频道的视频，以及根据你的观看内容推荐的视频，会显示在这里。</string>
+    <string name="native_loading_failed">无法从 YouTube 加载此内容。</string>
+    <string name="native_retry">重试</string>
+    <string name="native_no_results">没有结果</string>
+    <string name="native_live">直播</string>
+    <string name="native_subscribe">订阅</string>
+    <string name="native_subscribed">已订阅</string>
+    <string name="native_watch_later">稍后观看</string>
+    <string name="native_saved">已保存</string>
+    <string name="native_share">分享</string>
+    <string name="native_classic_page">经典页面</string>
+    <string name="native_tab_subtitles">字幕</string>
+    <string name="native_tab_up_next">接下来播放</string>
+    <string name="native_tab_comments">评论</string>
+    <string name="native_tab_about">简介</string>
+    <string name="native_comments_read_only">这里的评论只能查看。如需点赞或回复，请打开经典页面。</string>
+    <plurals name="native_replies">
+        <item quantity="other">%1$d 条回复</item>
+    </plurals>
+    <string name="native_hide_replies">隐藏回复</string>
+    <string name="native_pinned">已置顶</string>
+    <string name="native_no_comments">没有可显示的评论。</string>
+    <string name="native_no_description">暂无简介。</string>
+    <string name="native_library_history">历史记录</string>
+    <string name="native_library_subscriptions">订阅</string>
+    <string name="native_library_clear_history">清除历史记录</string>
+    <string name="native_library_empty">这里还没有内容。</string>
+    <string name="native_remove_from_history">从历史记录中移除</string>
+    <string name="native_remove_from_watch_later">从“稍后观看”中移除</string>
+    <string name="native_channel_videos">视频</string>
+    <string name="native_play">播放</string>
+    <string name="native_pause">暂停</string>
+    <string name="native_close_player">停止并关闭</string>
+    <string name="native_share_video">分享视频</string>
+</resources>

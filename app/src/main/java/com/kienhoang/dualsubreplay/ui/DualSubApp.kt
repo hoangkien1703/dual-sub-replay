@@ -1,6 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -10,8 +12,10 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -80,6 +84,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -92,6 +97,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Composable
+@Suppress("LongMethod")
 fun DualSubApp(
     viewModel: AppViewModel,
     playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
@@ -174,6 +180,7 @@ fun DualSubApp(
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
                 onWordClick = viewModel::selectLearningWord,
                 onResetSettings = viewModel::resetAllSettings,
+                nativeMode = rememberNativeModeBinding(viewModel),
             )
         }
         state.selectedLearningWord?.let { selection ->
@@ -199,6 +206,18 @@ fun DualSubApp(
             onDismiss = { showProgress = false },
         )
     }
+}
+
+@Composable
+private fun rememberNativeModeBinding(viewModel: AppViewModel): NativeModeBinding {
+    val nativeModeViewModel: NativeModeViewModel = viewModel()
+    val enabled by nativeModeViewModel.enabled.collectAsStateWithLifecycle()
+    return NativeModeBinding(
+        viewModel = nativeModeViewModel,
+        enabled = enabled,
+        openVideo = viewModel::openNativeVideo,
+        closeVideo = { viewModel.openYouTubePage(YOUTUBE_HOME_URL) },
+    )
 }
 
 @Composable
@@ -283,6 +302,7 @@ private fun DualSubExperience(
     onTapToLearnChange: (Boolean) -> Unit = {},
     onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
+    nativeMode: NativeModeBinding,
 ) {
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)
@@ -331,14 +351,26 @@ private fun DualSubExperience(
             WindowInsets.safeDrawing
         }
     val liveCaptionCaptureEnabled = shouldCaptureCaptionsForPresentation(state, effectivePlayerMode)
+    // Native mode in portrait shows only the player in a 16:9 strip; its own screens fill the rest.
+    val nativePortrait = nativeMode.enabled && configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val floatingSubtitlesAllowed = floatingSubtitlesAllowed(nativePortrait, nativeDialogVisible, sideBySide)
+    var navigationOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showQuickSettings = true
     }
 
-    AppNavigation(onPractice = onVocabulary, onProgress = onProgress, onSettings = {
-        showSettings = true
-    }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
+    AppNavigation(
+        onPractice = onVocabulary,
+        onProgress = onProgress,
+        onSettings = { showSettings = true },
+        onVisibilityChange = {
+            navigationOpen = it
+            onNavigationVisibilityChange(it)
+        },
+        nativeModeEnabled = nativeMode.enabled,
+        onNativeModeChange = { on -> nativeMode.viewModel.setEnabled(on, state.activeVideoId) },
+    ) { menuButton ->
         Scaffold(contentWindowInsets = contentInsets, topBar = {
             Surface {
                 Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
@@ -375,10 +407,11 @@ private fun DualSubExperience(
                         suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
                         captionTrackTarget = captionTrackTarget(state),
                         fullscreenOverlay = fullscreenLearningOverlay,
+                        nativePlayerOnly = nativeMode.enabled,
                         modifier =
                             Modifier
                                 .weight(if (sideBySide) landscapeVideoFraction else 1f)
-                                .fillMaxHeight()
+                                .pageHeight(nativePortrait)
                                 .testTag("youtube_web_app"),
                     )
 
@@ -413,7 +446,7 @@ private fun DualSubExperience(
                     }
                 }
 
-                if (tracksVisible && !nativeDialogVisible && !sideBySide && state.activeVideoId != null && state.subtitlePanelVisible) {
+                if (tracksVisible && floatingSubtitlesAllowed && state.activeVideoId != null && state.subtitlePanelVisible) {
                     val panelContent: @Composable (Modifier) -> Unit = { panelModifier ->
                         SubtitlePanel(
                             state = state,
@@ -446,11 +479,23 @@ private fun DualSubExperience(
                         )
                     }
                 } else if (
-                    !nativeDialogVisible && !sideBySide &&
+                    floatingSubtitlesAllowed &&
                     state.activeVideoId != null &&
                     effectivePlayerMode == PlayerExperienceMode.TRANSCRIPT_PANEL
                 ) {
                     MovableSubtitleFab(onClick = { if (tracksVisible) onShowSubtitles() else showSettings = true })
+                }
+                if (nativeMode.enabled) {
+                    NativeModeLayer(
+                        binding = nativeMode,
+                        state = state,
+                        webController = webController,
+                        showWatch = configuration.orientation == Configuration.ORIENTATION_PORTRAIT,
+                        backEnabled = !navigationOpen,
+                        onSettings = { showQuickSettings = true },
+                        onRetry = onRetry,
+                        onWordClick = onWordClick,
+                    )
                 }
             }
         }
@@ -520,6 +565,134 @@ private fun DualSubExperience(
             },
             onDismiss = { showSettings = false },
         )
+    }
+}
+
+/**
+ * The floating subtitle panel and button show unless YouTube's own dialog is open, the landscape
+ * split shows subtitles beside the video, or native mode's Subtitles tab shows them (portrait).
+ */
+internal fun floatingSubtitlesAllowed(
+    nativePortrait: Boolean,
+    nativeDialogVisible: Boolean,
+    sideBySide: Boolean,
+): Boolean = !nativePortrait && !nativeDialogVisible && !sideBySide
+
+/** The page fills the height, or in native portrait only a 16:9 strip for the player. */
+private fun Modifier.pageHeight(nativePortrait: Boolean): Modifier =
+    if (nativePortrait) aspectRatio(16f / 9f) else fillMaxHeight()
+
+/** Native mode's screens over the page, wired to the page video and the subtitle timeline. */
+@Composable
+private fun NativeModeLayer(
+    binding: NativeModeBinding,
+    state: DualSubUiState,
+    webController: YouTubeWebController,
+    showWatch: Boolean,
+    backEnabled: Boolean,
+    onSettings: () -> Unit,
+    onRetry: () -> Unit,
+    onWordClick: (WordTap) -> Unit,
+) {
+    val viewModel = binding.viewModel
+    val activity = LocalActivity.current
+    // Autoplay and end-screen taps change the page video; the watch screen follows it.
+    LaunchedEffect(state.activeVideoId) { state.activeVideoId?.let(viewModel::followPageVideo) }
+    val host =
+        NativeModeHost(
+            activeVideoId = state.activeVideoId,
+            playing = !state.playbackPaused,
+            play = { video, playlistId ->
+                viewModel.openVideo(video)
+                if (video.videoId != state.activeVideoId || playlistId != null) binding.openVideo(video.videoId, playlistId)
+            },
+            pause = webController::pause,
+            resume = webController::resume,
+            stop = {
+                webController.pause()
+                binding.closeVideo()
+            },
+            switchBack = { viewModel.setEnabled(false) },
+            subtitles = { modifier ->
+                NativeSubtitlesTab(
+                    state = state,
+                    modifier = modifier,
+                    onSettings = onSettings,
+                    onRetry = onRetry,
+                    onWordClick = onWordClick,
+                    onReplay = { segment -> webController.replayFrom(segment.startMs / 1_000f) },
+                )
+            },
+        )
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        NativeModeShell(viewModel, host, videoHeight = maxWidth * 9f / 16f, showWatch = showWatch)
+    }
+    // Composed after the page, so back walks native screens before it would leave the app.
+    BackHandler(enabled = backEnabled && !assistantPanelOpen()) {
+        if (!viewModel.back()) activity?.leaveKeepingState()
+    }
+}
+
+/** True while the assistant panel is open, so its own Back (close the panel) comes first. */
+@Composable
+private fun assistantPanelOpen(): Boolean {
+    val controller = LocalAiAssistant.current?.controller ?: return false
+    val assistant by controller.state.collectAsStateWithLifecycle()
+    return assistant.panelOpen && assistant.settings.enabled
+}
+
+/** The subtitle timeline as a watch-screen tab: the same content as the panel, without dragging or hiding. */
+@Composable
+private fun NativeSubtitlesTab(
+    state: DualSubUiState,
+    modifier: Modifier,
+    onSettings: () -> Unit,
+    onRetry: () -> Unit,
+    onWordClick: (WordTap) -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
+) {
+    Column(modifier.testTag("subtitle_timeline")) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = sourceDescription(state),
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            IconButton(onClick = onSettings) {
+                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.player_subtitle_settings))
+            }
+        }
+        Box(Modifier.fillMaxWidth().weight(1f)) {
+            SubtitlePanelContent(state, onRetry, onWordClick, onReplay)
+        }
+    }
+}
+
+@Composable
+private fun SubtitlePanelContent(
+    state: DualSubUiState,
+    onRetry: () -> Unit,
+    onWordClick: (WordTap) -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
+) {
+    when {
+        state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
+        state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
+        state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
+        else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
     }
 }
 
@@ -648,12 +821,7 @@ private fun SubtitlePanel(
             HorizontalDivider(color = Color(0xFF244044))
 
             Box(Modifier.fillMaxWidth().weight(1f)) {
-                when {
-                    state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
-                    state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
-                    state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
-                    else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
-                }
+                SubtitlePanelContent(state, onRetry, onWordClick, onReplay)
             }
         }
     }

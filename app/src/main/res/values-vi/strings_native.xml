@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="native_mode_title">Chế độ Native</string>
+    <string name="native_mode_beta">Beta</string>
+    <string name="native_mode_drawer_description">Giao diện giống ứng dụng YouTube cho tìm kiếm, kênh và bình luận. Vẫn đang thử nghiệm: tắt đi để quay lại trang YouTube cổ điển.</string>
+    <string name="native_mode_beta_notice">Chế độ Native đang ở bản beta nên một số thứ có thể chưa hoạt động.</string>
+    <string name="native_mode_switch_back">Quay lại bản cũ</string>
+    <string name="native_search_hint">Tìm kiếm trên YouTube</string>
+    <string name="native_clear_search">Xóa tìm kiếm</string>
+    <string name="native_recent_searches">Tìm kiếm gần đây</string>
+    <string name="native_forget_search">Xóa khỏi tìm kiếm gần đây</string>
+    <string name="native_home">Trang chủ</string>
+    <string name="native_library">Thư viện</string>
+    <string name="native_back">Quay lại</string>
+    <string name="native_home_continue">Xem tiếp</string>
+    <string name="native_home_subscriptions">Từ các kênh bạn đăng ký</string>
+    <string name="native_home_for_you">Vì bạn đã xem %1$s</string>
+    <string name="native_home_recommended">Đề xuất cho bạn</string>
+    <string name="native_home_empty_title">Tìm video để xem</string>
+    <string name="native_home_empty_body">Video từ các kênh bạn đăng ký và gợi ý dựa trên những gì bạn xem sẽ hiện ở đây.</string>
+    <string name="native_loading_failed">Không tải được nội dung này từ YouTube.</string>
+    <string name="native_retry">Thử lại</string>
+    <string name="native_no_results">Không có kết quả</string>
+    <string name="native_live">TRỰC TIẾP</string>
+    <string name="native_subscribe">Đăng ký</string>
+    <string name="native_subscribed">Đã đăng ký</string>
+    <string name="native_watch_later">Xem sau</string>
+    <string name="native_saved">Đã lưu</string>
+    <string name="native_share">Chia sẻ</string>
+    <string name="native_classic_page">Trang cổ điển</string>
+    <string name="native_tab_subtitles">Phụ đề</string>
+    <string name="native_tab_up_next">Tiếp theo</string>
+    <string name="native_tab_comments">Bình luận</string>
+    <string name="native_tab_about">Giới thiệu</string>
+    <string name="native_comments_read_only">Ở đây chỉ xem được bình luận. Để thích hoặc trả lời, hãy mở trang cổ điển.</string>
+    <plurals name="native_replies">
+        <item quantity="other">%1$d phản hồi</item>
+    </plurals>
+    <string name="native_hide_replies">Ẩn phản hồi</string>
+    <string name="native_pinned">Đã ghim</string>
+    <string name="native_no_comments">Không có bình luận nào để hiển thị.</string>
+    <string name="native_no_description">Không có mô tả.</string>
+    <string name="native_library_history">Lịch sử</string>
+    <string name="native_library_subscriptions">Kênh đăng ký</string>
+    <string name="native_library_clear_history">Xóa lịch sử</string>
+    <string name="native_library_empty">Chưa có gì ở đây.</string>
+    <string name="native_remove_from_history">Xóa khỏi lịch sử</string>
+    <string name="native_remove_from_watch_later">Xóa khỏi Xem sau</string>
+    <string name="native_channel_videos">Video</string>
+    <string name="native_play">Phát</string>
+    <string name="native_pause">Tạm dừng</string>
+    <string name="native_close_player">Dừng và đóng</string>
+    <string name="native_share_video">Chia sẻ video</string>
+</resources>

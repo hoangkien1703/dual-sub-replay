@@ -30,6 +30,8 @@ import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
+import com.kienhoang.dualsubreplay.data.isNativePlaylistId
+import com.kienhoang.dualsubreplay.data.isNativeVideoId
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.translation.DEFAULT_TRANSLATION_ENGINE
@@ -923,6 +925,22 @@ class AppViewModel internal constructor(
     ) {
         preferences.edit().putString(if (original) ORIGINAL_VISIBILITY else TRANSLATED_VISIBILITY, visibility.name).apply()
         _state.update { if (original) it.copy(originalVisibility = visibility) else it.copy(translatedVisibility = visibility) }
+    }
+
+    /**
+     * Native mode: plays [videoId] on the page, inside [playlistId] when given so YouTube moves on
+     * to the playlist's next video by itself.
+     */
+    fun openNativeVideo(
+        videoId: String,
+        playlistId: String? = null,
+    ) {
+        if (!isNativeVideoId(videoId)) return
+        val list = playlistId?.takeIf(::isNativePlaylistId)?.let { "&list=$it" }.orEmpty()
+        val url = mobileWatchUrl(videoId) + list
+        preferences.edit().putString("last_browser_url", url).apply()
+        _state.update { it.copy(browserUrl = url, browserNavigationRequestId = it.browserNavigationRequestId + 1) }
+        openVideo(videoId)
     }
 
     /** Opens a YouTube page in the app's one YouTube view, for example a search the assistant offered. */

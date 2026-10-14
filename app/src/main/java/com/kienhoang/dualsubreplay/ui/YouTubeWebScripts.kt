@@ -7,6 +7,7 @@ internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
 internal const val LIVE_CAPTION_CAPTURE_STATE_KEY = "__dualSubLiveCaptionV1"
 internal const val MAX_LIVE_CAPTION_TEXT_LENGTH = 4_096
 internal const val CAPTION_TRACK_SYNC_STATE_KEY = "__dualSubCaptionTrackV1"
+internal const val NATIVE_MODE_PLAYER_STYLE_ID = "dual-sub-native-mode-player"
 
 internal data class WebPlaybackSnapshot(
     val url: String,
@@ -583,6 +584,61 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
         )
     }.getOrNull()
 }
+
+/**
+ * Native mode shows only the page's player: the player fills the page's whole (video-sized) view
+ * and the rest of the YouTube page stays hidden behind it. YouTube's own menus (quality, speed,
+ * captions) still open above the player. Removing the style restores the page.
+ */
+internal fun webNativePlayerOnlyScript(enabled: Boolean): String {
+    val enabledLiteral = if (enabled) "true" else "false"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          const styleId = '$NATIVE_MODE_PLAYER_STYLE_ID';
+          const existing = document.getElementById(styleId);
+          if ($enabledLiteral) {
+            const style = existing || document.createElement('style');
+            style.id = styleId;
+            style.textContent =
+              'html, body { overflow: hidden !important; background: #000 !important; }' +
+              '#player-container-id, .player-container, #player-container, ytm-player, #player {' +
+              ' position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important;' +
+              ' width: 100vw !important; height: 100vh !important; max-height: none !important;' +
+              ' margin: 0 !important; padding: 0 !important; transform: none !important;' +
+              ' z-index: 2147483646 !important; background: #000 !important; }' +
+              '#movie_player, .html5-video-player, .html5-video-container {' +
+              ' width: 100vw !important; height: 100vh !important; }' +
+              '#movie_player video, .html5-main-video {' +
+              ' width: 100vw !important; height: 100vh !important; left: 0 !important; top: 0 !important;' +
+              ' object-fit: contain !important; }' +
+              '[role="dialog"][aria-modal="true"], ytw-scrim, .ytSpecBottomSheetLayoutHost {' +
+              ' z-index: 2147483647 !important; }';
+            if (!existing) (document.head || document.documentElement).appendChild(style);
+          } else if (existing) {
+            existing.remove();
+          }
+          window.dispatchEvent(new Event('resize'));
+          return true;
+        })();
+        """.trimIndent()
+}
+
+/** Resumes the page video; native mode's mini player. */
+internal fun webResumeScript(): String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+      if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      const video = document.querySelector('video');
+      if (!video) return false;
+      const request = video.play();
+      if (request && request.catch) request.catch(function() {});
+      return true;
+    })();
+    """.trimIndent()
 
 internal fun webPauseScript(): String =
     """
