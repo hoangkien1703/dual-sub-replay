@@ -149,8 +149,34 @@ class AiOpenCodeTermuxTest {
             assertTrue(script.indexOf("PATH=") < script.indexOf("command -v opencode"))
         }
         assertEquals("""{"agent":{"plan":{"permission":"ask"}}}""", OPENCODE_CONFIG)
-        assertTrue(OPENCODE_RUN_SCRIPT.endsWith("exec opencode run --agent plan --format json -m \"\$1\""))
+        assertTrue(OPENCODE_RUN_SCRIPT.endsWith("run_opencode run --agent plan --format json -m \"\$1\""))
+        // In a proot-distro Linux, OpenCode still runs in the work folder that holds the config.
+        assertTrue(OPENCODE_RUN_SCRIPT.contains("exec proot-distro login \"\$distro\" --work-dir \"\$dir\" -- opencode \"\$@\""))
     }
+
+    @Test
+    fun aModelNameThatIsNotProviderSlashModelNeverReachesTermux() =
+        runBlocking {
+            val termux = FakeTermux(TermuxResult(textEvent("OK"), "", 0))
+            val request =
+                AiChatRequest(
+                    baseUrl = AiProvider.OPENCODE_PHONE.baseUrl,
+                    model = "opencode/x; rm -rf ~",
+                    apiKey = "",
+                    messages = listOf(AiWireMessage(AiRole.USER, "Hi")),
+                    format = AiWireFormat.OPENCODE_TERMUX,
+                )
+            val error =
+                try {
+                    AiOpenCodeTransport(termux).complete(request)
+                    null
+                } catch (failure: AiChatException) {
+                    failure
+                }
+            assertEquals(AiErrorKind.UNKNOWN_MODEL, error?.kind)
+            assertTrue(termux.runs.isEmpty())
+            assertEquals("OK", AiOpenCodeTransport(termux).complete(request.copy(model = "openrouter/qwen/qwen3:free")).text)
+        }
 
     @Test
     fun picturesAndPdfsAreRefusedBeforeTermuxIsAsked() =

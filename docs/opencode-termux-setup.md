@@ -24,12 +24,26 @@ To use it, open OpenCode in Termux and ask:
   PATH="$HOME/.opencode/bin:$HOME/.bun/bin:$HOME/.local/bin:$HOME/bin:$PATH"
   dir="$HOME/.dualsub-replay"
   mkdir -p "$dir" && cd "$dir" && printf '%s\n' '{"agent":{"plan":{"permission":"ask"}}}' > opencode.json || exit 90
-  command -v opencode >/dev/null 2>&1 || exit 91
-  exec opencode run --agent plan --format json -m "$1"
+  re="^[[:space:]]*alias[[:space:]]+opencode=[\"']?(proot-distro|pd)[[:space:]]+login[[:space:]]+([A-Za-z0-9._-]+)"
+  distro=
+  for f in "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+    [ -f "$f" ] || continue
+    while IFS= read -r line; do [[ $line =~ $re ]] && distro=${BASH_REMATCH[2]}; done < "$f"
+  done
+  if [ -n "$distro" ] && command -v proot-distro >/dev/null 2>&1; then
+    run_opencode() { exec proot-distro login "$distro" --work-dir "$dir" -- opencode "$@"; }
+  else
+    command -v opencode >/dev/null 2>&1 || exit 91
+    run_opencode() { exec opencode "$@"; }
+  fi
+  run_opencode run --agent plan --format json -m "$1"
   ```
 
   Exit 90 shows "Termux couldn't run OpenCode", and exit 91 shows "OpenCode wasn't found in Termux".
-  Builds before PR #118's second commit did not have the `PATH=` line.
+- OpenCode's Linux build does not run in plain Termux ("cannot execute: required file not found").
+  If `~/.bashrc` has an alias like `alias opencode="proot-distro login debian -- opencode"`, the
+  script starts that Linux in the same work folder, which proot-distro shares with Termux at the
+  same path. Earlier preview builds of PR #118 did not do this.
 - `~/.dualsub-replay/opencode.json` keeps OpenCode's own tools on "ask". A run with no terminal
   refuses every ask, so the model can only answer in text. Don't change this file: the app
   rewrites it before every run.
@@ -43,10 +57,12 @@ Run each step and keep its output for the report.
 2. **Where OpenCode is.** Run `command -v opencode; opencode --version`.
    - If the path is not in `$PREFIX/bin`, check whether a background login shell can find it:
      `env -i HOME="$HOME" PREFIX="$PREFIX" PATH="$PREFIX/bin" bash -lc 'command -v opencode'`.
-   - If that prints nothing, make OpenCode visible to every shell with a link in Termux's `bin`
-     (ask the user first): `ln -sf "$(command -v opencode)" "$PREFIX/bin/opencode"`.
-     If `command -v opencode` names an alias or function instead of a file, find the real file
-     first (for example `type opencode`) and link that file.
+   - If `type opencode` shows an alias to `proot-distro login <distro> -- opencode`, nothing more
+     is needed: the app reads that alias. Upgrade OpenCode inside that Linux, not in Termux.
+   - Otherwise, if that prints nothing, make OpenCode visible to every shell with a link in
+     Termux's `bin` (ask the user first): `ln -sf "$(command -v opencode)" "$PREFIX/bin/opencode"`.
+   - OpenCode 1.x refuses the app's settings ("Expected PermissionActionConfig"); version 2 is
+     needed.
 3. **Other apps allowed.** Run `grep -n allow-external-apps ~/.termux/termux.properties`.
    - There must be a line `allow-external-apps=true` (or `allow-external-apps = true`), and no line
      setting it to `false`. Repeated identical lines are harmless.
@@ -60,8 +76,19 @@ Run each step and keep its output for the report.
    PATH="$HOME/.opencode/bin:$HOME/.bun/bin:$HOME/.local/bin:$HOME/bin:$PATH"
    dir="$HOME/.dualsub-replay"
    mkdir -p "$dir" && cd "$dir" && printf '%s\n' '{"agent":{"plan":{"permission":"ask"}}}' > opencode.json || exit 90
-   command -v opencode >/dev/null 2>&1 || exit 91
-   exec opencode run --agent plan --format json -m "$1"
+   re="^[[:space:]]*alias[[:space:]]+opencode=[\"']?(proot-distro|pd)[[:space:]]+login[[:space:]]+([A-Za-z0-9._-]+)"
+   distro=
+   for f in "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+     [ -f "$f" ] || continue
+     while IFS= read -r line; do [[ $line =~ $re ]] && distro=${BASH_REMATCH[2]}; done < "$f"
+   done
+   if [ -n "$distro" ] && command -v proot-distro >/dev/null 2>&1; then
+     run_opencode() { exec proot-distro login "$distro" --work-dir "$dir" -- opencode "$@"; }
+   else
+     command -v opencode >/dev/null 2>&1 || exit 91
+     run_opencode() { exec opencode "$@"; }
+   fi
+   run_opencode run --agent plan --format json -m "$1"
    EOF
    echo "Reply with exactly one word: OK" |
      env -i HOME="$HOME" PREFIX="$PREFIX" TMPDIR="$TMPDIR" PATH="$PREFIX/bin" \
@@ -69,7 +96,8 @@ Run each step and keep its output for the report.
    echo "exit code: $?"
    ```
 
-   Success is a JSON line with `"type":"text"` and exit code 0.
+   Run it from plain Termux, not from inside a proot-distro Linux. Success is a JSON line with
+   `"type":"text"` and exit code 0.
    - Exit 91: OpenCode is still not found, so go back to step 2.
    - An `"type":"error"` line: report its `message`. A "free tier" or "rate limit" message comes
      from OpenCode's servers, not from the phone.

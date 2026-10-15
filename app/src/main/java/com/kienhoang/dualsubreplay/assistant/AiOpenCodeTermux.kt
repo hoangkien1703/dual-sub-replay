@@ -52,18 +52,38 @@ internal val OPENCODE_INSTALL_FOLDERS = listOf(".opencode/bin", ".bun/bin", ".lo
 
 /**
  * Prepares the work folder, writing [OPENCODE_CONFIG] every time so a changed file cannot turn the
- * tools on. Chat text never reaches the shell: the model name is `$1` and the message comes on stdin.
+ * tools on, and defines `run_opencode`. Chat text never reaches the shell: the model name is `$1`
+ * and the message comes on stdin.
+ *
+ * OpenCode's Linux build does not run in plain Termux, so many people run it in a proot-distro
+ * Linux with an alias such as `alias opencode="proot-distro login debian -- opencode"` in
+ * `~/.bashrc`. A background shell never reads aliases, so the script finds that alias itself and
+ * starts the same Linux in the work folder, which proot-distro shares with Termux at the same path.
  */
 private val OPENCODE_PREPARE =
     """
     PATH="${OPENCODE_INSTALL_FOLDERS.joinToString(":") { "${'$'}HOME/$it" }}:${'$'}PATH"
     dir="${'$'}HOME/$OPENCODE_WORK_FOLDER"
     mkdir -p "${'$'}dir" && cd "${'$'}dir" && printf '%s\n' '$OPENCODE_CONFIG' > opencode.json || exit $OPENCODE_EXIT_NO_FOLDER
-    command -v opencode >/dev/null 2>&1 || exit $OPENCODE_EXIT_NOT_FOUND
+    re="^[[:space:]]*alias[[:space:]]+opencode=[\"']?(proot-distro|pd)[[:space:]]+login[[:space:]]+([A-Za-z0-9._-]+)"
+    distro=
+    for f in "${'$'}HOME/.bashrc" "${'$'}HOME/.bash_profile" "${'$'}HOME/.profile"; do
+      [ -f "${'$'}f" ] || continue
+      while IFS= read -r line; do [[ ${'$'}line =~ ${'$'}re ]] && distro=${'$'}{BASH_REMATCH[2]}; done < "${'$'}f"
+    done
+    if [ -n "${'$'}distro" ] && command -v proot-distro >/dev/null 2>&1; then
+      run_opencode() { exec proot-distro login "${'$'}distro" --work-dir "${'$'}dir" -- opencode "$@"; }
+    else
+      command -v opencode >/dev/null 2>&1 || exit $OPENCODE_EXIT_NOT_FOUND
+      run_opencode() { exec opencode "$@"; }
+    fi
     """.trimIndent()
 
-internal val OPENCODE_RUN_SCRIPT = OPENCODE_PREPARE + "\nexec opencode run --agent plan --format json -m \"\$1\""
-internal val OPENCODE_MODELS_SCRIPT = OPENCODE_PREPARE + "\nexec opencode models"
+internal val OPENCODE_RUN_SCRIPT = OPENCODE_PREPARE + "\nrun_opencode run --agent plan --format json -m \"\$1\""
+internal val OPENCODE_MODELS_SCRIPT = OPENCODE_PREPARE + "\nrun_opencode models"
+
+/** Model names as OpenCode lists them; proot-distro passes its command on as one line of text. */
+private val OPENCODE_MODEL_NAME = Regex("""[A-Za-z0-9._:@+-]+/[A-Za-z0-9._:@+/-]+""")
 
 private const val MAX_OPENCODE_ERROR_CHARS = 300
 private val ACTION_LINE = Regex("""<action>(.*?)</action>""", RegexOption.DOT_MATCHES_ALL)
@@ -253,6 +273,9 @@ internal class AiOpenCodeTransport(
     override suspend fun complete(request: AiChatRequest): AiReply {
         if (openCodeRefusesAttachments(request.messages)) {
             throw AiChatException(AiErrorKind.UNSUPPORTED_ATTACHMENT, "OpenCode on this phone reads text only.")
+        }
+        if (!OPENCODE_MODEL_NAME.matches(request.model)) {
+            throw AiChatException(AiErrorKind.UNKNOWN_MODEL, "OpenCode model names look like provider/model.")
         }
         val prompt = openCodePrompt(request.messages, request.tools)
         return openCodeReply(termux.run(OPENCODE_RUN_SCRIPT, listOf(request.model), prompt, request.timeoutMs))

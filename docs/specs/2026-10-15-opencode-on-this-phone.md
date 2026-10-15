@@ -135,8 +135,17 @@ CLI rather than OpenCode's paid API, and asked to discuss first. After the optio
 - OpenCode's install script puts `opencode` in `~/.opencode/bin` and adds it to PATH only in
   `~/.bashrc`, which a background login shell never reads. The owner's first phone test (2026-10-15,
   build 405) failed with "OpenCode wasn't found" for this reason, so the script now adds
-  `~/.opencode/bin`, `~/.bun/bin`, `~/.local/bin` and `~/bin` to PATH. An alias in `.bashrc` is still
-  not seen.
+  `~/.opencode/bin`, `~/.bun/bin`, `~/.local/bin` and `~/bin` to PATH.
+- OpenCode's Linux build needs glibc and does not run in plain Termux, so people (the owner
+  included) run it in a proot-distro Linux behind `alias opencode="proot-distro login debian --
+  opencode"` in `~/.bashrc`. The script reads that alias and runs
+  `proot-distro login <distro> --work-dir ~/.dualsub-replay -- opencode …`; proot-distro shares
+  Termux's home at the same path, so the folder's `opencode.json` still keeps the tools on "ask".
+  proot-distro passes its command on as one line, so the app accepts only `provider/model` names
+  made of letters, digits and `._:@+-/`.
+- OpenCode 1.x refuses `"permission":"ask"` ("Expected PermissionActionConfig"); version 2 is needed.
+- Fresh users need Termux, a proot-distro Linux and OpenCode in it before the app's own steps; the
+  app cannot install those. Gemini stays the default for everyone else.
 - Termux older than 0.118 ignores stdin; `opencode run` then gets no message and fails.
 - Some phones stop Termux in the background; Termux's own notification keeps it alive while running.
 
@@ -168,4 +177,4 @@ OpenCode refuses its free models there (see Context).
 | `AiOpenCodeTermuxTest`, new `AiAssistantControllerTest` cases | Passed |
 | CLI behavior with OpenCode 2.0.29 (linux-x64) | Done: Plan agent answered with the free models; with the app's `opencode.json`, shell, read, glob and webfetch calls were refused and a canary file was never read |
 | `AiAssistantPanelUiTest.openCodeOnThisPhoneShowsTermuxStepsAndConnectsWithoutAKey` | Not run locally (no emulator); runs in CI `managed-device-tests` |
-| Phone with Termux and OpenCode 2.0.29 | Build 405 (owner, 2026-10-15): Allow worked and Termux ran the script, but it exited with "OpenCode wasn't found" (installed in `~/.opencode/bin`). Fixed in the next build; retest pending |
+| Phone with Termux and OpenCode 2.0.29 | Build 405 (owner, 2026-10-15): Allow worked and Termux ran the script and returned its result. It first exited with "OpenCode wasn't found" (`~/.opencode/bin`, alias to proot-distro Debian); with a link, "cannot execute: required file not found" (glibc build). The owner's OpenCode agent also upgraded OpenCode 1.17.9 to 2.0.29. Fixed by reading the proot-distro alias; retest pending |
