@@ -132,8 +132,11 @@ CLI rather than OpenCode's paid API, and asked to discuss first. After the optio
   just leaves a text answer.
 - The Plan agent's coding-assistant system prompt shapes the tone; the app's instructions come
   first in the message.
-- If `opencode` only works in an interactive Termux shell (an alias in `.bashrc`), the app reports
-  "OpenCode wasn't found"; the script uses a login shell, which reads `~/.profile`/`~/.bash_profile`.
+- OpenCode's install script puts `opencode` in `~/.opencode/bin` and adds it to PATH only in
+  `~/.bashrc`, which a background login shell never reads. The owner's first phone test (2026-10-15,
+  build 405) failed with "OpenCode wasn't found" for this reason, so the script now adds
+  `~/.opencode/bin`, `~/.bun/bin`, `~/.local/bin` and `~/bin` to PATH. An alias in `.bashrc` is still
+  not seen.
 - Termux older than 0.118 ignores stdin; `opencode run` then gets no message and fails.
 - Some phones stop Termux in the background; Termux's own notification keeps it alive while running.
 
@@ -161,4 +164,4 @@ OpenCode refuses its free models there (see Context).
 | `AiOpenCodeTermuxTest`, new `AiAssistantControllerTest` cases | Passed |
 | CLI behavior with OpenCode 2.0.29 (linux-x64) | Done: Plan agent answered with the free models; with the app's `opencode.json`, shell, read, glob and webfetch calls were refused and a canary file was never read |
 | `AiAssistantPanelUiTest.openCodeOnThisPhoneShowsTermuxStepsAndConnectsWithoutAKey` | Not run locally (no emulator); runs in CI `managed-device-tests` |
-| Phone with Termux and OpenCode 2.0.29 | Not run: needs the owner's phone and the preview APK. The Termux intent, its permission prompt and the result `PendingIntent` are untested on a real device |
+| Phone with Termux and OpenCode 2.0.29 | Build 405 (owner, 2026-10-15): Allow worked and Termux ran the script, but it exited with "OpenCode wasn't found" (installed in `~/.opencode/bin`). Fixed in the next build; retest pending |

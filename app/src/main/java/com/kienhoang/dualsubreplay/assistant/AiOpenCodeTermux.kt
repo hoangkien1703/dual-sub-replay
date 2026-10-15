@@ -45,11 +45,18 @@ internal const val TERMUX_ALLOW_APPS_COMMAND =
     "mkdir -p ~/.termux && echo \"allow-external-apps=true\" >> ~/.termux/termux.properties && termux-reload-settings"
 
 /**
+ * Where `opencode` may be installed besides Termux's own `bin`. OpenCode's install script uses
+ * `~/.opencode/bin` and adds it to PATH only in `~/.bashrc`, which a background shell never reads.
+ */
+internal val OPENCODE_INSTALL_FOLDERS = listOf(".opencode/bin", ".bun/bin", ".local/bin", "bin")
+
+/**
  * Prepares the work folder, writing [OPENCODE_CONFIG] every time so a changed file cannot turn the
  * tools on. Chat text never reaches the shell: the model name is `$1` and the message comes on stdin.
  */
 private val OPENCODE_PREPARE =
     """
+    PATH="${OPENCODE_INSTALL_FOLDERS.joinToString(":") { "${'$'}HOME/$it" }}:${'$'}PATH"
     dir="${'$'}HOME/$OPENCODE_WORK_FOLDER"
     mkdir -p "${'$'}dir" && cd "${'$'}dir" && printf '%s\n' '$OPENCODE_CONFIG' > opencode.json || exit $OPENCODE_EXIT_NO_FOLDER
     command -v opencode >/dev/null 2>&1 || exit $OPENCODE_EXIT_NOT_FOUND

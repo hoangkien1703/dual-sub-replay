@@ -144,6 +144,9 @@ class AiOpenCodeTermuxTest {
         listOf(OPENCODE_RUN_SCRIPT, OPENCODE_MODELS_SCRIPT).forEach { script ->
             assertTrue(script.contains("printf '%s\\n' '$OPENCODE_CONFIG' > opencode.json"))
             assertTrue(script.contains("exit $OPENCODE_EXIT_NOT_FOUND"))
+            // OpenCode's install script adds ~/.opencode/bin to PATH only in ~/.bashrc.
+            assertTrue(script.startsWith("PATH=\"\$HOME/.opencode/bin:"))
+            assertTrue(script.indexOf("PATH=") < script.indexOf("command -v opencode"))
         }
         assertEquals("""{"agent":{"plan":{"permission":"ask"}}}""", OPENCODE_CONFIG)
         assertTrue(OPENCODE_RUN_SCRIPT.endsWith("exec opencode run --agent plan --format json -m \"\$1\""))
