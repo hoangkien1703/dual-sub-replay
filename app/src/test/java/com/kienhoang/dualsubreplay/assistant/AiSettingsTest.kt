@@ -44,7 +44,7 @@ class AiSettingsTest {
 
     @Test
     fun everyBuiltInServiceHasAnHttpsChatAddress() {
-        AiProvider.entries.filter { it != AiProvider.CUSTOM }.forEach { provider ->
+        AiProvider.entries.filter { it != AiProvider.CUSTOM && it.needsKey }.forEach { provider ->
             val anthropic = provider.format == AiWireFormat.ANTHROPIC_MESSAGES
             val url = if (anthropic) anthropicMessagesUrl(provider.baseUrl) else chatCompletionsUrl(provider.baseUrl)
             assertEquals(provider.name, "https", url?.scheme)

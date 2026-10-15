@@ -65,6 +65,21 @@ internal enum class AiErrorKind {
 
     /** The model cannot take the app's actions; the question is asked again without them. */
     UNSUPPORTED_TOOLS,
+
+    /** OpenCode on this phone: Termux is not installed. */
+    TERMUX_MISSING,
+
+    /** OpenCode on this phone: the app may not run commands in Termux yet. */
+    TERMUX_PERMISSION,
+
+    /** OpenCode on this phone: Termux does not allow other apps yet (`allow-external-apps`). */
+    TERMUX_APPS_NOT_ALLOWED,
+
+    /** OpenCode on this phone: Termux could not run the command. */
+    TERMUX_FAILED,
+
+    /** OpenCode on this phone: `opencode` is not installed in Termux. */
+    OPENCODE_MISSING,
 }
 
 /** [detail] is the service's own English message, with the key removed, for reports. */

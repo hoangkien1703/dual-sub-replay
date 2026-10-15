@@ -255,6 +255,27 @@ class AiAssistantPanelUiTest {
     }
 
     @Test
+    fun openCodeOnThisPhoneShowsTermuxStepsAndConnectsWithoutAKey() {
+        showTopBarAndPanel()
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_provider_opencode_phone").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ai_provider_opencode_phone").assertIsSelected()
+        assertEquals(AiProvider.OPENCODE_PHONE, settings.provider)
+        composeRule.onNodeWithText("Free models through OpenCode in Termux, no key").assertExists()
+        composeRule.onNodeWithTag("ai_opencode_command").performScrollTo().assertTextContains("allow-external-apps=true", substring = true)
+        composeRule.onNodeWithTag("ai_opencode_copy").assertExists()
+        // Termux is not installed on the test device, so the app may not run commands there yet.
+        composeRule.onNodeWithTag("ai_opencode_allow").assertExists()
+        composeRule.onNodeWithTag("ai_paste_key").assertDoesNotExist()
+        saveUiEvidence("ai_panel_opencode_setup")
+        composeRule.onNodeWithTag("ai_opencode_connect").performScrollTo().performClick()
+        composeRule.waitUntil(5_000) { requests.isNotEmpty() }
+        assertEquals(AiProvider.OPENCODE_PHONE.format, requests.single().format)
+        assertEquals("", requests.single().apiKey)
+        composeRule.onNodeWithTag("ai_input").assertIsDisplayed()
+    }
+
+    @Test
     fun askAiAboutAProblemSendsItAndShowsTheAnswer() {
         checkedGeminiKey()
         showTopBarAndPanel()

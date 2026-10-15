@@ -98,6 +98,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - The ✨ button at the top right opens an assistant from the right side. Ask where a setting is, what a word or sentence means, or tap **Explain the current line**.
 - Problems such as Google Translate failing or subtitles not loading show at the top of the panel, with **Ask AI about this**.
 - It uses your own free or paid API key from Google Gemini, OpenRouter, OpenAI, Claude, OpenCode, or another OpenAI-compatible service. Pick a service in the panel, and **Get a key** opens the page that gives you one. The key is checked before the first question.
+- **OpenCode on this phone** needs no key: if you run [OpenCode](https://opencode.ai) in [Termux](https://termux.dev), the assistant can ask it, with OpenCode's free models. Run the one setup command the panel shows in Termux, tap **Allow**, then **Connect**. OpenCode's own tools stay off, and pictures and PDFs can't be sent this way.
 - Under the chat box, **+** adds photos and files (pictures, PDFs, subtitle and text files), and you can switch the model and how long it thinks, as in other chat apps.
 - Your key is encrypted on the phone and never backed up. Chats stay on the phone for 7 days by default. Turn the assistant off completely in **More settings → AI assistant**.
 

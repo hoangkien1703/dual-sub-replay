@@ -194,4 +194,23 @@
     <string name="ai_action_memory_save_button">保存</string>
     <string name="ai_action_memory_forget_button">忘れる</string>
     <string name="ai_action_manage">管理</string>
+    <string name="ai_provider_opencode_phone">このスマホの OpenCode</string>
+    <string name="ai_provider_opencode_phone_note">Termux の OpenCode で無料モデル、キー不要</string>
+    <string name="ai_opencode_setup_heading">OpenCode を設定</string>
+    <string name="ai_opencode_step_install">Termux と OpenCode をインストールし、Termux で opencode が起動することを確認します。</string>
+    <string name="ai_opencode_step_command">ほかのアプリから使えるように、Termux でこのコマンドを一度実行します:</string>
+    <string name="ai_opencode_copy">コマンドをコピー</string>
+    <string name="ai_opencode_copied">コピーしました。Termux に貼り付けて Enter を押してください。</string>
+    <string name="ai_opencode_step_allow">DualSub Replay が Termux でコマンドを実行できるように許可します。</string>
+    <string name="ai_opencode_allow">許可</string>
+    <string name="ai_opencode_allowed">許可済み</string>
+    <string name="ai_opencode_step_connect">「接続」をタップします。OpenCode が一言答えるとチャットが開きます。</string>
+    <string name="ai_opencode_connect">接続</string>
+    <string name="ai_opencode_checking">OpenCode に確認中…</string>
+    <string name="ai_opencode_note">質問のたびに Termux で OpenCode が動き、選んだモデルに送られます。OpenCode 自身のツールはオフのままで、画像と PDF は送れません。</string>
+    <string name="ai_error_termux_missing">このスマホに Termux がインストールされていません。先に Termux と OpenCode をインストールしてください。</string>
+    <string name="ai_error_termux_permission">DualSub Replay はまだ Termux でコマンドを実行できません。OpenCode の設定で「許可」をタップしてください。</string>
+    <string name="ai_error_termux_apps_not_allowed">Termux がまだほかのアプリからのコマンドを受け付けていません。Termux で設定コマンドを実行してから、もう一度お試しください。</string>
+    <string name="ai_error_termux_failed">Termux で OpenCode を実行できませんでした。詳細は下にあります。</string>
+    <string name="ai_error_opencode_missing">Termux に OpenCode が見つかりません。Termux にインストールし、opencode が起動することを確認してください。</string>
 </resources>

@@ -171,6 +171,11 @@ internal fun AiErrorKind.messageRes(): Int =
         AiErrorKind.BAD_REPLY -> R.string.ai_error_bad_reply
         AiErrorKind.UNSUPPORTED_THINKING -> R.string.ai_error_unsupported_thinking
         AiErrorKind.UNSUPPORTED_ATTACHMENT -> R.string.ai_error_unsupported_attachment
+        AiErrorKind.TERMUX_MISSING -> R.string.ai_error_termux_missing
+        AiErrorKind.TERMUX_PERMISSION -> R.string.ai_error_termux_permission
+        AiErrorKind.TERMUX_APPS_NOT_ALLOWED -> R.string.ai_error_termux_apps_not_allowed
+        AiErrorKind.TERMUX_FAILED -> R.string.ai_error_termux_failed
+        AiErrorKind.OPENCODE_MISSING -> R.string.ai_error_opencode_missing
     }
 
 /** Opens [url] in the browser; false when no browser can open it. */

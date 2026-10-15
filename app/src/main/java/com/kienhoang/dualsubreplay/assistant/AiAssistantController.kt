@@ -139,6 +139,10 @@ private val SETUP_PROBLEMS =
         AiErrorKind.INVALID_KEY,
         AiErrorKind.UNKNOWN_MODEL,
         AiErrorKind.BAD_REQUEST,
+        AiErrorKind.TERMUX_MISSING,
+        AiErrorKind.TERMUX_PERMISSION,
+        AiErrorKind.TERMUX_APPS_NOT_ALLOWED,
+        AiErrorKind.OPENCODE_MISSING,
     )
 
 /**
@@ -186,9 +190,10 @@ internal data class AiAssistantUiState(
     /** Whether the next new chat reads and saves memories; the open chat keeps its own choice. */
     val newChatMemory: Boolean = true,
 ) {
-    val hasKey: Boolean get() = settings.provider in keyHints
+    /** A key is saved for the service, or it needs none. */
+    val hasKey: Boolean get() = !settings.provider.needsKey || settings.provider in keyHints
     val messages: List<AiChatMessage> get() = chat?.messages.orEmpty()
-    val addressValid: Boolean get() = chatCompletionsUrl(settings.baseUrlFor(settings.provider)) != null
+    val addressValid: Boolean get() = aiAddressValid(settings, settings.provider)
 
     /** The saved key answered through the current service, address and model. */
     val keyChecked: Boolean
@@ -405,7 +410,7 @@ internal class AiAssistantController(
             scope.launch {
                 val result =
                     try {
-                        val key = unlockKey(provider)
+                        val key = if (provider.needsKey) unlockKey(provider) else ""
                         val models =
                             withContext(io) { aiCall { modelLister.listModels(settings.baseUrlFor(provider), key, provider.format) } }
                         AiModelList.Loaded(provider, models.filter { aiModelCanChat(provider, it.id) })
@@ -703,8 +708,8 @@ internal class AiAssistantController(
     ): AiReply {
         val provider = settings.provider
         val baseUrl = settings.baseUrlFor(provider)
-        if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
-        val key = unlockKey(provider)
+        if (!aiAddressValid(settings, provider)) throw AiChatException(AiErrorKind.BAD_ADDRESS)
+        val key = if (provider.needsKey) unlockKey(provider) else ""
         val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort, tools, provider.format)
         val busyWaits = busyRetryDelaysMs.iterator()
         var wrongModelAnswers = 0

@@ -194,4 +194,23 @@
     <string name="ai_action_memory_save_button">Salvar</string>
     <string name="ai_action_memory_forget_button">Esquecer</string>
     <string name="ai_action_manage">Gerenciar</string>
+    <string name="ai_provider_opencode_phone">OpenCode neste celular</string>
+    <string name="ai_provider_opencode_phone_note">Modelos grátis pelo OpenCode no Termux, sem chave</string>
+    <string name="ai_opencode_setup_heading">Configurar o OpenCode</string>
+    <string name="ai_opencode_step_install">Instale o Termux e o OpenCode e confira se o opencode abre no Termux.</string>
+    <string name="ai_opencode_step_command">No Termux, rode este comando uma vez para que outros apps possam usá-lo:</string>
+    <string name="ai_opencode_copy">Copiar comando</string>
+    <string name="ai_opencode_copied">Copiado. Cole no Termux e pressione Enter.</string>
+    <string name="ai_opencode_step_allow">Permita que o DualSub Replay rode comandos no Termux.</string>
+    <string name="ai_opencode_allow">Permitir</string>
+    <string name="ai_opencode_allowed">Permitido</string>
+    <string name="ai_opencode_step_connect">Toque em Conectar. O OpenCode responde uma palavra e o chat abre.</string>
+    <string name="ai_opencode_connect">Conectar</string>
+    <string name="ai_opencode_checking">Perguntando ao OpenCode…</string>
+    <string name="ai_opencode_note">Cada pergunta roda o OpenCode no Termux e vai para o modelo que você escolher. As ferramentas do próprio OpenCode ficam desligadas, e imagens e PDFs não podem ser enviados.</string>
+    <string name="ai_error_termux_missing">O Termux não está instalado neste celular. Instale o Termux e o OpenCode primeiro.</string>
+    <string name="ai_error_termux_permission">O DualSub Replay ainda não pode rodar comandos no Termux. Toque em Permitir na configuração do OpenCode.</string>
+    <string name="ai_error_termux_apps_not_allowed">O Termux ainda não deixa outros apps rodarem comandos. Rode o comando de configuração no Termux e tente de novo.</string>
+    <string name="ai_error_termux_failed">O Termux não conseguiu rodar o OpenCode. Os detalhes estão abaixo.</string>
+    <string name="ai_error_opencode_missing">O OpenCode não foi encontrado no Termux. Instale-o lá e confira se o opencode abre.</string>
 </resources>

@@ -200,4 +200,23 @@
     <string name="ai_action_memory_save_button">Save</string>
     <string name="ai_action_memory_forget_button">Forget</string>
     <string name="ai_action_manage">Manage</string>
+    <string name="ai_provider_opencode_phone">OpenCode on this phone</string>
+    <string name="ai_provider_opencode_phone_note">Free models through OpenCode in Termux, no key</string>
+    <string name="ai_opencode_setup_heading">Set up OpenCode</string>
+    <string name="ai_opencode_step_install">Install Termux and OpenCode, and check that opencode starts in Termux.</string>
+    <string name="ai_opencode_step_command">In Termux, run this command once so other apps can use it:</string>
+    <string name="ai_opencode_copy">Copy command</string>
+    <string name="ai_opencode_copied">Copied. Paste it in Termux and press Enter.</string>
+    <string name="ai_opencode_step_allow">Allow DualSub Replay to run commands in Termux.</string>
+    <string name="ai_opencode_allow">Allow</string>
+    <string name="ai_opencode_allowed">Allowed</string>
+    <string name="ai_opencode_step_connect">Tap Connect. OpenCode answers one word, then the chat opens.</string>
+    <string name="ai_opencode_connect">Connect</string>
+    <string name="ai_opencode_checking">Asking OpenCode…</string>
+    <string name="ai_opencode_note">Each question runs OpenCode in Termux and goes to the model you choose. OpenCode\'s own tools stay off, and pictures and PDFs can\'t be sent.</string>
+    <string name="ai_error_termux_missing">Termux isn\'t installed on this phone. Install Termux and OpenCode first.</string>
+    <string name="ai_error_termux_permission">DualSub Replay can\'t run commands in Termux yet. Tap Allow in the OpenCode setup.</string>
+    <string name="ai_error_termux_apps_not_allowed">Termux doesn\'t let other apps run commands yet. Run the setup command in Termux, then try again.</string>
+    <string name="ai_error_termux_failed">Termux couldn\'t run OpenCode. The details are below.</string>
+    <string name="ai_error_opencode_missing">OpenCode wasn\'t found in Termux. Install it there and check that opencode starts.</string>
 </resources>

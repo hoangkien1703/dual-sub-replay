@@ -194,4 +194,23 @@
     <string name="ai_action_memory_save_button">Lưu</string>
     <string name="ai_action_memory_forget_button">Quên</string>
     <string name="ai_action_manage">Quản lý</string>
+    <string name="ai_provider_opencode_phone">OpenCode trên điện thoại này</string>
+    <string name="ai_provider_opencode_phone_note">Mô hình miễn phí qua OpenCode trong Termux, không cần khóa</string>
+    <string name="ai_opencode_setup_heading">Thiết lập OpenCode</string>
+    <string name="ai_opencode_step_install">Cài Termux và OpenCode, rồi kiểm tra opencode chạy được trong Termux.</string>
+    <string name="ai_opencode_step_command">Trong Termux, chạy lệnh này một lần để ứng dụng khác dùng được:</string>
+    <string name="ai_opencode_copy">Sao chép lệnh</string>
+    <string name="ai_opencode_copied">Đã sao chép. Dán vào Termux rồi nhấn Enter.</string>
+    <string name="ai_opencode_step_allow">Cho phép DualSub Replay chạy lệnh trong Termux.</string>
+    <string name="ai_opencode_allow">Cho phép</string>
+    <string name="ai_opencode_allowed">Đã cho phép</string>
+    <string name="ai_opencode_step_connect">Nhấn Kết nối. OpenCode trả lời một từ, rồi khung chat mở ra.</string>
+    <string name="ai_opencode_connect">Kết nối</string>
+    <string name="ai_opencode_checking">Đang hỏi OpenCode…</string>
+    <string name="ai_opencode_note">Mỗi câu hỏi chạy OpenCode trong Termux và được gửi tới mô hình bạn chọn. Công cụ riêng của OpenCode luôn tắt, và không gửi được ảnh hay PDF.</string>
+    <string name="ai_error_termux_missing">Điện thoại này chưa cài Termux. Hãy cài Termux và OpenCode trước.</string>
+    <string name="ai_error_termux_permission">DualSub Replay chưa được chạy lệnh trong Termux. Nhấn Cho phép trong phần thiết lập OpenCode.</string>
+    <string name="ai_error_termux_apps_not_allowed">Termux chưa cho ứng dụng khác chạy lệnh. Chạy lệnh thiết lập trong Termux rồi thử lại.</string>
+    <string name="ai_error_termux_failed">Termux không chạy được OpenCode. Chi tiết ở bên dưới.</string>
+    <string name="ai_error_opencode_missing">Không tìm thấy OpenCode trong Termux. Hãy cài nó trong Termux và kiểm tra opencode chạy được.</string>
 </resources>

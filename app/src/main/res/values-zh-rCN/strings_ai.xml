@@ -194,4 +194,23 @@
     <string name="ai_action_memory_save_button">保存</string>
     <string name="ai_action_memory_forget_button">忘记</string>
     <string name="ai_action_manage">管理</string>
+    <string name="ai_provider_opencode_phone">本机上的 OpenCode</string>
+    <string name="ai_provider_opencode_phone_note">通过 Termux 中的 OpenCode 使用免费模型，无需密钥</string>
+    <string name="ai_opencode_setup_heading">设置 OpenCode</string>
+    <string name="ai_opencode_step_install">安装 Termux 和 OpenCode，并确认在 Termux 中能启动 opencode。</string>
+    <string name="ai_opencode_step_command">在 Termux 中运行一次此命令，让其他应用可以使用它：</string>
+    <string name="ai_opencode_copy">复制命令</string>
+    <string name="ai_opencode_copied">已复制。粘贴到 Termux 中并按回车。</string>
+    <string name="ai_opencode_step_allow">允许 DualSub Replay 在 Termux 中运行命令。</string>
+    <string name="ai_opencode_allow">允许</string>
+    <string name="ai_opencode_allowed">已允许</string>
+    <string name="ai_opencode_step_connect">点按“连接”。OpenCode 回答一个词后，聊天就会打开。</string>
+    <string name="ai_opencode_connect">连接</string>
+    <string name="ai_opencode_checking">正在询问 OpenCode…</string>
+    <string name="ai_opencode_note">每个问题都会在 Termux 中运行 OpenCode，并发送给你选择的模型。OpenCode 自带的工具保持关闭，无法发送图片和 PDF。</string>
+    <string name="ai_error_termux_missing">这部手机未安装 Termux。请先安装 Termux 和 OpenCode。</string>
+    <string name="ai_error_termux_permission">DualSub Replay 还不能在 Termux 中运行命令。请在 OpenCode 设置中点按“允许”。</string>
+    <string name="ai_error_termux_apps_not_allowed">Termux 还不允许其他应用运行命令。请在 Termux 中运行设置命令，然后重试。</string>
+    <string name="ai_error_termux_failed">Termux 无法运行 OpenCode。详细信息见下方。</string>
+    <string name="ai_error_opencode_missing">在 Termux 中找不到 OpenCode。请在 Termux 中安装，并确认 opencode 能启动。</string>
 </resources>

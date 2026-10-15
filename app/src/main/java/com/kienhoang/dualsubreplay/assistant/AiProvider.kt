@@ -10,6 +10,9 @@ internal enum class AiWireFormat {
 
     /** Anthropic's own Messages API (`messages`), with an `x-api-key` key. */
     ANTHROPIC_MESSAGES,
+
+    /** `opencode run` in Termux on the same phone, with no key ([AiOpenCodeTransport]). */
+    OPENCODE_TERMUX,
 }
 
 /**
@@ -35,6 +38,8 @@ internal enum class AiProvider(
     /** A few models to offer first in the model menu; the full list comes from the service. */
     val suggestedModels: List<String>,
     val format: AiWireFormat = AiWireFormat.OPENAI_CHAT,
+    /** False for [OPENCODE_PHONE], which uses the OpenCode app the user set up in Termux instead. */
+    val needsKey: Boolean = true,
 ) {
     GEMINI(
         key = "gemini",
@@ -121,6 +126,26 @@ internal enum class AiProvider(
         createKeyStepRes = R.string.ai_setup_step_create_opencode,
         suggestedModels = listOf("deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
     ),
+
+    /**
+     * The OpenCode command line in Termux on this phone, with OpenCode's free models and no key
+     * (owner decision 2026-10-15). OpenCode only lets its own app use the free models, so the
+     * app runs `opencode run` there rather than calling OpenCode's servers.
+     */
+    OPENCODE_PHONE(
+        key = "opencode_phone",
+        labelRes = R.string.ai_provider_opencode_phone,
+        noteRes = R.string.ai_provider_opencode_phone_note,
+        baseUrl = "termux:opencode",
+        defaultModel = "opencode/deepseek-v4.1-flash-free",
+        keyPageUrl = null,
+        freeKeys = true,
+        getKeyStepRes = R.string.ai_setup_step_create_generic,
+        createKeyStepRes = R.string.ai_setup_step_create_generic,
+        suggestedModels = listOf("opencode/deepseek-v4.1-flash-free", "opencode/big-pickle", "opencode/mimo-v2.6-flash-free"),
+        format = AiWireFormat.OPENCODE_TERMUX,
+        needsKey = false,
+    ),
     CUSTOM(
         key = "custom",
         labelRes = R.string.ai_provider_custom,
@@ -164,6 +189,8 @@ internal fun aiProviderForKey(
     val key = text.trim()
     return when {
         current == AiProvider.CUSTOM -> current
+        // A key never belongs to a service that needs none; an unknown one means the default service.
+        !current.needsKey -> aiProviderForKey(key, DEFAULT_AI_PROVIDER)
         // Google AI Studio's keys start with "AIza", and its newer ones with "AQ.".
         key.startsWith("AIza") || key.startsWith("AQ.") -> AiProvider.GEMINI
         key.startsWith("sk-or-") -> AiProvider.OPENROUTER

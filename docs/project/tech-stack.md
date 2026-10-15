@@ -69,7 +69,13 @@ Paths below are relative to
   and Go, or a custom address (`AiProvider.kt`), and lists the service's models from `/models`.
   Claude uses Anthropic's own Messages API (`AiAnthropicMessages.kt`, `x-api-key` header) through
   the same client; an answer that asks for actions goes back unchanged, thinking included, with
-  their results.
+  their results. "OpenCode on this phone" needs no key: `AiOpenCodeTermux.kt` runs
+  `opencode run --agent plan --format json` in Termux through `TermuxCommandRunner.kt` (Termux's
+  `RUN_COMMAND` intent, message on stdin, result through a one-time `PendingIntent`), with the
+  Plan agent's tools set to "ask" so the unattended run refuses them, and reads app actions from
+  `<action>` lines. OpenCode refuses its free models to anything but its own app, so the app never
+  calls OpenCode's servers or `opencode serve` itself
+  ([spec](../specs/2026-10-15-opencode-on-this-phone.md)).
   `AiAttachmentReader.kt` turns chosen pictures (scaled JPEG), PDFs and text files into message
   parts that live only in memory. `AiKeyStore.kt` keeps one key per service, AES-GCM encrypted with an Android
   Keystore key, in the `ai_assistant_keys` preferences; `AiChatHistory.kt` keeps chats in

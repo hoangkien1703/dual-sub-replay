@@ -54,6 +54,7 @@ import com.kienhoang.dualsubreplay.assistant.AiModelInfo
 import com.kienhoang.dualsubreplay.assistant.AiModelList
 import com.kienhoang.dualsubreplay.assistant.AiPanelPage
 import com.kienhoang.dualsubreplay.assistant.AiThinking
+import com.kienhoang.dualsubreplay.assistant.AiWireFormat
 
 private val ModelButtonMaxWidth = 180.dp
 
@@ -74,7 +75,8 @@ internal fun AiChatOptionsBar(
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             leading()
             AiModelMenu(aiState, controller, Modifier.weight(1f, fill = false))
-            AiThinkingMenu(aiState.settings.thinking, controller)
+            // The OpenCode command line has no thinking setting that works for every model.
+            if (aiState.settings.provider.format != AiWireFormat.OPENCODE_TERMUX) AiThinkingMenu(aiState.settings.thinking, controller)
         }
     }
 }

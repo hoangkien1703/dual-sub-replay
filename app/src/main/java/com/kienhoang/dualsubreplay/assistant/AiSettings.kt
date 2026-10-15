@@ -139,6 +139,12 @@ internal fun writeAiAssistantSettings(
  */
 internal fun chatCompletionsUrl(baseUrl: String): HttpUrl? = aiServiceUrl(baseUrl, "chat", "completions")
 
+/** Whether [provider]'s address can be used: an HTTPS address, or the OpenCode app in Termux, which has none. */
+internal fun aiAddressValid(
+    settings: AiAssistantSettings,
+    provider: AiProvider,
+): Boolean = provider.format == AiWireFormat.OPENCODE_TERMUX || chatCompletionsUrl(settings.baseUrlFor(provider)) != null
+
 /** The `models` list under [baseUrl], with the same rules as [chatCompletionsUrl]. */
 internal fun modelsUrl(baseUrl: String): HttpUrl? = aiServiceUrl(baseUrl, "models")
 

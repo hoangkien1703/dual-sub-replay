@@ -212,6 +212,46 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun openCodeOnThisPhoneNeedsNoKeyAndOpensTheChatAfterConnect() {
+        val controller = controller()
+        controller.selectProvider(AiProvider.OPENCODE_PHONE)
+        val before = controller.state.value
+        assertTrue(before.hasKey)
+        assertTrue(before.addressValid)
+        assertFalse(before.ready)
+        controller.testConnection()
+        val check = transport.requests.single()
+        assertEquals(AiWireFormat.OPENCODE_TERMUX, check.format)
+        assertEquals("", check.apiKey)
+        assertEquals("opencode/deepseek-v4.1-flash-free", check.model)
+        assertTrue(controller.state.value.ready)
+        // The check is kept without a saved key, so the chat stays ready after the app restarts.
+        assertEquals(aiCheckedSetup(settings.value, AiProvider.OPENCODE_PHONE), keyStore.checkedSetup(AiProvider.OPENCODE_PHONE))
+        assertTrue(controller().state.value.ready)
+        controller.send("What does いただきます mean?", "guide")
+        assertEquals(
+            "OK",
+            controller.state.value.messages
+                .last()
+                .text,
+        )
+    }
+
+    @Test
+    fun openCodeSetupProblemsKeepTheChatClosed() {
+        val controller = controller()
+        controller.selectProvider(AiProvider.OPENCODE_PHONE)
+        transport.failure = AiChatException(AiErrorKind.TERMUX_APPS_NOT_ALLOWED, "allow-external-apps is not true")
+        controller.testConnection()
+        val state = controller.state.value
+        assertFalse(state.ready)
+        assertEquals(AiErrorKind.TERMUX_APPS_NOT_ALLOWED, (state.connectionTest as AiConnectionTest.Failed).failure.kind)
+        assertNull(keyStore.checkedSetup(AiProvider.OPENCODE_PHONE))
+        // A key pasted while OpenCode on this phone is chosen goes to the service it belongs to.
+        assertEquals(AiProvider.GEMINI, controller.saveKey(geminiKey))
+    }
+
+    @Test
     fun aPastedKeyPicksItsServiceAndTestsTheConnection() {
         settings.value = AiAssistantSettings(provider = AiProvider.OPENAI)
         val controller = controller()

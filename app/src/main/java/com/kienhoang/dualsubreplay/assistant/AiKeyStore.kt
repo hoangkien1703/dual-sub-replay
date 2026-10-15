@@ -152,9 +152,14 @@ internal class AiKeyStore(
     fun hint(provider: AiProvider): String? =
         storage.get(KEY_PREFIX + provider.key)?.let { storage.get(HINT_PREFIX + provider.key).orEmpty() }
 
-    /** The setup the saved key last worked with, or null when it has not been checked since it was saved. */
+    /**
+     * The setup the saved key last worked with, or null when it has not been checked since it was
+     * saved. A service that needs no key keeps its check on its own.
+     */
     fun checkedSetup(provider: AiProvider): String? =
-        storage.get(CHECKED_PREFIX + provider.key)?.takeIf { it.isNotEmpty() && storage.get(KEY_PREFIX + provider.key) != null }
+        storage.get(CHECKED_PREFIX + provider.key)?.takeIf {
+            it.isNotEmpty() && (!provider.needsKey || storage.get(KEY_PREFIX + provider.key) != null)
+        }
 
     fun markChecked(
         provider: AiProvider,

@@ -24,7 +24,7 @@ class AiAssistantViewModel(
             .use { it.readText() }
     }
 
-    private val transport = AiHttpTransport()
+    private val transport = AiRoutingTransport(AiHttpTransport(), AiOpenCodeTransport(TermuxCommandRunner(application)))
 
     internal val controller =
         AiAssistantController(

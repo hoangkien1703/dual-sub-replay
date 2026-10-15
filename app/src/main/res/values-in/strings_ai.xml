@@ -194,4 +194,23 @@
     <string name="ai_action_memory_save_button">Simpan</string>
     <string name="ai_action_memory_forget_button">Lupakan</string>
     <string name="ai_action_manage">Kelola</string>
+    <string name="ai_provider_opencode_phone">OpenCode di ponsel ini</string>
+    <string name="ai_provider_opencode_phone_note">Model gratis lewat OpenCode di Termux, tanpa kunci</string>
+    <string name="ai_opencode_setup_heading">Siapkan OpenCode</string>
+    <string name="ai_opencode_step_install">Pasang Termux dan OpenCode, lalu pastikan opencode bisa dijalankan di Termux.</string>
+    <string name="ai_opencode_step_command">Di Termux, jalankan perintah ini sekali agar aplikasi lain bisa memakainya:</string>
+    <string name="ai_opencode_copy">Salin perintah</string>
+    <string name="ai_opencode_copied">Disalin. Tempel di Termux lalu tekan Enter.</string>
+    <string name="ai_opencode_step_allow">Izinkan DualSub Replay menjalankan perintah di Termux.</string>
+    <string name="ai_opencode_allow">Izinkan</string>
+    <string name="ai_opencode_allowed">Diizinkan</string>
+    <string name="ai_opencode_step_connect">Ketuk Hubungkan. OpenCode menjawab satu kata, lalu chat terbuka.</string>
+    <string name="ai_opencode_connect">Hubungkan</string>
+    <string name="ai_opencode_checking">Bertanya ke OpenCode…</string>
+    <string name="ai_opencode_note">Setiap pertanyaan menjalankan OpenCode di Termux dan dikirim ke model yang Anda pilih. Alat bawaan OpenCode tetap mati, dan gambar serta PDF tidak bisa dikirim.</string>
+    <string name="ai_error_termux_missing">Termux belum terpasang di ponsel ini. Pasang Termux dan OpenCode dulu.</string>
+    <string name="ai_error_termux_permission">DualSub Replay belum bisa menjalankan perintah di Termux. Ketuk Izinkan di pengaturan OpenCode.</string>
+    <string name="ai_error_termux_apps_not_allowed">Termux belum mengizinkan aplikasi lain menjalankan perintah. Jalankan perintah pengaturan di Termux, lalu coba lagi.</string>
+    <string name="ai_error_termux_failed">Termux tidak bisa menjalankan OpenCode. Detailnya ada di bawah.</string>
+    <string name="ai_error_opencode_missing">OpenCode tidak ditemukan di Termux. Pasang di sana dan pastikan opencode bisa dijalankan.</string>
 </resources>

@@ -6,8 +6,11 @@
     <!-- Keeps a playing video's earphone controls and notification alive with the screen off. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- AI assistant, "OpenCode on this phone": runs `opencode run` in Termux once the user allows it. -->
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+        <package android:name="com.termux" />
     </queries>
 
     <application

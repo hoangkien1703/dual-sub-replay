@@ -72,13 +72,14 @@ internal fun AiConnectCard(
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (aiState.hasKey && aiState.addressValid) {
+            val provider = aiState.settings.provider
+            if (provider.needsKey && aiState.hasKey && aiState.addressValid) {
                 AiKeyCheck(aiState, controller)
             } else {
                 Text(stringResource(R.string.ai_setup_title), style = MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.ai_setup_intro), style = MaterialTheme.typography.bodyMedium)
-                AiServicePicker(aiState.settings.provider, includeCustom = false, onSelect = controller::selectProvider)
-                AiSetupSteps(aiState, controller)
+                AiServicePicker(provider, includeCustom = false, onSelect = controller::selectProvider)
+                if (provider.needsKey) AiSetupSteps(aiState, controller) else AiOpenCodeSetup(aiState, controller)
             }
             TextButton(onClick = onOpenSettings, modifier = Modifier.testTag("ai_open_settings")) {
                 Text(stringResource(R.string.ai_open_settings))
@@ -249,8 +250,13 @@ internal fun AiAssistantSettingsSection(host: AiAssistantHost) {
     AiServicePicker(aiState.settings.provider, includeCustom = true, onSelect = controller::selectProvider)
     if (aiState.settings.provider == AiProvider.CUSTOM) AiCustomAddressField(aiState, controller)
     SettingsSectionDivider()
-    SettingsSubheading(stringResource(R.string.ai_settings_key_heading))
-    AiKeySettings(aiState, controller)
+    if (aiState.settings.provider.needsKey) {
+        SettingsSubheading(stringResource(R.string.ai_settings_key_heading))
+        AiKeySettings(aiState, controller)
+    } else {
+        SettingsSubheading(stringResource(R.string.ai_opencode_setup_heading))
+        AiOpenCodeSetup(aiState, controller)
+    }
     SettingsSectionDivider()
     SettingsSubheading(stringResource(R.string.ai_memory_title))
     AiMemorySettings(aiState, controller)
