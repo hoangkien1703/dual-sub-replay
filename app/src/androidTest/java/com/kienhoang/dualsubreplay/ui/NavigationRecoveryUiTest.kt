@@ -9,7 +9,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.unit.dp
-import androidx.test.espresso.Espresso
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -48,7 +47,7 @@ class NavigationRecoveryUiTest {
         compose.onNodeWithText("Close").assertIsDisplayed().performClick()
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
         compose.onNodeWithContentDescription("Open navigation menu").performClick()
-        Espresso.pressBack()
+        compose.pressActivityBack("navigation_menu_button")
         compose.waitForIdle()
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
         compose.onNodeWithContentDescription("Open navigation menu").performClick()

@@ -27,7 +27,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.Espresso
 import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_NEWS_VERSION
 import com.kienhoang.dualsubreplay.assistant.AI_SAVE_MEMORY_TOOL
@@ -480,7 +479,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_attach_photo").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_attach_file").assertIsDisplayed()
         // The pickers belong to the system, so the test closes the menu and adds files directly.
-        Espresso.pressBack()
+        composeRule.pressBackInWindowOf("ai_attach_photo")
         composeRule.onNodeWithTag("ai_attach_photo").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
         composeRule.runOnIdle {
@@ -604,7 +603,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_instructions").performScrollTo().performTextInput("Explain in Vietnamese. Keep answers short.")
         composeRule.onNodeWithTag("ai_instructions_save").performClick()
         assertEquals("Explain in Vietnamese. Keep answers short.", memory.data.instructions)
-        Espresso.closeSoftKeyboard()
+        composeRule.hideKeyboard("ai_instructions")
         composeRule.onNodeWithTag("ai_memory_switch").performScrollTo()
         saveUiEvidence("ai_panel_memory_page")
 
