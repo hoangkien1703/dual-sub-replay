@@ -153,6 +153,10 @@ visibility, strings in all eight languages, and the guide, README, tech stack an
 `AiKeyStore.checkedSetup` keeps a passed check for a service without a key. The Thinking menu is
 hidden for this service.
 
+After the first phone test, the owner asked for a guide that the OpenCode agent in Termux can read
+and follow: [docs/opencode-termux-setup.md](../opencode-termux-setup.md) checks the Termux version,
+where `opencode` is, `allow-external-apps`, and runs exactly what the app runs.
+
 Deviation from the first discussion: the app does not call `opencode serve` over HTTP, because
 OpenCode refuses its free models there (see Context).
 
