@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">Nunca</string>
     <string name="settings_original_captions_visibility">Subtítulos originales: %1$s</string>
     <string name="settings_translated_captions_visibility">Subtítulos traducidos: %1$s</string>
+    <string name="settings_translation_position_title">Posición de la traducción</string>
+    <string name="settings_translation_position_below">Debajo del original</string>
+    <string name="settings_translation_position_above">Encima del original</string>
     <string name="settings_portrait_panel_position">Posición del panel en vertical</string>
     <string name="settings_portrait_panel_position_hint">Mueve el panel de transcripción vertical hacia arriba o abajo. Cuanto más abajo, menos filas de subtítulos se muestran.</string>
     <string name="settings_portrait_panel_higher">Más arriba</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">Lavanda</string>
     <string name="settings_color_deep_teal">Verde azulado oscuro</string>
     <string name="settings_color_black">Negro</string>
+    <string name="settings_color_light">Claro</string>
     <string name="settings_color_navy">Azul marino</string>
     <string name="settings_color_slate">Pizarra</string>
     <string name="settings_color_plum">Ciruela</string>
@@ -39,10 +43,12 @@
     <string name="settings_app_theme_title">Tema de la app</string>
     <string name="settings_accent_color_title">Color de acento</string>
     <string name="settings_accent_color_hint">Cambia los interruptores, controles deslizantes, botones, bordes activos y otros acentos de la app.</string>
+    <string name="settings_app_colors_title">Colores de la app</string>
+    <string name="settings_app_colors_hint">Cambia los fondos, las tarjetas, los menús y el texto de toda la app. La superposición sobre el video mantiene su propio fondo.</string>
     <string name="settings_section_layout_title">Diseño y formato</string>
     <string name="settings_section_layout_summary">Posición del panel, formato de subtítulos, vista dividida</string>
     <string name="settings_section_colors_title">Colores y tema</string>
-    <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, acento de la app</string>
+    <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, colores y acento de la app</string>
     <string name="settings_section_word_learning_title">Aprendizaje de palabras</string>
     <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación</string>
     <string name="settings_section_overlay_title">Superposición y pantalla completa</string>

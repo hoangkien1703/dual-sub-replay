@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">Never</string>
     <string name="settings_original_captions_visibility">Original captions: %1$s</string>
     <string name="settings_translated_captions_visibility">Translated captions: %1$s</string>
+    <string name="settings_translation_position_title">Translation position</string>
+    <string name="settings_translation_position_below">Below original</string>
+    <string name="settings_translation_position_above">Above original</string>
     <string name="settings_portrait_panel_position">Portrait panel position</string>
     <string name="settings_portrait_panel_position_hint">Move the portrait transcript panel up or down. Moving it lower shows fewer subtitle rows.</string>
     <string name="settings_portrait_panel_higher">Higher</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">Lavender</string>
     <string name="settings_color_deep_teal">Deep teal</string>
     <string name="settings_color_black">Black</string>
+    <string name="settings_color_light">Light</string>
     <string name="settings_color_navy">Navy</string>
     <string name="settings_color_slate">Slate</string>
     <string name="settings_color_plum">Plum</string>
@@ -39,10 +43,12 @@
     <string name="settings_app_theme_title">App theme</string>
     <string name="settings_accent_color_title">Accent color</string>
     <string name="settings_accent_color_hint">Changes switches, sliders, buttons, active borders, and other app accents.</string>
+    <string name="settings_app_colors_title">App colors</string>
+    <string name="settings_app_colors_hint">Changes the backgrounds, cards, menus and text of the whole app. The overlay on the video keeps its own background.</string>
     <string name="settings_section_layout_title">Layout &amp; format</string>
     <string name="settings_section_layout_summary">Panel position, caption format, split view</string>
     <string name="settings_section_colors_title">Colors &amp; theme</string>
-    <string name="settings_section_colors_summary">Subtitle colors, overlay background, app accent</string>
+    <string name="settings_section_colors_summary">Subtitle colors, overlay background, app colors and accent</string>
     <string name="settings_section_word_learning_title">Word learning</string>
     <string name="settings_section_word_learning_summary">Word colors, tap for meaning, pronunciation</string>
     <string name="settings_section_overlay_title">Overlay &amp; fullscreen</string>

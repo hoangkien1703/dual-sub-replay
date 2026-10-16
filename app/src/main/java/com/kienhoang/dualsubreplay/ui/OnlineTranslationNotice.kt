@@ -66,7 +66,6 @@ internal fun DualSubUiState.translationIssue(): TranslationIssue? =
         else -> null
     }
 
-private val FallbackTint = Color(0xFFFFC857)
 private val UnavailableTint = Color(0xFFFFB4AB)
 
 /**
@@ -87,7 +86,14 @@ internal fun TranslationIssueButton(
             Icon(
                 if (fallback) Icons.Default.CloudOff else Icons.Default.ErrorOutline,
                 contentDescription = stringResource(R.string.translation_issue_button),
-                tint = if (fallback) FallbackTint else UnavailableTint,
+                tint =
+                    if (fallback) {
+                        mildProblemTint()
+                    } else if (appThemeIsLight()) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        UnavailableTint
+                    },
             )
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {

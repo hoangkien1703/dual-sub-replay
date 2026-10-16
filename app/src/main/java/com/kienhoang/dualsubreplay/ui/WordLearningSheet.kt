@@ -14,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -208,7 +207,7 @@ private fun WordByWord(
                 Text(part.text, style = MaterialTheme.typography.bodyLarge)
                 val partOfSpeech = stringResource(partOfSpeechLabel(part.partOfSpeech))
                 val details = listOfNotNull(partOfSpeech, part.reading?.takeIf { it.isNotBlank() }).joinToString(" · ")
-                Text(details, style = MaterialTheme.typography.bodySmall, color = Color(part.partOfSpeech.colorHex))
+                Text(details, style = MaterialTheme.typography.bodySmall, color = partOfSpeechColor(part.partOfSpeech, appThemeIsLight()))
             }
             IconButton(onClick = { onSpeakPart(part) }, modifier = Modifier.testTag("pronounce_part_$index")) {
                 Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = stringResource(R.string.practice_pronounce_item, part.text))

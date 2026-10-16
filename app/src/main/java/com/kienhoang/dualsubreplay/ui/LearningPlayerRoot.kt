@@ -78,6 +78,15 @@ internal const val REMEMBER_OVERLAY_POSITION_PREFERENCE = "remember_overlay_posi
 internal const val OVERLAY_VERTICAL_POSITION_PREFERENCE = "overlay_vertical_position"
 internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_horizontal_position"
 internal const val MOVABLE_OVERLAY_PREFERENCE = "movable_subtitle_box"
+
+/** Where the overlay and the CC button were dragged; forgotten when "Remember dragged position" turns off. */
+internal val REMEMBERED_POSITION_PREFERENCES =
+    listOf(
+        OVERLAY_VERTICAL_POSITION_PREFERENCE,
+        OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+        COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+        COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+    )
 internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
 internal const val FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION = 0.08f
 internal const val DEFAULT_OVERLAY_HORIZONTAL_POSITION = 0.5f
@@ -481,6 +490,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                     targetLanguageCode = state.targetLanguage,
                     lockToVideo = state.lockOverlayToVideo,
+                    translationPosition = state.translationPosition,
                     onWordClick = viewModel::selectLearningWord,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -563,6 +573,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                         originalLanguageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
                         targetLanguageCode = state.targetLanguage,
                         lockToVideo = state.lockOverlayToVideo,
+                        translationPosition = state.translationPosition,
                         onWordClick = viewModel::selectLearningWord,
                         modifier = overlayModifier,
                         onPositionChange = ::updateOverlayPosition,
@@ -623,6 +634,7 @@ internal fun LearningSubtitleOverlay(
     originalLanguageCode: String? = null,
     targetLanguageCode: String? = null,
     lockToVideo: Boolean = false,
+    translationPosition: TranslationPosition = TranslationPosition.BELOW,
     onWordClick: (WordTap) -> Unit = {},
     onPositionChange: (Float) -> Unit = {},
     onHorizontalPositionChange: (Float) -> Unit = {},
@@ -726,99 +738,117 @@ internal fun LearningSubtitleOverlay(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                content.originalText?.let { original ->
-                    val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
-                    val annotated = rememberAnnotatedSubtitleText(
-                        text = original,
-                        words = content.words,
-                        activeWordIndex = content.activeWordIndex,
-                        baseColor = originalColor,
-                        highlightColor = highlightColor,
-                        wordLearningEnabled = shouldHighlightPos,
-                        languageCode = originalLanguageCode,
-                    )
-                    if (wordLearningEnabled && tapToLearnEnabled) {
-                        SelectableSubtitleText(
-                            text = original,
-                            annotated = annotated,
-                            style = TextStyle(
-                                fontSize = (17f * fontScale).sp,
-                                lineHeight = (21f * fontScale).sp,
-                                fontWeight = FontWeight.Medium,
-                                color = originalColor,
-                            ),
-                            languageCode = originalLanguageCode,
-                            segment = content.segment,
-                            translated = false,
-                            highlightColor = highlightColor,
-                            onWordClick = onWordClick,
-                            onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    } else {
-                        Text(
-                            text = annotated,
-                            fontSize = (17f * fontScale).sp,
-                            lineHeight = (21f * fontScale).sp,
-                            fontWeight = FontWeight.Medium,
-                            color = originalColor,
-                            maxLines = Int.MAX_VALUE,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                val originalLine: (@Composable () -> Unit)? =
+                    content.originalText?.let { original ->
+                        {
+                            val shouldHighlightPos =
+                                wordLearningEnabled && (wordLearningTarget == "original" || wordLearningTarget == "both")
+                            val annotated = rememberAnnotatedSubtitleText(
+                                text = original,
+                                words = content.words,
+                                activeWordIndex = content.activeWordIndex,
+                                baseColor = originalColor,
+                                highlightColor = highlightColor,
+                                wordLearningEnabled = shouldHighlightPos,
+                                languageCode = originalLanguageCode,
+                            )
+                            if (wordLearningEnabled && tapToLearnEnabled) {
+                                SelectableSubtitleText(
+                                    text = original,
+                                    annotated = annotated,
+                                    style = TextStyle(
+                                        fontSize = (17f * fontScale).sp,
+                                        lineHeight = (21f * fontScale).sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = originalColor,
+                                    ),
+                                    languageCode = originalLanguageCode,
+                                    segment = content.segment,
+                                    translated = false,
+                                    highlightColor = highlightColor,
+                                    onWordClick = onWordClick,
+                                    onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            } else {
+                                Text(
+                                    text = annotated,
+                                    fontSize = (17f * fontScale).sp,
+                                    lineHeight = (21f * fontScale).sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = originalColor,
+                                    maxLines = Int.MAX_VALUE,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
                     }
-                }
-                content.translatedText?.let { translated ->
-                    if (content.originalText != null) Spacer(Modifier.size(2.dp))
-                    val shouldHighlightPos = wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
-                    val revision = tokenizerRevision()
-                    val origTokens: List<AnalyzedToken>? = remember(content.segment?.originalText, originalLanguageCode, revision) {
-                        content.segment?.originalText?.let { LanguageAwareTokenizer.tokenize(it, originalLanguageCode) }
+                val translationLine: (@Composable () -> Unit)? =
+                    content.translatedText?.let { translated ->
+                        {
+                            val shouldHighlightPos =
+                                wordLearningEnabled && (wordLearningTarget == "translation" || wordLearningTarget == "both")
+                            val revision = tokenizerRevision()
+                            val origTokens: List<AnalyzedToken>? = remember(content.segment?.originalText, originalLanguageCode, revision) {
+                                content.segment?.originalText?.let { LanguageAwareTokenizer.tokenize(it, originalLanguageCode) }
+                            }
+                            val annotated = if (shouldHighlightPos) {
+                                rememberAnnotatedSubtitleText(
+                                    text = translated,
+                                    words = emptyList(),
+                                    activeWordIndex = -1,
+                                    baseColor = translatedColor,
+                                    highlightColor = highlightColor,
+                                    wordLearningEnabled = true,
+                                    languageCode = targetLanguageCode,
+                                    alignedOriginalTokens = origTokens,
+                                )
+                            } else {
+                                AnnotatedString(translated)
+                            }
+                            if (wordLearningEnabled && tapToLearnEnabled) {
+                                SelectableSubtitleText(
+                                    text = translated,
+                                    annotated = annotated,
+                                    style = TextStyle(
+                                        fontSize = (14f * fontScale).sp,
+                                        lineHeight = (18f * fontScale).sp,
+                                        color = translatedColor,
+                                    ),
+                                    languageCode = targetLanguageCode,
+                                    segment = content.segment,
+                                    translated = true,
+                                    highlightColor = highlightColor,
+                                    onWordClick = onWordClick,
+                                    onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
+                                    alignedOriginalTokens = origTokens,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            } else {
+                                Text(
+                                    text = annotated,
+                                    fontSize = (14f * fontScale).sp,
+                                    lineHeight = (18f * fontScale).sp,
+                                    color = translatedColor,
+                                    maxLines = Int.MAX_VALUE,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
                     }
-                    val annotated = if (shouldHighlightPos) {
-                        rememberAnnotatedSubtitleText(
-                            text = translated,
-                            words = emptyList(),
-                            activeWordIndex = -1,
-                            baseColor = translatedColor,
-                            highlightColor = highlightColor,
-                            wordLearningEnabled = true,
-                            languageCode = targetLanguageCode,
-                            alignedOriginalTokens = origTokens,
-                        )
-                    } else {
-                        AnnotatedString(translated)
-                    }
-                    if (wordLearningEnabled && tapToLearnEnabled) {
-                        SelectableSubtitleText(
-                            text = translated,
-                            annotated = annotated,
-                            style = TextStyle(
-                                fontSize = (14f * fontScale).sp,
-                                lineHeight = (18f * fontScale).sp,
-                                color = translatedColor,
-                            ),
-                            languageCode = targetLanguageCode,
-                            segment = content.segment,
-                            translated = true,
-                            highlightColor = highlightColor,
-                            onWordClick = onWordClick,
-                            onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
-                            alignedOriginalTokens = origTokens,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    } else {
-                        Text(
-                            text = annotated,
-                            fontSize = (14f * fontScale).sp,
-                            lineHeight = (18f * fontScale).sp,
-                            color = translatedColor,
-                            maxLines = Int.MAX_VALUE,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
+                subtitleLineOrder(originalLine, translationLine, translationPosition).forEachIndexed { index, line ->
+                    if (index > 0) Spacer(Modifier.size(2.dp))
+                    line()
                 }
                 onRetryTranscript?.let { retry ->
-                    androidx.compose.material3.TextButton(onClick = retry) { Text(stringResource(R.string.player_retry_full_transcript)) }
+                    // The overlay stays dark on every app theme, so the button takes a light subtitle color.
+                    androidx.compose.material3.TextButton(
+                        onClick = retry,
+                        colors =
+                            androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                contentColor = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
+                            ),
+                    ) { Text(stringResource(R.string.player_retry_full_transcript)) }
                 }
                 content.statusText?.let { status ->
                     Text(

@@ -2,7 +2,9 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.PartOfSpeech
 
 const val SUBTITLE_ORIGINAL_COLOR_PREFERENCE = "subtitle_original_color"
 const val SUBTITLE_TRANSLATED_COLOR_PREFERENCE = "subtitle_translated_color"
@@ -13,8 +15,10 @@ const val WORD_HIGHLIGHT_ENABLED_PREFERENCE = "highlight_spoken_words_enabled"
 const val CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE = "custom_subtitle_colors_enabled"
 
 /** Default-on toggles so users can turn the issue #21 features off entirely. */
-internal fun storedFeatureEnabled(raw: Boolean?, fallback: Boolean = true): Boolean =
-    raw ?: fallback
+internal fun storedFeatureEnabled(
+    raw: Boolean?,
+    fallback: Boolean = true,
+): Boolean = raw ?: fallback
 
 /** Common shape for the preset color swatches used by subtitle and theme settings. */
 internal interface ColorSettingOption {
@@ -33,13 +37,15 @@ internal enum class SubtitleColorOption(
     override val key: String,
     @StringRes override val labelRes: Int,
     override val argb: Long,
+    /** The shade used on the light app theme's white cards. */
+    val lightArgb: Long,
 ) : ColorSettingOption {
-    ICE_WHITE("ice_white", R.string.settings_color_ice_white, 0xFFF3FAFA),
-    SKY_BLUE("sky_blue", R.string.settings_color_sky_blue, 0xFF9EDCE4),
-    MINT("mint", R.string.settings_color_mint, 0xFF75E7C1),
-    AMBER("amber", R.string.settings_color_amber, 0xFFFFD54F),
-    ROSE("rose", R.string.settings_color_rose, 0xFFFF8A80),
-    LAVENDER("lavender", R.string.settings_color_lavender, 0xFFC5A3FF),
+    ICE_WHITE("ice_white", R.string.settings_color_ice_white, 0xFFF3FAFA, 0xFF14272A),
+    SKY_BLUE("sky_blue", R.string.settings_color_sky_blue, 0xFF9EDCE4, 0xFF0B5E80),
+    MINT("mint", R.string.settings_color_mint, 0xFF75E7C1, 0xFF0B7350),
+    AMBER("amber", R.string.settings_color_amber, 0xFFFFD54F, 0xFF865600),
+    ROSE("rose", R.string.settings_color_rose, 0xFFFF8A80, 0xFFB3261E),
+    LAVENDER("lavender", R.string.settings_color_lavender, 0xFFC5A3FF, 0xFF6440B0),
 }
 
 /** Semi-opaque backgrounds keep subtitles readable while preserving video context. */
@@ -76,14 +82,33 @@ internal val DEFAULT_HIGHLIGHT_COLOR_KEY = SubtitleColorOption.MINT.key
 internal val DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY = SubtitleBoxBackgroundOption.DEEP_TEAL.key
 internal val DEFAULT_APP_THEME_ACCENT_KEY = AppThemeAccentOption.CYAN.key
 
-internal fun storedSubtitleColorKey(raw: String?, fallback: String): String =
-    SubtitleColorOption.entries.firstOrNull { it.key == raw }?.key ?: fallback
+internal fun storedSubtitleColorKey(
+    raw: String?,
+    fallback: String,
+): String = SubtitleColorOption.entries.firstOrNull { it.key == raw }?.key ?: fallback
 
-internal fun subtitleColor(key: String): Color =
-    SubtitleColorOption.entries
-        .firstOrNull { it.key == key }
-        ?.let { Color(it.argb) }
-        ?: Color(SubtitleColorOption.ICE_WHITE.argb)
+/** [key]'s color; [onLight] picks the shade for the light app theme's white cards. */
+internal fun subtitleColor(
+    key: String,
+    onLight: Boolean = false,
+): Color {
+    val option = SubtitleColorOption.entries.firstOrNull { it.key == key } ?: SubtitleColorOption.ICE_WHITE
+    return Color(if (onLight) option.lightArgb else option.argb)
+}
+
+/** Part-of-speech colors are made for dark cards; on light cards they are darkened to stay readable. */
+internal fun partOfSpeechColor(
+    partOfSpeech: PartOfSpeech,
+    onLight: Boolean,
+): Color {
+    val color = Color(partOfSpeech.colorHex)
+    return if (onLight) lerp(color, Color.Black, PART_OF_SPEECH_DARKENING) else color
+}
+
+private const val PART_OF_SPEECH_DARKENING = 0.45f
+
+/** Below this luminance a subtitle's text color is dark, so it sits on a light card. */
+internal const val DARK_TEXT_LUMINANCE = 0.4f
 
 internal fun storedSubtitleBoxBackgroundKey(raw: String?): String =
     SubtitleBoxBackgroundOption.entries.firstOrNull { it.key == raw }?.key
@@ -106,66 +131,64 @@ internal fun appThemeAccentColor(key: String): Color =
         ?: Color(AppThemeAccentOption.CYAN.argb)
 
 /** Custom text colors apply only while the "Custom subtitle colors" switch is on. */
-internal fun effectiveOriginalColor(state: DualSubUiState): Color = if (
-    state.customColorsEnabled
-) {
-    subtitleColor(state.originalColorKey)
-} else {
-    subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY)
-}
+internal fun effectiveOriginalColor(
+    state: DualSubUiState,
+    onLight: Boolean = false,
+): Color = subtitleColor(if (state.customColorsEnabled) state.originalColorKey else DEFAULT_ORIGINAL_COLOR_KEY, onLight)
 
-internal fun effectiveTranslatedColor(state: DualSubUiState): Color = if (
-    state.customColorsEnabled
-) {
-    subtitleColor(state.translatedColorKey)
-} else {
-    subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY)
-}
+internal fun effectiveTranslatedColor(
+    state: DualSubUiState,
+    onLight: Boolean = false,
+): Color = subtitleColor(if (state.customColorsEnabled) state.translatedColorKey else DEFAULT_TRANSLATED_COLOR_KEY, onLight)
 
-internal fun effectiveHighlightColor(state: DualSubUiState): Color = if (
-    state.customColorsEnabled && state.wordHighlightEnabled
-) {
-    subtitleColor(state.highlightColorKey)
-} else {
-    subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY)
-}
+internal fun effectiveHighlightColor(
+    state: DualSubUiState,
+    onLight: Boolean = false,
+): Color =
+    subtitleColor(
+        if (state.customColorsEnabled && state.wordHighlightEnabled) state.highlightColorKey else DEFAULT_HIGHLIGHT_COLOR_KEY,
+        onLight,
+    )
 
 /** Every preference key that "Reset all settings to defaults" clears (issue #22). */
-val RESETTABLE_SETTING_KEYS = listOf(
-    "auto_pronounce",
-    PRONUNCIATION_VOLUME_PREFERENCE,
-    "font_scale",
-    PORTRAIT_PANEL_OFFSET_PREFERENCE,
-    "preferred_caption_language",
-    "target_language",
-    "landscape_split_enabled",
-    PLAYER_EXPERIENCE_MODE_PREFERENCE,
-    AUTO_OVERLAY_FULLSCREEN_PREFERENCE,
-    AUTO_OVERLAY_LANDSCAPE_PREFERENCE,
-    AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE,
-    REMEMBER_OVERLAY_POSITION_PREFERENCE,
-    OVERLAY_VERTICAL_POSITION_PREFERENCE,
-    OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
-    MOVABLE_OVERLAY_PREFERENCE,
-    COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
-    COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
-    SPLIT_LONG_SENTENCES_PREFERENCE,
-    CAPTION_FORMAT_PREFERENCE,
-    LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
-    SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
-    SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
-    SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
-    SUBTITLE_BOX_BACKGROUND_PREFERENCE,
-    APP_THEME_ACCENT_PREFERENCE,
-    WORD_HIGHLIGHT_ENABLED_PREFERENCE,
-    KARAOKE_TIMING_MODE_PREFERENCE,
-    CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
-    LOCK_OVERLAY_TO_VIDEO_PREFERENCE,
-    PRELOAD_MODELS_ENABLED_PREFERENCE,
-    NATURAL_SUBTITLES_PREFERENCE,
-    WORD_LEARNING_ENABLED_PREFERENCE,
-    WORD_LEARNING_TARGET_PREFERENCE,
-    TAP_TO_LEARN_PREFERENCE,
-    WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
-    com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
-)
+val RESETTABLE_SETTING_KEYS =
+    listOf(
+        "auto_pronounce",
+        PRONUNCIATION_VOLUME_PREFERENCE,
+        "font_scale",
+        PORTRAIT_PANEL_OFFSET_PREFERENCE,
+        "preferred_caption_language",
+        "target_language",
+        "landscape_split_enabled",
+        PLAYER_EXPERIENCE_MODE_PREFERENCE,
+        AUTO_OVERLAY_FULLSCREEN_PREFERENCE,
+        AUTO_OVERLAY_LANDSCAPE_PREFERENCE,
+        AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE,
+        REMEMBER_OVERLAY_POSITION_PREFERENCE,
+        OVERLAY_VERTICAL_POSITION_PREFERENCE,
+        OVERLAY_HORIZONTAL_POSITION_PREFERENCE,
+        MOVABLE_OVERLAY_PREFERENCE,
+        COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE,
+        COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE,
+        SPLIT_LONG_SENTENCES_PREFERENCE,
+        CAPTION_FORMAT_PREFERENCE,
+        TRANSLATION_POSITION_PREFERENCE,
+        LANDSCAPE_VIDEO_FRACTION_PREFERENCE,
+        SUBTITLE_ORIGINAL_COLOR_PREFERENCE,
+        SUBTITLE_TRANSLATED_COLOR_PREFERENCE,
+        SUBTITLE_HIGHLIGHT_COLOR_PREFERENCE,
+        SUBTITLE_BOX_BACKGROUND_PREFERENCE,
+        APP_THEME_ACCENT_PREFERENCE,
+        APP_COLOR_THEME_PREFERENCE,
+        WORD_HIGHLIGHT_ENABLED_PREFERENCE,
+        KARAOKE_TIMING_MODE_PREFERENCE,
+        CUSTOM_SUBTITLE_COLORS_ENABLED_PREFERENCE,
+        LOCK_OVERLAY_TO_VIDEO_PREFERENCE,
+        PRELOAD_MODELS_ENABLED_PREFERENCE,
+        NATURAL_SUBTITLES_PREFERENCE,
+        WORD_LEARNING_ENABLED_PREFERENCE,
+        WORD_LEARNING_TARGET_PREFERENCE,
+        TAP_TO_LEARN_PREFERENCE,
+        WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
+        com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
+    )

@@ -84,8 +84,8 @@ fun LanguageSetupScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize().testTag("language_setup_screen"),
-        color = Color(0xFF061719),
-        contentColor = Color(0xFFF3FAFA),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         Column(
             modifier = Modifier
@@ -104,13 +104,13 @@ fun LanguageSetupScreen(
             Text(
                 text = stringResource(R.string.onboarding_language_welcome),
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color(0xFFF3FAFA),
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(R.string.onboarding_language_intro),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFFB7CED1),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(28.dp))
 
@@ -159,7 +159,7 @@ fun LanguageSetupScreen(
             ) {
                 Text(
                     stringResource(R.string.onboarding_language_skip_for_now),
-                    color = Color(0xFFB7CED1),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -175,7 +175,7 @@ private fun SetupLanguageField(
     testTag: String,
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = Color(0xFFF3FAFA))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
         OutlinedButton(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth().testTag(testTag),
@@ -184,9 +184,9 @@ private fun SetupLanguageField(
                 text = selection ?: stringResource(R.string.onboarding_language_select),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = if (selection == null) Color(0xFF9EDCE4) else Color.Unspecified,
+                color = if (selection == null) MaterialTheme.colorScheme.primary else Color.Unspecified,
             )
         }
-        Text(helper, style = MaterialTheme.typography.bodySmall, color = Color(0xFF607477))
+        Text(helper, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
     }
 }

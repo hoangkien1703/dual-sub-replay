@@ -21,6 +21,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,6 +59,12 @@ internal data class AppProblem(
 
 /** The amber of the translation fallback notice: translation still works on the device. */
 internal val MildProblemTint = Color(0xFFFFC857)
+
+/** The same amber, darker on the light theme so it stays visible on white. */
+private val MildProblemTintOnLight = Color(0xFF8F5F00)
+
+@Composable
+internal fun mildProblemTint(): Color = if (appThemeIsLight()) MildProblemTintOnLight else MildProblemTint
 
 @Composable
 internal fun appProblems(
@@ -130,7 +137,7 @@ internal fun TopBarAssistantOrIssueButton(
     val tint =
         when {
             problems.isEmpty() -> null
-            problems.all { it.mild } -> MildProblemTint
+            problems.all { it.mild } -> mildProblemTint()
             else -> MaterialTheme.colorScheme.error
         }
     IconButton(onClick = host.controller::openPanel, modifier = Modifier.testTag("ai_assistant_button")) {
@@ -202,6 +209,7 @@ internal fun AiAssistantOverlay(
     // The button is not reachable in fullscreen video, so the panel does not stay over it either.
     LaunchedEffect(fullscreen) { if (fullscreen) host.controller.closePanel() }
     val locale = currentInterfaceLocale()
+    val context = LocalContext.current
     val explainLine = stringResource(R.string.ai_chip_explain_line)
     val currentLine =
         state.segments.getOrNull(state.currentIndex)?.takeIf { state.activeVideoId != null }?.let { segment ->
@@ -220,7 +228,16 @@ internal fun AiAssistantOverlay(
     AiAssistantPanel(
         host = host,
         problems = appProblems(state, onTryGoogleAgain, onRetry),
-        snapshot = { aiAppSnapshot(state, playerMode, locale, BuildConfig.VERSION_NAME) },
+        snapshot = {
+            aiAppSnapshot(
+                state,
+                playerMode,
+                locale,
+                BuildConfig.VERSION_NAME,
+                readAiStoredSettings(context),
+                host.player.speedFor(state.activeVideoId),
+            )
+        },
         currentLineQuestion = currentLine,
     )
 }

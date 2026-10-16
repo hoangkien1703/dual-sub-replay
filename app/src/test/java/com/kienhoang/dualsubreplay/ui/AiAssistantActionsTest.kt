@@ -1,10 +1,17 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.assistant.AI_ACCENT_COLORS
+import com.kienhoang.dualsubreplay.assistant.AI_APP_COLORS
+import com.kienhoang.dualsubreplay.assistant.AI_APP_LANGUAGES
+import com.kienhoang.dualsubreplay.assistant.AI_DAILY_GOALS
+import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
 import com.kienhoang.dualsubreplay.assistant.AI_SUBTITLE_COLORS
 import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiSettingValue
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import com.kienhoang.dualsubreplay.data.DAILY_GOAL_CHOICES
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,22 +36,53 @@ class AiAssistantActionsTest {
         )
 
     @Test
-    fun theAssistantsColorsAreTheAppsSubtitleColors() {
+    fun theAssistantsChoicesAreTheApps() {
         assertEquals(SubtitleColorOption.entries.map { it.key }, AI_SUBTITLE_COLORS)
+        assertEquals(SubtitleBoxBackgroundOption.entries.map { it.key }, AI_OVERLAY_BACKGROUNDS)
+        assertEquals(AppColorThemeOption.entries.map { it.key }, AI_APP_COLORS)
+        assertEquals(AppThemeAccentOption.entries.map { it.key }, AI_ACCENT_COLORS)
+        assertEquals(listOf("device") + APP_LANGUAGES.map { it.tag }, AI_APP_LANGUAGES)
+        assertEquals(listOf("off") + DAILY_GOAL_CHOICES.map { it.toString() }, AI_DAILY_GOALS)
+        assertEquals(TranslationPosition.entries.map { it.storageValue }, AiSetting.TRANSLATION_POSITION.choices)
     }
 
     @Test
     fun everyCurrentValueIsOneTheActionsAccept() {
         val state =
             DualSubUiState(fontScale = 1.25f, captionFormat = CaptionFormat.WHOLE_SENTENCE, originalVisibility = CaptionVisibility.PAUSED)
-        for (setting in AiSetting.entries) {
-            val value = aiSettingCurrentValue(state, PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, 0.75f, setting)
-            assertEquals(setting.key, value, aiSettingValue(setting, value))
+        val stored =
+            AiStoredSettings(appColors = "light", pronunciationVolume = 1.25f, rememberDraggedPosition = false, appLanguage = "pt-BR")
+        for (current in listOf(
+            state,
+            DualSubUiState(portraitPanelOffsetFraction = -0.15f, dailyGoalMinutes = 30, sourcePreference = "ja"),
+        )) {
+            for (setting in AiSetting.entries) {
+                for (saved in listOf(AiStoredSettings(), stored)) {
+                    val value = aiSettingCurrentValue(current, PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, 0.75f, saved, setting)
+                    assertEquals(setting.key, value, aiSettingValue(setting, value))
+                }
+            }
         }
-        assertEquals("125", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, AiSetting.TEXT_SIZE))
-        assertEquals("paused", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, AiSetting.ORIGINAL_CAPTIONS))
-        assertEquals("overlay", aiSettingCurrentValue(state, PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, 1f, AiSetting.DEFAULT_VIEW))
-        assertEquals("0.75", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 0.75f, AiSetting.PLAYBACK_SPEED))
+        val none = AiStoredSettings()
+        assertEquals("125", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.TEXT_SIZE))
+        assertEquals("paused", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.ORIGINAL_CAPTIONS))
+        assertEquals(
+            "overlay",
+            aiSettingCurrentValue(state, PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, 1f, none, AiSetting.DEFAULT_VIEW),
+        )
+        assertEquals("0.75", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 0.75f, none, AiSetting.PLAYBACK_SPEED))
+        assertEquals("off", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.DAILY_GOAL))
+        assertEquals("125", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, stored, AiSetting.PRONUNCIATION_VOLUME))
+        assertEquals("1", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.PORTRAIT_PANEL_POSITION))
+    }
+
+    @Test
+    fun anOriginalLanguageTheVideoLacksIsRefusedWithTheOnesItHas() {
+        val video = playing.copy(availableSourceLanguages = listOf(CaptionLanguage("ja", "Japanese")))
+        val refusal = aiActionRefusal(video, AiAction.ChangeSetting(AiSetting.ORIGINAL_CAPTION_LANGUAGE, "ko"))
+        assertTrue(refusal.orEmpty(), "ja (Japanese)" in refusal.orEmpty())
+        assertNull(aiActionRefusal(video, AiAction.ChangeSetting(AiSetting.ORIGINAL_CAPTION_LANGUAGE, "ja")))
+        assertNull(aiActionRefusal(video, AiAction.ChangeSetting(AiSetting.ORIGINAL_CAPTION_LANGUAGE, "auto")))
     }
 
     @Test

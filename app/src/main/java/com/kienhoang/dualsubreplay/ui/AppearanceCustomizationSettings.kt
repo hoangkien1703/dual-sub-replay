@@ -34,7 +34,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 
-/** Overlay box and app accent colors, shown in the "Colors & theme" settings section. */
+/** Overlay box, app and accent colors, shown in the "Colors & theme" settings section. */
 @Composable
 internal fun AdvancedAppearanceSettings() {
     val context = LocalContext.current
@@ -50,6 +50,9 @@ internal fun AdvancedAppearanceSettings() {
                 ),
             ),
         )
+    }
+    var themeKey by remember {
+        mutableStateOf(storedAppColorTheme(preferences.getString(APP_COLOR_THEME_PREFERENCE, null)).key)
     }
     var accentKey by remember {
         mutableStateOf(
@@ -67,6 +70,7 @@ internal fun AdvancedAppearanceSettings() {
                         sharedPreferences.getString(key, DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY),
                     )
                 }
+                APP_COLOR_THEME_PREFERENCE -> themeKey = storedAppColorTheme(sharedPreferences.getString(key, null)).key
                 APP_THEME_ACCENT_PREFERENCE -> {
                     accentKey = storedAppThemeAccentKey(
                         sharedPreferences.getString(key, DEFAULT_APP_THEME_ACCENT_KEY),
@@ -78,48 +82,67 @@ internal fun AdvancedAppearanceSettings() {
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    Text(stringResource(R.string.settings_box_background_title))
-    Text(
-        stringResource(R.string.settings_box_background_hint),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    SettingsColorSwatchRow(
+    fun save(
+        key: String,
+        selected: String,
+    ) = preferences.edit().putString(key, selected).apply()
+
+    ColorChoiceSetting(
+        title = stringResource(R.string.settings_box_background_title),
+        hint = stringResource(R.string.settings_box_background_hint),
         selectedKey = backgroundKey,
         options = SubtitleBoxBackgroundOption.entries,
-        onColorChange = { selected ->
-            backgroundKey = selected
-            preferences.edit()
-                .putString(SUBTITLE_BOX_BACKGROUND_PREFERENCE, selected)
-                .apply()
-        },
         testTagPrefix = "box_background",
-    )
+    ) {
+        backgroundKey = it
+        save(SUBTITLE_BOX_BACKGROUND_PREFERENCE, it)
+    }
 
     Spacer(Modifier.height(14.dp))
     HorizontalDivider()
     Spacer(Modifier.height(14.dp))
     Text(stringResource(R.string.settings_app_theme_title), style = MaterialTheme.typography.titleSmall)
+    Spacer(Modifier.height(6.dp))
+    ColorChoiceSetting(
+        title = stringResource(R.string.settings_app_colors_title),
+        hint = stringResource(R.string.settings_app_colors_hint),
+        selectedKey = themeKey,
+        options = AppColorThemeOption.entries,
+        testTagPrefix = "app_colors",
+    ) {
+        themeKey = it
+        save(APP_COLOR_THEME_PREFERENCE, it)
+    }
+    Spacer(Modifier.height(10.dp))
+    ColorChoiceSetting(
+        title = stringResource(R.string.settings_accent_color_title),
+        hint = stringResource(R.string.settings_accent_color_hint),
+        selectedKey = accentKey,
+        options = AppThemeAccentOption.entries,
+        testTagPrefix = "theme_accent",
+    ) {
+        accentKey = it
+        save(APP_THEME_ACCENT_PREFERENCE, it)
+    }
+}
+
+/** A titled row of color swatches with a short hint. */
+@Composable
+private fun ColorChoiceSetting(
+    title: String,
+    hint: String,
+    selectedKey: String,
+    options: List<ColorSettingOption>,
+    testTagPrefix: String,
+    onColorChange: (String) -> Unit,
+) {
+    Text(title)
     Text(
-        stringResource(R.string.settings_accent_color_title),
-        modifier = Modifier.padding(top = 6.dp),
-    )
-    Text(
-        stringResource(R.string.settings_accent_color_hint),
+        hint,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    SettingsColorSwatchRow(
-        selectedKey = accentKey,
-        options = AppThemeAccentOption.entries,
-        onColorChange = { selected ->
-            accentKey = selected
-            preferences.edit()
-                .putString(APP_THEME_ACCENT_PREFERENCE, selected)
-                .apply()
-        },
-        testTagPrefix = "theme_accent",
-    )
+    SettingsColorSwatchRow(selectedKey, options, onColorChange, testTagPrefix)
 }
 
 @Composable
