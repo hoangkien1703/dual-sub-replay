@@ -38,9 +38,10 @@ class TranslationPositionAndThemeUiTest {
         preferences.edit().remove(APP_COLOR_THEME_PREFERENCE).commit()
     }
 
+    // Unmerged: a subtitle card is one clickable node that holds both of its lines.
     private fun top(text: String) =
         composeRule
-            .onNodeWithText(text)
+            .onNodeWithText(text, useUnmergedTree = true)
             .fetchSemanticsNode()
             .boundsInRoot.top
 
@@ -108,11 +109,14 @@ class TranslationPositionAndThemeUiTest {
         composeRule.onNodeWithTag("settings_section_colors").performScrollTo().performClick()
         composeRule.onNodeWithTag("color_option_app_colors_light").performScrollTo().performClick()
         composeRule.waitUntil(5_000) { background > 0.8f }
+        // The theme is chosen before its new colors are drawn; let that frame finish first.
+        composeRule.waitForIdle()
         assertEquals("light", preferences.getString(APP_COLOR_THEME_PREFERENCE, null))
         saveUiEvidence("settings-light-theme")
 
         composeRule.onNodeWithTag("color_option_app_colors_navy").performScrollTo().performClick()
         composeRule.waitUntil(5_000) { background < 0.1f }
+        composeRule.waitForIdle()
         saveUiEvidence("settings-navy-theme")
     }
 

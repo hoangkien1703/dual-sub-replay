@@ -48,7 +48,7 @@
     <string name="settings_section_layout_title">レイアウトと形式</string>
     <string name="settings_section_layout_summary">パネルの位置、字幕の形式、分割表示</string>
     <string name="settings_section_colors_title">色とテーマ</string>
-    <string name="settings_section_colors_summary">字幕の色、オーバーレイの背景、アプリのアクセント</string>
+    <string name="settings_section_colors_summary">字幕の色、オーバーレイの背景、アプリの色とアクセント</string>
     <string name="settings_section_word_learning_title">単語学習</string>
     <string name="settings_section_word_learning_summary">単語の色分け、タップで意味表示、発音</string>
     <string name="settings_section_overlay_title">オーバーレイと全画面</string>

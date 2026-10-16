@@ -48,7 +48,7 @@
     <string name="settings_section_layout_title">Diseño y formato</string>
     <string name="settings_section_layout_summary">Posición del panel, formato de subtítulos, vista dividida</string>
     <string name="settings_section_colors_title">Colores y tema</string>
-    <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, acento de la app</string>
+    <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, colores y acento de la app</string>
     <string name="settings_section_word_learning_title">Aprendizaje de palabras</string>
     <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación</string>
     <string name="settings_section_overlay_title">Superposición y pantalla completa</string>

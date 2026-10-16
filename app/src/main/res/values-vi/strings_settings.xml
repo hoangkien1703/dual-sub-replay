@@ -48,7 +48,7 @@
     <string name="settings_section_layout_title">Bố cục &amp; định dạng</string>
     <string name="settings_section_layout_summary">Vị trí bảng, định dạng phụ đề, chia đôi màn hình</string>
     <string name="settings_section_colors_title">Màu sắc &amp; giao diện</string>
-    <string name="settings_section_colors_summary">Màu phụ đề, nền lớp phủ, màu nhấn ứng dụng</string>
+    <string name="settings_section_colors_summary">Màu phụ đề, nền lớp phủ, màu và màu nhấn ứng dụng</string>
     <string name="settings_section_word_learning_title">Học từ</string>
     <string name="settings_section_word_learning_summary">Tô màu từ, chạm để xem nghĩa, phát âm</string>
     <string name="settings_section_overlay_title">Lớp phủ &amp; toàn màn hình</string>

@@ -48,7 +48,7 @@
     <string name="settings_section_layout_title">레이아웃 및 형식</string>
     <string name="settings_section_layout_summary">패널 위치, 자막 형식, 분할 화면</string>
     <string name="settings_section_colors_title">색상 및 테마</string>
-    <string name="settings_section_colors_summary">자막 색상, 오버레이 배경, 앱 강조 색상</string>
+    <string name="settings_section_colors_summary">자막 색상, 오버레이 배경, 앱 색상과 강조 색상</string>
     <string name="settings_section_word_learning_title">단어 학습</string>
     <string name="settings_section_word_learning_summary">단어 색상, 탭하여 뜻 보기, 발음</string>
     <string name="settings_section_overlay_title">오버레이 및 전체 화면</string>

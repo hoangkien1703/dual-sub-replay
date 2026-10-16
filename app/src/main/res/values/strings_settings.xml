@@ -48,7 +48,7 @@
     <string name="settings_section_layout_title">Layout &amp; format</string>
     <string name="settings_section_layout_summary">Panel position, caption format, split view</string>
     <string name="settings_section_colors_title">Colors &amp; theme</string>
-    <string name="settings_section_colors_summary">Subtitle colors, overlay background, app accent</string>
+    <string name="settings_section_colors_summary">Subtitle colors, overlay background, app colors and accent</string>
     <string name="settings_section_word_learning_title">Word learning</string>
     <string name="settings_section_word_learning_summary">Word colors, tap for meaning, pronunciation</string>
     <string name="settings_section_overlay_title">Overlay &amp; fullscreen</string>
