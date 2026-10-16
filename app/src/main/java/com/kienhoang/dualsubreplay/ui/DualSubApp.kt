@@ -64,7 +64,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -115,10 +114,7 @@ fun DualSubApp(
 
     DualSubTheme {
         if (!state.onboardingCompleted) {
-            LanguageSetupScreen(
-                onComplete = viewModel::completeOnboarding,
-                onSkip = viewModel::skipOnboarding,
-            )
+            LanguageSetupScreen(onComplete = viewModel::completeOnboarding, onSkip = viewModel::skipOnboarding)
         } else if (!state.guideCompleted) {
             GuideScreen(onFinish = viewModel::completeGuide)
         } else if (!state.dailyGoalPromptCompleted) {
@@ -158,6 +154,7 @@ fun DualSubApp(
                 onWordHighlightChange = viewModel::setWordHighlightEnabled,
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
                 onCaptionFormatChange = viewModel::setCaptionFormat,
+                onTranslationPositionChange = viewModel::setTranslationPosition,
                 lockOverlayToVideo = state.lockOverlayToVideo,
                 onLockOverlayToVideoChange = viewModel::setLockOverlayToVideo,
                 preloadModelsEnabled = state.preloadModelsEnabled,
@@ -267,6 +264,7 @@ private fun DualSubExperience(
     onWordHighlightChange: (Boolean) -> Unit,
     onCustomColorsChange: (Boolean) -> Unit,
     onCaptionFormatChange: (CaptionFormat) -> Unit,
+    onTranslationPositionChange: (TranslationPosition) -> Unit = {},
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -488,6 +486,8 @@ private fun DualSubExperience(
             wordHighlightEnabled = state.wordHighlightEnabled,
             customColorsEnabled = state.customColorsEnabled,
             captionFormat = state.captionFormat,
+            translationPosition = state.translationPosition,
+            onTranslationPositionChange = onTranslationPositionChange,
             lockOverlayToVideo = state.lockOverlayToVideo,
             onLockOverlayToVideoChange = onLockOverlayToVideoChange,
             preloadModelsEnabled = state.preloadModelsEnabled,
@@ -581,8 +581,8 @@ private fun SubtitlePanel(
             .offset { IntOffset(0, panelOffsetY.roundToInt()) }
             .shadow(18.dp, RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
         shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
-        color = Color(0xFF061719),
-        contentColor = Color(0xFFF3FAFA),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         tonalElevation = 8.dp,
     ) {
         Column(Modifier.fillMaxSize()) {
@@ -598,7 +598,7 @@ private fun SubtitlePanel(
                             .width(36.dp)
                             .height(4.dp),
                         shape = CircleShape,
-                        color = Color(0xFF51686B),
+                        color = MaterialTheme.colorScheme.outline,
                     ) {}
                 }
 
@@ -617,14 +617,14 @@ private fun SubtitlePanel(
                         Text(
                             text = sourceDescription(state),
                             style = MaterialTheme.typography.labelLarge,
-                            color = Color(0xFFF3FAFA),
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFFB7CED1),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -633,19 +633,19 @@ private fun SubtitlePanel(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = stringResource(R.string.player_subtitle_settings),
-                            tint = Color(0xFFE5F2F3),
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                     IconButton(onClick = onHide) {
                         Icon(
                             Icons.Default.Close,
                             contentDescription = stringResource(R.string.player_hide_dual_subtitles),
-                            tint = Color(0xFFE5F2F3),
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
             }
-            HorizontalDivider(color = Color(0xFF244044))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 when {
@@ -720,7 +720,7 @@ private fun LandscapeSplitDivider(
         Surface(
             modifier = Modifier.width(3.dp).height(64.dp),
             shape = CircleShape,
-            color = Color(0xFF607477),
+            color = MaterialTheme.colorScheme.outline,
         ) {}
     }
 }
@@ -779,8 +779,8 @@ private fun SideSubtitlePanel(
             .onSizeChanged { panelWidthPx = it.width.toFloat() }
             .offset { IntOffset(panelOffsetX.roundToInt(), 0) },
         shape = RectangleShape,
-        color = Color(0xFF061719),
-        contentColor = Color(0xFFF3FAFA),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         tonalElevation = 8.dp,
     ) {
         Column(Modifier.fillMaxSize()) {
@@ -800,14 +800,14 @@ private fun SideSubtitlePanel(
                         Text(
                             text = sourceDescription(state),
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color(0xFFF3FAFA),
+                            color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFFB7CED1),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -816,7 +816,7 @@ private fun SideSubtitlePanel(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = stringResource(R.string.player_subtitle_settings),
-                            tint = Color(0xFFE5F2F3),
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -824,13 +824,13 @@ private fun SideSubtitlePanel(
                         Icon(
                             Icons.Default.Close,
                             contentDescription = stringResource(R.string.player_hide_dual_subtitles),
-                            tint = Color(0xFFE5F2F3),
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(20.dp),
                         )
                     }
                 }
             }
-            HorizontalDivider(color = Color(0xFF244044))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             when {
                 state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
@@ -896,9 +896,10 @@ internal fun SubtitleTimeline(
     val showOriginal = state.showOriginal()
     val showTranslation = state.showTranslation()
     val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
-    val originalColor = effectiveOriginalColor(state)
-    val translatedColor = effectiveTranslatedColor(state)
-    val highlightColor = effectiveHighlightColor(state)
+    val onLight = appThemeIsLight()
+    val originalColor = effectiveOriginalColor(state, onLight)
+    val translatedColor = effectiveTranslatedColor(state, onLight)
+    val highlightColor = effectiveHighlightColor(state, onLight)
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
@@ -912,6 +913,7 @@ internal fun SubtitleTimeline(
                     segment = segment,
                     showOriginal = showOriginal,
                     showTranslation = showTranslation,
+                    translationPosition = state.translationPosition,
                     active = active,
                     fontScale = state.fontScale,
                     onReplay = { onReplay(segment) },
@@ -1074,7 +1076,7 @@ private fun CompactLoadingPanel(message: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(Modifier.size(34.dp), strokeWidth = 3.dp)
             Spacer(Modifier.height(10.dp))
-            Text(message, color = Color(0xFFB7CED1))
+            Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

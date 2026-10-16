@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -159,7 +158,7 @@ internal fun JumpBackPill(
                 }
             },
             shape = CircleShape,
-            color = Color(0xFF0A2B30),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             contentColor = primary,
             border = BorderStroke(1.dp, primary.copy(alpha = 0.6f)),
             shadowElevation = 6.dp,

@@ -69,7 +69,7 @@ internal fun AppProblemCard(
                 Icon(
                     Icons.Default.ErrorOutline,
                     contentDescription = null,
-                    tint = if (problem.mild) MildProblemTint else MaterialTheme.colorScheme.error,
+                    tint = if (problem.mild) mildProblemTint() else MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.width(8.dp))

@@ -96,6 +96,7 @@ data class DualSubUiState(
     val wordHighlightEnabled: Boolean = true,
     val customColorsEnabled: Boolean = true,
     val captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
+    val translationPosition: TranslationPosition = TranslationPosition.BELOW,
     val isDownloadingTranslationModel: Boolean = false,
     val lockOverlayToVideo: Boolean = false,
     val preloadModelsEnabled: Boolean = true,
@@ -433,6 +434,7 @@ class AppViewModel internal constructor(
                         preferences.getString(CAPTION_FORMAT_PREFERENCE, null),
                         preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
                     ),
+                translationPosition = storedTranslationPosition(preferences.getString(TRANSLATION_POSITION_PREFERENCE, null)),
                 lockOverlayToVideo =
                     storedFeatureEnabled(
                         preferences.getBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, false),
@@ -911,6 +913,11 @@ class AppViewModel internal constructor(
         liveCaptionProgress = null
     }
 
+    fun setTranslationPosition(position: TranslationPosition) {
+        preferences.edit().putString(TRANSLATION_POSITION_PREFERENCE, position.storageValue).apply()
+        _state.update { it.copy(translationPosition = position) }
+    }
+
     fun setLockOverlayToVideo(locked: Boolean) {
         preferences.edit().putBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, locked).apply()
         _state.update { it.copy(lockOverlayToVideo = locked) }
@@ -1115,6 +1122,7 @@ class AppViewModel internal constructor(
                 originalVisibility = CaptionVisibility.ALWAYS,
                 translatedVisibility = CaptionVisibility.ALWAYS,
                 captionFormat = CaptionFormat.SHORT_PHRASES,
+                translationPosition = TranslationPosition.BELOW,
                 lockOverlayToVideo = false,
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,

@@ -112,30 +112,108 @@ internal fun aiYouTubeSearchUrl(query: String): String =
 
 private fun onOff(enabled: Boolean) = if (enabled) "on" else "off"
 
+/** The settings kept only in preferences rather than in [DualSubUiState], as the assistant reads them. */
+internal data class AiStoredSettings(
+    val overlayBackground: String = DEFAULT_SUBTITLE_BOX_BACKGROUND_KEY,
+    val appColors: String = DEFAULT_APP_COLOR_THEME_KEY,
+    val accentColor: String = DEFAULT_APP_THEME_ACCENT_KEY,
+    val pronunciationVolume: Float = DEFAULT_PRONUNCIATION_VOLUME,
+    val overlayInFullscreen: Boolean = true,
+    val overlayWhenRotated: Boolean = true,
+    val movableControls: Boolean = true,
+    val avoidVideoControls: Boolean = true,
+    val rememberDraggedPosition: Boolean = true,
+    /** An `APP_LANGUAGES` tag, or "device". */
+    val appLanguage: String = "device",
+)
+
+internal fun readAiStoredSettings(context: Context): AiStoredSettings {
+    val preferences = context.getSharedPreferences("dual_sub_preferences", 0)
+    return AiStoredSettings(
+        overlayBackground = storedSubtitleBoxBackgroundKey(preferences.getString(SUBTITLE_BOX_BACKGROUND_PREFERENCE, null)),
+        appColors = storedAppColorTheme(preferences.getString(APP_COLOR_THEME_PREFERENCE, null)).key,
+        accentColor = storedAppThemeAccentKey(preferences.getString(APP_THEME_ACCENT_PREFERENCE, null)),
+        pronunciationVolume = readPronunciationVolume(context),
+        overlayInFullscreen = preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true),
+        overlayWhenRotated = preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true),
+        movableControls = preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true),
+        avoidVideoControls = preferences.getBoolean(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, true),
+        rememberDraggedPosition = preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true),
+        appLanguage = AppLanguageSettings.selected(context)?.tag ?: "device",
+    )
+}
+
 /** [setting]'s value now, written as the assistant's actions write it. */
 internal fun aiSettingCurrentValue(
     state: DualSubUiState,
     playerMode: PlayerExperienceMode,
     speed: Float,
+    stored: AiStoredSettings,
     setting: AiSetting,
 ): String =
+    aiStoredSettingValue(stored, setting)
+        ?: aiReadingSettingValue(state, playerMode, setting)
+        ?: aiLearningSettingValue(state, speed, setting)
+
+private fun aiStoredSettingValue(
+    stored: AiStoredSettings,
+    setting: AiSetting,
+): String? =
+    when (setting) {
+        AiSetting.OVERLAY_BACKGROUND -> stored.overlayBackground
+        AiSetting.APP_COLORS -> stored.appColors
+        AiSetting.ACCENT_COLOR -> stored.accentColor
+        AiSetting.PRONUNCIATION_VOLUME -> Math.round(stored.pronunciationVolume * PERCENT).toString()
+        AiSetting.OVERLAY_IN_FULLSCREEN -> onOff(stored.overlayInFullscreen)
+        AiSetting.OVERLAY_WHEN_ROTATED -> onOff(stored.overlayWhenRotated)
+        AiSetting.MOVABLE_SUBTITLE_CONTROLS -> onOff(stored.movableControls)
+        AiSetting.AVOID_VIDEO_CONTROLS -> onOff(stored.avoidVideoControls)
+        AiSetting.REMEMBER_DRAGGED_POSITION -> onOff(stored.rememberDraggedPosition)
+        AiSetting.APP_LANGUAGE -> stored.appLanguage
+        else -> null
+    }
+
+/** The Reading, Default view, Layout and Colors settings that the view model holds. */
+private fun aiReadingSettingValue(
+    state: DualSubUiState,
+    playerMode: PlayerExperienceMode,
+    setting: AiSetting,
+): String? =
     when (setting) {
         AiSetting.TEXT_SIZE -> Math.round(state.fontScale * PERCENT).toString()
         AiSetting.ORIGINAL_CAPTIONS -> state.originalVisibility.name.lowercase(Locale.ROOT)
         AiSetting.TRANSLATED_CAPTIONS -> state.translatedVisibility.name.lowercase(Locale.ROOT)
+        AiSetting.TRANSLATION_POSITION -> state.translationPosition.storageValue
         AiSetting.HIGHLIGHT_SPOKEN_WORDS -> onOff(state.wordHighlightEnabled)
         AiSetting.DEFAULT_VIEW -> if (playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL) "transcript_panel" else "overlay"
+        AiSetting.PORTRAIT_PANEL_POSITION -> Math.round(state.portraitPanelOffsetFraction * PERCENT).toString()
         AiSetting.CAPTION_FORMAT -> state.captionFormat.storageValue
         AiSetting.LANDSCAPE_SPLIT_VIEW -> onOff(state.landscapeSplitEnabled)
         AiSetting.CUSTOM_SUBTITLE_COLORS -> onOff(state.customColorsEnabled)
         AiSetting.ORIGINAL_COLOR -> state.originalColorKey
         AiSetting.TRANSLATED_COLOR -> state.translatedColorKey
         AiSetting.HIGHLIGHT_COLOR -> state.highlightColorKey
+        AiSetting.LOCK_OVERLAY_TO_VIDEO -> onOff(state.lockOverlayToVideo)
+        else -> null
+    }
+
+/** Word learning, captions, the daily goal and the video's speed. */
+private fun aiLearningSettingValue(
+    state: DualSubUiState,
+    speed: Float,
+    setting: AiSetting,
+): String =
+    when (setting) {
         AiSetting.PRONOUNCE_TAPPED_WORDS -> onOff(state.autoPronounce)
         AiSetting.WORD_LEARNING_MODE -> onOff(state.wordLearningEnabled)
+        AiSetting.COLORED_SUBTITLE_LINES -> state.wordLearningTarget
         AiSetting.TAP_WORD_FOR_DEFINITION -> onOff(state.tapToLearnEnabled)
-        AiSetting.LOCK_OVERLAY_TO_VIDEO -> onOff(state.lockOverlayToVideo)
-        AiSetting.PLAYBACK_SPEED -> (Math.round(speed * PERCENT) / PERCENT).toString()
+        AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> onOff(state.wordLearningActiveOnly)
+        AiSetting.NATURAL_SUBTITLE_FLOW -> onOff(state.naturalSubtitlesEnabled)
+        AiSetting.PRELOAD_TRANSLATION_MODELS -> onOff(state.preloadModelsEnabled)
+        AiSetting.ORIGINAL_CAPTION_LANGUAGE -> state.sourcePreference
+        AiSetting.DAILY_GOAL -> if (state.dailyGoalMinutes <= 0) "off" else state.dailyGoalMinutes.toString()
+        else -> (Math.round(speed * PERCENT) / PERCENT).toString()
     }
 
 /** Why [action] cannot run in [state], in English for the model, or null. */
@@ -147,6 +225,10 @@ internal fun aiActionRefusal(
         action is AiAction.Playback -> aiPlaybackRefusal(state, action.command)
         action is AiAction.ChangeSetting && action.setting == AiSetting.PLAYBACK_SPEED && state.activeVideoId == null ->
             "No video is open."
+        action is AiAction.ChangeSetting && action.setting == AiSetting.ORIGINAL_CAPTION_LANGUAGE &&
+            !shouldAcceptSourcePreference(action.value, state.availableSourceLanguages) ->
+            "The open video has no captions in ${TranslationLanguages.displayName(action.value)}. It has: " +
+                state.availableSourceLanguages.joinToString(", ") { "${it.code} (${TranslationLanguages.displayName(it.code)})" } + "."
         else -> null
     }
 
@@ -368,7 +450,7 @@ internal class AppAiActions(
     }
 
     private fun currentValue(setting: AiSetting): String =
-        aiSettingCurrentValue(state, playerMode(), player.speedFor(state.activeVideoId), setting)
+        aiSettingCurrentValue(state, playerMode(), player.speedFor(state.activeVideoId), readAiStoredSettings(context), setting)
 
     private fun changeSetting(
         setting: AiSetting,
@@ -395,6 +477,32 @@ internal class AppAiActions(
         setting: AiSetting,
         value: String,
     ) {
+        if (applyStored(setting, value) || applyReading(setting, value)) return
+        val on = value == "on"
+        when (setting) {
+            AiSetting.PRONOUNCE_TAPPED_WORDS -> viewModel.setAutoPronounce(on)
+            AiSetting.WORD_LEARNING_MODE -> viewModel.setWordLearningEnabled(on)
+            AiSetting.TAP_WORD_FOR_DEFINITION -> viewModel.setTapToLearnEnabled(on)
+            AiSetting.COLORED_SUBTITLE_LINES -> viewModel.setWordLearningTarget(value)
+            AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> viewModel.setWordLearningActiveOnly(on)
+            AiSetting.LOCK_OVERLAY_TO_VIDEO -> viewModel.setLockOverlayToVideo(on)
+            AiSetting.PLAYBACK_SPEED -> player.setSpeed(value.toFloat(), state.activeVideoId)
+            AiSetting.NATURAL_SUBTITLE_FLOW -> viewModel.setNaturalSubtitlesEnabled(on)
+            AiSetting.PRELOAD_TRANSLATION_MODELS -> viewModel.setPreloadModelsEnabled(on)
+            AiSetting.ORIGINAL_CAPTION_LANGUAGE -> viewModel.setSourcePreference(value)
+            AiSetting.DAILY_GOAL -> viewModel.setDailyGoal(value.toIntOrNull() ?: 0)
+            AiSetting.APP_LANGUAGE ->
+                context.findActivity()?.let { AppLanguageSettings.select(it, APP_LANGUAGES.firstOrNull { option -> option.tag == value }) }
+            // The rest were handled by applyStored or applyReading.
+            else -> Unit
+        }
+    }
+
+    /** Applies a reading, layout or color setting; false when [setting] is not one. */
+    private fun applyReading(
+        setting: AiSetting,
+        value: String,
+    ): Boolean {
         val on = value == "on"
         when (setting) {
             AiSetting.TEXT_SIZE -> viewModel.setFontScale(value.toFloat() / PERCENT)
@@ -403,26 +511,49 @@ internal class AppAiActions(
             AiSetting.HIGHLIGHT_SPOKEN_WORDS -> viewModel.setWordHighlightEnabled(on)
             AiSetting.DEFAULT_VIEW ->
                 setPlayerMode(
-                    if (value ==
-                        "overlay"
-                    ) {
-                        PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
-                    } else {
-                        PlayerExperienceMode.TRANSCRIPT_PANEL
-                    },
+                    if (value == "overlay") PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY else PlayerExperienceMode.TRANSCRIPT_PANEL,
                 )
             AiSetting.CAPTION_FORMAT -> viewModel.setCaptionFormat(captionFormat(value))
+            AiSetting.TRANSLATION_POSITION -> viewModel.setTranslationPosition(storedTranslationPosition(value))
             AiSetting.LANDSCAPE_SPLIT_VIEW -> viewModel.setLandscapeSplitEnabled(on)
+            AiSetting.PORTRAIT_PANEL_POSITION -> viewModel.setPortraitPanelOffsetFraction(value.toFloat() / PERCENT)
             AiSetting.CUSTOM_SUBTITLE_COLORS -> viewModel.setCustomColorsEnabled(on)
             AiSetting.ORIGINAL_COLOR -> viewModel.setOriginalSubtitleColor(value)
             AiSetting.TRANSLATED_COLOR -> viewModel.setTranslatedSubtitleColor(value)
             AiSetting.HIGHLIGHT_COLOR -> viewModel.setHighlightColor(value)
-            AiSetting.PRONOUNCE_TAPPED_WORDS -> viewModel.setAutoPronounce(on)
-            AiSetting.WORD_LEARNING_MODE -> viewModel.setWordLearningEnabled(on)
-            AiSetting.TAP_WORD_FOR_DEFINITION -> viewModel.setTapToLearnEnabled(on)
-            AiSetting.LOCK_OVERLAY_TO_VIDEO -> viewModel.setLockOverlayToVideo(on)
-            AiSetting.PLAYBACK_SPEED -> player.setSpeed(value.toFloat(), state.activeVideoId)
+            else -> return false
         }
+        return true
+    }
+
+    /**
+     * Writes a setting the app keeps only in preferences, the same way the settings page does; the
+     * screens that show it listen for the change. False when [setting] lives in the view model.
+     */
+    private fun applyStored(
+        setting: AiSetting,
+        value: String,
+    ): Boolean {
+        val editor = context.getSharedPreferences("dual_sub_preferences", 0).edit()
+        val on = value == "on"
+        when (setting) {
+            AiSetting.OVERLAY_BACKGROUND -> editor.putString(SUBTITLE_BOX_BACKGROUND_PREFERENCE, value)
+            AiSetting.APP_COLORS -> editor.putString(APP_COLOR_THEME_PREFERENCE, value)
+            AiSetting.ACCENT_COLOR -> editor.putString(APP_THEME_ACCENT_PREFERENCE, value)
+            AiSetting.PRONUNCIATION_VOLUME -> editor.putFloat(PRONUNCIATION_VOLUME_PREFERENCE, value.toFloat() / PERCENT)
+            AiSetting.OVERLAY_IN_FULLSCREEN -> editor.putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, on)
+            AiSetting.OVERLAY_WHEN_ROTATED -> editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, on)
+            AiSetting.MOVABLE_SUBTITLE_CONTROLS -> editor.putBoolean(MOVABLE_OVERLAY_PREFERENCE, on)
+            AiSetting.AVOID_VIDEO_CONTROLS -> editor.putBoolean(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, on)
+            AiSetting.REMEMBER_DRAGGED_POSITION -> {
+                editor.putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, on)
+                // Like the settings page: turning it off forgets the dragged positions.
+                if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
+            }
+            else -> return false
+        }
+        editor.apply()
+        return true
     }
 
     private fun captionVisibility(value: String): CaptionVisibility =
@@ -444,7 +575,21 @@ internal class AppAiActions(
     private fun color(
         @StringRes name: Int,
         value: String,
-    ): String = named(name, SubtitleColorOption.entries.firstOrNull { it.key == value }?.let { string(it.labelRes) } ?: value)
+    ): String = option(name, SubtitleColorOption.entries, value)
+
+    private fun option(
+        @StringRes name: Int,
+        options: List<ColorSettingOption>,
+        value: String,
+    ): String = named(name, options.firstOrNull { it.key == value }?.let { string(it.labelRes) } ?: value)
+
+    @StringRes
+    private fun coloredLinesLabel(value: String): Int =
+        when (value) {
+            "translation" -> R.string.settings_colored_lines_translation
+            "both" -> R.string.settings_colored_lines_both
+            else -> R.string.settings_colored_lines_original
+        }
 
     private fun settingLabel(
         setting: AiSetting,
@@ -482,6 +627,55 @@ internal class AppAiActions(
                         NumberFormat.getNumberInstance(context.interfaceLocale()).format(value.toDouble()),
                     ),
                 )
+            else -> otherSettingLabel(setting, value)
+        }
+
+    /** Labels of the settings added for the whole settings page (2026-10-16). */
+    private fun otherSettingLabel(
+        setting: AiSetting,
+        value: String,
+    ): String =
+        when (setting) {
+            AiSetting.TRANSLATION_POSITION ->
+                named(R.string.settings_translation_position_title, string(storedTranslationPosition(value).labelRes))
+            AiSetting.PORTRAIT_PANEL_POSITION -> {
+                val position = portraitPanelPositionText(value.toFloat() / PERCENT)
+                named(R.string.settings_portrait_panel_position, string(position.textRes, position.percentage))
+            }
+            AiSetting.OVERLAY_BACKGROUND -> option(R.string.settings_box_background_title, SubtitleBoxBackgroundOption.entries, value)
+            AiSetting.APP_COLORS -> option(R.string.settings_app_colors_title, AppColorThemeOption.entries, value)
+            AiSetting.ACCENT_COLOR -> option(R.string.settings_accent_color_title, AppThemeAccentOption.entries, value)
+            AiSetting.PRONUNCIATION_VOLUME -> string(R.string.settings_pronunciation_volume_title, value.toInt())
+            AiSetting.COLORED_SUBTITLE_LINES -> named(R.string.settings_colored_lines_title, string(coloredLinesLabel(value)))
+            AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> switch(R.string.settings_active_sentence_only_title, value)
+            AiSetting.OVERLAY_IN_FULLSCREEN -> switch(R.string.settings_overlay_fullscreen_title, value)
+            AiSetting.OVERLAY_WHEN_ROTATED -> switch(R.string.settings_overlay_landscape_title, value)
+            AiSetting.MOVABLE_SUBTITLE_CONTROLS -> switch(R.string.settings_movable_controls_title, value)
+            AiSetting.AVOID_VIDEO_CONTROLS -> switch(R.string.settings_avoid_controls_title, value)
+            AiSetting.REMEMBER_DRAGGED_POSITION -> switch(R.string.settings_remember_position_title, value)
+            AiSetting.NATURAL_SUBTITLE_FLOW -> switch(R.string.settings_natural_flow_title, value)
+            AiSetting.PRELOAD_TRANSLATION_MODELS -> switch(R.string.settings_preload_models_title, value)
+            AiSetting.ORIGINAL_CAPTION_LANGUAGE ->
+                named(
+                    R.string.settings_original_caption_language,
+                    if (value == "auto") {
+                        string(R.string.settings_source_language_auto)
+                    } else {
+                        languageDisplayName(value, context.interfaceLocale())
+                    },
+                )
+            AiSetting.APP_LANGUAGE ->
+                named(
+                    R.string.navigation_app_language,
+                    APP_LANGUAGES.firstOrNull { it.tag == value }?.nativeName ?: string(R.string.navigation_device_language),
+                )
+            AiSetting.DAILY_GOAL ->
+                named(
+                    R.string.onboarding_goal_dialog_title,
+                    value.toIntOrNull()?.let { string(R.string.onboarding_duration_minutes, it) } ?: string(R.string.onboarding_goal_off),
+                )
+            // settingLabel names the others.
+            else -> value
         }
 
     private fun translationLabel(action: AiAction.ChangeTranslation): String =

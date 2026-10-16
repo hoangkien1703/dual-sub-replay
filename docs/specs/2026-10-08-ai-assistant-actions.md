@@ -34,6 +34,9 @@ cannot.
 - Memory and the instructions box (next PR).
 - Changing the original caption language, natural subtitle flow, overlay positions, theme colors,
   downloads, or anything in the AI settings (service, key, model, history, the switch).
+  Superseded on 2026-10-16: the assistant now reads and changes every setting on the settings page
+  except downloads, dragged positions and the AI settings; see the
+  [settings spec](2026-10-16-translation-position-and-ai-settings.md).
 - Deleting or editing saved words, import or export, Reset all settings, signing in or out.
 - Opening links other than YouTube, or a video whose link the user did not type (no guessed IDs).
 - Playing a paused video without replaying a line; reading the video title, comments or the page.

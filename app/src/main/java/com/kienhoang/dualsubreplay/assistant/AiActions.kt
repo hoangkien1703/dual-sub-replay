@@ -20,6 +20,7 @@ private const val MAX_WORD_CHARS = 80
 private const val MAX_MEANING_CHARS = 300
 private const val PERCENT_FACTOR = 100f
 private const val LARGEST_FACTOR_VALUE = 3f
+private const val VOLUME_STEP = 25f
 
 private object AiChoices {
     val onOff = listOf("on", "off")
@@ -29,30 +30,66 @@ private object AiChoices {
 /** The keys of the app's subtitle text colors (`SubtitleColorOption`); a test keeps them equal. */
 internal val AI_SUBTITLE_COLORS = listOf("ice_white", "sky_blue", "mint", "amber", "rose", "lavender")
 
+/** The keys of `SubtitleBoxBackgroundOption`; a test keeps them equal. */
+internal val AI_OVERLAY_BACKGROUNDS = listOf("deep_teal", "black", "navy", "slate", "plum", "forest")
+
+/** The keys of `AppColorThemeOption`; a test keeps them equal. */
+internal val AI_APP_COLORS = listOf("deep_teal", "black", "navy", "slate", "plum", "forest", "light")
+
+/** The keys of `AppThemeAccentOption`; a test keeps them equal. */
+internal val AI_ACCENT_COLORS = listOf("cyan", "blue", "mint", "amber", "rose", "lavender")
+
+/** "device" follows the phone; the rest are the tags of `APP_LANGUAGES`, which a test keeps equal. */
+internal val AI_APP_LANGUAGES = listOf("device", "en", "vi", "es", "pt-BR", "ja", "ko", "zh-CN", "id")
+
+/** "off" or the minutes of `DAILY_GOAL_CHOICES`, which a test keeps equal. */
+internal val AI_DAILY_GOALS = listOf("off", "5", "10", "15", "20", "30", "45", "60")
+
 /**
- * A setting the assistant may change at once, with Undo. [choices] lists the values it takes; a
- * setting without choices takes a number within [range].
+ * A setting the assistant may change, in the order the settings page shows them. [choices] lists
+ * the values it takes; a setting without choices takes a number within [range], or a language.
+ * Most run at once with Undo; one that [asks] reloads the video's subtitles, downloads language
+ * models, or rebuilds the screen, so it waits for the user's tap.
  */
 internal enum class AiSetting(
     val key: String,
     val choices: List<String> = AiChoices.onOff,
     val range: ClosedFloatingPointRange<Float>? = null,
+    val asks: Boolean = false,
 ) {
     TEXT_SIZE("text_size", emptyList(), 80f..200f),
     ORIGINAL_CAPTIONS("original_captions", AiChoices.captionVisibility),
     TRANSLATED_CAPTIONS("translated_captions", AiChoices.captionVisibility),
+    TRANSLATION_POSITION("translation_position", listOf("below", "above")),
     HIGHLIGHT_SPOKEN_WORDS("highlight_spoken_words"),
     DEFAULT_VIEW("default_view", listOf("transcript_panel", "overlay")),
+    PORTRAIT_PANEL_POSITION("portrait_panel_position", emptyList(), -20f..20f),
     CAPTION_FORMAT("caption_format", listOf("short_phrases", "whole_sentence")),
     LANDSCAPE_SPLIT_VIEW("landscape_split_view"),
     CUSTOM_SUBTITLE_COLORS("custom_subtitle_colors"),
     ORIGINAL_COLOR("original_subtitle_color", AI_SUBTITLE_COLORS),
     TRANSLATED_COLOR("translated_subtitle_color", AI_SUBTITLE_COLORS),
     HIGHLIGHT_COLOR("spoken_word_highlight_color", AI_SUBTITLE_COLORS),
+    OVERLAY_BACKGROUND("overlay_background", AI_OVERLAY_BACKGROUNDS),
+    APP_COLORS("app_colors", AI_APP_COLORS),
+    ACCENT_COLOR("accent_color", AI_ACCENT_COLORS),
     PRONOUNCE_TAPPED_WORDS("pronounce_tapped_words"),
+    PRONUNCIATION_VOLUME("pronunciation_volume", emptyList(), 25f..200f),
     WORD_LEARNING_MODE("word_learning_mode"),
+    COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
+    HIGHLIGHT_ACTIVE_SENTENCE_ONLY("highlight_active_sentence_only"),
+    OVERLAY_IN_FULLSCREEN("overlay_in_fullscreen"),
+    OVERLAY_WHEN_ROTATED("overlay_when_rotated"),
+    MOVABLE_SUBTITLE_CONTROLS("movable_subtitle_controls"),
     LOCK_OVERLAY_TO_VIDEO("lock_overlay_to_video"),
+    AVOID_VIDEO_CONTROLS("avoid_video_controls"),
+    REMEMBER_DRAGGED_POSITION("remember_dragged_position"),
+    NATURAL_SUBTITLE_FLOW("natural_subtitle_flow", asks = true),
+    PRELOAD_TRANSLATION_MODELS("preload_translation_models", asks = true),
+    ORIGINAL_CAPTION_LANGUAGE("original_caption_language", emptyList(), asks = true),
+    APP_LANGUAGE("app_language", AI_APP_LANGUAGES, asks = true),
+    DAILY_GOAL("daily_goal", AI_DAILY_GOALS),
 
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
@@ -132,9 +169,14 @@ internal sealed interface AiAction {
     ) : AiAction
 }
 
-/** Navigation and translation changes wait for the user's tap, whatever the question carried. */
+/**
+ * Navigation, translation changes and settings that reload, download or rebuild the screen wait for
+ * the user's tap, whatever the question carried.
+ */
 internal val AiAction.alwaysAsks: Boolean
-    get() = this is AiAction.SearchYouTube || this is AiAction.OpenVideo || this is AiAction.ChangeTranslation
+    get() =
+        this is AiAction.SearchYouTube || this is AiAction.OpenVideo || this is AiAction.ChangeTranslation ||
+            (this is AiAction.ChangeSetting && setting.asks)
 
 /**
  * Setting and memory changes also wait for a tap when the answer rests on text the user did not
@@ -354,7 +396,32 @@ private val CHOICE_ALIASES =
         "red" to "rose",
         "pink" to "rose",
         "purple" to "lavender",
+        "teal" to "deep_teal",
+        "dark_teal" to "deep_teal",
+        "dark_blue" to "navy",
+        "gray" to "slate",
+        "grey" to "slate",
+        "day" to "light",
+        "white_theme" to "light",
+        "light_theme" to "light",
+        "dark_theme" to "deep_teal",
+        "translations" to "translation",
+        "originals" to "original",
+        "under" to "below",
+        "bottom" to "below",
+        "over" to "above",
+        "top" to "above",
     )
+
+private val SETTING_CHOICE_ALIASES =
+    mapOf(
+        AiSetting.APP_COLORS to mapOf("white" to "light", "green" to "forest", "purple" to "plum", "blue" to "navy", "dark" to "deep_teal"),
+        AiSetting.OVERLAY_BACKGROUND to mapOf("green" to "forest", "purple" to "plum", "blue" to "navy"),
+        AiSetting.ACCENT_COLOR to
+            mapOf("teal" to "cyan", "green" to "mint", "yellow" to "amber", "red" to "rose", "pink" to "rose", "purple" to "lavender"),
+    )
+
+private val DEVICE_LANGUAGE_WORDS = setOf("device", "system", "auto", "automatic", "default", "phone", "follow_device", "follow_the_device")
 
 /** [raw] as one of [setting]'s choices, or as a number in its range; null when it is neither. */
 internal fun aiSettingValue(
@@ -370,12 +437,45 @@ internal fun aiSettingValue(
             .lowercase(Locale.ROOT)
             .replace(' ', '_')
             .replace('-', '_')
-    return (CHOICE_ALIASES[key] ?: key).takeIf { it in setting.choices }
+    return when (setting) {
+        AiSetting.ORIGINAL_CAPTION_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "auto" else aiLanguageCode(raw)
+        AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
+        AiSetting.DAILY_GOAL -> aiDailyGoal(key)
+        else ->
+            listOfNotNull(key, SETTING_CHOICE_ALIASES[setting]?.get(key), CHOICE_ALIASES[key])
+                .firstOrNull { it in setting.choices }
+    }
+}
+
+/** One of [AI_APP_LANGUAGES] from a tag ("pt-BR"), a code ("pt") or an English name ("Portuguese"). */
+private fun aiAppLanguage(raw: String): String? {
+    val trimmed = raw.trim()
+    AI_APP_LANGUAGES.firstOrNull { it.equals(trimmed, ignoreCase = true) }?.let { return it }
+    val language = (aiLanguageCode(trimmed) ?: trimmed).substringBefore('-').lowercase(Locale.ROOT)
+    return AI_APP_LANGUAGES.drop(1).firstOrNull { it.substringBefore('-').lowercase(Locale.ROOT) == language }
+}
+
+private fun aiDailyGoal(key: String): String? {
+    if (key in setOf("off", "none", "no_goal", "0")) return "off"
+    val minutes =
+        key
+            .removeSuffix("minutes")
+            .removeSuffix("minute")
+            .removeSuffix("mins")
+            .removeSuffix("min")
+            .trim('_')
+            .toFloatOrNull()
+    return minutes
+        ?.takeIf { it % 1f == 0f }
+        ?.toInt()
+        ?.toString()
+        ?.takeIf { it in AI_DAILY_GOALS }
 }
 
 /**
- * Text size is a percentage ("150", "150%", or 1.5 as a factor); speed is a factor ("0.75", "0.75x",
- * or 75 as a percentage). Text size is a whole percent, speed has two decimals.
+ * Text size and pronunciation volume are percentages ("150", "150%", or 1.5 as a factor); volume
+ * moves in steps of 25 like its slider. Speed is a factor ("0.75", "0.75x", or 75 as a percentage)
+ * with two decimals. The portrait panel position is a whole percentage, negative for higher.
  */
 private fun aiSettingNumber(
     setting: AiSetting,
@@ -389,13 +489,22 @@ private fun aiSettingNumber(
             .removeSuffix("×")
             .trim()
             .toFloatOrNull()
-            ?.takeIf { it.isFinite() && it > 0f } ?: return null
-    return if (setting == AiSetting.TEXT_SIZE) {
-        val percent = if (number <= LARGEST_FACTOR_VALUE) number * PERCENT_FACTOR else number
-        Math.round(percent).takeIf { it.toFloat() in range }?.toString()
-    } else {
-        val factor = if (number > LARGEST_FACTOR_VALUE) number / PERCENT_FACTOR else number
-        (Math.round(factor * PERCENT_FACTOR) / PERCENT_FACTOR).takeIf { it in range }?.toString()
+            ?.takeIf { it.isFinite() } ?: return null
+    if (setting == AiSetting.PORTRAIT_PANEL_POSITION) return Math.round(number).takeIf { it.toFloat() in range }?.toString()
+    if (number <= 0f) return null
+    return when (setting) {
+        AiSetting.PLAYBACK_SPEED -> {
+            val factor = if (number > LARGEST_FACTOR_VALUE) number / PERCENT_FACTOR else number
+            (Math.round(factor * PERCENT_FACTOR) / PERCENT_FACTOR).takeIf { it in range }?.toString()
+        }
+        AiSetting.PRONUNCIATION_VOLUME -> {
+            val percent = if (number <= LARGEST_FACTOR_VALUE) number * PERCENT_FACTOR else number
+            (Math.round(percent / VOLUME_STEP) * VOLUME_STEP.toInt()).takeIf { it.toFloat() in range }?.toString()
+        }
+        else -> {
+            val percent = if (number <= LARGEST_FACTOR_VALUE) number * PERCENT_FACTOR else number
+            Math.round(percent).takeIf { it.toFloat() in range }?.toString()
+        }
     }
 }
 
@@ -404,6 +513,11 @@ internal fun aiSettingValues(setting: AiSetting): String =
     when (setting) {
         AiSetting.TEXT_SIZE -> "a percentage from 80 to 200"
         AiSetting.PLAYBACK_SPEED -> "a speed from 0.25 to 2 (1 is normal)"
+        AiSetting.PRONUNCIATION_VOLUME -> "a percentage from 25 to 200 in steps of 25 (100 follows the phone's media volume)"
+        AiSetting.PORTRAIT_PANEL_POSITION -> "a percentage from -20 (higher) to 20 (lower), 0 is the middle"
+        AiSetting.ORIGINAL_CAPTION_LANGUAGE -> "auto, or the code of a language the open video has captions in"
+        AiSetting.APP_LANGUAGE -> choiceList(setting.choices) + " (device follows the phone)"
+        AiSetting.DAILY_GOAL -> choiceList(setting.choices) + " (minutes a day)"
         else -> choiceList(setting.choices)
     }
 
@@ -461,8 +575,11 @@ internal val AI_TOOLS: List<AiTool> by lazy {
         ),
         AiTool(
             AI_SETTING_TOOL,
-            "Change one app setting the user asked for. Runs at once and the user sees Undo. Only change what the user " +
-                "asked for. Values: " + AiSetting.entries.joinToString("; ") { "${it.key}: ${aiSettingValues(it)}" } + ".",
+            "Change one app setting the user asked for. Most run at once and the user sees Undo; " +
+                AiSetting.entries.filter { it.asks }.joinToString(", ") { it.key } +
+                " show an Apply button and change nothing until the user taps it. Only change what the user asked for. " +
+                "The current values are in the system prompt. Values: " +
+                AiSetting.entries.joinToString("; ") { "${it.key}: ${aiSettingValues(it)}" } + ".",
             schema(
                 JSONObject()
                     .put("setting", stringProperty("The setting.", AiSetting.entries.map { it.key }))

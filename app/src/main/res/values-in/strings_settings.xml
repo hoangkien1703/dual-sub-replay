@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">Tidak pernah</string>
     <string name="settings_original_captions_visibility">Subtitel asli: %1$s</string>
     <string name="settings_translated_captions_visibility">Subtitel terjemahan: %1$s</string>
+    <string name="settings_translation_position_title">Posisi terjemahan</string>
+    <string name="settings_translation_position_below">Di bawah teks asli</string>
+    <string name="settings_translation_position_above">Di atas teks asli</string>
     <string name="settings_portrait_panel_position">Posisi panel potret</string>
     <string name="settings_portrait_panel_position_hint">Geser panel transkrip potret ke atas atau bawah. Makin rendah posisinya, makin sedikit baris subtitel yang tampil.</string>
     <string name="settings_portrait_panel_higher">Lebih tinggi</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">Lavender</string>
     <string name="settings_color_deep_teal">Hijau toska tua</string>
     <string name="settings_color_black">Hitam</string>
+    <string name="settings_color_light">Terang</string>
     <string name="settings_color_navy">Biru dongker</string>
     <string name="settings_color_slate">Abu-abu batu</string>
     <string name="settings_color_plum">Ungu plum</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">Tema aplikasi</string>
     <string name="settings_accent_color_title">Warna aksen</string>
     <string name="settings_accent_color_hint">Mengubah sakelar, penggeser, tombol, bingkai aktif, dan aksen aplikasi lainnya.</string>
+    <string name="settings_app_colors_title">Warna aplikasi</string>
+    <string name="settings_app_colors_hint">Mengubah latar, kartu, menu, dan teks di seluruh aplikasi. Overlay di atas video tetap memakai latarnya sendiri.</string>
     <string name="settings_section_layout_title">Tata letak dan format</string>
     <string name="settings_section_layout_summary">Posisi panel, format subtitel, tampilan terpisah</string>
     <string name="settings_section_colors_title">Warna dan tema</string>

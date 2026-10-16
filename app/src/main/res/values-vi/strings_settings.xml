@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">Không bao giờ</string>
     <string name="settings_original_captions_visibility">Phụ đề gốc: %1$s</string>
     <string name="settings_translated_captions_visibility">Phụ đề dịch: %1$s</string>
+    <string name="settings_translation_position_title">Vị trí bản dịch</string>
+    <string name="settings_translation_position_below">Dưới bản gốc</string>
+    <string name="settings_translation_position_above">Trên bản gốc</string>
     <string name="settings_portrait_panel_position">Vị trí bảng ở chế độ dọc</string>
     <string name="settings_portrait_panel_position_hint">Di chuyển bảng chép lời ở chế độ dọc lên hoặc xuống. Đặt càng thấp thì càng hiện ít dòng phụ đề.</string>
     <string name="settings_portrait_panel_higher">Cao hơn</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">Oải hương</string>
     <string name="settings_color_deep_teal">Xanh mòng két đậm</string>
     <string name="settings_color_black">Đen</string>
+    <string name="settings_color_light">Sáng</string>
     <string name="settings_color_navy">Xanh hải quân</string>
     <string name="settings_color_slate">Xám đá</string>
     <string name="settings_color_plum">Mận</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">Giao diện ứng dụng</string>
     <string name="settings_accent_color_title">Màu nhấn</string>
     <string name="settings_accent_color_hint">Đổi màu công tắc, thanh trượt, nút, viền đang chọn và các điểm nhấn khác của ứng dụng.</string>
+    <string name="settings_app_colors_title">Màu ứng dụng</string>
+    <string name="settings_app_colors_hint">Đổi màu nền, thẻ, menu và chữ của toàn bộ ứng dụng. Lớp phụ đề trên video vẫn giữ màu nền riêng.</string>
     <string name="settings_section_layout_title">Bố cục &amp; định dạng</string>
     <string name="settings_section_layout_summary">Vị trí bảng, định dạng phụ đề, chia đôi màn hình</string>
     <string name="settings_section_colors_title">Màu sắc &amp; giao diện</string>

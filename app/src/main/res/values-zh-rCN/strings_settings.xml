@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">从不</string>
     <string name="settings_original_captions_visibility">原文字幕：%1$s</string>
     <string name="settings_translated_captions_visibility">翻译字幕：%1$s</string>
+    <string name="settings_translation_position_title">译文位置</string>
+    <string name="settings_translation_position_below">原文下方</string>
+    <string name="settings_translation_position_above">原文上方</string>
     <string name="settings_portrait_panel_position">竖屏面板位置</string>
     <string name="settings_portrait_panel_position_hint">上下移动竖屏的字幕文稿面板。位置越低，显示的字幕行越少。</string>
     <string name="settings_portrait_panel_higher">更高</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">薰衣草紫</string>
     <string name="settings_color_deep_teal">深青色</string>
     <string name="settings_color_black">黑色</string>
+    <string name="settings_color_light">浅色</string>
     <string name="settings_color_navy">海军蓝</string>
     <string name="settings_color_slate">石板灰</string>
     <string name="settings_color_plum">梅紫</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">应用主题</string>
     <string name="settings_accent_color_title">强调色</string>
     <string name="settings_accent_color_hint">更改开关、滑块、按钮、选中边框及其他应用强调元素的颜色。</string>
+    <string name="settings_app_colors_title">应用颜色</string>
+    <string name="settings_app_colors_hint">更改整个应用的背景、卡片、菜单和文字颜色。视频上的叠加字幕保留自己的背景。</string>
     <string name="settings_section_layout_title">布局与格式</string>
     <string name="settings_section_layout_summary">面板位置、字幕格式、分屏视图</string>
     <string name="settings_section_colors_title">颜色与主题</string>

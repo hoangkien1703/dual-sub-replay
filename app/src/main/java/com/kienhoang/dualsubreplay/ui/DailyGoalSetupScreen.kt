@@ -20,7 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,13 +33,13 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
     var selected by rememberSaveable { mutableIntStateOf(DEFAULT_DAILY_GOAL_MINUTES) }
     Surface(
         modifier = Modifier.fillMaxSize().testTag("daily_goal_setup"),
-        color = Color(0xFF061719),
-        contentColor = Color(0xFFF3FAFA),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 28.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = { onFinish(null) }, modifier = Modifier.testTag("daily_goal_skip")) {
-                    Text(stringResource(R.string.onboarding_skip), color = Color(0xFFB7CED1))
+                    Text(stringResource(R.string.onboarding_skip), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Column(
@@ -51,14 +50,14 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
                 Text(
                     stringResource(R.string.onboarding_goal_setup_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFFF3FAFA),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
                     stringResource(R.string.onboarding_goal_setup_body),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFFB7CED1),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(Modifier.height(24.dp))

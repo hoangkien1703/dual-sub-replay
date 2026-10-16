@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">표시 안 함</string>
     <string name="settings_original_captions_visibility">원본 자막: %1$s</string>
     <string name="settings_translated_captions_visibility">번역 자막: %1$s</string>
+    <string name="settings_translation_position_title">번역 위치</string>
+    <string name="settings_translation_position_below">원문 아래</string>
+    <string name="settings_translation_position_above">원문 위</string>
     <string name="settings_portrait_panel_position">세로 패널 위치</string>
     <string name="settings_portrait_panel_position_hint">세로 화면의 스크립트 패널을 위아래로 옮겨요. 아래로 내릴수록 보이는 자막 줄이 줄어요.</string>
     <string name="settings_portrait_panel_higher">위로</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">라벤더</string>
     <string name="settings_color_deep_teal">딥 틸</string>
     <string name="settings_color_black">검정</string>
+    <string name="settings_color_light">밝게</string>
     <string name="settings_color_navy">네이비</string>
     <string name="settings_color_slate">슬레이트</string>
     <string name="settings_color_plum">플럼</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">앱 테마</string>
     <string name="settings_accent_color_title">강조 색상</string>
     <string name="settings_accent_color_hint">스위치, 슬라이더, 버튼, 활성 테두리 등 앱의 강조 색상을 바꿔요.</string>
+    <string name="settings_app_colors_title">앱 색상</string>
+    <string name="settings_app_colors_hint">앱 전체의 배경, 카드, 메뉴, 글자 색을 바꿉니다. 동영상 위 오버레이는 자체 배경을 유지합니다.</string>
     <string name="settings_section_layout_title">레이아웃 및 형식</string>
     <string name="settings_section_layout_summary">패널 위치, 자막 형식, 분할 화면</string>
     <string name="settings_section_colors_title">색상 및 테마</string>

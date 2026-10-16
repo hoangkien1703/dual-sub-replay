@@ -314,6 +314,8 @@ internal fun SubtitleSettingsDialog(
     wordHighlightEnabled: Boolean = true,
     customColorsEnabled: Boolean = true,
     captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
+    translationPosition: TranslationPosition = TranslationPosition.BELOW,
+    onTranslationPositionChange: (TranslationPosition) -> Unit = {},
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -409,6 +411,7 @@ internal fun SubtitleSettingsDialog(
                         Text(stringResource(R.string.settings_text_size, (fontScale * 100).toInt()))
                         Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE)
                         CaptionVisibilitySettings()
+                        TranslationPositionSettings(translationPosition, onTranslationPositionChange)
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_highlight_spoken_words_title),
                             description = stringResource(R.string.settings_highlight_spoken_words_description),
@@ -894,13 +897,7 @@ private fun OverlaySettings(
                 preferences
                     .edit()
                     .putBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, enabled)
-            if (!enabled) {
-                editor
-                    .remove(OVERLAY_VERTICAL_POSITION_PREFERENCE)
-                    .remove(OVERLAY_HORIZONTAL_POSITION_PREFERENCE)
-                    .remove(COLLAPSED_CC_HORIZONTAL_POSITION_PREFERENCE)
-                    .remove(COLLAPSED_CC_VERTICAL_POSITION_PREFERENCE)
-            }
+            if (!enabled) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             editor.apply()
         },
         testTag = "remember_overlay_position_switch",

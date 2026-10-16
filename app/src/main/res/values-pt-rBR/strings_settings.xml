@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">Nunca</string>
     <string name="settings_original_captions_visibility">Legendas originais: %1$s</string>
     <string name="settings_translated_captions_visibility">Legendas traduzidas: %1$s</string>
+    <string name="settings_translation_position_title">Posição da tradução</string>
+    <string name="settings_translation_position_below">Abaixo do original</string>
+    <string name="settings_translation_position_above">Acima do original</string>
     <string name="settings_portrait_panel_position">Posição do painel no modo retrato</string>
     <string name="settings_portrait_panel_position_hint">Mova o painel de transcrição no modo retrato para cima ou para baixo. Quanto mais baixo, menos linhas de legenda aparecem.</string>
     <string name="settings_portrait_panel_higher">Mais alto</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">Lavanda</string>
     <string name="settings_color_deep_teal">Azul-petróleo escuro</string>
     <string name="settings_color_black">Preto</string>
+    <string name="settings_color_light">Claro</string>
     <string name="settings_color_navy">Azul-marinho</string>
     <string name="settings_color_slate">Ardósia</string>
     <string name="settings_color_plum">Ameixa</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">Tema do app</string>
     <string name="settings_accent_color_title">Cor de destaque</string>
     <string name="settings_accent_color_hint">Muda as chaves, controles deslizantes, botões, bordas ativas e outros destaques do app.</string>
+    <string name="settings_app_colors_title">Cores do app</string>
+    <string name="settings_app_colors_hint">Muda os fundos, cartões, menus e textos de todo o app. A sobreposição no vídeo mantém o próprio fundo.</string>
     <string name="settings_section_layout_title">Layout e formato</string>
     <string name="settings_section_layout_summary">Posição do painel, formato das legendas, tela dividida</string>
     <string name="settings_section_colors_title">Cores e tema</string>

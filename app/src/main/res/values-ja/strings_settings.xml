@@ -9,6 +9,9 @@
     <string name="settings_caption_visibility_never">表示しない</string>
     <string name="settings_original_captions_visibility">元の字幕: %1$s</string>
     <string name="settings_translated_captions_visibility">翻訳字幕: %1$s</string>
+    <string name="settings_translation_position_title">翻訳の位置</string>
+    <string name="settings_translation_position_below">原文の下</string>
+    <string name="settings_translation_position_above">原文の上</string>
     <string name="settings_portrait_panel_position">縦向きパネルの位置</string>
     <string name="settings_portrait_panel_position_hint">縦向きのトランスクリプトパネルを上下に移動します。下げるほど表示される字幕の行数が減ります。</string>
     <string name="settings_portrait_panel_higher">上へ</string>
@@ -26,6 +29,7 @@
     <string name="settings_color_lavender">ラベンダー</string>
     <string name="settings_color_deep_teal">ディープティール</string>
     <string name="settings_color_black">ブラック</string>
+    <string name="settings_color_light">ライト</string>
     <string name="settings_color_navy">ネイビー</string>
     <string name="settings_color_slate">スレート</string>
     <string name="settings_color_plum">プラム</string>
@@ -39,6 +43,8 @@
     <string name="settings_app_theme_title">アプリのテーマ</string>
     <string name="settings_accent_color_title">アクセントカラー</string>
     <string name="settings_accent_color_hint">スイッチ、スライダー、ボタン、選択中の枠線など、アプリのアクセントを変更します。</string>
+    <string name="settings_app_colors_title">アプリの色</string>
+    <string name="settings_app_colors_hint">アプリ全体の背景、カード、メニュー、文字の色を変えます。動画上のオーバーレイは独自の背景色のままです。</string>
     <string name="settings_section_layout_title">レイアウトと形式</string>
     <string name="settings_section_layout_summary">パネルの位置、字幕の形式、分割表示</string>
     <string name="settings_section_colors_title">色とテーマ</string>

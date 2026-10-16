@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
+import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
@@ -11,6 +12,8 @@ internal fun aiAppSnapshot(
     playerMode: PlayerExperienceMode,
     interfaceLocale: Locale,
     appVersion: String,
+    stored: AiStoredSettings = AiStoredSettings(),
+    speed: Float = 1f,
 ): AiAppSnapshot =
     AiAppSnapshot(
         appVersion = appVersion,
@@ -21,7 +24,7 @@ internal fun aiAppSnapshot(
                 ?: "Auto (follows the video)",
         targetLanguage = TranslationLanguages.displayName(state.targetLanguage),
         translation = aiTranslationStatus(state),
-        settings = aiSettingsSummary(state, playerMode),
+        settings = aiSettingsSummary(state, playerMode, stored, speed),
     )
 
 internal fun aiTranslationStatus(state: DualSubUiState): String =
@@ -34,31 +37,14 @@ internal fun aiTranslationStatus(state: DualSubUiState): String =
 
 private fun onOff(enabled: Boolean) = if (enabled) "on" else "off"
 
-private fun visibility(value: CaptionVisibility) =
-    when (value) {
-        CaptionVisibility.ALWAYS -> "always"
-        CaptionVisibility.PAUSED -> "only when paused"
-        CaptionVisibility.NEVER -> "never"
-    }
-
+/** Every setting the assistant may change, by the key and value its change_setting tool uses. */
 internal fun aiSettingsSummary(
     state: DualSubUiState,
     playerMode: PlayerExperienceMode,
+    stored: AiStoredSettings,
+    speed: Float,
 ): List<Pair<String, String>> =
-    listOf(
-        "Text size" to "${(state.fontScale * 100).toInt()}%",
-        "Original captions" to visibility(state.originalVisibility),
-        "Translated captions" to visibility(state.translatedVisibility),
-        "Highlight spoken words" to onOff(state.wordHighlightEnabled),
-        "Default view" to if (playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL) "Transcript panel" else "Scroll-friendly overlay",
-        "Caption format" to if (state.captionFormat == CaptionFormat.SHORT_PHRASES) "Short paired phrases" else "Whole sentence",
-        "Landscape split view" to onOff(state.landscapeSplitEnabled),
-        "Custom subtitle colors" to onOff(state.customColorsEnabled),
-        "Pronounce tapped words" to onOff(state.autoPronounce),
-        "Word learning mode" to onOff(state.wordLearningEnabled),
-        "Tap word for definition" to onOff(state.tapToLearnEnabled),
-        "Lock overlay to video player" to onOff(state.lockOverlayToVideo),
-        "Google Translate (online)" to onOff(state.translationEngine == TranslationEngine.GOOGLE_WEB),
-        "Natural subtitle flow" to onOff(state.naturalSubtitlesEnabled),
-        "Preload translation models" to onOff(state.preloadModelsEnabled),
-    )
+    AiSetting.entries
+        .filter { it != AiSetting.PLAYBACK_SPEED || state.activeVideoId != null }
+        .map { it.key to aiSettingCurrentValue(state, playerMode, speed, stored, it) } +
+        ("google_translate (change_translation)" to onOff(state.translationEngine == TranslationEngine.GOOGLE_WEB))

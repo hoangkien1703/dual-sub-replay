@@ -54,6 +54,63 @@ class AiActionsTest {
         )
     }
 
+    private fun setting(
+        key: String,
+        value: String,
+    ): String? =
+        (parseAiAction(call(AI_SETTING_TOOL, JSONObject().put("setting", key).put("value", value).toString())) as? AiActionParse.Valid)
+            ?.let { (it.action as AiAction.ChangeSetting).value }
+
+    @Test
+    fun theNewSettingsTakeTheirDocumentedValues() {
+        assertEquals("above", setting("translation_position", "Above"))
+        assertEquals("below", setting("translation_position", "under"))
+        assertEquals("-10", setting("portrait_panel_position", "-10%"))
+        assertEquals("0", setting("portrait_panel_position", "0"))
+        assertEquals(null, setting("portrait_panel_position", "25"))
+        assertEquals("125", setting("pronunciation_volume", "130"))
+        assertEquals("150", setting("pronunciation_volume", "1.5"))
+        assertEquals(null, setting("pronunciation_volume", "300"))
+        assertEquals("light", setting("app_colors", "Light"))
+        assertEquals("light", setting("app_colors", "white"))
+        assertEquals("forest", setting("app_colors", "green"))
+        assertEquals("deep_teal", setting("overlay_background", "teal"))
+        assertEquals("blue", setting("accent_color", "Blue"))
+        assertEquals("cyan", setting("accent_color", "teal"))
+        assertEquals("both", setting("colored_subtitle_lines", "Both"))
+        assertEquals("off", setting("remember_dragged_position", "false"))
+        assertEquals("vi", setting("app_language", "Vietnamese"))
+        assertEquals("pt-BR", setting("app_language", "Portuguese"))
+        assertEquals("zh-CN", setting("app_language", "zh"))
+        assertEquals("device", setting("app_language", "follow the device"))
+        assertEquals(null, setting("app_language", "Klingon"))
+        assertEquals("ja", setting("original_caption_language", "Japanese"))
+        assertEquals("auto", setting("original_caption_language", "Auto"))
+        assertEquals("15", setting("daily_goal", "15 minutes"))
+        assertEquals("off", setting("daily_goal", "0"))
+        assertEquals(null, setting("daily_goal", "7"))
+    }
+
+    @Test
+    fun settingsThatReloadDownloadOrRebuildAlwaysAsk() {
+        val asking =
+            listOf(
+                AiSetting.NATURAL_SUBTITLE_FLOW,
+                AiSetting.PRELOAD_TRANSLATION_MODELS,
+                AiSetting.ORIGINAL_CAPTION_LANGUAGE,
+                AiSetting.APP_LANGUAGE,
+            )
+        assertEquals(asking, AiSetting.entries.filter { it.asks })
+        assertTrue(AiAction.ChangeSetting(AiSetting.APP_LANGUAGE, "vi").alwaysAsks)
+        assertTrue(!AiAction.ChangeSetting(AiSetting.APP_COLORS, "light").alwaysAsks)
+        val description = AI_TOOLS.first { it.name == AI_SETTING_TOOL }.description
+        assertTrue(
+            "natural_subtitle_flow, preload_translation_models, original_caption_language, app_language show an Apply button" in
+                description,
+        )
+        assertTrue("app_colors: deep_teal, black, navy, slate, plum, forest or light" in description)
+    }
+
     @Test
     fun settingsOutsideTheListOrRangeAreRefusedWithWhatTheyTake() {
         assertTrue("no setting" in refused(AI_SETTING_TOOL, """{"setting":"api_key","value":"x"}"""))

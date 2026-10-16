@@ -53,9 +53,9 @@ internal fun CompactSubtitleCard(
     fontScale: Float,
     onReplay: () -> Unit,
     activeWordIndex: Int = -1,
-    originalColor: Color = subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY),
-    translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
-    highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY),
+    originalColor: Color = subtitleColor(DEFAULT_ORIGINAL_COLOR_KEY, appThemeIsLight()),
+    translatedColor: Color = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY, appThemeIsLight()),
+    highlightColor: Color = subtitleColor(DEFAULT_HIGHLIGHT_COLOR_KEY, appThemeIsLight()),
     wordLearningEnabled: Boolean = false,
     wordLearningTarget: String = DEFAULT_WORD_LEARNING_TARGET,
     wordLearningActiveOnly: Boolean = true,
@@ -68,6 +68,7 @@ internal fun CompactSubtitleCard(
     replayEnabled: Boolean = true,
     showOriginal: Boolean = true,
     showTranslation: Boolean = true,
+    translationPosition: TranslationPosition = TranslationPosition.BELOW,
 ) {
     if (!showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -80,12 +81,13 @@ internal fun CompactSubtitleCard(
         border =
             BorderStroke(
                 width = if (active) 2.dp else 1.dp,
-                color = if (active) MaterialTheme.colorScheme.primary else Color(0xFF183034),
+                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
             ),
         colors =
             CardDefaults.outlinedCardColors(
-                containerColor = if (active) Color(0xFF0A2B30) else Color(0xFF081D20),
-                contentColor = Color(0xFFF3FAFA),
+                containerColor =
+                    if (active) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainerLow,
+                contentColor = MaterialTheme.colorScheme.onSurface,
             ),
         shape = RoundedCornerShape(10.dp),
     ) {
@@ -99,7 +101,7 @@ internal fun CompactSubtitleCard(
                     shape = CircleShape,
                     colors =
                         CardDefaults.cardColors(
-                            containerColor = if (active) MaterialTheme.colorScheme.primary else Color(0xFF24383B),
+                            containerColor = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                         ),
                 ) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -115,45 +117,48 @@ internal fun CompactSubtitleCard(
             if (replayEnabled) Spacer(Modifier.size(9.dp))
             Column(Modifier.weight(1f)) {
                 val isSentenceEligibleForPos = !wordLearningActiveOnly || active
-                if (showOriginal) {
-                    OriginalCardText(
-                        segment,
-                        active,
-                        activeWordIndex,
-                        fontScale,
-                        originalColor,
-                        translatedColor,
-                        highlightColor,
-                        wordLearningEnabled,
-                        wordLearningTarget,
-                        isSentenceEligibleForPos,
-                        tapToLearnEnabled,
-                        resolvedSourceLanguage,
-                        targetLanguage,
-                        isDownloadingTranslationModel,
-                        onWordClick,
-                        onReplay,
-                    )
-                }
-                if (showTranslation) {
-                    TranslatedCardText(
-                        segment,
-                        active,
-                        activeWordIndex,
-                        fontScale,
-                        originalColor,
-                        translatedColor,
-                        highlightColor,
-                        wordLearningEnabled,
-                        wordLearningTarget,
-                        isSentenceEligibleForPos,
-                        tapToLearnEnabled,
-                        resolvedSourceLanguage,
-                        targetLanguage,
-                        stringResource(pendingTranslationTextRes(isDownloadingTranslationModel, translationUnavailable)),
-                        onWordClick,
-                        onReplay,
-                    )
+                // true marks the translation line.
+                val lines = subtitleLineOrder(false.takeIf { showOriginal }, true.takeIf { showTranslation }, translationPosition)
+                lines.forEach { translated ->
+                    if (translated) {
+                        TranslatedCardText(
+                            segment,
+                            active,
+                            activeWordIndex,
+                            fontScale,
+                            originalColor,
+                            translatedColor,
+                            highlightColor,
+                            wordLearningEnabled,
+                            wordLearningTarget,
+                            isSentenceEligibleForPos,
+                            tapToLearnEnabled,
+                            resolvedSourceLanguage,
+                            targetLanguage,
+                            stringResource(pendingTranslationTextRes(isDownloadingTranslationModel, translationUnavailable)),
+                            onWordClick,
+                            onReplay,
+                        )
+                    } else {
+                        OriginalCardText(
+                            segment,
+                            active,
+                            activeWordIndex,
+                            fontScale,
+                            originalColor,
+                            translatedColor,
+                            highlightColor,
+                            wordLearningEnabled,
+                            wordLearningTarget,
+                            isSentenceEligibleForPos,
+                            tapToLearnEnabled,
+                            resolvedSourceLanguage,
+                            targetLanguage,
+                            isDownloadingTranslationModel,
+                            onWordClick,
+                            onReplay,
+                        )
+                    }
                 }
             }
         }

@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -58,8 +57,8 @@ fun GuideScreen(onFinish: () -> Unit) {
 
     Surface(
         modifier = Modifier.fillMaxSize().testTag("guide_screen"),
-        color = Color(0xFF061719),
-        contentColor = Color(0xFFF3FAFA),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         Column(
             modifier = Modifier
@@ -74,7 +73,7 @@ fun GuideScreen(onFinish: () -> Unit) {
                     onClick = onFinish,
                     modifier = Modifier.testTag("guide_skip"),
                 ) {
-                    Text(stringResource(R.string.onboarding_skip), color = Color(0xFFB7CED1))
+                    Text(stringResource(R.string.onboarding_skip), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -135,21 +134,21 @@ private fun GuidePageContent(page: GuidePage, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .aspectRatio(aspectRatio)
                     .clip(RoundedCornerShape(20.dp))
-                    .border(1.dp, Color(0xFF183034), RoundedCornerShape(20.dp)),
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
             )
             Spacer(Modifier.height(28.dp))
         }
         Text(
             text = stringResource(page.titleRes),
             style = MaterialTheme.typography.headlineSmall,
-            color = Color(0xFFF3FAFA),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(10.dp))
         Text(
             text = stringResource(page.bodyRes),
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFFB7CED1),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
@@ -175,7 +174,7 @@ private fun GuidePageIndicator(
                         if (index == currentPage) {
                             MaterialTheme.colorScheme.primary
                         } else {
-                            Color(0xFF244044)
+                            MaterialTheme.colorScheme.outlineVariant
                         },
                     ),
             )

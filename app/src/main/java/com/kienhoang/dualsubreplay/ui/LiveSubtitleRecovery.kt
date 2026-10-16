@@ -94,6 +94,7 @@ internal fun LiveSubtitlePanel(
                 activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
                 showOriginal = state.showOriginal(),
                 showTranslation = state.showTranslation(),
+                translationPosition = state.translationPosition,
                 active = true,
                 fontScale = state.fontScale,
                 onReplay = {},

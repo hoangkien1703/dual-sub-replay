@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -95,6 +96,8 @@ internal fun annotatedSubtitleText(
             emptyList()
         }
 
+    // Dark text means a light card, where the part-of-speech colors need their darker shades.
+    val onLight = baseColor.luminance() < DARK_TEXT_LUMINANCE
     return buildAnnotatedString {
         append(text)
 
@@ -104,7 +107,7 @@ internal fun annotatedSubtitleText(
                 if (token.startIndex >= 0 && token.endIndex <= text.length && token.startIndex < token.endIndex) {
                     if (token.partOfSpeech != PartOfSpeech.OTHER) {
                         addStyle(
-                            SpanStyle(color = Color(token.partOfSpeech.colorHex)),
+                            SpanStyle(color = partOfSpeechColor(token.partOfSpeech, onLight)),
                             token.startIndex,
                             token.endIndex,
                         )
