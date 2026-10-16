@@ -7,7 +7,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -174,11 +174,13 @@ fun DualSubTheme(content: @Composable () -> Unit) {
     val light = storedAppColorTheme(themeKey).isLight
     val view = LocalView.current
     if (!view.isInEditMode) {
-        SideEffect {
+        // Only when the theme changes: this content recomposes on every playback tick, and each
+        // system-bar change is a call into the system.
+        LaunchedEffect(light, view) {
             context.findActivity()?.window?.let { window ->
                 WindowCompat.getInsetsController(window, view).apply {
-                    isAppearanceLightStatusBars = light
-                    isAppearanceLightNavigationBars = light
+                    if (isAppearanceLightStatusBars != light) isAppearanceLightStatusBars = light
+                    if (isAppearanceLightNavigationBars != light) isAppearanceLightNavigationBars = light
                 }
             }
         }
