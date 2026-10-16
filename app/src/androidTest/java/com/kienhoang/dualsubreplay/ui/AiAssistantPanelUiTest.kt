@@ -459,6 +459,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_attach_photo").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_attach_file").assertIsDisplayed()
         // The pickers belong to the system, so the test closes the menu and adds files directly.
+        closeSystemDialogs()
         Espresso.pressBack()
         composeRule.onNodeWithTag("ai_attach_photo").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
@@ -583,6 +584,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_instructions").performScrollTo().performTextInput("Explain in Vietnamese. Keep answers short.")
         composeRule.onNodeWithTag("ai_instructions_save").performClick()
         assertEquals("Explain in Vietnamese. Keep answers short.", memory.data.instructions)
+        closeSystemDialogs()
         Espresso.closeSoftKeyboard()
         composeRule.onNodeWithTag("ai_memory_switch").performScrollTo()
         saveUiEvidence("ai_panel_memory_page")

@@ -48,6 +48,7 @@ class NavigationRecoveryUiTest {
         compose.onNodeWithText("Close").assertIsDisplayed().performClick()
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
         compose.onNodeWithContentDescription("Open navigation menu").performClick()
+        closeSystemDialogs()
         Espresso.pressBack()
         compose.waitForIdle()
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
