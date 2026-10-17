@@ -61,7 +61,7 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
 - **Repeat without scrubbing.** Tap a subtitle line and the video jumps back to that exact moment.
 - **Learn the words you hear.** Tap a word for its meaning, part of speech, pronunciation and, for Japanese, the grammar around it.
 - **Remember them.** Save words with their original sentence and review them with spaced repetition.
-- **Stay private.** Translation happens on your phone. There is no account, no tracking, and no ads.
+- **Stay private.** There is no account, no tracking, and no ads. Translation uses Google Translate by default, or turn it off and your phone translates on its own.
 
 If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
 

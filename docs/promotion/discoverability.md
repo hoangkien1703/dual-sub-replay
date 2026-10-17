@@ -52,6 +52,10 @@ https://hoangkien1703.github.io/dual-sub-replay/vi/ (Vietnamese).
 
 - `site/` is plain HTML and CSS with no build step. Keep English and Vietnamese pages in
   step, and keep FAQ answers identical in visible text and JSON-LD.
+- Guide pages (`learn-japanese/`, `language-reactor-alternative/`) each target one search.
+  Add a new one as an English and Vietnamese pair, list both in `sitemap.xml` and
+  `PAGE_PAIRS` in `tools/tests/test_site.py`, and link it from the footers.
+- Recheck claims about other products, such as Language Reactor having no mobile app.
 - `tools/tests/test_site.py` checks titles, descriptions, canonical and hreflang links,
   FAQ structured data, local links, the sitemap, and that the language list matches
   `TranslationLanguages.kt`.

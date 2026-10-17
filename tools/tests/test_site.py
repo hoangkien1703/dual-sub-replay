@@ -11,7 +11,13 @@ from urllib.parse import urljoin, urlparse
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "site"
 BASE_URL = "https://hoangkien1703.github.io/dual-sub-replay/"
-PAGES = {"index.html": BASE_URL, "vi/index.html": BASE_URL + "vi/"}
+# Each English page and its Vietnamese translation, as paths under site/.
+PAGE_PAIRS = [
+    ("", "vi/"),
+    ("learn-japanese/", "vi/learn-japanese/"),
+    ("language-reactor-alternative/", "vi/language-reactor-alternative/"),
+]
+PAGES = {path + "index.html": BASE_URL + path for pair in PAGE_PAIRS for path in pair}
 LANGUAGES_SOURCE = (
     ROOT / "app/src/main/java/com/kienhoang/dualsubreplay/translation/TranslationLanguages.kt"
 )
@@ -107,16 +113,21 @@ class SiteTest(unittest.TestCase):
                 self.assertTrue(page.meta.get("og:image", "").startswith(BASE_URL + "images/"))
 
     def test_hreflang_alternates_are_reciprocal(self):
-        expected = {("en", PAGES["index.html"]), ("vi", PAGES["vi/index.html"]), ("x-default", BASE_URL)}
-        for path in PAGES:
-            with self.subTest(path=path):
-                page = parse(path)
-                alternates = {
-                    (link["hreflang"], link["href"])
-                    for link in page.links
-                    if link.get("rel") == "alternate" and "hreflang" in link
-                }
-                self.assertEqual(expected, alternates)
+        for english, vietnamese in PAGE_PAIRS:
+            expected = {
+                ("en", BASE_URL + english),
+                ("vi", BASE_URL + vietnamese),
+                ("x-default", BASE_URL + english),
+            }
+            for path in (english + "index.html", vietnamese + "index.html"):
+                with self.subTest(path=path):
+                    page = parse(path)
+                    alternates = {
+                        (link["hreflang"], link["href"])
+                        for link in page.links
+                        if link.get("rel") == "alternate" and "hreflang" in link
+                    }
+                    self.assertEqual(expected, alternates)
 
     def test_structured_data_matches_visible_faq(self):
         for path in PAGES:

@@ -38,6 +38,7 @@ jobs:
           cp -R site _site
           mkdir -p _site/images
           cp docs/images/dualsub-replay-preview.webp \
+             docs/images/dualsub-replay-japanese-word-card.webp \
              docs/images/dualsub-replay-full-hd.jpg \
              docs/images/dualsub-replay-landscape.png \
              docs/images/dualsub-replay-social-preview.png \
