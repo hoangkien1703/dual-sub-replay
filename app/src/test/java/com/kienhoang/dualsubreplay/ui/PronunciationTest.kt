@@ -192,6 +192,32 @@ class PronunciationTest {
     }
 
     @Test
+    fun chineseIsSpokenAsMandarinFromItsScript() {
+        assertEquals(Locale.CHINA, pronunciationLocale("zh-Hans"))
+        assertEquals(Locale.CHINA, pronunciationLocale("zh"))
+        assertEquals(Locale.TAIWAN, pronunciationLocale("zh-Hant"))
+        assertEquals(Locale.TAIWAN, pronunciationLocale("zh-TW"))
+        val mandarin = PronunciationVoice("cmn-cn-x-local", Locale.forLanguageTag("cmn-CN"))
+        val cantonese = PronunciationVoice("yue-hk-x-local", Locale.forLanguageTag("yue-HK"))
+        assertEquals(listOf(mandarin), pronunciationVoices(listOf(cantonese, mandarin), Locale.CHINA))
+    }
+
+    @Test
+    fun anEngineThatCannotSelectItsVoiceStillGetsTheLanguage() {
+        runBlocking {
+            val engine =
+                object : PronunciationEngine by FakeEngine() {
+                    override fun voices() = listOf(PronunciationVoice("zh", Locale.CHINA))
+
+                    override fun selectVoice(voice: PronunciationVoice) = false
+
+                    override fun selectLanguage(locale: Locale) = locale == Locale.CHINA
+                }
+            assertEquals(PronunciationResult.SPOKEN, pronounceWord("银行", "zh-Hans", listOf(null)) { engine })
+        }
+    }
+
+    @Test
     fun invalidLanguageDoesNotStartAnEngine() {
         runBlocking {
             val result =

@@ -110,6 +110,7 @@ internal fun matchGrammar(
 /**
  * The grammar points that belong to a selection from [start] to [end]: those inside or overlapping
  * it, and one that starts right after it (体育館 + に), since particles and endings follow their word.
+ * A point that comes up more than once in the selection (对对对) is listed once.
  */
 internal fun grammarForSelection(
     matches: List<GrammarMatch>,
@@ -118,5 +119,5 @@ internal fun grammarForSelection(
 ): List<GrammarMatch> {
     val inside = matches.filter { it.start < end && it.end > start }
     val following = matches.filter { it.start == end }.take(1)
-    return (inside + following).distinct()
+    return (inside + following).distinctBy { it.form to it.meanings }
 }

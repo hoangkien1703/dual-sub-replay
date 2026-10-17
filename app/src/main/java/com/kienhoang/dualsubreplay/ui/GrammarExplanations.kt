@@ -271,19 +271,29 @@ private fun GrammarPointCard(match: GrammarMatch) {
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(match.form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            val text = grammarPointText(stringResource(meaningText(match.meanings.first())), match.form)
+            if (match.form.length <= SIDE_BY_SIDE_FORM_LENGTH) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        GrammarForm(match.form)
+                        LevelBadge(match.level)
+                    }
+                    Text(text, modifier = Modifier.weight(1f))
+                }
+            } else {
+                // A long form beside the text would squeeze it into a narrow column.
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    GrammarForm(match.form, Modifier.weight(1f, fill = false))
                     LevelBadge(match.level)
                 }
-                Text(stringResource(meaningText(match.meanings.first())), modifier = Modifier.weight(1f))
+                Text(text, modifier = Modifier.padding(top = 4.dp))
             }
             val others = match.meanings.drop(1)
             if (others.isNotEmpty()) {
                 if (showAll) {
                     others.forEach { meaning ->
                         Text(
-                            stringResource(meaningText(meaning)),
+                            grammarPointText(stringResource(meaningText(meaning)), match.form),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp).testTag("grammar_alternate"),
@@ -297,3 +307,42 @@ private fun GrammarPointCard(match: GrammarMatch) {
         }
     }
 }
+
+@Composable
+private fun GrammarForm(
+    form: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = modifier)
+}
+
+/** Forms up to this many characters sit beside their explanation; longer ones go above it. */
+private const val SIDE_BY_SIDE_FORM_LENGTH = 8
+
+/**
+ * [text] without a leading label that only repeats [form] ("对: to, toward" under 对 duì,
+ * "Would rather: would prefer to" under would rather), so the card does not say it twice. A label
+ * that adds something ("Question: do comes first", "A 比 B + adjective" under 比 bǐ) stays.
+ */
+internal fun grammarPointText(
+    text: String,
+    form: String,
+): String {
+    val colon = text.indexOfFirst { it == ':' || it == '：' }
+    if (colon <= 0) return text
+    val label = text.substring(0, colon)
+    val rest = text.substring(colon + 1).trimStart()
+    if (rest.isEmpty()) return text
+    val labelWords = words(label)
+    val repeats = labelWords.isNotEmpty() && words(form).containsAll(labelWords)
+    return if (repeats) rest.replaceFirstChar { it.titlecase() } else text
+}
+
+private fun words(text: String): List<String> =
+    text
+        .lowercase()
+        .replace('’', '\'')
+        .split(NOT_A_WORD)
+        .filter(String::isNotEmpty)
+
+private val NOT_A_WORD = Regex("[^\\p{L}\\p{N}]+")

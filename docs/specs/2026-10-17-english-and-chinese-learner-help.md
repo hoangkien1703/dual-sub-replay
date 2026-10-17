@@ -190,6 +190,12 @@ OpenNLP model itself, because OpenNLP's loader asks Android's XML parser for a f
   came from the words the first coverage run missed most.
 - **`GrammarPattern`** gains a prefix condition (`第~`), and `matchGrammar` lets rules win ties
   (Chinese 了 and 的 need that).
+- **After the owner's phone test (2026-10-17).** A point that appears more than once in the
+  selection (对对对) is listed once. A form longer than 8 characters (虽然…但是, am / is / are) sits
+  above its explanation instead of squeezing it into a narrow column, and a label that only
+  repeats the form ("对: …", "Would rather: …") is dropped from the text. Chinese speech asks
+  engines for Mandarin by country (zh-Hans as zh-CN, zh-Hant as zh-TW), accepts voices listed as
+  `cmn`, and falls back to the engine's language setting when no listed voice can be selected.
 - **Tests and loading.** Tests that tokenize English or Chinese now wait for the analyzers first,
   so they no longer depend on whether the background load has finished.
 
