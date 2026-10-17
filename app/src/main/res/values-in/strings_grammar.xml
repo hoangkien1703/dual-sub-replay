@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">Adalah A (sopan); membuat kalimat sopan</string>
     <string name="grammar_copula">Adalah A (santai)</string>
     <string name="grammar_na_adjective">Menghubungkan kata sifat na A dengan kata benda sesudahnya</string>
+    <string name="grammar_counter">Kata bantu bilangan: berapa banyak atau ke berapa (３人 = tiga orang, ２時 = jam dua)</string>
 </resources>

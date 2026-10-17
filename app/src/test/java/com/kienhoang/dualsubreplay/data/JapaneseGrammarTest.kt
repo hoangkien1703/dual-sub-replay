@@ -45,7 +45,7 @@ class JapaneseGrammarTest {
         assertEquals("に" to GrammarMeaning.DESTINATION, points("日本に行きましょう！").first())
         assertEquals("に" to GrammarMeaning.PURPOSE, points("映画を見に行きたいです。")[1])
         assertEquals("に" to GrammarMeaning.BY_PASSIVE, points("先生に褒められた。").first())
-        assertEquals("に" to GrammarMeaning.TIME, points("三時に起きる。").first())
+        assertEquals("に" to GrammarMeaning.TIME, points("三時に起きる。").first { it.first == "に" })
         assertEquals("に" to GrammarMeaning.RECIPIENT, points("友達に会う。").first())
         assertEquals("に" to GrammarMeaning.RECIPIENT, points("母に料理を作ってもらった。").first())
         assertEquals("に" to GrammarMeaning.PLACE_EXIST, points("東京に住んでいます。").first())
@@ -177,5 +177,53 @@ class JapaneseGrammarTest {
     fun quotingWithIuIsNotCalled() {
         assertTrue(points("先生になりたいと言っていた。").none { it.second == GrammarMeaning.CALLED })
         assertTrue(points("田中という人が来た。").any { it.second == GrammarMeaning.CALLED })
+    }
+
+    @Test
+    fun theVoicedPastOfAVerbIsPastNotTheCopula() {
+        assertTrue("〜た" to GrammarMeaning.PAST in points("昨日はゆっくり休んだ。"))
+        assertTrue("〜たら" to GrammarMeaning.IF_WHEN in points("本を読んだら寝る。"))
+        assertTrue(points("昨日はゆっくり休んだ。").none { it.second == GrammarMeaning.COPULA })
+    }
+
+    @Test
+    fun holdingABookIsNotTheFormalWoMotte() {
+        assertTrue(points("彼は本を持っています。").none { it.second == GrammarMeaning.BY_MEANS_MOTTE })
+        assertTrue(points("本日をもって閉店します。").any { it.second == GrammarMeaning.BY_MEANS_MOTTE })
+    }
+
+    @Test
+    fun helperVerbsInKanjiOrPotentialAreStillHelpers() {
+        assertTrue("〜てください" to GrammarMeaning.PLEASE in points("ちゃんと聞いて下さい。"))
+        assertTrue("〜てもらう" to GrammarMeaning.FAVOR_HAVE in points("英語で理解してもらえなかった。"))
+        assertTrue("〜てもいい" to GrammarMeaning.MAY in points("何をしていいか分からない。"))
+    }
+
+    @Test
+    fun countersAfterANumberOrNani() {
+        assertTrue("〜人" to GrammarMeaning.COUNTER in points("彼らのうち数人が反対した。"))
+        assertTrue("〜時" to GrammarMeaning.COUNTER in points("毎朝９時に起きる。"))
+        assertTrue("〜回" to GrammarMeaning.COUNTER in points("何回も見た。"))
+        assertTrue(points("子供の時、よく泳いだ。").none { it.second == GrammarMeaning.COUNTER })
+    }
+
+    @Test
+    fun aQuestionWithNoDeshouKeepsItsU() {
+        val explain = grammar("ないのでしょうか。").single { it.meanings.first() == GrammarMeaning.EXPLAIN_N }
+        assertEquals("のでしょう", "ないのでしょうか。".substring(explain.start, explain.end))
+    }
+
+    @Test
+    fun becomingAndMakingBeatTheParticleAndTheAdverb() {
+        assertEquals(listOf("〜くなる / 〜になる" to GrammarMeaning.BECOME, "〜た" to GrammarMeaning.PAST), points("急に寒くなった。").drop(1))
+        assertTrue("〜くする / 〜にする" to GrammarMeaning.MAKE_IT in points("部屋をきれいにした。"))
+        assertTrue(points("体に気をつけて、無理しないように気にしないで。").none { it.second == GrammarMeaning.DECIDE_ON })
+        assertTrue(points("料理がおいしくない。").none { it.second == GrammarMeaning.ADVERB_KU })
+    }
+
+    @Test
+    fun aSentenceEndingNaIsNotAlwaysTheProhibition() {
+        assertEquals("〜な" to GrammarMeaning.DONT_COMMAND, points("そこに行くな。").last())
+        assertEquals("〜な" to GrammarMeaning.NA_ENDING, points("いい天気だな。").last())
     }
 }

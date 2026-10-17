@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">Là A (lịch sự); làm câu lịch sự</string>
     <string name="grammar_copula">Là A (thân mật)</string>
     <string name="grammar_na_adjective">Nối tính từ đuôi na A với danh từ phía sau</string>
+    <string name="grammar_counter">Từ đếm: bao nhiêu, thứ mấy (３人 = ba người, ２時 = hai giờ)</string>
 </resources>

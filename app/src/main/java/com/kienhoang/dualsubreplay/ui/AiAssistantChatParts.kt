@@ -197,6 +197,19 @@ internal fun AiThinkingRow() {
     }
 }
 
+/** The user stopped the last question; [onRetry] asks it again, null when it can't be asked now. */
+@Composable
+internal fun AiStoppedRow(onRetry: (() -> Unit)?) {
+    Column(Modifier.fillMaxWidth().testTag("ai_stopped")) {
+        Text(stringResource(R.string.ai_stopped), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (onRetry != null) {
+            OutlinedButton(onClick = onRetry, modifier = Modifier.padding(top = 4.dp).testTag("ai_retry")) {
+                Text(stringResource(R.string.ai_retry))
+            }
+        }
+    }
+}
+
 /** Why the last question got no answer. [onRetry] is null while the key needs a new check first. */
 @Composable
 internal fun AiFailureRow(

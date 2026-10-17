@@ -14,6 +14,8 @@
     <string name="ai_send">Gửi</string>
     <string name="ai_thinking">Đang suy nghĩ…</string>
     <string name="ai_retry">Thử lại</string>
+    <string name="ai_stop">Dừng trả lời</string>
+    <string name="ai_stopped">Bạn đã dừng câu trả lời này.</string>
     <string name="ai_message_about">Về: %1$s</string>
     <string name="ai_welcome_title">Tôi có thể giúp gì?</string>
     <string name="ai_welcome_message">Hãy hỏi về một cài đặt, một từ, một câu hoặc một sự cố trong ứng dụng.</string>
@@ -30,6 +32,8 @@
     <string name="ai_chip_features">Ứng dụng này làm được gì?</string>
     <string name="ai_chip_bigger_subtitles">Làm sao để phụ đề lớn hơn?</string>
     <string name="ai_chip_explain_line">Giải thích dòng hiện tại</string>
+    <string name="ai_explain_grammar_button">Giải thích ngữ pháp bằng AI</string>
+    <string name="ai_explain_grammar_question">Giải thích ngữ pháp của câu này từng bước.</string>
     <string name="ai_problem_captions_title">Không tải được phụ đề</string>
     <string name="ai_problem_retry">Thử lại</string>
     <string name="ai_problem_ask">Hỏi AI về việc này</string>

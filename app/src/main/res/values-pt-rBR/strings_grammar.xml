@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">É A (educado); deixa a frase educada</string>
     <string name="grammar_copula">É A (informal)</string>
     <string name="grammar_na_adjective">Liga o adjetivo na A ao substantivo seguinte</string>
+    <string name="grammar_counter">Contador: quantos ou qual (３人 = três pessoas, ２時 = duas horas)</string>
 </resources>

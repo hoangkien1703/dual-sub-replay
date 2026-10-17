@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">Theo đúng A</string>
     <string name="grammar_point_at_the_risk">Bất chấp A</string>
     <string name="grammar_point_via">Trải qua A</string>
+    <string name="grammar_point_plural_people">Số nhiều: A và những người khác (私たち = chúng tôi, 子供たち = bọn trẻ)</string>
+    <string name="grammar_point_name_suffix">Kính ngữ sau tên: anh/chị A (さん); くん cho con trai, ちゃん cho trẻ em và bạn thân, 様 rất lịch sự</string>
+    <string name="grammar_point_adjective_to_noun_sa">Biến tính từ A thành danh từ: độ A (寒さ = cái lạnh, 高さ = chiều cao)</string>
+    <string name="grammar_point_teki">Tính A: dùng danh từ A như tính từ đuôi な (経済的 = mang tính kinh tế)</string>
+    <string name="grammar_point_nature_sei">Tính chất, khả năng của A (可能性 = khả năng)</string>
+    <string name="grammar_point_making_ka">Hóa A: biến thành A (可視化 = trực quan hóa)</string>
+    <string name="grammar_point_person_sha">Người làm A hoặc thuộc về A (訪問者 = khách, 会社員 = nhân viên công ty)</string>
+    <string name="grammar_point_person_of_jin">Người A (日本人 = người Nhật, アメリカ人 = người Mỹ)</string>
+    <string name="grammar_point_language_go">Tiếng A (日本語 = tiếng Nhật, 韓国語 = tiếng Hàn)</string>
+    <string name="grammar_point_become">Trở nên A; trở thành A (高くなる = đắt lên, 医者になる = trở thành bác sĩ)</string>
+    <string name="grammar_point_make_it">Làm cho A (きれいにする = làm sạch, 短くする = làm ngắn lại)</string>
+    <string name="grammar_point_decide_on">Biến thành A, coi là A, hoặc chọn A (秘密にする = giữ bí mật, コーヒーにする = tôi lấy cà phê)</string>
+    <string name="grammar_point_adverb_ni">Biến tính từ đuôi な A thành trạng từ: một cách A (静かに = một cách yên lặng)</string>
+    <string name="grammar_point_adverb_ku">Biến tính từ đuôi い A thành trạng từ (早く起きる = dậy sớm)</string>
+    <string name="grammar_point_de_aru">Là A (văn viết trang trọng của だ)</string>
+    <string name="grammar_point_not_copula">Không phải là A (thân mật của ではない; じゃありません là lịch sự)</string>
+    <string name="grammar_point_jan">A còn gì; đúng không (thân mật, từ じゃないか)</string>
+    <string name="grammar_point_na_ending">Cuối câu thể hiện cảm xúc hoặc tự nói: …nhỉ, …ghê (thân mật)</string>
+    <string name="grammar_point_naa_ending">Cảm thán mạnh hoặc mong ước: A quá!; ước gì A (thân mật)</string>
+    <string name="grammar_point_wa_ending">Nhấn mạnh nhẹ ở cuối câu (thường là nữ; ở Kansai nam cũng dùng)</string>
+    <string name="grammar_point_sa_ending">Nhấn mạnh nhẹ: …mà, …đấy (thân mật)</string>
+    <string name="grammar_point_gozaimasu">Cách nói rất lịch sự của ある hoặc です (ありがとうございます)</string>
+    <string name="grammar_point_must_neba">Phải A (văn viết của なければならない)</string>
+    <string name="grammar_point_please_kudasai">Xin cho tôi A; xin hãy A (お待ちください = xin vui lòng đợi)</string>
 </resources>

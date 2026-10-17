@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">是A（礼貌）；使句子礼貌</string>
     <string name="grammar_copula">是A（口语）</string>
     <string name="grammar_na_adjective">把な形容词A和后面的名词连接起来</string>
+    <string name="grammar_counter">量词：多少个、第几（３人 = 三个人，２時 = 两点）</string>
 </resources>
