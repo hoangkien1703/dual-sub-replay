@@ -205,6 +205,16 @@ OpenNLP model itself, because OpenNLP's loader asks Android's XML parser for a f
   prefers the engine's highest-quality offline voice for the country. Live check from a cloud
   address (heavily blocked by YouTube): one video went from intermittent to 3 of 3 loads, others
   stayed refused, so a lasting fix needs the transcript to come through the YouTube page itself.
+- **Full transcript through the YouTube page (owner choice 2026-10-17, "Add to this PR").** The
+  page in the app already holds the player's caption track list, so a read-only script
+  (`WEB_PAGE_CAPTION_TRACKS_SCRIPT`, origin re-checked) hands it to `data/PageCaptionSource.kt`
+  once per video, and the WebView client notes the `pot` and client fields of the page player's
+  own `/api/timedtext` requests without changing them. `YouTubeCaptionProvider` tries that list
+  first, downloading the chosen track with those fields, the page's user agent and its YouTube
+  cookies (sent only to the allowlisted YouTube hosts), and falls back to the usual lookup. This
+  skips the player request YouTube's bot check refuses. Offline tests cover the parsing and the
+  download; the live page path is unverified until the owner's phone test, because cloud
+  addresses can't load m.youtube.com.
 - **Tests and loading.** Tests that tokenize English or Chinese now wait for the analyzers first,
   so they no longer depend on whether the background load has finished.
 

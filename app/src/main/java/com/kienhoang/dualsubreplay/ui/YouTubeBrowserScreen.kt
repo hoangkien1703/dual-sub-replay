@@ -57,6 +57,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.PageCaptionSource
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.playback.WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT
 import com.kienhoang.dualsubreplay.playback.WEB_VIDEO_STATE_SCRIPT
@@ -359,6 +360,8 @@ internal fun SingleYouTubePage(
             settings.useWideViewPort = false
             settings.loadWithOverviewMode = false
             settings.textZoom = 100
+            PageCaptionSource.Shared.userAgent = settings.userAgentString
+            PageCaptionSource.Shared.cookies = { url -> CookieManager.getInstance().getCookie(url.toString()) }
             webChromeClient = object : WebChromeClient() {
                 override fun onShowCustomView(
                     view: View,
@@ -439,7 +442,11 @@ internal fun SingleYouTubePage(
                 override fun shouldInterceptRequest(
                     view: WebView,
                     request: WebResourceRequest,
-                ): WebResourceResponse? = requestInterceptor?.invoke(view, request) ?: super.shouldInterceptRequest(view, request)
+                ): WebResourceResponse? {
+                    // Only notes the parameters of the page's own caption requests; never changes them.
+                    if (request.url.path == "/api/timedtext") PageCaptionSource.Shared.recordTimedTextRequest(request.url.toString())
+                    return requestInterceptor?.invoke(view, request) ?: super.shouldInterceptRequest(view, request)
+                }
 
                 override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
                     super.doUpdateVisitedHistory(view, url, isReload)
@@ -594,6 +601,7 @@ internal fun SingleYouTubePage(
                         val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
                         if (!gate.accept(ticket, requestedUrl, webView.url, snapshot.url)) return@evaluateJavascript
                         controller.observePage(snapshot.url)
+                        readPageCaptionTracks(webView, snapshot.url)
                         youtubePlayerControlsVisible.value = snapshot.controlsVisible
                         youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
                         reportNavigation(webView, snapshot.url)
@@ -811,5 +819,17 @@ internal fun WebPageErrorCard(
                 Text(stringResource(R.string.player_reload))
             }
         }
+    }
+}
+
+/** Hands the page's caption track list to [PageCaptionSource] once per watched video. */
+private fun readPageCaptionTracks(
+    webView: WebView,
+    url: String,
+) {
+    val videoId = browseVideoSelection(url)?.videoId ?: return
+    if (PageCaptionSource.Shared.hasTracks(videoId)) return
+    webView.evaluateJavascript(WEB_PAGE_CAPTION_TRACKS_SCRIPT) { rawValue ->
+        parsePageCaptionTracks(rawValue)?.let(PageCaptionSource.Shared::recordPlayerResponse)
     }
 }

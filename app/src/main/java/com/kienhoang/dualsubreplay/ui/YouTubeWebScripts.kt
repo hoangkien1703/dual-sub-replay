@@ -651,3 +651,37 @@ internal fun webClipReplayScript(
         })();
         """.trimIndent()
 }
+
+/**
+ * Returns the caption part of the page player's response (tracks, audio tracks, title) for
+ * `PageCaptionSource`, or null before the player has one. Translation languages are left out to
+ * keep the result small. Read-only: it changes nothing on the page.
+ */
+internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+      const player = document.getElementById('movie_player');
+      let response = null;
+      try { response = player && typeof player.getPlayerResponse === 'function' ? player.getPlayerResponse() : null; } catch (_) {}
+      const details = response && response.videoDetails;
+      const renderer = response && response.captions && response.captions.playerCaptionsTracklistRenderer;
+      if (!details || !details.videoId || !renderer || !Array.isArray(renderer.captionTracks)) return null;
+      return JSON.stringify({
+        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
+        captions: { playerCaptionsTracklistRenderer: {
+          captionTracks: renderer.captionTracks,
+          audioTracks: renderer.audioTracks || [],
+          defaultAudioTrackIndex: renderer.defaultAudioTrackIndex || 0
+        } }
+      });
+    })();
+    """.trimIndent()
+
+/** The JSON text [WEB_PAGE_CAPTION_TRACKS_SCRIPT] returned through `evaluateJavascript`, or null. */
+internal fun parsePageCaptionTracks(rawValue: String?): String? {
+    if (rawValue.isNullOrBlank() || rawValue == "null") return null
+    return runCatching { JSONTokener(rawValue).nextValue() as? String }.getOrNull()?.takeIf(String::isNotBlank)
+}

@@ -180,6 +180,8 @@ class PlaybackArchitectureTest {
     fun playbackScriptsRecheckTheExecutingYouTubeOrigin() {
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("window.location.protocol !== 'https:'"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("host.endsWith('.youtube.com')"))
+        assertTrue(WEB_PAGE_CAPTION_TRACKS_SCRIPT.contains("window.location.protocol !== 'https:'"))
+        assertTrue(WEB_PAGE_CAPTION_TRACKS_SCRIPT.contains("host.endsWith('.youtube.com')"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("controlsVisible"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("ytp-autohide"))
         assertTrue(webReplayScript(1f).contains("window.location.protocol !== 'https:'"))

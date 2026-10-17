@@ -508,6 +508,7 @@ class YouTubeCaptionProvider(
             .writeTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .callTimeout(YOUTUBE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .build(),
+    private val pageSource: PageCaptionSource = PageCaptionSource.Shared,
 ) : CaptionProvider {
     override suspend fun fetch(
         videoId: String,
@@ -519,8 +520,9 @@ class YouTubeCaptionProvider(
                 System.nanoTime() +
                     TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
             try {
+                val languages = CaptionLanguageChoice(preferredLanguages, learningLanguage)
                 retryRefusedCaptionLookup(deadlineNanos) {
-                    fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), deadlineNanos)
+                    fetchFromPage(videoId, languages, deadlineNanos) ?: fetchInternal(videoId, languages, deadlineNanos)
                 }
             } catch (error: CancellationException) {
                 // Never turn a cancelled/replaced load into a caption failure. The
@@ -645,6 +647,38 @@ class YouTubeCaptionProvider(
         )
     }
 
+    /**
+     * The track list the YouTube page in the app already received, downloaded with the page's own
+     * caption parameters and cookies. Null when the page has no list for [videoId] yet or its
+     * download fails, so the usual lookup runs.
+     */
+    private suspend fun fetchFromPage(
+        videoId: String,
+        languages: CaptionLanguageChoice,
+        deadlineNanos: Long,
+    ): CaptionTrackResult? {
+        val page = pageSource.playerResponse(videoId) ?: return null
+        return try {
+            captionResultFromPlayerResponse(
+                root = page,
+                languages = languages,
+                userAgent = pageSource.userAgent ?: WEB_USER_AGENT,
+                deadlineNanos = deadlineNanos,
+                noTracksMessage = "The YouTube page has no public caption track.",
+                pageVideoId = videoId,
+            )
+        } catch (error: CaptionLookupTimeoutException) {
+            throw error
+        } catch (error: ResponseLimitExceededException) {
+            throw error
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            reportCaptionFailure("page", error)
+            null
+        }
+    }
+
     private suspend fun discoverWatchPage(
         videoId: String,
         deadlineNanos: Long,
@@ -713,6 +747,7 @@ class YouTubeCaptionProvider(
         userAgent: String,
         deadlineNanos: Long,
         noTracksMessage: String,
+        pageVideoId: String? = null,
     ): CaptionTrackResult {
         val playability = root.optJSONObject("playabilityStatus")
         val playabilityStatus = playability?.optString("status").orEmpty()
@@ -740,9 +775,13 @@ class YouTubeCaptionProvider(
                 ?: throw NoCaptionTracksException("No compatible caption track was found.")
         val cues =
             fetchCaptionCues(
-                baseUrl = selected.getString("baseUrl"),
+                baseUrl =
+                    selected.getString("baseUrl").let { baseUrl ->
+                        pageVideoId?.let { withPageTimedTextParameters(baseUrl, pageSource.timedTextParameters(it)) } ?: baseUrl
+                    },
                 userAgent = userAgent,
                 deadlineNanos = deadlineNanos,
+                withPageCookies = pageVideoId != null,
             )
 
         return CaptionTrackResult(
@@ -781,6 +820,7 @@ class YouTubeCaptionProvider(
         baseUrl: String,
         userAgent: String,
         deadlineNanos: Long,
+        withPageCookies: Boolean = false,
     ): List<RawCaptionCue> {
         val candidateUrls = captionCandidateUrls(baseUrl)
         if (candidateUrls.isEmpty()) {
@@ -799,7 +839,9 @@ class YouTubeCaptionProvider(
                                 .Builder()
                                 .url(url)
                                 .header("User-Agent", userAgent)
-                                .build(),
+                                .apply {
+                                    if (withPageCookies) pageSource.cookies(url)?.takeIf(String::isNotBlank)?.let { header("Cookie", it) }
+                                }.build(),
                             stage = "caption download ($format)",
                             deadlineNanos = deadlineNanos,
                         )
