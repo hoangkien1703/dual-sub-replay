@@ -30,7 +30,7 @@
     "@type": "MobileApplication",
     "name": "DualSub Replay",
     "alternateName": "Dual Sub Replay",
-    "description": "Free, open-source Android app that shows original and translated YouTube subtitles together and replays any sentence with one tap. Translation runs on the device with Google ML Kit.",
+    "description": "Free, open-source Android app that shows original and translated YouTube subtitles together and replays any sentence with one tap. Translation uses Google Translate online, or Google ML Kit on the phone.",
     "url": "https://hoangkien1703.github.io/dual-sub-replay/",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "Android 8.0 or newer",
@@ -55,7 +55,7 @@
       {
         "@type": "Question",
         "name": "Is DualSub Replay free?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. DualSub Replay is free and open source. There are no ads, subscriptions, accounts, or API keys." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. DualSub Replay is free and open source. There are no ads, subscriptions, or accounts, and no API key is needed." }
       },
       {
         "@type": "Question",
@@ -74,13 +74,18 @@
       },
       {
         "@type": "Question",
+        "name": "Can I learn Japanese with DualSub Replay?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tap a Japanese word to see its reading, meaning and part of speech, plus the grammar around it, such as the particle after it or an ending like 〜てくれました. You can hear it pronounced and save it with its sentence." }
+      },
+      {
+        "@type": "Question",
         "name": "Is DualSub Replay on Google Play?",
         "acceptedAnswer": { "@type": "Answer", "text": "Not yet. Download the official APK from the GitHub releases page. Android may ask you to allow installs from your browser the first time." }
       },
       {
         "@type": "Question",
         "name": "Does translation send my subtitles to a server?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No. Google ML Kit downloads the language model once, then translation runs on your phone. The project runs no server and collects no analytics." }
+        "acceptedAnswer": { "@type": "Answer", "text": "By default, subtitle text goes to Google Translate for the best quality. Turn off Google Translate (online) in Settings → Translation and Google ML Kit translates on your phone instead. The project runs no server and collects no analytics." }
       }
     ]
   }
@@ -135,6 +140,18 @@
           <div class="card">
             <h3>Save words and practice</h3>
             <p>Tap a word to hear it and save it with its sentence. Review with spaced repetition or export to Anki.</p>
+          </div>
+          <div class="card">
+            <h3>Japanese grammar explained</h3>
+            <p>Tap a Japanese word for its reading, meaning and part of speech, and see the grammar around it, from particles to verb endings.</p>
+          </div>
+          <div class="card">
+            <h3>Keeps playing with the screen off</h3>
+            <p>Lock your phone and keep listening. Play and pause from your earphones, the lock screen or the notification.</p>
+          </div>
+          <div class="card">
+            <h3>Optional AI tutor</h3>
+            <p>Ask what a line means or where a setting is. Add your own free or paid key from Gemini, OpenAI, Claude or OpenRouter; it is off until you do.</p>
           </div>
           <div class="card">
             <h3>The YouTube you know</h3>
@@ -231,7 +248,7 @@
         <h2>Frequently asked questions</h2>
         <details>
           <summary>Is DualSub Replay free?</summary>
-          <p>Yes. DualSub Replay is free and open source. There are no ads, subscriptions, accounts, or API keys.</p>
+          <p>Yes. DualSub Replay is free and open source. There are no ads, subscriptions, or accounts, and no API key is needed.</p>
         </details>
         <details>
           <summary>How do I show two subtitles at once on YouTube for Android?</summary>
@@ -246,12 +263,16 @@
           <p>Any caption language a YouTube video offers can be the original. Translations can go into 59 languages supported by Google ML Kit, including English, Spanish, Japanese, Korean, Chinese, French, German, and Vietnamese.</p>
         </details>
         <details>
+          <summary>Can I learn Japanese with DualSub Replay?</summary>
+          <p>Yes. Tap a Japanese word to see its reading, meaning and part of speech, plus the grammar around it, such as the particle after it or an ending like 〜てくれました. You can hear it pronounced and save it with its sentence.</p>
+        </details>
+        <details>
           <summary>Is DualSub Replay on Google Play?</summary>
           <p>Not yet. Download the official APK from the GitHub releases page. Android may ask you to allow installs from your browser the first time.</p>
         </details>
         <details>
           <summary>Does translation send my subtitles to a server?</summary>
-          <p>No. Google ML Kit downloads the language model once, then translation runs on your phone. The project runs no server and collects no analytics.</p>
+          <p>By default, subtitle text goes to Google Translate for the best quality. Turn off Google Translate (online) in Settings → Translation and Google ML Kit translates on your phone instead. The project runs no server and collects no analytics.</p>
         </details>
       </div>
     </section>

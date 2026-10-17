@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DualSub Replay: Phụ đề song ngữ YouTube trên Android</title>
-  <meta name="description" content="Ứng dụng Android miễn phí, mã nguồn mở: xem YouTube với hai phụ đề cùng lúc, chạm vào câu để nghe lại. Dịch ngay trên điện thoại, không cần tài khoản.">
+  <meta name="description" content="Ứng dụng Android miễn phí, mã nguồn mở: xem YouTube với hai phụ đề cùng lúc, chạm vào câu để nghe lại. Không quảng cáo, không cần tài khoản.">
   <link rel="canonical" href="https://hoangkien1703.github.io/dual-sub-replay/vi/">
   <link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/">
   <link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/">
@@ -30,7 +30,7 @@
     "@type": "MobileApplication",
     "name": "DualSub Replay",
     "alternateName": "Dual Sub Replay",
-    "description": "Ứng dụng Android miễn phí, mã nguồn mở hiển thị phụ đề YouTube gốc và bản dịch cùng lúc, chạm một lần để nghe lại từng câu. Bản dịch chạy ngay trên thiết bị bằng Google ML Kit.",
+    "description": "Ứng dụng Android miễn phí, mã nguồn mở hiển thị phụ đề YouTube gốc và bản dịch cùng lúc, chạm một lần để nghe lại từng câu. Bản dịch dùng Google Dịch trực tuyến, hoặc Google ML Kit ngay trên điện thoại.",
     "url": "https://hoangkien1703.github.io/dual-sub-replay/vi/",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "Android 8.0 trở lên",
@@ -69,13 +69,18 @@
       },
       {
         "@type": "Question",
+        "name": "Có học tiếng Nhật bằng DualSub Replay được không?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Được. Chạm vào một từ tiếng Nhật để xem cách đọc, nghĩa, từ loại và ngữ pháp xung quanh nó, như trợ từ đứng sau hay đuôi câu 〜てくれました. Bạn có thể nghe phát âm và lưu từ kèm câu gốc." }
+      },
+      {
+        "@type": "Question",
         "name": "DualSub Replay có trên Google Play không?",
         "acceptedAnswer": { "@type": "Answer", "text": "Chưa có. Bạn tải tệp APK chính thức từ trang phát hành trên GitHub. Lần đầu cài, Android có thể hỏi bạn cho phép trình duyệt cài ứng dụng." }
       },
       {
         "@type": "Question",
         "name": "Phụ đề của tôi có bị gửi lên máy chủ để dịch không?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Không. Google ML Kit tải mô hình ngôn ngữ một lần, sau đó dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Mặc định, nội dung phụ đề được gửi tới Google Dịch để có bản dịch tốt nhất. Tắt Google Dịch (trực tuyến) trong Cài đặt → Dịch thì Google ML Kit sẽ dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích." }
       }
     ]
   }
@@ -120,8 +125,8 @@
             <p>Chạm vào đoạn phụ đề, video tua về đúng câu đó. Không cần kéo thanh thời gian.</p>
           </div>
           <div class="card">
-            <h3>Dịch ngay trên máy</h3>
-            <p>Google ML Kit dịch trực tiếp trên điện thoại. Nội dung bạn xem không bị gửi lên máy chủ của dự án.</p>
+            <h3>Dịch trực tuyến hoặc ngay trên máy</h3>
+            <p>Mặc định dùng Google Dịch trực tuyến cho chất lượng tốt nhất, hoặc chuyển sang Google ML Kit dịch ngay trên điện thoại. Nội dung bạn xem không bị gửi lên máy chủ của dự án.</p>
           </div>
           <div class="card">
             <h3>Tô sáng từng từ</h3>
@@ -130,6 +135,18 @@
           <div class="card">
             <h3>Lưu từ vựng và ôn tập</h3>
             <p>Chạm vào một từ để nghe phát âm và lưu kèm câu gốc. Ôn tập ngắt quãng hoặc xuất sang Anki.</p>
+          </div>
+          <div class="card">
+            <h3>Giải thích ngữ pháp tiếng Nhật</h3>
+            <p>Chạm vào từ tiếng Nhật để xem cách đọc, nghĩa, từ loại và ngữ pháp xung quanh, từ trợ từ đến đuôi động từ.</p>
+          </div>
+          <div class="card">
+            <h3>Nghe tiếp khi tắt màn hình</h3>
+            <p>Khóa máy mà vẫn nghe tiếp. Phát và tạm dừng bằng tai nghe, màn hình khóa hoặc thông báo.</p>
+          </div>
+          <div class="card">
+            <h3>Trợ lý AI tùy chọn</h3>
+            <p>Hỏi nghĩa một câu hay một cài đặt nằm ở đâu. Thêm khóa miễn phí hoặc trả phí của riêng bạn từ Gemini, OpenAI, Claude hay OpenRouter; chưa thêm thì trợ lý không gửi gì.</p>
           </div>
           <div class="card">
             <h3>Vẫn là YouTube quen thuộc</h3>
@@ -168,12 +185,16 @@
           <p>Phụ đề gốc có thể là bất kỳ ngôn ngữ nào video cung cấp. Bản dịch hỗ trợ 59 ngôn ngữ của Google ML Kit, gồm tiếng Việt, tiếng Anh, tiếng Nhật, tiếng Hàn, tiếng Trung, tiếng Pháp và tiếng Đức.</p>
         </details>
         <details>
+          <summary>Có học tiếng Nhật bằng DualSub Replay được không?</summary>
+          <p>Được. Chạm vào một từ tiếng Nhật để xem cách đọc, nghĩa, từ loại và ngữ pháp xung quanh nó, như trợ từ đứng sau hay đuôi câu 〜てくれました. Bạn có thể nghe phát âm và lưu từ kèm câu gốc.</p>
+        </details>
+        <details>
           <summary>DualSub Replay có trên Google Play không?</summary>
           <p>Chưa có. Bạn tải tệp APK chính thức từ trang phát hành trên GitHub. Lần đầu cài, Android có thể hỏi bạn cho phép trình duyệt cài ứng dụng.</p>
         </details>
         <details>
           <summary>Phụ đề của tôi có bị gửi lên máy chủ để dịch không?</summary>
-          <p>Không. Google ML Kit tải mô hình ngôn ngữ một lần, sau đó dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích.</p>
+          <p>Mặc định, nội dung phụ đề được gửi tới Google Dịch để có bản dịch tốt nhất. Tắt Google Dịch (trực tuyến) trong Cài đặt → Dịch thì Google ML Kit sẽ dịch ngay trên điện thoại. Dự án không vận hành máy chủ và không thu thập dữ liệu phân tích.</p>
         </details>
       </div>
     </section>
