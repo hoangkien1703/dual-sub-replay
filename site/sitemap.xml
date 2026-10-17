@@ -12,4 +12,28 @@
     <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/"/>
   </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-japanese/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/vi/learn-japanese/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-japanese/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/language-reactor-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/vi/language-reactor-alternative/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/language-reactor-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/"/>
+  </url>
 </urlset>
