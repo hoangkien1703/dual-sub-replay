@@ -14,7 +14,9 @@ BASE_URL = "https://hoangkien1703.github.io/dual-sub-replay/"
 # Each English page and its Vietnamese translation, as paths under site/.
 PAGE_PAIRS = [
     ("", "vi/"),
+    ("learn-english/", "vi/learn-english/"),
     ("learn-japanese/", "vi/learn-japanese/"),
+    ("dual-subtitles-youtube-android/", "vi/dual-subtitles-youtube-android/"),
     ("language-reactor-alternative/", "vi/language-reactor-alternative/"),
 ]
 PAGES = {path + "index.html": BASE_URL + path for pair in PAGE_PAIRS for path in pair}

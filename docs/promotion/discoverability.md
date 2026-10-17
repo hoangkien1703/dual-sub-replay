@@ -27,8 +27,9 @@ https://hoangkien1703.github.io/dual-sub-replay/vi/ (Vietnamese).
    and variables → Actions → Variables), re-run Publish website, then press Verify.
    Submit `sitemap.xml` and request indexing for both pages. (Done 2026-09-26 with the
    HTML file method instead: `site/googlea6eec9334d18b877.html`. Keep that file, or
-   Search Console loses verification.) Bing Webmaster Tools can
-   import the verified site from Search Console.
+   Search Console loses verification.) Also add the site to
+   Bing Webmaster Tools (Import from Google Search Console): ChatGPT search and Copilot
+   rely on Bing's index, so this is how AI assistants find the guide pages.
 5. **Earn links from places learners already look.** Each is a backlink that helps
    ranking and a direct source of users and stars:
    - List the app on AlternativeTo as an alternative to Language Reactor and similar tools.
@@ -52,10 +53,14 @@ https://hoangkien1703.github.io/dual-sub-replay/vi/ (Vietnamese).
 
 - `site/` is plain HTML and CSS with no build step. Keep English and Vietnamese pages in
   step, and keep FAQ answers identical in visible text and JSON-LD.
-- Guide pages (`learn-japanese/`, `language-reactor-alternative/`) each target one search.
+- Guide pages (`learn-english/`, `learn-japanese/`, `dual-subtitles-youtube-android/`,
+  `language-reactor-alternative/`) each answer one question people ask search engines
+  and AI assistants.
   Add a new one as an English and Vietnamese pair, list both in `sitemap.xml` and
   `PAGE_PAIRS` in `tools/tests/test_site.py`, and link it from the footers.
-- Recheck claims about other products, such as Language Reactor having no mobile app.
+- Recheck claims about other products (Language Reactor having no mobile app, Trancy's
+  free-plan limits and prices, Dualsub on Firefox for Android) every few months and
+  update the "Last checked" line on the comparison page.
 - `tools/tests/test_site.py` checks titles, descriptions, canonical and hreflang links,
   FAQ structured data, local links, the sitemap, and that the language list matches
   `TranslationLanguages.kt`.
