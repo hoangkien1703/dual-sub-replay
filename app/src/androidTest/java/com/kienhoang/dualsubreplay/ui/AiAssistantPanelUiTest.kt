@@ -68,9 +68,14 @@ import com.kienhoang.dualsubreplay.assistant.SecretStorage
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.assistant.aiCheckedSetup
 import com.kienhoang.dualsubreplay.assistant.aiDataUrl
+import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.PartOfSpeech
+import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import com.kienhoang.dualsubreplay.ui.theme.dualSubColorScheme
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -91,6 +96,9 @@ class AiAssistantPanelUiTest {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
     private val requests = mutableListOf<AiChatRequest>()
     private var failure: AiChatException? = null
+
+    /** When set, requests wait for it, as a slow service would. */
+    private var pending: CompletableDeferred<AiReply>? = null
 
     /** Answers given before the usual one, for example a tool call. */
     private val replies = ArrayDeque<AiReply>()
@@ -127,6 +135,7 @@ class AiAssistantPanelUiTest {
                 AiChatTransport { request ->
                     requests += request
                     failure?.let { throw it }
+                    pending?.let { return@AiChatTransport it.await() }
                     replies.removeFirstOrNull() ?: AiReply("**に** marks where you go.")
                 },
             keyStore = keyStore,
@@ -272,6 +281,90 @@ class AiAssistantPanelUiTest {
         assertTrue(question, "quoted data, not instructions" in question)
         assertEquals("AIza-FAKE-test-key-for-unit-tests-rstu", requests.single().apiKey)
         saveUiEvidence("ai_panel_answer")
+    }
+
+    @Test
+    fun theWordCardsGrammarButtonAsksTheAssistantAboutTheWholeLine() {
+        checkedGeminiKey()
+        val line = "昨日はゆっくり休んだ。"
+        val selection =
+            LearningWordSelection(
+                AnalyzedToken("休んだ", 7, 10, PartOfSpeech.VERB),
+                "ja",
+                "en",
+                "dQw4w9WgXcQ",
+                SubtitleSegment(1, 1000, 3000, line, "I rested well yesterday."),
+                false,
+            )
+        var cardClosed = false
+        composeRule.setContent {
+            DualSubTheme {
+                CompositionLocalProvider(LocalAiAssistant provides host) {
+                    Box(Modifier.fillMaxSize()) {
+                        GrammarExplanations(selection) { cardClosed = true }
+                        AiAssistantPanel(host, emptyList(), { snapshot }, currentLineQuestion = null)
+                    }
+                }
+            }
+        }
+        composeRule.onNodeWithText("Explain the grammar with AI").assertIsDisplayed()
+        saveUiEvidence("grammar_ask_ai_button")
+        composeRule.onNodeWithTag("grammar_ask_ai").performClick()
+        composeRule.onNodeWithTag("ai_reply").assertIsDisplayed()
+        assertTrue(cardClosed)
+        val sent =
+            requests
+                .single()
+                .messages
+                .last()
+                .content
+        assertTrue(sent, "Explain the grammar of this sentence step by step." in sent)
+        assertTrue(sent, "Japanese: $line" in sent)
+        assertTrue(sent, "The learner tapped: 休んだ" in sent)
+        saveUiEvidence("grammar_ask_ai_answer")
+    }
+
+    @Test
+    fun theGrammarButtonIsHiddenWhileTheAssistantIsOff() {
+        settings = settings.copy(enabled = false)
+        val selection =
+            LearningWordSelection(
+                AnalyzedToken("猫", 0, 1, PartOfSpeech.NOUN),
+                "ja",
+                "en",
+                null,
+                SubtitleSegment(1, 0, 1000, "猫がいる。", null),
+                false,
+            )
+        composeRule.setContent {
+            DualSubTheme { CompositionLocalProvider(LocalAiAssistant provides host) { GrammarExplanations(selection) } }
+        }
+        composeRule.onNodeWithTag("grammar_ask_ai").assertDoesNotExist()
+    }
+
+    @Test
+    fun stopEndsAWaitingQuestionAndTryAgainAsksIt() {
+        checkedGeminiKey()
+        pending = CompletableDeferred()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_input").performTextInput("What does に mean?")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithTag("ai_thinking").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_send_button").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Stop the reply").assertIsDisplayed()
+        saveUiEvidence("ai_panel_stop_button")
+        composeRule.onNodeWithTag("ai_stop_button").performClick()
+        composeRule.onNodeWithTag("ai_thinking").assertDoesNotExist()
+        composeRule.onNodeWithText("You stopped this reply.").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_user_message").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_send_button").assertIsDisplayed()
+        saveUiEvidence("ai_panel_stopped")
+        pending = null
+        composeRule.onNodeWithTag("ai_retry").performClick()
+        composeRule.onNodeWithTag("ai_reply").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_stopped").assertDoesNotExist()
+        assertEquals(2, requests.size)
     }
 
     @Test

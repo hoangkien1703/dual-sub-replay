@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">De acuerdo con A</string>
     <string name="grammar_point_at_the_risk">Sin importar A</string>
     <string name="grammar_point_via">Pasando por A</string>
+    <string name="grammar_point_plural_people">Plural: A y los demás (私たち = nosotros, 子供たち = los niños)</string>
+    <string name="grammar_point_name_suffix">Tratamiento tras un nombre: señor o señora A (さん); くん para chicos, ちゃん para niños y amigos, 様 muy formal</string>
+    <string name="grammar_point_adjective_to_noun_sa">Convierte el adjetivo A en sustantivo: lo A que es (寒さ = el frío, 高さ = la altura)</string>
+    <string name="grammar_point_teki">-ico, -al: el sustantivo A describe cosas, como un adjetivo な (経済的 = económico)</string>
+    <string name="grammar_point_nature_sei">-idad: la cualidad de A (可能性 = posibilidad)</string>
+    <string name="grammar_point_making_ka">-izar, -ización: convertir en A (可視化 = visualización)</string>
+    <string name="grammar_point_person_sha">Persona que hace A o pertenece a A (訪問者 = visitante, 会社員 = oficinista)</string>
+    <string name="grammar_point_person_of_jin">Persona de A (日本人 = japonés, アメリカ人 = estadounidense)</string>
+    <string name="grammar_point_language_go">El idioma de A (日本語 = japonés, 韓国語 = coreano)</string>
+    <string name="grammar_point_become">Volverse A; llegar a ser A (高くなる = encarecerse, 医者になる = hacerse médico)</string>
+    <string name="grammar_point_make_it">Hacer que algo sea A (きれいにする = limpiar, 短くする = acortar)</string>
+    <string name="grammar_point_decide_on">Convertir en A, tratar como A o elegir A (秘密にする = guardar en secreto, コーヒーにする = tomaré café)</string>
+    <string name="grammar_point_adverb_ni">Convierte el adjetivo な A en adverbio: de forma A (静かに = en silencio)</string>
+    <string name="grammar_point_adverb_ku">Convierte el adjetivo い A en adverbio (早く起きる = levantarse temprano)</string>
+    <string name="grammar_point_de_aru">Es A (forma escrita y formal de だ)</string>
+    <string name="grammar_point_not_copula">No es A (coloquial de ではない; じゃありません es formal)</string>
+    <string name="grammar_point_jan">¿Ves? ¿No es A? (coloquial, de じゃないか)</string>
+    <string name="grammar_point_na_ending">Final con emoción o pensando en voz alta: …, ¿eh?; …, vaya (coloquial)</string>
+    <string name="grammar_point_naa_ending">Emoción fuerte o deseo: ¡qué A!; ojalá A (coloquial)</string>
+    <string name="grammar_point_wa_ending">Énfasis suave al final de la frase (sobre todo mujeres; en Kansai también hombres)</string>
+    <string name="grammar_point_sa_ending">Énfasis ligero: …, ¿sabes? (coloquial)</string>
+    <string name="grammar_point_gozaimasu">Forma muy cortés de ある o です (ありがとうございます)</string>
+    <string name="grammar_point_must_neba">Hay que A (formal y escrito: なければならない)</string>
+    <string name="grammar_point_please_kudasai">Deme A, por favor; por favor, A (お待ちください = espere, por favor)</string>
 </resources>

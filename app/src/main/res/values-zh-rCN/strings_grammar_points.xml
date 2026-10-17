@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">依照A</string>
     <string name="grammar_point_at_the_risk">不顾A</string>
     <string name="grammar_point_via">经过A</string>
+    <string name="grammar_point_plural_people">A们（复数：私たち = 我们，子供たち = 孩子们）</string>
+    <string name="grammar_point_name_suffix">名字后的敬称：A先生/女士（さん）；くん用于男生，ちゃん用于孩子和朋友，様最礼貌</string>
+    <string name="grammar_point_adjective_to_noun_sa">把形容词A变成名词：A的程度（寒さ = 寒冷，高さ = 高度）</string>
+    <string name="grammar_point_teki">A的（像…的、关于…的，当な形容词用：経済的 = 经济的）</string>
+    <string name="grammar_point_nature_sei">A性（性质、倾向：可能性）</string>
+    <string name="grammar_point_making_ka">A化（变成…、使…化：可視化 = 可视化）</string>
+    <string name="grammar_point_person_sha">做A的人、属于A的人（訪問者 = 访客，会社員 = 公司职员）</string>
+    <string name="grammar_point_person_of_jin">A人（某国家或地区的人：日本人，アメリカ人 = 美国人）</string>
+    <string name="grammar_point_language_go">A语（日本語 = 日语，韓国語 = 韩语）</string>
+    <string name="grammar_point_become">变得A；成为A（高くなる = 变贵，医者になる = 成为医生）</string>
+    <string name="grammar_point_make_it">使…变得A（きれいにする = 弄干净，短くする = 缩短）</string>
+    <string name="grammar_point_decide_on">把…变成A、当作A，或选A（秘密にする = 保密，コーヒーにする = 我要咖啡）</string>
+    <string name="grammar_point_adverb_ni">把な形容词A变成副词：A地（静かに = 安静地）</string>
+    <string name="grammar_point_adverb_ku">把い形容词A变成副词（早く起きる = 早起）</string>
+    <string name="grammar_point_de_aru">是A（だ的书面语）</string>
+    <string name="grammar_point_not_copula">不是A（ではない的口语；じゃありません是礼貌形）</string>
+    <string name="grammar_point_jan">不是A吗？对吧（じゃないか的口语）</string>
+    <string name="grammar_point_na_ending">句末表达感慨或自言自语：…啊、…呢（口语）</string>
+    <string name="grammar_point_naa_ending">强烈感叹或愿望：多么A啊！要是A就好了（口语）</string>
+    <string name="grammar_point_wa_ending">句末轻微强调（多为女性，关西男性也用）</string>
+    <string name="grammar_point_sa_ending">轻松的强调：…嘛、…啦（口语）</string>
+    <string name="grammar_point_gozaimasu">ある、です的非常礼貌说法（ありがとうございます）</string>
+    <string name="grammar_point_must_neba">必须A（なければならない的书面语）</string>
+    <string name="grammar_point_please_kudasai">请给我A；请A（お待ちください = 请稍等）</string>
 </resources>

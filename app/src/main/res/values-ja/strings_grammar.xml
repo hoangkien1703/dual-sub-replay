@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">Aです（丁寧な断定、文を丁寧にする）</string>
     <string name="grammar_copula">Aだ（くだけた断定）</string>
     <string name="grammar_na_adjective">な形容詞Aと後ろの名詞をつなぐ</string>
+    <string name="grammar_counter">助数詞（数え方：３人、２時）</string>
 </resources>

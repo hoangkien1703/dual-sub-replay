@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">Sesuai dengan A</string>
     <string name="grammar_point_at_the_risk">Tanpa mempedulikan A</string>
     <string name="grammar_point_via">Melalui A</string>
+    <string name="grammar_point_plural_people">Jamak: A dan yang lain (私たち = kami, 子供たち = anak-anak)</string>
+    <string name="grammar_point_name_suffix">Sapaan setelah nama: Bapak atau Ibu A (さん); くん untuk laki-laki, ちゃん untuk anak dan teman akrab, 様 sangat sopan</string>
+    <string name="grammar_point_adjective_to_noun_sa">Mengubah kata sifat A menjadi kata benda: seberapa A (寒さ = dinginnya, 高さ = tingginya)</string>
+    <string name="grammar_point_teki">-is, -al: kata benda A dipakai seperti kata sifat な (経済的 = ekonomis)</string>
+    <string name="grammar_point_nature_sei">-itas, ke-an: sifat A (可能性 = kemungkinan)</string>
+    <string name="grammar_point_making_ka">-isasi: menjadi A (可視化 = visualisasi)</string>
+    <string name="grammar_point_person_sha">Orang yang melakukan A atau termasuk A (訪問者 = pengunjung, 会社員 = karyawan)</string>
+    <string name="grammar_point_person_of_jin">Orang A (日本人 = orang Jepang, アメリカ人 = orang Amerika)</string>
+    <string name="grammar_point_language_go">Bahasa A (日本語 = bahasa Jepang, 韓国語 = bahasa Korea)</string>
+    <string name="grammar_point_become">Menjadi A (高くなる = menjadi mahal, 医者になる = menjadi dokter)</string>
+    <string name="grammar_point_make_it">Membuat sesuatu A (きれいにする = membersihkan, 短くする = memendekkan)</string>
+    <string name="grammar_point_decide_on">Menjadikan A, menganggap sebagai A, atau memilih A (秘密にする = merahasiakan, コーヒーにする = saya pilih kopi)</string>
+    <string name="grammar_point_adverb_ni">Mengubah kata sifat な A menjadi kata keterangan: dengan A (静かに = dengan tenang)</string>
+    <string name="grammar_point_adverb_ku">Mengubah kata sifat い A menjadi kata keterangan (早く起きる = bangun pagi)</string>
+    <string name="grammar_point_de_aru">Adalah A (bentuk tulis formal dari だ)</string>
+    <string name="grammar_point_not_copula">Bukan A (santai dari ではない; じゃありません sopan)</string>
+    <string name="grammar_point_jan">Kan A? (santai, dari じゃないか)</string>
+    <string name="grammar_point_na_ending">Akhir kalimat dengan perasaan atau bicara sendiri: …ya, …nih (santai)</string>
+    <string name="grammar_point_naa_ending">Perasaan kuat atau harapan: alangkah A!; andai A (santai)</string>
+    <string name="grammar_point_wa_ending">Penekanan lembut di akhir kalimat (sering perempuan; di Kansai juga laki-laki)</string>
+    <string name="grammar_point_sa_ending">Penekanan ringan: …lho, …sih (santai)</string>
+    <string name="grammar_point_gozaimasu">Bentuk sangat sopan dari ある atau です (ありがとうございます)</string>
+    <string name="grammar_point_must_neba">Harus A (formal dan tertulis: なければならない)</string>
+    <string name="grammar_point_please_kudasai">Tolong beri saya A; silakan A (お待ちください = mohon tunggu)</string>
 </resources>

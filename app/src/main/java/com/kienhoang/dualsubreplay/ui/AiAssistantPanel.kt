@@ -90,6 +90,10 @@ internal fun AiAssistantPanel(
     val open = aiState.panelOpen && aiState.settings.enabled
     val systemPrompt = { aiSystemPrompt(host.guide(), snapshot()) }
     BackHandler(open) { if (aiState.page != AiPanelPage.CHAT) controller.showPage(AiPanelPage.CHAT) else controller.closePanel() }
+    // A question asked from the word card waits until the assistant can answer it.
+    LaunchedEffect(open, aiState.ready, aiState.sending, aiState.pendingQuestion, aiState.settings.introSeen) {
+        if (open && aiState.settings.introSeen) controller.sendPendingQuestion(systemPrompt())
+    }
     AnimatedVisibility(visible = open, enter = fadeIn(), exit = fadeOut()) {
         Box(
             Modifier
@@ -228,7 +232,7 @@ private fun AiChatContent(
 ) {
     val listState = rememberLazyListState()
     val messages = aiState.messages
-    LaunchedEffect(messages.size, aiState.sending, aiState.failure) {
+    LaunchedEffect(messages.size, aiState.sending, aiState.failure, aiState.stopped) {
         val last = listState.layoutInfo.totalItemsCount - 1
         if (messages.isNotEmpty() && last >= 0) listState.animateScrollToItem(last)
     }
@@ -277,4 +281,5 @@ private fun LazyListScope.aiMessages(
     // After actions that ran, the question has an answer, so asking it again is left to the user.
     val canRetry = aiState.ready && aiState.messages.lastOrNull()?.role == AiRole.USER
     aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry.takeIf { canRetry }) } }
+    if (aiState.stopped && !aiState.sending) item(key = "stopped") { AiStoppedRow(onRetry.takeIf { canRetry }) }
 }

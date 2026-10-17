@@ -14,6 +14,8 @@
     <string name="ai_send">送信</string>
     <string name="ai_thinking">考え中…</string>
     <string name="ai_retry">もう一度試す</string>
+    <string name="ai_stop">回答を停止</string>
+    <string name="ai_stopped">この回答を停止しました。</string>
     <string name="ai_message_about">対象: %1$s</string>
     <string name="ai_welcome_title">何をお手伝いしましょうか?</string>
     <string name="ai_welcome_message">設定、単語、文、アプリの問題について質問できます。</string>
@@ -30,6 +32,8 @@
     <string name="ai_chip_features">このアプリで何ができる?</string>
     <string name="ai_chip_bigger_subtitles">字幕を大きくするには?</string>
     <string name="ai_chip_explain_line">今の行を説明して</string>
+    <string name="ai_explain_grammar_button">AIで文法を説明</string>
+    <string name="ai_explain_grammar_question">この文の文法を順番に説明して。</string>
     <string name="ai_problem_captions_title">字幕を読み込めませんでした</string>
     <string name="ai_problem_retry">再試行</string>
     <string name="ai_problem_ask">AI に聞く</string>

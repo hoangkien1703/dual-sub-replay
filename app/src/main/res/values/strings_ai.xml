@@ -14,6 +14,8 @@
     <string name="ai_send">Send</string>
     <string name="ai_thinking">Thinking…</string>
     <string name="ai_retry">Try again</string>
+    <string name="ai_stop">Stop the reply</string>
+    <string name="ai_stopped">You stopped this reply.</string>
     <string name="ai_message_about">About: %1$s</string>
     <string name="ai_welcome_title">How can I help?</string>
     <string name="ai_welcome_message">Ask about a setting, a word, a sentence, or a problem in the app.</string>
@@ -30,6 +32,8 @@
     <string name="ai_chip_features">What can this app do?</string>
     <string name="ai_chip_bigger_subtitles">How do I make subtitles bigger?</string>
     <string name="ai_chip_explain_line">Explain the current line</string>
+    <string name="ai_explain_grammar_button">Explain the grammar with AI</string>
+    <string name="ai_explain_grammar_question">Explain the grammar of this sentence step by step.</string>
     <string name="ai_problem_captions_title">Subtitles couldn\'t load</string>
     <string name="ai_problem_retry">Retry</string>
     <string name="ai_problem_ask">Ask AI about this</string>

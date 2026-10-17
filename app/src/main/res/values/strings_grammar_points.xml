@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">In line with A</string>
     <string name="grammar_point_at_the_risk">Disregarding A</string>
     <string name="grammar_point_via">After going through A</string>
+    <string name="grammar_point_plural_people">More than one: A and others (私たち = we, 子供たち = children)</string>
+    <string name="grammar_point_name_suffix">Polite title after a name: Mr. or Ms. A (さん); くん for boys, ちゃん for children and friends, 様 very polite</string>
+    <string name="grammar_point_adjective_to_noun_sa">Turns the adjective A into a noun: how A it is (寒さ = coldness, 高さ = height)</string>
+    <string name="grammar_point_teki">-ic, -al: lets the noun A describe things, like a na-adjective (経済的 = economical)</string>
+    <string name="grammar_point_nature_sei">-ness, -ity: the nature or quality of A (可能性 = possibility)</string>
+    <string name="grammar_point_making_ka">-ize, -ization: turning into A (可視化 = visualization)</string>
+    <string name="grammar_point_person_sha">A person who does A or belongs to A (訪問者 = visitor, 会社員 = office worker)</string>
+    <string name="grammar_point_person_of_jin">A person from A (日本人 = Japanese person, アメリカ人 = American)</string>
+    <string name="grammar_point_language_go">The language of A (日本語 = Japanese, 韓国語 = Korean)</string>
+    <string name="grammar_point_become">Become A; get A (高くなる = get expensive, 医者になる = become a doctor)</string>
+    <string name="grammar_point_make_it">Make something A (きれいにする = make it clean, 短くする = shorten)</string>
+    <string name="grammar_point_decide_on">Make into A; treat as A; or choose A (秘密にする = keep it secret, コーヒーにする = I’ll have coffee)</string>
+    <string name="grammar_point_adverb_ni">Turns the na-adjective A into an adverb: in an A way (静かに = quietly)</string>
+    <string name="grammar_point_adverb_ku">Turns the i-adjective A into an adverb (早く起きる = get up early)</string>
+    <string name="grammar_point_de_aru">Is A (formal, written style of だ)</string>
+    <string name="grammar_point_not_copula">Is not A (casual ではない; じゃありません is polite)</string>
+    <string name="grammar_point_jan">Right? Isn’t it A? (casual, from じゃないか)</string>
+    <string name="grammar_point_na_ending">Sentence ending with feeling, or thinking aloud: …, huh; …, I guess (casual)</string>
+    <string name="grammar_point_naa_ending">Strong feeling or a wish: how A!; I wish A (casual)</string>
+    <string name="grammar_point_wa_ending">Soft emphasis at the end of a sentence (often women; men too in Kansai)</string>
+    <string name="grammar_point_sa_ending">Light, casual emphasis: …, you know (casual)</string>
+    <string name="grammar_point_gozaimasu">Very polite ある or です (ありがとうございます)</string>
+    <string name="grammar_point_must_neba">Must A (formal, written なければならない)</string>
+    <string name="grammar_point_please_kudasai">Please give me A; please do A (お待ちください = please wait)</string>
 </resources>

@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">Is A (polite); makes the sentence polite</string>
     <string name="grammar_copula">Is A (casual)</string>
     <string name="grammar_na_adjective">Links the na-adjective A to the noun after it</string>
+    <string name="grammar_counter">Counter word: how many, or which one (３人 = three people, ２時 = two o’clock)</string>
 </resources>

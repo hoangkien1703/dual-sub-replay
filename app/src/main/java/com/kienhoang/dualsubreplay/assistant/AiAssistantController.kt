@@ -163,6 +163,13 @@ private val KEY_WORKS_PROBLEMS = BUSY_PROBLEMS + AiErrorKind.NOT_A_CHAT_MODEL
 private val KEY_CHECK_MESSAGES =
     listOf(AiWireMessage(AiRole.SYSTEM, "Reply with the single word OK."), AiWireMessage(AiRole.USER, "OK?"))
 
+/** A question with hidden [context], asked from outside the panel; [contextLabel] says what the context is. */
+internal data class AiPendingQuestion(
+    val text: String,
+    val context: String? = null,
+    val contextLabel: String? = null,
+)
+
 internal data class AiAssistantUiState(
     val settings: AiAssistantSettings = AiAssistantSettings(),
     /** The last characters of each saved key; a service without an entry has no key. */
@@ -175,6 +182,8 @@ internal data class AiAssistantUiState(
     val savedChats: List<AiChat> = emptyList(),
     val chat: AiChat? = null,
     val sending: Boolean = false,
+    /** The user stopped the last question before it was answered; cleared by the next one. */
+    val stopped: Boolean = false,
     /** Why the last question got no answer; cleared by the next one. */
     val failure: AiFailure? = null,
     val connectionTest: AiConnectionTest = AiConnectionTest.Idle,
@@ -185,6 +194,8 @@ internal data class AiAssistantUiState(
     val memory: AiMemoryData = AiMemoryData(),
     /** Whether the next new chat reads and saves memories; the open chat keeps its own choice. */
     val newChatMemory: Boolean = true,
+    /** A question asked from elsewhere in the app (the word card's grammar button), sent once the panel can. */
+    val pendingQuestion: AiPendingQuestion? = null,
 ) {
     val hasKey: Boolean get() = settings.provider in keyHints
     val messages: List<AiChatMessage> get() = chat?.messages.orEmpty()
@@ -272,7 +283,20 @@ internal class AiAssistantController(
 
     fun openPanel() = _state.update { it.copy(panelOpen = true) }
 
-    fun closePanel() = _state.update { it.copy(panelOpen = false, page = AiPanelPage.CHAT) }
+    fun closePanel() = _state.update { it.copy(panelOpen = false, page = AiPanelPage.CHAT, pendingQuestion = null) }
+
+    /** Opens the chat with [question] waiting; the panel sends it with [sendPendingQuestion] once it can. */
+    fun askFromApp(question: AiPendingQuestion) =
+        _state.update { it.copy(panelOpen = true, page = AiPanelPage.CHAT, pendingQuestion = question) }
+
+    /** Sends the waiting question when the assistant is ready and not busy; until then it keeps waiting. */
+    fun sendPendingQuestion(systemPrompt: String) {
+        val current = _state.value
+        val question = current.pendingQuestion ?: return
+        if (!current.panelOpen || !current.ready || current.sending) return
+        _state.update { it.copy(pendingQuestion = null) }
+        send(question.text, systemPrompt, question.context, question.contextLabel)
+    }
 
     fun showPage(page: AiPanelPage) = _state.update { it.copy(page = page) }
 
@@ -505,13 +529,13 @@ internal class AiAssistantController(
 
     fun newChat() {
         cancelRequests()
-        _state.update { it.copy(chat = null, failure = null, page = AiPanelPage.CHAT, newChatMemory = true) }
+        _state.update { it.copy(chat = null, failure = null, stopped = false, page = AiPanelPage.CHAT, newChatMemory = true) }
     }
 
     fun openChat(id: String) {
         val chat = _state.value.savedChats.firstOrNull { it.id == id } ?: return
         cancelRequests()
-        _state.update { it.copy(chat = chat, failure = null, page = AiPanelPage.CHAT) }
+        _state.update { it.copy(chat = chat, failure = null, stopped = false, page = AiPanelPage.CHAT) }
     }
 
     fun deleteChat(id: String) {
@@ -595,7 +619,7 @@ internal class AiAssistantController(
             AiAnswerRun(appActions, history, tools, memories, newId) { messages, offered ->
                 request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered)
             }
-        _state.update { it.copy(sending = true, failure = null) }
+        _state.update { it.copy(sending = true, failure = null, stopped = false) }
         sendJob =
             scope.launch {
                 try {
@@ -615,7 +639,10 @@ internal class AiAssistantController(
                         }
                     }
                 } catch (cancelled: CancellationException) {
-                    if (run.records.isNotEmpty()) addAnswer(run, chatId)
+                    if (run.records.isNotEmpty()) {
+                        addAnswer(run, chatId)
+                        persistChats()
+                    }
                     _state.update { it.copy(sending = false) }
                     throw cancelled
                 } finally {
@@ -774,6 +801,17 @@ internal class AiAssistantController(
         val updated = change(_state.value.settings)
         _state.update { it.copy(settings = updated) }
         scope.launch { withContext(io) { settingsStorage.save(updated) } }
+    }
+
+    /**
+     * The Stop button: drops the question's request while it waits for an answer. The question stays
+     * in the chat, so it can be asked again; actions that already ran keep their Undo.
+     */
+    fun stop() {
+        if (!_state.value.sending) return
+        cancelRequests()
+        _state.update { it.copy(stopped = true) }
+        persistChats()
     }
 
     private fun cancelRequests() {

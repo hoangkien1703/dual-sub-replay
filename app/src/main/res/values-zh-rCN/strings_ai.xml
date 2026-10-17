@@ -14,6 +14,8 @@
     <string name="ai_send">发送</string>
     <string name="ai_thinking">正在思考…</string>
     <string name="ai_retry">重试</string>
+    <string name="ai_stop">停止回答</string>
+    <string name="ai_stopped">你已停止此回答。</string>
     <string name="ai_message_about">关于：%1$s</string>
     <string name="ai_welcome_title">需要什么帮助？</string>
     <string name="ai_welcome_message">可以询问设置、词语、句子或应用中的问题。</string>
@@ -30,6 +32,8 @@
     <string name="ai_chip_features">这个应用能做什么？</string>
     <string name="ai_chip_bigger_subtitles">怎样把字幕调大？</string>
     <string name="ai_chip_explain_line">解释当前这一行</string>
+    <string name="ai_explain_grammar_button">用AI讲解语法</string>
+    <string name="ai_explain_grammar_question">请逐步讲解这句话的语法。</string>
     <string name="ai_problem_captions_title">无法加载字幕</string>
     <string name="ai_problem_retry">重试</string>
     <string name="ai_problem_ask">问问 AI</string>

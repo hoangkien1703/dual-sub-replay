@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -146,16 +147,23 @@ internal fun AiComposer(
                 maxLines = 5,
                 shape = RoundedCornerShape(20.dp),
             )
-            IconButton(
-                onClick = {
-                    onSend(text.ifBlank { defaultQuestion }, drafts)
-                    text = ""
-                    notice = null
-                },
-                enabled = !aiState.sending && (text.isNotBlank() || drafts.isNotEmpty()),
-                modifier = Modifier.testTag("ai_send_button"),
-            ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.ai_send))
+            if (aiState.sending) {
+                // While the question waits for its answer, Send becomes Stop.
+                IconButton(onClick = controller::stop, modifier = Modifier.testTag("ai_stop_button")) {
+                    Icon(Icons.Default.Stop, contentDescription = stringResource(R.string.ai_stop))
+                }
+            } else {
+                IconButton(
+                    onClick = {
+                        onSend(text.ifBlank { defaultQuestion }, drafts)
+                        text = ""
+                        notice = null
+                    },
+                    enabled = text.isNotBlank() || drafts.isNotEmpty(),
+                    modifier = Modifier.testTag("ai_send_button"),
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.ai_send))
+                }
             }
         }
         AiChatOptionsBar(aiState, controller) {

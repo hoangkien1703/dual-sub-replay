@@ -14,6 +14,8 @@
     <string name="ai_send">Enviar</string>
     <string name="ai_thinking">Pensando…</string>
     <string name="ai_retry">Tentar de novo</string>
+    <string name="ai_stop">Parar a resposta</string>
+    <string name="ai_stopped">Você parou esta resposta.</string>
     <string name="ai_message_about">Sobre: %1$s</string>
     <string name="ai_welcome_title">Como posso ajudar?</string>
     <string name="ai_welcome_message">Pergunte sobre uma configuração, uma palavra, uma frase ou um problema no app.</string>
@@ -30,6 +32,8 @@
     <string name="ai_chip_features">O que este app faz?</string>
     <string name="ai_chip_bigger_subtitles">Como deixo as legendas maiores?</string>
     <string name="ai_chip_explain_line">Explique a linha atual</string>
+    <string name="ai_explain_grammar_button">Explicar a gramática com IA</string>
+    <string name="ai_explain_grammar_question">Explique a gramática desta frase passo a passo.</string>
     <string name="ai_problem_captions_title">Não foi possível carregar as legendas</string>
     <string name="ai_problem_retry">Tentar de novo</string>
     <string name="ai_problem_ask">Perguntar à IA</string>

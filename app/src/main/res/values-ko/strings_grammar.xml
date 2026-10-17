@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">A입니다 (정중한 단정, 문장을 정중하게 함)</string>
     <string name="grammar_copula">A이다 (반말 단정)</string>
     <string name="grammar_na_adjective">な형용사 A를 뒤의 명사와 이어 줌</string>
+    <string name="grammar_counter">조수사: 몇 개, 몇 번째 (３人 = 세 명, ２時 = 두 시)</string>
 </resources>
