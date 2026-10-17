@@ -172,6 +172,8 @@ OpenNLP model itself, because OpenNLP's loader asks Android's XML parser for a f
   modal or after "to" (it may rain, going to rain). After a modal, and after "to" that follows
   going, ought, used, want, need, have, got or try, such a word becomes a verb (not after "be
   used to" or "going to school"). A subject pronoun before 'd (I'd) is a pronoun.
+  Word colors use the fixed tags too: the first CI run's `LearnerDataDeviceTest` showed "rain" in
+  "It's going to rain" colored as a noun because colors still read the model's raw tag.
 - **Chinese splits.** jieba's list keeps some phrases whole that hide grammar. 在家, 我会, 往前,
   往后, a verb with 过 or 着 (看过, 坐着) and 太 or 很 with a one-character adjective (太贵) are
   split. A few tags are corrected (等 v, 回家 v, 别 d, 朝 p, 毕业 v and others in

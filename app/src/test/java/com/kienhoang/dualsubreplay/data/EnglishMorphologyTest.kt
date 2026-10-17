@@ -46,6 +46,9 @@ class EnglishMorphologyTest {
         assertEquals("VERB", goingTo.first { it.surface == "rain" }.pos)
         // Going to a place is not the future.
         assertEquals("NOUN", morphemes("I'm going to school.").first { it.surface == "school" }.pos)
+        // Word colors use the same fix.
+        assertEquals(PartOfSpeech.VERB, englishWords(tagger, "It's going to rain.").first { it.text == "rain" }.partOfSpeech)
+        assertEquals(PartOfSpeech.VERB, englishWords(tagger, "It may rain tomorrow.").first { it.text == "rain" }.partOfSpeech)
     }
 
     @Test

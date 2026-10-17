@@ -46,6 +46,7 @@ internal fun tagEnglish(
     }
 }
 
+/** Words colored by their first piece's tag, so a verb after a helper or "going to" shows as a verb. */
 internal fun englishWords(
     tagger: EnglishPosTagger,
     text: String,
@@ -60,7 +61,7 @@ internal fun englishWords(
             text = token.text,
             startIndex = token.start,
             endIndex = token.start + token.text.length,
-            partOfSpeech = englishPartOfSpeech(token.tag.substringBefore('+'), lower),
+            partOfSpeech = englishPartOfSpeech(head?.pos ?: token.tag.substringBefore('+'), lower),
             baseForm = head?.baseForm?.takeIf { parts.size == 1 && it != lower && it != "*" },
         )
     }
