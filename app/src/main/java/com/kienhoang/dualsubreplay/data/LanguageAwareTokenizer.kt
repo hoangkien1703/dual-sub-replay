@@ -180,24 +180,33 @@ object LanguageAwareTokenizer {
         val isJapaneseOrCjk = (languageCode != null && (languageCode.startsWith("ja") || languageCode.startsWith("zh")))
             || isCjk(text)
 
-        return if (isJapaneseOrCjk) {
-            tokenizeCjk(text, languageCode)
-        } else {
-            tokenizeSpacedLanguage(text)
+        return when {
+            isJapaneseOrCjk -> tokenizeCjk(text, languageCode)
+            isEnglishCode(languageCode) -> EnglishMorphology.analyze(text) ?: tokenizeSpacedLanguage(text)
+            else -> tokenizeSpacedLanguage(text)
         }
     }
 
     /**
-     * Japanese goes through the morphological analyzer once it has loaded, so a tap selects the
-     * whole word with its endings. Chinese, and Japanese while the analyzer loads, use the
-     * script-boundary heuristic below.
+     * Japanese and Chinese go through their analyzers once loaded, so a tap selects the whole word
+     * (with its endings, or its pinyin). While an analyzer loads, the script-boundary heuristic
+     * below splits the line.
      */
     private fun tokenizeCjk(
         text: String,
         languageCode: String?,
     ): List<AnalyzedToken> =
-        (if (isJapanese(text, languageCode)) JapaneseMorphology.analyze(text) else null)
-            ?: tokenizeJapanese(text)
+        when {
+            isJapanese(text, languageCode) -> JapaneseMorphology.analyze(text)
+            isChineseCode(languageCode) -> ChineseMorphology.analyze(text)
+            else -> null
+        } ?: tokenizeJapanese(text)
+
+    private fun isEnglishCode(languageCode: String?): Boolean =
+        languageCode?.lowercase(Locale.ROOT)?.let { it == "en" || it.startsWith("en-") || it.startsWith("en_") } == true
+
+    private fun isChineseCode(languageCode: String?): Boolean =
+        languageCode?.lowercase(Locale.ROOT)?.let { it == "zh" || it.startsWith("zh-") || it.startsWith("zh_") } == true
 
     /** Japanese by its language code, or by kana in text whose language is unknown or not Chinese. */
     internal fun isJapanese(

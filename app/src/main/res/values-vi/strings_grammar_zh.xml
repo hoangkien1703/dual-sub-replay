@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ngữ pháp tiếng Trung cho người học tiếng Trung. Giữ nguyên các từ và ví dụ tiếng Trung. -->
+    <string name="grammar_zh_budebu">不得不: không còn cách nào khác, đành phải</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…: không những… mà còn…</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…: bất kể…, (đều)…</string>
+    <string name="grammar_zh_buru">A 不如 B: A không bằng B; tốt hơn là nên…</string>
+    <string name="grammar_zh_buyong">不用: không cần phải</string>
+    <string name="grammar_zh_bie">别 / 不要 + động từ: đừng (làm)</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过: nhưng, tuy nhiên</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…: tuy…, nhưng (vẫn)…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…: vì… (nên)…: nêu lý do, rồi đến kết quả</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…: nếu…, thì…</string>
+    <string name="grammar_zh_zhiyao">只要…就…: chỉ cần…, (thì)…</string>
+    <string name="grammar_zh_zhiyou">只有…才…: chỉ khi…, (thì mới)…</string>
+    <string name="grammar_zh_jiran">既然…就…: đã… (vì sự thật là vậy), thì…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…: cho dù…, cũng (vẫn)…</string>
+    <string name="grammar_zh_lian">连…都 / 也…: ngay cả…</string>
+    <string name="grammar_zh_chule">除了…(以外): trừ…; ngoài… ra</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说: đối với (ai đó), theo góc nhìn của họ</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B: không phải A, mà là B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来: trông có vẻ, nghe có vẻ, dường như</string>
+    <string name="grammar_zh_youdianr">有点儿 + tính từ: hơi (thường là điều không mong muốn)</string>
+    <string name="grammar_zh_yidianr">一点儿: một chút (tính từ + 一点儿 = … hơn một chút)</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + tính từ: ngày càng…</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B: càng A càng B</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B: vừa A vừa B (cùng một lúc)</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了: sắp xảy ra, rất gần rồi</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + động từ: đang làm ngay lúc này (đang diễn ra)</string>
+    <string name="grammar_zh_yixia">Động từ + 一下: làm một chút (xem qua, đợi một lát)</string>
+    <string name="grammar_zh_direction">Động từ + 来 / 去 (…): hướng của hành động (来 về phía người nói, 去 ra xa)</string>
+    <string name="grammar_zh_potential">Động từ + 得 / 不 + kết quả: có thể / không thể (听不懂 = nghe không hiểu)</string>
+    <string name="grammar_zh_result">Động từ + kết quả: cho biết hành động kết thúc ra sao (做完 = làm xong, 听懂 = nghe hiểu, 找到 = tìm thấy)</string>
+    <string name="grammar_zh_rang">让 / 叫 + ai đó + động từ: để hoặc bắt ai đó làm gì</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B: lấy A làm B (trang trọng)</string>
+    <string name="grammar_zh_ma">吗: biến câu thành câu hỏi có/không</string>
+    <string name="grammar_zh_ne">呢: còn… thì sao?; làm câu hỏi nhẹ nhàng hơn; hoặc hành động vẫn đang diễn ra</string>
+    <string name="grammar_zh_shi">是: là (nối hai danh từ: 我是学生)</string>
+    <string name="grammar_zh_you">有: có (sở hữu); có (tồn tại ở đâu đó)</string>
+    <string name="grammar_zh_zai">在: ở, tại (một nơi); hoặc đang ở một nơi</string>
+    <string name="grammar_zh_hen">很: rất (thường chỉ để nối chủ ngữ với tính từ)</string>
+    <string name="grammar_zh_tai">太 (…了): quá…; hoặc thật là… (了 thêm cảm xúc)</string>
+    <string name="grammar_zh_dou">都: đều, tất cả (đứng trước động từ)</string>
+    <string name="grammar_zh_ye">也: cũng (đứng trước động từ)</string>
+    <string name="grammar_zh_he">和: và (nối danh từ, không nối câu); với</string>
+    <string name="grammar_zh_question_word">Từ để hỏi: cái gì, ai, ở đâu, thế nào, bao nhiêu, tại sao (đứng ở chỗ của câu trả lời)</string>
+    <string name="grammar_zh_de_shihou">…的时候: khi…, lúc…</string>
+    <string name="grammar_zh_location">Từ chỉ vị trí đứng sau danh từ: 桌子上 = trên bàn, 房间里 = trong phòng</string>
+    <string name="grammar_zh_qing">请 + động từ: xin mời, vui lòng (làm)</string>
+    <string name="grammar_zh_hui">会: biết (kỹ năng học được); có lẽ sẽ</string>
+    <string name="grammar_zh_neng">能: có thể (có khả năng, hoặc được phép)</string>
+    <string name="grammar_zh_xiang">想 + động từ: muốn, mong muốn</string>
+    <string name="grammar_zh_de">的: nối từ miêu tả hoặc người sở hữu với danh từ (我的书 = sách của tôi)</string>
+    <string name="grammar_zh_le_completed">Động từ + 了: hành động đã hoàn thành</string>
+    <string name="grammar_zh_guo">Động từ + 过: đã từng làm (kinh nghiệm)</string>
+    <string name="grammar_zh_zhe">Động từ + 着: trạng thái kéo dài hoặc hành động đang diễn ra (穿着 = đang mặc)</string>
+    <string name="grammar_zh_de_degree">Động từ + 得 + miêu tả: làm như thế nào, giỏi ra sao (跑得很快)</string>
+    <string name="grammar_zh_bi">A 比 B + tính từ: A … hơn B</string>
+    <string name="grammar_zh_zui">最: nhất</string>
+    <string name="grammar_zh_jiu">就: thì; ngay; chính là; chỉ (nhấn mạnh là sớm hoặc dễ)</string>
+    <string name="grammar_zh_yijing">已经 (…了): đã… rồi</string>
+    <string name="grammar_zh_gei">给: cho; cho, đến (给他打电话 = gọi điện cho anh ấy)</string>
+    <string name="grammar_zh_dui">对: với, đối với, về (对…感兴趣); hoặc đúng</string>
+    <string name="grammar_zh_cong">从: từ (một nơi hoặc một thời điểm); 从…到…: từ… đến…</string>
+    <string name="grammar_zh_li">离: khoảng cách từ (A 离 B 很远 = A cách B rất xa)</string>
+    <string name="grammar_zh_wang">往: về phía (một hướng)</string>
+    <string name="grammar_zh_yiqi">一起: cùng nhau (跟…一起 = cùng với)</string>
+    <string name="grammar_zh_hai">还: vẫn; còn; còn… hơn (还有 = còn có)</string>
+    <string name="grammar_zh_zai_again">再: lại (trong tương lai); rồi (先…再…)</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺: rất, thật (tính từ mạnh đến mức nào)</string>
+    <string name="grammar_zh_keyi">可以: được, có thể (cho phép hoặc khả năng)</string>
+    <string name="grammar_zh_yao">要: muốn; cần phải; sẽ (sắp)</string>
+    <string name="grammar_zh_ba_particle">吧: lời gợi ý (…nhé, …đi) hoặc hỏi lại cho chắc (…phải không?)</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是: mức độ thường xuyên (thường, hay, luôn luôn)</string>
+    <string name="grammar_zh_before_after">…以前 / …以后: trước khi… / sau khi… (đứng sau sự việc)</string>
+    <string name="grammar_zh_ordinal">第 + số: số thứ tự (第一 = thứ nhất)</string>
+    <string name="grammar_zh_mei_every">每 (+ lượng từ): mỗi (thường đi với 都)</string>
+    <string name="grammar_zh_le_change">了 ở cuối câu: có điều đã thay đổi hoặc giờ đã khác</string>
+    <string name="grammar_zh_v_not_v">Động từ 不 động từ: câu hỏi có/không (去不去 = có đi không?)</string>
+    <string name="grammar_zh_reduplication">Lặp động từ (看看, 试一试): làm một chút, thử xem</string>
+    <string name="grammar_zh_ba">把 + tân ngữ + động từ + kết quả: tác động lên tân ngữ (tân ngữ đứng trước động từ)</string>
+    <string name="grammar_zh_bei">被: bị động, chủ ngữ chịu tác động của hành động (thường là điều không mong muốn)</string>
+    <string name="grammar_zh_de_adverbial">Từ miêu tả + 地 + động từ: hành động được làm như thế nào (慢慢地走)</string>
+    <string name="grammar_zh_geng">更: càng… hơn, hơn nữa</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…): trước tiên (…, rồi…)</string>
+    <string name="grammar_zh_ranhou">然后: sau đó, rồi</string>
+    <string name="grammar_zh_haishi">还是: hay (trong câu hỏi); vẫn; tốt hơn là</string>
+    <string name="grammar_zh_huozhe">或者: hoặc (trong câu trần thuật)</string>
+    <string name="grammar_zh_cai">才: mới, phải đến… mới (muộn hơn hoặc khó hơn dự kiến)</string>
+    <string name="grammar_zh_you_again">又: lại (đã xảy ra thêm lần nữa); 又 A 又 B: vừa A vừa B</string>
+    <string name="grammar_zh_bijiao">比较: khá, tương đối; so sánh</string>
+    <string name="grammar_zh_zhi">只: chỉ (đứng trước động từ)</string>
+    <string name="grammar_zh_yiding">一定: chắc chắn, nhất định; phải</string>
+    <string name="grammar_zh_zhongyu">终于: cuối cùng (sau khi chờ đợi hoặc cố gắng)</string>
+    <string name="grammar_zh_mashang">马上: ngay lập tức, ngay bây giờ</string>
+    <string name="grammar_zh_yizhi">一直: suốt, liên tục; đi thẳng</string>
+    <string name="grammar_zh_qishi">其实: thật ra, thực tế là</string>
+    <string name="grammar_zh_gang">刚 / 刚刚: vừa mới; 刚才: lúc nãy</string>
+    <string name="grammar_zh_yinggai">应该: nên, cần phải</string>
+    <string name="grammar_zh_bixu">必须: bắt buộc phải</string>
+    <string name="grammar_zh_xuyao">需要: cần (phải)</string>
+    <string name="grammar_zh_yuanyi">愿意: sẵn lòng, bằng lòng</string>
+    <string name="grammar_zh_weile">为了: để; vì (ai, điều gì)</string>
+    <string name="grammar_zh_guanyu">关于: về, liên quan đến</string>
+    <string name="grammar_zh_gen">跟: với, và (跟…一起 = cùng với)</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样: A giống B</string>
+    <string name="grammar_zh_haoxiang">好像: hình như, như thể</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ tính từ): … như thế này / … như thế kia</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦: thêm cảm xúc (ngạc nhiên, phấn khích, giọng mềm hơn)</string>
+    <string name="grammar_zh_shi_de">是…的: nhấn mạnh việc gì đó đã xảy ra khi nào, ở đâu hoặc bằng cách nào</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B: hễ A là (liền) B</string>
+    <string name="grammar_zh_yushi">于是: thế là, rồi (chuyện xảy ra tiếp theo)</string>
+    <string name="grammar_zh_duome">多么 + tính từ!: … biết bao! (cảm xúc mạnh)</string>
+    <string name="grammar_zh_yuanlai">原来: vốn dĩ, ban đầu; hóa ra (vừa mới nhận ra)</string>
+    <string name="grammar_zh_daodi">到底: rốt cuộc (trong câu hỏi); suy cho cùng</string>
+    <string name="grammar_zh_shenzhi">甚至: thậm chí (vượt hơn dự đoán)</string>
+    <string name="grammar_zh_fouze">否则 / 不然: nếu không thì</string>
+    <string name="grammar_zh_jingran">竟然 / 居然: không ngờ, thế mà (khiến bạn ngạc nhiên)</string>
+    <string name="grammar_zh_nandao">难道…?: chẳng lẽ…? (câu hỏi mong câu trả lời là không)</string>
+    <string name="grammar_zh_jinguan">尽管: mặc dù; cứ việc</string>
+    <string name="grammar_zh_suizhe">随着: cùng với, theo (khi điều gì đó thay đổi)</string>
+    <string name="grammar_zh_fanzheng">反正: dù sao, đằng nào cũng</string>
+    <string name="grammar_zh_bijing">毕竟: suy cho cùng, dù sao thì</string>
+    <string name="grammar_zh_weibi">未必: chưa chắc</string>
+    <string name="grammar_zh_jianzhi">简直: quả thực, đúng là (cảm xúc mạnh)</string>
+    <string name="grammar_zh_wanyi">万一: lỡ như, nhỡ (điều không hay)</string>
+    <string name="grammar_zh_zongzhi">总之: tóm lại, nói chung</string>
+    <string name="grammar_zh_zhiyu">至于: còn về…</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B: thay vì A, chi bằng B</string>
+    <string name="grammar_zh_ningke">宁可: thà (dù phải trả giá)</string>
+    <string name="grammar_zh_hebi">何必…?: hà tất phải…? (không cần thiết)</string>
+    <string name="grammar_zh_yimian">以免: để tránh</string>
+    <string name="grammar_zh_yibian_so">以便: để, để dễ (làm gì)</string>
+    <string name="grammar_zh_conger">从而: từ đó, qua đó</string>
+    <string name="grammar_zh_guran">固然: đúng là, công nhận là… (nhưng)</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况: hơn nữa, vả lại; huống hồ</string>
+    <string name="grammar_zh_measure">Lượng từ: số đếm hoặc này / kia + lượng từ + danh từ (一本书, 这个人)</string>
+    <string name="grammar_zh_bu">不: không (hiện tại, tương lai, thói quen, và với tính từ)</string>
+    <string name="grammar_zh_mei">没 / 没有: đã không, chưa (hành động trong quá khứ); 没有 + danh từ: không có</string>
+    <string name="grammar_zh_men">们: biến từ chỉ người thành số nhiều (朋友们 = các bạn)</string>
+    <string name="grammar_zh_yong">用 + đồ vật + động từ: làm việc gì bằng hoặc dùng đồ vật đó</string>
+    <string name="grammar_zh_wei_for">为 + ai đó: vì ai đó, thay cho ai đó (为你高兴 = mừng cho bạn)</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝: về phía, hướng về (向我走来 = đi về phía tôi)</string>
+    <string name="grammar_zh_yiwei_thought">以为: tưởng là (thường là nghĩ sai), cứ ngỡ</string>
+    <string name="grammar_zh_er">而: và, nhưng, còn (nối hai ý, trang trọng hơn)</string>
+    <string name="grammar_zh_bing">并: và còn; 并不 / 并没有: hoàn toàn không, thật ra không</string>
+    <string name="grammar_zh_you_by">由: do (ai làm); từ (由我负责 = tôi phụ trách)</string>
+    <string name="grammar_zh_suo">所 + động từ: những gì… (trang trọng; 我所知道的 = những gì tôi biết)</string>
+    <string name="grammar_zh_zhishi">只是: chỉ, chỉ là; nhưng (nhẹ nhàng hơn 但是)</string>
+    <string name="grammar_zh_youyu">由于: do, bởi vì (trang trọng)</string>
+    <string name="grammar_zh_genju">根据: theo, căn cứ vào; 通过: thông qua, bằng cách; 按照: theo (quy định)</string>
+    <string name="grammar_zh_yu_at">于: ở, tại, vào, từ (văn viết trang trọng)</string>
+    <string name="grammar_zh_yi_by">以: bằng, dùng, với tư cách (trang trọng)</string>
+    <string name="grammar_zh_zhi_of">之: dạng trang trọng của 的 (三分之一 = một phần ba; …之一 = một trong những…)</string>
+</resources>

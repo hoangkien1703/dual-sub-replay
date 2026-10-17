@@ -5,9 +5,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class LanguageAwareTokenizerTest {
+    @Before
+    fun loadEnglishAndChinese() {
+        // The app tags English and splits Chinese once their bundled data loads; test that, not the stand-in.
+        assertTrue(EnglishMorphology.awaitReady())
+        assertTrue(ChineseMorphology.awaitReady())
+    }
 
     @Test
     fun segmentsJapaneseTextIntoMorphemes() {

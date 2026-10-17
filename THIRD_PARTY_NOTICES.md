@@ -21,7 +21,12 @@ Current releases bundle only:
 - Kotlin / Coroutines: Apache-2.0.
 - Kuromoji 0.9.0 (`com.atilika.kuromoji:kuromoji-ipadic`, code only): Apache-2.0, copyright 2010-2015 Atilika Inc. and contributors. Its license and notice files are kept in the APK under `META-INF/`.
 
-The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries above with the Apache-2.0 text, and the ML Kit translation terms.
+- English and Chinese learner data (data files only, no library code), copied at build time from Maven Central into the APK's `assets/learner-data/`:
+  - Apache OpenNLP's English part-of-speech model `opennlp-en-ud-ewt-pos-1.3-2.5.4.bin` (`org.apache.opennlp:opennlp-models-pos-en:1.3.0`): Apache-2.0, copyright 2025 The Apache Software Foundation. It was trained on the [Universal Dependencies English Web Treebank](https://github.com/UniversalDependencies/UD_English-EWT); the Apache OpenNLP project releases the model under Apache-2.0.
+  - jieba's Chinese word list (`dict.txt` in `com.huaban:jieba-analysis:1.0.2`, an Apache-2.0 jar): MIT, copyright (c) 2013 Sun Junyi. The app keeps the words seen at least 4 times, sorted.
+  - HanLP's pinyin and traditional-to-simplified tables (`pinyin.txt`, `t2s.txt` in `com.hankcs:hanlp:portable-1.8.6`): Apache-2.0, copyright hankcs.
+
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text and jieba's MIT notice, and the ML Kit translation terms.
 
 ## Japanese dictionary (downloaded on first use)
 

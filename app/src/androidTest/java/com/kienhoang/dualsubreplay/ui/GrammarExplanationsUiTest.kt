@@ -4,11 +4,14 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.kienhoang.dualsubreplay.data.CefrLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
+import com.kienhoang.dualsubreplay.data.HskLevel
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Rule
 import org.junit.Test
@@ -42,6 +45,30 @@ class GrammarExplanationsUiTest {
         compose.onNodeWithText("At A; on A (a point in time)").assertIsDisplayed()
         compose.onAllNodesWithTag("grammar_alternate").assertCountEquals(2)
         compose.onNodeWithText("Hide other meanings").assertIsDisplayed()
+    }
+
+    @Test
+    fun showsHskAndCefrLevels() {
+        compose.setContent {
+            DualSubTheme {
+                GrammarPointList(
+                    listOf(
+                        GrammarMatch("V + 了 le", 4, 5, listOf(GrammarMeaning.ZH_LE_COMPLETED), HskLevel.HSK1),
+                        GrammarMatch("be going to + verb", 5, 16, listOf(GrammarMeaning.EN_GOING_TO), CefrLevel.A2),
+                        GrammarMatch("虽然…但是 suīrán…dànshì", 0, 9, listOf(GrammarMeaning.ZH_SUIRAN), HskLevel.HSK2),
+                    ),
+                )
+            }
+        }
+
+        compose.onNodeWithText("Verb + 了: the action is completed").assertIsDisplayed()
+        compose.onNodeWithContentDescription("HSK level 1").assertIsDisplayed()
+        // The label only repeated the form, so it is dropped; a long form sits above its text.
+        compose.onNodeWithText("A plan, or something you can see is coming (gonna in speech)").assertIsDisplayed()
+        compose.onNodeWithContentDescription("CEFR level A2").assertIsDisplayed()
+        compose.onNodeWithText("虽然…但是 / 可是…: although…, (still)…").assertIsDisplayed()
+        compose.onNodeWithContentDescription("HSK level 2").assertIsDisplayed()
+        saveUiEvidence("grammar-hsk-and-cefr")
     }
 
     @Test

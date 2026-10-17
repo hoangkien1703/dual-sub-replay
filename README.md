@@ -55,11 +55,11 @@ Free · Android 8.0 or newer · See [How to install](#how-to-install) if you nee
 
 ## Why DualSub Replay?
 
-DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, explains words and Japanese grammar, and saves words for spaced-repetition practice. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
+DualSub Replay is a free, open-source **dual subtitles app for YouTube on Android**. It shows bilingual captions (the original and a translation into any of 59 languages), replays a sentence with one tap, explains words and Japanese, English and Chinese grammar, and saves words for spaced-repetition practice. [Website](https://hoangkien1703.github.io/dual-sub-replay/) · [Tiếng Việt](https://hoangkien1703.github.io/dual-sub-replay/vi/)
 
 - **See every meaning.** The original caption and its translation stay together while you watch.
 - **Repeat without scrubbing.** Tap a subtitle line and the video jumps back to that exact moment.
-- **Learn the words you hear.** Tap a word for its meaning, part of speech, pronunciation and, for Japanese, the grammar around it.
+- **Learn the words you hear.** Tap a word for its meaning, part of speech, pronunciation and, for Japanese, English and Chinese, the grammar around it.
 - **Remember them.** Save words with their original sentence and review them with spaced repetition.
 - **Stay private.** There is no account, no tracking, and no ads. Translation uses Google Translate by default, or turn it off and your phone translates on its own.
 
@@ -84,7 +84,8 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 
 - Tap a word in either subtitle line; tap another word in the same line to select the whole phrase. A small bar shows the translation right away, with **Copy**, **Translate** and **Pronounce**.
 - **Translate** opens a card with the meaning, each word's part of speech, and **Save to vocabulary**.
-- For Japanese, the card also explains the grammar of the selection and the particle right after it (for example に or 〜てくれました).
+- For Japanese, the card also explains the grammar of the selection and the particle right after it (for example に or 〜てくれました), with its JLPT level.
+- For English and Chinese, words are colored by their part of speech in the sentence, Chinese lines are split into words with pinyin (银行 yínháng), and the card explains grammar points with their CEFR level (be going to, A2) or HSK level (了, 把). The data is in the app, so it works offline from the first video.
 - **Pronounce** uses the voices installed on your phone, preferring offline voices.
 
 ### Practice saved words
