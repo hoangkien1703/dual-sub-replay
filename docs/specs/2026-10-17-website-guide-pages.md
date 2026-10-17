@@ -83,8 +83,8 @@ entry on the home pages, four new guide pages, and a "Guides" footer line.
 ## Release intent
 
 The PR changes `pages.yml` and `tools/tests/test_site.py`, so the standing
-`release:skip` rule for docs-only PRs does not apply on its own. No app code changes;
-the release label is the owner's call (patch by default, `release:skip` suggested).
+`release:skip` rule for docs-only PRs does not apply on its own. No app code changes,
+and the owner chose `release:skip` in the project thread on 2026-10-17.
 
 ## Implementation result
 
