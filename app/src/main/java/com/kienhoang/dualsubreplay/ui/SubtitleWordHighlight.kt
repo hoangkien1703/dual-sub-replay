@@ -10,6 +10,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.ChineseMorphology
+import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
@@ -150,11 +152,15 @@ internal fun annotatedSubtitleText(
 }
 
 /**
- * Changes once the Japanese analyzer finishes loading in the background. Use it as a `remember`
- * key wherever subtitle text is tokenized, so lines shown before it loaded are split again.
+ * Changes once the Japanese, English or Chinese analyzer finishes loading in the background. Use
+ * it as a `remember` key wherever subtitle text is tokenized, so lines shown before it loaded are
+ * split again. Each revision only grows, so their sum changes whenever one does.
  */
 @Composable
-internal fun tokenizerRevision(): Int = JapaneseMorphology.revision.collectAsState().value
+internal fun tokenizerRevision(): Int =
+    JapaneseMorphology.revision.collectAsState().value +
+        EnglishMorphology.revision.collectAsState().value +
+        ChineseMorphology.revision.collectAsState().value
 
 /** Expensive language analysis is independent of the changing spoken-word index. */
 @Composable

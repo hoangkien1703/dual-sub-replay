@@ -5,6 +5,10 @@
     <string name="grammar_hide_alternates">ほかの意味を隠す</string>
     <string name="grammar_jlpt_level">N%1$d</string>
     <string name="grammar_jlpt_level_description">JLPT N%1$dレベル</string>
+    <string name="grammar_hsk_level">HSK %1$d</string>
+    <string name="grammar_hsk_level_description">HSK %1$d級</string>
+    <string name="grammar_cefr_level">%1$s</string>
+    <string name="grammar_cefr_level_description">CEFR %1$sレベル</string>
     <string name="grammar_topic">Aについて言えば（Aが話題であることを示す）</string>
     <string name="grammar_contrast">対比：少なくともAは（ほかとは違って）</string>
     <string name="grammar_subject">Aが主語であることを示す（だれ・何がするか）</string>

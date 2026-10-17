@@ -36,18 +36,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiPendingQuestion
 import com.kienhoang.dualsubreplay.assistant.aiGrammarContext
+import com.kienhoang.dualsubreplay.data.CefrLevel
+import com.kienhoang.dualsubreplay.data.GrammarLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
-import com.kienhoang.dualsubreplay.data.JapaneseMorphology
+import com.kienhoang.dualsubreplay.data.HskLevel
 import com.kienhoang.dualsubreplay.data.JlptLevel
-import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.grammarForSelection
-import com.kienhoang.dualsubreplay.data.japaneseGrammar
+import com.kienhoang.dualsubreplay.data.grammarLanguage
+import com.kienhoang.dualsubreplay.data.grammarMatches
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
-/** How each grammar meaning reads to the learner: the rule points here, the catalogue in [GRAMMAR_POINT_TEXT]. */
-internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy { GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT }
+/**
+ * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
+ * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`.
+ */
+internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT
+}
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
     mapOf(
@@ -158,8 +165,9 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese selection, read from its whole subtitle line, and the button that asks
- * the assistant about the whole line ([onAskedAi] then closes the card); nothing for other languages.
+ * The grammar of a Japanese, English or Chinese selection, read from its whole subtitle line, and
+ * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
+ * nothing for other languages.
  */
 @Composable
 internal fun GrammarExplanations(
@@ -168,9 +176,9 @@ internal fun GrammarExplanations(
 ) {
     val segment = selection.segment
     val line = (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
-    if (!LanguageAwareTokenizer.isJapanese(line, selection.wordLanguage)) return
+    val language = grammarLanguage(line, selection.wordLanguage) ?: return
     val revision = tokenizerRevision()
-    val lineMatches = remember(line, revision) { JapaneseMorphology.morphemes(line)?.let(::japaneseGrammar).orEmpty() }
+    val lineMatches = remember(line, language, revision) { grammarMatches(line, language).orEmpty() }
     val matches =
         remember(lineMatches, selection.token) {
             val range = selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
@@ -202,7 +210,7 @@ private fun AiGrammarButton(
                     otherLine = if (selection.translated) segment?.originalText else segment?.translatedText,
                     otherLanguage = TranslationLanguages.displayName(selection.meaningLanguage),
                     selected = selection.token.text,
-                    foundPoints = found.map { "${it.form} (N${it.level.number})" },
+                    foundPoints = found.map { "${it.form} (${it.level.code})" },
                 )
             host.controller.askFromApp(AiPendingQuestion(question, context, line))
             onAsked()
@@ -225,17 +233,28 @@ internal fun GrammarPointList(matches: List<GrammarMatch>) {
     }
 }
 
-/** A small "N3" label, so learners see how advanced each point is. */
+/** A small "N3", "HSK 2" or "B1" label, so learners see how advanced each point is. */
 @Composable
-private fun JlptBadge(level: JlptLevel) {
-    val description = stringResource(R.string.grammar_jlpt_level_description, level.number)
+private fun LevelBadge(level: GrammarLevel) {
+    val label =
+        when (level) {
+            is JlptLevel -> stringResource(R.string.grammar_jlpt_level, level.number)
+            is HskLevel -> stringResource(R.string.grammar_hsk_level, level.number)
+            is CefrLevel -> stringResource(R.string.grammar_cefr_level, level.name)
+        }
+    val description =
+        when (level) {
+            is JlptLevel -> stringResource(R.string.grammar_jlpt_level_description, level.number)
+            is HskLevel -> stringResource(R.string.grammar_hsk_level_description, level.number)
+            is CefrLevel -> stringResource(R.string.grammar_cefr_level_description, level.name)
+        }
     Surface(
         modifier = Modifier.padding(top = 2.dp).testTag("grammar_level").semantics { contentDescription = description },
         shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
         Text(
-            stringResource(R.string.grammar_jlpt_level, level.number),
+            label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp).clearAndSetSemantics { },
@@ -255,7 +274,7 @@ private fun GrammarPointCard(match: GrammarMatch) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(match.form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    JlptBadge(match.level)
+                    LevelBadge(match.level)
                 }
                 Text(stringResource(meaningText(match.meanings.first())), modifier = Modifier.weight(1f))
             }

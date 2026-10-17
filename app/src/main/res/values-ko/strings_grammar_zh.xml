@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 중국어를 배우는 사람을 위한 중국어 문법 항목. 중국어 단어와 예문은 그대로 둔다. -->
+    <string name="grammar_zh_budebu">不得不: 어쩔 수 없이 ~해야 한다</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…: ~뿐만 아니라 …도</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…: ~에 상관없이 (언제나)…</string>
+    <string name="grammar_zh_buru">A 不如 B: A는 B만 못하다; …하는 편이 낫다</string>
+    <string name="grammar_zh_buyong">不用: ~할 필요 없다</string>
+    <string name="grammar_zh_bie">别 / 不要 + 동사: ~하지 마</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过: 하지만, 그러나</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…: 비록 ~지만, (그래도)…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…: ~ 때문에 (그래서)…: 이유를 먼저, 그다음 결과</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…: 만약 ~라면, …</string>
+    <string name="grammar_zh_zhiyao">只要…就…: ~하기만 하면, (곧)…</string>
+    <string name="grammar_zh_zhiyou">只有…才…: ~해야만, (비로소)…</string>
+    <string name="grammar_zh_jiran">既然…就…: 기왕 ~한 이상 (그렇다면)…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…: 설령 ~하더라도, 그래도…</string>
+    <string name="grammar_zh_lian">连…都 / 也…: ~조차, ~마저</string>
+    <string name="grammar_zh_chule">除了…(以外): ~을 제외하고; ~ 외에도</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说: (누구)에게 있어서, 그 사람의 입장에서</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B: A가 아니라 B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来: ~해 보이다, ~하게 들리다, ~인 것 같다</string>
+    <string name="grammar_zh_youdianr">有点儿 + 형용사: 좀 ~하다 (주로 원치 않는 것)</string>
+    <string name="grammar_zh_yidianr">一点儿: 조금 (형용사 + 一点儿 = 좀 더 …)</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + 형용사: 점점 더 …</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B: A할수록 B하다</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B: A하면서 동시에 B함</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了: 곧 ~하려 한다, 머지않아</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + 동사: 지금 ~하고 있는 중 (진행)</string>
+    <string name="grammar_zh_yixia">동사 + 一下: 잠깐 ~하다 (한번 보다, 잠깐 기다리다)</string>
+    <string name="grammar_zh_direction">동사 + 来 / 去 (…): 동작의 방향 (来는 말하는 사람 쪽으로, 去는 멀어지는 쪽)</string>
+    <string name="grammar_zh_potential">동사 + 得 / 不 + 결과: ~할 수 있다 / 없다 (听不懂 = 알아듣지 못하다)</string>
+    <string name="grammar_zh_result">동사 + 결과: 동작이 어떻게 끝나는지 나타냄 (做完 = 다 하다, 听懂 = 알아듣다, 找到 = 찾아내다)</string>
+    <string name="grammar_zh_rang">让 / 叫 + 사람 + 동사: 누군가에게 ~하게 하다 (허락하거나 시킴)</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B: A를 B로 삼다 (격식체)</string>
+    <string name="grammar_zh_ma">吗: 문장을 예/아니요 의문문으로 만듦</string>
+    <string name="grammar_zh_ne">呢: …는요?; 질문을 부드럽게 함; 또는 동작이 아직 계속되는 중</string>
+    <string name="grammar_zh_shi">是: ~이다 (두 명사를 연결: 我是学生)</string>
+    <string name="grammar_zh_you">有: 가지고 있다; ~이 있다</string>
+    <string name="grammar_zh_zai">在: ~에 (장소); 또는 ~에 있다</string>
+    <string name="grammar_zh_hen">很: 매우 (흔히 주어와 형용사를 이어 주는 역할만 함)</string>
+    <string name="grammar_zh_tai">太 (…了): 너무 ~하다; 또는 정말 ~하다 (了는 감정을 더함)</string>
+    <string name="grammar_zh_dou">都: 모두, 다 (동사 앞에 옴)</string>
+    <string name="grammar_zh_ye">也: ~도, 또한 (동사 앞에 옴)</string>
+    <string name="grammar_zh_he">和: ~와, 그리고 (문장이 아닌 명사를 연결); ~와 함께</string>
+    <string name="grammar_zh_question_word">의문사: 무엇, 누구, 어디, 어떻게, 몇, 왜 (답이 들어갈 자리에 옴)</string>
+    <string name="grammar_zh_de_shihou">…的时候: ~할 때, ~하던 때</string>
+    <string name="grammar_zh_location">명사 뒤의 방위사: 桌子上 = 탁자 위에, 房间里 = 방 안에</string>
+    <string name="grammar_zh_qing">请 + 동사: ~해 주세요</string>
+    <string name="grammar_zh_hui">会: ~할 줄 안다 (배워서 익힌 능력); 아마 ~할 것이다</string>
+    <string name="grammar_zh_neng">能: ~할 수 있다 (능력이 되거나, 허락됨)</string>
+    <string name="grammar_zh_xiang">想 + 동사: ~하고 싶다</string>
+    <string name="grammar_zh_de">的: 꾸미는 말이나 소유자를 명사와 이어 줌 (我的书 = 내 책)</string>
+    <string name="grammar_zh_le_completed">동사 + 了: 동작이 완료됨</string>
+    <string name="grammar_zh_guo">동사 + 过: ~한 적이 있다 (경험)</string>
+    <string name="grammar_zh_zhe">동사 + 着: 지속되는 상태나 진행 중인 동작 (穿着 = 입고 있다)</string>
+    <string name="grammar_zh_de_degree">동사 + 得 + 묘사: 얼마나 (잘) 하는지 (跑得很快)</string>
+    <string name="grammar_zh_bi">A 比 B + 형용사: A가 B보다 더 …하다</string>
+    <string name="grammar_zh_zui">最: 가장</string>
+    <string name="grammar_zh_jiu">就: 그러면; 곧, 바로; 바로 그것; ~만 (이르거나 쉬움을 강조)</string>
+    <string name="grammar_zh_yijing">已经 (…了): 이미</string>
+    <string name="grammar_zh_gei">给: 주다; ~에게, ~을 위해 (给他打电话 = 그에게 전화하다)</string>
+    <string name="grammar_zh_dui">对: ~에게, ~을 향해, ~에 대해 (对…感兴趣); 또는 맞다</string>
+    <string name="grammar_zh_cong">从: ~부터, ~에서 (장소나 시간); 从…到…: …부터 …까지</string>
+    <string name="grammar_zh_li">离: ~로부터의 거리 (A 离 B 很远 = A는 B에서 멀다)</string>
+    <string name="grammar_zh_wang">往: ~쪽으로 (방향)</string>
+    <string name="grammar_zh_yiqi">一起: 함께 (跟…一起 = ~와 함께)</string>
+    <string name="grammar_zh_hai">还: 아직; 또; 더 (还有 = 그리고 또 있다)</string>
+    <string name="grammar_zh_zai_again">再: 다시 (앞으로); 그다음에 (先…再…)</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺: 매우, 정말 (형용사의 정도)</string>
+    <string name="grammar_zh_keyi">可以: ~해도 된다, ~할 수 있다 (허락이나 가능)</string>
+    <string name="grammar_zh_yao">要: 원하다; ~해야 한다; (곧) ~할 것이다</string>
+    <string name="grammar_zh_ba_particle">吧: 제안 (…하자) 또는 확인 (…지?)</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是: 빈도 (자주, 늘, 항상)</string>
+    <string name="grammar_zh_before_after">…以前 / …以后: ~ 전에 / ~ 후에 (사건 뒤에 옴)</string>
+    <string name="grammar_zh_ordinal">第 + 숫자: 순서 (第一 = 첫째)</string>
+    <string name="grammar_zh_mei_every">每 (+ 양사): 매, ~마다 (흔히 都와 함께)</string>
+    <string name="grammar_zh_le_change">문장 끝 了: 무언가가 바뀌었거나 이제 새로운 상황임</string>
+    <string name="grammar_zh_v_not_v">동사 不 동사: 예/아니요 의문문 (去不去 = 갈 거야, 안 갈 거야?)</string>
+    <string name="grammar_zh_reduplication">동사 중첩 (看看, 试一试): 좀 ~하다, 한번 해 보다</string>
+    <string name="grammar_zh_ba">把 + 목적어 + 동사 + 결과: 목적어에 어떤 일을 함 (목적어가 동사 앞에 옴)</string>
+    <string name="grammar_zh_bei">被: 수동, 주어가 동작을 받음 (주로 원치 않는 일)</string>
+    <string name="grammar_zh_de_adverbial">묘사 + 地 + 동사: 동작을 어떻게 하는지 (慢慢地走)</string>
+    <string name="grammar_zh_geng">更: 더욱, 훨씬 더</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…): 먼저 (…, 그다음에…)</string>
+    <string name="grammar_zh_ranhou">然后: 그런 다음, 그 후에</string>
+    <string name="grammar_zh_haishi">还是: 아니면 (의문문에서); 여전히; ~하는 편이 낫다</string>
+    <string name="grammar_zh_huozhe">或者: 또는 (평서문에서)</string>
+    <string name="grammar_zh_cai">才: 그제야, ~해서야 비로소 (예상보다 늦거나 어려움)</string>
+    <string name="grammar_zh_you_again">又: 또 (이미 다시 일어남); 又 A 又 B: A하기도 하고 B하기도 함</string>
+    <string name="grammar_zh_bijiao">比较: 비교적, 꽤; 비교하다</string>
+    <string name="grammar_zh_zhi">只: ~만, 단지 (동사 앞)</string>
+    <string name="grammar_zh_yiding">一定: 틀림없이, 반드시; 꼭 ~해야 한다</string>
+    <string name="grammar_zh_zhongyu">终于: 마침내 (기다리거나 노력한 끝에)</string>
+    <string name="grammar_zh_mashang">马上: 곧바로, 즉시</string>
+    <string name="grammar_zh_yizhi">一直: 줄곧, 계속; 곧장 앞으로</string>
+    <string name="grammar_zh_qishi">其实: 사실은, 실제로는</string>
+    <string name="grammar_zh_gang">刚 / 刚刚: 막, 방금; 刚才: 조금 전</string>
+    <string name="grammar_zh_yinggai">应该: ~해야 한다, 마땅히 ~하는 것이 옳다</string>
+    <string name="grammar_zh_bixu">必须: 반드시 ~해야 한다</string>
+    <string name="grammar_zh_xuyao">需要: ~이 필요하다, ~할 필요가 있다</string>
+    <string name="grammar_zh_yuanyi">愿意: 기꺼이 ~하다</string>
+    <string name="grammar_zh_weile">为了: ~하기 위해서; ~을 위해서</string>
+    <string name="grammar_zh_guanyu">关于: ~에 관하여, ~에 대해</string>
+    <string name="grammar_zh_gen">跟: ~와 함께, ~와 (跟…一起 = ~와 함께)</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样: A는 B와 같다</string>
+    <string name="grammar_zh_haoxiang">好像: ~인 것 같다, 마치 ~처럼</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ 형용사): 이렇게 / 그렇게 …</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦: 감정을 더함 (놀람, 들뜸, 부드러운 어조)</string>
+    <string name="grammar_zh_shi_de">是…的: 일이 언제, 어디서, 어떻게 일어났는지 강조함</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B: A하자마자 (곧) B</string>
+    <string name="grammar_zh_yushi">于是: 그래서, 그리하여 (다음에 일어난 일)</string>
+    <string name="grammar_zh_duome">多么 + 형용사!: 얼마나 …한지! (강한 감정)</string>
+    <string name="grammar_zh_yuanlai">原来: 원래; 알고 보니 (방금 깨달음)</string>
+    <string name="grammar_zh_daodi">到底: 도대체 (의문문에서); 결국</string>
+    <string name="grammar_zh_shenzhi">甚至: 심지어 (예상보다 더 나아감)</string>
+    <string name="grammar_zh_fouze">否则 / 不然: 그렇지 않으면</string>
+    <string name="grammar_zh_jingran">竟然 / 居然: 뜻밖에도, 놀랍게도</string>
+    <string name="grammar_zh_nandao">难道…?: 설마 ~란 말인가? (아니라는 답을 기대하는 질문)</string>
+    <string name="grammar_zh_jinguan">尽管: 비록 ~지만; 얼마든지 ~해도 된다</string>
+    <string name="grammar_zh_suizhe">随着: ~에 따라 (무언가가 변하면서)</string>
+    <string name="grammar_zh_fanzheng">反正: 어차피, 어쨌든</string>
+    <string name="grammar_zh_bijing">毕竟: 어디까지나, 결국 (따지고 보면)</string>
+    <string name="grammar_zh_weibi">未必: 꼭 ~인 것은 아니다</string>
+    <string name="grammar_zh_jianzhi">简直: 그야말로, 거의 (강한 감정)</string>
+    <string name="grammar_zh_wanyi">万一: 만에 하나 (나쁜 일이 생기면)</string>
+    <string name="grammar_zh_zongzhi">总之: 요컨대, 어쨌든</string>
+    <string name="grammar_zh_zhiyu">至于: …에 관해서는, …로 말하자면</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B: A하느니 차라리 B하는 게 낫다</string>
+    <string name="grammar_zh_ningke">宁可: 차라리 ~하겠다 (대가를 치르더라도)</string>
+    <string name="grammar_zh_hebi">何必…?: 굳이 ~할 필요가 있나? (필요 없음)</string>
+    <string name="grammar_zh_yimian">以免: ~하지 않도록, ~을 피하기 위해</string>
+    <string name="grammar_zh_yibian_so">以便: ~하도록, ~하기 쉽게</string>
+    <string name="grammar_zh_conger">从而: 따라서, 이로써</string>
+    <string name="grammar_zh_guran">固然: 물론 ~이긴 하다 (하지만…)</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况: 게다가; 하물며</string>
+    <string name="grammar_zh_measure">양사: 숫자나 이 / 그 + 양사 + 명사 (一本书, 这个人)</string>
+    <string name="grammar_zh_bu">不: ~하지 않다 (현재, 미래, 습관, 그리고 형용사와 함께)</string>
+    <string name="grammar_zh_mei">没 / 没有: ~하지 않았다, ~한 적 없다 (과거 동작); 没有 + 명사: ~이 없다</string>
+    <string name="grammar_zh_men">们: 사람을 나타내는 말을 복수로 만듦 (朋友们 = 친구들)</string>
+    <string name="grammar_zh_yong">用 + 사물 + 동사: ~을 사용해서 ~함</string>
+    <string name="grammar_zh_wei_for">为 + 사람: ~을 위해, ~을 대신해 (为你高兴 = 네 일이 기쁘다)</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝: ~을 향해, ~쪽으로 (向我走来 = 나를 향해 걸어옴)</string>
+    <string name="grammar_zh_yiwei_thought">以为: ~라고 생각했다 (보통 잘못 생각함), ~인 줄 알았다</string>
+    <string name="grammar_zh_er">而: 그리고, 그러나, 반면 (두 생각을 연결, 다소 격식체)</string>
+    <string name="grammar_zh_bing">并: 그리고 또; 并不 / 并没有: 결코 ~않다, 사실은 ~않다</string>
+    <string name="grammar_zh_you_by">由: ~에 의해 (하는 사람); ~부터 (由我负责 = 내가 책임진다)</string>
+    <string name="grammar_zh_suo">所 + 동사: ~하는 것 (격식체; 我所知道的 = 내가 아는 것)</string>
+    <string name="grammar_zh_zhishi">只是: 단지, 그저; 하지만 (但是보다 부드러움)</string>
+    <string name="grammar_zh_youyu">由于: ~때문에, ~로 인해 (격식체)</string>
+    <string name="grammar_zh_genju">根据: ~에 따르면; 通过: ~을 통해; 按照: ~에 따라 (규칙 등)</string>
+    <string name="grammar_zh_yu_at">于: ~에, ~에서, ~로부터 (격식 있는 문어체)</string>
+    <string name="grammar_zh_yi_by">以: ~로, ~을 가지고, ~로서 (격식체)</string>
+    <string name="grammar_zh_zhi_of">之: 격식체의 的 (三分之一 = 3분의 1; …之一 = …중 하나)</string>
+</resources>

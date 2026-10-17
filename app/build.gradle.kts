@@ -1,3 +1,6 @@
+import java.io.InputStream
+import java.util.zip.ZipFile
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
@@ -52,8 +55,80 @@ val japaneseTestDictionary by tasks.registering(JapaneseTestDictionary::class) {
     output.set(layout.buildDirectory.dir("generated/japanese-test-dictionary"))
 }
 
+// English and Chinese learner data: only these data files are packaged, none of the libraries' code.
+val learnerData by configurations.creating { isTransitive = false }
+
+abstract class LearnerLanguageData : DefaultTask() {
+    @get:InputFiles
+    abstract val artifacts: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val output: DirectoryProperty
+
+    @TaskAction
+    fun extract() {
+        // Entry in a downloaded artifact -> file the app reads from learner-data/.
+        val wanted =
+            mapOf(
+                "dict.txt" to "zh-words.txt",
+                "data/dictionary/pinyin/pinyin.txt" to "zh-pinyin.txt",
+                "data/dictionary/tc/t2s.txt" to "zh-t2s.txt",
+                "opennlp-en-ud-ewt-pos-1.3-2.5.4.bin" to "en-pos.zip",
+            )
+        val directory = output.dir("learner-data").get().asFile
+        directory.mkdirs()
+        val found = mutableSetOf<String>()
+        artifacts.files.forEach { jar ->
+            ZipFile(jar).use { zip ->
+                wanted.forEach { (entry, name) ->
+                    zip.getEntry(entry)?.let {
+                        val target = File(directory, name)
+                        zip.getInputStream(it).use { input ->
+                            if (entry == "dict.txt") writeSortedWords(input, target) else target.outputStream().use(input::copyTo)
+                        }
+                        found += entry
+                    }
+                }
+            }
+        }
+        val missing = wanted.keys - found
+        if (missing.isNotEmpty()) throw GradleException("Learner data entries not found: $missing")
+    }
+
+    /**
+     * jieba's word list sorted by word (String order), so the app reads it straight into arrays.
+     * Words seen fewer than 4 times are dropped: mostly rare names, and phrases such as 坐飞机 that
+     * would otherwise win over their own words.
+     */
+    private fun writeSortedWords(
+        input: InputStream,
+        target: File,
+    ) {
+        val lines =
+            input
+                .bufferedReader(Charsets.UTF_8)
+                .readLines()
+                .map { it.trim().split(' ') }
+                .filter { it.size >= 2 && (it[1].toIntOrNull() ?: 0) >= 4 }
+                .sortedBy { it[0] }
+        target.bufferedWriter(Charsets.UTF_8).use { out ->
+            lines.forEach { out.write(it.joinToString(" ")); out.write("\n") }
+        }
+    }
+}
+
+val learnerLanguageData by tasks.registering(LearnerLanguageData::class) {
+    artifacts.from(learnerData)
+    output.set(layout.buildDirectory.dir("generated/learner-language-data"))
+}
+
 androidComponents {
     onVariants { variant ->
+        variant.sources.assets?.addGeneratedSourceDirectory(learnerLanguageData, LearnerLanguageData::output)
+        // Unit tests read the same files from the classpath.
+        variant.hostTests.values.forEach { hostTest ->
+            hostTest.sources.resources?.addGeneratedSourceDirectory(learnerLanguageData, LearnerLanguageData::output)
+        }
         variant.deviceTests.values.forEach { deviceTest ->
             deviceTest.sources.assets?.addGeneratedSourceDirectory(japaneseTestDictionary, JapaneseTestDictionary::output)
         }
@@ -187,6 +262,11 @@ dependencies {
     // The APK keeps only its code; the dictionary files are excluded from packaging below.
     implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
     japaneseDictionary("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
+    // Data files only (see LearnerLanguageData): English part-of-speech model (Apache-2.0),
+    // jieba's Chinese word list (MIT, in an Apache-2.0 jar), HanLP's pinyin and character tables (Apache-2.0).
+    learnerData("org.apache.opennlp:opennlp-models-pos-en:1.3.0")
+    learnerData("com.huaban:jieba-analysis:1.0.2")
+    learnerData("com.hankcs:hanlp:portable-1.8.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     debugImplementation("androidx.compose.ui:ui-tooling")

@@ -13,6 +13,7 @@ version snapshot here drifts, and update relevant documentation with lasting cha
 | UI | Jetpack Compose / Material 3; Compose BOM 2026.06.01 | [App dependencies](../../app/build.gradle.kts) |
 | Translation/network | ML Kit Translate 17.0.3, OkHttp, Kotlin coroutines | [App dependencies](../../app/build.gradle.kts) |
 | Japanese words | Kuromoji 0.9.0 (Apache-2.0, pure Java); its 13 MB IPADIC dictionary downloads on first Japanese use | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-09-29-word-audio-jump-back-japanese-words.md) |
+| English and Chinese words | Data files only, extracted at build time into `assets/learner-data/`: OpenNLP's UD English part-of-speech model (Apache-2.0), jieba's word list (MIT) and HanLP's pinyin and traditional-to-simplified tables (Apache-2.0); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-10-17-english-and-chinese-learner-help.md) |
 | Media controls | `androidx.media` 1.7.1 media session and notification (no player library) | [App dependencies](../../app/build.gradle.kts) |
 | Tests | JUnit4 4.13.2; Compose/Android instrumentation, API 36 AOSP x86_64 managed Pixel 2 | [App test configuration](../../app/build.gradle.kts) |
 | Performance | Separate test-only `:benchmark` module, Macrobenchmark and app Baseline Profile | [Benchmark build](../../benchmark/build.gradle.kts), [methodology](../quality-and-performance.md) |
@@ -88,6 +89,11 @@ Paths below are relative to
   While the assistant is on, the card's "Explain the grammar with AI" queues a question about the
   whole line (`AiAssistantController.askFromApp`). See the [N1 spec](../specs/2026-10-07-grammar-to-n1-and-auto-caption-language.md)
   and the [everyday points spec](../specs/2026-10-17-more-grammar-and-stop-ai-reply.md).
+  English (`EnglishGrammar.kt`, CEFR A1 to C1) and Chinese (`ChineseGrammar.kt`, HSK 1 to 6) work
+  the same way: a generated catalogue plus a few rules, shared matching in `GrammarMatcher.kt`,
+  text in `strings_grammar_en.xml` / `strings_grammar_zh.xml` and an example sentence per point
+  in `EnglishGrammarCatalogueTest` / `ChineseGrammarCatalogueTest`. See the
+  [English and Chinese spec](../specs/2026-10-17-english-and-chinese-learner-help.md).
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`
@@ -107,6 +113,11 @@ Paths below are relative to
   its morphemes into learner words; until it loads, the script-boundary heuristic is used.
   The APK excludes Kuromoji's dictionary files; `data/JapaneseDictionaryStore.kt` downloads the
   Maven artifact (pinned SHA-256) into app storage and reads the dictionary from it.
+  English goes through `data/EnglishMorphology.kt` (`EnglishPosTagger.kt` runs OpenNLP's model
+  without the OpenNLP library and gives the same tags) and Chinese through
+  `data/ChineseMorphology.kt` (jieba's most probable split, pinyin per word). Both load from
+  `LearnerData` on a background thread; until then English uses the word-list heuristic and
+  Chinese the script-boundary heuristic.
 
 ## Architecture invariants
 
