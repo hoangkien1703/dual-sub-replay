@@ -3,7 +3,9 @@ package com.kienhoang.dualsubreplay.data
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -92,5 +94,53 @@ class YouTubeCaptionFallbackTest {
             "https://www.reddit.com/",
             body.getJSONObject("context").getJSONObject("thirdParty").getString("embedUrl"),
         )
+    }
+
+    @Test
+    fun aRefusedLookupIsTriedAgainWhileTimeRemains() {
+        var now = 0L
+        var calls = 0
+        val result =
+            runBlocking {
+                retryRefusedCaptionLookup(deadlineNanos = 20_000_000_000L, nanoTime = { now }, pause = {}) {
+                    calls++
+                    now += 5_000_000_000L
+                    if (calls < 3) throw CaptionLookupRefusedException("Player returned LOGIN_REQUIRED")
+                    "track"
+                }
+            }
+        assertEquals("track", result)
+        assertEquals(3, calls)
+    }
+
+    @Test
+    fun aRefusedLookupStopsWhenTooLittleTimeIsLeft() {
+        var now = 0L
+        var calls = 0
+        assertThrows(CaptionLookupRefusedException::class.java) {
+            runBlocking {
+                retryRefusedCaptionLookup<String>(deadlineNanos = 20_000_000_000L, nanoTime = { now }, pause = {}) {
+                    calls++
+                    now += 8_000_000_000L
+                    throw CaptionLookupRefusedException("Player returned LOGIN_REQUIRED")
+                }
+            }
+        }
+        // 8 s and 16 s used: after the second try only 4 s are left, too little for another.
+        assertEquals(2, calls)
+    }
+
+    @Test
+    fun aVideoWithoutCaptionsIsNotTriedAgain() {
+        var calls = 0
+        assertThrows(CaptionUnavailableException::class.java) {
+            runBlocking {
+                retryRefusedCaptionLookup<String>(deadlineNanos = Long.MAX_VALUE, nanoTime = { 0L }, pause = {}) {
+                    calls++
+                    throw CaptionUnavailableException("This video does not provide a public caption track.")
+                }
+            }
+        }
+        assertEquals(1, calls)
     }
 }

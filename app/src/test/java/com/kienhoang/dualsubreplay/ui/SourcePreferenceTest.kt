@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -45,4 +46,9 @@ class SourcePreferenceTest {
         CaptionLanguage("en", "English"),
         CaptionLanguage("es", "Spanish"),
     )
+
+    @Test
+    fun aFailedFullTranscriptIsTriedAgainAFewTimes() {
+        assertEquals(listOf(10_000L, 30_000L, 90_000L, null), (0..3).map(::automaticTranscriptRetryDelayMs))
+    }
 }

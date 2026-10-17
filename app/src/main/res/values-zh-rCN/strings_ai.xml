@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">用AI讲解语法</string>
     <string name="ai_explain_grammar_question">请逐步讲解这句话的语法。</string>
     <string name="ai_problem_captions_title">无法加载字幕</string>
+    <string name="ai_problem_full_transcript_title">无法加载完整字幕</string>
     <string name="ai_problem_retry">重试</string>
     <string name="ai_problem_ask">问问 AI</string>
     <string name="ai_problem_ask_message">为什么会这样？我该怎么办？</string>

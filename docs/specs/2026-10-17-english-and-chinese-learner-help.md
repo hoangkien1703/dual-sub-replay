@@ -196,6 +196,15 @@ OpenNLP model itself, because OpenNLP's loader asks Android's XML parser for a f
   repeats the form ("对: …", "Would rather: …") is dropped from the text. Chinese speech asks
   engines for Mandarin by country (zh-Hans as zh-CN, zh-Hant as zh-TW), accepts voices listed as
   `cmn`, and falls back to the engine's language setting when no listed voice can be selected.
+- **After the second phone test (2026-10-17).** The "dual subtitles not working" report was
+  YouTube refusing the app's caption lookup ("Sign in to confirm you're not a bot" or
+  "UNPLAYABLE"), which the owner then saw in the released app too; this PR did not change
+  caption loading. A refused lookup is now tried again while at least 6 s of the 20 s budget
+  remain, a failed full transcript is retried in the background after 10 s, 30 s and 90 s, and the
+  AI assistant's problem icon shows YouTube's reason with a Retry action. Chinese speech now
+  prefers the engine's highest-quality offline voice for the country. Live check from a cloud
+  address (heavily blocked by YouTube): one video went from intermittent to 3 of 3 loads, others
+  stayed refused, so a lasting fix needs the transcript to come through the YouTube page itself.
 - **Tests and loading.** Tests that tokenize English or Chinese now wait for the analyzers first,
   so they no longer depend on whether the background load has finished.
 

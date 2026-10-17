@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">Explain the grammar with AI</string>
     <string name="ai_explain_grammar_question">Explain the grammar of this sentence step by step.</string>
     <string name="ai_problem_captions_title">Subtitles couldn\'t load</string>
+    <string name="ai_problem_full_transcript_title">Full subtitles couldn\'t load</string>
     <string name="ai_problem_retry">Retry</string>
     <string name="ai_problem_ask">Ask AI about this</string>
     <string name="ai_problem_ask_message">Why did this happen, and what can I do?</string>

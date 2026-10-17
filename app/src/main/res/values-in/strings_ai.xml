@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">Jelaskan tata bahasa dengan AI</string>
     <string name="ai_explain_grammar_question">Jelaskan tata bahasa kalimat ini langkah demi langkah.</string>
     <string name="ai_problem_captions_title">Subtitel tidak dapat dimuat</string>
+    <string name="ai_problem_full_transcript_title">Subtitel lengkap tidak dapat dimuat</string>
     <string name="ai_problem_retry">Coba lagi</string>
     <string name="ai_problem_ask">Tanya AI tentang ini</string>
     <string name="ai_problem_ask_message">Kenapa ini terjadi, dan apa yang bisa saya lakukan?</string>

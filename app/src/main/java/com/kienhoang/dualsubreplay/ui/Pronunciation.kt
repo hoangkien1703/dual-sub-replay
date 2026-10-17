@@ -11,6 +11,8 @@ internal data class PronunciationVoice(
     val locale: Locale,
     val network: Boolean = false,
     val installed: Boolean = true,
+    /** The engine's own rating (Android's Voice.QUALITY_*, higher sounds more natural). */
+    val quality: Int = 300,
 )
 
 internal interface PronunciationEngine {
@@ -100,8 +102,9 @@ internal fun pronunciationVoices(
             .filter { locale.script.isBlank() || it.locale.script.isBlank() || it.locale.script == locale.script }
             .sortedWith(
                 compareBy<PronunciationVoice> { it.network }
-                    .thenBy { it.locale != locale }
                     .thenBy { it.locale.country != locale.country }
+                    .thenByDescending { it.quality }
+                    .thenBy { it.locale != locale }
                     .thenBy { it.name },
             )
     // Keep a network fallback reachable even when an engine lists many offline voices.

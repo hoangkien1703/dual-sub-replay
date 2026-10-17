@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">Giải thích ngữ pháp bằng AI</string>
     <string name="ai_explain_grammar_question">Giải thích ngữ pháp của câu này từng bước.</string>
     <string name="ai_problem_captions_title">Không tải được phụ đề</string>
+    <string name="ai_problem_full_transcript_title">Không tải được toàn bộ phụ đề</string>
     <string name="ai_problem_retry">Thử lại</string>
     <string name="ai_problem_ask">Hỏi AI về việc này</string>
     <string name="ai_problem_ask_message">Vì sao lại xảy ra chuyện này và tôi có thể làm gì?</string>

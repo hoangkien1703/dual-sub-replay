@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">Explicar a gramática com IA</string>
     <string name="ai_explain_grammar_question">Explique a gramática desta frase passo a passo.</string>
     <string name="ai_problem_captions_title">Não foi possível carregar as legendas</string>
+    <string name="ai_problem_full_transcript_title">Não foi possível carregar as legendas completas</string>
     <string name="ai_problem_retry">Tentar de novo</string>
     <string name="ai_problem_ask">Perguntar à IA</string>
     <string name="ai_problem_ask_message">Por que isso aconteceu e o que posso fazer?</string>

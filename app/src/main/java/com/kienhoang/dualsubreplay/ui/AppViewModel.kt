@@ -111,6 +111,8 @@ data class DualSubUiState(
     val stage: LoadStage = LoadStage.IDLE,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
+    /** Why the full transcript failed while current captions show instead, or null. Diagnostic English. */
+    val transcriptFailure: String? = null,
     /** Why translation stopped while the original captions keep playing, or null. */
     val translationError: String? = null,
     val translationEngine: TranslationEngine = TranslationEngine.ON_DEVICE,
@@ -207,6 +209,9 @@ internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
 
 /** The language chosen as "learning" at onboarding; see [storedLearningLanguage]. */
 private const val LEARNING_LANGUAGE_PREFERENCE = "learning_language"
+
+/** How long to wait before the [attempt]th automatic retry of a failed full transcript (from 0), or null for no more. */
+internal fun automaticTranscriptRetryDelayMs(attempt: Int): Long? = listOf(10_000L, 30_000L, 90_000L).getOrNull(attempt)
 
 internal fun preferredCaptionLanguages(sourcePreference: String): List<String> =
     sourcePreference.takeUnless { it == "auto" }?.let(::listOf).orEmpty()
@@ -343,6 +348,9 @@ class AppViewModel internal constructor(
     private var loadingJob: Job? = null
     private var translationWarmupJob: Job? = null
     private var loadGeneration = 0L
+    private var transcriptRetryJob: Job? = null
+    private var transcriptRetryVideo: String? = null
+    private var transcriptRetries = 0
     private var latestPlaybackSecondMs = 0L
     private val subtitleDirectory by lazy {
         File(application.cacheDir, "subtitle-transcripts").apply {
@@ -1159,6 +1167,30 @@ class AppViewModel internal constructor(
         loadVideo(videoId, showPanel = true)
     }
 
+    /**
+     * YouTube refuses some transcript requests at random, so a video showing current captions only
+     * tries the full transcript again on its own, a few times, as long as nothing else was loaded.
+     */
+    private fun scheduleTranscriptRetry(
+        videoId: String,
+        generation: Long,
+    ) {
+        if (transcriptRetryVideo != videoId) {
+            transcriptRetryVideo = videoId
+            transcriptRetries = 0
+        }
+        val delayMs = automaticTranscriptRetryDelayMs(transcriptRetries++) ?: return
+        transcriptRetryJob?.cancel()
+        transcriptRetryJob =
+            viewModelScope.launch {
+                delay(delayMs)
+                val current = _state.value
+                if (loadGeneration == generation && current.activeVideoId == videoId && current.liveFallback && !current.retryingTranscript) {
+                    loadVideo(videoId, showPanel = current.subtitlePanelVisible)
+                }
+            }
+    }
+
     fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }
 
     fun hideSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = false) }
@@ -1187,6 +1219,7 @@ class AppViewModel internal constructor(
             it.copy(
                 activeVideoId = null,
                 liveFallback = false,
+                transcriptFailure = null,
                 liveOriginal = null,
                 liveTranslated = null,
                 retryingTranscript = false,
@@ -1268,6 +1301,7 @@ class AppViewModel internal constructor(
                             liveOriginal = null,
                             liveTranslated = null,
                             retryingTranscript = false,
+                            transcriptFailure = null,
                             resolvedSourceLanguage = track.languageCode,
                             sourcePreference =
                                 resolvedSourcePreference(
@@ -1291,6 +1325,7 @@ class AppViewModel internal constructor(
                             stage = LoadStage.READY,
                             liveFallback = true,
                             retryingTranscript = false,
+                            transcriptFailure = error.message ?: error.javaClass.simpleName,
                             statusMessage =
                                 if (current.liveOriginal !=
                                     null
@@ -1302,6 +1337,7 @@ class AppViewModel internal constructor(
                             errorMessage = null,
                         )
                     }
+                    scheduleTranscriptRetry(videoId, generation)
                 } finally {
                     withContext(NonCancellable + Dispatchers.IO) { rawStore?.close() }
                 }

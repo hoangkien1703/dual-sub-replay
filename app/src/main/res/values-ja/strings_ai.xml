@@ -35,6 +35,7 @@
     <string name="ai_explain_grammar_button">AIで文法を説明</string>
     <string name="ai_explain_grammar_question">この文の文法を順番に説明して。</string>
     <string name="ai_problem_captions_title">字幕を読み込めませんでした</string>
+    <string name="ai_problem_full_transcript_title">全文の字幕を読み込めませんでした</string>
     <string name="ai_problem_retry">再試行</string>
     <string name="ai_problem_ask">AI に聞く</string>
     <string name="ai_problem_ask_message">なぜこうなったのか、どうすればよいですか?</string>

@@ -110,6 +110,18 @@ internal fun appProblems(
                 mild = false,
             )
     }
+    if (state.activeVideoId != null && state.liveFallback && state.transcriptFailure != null) {
+        problems +=
+            AppProblem(
+                key = "full_transcript",
+                title = stringResource(R.string.ai_problem_full_transcript_title),
+                message = null,
+                detail = state.transcriptFailure,
+                actionLabel = stringResource(R.string.ai_problem_retry),
+                action = onRetry,
+                mild = true,
+            )
+    }
     return problems
 }
 

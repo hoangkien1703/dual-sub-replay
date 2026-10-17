@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.data
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -41,6 +42,39 @@ internal class CaptionLookupTimeoutException(
     message: String,
     cause: Throwable? = null,
 ) : Exception(message, cause)
+
+/** Every YouTube client failed for a reason other than the video having no captions. */
+internal class CaptionLookupRefusedException(
+    message: String,
+    cause: Throwable? = null,
+) : Exception(message, cause)
+
+/** Time one more full lookup needs: about 3.5 to 6 seconds were measured, so start one only with 6 left. */
+private val CAPTION_RETRY_MIN_REMAINING_NANOS = TimeUnit.SECONDS.toNanos(6)
+private const val CAPTION_RETRY_PAUSE_MS = 500L
+
+/**
+ * Runs [lookup] again while YouTube refuses it and time remains before [deadlineNanos]. YouTube
+ * refuses some caption requests at random ("Sign in to confirm you're not a bot", "Video
+ * unavailable"), and the same request a moment later usually works: in a test on 2026-10-17, the
+ * same video failed and then loaded on the next try.
+ */
+internal suspend fun <T> retryRefusedCaptionLookup(
+    deadlineNanos: Long,
+    nanoTime: () -> Long = System::nanoTime,
+    pause: suspend (Long) -> Unit = { delay(it) },
+    lookup: suspend () -> T,
+): T {
+    while (true) {
+        try {
+            return lookup()
+        } catch (error: CaptionLookupRefusedException) {
+            if (deadlineNanos - nanoTime() < CAPTION_RETRY_MIN_REMAINING_NANOS) throw error
+            reportCaptionFailure("retry", error)
+        }
+        pause(CAPTION_RETRY_PAUSE_MS)
+    }
+}
 
 /** Fixed categories only: never put server text, signed URLs, or cookies in logcat. */
 internal fun captionFailureCategory(message: String?): String =
@@ -485,7 +519,9 @@ class YouTubeCaptionProvider(
                 System.nanoTime() +
                     TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
             try {
-                fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), deadlineNanos)
+                retryRefusedCaptionLookup(deadlineNanos) {
+                    fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), deadlineNanos)
+                }
             } catch (error: CancellationException) {
                 // Never turn a cancelled/replaced load into a caption failure. The
                 // ViewModel uses cancellation whenever the video or language changes.
@@ -493,6 +529,9 @@ class YouTubeCaptionProvider(
             } catch (error: CaptionUnavailableException) {
                 reportCaptionFailure("lookup", error)
                 throw error
+            } catch (error: CaptionLookupRefusedException) {
+                reportCaptionFailure("lookup", error)
+                throw CaptionUnavailableException(error.message.orEmpty(), error.cause)
             } catch (error: ResponseLimitExceededException) {
                 throw CaptionUnavailableException(error.message.orEmpty(), error)
             } catch (error: CaptionLookupTimeoutException) {
@@ -599,7 +638,7 @@ class YouTubeCaptionProvider(
             lastServiceFailure
                 ?: failures.lastOrNull()
                 ?: "No YouTube client returned usable captions."
-        throw CaptionUnavailableException(
+        throw CaptionLookupRefusedException(
             "Captions could not be loaded after trying the watch page and YouTube client fallbacks. " +
                 "Last failure: $detail",
             lastError,
