@@ -71,8 +71,9 @@ Website only: four new pages, a comparison table, and updated footer links.
 
 ## Release intent
 
-No app change. The PR touches `tools/tests/test_site.py`, so the docs-only skip rule
-does not apply on its own; the owner is asked (skip recommended, as for #121).
+`release:skip`. No app change. On 2026-10-17 the owner chose "Always skip" for
+website-only PRs, including ones that change the website's test or Pages workflow;
+`AGENTS.md` and the spec README record that standing decision.
 
 ## Implementation result
 
