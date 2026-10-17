@@ -14,6 +14,8 @@
     <string name="ai_send">发送</string>
     <string name="ai_thinking">正在思考…</string>
     <string name="ai_retry">重试</string>
+    <string name="ai_stop">停止回答</string>
+    <string name="ai_stopped">你已停止此回答。</string>
     <string name="ai_message_about">关于：%1$s</string>
     <string name="ai_welcome_title">需要什么帮助？</string>
     <string name="ai_welcome_message">可以询问设置、词语、句子或应用中的问题。</string>

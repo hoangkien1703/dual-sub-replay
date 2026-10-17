@@ -14,6 +14,8 @@
     <string name="ai_send">Send</string>
     <string name="ai_thinking">Thinking…</string>
     <string name="ai_retry">Try again</string>
+    <string name="ai_stop">Stop the reply</string>
+    <string name="ai_stopped">You stopped this reply.</string>
     <string name="ai_message_about">About: %1$s</string>
     <string name="ai_welcome_title">How can I help?</string>
     <string name="ai_welcome_message">Ask about a setting, a word, a sentence, or a problem in the app.</string>

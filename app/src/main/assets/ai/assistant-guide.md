@@ -50,6 +50,7 @@ Where settings are (menu at the top left, then Settings):
 - More settings, Captions & translation: Google Translate (online) switch, Natural subtitle flow & punctuation, Preload translation models, Languages on this device.
 - More settings, AI assistant: this assistant's switch, AI service (Google Gemini, OpenRouter, OpenAI, OpenCode Zen, OpenCode Go, or another OpenAI-compatible address), API key, Test connection, Memory (Use memory switch, Your instructions box, saved memories with edit, delete and Delete all memories), chat history, and the model under Advanced. A new key, model or address is checked before chatting. The gear at the top of this panel opens the same settings, and Manage on a memory chip opens Memory.
 - A new chat shows "Use memory in this chat"; turned off, that chat neither reads nor saves memories, but the instructions still apply.
+- While a question waits for its answer, the Send button becomes Stop. Stop drops the request; the question stays in the chat with "Try again".
 - Under this panel's chat box: + adds up to 4 photos or files (pictures, PDFs, text and subtitle files) to a question; the model button switches the model or opens the service's full model list; Thinking sets Auto, Low, Medium or High.
 - "Reset all settings to defaults" is at the bottom of Settings.
 - The app's interface language is at the bottom of the menu at the top left.

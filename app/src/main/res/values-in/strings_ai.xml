@@ -14,6 +14,8 @@
     <string name="ai_send">Kirim</string>
     <string name="ai_thinking">Sedang berpikir…</string>
     <string name="ai_retry">Coba lagi</string>
+    <string name="ai_stop">Hentikan jawaban</string>
+    <string name="ai_stopped">Kamu menghentikan jawaban ini.</string>
     <string name="ai_message_about">Tentang: %1$s</string>
     <string name="ai_welcome_title">Ada yang bisa dibantu?</string>
     <string name="ai_welcome_message">Tanyakan tentang setelan, kata, kalimat, atau masalah di aplikasi.</string>

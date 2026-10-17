@@ -14,6 +14,8 @@
     <string name="ai_send">Enviar</string>
     <string name="ai_thinking">Pensando…</string>
     <string name="ai_retry">Tentar de novo</string>
+    <string name="ai_stop">Parar a resposta</string>
+    <string name="ai_stopped">Você parou esta resposta.</string>
     <string name="ai_message_about">Sobre: %1$s</string>
     <string name="ai_welcome_title">Como posso ajudar?</string>
     <string name="ai_welcome_message">Pergunte sobre uma configuração, uma palavra, uma frase ou um problema no app.</string>

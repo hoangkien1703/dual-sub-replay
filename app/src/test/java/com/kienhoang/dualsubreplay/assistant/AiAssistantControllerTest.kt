@@ -355,6 +355,71 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun stopDropsTheWaitingQuestionAndItCanBeAskedAgain() {
+        checkedGeminiKey()
+        val controller = controller()
+        val waiting = CompletableDeferred<String>()
+        transport.pending = waiting
+        controller.send("Explain this line", "guide")
+        assertTrue(controller.state.value.sending)
+
+        controller.stop()
+        val stopped = controller.state.value
+        assertFalse(stopped.sending)
+        assertTrue(stopped.stopped)
+        assertNull(stopped.failure)
+        // An answer that still arrives after Stop is dropped.
+        waiting.complete("Too late")
+        assertEquals(
+            listOf("Explain this line"),
+            controller.state.value.messages
+                .map { it.text },
+        )
+        assertEquals(
+            listOf("Explain this line"),
+            history.chats
+                .single()
+                .messages
+                .map { it.text },
+        )
+
+        transport.pending = null
+        controller.retry("guide")
+        val answered = controller.state.value
+        assertFalse(answered.stopped)
+        assertEquals(listOf("Explain this line", "OK"), answered.messages.map { it.text })
+        assertEquals(2, transport.requests.size)
+    }
+
+    @Test
+    fun aNewQuestionAfterStopIsSentAndClearsTheStop() {
+        checkedGeminiKey()
+        val controller = controller()
+        transport.pending = CompletableDeferred()
+        controller.send("First", "guide")
+        controller.stop()
+        transport.pending = null
+        controller.send("Second", "guide")
+        val state = controller.state.value
+        assertFalse(state.stopped)
+        assertEquals(listOf("First", "Second", "OK"), state.messages.map { it.text })
+    }
+
+    @Test
+    fun stopWithNothingWaitingChangesNothing() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.send("Hi", "guide")
+        controller.stop()
+        assertFalse(controller.state.value.stopped)
+        assertEquals(
+            listOf("Hi", "OK"),
+            controller.state.value.messages
+                .map { it.text },
+        )
+    }
+
+    @Test
     fun aKeyThePhoneCanNoLongerUnlockAsksForANewOne() {
         val cipher = FakeCipher()
         val store = AiKeyStore(secrets, cipher)

@@ -14,6 +14,8 @@
     <string name="ai_send">보내기</string>
     <string name="ai_thinking">생각하는 중…</string>
     <string name="ai_retry">다시 시도</string>
+    <string name="ai_stop">답변 중지</string>
+    <string name="ai_stopped">이 답변을 중지했습니다.</string>
     <string name="ai_message_about">관련 내용: %1$s</string>
     <string name="ai_welcome_title">무엇을 도와드릴까요?</string>
     <string name="ai_welcome_message">설정, 단어, 문장, 앱 문제에 대해 물어보세요.</string>

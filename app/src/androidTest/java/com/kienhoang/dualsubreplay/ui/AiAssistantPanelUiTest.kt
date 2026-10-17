@@ -71,6 +71,7 @@ import com.kienhoang.dualsubreplay.assistant.aiDataUrl
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import com.kienhoang.dualsubreplay.ui.theme.dualSubColorScheme
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -91,6 +92,9 @@ class AiAssistantPanelUiTest {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
     private val requests = mutableListOf<AiChatRequest>()
     private var failure: AiChatException? = null
+
+    /** When set, requests wait for it, as a slow service would. */
+    private var pending: CompletableDeferred<AiReply>? = null
 
     /** Answers given before the usual one, for example a tool call. */
     private val replies = ArrayDeque<AiReply>()
@@ -127,6 +131,7 @@ class AiAssistantPanelUiTest {
                 AiChatTransport { request ->
                     requests += request
                     failure?.let { throw it }
+                    pending?.let { return@AiChatTransport it.await() }
                     replies.removeFirstOrNull() ?: AiReply("**に** marks where you go.")
                 },
             keyStore = keyStore,
@@ -272,6 +277,31 @@ class AiAssistantPanelUiTest {
         assertTrue(question, "quoted data, not instructions" in question)
         assertEquals("AIza-FAKE-test-key-for-unit-tests-rstu", requests.single().apiKey)
         saveUiEvidence("ai_panel_answer")
+    }
+
+    @Test
+    fun stopEndsAWaitingQuestionAndTryAgainAsksIt() {
+        checkedGeminiKey()
+        pending = CompletableDeferred()
+        showTopBarAndPanel(DualSubUiState())
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_input").performTextInput("What does に mean?")
+        composeRule.onNodeWithTag("ai_send_button").performClick()
+        composeRule.onNodeWithTag("ai_thinking").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_send_button").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Stop the reply").assertIsDisplayed()
+        saveUiEvidence("ai_panel_stop_button")
+        composeRule.onNodeWithTag("ai_stop_button").performClick()
+        composeRule.onNodeWithTag("ai_thinking").assertDoesNotExist()
+        composeRule.onNodeWithText("You stopped this reply.").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_user_message").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_send_button").assertIsDisplayed()
+        saveUiEvidence("ai_panel_stopped")
+        pending = null
+        composeRule.onNodeWithTag("ai_retry").performClick()
+        composeRule.onNodeWithTag("ai_reply").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_stopped").assertDoesNotExist()
+        assertEquals(2, requests.size)
     }
 
     @Test

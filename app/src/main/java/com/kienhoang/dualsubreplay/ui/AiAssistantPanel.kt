@@ -228,7 +228,7 @@ private fun AiChatContent(
 ) {
     val listState = rememberLazyListState()
     val messages = aiState.messages
-    LaunchedEffect(messages.size, aiState.sending, aiState.failure) {
+    LaunchedEffect(messages.size, aiState.sending, aiState.failure, aiState.stopped) {
         val last = listState.layoutInfo.totalItemsCount - 1
         if (messages.isNotEmpty() && last >= 0) listState.animateScrollToItem(last)
     }
@@ -277,4 +277,5 @@ private fun LazyListScope.aiMessages(
     // After actions that ran, the question has an answer, so asking it again is left to the user.
     val canRetry = aiState.ready && aiState.messages.lastOrNull()?.role == AiRole.USER
     aiState.failure?.let { failure -> item(key = "failure") { AiFailureRow(failure, onRetry.takeIf { canRetry }) } }
+    if (aiState.stopped && !aiState.sending) item(key = "stopped") { AiStoppedRow(onRetry.takeIf { canRetry }) }
 }

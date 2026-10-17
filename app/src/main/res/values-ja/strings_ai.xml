@@ -14,6 +14,8 @@
     <string name="ai_send">送信</string>
     <string name="ai_thinking">考え中…</string>
     <string name="ai_retry">もう一度試す</string>
+    <string name="ai_stop">回答を停止</string>
+    <string name="ai_stopped">この回答を停止しました。</string>
     <string name="ai_message_about">対象: %1$s</string>
     <string name="ai_welcome_title">何をお手伝いしましょうか?</string>
     <string name="ai_welcome_message">設定、単語、文、アプリの問題について質問できます。</string>

@@ -175,6 +175,8 @@ internal data class AiAssistantUiState(
     val savedChats: List<AiChat> = emptyList(),
     val chat: AiChat? = null,
     val sending: Boolean = false,
+    /** The user stopped the last question before it was answered; cleared by the next one. */
+    val stopped: Boolean = false,
     /** Why the last question got no answer; cleared by the next one. */
     val failure: AiFailure? = null,
     val connectionTest: AiConnectionTest = AiConnectionTest.Idle,
@@ -505,13 +507,13 @@ internal class AiAssistantController(
 
     fun newChat() {
         cancelRequests()
-        _state.update { it.copy(chat = null, failure = null, page = AiPanelPage.CHAT, newChatMemory = true) }
+        _state.update { it.copy(chat = null, failure = null, stopped = false, page = AiPanelPage.CHAT, newChatMemory = true) }
     }
 
     fun openChat(id: String) {
         val chat = _state.value.savedChats.firstOrNull { it.id == id } ?: return
         cancelRequests()
-        _state.update { it.copy(chat = chat, failure = null, page = AiPanelPage.CHAT) }
+        _state.update { it.copy(chat = chat, failure = null, stopped = false, page = AiPanelPage.CHAT) }
     }
 
     fun deleteChat(id: String) {
@@ -595,7 +597,7 @@ internal class AiAssistantController(
             AiAnswerRun(appActions, history, tools, memories, newId) { messages, offered ->
                 request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered)
             }
-        _state.update { it.copy(sending = true, failure = null) }
+        _state.update { it.copy(sending = true, failure = null, stopped = false) }
         sendJob =
             scope.launch {
                 try {
@@ -615,7 +617,10 @@ internal class AiAssistantController(
                         }
                     }
                 } catch (cancelled: CancellationException) {
-                    if (run.records.isNotEmpty()) addAnswer(run, chatId)
+                    if (run.records.isNotEmpty()) {
+                        addAnswer(run, chatId)
+                        persistChats()
+                    }
                     _state.update { it.copy(sending = false) }
                     throw cancelled
                 } finally {
@@ -774,6 +779,17 @@ internal class AiAssistantController(
         val updated = change(_state.value.settings)
         _state.update { it.copy(settings = updated) }
         scope.launch { withContext(io) { settingsStorage.save(updated) } }
+    }
+
+    /**
+     * The Stop button: drops the question's request while it waits for an answer. The question stays
+     * in the chat, so it can be asked again; actions that already ran keep their Undo.
+     */
+    fun stop() {
+        if (!_state.value.sending) return
+        cancelRequests()
+        _state.update { it.copy(stopped = true) }
+        persistChats()
     }
 
     private fun cancelRequests() {
