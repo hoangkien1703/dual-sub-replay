@@ -73,8 +73,10 @@ appropriate, but do not silently change the owner's release policy.
 Standing owner decision (2026-10-04): a PR whose changed files are all documentation
 or promo media (`*.md`, `docs/**`, `site/**`, `tools/promo-video/**`,
 `.github/ISSUE_TEMPLATE/**`, `.github/pull_request_template.md`) gets `release:skip`
-without asking, because the APK does not change. Any other changed file, including
-workflows and release tools, keeps the patch default.
+without asking, because the APK does not change. On 2026-10-17 the owner extended this
+to website-only PRs that also change `tools/tests/test_site.py` or
+`.github/workflows/pages.yml`. Any other changed file, including other workflows and
+release tools, keeps the patch default.
 
 | Intent in spec | Actual PR metadata |
 | --- | --- |

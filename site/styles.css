@@ -260,3 +260,41 @@ footer p {
     width: min(260px, 100%);
   }
 }
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+table.compare {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+table.compare th,
+table.compare td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+table.compare thead th {
+  background: var(--bg-raised);
+}
+
+table.compare tbody th {
+  white-space: nowrap;
+}
+
+table.compare td {
+  color: var(--muted);
+}
+
+table.compare tr:last-child > * {
+  border-bottom: 0;
+}

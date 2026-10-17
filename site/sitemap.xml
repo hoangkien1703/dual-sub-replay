@@ -13,6 +13,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/"/>
   </url>
   <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/learn-english/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-english/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-english/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/learn-english/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/vi/learn-english/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-english/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-english/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/learn-english/"/>
+  </url>
+  <url>
     <loc>https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
     <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-japanese/"/>
@@ -23,6 +35,18 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
     <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/learn-japanese/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/learn-japanese/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/dual-subtitles-youtube-android/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/"/>
+  </url>
+  <url>
+    <loc>https://hoangkien1703.github.io/dual-sub-replay/vi/dual-subtitles-youtube-android/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoangkien1703.github.io/dual-sub-replay/vi/dual-subtitles-youtube-android/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/"/>
   </url>
   <url>
     <loc>https://hoangkien1703.github.io/dual-sub-replay/language-reactor-alternative/</loc>
