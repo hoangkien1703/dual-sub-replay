@@ -90,6 +90,10 @@ internal fun AiAssistantPanel(
     val open = aiState.panelOpen && aiState.settings.enabled
     val systemPrompt = { aiSystemPrompt(host.guide(), snapshot()) }
     BackHandler(open) { if (aiState.page != AiPanelPage.CHAT) controller.showPage(AiPanelPage.CHAT) else controller.closePanel() }
+    // A question asked from the word card waits until the assistant can answer it.
+    LaunchedEffect(open, aiState.ready, aiState.sending, aiState.pendingQuestion, aiState.settings.introSeen) {
+        if (open && aiState.settings.introSeen) controller.sendPendingQuestion(systemPrompt())
+    }
     AnimatedVisibility(visible = open, enter = fadeIn(), exit = fadeOut()) {
         Box(
             Modifier

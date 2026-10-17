@@ -85,7 +85,9 @@ Paths below are relative to
   sentence in `JapaneseGrammarCatalogueTest`. `ui/GrammarExplanations.kt` words them
   (`strings_grammar.xml`, `strings_grammar_points.xml`) with a JLPT badge in the word card.
   Explanations are this project's own text, not copied from other grammar resources.
-  See the [N1 spec](../specs/2026-10-07-grammar-to-n1-and-auto-caption-language.md).
+  While the assistant is on, the card's "Explain the grammar with AI" queues a question about the
+  whole line (`AiAssistantController.askFromApp`). See the [N1 spec](../specs/2026-10-07-grammar-to-n1-and-auto-caption-language.md)
+  and the [everyday points spec](../specs/2026-10-17-more-grammar-and-stop-ai-reply.md).
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`

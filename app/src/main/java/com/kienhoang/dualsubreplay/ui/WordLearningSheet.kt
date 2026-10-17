@@ -90,7 +90,7 @@ internal fun WordLearningDialog(
                         modifier = Modifier.fillMaxWidth().testTag("word_meaning"),
                     )
                     error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
-                    GrammarExplanations(selection)
+                    GrammarExplanations(selection, onAskedAi = onDismiss)
                     if (canClip) {
                         ClipChoice(stringResource(R.string.practice_online_example), online, {
                             online = it

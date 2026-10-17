@@ -90,4 +90,5 @@
     <string name="grammar_copula_polite">Es A (cortés); hace cortés la frase</string>
     <string name="grammar_copula">Es A (informal)</string>
     <string name="grammar_na_adjective">Une el adjetivo na A al sustantivo que sigue</string>
+    <string name="grammar_counter">Contador: cuántos o cuál (３人 = tres personas, ２時 = las dos)</string>
 </resources>

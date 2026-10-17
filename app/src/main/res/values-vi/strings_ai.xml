@@ -32,6 +32,8 @@
     <string name="ai_chip_features">Ứng dụng này làm được gì?</string>
     <string name="ai_chip_bigger_subtitles">Làm sao để phụ đề lớn hơn?</string>
     <string name="ai_chip_explain_line">Giải thích dòng hiện tại</string>
+    <string name="ai_explain_grammar_button">Giải thích ngữ pháp bằng AI</string>
+    <string name="ai_explain_grammar_question">Giải thích ngữ pháp của câu này từng bước.</string>
     <string name="ai_problem_captions_title">Không tải được phụ đề</string>
     <string name="ai_problem_retry">Thử lại</string>
     <string name="ai_problem_ask">Hỏi AI về việc này</string>

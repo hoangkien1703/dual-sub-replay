@@ -4,10 +4,17 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,7 +32,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AiPendingQuestion
+import com.kienhoang.dualsubreplay.assistant.aiGrammarContext
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
@@ -34,6 +44,7 @@ import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.grammarForSelection
 import com.kienhoang.dualsubreplay.data.japaneseGrammar
+import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
 /** How each grammar meaning reads to the learner: the rule points here, the catalogue in [GRAMMAR_POINT_TEXT]. */
 internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy { GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT }
@@ -125,6 +136,7 @@ private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
         GrammarMeaning.COPULA_POLITE to R.string.grammar_copula_polite,
         GrammarMeaning.COPULA to R.string.grammar_copula,
         GrammarMeaning.NA_ADJECTIVE to R.string.grammar_na_adjective,
+        GrammarMeaning.COUNTER to R.string.grammar_counter,
     )
 
 @StringRes
@@ -145,24 +157,62 @@ internal fun selectionRangeIn(
     return if (found >= 0 && word.isNotEmpty()) found until found + word.length else null
 }
 
-/** The grammar of a Japanese selection, read from its whole subtitle line; empty for other languages. */
+/**
+ * The grammar of a Japanese selection, read from its whole subtitle line, and the button that asks
+ * the assistant about the whole line ([onAskedAi] then closes the card); nothing for other languages.
+ */
 @Composable
-internal fun GrammarExplanations(selection: LearningWordSelection) {
+internal fun GrammarExplanations(
+    selection: LearningWordSelection,
+    onAskedAi: () -> Unit = {},
+) {
     val segment = selection.segment
     val line = (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
     if (!LanguageAwareTokenizer.isJapanese(line, selection.wordLanguage)) return
     val revision = tokenizerRevision()
+    val lineMatches = remember(line, revision) { JapaneseMorphology.morphemes(line)?.let(::japaneseGrammar).orEmpty() }
     val matches =
-        remember(line, selection.token, revision) {
+        remember(lineMatches, selection.token) {
             val range = selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
-            val morphemes = JapaneseMorphology.morphemes(line)
-            if (range == null || morphemes == null) {
-                emptyList()
-            } else {
-                grammarForSelection(japaneseGrammar(morphemes), range.first, range.last + 1)
-            }
+            if (range == null) emptyList() else grammarForSelection(lineMatches, range.first, range.last + 1)
         }
     GrammarPointList(matches)
+    AiGrammarButton(selection, line, lineMatches, onAskedAi)
+}
+
+/** Asks the assistant to explain the whole line's grammar; shown only while the assistant is on. */
+@Composable
+private fun AiGrammarButton(
+    selection: LearningWordSelection,
+    line: String,
+    found: List<GrammarMatch>,
+    onAsked: () -> Unit,
+) {
+    val host = LocalAiAssistant.current ?: return
+    val aiState by host.controller.state.collectAsStateWithLifecycle()
+    if (!aiState.settings.enabled) return
+    val question = stringResource(R.string.ai_explain_grammar_question)
+    OutlinedButton(
+        onClick = {
+            val segment = selection.segment
+            val context =
+                aiGrammarContext(
+                    line = line,
+                    lineLanguage = TranslationLanguages.displayName(selection.wordLanguage),
+                    otherLine = if (selection.translated) segment?.originalText else segment?.translatedText,
+                    otherLanguage = TranslationLanguages.displayName(selection.meaningLanguage),
+                    selected = selection.token.text,
+                    foundPoints = found.map { "${it.form} (N${it.level.number})" },
+                )
+            host.controller.askFromApp(AiPendingQuestion(question, context, line))
+            onAsked()
+        },
+        modifier = Modifier.testTag("grammar_ask_ai"),
+    ) {
+        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.ai_explain_grammar_button))
+    }
 }
 
 /** The "Grammar" heading and one card per grammar point; nothing when there are none. */

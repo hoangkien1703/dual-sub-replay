@@ -232,11 +232,15 @@ private fun teCombinationRule(
             val endings = m.drop(helperIndex + 1).takeWhile { it.pos == AUXILIARY }.size
             hit("〜てはいけない", GrammarMeaning.MUST_NOT, length = helperIndex - i + 1 + endings)
         }
-        !contracted && second.surface == "も" && third?.baseForm in setOf("いい", "よい", "良い") ->
+        !contracted && second.surface == "も" && third?.baseForm in GOOD ->
             hit("〜てもいい", GrammarMeaning.MAY, length = 3)
+        // 〜ていい: the casual 〜てもいい without も (今何をしていいか).
+        !contracted && second.pos == ADJECTIVE && second.baseForm in GOOD -> hit("〜てもいい", GrammarMeaning.MAY, length = 2)
         else -> null
     }
 }
+
+private val GOOD = setOf("いい", "よい", "良い")
 
 private val TE_HELPERS =
     mapOf(
@@ -244,8 +248,10 @@ private val TE_HELPERS =
         "しまう" to ("〜てしまう" to GrammarMeaning.COMPLETION),
         "くれる" to ("〜てくれる" to GrammarMeaning.FAVOR_RECEIVE),
         "くださる" to ("〜てください" to GrammarMeaning.PLEASE),
+        "下さる" to ("〜てください" to GrammarMeaning.PLEASE),
         "あげる" to ("〜てあげる" to GrammarMeaning.FAVOR_GIVE),
         "もらう" to ("〜てもらう" to GrammarMeaning.FAVOR_HAVE),
+        "もらえる" to ("〜てもらう" to GrammarMeaning.FAVOR_HAVE),
         "みる" to ("〜てみる" to GrammarMeaning.TRY),
         "おく" to ("〜ておく" to GrammarMeaning.IN_ADVANCE),
         "ある" to ("〜てある" to GrammarMeaning.RESULT_STATE),
@@ -323,6 +329,9 @@ private fun auxiliaryRule(
     return when (aux.baseForm) {
         "です", "だ" ->
             when {
+                // The voiced past of 読む, 休む, 泳ぐ: 読んだ, 読んだら.
+                aux.baseForm == "だ" && previous?.pos == VERB && previous.conjugationForm.startsWith("連用タ") ->
+                    if (aux.surface == "だら") hit("〜たら", GrammarMeaning.IF_WHEN) else hit("〜た", GrammarMeaning.PAST)
                 aux.conjugationForm == "未然形" && next?.baseForm == "う" ->
                     hit(if (aux.baseForm == "です") "でしょう" else "だろう", GrammarMeaning.PROBABLY, length = 2)
                 aux.conjugationForm == "体言接続" -> hit("〜な", GrammarMeaning.NA_ADJECTIVE)
@@ -476,6 +485,18 @@ private fun nominalizerRule(
     }
 }
 
+/** A counter after a number or 何: ３人, ２時間, 何回. */
+private fun counterRule(
+    m: List<Morpheme>,
+    i: Int,
+): RuleHit? {
+    val counter = m[i]
+    if (counter.pos != NOUN || counter.subDetail != "助数詞") return null
+    val number = m.at(i - 1) ?: return null
+    if (number.detail != "数" && number.surface !in setOf("何", "なん", "幾", "いく")) return null
+    return hit("〜${counter.surface}", GrammarMeaning.COUNTER)
+}
+
 /** In priority order: between hits of the same length, the earlier rule wins. */
 private val GRAMMAR_RULES: List<GrammarRule> =
     listOf(
@@ -489,4 +510,5 @@ private val GRAMMAR_RULES: List<GrammarRule> =
         ::compoundParticleRule,
         ::nominalizerRule,
         ::particleRule,
+        ::counterRule,
     )

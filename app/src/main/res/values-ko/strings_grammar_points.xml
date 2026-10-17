@@ -344,4 +344,28 @@
     <string name="grammar_point_in_accordance_soku">A에 입각하여</string>
     <string name="grammar_point_at_the_risk">A를 돌보지 않고</string>
     <string name="grammar_point_via">A를 거쳐</string>
+    <string name="grammar_point_plural_people">A들 (복수: 私たち = 우리, 子供たち = 아이들)</string>
+    <string name="grammar_point_name_suffix">A 씨 (이름 뒤 호칭; くん은 남자, ちゃん은 아이·친구, 様는 매우 공손)</string>
+    <string name="grammar_point_adjective_to_noun_sa">형용사 A를 명사로: A한 정도 (寒さ = 추위, 高さ = 높이)</string>
+    <string name="grammar_point_teki">A적 (명사를 な형용사처럼 씀: 経済的 = 경제적)</string>
+    <string name="grammar_point_nature_sei">A성 (성질·경향: 可能性 = 가능성)</string>
+    <string name="grammar_point_making_ka">A화 (~하게 됨, ~하게 만듦: 可視化 = 시각화)</string>
+    <string name="grammar_point_person_sha">A하는 사람, A에 속한 사람 (訪問者 = 방문자, 会社員 = 회사원)</string>
+    <string name="grammar_point_person_of_jin">A 사람 (日本人 = 일본 사람, アメリカ人 = 미국 사람)</string>
+    <string name="grammar_point_language_go">A어 (日本語 = 일본어, 韓国語 = 한국어)</string>
+    <string name="grammar_point_become">A해지다; A가 되다 (高くなる = 비싸지다, 医者になる = 의사가 되다)</string>
+    <string name="grammar_point_make_it">A하게 하다 (きれいにする = 깨끗하게 하다, 短くする = 짧게 하다)</string>
+    <string name="grammar_point_decide_on">A로 하다: A로 만들다, A로 삼다, A를 고르다 (秘密にする = 비밀로 하다, コーヒーにする = 커피로 할게요)</string>
+    <string name="grammar_point_adverb_ni">な형용사 A를 부사로: A하게 (静かに = 조용히)</string>
+    <string name="grammar_point_adverb_ku">い형용사 A를 부사로 (早く起きる = 일찍 일어나다)</string>
+    <string name="grammar_point_de_aru">A이다 (だ의 문어체)</string>
+    <string name="grammar_point_not_copula">A가 아니다 (ではない의 구어; じゃありません은 공손)</string>
+    <string name="grammar_point_jan">A잖아 (じゃないか의 구어)</string>
+    <string name="grammar_point_na_ending">문장 끝 감정·혼잣말: ~네, ~군 (구어)</string>
+    <string name="grammar_point_naa_ending">강한 감탄·바람: 정말 A하구나!, A하면 좋겠다 (구어)</string>
+    <string name="grammar_point_wa_ending">문장 끝의 부드러운 강조 (주로 여성, 간사이에서는 남성도)</string>
+    <string name="grammar_point_sa_ending">가벼운 강조: ~거든, ~말이야 (구어)</string>
+    <string name="grammar_point_gozaimasu">ある·です의 매우 공손한 말 (ありがとうございます)</string>
+    <string name="grammar_point_must_neba">A해야 한다 (なければならない의 문어체)</string>
+    <string name="grammar_point_please_kudasai">A 주세요; A해 주세요 (お待ちください = 기다려 주세요)</string>
 </resources>

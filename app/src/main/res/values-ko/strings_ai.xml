@@ -32,6 +32,8 @@
     <string name="ai_chip_features">이 앱으로 무엇을 할 수 있나요?</string>
     <string name="ai_chip_bigger_subtitles">자막을 크게 하려면?</string>
     <string name="ai_chip_explain_line">지금 줄 설명해 줘</string>
+    <string name="ai_explain_grammar_button">AI로 문법 설명</string>
+    <string name="ai_explain_grammar_question">이 문장의 문법을 차례대로 설명해 줘.</string>
     <string name="ai_problem_captions_title">자막을 불러오지 못했습니다</string>
     <string name="ai_problem_retry">다시 시도</string>
     <string name="ai_problem_ask">AI에게 물어보기</string>

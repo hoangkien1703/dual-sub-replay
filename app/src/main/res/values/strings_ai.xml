@@ -32,6 +32,8 @@
     <string name="ai_chip_features">What can this app do?</string>
     <string name="ai_chip_bigger_subtitles">How do I make subtitles bigger?</string>
     <string name="ai_chip_explain_line">Explain the current line</string>
+    <string name="ai_explain_grammar_button">Explain the grammar with AI</string>
+    <string name="ai_explain_grammar_question">Explain the grammar of this sentence step by step.</string>
     <string name="ai_problem_captions_title">Subtitles couldn\'t load</string>
     <string name="ai_problem_retry">Retry</string>
     <string name="ai_problem_ask">Ask AI about this</string>

@@ -163,6 +163,13 @@ private val KEY_WORKS_PROBLEMS = BUSY_PROBLEMS + AiErrorKind.NOT_A_CHAT_MODEL
 private val KEY_CHECK_MESSAGES =
     listOf(AiWireMessage(AiRole.SYSTEM, "Reply with the single word OK."), AiWireMessage(AiRole.USER, "OK?"))
 
+/** A question with hidden [context], asked from outside the panel; [contextLabel] says what the context is. */
+internal data class AiPendingQuestion(
+    val text: String,
+    val context: String? = null,
+    val contextLabel: String? = null,
+)
+
 internal data class AiAssistantUiState(
     val settings: AiAssistantSettings = AiAssistantSettings(),
     /** The last characters of each saved key; a service without an entry has no key. */
@@ -187,6 +194,8 @@ internal data class AiAssistantUiState(
     val memory: AiMemoryData = AiMemoryData(),
     /** Whether the next new chat reads and saves memories; the open chat keeps its own choice. */
     val newChatMemory: Boolean = true,
+    /** A question asked from elsewhere in the app (the word card's grammar button), sent once the panel can. */
+    val pendingQuestion: AiPendingQuestion? = null,
 ) {
     val hasKey: Boolean get() = settings.provider in keyHints
     val messages: List<AiChatMessage> get() = chat?.messages.orEmpty()
@@ -274,7 +283,20 @@ internal class AiAssistantController(
 
     fun openPanel() = _state.update { it.copy(panelOpen = true) }
 
-    fun closePanel() = _state.update { it.copy(panelOpen = false, page = AiPanelPage.CHAT) }
+    fun closePanel() = _state.update { it.copy(panelOpen = false, page = AiPanelPage.CHAT, pendingQuestion = null) }
+
+    /** Opens the chat with [question] waiting; the panel sends it with [sendPendingQuestion] once it can. */
+    fun askFromApp(question: AiPendingQuestion) =
+        _state.update { it.copy(panelOpen = true, page = AiPanelPage.CHAT, pendingQuestion = question) }
+
+    /** Sends the waiting question when the assistant is ready and not busy; until then it keeps waiting. */
+    fun sendPendingQuestion(systemPrompt: String) {
+        val current = _state.value
+        val question = current.pendingQuestion ?: return
+        if (!current.panelOpen || !current.ready || current.sending) return
+        _state.update { it.copy(pendingQuestion = null) }
+        send(question.text, systemPrompt, question.context, question.contextLabel)
+    }
 
     fun showPage(page: AiPanelPage) = _state.update { it.copy(page = page) }
 

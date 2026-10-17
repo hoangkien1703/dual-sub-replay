@@ -420,6 +420,34 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun aQuestionFromTheWordCardWaitsUntilTheAssistantCanAnswer() {
+        val controller = controller()
+        controller.askFromApp(AiPendingQuestion("Explain the grammar", "line context", "昨日休んだ。"))
+        assertTrue(controller.state.value.panelOpen)
+        controller.sendPendingQuestion("guide")
+        // No key yet: the question keeps waiting and nothing is sent.
+        assertTrue(transport.requests.isEmpty())
+        assertEquals(
+            "Explain the grammar",
+            controller.state.value.pendingQuestion
+                ?.text,
+        )
+
+        checkedGeminiKey()
+        val ready = controller()
+        ready.askFromApp(AiPendingQuestion("Explain the grammar", "line context", "昨日休んだ。"))
+        ready.sendPendingQuestion("guide")
+        val state = ready.state.value
+        assertNull(state.pendingQuestion)
+        assertEquals("line context", state.messages.first().context)
+        assertEquals(listOf("Explain the grammar", "OK"), state.messages.map { it.text })
+
+        ready.askFromApp(AiPendingQuestion("Again"))
+        ready.closePanel()
+        assertNull(ready.state.value.pendingQuestion)
+    }
+
+    @Test
     fun aKeyThePhoneCanNoLongerUnlockAsksForANewOne() {
         val cipher = FakeCipher()
         val store = AiKeyStore(secrets, cipher)

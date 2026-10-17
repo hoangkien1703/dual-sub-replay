@@ -32,6 +32,8 @@
     <string name="ai_chip_features">¿Qué puede hacer esta app?</string>
     <string name="ai_chip_bigger_subtitles">¿Cómo agrando los subtítulos?</string>
     <string name="ai_chip_explain_line">Explica la línea actual</string>
+    <string name="ai_explain_grammar_button">Explicar la gramática con IA</string>
+    <string name="ai_explain_grammar_question">Explica la gramática de esta frase paso a paso.</string>
     <string name="ai_problem_captions_title">No se pudieron cargar los subtítulos</string>
     <string name="ai_problem_retry">Reintentar</string>
     <string name="ai_problem_ask">Preguntar a la IA</string>

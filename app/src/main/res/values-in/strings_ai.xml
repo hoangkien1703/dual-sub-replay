@@ -32,6 +32,8 @@
     <string name="ai_chip_features">Apa saja yang bisa dilakukan aplikasi ini?</string>
     <string name="ai_chip_bigger_subtitles">Bagaimana cara memperbesar subtitel?</string>
     <string name="ai_chip_explain_line">Jelaskan baris saat ini</string>
+    <string name="ai_explain_grammar_button">Jelaskan tata bahasa dengan AI</string>
+    <string name="ai_explain_grammar_question">Jelaskan tata bahasa kalimat ini langkah demi langkah.</string>
     <string name="ai_problem_captions_title">Subtitel tidak dapat dimuat</string>
     <string name="ai_problem_retry">Coba lagi</string>
     <string name="ai_problem_ask">Tanya AI tentang ini</string>

@@ -32,6 +32,8 @@
     <string name="ai_chip_features">O que este app faz?</string>
     <string name="ai_chip_bigger_subtitles">Como deixo as legendas maiores?</string>
     <string name="ai_chip_explain_line">Explique a linha atual</string>
+    <string name="ai_explain_grammar_button">Explicar a gramática com IA</string>
+    <string name="ai_explain_grammar_question">Explique a gramática desta frase passo a passo.</string>
     <string name="ai_problem_captions_title">Não foi possível carregar as legendas</string>
     <string name="ai_problem_retry">Tentar de novo</string>
     <string name="ai_problem_ask">Perguntar à IA</string>

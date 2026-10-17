@@ -2,6 +2,9 @@
 
 ## Status
 
+Extended by [more grammar and stopping an AI reply](2026-10-17-more-grammar-and-stop-ai-reply.md),
+which adds frequent everyday points and an optional AI grammar button through the assistant.
+
 Implemented. The owner asked in the project thread on 2026-10-07 for grammar explanations up to
 N1 and for Auto to pick the spoken caption language, discussed the plan, chose "All 8 languages"
 on the decision card, and asked for everything in one PR. That does not authorize merging or
