@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 中国語学習者向けの中国語の文法項目。中国語の語句と例はそのまま残す。 -->
+    <string name="grammar_zh_budebu">不得不：〜せざるを得ない、仕方なく〜する</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…：〜だけでなく、…も</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…：〜に関係なく、（いつも）…</string>
+    <string name="grammar_zh_buru">A 不如 B：A は B に及ばない；〜したほうがいい</string>
+    <string name="grammar_zh_buyong">不用：〜する必要はない</string>
+    <string name="grammar_zh_bie">别 / 不要 + 動詞：〜しないで（禁止）</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过：しかし、でも</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…：〜だけれども、（それでも）…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…：〜なので、（だから）…（先に理由、次に結果）</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…：もし〜なら、…</string>
+    <string name="grammar_zh_zhiyao">只要…就…：〜さえすれば、（それで）…</string>
+    <string name="grammar_zh_zhiyou">只有…才…：〜の場合にだけ、（はじめて）…</string>
+    <string name="grammar_zh_jiran">既然…就…：〜である以上（〜なのだから）、…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…：たとえ〜でも、やはり…</string>
+    <string name="grammar_zh_lian">连…都 / 也…：〜さえ（も）</string>
+    <string name="grammar_zh_chule">除了…(以外)：〜を除いて；〜のほかに</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说：（だれか）にとって、その人の立場から見ると</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B：A ではなく B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来：〜のように見える・聞こえる、〜らしい</string>
+    <string name="grammar_zh_youdianr">有点儿 + 形容詞：少し〜（たいてい好ましくないこと）</string>
+    <string name="grammar_zh_yidianr">一点儿：少し（形容詞 + 一点儿 = もう少し〜）</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + 形容詞：ますます〜</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B：A であるほど B</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B：A しながら B する（同時に）</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了：もうすぐ〜する、まもなく起こる</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + 動詞：今ちょうど〜している（進行中）</string>
+    <string name="grammar_zh_yixia">動詞 + 一下：ちょっと〜する（ちょっと見る、少し待つ）</string>
+    <string name="grammar_zh_direction">動詞 + 来 / 去 (…)：動作の方向（来 は話し手の方へ、去 は離れる方へ）</string>
+    <string name="grammar_zh_potential">動詞 + 得 / 不 + 結果：〜できる / 〜できない（听不懂 = 聞いて分からない）</string>
+    <string name="grammar_zh_result">動詞 + 結果：動作がどう終わるかを示す（做完 = やり終える、听懂 = 聞いて分かる、找到 = 見つける）</string>
+    <string name="grammar_zh_rang">让 / 叫 + 人 + 動詞：人に〜させる（許す、またはさせる）</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B：A を B とする（硬い言い方）</string>
+    <string name="grammar_zh_ma">吗：文を「はい・いいえ」で答える疑問文にする</string>
+    <string name="grammar_zh_ne">呢：〜は？（聞き返す）；質問の口調をやわらげる；または動作が続いている</string>
+    <string name="grammar_zh_shi">是：〜です・〜である（二つの名詞を結ぶ：我是学生）</string>
+    <string name="grammar_zh_you">有：持っている；〜がある・いる</string>
+    <string name="grammar_zh_zai">在：（場所）で、に；または（場所）にいる・ある</string>
+    <string name="grammar_zh_hen">很：とても（主語と形容詞をつなぐだけのことも多い）</string>
+    <string name="grammar_zh_tai">太 (…了)：〜すぎる；またはとても〜（了 で気持ちを加える）</string>
+    <string name="grammar_zh_dou">都：みんな、どちらも（動詞の前に置く）</string>
+    <string name="grammar_zh_ye">也：〜も（動詞の前に置く）</string>
+    <string name="grammar_zh_he">和：〜と（名詞をつなぐ。文はつながない）；〜と一緒に</string>
+    <string name="grammar_zh_question_word">疑問詞：何、だれ、どこ、どのように、いくつ、なぜ（答えが入る位置に置く）</string>
+    <string name="grammar_zh_de_shihou">…的时候：〜するとき、〜の時に</string>
+    <string name="grammar_zh_location">名詞の後ろに場所を表す語をつける：桌子上 = テーブルの上に、房间里 = 部屋の中に</string>
+    <string name="grammar_zh_qing">请 + 動詞：どうぞ〜してください</string>
+    <string name="grammar_zh_hui">会：（習って身につけた技能が）できる；たぶん〜するだろう</string>
+    <string name="grammar_zh_neng">能：できる（能力がある、または許されている）</string>
+    <string name="grammar_zh_xiang">想 + 動詞：〜したい、〜したいと思う</string>
+    <string name="grammar_zh_de">的：修飾語や持ち主を名詞につなぐ（我的书 = 私の本）</string>
+    <string name="grammar_zh_le_completed">動詞 + 了：動作が完了した</string>
+    <string name="grammar_zh_guo">動詞 + 过：以前に〜したことがある（経験）</string>
+    <string name="grammar_zh_zhe">動詞 + 着：続いている状態や進行中の動作（穿着 = 着ている）</string>
+    <string name="grammar_zh_de_degree">動詞 + 得 + 様子の説明：どのように（どれくらい上手に）するか（跑得很快）</string>
+    <string name="grammar_zh_bi">A 比 B + 形容詞：A は B より〜だ</string>
+    <string name="grammar_zh_zui">最：最も、いちばん</string>
+    <string name="grammar_zh_jiu">就：それなら；すぐに；まさに；〜だけ（すぐであること・簡単であることを強調）</string>
+    <string name="grammar_zh_yijing">已经 (…了)：もう、すでに</string>
+    <string name="grammar_zh_gei">给：あげる；〜のために、〜に（给他打电话 = 彼に電話する）</string>
+    <string name="grammar_zh_dui">对：〜に、〜に対して、〜について（对…感兴趣）；または正しい</string>
+    <string name="grammar_zh_cong">从：（場所や時間）から；从…到…：〜から…まで</string>
+    <string name="grammar_zh_li">离：〜からの距離（A 离 B 很远 = A は B から遠い）</string>
+    <string name="grammar_zh_wang">往：〜の方へ（方向）</string>
+    <string name="grammar_zh_yiqi">一起：一緒に（跟…一起 = 〜と一緒に）</string>
+    <string name="grammar_zh_hai">还：まだ；さらに；もっと（还有 = ほかにも〜がある）</string>
+    <string name="grammar_zh_zai_again">再：また（これから先に）；それから（先…再…）</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺：とても、本当に（形容詞の強さを表す）</string>
+    <string name="grammar_zh_keyi">可以：〜してもよい、〜できる（許可や可能性）</string>
+    <string name="grammar_zh_yao">要：ほしい；〜する必要がある；（もうすぐ）〜する</string>
+    <string name="grammar_zh_ba_particle">吧：提案（〜しよう）や確認（〜でしょう？）</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是：頻度（よく、ふだん、いつも）</string>
+    <string name="grammar_zh_before_after">…以前 / …以后：〜の前 / 〜の後（出来事の後ろに置く）</string>
+    <string name="grammar_zh_ordinal">第 + 数：順番を表す（第一 = 一番目）</string>
+    <string name="grammar_zh_mei_every">每 (+ 量詞)：毎〜、どの〜も（よく 都 と一緒に使う）</string>
+    <string name="grammar_zh_le_change">文末の 了：状況が変わった、または今は新しい状態だ</string>
+    <string name="grammar_zh_v_not_v">動詞 不 動詞：はい・いいえを問う疑問文（去不去 = 行く？行かない？）</string>
+    <string name="grammar_zh_reduplication">動詞の重ね型（看看、试一试）：ちょっと〜する、試しにやってみる</string>
+    <string name="grammar_zh_ba">把 + 目的語 + 動詞 + 結果：目的語に何かをする（目的語が動詞の前に来る）</string>
+    <string name="grammar_zh_bei">被：受け身。主語が動作を受ける（好ましくないことが多い）</string>
+    <string name="grammar_zh_de_adverbial">様子を表す語 + 地 + 動詞：動作のしかた（慢慢地走）</string>
+    <string name="grammar_zh_geng">更：さらに、もっと</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…)：まず（〜、それから…）</string>
+    <string name="grammar_zh_ranhou">然后：それから、その後</string>
+    <string name="grammar_zh_haishi">还是：それとも（疑問文で）；やはり、まだ；〜したほうがいい</string>
+    <string name="grammar_zh_huozhe">或者：または、あるいは（平叙文で）</string>
+    <string name="grammar_zh_cai">才：〜してやっと、〜になってはじめて（予想より遅い・難しい）</string>
+    <string name="grammar_zh_you_again">又：また（すでにもう一度起きた）；又 A 又 B：A でもあり B でもある</string>
+    <string name="grammar_zh_bijiao">比较：わりと、比較的；比べる</string>
+    <string name="grammar_zh_zhi">只：〜だけ（動詞の前に置く）</string>
+    <string name="grammar_zh_yiding">一定：きっと、必ず；〜しなければならない</string>
+    <string name="grammar_zh_zhongyu">终于：ついに、やっと（待ったり努力したりした末に）</string>
+    <string name="grammar_zh_mashang">马上：すぐに、ただちに</string>
+    <string name="grammar_zh_yizhi">一直：ずっと、絶えず；まっすぐ</string>
+    <string name="grammar_zh_qishi">其实：実は、実際は</string>
+    <string name="grammar_zh_gang">刚 / 刚刚：〜したばかり（ついさっき）；刚才：さっき</string>
+    <string name="grammar_zh_yinggai">应该：〜すべきだ、〜したほうがいい</string>
+    <string name="grammar_zh_bixu">必须：〜しなければならない</string>
+    <string name="grammar_zh_xuyao">需要：（〜する）必要がある</string>
+    <string name="grammar_zh_yuanyi">愿意：進んで〜する、〜してもいいと思う</string>
+    <string name="grammar_zh_weile">为了：〜するために；〜のために</string>
+    <string name="grammar_zh_guanyu">关于：〜について、〜に関して</string>
+    <string name="grammar_zh_gen">跟：〜と、〜と一緒に（跟…一起 = 〜と一緒に）</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样：A は B と同じだ</string>
+    <string name="grammar_zh_haoxiang">好像：〜のようだ、まるで〜みたい</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ 形容詞)：こんなに〜 / あんなに〜；このように / そのように</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦：気持ちを加える（驚き、興奮、やわらかい口調）</string>
+    <string name="grammar_zh_shi_de">是…的：いつ、どこで、どのように起きたかを強調する</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B：A するとすぐに B</string>
+    <string name="grammar_zh_yushi">于是：そこで、それで（次に起きたこと）</string>
+    <string name="grammar_zh_duome">多么 + 形容詞!：なんと〜なんだろう！（強い気持ち）</string>
+    <string name="grammar_zh_yuanlai">原来：もともと；なんだ、そうだったのか（今気づいた）</string>
+    <string name="grammar_zh_daodi">到底：いったい（疑問文で）；結局のところ</string>
+    <string name="grammar_zh_shenzhi">甚至：〜さえ、〜までも（予想以上に）</string>
+    <string name="grammar_zh_fouze">否则 / 不然：さもないと、そうでないと</string>
+    <string name="grammar_zh_jingran">竟然 / 居然：意外にも、驚いたことに</string>
+    <string name="grammar_zh_nandao">难道…?：まさか〜ではないだろう？（「いいえ」の答えを予想する疑問）</string>
+    <string name="grammar_zh_jinguan">尽管：〜だけれども；遠慮なく〜する</string>
+    <string name="grammar_zh_suizhe">随着：〜につれて、〜とともに（何かが変わる）</string>
+    <string name="grammar_zh_fanzheng">反正：どうせ、いずれにしても</string>
+    <string name="grammar_zh_bijing">毕竟：結局、なんといっても</string>
+    <string name="grammar_zh_weibi">未必：必ずしも〜とは限らない</string>
+    <string name="grammar_zh_jianzhi">简直：まったく、まるで（強い気持ち）</string>
+    <string name="grammar_zh_wanyi">万一：もしも〜したら（悪いこと）</string>
+    <string name="grammar_zh_zongzhi">总之：要するに、とにかく</string>
+    <string name="grammar_zh_zhiyu">至于：〜については</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B：A するより B したほうがいい</string>
+    <string name="grammar_zh_ningke">宁可：むしろ〜したい（代償を払ってでも）</string>
+    <string name="grammar_zh_hebi">何必…?：わざわざ〜することがあるだろうか（その必要はない）</string>
+    <string name="grammar_zh_yimian">以免：〜しないように、〜を避けるために</string>
+    <string name="grammar_zh_yibian_so">以便：〜できるように、〜しやすくするために</string>
+    <string name="grammar_zh_conger">从而：それによって、したがって</string>
+    <string name="grammar_zh_guran">固然：確かに〜ではあるが（しかし…）</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况：その上、しかも；ましてや</string>
+    <string name="grammar_zh_measure">量詞：数、または「この / その」+ 量詞 + 名詞（一本书、这个人）</string>
+    <string name="grammar_zh_bu">不：〜ない（現在・未来・習慣、形容詞の否定）</string>
+    <string name="grammar_zh_mei">没 / 没有：〜しなかった、まだ〜していない（過去の動作）；没有 + 名詞：持っていない、ない</string>
+    <string name="grammar_zh_men">们：人を表す語を複数にする（朋友们 = 友人たち）</string>
+    <string name="grammar_zh_yong">用 + もの + 動詞：〜を使って〜する</string>
+    <string name="grammar_zh_wei_for">为 + 人：〜のために、〜に代わって（为你高兴 = あなたのことをうれしく思う）</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝：〜に向かって、〜の方へ（向我走来 = 私の方へ歩いてくる）</string>
+    <string name="grammar_zh_yiwei_thought">以为：〜と思っていた（多くは思い違い）、〜と思い込む</string>
+    <string name="grammar_zh_er">而：そして、しかし、一方（二つの考えをつなぐ。やや硬い）</string>
+    <string name="grammar_zh_bing">并：そして、さらに；并不 / 并没有：決して〜ない、実は〜ない</string>
+    <string name="grammar_zh_you_by">由：〜によって（する人）；〜から（由我负责 = 私が担当する）</string>
+    <string name="grammar_zh_suo">所 + 動詞：〜するところのもの（硬い表現；我所知道的 = 私が知っていること）</string>
+    <string name="grammar_zh_zhishi">只是：ただ〜だけ；でも（但是 より柔らかい）</string>
+    <string name="grammar_zh_youyu">由于：〜のため、〜が原因で（硬い表現）</string>
+    <string name="grammar_zh_genju">根据：〜によると；通过：〜を通じて、〜によって；按照：〜に従って（規則など）</string>
+    <string name="grammar_zh_yu_at">于：〜に、〜で、〜から（書き言葉の硬い表現）</string>
+    <string name="grammar_zh_yi_by">以：〜で、〜によって、〜として（硬い表現）</string>
+    <string name="grammar_zh_zhi_of">之：硬い表現の 的（三分之一 = 3分の1）</string>
+    <string name="grammar_zh_zhiyi">A 之一：A の一つ（最好的电影之一 = 最高の映画の一つ）</string>
+    <string name="grammar_zh_duiyu">对于：〜について、〜に対して（对于这个问题 = この問題について）</string>
+    <string name="grammar_zh_yinci">因此：だから、そのため（前に述べたことの結果）</string>
+    <string name="grammar_zh_raner">然而：しかしながら（但是より硬い）</string>
+    <string name="grammar_zh_chufei">除非：〜しない限り、〜でなければ（除非…才 / 否则…）</string>
+    <string name="grammar_zh_yaome">要么 A 要么 B：A か B かのどちらか</string>
+    <string name="grammar_zh_ji_you">既 A 又 / 也 B：A でもあり B でもある</string>
+    <string name="grammar_zh_tongshi">同时：同時に、それと同時に</string>
+    <string name="grammar_zh_shide">(像)…似的：まるで〜のようだ（他像孩子似的 = 子どものようだ）</string>
+    <string name="grammar_zh_zicong">自从 / 自：〜から、〜以来（過去のある時から今まで）</string>
+    <string name="grammar_zh_yiji">以及：および、ならびに（硬い表現）</string>
+    <string name="grammar_zh_ti">替：〜の代わりに、〜のために（替我谢谢他 = 私の代わりにお礼を言って）</string>
+</resources>

@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.data
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -10,6 +11,12 @@ import org.junit.Test
  * did not cover (U+9FB0–U+9FFF). The timeouts make a regression fail instead of hanging the build.
  */
 class TokenizerTerminationTest {
+    @Before
+    fun loadChinese() {
+        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+        assertTrue(ChineseMorphology.awaitReady())
+    }
+
     @Test(timeout = 5_000)
     fun hanCharactersAtTheEndOfTheUnifiedBlockAreTokenized() {
         for (codePoint in listOf(0x9FAF, 0x9FB0, 0x9FCF, 0x9FFF)) {

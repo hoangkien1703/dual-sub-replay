@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Poin tata bahasa Mandarin untuk pelajar bahasa Mandarin. Biarkan kata dan contoh bahasa Mandarin apa adanya. -->
+    <string name="grammar_zh_budebu">不得不: terpaksa, tidak ada pilihan selain</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…: tidak hanya… tetapi juga…</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…: tidak peduli…, (tetap)…</string>
+    <string name="grammar_zh_buru">A 不如 B: A tidak sebaik B; lebih baik…</string>
+    <string name="grammar_zh_buyong">不用: tidak perlu</string>
+    <string name="grammar_zh_bie">别 / 不要 + kata kerja: jangan (lakukan)</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过: tetapi, namun</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…: meskipun…, (tetap)…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…: karena… (maka)…: alasan, lalu akibatnya</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…: jika…, maka…</string>
+    <string name="grammar_zh_zhiyao">只要…就…: asalkan…, (maka)…</string>
+    <string name="grammar_zh_zhiyou">只有…才…: hanya jika…, (baru)…</string>
+    <string name="grammar_zh_jiran">既然…就…: karena sudah… (mengingat bahwa…), maka…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…: sekalipun…, tetap…</string>
+    <string name="grammar_zh_lian">连…都 / 也…: bahkan…</string>
+    <string name="grammar_zh_chule">除了…(以外): kecuali…; selain…</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说: bagi (seseorang), dari sudut pandangnya</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B: bukan A, melainkan B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来: kelihatannya, kedengarannya, sepertinya</string>
+    <string name="grammar_zh_youdianr">有点儿 + kata sifat: agak (biasanya hal yang tidak diinginkan)</string>
+    <string name="grammar_zh_yidianr">一点儿: sedikit (kata sifat + 一点儿 = sedikit lebih…)</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + kata sifat: semakin…</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B: semakin A, semakin B</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B: melakukan A sambil B</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了: akan segera terjadi, sebentar lagi</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + kata kerja: sedang melakukannya (sedang berlangsung)</string>
+    <string name="grammar_zh_yixia">Kata kerja + 一下: melakukannya sebentar (lihat sebentar, tunggu sebentar)</string>
+    <string name="grammar_zh_direction">Kata kerja + 来 / 去 (…): arah tindakan (来 ke arah pembicara, 去 menjauh)</string>
+    <string name="grammar_zh_potential">Kata kerja + 得 / 不 + hasil: bisa / tidak bisa (听不懂 = tidak bisa mengerti)</string>
+    <string name="grammar_zh_result">Kata kerja + hasil: menunjukkan bagaimana tindakan berakhir (做完 = selesai, 听懂 = mengerti, 找到 = menemukan)</string>
+    <string name="grammar_zh_rang">让 / 叫 + seseorang + kata kerja: membiarkan atau menyuruh seseorang melakukan sesuatu</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B: menjadikan A sebagai B (formal)</string>
+    <string name="grammar_zh_ma">吗: mengubah kalimat menjadi pertanyaan ya/tidak</string>
+    <string name="grammar_zh_ne">呢: bagaimana dengan…?; melembutkan pertanyaan; atau tindakan yang masih berlangsung</string>
+    <string name="grammar_zh_shi">是: adalah (menghubungkan dua kata benda: 我是学生)</string>
+    <string name="grammar_zh_you">有: punya; ada</string>
+    <string name="grammar_zh_zai">在: di (suatu tempat); atau berada di suatu tempat</string>
+    <string name="grammar_zh_hen">很: sangat (sering hanya menghubungkan subjek dengan kata sifat)</string>
+    <string name="grammar_zh_tai">太 (…了): terlalu…; atau sangat… (了 menambah perasaan)</string>
+    <string name="grammar_zh_dou">都: semua, keduanya (diletakkan sebelum kata kerja)</string>
+    <string name="grammar_zh_ye">也: juga (diletakkan sebelum kata kerja)</string>
+    <string name="grammar_zh_he">和: dan (menghubungkan kata benda, bukan kalimat); dengan</string>
+    <string name="grammar_zh_question_word">Kata tanya: apa, siapa, di mana, bagaimana, berapa, mengapa (diletakkan di posisi jawabannya)</string>
+    <string name="grammar_zh_de_shihou">…的时候: ketika…, pada saat…</string>
+    <string name="grammar_zh_location">Kata tempat setelah kata benda: 桌子上 = di atas meja, 房间里 = di dalam kamar</string>
+    <string name="grammar_zh_qing">请 + kata kerja: silakan, tolong (lakukan)</string>
+    <string name="grammar_zh_hui">会: bisa (keterampilan yang dipelajari); mungkin akan</string>
+    <string name="grammar_zh_neng">能: bisa (mampu, atau boleh)</string>
+    <string name="grammar_zh_xiang">想 + kata kerja: ingin, mau</string>
+    <string name="grammar_zh_de">的: menghubungkan kata penjelas atau pemilik dengan kata benda (我的书 = buku saya)</string>
+    <string name="grammar_zh_le_completed">Kata kerja + 了: tindakan sudah selesai</string>
+    <string name="grammar_zh_guo">Kata kerja + 过: pernah melakukannya (pengalaman)</string>
+    <string name="grammar_zh_zhe">Kata kerja + 着: keadaan yang bertahan atau tindakan yang sedang berlangsung (穿着 = memakai)</string>
+    <string name="grammar_zh_de_degree">Kata kerja + 得 + keterangan: seberapa (baik) sesuatu dilakukan (跑得很快)</string>
+    <string name="grammar_zh_bi">A 比 B + kata sifat: A lebih… daripada B</string>
+    <string name="grammar_zh_zui">最: paling</string>
+    <string name="grammar_zh_jiu">就: lalu; segera; tepat; hanya (menekankan bahwa itu cepat atau mudah)</string>
+    <string name="grammar_zh_yijing">已经 (…了): sudah</string>
+    <string name="grammar_zh_gei">给: memberi; untuk, kepada (给他打电话 = menelepon dia)</string>
+    <string name="grammar_zh_dui">对: kepada, terhadap, tentang (对…感兴趣); atau benar</string>
+    <string name="grammar_zh_cong">从: dari (tempat atau waktu); 从…到…: dari… sampai…</string>
+    <string name="grammar_zh_li">离: jarak dari (A 离 B 很远 = A jauh dari B)</string>
+    <string name="grammar_zh_wang">往: menuju (suatu arah)</string>
+    <string name="grammar_zh_yiqi">一起: bersama (跟…一起 = bersama dengan)</string>
+    <string name="grammar_zh_hai">还: masih; juga; lebih lagi (还有 = ada juga)</string>
+    <string name="grammar_zh_zai_again">再: lagi (di masa depan); lalu (先…再…)</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺: sangat, sungguh (seberapa kuat kata sifatnya)</string>
+    <string name="grammar_zh_keyi">可以: boleh, bisa (izin atau kemungkinan)</string>
+    <string name="grammar_zh_yao">要: mau; perlu; akan (segera)</string>
+    <string name="grammar_zh_ba_particle">吧: ajakan (ayo…) atau memastikan (…kan?)</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是: seberapa sering (sering, biasanya, selalu)</string>
+    <string name="grammar_zh_before_after">…以前 / …以后: sebelum… / setelah… (diletakkan setelah kejadiannya)</string>
+    <string name="grammar_zh_ordinal">第 + angka: bilangan tingkat (第一 = pertama)</string>
+    <string name="grammar_zh_mei_every">每 (+ kata bantu bilangan): setiap (sering dengan 都)</string>
+    <string name="grammar_zh_le_change">了 di akhir kalimat: sesuatu sudah berubah atau kini menjadi baru</string>
+    <string name="grammar_zh_v_not_v">Kata kerja 不 kata kerja: pertanyaan ya/tidak (去不去 = pergi atau tidak?)</string>
+    <string name="grammar_zh_reduplication">Kata kerja diulang (看看, 试一试): melakukannya sedikit, mencoba</string>
+    <string name="grammar_zh_ba">把 + objek + kata kerja + hasil: melakukan sesuatu pada objek (objek diletakkan sebelum kata kerja)</string>
+    <string name="grammar_zh_bei">被: pasif, subjek dikenai tindakan (sering hal yang tidak diinginkan)</string>
+    <string name="grammar_zh_de_adverbial">Keterangan + 地 + kata kerja: cara tindakan dilakukan (慢慢地走)</string>
+    <string name="grammar_zh_geng">更: lebih lagi</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…): pertama-tama (…, lalu…)</string>
+    <string name="grammar_zh_ranhou">然后: lalu, setelah itu</string>
+    <string name="grammar_zh_haishi">还是: atau (dalam pertanyaan); masih; sebaiknya</string>
+    <string name="grammar_zh_huozhe">或者: atau (dalam pernyataan)</string>
+    <string name="grammar_zh_cai">才: baru (lebih lambat atau lebih sulit dari dugaan)</string>
+    <string name="grammar_zh_you_again">又: lagi (sudah terjadi lagi); 又 A 又 B: A dan juga B</string>
+    <string name="grammar_zh_bijiao">比较: cukup, agak; membandingkan</string>
+    <string name="grammar_zh_zhi">只: hanya (sebelum kata kerja)</string>
+    <string name="grammar_zh_yiding">一定: pasti, tentu; harus</string>
+    <string name="grammar_zh_zhongyu">终于: akhirnya (setelah menunggu atau berusaha)</string>
+    <string name="grammar_zh_mashang">马上: segera, sekarang juga</string>
+    <string name="grammar_zh_yizhi">一直: terus-menerus, selalu; lurus terus</string>
+    <string name="grammar_zh_qishi">其实: sebenarnya, sesungguhnya</string>
+    <string name="grammar_zh_gang">刚 / 刚刚: baru saja; 刚才: tadi</string>
+    <string name="grammar_zh_yinggai">应该: seharusnya, sebaiknya</string>
+    <string name="grammar_zh_bixu">必须: harus, wajib</string>
+    <string name="grammar_zh_xuyao">需要: perlu, membutuhkan</string>
+    <string name="grammar_zh_yuanyi">愿意: bersedia, mau</string>
+    <string name="grammar_zh_weile">为了: untuk, supaya; demi</string>
+    <string name="grammar_zh_guanyu">关于: tentang, mengenai</string>
+    <string name="grammar_zh_gen">跟: dengan, dan (跟…一起 = bersama dengan)</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样: A sama dengan B</string>
+    <string name="grammar_zh_haoxiang">好像: sepertinya, seolah-olah</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ kata sifat): begitu…, seperti ini / seperti itu</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦: menambah perasaan (terkejut, antusias, nada lebih lembut)</string>
+    <string name="grammar_zh_shi_de">是…的: menekankan kapan, di mana, atau bagaimana sesuatu terjadi</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B: begitu A, (langsung) B</string>
+    <string name="grammar_zh_yushi">于是: maka, lalu (apa yang terjadi selanjutnya)</string>
+    <string name="grammar_zh_duome">多么 + kata sifat!: alangkah…! (perasaan kuat)</string>
+    <string name="grammar_zh_yuanlai">原来: semula; ternyata (baru sadar)</string>
+    <string name="grammar_zh_daodi">到底: sebenarnya (dalam pertanyaan); bagaimanapun juga</string>
+    <string name="grammar_zh_shenzhi">甚至: bahkan (lebih jauh dari dugaan)</string>
+    <string name="grammar_zh_fouze">否则 / 不然: kalau tidak, jika tidak</string>
+    <string name="grammar_zh_jingran">竟然 / 居然: tak disangka, ternyata (mengejutkan)</string>
+    <string name="grammar_zh_nandao">难道…?: masa…? (pertanyaan yang mengharapkan jawaban tidak)</string>
+    <string name="grammar_zh_jinguan">尽管: meskipun; silakan saja</string>
+    <string name="grammar_zh_suizhe">随着: seiring dengan (sesuatu yang berubah)</string>
+    <string name="grammar_zh_fanzheng">反正: lagi pula, bagaimanapun juga</string>
+    <string name="grammar_zh_bijing">毕竟: bagaimanapun juga, toh</string>
+    <string name="grammar_zh_weibi">未必: belum tentu</string>
+    <string name="grammar_zh_jianzhi">简直: benar-benar, sungguh (perasaan kuat)</string>
+    <string name="grammar_zh_wanyi">万一: kalau-kalau, seandainya (hal buruk)</string>
+    <string name="grammar_zh_zongzhi">总之: singkatnya, pokoknya</string>
+    <string name="grammar_zh_zhiyu">至于: adapun…, soal…</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B: daripada A, lebih baik B</string>
+    <string name="grammar_zh_ningke">宁可: lebih memilih (meski harus berkorban)</string>
+    <string name="grammar_zh_hebi">何必…?: buat apa…? (tidak perlu)</string>
+    <string name="grammar_zh_yimian">以免: supaya tidak, agar terhindar dari</string>
+    <string name="grammar_zh_yibian_so">以便: supaya, agar lebih mudah</string>
+    <string name="grammar_zh_conger">从而: sehingga, dengan demikian</string>
+    <string name="grammar_zh_guran">固然: memang, memang benar bahwa… (tetapi)</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况: lagi pula; apalagi</string>
+    <string name="grammar_zh_measure">Kata bantu bilangan: angka atau ini / itu + kata bantu bilangan + kata benda (一本书, 这个人)</string>
+    <string name="grammar_zh_bu">不: tidak (sekarang, masa depan, kebiasaan, dan dengan kata sifat)</string>
+    <string name="grammar_zh_mei">没 / 没有: tidak, belum (tindakan lampau); 没有 + kata benda: tidak punya</string>
+    <string name="grammar_zh_men">们: menjadikan kata untuk orang bentuk jamak (朋友们 = teman-teman)</string>
+    <string name="grammar_zh_yong">用 + benda + kata kerja: melakukan sesuatu dengan atau memakai benda itu</string>
+    <string name="grammar_zh_wei_for">为 + seseorang: untuk seseorang, atas nama seseorang (为你高兴 = ikut senang untukmu)</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝: ke arah, menghadap (向我走来 = datang ke arahku)</string>
+    <string name="grammar_zh_yiwei_thought">以为: mengira (biasanya keliru), menyangka</string>
+    <string name="grammar_zh_er">而: dan, tetapi, sedangkan (menghubungkan dua gagasan, lebih formal)</string>
+    <string name="grammar_zh_bing">并: dan juga; 并不 / 并没有: sama sekali tidak, sebenarnya tidak</string>
+    <string name="grammar_zh_you_by">由: oleh (siapa yang melakukan); dari (由我负责 = saya yang bertanggung jawab)</string>
+    <string name="grammar_zh_suo">所 + kata kerja: apa yang… (formal; 我所知道的 = apa yang saya ketahui)</string>
+    <string name="grammar_zh_zhishi">只是: hanya, cuma; tetapi (但是 yang lebih halus)</string>
+    <string name="grammar_zh_youyu">由于: karena, disebabkan oleh (formal)</string>
+    <string name="grammar_zh_genju">根据: menurut; 通过: melalui, dengan cara; 按照: sesuai dengan (aturan)</string>
+    <string name="grammar_zh_yu_at">于: di, ke, dari (bahasa Mandarin tulis formal)</string>
+    <string name="grammar_zh_yi_by">以: dengan, dengan cara, sebagai (formal)</string>
+    <string name="grammar_zh_zhi_of">之: bentuk formal dari 的 (三分之一 = sepertiga)</string>
+    <string name="grammar_zh_zhiyi">A 之一: salah satu dari A (最好的电影之一 = salah satu film terbaik)</string>
+    <string name="grammar_zh_duiyu">对于: mengenai, terhadap (对于这个问题 = mengenai masalah ini)</string>
+    <string name="grammar_zh_yinci">因此: oleh karena itu, maka (akibat dari yang baru dikatakan)</string>
+    <string name="grammar_zh_raner">然而: akan tetapi (lebih formal daripada 但是)</string>
+    <string name="grammar_zh_chufei">除非: kecuali jika; hanya jika (除非…才 / 否则…)</string>
+    <string name="grammar_zh_yaome">要么 A 要么 B: entah A atau B (pilih satu)</string>
+    <string name="grammar_zh_ji_you">既 A 又 / 也 B: baik A maupun B</string>
+    <string name="grammar_zh_tongshi">同时: pada saat yang sama; sekaligus</string>
+    <string name="grammar_zh_shide">(像)…似的: seperti, seakan-akan (他像孩子似的 = dia seperti anak kecil)</string>
+    <string name="grammar_zh_zicong">自从 / 自: sejak (suatu waktu di masa lalu sampai sekarang)</string>
+    <string name="grammar_zh_yiji">以及: serta, dan juga (formal; menyambung unsur terakhir)</string>
+    <string name="grammar_zh_ti">替: untuk, atas nama (替我谢谢他 = sampaikan terima kasihku padanya)</string>
+</resources>

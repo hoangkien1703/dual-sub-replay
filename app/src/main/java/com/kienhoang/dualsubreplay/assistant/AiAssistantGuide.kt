@@ -66,9 +66,9 @@ internal fun aiSubtitleLineContext(
     }
 
 /**
- * The hidden context sent with the word card's "Explain the grammar with AI": the Japanese line,
- * the other subtitle line, the words the user tapped, and the grammar points the app already
- * found, so the model can build on them and add what they miss.
+ * The hidden context sent with the word card's "Explain the grammar with AI": the Japanese or
+ * Chinese line, the other subtitle line, the words the user tapped, and the grammar
+ * points the app already found, so the model can build on them and add what they miss.
  */
 internal fun aiGrammarContext(
     line: String,
