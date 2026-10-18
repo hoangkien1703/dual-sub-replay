@@ -87,7 +87,7 @@ class PageTranscriptWebViewTest {
                     "if (option === 'tracklist') return [{languageCode: 'zh-Hans', kind: 'asr'}];",
                     "if (option === 'tracklist') return [];",
                 ).replace("const playerLoadsCaptionsWhenAsked = true;", "const playerLoadsCaptionsWhenAsked = false;")
-                .replace("</script></body>", PANEL_PAGE_PART + "</body>"),
+                .replace("</script></body>", "</script>" + PANEL_PAGE_PART + "</body>"),
             PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload()),
         ) { model, page, _ ->
             compose.waitUntil(60_000) { !model.state.value.liveFallback && model.state.value.resolvedSourceLanguage == "zh" }
