@@ -1634,7 +1634,9 @@ class AppViewModel internal constructor(
             }
         // The error's own message is English diagnostic text, like Google's failure detail.
         val detail = downloadError.message?.takeIf(String::isNotBlank) ?: downloadError.javaClass.simpleName
-        return listOfNotNull(page, text(R.string.status_transcript_download_failed, detail)).joinToString("\n")
+        // Where the page looked, also English diagnostic text, so a phone test shows which step failed.
+        val pageDetail = pageTranscripts.problemDetail(videoId)?.let { text(R.string.status_transcript_page_detail, it) }
+        return listOfNotNull(page, pageDetail, text(R.string.status_transcript_download_failed, detail)).joinToString("\n")
     }
 
     /** A language's name in the interface language, for use inside [text] messages. */

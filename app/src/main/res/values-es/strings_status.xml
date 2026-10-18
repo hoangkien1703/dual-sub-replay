@@ -24,6 +24,7 @@
     <string name="status_transcript_page_waiting">Transcripción completa: YouTube aún no ha cargado los subtítulos. Aparecerá sola cuando se carguen, normalmente al empezar el video.</string>
     <string name="status_transcript_page_unreadable">Transcripción completa: no se pudieron leer los subtítulos que envió YouTube.</string>
     <string name="status_transcript_download_failed">Descarga de la app: %1$s</string>
+    <string name="status_transcript_page_detail">Revisión de la página: %1$s</string>
     <string name="translation_issue_button">Problema de traducción</string>
     <string name="translation_issue_on_device_title">Usando la traducción en el dispositivo</string>
     <string name="translation_issue_on_device_message">Google Traductor no funciona en este momento, así que este video se traduce en tu dispositivo. La app vuelve a probar Google cada 2 minutos y en el siguiente video.</string>

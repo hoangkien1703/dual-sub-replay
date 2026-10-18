@@ -2,8 +2,10 @@
 
 ## Status
 
-Implemented, revised once (physical-phone and live-YouTube checks pending). The first version
-failed on the owner's phone; see [Revision 1](#revision-1-keep-the-players-own-download). On 2026-10-18 the owner reported that the full dual-subtitle
+Implemented, revised twice (physical-phone and live-YouTube checks pending). The first version
+failed on the owner's phone; see [Revision 1](#revision-1-keep-the-players-own-download). Revision 1
+then stopped on an empty track list; see
+[Revision 2](#revision-2-no-dead-end-on-an-empty-track-list-and-the-transcript-panel). On 2026-10-18 the owner reported that the full dual-subtitle
 transcript still does not load (PR #123's attempt did not fix it) and asked why other projects
 still work. After the cause was explained in the project thread, the owner picked "Page first"
 on the decision card: the YouTube page in the app's WebView fetches the whole caption track, and
@@ -215,3 +217,94 @@ Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator: the cloud machine
 | `PageTranscriptWebViewTest` (both tests) | Not run locally (no emulator); runs in CI's `managed-device-tests` |
 | Physical phone and live YouTube | Not run; owner's preview test |
 
+## Revision 2: no dead end on an empty track list, and the transcript panel
+
+### Problem
+
+On 2026-10-18 the owner sent a screenshot (signed in to YouTube Premium, an English video on
+`m.youtube.com`): live subtitles showed the video's English captions, and the sheet said "Full
+transcript: YouTube lists no captions for this video" with "App download: Caption discovery stopped
+after 20 seconds... Last stage: player request (Web embedded, youtubei.googleapis.com)". So the page
+player had captions and had downloaded them, but `PageTranscriptSource.offerTracks` ended the request
+the first time the page's player details listed no track (or no trusted track address), before the
+kept copy of the player's download was ever looked at. Which of those it was is not known: the page's
+reason did not say where it looked.
+
+The owner asked for a lasting fix without another server or PC. Research on 2026-10-18 (sources in
+the project thread) found that the tools that still work in September 2026 reuse the captions the
+page's own player downloads: caption track addresses without the player's `pot` answer an empty 200,
+`/youtubei/v1/get_transcript` answers `FAILED_PRECONDITION`, and requests from outside a browser get
+the bot check. Revision 1's capture is that method; this revision removes the step that stopped it.
+The owner was offered three options on a decision card (use the player's download; that plus
+reading YouTube's own transcript panel as a last resort; minting our own tokens like NewPipe) and
+picked "Plus transcript panel". Both parts are built here. The panel matters for videos whose player
+never downloads captions (captions off, not played yet): one report from September 2026 found the
+transcript panel still loading where hand-built requests were refused, because the panel's own
+request comes from YouTube's code.
+
+### Approach
+
+1. `WEB_PAGE_CAPTION_TRACKS_SCRIPT` prefers a player response for the page's own video that lists
+   tracks (the player's, else `ytInitialPlayerResponse`), resolves relative track addresses against
+   the page, and, when the details list none, takes the tracks from the player's captions menu
+   (`getOption('captions', 'tracklist')`, only when the player's video is the same) and from the
+   tracks the capture already kept for that video. It installs the capture too and still changes
+   nothing. It reports `found` counts per source and YouTube's playability status.
+2. `PageTranscriptSource.offerTracks` takes a track without a trusted address (the job then waits for
+   the player's own download), and keeps asking while the page lists no track. After
+   `PAGE_NO_TRACKS_GRACE_MS` (8 s) it stops the provider's wait with `NO_TRACKS` but keeps watching,
+   so a track the player lists or downloads later still gives a late transcript.
+3. The sheet adds a "Page check" line with those counts and the job's last step (English diagnostic
+   text, like the download error), so the next phone test shows which source was empty.
+4. Transcript panel, last resort. When the job's caption window (`PAGE_CAPTION_SWITCH_MS`) ends
+   without the track, or at once for a page that listed no track (`PageCaptionTarget.panelOnly`,
+   set when the grace time ends), the job presses YouTube's own "Show transcript" button
+   (`*-video-description-transcript-section-renderer button`), first unfolding the description
+   when the button is not there. Each press gets time before the next, at most `PANEL_OPEN_TRIES`.
+   The capture keeps the panel's `/youtubei/v1/get_transcript` reply (read-only, YouTube hosts,
+   last four videos); if that is missed, the job reads the shown lines
+   (`transcript-segment-view-model`, `ytm-`/`ytd-transcript-segment-renderer`). Afterwards it
+   presses only the close button inside that panel. `parseTranscriptPanel` turns either form into
+   lines (line timing only, no word timing). A panel-only target's language is a guess (the chosen
+   or learned language, else English) replaced by the lines' writing system when it names one.
+
+### Acceptance criteria
+
+- [x] When the player's details list no track but the player downloaded one, the full transcript is
+  built from that download (`PageTranscriptSourceTest`, headless Chromium run).
+- [x] Tracks from the player's captions menu and relative track addresses are used
+  (headless Chromium run).
+- [x] A page with no track at all stops the wait after the grace time, keeps watching, and names
+  where it looked (`PageTranscriptSourceTest`).
+- [x] The track script only reads: no `fetch`, `setOption` or `loadModule`
+  (`PageTranscriptScriptsTest`).
+- [x] When no captions come, the job unfolds the description, opens the transcript panel, takes its
+  reply or its shown lines, and closes the panel (`TranscriptPanelParserTest`,
+  `PageTranscriptWebViewTest.youTubesTranscriptPanelIsTheLastResort`, headless Chromium run).
+- [ ] On the owner's phone, the English video from the screenshot shows the full transcript.
+
+### Validation result (revision 2)
+
+Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator).
+
+| Check | Result |
+| --- | --- |
+| `PageTranscriptSourceTest`, `PageTranscriptScriptsTest`, `TranscriptPanelParserTest`, `PlaybackArchitectureTest` | Passed |
+| Scripts in headless Chromium 1194 on an offline `m.youtube.com` page whose track answers only with the player's `pot`, player details without tracks: (a) player already downloaded the track: listed from the download, job done; (b) only the captions menu lists it: job switched captions on, took the player's download, done; (c) relative track address: resolved, done; (d) nothing anywhere: empty list, counts reported | Passed (scratch Playwright run, not committed) |
+| Transcript panel in headless Chromium on an offline page with a folded description: (a) panel-only job: unfolded, opened, kept the `get_transcript` reply, closed, done in 4 s; (b) reply not seen: read the shown lines, done in 4 s; (c) normal job with captions never downloaded: panel after the caption window, done in 19 s | Passed (scratch Playwright run, not committed) |
+| `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` | Passed |
+| `PageTranscriptWebViewTest` (four tests, two new) | Not run locally (no emulator); runs in CI's `managed-device-tests` |
+| Physical phone and live YouTube | Not run; owner's preview test. The panel's button and line selectors are taken from public reports, not checked on live `m.youtube.com` (the build machine gets YouTube's bot check) |
+
+### Risks
+
+- The panel is found by YouTube's element names, which change; the "Page check" line names the step
+  it stopped at (`panel-missing`, `panel-opening`, `panel-reading`).
+- Opening the panel unfolds the description on the page under the app's sheet; when the panel has
+  no close button the app can find, it stays open.
+- A video with no captions at all now waits the 8 s grace time (once) before the download's error
+  shows, and the panel is tried once per attempt.
+
+### Release intent
+
+`release:patch` (default; no other intent from the owner).

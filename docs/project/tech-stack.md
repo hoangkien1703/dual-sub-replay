@@ -51,7 +51,9 @@ Paths below are relative to
   scripts) while `YouTubeCaptionProvider` runs alongside as the fallback; the first success wins.
   The page keeps a copy of the caption replies its own player downloads (they carry the page's
   cookies and proof-of-origin token), and keeps watching after live subtitles take over, so
-  captions the player loads later still give the full transcript. See the
+  captions the player loads later still give the full transcript. When the player never downloads
+  the track, the page opens YouTube's own transcript panel and `data/TranscriptPanelParser.kt`
+  reads its lines (line timing only). See the
   [spec](../specs/2026-10-18-page-first-full-transcript.md).
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve

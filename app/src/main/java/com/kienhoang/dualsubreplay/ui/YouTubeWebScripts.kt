@@ -655,35 +655,7 @@ internal fun webClipReplayScript(
         """.trimIndent()
 }
 
-/**
- * Returns the caption part of the page player's response (tracks, audio tracks, title) for
- * `PageTranscriptSource`, or null before the player has one. Read-only: it changes nothing.
- */
-internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
-    """
-    (function() {
-      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
-      if (window.location.protocol !== 'https:' ||
-          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
-      const player = document.getElementById('movie_player');
-      let response = null;
-      try { response = player && typeof player.getPlayerResponse === 'function' ? player.getPlayerResponse() : null; } catch (_) {}
-      if (!response) response = window.ytInitialPlayerResponse || null;
-      const details = response && response.videoDetails;
-      if (!details || !details.videoId) return null;
-      const renderer = response.captions && response.captions.playerCaptionsTracklistRenderer;
-      return JSON.stringify({
-        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
-        captions: renderer ? { playerCaptionsTracklistRenderer: {
-          captionTracks: Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [],
-          audioTracks: renderer.audioTracks || [],
-          defaultAudioTrackIndex: renderer.defaultAudioTrackIndex || 0
-        } } : null
-      });
-    })();
-    """.trimIndent()
-
-internal const val CAPTION_CAPTURE_STATE_KEY = "__dualSubCaptionCaptureV1"
+internal const val CAPTION_CAPTURE_STATE_KEY = "__dualSubCaptionCaptureV2"
 
 /**
  * Keeps a copy of every caption track the YouTube page player downloads, so the app can build the
@@ -692,6 +664,8 @@ internal const val CAPTION_CAPTURE_STATE_KEY = "__dualSubCaptionCaptureV1"
  * lookup cannot supply. Added at document start (and again by [webPageTranscriptScript] where that
  * is unsupported). It only reads `/api/timedtext` replies from YouTube hosts, skips auto-translated
  * tracks and replies over 8 MiB, keeps the last eight tracks, and never changes a request or reply.
+ * It also keeps the `/youtubei/v1/get_transcript` reply of YouTube's own transcript panel (the last
+ * four videos), which [webPageTranscriptScript] opens when the player never downloads captions.
  */
 internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
     """
@@ -701,7 +675,32 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return;
       const key = '$CAPTION_CAPTURE_STATE_KEY';
       if (window[key]) return;
-      const capture = window[key] = { tracks: {}, order: [] };
+      const capture = window[key] = { tracks: {}, order: [], transcripts: {}, transcriptOrder: [] };
+      capture.pageVideo = function() {
+        try {
+          const address = new URL(window.location.href);
+          return address.searchParams.get('v') ||
+            (address.pathname.match(/^\/(?:shorts|live|embed)\/([A-Za-z0-9_-]{11})/) || [])[1] || null;
+        } catch (_) {
+          return null;
+        }
+      };
+      capture.panelReply = function(value) {
+        try {
+          const url = new URL(String(value), window.location.href);
+          const urlHost = url.hostname.toLowerCase().replace(/\.$/, '');
+          if (url.protocol !== 'https:' || !(urlHost === 'youtube.com' || urlHost.endsWith('.youtube.com')) ||
+              url.pathname !== '/youtubei/v1/get_transcript') return null;
+          const videoId = capture.pageVideo();
+          return videoId ? { panel: videoId } : null;
+        } catch (_) {
+          return null;
+        }
+      };
+      capture.watch = function(value) {
+        const url = capture.timedText(value);
+        return url ? { url: url } : capture.panelReply(value);
+      };
       capture.timedText = function(value) {
         try {
           const url = new URL(String(value), window.location.href);
@@ -713,8 +712,15 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           return null;
         }
       };
-      capture.keep = function(url, text) {
+      capture.keep = function(entry, text) {
         if (typeof text !== 'string' || !text.trim() || text.length > $MAX_PAGE_TRANSCRIPT_LENGTH) return;
+        if (entry.panel) {
+          if (!capture.transcripts[entry.panel]) capture.transcriptOrder.push(entry.panel);
+          capture.transcripts[entry.panel] = text;
+          while (capture.transcriptOrder.length > 4) delete capture.transcripts[capture.transcriptOrder.shift()];
+          return;
+        }
+        const url = entry.url;
         const track = {
           videoId: url.searchParams.get('v'),
           languageCode: url.searchParams.get('lang') || '',
@@ -730,7 +736,7 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
         const open = XMLHttpRequest.prototype.open;
         const send = XMLHttpRequest.prototype.send;
         XMLHttpRequest.prototype.open = function(method, address) {
-          this.__dualSubTimedText = capture.timedText(address);
+          this.__dualSubTimedText = capture.watch(address);
           return open.apply(this, arguments);
         };
         XMLHttpRequest.prototype.send = function() {
@@ -756,7 +762,7 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           window.fetch = function(input) {
             const reply = pageFetch.apply(window, arguments);
             try {
-              const url = capture.timedText(input && typeof input === 'object' && 'url' in input ? input.url : input);
+              const url = capture.watch(input && typeof input === 'object' && 'url' in input ? input.url : input);
               if (url) {
                 reply.then(function(response) {
                   if (response && response.ok) response.clone().text().then(function(text) { capture.keep(url, text); }, function() {});
@@ -767,6 +773,91 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           };
         }
       } catch (_) {}
+    })();
+    """.trimIndent()
+
+/**
+ * Returns the caption part of the page player's response (tracks, audio tracks, title) for
+ * `PageTranscriptSource`, or null before the player has one. When the player's details list no
+ * track, which happens while YouTube's own player shows captions, the tracks come from the player's
+ * captions menu and from the caption tracks the player already downloaded (kept by
+ * [WEB_CAPTION_CAPTURE_SCRIPT], which this script also makes sure is installed). `found` counts each
+ * source for the app's diagnostics. It changes nothing on the page.
+ */
+internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+      $WEB_CAPTION_CAPTURE_SCRIPT
+      const capture = window['$CAPTION_CAPTURE_STATE_KEY'];
+      if (!capture) return null;
+      const player = document.getElementById('movie_player');
+      const pageVideo = capture.pageVideo();
+      const listedTracks = function(response) {
+        const renderer = response.captions && response.captions.playerCaptionsTracklistRenderer;
+        return renderer && Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [];
+      };
+      const responses = [];
+      try { if (player && typeof player.getPlayerResponse === 'function') responses.push(player.getPlayerResponse()); } catch (_) {}
+      responses.push(window.ytInitialPlayerResponse || null);
+      const known = responses.filter(function(item) { return item && item.videoDetails && item.videoDetails.videoId; });
+      const matching = known.filter(function(item) { return item.videoDetails.videoId === pageVideo; });
+      const response = matching.find(function(item) { return listedTracks(item).length > 0; }) || matching[0] || known[0];
+      if (!response) return null;
+      const details = response.videoDetails;
+      const renderer = (response.captions && response.captions.playerCaptionsTracklistRenderer) || {};
+      // The page resolves a relative track address against itself; the app only takes absolute ones.
+      const listed = listedTracks(response).map(function(track) {
+        const copy = Object.assign({}, track);
+        try { if (copy.baseUrl) copy.baseUrl = new URL(String(copy.baseUrl), window.location.href).toString(); } catch (_) { copy.baseUrl = ''; }
+        return copy;
+      });
+      let menu = [];
+      try {
+        const data = player && typeof player.getVideoData === 'function' ? player.getVideoData() : null;
+        const list = data && data.video_id === details.videoId && typeof player.getOption === 'function' ?
+          player.getOption('captions', 'tracklist', { includeAsr: true }) : null;
+        if (Array.isArray(list)) menu = list.filter(function(item) { return item && item.languageCode; }).map(function(item) {
+          return {
+            languageCode: String(item.languageCode),
+            kind: item.kind === 'asr' ? 'asr' : '',
+            vssId: String(item.vss_id || item.vssId || ''),
+            name: { simpleText: String(item.displayName || item.languageName || '') },
+            baseUrl: ''
+          };
+        });
+      } catch (_) {}
+      const downloaded = capture.order.map(function(id) { return capture.tracks[id]; }).filter(function(track) {
+        return track && track.videoId === details.videoId && track.languageCode;
+      }).map(function(track) {
+        return { languageCode: track.languageCode, kind: track.generated ? 'asr' : '', name: { simpleText: '' }, baseUrl: '' };
+      });
+      let tracks = listed;
+      if (!tracks.length) {
+        const seen = {};
+        tracks = menu.concat(downloaded).filter(function(track) {
+          const id = track.languageCode + '|' + (track.kind === 'asr' || String(track.vssId || '').indexOf('a.') === 0);
+          if (seen[id]) return false;
+          seen[id] = true;
+          return true;
+        });
+      }
+      return JSON.stringify({
+        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
+        captions: { playerCaptionsTracklistRenderer: {
+          captionTracks: tracks,
+          audioTracks: renderer.audioTracks || [],
+          defaultAudioTrackIndex: renderer.defaultAudioTrackIndex || 0
+        } },
+        found: {
+          details: listed.length,
+          menu: menu.length,
+          downloaded: downloaded.length,
+          playability: String((response.playabilityStatus && response.playabilityStatus.status) || '')
+        }
+      });
     })();
     """.trimIndent()
 
@@ -783,13 +874,17 @@ internal const val PAGE_CAPTION_SWITCH_MS = 15_000
  * waits for the page player to download the track (see [WEB_CAPTION_CAPTURE_SCRIPT]); for the first
  * [PAGE_CAPTION_SWITCH_MS] it switches the page's captions to that track so the player does so, and
  * switches them back if nobody changed them since. After that it keeps watching, so captions the
- * player loads later (when the video plays, or live subtitles turn them on) still finish the job.
+ * player loads later (when the video plays, or live subtitles turn them on) still finish the job,
+ * and, as the last resort, opens YouTube's own transcript panel (unfolding the description first
+ * when its button is hidden there) and takes the panel's reply or its shown lines. A
+ * [PageCaptionTarget.panelOnly] target, for a page that listed no track, goes to the panel at once.
  */
 internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
     // Fixed key order (Android's JSONObject keeps insertion order, the JVM's does not).
     val targetLiteral =
         "{\"videoId\":${JSONObject.quote(target.videoId)},\"languageCode\":${JSONObject.quote(target.languageCode)}," +
-            "\"generated\":${target.generated},\"baseUrl\":${JSONObject.quote(target.baseUrl)},\"attempt\":\"${target.attempt}\"}"
+            "\"generated\":${target.generated},\"baseUrl\":${JSONObject.quote(target.baseUrl)},\"attempt\":\"${target.attempt}\"," +
+            "\"panelOnly\":${target.panelOnly}}"
     return """
         (function() {
           const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
@@ -802,6 +897,7 @@ internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
           const key = '$PAGE_TRANSCRIPT_STATE_KEY';
           const state = window[key] || (window[key] = { jobs: {} });
           $PAGE_TRANSCRIPT_FUNCTIONS
+          $PAGE_TRANSCRIPT_PANEL_FUNCTIONS
           Object.keys(state.jobs).forEach(function(id) {
             if (id === target.attempt) return;
             state.restoreTrack(state.jobs[id]);
@@ -818,7 +914,8 @@ internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
             step: job.step,
             text: job.status === 'done' ? job.text : null,
             languageCode: job.languageCode || null,
-            generated: !!job.generated
+            generated: !!job.generated,
+            panel: !!job.panel
           });
         })();
         """.trimIndent()
@@ -854,8 +951,8 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       const base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
       for (let index = capture.order.length - 1; index >= 0; index--) {
         const track = capture.tracks[capture.order[index]];
-        if (track && track.videoId === target.videoId && base(track.languageCode) === base(target.languageCode) &&
-            state.usable(track.text)) return track;
+        if (track && track.videoId === target.videoId && state.usable(track.text) &&
+            (target.panelOnly || base(track.languageCode) === base(target.languageCode))) return track;
       }
       return null;
     };
@@ -865,6 +962,7 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       job.text = track.text;
       job.languageCode = track.languageCode;
       job.generated = track.generated;
+      job.panel = !!track.panel;
     };
     state.showTrack = function(job, target) {
       const player = state.player();
@@ -909,20 +1007,127 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
     state.check = function(job, target) {
       if (job.status !== 'working') return;
       const elapsed = Date.now() - job.started;
-      const track = state.captured(target, elapsed > $PAGE_CAPTION_SWITCH_MS);
+      const track = state.captured(target, target.panelOnly || elapsed > $PAGE_CAPTION_SWITCH_MS);
       if (track) {
+        state.closePanel(job);
         state.finish(job, track);
         return;
       }
-      if (!job.addressTried && elapsed < 5000) return;
-      if (elapsed > $PAGE_CAPTION_SWITCH_MS) {
+      if (target.panelOnly || elapsed > $PAGE_CAPTION_SWITCH_MS) {
         state.restoreTrack(job);
-      } else if (state.player()) {
-        state.showTrack(job, target);
+        state.panel(job, target);
+        return;
       }
+      if (!job.addressTried && elapsed < 5000) return;
+      if (state.player()) state.showTrack(job, target);
       job.step = state.player() ? 'waiting-for-captions' : 'no-player';
     };
     """.trim()
+
+/** `state.*` helpers for [webPageTranscriptScript] that use YouTube's own transcript panel. */
+private val PAGE_TRANSCRIPT_PANEL_FUNCTIONS =
+    """
+    state.first = function(selectors) {
+      for (let index = 0; index < selectors.length; index++) {
+        const element = document.querySelector(selectors[index]);
+        if (element) return element;
+      }
+      return null;
+    };
+    state.panelLines = function() {
+      const segments = document.querySelectorAll($PANEL_SEGMENT_SELECTORS);
+      const lines = [];
+      segments.forEach(function(segment) {
+        const stamp = segment.querySelector('.segment-timestamp, [class*="timestamp"]');
+        const all = (segment.textContent || '').replace(/\s+/g, ' ').trim();
+        const found = ((stamp ? stamp.textContent : all) || '').match(/\d{1,2}(?::\d{2}){1,2}/);
+        if (!found) return;
+        const startMs = found[0].split(':').reduce(function(total, part) { return total * 60 + Number(part); }, 0) * 1000;
+        const textElement = segment.querySelector('.segment-text, [class*="segment-text"]');
+        let text = textElement ? textElement.textContent : all;
+        if (!textElement) text = String(text).replace(stamp ? stamp.textContent : found[0], '');
+        text = String(text || '').replace(/\s+/g, ' ').trim();
+        if (text) lines.push({ startMs: startMs, text: text });
+      });
+      return lines;
+    };
+    state.closePanel = function(job) {
+      if (!job.panelOpened) return;
+      job.panelOpened = false;
+      // Only a close button inside the transcript's own panel; anything else is left as it is.
+      const segment = document.querySelector($PANEL_SEGMENT_SELECTORS);
+      const panel = segment && segment.closest('[class*="engagement-panel"], ytm-engagement-panel-section-list-renderer, ytd-engagement-panel-section-list-renderer');
+      const close = panel && panel.querySelector('#visibility-button button, button[class*="close"], [class*="close-button"] button');
+      try { if (close) close.click(); } catch (_) {}
+    };
+    state.panel = function(job, target) {
+      const kept = capture.transcripts[target.videoId];
+      if (state.usable(kept)) {
+        state.closePanel(job);
+        state.finish(job, { text: kept, languageCode: target.languageCode, generated: target.generated, panel: true });
+        return;
+      }
+      const lines = state.panelLines();
+      // Shown lines are taken once their count stops growing between two polls.
+      if (lines.length && lines.length === job.panelLines) {
+        state.closePanel(job);
+        state.finish(job, {
+          text: JSON.stringify({ panelLines: lines }),
+          languageCode: target.languageCode,
+          generated: target.generated,
+          panel: true
+        });
+        return;
+      }
+      job.panelLines = lines.length;
+      if (lines.length) {
+        job.step = 'panel-reading';
+        return;
+      }
+      const now = Date.now();
+      if ((job.panelTries || 0) >= $PANEL_OPEN_TRIES) {
+        job.step = 'panel-missing';
+        return;
+      }
+      // An opened panel gets time to load before the button is pressed again (it may toggle).
+      if (job.panelTried && now - job.panelTried < (job.panelOpened ? 8000 : 2500)) return;
+      job.panelTried = now;
+      job.panelTries = (job.panelTries || 0) + 1;
+      const button = state.first([
+        'ytm-video-description-transcript-section-renderer button',
+        'ytd-video-description-transcript-section-renderer button',
+        '[class*="transcript-section"] button'
+      ]);
+      if (button) {
+        button.click();
+        job.panelOpened = true;
+        job.step = 'panel-opening';
+        return;
+      }
+      // The panel's button sits in the video's description, which may still be folded.
+      const more = state.first([
+        'ytm-slim-video-information-renderer .slim-video-information-show-more',
+        '.slim-video-information-show-more',
+        'ytm-slim-video-information-renderer [role="button"]',
+        'ytm-slim-video-information-renderer button',
+        '#description-inline-expander #expand',
+        'tp-yt-paper-button#expand'
+      ]);
+      if (more) {
+        more.click();
+        job.step = 'panel-description';
+        return;
+      }
+      job.step = 'panel-missing';
+    };
+    """.trim()
+
+/** Transcript line elements of YouTube's transcript panel (mobile, desktop and the newer view). */
+private const val PANEL_SEGMENT_SELECTORS =
+    "'transcript-segment-view-model, ytm-transcript-segment-renderer, ytd-transcript-segment-renderer'"
+
+/** How often a job tries to open the transcript panel (about 2.5 s apart) before giving up. */
+internal const val PANEL_OPEN_TRIES = 4
 
 /** Reads what [webPageTranscriptScript] returned through `evaluateJavascript`. */
 internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {
@@ -934,6 +1139,7 @@ internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {
         text,
         json.optString("languageCode").takeIf { it.matches(Regex("[a-zA-Z]{2,3}(-[a-zA-Z0-9]+)*")) },
         json.optBoolean("generated"),
+        panel = json.optBoolean("panel"),
     )
 }
 

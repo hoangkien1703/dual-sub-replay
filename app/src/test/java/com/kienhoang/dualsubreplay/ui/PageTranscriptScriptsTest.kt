@@ -31,7 +31,7 @@ class PageTranscriptScriptsTest {
         assertTrue(
             script.contains(
                 """const target = {"videoId":"abcdefghijk","languageCode":"zh-Hans","generated":true,""" +
-                    """"baseUrl":${JSONObject.quote(target.baseUrl)},"attempt":"7"};""",
+                    """"baseUrl":${JSONObject.quote(target.baseUrl)},"attempt":"7","panelOnly":false};""",
             ),
         )
         // Every address the page fetches or keeps passes the same YouTube-host, /api/timedtext check.
@@ -48,6 +48,20 @@ class PageTranscriptScriptsTest {
         assertTrue(script.contains("player.setOption('captions', 'track', job.previous || {})"))
         assertTrue(WEB_PAGE_CAPTION_TRACKS_SCRIPT.contains("getPlayerResponse()"))
         assertFalse(WEB_PAGE_CAPTION_TRACKS_SCRIPT.contains("setOption"))
+    }
+
+    @Test
+    fun theTrackListAlsoReadsThePlayersMenuAndDownloadsWithoutFetching() {
+        val tracks = WEB_PAGE_CAPTION_TRACKS_SCRIPT
+        // The capture is installed here too (declared first, so it is never inlined as "null").
+        assertTrue(tracks.contains(WEB_CAPTION_CAPTURE_SCRIPT))
+        assertTrue(tracks.contains("player.getOption('captions', 'tracklist', { includeAsr: true })"))
+        assertTrue(tracks.contains("data.video_id === details.videoId"))
+        assertTrue(tracks.contains("track.videoId === details.videoId"))
+        // Other sources are used only when the player's details list no track.
+        assertTrue(tracks.contains("if (!tracks.length) {"))
+        assertFalse(tracks.contains("fetch("))
+        assertFalse(tracks.contains("loadModule"))
     }
 
     @Test
@@ -77,6 +91,26 @@ class PageTranscriptScriptsTest {
         // A job never gives up by itself: the app decides how long it waits.
         assertFalse(script.contains("'failed'"))
         assertTrue(script.contains("elapsed > $PAGE_CAPTION_SWITCH_MS"))
+    }
+
+    @Test
+    fun theTranscriptPanelIsTheLastResortAndOnlyReadOrClicked() {
+        val script = webPageTranscriptScript(target)
+        // Captions first; the panel only after the caption window, or at once for a page without tracks.
+        assertTrue(script.contains("if (target.panelOnly || elapsed > $PAGE_CAPTION_SWITCH_MS) {"))
+        // The panel's own reply is kept like caption replies, only from a YouTube host.
+        assertTrue(WEB_CAPTION_CAPTURE_SCRIPT.contains("url.pathname !== '/youtubei/v1/get_transcript'"))
+        assertTrue(WEB_CAPTION_CAPTURE_SCRIPT.contains("capture.transcriptOrder.length > 4"))
+        // Opening is bounded, and a pressed button gets time before it is pressed again.
+        assertTrue(script.contains("(job.panelTries || 0) >= $PANEL_OPEN_TRIES"))
+        assertTrue(script.contains("(job.panelOpened ? 8000 : 2500)"))
+        // Only the transcript panel's own close button is pressed afterwards.
+        assertTrue(script.contains("const close = panel && panel.querySelector("))
+        assertEquals(1, Regex("fetch\\(").findAll(script).count())
+        assertTrue(
+            parsePageTranscriptReply(JSONObject.quote("""{"status":"done","text":"{}","panel":true}"""))
+                .let { it is PageTranscriptReply.Done && it.panel },
+        )
     }
 
     @Test
