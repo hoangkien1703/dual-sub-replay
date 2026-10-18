@@ -29,9 +29,11 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.assistant.AI_FIND_VIDEOS_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_NEWS_VERSION
 import com.kienhoang.dualsubreplay.assistant.AI_SAVE_MEMORY_TOOL
+import com.kienhoang.dualsubreplay.assistant.AI_SCREEN_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_SEARCH_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_SETTING_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_TOOLS
@@ -707,7 +709,8 @@ class AiAssistantPanelUiTest {
             saveUiEvidence("ai_settings_search")
             composeRule.onNodeWithTag("ai_tavily_key_field").performScrollTo().performTextInput("tvly-dev-abcdefghijkl9876")
             composeRule.onNodeWithTag("ai_save_tavily_key").performScrollTo().performClick()
-            composeRule.onNodeWithTag("ai_tavily_key_row").performScrollTo().assertTextContains("9876", substring = true)
+            composeRule.onNodeWithTag("ai_tavily_key_row").performScrollTo()
+            composeRule.onNodeWithText("Key ending in 9876").assertIsDisplayed()
             assertEquals(AiWebSearchMode.TAVILY, settings.webSearch)
             assertFalse(secrets.values.any { "tvly-dev-abcdefghijkl9876" in it })
             saveUiEvidence("ai_settings_search_tavily")
@@ -759,7 +762,7 @@ class AiAssistantPanelUiTest {
             ).assertIsDisplayed()
             .assertTextContains("Saved to memory: “Studies for JLPT N3, exam in December”")
         composeRule.onNodeWithTag("ai_action_undo").assertIsDisplayed()
-        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, requests.first().tools)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, requests.first().tools)
         saveUiEvidence("ai_panel_memory_chip")
 
         composeRule.onNodeWithTag("ai_action_manage").performClick()
@@ -824,7 +827,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_input").performTextInput("Hi")
         composeRule.onNodeWithTag("ai_send_button").performClick()
         composeRule.onNodeWithTag("ai_chat_memory_off").assertIsDisplayed()
-        assertEquals(AI_TOOLS, requests.single().tools)
+        assertEquals(AI_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, requests.single().tools)
     }
 
     @Test
