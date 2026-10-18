@@ -32,7 +32,8 @@ internal enum class JlptLevel(
  * - A first condition starting with `^` checks the morpheme before the point, and a last one
  *   starting with `>` the morpheme after it; neither is part of the point. A `>` with only `!`
  *   words also allows the end of the sentence.
- * - `NEG` stands for `ます? ない|ぬ|ん|ず`, a negative ending in any politeness.
+ * - `NEG` stands for `ます? ない|ぬ|ん|ず`, a negative ending in any politeness; `MID` for
+ *   `not|n't? _@ADV? _@ADV?`, the optional words between English helper verbs.
  */
 internal class GrammarPattern(
     val level: GrammarLevel,
@@ -49,7 +50,12 @@ internal class GrammarPattern(
     ): Int = alternatives.maxOf { it.lengthAt(morphemes, index) }
 }
 
-private val SPEC_MACROS = mapOf("NEG" to "ます? ない|ぬ|ん|ず")
+private val SPEC_MACROS =
+    mapOf(
+        "NEG" to "ます? ない|ぬ|ん|ず",
+        // English: an optional "not" and up to two adverbs between helper words (have not always been).
+        "MID" to "not|n't? _@ADV? _@ADV?",
+    )
 
 private class PatternSequence(
     spec: String,

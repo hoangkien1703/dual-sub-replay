@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Poin tata bahasa Inggris untuk pelajar bahasa Inggris. Biarkan contoh bahasa Inggris di dalam kurung apa adanya. -->
+    <string name="grammar_en_would_rather">Would rather: lebih memilih untuk</string>
+    <string name="grammar_en_do_negative">Not: do, does, atau did + not membuat kata kerja menjadi negatif (di awal kalimat: don’t do it)</string>
+    <string name="grammar_en_do_question">Pertanyaan: do, does, atau did diletakkan sebelum subjek</string>
+    <string name="grammar_en_lets">Let’s: ajakan untuk melakukan sesuatu bersama</string>
+    <string name="grammar_en_would_like">Would like: cara sopan untuk mengatakan want (Would you like…? untuk menawarkan sesuatu)</string>
+    <string name="grammar_en_want_to">Want to: ingin melakukan sesuatu (wanna dalam percakapan santai)</string>
+    <string name="grammar_en_can">Can: bisa, atau boleh</string>
+    <string name="grammar_en_present_continuous">Present continuous tense: sedang terjadi sekarang, atau rencana yang sudah pasti</string>
+    <string name="grammar_en_there_be">There is / there are: ada sesuatu, atau sesuatu berada di suatu tempat</string>
+    <string name="grammar_en_like_ing">Like, love, atau hate + -ing: perasaan terhadap suatu kegiatan</string>
+    <string name="grammar_en_a_lot_of">A lot of: banyak (bahasa Inggris sehari-hari)</string>
+    <string name="grammar_en_how_many">How many: jumlah (benda yang bisa dihitung); how much: banyaknya atau harganya</string>
+    <string name="grammar_en_to_infinitive">To + kata kerja: bentuk infinitive (menyatakan tujuan, atau mengikuti want, need, hope…)</string>
+    <string name="grammar_en_be">Be untuk masa sekarang: am (I), is (he, she, it), are (you, we, they)</string>
+    <string name="grammar_en_present_s">Simple present tense dengan he, she, atau it: kebiasaan dan fakta</string>
+    <string name="grammar_en_past_simple">Simple past tense: tindakan atau keadaan yang sudah selesai di masa lampau</string>
+    <string name="grammar_en_a_an">A atau an: salah satu dari banyak, atau sesuatu yang baru pertama kali disebut (an sebelum bunyi vokal)</string>
+    <string name="grammar_en_the">The: sesuatu yang tertentu dan sudah diketahui kedua pihak</string>
+    <string name="grammar_en_and">And: menggabungkan dua kata atau gagasan</string>
+    <string name="grammar_en_but">But: menyatakan pertentangan</string>
+    <string name="grammar_en_or">Or: pilihan di antara dua hal</string>
+    <string name="grammar_en_because">Because: menyatakan alasan (+ kalimat)</string>
+    <string name="grammar_en_frequency">Seberapa sering: always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</string>
+    <string name="grammar_en_possessive">’s: milik (Tom’s bag = tas milik Tom)</string>
+    <string name="grammar_en_too_also">Too (di akhir kalimat): juga</string>
+    <string name="grammar_en_ago">Ago: yang lalu, dihitung mundur dari sekarang (two days ago)</string>
+    <string name="grammar_en_in">In: di dalam; dipakai dengan bulan, tahun, dan bagian hari</string>
+    <string name="grammar_en_on">On: di atas permukaan; dipakai dengan hari dan tanggal</string>
+    <string name="grammar_en_at">At: di suatu titik atau tempat; dipakai dengan jam</string>
+    <string name="grammar_en_to">To: ke arah suatu tempat atau orang (go to, give to)</string>
+    <string name="grammar_en_for">For: tujuan atau penerima; for + lamanya waktu</string>
+    <string name="grammar_en_from">From: titik awal (tempat, waktu, atau asal)</string>
+    <string name="grammar_en_with">With: bersama; menggunakan (cut with a knife)</string>
+    <string name="grammar_en_of">Of: milik, atau bagian dari (a cup of tea)</string>
+    <string name="grammar_en_about">About: tentang suatu topik; atau kira-kira (about ten minutes)</string>
+    <string name="grammar_en_wh_question">Kata tanya: menanyakan informasi (what, where, when, why, who, how)</string>
+    <string name="grammar_en_yes_no_question">Pertanyaan: be atau have diletakkan sebelum subjek</string>
+    <string name="grammar_en_imperative">Kalimat perintah (imperative): kata kerja dasar tanpa subjek untuk memberi perintah atau permintaan</string>
+    <string name="grammar_en_dont_have_to">Don’t have to: tidak perlu (tapi boleh saja)</string>
+    <string name="grammar_en_why_dont">Why don’t you / we…?: saran yang ramah</string>
+    <string name="grammar_en_going_to">Be going to: rencana, atau sesuatu yang terlihat akan terjadi (gonna dalam percakapan)</string>
+    <string name="grammar_en_used_to">Used to: kebiasaan atau keadaan di masa lalu yang sekarang sudah tidak berlaku</string>
+    <string name="grammar_en_have_to">Have to: harus (karena aturan atau keadaan); had to = bentuk lampau</string>
+    <string name="grammar_en_need_to">Need to: perlu (karena memang dibutuhkan)</string>
+    <string name="grammar_en_must_not">Mustn’t: tidak boleh, dilarang</string>
+    <string name="grammar_en_verb_to">Kata kerja + to + kata kerja: beberapa kata kerja diikuti to (decide to, hope to, try to)</string>
+    <string name="grammar_en_past_continuous">Past continuous tense: sedang berlangsung pada suatu saat di masa lampau (sering terpotong kejadian lain)</string>
+    <string name="grammar_en_have_got">Have got: punya atau memiliki (terutama bahasa Inggris Britania)</string>
+    <string name="grammar_en_present_perfect">Present perfect tense: terjadi sebelum sekarang dan masih berpengaruh (pengalaman, hasil, sampai sekarang)</string>
+    <string name="grammar_en_will">Will: masa depan, keputusan spontan, janji, atau tawaran</string>
+    <string name="grammar_en_could">Could: dulu bisa; permintaan sopan; sesuatu yang mungkin</string>
+    <string name="grammar_en_must">Must: harus; atau pasti (yakin hal itu benar)</string>
+    <string name="grammar_en_should">Should: saran, atau hal yang benar atau semestinya</string>
+    <string name="grammar_en_comparative">Comparative: lebih … daripada hal lain</string>
+    <string name="grammar_en_superlative">Superlative: paling … di antara semuanya</string>
+    <string name="grammar_en_too_adj">Too + kata sifat: terlalu (lebih dari yang baik atau mungkin)</string>
+    <string name="grammar_en_enough">Enough: cukup, sebanyak yang dibutuhkan (kata sifat + enough, enough + kata benda)</string>
+    <string name="grammar_en_so_adj">So + kata sifat: sangat (menunjukkan perasaan kuat)</string>
+    <string name="grammar_en_so_result">So: jadi, karena itu (akibatnya)</string>
+    <string name="grammar_en_before_after">Before / after: sebelum atau sesudah sesuatu (+ kata benda, -ing, atau kalimat)</string>
+    <string name="grammar_en_until">Until: sampai suatu waktu, lalu berhenti</string>
+    <string name="grammar_en_already">Already: sudah sebelum sekarang, atau lebih cepat dari dugaan</string>
+    <string name="grammar_en_yet">Yet: sampai sekarang (dalam pertanyaan dan kalimat negatif)</string>
+    <string name="grammar_en_still">Still: masih berlanjut, belum selesai</string>
+    <string name="grammar_en_just">Just: baru saja; atau hanya</string>
+    <string name="grammar_en_ever">Ever: kapan pun, pernah (Have you ever…?)</string>
+    <string name="grammar_en_some_any">Some: dalam kalimat positif dan tawaran; any: dalam pertanyaan dan kalimat negatif</string>
+    <string name="grammar_en_much_many">Many: benda yang bisa dihitung; much: jumlah yang tidak bisa dihitung</string>
+    <string name="grammar_en_a_few">A few: beberapa, jumlah yang sedikit</string>
+    <string name="grammar_en_every_each">Every / each: semua anggota kelompok, satu per satu</string>
+    <string name="grammar_en_no_noun">No + kata benda: tidak ada sama sekali</string>
+    <string name="grammar_en_reflexive">-self: orang yang sama dengan subjek (by myself = sendirian)</string>
+    <string name="grammar_en_ly_adverb">-ly: mengubah kata sifat menjadi kata keterangan (cara sesuatu dilakukan)</string>
+    <string name="grammar_en_phrasal_verb">Phrasal verb: kata kerja + kata pendek, sering dengan arti baru (give up = berhenti)</string>
+    <string name="grammar_en_how_about">How about…? / What about…?: saran (+ kata benda atau -ing)</string>
+    <string name="grammar_en_by">By: dekat; paling lambat; siapa pelakunya (setelah kalimat pasif); dengan cara apa (by bus)</string>
+    <string name="grammar_en_during">During: pada suatu saat dalam periode tertentu (during the night)</string>
+    <string name="grammar_en_without">Without: tanpa memiliki atau tanpa melakukan (+ kata benda atau -ing)</string>
+    <string name="grammar_en_into">Into: bergerak masuk ke dalam</string>
+    <string name="grammar_en_between">Between: di antara yang satu dan yang lain (tempat atau waktu)</string>
+    <string name="grammar_en_both">Both: keduanya bersama-sama (both … and …)</string>
+    <string name="grammar_en_if_real">If + present: kemungkinan yang nyata (… will happen)</string>
+    <string name="grammar_en_when_clause">When: pada saat</string>
+    <string name="grammar_en_present_perfect_continuous">Present perfect continuous tense: dimulai di masa lampau dan masih berlangsung (for, since)</string>
+    <string name="grammar_en_past_perfect">Past perfect tense: terjadi sebelum kejadian lampau yang lain</string>
+    <string name="grammar_en_future_continuous">Future continuous tense: sedang berlangsung pada suatu waktu di masa depan</string>
+    <string name="grammar_en_modal_passive">Pasif setelah can, will, must…: (it can be done)</string>
+    <string name="grammar_en_passive">Kalimat pasif: subjek dikenai tindakan (by + pelakunya)</string>
+    <string name="grammar_en_be_able_to">Be able to: bisa (dalam tense apa pun: will be able to)</string>
+    <string name="grammar_en_supposed_to">Be supposed to: diharapkan atau direncanakan (tapi sering tidak terjadi)</string>
+    <string name="grammar_en_had_better">Had better: saran yang tegas (kalau tidak, akan ada masalah)</string>
+    <string name="grammar_en_have_got_to">Have got to (gotta): sama dengan have to, must (santai)</string>
+    <string name="grammar_en_be_used_to">Be used to: sudah terbiasa (get used to: menjadi terbiasa)</string>
+    <string name="grammar_en_be_about_to">Be about to: akan segera terjadi</string>
+    <string name="grammar_en_may">May: mungkin; atau izin yang sopan (May I…?)</string>
+    <string name="grammar_en_might">Might: barangkali (kurang yakin dibanding may)</string>
+    <string name="grammar_en_shall">Shall I / we…?: tawaran atau saran</string>
+    <string name="grammar_en_would">Would: situasi yang dibayangkan, permintaan sopan, atau kebiasaan di masa lalu</string>
+    <string name="grammar_en_verb_ing">Beberapa kata kerja diikuti -ing (enjoy, finish, avoid, keep)</string>
+    <string name="grammar_en_verb_someone_to">Kata kerja + seseorang + to + kata kerja: menginginkan, meminta, atau menyuruh seseorang melakukan sesuatu</string>
+    <string name="grammar_en_let_make">Let / make + seseorang + kata kerja (tanpa to): membiarkan atau memaksa seseorang melakukannya</string>
+    <string name="grammar_en_preposition_ing">Setelah preposisi (of, for, at…), kata kerja memakai bentuk -ing</string>
+    <string name="grammar_en_in_order_to">In order to: untuk, dengan tujuan</string>
+    <string name="grammar_en_so_that">So that: supaya, agar (+ kalimat, sering dengan can atau could)</string>
+    <string name="grammar_en_so_adj_that">So / such … that: begitu … sehingga ada akibatnya</string>
+    <string name="grammar_en_because_of">Because of + kata benda: karena, disebabkan oleh</string>
+    <string name="grammar_en_although">Although: meskipun, ada pertentangan (seperti but)</string>
+    <string name="grammar_en_even_if">Even if: sekalipun (terjadi atau tidak, hasilnya sama)</string>
+    <string name="grammar_en_while">While: selagi, ketika; atau sedangkan (pertentangan)</string>
+    <string name="grammar_en_as_soon_as">As soon as: begitu, segera setelah</string>
+    <string name="grammar_en_in_case">In case: untuk berjaga-jaga kalau terjadi (bersiap untuk itu)</string>
+    <string name="grammar_en_whether">Whether: apakah (kalau ada dua pilihan)</string>
+    <string name="grammar_en_unless">Unless: kalau tidak; kecuali kalau</string>
+    <string name="grammar_en_since">Since + waktu: sejak saat itu sampai sekarang (dengan have done); atau since = because</string>
+    <string name="grammar_en_instead_of">Instead of: sebagai ganti (+ kata benda atau -ing)</string>
+    <string name="grammar_en_either_neither">Either … or: salah satu dari keduanya; neither … nor: bukan yang satu dan bukan yang lain</string>
+    <string name="grammar_en_wish">Wish + past: ingin sesuatu berbeda dari kenyataan (wish + had done: menyesal)</string>
+    <string name="grammar_en_relative_nondefining">Setelah koma, who atau which menambahkan keterangan tambahan tentang kata benda</string>
+    <string name="grammar_en_whose">Whose: yang …-nya, milik orang itu (the girl whose father…)</string>
+    <string name="grammar_en_relative">Klausa relatif: who (orang), which (benda), atau that (keduanya) menjelaskan kata benda sebelumnya</string>
+    <string name="grammar_en_reported">Kalimat tidak langsung (reported speech): apa yang dikatakan seseorang (tense sering mundur: is → was)</string>
+    <string name="grammar_en_that_clause">That + kalimat: apa yang dipikirkan, dikatakan, atau diketahui seseorang (sering dihilangkan)</string>
+    <string name="grammar_en_look_forward">Look forward to (+ kata benda atau -ing): menantikan dengan senang sesuatu yang akan datang</string>
+    <string name="grammar_en_get_adjective">Get + kata sifat: menjadi (get tired, get better)</string>
+    <string name="grammar_en_so_do_i">So do I / neither do I: saya juga (menyetujui apa yang dikatakan)</string>
+    <string name="grammar_en_it_adj_to">It is + kata sifat + to + kata kerja: menggambarkan suatu tindakan (It’s easy to learn)</string>
+    <string name="grammar_en_question_tag">Question tag: memastikan pendengar setuju (kalimat positif → tag negatif)</string>
+    <string name="grammar_en_such_as">Such as: misalnya, seperti</string>
+    <string name="grammar_en_according_to">According to: menurut seseorang atau suatu sumber</string>
+    <string name="grammar_en_however">However: namun (memulai kalimat yang bertentangan)</string>
+    <string name="grammar_en_suffix_ness">-ness: membentuk kata benda dari kata sifat (happy → happiness)</string>
+    <string name="grammar_en_suffix_ment">-ment: membentuk kata benda dari kata kerja (move → movement)</string>
+    <string name="grammar_en_suffix_tion">-tion / -sion: membentuk kata benda dari kata kerja (decide → decision)</string>
+    <string name="grammar_en_suffix_ful">-ful: penuh dengan (care → careful)</string>
+    <string name="grammar_en_suffix_less">-less: tanpa (home → homeless)</string>
+    <string name="grammar_en_suffix_able">-able / -ible: dapat dilakukan (wash → washable)</string>
+    <string name="grammar_en_if_unreal">If + past: dibayangkan atau kecil kemungkinannya sekarang (… would happen)</string>
+    <string name="grammar_en_past_perfect_continuous">Past perfect continuous tense: sudah berlangsung sampai suatu saat di masa lampau</string>
+    <string name="grammar_en_future_perfect">Future perfect tense: akan sudah selesai pada suatu waktu di masa depan</string>
+    <string name="grammar_en_perfect_passive">Pasif perfect: has been done (by someone) = sudah dilakukan (oleh seseorang)</string>
+    <string name="grammar_en_continuous_passive">Pasif continuous: is being done = sedang dilakukan saat ini</string>
+    <string name="grammar_en_get_passive">Get + past participle (V3): sesuatu terjadi pada seseorang (get hurt, get married)</string>
+    <string name="grammar_en_should_have">Should have done: seharusnya dilakukan tapi tidak terjadi (penyesalan atau kritik)</string>
+    <string name="grammar_en_could_have">Could have done: tadinya mungkin, tapi tidak terjadi</string>
+    <string name="grammar_en_must_have">Must have done: saya yakin hal itu sudah terjadi</string>
+    <string name="grammar_en_might_have">Might / may have done: mungkin hal itu sudah terjadi</string>
+    <string name="grammar_en_would_have">Would have done: akibat yang dibayangkan di masa lampau (if … had …)</string>
+    <string name="grammar_en_ought_to">Ought to: seharusnya, sama dengan should (agak formal)</string>
+    <string name="grammar_en_if_only">If only: andai saja (keinginan kuat atau penyesalan)</string>
+    <string name="grammar_en_as_if">As if: seolah-olah (tampaknya begitu, tapi belum tentu)</string>
+    <string name="grammar_en_as_long_as">As long as: asalkan, hanya jika</string>
+    <string name="grammar_en_despite">Despite / in spite of + kata benda atau -ing: meskipun</string>
+    <string name="grammar_en_not_only">Not only … but also: keduanya, dan yang kedua lebih mengejutkan</string>
+    <string name="grammar_en_otherwise">Otherwise: kalau tidak (sesuatu yang buruk akan terjadi)</string>
+    <string name="grammar_en_therefore">Therefore: jadi, oleh karena itu (formal)</string>
+    <string name="grammar_en_due_to">Due to: karena, disebabkan oleh (formal)</string>
+    <string name="grammar_en_whatever">-ever: … apa pun juga; tidak peduli apa, siapa, atau di mana</string>
+    <string name="grammar_en_if_past_unreal">If + had done: membayangkan masa lampau yang berbeda (… would have happened)</string>
+    <string name="grammar_en_negative_inversion">Kata negatif di depan, lalu kata kerja bantu sebelum subjek (formal, untuk penekanan)</string>
+    <string name="grammar_en_subjunctive">Subjunctive: setelah suggest atau insist that, kata kerja dipakai dalam bentuk dasar (he go, she be)</string>
+    <string name="grammar_en_as_as">As … as: sama … (not as … as: tidak se…)</string>
+    <string name="grammar_en_this_that">This / these: dekat denganmu (this one); that / those: lebih jauh (that one)</string>
+    <string name="grammar_en_not">Not: membuat kata atau kalimat menjadi negatif (I’m not hungry, it isn’t far)</string>
+    <string name="grammar_en_all">All: semua anggota suatu kelompok, atau seluruh sesuatu</string>
+    <string name="grammar_en_like_similar">Like: mirip dengan, sama seperti (He looks like his father = dia mirip ayahnya)</string>
+    <string name="grammar_en_place_movement">Tempat atau gerakan: di mana sesuatu berada atau ke arah mana ia bergerak (under the table = di bawah meja, across the road = menyeberangi jalan)</string>
+    <string name="grammar_en_as">As: sebagai (works as a nurse = bekerja sebagai perawat); atau karena, sambil</string>
+    <string name="grammar_en_than">Than: membandingkan dua hal (taller than me = lebih tinggi dari saya, more than ten = lebih dari sepuluh)</string>
+    <string name="grammar_en_another">Another: satu lagi, atau yang lain (another cup = secangkir lagi, another day = hari lain)</string>
+    <string name="grammar_en_such">Such (a): begitu… seperti ini, lebih kuat dari very (such a nice day = hari yang begitu indah)</string>
+    <string name="grammar_en_except">Except: semua kecuali yang ini, tidak termasuk (everyone except Tom = semua orang kecuali Tom)</string>
+    <string name="grammar_en_ing_after_noun">Kata benda + -ing: kata berakhiran -ing menyatakan apa yang sedang dilakukan kata benda di depannya (the man standing there = pria yang berdiri di sana, I saw him running = saya melihatnya berlari)</string>
+</resources>

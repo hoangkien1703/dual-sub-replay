@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.kienhoang.dualsubreplay.data.CefrLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
 import com.kienhoang.dualsubreplay.data.HskLevel
@@ -47,7 +48,7 @@ class GrammarExplanationsUiTest {
     }
 
     @Test
-    fun showsHskLevels() {
+    fun showsHskAndCefrLevels() {
         compose.setContent {
             DualSubTheme {
                 GrammarPointList(
@@ -55,6 +56,7 @@ class GrammarExplanationsUiTest {
                         GrammarMatch("V + 了 le", 4, 5, listOf(GrammarMeaning.ZH_LE_COMPLETED), HskLevel.HSK1),
                         GrammarMatch("虽然…但是 suīrán…dànshì", 0, 9, listOf(GrammarMeaning.ZH_SUIRAN), HskLevel.HSK2),
                         GrammarMatch("宁可 nìngkě", 0, 2, listOf(GrammarMeaning.ZH_NINGKE), HskLevel.HSK7_9),
+                        GrammarMatch("be going to + verb", 5, 16, listOf(GrammarMeaning.EN_GOING_TO), CefrLevel.A2),
                     ),
                 )
             }
@@ -66,7 +68,10 @@ class GrammarExplanationsUiTest {
         compose.onNodeWithText("虽然…但是 / 可是…: although…, (still)…").assertIsDisplayed()
         compose.onNodeWithContentDescription("HSK level 2").assertIsDisplayed()
         compose.onNodeWithContentDescription("HSK level 7–9").assertIsDisplayed()
-        saveUiEvidence("grammar-hsk")
+        // The label only repeated the form, so it is dropped; a long form sits above its text.
+        compose.onNodeWithText("A plan, or something you can see is coming (gonna in speech)").assertIsDisplayed()
+        compose.onNodeWithContentDescription("CEFR level A2").assertIsDisplayed()
+        saveUiEvidence("grammar-hsk-and-cefr")
     }
 
     @Test

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ngữ pháp tiếng Anh cho người học tiếng Anh. Giữ nguyên các ví dụ tiếng Anh trong ngoặc. -->
+    <string name="grammar_en_would_rather">Would rather: thích … hơn, thà … còn hơn</string>
+    <string name="grammar_en_do_negative">Phủ định: do, does hoặc did + not làm động từ thành phủ định (đứng đầu câu: don’t do it)</string>
+    <string name="grammar_en_do_question">Câu hỏi: do, does hoặc did đứng trước chủ ngữ</string>
+    <string name="grammar_en_lets">Let’s: lời rủ cùng nhau làm gì đó</string>
+    <string name="grammar_en_would_like">Would like: cách nói lịch sự của want (Would you like…? dùng để mời ai thứ gì)</string>
+    <string name="grammar_en_want_to">Want to: muốn làm gì đó (văn nói thân mật: wanna)</string>
+    <string name="grammar_en_can">Can: có thể, hoặc được phép</string>
+    <string name="grammar_en_present_continuous">Thì hiện tại tiếp diễn: đang xảy ra lúc này, hoặc một kế hoạch đã định</string>
+    <string name="grammar_en_there_be">There is / there are: có (thứ gì đó tồn tại hoặc ở một nơi nào đó)</string>
+    <string name="grammar_en_like_ing">Like, love hoặc hate + -ing: bạn cảm thấy thế nào về một hoạt động</string>
+    <string name="grammar_en_a_lot_of">A lot of: nhiều (như many hoặc much, tiếng Anh hằng ngày)</string>
+    <string name="grammar_en_how_many">How many: bao nhiêu (thứ đếm được); how much: bao nhiêu (lượng hoặc giá tiền)</string>
+    <string name="grammar_en_to_infinitive">To + động từ: động từ nguyên mẫu có to (nói mục đích, hoặc đứng sau want, need, hope…)</string>
+    <string name="grammar_en_be">Be ở thì hiện tại: am (I), is (he, she, it), are (you, we, they)</string>
+    <string name="grammar_en_present_s">Thì hiện tại đơn với he, she hoặc it: thói quen và sự thật</string>
+    <string name="grammar_en_past_simple">Thì quá khứ đơn: hành động hoặc trạng thái đã kết thúc trong quá khứ</string>
+    <string name="grammar_en_a_an">A hoặc an: một trong nhiều cái, hoặc thứ được nhắc đến lần đầu (an đứng trước âm nguyên âm)</string>
+    <string name="grammar_en_the">The: một thứ cụ thể mà cả hai người đều biết</string>
+    <string name="grammar_en_and">And: nối hai từ hoặc hai ý</string>
+    <string name="grammar_en_but">But: nêu ý trái ngược</string>
+    <string name="grammar_en_or">Or: lựa chọn giữa hai thứ</string>
+    <string name="grammar_en_because">Because: nêu lý do (+ một câu)</string>
+    <string name="grammar_en_frequency">Trạng từ tần suất: always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</string>
+    <string name="grammar_en_possessive">’s: thuộc về (Tom’s bag = cái túi của Tom)</string>
+    <string name="grammar_en_too_also">Too (ở cuối câu): cũng</string>
+    <string name="grammar_en_ago">Ago: cách đây, tính lùi từ bây giờ (two days ago)</string>
+    <string name="grammar_en_in">In: bên trong; dùng với tháng, năm và các buổi trong ngày</string>
+    <string name="grammar_en_on">On: trên một bề mặt; dùng với thứ và ngày tháng</string>
+    <string name="grammar_en_at">At: tại một điểm hoặc địa điểm; dùng với giờ</string>
+    <string name="grammar_en_to">To: hướng tới một nơi hoặc một người (go to, give to)</string>
+    <string name="grammar_en_for">For: mục đích hoặc người nhận; for + một khoảng thời gian</string>
+    <string name="grammar_en_from">From: điểm bắt đầu (nơi chốn, thời gian hoặc nguồn gốc)</string>
+    <string name="grammar_en_with">With: cùng với; bằng một thứ gì đó (cut with a knife)</string>
+    <string name="grammar_en_of">Of: của, thuộc về, hoặc một phần của (a cup of tea)</string>
+    <string name="grammar_en_about">About: về (một chủ đề); hoặc khoảng chừng (about ten minutes)</string>
+    <string name="grammar_en_wh_question">Từ để hỏi: hỏi thông tin (what, where, when, why, who, how)</string>
+    <string name="grammar_en_yes_no_question">Câu hỏi: be hoặc have đứng trước chủ ngữ</string>
+    <string name="grammar_en_imperative">Câu mệnh lệnh: động từ nguyên mẫu, không có chủ ngữ, để ra lệnh hoặc yêu cầu</string>
+    <string name="grammar_en_dont_have_to">Don’t have to: không cần thiết (nhưng làm cũng được)</string>
+    <string name="grammar_en_why_dont">Why don’t you / we…?: lời gợi ý thân thiện</string>
+    <string name="grammar_en_going_to">Be going to: dự định, hoặc điều bạn thấy sắp xảy ra (văn nói: gonna)</string>
+    <string name="grammar_en_used_to">Used to: thói quen hoặc trạng thái trong quá khứ, nay không còn nữa</string>
+    <string name="grammar_en_have_to">Have to: phải (do quy định hoặc hoàn cảnh); had to = quá khứ</string>
+    <string name="grammar_en_need_to">Need to: bạn cần phải làm</string>
+    <string name="grammar_en_must_not">Mustn’t: không được phép, bị cấm</string>
+    <string name="grammar_en_verb_to">Động từ + to + động từ: một số động từ đi với to (decide to, hope to, try to)</string>
+    <string name="grammar_en_past_continuous">Thì quá khứ tiếp diễn: đang diễn ra tại một thời điểm trong quá khứ (thường bị việc khác xen vào)</string>
+    <string name="grammar_en_have_got">Have got: có, sở hữu (chủ yếu trong tiếng Anh-Anh)</string>
+    <string name="grammar_en_present_perfect">Thì hiện tại hoàn thành: đã xảy ra trước bây giờ và vẫn còn liên quan (kinh nghiệm, kết quả, cho đến nay)</string>
+    <string name="grammar_en_will">Will: tương lai, quyết định tức thì, lời hứa hoặc lời đề nghị giúp</string>
+    <string name="grammar_en_could">Could: đã có thể; lời nhờ lịch sự; điều có thể xảy ra</string>
+    <string name="grammar_en_must">Must: bắt buộc phải; hoặc chắc hẳn (tôi tin chắc điều đó đúng)</string>
+    <string name="grammar_en_should">Should: nên (lời khuyên), hoặc điều đúng đắn, điều được mong đợi</string>
+    <string name="grammar_en_comparative">So sánh hơn: có một tính chất nhiều hơn thứ khác</string>
+    <string name="grammar_en_superlative">So sánh nhất: hơn tất cả những cái khác</string>
+    <string name="grammar_en_too_adj">Too + tính từ: quá (vượt mức tốt hoặc mức có thể)</string>
+    <string name="grammar_en_enough">Enough: đủ (tính từ + enough, enough + danh từ)</string>
+    <string name="grammar_en_so_adj">So + tính từ: rất (thể hiện cảm xúc mạnh)</string>
+    <string name="grammar_en_so_result">So: và vì thế (nêu kết quả)</string>
+    <string name="grammar_en_before_after">Before / after: trước hoặc sau một việc gì (+ danh từ, -ing hoặc một câu)</string>
+    <string name="grammar_en_until">Until: cho đến một lúc, rồi dừng lại</string>
+    <string name="grammar_en_already">Already: đã (trước bây giờ), hoặc sớm hơn dự kiến</string>
+    <string name="grammar_en_yet">Yet: tính đến giờ, chưa (trong câu hỏi và câu phủ định)</string>
+    <string name="grammar_en_still">Still: vẫn còn, chưa kết thúc</string>
+    <string name="grammar_en_just">Just: vừa mới; hoặc chỉ</string>
+    <string name="grammar_en_ever">Ever: đã từng, vào bất cứ lúc nào (Have you ever…?)</string>
+    <string name="grammar_en_some_any">Some: trong câu khẳng định và lời mời; any: trong câu hỏi và câu phủ định</string>
+    <string name="grammar_en_much_many">Many: với thứ đếm được; much: với lượng không đếm được</string>
+    <string name="grammar_en_a_few">A few: một vài, một số ít</string>
+    <string name="grammar_en_every_each">Every / each: tất cả trong một nhóm, xét từng cái một</string>
+    <string name="grammar_en_no_noun">No + danh từ: không có … nào</string>
+    <string name="grammar_en_reflexive">-self: chính người làm chủ ngữ (by myself = một mình)</string>
+    <string name="grammar_en_ly_adverb">-ly: biến tính từ thành trạng từ (việc được làm như thế nào)</string>
+    <string name="grammar_en_phrasal_verb">Cụm động từ: động từ + một từ nhỏ, thường mang nghĩa mới (give up = từ bỏ)</string>
+    <string name="grammar_en_how_about">How about…? / What about…?: lời gợi ý (+ danh từ hoặc -ing)</string>
+    <string name="grammar_en_by">By: bên cạnh; không muộn hơn; ai làm (sau câu bị động); bằng cách nào (by bus)</string>
+    <string name="grammar_en_during">During: trong, vào một lúc nào đó trong một khoảng thời gian (during the night)</string>
+    <string name="grammar_en_without">Without: không có hoặc không làm (+ danh từ hoặc -ing)</string>
+    <string name="grammar_en_into">Into: di chuyển vào bên trong</string>
+    <string name="grammar_en_between">Between: ở giữa hai thứ (về không gian hoặc thời gian)</string>
+    <string name="grammar_en_both">Both: cả hai (both … and …)</string>
+    <string name="grammar_en_if_real">If + hiện tại (câu điều kiện loại 1): khả năng có thật (… will happen)</string>
+    <string name="grammar_en_when_clause">When: khi, vào lúc mà</string>
+    <string name="grammar_en_present_perfect_continuous">Thì hiện tại hoàn thành tiếp diễn: bắt đầu trong quá khứ và vẫn đang tiếp diễn (for, since)</string>
+    <string name="grammar_en_past_perfect">Thì quá khứ hoàn thành: xảy ra trước một sự việc khác trong quá khứ</string>
+    <string name="grammar_en_future_continuous">Thì tương lai tiếp diễn: đang diễn ra tại một thời điểm trong tương lai</string>
+    <string name="grammar_en_modal_passive">Câu bị động sau can, will, must…: (it can be done)</string>
+    <string name="grammar_en_passive">Câu bị động: chủ ngữ nhận hành động (by + người làm)</string>
+    <string name="grammar_en_be_able_to">Be able to: có thể, như can (dùng được ở mọi thì: will be able to)</string>
+    <string name="grammar_en_supposed_to">Be supposed to: lẽ ra phải, theo dự kiến (nhưng thường không xảy ra)</string>
+    <string name="grammar_en_had_better">Had better: lời khuyên mạnh (nếu không sẽ gặp rắc rối)</string>
+    <string name="grammar_en_have_got_to">Have got to (gotta): phải, như have to, must (thân mật)</string>
+    <string name="grammar_en_be_used_to">Be used to: đã quen với điều gì (get used to: dần quen)</string>
+    <string name="grammar_en_be_about_to">Be about to: sắp xảy ra ngay</string>
+    <string name="grammar_en_may">May: có lẽ, có thể; hoặc xin phép lịch sự (May I…?)</string>
+    <string name="grammar_en_might">Might: có lẽ (ít chắc chắn hơn may)</string>
+    <string name="grammar_en_shall">Shall I / we…?: lời đề nghị giúp hoặc lời gợi ý</string>
+    <string name="grammar_en_would">Would: tình huống tưởng tượng, lời nhờ lịch sự, hoặc thói quen trong quá khứ</string>
+    <string name="grammar_en_verb_ing">Một số động từ đi với -ing (enjoy, finish, avoid, keep)</string>
+    <string name="grammar_en_verb_someone_to">Động từ + ai đó + to + động từ: điều bạn muốn, nhờ hoặc bảo ai đó làm</string>
+    <string name="grammar_en_let_make">Let / make + ai đó + động từ (không có to): cho phép hoặc bắt ai đó làm</string>
+    <string name="grammar_en_preposition_ing">Sau giới từ (of, for, at…), động từ thêm -ing</string>
+    <string name="grammar_en_in_order_to">In order to: để, nhằm mục đích</string>
+    <string name="grammar_en_so_that">So that: để mà (+ một câu, thường có can hoặc could)</string>
+    <string name="grammar_en_so_adj_that">So / such … that: quá … đến nỗi (dẫn tới một kết quả)</string>
+    <string name="grammar_en_because_of">Because of + danh từ: vì, do (điều gì đó)</string>
+    <string name="grammar_en_although">Although: mặc dù (có sự tương phản, giống but)</string>
+    <string name="grammar_en_even_if">Even if: cho dù (điều này có xảy ra hay không)</string>
+    <string name="grammar_en_while">While: trong khi (cùng lúc); hoặc trong khi đó (tương phản)</string>
+    <string name="grammar_en_as_soon_as">As soon as: ngay khi</string>
+    <string name="grammar_en_in_case">In case: phòng khi (vì điều đó có thể xảy ra, nên chuẩn bị sẵn)</string>
+    <string name="grammar_en_whether">Whether: liệu … hay không (như if, khi có hai lựa chọn)</string>
+    <string name="grammar_en_unless">Unless: nếu không; trừ khi</string>
+    <string name="grammar_en_since">Since + mốc thời gian: từ lúc đó đến nay (với have done); hoặc since = vì (như because)</string>
+    <string name="grammar_en_instead_of">Instead of: thay vì (+ danh từ hoặc -ing)</string>
+    <string name="grammar_en_either_neither">Either … or: hoặc cái này hoặc cái kia; neither … nor: không cái này cũng không cái kia</string>
+    <string name="grammar_en_wish">Wish + quá khứ: mong điều gì đó khác đi (wish + had done: hối tiếc)</string>
+    <string name="grammar_en_relative_nondefining">Sau dấu phẩy, who hoặc which thêm thông tin phụ về danh từ</string>
+    <string name="grammar_en_whose">Whose: của người mà (the girl whose father…)</string>
+    <string name="grammar_en_relative">Mệnh đề quan hệ: who (người), which (vật) hoặc that (cả hai) nói thêm về danh từ đứng trước</string>
+    <string name="grammar_en_reported">Câu tường thuật: lời ai đó đã nói (thì thường lùi lại: is → was)</string>
+    <string name="grammar_en_that_clause">That + câu: điều ai đó nghĩ, nói hoặc biết (that thường được lược bỏ)</string>
+    <string name="grammar_en_look_forward">Look forward to (+ danh từ hoặc -ing): háo hức mong chờ điều sắp đến</string>
+    <string name="grammar_en_get_adjective">Get + tính từ: trở nên (get tired, get better)</string>
+    <string name="grammar_en_so_do_i">So do I / neither do I: tôi cũng vậy (đồng ý với điều vừa nói)</string>
+    <string name="grammar_en_it_adj_to">It is + tính từ + to + động từ: nhận xét về một hành động (It’s easy to learn)</string>
+    <string name="grammar_en_question_tag">Câu hỏi đuôi: hỏi xem người nghe có đồng ý không (câu khẳng định → đuôi phủ định)</string>
+    <string name="grammar_en_such_as">Such as: chẳng hạn như, ví dụ</string>
+    <string name="grammar_en_according_to">According to: theo (lời một người hoặc một nguồn)</string>
+    <string name="grammar_en_however">However: tuy nhiên (mở đầu câu nói ý trái ngược)</string>
+    <string name="grammar_en_suffix_ness">-ness: tạo danh từ từ tính từ (happy → happiness)</string>
+    <string name="grammar_en_suffix_ment">-ment: tạo danh từ từ động từ (move → movement)</string>
+    <string name="grammar_en_suffix_tion">-tion / -sion: tạo danh từ từ động từ (decide → decision)</string>
+    <string name="grammar_en_suffix_ful">-ful: đầy, có nhiều (care → careful)</string>
+    <string name="grammar_en_suffix_less">-less: không có (home → homeless)</string>
+    <string name="grammar_en_suffix_able">-able / -ible: có thể … được (wash → washable)</string>
+    <string name="grammar_en_if_unreal">If + quá khứ (câu điều kiện loại 2): tưởng tượng hoặc khó xảy ra ở hiện tại (… would happen)</string>
+    <string name="grammar_en_past_perfect_continuous">Thì quá khứ hoàn thành tiếp diễn: đã diễn ra liên tục cho đến một thời điểm trong quá khứ</string>
+    <string name="grammar_en_future_perfect">Thì tương lai hoàn thành: sẽ xong trước một thời điểm trong tương lai</string>
+    <string name="grammar_en_perfect_passive">Bị động ở thì hoàn thành: has been done (bởi ai đó)</string>
+    <string name="grammar_en_continuous_passive">Bị động ở thì tiếp diễn: is being done (đang được làm ngay lúc này)</string>
+    <string name="grammar_en_get_passive">Get + quá khứ phân từ: điều gì đó xảy ra với ai (get hurt, get married)</string>
+    <string name="grammar_en_should_have">Should have done: lẽ ra nên làm nhưng đã không làm (hối tiếc hoặc trách móc)</string>
+    <string name="grammar_en_could_have">Could have done: lẽ ra đã có thể xảy ra nhưng đã không xảy ra</string>
+    <string name="grammar_en_must_have">Must have done: chắc hẳn đã xảy ra (tôi tin chắc)</string>
+    <string name="grammar_en_might_have">Might / may have done: có lẽ điều đó đã xảy ra</string>
+    <string name="grammar_en_would_have">Would have done: kết quả tưởng tượng trong quá khứ (if … had …)</string>
+    <string name="grammar_en_ought_to">Ought to: nên, như should (hơi trang trọng)</string>
+    <string name="grammar_en_if_only">If only: giá mà (mong ước hoặc hối tiếc mạnh)</string>
+    <string name="grammar_en_as_if">As if: như thể (trông có vẻ vậy, nhưng có thể không phải)</string>
+    <string name="grammar_en_as_long_as">As long as: miễn là, chỉ khi</string>
+    <string name="grammar_en_despite">Despite / in spite of + danh từ hoặc -ing: mặc dù</string>
+    <string name="grammar_en_not_only">Not only … but also: không những … mà còn (vế sau bất ngờ hơn)</string>
+    <string name="grammar_en_otherwise">Otherwise: nếu không thì (sẽ có chuyện không hay)</string>
+    <string name="grammar_en_therefore">Therefore: vì vậy, do đó (trang trọng)</string>
+    <string name="grammar_en_due_to">Due to: do, vì (trang trọng)</string>
+    <string name="grammar_en_whatever">-ever: bất cứ … nào; bất kể cái gì, ai hay ở đâu</string>
+    <string name="grammar_en_if_past_unreal">If + had done (câu điều kiện loại 3): tưởng tượng quá khứ khác đi (… would have happened)</string>
+    <string name="grammar_en_negative_inversion">Đảo ngữ: từ phủ định đứng đầu, rồi trợ động từ đứng trước chủ ngữ (trang trọng, để nhấn mạnh)</string>
+    <string name="grammar_en_subjunctive">Thể giả định: sau suggest hoặc insist that, dùng động từ nguyên mẫu (he go, she be)</string>
+    <string name="grammar_en_as_as">As … as: bằng, ngang bằng (not as … as: kém hơn)</string>
+    <string name="grammar_en_this_that">This / these: ở gần bạn (this one); that / those: ở xa hơn (that one)</string>
+    <string name="grammar_en_not">Not: làm cho một từ hoặc một câu thành phủ định (I’m not hungry, it isn’t far)</string>
+    <string name="grammar_en_all">All: tất cả trong một nhóm, hoặc toàn bộ một thứ</string>
+    <string name="grammar_en_like_similar">Like: giống như, theo cách giống (He looks like his father = anh ấy trông giống bố)</string>
+    <string name="grammar_en_place_movement">Vị trí hoặc chuyển động: vật ở đâu, hoặc đi về hướng nào (under the table = dưới gầm bàn, across the road = sang bên kia đường)</string>
+    <string name="grammar_en_as">As: với vai trò là (works as a nurse = làm y tá); hoặc vì, trong khi</string>
+    <string name="grammar_en_than">Than: so sánh hai thứ (taller than me = cao hơn tôi, more than ten = hơn mười)</string>
+    <string name="grammar_en_another">Another: thêm một cái nữa, hoặc một cái khác (another cup = thêm một cốc, another day = một ngày khác)</string>
+    <string name="grammar_en_such">Such (a): thật là…, mạnh hơn very (such a nice day = một ngày thật đẹp)</string>
+    <string name="grammar_en_except">Except: trừ, ngoại trừ (everyone except Tom = mọi người trừ Tom)</string>
+    <string name="grammar_en_ing_after_noun">Danh từ + -ing: từ đuôi -ing cho biết danh từ đứng trước đang làm gì (the man standing there = người đàn ông đang đứng đó, I saw him running = tôi thấy anh ấy đang chạy)</string>
+</resources>

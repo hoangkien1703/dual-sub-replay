@@ -71,6 +71,8 @@
     <string name="practice_saved">Saved</string>
     <string name="practice_save_to_vocabulary">Save to vocabulary</string>
     <string name="practice_word_by_word">Word by word</string>
+    <string name="practice_dictionary_form">Dictionary form: %1$s</string>
+    <string name="practice_word_level_description">Word level: CEFR %1$s</string>
     <string name="practice_pos_noun">Noun</string>
     <string name="practice_pos_verb">Verb</string>
     <string name="practice_pos_adjective">Adjective</string>

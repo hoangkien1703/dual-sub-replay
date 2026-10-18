@@ -10,7 +10,8 @@ class LearnerGrammarTest {
         assertEquals(GrammarLanguage.CHINESE, grammarLanguage("你好", "zh-Hans"))
         assertEquals(GrammarLanguage.CHINESE, grammarLanguage("你好", "zh_TW"))
         assertEquals(GrammarLanguage.JAPANESE, grammarLanguage("こんにちは", "ja"))
-        assertNull(grammarLanguage("Hello there", "en"))
+        assertEquals(GrammarLanguage.ENGLISH, grammarLanguage("Hello there", "en"))
+        assertEquals(GrammarLanguage.ENGLISH, grammarLanguage("Hello there", "en-GB"))
         assertNull(grammarLanguage("Hola", "es"))
         assertNull(grammarLanguage("Hello", null))
         assertNull(grammarLanguage("Hello", "eng"))
@@ -23,5 +24,6 @@ class LearnerGrammarTest {
         assertEquals("N3", JlptLevel.N3.code)
         assertEquals("HSK 2", HskLevel.HSK2.code)
         assertEquals("HSK 7–9", HskLevel.HSK7_9.code)
+        assertEquals("B1", CefrLevel.B1.code)
     }
 }

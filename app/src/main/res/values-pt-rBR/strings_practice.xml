@@ -71,6 +71,8 @@
     <string name="practice_saved">Salva</string>
     <string name="practice_save_to_vocabulary">Salvar no vocabulário</string>
     <string name="practice_word_by_word">Palavra por palavra</string>
+    <string name="practice_dictionary_form">Forma de dicionário: %1$s</string>
+    <string name="practice_word_level_description">Nível da palavra: QECR %1$s</string>
     <string name="practice_pos_noun">Substantivo</string>
     <string name="practice_pos_verb">Verbo</string>
     <string name="practice_pos_adjective">Adjetivo</string>

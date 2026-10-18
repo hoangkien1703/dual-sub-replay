@@ -13,6 +13,7 @@ version snapshot here drifts, and update relevant documentation with lasting cha
 | UI | Jetpack Compose / Material 3; Compose BOM 2026.06.01 | [App dependencies](../../app/build.gradle.kts) |
 | Translation/network | ML Kit Translate 17.0.3, OkHttp, Kotlin coroutines | [App dependencies](../../app/build.gradle.kts) |
 | Japanese words | Kuromoji 0.9.0 (Apache-2.0, pure Java); its 13 MB IPADIC dictionary downloads on first Japanese use | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-09-29-word-audio-jump-back-japanese-words.md) |
+| English words | Data files only, extracted at build time into `assets/learner-data/`: Apache OpenNLP's UD English part-of-speech model (Apache-2.0) and WordNet 3.1's word and irregular-form lists (WordNet licence), plus the committed CEFR-J word levels (`app/src/main/learner-data/`, free with citation); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-10-18-english-learner-help.md) |
 | Chinese words | Data files only, extracted at build time into `assets/learner-data/`: jieba's word list (MIT) and HanLP's pinyin and traditional-to-simplified tables (Apache-2.0); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-10-18-chinese-learner-help.md) |
 | Media controls | `androidx.media` 1.7.1 media session and notification (no player library) | [App dependencies](../../app/build.gradle.kts) |
 | Tests | JUnit4 4.13.2; Compose/Android instrumentation, API 36 AOSP x86_64 managed Pixel 2 | [App test configuration](../../app/build.gradle.kts) |
@@ -99,8 +100,11 @@ Paths below are relative to
   Chinese (`ChineseGrammar.kt`, HSK 3.0 levels 1 to 6 and 7–9) works the same way: a catalogue
   (`ChineseGrammarCatalogue.kt`) plus a few rules, shared matching in `GrammarMatcher.kt`, text in
   `strings_grammar_zh.xml` and an example sentence per point in `ChineseGrammarCatalogueTest`.
+  English (`EnglishGrammar.kt`, CEFR A1 to B2 from the CEFR-J Grammar Profile) is the same again:
+  `EnglishGrammarCatalogue.kt`, a few rules, `strings_grammar_en.xml` and `EnglishGrammarCatalogueTest`.
   `LearnerGrammar.kt` picks the language's grammar for the word card. See the
-  [Chinese spec](../specs/2026-10-18-chinese-learner-help.md).
+  [Chinese spec](../specs/2026-10-18-chinese-learner-help.md) and the
+  [English spec](../specs/2026-10-18-english-learner-help.md).
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`
@@ -123,7 +127,10 @@ Paths below are relative to
   Chinese (caption language `zh*`) goes through `data/ChineseMorphology.kt`: jieba's most
   probable split over its word list, traditional characters read through the simplified table,
   and tone-marked pinyin per word. It loads from `LearnerData` (APK assets) on a background
-  thread; until then the script-boundary heuristic is used.
+  thread; until then the script-boundary heuristic is used. English (caption language `en*`)
+  goes through `data/EnglishMorphology.kt`: `EnglishPosTagger` runs OpenNLP's model without the
+  library (same features, same tags), and `EnglishLexicon` gives dictionary forms (WordNet's
+  morphy after the app's irregular-verb table) and CEFR-J word levels for the word card.
 
 ## Architecture invariants
 

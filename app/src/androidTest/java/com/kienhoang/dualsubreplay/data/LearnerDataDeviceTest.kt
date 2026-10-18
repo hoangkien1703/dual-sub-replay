@@ -5,12 +5,22 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** The Chinese word list and tables are packaged in the APK and load on Android's runtime. */
+/** The English model and the Chinese word list and tables are packaged in the APK and load on Android's runtime. */
 class LearnerDataDeviceTest {
     @Test
-    fun chineseAnalyzerLoadsFromTheApk() {
+    fun englishAndChineseAnalyzersLoadFromTheApk() {
         LearnerData.useAssets(InstrumentationRegistry.getInstrumentation().targetContext.assets)
         assertTrue(ChineseMorphology.awaitReady())
+        assertTrue(EnglishMorphology.awaitReady())
+
+        val english = LanguageAwareTokenizer.tokenize("It's going to rain.", "en")
+        assertEquals(PartOfSpeech.VERB, english.first { it.text == "rain" }.partOfSpeech)
+        val goingTo =
+            grammarMatches("It's going to rain.", GrammarLanguage.ENGLISH).orEmpty().single {
+                GrammarMeaning.EN_GOING_TO in
+                    it.meanings
+            }
+        assertEquals(CefrLevel.A2, goingTo.level)
 
         val line = "我在银行工作了三年。"
         val chinese = LanguageAwareTokenizer.tokenize(line, "zh")

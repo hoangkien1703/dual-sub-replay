@@ -21,13 +21,18 @@ Current releases bundle only:
 - Kotlin / Coroutines: Apache-2.0.
 - Kuromoji 0.9.0 (`com.atilika.kuromoji:kuromoji-ipadic`, code only): Apache-2.0, copyright 2010-2015 Atilika Inc. and contributors. Its license and notice files are kept in the APK under `META-INF/`.
 
+- English learner data (data files only, no library code), copied at build time from Maven Central into the APK's `assets/learner-data/`:
+  - Apache OpenNLP's English part-of-speech model (`opennlp-en-ud-ewt-pos-1.3-2.5.4.bin` in `org.apache.opennlp:opennlp-models-pos-en:1.3.0`): Apache-2.0, copyright The Apache Software Foundation. It was trained on the Universal Dependencies English Web Treebank (CC BY-SA 4.0); the Apache OpenNLP project releases the trained model under Apache-2.0.
+  - WordNet 3.1's single-word lists and irregular-form lists (`index.*` and `*.exc` in `net.sf.extjwnl:extjwnl-data-wn31:1.2`), reduced to words and their parts of speech: WordNet License, WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved. The licence text is on the app's licence screen.
+- English word levels (`app/src/main/learner-data/en-levels.txt`, packaged in the same folder) come from the CEFR-J Wordlist Version 1.5, compiled by Yukio Tono, Tokyo University of Foreign Studies ([cefr-j.org](http://www.cefr-j.org/download.html), via [Open Language Profiles](https://github.com/openlanguageprofiles/olp-en-cefrj)), reduced to word, part of speech and level. The CEFR-J vocabulary and grammar profiles may be used for research and commercial purposes with no charge, provided the dataset is cited. The CEFR levels of the English grammar points follow the CEFR-J Grammar Profile Version 20180315 (only the levels are used; the profile is not part of the app).
+
 - Chinese learner data (data files only, no library code), copied at build time from Maven Central into the APK's `assets/learner-data/`:
   - jieba's Chinese word list (`dict.txt` in `com.huaban:jieba-analysis:1.0.2`, an Apache-2.0 jar): MIT, copyright (c) 2013 Sun Junyi. The app keeps the words seen at least 4 times, sorted.
   - HanLP's pinyin and traditional-to-simplified tables (`pinyin.txt`, `t2s.txt` in `com.hankcs:hanlp:portable-1.8.6`): Apache-2.0, copyright hankcs.
 
 The HSK levels of the Chinese grammar points are taken from the grammar syllabus and word list of the *Chinese Proficiency Grading Standards for International Chinese Language Education* (GF0025-2021), as published in [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT). Only the level numbers are used; the lists are not part of the app.
 
-The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text and jieba's MIT notice, and the ML Kit translation terms.
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, and the ML Kit translation terms.
 
 ## Japanese dictionary (downloaded on first use)
 

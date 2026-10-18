@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.IntRect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.ChineseMorphology
+import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStatus
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -21,8 +22,9 @@ import org.junit.Test
 
 class PhraseSelectionTest {
     @Before
-    fun loadChinese() {
-        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+    fun loadEnglishAndChinese() {
+        // The app tags English and splits Chinese once their bundled data loads; test that, not the stand-in.
+        assertTrue(EnglishMorphology.awaitReady())
         assertTrue(ChineseMorphology.awaitReady())
     }
 
