@@ -37,17 +37,18 @@ internal class PronunciationCache(
 
     /**
      * Deletes the previous word's speech, and any file a previous run left behind, and returns
-     * the file to record [text] into. Call [markReady] once the recording is complete.
+     * the file to record [text] into, ending in [extension]. Call [markReady] once the recording is complete.
      */
     fun prepare(
         text: String,
         language: String,
+        extension: String = "wav",
     ): File {
         clear()
         directory.mkdirs()
         directory.listFiles()?.forEach { it.delete() }
         counter++
-        return File(directory, "word-$counter.wav").also {
+        return File(directory, "word-$counter.$extension").also {
             key = keyOf(text, language)
             audio = it
         }

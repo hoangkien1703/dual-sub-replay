@@ -69,8 +69,9 @@ Only data files are packaged; no jieba or HanLP code is added.
 - Grammar cards for Chinese in the word card, with an HSK 3.0 level badge (HSK 1 … HSK 6, HSK 7–9),
   from a pattern catalogue and a few context rules sharing the Japanese matcher, and the existing
   "Explain the grammar with AI" button.
-- Chinese words are spoken by a Mandarin voice (zh-Hans → China, zh-Hant → Taiwan, `cmn` voices
-  accepted, best offline voice first).
+- Chinese words are spoken by a natural Mandarin voice: Google Translate's online voice while
+  Google translates subtitles (the default), otherwise the phone's Mandarin voice (zh-Hans → China,
+  zh-Hant → Taiwan, `cmn` voices accepted, best offline voice first).
 - Release as **v1.6.0**.
 
 ## Non-goals
@@ -196,6 +197,7 @@ Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator: the cloud machine
 | Japanese grammar, tokenizer and pronunciation tests | Passed unchanged |
 | The debug APK carries `assets/learner-data/zh-words.txt`, `zh-pinyin.txt`, `zh-t2s.txt` (2.6 MB before compression) | Checked with `unzip -l` |
 | `LearnerDataDeviceTest`, `GrammarExplanationsUiTest.showsHskLevels` | Not run locally (no emulator); run in CI's `managed-device-tests` |
+| `LearnerDataDeviceTest`, `GrammarExplanationsUiTest.showsHskLevels` in CI | Passed (`managed-device-tests` on 3c483a4) |
 | Physical phone and live YouTube | Not run; owner's preview test |
 
 Coverage on 3,000 random Chinese Tatoeba sentences (CC BY 2.0 FR, scratch test, not committed).
@@ -211,3 +213,30 @@ measure words and the suffix 们) belongs to a grammar point.
 
 Loading the word list and tables on the JVM takes about 0.27 s and 8 MB of heap. Remaining misses
 are mostly rare or written words (只不过, 至, 及, 若, 如此, 以至于, 罢了).
+
+## Follow-up: Chinese speech on the owner's phone (2026-10-18)
+
+The owner's first preview test reported that Chinese words were not spoken, and asked for a
+natural voice. Many phones, especially ones set up outside China, have no Mandarin voice installed:
+Google's speech engine lists Mandarin voices only as "not installed" until the learner downloads
+them, so the app found no voice. (Inferred from the code path; the phone's speech settings were not
+inspected.)
+
+- **Decision:** while Google translates subtitles (the default, owner decision 2026-10-05), Chinese
+  words are first fetched from Google Translate's own speech endpoint
+  (`translate.googleapis.com/translate_tts`, `client=gtx`), the voice learners hear on Google
+  Translate. It needs no download and sounds the same on every phone. Simplified and mainland text
+  uses Google's `zh-CN` voice, traditional or Taiwanese text `zh-TW`; Hong Kong and Macau text,
+  often Cantonese, stays with the phone. Text over 200 characters stays with the phone.
+- **Fallback:** if Google fails, answers with something other than MP3, or the learner chose
+  on-device translation, the phone's voices are used exactly as before. Japanese and every other
+  language are unchanged.
+- **Limits:** one GET per new word (the last word's audio is reused for replays), 8 s timeout,
+  replies over 512 KiB are dropped.
+- **Code:** `translation/GoogleWebSpeech.kt` (`googleSpeechLanguage`, `speaksWithGoogle`, the
+  download), `ui/WordPronouncer.kt` (tries it before the phone), `PronunciationCache` keeps the MP3
+  under its own extension.
+- **Validation:** `GoogleWebSpeechTest` (voice choice, the on-device setting, URL, MP3 check, size
+  cap, and recording through a fake Google) passed; the endpoint returned a 9 KB MP3 for 银行 from
+  the build machine. Playback on the owner's phone is the remaining check.
+
