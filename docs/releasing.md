@@ -11,7 +11,7 @@ Pull requests use the committed wrapper to run formatting and complexity checks,
 
 ## Automatic official releases
 
-When **hoangkien1703 merges a PR into `main`**, the **Release merged PR** workflow checks that the latest Android CI run for the PR's final commit succeeded, including both jobs: `verify-build` and `managed-device-tests`. It then builds the preview and a production-signed official APK. Direct pushes and merges by other accounts do not publish releases.
+When **hoangkien1703 merges a PR into `main`**, the **Release merged PR** workflow checks that the latest Android CI run for the PR's final commit succeeded, including both jobs: `verify-build` and `managed-device-tests`. It then builds a production-signed official APK. Merges no longer publish a preview APK of `main`; the preview release only holds open PRs' test APKs. Direct pushes and merges by other accounts do not publish releases.
 
 By default, each eligible merge increments the highest existing or reserved stable patch version: `1.0.4 → 1.0.5` (and `1.0.9 → 1.0.10`). It also increments Android's internal `versionCode` above all prior stable releases and reservations. Preview tags do not affect official version selection. **Do not manually bump the Gradle constants in feature PRs.**
 
@@ -23,7 +23,7 @@ Choose an override **before merging**:
 | Label `release:minor` | 1.1.0 |
 | Label `release:major` | 2.0.0 |
 | A standalone `Release-Version: 1.2.0` line in the PR description | Exactly 1.2.0 |
-| Label `release:skip` | Preview only; no official release |
+| Label `release:skip` | No release |
 
 Use at most one release label or one exact-version directive. Conflicting instructions, malformed versions, and versions no higher than the existing/reserved versions stop the release. Labels are created automatically when the new main workflow first runs; exact-version directives work without labels.
 

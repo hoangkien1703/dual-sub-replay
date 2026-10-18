@@ -38,11 +38,11 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 
 - When `hoangkien1703` merges a PR into `main`, `release-on-main.yml` checks the latest Android CI run for the PR's final head and requires both Android CI jobs (`verify-build`, `managed-device-tests`) to succeed. Direct pushes and other mergers do not release. Android CI also runs on every push to `main` so `setup-gradle` saves fresh caches for PR runs; those runs never count as PR CI.
 - Default: bump the highest existing/reserved stable patch version and monotonically increase Android `versionCode`. **Do not manually bump Gradle version constants in feature PRs.**
-- Before merge, apply at most one GitHub label (`release:patch`, `release:minor`, `release:major`, `release:skip`) OR a standalone `Release-Version: X.Y.Z` in the PR description. Conflicting instructions fail closed. `release:skip` keeps the rolling preview only.
+- Before merge, apply at most one GitHub label (`release:patch`, `release:minor`, `release:major`, `release:skip`) OR a standalone `Release-Version: X.Y.Z` in the PR description. Conflicting instructions fail closed. `release:skip` publishes nothing.
 - Release versions live in a release-only commit/tag based on the exact merge; only the two Gradle version constants change. `main` keeps development defaults. No bot commits to `main` or branch-protection bypass is needed.
 - Draft release metadata reserves version/name/code/source before building. Retry failed runs (or dispatch with a merged PR number) to resume that reservation. Never delete reservations or edit their hidden marker to retry. Published merges are a no-op.
 - Production signature, package, and version are verified before upload; the draft is published only with both APK and checksum present. Release notes are generated automatically. Queued runs cannot allocate the same version, and older retries cannot replace a newer Latest release.
-- The rolling preview artifact name remains `DualSub-Replay-preview.apk`.
+- Merges into `main` publish no preview APK (owner decision 2026-10-18); the `preview` release holds only open PRs' `DualSub-Replay-PR<N>-build<run>-preview.apk` builds. The PR CI artifact stays `DualSub-Replay-preview`, the name `pr-preview-auto.yml` downloads.
 - Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true`. Never commit signing material (`*.jks`/`*.keystore` are gitignored).
 - Test workflow changes with `python3 -m unittest discover -s tools/tests -p 'test_*.py' -v` and validate workflow YAML/shell. These tests also run in Android PR CI.
 
