@@ -43,7 +43,7 @@ checkable acceptance criteria. Risk and behavior matter more than line count.
 
 Lifecycle: idea → feature spec (including plan and release intent) → focused branch →
 implementation → tests/validation → PR → green final-head CI and preview review →
-owner manually merges → automatic version bump and official release (or preview only
+owner manually merges → automatic version bump and official release (or nothing
 when skipped). Put spec changes on the feature branch too; an already-active focused
 branch can be used while drafting. Feedback can return work to earlier stages.
 
@@ -83,7 +83,7 @@ release tools, keeps the patch default.
 | `release:patch` | No override (default patch), or the single GitHub label `release:patch` |
 | `release:minor` | Single GitHub label `release:minor` |
 | `release:major` | Single GitHub label `release:major` |
-| `release:skip` | Single GitHub label `release:skip`; preview continues |
+| `release:skip` | Single GitHub label `release:skip`; nothing is published |
 | `Release-Version: X.Y.Z` | One standalone exact-version line in the PR body, outside HTML comments and code fences; no release label |
 
 The [release parser](../../tools/automatic_release.py) reads GitHub labels and exact

@@ -115,7 +115,7 @@ class ReleaseTests(unittest.TestCase):
         self.pr["labels"] = [{"name": "release:minor"}]
         self.assertEqual(release.prepare(self.api, self.pr)["version"], "1.1.0")
 
-    def test_skip_keeps_preview_but_does_not_reserve_a_release(self):
+    def test_skip_does_not_reserve_a_release(self):
         self.pr["labels"] = [{"name": "release:skip"}]
         self.assertEqual(release.prepare(self.api, self.pr),
                          {"eligible": True, "release_needed": False, "source_sha": "merge72"})

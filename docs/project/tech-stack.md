@@ -175,6 +175,6 @@ After an owner merge, [release-on-main.yml](../../.github/workflows/release-on-m
 and [automatic_release.py](../../tools/automatic_release.py) verify final-head PR CI,
 reserve monotonic versions, and build from the exact merge via a release-only commit.
 Production signature/package/version checks, APK/checksum publication, serialized
-reservations and retries are existing safeguards. A skip label retains rolling preview
-updates. See [release operation and recovery](../releasing.md#automatic-official-releases)
+reservations and retries are existing safeguards. A skip label publishes nothing. See
+[release operation and recovery](../releasing.md#automatic-official-releases)
 and [PR preparation](../../AGENTS.md#preparing-prs-for-owner-merge); specs do not control automation.

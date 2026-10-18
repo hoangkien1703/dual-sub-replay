@@ -14,7 +14,7 @@
 
 <p align="center">
   Android 8.0 or newer · No account · No ads<br>
-  Want the newest features first? <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview">Try the preview version</a> (may be less stable).
+  Want to try changes before they are released? <a href="https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview">Get a preview build</a> of an open pull request (may be less stable).
 </p>
 
 ### How to install
@@ -25,7 +25,7 @@
 
 Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
 
-> **About the preview version:** it installs as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
+> **About preview builds:** they install as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
 
 ## See it in action
 
