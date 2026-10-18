@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Puntos de gramática inglesa para quienes aprenden inglés. Deja tal cual los ejemplos en inglés entre paréntesis. -->
+    <string name="grammar_en_would_rather">Would rather: preferir (yo preferiría…)</string>
+    <string name="grammar_en_do_negative">Negación: do, does o did + not hace negativo el verbo (al principio: don’t do it)</string>
+    <string name="grammar_en_do_question">Pregunta: do, does o did va antes del sujeto</string>
+    <string name="grammar_en_lets">Let’s: propone hacer algo juntos</string>
+    <string name="grammar_en_would_like">Would like: forma cortés de decir want (Would you like…? ofrece algo)</string>
+    <string name="grammar_en_want_to">Want to: querer hacer algo (wanna en el habla informal)</string>
+    <string name="grammar_en_can">Can: poder, ser capaz de o tener permiso para</string>
+    <string name="grammar_en_present_continuous">Presente continuo: ocurre ahora, o un plan fijo</string>
+    <string name="grammar_en_there_be">There is / there are: hay; algo existe o está en un lugar</string>
+    <string name="grammar_en_like_ing">Like, love o hate + -ing: lo que sientes por una actividad</string>
+    <string name="grammar_en_a_lot_of">A lot of: mucho o muchos, como many o much (inglés cotidiano)</string>
+    <string name="grammar_en_how_many">How many: el número (cosas que se pueden contar); how much: la cantidad o el precio</string>
+    <string name="grammar_en_to_infinitive">To + verbo: el infinitivo (dice para qué, o va tras want, need, hope…)</string>
+    <string name="grammar_en_be">Be en presente: am (I), is (he, she, it), are (you, we, they)</string>
+    <string name="grammar_en_present_s">Presente simple con he, she o it: hábitos y hechos</string>
+    <string name="grammar_en_past_simple">Pasado simple: una acción o un estado terminados en el pasado</string>
+    <string name="grammar_en_a_an">A o an: uno entre muchos, o algo que se menciona por primera vez (an antes de un sonido vocálico)</string>
+    <string name="grammar_en_the">The: algo concreto que los dos conocen</string>
+    <string name="grammar_en_and">And: une dos palabras o ideas</string>
+    <string name="grammar_en_but">But: introduce un contraste</string>
+    <string name="grammar_en_or">Or: una elección entre dos cosas</string>
+    <string name="grammar_en_because">Because: da la razón (+ una oración)</string>
+    <string name="grammar_en_frequency">Con qué frecuencia: always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</string>
+    <string name="grammar_en_possessive">’s: pertenece a (Tom’s bag = la bolsa de Tom)</string>
+    <string name="grammar_en_too_also">Too (al final): también</string>
+    <string name="grammar_en_ago">Ago: hace (contando hacia atrás desde ahora: two days ago)</string>
+    <string name="grammar_en_in">In: dentro; con meses, años y partes del día</string>
+    <string name="grammar_en_on">On: sobre una superficie; con días y fechas</string>
+    <string name="grammar_en_at">At: en un punto o lugar; con las horas del reloj</string>
+    <string name="grammar_en_to">To: hacia un lugar o una persona (go to, give to)</string>
+    <string name="grammar_en_for">For: el propósito o quien lo recibe; for + un periodo de tiempo</string>
+    <string name="grammar_en_from">From: el punto de partida (lugar, tiempo u origen)</string>
+    <string name="grammar_en_with">With: junto con; usando (cut with a knife)</string>
+    <string name="grammar_en_of">Of: que pertenece a, o parte de (a cup of tea)</string>
+    <string name="grammar_en_about">About: sobre el tema de; o aproximadamente (about ten minutes)</string>
+    <string name="grammar_en_wh_question">Palabra interrogativa: pide información (what, where, when, why, who, how)</string>
+    <string name="grammar_en_yes_no_question">Pregunta: be o have va antes del sujeto</string>
+    <string name="grammar_en_imperative">Imperativo: la forma base del verbo, sin sujeto, da una orden o pide algo</string>
+    <string name="grammar_en_dont_have_to">Don’t have to: no es necesario (pero puedes hacerlo)</string>
+    <string name="grammar_en_why_dont">Why don’t you / we…?: una sugerencia amable</string>
+    <string name="grammar_en_going_to">Be going to: un plan, o algo que ves que va a pasar (gonna al hablar)</string>
+    <string name="grammar_en_used_to">Used to: solía; un hábito o estado del pasado que ya no es así</string>
+    <string name="grammar_en_have_to">Have to: es necesario (por una norma o la situación); had to = pasado</string>
+    <string name="grammar_en_need_to">Need to: te hace falta hacerlo</string>
+    <string name="grammar_en_must_not">Mustn’t: no está permitido</string>
+    <string name="grammar_en_verb_to">Verbo + to + verbo: algunos verbos van seguidos de to (decide to, hope to, try to)</string>
+    <string name="grammar_en_past_continuous">Pasado continuo: en curso en un momento del pasado (a menudo interrumpido)</string>
+    <string name="grammar_en_have_got">Have got: tener o poseer (sobre todo inglés británico)</string>
+    <string name="grammar_en_present_perfect">Presente perfecto: pasó antes de ahora y aún importa (experiencia, resultado, hasta ahora)</string>
+    <string name="grammar_en_will">Will: el futuro, una decisión rápida, una promesa o un ofrecimiento</string>
+    <string name="grammar_en_could">Could: podía o pudo; una petición cortés; algo posible</string>
+    <string name="grammar_en_must">Must: es necesario; o estoy seguro de que es verdad</string>
+    <string name="grammar_en_should">Should: un consejo, o lo que es correcto o se espera</string>
+    <string name="grammar_en_comparative">Comparativo: más de una cualidad que otra cosa</string>
+    <string name="grammar_en_superlative">Superlativo: más que todos los demás</string>
+    <string name="grammar_en_too_adj">Too + adjetivo: demasiado (más de lo conveniente o posible)</string>
+    <string name="grammar_en_enough">Enough: tanto como hace falta (adjetivo + enough, enough + sustantivo)</string>
+    <string name="grammar_en_so_adj">So + adjetivo: muy, tan (muestra un sentimiento fuerte)</string>
+    <string name="grammar_en_so_result">So: así que, por eso (el resultado)</string>
+    <string name="grammar_en_before_after">Before / after: antes o después de algo (+ sustantivo, -ing o una oración)</string>
+    <string name="grammar_en_until">Until: hasta un momento, y entonces se acaba</string>
+    <string name="grammar_en_already">Already: ya; antes de ahora o antes de lo esperado</string>
+    <string name="grammar_en_yet">Yet: aún, hasta ahora (en preguntas y negaciones)</string>
+    <string name="grammar_en_still">Still: todavía; sigue, no ha terminado</string>
+    <string name="grammar_en_just">Just: hace muy poco; o solo</string>
+    <string name="grammar_en_ever">Ever: alguna vez (Have you ever…?)</string>
+    <string name="grammar_en_some_any">Some: en frases afirmativas y ofrecimientos; any: en preguntas y negaciones</string>
+    <string name="grammar_en_much_many">Many: cosas que se pueden contar; much: cantidades que no se pueden contar</string>
+    <string name="grammar_en_a_few">A few: unos pocos, algunos</string>
+    <string name="grammar_en_every_each">Every / each: cada; todos los de un grupo, uno a uno</string>
+    <string name="grammar_en_no_noun">No + sustantivo: ningún, ninguna</string>
+    <string name="grammar_en_reflexive">-self: la misma persona que el sujeto (by myself = yo solo)</string>
+    <string name="grammar_en_ly_adverb">-ly: convierte un adjetivo en adverbio (cómo se hace algo)</string>
+    <string name="grammar_en_phrasal_verb">Phrasal verb: verbo + una palabra corta, a menudo con un significado nuevo (give up = dejar de)</string>
+    <string name="grammar_en_how_about">How about…? / What about…?: una sugerencia (+ sustantivo o -ing)</string>
+    <string name="grammar_en_by">By: cerca de; no más tarde de; quién lo hizo (tras una pasiva); cómo (by bus)</string>
+    <string name="grammar_en_during">During: durante; en algún momento de un periodo (during the night)</string>
+    <string name="grammar_en_without">Without: sin tener o sin hacer (+ sustantivo o -ing)</string>
+    <string name="grammar_en_into">Into: movimiento hacia dentro</string>
+    <string name="grammar_en_between">Between: en el espacio o el tiempo entre uno y otro</string>
+    <string name="grammar_en_both">Both: los dos juntos (both … and …)</string>
+    <string name="grammar_en_if_real">If + presente: una posibilidad real (… will happen)</string>
+    <string name="grammar_en_when_clause">When: en el momento en que</string>
+    <string name="grammar_en_present_perfect_continuous">Presente perfecto continuo: empezó en el pasado y sigue ahora (for, since)</string>
+    <string name="grammar_en_past_perfect">Pasado perfecto: pasó antes de otro hecho pasado</string>
+    <string name="grammar_en_future_continuous">Futuro continuo: en curso en un momento del futuro</string>
+    <string name="grammar_en_modal_passive">Pasiva tras can, will, must…: (it can be done)</string>
+    <string name="grammar_en_passive">Pasiva: el sujeto recibe la acción (by + quién la hizo)</string>
+    <string name="grammar_en_be_able_to">Be able to: poder, como can (en cualquier tiempo: will be able to)</string>
+    <string name="grammar_en_supposed_to">Be supposed to: se espera o está previsto (pero a menudo no pasa)</string>
+    <string name="grammar_en_had_better">Had better: un consejo fuerte (si no, habrá un problema)</string>
+    <string name="grammar_en_have_got_to">Have got to (gotta): tener que, como have to o must (informal)</string>
+    <string name="grammar_en_be_used_to">Be used to: estar acostumbrado (get used to: acostumbrarse)</string>
+    <string name="grammar_en_be_about_to">Be about to: estar a punto de pasar, muy pronto</string>
+    <string name="grammar_en_may">May: posiblemente; o permiso cortés (May I…?)</string>
+    <string name="grammar_en_might">Might: quizás (menos seguro que may)</string>
+    <string name="grammar_en_shall">Shall I / we…?: un ofrecimiento o una sugerencia</string>
+    <string name="grammar_en_would">Would: una situación imaginada, una petición cortés o un hábito del pasado</string>
+    <string name="grammar_en_verb_ing">Algunos verbos van seguidos de -ing (enjoy, finish, avoid, keep)</string>
+    <string name="grammar_en_verb_someone_to">Verbo + alguien + to + verbo: lo que quieres, pides o dices a alguien que haga</string>
+    <string name="grammar_en_let_make">Let / make + alguien + verbo (sin to): dejar u obligar a alguien a hacerlo</string>
+    <string name="grammar_en_preposition_ing">Tras una preposición (of, for, at…), el verbo va en -ing</string>
+    <string name="grammar_en_in_order_to">In order to: para, con el fin de</string>
+    <string name="grammar_en_so_that">So that: para que (+ una oración, a menudo con can o could)</string>
+    <string name="grammar_en_so_adj_that">So / such … that: tan… que (indica el resultado)</string>
+    <string name="grammar_en_because_of">Because of + sustantivo: a causa de, por esta razón</string>
+    <string name="grammar_en_although">Although: aunque; hay un contraste (como but)</string>
+    <string name="grammar_en_even_if">Even if: incluso si; pase esto o no</string>
+    <string name="grammar_en_while">While: mientras; o en cambio (un contraste)</string>
+    <string name="grammar_en_as_soon_as">As soon as: en cuanto, justo cuando</string>
+    <string name="grammar_en_in_case">In case: por si acaso pasa (para estar preparado)</string>
+    <string name="grammar_en_whether">Whether: si (cuando hay dos opciones)</string>
+    <string name="grammar_en_unless">Unless: si no; a menos que</string>
+    <string name="grammar_en_since">Since + un momento: desde entonces hasta ahora (con have done); o since = because (porque)</string>
+    <string name="grammar_en_instead_of">Instead of: en lugar de (+ sustantivo o -ing)</string>
+    <string name="grammar_en_either_neither">Either … or: uno u otro; neither … nor: ni uno ni otro</string>
+    <string name="grammar_en_wish">Wish + pasado: quieres que algo sea distinto (wish + had done: arrepentimiento)</string>
+    <string name="grammar_en_relative_nondefining">Tras una coma, who o which añade información extra sobre el sustantivo</string>
+    <string name="grammar_en_whose">Whose: cuyo, de quien (the girl whose father…)</string>
+    <string name="grammar_en_relative">Oración de relativo: who (personas), which (cosas) o that (ambos) dice más sobre el sustantivo anterior</string>
+    <string name="grammar_en_reported">Estilo indirecto: lo que alguien dijo (los tiempos suelen ir un paso atrás: is → was)</string>
+    <string name="grammar_en_that_clause">That + oración: lo que alguien piensa, dice o sabe (a menudo se omite)</string>
+    <string name="grammar_en_look_forward">Look forward to (+ sustantivo o -ing): tener ganas de algo que va a llegar</string>
+    <string name="grammar_en_get_adjective">Get + adjetivo: volverse, ponerse (get tired, get better)</string>
+    <string name="grammar_en_so_do_i">So do I / neither do I: yo también / yo tampoco (estar de acuerdo con lo dicho)</string>
+    <string name="grammar_en_it_adj_to">It is + adjetivo + to + verbo: describe una acción (It’s easy to learn)</string>
+    <string name="grammar_en_question_tag">Question tag (coletilla): comprueba que el oyente está de acuerdo (frase afirmativa → coletilla negativa)</string>
+    <string name="grammar_en_such_as">Such as: por ejemplo, como</string>
+    <string name="grammar_en_according_to">According to: según una persona o una fuente</string>
+    <string name="grammar_en_however">However: sin embargo, pero (empieza una frase de contraste)</string>
+    <string name="grammar_en_suffix_ness">-ness: forma un sustantivo a partir de un adjetivo (happy → happiness)</string>
+    <string name="grammar_en_suffix_ment">-ment: forma un sustantivo a partir de un verbo (move → movement)</string>
+    <string name="grammar_en_suffix_tion">-tion / -sion: forma un sustantivo a partir de un verbo (decide → decision)</string>
+    <string name="grammar_en_suffix_ful">-ful: lleno de (care → careful)</string>
+    <string name="grammar_en_suffix_less">-less: sin (home → homeless)</string>
+    <string name="grammar_en_suffix_able">-able / -ible: que se puede hacer (wash → washable)</string>
+    <string name="grammar_en_if_unreal">If + pasado: imaginado o poco probable ahora (… would happen)</string>
+    <string name="grammar_en_past_perfect_continuous">Pasado perfecto continuo: llevaba ocurriendo hasta un momento del pasado</string>
+    <string name="grammar_en_future_perfect">Futuro perfecto: estará terminado para un momento del futuro</string>
+    <string name="grammar_en_perfect_passive">Pasiva perfecta: has been done (ha sido hecho por alguien)</string>
+    <string name="grammar_en_continuous_passive">Pasiva continua: is being done (se está haciendo ahora mismo)</string>
+    <string name="grammar_en_get_passive">Get + participio pasado: a alguien le pasa algo (get hurt, get married)</string>
+    <string name="grammar_en_should_have">Should have done: era lo correcto pero no pasó (arrepentimiento o crítica)</string>
+    <string name="grammar_en_could_have">Could have done: era posible pero no pasó</string>
+    <string name="grammar_en_must_have">Must have done: estoy seguro de que pasó</string>
+    <string name="grammar_en_might_have">Might / may have done: quizás pasó</string>
+    <string name="grammar_en_would_have">Would have done: un resultado pasado imaginado (if … had …)</string>
+    <string name="grammar_en_ought_to">Ought to: debería, como should (algo formal)</string>
+    <string name="grammar_en_if_only">If only: ojalá; un deseo fuerte o un arrepentimiento</string>
+    <string name="grammar_en_as_if">As if: como si (lo parece, pero puede que no sea así)</string>
+    <string name="grammar_en_as_long_as">As long as: siempre que, solo si</string>
+    <string name="grammar_en_despite">Despite / in spite of + sustantivo o -ing: a pesar de, como although</string>
+    <string name="grammar_en_not_only">Not only … but also: los dos, y el segundo sorprende más</string>
+    <string name="grammar_en_otherwise">Otherwise: si no (pasará algo malo)</string>
+    <string name="grammar_en_therefore">Therefore: por lo tanto, por esta razón (formal)</string>
+    <string name="grammar_en_due_to">Due to: debido a, como because of (formal)</string>
+    <string name="grammar_en_whatever">-ever: cualquier …, sea el que sea; no importa qué, quién o dónde</string>
+    <string name="grammar_en_if_past_unreal">If + had done: imaginar un pasado distinto (… would have happened)</string>
+    <string name="grammar_en_negative_inversion">Primero una palabra negativa y luego el verbo auxiliar antes del sujeto (formal, para dar énfasis)</string>
+    <string name="grammar_en_subjunctive">Subjuntivo: tras suggest o insist that, se usa la forma base del verbo (he go, she be)</string>
+    <string name="grammar_en_as_as">As … as: tan … como (not as … as: menos)</string>
+    <string name="grammar_en_this_that">This / these: cerca de ti (this one); that / those: más lejos (that one)</string>
+    <string name="grammar_en_not">Not: hace negativa una palabra o una oración (I’m not hungry, it isn’t far)</string>
+    <string name="grammar_en_all">All: todos los de un grupo, o algo entero</string>
+    <string name="grammar_en_like_similar">Like: parecido a, igual que (He looks like his father = se parece a su padre)</string>
+    <string name="grammar_en_place_movement">Lugar o movimiento: dónde está algo o hacia dónde va (under the table = debajo de la mesa, across the road = al otro lado de la calle)</string>
+    <string name="grammar_en_as">As: en el papel de (works as a nurse = trabaja de enfermera); o porque, mientras</string>
+    <string name="grammar_en_than">Than: compara dos cosas (taller than me = más alto que yo, more than ten = más de diez)</string>
+    <string name="grammar_en_another">Another: uno más, u otro distinto (another cup = otra taza, another day = otro día)</string>
+    <string name="grammar_en_such">Such (a): tan… de este tipo, más fuerte que very (such a nice day = un día tan bonito)</string>
+    <string name="grammar_en_except">Except: todos menos este, sin incluirlo (everyone except Tom = todos menos Tom)</string>
+    <string name="grammar_en_ing_after_noun">Sustantivo + -ing: la palabra en -ing dice qué está haciendo el sustantivo anterior (the man standing there = el hombre que está allí de pie, I saw him running = lo vi corriendo)</string>
+</resources>

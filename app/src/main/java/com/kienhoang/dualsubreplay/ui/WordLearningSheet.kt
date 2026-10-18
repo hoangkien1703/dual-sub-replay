@@ -20,11 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.CefrLevel
+import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.validClipRange
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 internal fun WordLearningDialog(
@@ -127,17 +130,27 @@ internal fun WordLearningDialog(
     }
 }
 
-/** Part of speech (or "Phrase"), reading, and any speech problem with its settings shortcut. */
+/**
+ * Part of speech (or "Phrase") with an English word's CEFR level, reading, an English word's
+ * dictionary form, and any speech problem with its settings shortcut.
+ */
 @Composable
 private fun WordCardDetails(
     selection: LearningWordSelection,
     speechMessage: String?,
     onSpeechSettings: (() -> Unit)?,
 ) {
-    Text(stringResource(if (selection.isPhrase) R.string.practice_phrase else partOfSpeechLabel(selection.token.partOfSpeech)))
+    val wordLevel = remember(selection) { selection.takeUnless { it.isPhrase }?.let { englishWordLevel(it) } }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(if (selection.isPhrase) R.string.practice_phrase else partOfSpeechLabel(selection.token.partOfSpeech)))
+        wordLevel?.let { LevelBadge(it, stringResource(R.string.practice_word_level_description, it.code), tag = "word_level") }
+    }
     selection.token.reading
         ?.takeIf { it.isNotBlank() }
         ?.let { Text(it) }
+    selection.token.baseForm
+        ?.takeIf { !selection.isPhrase && it.isNotBlank() }
+        ?.let { Text(stringResource(R.string.practice_dictionary_form, it), modifier = Modifier.testTag("dictionary_form")) }
     speechMessage?.let { Text(it) }
     onSpeechSettings?.let { open ->
         TextButton(onClick = open, modifier = Modifier.testTag("speech_settings")) {
@@ -228,6 +241,13 @@ internal fun ClipChoice(
         Checkbox(checked, onChange, modifier = Modifier.testTag(tag))
     }
 }
+
+/** The CEFR-J level of a tapped English word, or null for other languages and unlisted words. */
+private fun englishWordLevel(selection: LearningWordSelection): CefrLevel? =
+    selection.wordLanguage
+        .lowercase(Locale.ROOT)
+        .takeIf { it == "en" || it.startsWith("en-") || it.startsWith("en_") }
+        ?.let { EnglishMorphology.wordLevel(selection.token) }
 
 /** The shown name of a part of speech, in the interface language. */
 @StringRes

@@ -71,6 +71,8 @@
     <string name="practice_saved">Đã lưu</string>
     <string name="practice_save_to_vocabulary">Lưu vào từ vựng</string>
     <string name="practice_word_by_word">Từng từ</string>
+    <string name="practice_dictionary_form">Dạng từ điển: %1$s</string>
+    <string name="practice_word_level_description">Cấp độ từ: CEFR %1$s</string>
     <string name="practice_pos_noun">Danh từ</string>
     <string name="practice_pos_verb">Động từ</string>
     <string name="practice_pos_adjective">Tính từ</string>

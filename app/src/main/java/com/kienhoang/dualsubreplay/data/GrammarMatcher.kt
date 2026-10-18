@@ -2,7 +2,7 @@ package com.kienhoang.dualsubreplay.data
 
 /** How advanced a grammar point is, on the scale learners of its language know. */
 internal sealed interface GrammarLevel {
-    /** The level as tests and the assistant name it: N3, HSK 2, HSK 7–9. */
+    /** The level as tests and the assistant name it: N3, HSK 2, HSK 7–9, B1. */
     val code: String
 }
 
@@ -24,6 +24,19 @@ internal enum class HskLevel(
     ;
 
     override val code: String get() = "HSK $label"
+}
+
+/** The CEFR level an English grammar point is taught at, from A1 (first) to C2. */
+internal enum class CefrLevel : GrammarLevel {
+    A1,
+    A2,
+    B1,
+    B2,
+    C1,
+    C2,
+    ;
+
+    override val code: String get() = name
 }
 
 /**

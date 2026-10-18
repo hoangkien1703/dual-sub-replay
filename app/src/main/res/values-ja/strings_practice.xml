@@ -71,6 +71,8 @@
     <string name="practice_saved">保存済み</string>
     <string name="practice_save_to_vocabulary">単語帳に保存</string>
     <string name="practice_word_by_word">単語ごと</string>
+    <string name="practice_dictionary_form">辞書形：%1$s</string>
+    <string name="practice_word_level_description">単語のレベル：CEFR %1$s</string>
     <string name="practice_pos_noun">名詞</string>
     <string name="practice_pos_verb">動詞</string>
     <string name="practice_pos_adjective">形容詞</string>

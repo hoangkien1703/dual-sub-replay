@@ -31,6 +31,8 @@ class GrammarExplanationsTest {
         assertEquals("〜に、〜に対して", grammarPointText("对：〜に、〜に対して", "对 duì"))
         assertEquals("A 比 B + adjective: A is more", grammarPointText("A 比 B + adjective: A is more", "比 bǐ"))
         assertEquals("As for A; marks A as the topic", grammarPointText("As for A; marks A as the topic", "は wa"))
+        assertEquals("Would prefer to", grammarPointText("Would rather: would prefer to", "would rather"))
+        assertEquals("Question: do comes first", grammarPointText("Question: do comes first", "do … + verb?"))
     }
 
     @Test

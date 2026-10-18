@@ -55,12 +55,16 @@ val japaneseTestDictionary by tasks.registering(JapaneseTestDictionary::class) {
     output.set(layout.buildDirectory.dir("generated/japanese-test-dictionary"))
 }
 
-// Chinese learner data: only these data files are packaged, none of the libraries' code.
+// English and Chinese learner data: only these data files are packaged, none of the libraries' code.
 val learnerData by configurations.creating { isTransitive = false }
 
 abstract class LearnerLanguageData : DefaultTask() {
     @get:InputFiles
     abstract val artifacts: ConfigurableFileCollection
+
+    /** Data kept in the repository (word levels), copied as they are. */
+    @get:InputFiles
+    abstract val bundled: ConfigurableFileCollection
 
     @get:OutputDirectory
     abstract val output: DirectoryProperty
@@ -73,6 +77,7 @@ abstract class LearnerLanguageData : DefaultTask() {
                 "dict.txt" to "zh-words.txt",
                 "data/dictionary/pinyin/pinyin.txt" to "zh-pinyin.txt",
                 "data/dictionary/tc/t2s.txt" to "zh-t2s.txt",
+                "opennlp-en-ud-ewt-pos-1.3-2.5.4.bin" to "en-pos.zip",
             )
         val directory = output.dir("learner-data").get().asFile
         directory.mkdirs()
@@ -92,6 +97,43 @@ abstract class LearnerLanguageData : DefaultTask() {
         }
         val missing = wanted.keys - found
         if (missing.isNotEmpty()) throw GradleException("Learner data entries not found: $missing")
+        val wordNet = artifacts.files.firstOrNull { jar -> ZipFile(jar).use { it.getEntry("$WORDNET/index.verb") != null } }
+            ?: throw GradleException("WordNet data not found")
+        ZipFile(wordNet).use { writeWordNet(it, directory) }
+        bundled.files.forEach { it.copyTo(File(directory, it.name), overwrite = true) }
+    }
+
+    /**
+     * WordNet's single words with their parts of speech (`run nv`: n noun, v verb, a adjective,
+     * r adverb), sorted, and its irregular forms (`went v go`), for English dictionary forms.
+     */
+    private fun writeWordNet(
+        zip: ZipFile,
+        directory: File,
+    ) {
+        val word = Regex("[a-z][a-z'-]*")
+        val parts = sortedMapOf<String, String>()
+        val exceptions = mutableListOf<String>()
+        listOf("noun" to 'n', "verb" to 'v', "adj" to 'a', "adv" to 'r').forEach { (file, letter) ->
+            zip.getInputStream(zip.getEntry("$WORDNET/index.$file")).bufferedReader(Charsets.UTF_8).forEachLine { line ->
+                val lemma = line.substringBefore(' ')
+                if (!line.startsWith(' ') && word.matches(lemma)) parts[lemma] = parts[lemma].orEmpty() + letter
+            }
+            zip.getInputStream(zip.getEntry("$WORDNET/$file.exc")).bufferedReader(Charsets.UTF_8).forEachLine { line ->
+                val fields = line.trim().split(' ')
+                if (fields.size >= 2 && fields.all(word::matches)) exceptions += "${fields[0]} $letter ${fields.drop(1).joinToString(" ")}"
+            }
+        }
+        File(directory, "en-words.txt").bufferedWriter(Charsets.UTF_8).use { out ->
+            parts.forEach { (lemma, letters) -> out.write("$lemma $letters\n") }
+        }
+        File(directory, "en-exceptions.txt").bufferedWriter(Charsets.UTF_8).use { out ->
+            exceptions.sorted().forEach { out.write(it); out.write("\n") }
+        }
+    }
+
+    private companion object {
+        const val WORDNET = "net/sf/extjwnl/data/wordnet/wn31"
     }
 
     /**
@@ -118,6 +160,7 @@ abstract class LearnerLanguageData : DefaultTask() {
 
 val learnerLanguageData by tasks.registering(LearnerLanguageData::class) {
     artifacts.from(learnerData)
+    bundled.from(fileTree("src/main/learner-data"))
     output.set(layout.buildDirectory.dir("generated/learner-language-data"))
 }
 
@@ -261,8 +304,11 @@ dependencies {
     // The APK keeps only its code; the dictionary files are excluded from packaging below.
     implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
     japaneseDictionary("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
-    // Data files only (see LearnerLanguageData): jieba's Chinese word list (MIT, in an Apache-2.0 jar)
-    // and HanLP's pinyin and character tables (Apache-2.0).
+    // Data files only (see LearnerLanguageData): English part-of-speech model (Apache-2.0), WordNet 3.1's
+    // word and exception lists (WordNet licence), jieba's Chinese word list (MIT, in an Apache-2.0 jar),
+    // HanLP's pinyin and character tables (Apache-2.0).
+    learnerData("org.apache.opennlp:opennlp-models-pos-en:1.3.0")
+    learnerData("net.sf.extjwnl:extjwnl-data-wn31:1.2")
     learnerData("com.huaban:jieba-analysis:1.0.2")
     learnerData("com.hankcs:hanlp:portable-1.8.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")

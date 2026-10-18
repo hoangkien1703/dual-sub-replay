@@ -180,17 +180,17 @@ object LanguageAwareTokenizer {
         val isJapaneseOrCjk = (languageCode != null && (languageCode.startsWith("ja") || languageCode.startsWith("zh")))
             || isCjk(text)
 
-        return if (isJapaneseOrCjk) {
-            tokenizeCjk(text, languageCode)
-        } else {
-            tokenizeSpacedLanguage(text)
+        return when {
+            isJapaneseOrCjk -> tokenizeCjk(text, languageCode)
+            isEnglishCode(languageCode) -> EnglishMorphology.analyze(text) ?: tokenizeSpacedLanguage(text)
+            else -> tokenizeSpacedLanguage(text)
         }
     }
 
     /**
      * Japanese and Chinese go through their analyzers once loaded, so a tap selects the whole word
-     * (with its endings, or its pinyin). While an analyzer loads, and for hanzi in a line of unknown
-     * language, the script-boundary heuristic below splits the line.
+     * (with its endings, or its pinyin). While an analyzer loads, the script-boundary heuristic
+     * below splits the line.
      */
     private fun tokenizeCjk(
         text: String,
@@ -201,6 +201,9 @@ object LanguageAwareTokenizer {
             isChineseCode(languageCode) -> ChineseMorphology.analyze(text)
             else -> null
         } ?: tokenizeJapanese(text)
+
+    private fun isEnglishCode(languageCode: String?): Boolean =
+        languageCode?.lowercase(Locale.ROOT)?.let { it == "en" || it.startsWith("en-") || it.startsWith("en_") } == true
 
     private fun isChineseCode(languageCode: String?): Boolean =
         languageCode?.lowercase(Locale.ROOT)?.let { it == "zh" || it.startsWith("zh-") || it.startsWith("zh_") } == true

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 面向英语学习者的英语语法点。括号里的英语例子保持原样。 -->
+    <string name="grammar_en_would_rather">Would rather：宁愿，更想（做某事）</string>
+    <string name="grammar_en_do_negative">否定句：do、does 或 did + not 使动词变为否定（放在句首表示禁止：don’t do it）</string>
+    <string name="grammar_en_do_question">疑问句：do、does 或 did 放在主语前面</string>
+    <string name="grammar_en_lets">Let’s：提议大家一起做某事</string>
+    <string name="grammar_en_would_like">Would like：want 的礼貌说法（Would you like…? 用来主动提供东西）</string>
+    <string name="grammar_en_want_to">Want to：想要做某事（口语中常说 wanna）</string>
+    <string name="grammar_en_can">Can：能够，或被允许（做某事）</string>
+    <string name="grammar_en_present_continuous">现在进行时：正在发生的事，或已经定好的安排</string>
+    <string name="grammar_en_there_be">There is / there are：某物存在，或位于某处</string>
+    <string name="grammar_en_like_ing">Like、love 或 hate + -ing：表达你对某项活动的感受</string>
+    <string name="grammar_en_a_lot_of">A lot of：很多，相当于 many 或 much（日常英语）</string>
+    <string name="grammar_en_how_many">How many：问数目（可数的东西）；how much：问数量或价格</string>
+    <string name="grammar_en_to_infinitive">To + 动词：不定式（说明目的，或跟在 want、need、hope… 后面）</string>
+    <string name="grammar_en_be">Be 的现在时：am（I）、is（he、she、it）、are（you、we、they）</string>
+    <string name="grammar_en_present_s">一般现在时（he、she 或 it 作主语）：表示习惯和事实</string>
+    <string name="grammar_en_past_simple">一般过去时：过去已经结束的动作或状态</string>
+    <string name="grammar_en_a_an">A 或 an：许多中的一个，或第一次提到的事物（以元音开头的音前用 an）</string>
+    <string name="grammar_en_the">The：特指双方都知道的那个事物</string>
+    <string name="grammar_en_and">And：连接两个词或两个意思</string>
+    <string name="grammar_en_but">But：引出转折或对比</string>
+    <string name="grammar_en_or">Or：在两者之间选择</string>
+    <string name="grammar_en_because">Because：说明原因（+ 句子）</string>
+    <string name="grammar_en_frequency">频率副词：always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</string>
+    <string name="grammar_en_possessive">’s：表示所属（Tom’s bag = Tom 的包）</string>
+    <string name="grammar_en_too_also">Too（放在句末）：也</string>
+    <string name="grammar_en_ago">Ago：从现在往前推（two days ago = 两天前）</string>
+    <string name="grammar_en_in">In：在…里面；用于月份、年份和一天中的时段</string>
+    <string name="grammar_en_on">On：在…表面上；用于星期几和日期</string>
+    <string name="grammar_en_at">At：在某个点或某个地方；用于钟点时间</string>
+    <string name="grammar_en_to">To：朝向某地或某人（go to、give to）</string>
+    <string name="grammar_en_for">For：表示目的或接受者；for + 一段时间</string>
+    <string name="grammar_en_from">From：表示起点（地点、时间或来源）</string>
+    <string name="grammar_en_with">With：和…一起；用（cut with a knife = 用刀切）</string>
+    <string name="grammar_en_of">Of：属于，或…的一部分（a cup of tea = 一杯茶）</string>
+    <string name="grammar_en_about">About：关于；或大约（about ten minutes = 大约十分钟）</string>
+    <string name="grammar_en_wh_question">疑问词：用来询问信息（what、where、when、why、who、how）</string>
+    <string name="grammar_en_yes_no_question">疑问句：be 或 have 放在主语前面</string>
+    <string name="grammar_en_imperative">祈使句：不带主语的动词原形，表示命令或请求</string>
+    <string name="grammar_en_dont_have_to">Don’t have to：没有必要（但做也可以）</string>
+    <string name="grammar_en_why_dont">Why don’t you / we…?：友好的建议</string>
+    <string name="grammar_en_going_to">Be going to：打算，或看得出即将发生的事（口语中说 gonna）</string>
+    <string name="grammar_en_used_to">Used to：过去的习惯或状态，现在已经不是这样了</string>
+    <string name="grammar_en_have_to">Have to：必须（因为规定或情况所迫）；had to = 过去式</string>
+    <string name="grammar_en_need_to">Need to：你需要（做某事）</string>
+    <string name="grammar_en_must_not">Mustn’t：不允许，禁止</string>
+    <string name="grammar_en_verb_to">动词 + to + 动词：有些动词后面接 to（decide to、hope to、try to）</string>
+    <string name="grammar_en_past_continuous">过去进行时：过去某一时刻正在进行（常被打断）</string>
+    <string name="grammar_en_have_got">Have got：有，拥有（多用于英式英语）</string>
+    <string name="grammar_en_present_perfect">现在完成时：发生在现在之前，至今仍有影响（经历、结果、持续到现在）</string>
+    <string name="grammar_en_will">Will：表示将来、当场的决定、承诺或主动提供帮助</string>
+    <string name="grammar_en_could">Could：过去能够；礼貌的请求；有可能</string>
+    <string name="grammar_en_must">Must：必须；或表示我确信如此（推测）</string>
+    <string name="grammar_en_should">Should：建议，或表示理应如此、按理会这样</string>
+    <string name="grammar_en_comparative">比较级：某方面的程度比另一事物更高</string>
+    <string name="grammar_en_superlative">最高级：比其他所有的都更…</string>
+    <string name="grammar_en_too_adj">Too + 形容词：太…，超过了合适或可能的程度</string>
+    <string name="grammar_en_enough">Enough：足够（形容词 + enough，enough + 名词）</string>
+    <string name="grammar_en_so_adj">So + 形容词：非常（表达强烈的感受）</string>
+    <string name="grammar_en_so_result">So：所以，因此（表示结果）</string>
+    <string name="grammar_en_before_after">Before / after：在…之前 / 之后（+ 名词、-ing 或句子）</string>
+    <string name="grammar_en_until">Until：直到某个时间，然后停止</string>
+    <string name="grammar_en_already">Already：已经（在现在之前，或比预期的早）</string>
+    <string name="grammar_en_yet">Yet：到现在为止（用于疑问句和否定句）</string>
+    <string name="grammar_en_still">Still：仍然，还在继续，没有结束</string>
+    <string name="grammar_en_just">Just：刚刚；或只是</string>
+    <string name="grammar_en_ever">Ever：在任何时候，曾经（Have you ever…?）</string>
+    <string name="grammar_en_some_any">Some：用于肯定句和提供东西时；any：用于疑问句和否定句</string>
+    <string name="grammar_en_much_many">Many：用于可数的东西；much：用于不可数的量</string>
+    <string name="grammar_en_a_few">A few：几个，少量</string>
+    <string name="grammar_en_every_each">Every / each：每一个（一组中的全部，逐一来看）</string>
+    <string name="grammar_en_no_noun">No + 名词：没有任何…</string>
+    <string name="grammar_en_reflexive">-self：与主语是同一个人（by myself = 独自）</string>
+    <string name="grammar_en_ly_adverb">-ly：把形容词变成副词（说明事情怎么做）</string>
+    <string name="grammar_en_phrasal_verb">短语动词：动词 + 小词，常有新的意思（give up = 放弃）</string>
+    <string name="grammar_en_how_about">How about…? / What about…?：提出建议（+ 名词或 -ing）</string>
+    <string name="grammar_en_by">By：在…旁边；不迟于；（被动句中）由谁做的；表示方式（by bus = 坐公交车）</string>
+    <string name="grammar_en_during">During：在某段时间内的某个时候（during the night = 在夜里）</string>
+    <string name="grammar_en_without">Without：没有，不做（+ 名词或 -ing）</string>
+    <string name="grammar_en_into">Into：进入…里面</string>
+    <string name="grammar_en_between">Between：在两者之间（空间或时间）</string>
+    <string name="grammar_en_both">Both：两者都（both … and …）</string>
+    <string name="grammar_en_if_real">If + 现在时：真实可能发生的情况（… will happen）</string>
+    <string name="grammar_en_when_clause">When：当…的时候</string>
+    <string name="grammar_en_present_perfect_continuous">现在完成进行时：从过去开始，现在仍在继续（for、since）</string>
+    <string name="grammar_en_past_perfect">过去完成时：发生在另一件过去的事之前</string>
+    <string name="grammar_en_future_continuous">将来进行时：将来某个时间正在进行</string>
+    <string name="grammar_en_modal_passive">can、will、must… 后面的被动语态（it can be done）</string>
+    <string name="grammar_en_passive">被动语态：主语是动作的承受者（by + 动作的执行者）</string>
+    <string name="grammar_en_be_able_to">Be able to：能够，相当于 can（可用于任何时态：will be able to）</string>
+    <string name="grammar_en_supposed_to">Be supposed to：按预期或计划应该（但常常没做到）</string>
+    <string name="grammar_en_had_better">Had better：最好（强烈建议，否则会有麻烦）</string>
+    <string name="grammar_en_have_got_to">Have got to（gotta）：必须，相当于 have to、must（非正式）</string>
+    <string name="grammar_en_be_used_to">Be used to：习惯于（get used to：逐渐习惯）</string>
+    <string name="grammar_en_be_about_to">Be about to：马上就要发生</string>
+    <string name="grammar_en_may">May：可能；或礼貌地请求许可（May I…?）</string>
+    <string name="grammar_en_might">Might：也许（比 may 更不确定）</string>
+    <string name="grammar_en_shall">Shall I / we…?：主动提出帮忙或提出建议</string>
+    <string name="grammar_en_would">Would：想象的情况、礼貌的请求，或过去的习惯</string>
+    <string name="grammar_en_verb_ing">有些动词后面接 -ing（enjoy、finish、avoid、keep）</string>
+    <string name="grammar_en_verb_someone_to">动词 + 某人 + to + 动词：想要、请求或叫某人做某事（want、ask、tell）</string>
+    <string name="grammar_en_let_make">Let / make + 某人 + 动词（不加 to）：允许或迫使某人做某事</string>
+    <string name="grammar_en_preposition_ing">介词（of、for、at…）后面的动词用 -ing 形式</string>
+    <string name="grammar_en_in_order_to">In order to：为了（表示目的）</string>
+    <string name="grammar_en_so_that">So that：以便，为了（+ 句子，常与 can 或 could 连用）</string>
+    <string name="grammar_en_so_adj_that">So / such … that：如此…以至于（导致某种结果）</string>
+    <string name="grammar_en_because_of">Because of + 名词：因为（这个原因）</string>
+    <string name="grammar_en_although">Although：虽然，尽管（表示转折，类似 but）</string>
+    <string name="grammar_en_even_if">Even if：即使（不管这件事是否发生）</string>
+    <string name="grammar_en_while">While：在…期间；或然而（表示对比）</string>
+    <string name="grammar_en_as_soon_as">As soon as：一…就…</string>
+    <string name="grammar_en_in_case">In case：以防（因为可能发生，先做好准备）</string>
+    <string name="grammar_en_whether">Whether：是否（有两种选择时，相当于 if）</string>
+    <string name="grammar_en_unless">Unless：如果不；除非</string>
+    <string name="grammar_en_since">Since + 时间：从那时到现在（与 have done 连用）；或 since = because（因为）</string>
+    <string name="grammar_en_instead_of">Instead of：代替，而不是（+ 名词或 -ing）</string>
+    <string name="grammar_en_either_neither">Either … or：二者之一；neither … nor：两者都不</string>
+    <string name="grammar_en_wish">Wish + 过去时：希望情况有所不同（wish + had done：表示后悔）</string>
+    <string name="grammar_en_relative_nondefining">逗号后的 who 或 which 给名词补充额外信息</string>
+    <string name="grammar_en_whose">Whose：谁的（the girl whose father…）</string>
+    <string name="grammar_en_relative">定语从句：who（人）、which（物）或 that（两者都可）对前面的名词作进一步说明</string>
+    <string name="grammar_en_reported">间接引语：转述别人说的话（时态常向过去推移：is → was）</string>
+    <string name="grammar_en_that_clause">That + 句子：某人想的、说的或知道的内容（that 常被省略）</string>
+    <string name="grammar_en_look_forward">Look forward to（+ 名词或 -ing）：期待即将到来的事</string>
+    <string name="grammar_en_get_adjective">Get + 形容词：变得（get tired = 累了，get better = 好转）</string>
+    <string name="grammar_en_so_do_i">So do I / neither do I：我也是 / 我也不（附和别人说的话）</string>
+    <string name="grammar_en_it_adj_to">It is + 形容词 + to + 动词：描述某个动作（It’s easy to learn = 学起来很容易）</string>
+    <string name="grammar_en_question_tag">反意疑问句：确认听者是否同意（肯定句 → 否定的附加疑问）</string>
+    <string name="grammar_en_such_as">Such as：例如</string>
+    <string name="grammar_en_according_to">According to：根据（某人或某个来源的说法）</string>
+    <string name="grammar_en_however">However：但是，然而（放在表示对比的句子开头）</string>
+    <string name="grammar_en_suffix_ness">-ness：把形容词变成名词（happy → happiness）</string>
+    <string name="grammar_en_suffix_ment">-ment：把动词变成名词（move → movement）</string>
+    <string name="grammar_en_suffix_tion">-tion / -sion：把动词变成名词（decide → decision）</string>
+    <string name="grammar_en_suffix_ful">-ful：充满…的（care → careful）</string>
+    <string name="grammar_en_suffix_less">-less：没有…的（home → homeless）</string>
+    <string name="grammar_en_suffix_able">-able / -ible：可以被…的（wash → washable）</string>
+    <string name="grammar_en_if_unreal">If + 过去时：想象的或现在不太可能的情况（… would happen）</string>
+    <string name="grammar_en_past_perfect_continuous">过去完成进行时：一直持续到过去某一时刻</string>
+    <string name="grammar_en_future_perfect">将来完成时：到将来某个时间会已经完成</string>
+    <string name="grammar_en_perfect_passive">完成时的被动语态：has been done（已经被某人做了）</string>
+    <string name="grammar_en_continuous_passive">进行时的被动语态：is being done（此刻正在被做）</string>
+    <string name="grammar_en_get_passive">Get + 过去分词：某事发生在某人身上（get hurt = 受伤，get married = 结婚）</string>
+    <string name="grammar_en_should_have">Should have done：本该做却没做（表示后悔或批评）</string>
+    <string name="grammar_en_could_have">Could have done：本来可以，但没有发生</string>
+    <string name="grammar_en_must_have">Must have done：一定已经…（对过去很有把握的推测）</string>
+    <string name="grammar_en_might_have">Might / may have done：也许已经…（对过去的推测）</string>
+    <string name="grammar_en_would_have">Would have done：想象中过去的结果（if … had …）</string>
+    <string name="grammar_en_ought_to">Ought to：应该，相当于 should（稍正式）</string>
+    <string name="grammar_en_if_only">If only：要是…就好了（强烈的愿望或遗憾）</string>
+    <string name="grammar_en_as_if">As if：好像，仿佛（看起来如此，但可能不是）</string>
+    <string name="grammar_en_as_long_as">As long as：只要</string>
+    <string name="grammar_en_despite">Despite / in spite of + 名词或 -ing：尽管，相当于 although</string>
+    <string name="grammar_en_not_only">Not only … but also：不但…而且…（第二点更令人意外）</string>
+    <string name="grammar_en_otherwise">Otherwise：否则（会发生不好的事）</string>
+    <string name="grammar_en_therefore">Therefore：所以，因此（正式）</string>
+    <string name="grammar_en_due_to">Due to：由于，相当于 because of（正式）</string>
+    <string name="grammar_en_whatever">-ever：任何…都；无论什么、谁或哪里（whatever、whoever、wherever）</string>
+    <string name="grammar_en_if_past_unreal">If + had done：想象与过去不同的情况（… would have happened）</string>
+    <string name="grammar_en_negative_inversion">否定词放在句首时，助动词移到主语前面（正式，用于强调）</string>
+    <string name="grammar_en_subjunctive">虚拟语气：在 suggest 或 insist that 后面用动词原形（he go、she be）</string>
+    <string name="grammar_en_as_as">As … as：和…一样（not as … as：不如…）</string>
+    <string name="grammar_en_this_that">This / these：近处的（this one）；that / those：较远的（that one）</string>
+    <string name="grammar_en_not">Not：使单词或句子变成否定（I’m not hungry, it isn’t far）</string>
+    <string name="grammar_en_all">All：一个群体中的每一个，或某物的全部</string>
+    <string name="grammar_en_like_similar">Like：像，和……一样（He looks like his father = 他长得像他父亲）</string>
+    <string name="grammar_en_place_movement">位置或方向：某物在哪里，或朝哪个方向移动（under the table = 在桌子下面，across the road = 穿过马路）</string>
+    <string name="grammar_en_as">As：作为（works as a nurse = 当护士）；也可表示因为、当……时</string>
+    <string name="grammar_en_than">Than：比较两样东西（taller than me = 比我高，more than ten = 多于十个）</string>
+    <string name="grammar_en_another">Another：再一个，或另一个（another cup = 再来一杯，another day = 改天）</string>
+    <string name="grammar_en_such">Such (a)：这么……的，比 very 语气更强（such a nice day = 这么好的天气）</string>
+    <string name="grammar_en_except">Except：除了……以外（everyone except Tom = 除了汤姆以外的所有人）</string>
+    <string name="grammar_en_ing_after_noun">名词 + -ing：-ing 词说明前面的名词正在做什么（the man standing there = 站在那里的男人，I saw him running = 我看见他在跑）</string>
+</resources>

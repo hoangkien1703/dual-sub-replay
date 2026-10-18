@@ -71,6 +71,8 @@
     <string name="practice_saved">저장됨</string>
     <string name="practice_save_to_vocabulary">단어장에 저장</string>
     <string name="practice_word_by_word">단어별 보기</string>
+    <string name="practice_dictionary_form">사전형: %1$s</string>
+    <string name="practice_word_level_description">단어 수준: CEFR %1$s</string>
     <string name="practice_pos_noun">명사</string>
     <string name="practice_pos_verb">동사</string>
     <string name="practice_pos_adjective">형용사</string>

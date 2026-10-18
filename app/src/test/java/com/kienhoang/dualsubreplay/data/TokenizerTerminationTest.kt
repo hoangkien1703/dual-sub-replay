@@ -12,8 +12,9 @@ import org.junit.Test
  */
 class TokenizerTerminationTest {
     @Before
-    fun loadChinese() {
-        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+    fun loadEnglishAndChinese() {
+        // The app tags English and splits Chinese once their bundled data loads; test that, not the stand-in.
+        assertTrue(EnglishMorphology.awaitReady())
         assertTrue(ChineseMorphology.awaitReady())
     }
 

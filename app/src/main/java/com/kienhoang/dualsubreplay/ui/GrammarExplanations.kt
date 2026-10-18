@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiPendingQuestion
 import com.kienhoang.dualsubreplay.assistant.aiGrammarContext
+import com.kienhoang.dualsubreplay.data.CefrLevel
 import com.kienhoang.dualsubreplay.data.GrammarLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
@@ -49,10 +50,10 @@ import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
 /**
  * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
- * catalogue in [GRAMMAR_POINT_TEXT], Chinese in `LearnerGrammarText.kt`.
+ * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`.
  */
 internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
-    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + CHINESE_GRAMMAR_TEXT
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT
 }
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
@@ -164,7 +165,7 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese or Chinese selection, read from its whole subtitle line, and
+ * The grammar of a Japanese, English or Chinese selection, read from its whole subtitle line, and
  * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
  * nothing for other languages.
  */
@@ -232,21 +233,30 @@ internal fun GrammarPointList(matches: List<GrammarMatch>) {
     }
 }
 
-/** A small "N3" or "HSK 2" label, so learners see how advanced each point is. */
+/**
+ * A small "N3", "HSK 2" or "B1" label, so learners see how advanced each point (or, with its own
+ * [description] and [tag], each English word) is.
+ */
 @Composable
-private fun LevelBadge(level: GrammarLevel) {
+internal fun LevelBadge(
+    level: GrammarLevel,
+    description: String? = null,
+    tag: String = "grammar_level",
+) {
     val label =
         when (level) {
             is JlptLevel -> stringResource(R.string.grammar_jlpt_level, level.number)
             is HskLevel -> stringResource(R.string.grammar_hsk_level, level.label)
+            is CefrLevel -> stringResource(R.string.grammar_cefr_level, level.name)
         }
-    val description =
-        when (level) {
+    val spoken =
+        description ?: when (level) {
             is JlptLevel -> stringResource(R.string.grammar_jlpt_level_description, level.number)
             is HskLevel -> stringResource(R.string.grammar_hsk_level_description, level.label)
+            is CefrLevel -> stringResource(R.string.grammar_cefr_level_description, level.name)
         }
     Surface(
-        modifier = Modifier.padding(top = 2.dp).testTag("grammar_level").semantics { contentDescription = description },
+        modifier = Modifier.padding(top = 2.dp).testTag(tag).semantics { contentDescription = spoken },
         shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer,
     ) {

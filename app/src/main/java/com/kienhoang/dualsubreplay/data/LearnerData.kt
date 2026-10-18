@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
 /**
- * The Chinese learner data packaged with the app (`learner-data/` in the APK's assets,
+ * The English and Chinese learner data packaged with the app (`learner-data/` in the APK's assets,
  * extracted from Maven artifacts at build time). Unit tests read the same files from the classpath.
  */
 internal object LearnerData {

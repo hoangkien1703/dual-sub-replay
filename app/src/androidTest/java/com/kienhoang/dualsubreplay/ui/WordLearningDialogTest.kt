@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.*
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.*
@@ -34,6 +35,21 @@ class WordLearningDialogTest {
         compose.runOnIdle { assertEquals(Pair("từ", true), saved) }
         compose.onNodeWithTag("word_saved").performScrollTo().assertIsDisplayed()
     }
+
+    @Test
+    fun englishWordShowsItsDictionaryFormAndLevel() {
+        LearnerData.useAssets(InstrumentationRegistry.getInstrumentation().targetContext.assets)
+        assertTrue(EnglishMorphology.awaitReady())
+        val went = LanguageAwareTokenizer.tokenize("We went home.", "en").first { it.text == "went" }
+        val wentSelection = selection.copy(token = went)
+        compose.setContent {
+            DualSubTheme { WordLearningDialog(wentSelection, false, { "đi" }, { _, _ -> }, {}, null, {}) }
+        }
+        compose.onNodeWithTag("dictionary_form").assertTextEquals("Dictionary form: go")
+        compose.onNodeWithContentDescription("Word level: CEFR A1").assertIsDisplayed()
+        saveUiEvidence("word-card-english")
+    }
+
     @Test fun manualSpeechWorksWhenAutomaticSpeechIsDisabled() {
         var spoken = 0
         compose.setContent { DualSubTheme {

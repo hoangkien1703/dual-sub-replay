@@ -10,8 +10,9 @@ import org.junit.Test
 
 class LanguageAwareTokenizerTest {
     @Before
-    fun loadChinese() {
-        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+    fun loadEnglishAndChinese() {
+        // The app tags English and splits Chinese once their bundled data loads; test that, not the stand-in.
+        assertTrue(EnglishMorphology.awaitReady())
         assertTrue(ChineseMorphology.awaitReady())
     }
 
@@ -93,11 +94,12 @@ class LanguageAwareTokenizerTest {
         val originalTokens = LanguageAwareTokenizer.tokenize(originalText, "en")
         val translationText = "Cả con trỏ và Openai để có được nhiều"
 
-        val alignedTokens = LanguageAwareTokenizer.alignAndTokenizeTranslation(
-            translationText = translationText,
-            originalTokens = originalTokens,
-            translationLanguage = "vi",
-        )
+        val alignedTokens =
+            LanguageAwareTokenizer.alignAndTokenizeTranslation(
+                translationText = translationText,
+                originalTokens = originalTokens,
+                translationLanguage = "vi",
+            )
 
         assertTrue(alignedTokens.isNotEmpty())
         val openaiToken = alignedTokens.find { it.text.equals("Openai", ignoreCase = true) }

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 영어를 배우는 사람을 위한 영어 문법 항목. 괄호 안의 영어 예시는 그대로 둔다. -->
+    <string name="grammar_en_would_rather">Would rather: 차라리 ~하고 싶다 (그쪽을 더 원함)</string>
+    <string name="grammar_en_do_negative">부정문: do, does, did + not이 동사를 부정함 (문장 맨 앞: don’t do it)</string>
+    <string name="grammar_en_do_question">의문문: do, does, did가 주어 앞에 옴</string>
+    <string name="grammar_en_lets">Let’s: 함께 무언가를 하자는 제안</string>
+    <string name="grammar_en_would_like">Would like: want의 공손한 표현 (Would you like…?는 무언가를 권함)</string>
+    <string name="grammar_en_want_to">Want to: 무언가를 하고 싶다 (구어에서는 wanna)</string>
+    <string name="grammar_en_can">Can: ~할 수 있다, 또는 ~해도 된다</string>
+    <string name="grammar_en_present_continuous">현재진행형: 지금 일어나고 있는 일, 또는 정해진 계획</string>
+    <string name="grammar_en_there_be">There is / there are: 무언가가 존재하거나 어떤 장소에 있음</string>
+    <string name="grammar_en_like_ing">Like, love, hate + -ing: 어떤 활동에 대한 감정</string>
+    <string name="grammar_en_a_lot_of">A lot of: 많은, many나 much와 같은 뜻 (일상 영어)</string>
+    <string name="grammar_en_how_many">How many: 개수 (셀 수 있는 것); how much: 양이나 가격</string>
+    <string name="grammar_en_to_infinitive">To + 동사: to부정사 (이유를 말하거나 want, need, hope… 뒤에 옴)</string>
+    <string name="grammar_en_be">현재형 be: am (I), is (he, she, it), are (you, we, they)</string>
+    <string name="grammar_en_present_s">he, she, it 주어의 현재시제: 습관과 사실</string>
+    <string name="grammar_en_past_simple">과거시제: 과거에 끝난 동작이나 상태</string>
+    <string name="grammar_en_a_an">A / an: 여럿 중 하나, 또는 처음 언급하는 것 (모음 소리 앞에서는 an)</string>
+    <string name="grammar_en_the">The: 서로 알고 있는 특정한 것</string>
+    <string name="grammar_en_and">And: 두 단어나 생각을 이음</string>
+    <string name="grammar_en_but">But: 반대되는 내용을 이끔</string>
+    <string name="grammar_en_or">Or: 둘 중 하나를 고름</string>
+    <string name="grammar_en_because">Because: 이유를 말함 (+ 문장)</string>
+    <string name="grammar_en_frequency">빈도: always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</string>
+    <string name="grammar_en_possessive">’s: ~의 것 (Tom’s bag = Tom의 가방)</string>
+    <string name="grammar_en_too_also">Too (문장 끝): ~도, 또한</string>
+    <string name="grammar_en_ago">Ago: 지금부터 ~ 전 (two days ago)</string>
+    <string name="grammar_en_in">In: ~ 안에; 월·연도·하루 중 때(아침·오후 등)와 함께 씀</string>
+    <string name="grammar_en_on">On: 표면 위에; 요일·날짜와 함께 씀</string>
+    <string name="grammar_en_at">At: 한 지점이나 장소에; 시각과 함께 씀</string>
+    <string name="grammar_en_to">To: 장소나 사람 쪽으로 (go to, give to)</string>
+    <string name="grammar_en_for">For: 목적이나 받는 사람; for + 기간</string>
+    <string name="grammar_en_from">From: 출발점 (장소, 시간 또는 출신)</string>
+    <string name="grammar_en_with">With: ~와 함께; ~을 사용해서 (cut with a knife)</string>
+    <string name="grammar_en_of">Of: ~의, ~의 일부 (a cup of tea)</string>
+    <string name="grammar_en_about">About: ~에 대해; 또는 약, 대략 (about ten minutes)</string>
+    <string name="grammar_en_wh_question">의문사: 정보를 물음 (what, where, when, why, who, how)</string>
+    <string name="grammar_en_yes_no_question">의문문: be나 have가 주어 앞에 옴</string>
+    <string name="grammar_en_imperative">명령문: 주어 없이 동사원형으로 명령이나 부탁을 함</string>
+    <string name="grammar_en_dont_have_to">Don’t have to: ~할 필요 없다 (해도 되긴 함)</string>
+    <string name="grammar_en_why_dont">Why don’t you / we…?: 친근한 제안</string>
+    <string name="grammar_en_going_to">Be going to: 계획, 또는 곧 일어날 것이 보이는 일 (구어에서는 gonna)</string>
+    <string name="grammar_en_used_to">Used to: 지금은 아닌 과거의 습관이나 상태</string>
+    <string name="grammar_en_have_to">Have to: ~해야 한다 (규칙이나 상황 때문에); had to = 과거</string>
+    <string name="grammar_en_need_to">Need to: 자신에게 필요한 일, ~해야 한다</string>
+    <string name="grammar_en_must_not">Mustn’t: ~하면 안 된다 (금지)</string>
+    <string name="grammar_en_verb_to">동사 + to + 동사: 어떤 동사는 뒤에 to가 옴 (decide to, hope to, try to)</string>
+    <string name="grammar_en_past_continuous">과거진행형: 과거의 한 시점에 진행 중이던 일 (흔히 도중에 끊김)</string>
+    <string name="grammar_en_have_got">Have got: 가지고 있다 (주로 영국 영어)</string>
+    <string name="grammar_en_present_perfect">현재완료: 전에 일어나서 지금도 관련 있는 일 (경험, 결과, 지금까지의 계속)</string>
+    <string name="grammar_en_will">Will: 미래, 즉석 결정, 약속 또는 제의</string>
+    <string name="grammar_en_could">Could: ~할 수 있었다; 공손한 부탁; 가능성</string>
+    <string name="grammar_en_must">Must: ~해야 한다; 또는 분명 ~일 것이다 (확신)</string>
+    <string name="grammar_en_should">Should: 조언, 또는 옳거나 마땅한 일</string>
+    <string name="grammar_en_comparative">비교급: 다른 것보다 어떤 성질이 더함</string>
+    <string name="grammar_en_superlative">최상급: 다른 모든 것보다 더함 (가장 ~)</string>
+    <string name="grammar_en_too_adj">Too + 형용사: 너무 ~함 (적당하거나 가능한 정도를 넘음)</string>
+    <string name="grammar_en_enough">Enough: 필요한 만큼 충분히 (형용사 + enough, enough + 명사)</string>
+    <string name="grammar_en_so_adj">So + 형용사: 아주, 정말 (강한 감정)</string>
+    <string name="grammar_en_so_result">So: 그래서 (결과)</string>
+    <string name="grammar_en_before_after">Before / after: 어떤 일보다 먼저 / 나중에 (+ 명사, -ing 또는 문장)</string>
+    <string name="grammar_en_until">Until: 어느 때까지 이어지다가 그때 멈춤</string>
+    <string name="grammar_en_already">Already: 이미, 또는 예상보다 일찍</string>
+    <string name="grammar_en_yet">Yet: 지금까지, 아직 (의문문과 부정문에서)</string>
+    <string name="grammar_en_still">Still: 여전히, 아직 끝나지 않음</string>
+    <string name="grammar_en_just">Just: 방금; 또는 단지, ~만</string>
+    <string name="grammar_en_ever">Ever: 언제든, 한 번이라도 (Have you ever…?)</string>
+    <string name="grammar_en_some_any">Some: 긍정문과 권유에서; any: 의문문과 부정문에서</string>
+    <string name="grammar_en_much_many">Many: 셀 수 있는 것; much: 셀 수 없는 양</string>
+    <string name="grammar_en_a_few">A few: 적은 수, 몇몇</string>
+    <string name="grammar_en_every_each">Every / each: 한 무리 전부를 하나하나</string>
+    <string name="grammar_en_no_noun">No + 명사: 하나도 없음</string>
+    <string name="grammar_en_reflexive">-self: 주어와 같은 사람 (by myself = 혼자서)</string>
+    <string name="grammar_en_ly_adverb">-ly: 형용사를 부사로 바꿈 (어떻게 하는지)</string>
+    <string name="grammar_en_phrasal_verb">구동사: 동사 + 짧은 단어로, 흔히 새로운 뜻이 됨 (give up = 그만두다)</string>
+    <string name="grammar_en_how_about">How about…? / What about…?: 제안 (+ 명사 또는 -ing)</string>
+    <string name="grammar_en_by">By: 옆에; 늦어도 ~까지; 누가 했는지 (수동태 뒤); 수단 (by bus)</string>
+    <string name="grammar_en_during">During: 어떤 기간 중에 (during the night)</string>
+    <string name="grammar_en_without">Without: ~ 없이, ~하지 않고 (+ 명사 또는 -ing)</string>
+    <string name="grammar_en_into">Into: 안으로 들어감</string>
+    <string name="grammar_en_between">Between: 둘 사이 (공간이나 시간)</string>
+    <string name="grammar_en_both">Both: 둘 다 (both … and …)</string>
+    <string name="grammar_en_if_real">If + 현재형: 실제로 일어날 수 있는 일 (… will happen)</string>
+    <string name="grammar_en_when_clause">When: ~할 때</string>
+    <string name="grammar_en_present_perfect_continuous">현재완료진행형: 과거에 시작해 지금도 계속되는 일 (for, since)</string>
+    <string name="grammar_en_past_perfect">과거완료: 과거의 다른 일보다 먼저 일어난 일</string>
+    <string name="grammar_en_future_continuous">미래진행형: 미래의 한 시점에 진행 중일 일</string>
+    <string name="grammar_en_modal_passive">can, will, must… 뒤의 수동태: (it can be done)</string>
+    <string name="grammar_en_passive">수동태: 주어가 동작을 받음 (by + 동작을 한 사람)</string>
+    <string name="grammar_en_be_able_to">Be able to: can과 같음 (어느 시제에나 씀: will be able to)</string>
+    <string name="grammar_en_supposed_to">Be supposed to: ~하기로 되어 있다 (예정이지만 흔히 그렇게 되지 않음)</string>
+    <string name="grammar_en_had_better">Had better: 강한 조언 (안 그러면 문제가 생김)</string>
+    <string name="grammar_en_have_got_to">Have got to (gotta): have to, must와 같음 (비격식)</string>
+    <string name="grammar_en_be_used_to">Be used to: ~에 익숙하다 (get used to: 익숙해지다)</string>
+    <string name="grammar_en_be_about_to">Be about to: 막 ~하려는 참이다</string>
+    <string name="grammar_en_may">May: 아마도; 또는 공손한 허락 (May I…?)</string>
+    <string name="grammar_en_might">Might: 어쩌면 (may보다 덜 확실함)</string>
+    <string name="grammar_en_shall">Shall I / we…?: 해 주겠다는 제의나 제안</string>
+    <string name="grammar_en_would">Would: 상상한 상황, 공손한 부탁, 또는 과거의 습관</string>
+    <string name="grammar_en_verb_ing">어떤 동사는 뒤에 -ing가 옴 (enjoy, finish, avoid, keep)</string>
+    <string name="grammar_en_verb_someone_to">동사 + 사람 + to + 동사: 누군가에게 바라거나 부탁하거나 시키는 일</string>
+    <string name="grammar_en_let_make">Let / make + 사람 + 동사 (to 없음): ~하게 허락하거나 억지로 시킴</string>
+    <string name="grammar_en_preposition_ing">전치사 (of, for, at…) 뒤의 동사는 -ing 형태가 됨</string>
+    <string name="grammar_en_in_order_to">In order to: ~하기 위해서 (목적)</string>
+    <string name="grammar_en_so_that">So that: ~하도록 (+ 문장, 흔히 can이나 could와 함께)</string>
+    <string name="grammar_en_so_adj_that">So / such … that: 너무 ~해서 그 결과 …함</string>
+    <string name="grammar_en_because_of">Because of + 명사: ~ 때문에 (이유)</string>
+    <string name="grammar_en_although">Although: 비록 ~이지만 (but처럼 대조를 나타냄)</string>
+    <string name="grammar_en_even_if">Even if: 그 일이 일어나든 안 일어나든, ~하더라도</string>
+    <string name="grammar_en_while">While: ~하는 동안; 또는 ~인 반면 (대조)</string>
+    <string name="grammar_en_as_soon_as">As soon as: ~하자마자 곧바로</string>
+    <string name="grammar_en_in_case">In case: ~할지도 모르니까 (미리 대비함)</string>
+    <string name="grammar_en_whether">Whether: ~인지 아닌지 (두 가지 선택이 있을 때의 if)</string>
+    <string name="grammar_en_unless">Unless: ~하지 않으면; ~인 경우가 아니면</string>
+    <string name="grammar_en_since">Since + 시점: 그때부터 지금까지 (have done과 함께); 또는 since = because</string>
+    <string name="grammar_en_instead_of">Instead of: ~ 대신에 (+ 명사 또는 -ing)</string>
+    <string name="grammar_en_either_neither">Either … or: 둘 중 하나; neither … nor: 둘 다 아님</string>
+    <string name="grammar_en_wish">Wish + 과거형: 지금과 다르기를 바람 (wish + had done: 후회)</string>
+    <string name="grammar_en_relative_nondefining">쉼표 뒤의 who나 which는 명사에 대한 정보를 덧붙임</string>
+    <string name="grammar_en_whose">Whose: 그 사람의 (the girl whose father…)</string>
+    <string name="grammar_en_relative">관계절: who (사람), which (사물), that (둘 다)이 앞의 명사를 더 자세히 설명함</string>
+    <string name="grammar_en_reported">간접화법: 남이 한 말을 전함 (시제가 흔히 한 단계 과거로: is → was)</string>
+    <string name="grammar_en_that_clause">That + 문장: 누군가가 생각하거나 말하거나 아는 내용 (흔히 생략됨)</string>
+    <string name="grammar_en_look_forward">Look forward to (+ 명사 또는 -ing): 다가올 일을 기대하다</string>
+    <string name="grammar_en_get_adjective">Get + 형용사: ~해지다 (get tired, get better)</string>
+    <string name="grammar_en_so_do_i">So do I / neither do I: 나도 그래 (상대의 말에 동의)</string>
+    <string name="grammar_en_it_adj_to">It is + 형용사 + to + 동사: 어떤 행동이 어떤지 설명함 (It’s easy to learn)</string>
+    <string name="grammar_en_question_tag">부가의문문: 듣는 사람이 동의하는지 확인함 (긍정문 → 부정 꼬리)</string>
+    <string name="grammar_en_such_as">Such as: 예를 들면</string>
+    <string name="grammar_en_according_to">According to: 어떤 사람이나 출처에 따르면</string>
+    <string name="grammar_en_however">However: 하지만 (대조되는 문장을 시작함)</string>
+    <string name="grammar_en_suffix_ness">-ness: 형용사를 명사로 만듦 (happy → happiness)</string>
+    <string name="grammar_en_suffix_ment">-ment: 동사를 명사로 만듦 (move → movement)</string>
+    <string name="grammar_en_suffix_tion">-tion / -sion: 동사를 명사로 만듦 (decide → decision)</string>
+    <string name="grammar_en_suffix_ful">-ful: ~로 가득한 (care → careful)</string>
+    <string name="grammar_en_suffix_less">-less: ~이 없는 (home → homeless)</string>
+    <string name="grammar_en_suffix_able">-able / -ible: ~할 수 있는 (wash → washable)</string>
+    <string name="grammar_en_if_unreal">If + 과거형: 지금 상상하거나 일어날 것 같지 않은 일 (… would happen)</string>
+    <string name="grammar_en_past_perfect_continuous">과거완료진행형: 과거의 한 시점까지 계속되고 있던 일</string>
+    <string name="grammar_en_future_perfect">미래완료: 미래의 어느 시점까지 끝나 있을 일</string>
+    <string name="grammar_en_perfect_passive">완료 수동태: has been done (누군가에 의해 이미 ~됨)</string>
+    <string name="grammar_en_continuous_passive">진행 수동태: is being done (지금 ~되고 있는 중)</string>
+    <string name="grammar_en_get_passive">Get + 과거분사: 누군가에게 어떤 일이 생김 (get hurt, get married)</string>
+    <string name="grammar_en_should_have">Should have done: 했어야 했는데 하지 않음 (후회나 비판)</string>
+    <string name="grammar_en_could_have">Could have done: 가능했지만 일어나지 않음</string>
+    <string name="grammar_en_must_have">Must have done: 분명 일어났을 것이다 (확신)</string>
+    <string name="grammar_en_might_have">Might / may have done: 어쩌면 일어났을지도 모른다</string>
+    <string name="grammar_en_would_have">Would have done: 상상한 과거의 결과 (if … had …)</string>
+    <string name="grammar_en_ought_to">Ought to: should와 같음 (약간 격식체)</string>
+    <string name="grammar_en_if_only">If only: 강한 바람이나 후회</string>
+    <string name="grammar_en_as_if">As if: 마치 ~인 것처럼 (그렇게 보이지만 아닐 수도 있음)</string>
+    <string name="grammar_en_as_long_as">As long as: ~하기만 하면 (그 경우에만)</string>
+    <string name="grammar_en_despite">Despite / in spite of + 명사 또는 -ing: ~에도 불구하고 (although와 비슷)</string>
+    <string name="grammar_en_not_only">Not only … but also: 둘 다이며, 뒤의 것이 더 놀라움</string>
+    <string name="grammar_en_otherwise">Otherwise: 그렇지 않으면 (나쁜 일이 생김)</string>
+    <string name="grammar_en_therefore">Therefore: 그러므로, 이런 이유로 (격식체)</string>
+    <string name="grammar_en_due_to">Due to: ~ 때문에 (격식체)</string>
+    <string name="grammar_en_whatever">-ever: 어떤 …이든; 무엇이든, 누구든, 어디든 상관없이</string>
+    <string name="grammar_en_if_past_unreal">If + had done: 과거를 다르게 상상함 (… would have happened)</string>
+    <string name="grammar_en_negative_inversion">부정어가 문장 앞에 오면 조동사가 주어 앞에 옴 (격식체, 강조)</string>
+    <string name="grammar_en_subjunctive">가정법 현재: suggest나 insist that 뒤에는 동사원형을 씀 (he go, she be)</string>
+    <string name="grammar_en_as_as">As … as: 같은 정도 (not as … as: 그보다 덜함)</string>
+    <string name="grammar_en_this_that">This / these: 가까이 있는 것 (this one); that / those: 멀리 있는 것 (that one)</string>
+    <string name="grammar_en_not">Not: 단어나 문장을 부정으로 만듦 (I’m not hungry, it isn’t far)</string>
+    <string name="grammar_en_all">All: 무리 전체, 또는 어떤 것의 전부</string>
+    <string name="grammar_en_like_similar">Like: ~와 비슷한, ~처럼 (He looks like his father = 그는 아버지를 닮았다)</string>
+    <string name="grammar_en_place_movement">장소·이동: 무엇이 어디에 있는지, 어느 쪽으로 가는지 (under the table = 탁자 아래에, across the road = 길 건너편으로)</string>
+    <string name="grammar_en_as">As: ~로서 (works as a nurse = 간호사로 일한다); 또는 ~때문에, ~하면서</string>
+    <string name="grammar_en_than">Than: 두 가지를 비교 (taller than me = 나보다 키가 크다, more than ten = 열 개보다 많다)</string>
+    <string name="grammar_en_another">Another: 하나 더, 또는 다른 것 (another cup = 한 잔 더, another day = 다른 날)</string>
+    <string name="grammar_en_such">Such (a): 이렇게나 ~한, very보다 강한 말 (such a nice day = 정말 좋은 날)</string>
+    <string name="grammar_en_except">Except: ~을 빼고, ~을 제외하고 (everyone except Tom = 톰을 빼고 모두)</string>
+    <string name="grammar_en_ing_after_noun">명사 + -ing: -ing 말이 앞 명사가 하고 있는 일을 설명 (the man standing there = 저기 서 있는 남자, I saw him running = 그가 달리는 것을 봤다)</string>
+</resources>
