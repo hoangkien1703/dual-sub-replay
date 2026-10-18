@@ -555,6 +555,8 @@ internal fun SingleYouTubePage(
         }
     }
 
+    PageTranscriptReader(webView, active = lifecycleStarted)
+
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect
         val gate = PlaybackSnapshotGate()

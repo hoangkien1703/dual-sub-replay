@@ -21,6 +21,8 @@ import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.PageFirstCaptionProvider
+import com.kienhoang.dualsubreplay.data.PageTranscriptSource
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
@@ -295,7 +297,11 @@ class AppViewModel internal constructor(
     constructor(application: Application) : this(
         application,
         // Survives Android closing the app in the background, so returning skips the caption download.
-        RecentCaptionTracks(YouTubeCaptionProvider(), File(application.cacheDir, "recent-caption-tracks")),
+        // The YouTube page fetches the track first; the app's own lookup runs alongside as the fallback.
+        RecentCaptionTracks(
+            PageFirstCaptionProvider(PageTranscriptSource.Shared, YouTubeCaptionProvider()),
+            File(application.cacheDir, "recent-caption-tracks"),
+        ),
     )
 
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)

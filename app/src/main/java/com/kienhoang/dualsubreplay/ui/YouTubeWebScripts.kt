@@ -1,5 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.MAX_PAGE_TRANSCRIPT_LENGTH
+import com.kienhoang.dualsubreplay.data.PageCaptionTarget
+import com.kienhoang.dualsubreplay.data.PageTranscriptReply
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -650,4 +653,195 @@ internal fun webClipReplayScript(
           return true;
         })();
         """.trimIndent()
+}
+
+/**
+ * Returns the caption part of the page player's response (tracks, audio tracks, title) for
+ * `PageTranscriptSource`, or null before the player has one. Read-only: it changes nothing.
+ */
+internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+      const player = document.getElementById('movie_player');
+      let response = null;
+      try { response = player && typeof player.getPlayerResponse === 'function' ? player.getPlayerResponse() : null; } catch (_) {}
+      if (!response) response = window.ytInitialPlayerResponse || null;
+      const details = response && response.videoDetails;
+      if (!details || !details.videoId) return null;
+      const renderer = response.captions && response.captions.playerCaptionsTracklistRenderer;
+      return JSON.stringify({
+        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
+        captions: renderer ? { playerCaptionsTracklistRenderer: {
+          captionTracks: Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [],
+          audioTracks: renderer.audioTracks || [],
+          defaultAudioTrackIndex: renderer.defaultAudioTrackIndex || 0
+        } } : null
+      });
+    })();
+    """.trimIndent()
+
+internal const val PAGE_TRANSCRIPT_STATE_KEY = "__dualSubPageTranscriptV1"
+
+/**
+ * Has the page download [target]'s caption track and reports `working`, `done` (with the
+ * document) or `failed` as JSON text. The first call starts one job per track; later calls only
+ * report. The job first fetches the track's own address from the page. When YouTube answers that
+ * with nothing (its web addresses need a proof-of-origin token, `pot`), it switches the page's
+ * captions to that track so the page player requests it with its token, takes that request's
+ * address from the browser's resource timing list, switches captions back if they were off, and
+ * fetches the track from the page with the page's cookies. Only `/api/timedtext` on a YouTube
+ * host is ever fetched, and documents over 8 MiB are dropped.
+ */
+internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
+    // Fixed key order (Android's JSONObject keeps insertion order, the JVM's does not).
+    val targetLiteral =
+        "{\"videoId\":${JSONObject.quote(target.videoId)},\"languageCode\":${JSONObject.quote(target.languageCode)}," +
+            "\"generated\":${target.generated},\"baseUrl\":${JSONObject.quote(target.baseUrl)}}"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          const target = $targetLiteral;
+          const key = '$PAGE_TRANSCRIPT_STATE_KEY';
+          const state = window[key] || (window[key] = { jobs: {}, addresses: {} });
+          $PAGE_TRANSCRIPT_FUNCTIONS
+          state.watchRequests();
+          Object.keys(state.jobs).forEach(function(id) {
+            if (state.jobs[id].videoId !== target.videoId) delete state.jobs[id];
+          });
+          const id = target.videoId + '|' + target.languageCode + '|' + target.generated;
+          let job = state.jobs[id];
+          if (!job) {
+            job = state.jobs[id] = { videoId: target.videoId, status: 'working', text: null, reason: null };
+            state.start(job, target);
+          }
+          return JSON.stringify({ status: job.status, text: job.status === 'done' ? job.text : null, reason: job.reason });
+        })();
+        """.trimIndent()
+}
+
+/** `state.*` helpers for [webPageTranscriptScript]. */
+private val PAGE_TRANSCRIPT_FUNCTIONS =
+    """
+    state.timedText = function(value) {
+      try {
+        const url = new URL(String(value), window.location.href);
+        const urlHost = url.hostname.toLowerCase().replace(/\.$/, '');
+        if (url.protocol !== 'https:' || !(urlHost === 'youtube.com' || urlHost.endsWith('.youtube.com')) ||
+            url.pathname !== '/api/timedtext' || !url.searchParams.get('v')) return null;
+        return url;
+      } catch (_) {
+        return null;
+      }
+    };
+    state.note = function(name) {
+      const url = state.timedText(name);
+      if (url && url.searchParams.get('pot')) state.addresses[url.searchParams.get('v')] = url.toString();
+    };
+    state.watchRequests = function() {
+      if (!state.watching) {
+        state.watching = true;
+        try { if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(1000); } catch (_) {}
+        try {
+          new PerformanceObserver(function(list) { list.getEntries().forEach(function(entry) { state.note(entry.name); }); })
+            .observe({ type: 'resource', buffered: true });
+        } catch (_) {}
+      }
+      try { performance.getEntriesByType('resource').forEach(function(entry) { state.note(entry.name); }); } catch (_) {}
+    };
+    state.player = function() {
+      const player = document.getElementById('movie_player');
+      return player && typeof player.getOption === 'function' &&
+        typeof player.setOption === 'function' ? player : null;
+    };
+    state.download = function(address, target, samePage) {
+      const url = state.timedText(address);
+      if (!url || url.searchParams.get('v') !== target.videoId) return Promise.resolve('');
+      // The page's own host keeps the request same-origin, so the page's cookies go with it.
+      if (samePage) url.host = window.location.host;
+      url.searchParams.set('lang', target.languageCode);
+      if (target.generated) url.searchParams.set('kind', 'asr'); else url.searchParams.delete('kind');
+      url.searchParams.delete('tlang');
+      url.searchParams.set('fmt', 'json3');
+      return fetch(url.toString(), { credentials: 'include' })
+        .then(function(response) { return response.ok ? response.text() : ''; })
+        .catch(function() { return ''; });
+    };
+    state.usable = function(text) {
+      return typeof text === 'string' && text.trim().length > 0 && text.length <= $MAX_PAGE_TRANSCRIPT_LENGTH;
+    };
+    state.showTrack = function(job, target) {
+      const player = state.player();
+      if (!player || job.switched) return;
+      let active = null;
+      try { active = player.getOption('captions', 'track'); } catch (_) {}
+      job.previous = active && typeof active === 'object' && Object.keys(active).length ? active : null;
+      let track = { languageCode: target.languageCode };
+      if (target.generated) track.kind = 'asr';
+      try {
+        if (typeof player.loadModule === 'function') player.loadModule('captions');
+        const list = player.getOption('captions', 'tracklist', { includeAsr: true });
+        const match = Array.isArray(list) && list.find(function(item) {
+          return item && item.languageCode === target.languageCode && (item.kind === 'asr') === target.generated;
+        });
+        if (match) track = match;
+      } catch (_) {}
+      try {
+        player.setOption('captions', 'track', track);
+        job.switched = true;
+      } catch (_) {}
+    };
+    state.restoreTrack = function(job) {
+      const player = state.player();
+      if (!player || !job.switched) return;
+      job.switched = false;
+      try { player.setOption('captions', 'track', job.previous || {}); } catch (_) {}
+    };
+    state.start = function(job, target) {
+      const finish = function(text, reason) {
+        job.status = state.usable(text) ? 'done' : 'failed';
+        job.text = job.status === 'done' ? text : null;
+        job.reason = job.status === 'done' ? null : reason;
+      };
+      const waitForAddress = function(started) {
+        state.watchRequests();
+        const address = state.addresses[target.videoId];
+        if (address) {
+          state.restoreTrack(job);
+          state.download(address, target, false).then(function(text) { finish(text, 'empty-with-token'); });
+          return;
+        }
+        if (Date.now() - started > 15000) {
+          state.restoreTrack(job);
+          finish('', state.player() ? 'no-page-request' : 'no-player');
+          return;
+        }
+        state.showTrack(job, target);
+        setTimeout(function() { waitForAddress(started); }, 300);
+      };
+      state.download(target.baseUrl, target, true).then(function(text) {
+        if (state.usable(text)) finish(text, null);
+        else waitForAddress(Date.now());
+      });
+    };
+    """.trim()
+
+/** Reads what [webPageTranscriptScript] returned through `evaluateJavascript`. */
+internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {
+    val json = decodeScriptString(rawValue)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return PageTranscriptReply.Working
+    return when (json.optString("status")) {
+        "done" -> json.optString("text").takeIf(String::isNotBlank)?.let(PageTranscriptReply::Done) ?: PageTranscriptReply.Failed("empty")
+        "failed" -> PageTranscriptReply.Failed(json.optString("reason").ifBlank { "failed" })
+        else -> PageTranscriptReply.Working
+    }
+}
+
+/** The string a page script returned through `evaluateJavascript` (which JSON-quotes it), or null. */
+internal fun decodeScriptString(rawValue: String?): String? {
+    if (rawValue.isNullOrBlank() || rawValue == "null") return null
+    return runCatching { JSONTokener(rawValue).nextValue() as? String }.getOrNull()?.takeIf(String::isNotBlank)
 }
