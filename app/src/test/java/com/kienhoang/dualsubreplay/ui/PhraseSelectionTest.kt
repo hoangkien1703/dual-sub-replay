@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.ChineseMorphology
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStatus
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -15,9 +16,16 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class PhraseSelectionTest {
+    @Before
+    fun loadChinese() {
+        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+        assertTrue(ChineseMorphology.awaitReady())
+    }
+
     private val sentence = "I'm really looking forward to seeing you."
     private val segment = SubtitleSegment(1, 1_000, 3_000, sentence, "Mình rất mong được gặp bạn.")
 

@@ -5,6 +5,8 @@
     <string name="grammar_hide_alternates">隐藏其他含义</string>
     <string name="grammar_jlpt_level">N%1$d</string>
     <string name="grammar_jlpt_level_description">JLPT N%1$d 级</string>
+    <string name="grammar_hsk_level">HSK %1$s</string>
+    <string name="grammar_hsk_level_description">HSK %1$s 级</string>
     <string name="grammar_topic">至于A；表示A是话题</string>
     <string name="grammar_contrast">对比：至少A（与其他不同）</string>
     <string name="grammar_subject">表示A是主语（谁或什么在做）</string>

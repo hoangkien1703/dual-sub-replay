@@ -11,6 +11,8 @@ internal data class PronunciationVoice(
     val locale: Locale,
     val network: Boolean = false,
     val installed: Boolean = true,
+    /** The engine's own rating (Android's Voice.QUALITY_*, higher sounds more natural). */
+    val quality: Int = 300,
 )
 
 internal interface PronunciationEngine {
@@ -77,10 +79,18 @@ internal fun spokenWord(
 private fun kanaReading(reading: String?): String? =
     reading?.trim()?.takeIf { text -> text.isNotEmpty() && text.all { it.code in 0x3040..0x30FF || it == ' ' } }
 
-internal fun pronunciationLocale(language: String): Locale? =
-    Locale.forLanguageTag(language.trim().replace('_', '-')).takeIf {
-        it.language.isNotBlank() && it.language !in setOf("und", "auto")
-    }
+internal fun pronunciationLocale(language: String): Locale? {
+    val locale =
+        Locale.forLanguageTag(language.trim().replace('_', '-')).takeIf {
+            it.language.isNotBlank() && it.language !in setOf("und", "auto")
+        } ?: return null
+    if (locale.language != "zh" || locale.country.isNotBlank()) return locale
+    // Speech engines list Chinese by country, not script: zh-Hans is read as Mandarin from China, zh-Hant from Taiwan.
+    return if (locale.script == "Hant") Locale.TAIWAN else Locale.CHINA
+}
+
+/** A voice's language, with Mandarin's own code (cmn), which some engines use, read as Chinese. */
+private fun speechLanguage(locale: Locale): String = if (locale.language == "cmn") "zh" else locale.language
 
 internal fun pronunciationVoices(
     voices: List<PronunciationVoice>,
@@ -88,12 +98,13 @@ internal fun pronunciationVoices(
 ): List<PronunciationVoice> {
     val matching =
         voices
-            .filter { it.installed && it.locale.language == locale.language }
+            .filter { it.installed && speechLanguage(it.locale) == speechLanguage(locale) }
             .filter { locale.script.isBlank() || it.locale.script.isBlank() || it.locale.script == locale.script }
             .sortedWith(
                 compareBy<PronunciationVoice> { it.network }
-                    .thenBy { it.locale != locale }
                     .thenBy { it.locale.country != locale.country }
+                    .thenByDescending { it.quality }
+                    .thenBy { it.locale != locale }
                     .thenBy { it.name },
             )
     // Keep a network fallback reachable even when an engine lists many offline voices.
@@ -122,19 +133,17 @@ internal suspend fun pronounceWord(
             val active = createEngine(name).also { engine = it }
             if (withTimeoutOrNull(4_000) { active.initialize() } != true) continue
             initialized = true
-            val voices = pronunciationVoices(active.voices(), locale)
-            if (voices.isEmpty()) {
-                // Some older engines implement setLanguage but do not expose a voice catalog.
-                if (!active.selectLanguage(locale)) continue
+            var selected = false
+            for (voice in pronunciationVoices(active.voices(), locale)) {
+                if (!active.selectVoice(voice)) continue
+                selected = true
                 playbackFailed = true
                 if (withTimeoutOrNull(10_000) { active.render() } == true) return PronunciationResult.SPOKEN
-            } else {
-                for (voice in voices) {
-                    if (!active.selectVoice(voice)) continue
-                    playbackFailed = true
-                    if (withTimeoutOrNull(10_000) { active.render() } == true) return PronunciationResult.SPOKEN
-                }
             }
+            // Some engines implement setLanguage but list no voice for it, or none that can be selected.
+            if (selected || !active.selectLanguage(locale)) continue
+            playbackFailed = true
+            if (withTimeoutOrNull(10_000) { active.render() } == true) return PronunciationResult.SPOKEN
         } catch (cancel: CancellationException) {
             throw cancel
         } catch (_: Exception) {

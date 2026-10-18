@@ -3,12 +3,15 @@ package com.kienhoang.dualsubreplay.data
 /** The JLPT level a grammar point is usually taught at, from N5 (first) to N1 (last). */
 internal enum class JlptLevel(
     val number: Int,
-) {
+) : GrammarLevel {
     N5(5),
     N4(4),
     N3(3),
     N2(2),
     N1(1),
+    ;
+
+    override val code: String get() = "N$number"
 }
 
 /**
@@ -20,7 +23,7 @@ internal enum class JlptLevel(
  *
  * - `わけ|訳` the surface or base form is one of these words; `_` or nothing means any word.
  *   `~まみれ` means the word ends with it; `~~合う` also needs a hiragana right before it
- *   (助け合う, not 似合う).
+ *   (助け合う, not 似合う); `第~` means a longer word starting with it (第一).
  * - `@名詞` the part of speech (any IPADIC level) is this; `@動詞,形容詞` is any of them, and
  *   several `@` groups must all hold.
  * - `%連用` the conjugation form starts with this (`%基本形,体言` is either).
@@ -32,7 +35,7 @@ internal enum class JlptLevel(
  * - `NEG` stands for `ます? ない|ぬ|ん|ず`, a negative ending in any politeness.
  */
 internal class GrammarPattern(
-    val level: JlptLevel,
+    val level: GrammarLevel,
     val form: String,
     spec: String,
     val meanings: List<GrammarMeaning>,
@@ -103,6 +106,7 @@ private class MorphemeCondition(
     val optional = raw.length > 1 && raw.endsWith("?")
     private val excluded: Set<String>
     private val suffixLevel: Int
+    private val prefix: Boolean
     private val texts: Set<String>
     private val tagGroups: List<Set<String>>
     private val conjugations: List<String>
@@ -112,7 +116,14 @@ private class MorphemeCondition(
         excluded = body.split('!').drop(1).toSet()
         val withoutExcludes = body.substringBefore('!')
         suffixLevel = withoutExcludes.takeWhile { it == '~' }.length
-        val word = withoutExcludes.drop(suffixLevel)
+        val tilded = withoutExcludes.drop(suffixLevel)
+        prefix = suffixLevel == 0 &&
+            tilded
+                .substringBefore('@')
+                .substringBefore('%')
+                .split('|')
+                .all { it.length > 1 && it.endsWith('~') }
+        val word = if (prefix) tilded.replace("~", "") else tilded
         conjugations = word.substringAfter('%', "").split(',').filter(String::isNotEmpty)
         val tagged = word.substringBefore('%').split('@')
         texts =
@@ -139,6 +150,7 @@ private class MorphemeCondition(
     private fun textMatches(morpheme: Morpheme): Boolean =
         when {
             texts.isEmpty() -> true
+            prefix -> texts.any { morpheme.surface.length > it.length && morpheme.surface.startsWith(it) }
             suffixLevel == 0 -> morpheme.surface in texts || morpheme.baseForm in texts
             else -> endsWithText(morpheme.surface) || endsWithText(morpheme.baseForm)
         }
