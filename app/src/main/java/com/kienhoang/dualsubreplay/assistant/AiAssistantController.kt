@@ -1,5 +1,10 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import com.kienhoang.dualsubreplay.data.MAX_YOUTUBE_SEARCH_BYTES
+import com.kienhoang.dualsubreplay.data.YOUTUBE_SEARCH_URL
+import com.kienhoang.dualsubreplay.data.YouTubeVideoResult
+import com.kienhoang.dualsubreplay.data.parseYouTubeSearchReply
+import com.kienhoang.dualsubreplay.data.youTubeSearchRequestBody
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +20,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.Locale
 import java.util.UUID
 
 /** Where the assistant keeps its non-secret settings; SharedPreferences in the app. */
@@ -64,6 +70,7 @@ private class LoadedAiState(
     val keys: Map<AiProvider, List<AiSavedKey>>,
     val savedChats: List<AiChat>,
     val memory: AiMemoryData,
+    val tavilyKeyHint: String?,
 )
 
 internal data class AiFailure(
@@ -204,7 +211,13 @@ internal data class AiAssistantUiState(
     val newChatMemory: Boolean = true,
     /** A question asked from elsewhere in the app (the word card's grammar button), sent once the panel can. */
     val pendingQuestion: AiPendingQuestion? = null,
+    /** The last 4 characters of the saved Tavily key, or null when none is saved. */
+    val tavilyKeyHint: String? = null,
 ) {
+    /** How web searches run now, for the chosen service and settings. */
+    val webSearchRoute: AiWebSearchRoute
+        get() = aiWebSearchRoute(settings.webSearch, settings.provider, tavilyKeyHint != null)
+
     /** The chosen service's keys. */
     val currentKeys: List<AiSavedKey> get() = keys[settings.provider].orEmpty()
     val hasKey: Boolean get() = currentKeys.isNotEmpty()
@@ -249,6 +262,12 @@ internal class AiAssistantController(
     /** Waits before asking a busy service again; each entry is one more try. */
     private val busyRetryDelaysMs: List<Long> = AI_BUSY_RETRY_DELAYS_MS,
     private val memoryStorage: AiMemoryStorage = InMemoryAiMemoryStorage(),
+    /** The Tavily key; null leaves Tavily out (tests and previews). */
+    private val searchKeys: AiSearchKeyStore? = null,
+    /** Sends YouTube, Tavily and OpenAI search requests; null leaves searches out. */
+    private val poster: AiHttpPoster? = null,
+    /** The phone's country, for YouTube's results. */
+    private val country: () -> String = { Locale.getDefault().country },
 ) : AiMemoryKeeper {
     private val _state = MutableStateFlow(AiAssistantUiState())
     val state: StateFlow<AiAssistantUiState> = _state.asStateFlow()
@@ -262,6 +281,9 @@ internal class AiAssistantController(
 
     /** Service, address and model combinations that refused actions; asked without them from then on. */
     private val noToolSetups = mutableSetOf<String>()
+
+    /** Combinations that refused the service's own web search; asked without it from then on. */
+    private val noWebSearchSetups = mutableSetOf<String>()
 
     /** The actions that undo done actions, and the actions behind waiting cards, by record id; lost when the app closes. */
     private val undos = mutableMapOf<String, List<AiAction>>()
@@ -289,7 +311,7 @@ internal class AiAssistantController(
                     val stored = historyStorage.load()
                     val kept = keptAiChats(stored, settings.historyRetention, clock())
                     if (kept != stored) historyStorage.save(kept)
-                    LoadedAiState(settings, keys, kept, memoryStorage.load())
+                    LoadedAiState(settings, keys, kept, memoryStorage.load(), searchKeys?.hint())
                 }
             _state.update {
                 it.copy(
@@ -297,6 +319,7 @@ internal class AiAssistantController(
                     keys = loaded.keys,
                     savedChats = loaded.savedChats,
                     memory = loaded.memory,
+                    tavilyKeyHint = loaded.tavilyKeyHint,
                 )
             }
         }
@@ -394,6 +417,34 @@ internal class AiAssistantController(
     fun setFullAccess(enabled: Boolean) = updateSettings { it.copy(fullAccess = enabled) }
 
     fun setThinking(thinking: AiThinking) = updateSettings { it.copy(thinking = thinking) }
+
+    /** On by default: the assistant may search YouTube itself to suggest videos. */
+    fun setYouTubeSearch(enabled: Boolean) = updateSettings { it.copy(youtubeSearch = enabled) }
+
+    fun setWebSearch(mode: AiWebSearchMode) = updateSettings { it.copy(webSearch = mode) }
+
+    /** On by default: the assistant may take a screenshot of the app when it needs one. */
+    fun setScreenLook(enabled: Boolean) = updateSettings { it.copy(screenLook = enabled) }
+
+    /**
+     * Saves a pasted or typed Tavily key, encrypted, in place of the one before, and turns Tavily
+     * search on. False when the text is not a Tavily key.
+     */
+    fun saveTavilyKey(text: String): Boolean {
+        val store = searchKeys ?: return false
+        if (!looksLikeTavilyKey(text)) return false
+        val key = text.trim()
+        _state.update { it.copy(tavilyKeyHint = key.takeLast(AI_KEY_ENDING_LENGTH)) }
+        updateSettings { it.copy(webSearch = AiWebSearchMode.TAVILY) }
+        scope.launch { withContext(io) { store.save(key) } }
+        return true
+    }
+
+    fun removeTavilyKey() {
+        val store = searchKeys ?: return
+        _state.update { it.copy(tavilyKeyHint = null) }
+        scope.launch { withContext(io) { store.remove() } }
+    }
 
     /**
      * Switches the chat to [model] once it has answered one tiny request with a saved key, so a
@@ -695,19 +746,16 @@ internal class AiAssistantController(
         val setup = aiCheckedSetup(settings, settings.provider)
         val memoryUse = current.memoryUse
         val memories = if (memoryUse == AiMemoryUse.ON) current.memory.memories else emptyList()
-        val tools =
-            when {
-                setup in noToolSetups -> emptyList()
-                else ->
-                    AI_TOOLS + (if (memoryUse == AiMemoryUse.ON) AI_MEMORY_TOOLS else emptyList()) +
-                        (if (settings.fullAccess) AI_FULL_ACCESS_TOOLS else emptyList())
-            }
+        val route = current.webSearchRoute
+        val tools = if (setup in noToolSetups) emptyList() else aiOfferedTools(settings, memoryUse, route)
+        val webSearch = route == AiWebSearchRoute.IN_REQUEST && setup !in noToolSetups && setup !in noWebSearchSetups
         val prompt =
             systemPrompt + aiMemoryPrompt(current.memory.instructions, memories, memoryUse) +
                 (if (settings.fullAccess) aiFullAccessPrompt(current) else "")
+        val searches = poster?.let { Searches(settings, route, it) }
         val run =
-            AiAnswerRun(appActions, history, tools, memories, newId, settings.fullAccess) { messages, offered ->
-                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered)
+            AiAnswerRun(appActions, history, tools, memories, newId, settings.fullAccess, searches, webSearch) { messages, offered ->
+                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered, webSearch = this.webSearch)
             }
         _state.update { it.copy(sending = true, failure = null, stopped = false) }
         sendJob =
@@ -737,6 +785,7 @@ internal class AiAssistantController(
                     throw cancelled
                 } finally {
                     if (run.toolsRefused) noToolSetups += setup
+                    if (run.webSearchRefused) noWebSearchSetups += setup
                 }
                 persistChats()
             }
@@ -752,7 +801,8 @@ internal class AiAssistantController(
         val now = clock()
         _state.update { current ->
             val chat = current.chat?.takeIf { it.id == chatId } ?: return@update current.copy(sending = false)
-            val answer = AiChatMessage(newId(), AiRole.ASSISTANT, run.text, now, actions = run.records.toList())
+            val answer =
+                AiChatMessage(newId(), AiRole.ASSISTANT, run.text, now, actions = run.records.toList(), sources = run.sources.toList())
             current.copy(chat = chat.copy(updatedMs = now, messages = chat.messages + answer), sending = false)
         }
     }
@@ -822,6 +872,7 @@ internal class AiAssistantController(
         reasoningEffort: String? = null,
         tools: List<AiTool> = emptyList(),
         markChecked: Boolean = true,
+        webSearch: Boolean = false,
     ): AiReply {
         val provider = settings.provider
         val baseUrl = settings.baseUrlFor(provider)
@@ -829,10 +880,94 @@ internal class AiAssistantController(
         val setup = aiCheckedSetup(settings, provider).takeIf { markChecked }
         return withEachKey(provider, setup) { key, last ->
             complete(
-                AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort, tools, provider.format),
+                AiChatRequest(
+                    baseUrl,
+                    settings.modelFor(provider),
+                    key,
+                    messages,
+                    timeoutMs,
+                    reasoningEffort,
+                    tools,
+                    provider.format,
+                    webSearch,
+                ),
                 waitWhenRateLimited = last,
             )
         }
+    }
+
+    /** The YouTube and web searches of one answer, with the settings it was asked with. */
+    private inner class Searches(
+        private val settings: AiAssistantSettings,
+        private val route: AiWebSearchRoute,
+        private val poster: AiHttpPoster,
+    ) : AiSearches {
+        override suspend fun youtube(
+            query: String,
+            subtitlesOnly: Boolean,
+        ): List<YouTubeVideoResult> {
+            if (!settings.youtubeSearch) throw AiSearchException("YouTube search is off.")
+            val body = youTubeSearchRequestBody(query, subtitlesOnly, country())
+            val (code, reply) = post(AiHttpPost(YOUTUBE_SEARCH_URL, body, maxBytes = MAX_YOUTUBE_SEARCH_BYTES), "YouTube")
+            if (code !in 200..299) throw AiSearchException("YouTube answered HTTP $code.")
+            return parseYouTubeSearchReply(reply)
+        }
+
+        override suspend fun web(query: String): AiWebResult =
+            when (route) {
+                AiWebSearchRoute.TAVILY -> tavily(query)
+                AiWebSearchRoute.SEARCH_MODEL -> openAi(query)
+                AiWebSearchRoute.NONE, AiWebSearchRoute.IN_REQUEST -> throw AiSearchException("Web search is off.")
+            }
+
+        private suspend fun tavily(query: String): AiWebResult {
+            val key =
+                when (val stored = withContext(io) { searchKeys?.load() ?: StoredAiKey.Missing }) {
+                    is StoredAiKey.Found -> stored.key
+                    StoredAiKey.Missing -> throw AiSearchException("No Tavily key is saved.")
+                    StoredAiKey.Unreadable -> {
+                        _state.update { it.copy(tavilyKeyHint = null) }
+                        throw AiSearchException("The phone can no longer unlock the Tavily key; the user needs to add it again.")
+                    }
+                }
+            val request = AiHttpPost(TAVILY_SEARCH_URL, tavilyRequestBody(query), mapOf("Authorization" to "Bearer $key"))
+            val (code, reply) = post(request, "Tavily")
+            if (code !in 200..299) throw AiSearchException(tavilyFailure(code))
+            return parseTavilyReply(reply)
+        }
+
+        /** OpenAI's search model with the service's keys, the one in use first, as a chat question is asked. */
+        private suspend fun openAi(query: String): AiWebResult {
+            val url =
+                chatCompletionsUrl(settings.baseUrlFor(AiProvider.OPENAI)) ?: throw AiSearchException("The OpenAI address is not valid.")
+            val reply =
+                try {
+                    withEachKey(AiProvider.OPENAI, setup = null) { key, _ ->
+                        val request = AiHttpPost(url, openAiSearchRequestBody(query), mapOf("Authorization" to "Bearer $key"))
+                        val (code, body) = withContext(io) { aiCall { poster.post(request) } }
+                        val status = aiReplyStatus(code, body)
+                        if (status !in 200..299) {
+                            val message = providerErrorMessage(body)?.let { redactApiKey(it, key) }
+                            throw AiChatException(aiErrorKindForStatus(status, message), message ?: "HTTP $status")
+                        }
+                        body
+                    }
+                } catch (error: AiChatException) {
+                    throw AiSearchException("OpenAI's search model $OPENAI_SEARCH_MODEL failed: ${error.detail ?: error.kind.name}.")
+                }
+            return parseOpenAiSearchReply(reply)
+        }
+
+        private suspend fun post(
+            request: AiHttpPost,
+            service: String,
+        ): Pair<Int, String> =
+            try {
+                withContext(io) { aiCall { poster.post(request) } }
+            } catch (error: AiChatException) {
+                val reason = if (error.kind == AiErrorKind.TIMEOUT) "did not answer in time" else "could not be reached"
+                throw AiSearchException("$service $reason.")
+            }
     }
 
     /** One key only, for its check. */

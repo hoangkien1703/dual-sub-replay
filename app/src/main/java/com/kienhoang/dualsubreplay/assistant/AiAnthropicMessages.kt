@@ -13,17 +13,22 @@ internal const val ANTHROPIC_API_VERSION = "2023-06-01"
  */
 internal const val ANTHROPIC_MAX_TOKENS = 16_000
 
+/** Claude's own web searches for one request at most; each costs the user about one cent. */
+internal const val ANTHROPIC_MAX_WEB_SEARCHES = 3
+
 /**
  * The Messages API body: the system messages joined as `system`, then the conversation, with
  * `output_config.effort` when a thinking level is chosen and `tools` when actions are offered.
- * Messages of the same role in a row become one message, and the results of one round of actions
- * go back together in one user message, as Anthropic expects.
+ * [webSearch] adds Claude's own `web_search` tool, which Anthropic runs. Messages of the same role
+ * in a row become one message, and the results of one round of actions go back together in one
+ * user message, as Anthropic expects.
  */
 internal fun anthropicRequestBody(
     model: String,
     messages: List<AiWireMessage>,
     reasoningEffort: String? = null,
     tools: List<AiTool> = emptyList(),
+    webSearch: Boolean = false,
 ): String {
     val system = messages.filter { it.role == AiRole.SYSTEM }.joinToString("\n\n") { it.content }
     val turns = mutableListOf<Pair<String, JSONArray>>()
@@ -52,7 +57,21 @@ internal fun anthropicRequestBody(
                 },
             )
             if (reasoningEffort != null) put("output_config", JSONObject().put("effort", reasoningEffort))
-            if (tools.isNotEmpty()) put("tools", anthropicToolsJson(tools))
+            if (tools.isNotEmpty() || webSearch) {
+                put(
+                    "tools",
+                    anthropicToolsJson(tools).apply {
+                        if (webSearch) {
+                            put(
+                                JSONObject()
+                                    .put("type", "web_search_20250305")
+                                    .put("name", "web_search")
+                                    .put("max_uses", ANTHROPIC_MAX_WEB_SEARCHES),
+                            )
+                        }
+                    },
+                )
+            }
         }.toString()
 }
 
@@ -116,8 +135,9 @@ private fun anthropicToolsJson(tools: List<AiTool>): JSONArray =
     }
 
 /**
- * The text and the actions in a Messages API reply. Thinking blocks are kept only in
- * [AiReply.rawContent], which goes back unchanged with the results of the actions.
+ * The text and the actions in a Messages API reply. Thinking and web search blocks are kept only in
+ * [AiReply.rawContent], which goes back unchanged with the results of the actions or, after a
+ * `pause_turn`, on its own. The pages Claude's web search cited and its queries come along.
  */
 internal fun parseAnthropicReply(body: String): AiReply {
     val root =
@@ -136,10 +156,41 @@ internal fun parseAnthropicReply(body: String): AiReply {
             val id = block.optString("id").ifBlank { "toolu_$index" }
             AiToolCall(id, name, block.optJSONObject("input")?.toString() ?: "{}", JSONObject(block.toString()).put("id", id).toString())
         }
-    if (text.isEmpty() && calls.isEmpty()) {
+    val paused = root.optString("stop_reason") == "pause_turn"
+    if (text.isEmpty() && calls.isEmpty() && !paused) {
         val detail =
             if (root.optString("stop_reason") == "refusal") "Claude declined to answer this question." else "The reply had no text."
         throw AiChatException(AiErrorKind.BAD_REPLY, detail)
     }
-    return AiReply(text, calls, root.optString("model"), rawContent = if (calls.isEmpty()) null else content.toString())
+    return AiReply(
+        text,
+        calls,
+        root.optString("model"),
+        rawContent = if (calls.isEmpty() && !paused) null else content.toString(),
+        sources = anthropicCitations(blocks),
+        webQueries =
+            blocks
+                .filter { it.optString("type") == "server_tool_use" && it.optString("name") == "web_search" }
+                .mapNotNull {
+                    it
+                        .optJSONObject("input")
+                        ?.optString("query")
+                        ?.trim()
+                        ?.takeIf(String::isNotEmpty)
+                },
+        paused = paused,
+    )
 }
+
+/** The pages cited in the text blocks, each once. */
+private fun anthropicCitations(blocks: List<JSONObject>): List<AiWebSource> =
+    blocks
+        .filter { it.optString("type") == "text" }
+        .flatMap { block ->
+            val citations = block.optJSONArray("citations") ?: return@flatMap emptyList()
+            (0 until citations.length()).mapNotNull { index ->
+                val citation = citations.optJSONObject(index) ?: return@mapNotNull null
+                if (citation.optString("type") != "web_search_result_location") return@mapNotNull null
+                aiWebSource(citation.optString("title"), citation.optString("url"))
+            }
+        }.distinctBy { it.url }

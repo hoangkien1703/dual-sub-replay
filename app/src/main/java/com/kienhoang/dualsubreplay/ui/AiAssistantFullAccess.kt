@@ -17,6 +17,7 @@ import com.kienhoang.dualsubreplay.assistant.MAX_AI_FOUND_WORDS
 import com.kienhoang.dualsubreplay.assistant.MAX_AI_KEYS_PER_SERVICE
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.assistant.aiProviderForKey
+import com.kienhoang.dualsubreplay.assistant.storedAiWebSearchMode
 import com.kienhoang.dualsubreplay.data.SavedWord
 import kotlinx.coroutines.CancellationException
 
@@ -168,6 +169,9 @@ internal class AiFullAccessActions(
                 AiOwnSetting.THINKING -> settings.thinking.key
                 AiOwnSetting.MEMORY -> if (settings.memoryEnabled) "on" else "off"
                 AiOwnSetting.CHAT_HISTORY -> settings.historyRetention.key
+                AiOwnSetting.YOUTUBE_SEARCH -> if (settings.youtubeSearch) "on" else "off"
+                AiOwnSetting.WEB_SEARCH -> settings.webSearch.key
+                AiOwnSetting.SCREEN -> if (settings.screenLook) "on" else "off"
             }
         val note = "${action.setting.key} changed from $before to ${action.value}"
         if (before == action.value) return AiActionOutcome.Done(label, "${action.setting.key} was already ${action.value}")
@@ -182,6 +186,9 @@ internal class AiFullAccessActions(
             AiOwnSetting.THINKING -> assistant.setThinking(AiThinking.entries.first { it.key == action.value })
             AiOwnSetting.MEMORY -> assistant.setMemoryEnabled(action.value == "on")
             AiOwnSetting.CHAT_HISTORY -> assistant.setHistoryRetention(ChatHistoryRetention.entries.first { it.key == action.value })
+            AiOwnSetting.YOUTUBE_SEARCH -> assistant.setYouTubeSearch(action.value == "on")
+            AiOwnSetting.WEB_SEARCH -> assistant.setWebSearch(storedAiWebSearchMode(action.value))
+            AiOwnSetting.SCREEN -> assistant.setScreenLook(action.value == "on")
         }
         return AiActionOutcome.Done(label, note, listOf(AiAction.ChangeAiSetting(action.setting, before)))
     }
@@ -272,19 +279,10 @@ internal class AiFullAccessActions(
             AiOwnSetting.MODEL -> named(R.string.ai_settings_model, value)
             AiOwnSetting.THINKING ->
                 string(R.string.ai_effort_button, AiThinking.entries.firstOrNull { it.key == value }?.let { string(it.labelRes) } ?: value)
-            AiOwnSetting.MEMORY ->
-                named(
-                    R.string.ai_memory_enabled_title,
-                    string(
-                        if (value ==
-                            "on"
-                        ) {
-                            R.string.ai_action_on
-                        } else {
-                            R.string.ai_action_off
-                        },
-                    ),
-                )
+            AiOwnSetting.MEMORY -> named(R.string.ai_memory_enabled_title, onOff(value))
+            AiOwnSetting.YOUTUBE_SEARCH -> named(R.string.ai_search_youtube_title, onOff(value))
+            AiOwnSetting.SCREEN -> named(R.string.ai_search_screen_title, onOff(value))
+            AiOwnSetting.WEB_SEARCH -> named(R.string.ai_search_web_title, string(storedAiWebSearchMode(value).labelRes))
             AiOwnSetting.CHAT_HISTORY ->
                 named(
                     R.string.ai_settings_history_title,
@@ -296,4 +294,6 @@ internal class AiFullAccessActions(
         @StringRes name: Int,
         value: String,
     ): String = string(R.string.ai_action_setting, string(name), value)
+
+    private fun onOff(value: String): String = string(if (value == "on") R.string.ai_action_on else R.string.ai_action_off)
 }

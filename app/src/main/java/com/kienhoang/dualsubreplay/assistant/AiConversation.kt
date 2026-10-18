@@ -53,6 +53,8 @@ internal data class AiChatMessage(
     val attachments: List<AiAttachment> = emptyList(),
     /** What an answer did in the app, shown as chips under it. */
     val actions: List<AiActionRecord> = emptyList(),
+    /** The pages an answer's web searches came from, listed under it. */
+    val sources: List<AiWebSource> = emptyList(),
 )
 
 internal data class AiChat(
@@ -118,6 +120,12 @@ internal fun AiChatMessage.wireContent(): String =
         if (actions.isNotEmpty()) {
             if (isNotEmpty()) append("\n\n")
             append(aiActionsNote(actions))
+        }
+        if (sources.isNotEmpty()) {
+            if (isNotEmpty()) append("\n\n")
+            append(
+                sources.joinToString(prefix = "[Sources of this answer: ", separator = "; ", postfix = "]") { it.site.ifEmpty { it.url } },
+            )
         }
     }
 

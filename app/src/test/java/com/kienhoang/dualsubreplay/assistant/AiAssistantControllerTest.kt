@@ -956,7 +956,7 @@ class AiAssistantControllerTest {
         val action = answer.actions.single()
         assertEquals(AiActionState.DONE, action.state)
         assertTrue(action.undoable)
-        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, transport.requests.first().tools)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, transport.requests.first().tools)
 
         controller.undoAction(action.id)
         assertEquals(
@@ -1224,7 +1224,7 @@ class AiAssistantControllerTest {
         controller.setMemoryEnabled(false)
         controller.send("Hi", "guide")
         val off = transport.requests.last()
-        assertEquals(AI_TOOLS, off.tools)
+        assertEquals(AI_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, off.tools)
         assertTrue("Explain in Vietnamese." in systemPrompt(off))
         assertTrue("Memory is off in AI settings" in systemPrompt(off))
         assertFalse("JLPT" in systemPrompt(off))
@@ -1237,7 +1237,7 @@ class AiAssistantControllerTest {
         transport.replies += AiReply("", listOf(toolCall(AI_SAVE_MEMORY_TOOL, """{"text":"Likes cats"}""")))
         controller.send("I like cats", "guide")
         val chatOff = transport.requests[transport.requests.size - 2]
-        assertEquals(AI_TOOLS, chatOff.tools)
+        assertEquals(AI_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, chatOff.tools)
         assertTrue("Explain in Vietnamese." in systemPrompt(chatOff))
         assertTrue("Memory is off for this chat" in systemPrompt(chatOff))
         assertFalse("JLPT" in systemPrompt(chatOff))

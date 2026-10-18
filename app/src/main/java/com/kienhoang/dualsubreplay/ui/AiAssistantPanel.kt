@@ -47,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -94,7 +95,9 @@ internal fun AiAssistantPanel(
     LaunchedEffect(open, aiState.ready, aiState.sending, aiState.pendingQuestion, aiState.settings.introSeen) {
         if (open && aiState.settings.introSeen) controller.sendPendingQuestion(systemPrompt())
     }
-    AnimatedVisibility(visible = open, enter = fadeIn(), exit = fadeOut()) {
+    // While the assistant takes a screenshot, the panel and its dim background draw nothing.
+    val shown = Modifier.graphicsLayer { alpha = if (host.screen.hidden) 0f else 1f }
+    AnimatedVisibility(visible = open, modifier = shown, enter = fadeIn(), exit = fadeOut()) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -103,7 +106,7 @@ internal fun AiAssistantPanel(
                 .testTag("ai_panel_scrim"),
         )
     }
-    BoxWithConstraints(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize().then(shown)) {
         val width = minOf(maxWidth * PANEL_WIDTH_FRACTION, PanelMaxWidth)
         AnimatedVisibility(
             visible = open,

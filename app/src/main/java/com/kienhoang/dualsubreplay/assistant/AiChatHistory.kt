@@ -59,6 +59,12 @@ private fun encodeMessage(message: AiChatMessage): JSONObject =
                 )
             }
             if (message.actions.isNotEmpty()) put("actions", JSONArray().apply { message.actions.forEach { put(encodeAction(it)) } })
+            if (message.sources.isNotEmpty()) {
+                put(
+                    "sources",
+                    JSONArray().apply { message.sources.forEach { put(JSONObject().put("title", it.title).put("url", it.url)) } },
+                )
+            }
         }
 
 private fun encodeAction(action: AiActionRecord): JSONObject =
@@ -104,7 +110,15 @@ private fun decodeMessage(json: JSONObject?): AiChatMessage? {
         contextLabel = json.optString("contextLabel").takeIf { json.has("contextLabel") },
         attachments = decodeAttachmentNames(json.optJSONArray("attachments")),
         actions = decodeActions(json.optJSONArray("actions")),
+        sources = decodeSources(json.optJSONArray("sources")),
     )
+}
+
+private fun decodeSources(json: JSONArray?): List<AiWebSource> {
+    if (json == null) return emptyList()
+    return (0 until json.length()).mapNotNull { index ->
+        json.optJSONObject(index)?.let { aiWebSource(it.optString("title"), it.optString("url")) }
+    }
 }
 
 /** Undo and waiting cards only work while the app runs: after a restart, a card that was never answered is not done. */

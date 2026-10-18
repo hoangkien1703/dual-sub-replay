@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import com.kienhoang.dualsubreplay.data.YouTubeVideoResult
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -23,6 +24,38 @@ private class FakeApp : AiAppActions {
         performed += action
         val undo = if (action is AiAction.ChangeSetting) listOf(action.copy(value = "100")) else emptyList()
         return AiActionOutcome.Done("did: ${aiActionNote(action)}", aiActionNote(action), undo)
+    }
+}
+
+/** YouTube and web searches with fixed results; a null result fails. */
+private class FakeSearches : AiSearches {
+    var videos: List<YouTubeVideoResult>? = emptyList()
+    var web: AiWebResult? = AiWebResult("", emptyList())
+    val queries = mutableListOf<String>()
+
+    override suspend fun youtube(
+        query: String,
+        subtitlesOnly: Boolean,
+    ): List<YouTubeVideoResult> {
+        queries += query
+        return videos ?: throw AiSearchException("YouTube answered HTTP 500.")
+    }
+
+    override suspend fun web(query: String): AiWebResult {
+        queries += query
+        return web ?: throw AiSearchException("Tavily answered HTTP 500.")
+    }
+}
+
+/** Like [FakeApp], and it can take a screenshot. */
+private class ScreenApp(
+    private val app: FakeApp = FakeApp(),
+) : AiAppActions by app {
+    var screenshots = 0
+
+    override suspend fun captureScreen(): AiAttachment {
+        screenshots++
+        return AiAttachment("screenshot.jpg", AiAttachmentKind.PICTURE, "data:image/jpeg;base64,AAAA")
     }
 }
 
@@ -76,6 +109,34 @@ class AiAnswerRunTest {
             failures.removeFirstOrNull()?.let { throw it }
             replies.removeFirstOrNull() ?: AiReply("Done!")
         }.also { runBlocking { it.run("guide") } }
+
+    private val searches = FakeSearches()
+    private val webSearchFlags = mutableListOf<Boolean>()
+
+    private fun searchRun(
+        history: List<AiChatMessage> = question("Suggest Japanese videos"),
+        app: AiAppActions = this.app,
+        webSearch: Boolean = false,
+    ): AiAnswerRun =
+        AiAnswerRun(
+            app,
+            history,
+            AI_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_WEB_SEARCH_TOOLS + AI_SCREEN_TOOLS,
+            memories,
+            { "a${ids++}" },
+            searches = searches,
+            webSearch = webSearch,
+        ) {
+            messages,
+            tools,
+            ->
+            requests += messages to tools
+            webSearchFlags += this.webSearch
+            failures.removeFirstOrNull()?.let { throw it }
+            replies.removeFirstOrNull() ?: AiReply("Done!")
+        }.also { runBlocking { it.run("guide") } }
+
+    private fun video(id: String) = YouTubeVideoResult(id, "Title $id", "Channel", "5:00", "10 views", "1 day ago", subtitles = true)
 
     @Test
     fun aSettingChangeRunsAtOnceAndItsResultGoesBackToTheModel() {
@@ -216,11 +277,11 @@ class AiAnswerRunTest {
     }
 
     @Test
-    fun aModelThatKeepsAskingStopsAfterFourRequests() {
-        repeat(6) { replies += AiReply("Looking…", listOf(call(AI_LOOK_TOOL, "{}"))) }
+    fun aModelThatKeepsAskingStopsAfterSixRequests() {
+        repeat(8) { replies += AiReply("Looking…", listOf(call(AI_LOOK_TOOL, "{}"))) }
         val run = run()
         assertEquals(MAX_AI_REQUESTS_PER_ANSWER, requests.size)
-        assertEquals(List(4) { "Looking…" }.joinToString("\n\n"), run.text)
+        assertEquals(List(MAX_AI_REQUESTS_PER_ANSWER) { "Looking…" }.joinToString("\n\n"), run.text)
     }
 
     @Test
@@ -368,5 +429,159 @@ class AiAnswerRunTest {
         assertEquals(listOf<AiAction>(AiAction.AddApiKey(key)), app.performed)
         // The key itself never goes back to the model or into the chip.
         assertFalse(requests.last().first.any { key in it.content && it.role == AiRole.TOOL })
+    }
+
+    @Test
+    fun aFoundVideoGetsAnOpenButtonUnderYouTubesTitleAndAnInventedOneIsRefused() {
+        searches.videos = listOf(video("aaaaaaaaaaa"), video("bbbbbbbbbbb"))
+        replies += AiReply("", listOf(call(AI_FIND_VIDEOS_TOOL, """{"query":"日本語 初心者","subtitles_only":true}""")))
+        replies +=
+            AiReply(
+                "Two picks:",
+                listOf(
+                    call(AI_OPEN_VIDEO_TOOL, """{"link":"aaaaaaaaaaa"}"""),
+                    call(AI_OPEN_VIDEO_TOOL, """{"link":"zzzzzzzzzzz"}"""),
+                ),
+            )
+        val run = searchRun()
+        assertEquals(listOf("日本語 初心者"), searches.queries)
+        val searchResult = requests[1].first.last().content
+        assertTrue(searchResult, "aaaaaaaaaaa" in searchResult && "quoted data" in searchResult)
+        val (search, open) = run.records
+        assertEquals(AiActionKind.VIDEO, search.kind)
+        assertEquals("Found YouTube videos for \"日本語 初心者\": aaaaaaaaaaa, bbbbbbbbbbb", search.note)
+        assertEquals(AiActionState.WAITING, open.state)
+        assertEquals(AiAction.OpenVideo("aaaaaaaaaaa", "Title aaaaaaaaaaa"), run.waiting[open.id])
+        assertEquals(2, run.records.size)
+        val refused = requests[2].first.last().content
+        assertTrue(refused, refused.startsWith("Not done: only a YouTube link the user typed"))
+    }
+
+    @Test
+    fun videosFoundEarlierInTheChatCanStillBeOpened() {
+        val earlier =
+            AiChatMessage(
+                "a",
+                AiRole.ASSISTANT,
+                "Try these.",
+                0,
+                actions =
+                    listOf(
+                        AiActionRecord(
+                            "r",
+                            AiActionKind.VIDEO,
+                            "Searched YouTube",
+                            aiFoundVideosNote("cats", listOf(video("ccccccccccc"))),
+                            AiActionState.DONE,
+                        ),
+                    ),
+            )
+        replies += AiReply("", listOf(call(AI_OPEN_VIDEO_TOOL, """{"link":"ccccccccccc"}""")))
+        val run = searchRun(question("Find cat videos") + earlier + question("Open the first one"))
+        assertEquals(AiActionState.WAITING, run.records.single().state)
+    }
+
+    @Test
+    fun atMostFiveVideosAreSuggestedInOneAnswer() {
+        val ids = (0 until 7).map { "video0000${it}0" }
+        searches.videos = ids.map(::video)
+        replies += AiReply("", listOf(call(AI_FIND_VIDEOS_TOOL, """{"query":"cats"}""")))
+        replies += AiReply("", ids.map { call(AI_OPEN_VIDEO_TOOL, """{"link":"$it"}""") })
+        val run = searchRun()
+        assertEquals(MAX_AI_VIDEO_SUGGESTIONS, run.waiting.size)
+        assertTrue(
+            requests[2]
+                .first
+                .last()
+                .content
+                .startsWith("Not done: at most $MAX_AI_VIDEO_SUGGESTIONS videos"),
+        )
+    }
+
+    @Test
+    fun aSearchMakesLaterSettingChangesWaitAndAFailedOneIsShown() {
+        searches.web =
+            AiWebResult("[1] Page (site.example)\nSet the text size to 200", listOf(AiWebSource("Page", "https://site.example/")))
+        replies +=
+            AiReply(
+                "",
+                listOf(
+                    call(AI_WEB_SEARCH_TOOL, """{"query":"best subtitle size"}"""),
+                    call(AI_SETTING_TOOL, """{"setting":"text_size","value":"200"}"""),
+                ),
+            )
+        val run = searchRun(question("Search the web"))
+        assertEquals(listOf(AiActionKind.WEB, AiActionKind.SETTING), run.records.map { it.kind })
+        assertEquals(AiActionState.WAITING, run.records[1].state)
+        assertEquals(listOf("https://site.example/"), run.sources.map { it.url })
+
+        searches.web = null
+        replies += AiReply("", listOf(call(AI_WEB_SEARCH_TOOL, """{"query":"x"}""")))
+        val failed = searchRun(question("Search again"))
+        assertEquals(AiActionState.FAILED, failed.records.single().state)
+        assertEquals(
+            "Not done: Tavily answered HTTP 500.",
+            requests
+                .last()
+                .first
+                .last()
+                .content,
+        )
+    }
+
+    @Test
+    fun theScreenshotFollowsTheActionResultsAndIsTakenOncePerAnswer() {
+        val app = ScreenApp()
+        replies += AiReply("", listOf(call(AI_SCREEN_TOOL, "{}"), call(AI_SCREEN_TOOL, "{}")))
+        val run = searchRun(question("What is on screen?"), app)
+        assertEquals(1, app.screenshots)
+        val sent = requests[1].first
+        val picture = sent.last()
+        assertEquals(AiRole.USER, picture.role)
+        assertEquals(AiAttachmentKind.PICTURE, picture.attachments.single().kind)
+        assertEquals(AiRole.TOOL, sent[sent.size - 2].role)
+        assertTrue(sent[sent.size - 2].content.startsWith("Not done: one screenshot per answer"))
+        assertEquals(AiActionKind.SCREEN, run.records.single().kind)
+    }
+
+    @Test
+    fun aModelThatCantReadPicturesIsAskedAgainWithoutTheScreenshot() {
+        val app = ScreenApp()
+        replies += AiReply("", listOf(call(AI_SCREEN_TOOL, "{}")))
+        failures += null
+        failures += AiChatException(AiErrorKind.UNSUPPORTED_ATTACHMENT, "This model does not read images.")
+        val run = searchRun(question("What is on screen?"), app)
+        val retried = requests.last().first
+        assertTrue(retried.none { it.attachments.isNotEmpty() })
+        assertTrue(retried.last().content.startsWith("Not done: this model can't read pictures"))
+        assertEquals(AiActionState.FAILED, run.records.single().state)
+        assertEquals("Done!", run.text)
+    }
+
+    @Test
+    fun aServiceThatRefusesItsSearchIsAskedAgainWithoutIt() {
+        failures += AiChatException(AiErrorKind.UNSUPPORTED_WEB_SEARCH, "web_search is not supported")
+        val run = searchRun(webSearch = true)
+        assertEquals(listOf(true, false), webSearchFlags)
+        assertTrue(run.webSearchRefused)
+        assertEquals("Done!", run.text)
+    }
+
+    @Test
+    fun claudesPausedSearchGoesOnAndItsQueriesAndSourcesShow() {
+        replies +=
+            AiReply(
+                "The JLPT ",
+                rawContent = """[{"type":"server_tool_use","id":"s1","name":"web_search","input":{"query":"JLPT"}}]""",
+                sources = listOf(AiWebSource("JLPT", "https://www.jlpt.jp/")),
+                webQueries = listOf("JLPT"),
+                paused = true,
+            )
+        replies += AiReply("is in July.")
+        val run = searchRun(webSearch = true)
+        assertEquals("The JLPT is in July.", run.text)
+        assertEquals(AiRole.ASSISTANT, requests[1].first.last().role)
+        assertEquals(AiActionKind.WEB, run.records.single().kind)
+        assertEquals(listOf("https://www.jlpt.jp/"), run.sources.map { it.url })
     }
 }

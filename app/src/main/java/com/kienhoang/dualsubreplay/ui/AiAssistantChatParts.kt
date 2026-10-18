@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -34,6 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -49,6 +53,7 @@ import com.kienhoang.dualsubreplay.assistant.AiChatMessage
 import com.kienhoang.dualsubreplay.assistant.AiFailure
 import com.kienhoang.dualsubreplay.assistant.AiRole
 import com.kienhoang.dualsubreplay.assistant.AiSpanStyle
+import com.kienhoang.dualsubreplay.assistant.AiWebSource
 import com.kienhoang.dualsubreplay.assistant.formatAiReply
 import java.text.DateFormat
 import java.util.Date
@@ -124,7 +129,7 @@ internal fun AiWelcome(
     }
 }
 
-/** A message, and under an answer what it did in the app ([AiActionList]). */
+/** A message, and under an answer what it did in the app ([AiActionList]) and the pages its web searches used. */
 @Composable
 internal fun AiMessageBubble(
     message: AiChatMessage,
@@ -132,6 +137,44 @@ internal fun AiMessageBubble(
 ) {
     if (message.role == AiRole.USER || message.text.isNotEmpty()) AiMessageText(message)
     if (message.actions.isNotEmpty()) AiActionList(message.actions, handlers)
+    if (message.sources.isNotEmpty()) AiSourceList(message.sources)
+}
+
+/** "Sources", then each page's title and site; a tap opens the page in the browser. */
+@Composable
+private fun AiSourceList(sources: List<AiWebSource>) {
+    val context = LocalContext.current
+    Column(Modifier.widthIn(max = 340.dp).testTag("ai_sources")) {
+        Text(
+            stringResource(R.string.ai_sources_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp),
+        )
+        sources.forEach { source ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { openExternalPage(context, source.url) }
+                    .padding(horizontal = 4.dp, vertical = 4.dp)
+                    .testTag("ai_source"),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Default.Language,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(source.title, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(source.site, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)

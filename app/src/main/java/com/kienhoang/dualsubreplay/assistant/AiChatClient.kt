@@ -65,6 +65,9 @@ internal enum class AiErrorKind {
 
     /** The model cannot take the app's actions; the question is asked again without them. */
     UNSUPPORTED_TOOLS,
+
+    /** The service refused its own web search (off for the account, or not for this model); asked again without it. */
+    UNSUPPORTED_WEB_SEARCH,
 }
 
 /** [detail] is the service's own English message, with the key removed, for reports. */
@@ -109,6 +112,8 @@ internal data class AiChatRequest(
     /** The actions the model may ask for; empty sends none. */
     val tools: List<AiTool> = emptyList(),
     val format: AiWireFormat = AiWireFormat.OPENAI_CHAT,
+    /** The service's own web search goes with the request: Claude's `web_search` or OpenRouter's server tool. */
+    val webSearch: Boolean = false,
 )
 
 /** Sends one chat request and returns the reply, or throws [AiChatException]. */
@@ -132,9 +137,13 @@ internal fun interface AiModelLister {
     ): List<AiModelInfo>
 }
 
+/** OpenRouter's results per web search; each search costs the same up to 10. */
+private const val OPENROUTER_WEB_RESULTS = 5
+
 /**
  * `{"model": …, "messages": [{"role": …, "content": …}, …]}`, plus `reasoning_effort` when a
- * thinking level is chosen and `tools` when actions are offered. No sampling options, which some
+ * thinking level is chosen and `tools` when actions are offered. [webSearch] adds OpenRouter's web
+ * search server tool, which the model calls when it needs to. No sampling options, which some
  * models reject.
  */
 internal fun chatRequestBody(
@@ -142,13 +151,27 @@ internal fun chatRequestBody(
     messages: List<AiWireMessage>,
     reasoningEffort: String? = null,
     tools: List<AiTool> = emptyList(),
+    webSearch: Boolean = false,
 ): String =
     JSONObject()
         .put("model", model)
         .put("messages", JSONArray().apply { messages.forEach { put(wireMessage(it)) } })
         .apply {
             if (reasoningEffort != null) put("reasoning_effort", reasoningEffort)
-            if (tools.isNotEmpty()) put("tools", aiToolsJson(tools))
+            if (tools.isNotEmpty() || webSearch) {
+                put(
+                    "tools",
+                    aiToolsJson(tools).apply {
+                        if (webSearch) {
+                            put(
+                                JSONObject()
+                                    .put("type", "openrouter:web_search")
+                                    .put("parameters", JSONObject().put("max_results", OPENROUTER_WEB_RESULTS)),
+                            )
+                        }
+                    },
+                )
+            }
         }.toString()
 
 private fun wireMessage(message: AiWireMessage): JSONObject =
@@ -246,7 +269,7 @@ internal fun aiModelCanChat(
     return !(opencode && OPENCODE_OTHER_API_PREFIXES.any { lower.startsWith(it) })
 }
 
-/** The first choice's text and actions. Some services send content as a list of text parts. */
+/** The first choice's text, actions and cited pages. Some services send content as a list of text parts. */
 internal fun parseAiReply(body: String): AiReply {
     val root =
         try {
@@ -270,7 +293,7 @@ internal fun parseAiReply(body: String): AiReply {
     if (aiSafetyCheckerAnswered(model, text)) {
         throw AiChatException(AiErrorKind.NOT_A_CHAT_MODEL, "A safety checker answered instead of a chat model.")
     }
-    return AiReply(text, calls, model)
+    return AiReply(text, calls, model, sources = urlCitations(message))
 }
 
 /** A safety checker's whole answer, for example "User Safety: safe" and "Response Safety: unsafe". */
@@ -333,15 +356,20 @@ internal fun redactApiKey(
     return if (redacted.length > MAX_AI_ERROR_DETAIL_CHARS) redacted.take(MAX_AI_ERROR_DETAIL_CHARS) + "…" else redacted
 }
 
-/** A refusal of what came with the question (actions, pictures and files, or a thinking level), or null. */
+/** A refusal of what came with the question (web search, actions, pictures and files, or a thinking level), or null. */
 private fun unsupportedExtra(
     code: Int,
     lower: String,
     sentThinking: Boolean,
     sentAttachments: Boolean,
     sentTools: Boolean,
+    sentWebSearch: Boolean,
 ): AiErrorKind? =
     when {
+        // Anthropic answers 400 "web search is not enabled" when an admin turned it off.
+        sentWebSearch && code in 400..499 && code !in setOf(401, 402, 429) &&
+            ("web search" in lower || "web_search" in lower || "server tool" in lower || "server_tool" in lower) ->
+            AiErrorKind.UNSUPPORTED_WEB_SEARCH
         // OpenRouter answers 404 "No endpoints found that support tool use" for such a model.
         sentTools && code in 400..499 && code !in setOf(401, 402, 403, 429) && ("tool" in lower || "function" in lower) ->
             AiErrorKind.UNSUPPORTED_TOOLS
@@ -358,9 +386,10 @@ internal fun aiErrorKindForStatus(
     sentThinking: Boolean = false,
     sentAttachments: Boolean = false,
     sentTools: Boolean = false,
+    sentWebSearch: Boolean = false,
 ): AiErrorKind {
     val lower = message.orEmpty().lowercase()
-    unsupportedExtra(code, lower, sentThinking, sentAttachments, sentTools)?.let { return it }
+    unsupportedExtra(code, lower, sentThinking, sentAttachments, sentTools, sentWebSearch)?.let { return it }
     return when {
         code == 401 -> AiErrorKind.INVALID_KEY
         // OpenRouter also answers 403 for a model it keeps for coding apps; only a key problem names the key.
@@ -415,7 +444,8 @@ internal class AiHttpTransport(
             .followSslRedirects(false)
             .build(),
 ) : AiChatTransport,
-    AiModelLister {
+    AiModelLister,
+    AiHttpPoster {
     override suspend fun complete(request: AiChatRequest): AiReply {
         val anthropic = request.format == AiWireFormat.ANTHROPIC_MESSAGES
         val url =
@@ -423,18 +453,43 @@ internal class AiHttpTransport(
                 ?: throw AiChatException(AiErrorKind.BAD_ADDRESS)
         val json =
             if (anthropic) {
-                anthropicRequestBody(request.model, request.messages, request.reasoningEffort, request.tools)
+                anthropicRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
             } else {
-                chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools)
+                chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
             }
         val httpRequest = authorized(request.apiKey, request.format) { url(url).post(json.toRequestBody(JSON_MEDIA_TYPE)) }
         val (code, reply) = execute(httpRequest, request.timeoutMs, MAX_AI_RESPONSE_BYTES)
         val status = aiReplyStatus(code, reply)
         if (status !in 200..299) {
             val sentAttachments = request.messages.any { it.attachments.isNotEmpty() }
-            throw statusFailure(status, reply, request.apiKey, request.reasoningEffort != null, sentAttachments, request.tools.isNotEmpty())
+            throw statusFailure(
+                status,
+                reply,
+                request.apiKey,
+                request.reasoningEffort != null,
+                sentAttachments,
+                request.tools.isNotEmpty(),
+                request.webSearch,
+            )
         }
         return if (anthropic) parseAnthropicReply(reply) else parseAiReply(reply)
+    }
+
+    /** A search request (YouTube, Tavily, OpenAI's search model): the status and body, whatever the status. */
+    override suspend fun post(request: AiHttpPost): Pair<Int, String> {
+        val httpRequest =
+            try {
+                Request
+                    .Builder()
+                    .url(request.url)
+                    .header("Accept", "application/json")
+                    .apply { request.headers.forEach { (name, value) -> header(name, value) } }
+                    .post(request.body.toRequestBody(JSON_MEDIA_TYPE))
+                    .build()
+            } catch (error: IllegalArgumentException) {
+                throw AiChatException(AiErrorKind.INVALID_KEY, "The key has characters an API key cannot have.", error)
+            }
+        return execute(httpRequest, request.timeoutMs, request.maxBytes)
     }
 
     override suspend fun listModels(
@@ -488,9 +543,13 @@ internal class AiHttpTransport(
         sentThinking: Boolean,
         sentAttachments: Boolean,
         sentTools: Boolean = false,
+        sentWebSearch: Boolean = false,
     ): AiChatException {
         val message = providerErrorMessage(body)?.let { redactApiKey(it, apiKey) }
-        return AiChatException(aiErrorKindForStatus(code, message, sentThinking, sentAttachments, sentTools), message ?: "HTTP $code")
+        return AiChatException(
+            aiErrorKindForStatus(code, message, sentThinking, sentAttachments, sentTools, sentWebSearch),
+            message ?: "HTTP $code",
+        )
     }
 
     private suspend fun execute(

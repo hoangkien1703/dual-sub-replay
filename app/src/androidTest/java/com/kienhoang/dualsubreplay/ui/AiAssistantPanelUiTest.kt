@@ -29,9 +29,11 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.assistant.AI_FIND_VIDEOS_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_NEWS_VERSION
 import com.kienhoang.dualsubreplay.assistant.AI_SAVE_MEMORY_TOOL
+import com.kienhoang.dualsubreplay.assistant.AI_SCREEN_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_SEARCH_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_SETTING_TOOL
 import com.kienhoang.dualsubreplay.assistant.AI_TOOLS
@@ -60,10 +62,12 @@ import com.kienhoang.dualsubreplay.assistant.AiModelInfo
 import com.kienhoang.dualsubreplay.assistant.AiPanelPage
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiReply
+import com.kienhoang.dualsubreplay.assistant.AiSearchKeyStore
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
 import com.kienhoang.dualsubreplay.assistant.AiThinking
 import com.kienhoang.dualsubreplay.assistant.AiToolCall
+import com.kienhoang.dualsubreplay.assistant.AiWebSearchMode
 import com.kienhoang.dualsubreplay.assistant.InMemoryAiMemoryStorage
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
@@ -110,25 +114,25 @@ class AiAssistantPanelUiTest {
     private var settings = AiAssistantSettings(introSeen = true, newsSeen = AI_NEWS_VERSION)
     private val memory = InMemoryAiMemoryStorage()
 
-    private val keyStore =
-        AiKeyStore(
-            object : SecretStorage {
-                override fun get(name: String) = secrets[name]
+    private val secretStorage =
+        object : SecretStorage {
+            override fun get(name: String) = secrets[name]
 
-                override fun put(values: Map<String, String>) {
-                    secrets += values
-                }
+            override fun put(values: Map<String, String>) {
+                secrets += values
+            }
 
-                override fun remove(names: List<String>) {
-                    names.forEach(secrets::remove)
-                }
-            },
-            object : SecretCipher {
-                override fun encrypt(plain: ByteArray) = plain.reversedArray()
+            override fun remove(names: List<String>) {
+                names.forEach(secrets::remove)
+            }
+        }
+    private val secretCipher =
+        object : SecretCipher {
+            override fun encrypt(plain: ByteArray) = plain.reversedArray()
 
-                override fun decrypt(sealed: ByteArray) = sealed.reversedArray()
-            },
-        )
+            override fun decrypt(sealed: ByteArray) = sealed.reversedArray()
+        }
+    private val keyStore = AiKeyStore(secretStorage, secretCipher)
 
     private val controller by lazy {
         AiAssistantController(
@@ -160,6 +164,7 @@ class AiAssistantPanelUiTest {
             io = Dispatchers.Unconfined,
             modelLister = { _, _, _ -> listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemma-4-31b-it", free = true)) },
             memoryStorage = memory,
+            searchKeys = AiSearchKeyStore(secretStorage, secretCipher),
         )
     }
 
@@ -677,6 +682,51 @@ class AiAssistantPanelUiTest {
         }
     }
 
+    @Test
+    fun searchAndScreenSettingsSaveATavilyKeyAndSwitchTheSearches() {
+        checkedGeminiKey()
+        val preferences = InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", 0)
+        try {
+            showTopBarAndPanel(DualSubUiState())
+            composeRule.runOnIdle {
+                controller.openPanel()
+                controller.showPage(AiPanelPage.SETTINGS)
+            }
+            composeRule
+                .onNodeWithTag("ai_section_search")
+                .performScrollTo()
+                .assertTextContains("YouTube On", substring = true)
+                .performClick()
+            composeRule.onNodeWithTag("ai_youtube_search_switch").performScrollTo().assertIsOn()
+            composeRule.onNodeWithTag("ai_screen_switch").performScrollTo().assertIsOn()
+
+            composeRule.onNodeWithTag("ai_web_search_service").performScrollTo().performClick()
+            assertEquals(AiWebSearchMode.SERVICE, settings.webSearch)
+            composeRule.onNodeWithTag("ai_web_search_unavailable").performScrollTo().assertIsDisplayed()
+
+            composeRule.onNodeWithTag("ai_web_search_tavily").performScrollTo().performClick()
+            composeRule.onNodeWithTag("ai_get_tavily_key").performScrollTo().assertIsDisplayed()
+            saveUiEvidence("ai_settings_search")
+            composeRule.onNodeWithTag("ai_tavily_key_field").performScrollTo().performTextInput("tvly-dev-abcdefghijkl9876")
+            composeRule.onNodeWithTag("ai_save_tavily_key").performScrollTo().performClick()
+            composeRule.onNodeWithTag("ai_tavily_key_row").performScrollTo()
+            composeRule.onNodeWithText("Key ending in 9876").assertIsDisplayed()
+            assertEquals(AiWebSearchMode.TAVILY, settings.webSearch)
+            assertFalse(secrets.values.any { "tvly-dev-abcdefghijkl9876" in it })
+            saveUiEvidence("ai_settings_search_tavily")
+
+            composeRule.onNodeWithTag("ai_screen_switch").performScrollTo().performClick()
+            assertFalse(settings.screenLook)
+
+            preferences.edit().putString(APP_COLOR_THEME_PREFERENCE, AppColorThemeOption.LIGHT.key).commit()
+            composeRule.onNodeWithTag("ai_web_search_service").performScrollTo().performClick()
+            composeRule.waitForIdle()
+            saveUiEvidence("ai_settings_search_light")
+        } finally {
+            preferences.edit().remove(APP_COLOR_THEME_PREFERENCE).commit()
+        }
+    }
+
     /** Saves and forgets through the controller, as the app's actions do, with the app's English labels. */
     private class MemoryActions(
         private val keeper: AiMemoryKeeper,
@@ -712,7 +762,7 @@ class AiAssistantPanelUiTest {
             ).assertIsDisplayed()
             .assertTextContains("Saved to memory: “Studies for JLPT N3, exam in December”")
         composeRule.onNodeWithTag("ai_action_undo").assertIsDisplayed()
-        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS, requests.first().tools)
+        assertEquals(AI_TOOLS + AI_MEMORY_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, requests.first().tools)
         saveUiEvidence("ai_panel_memory_chip")
 
         composeRule.onNodeWithTag("ai_action_manage").performClick()
@@ -777,7 +827,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_input").performTextInput("Hi")
         composeRule.onNodeWithTag("ai_send_button").performClick()
         composeRule.onNodeWithTag("ai_chat_memory_off").assertIsDisplayed()
-        assertEquals(AI_TOOLS, requests.single().tools)
+        assertEquals(AI_TOOLS + AI_FIND_VIDEOS_TOOLS + AI_SCREEN_TOOLS, requests.single().tools)
     }
 
     @Test

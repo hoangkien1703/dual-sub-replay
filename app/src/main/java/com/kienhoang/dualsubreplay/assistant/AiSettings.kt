@@ -18,6 +18,9 @@ internal const val AI_INTRO_SEEN_PREFERENCE = "ai_intro_seen"
 internal const val AI_MEMORY_ENABLED_PREFERENCE = "ai_memory_enabled"
 internal const val AI_NEWS_SEEN_PREFERENCE = "ai_news_seen"
 internal const val AI_FULL_ACCESS_PREFERENCE = "ai_full_access"
+internal const val AI_YOUTUBE_SEARCH_PREFERENCE = "ai_youtube_search"
+internal const val AI_WEB_SEARCH_PREFERENCE = "ai_web_search"
+internal const val AI_SCREEN_PREFERENCE = "ai_screen"
 private const val AI_MODEL_PREFERENCE_PREFIX = "ai_model_"
 
 private const val DAY_MS = 24L * 60 * 60 * 1000
@@ -88,6 +91,12 @@ internal data class AiAssistantSettings(
      * change or delete saved words and reset settings ([AI_FULL_ACCESS_TOOLS]).
      */
     val fullAccess: Boolean = false,
+    /** On by default: the assistant may search YouTube itself to suggest videos (free, no key). */
+    val youtubeSearch: Boolean = true,
+    /** Off by default: the service's own search (paid) or Tavily (the user's free key). */
+    val webSearch: AiWebSearchMode = AiWebSearchMode.OFF,
+    /** On by default: the assistant may take a screenshot of the app when it needs to see it. */
+    val screenLook: Boolean = true,
 ) {
     /** People who answered the intro before the current note see it once at the top of the chat. */
     val showsNews: Boolean get() = enabled && introSeen && newsSeen < AI_NEWS_VERSION
@@ -113,6 +122,9 @@ internal fun readAiAssistantSettings(preferences: SharedPreferences): AiAssistan
         memoryEnabled = preferences.getBoolean(AI_MEMORY_ENABLED_PREFERENCE, true),
         newsSeen = preferences.getInt(AI_NEWS_SEEN_PREFERENCE, 0),
         fullAccess = preferences.getBoolean(AI_FULL_ACCESS_PREFERENCE, false),
+        youtubeSearch = preferences.getBoolean(AI_YOUTUBE_SEARCH_PREFERENCE, true),
+        webSearch = storedAiWebSearchMode(preferences.getString(AI_WEB_SEARCH_PREFERENCE, null)),
+        screenLook = preferences.getBoolean(AI_SCREEN_PREFERENCE, true),
     )
 
 internal fun writeAiAssistantSettings(
@@ -129,6 +141,9 @@ internal fun writeAiAssistantSettings(
         putBoolean(AI_MEMORY_ENABLED_PREFERENCE, settings.memoryEnabled)
         putInt(AI_NEWS_SEEN_PREFERENCE, settings.newsSeen)
         putBoolean(AI_FULL_ACCESS_PREFERENCE, settings.fullAccess)
+        putBoolean(AI_YOUTUBE_SEARCH_PREFERENCE, settings.youtubeSearch)
+        putString(AI_WEB_SEARCH_PREFERENCE, settings.webSearch.key)
+        putBoolean(AI_SCREEN_PREFERENCE, settings.screenLook)
         AiProvider.entries.forEach { provider ->
             val model = settings.models[provider]
             if (model == null) {

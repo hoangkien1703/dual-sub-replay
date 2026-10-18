@@ -108,4 +108,21 @@ class AiChatHistoryTest {
             root.deleteRecursively()
         }
     }
+
+    @Test
+    fun anAnswersSourcesSurviveEncodingAndBadOnesAreDropped() {
+        val sources = listOf(AiWebSource("JLPT", "https://www.jlpt.jp/e/"), AiWebSource("NHK", "https://www3.nhk.or.jp/"))
+        val chat = AiChat("c1", 10, 20, listOf(AiChatMessage("a", AiRole.ASSISTANT, "In July.", 12, sources = sources)))
+        assertEquals(listOf(chat), decodeAiChats(encodeAiChats(listOf(chat))))
+        val tampered = encodeAiChats(listOf(chat)).replace("https://www3.nhk.or.jp/", "javascript:alert(1)")
+        assertEquals(
+            sources.take(1),
+            decodeAiChats(tampered)
+                .single()
+                .messages
+                .single()
+                .sources,
+        )
+        assertTrue("[Sources of this answer: jlpt.jp; www3.nhk.or.jp]" in chat.messages.single().wireContent())
+    }
 }

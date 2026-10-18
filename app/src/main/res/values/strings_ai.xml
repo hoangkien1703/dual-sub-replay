@@ -230,4 +230,29 @@
         <item quantity="one">%1$d key</item>
         <item quantity="other">%1$d keys</item>
     </plurals>
+
+    <!-- Search and screen (2026-10-18) -->
+    <string name="ai_action_open_found_video">Open “%1$s”</string>
+    <string name="ai_action_find_videos">Searched YouTube for “%1$s”</string>
+    <string name="ai_action_web_search">Searched the web for “%1$s”</string>
+    <string name="ai_action_look_screen">Looked at the screen</string>
+    <string name="ai_sources_title">Sources</string>
+    <string name="ai_search_section">Search and screen</string>
+    <string name="ai_search_summary">YouTube %1$s · Web: %2$s · Screen %3$s</string>
+    <string name="ai_search_youtube_title">Find YouTube videos</string>
+    <string name="ai_search_youtube_description">The assistant can search YouTube itself to suggest videos. Free, no key needed.</string>
+    <string name="ai_search_web_title">Web search</string>
+    <string name="ai_search_web_off">Off</string>
+    <string name="ai_search_web_service">AI service</string>
+    <string name="ai_search_web_tavily">Tavily</string>
+    <string name="ai_search_web_off_note">The assistant answers from what its model already knows.</string>
+    <string name="ai_search_web_service_note">%1$s searches the web itself when it needs to. Each search costs extra on your %1$s bill, about one cent.</string>
+    <string name="ai_search_web_service_unavailable">%1$s can\'t search the web in this app. Choose Tavily, or use Claude, OpenRouter or OpenAI.</string>
+    <string name="ai_search_web_tavily_note">Free with your own Tavily key: 1,000 searches a month, no card needed. Works with every AI service.</string>
+    <string name="ai_search_tavily_steps">Sign in to Tavily, copy your API key (it starts with tvly-), then paste it here.</string>
+    <string name="ai_search_tavily_key_label">Tavily key</string>
+    <string name="ai_search_tavily_not_a_key">That isn\'t a Tavily key. Tavily keys start with tvly-.</string>
+    <string name="ai_search_tavily_saved">Saved as your Tavily search key (AI settings → Search and screen).</string>
+    <string name="ai_search_screen_title">Look at the screen</string>
+    <string name="ai_search_screen_description">The assistant can take a screenshot of the app when it needs to see something. The picture goes only to your AI service and is never saved.</string>
 </resources>

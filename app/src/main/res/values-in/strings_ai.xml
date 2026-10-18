@@ -223,4 +223,29 @@
     <plurals name="ai_settings_keys_count">
         <item quantity="other">%1$d kunci</item>
     </plurals>
+
+    <!-- Search and screen (2026-10-18) -->
+    <string name="ai_action_open_found_video">Buka “%1$s”</string>
+    <string name="ai_action_find_videos">Mencari “%1$s” di YouTube</string>
+    <string name="ai_action_web_search">Mencari “%1$s” di web</string>
+    <string name="ai_action_look_screen">Melihat layar</string>
+    <string name="ai_sources_title">Sumber</string>
+    <string name="ai_search_section">Penelusuran dan layar</string>
+    <string name="ai_search_summary">YouTube %1$s · Web: %2$s · Layar %3$s</string>
+    <string name="ai_search_youtube_title">Cari video YouTube</string>
+    <string name="ai_search_youtube_description">Asisten bisa mencari di YouTube sendiri untuk menyarankan video. Gratis, tanpa kunci.</string>
+    <string name="ai_search_web_title">Penelusuran web</string>
+    <string name="ai_search_web_off">Mati</string>
+    <string name="ai_search_web_service">Layanan AI</string>
+    <string name="ai_search_web_tavily">Tavily</string>
+    <string name="ai_search_web_off_note">Asisten menjawab dari yang sudah diketahui modelnya.</string>
+    <string name="ai_search_web_service_note">%1$s mencari di web sendiri saat perlu. Setiap penelusuran menambah biaya di tagihan %1$s Anda, sekitar satu sen dolar.</string>
+    <string name="ai_search_web_service_unavailable">%1$s tidak bisa mencari di web di aplikasi ini. Pilih Tavily, atau gunakan Claude, OpenRouter, atau OpenAI.</string>
+    <string name="ai_search_web_tavily_note">Gratis dengan kunci Tavily Anda sendiri: 1.000 penelusuran sebulan, tanpa kartu. Bisa dipakai dengan semua layanan AI.</string>
+    <string name="ai_search_tavily_steps">Masuk ke Tavily, salin kunci API Anda (diawali tvly-), lalu tempel di sini.</string>
+    <string name="ai_search_tavily_key_label">Kunci Tavily</string>
+    <string name="ai_search_tavily_not_a_key">Itu bukan kunci Tavily. Kunci Tavily diawali tvly-.</string>
+    <string name="ai_search_tavily_saved">Disimpan sebagai kunci penelusuran Tavily Anda (Setelan AI → Penelusuran dan layar).</string>
+    <string name="ai_search_screen_title">Lihat layar</string>
+    <string name="ai_search_screen_description">Asisten bisa mengambil tangkapan layar aplikasi saat perlu melihat sesuatu. Gambar hanya dikirim ke layanan AI Anda dan tidak pernah disimpan.</string>
 </resources>

@@ -17,8 +17,10 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Screenshot
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -52,6 +54,8 @@ private val AiActionKind.icon: ImageVector
     get() =
         when (this) {
             AiActionKind.LOOK -> Icons.Default.Subtitles
+            AiActionKind.SCREEN -> Icons.Default.Screenshot
+            AiActionKind.WEB -> Icons.Default.TravelExplore
             AiActionKind.PLAYBACK -> Icons.Default.Replay
             AiActionKind.SETTING -> Icons.Default.Tune
             AiActionKind.WORD -> Icons.Default.BookmarkAdd
@@ -59,6 +63,9 @@ private val AiActionKind.icon: ImageVector
             AiActionKind.TRANSLATION -> Icons.Default.Translate
             AiActionKind.MEMORY -> Icons.Default.Psychology
         }
+
+/** Actions that only read (subtitles, the screen, the web): their chip shows what was read, not a check mark. */
+private val READING_KINDS = setOf(AiActionKind.LOOK, AiActionKind.SCREEN, AiActionKind.WEB)
 
 /** What an answer did or wants to do: chips for actions that ran, cards for those waiting for a tap. */
 @Composable
@@ -109,7 +116,7 @@ private fun AiActionChip(
     val (icon, tint) =
         when (action.state) {
             AiActionState.DONE ->
-                (if (action.kind == AiActionKind.LOOK) action.kind.icon else Icons.Default.Check) to
+                (if (action.kind in READING_KINDS) action.kind.icon else Icons.Default.Check) to
                     MaterialTheme.colorScheme.primary
             AiActionState.UNDONE -> Icons.AutoMirrored.Filled.Undo to MaterialTheme.colorScheme.outline
             AiActionState.CANCELLED, AiActionState.WAITING -> Icons.Default.Close to MaterialTheme.colorScheme.outline

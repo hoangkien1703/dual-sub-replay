@@ -223,4 +223,29 @@
     <plurals name="ai_settings_keys_count">
         <item quantity="other">키 %1$d개</item>
     </plurals>
+
+    <!-- Search and screen (2026-10-18) -->
+    <string name="ai_action_open_found_video">“%1$s” 열기</string>
+    <string name="ai_action_find_videos">YouTube에서 “%1$s” 검색함</string>
+    <string name="ai_action_web_search">웹에서 “%1$s” 검색함</string>
+    <string name="ai_action_look_screen">화면을 봤어요</string>
+    <string name="ai_sources_title">출처</string>
+    <string name="ai_search_section">검색 및 화면</string>
+    <string name="ai_search_summary">YouTube %1$s · 웹: %2$s · 화면 %3$s</string>
+    <string name="ai_search_youtube_title">YouTube 동영상 찾기</string>
+    <string name="ai_search_youtube_description">어시스턴트가 직접 YouTube를 검색해 동영상을 추천할 수 있어요. 무료이고 키가 필요 없어요.</string>
+    <string name="ai_search_web_title">웹 검색</string>
+    <string name="ai_search_web_off">끄기</string>
+    <string name="ai_search_web_service">AI 서비스</string>
+    <string name="ai_search_web_tavily">Tavily</string>
+    <string name="ai_search_web_off_note">어시스턴트가 모델이 이미 아는 내용으로 답해요.</string>
+    <string name="ai_search_web_service_note">%1$s이(가) 필요할 때 직접 웹을 검색해요. 검색할 때마다 %1$s 요금이 약 1센트 더 나와요.</string>
+    <string name="ai_search_web_service_unavailable">%1$s은(는) 이 앱에서 웹을 검색할 수 없어요. Tavily를 선택하거나 Claude, OpenRouter, OpenAI를 사용하세요.</string>
+    <string name="ai_search_web_tavily_note">내 Tavily 키로 무료: 한 달 1,000회 검색, 카드 필요 없음. 모든 AI 서비스와 함께 쓸 수 있어요.</string>
+    <string name="ai_search_tavily_steps">Tavily에 로그인해 API 키(tvly-로 시작)를 복사한 다음 여기에 붙여 넣으세요.</string>
+    <string name="ai_search_tavily_key_label">Tavily 키</string>
+    <string name="ai_search_tavily_not_a_key">Tavily 키가 아니에요. Tavily 키는 tvly-로 시작해요.</string>
+    <string name="ai_search_tavily_saved">Tavily 검색 키로 저장했어요(AI 설정 → 검색 및 화면).</string>
+    <string name="ai_search_screen_title">화면 보기</string>
+    <string name="ai_search_screen_description">어시스턴트가 무언가를 봐야 할 때 앱 스크린샷을 찍을 수 있어요. 사진은 내 AI 서비스로만 가고 저장되지 않아요.</string>
 </resources>

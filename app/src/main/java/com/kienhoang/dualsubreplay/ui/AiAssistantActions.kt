@@ -12,6 +12,7 @@ import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiActionOutcome
 import com.kienhoang.dualsubreplay.assistant.AiActionText
 import com.kienhoang.dualsubreplay.assistant.AiAppActions
+import com.kienhoang.dualsubreplay.assistant.AiAttachment
 import com.kienhoang.dualsubreplay.assistant.AiMemoryChange
 import com.kienhoang.dualsubreplay.assistant.AiMemoryEvent
 import com.kienhoang.dualsubreplay.assistant.AiMemoryKeeper
@@ -109,6 +110,7 @@ internal fun BindAiAppActions(
                 host.controller::closePanel,
                 host.controller,
                 AiFullAccessActions(context, viewModel, host.controller),
+                host.screen,
             )
         host.controller.appActions = actions
         onDispose { if (host.controller.appActions === actions) host.controller.appActions = null }
@@ -346,6 +348,7 @@ internal class AppAiActions(
     private val closePanel: () -> Unit,
     private val memory: AiMemoryKeeper,
     private val fullAccess: AiFullAccessActions? = null,
+    private val screen: AiScreenCapture? = null,
 ) : AiAppActions {
     private val state: DualSubUiState get() = viewModel.state.value
 
@@ -355,6 +358,11 @@ internal class AppAiActions(
     ): String = context.getString(id, *arguments)
 
     override fun lookAtVideo(linesAround: Int): String = aiVideoLook(state, linesAround)
+
+    override suspend fun captureScreen(): AiAttachment? {
+        val activity = context.findActivity() ?: return null
+        return screen?.capture(activity)
+    }
 
     override fun refusal(action: AiAction): String? {
         memory.memoryRefusal(action)?.let { return it }
@@ -382,7 +390,14 @@ internal class AppAiActions(
                     string(R.string.ai_action_search, action.query),
                     string(R.string.ai_action_search_button),
                 )
-            is AiAction.OpenVideo -> AiActionText(string(R.string.ai_action_open_video), string(R.string.ai_action_open_button))
+            is AiAction.OpenVideo ->
+                AiActionText(
+                    action.title?.let { string(R.string.ai_action_open_found_video, it) } ?: string(R.string.ai_action_open_video),
+                    string(R.string.ai_action_open_button),
+                )
+            is AiAction.FindVideos -> AiActionText(string(R.string.ai_action_find_videos, action.query))
+            is AiAction.WebSearch -> AiActionText(string(R.string.ai_action_web_search, action.query))
+            AiAction.LookAtScreen -> AiActionText(string(R.string.ai_action_look_screen))
             is AiAction.ChangeTranslation -> AiActionText(translationLabel(action), string(R.string.ai_action_change_button))
             // Only Undo runs it, and Undo shows on the save's own chip.
             is AiAction.RemoveSavedWord -> AiActionText(action.word)
@@ -429,7 +444,8 @@ internal class AppAiActions(
                 ?: AiActionOutcome.Refused("Full access is not available here.")
         }
         return when (action) {
-            is AiAction.LookAtVideo -> AiActionOutcome.Done(label, aiActionNote(action))
+            is AiAction.LookAtVideo, is AiAction.FindVideos, is AiAction.WebSearch, AiAction.LookAtScreen ->
+                AiActionOutcome.Done(label, aiActionNote(action))
             is AiAction.Playback -> playback(action.command, label)
             is AiAction.ChangeSetting -> changeSetting(action.setting, action.value, label)
             is AiAction.SaveWord -> saveWord(action)
