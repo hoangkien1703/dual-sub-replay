@@ -113,22 +113,22 @@ can't read pictures gets "Not done: this model can't read pictures" and the answ
 
 ## Acceptance criteria
 
-- [ ] With YouTube search on, the tool list has `find_youtube_videos`; parsing a captured
+- [x] With YouTube search on, the tool list has `find_youtube_videos`; parsing a captured
       YouTube reply gives the videos with title, channel, length, views, age and CC flag.
-- [ ] `open_youtube_video` accepts an ID found by the app's search in this chat and refuses an
+- [x] `open_youtube_video` accepts an ID found by the app's search in this chat and refuses an
       invented one; suggestions don't use up the 3 actions, at most 5 show.
-- [ ] Claude requests carry `web_search_20250305` only when web search is "Through Claude";
+- [x] Claude requests carry `web_search_20250305` only when web search is set to the service's own search;
       OpenRouter requests carry `openrouter:web_search` only for OpenRouter; other services none.
-- [ ] Claude `pause_turn` is continued; server-tool queries become chips; citations and
+- [x] Claude `pause_turn` is continued; server-tool queries become chips; citations and
       OpenRouter/OpenAI `url_citation` annotations become sources, saved with the chat.
-- [ ] `search_web` is offered for OpenAI (service mode) and with a Tavily key (Tavily mode) only;
+- [x] `search_web` is offered for OpenAI (service mode) and with a Tavily key (Tavily mode) only;
       Tavily replies parse to text plus sources.
-- [ ] A Tavily key is saved encrypted under `ai_assistant_keys` and removable.
-- [ ] `look_at_screen` is offered only while its setting is on; its picture goes in the request
+- [x] A Tavily key is saved encrypted under `ai_assistant_keys` and removable.
+- [x] `look_at_screen` is offered only while its setting is on; its picture goes in the request
       but not into saved chats; a model that refuses pictures gets the screenshot dropped.
-- [ ] After search results or a screenshot, setting changes in that answer wait for a tap.
-- [ ] Every new string exists in all 8 languages (`AppLanguageTest`, lint).
-- [ ] CI parity checks pass.
+- [x] After search results or a screenshot, setting changes in that answer wait for a tap.
+- [x] Every new string exists in all 8 languages (`AppLanguageTest`, lint).
+- [x] CI parity checks pass.
 
 ## Validation plan
 
@@ -155,8 +155,41 @@ fit a new feature; that stays the owner's call.
 
 ## Implementation result
 
-To be filled after implementation.
+Built as planned, in one PR:
+
+- `data/YouTubeVideoSearch.kt` posts to `https://www.youtube.com/youtubei/v1/search` with the web
+  client (English texts, the phone's country, filter `EgQQASgB` for videos with subtitles or
+  `EgIQAQ==` for videos only), reads `videoRenderer` items at any depth, and keeps at most 10.
+- `assistant/AiWebSearch.kt` holds the web search mode (Off / the service's own / Tavily), the
+  route per service (`IN_REQUEST` for Claude and OpenRouter, `SEARCH_MODEL` for OpenAI through
+  `gpt-5-search-api`, `TAVILY`), sources, Tavily and OpenAI search parsing, the three new tools
+  and `aiOfferedTools`.
+- `AiAnswerRun` runs `find_youtube_videos`, `search_web` and `look_at_screen` as reading
+  actions: each makes later changes in the answer wait for a tap. `open_youtube_video` accepts a
+  video ID the search found in this answer or earlier in the chat (its IDs are saved in the
+  chip's note); at most 5 suggestions per answer, outside the 3-action limit, and each still waits
+  for the Open tap. Claude's `pause_turn` is continued, and the request limit per answer went from
+  4 to 6 so a search plus suggestions fits.
+- Deviation: the Tavily key lives in its own small `AiSearchKeyStore` (same `ai_assistant_keys`
+  preferences and Keystore cipher) instead of inside `AiKeyStore`, since it is not an AI service
+  key. A Tavily key pasted or typed in the API keys section is recognised (`tvly-`) and saved
+  there too.
+- The screenshot hides the panel and its dim background for two frames, copies the window with
+  `PixelCopy`, scales it to at most 1280 px and sends it as JPEG in a user message right after the
+  tool results; it is never written to chat history.
+- Full access can also switch the three new settings. The assistant guide and AGENTS.md describe
+  the new tools.
 
 ## Validation result
 
-To be filled after validation.
+Cloud container, 2026-10-18:
+
+| Check | Result |
+| --- | --- |
+| `formatCheck`, `complexityCheck` | Passed (two `when` blocks in `AiActions.kt` split to stay under the complexity limit). |
+| `testDebugUnitTest` | Passed, 776 tests, including the new `YouTubeVideoSearchTest`, `AiWebSearchTest`, answer-run and history tests. |
+| `lintDebug`, `assembleDebug`, `assembleDebugAndroidTest` | Passed; no new lint warnings in the new code. |
+| Compose test `searchAndScreenSettingsSaveATavilyKeyAndSwitchTheSearches` (with screenshots, also Light theme) | Not run here (no emulator); runs in PR CI `managed-device-tests`. |
+| Live YouTube search | One request from the container returned 20 videos, all with CC for the subtitles filter (while researching). |
+| Physical phone: video suggestions, Tavily web question, "what's on screen" (including whether the video area shows in the screenshot) | Not verified yet; for Kien on the preview build. |
+| Live Claude, OpenRouter, OpenAI web search | Not verified (needs paid keys); request and reply shapes follow the services' documentation and are unit tested. |

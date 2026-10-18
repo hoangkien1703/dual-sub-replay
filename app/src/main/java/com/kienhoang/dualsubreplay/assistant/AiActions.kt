@@ -329,15 +329,21 @@ internal fun aiActionNote(action: AiAction): String =
         is AiAction.RestoreMemory -> "Put back the memory \"${action.memory.text}\""
         is AiAction.SearchYouTube -> "Search YouTube for \"${action.query}\""
         is AiAction.OpenVideo -> "Open the YouTube video ${action.videoId}"
-        is AiAction.FindVideos -> "Search YouTube for \"${action.query}\"" + if (action.subtitlesOnly) " (videos with subtitles)" else ""
-        is AiAction.WebSearch -> "Search the web for \"${action.query}\""
-        AiAction.LookAtScreen -> "Take a screenshot of the app"
         is AiAction.ChangeTranslation ->
             listOfNotNull(
                 action.googleTranslate?.let { if (it) "Turn Google Translate on" else "Translate on the device" },
                 action.targetLanguage?.let { "Translate to ${TranslationLanguages.displayName(it)}" },
             ).joinToString("; ")
-        else -> aiFullAccessActionNote(action)
+        else -> searchActionNote(action) ?: aiFullAccessActionNote(action)
+    }
+
+/** The searches' and the screenshot's notes; null for other actions. */
+private fun searchActionNote(action: AiAction): String? =
+    when (action) {
+        is AiAction.FindVideos -> "Search YouTube for \"${action.query}\"" + if (action.subtitlesOnly) " (videos with subtitles)" else ""
+        is AiAction.WebSearch -> "Search the web for \"${action.query}\""
+        AiAction.LookAtScreen -> "Take a screenshot of the app"
+        else -> null
     }
 
 internal sealed interface AiActionParse {
@@ -375,20 +381,31 @@ internal fun parseAiAction(
                 ?.let(YouTubeUrlParser::extractVideoId)
                 ?.let { AiActionParse.Valid(AiAction.OpenVideo(it)) }
                 ?: invalid("Give a YouTube video link or 11-character video ID.")
-        AI_FIND_VIDEOS_TOOL ->
-            text(arguments, "query", MAX_QUERY_CHARS)
-                ?.let { AiActionParse.Valid(AiAction.FindVideos(it, argument(arguments, "subtitles_only") == true)) }
-                ?: invalid("Give a search query of at most $MAX_QUERY_CHARS characters.")
-        AI_WEB_SEARCH_TOOL ->
-            text(arguments, "query", MAX_QUERY_CHARS)?.let { AiActionParse.Valid(AiAction.WebSearch(it)) }
-                ?: invalid("Give a search query of at most $MAX_QUERY_CHARS characters.")
-        AI_SCREEN_TOOL -> AiActionParse.Valid(AiAction.LookAtScreen)
         AI_TRANSLATION_TOOL -> parseTranslation(arguments)
         AI_SAVE_MEMORY_TOOL -> parseSaveMemory(arguments, memories)
         AI_FORGET_MEMORY_TOOL ->
             numberedMemory(arguments, "number", memories)?.let { AiActionParse.Valid(AiAction.ForgetMemory(it)) }
                 ?: invalid(memoryNumbers(memories))
-        else -> parseFullAccessAction(call.name, arguments) ?: invalid("There is no action called \"${call.name}\".")
+        else ->
+            parseSearchAction(call.name, arguments)
+                ?: parseFullAccessAction(call.name, arguments)
+                ?: invalid("There is no action called \"${call.name}\".")
+    }
+}
+
+/** The searches and the screenshot; null for other tools. */
+private fun parseSearchAction(
+    name: String,
+    arguments: JSONObject,
+): AiActionParse? {
+    val query = { text(arguments, "query", MAX_QUERY_CHARS) }
+    val noQuery = "Give a search query of at most $MAX_QUERY_CHARS characters."
+    return when (name) {
+        AI_FIND_VIDEOS_TOOL ->
+            query()?.let { AiActionParse.Valid(AiAction.FindVideos(it, argument(arguments, "subtitles_only") == true)) } ?: invalid(noQuery)
+        AI_WEB_SEARCH_TOOL -> query()?.let { AiActionParse.Valid(AiAction.WebSearch(it)) } ?: invalid(noQuery)
+        AI_SCREEN_TOOL -> AiActionParse.Valid(AiAction.LookAtScreen)
+        else -> null
     }
 }
 

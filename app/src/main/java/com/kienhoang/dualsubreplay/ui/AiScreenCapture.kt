@@ -9,6 +9,8 @@ import android.view.PixelCopy
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import com.kienhoang.dualsubreplay.assistant.AiAttachment
 import com.kienhoang.dualsubreplay.assistant.AiAttachmentKind
 import com.kienhoang.dualsubreplay.assistant.aiDataUrl
@@ -62,7 +64,7 @@ internal class AiScreenCapture {
             } ?: return null
         return withContext(Dispatchers.Default) {
             val (width, height) = aiScreenshotSize(bitmap.width, bitmap.height)
-            val scaled = if (width == bitmap.width) bitmap else Bitmap.createScaledBitmap(bitmap, width, height, true)
+            val scaled = if (width == bitmap.width) bitmap else bitmap.scale(width, height)
             val bytes =
                 ByteArrayOutputStream().use { out ->
                     scaled.compress(Bitmap.CompressFormat.JPEG, AI_SCREENSHOT_JPEG_QUALITY, out)
@@ -87,7 +89,7 @@ internal class AiScreenCapture {
         height: Int,
     ): Bitmap? {
         val window = activity.window ?: return null
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height)
         val copied =
             suspendCancellableCoroutine { continuation ->
                 try {
