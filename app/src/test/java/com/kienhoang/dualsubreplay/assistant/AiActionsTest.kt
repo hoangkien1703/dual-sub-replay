@@ -222,4 +222,39 @@ class AiActionsTest {
         val answer = AiChatMessage("a", AiRole.ASSISTANT, "Done!", 0, actions = records.take(1))
         assertEquals("Done!\n\n[App actions with this answer: Set text_size to 150 (the user undid it)]", answer.wireContent())
     }
+
+    @Test
+    fun fullAccessActionsAreCheckedAndNeverShowAKey() {
+        assertEquals(
+            AiAction.ChangeAiSetting(AiOwnSetting.SERVICE, "opencode_zen"),
+            parsed(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_service","value":"OpenCode Zen"}"""),
+        )
+        assertEquals(
+            AiAction.ChangeAiSetting(AiOwnSetting.SERVICE, "claude"),
+            parsed(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"service","value":"Anthropic"}"""),
+        )
+        assertEquals(
+            AiAction.ChangeAiSetting(AiOwnSetting.CHAT_HISTORY, "30_days"),
+            parsed(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_chat_history","value":"30 days"}"""),
+        )
+        assertEquals(
+            AiAction.ChangeAiSetting(AiOwnSetting.MODEL, "gemini-flash-latest"),
+            parsed(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_model","value":" gemini-flash-latest "}"""),
+        )
+        assertTrue(refused(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_model","value":"two words"}""").startsWith("ai_model takes"))
+        assertTrue(refused(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_enabled","value":"off"}""").startsWith("setting must be"))
+        assertEquals(
+            AiAction.RemoveApiKey(AiProvider.GEMINI, "fpzA"),
+            parsed(AI_REMOVE_KEY_TOOL, """{"service":"Google Gemini","ending":"••••fpzA"}"""),
+        )
+        assertEquals(AiAction.Reset(AiResetTarget.SUBTITLE_POSITIONS), parsed(AI_RESET_TOOL, """{"what":"subtitle positions"}"""))
+        assertEquals(AiAction.EditSavedWord("猫", "cat", null), parsed(AI_EDIT_WORD_TOOL, """{"word":"猫","meaning":"cat"}"""))
+        assertTrue(refused(AI_EDIT_WORD_TOOL, """{"word":"猫"}""").startsWith("Give a new meaning"))
+        val key = "sk-or-v1-FAKE-key-for-unit-tests-9xQe"
+        val add = parsed(AI_ADD_KEY_TOOL, """{"key":"$key"}""")
+        assertEquals(AiAction.AddApiKey(key), add)
+        assertEquals("Add an API key ending in 9xQe", aiActionNote(add))
+        assertTrue(key !in add.toString())
+        assertTrue(refused(AI_ADD_KEY_TOOL, """{"key":"short"}""").startsWith("Give the whole key"))
+    }
 }

@@ -59,8 +59,16 @@ class AiAnswerRunTest {
         history: List<AiChatMessage> = question(),
         app: AiAppActions? = this.app,
         offerTools: Boolean = true,
+        fullAccess: Boolean = false,
     ): AiAnswerRun =
-        AiAnswerRun(app, history, if (offerTools) AI_TOOLS + AI_MEMORY_TOOLS else emptyList(), memories, { "a${ids++}" }) {
+        AiAnswerRun(
+            app,
+            history,
+            if (offerTools) AI_TOOLS + AI_MEMORY_TOOLS + (if (fullAccess) AI_FULL_ACCESS_TOOLS else emptyList()) else emptyList(),
+            memories,
+            { "a${ids++}" },
+            fullAccess,
+        ) {
             messages,
             tools,
             ->
@@ -295,5 +303,70 @@ class AiAnswerRunTest {
         assertEquals("", run.text)
         assertEquals(1, run.records.size)
         assertFalse(run.toolsRefused)
+    }
+
+    @Test
+    fun aFullAccessActionIsRefusedWhileFullAccessIsOff() {
+        replies += AiReply("", listOf(call(AI_RESET_TOOL, """{"what":"all_settings"}""")))
+        val run = run()
+        assertTrue(app.performed.isEmpty())
+        assertTrue(run.records.isEmpty())
+        assertTrue(
+            requests
+                .last()
+                .first
+                .last()
+                .content
+                .startsWith("Not done: There is no action called"),
+        )
+    }
+
+    @Test
+    fun withFullAccessMostChangesRunAtOnceButResetsAndKeyRemovalsWait() {
+        replies +=
+            AiReply(
+                "",
+                listOf(
+                    call(AI_DELETE_WORD_TOOL, """{"word":"猫"}"""),
+                    call(AI_SEARCH_TOOL, """{"query":"cats"}"""),
+                    call(AI_RESET_TOOL, """{"what":"all_settings"}"""),
+                ),
+            )
+        val run = run(question("Delete 猫, find cat videos and reset everything"), fullAccess = true)
+        assertEquals(listOf(AiAction.DeleteSavedWord("猫"), AiAction.SearchYouTube("cats")), app.performed)
+        assertEquals(listOf<AiAction>(AiAction.Reset(AiResetTarget.ALL_SETTINGS)), run.waiting.values.toList())
+        replies += AiReply("", listOf(call(AI_REMOVE_KEY_TOOL, """{"service":"gemini","ending":"fpzA"}""")))
+        assertEquals(listOf<AiAction>(AiAction.RemoveApiKey(AiProvider.GEMINI, "fpzA")), run(fullAccess = true).waiting.values.toList())
+    }
+
+    @Test
+    fun withFullAccessChangesAfterReadingSubtitlesStillWait() {
+        replies += AiReply("", listOf(call(AI_LOOK_TOOL, "{}")))
+        replies += AiReply("", listOf(call(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_memory","value":"off"}""")))
+        val run = run(fullAccess = true)
+        assertTrue(app.performed.isEmpty())
+        assertEquals(listOf<AiAction>(AiAction.ChangeAiSetting(AiOwnSetting.MEMORY, "off")), run.waiting.values.toList())
+    }
+
+    @Test
+    fun readingSavedWordsCountsAsOtherText() {
+        replies += AiReply("", listOf(call(AI_FIND_WORDS_TOOL, """{"query":"cat"}""")))
+        replies += AiReply("", listOf(call(AI_DELETE_WORD_TOOL, """{"word":"cat"}""")))
+        val run = run(question("Delete the word cat"), fullAccess = true)
+        assertEquals(listOf<AiAction>(AiAction.FindSavedWords("cat")), app.performed)
+        assertEquals(listOf<AiAction>(AiAction.DeleteSavedWord("cat")), run.waiting.values.toList())
+    }
+
+    @Test
+    fun onlyAKeyTheUserTypedCanBeAdded() {
+        val key = "AIza-FAKE-typed-key-for-unit-tests-abcd"
+        replies += AiReply("", listOf(call(AI_ADD_KEY_TOOL, """{"key":"$key"}""")))
+        run(question("Please use my other key"), fullAccess = true)
+        assertTrue(app.performed.isEmpty())
+        replies += AiReply("", listOf(call(AI_ADD_KEY_TOOL, """{"key":"$key"}""")))
+        run(question("Add this key: $key"), fullAccess = true)
+        assertEquals(listOf<AiAction>(AiAction.AddApiKey(key)), app.performed)
+        // The key itself never goes back to the model or into the chip.
+        assertFalse(requests.last().first.any { key in it.content && it.role == AiRole.TOOL })
     }
 }

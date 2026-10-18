@@ -28,6 +28,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
+import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_TOOLS
 import com.kienhoang.dualsubreplay.assistant.AI_NEWS_VERSION
 import com.kienhoang.dualsubreplay.assistant.AI_SAVE_MEMORY_TOOL
@@ -49,6 +50,7 @@ import com.kienhoang.dualsubreplay.assistant.AiChatRequest
 import com.kienhoang.dualsubreplay.assistant.AiChatTransport
 import com.kienhoang.dualsubreplay.assistant.AiErrorKind
 import com.kienhoang.dualsubreplay.assistant.AiHistoryStorage
+import com.kienhoang.dualsubreplay.assistant.AiKeyAdded
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
 import com.kienhoang.dualsubreplay.assistant.AiMemory
 import com.kienhoang.dualsubreplay.assistant.AiMemoryChange
@@ -175,9 +177,9 @@ class AiAssistantPanelUiTest {
     fun tearDown() = scope.cancel()
 
     /** A key that already answered, as after a passed check. */
-    private fun checkedGeminiKey() {
-        keyStore.save(AiProvider.GEMINI, "AIza-FAKE-test-key-for-unit-tests-rstu")
-        keyStore.markChecked(AiProvider.GEMINI, aiCheckedSetup(settings, AiProvider.GEMINI))
+    private fun checkedGeminiKey(key: String = "AIza-FAKE-test-key-for-unit-tests-rstu") {
+        val id = (keyStore.add(AiProvider.GEMINI, key) as AiKeyAdded.Saved).id
+        keyStore.markChecked(AiProvider.GEMINI, id, aiCheckedSetup(settings, AiProvider.GEMINI))
     }
 
     private fun showTopBarAndPanel(state: DualSubUiState = fallback) {
@@ -609,7 +611,15 @@ class AiAssistantPanelUiTest {
             }
         }
         composeRule.onNodeWithTag("settings_section_ai_assistant").performScrollTo().performClick()
-        composeRule.onNodeWithTag("ai_provider_openrouter").performScrollTo().assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("ai_service_menu")
+            .performScrollTo()
+            .assertTextContains("Google Gemini")
+            .performClick()
+        composeRule.onNodeWithTag("ai_service_openrouter").assertIsDisplayed()
+        saveUiEvidence("ai_settings_service_list")
+        composeRule.onNodeWithTag("ai_service_openrouter").performClick()
+        composeRule.onNodeWithTag("ai_service_menu").assertTextContains("OpenRouter")
         composeRule.onNodeWithTag("ai_key_field").performScrollTo().performTextInput("sk-or-v1-abcdefghijklmnopqrstuvwxyz")
         composeRule.onNodeWithTag("ai_save_key").performScrollTo().performClick()
         composeRule.onNodeWithTag("ai_key_saved").performScrollTo().assertIsDisplayed()
@@ -625,6 +635,46 @@ class AiAssistantPanelUiTest {
             .performClick()
         assertFalse(settings.enabled)
         composeRule.onNodeWithTag("ai_key_field").assertDoesNotExist()
+    }
+
+    @Test
+    fun theSettingsPageListsEachKeyInSectionsAndFullAccessStartsOff() {
+        checkedGeminiKey()
+        checkedGeminiKey("AIza-FAKE-second-key-for-unit-tests-wxyz")
+        val preferences = InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", 0)
+        try {
+            showTopBarAndPanel(DualSubUiState())
+            composeRule.runOnIdle {
+                controller.openPanel()
+                controller.showPage(AiPanelPage.SETTINGS)
+            }
+            composeRule.onNodeWithTag("ai_service_menu").assertTextContains("Google Gemini")
+            composeRule.onNodeWithTag("ai_section_keys").assertTextContains("2 keys")
+            composeRule.onNodeWithTag("ai_key_field").assertDoesNotExist()
+            saveUiEvidence("ai_settings_sections")
+
+            composeRule.onNodeWithTag("ai_section_keys").performClick()
+            composeRule.onAllNodesWithTag("ai_key_row").assertCountEquals(2)
+            composeRule.onNodeWithText("Key ending in wxyz").assertIsDisplayed()
+            composeRule.onNodeWithTag("ai_test_connection").performScrollTo().assertTextEquals("Test all keys")
+            saveUiEvidence("ai_settings_keys")
+
+            composeRule.onNodeWithTag("ai_section_permissions").performScrollTo().performClick()
+            composeRule
+                .onNodeWithTag("ai_full_access_switch")
+                .performScrollTo()
+                .assertIsOff()
+                .performClick()
+            assertTrue(settings.fullAccess)
+            saveUiEvidence("ai_settings_full_access")
+
+            preferences.edit().putString(APP_COLOR_THEME_PREFERENCE, AppColorThemeOption.LIGHT.key).commit()
+            composeRule.onNodeWithTag("ai_section_keys").performScrollTo().performClick()
+            composeRule.waitForIdle()
+            saveUiEvidence("ai_settings_keys_light")
+        } finally {
+            preferences.edit().remove(APP_COLOR_THEME_PREFERENCE).commit()
+        }
     }
 
     /** Saves and forgets through the controller, as the app's actions do, with the app's English labels. */

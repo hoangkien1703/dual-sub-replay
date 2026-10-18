@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">AI 服务发来的回复应用无法读取。</string>
     <string name="ai_settings_enabled_title">AI 助手</string>
     <string name="ai_settings_enabled_description">在右上角显示 AI 按钮。关闭后不会向任何 AI 服务发送内容，问题会显示在原来的图标中。</string>
-    <string name="ai_settings_key_heading">AI 密钥（API key）</string>
-    <string name="ai_settings_key_saved">已保存 %1$s 密钥，结尾为 %2$s</string>
     <string name="ai_settings_remove_key">移除密钥</string>
     <string name="ai_settings_test">测试连接</string>
     <string name="ai_settings_test_passed">已连接，助手可以使用了。</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">对话只保存在这台手机上，永远不会被备份。关闭后，关闭应用时会忘记当前对话，并删除已保存的对话。</string>
     <string name="ai_settings_delete_history">立即删除对话记录</string>
     <string name="ai_settings_history_deleted">对话记录已删除。</string>
-    <string name="ai_settings_advanced">高级</string>
     <string name="ai_settings_service">AI 服务</string>
     <string name="ai_provider_custom">其他（兼容 OpenAI）</string>
     <string name="ai_settings_base_url">服务地址（https://…/v1）</string>
@@ -198,4 +195,32 @@
     <string name="ai_action_memory_save_button">保存</string>
     <string name="ai_action_memory_forget_button">忘记</string>
     <string name="ai_action_manage">管理</string>
+    <string name="ai_settings_keys_section">API 密钥</string>
+    <string name="ai_settings_model_section">模型与思考</string>
+    <string name="ai_settings_permissions_section">权限</string>
+    <string name="ai_settings_keys_none">还没有密钥</string>
+    <string name="ai_settings_service_choose">选择 AI 服务</string>
+    <string name="ai_settings_test_all">测试所有密钥</string>
+    <string name="ai_settings_keys_fallback">当某个密钥被拒绝、额度用完或达到上限时，助手会自动换用下一个密钥。</string>
+    <string name="ai_settings_keys_full">此服务已保存的密钥数量已达上限（%1$d 个）。请先删除一个再添加。</string>
+    <string name="ai_settings_add_key">添加另一个密钥</string>
+    <string name="ai_settings_key_in_use">可用 · 正在使用</string>
+    <string name="ai_settings_key_works">可用</string>
+    <string name="ai_settings_key_ending">以 %1$s 结尾的密钥</string>
+    <string name="ai_settings_thinking_title">思考</string>
+    <string name="ai_settings_full_access_title">给助手完全权限</string>
+    <string name="ai_settings_full_access_description">助手还可以更改自己的 AI 设置、添加或删除密钥、修改或删除已保存的单词，以及重置设置。搜索、更改翻译和重新加载也不再先询问。</string>
+    <string name="ai_settings_full_access_warning">删除密钥和重置设置仍需你点按确认。助手读取字幕、文件或错误信息后，所有更改都需你点按确认。</string>
+    <string name="ai_settings_permissions_default">默认关闭。关闭时，除了保存新单词，助手无法改动密钥、AI 设置或已保存的单词。</string>
+    <string name="ai_action_key_add">添加以 %1$s 结尾的密钥</string>
+    <string name="ai_action_key_added">已保存以 %2$s 结尾的 %1$s 密钥</string>
+    <string name="ai_action_key_already">以 %2$s 结尾的 %1$s 密钥已保存</string>
+    <string name="ai_action_key_remove">删除以 %2$s 结尾的 %1$s 密钥</string>
+    <string name="ai_action_key_remove_button">删除</string>
+    <string name="ai_action_words_find">已读取你保存的单词</string>
+    <string name="ai_action_word_delete">从词汇中删除“%1$s”</string>
+    <string name="ai_action_word_edit">修改词汇中的“%1$s”</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="other">%1$d 个密钥</item>
+    </plurals>
 </resources>

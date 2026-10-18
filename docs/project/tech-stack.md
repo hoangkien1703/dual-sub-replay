@@ -151,7 +151,9 @@ Paths below are relative to
   2026-10-08). It sends nothing without a key and a question, never runs on a project server or
   shared key, stores keys only Keystore-encrypted and outside backups, and treats subtitle and
   error text as quoted data in its prompts. Turning it off restores the translation problem icon.
-  It cannot change settings by itself; a later setting-change feature must ask for confirmation.
+  It changes the app only through its fixed tool list, with Undo or a tap to confirm; its own
+  settings, keys and saved words need the off-by-default Full access option. Each service may keep
+  several keys, and a failing key hands the request to the next one.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding
   completion for existing users; new users still see the guide. Preserve vocabulary,
   review scheduling, backup/import compatibility, and retained legacy clip files.

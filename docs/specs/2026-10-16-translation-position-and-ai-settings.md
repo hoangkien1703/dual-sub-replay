@@ -41,7 +41,9 @@ several screens (setup, guide, transcript cards) used fixed hex colors instead o
 - No switch button on the player screen (owner decision for #115).
 - The assistant still can't touch its own AI settings, API keys, saved words or memories outside
   `save_memory`/`forget_memory`, language downloads, or "Reset all settings to defaults"
-  (owner rule 2026-10-08; reset can't be undone).
+  (owner rule 2026-10-08; reset can't be undone). Since 2026-10-18 the off-by-default Full access
+  option lifts this for everything except memory and language downloads
+  ([redesign spec](2026-10-18-ai-settings-redesign-keys-and-full-access.md)).
 - Saved overlay and CC-button positions (set by dragging) and "Reset subtitle positions" stay
   manual: they are drag results, not settings.
 

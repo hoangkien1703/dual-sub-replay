@@ -53,8 +53,12 @@ private class FakeTransport : AiChatTransport {
     /** Thrown once each, before [failure], as a busy service would. */
     val failOnce = ArrayDeque<AiChatException>()
 
+    /** Thrown for every request with that key, as for a key the service rejects or that ran out. */
+    val failForKey = mutableMapOf<String, AiChatException>()
+
     override suspend fun complete(request: AiChatRequest): AiReply {
         requests += request
+        failForKey[request.apiKey]?.let { throw it }
         replies.removeFirstOrNull()?.let { return it }
         failOnce.removeFirstOrNull()?.let { throw it }
         failure?.let { throw it }
@@ -62,9 +66,23 @@ private class FakeTransport : AiChatTransport {
     }
 }
 
+/** The one-key calls these tests were written with; they act on the service's first key. */
+private fun AiKeyStore.save(
+    provider: AiProvider,
+    apiKey: String,
+): String = (add(provider, apiKey) as AiKeyAdded.Saved).id
+
+private fun AiKeyStore.markChecked(
+    provider: AiProvider,
+    setup: String,
+) = markChecked(provider, keys(provider).first().id, setup)
+
+private fun AiKeyStore.checkedSetup(provider: AiProvider): String? = keys(provider).firstOrNull()?.checkedSetup
+
 class AiAssistantControllerTest {
     private val geminiKey = "AIza-FAKE-test-key-for-unit-tests-rstu"
     private val openAiKey = "sk-proj-abcdefghijklmnop1234"
+    private val secondGeminiKey = "AIza-FAKE-second-key-for-unit-tests-wxyz"
     private val day = 24L * 60 * 60 * 1000
     private var now = 100 * day
     private var ids = 0
@@ -219,7 +237,7 @@ class AiAssistantControllerTest {
         val state = controller.state.value
         assertEquals(AiProvider.GEMINI, state.settings.provider)
         assertEquals(AiProvider.GEMINI, settings.value.provider)
-        assertEquals(mapOf(AiProvider.GEMINI to "rstu"), state.keyHints)
+        assertEquals(mapOf(AiProvider.GEMINI to listOf("rstu")), state.keys.mapValues { (_, keys) -> keys.map { it.hint } })
         assertTrue(state.keyChecked)
         assertTrue(state.ready)
         assertEquals(AiConnectionTest.Passed, state.connectionTest)
@@ -260,7 +278,7 @@ class AiAssistantControllerTest {
         val controller = controller()
         assertNull(controller.saveKey("hello"))
         assertTrue(
-            controller.state.value.keyHints
+            controller.state.value.keys
                 .isEmpty(),
         )
         assertTrue(transport.requests.isEmpty())
@@ -539,11 +557,126 @@ class AiAssistantControllerTest {
     fun removingAKeyForgetsIt() {
         checkedGeminiKey()
         val controller = controller()
-        controller.removeKey(AiProvider.GEMINI)
+        controller.removeKey(AiProvider.GEMINI, keyStore.keys(AiProvider.GEMINI).single().id)
         assertFalse(controller.state.value.hasKey)
         assertFalse(controller.state.value.ready)
-        assertEquals(StoredAiKey.Missing, keyStore.load(AiProvider.GEMINI))
+        assertTrue(keyStore.keys(AiProvider.GEMINI).isEmpty())
+    }
+
+    @Test
+    fun aKeyThatHitsItsLimitHandsTheQuestionToTheNextKey() {
+        checkedGeminiKey()
+        val second = keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        val controller = controller()
+        transport.failForKey[geminiKey] = AiChatException(AiErrorKind.RATE_LIMITED, "Quota exceeded.")
+        controller.send("Hi", "guide")
+        var state = controller.state.value
+        assertNull(state.failure)
+        assertEquals(2, state.messages.size)
+        assertEquals(listOf(geminiKey, secondGeminiKey), transport.requests.map { it.apiKey })
+        assertEquals(second, state.keyInUse(AiProvider.GEMINI))
+        // The key that answered is checked now, and the next question tries it first.
+        assertEquals(aiCheckedSetup(settings.value, AiProvider.GEMINI), keyStore.keys(AiProvider.GEMINI).last().checkedSetup)
+        controller.send("Again", "guide")
+        state = controller.state.value
+        assertEquals(secondGeminiKey, transport.requests.last().apiKey)
+        assertEquals(3, transport.requests.size)
+        assertEquals(4, state.messages.size)
+    }
+
+    @Test
+    fun aRejectedKeyLosesItsCheckWhileAnotherKeyKeepsTheChatOpen() {
+        checkedGeminiKey()
+        keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        val controller = controller()
+        transport.failForKey[geminiKey] = AiChatException(AiErrorKind.INVALID_KEY, "API key expired.")
+        controller.send("Hi", "guide")
+        val state = controller.state.value
+        assertNull(state.failure)
+        assertTrue(state.ready)
         assertNull(keyStore.checkedSetup(AiProvider.GEMINI))
+        assertEquals(listOf(null, aiCheckedSetup(settings.value, AiProvider.GEMINI)), state.currentKeys.map { it.checkedSetup })
+    }
+
+    @Test
+    fun whenEveryKeyFailsTheLastKeysErrorShows() {
+        checkedGeminiKey()
+        keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        val controller = controller()
+        transport.failForKey[geminiKey] = AiChatException(AiErrorKind.RATE_LIMITED)
+        transport.failForKey[secondGeminiKey] = AiChatException(AiErrorKind.NO_CREDIT, "No credit left.")
+        controller.send("Hi", "guide")
+        assertEquals(AiFailure(AiErrorKind.NO_CREDIT, "No credit left."), controller.state.value.failure)
+        assertEquals(2, transport.requests.size)
+        // A problem of the service itself is not tried with the other keys.
+        transport.failForKey.clear()
+        transport.failure = AiChatException(AiErrorKind.TIMEOUT)
+        controller.retry("guide")
+        assertEquals(
+            AiErrorKind.TIMEOUT,
+            controller.state.value.failure
+                ?.kind,
+        )
+        assertEquals(3, transport.requests.size)
+    }
+
+    @Test
+    fun testingChecksEveryKeyAndAWorkingOneTakesOver() {
+        keyStore.save(AiProvider.GEMINI, geminiKey)
+        val second = keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        val first = keyStore.keys(AiProvider.GEMINI).first().id
+        val controller = controller()
+        transport.failForKey[geminiKey] = AiChatException(AiErrorKind.INVALID_KEY, "API key not valid.")
+        controller.testConnection()
+        val state = controller.state.value
+        assertEquals(AiConnectionTest.Failed(AiFailure(AiErrorKind.INVALID_KEY, "API key not valid.")), state.keyTests[first])
+        assertEquals(AiConnectionTest.Passed, state.keyTests[second])
+        assertEquals(AiConnectionTest.Passed, state.connectionTest)
+        assertTrue(state.ready)
+        assertEquals(second, state.keyInUse(AiProvider.GEMINI))
+    }
+
+    @Test
+    fun aSecondPastedKeyIsAddedAndCheckedOnItsOwn() {
+        checkedGeminiKey()
+        val controller = controller()
+        controller.saveKey(secondGeminiKey)
+        val state = controller.state.value
+        assertEquals(listOf("rstu", "wxyz"), state.currentKeys.map { it.hint })
+        assertEquals(listOf(secondGeminiKey), transport.requests.map { it.apiKey })
+        assertTrue(state.ready)
+        // Pasting the same key again adds no copy.
+        controller.saveKey(secondGeminiKey)
+        assertEquals(2, controller.state.value.currentKeys.size)
+    }
+
+    @Test
+    fun fullAccessToolsAndTheAssistantsOwnSettingsAreOfferedOnlyWhenItIsOn() {
+        checkedGeminiKey()
+        val controller = controller().also { it.appActions = RecordingApp() }
+        controller.send("Hi", "guide")
+        val offOffered =
+            transport.requests
+                .last()
+                .tools
+                .map { it.name }
+        assertFalse(AI_RESET_TOOL in offOffered)
+        assertFalse(
+            transport.requests
+                .last()
+                .messages
+                .first()
+                .content
+                .contains("Saved API keys"),
+        )
+        controller.setFullAccess(true)
+        assertTrue(settings.value.fullAccess)
+        controller.send("Again", "guide")
+        val request = transport.requests.last()
+        assertTrue(request.tools.map { it.name }.containsAll(AI_FULL_ACCESS_TOOLS.map { it.name }))
+        val prompt = request.messages.first().content
+        assertTrue(prompt.contains("- gemini: rstu (in use)"))
+        assertFalse(prompt.contains(geminiKey))
     }
 
     @Test

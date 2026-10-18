@@ -61,8 +61,7 @@ internal interface AiMemoryKeeper {
 
 private class LoadedAiState(
     val settings: AiAssistantSettings,
-    val keyHints: Map<AiProvider, String>,
-    val checkedSetups: Map<AiProvider, String>,
+    val keys: Map<AiProvider, List<AiSavedKey>>,
     val savedChats: List<AiChat>,
     val memory: AiMemoryData,
 )
@@ -152,6 +151,13 @@ internal val AI_BUSY_RETRY_DELAYS_MS = listOf(1_000L, 3_000L)
 private val BUSY_PROBLEMS = setOf(AiErrorKind.SERVER, AiErrorKind.RATE_LIMITED)
 
 /**
+ * Problems of one key, not of the service: the same request goes to the service's next key at
+ * once. A rate limit counts too, since free limits are per key.
+ */
+private val KEY_SWITCH_PROBLEMS =
+    setOf(AiErrorKind.NO_KEY, AiErrorKind.KEY_UNREADABLE, AiErrorKind.INVALID_KEY, AiErrorKind.NO_CREDIT, AiErrorKind.RATE_LIMITED)
+
+/**
  * OpenRouter's free model picker chooses at random and, for a question with a picture, picks a
  * safety checker about two times in five, so the same question is asked again at once.
  */
@@ -172,10 +178,12 @@ internal data class AiPendingQuestion(
 
 internal data class AiAssistantUiState(
     val settings: AiAssistantSettings = AiAssistantSettings(),
-    /** The last characters of each saved key; a service without an entry has no key. */
-    val keyHints: Map<AiProvider, String> = emptyMap(),
-    /** The setup each saved key last answered with ([aiCheckedSetup]); a key without an entry is unchecked. */
-    val checkedSetups: Map<AiProvider, String> = emptyMap(),
+    /** Each service's saved keys, in the order they were added; a service without an entry has no key. */
+    val keys: Map<AiProvider, List<AiSavedKey>> = emptyMap(),
+    /** The key each service answered with last; questions try it first. Lost when the app closes. */
+    val keysInUse: Map<AiProvider, String> = emptyMap(),
+    /** The last check of each of the chosen service's keys, by key id; cleared when the service changes. */
+    val keyTests: Map<String, AiConnectionTest> = emptyMap(),
     val panelOpen: Boolean = false,
     val page: AiPanelPage = AiPanelPage.CHAT,
     /** Saved chats, newest first. Empty when history is off. */
@@ -197,13 +205,24 @@ internal data class AiAssistantUiState(
     /** A question asked from elsewhere in the app (the word card's grammar button), sent once the panel can. */
     val pendingQuestion: AiPendingQuestion? = null,
 ) {
-    val hasKey: Boolean get() = settings.provider in keyHints
+    /** The chosen service's keys. */
+    val currentKeys: List<AiSavedKey> get() = keys[settings.provider].orEmpty()
+    val hasKey: Boolean get() = currentKeys.isNotEmpty()
     val messages: List<AiChatMessage> get() = chat?.messages.orEmpty()
     val addressValid: Boolean get() = chatCompletionsUrl(settings.baseUrlFor(settings.provider)) != null
 
-    /** The saved key answered through the current service, address and model. */
+    /** A saved key answered through the current service, address and model. */
     val keyChecked: Boolean
-        get() = hasKey && checkedSetups[settings.provider] == aiCheckedSetup(settings, settings.provider)
+        get() = aiCheckedSetup(settings, settings.provider).let { setup -> currentKeys.any { it.checkedSetup == setup } }
+
+    /** The key [provider]'s questions try first: the one that answered last, else the first checked one, else the first. */
+    fun keyInUse(provider: AiProvider): String? {
+        val saved = keys[provider].orEmpty()
+        val setup = aiCheckedSetup(settings, provider)
+        return keysInUse[provider]?.takeIf { id -> saved.any { it.id == id } }
+            ?: saved.firstOrNull { it.checkedSetup == setup }?.id
+            ?: saved.firstOrNull()?.id
+    }
 
     /** The assistant can be asked: on, with a key that has answered through the current setup. */
     val ready: Boolean
@@ -258,22 +277,24 @@ internal class AiAssistantController(
         scope.launch {
             val loaded =
                 withContext(io) {
-                    val hints = AiProvider.entries.mapNotNull { provider -> keyStore.hint(provider)?.let { provider to it } }.toMap()
+                    val keys = AiProvider.entries.associateWith(keyStore::keys).filterValues { it.isNotEmpty() }
                     val checked =
-                        AiProvider.entries.mapNotNull { provider -> keyStore.checkedSetup(provider)?.let { provider to it } }.toMap()
+                        keys
+                            .mapNotNull { (provider, saved) ->
+                                saved.firstNotNullOfOrNull { it.checkedSetup }?.let { provider to it }
+                            }.toMap()
                     val saved = settingsStorage.load()
                     val settings = aiModelsKeptFromChecks(saved, checked)
                     if (settings != saved) settingsStorage.save(settings)
                     val stored = historyStorage.load()
                     val kept = keptAiChats(stored, settings.historyRetention, clock())
                     if (kept != stored) historyStorage.save(kept)
-                    LoadedAiState(settings, hints, checked, kept, memoryStorage.load())
+                    LoadedAiState(settings, keys, kept, memoryStorage.load())
                 }
             _state.update {
                 it.copy(
                     settings = loaded.settings,
-                    keyHints = loaded.keyHints,
-                    checkedSetups = loaded.checkedSetups,
+                    keys = loaded.keys,
                     savedChats = loaded.savedChats,
                     memory = loaded.memory,
                 )
@@ -363,48 +384,58 @@ internal class AiAssistantController(
 
     fun selectProvider(provider: AiProvider) {
         if (provider == _state.value.settings.provider) return
-        testJob?.cancel()
+        stopTests()
         modelJob?.cancel()
         updateSettings { it.copy(provider = provider) }
-        _state.update { it.copy(connectionTest = AiConnectionTest.Idle, failure = null, modelCheck = null) }
+        _state.update { it.copy(connectionTest = AiConnectionTest.Idle, keyTests = emptyMap(), failure = null, modelCheck = null) }
     }
+
+    /** Off by default: on, the assistant may also change its own settings, keys, saved words and reset settings. */
+    fun setFullAccess(enabled: Boolean) = updateSettings { it.copy(fullAccess = enabled) }
 
     fun setThinking(thinking: AiThinking) = updateSettings { it.copy(thinking = thinking) }
 
     /**
-     * Switches the chat to [model] once it has answered one tiny request with the saved key, so a
+     * Switches the chat to [model] once it has answered one tiny request with a saved key, so a
      * model the service does not offer never breaks a working chat; the current model keeps
      * answering meanwhile. A model that fails stays unchosen, and [AiAssistantUiState.modelCheck] says why.
      */
     fun chooseModel(model: String) {
         val name = model.trim()
         val settings = _state.value.settings
-        val provider = settings.provider
         modelJob?.cancel()
-        if (name.isEmpty() || name == settings.modelFor(provider)) {
+        if (name.isEmpty() || name == settings.modelFor(settings.provider)) {
             _state.update { it.copy(modelCheck = null) }
             return
         }
-        val candidate = settings.copy(models = settings.models + (provider to name))
-        val setup = aiCheckedSetup(candidate, provider)
-        val generation = keyGeneration
         _state.update { it.copy(modelCheck = AiModelCheck.Checking(name)) }
         modelJob =
             scope.launch {
-                try {
-                    request(candidate, KEY_CHECK_MESSAGES, AI_TEST_TIMEOUT_MS)
-                } catch (error: AiChatException) {
-                    _state.update { it.copy(modelCheck = AiModelCheck.Failed(name, AiFailure(error.kind, error.detail))) }
-                    return@launch
-                }
-                if (generation != keyGeneration || _state.value.settings.provider != provider) {
-                    _state.update { it.copy(modelCheck = null) }
-                    return@launch
-                }
-                updateSettings { it.copy(models = it.models + (provider to name)) }
-                _state.update { it.copy(checkedSetups = it.checkedSetups + (provider to setup), modelCheck = null) }
-                withContext(io) { if (generation == keyGeneration) keyStore.markChecked(provider, setup) }
+                val failure = switchModel(name)
+                _state.update { it.copy(modelCheck = failure?.let { AiModelCheck.Failed(name, it) }) }
             }
+    }
+
+    /**
+     * Tries [model] with one tiny request and switches the chosen service to it when it answers.
+     * Returns why it did not answer, or null; a check overtaken by a new key or service changes nothing.
+     */
+    suspend fun switchModel(model: String): AiFailure? {
+        val name = model.trim()
+        val settings = _state.value.settings
+        val provider = settings.provider
+        val candidate = settings.copy(models = settings.models + (provider to name))
+        val setup = aiCheckedSetup(candidate, provider)
+        val generation = keyGeneration
+        try {
+            request(candidate, KEY_CHECK_MESSAGES, AI_TEST_TIMEOUT_MS, markChecked = false)
+        } catch (error: AiChatException) {
+            return AiFailure(error.kind, error.detail)
+        }
+        if (generation != keyGeneration || _state.value.settings.provider != provider) return null
+        updateSettings { it.copy(models = it.models + (provider to name)) }
+        _state.value.keyInUse(provider)?.let { markKeyChecked(provider, it, setup) }
+        return null
     }
 
     fun dismissModelCheck() = _state.update { it.copy(modelCheck = null) }
@@ -429,9 +460,10 @@ internal class AiAssistantController(
             scope.launch {
                 val result =
                     try {
-                        val key = unlockKey(provider)
                         val models =
-                            withContext(io) { aiCall { modelLister.listModels(settings.baseUrlFor(provider), key, provider.format) } }
+                            withEachKey(provider, setup = null) { key, _ ->
+                                withContext(io) { aiCall { modelLister.listModels(settings.baseUrlFor(provider), key, provider.format) } }
+                            }
                         AiModelList.Loaded(provider, models.filter { aiModelCanChat(provider, it.id) })
                     } catch (error: AiChatException) {
                         AiModelList.Failed(AiFailure(error.kind, error.detail))
@@ -449,72 +481,127 @@ internal class AiAssistantController(
     fun setCustomBaseUrl(url: String) = changeSetup { it.copy(customBaseUrl = url) }
 
     /**
-     * Saves a pasted or typed key, encrypted. A key whose start names its service switches to that
-     * service, so nobody has to know which one they have. Returns the service, or null when the
-     * text cannot be a key.
+     * Saves a pasted or typed key, encrypted, after the service's other keys. A key whose start
+     * names its service switches to that service, so nobody has to know which one they have.
+     * Returns the service, or null when the text cannot be a key.
      */
     fun saveKey(text: String): AiProvider? {
-        if (!looksLikeAiKey(text)) return null
-        val key = text.trim()
-        val provider = aiProviderForKey(key, _state.value.settings.provider)
-        keyGeneration++
-        selectProvider(provider)
-        testJob?.cancel()
-        _state.update {
-            it.copy(checkedSetups = it.checkedSetups - provider, connectionTest = AiConnectionTest.Testing, failure = null)
-        }
-        scope.launch {
-            withContext(io) { keyStore.save(provider, key) }
-            _state.update { it.copy(keyHints = it.keyHints + (provider to key.takeLast(4))) }
-            testConnection()
-        }
+        val provider = prepareKeySave(text) ?: return null
+        scope.launch { storeKey(provider, text.trim()) }
         return provider
     }
 
-    fun removeKey(provider: AiProvider) {
+    /** [saveKey] for the assistant's full access: waits until the key is saved and returns where. */
+    suspend fun addKey(text: String): Pair<AiProvider, AiKeyAdded>? {
+        val provider = prepareKeySave(text) ?: return null
+        return provider to storeKey(provider, text.trim())
+    }
+
+    private fun prepareKeySave(text: String): AiProvider? {
+        if (!looksLikeAiKey(text)) return null
+        val provider = aiProviderForKey(text.trim(), _state.value.settings.provider)
         keyGeneration++
-        if (provider == _state.value.settings.provider) testJob?.cancel()
-        _state.update {
-            it.copy(keyHints = it.keyHints - provider, checkedSetups = it.checkedSetups - provider, connectionTest = AiConnectionTest.Idle)
+        selectProvider(provider)
+        stopTests()
+        _state.update { it.copy(connectionTest = AiConnectionTest.Testing, failure = null) }
+        return provider
+    }
+
+    /** Saves [key] and checks it; a service that already has [MAX_AI_KEYS_PER_SERVICE] keys keeps them. */
+    private suspend fun storeKey(
+        provider: AiProvider,
+        key: String,
+    ): AiKeyAdded {
+        val added = withContext(io) { keyStore.add(provider, key) }
+        val saved = withContext(io) { keyStore.keys(provider) }
+        _state.update { it.copy(keys = it.keys + (provider to saved)) }
+        when (added) {
+            is AiKeyAdded.Saved -> testKeys(added.id)
+            AiKeyAdded.Full -> _state.update { it.copy(connectionTest = AiConnectionTest.Idle) }
         }
-        scope.launch { withContext(io) { keyStore.remove(provider) } }
+        return added
+    }
+
+    fun removeKey(
+        provider: AiProvider,
+        id: String,
+    ) {
+        keyGeneration++
+        if (provider == _state.value.settings.provider) stopTests()
+        _state.update { current ->
+            val rest = current.keys[provider].orEmpty().filterNot { it.id == id }
+            current.copy(
+                keys = if (rest.isEmpty()) current.keys - provider else current.keys + (provider to rest),
+                keysInUse = if (current.keysInUse[provider] == id) current.keysInUse - provider else current.keysInUse,
+                keyTests = current.keyTests - id,
+                connectionTest = AiConnectionTest.Idle,
+            )
+        }
+        scope.launch { withContext(io) { keyStore.remove(provider, id) } }
     }
 
     /**
-     * Asks for one word with the chosen service, key and model. Chat opens only after this passes;
-     * a wrong key, model or address makes the key unchecked again, while a network hiccup does not.
+     * Asks for one word with each of the chosen service's keys and its model. Chat opens only after
+     * one passes; a wrong key, model or address makes that key unchecked again, while a network
+     * hiccup does not.
      */
-    fun testConnection() {
-        testJob?.cancel()
-        val settings = _state.value.settings
+    fun testConnection() = testKeys(onlyId = null)
+
+    private fun testKeys(onlyId: String?) {
+        stopTests()
+        val current = _state.value
+        val settings = current.settings
         val provider = settings.provider
         val setup = aiCheckedSetup(settings, provider)
         val generation = keyGeneration
-        _state.update { it.copy(connectionTest = AiConnectionTest.Testing) }
+        val targets = current.currentKeys.filter { onlyId == null || it.id == onlyId }
+        val checking = targets.associate { it.id to AiConnectionTest.Testing }
+        _state.update { it.copy(connectionTest = AiConnectionTest.Testing, keyTests = it.keyTests + checking) }
         testJob =
             scope.launch {
-                val result =
-                    try {
-                        request(settings, KEY_CHECK_MESSAGES, AI_TEST_TIMEOUT_MS)
-                        AiConnectionTest.Passed
-                    } catch (error: AiChatException) {
-                        // A key the service rejects fails before it is busy, so busy still means the key works.
-                        if (error.kind in KEY_WORKS_PROBLEMS) {
-                            AiConnectionTest.Passed
-                        } else {
-                            AiConnectionTest.Failed(AiFailure(error.kind, error.detail))
+                val results =
+                    targets.map { saved ->
+                        val result = testKey(settings, saved.id)
+                        if (generation != keyGeneration) return@launch
+                        when {
+                            result == AiConnectionTest.Passed -> markKeyChecked(provider, saved.id, setup)
+                            result is AiConnectionTest.Failed && result.failure.kind in SETUP_PROBLEMS -> forgetKeyCheck(provider, saved.id)
                         }
+                        _state.update { it.copy(keyTests = it.keyTests + (saved.id to result)) }
+                        result
                     }
-                if (generation != keyGeneration) return@launch
-                when {
-                    result == AiConnectionTest.Passed -> {
-                        _state.update { it.copy(checkedSetups = it.checkedSetups + (provider to setup)) }
-                        withContext(io) { if (generation == keyGeneration) keyStore.markChecked(provider, setup) }
-                    }
-                    result is AiConnectionTest.Failed && result.failure.kind in SETUP_PROBLEMS -> forgetCheck(provider)
+                val tested = targets.zip(results)
+                val passed = tested.firstOrNull { (_, result) -> result == AiConnectionTest.Passed }?.first
+                val inUse = _state.value.keyInUse(provider)
+                // A key in use that failed hands over to one that passed.
+                if (passed != null && tested.any { (key, result) -> key.id == inUse && result != AiConnectionTest.Passed }) {
+                    _state.update { it.copy(keysInUse = it.keysInUse + (provider to passed.id)) }
                 }
-                _state.update { it.copy(connectionTest = result) }
+                val overall =
+                    when {
+                        passed != null -> AiConnectionTest.Passed
+                        else -> results.firstOrNull() ?: AiConnectionTest.Failed(AiFailure(AiErrorKind.NO_KEY))
+                    }
+                _state.update { it.copy(connectionTest = overall) }
             }
+    }
+
+    /** One key's check; a key the service rejects fails before it is busy, so busy still means the key works. */
+    private suspend fun testKey(
+        settings: AiAssistantSettings,
+        id: String,
+    ): AiConnectionTest =
+        try {
+            requestWithKey(settings, id, KEY_CHECK_MESSAGES, AI_TEST_TIMEOUT_MS)
+            AiConnectionTest.Passed
+        } catch (error: AiChatException) {
+            if (error.kind in KEY_WORKS_PROBLEMS) AiConnectionTest.Passed else AiConnectionTest.Failed(AiFailure(error.kind, error.detail))
+        }
+
+    /** Stops a running check; keys it had not reached yet lose their "checking" state. */
+    private fun stopTests() {
+        testJob?.cancel()
+        _state.update { current -> current.copy(keyTests = current.keyTests.filterValues { it != AiConnectionTest.Testing }) }
     }
 
     fun setHistoryRetention(retention: ChatHistoryRetention) {
@@ -611,12 +698,15 @@ internal class AiAssistantController(
         val tools =
             when {
                 setup in noToolSetups -> emptyList()
-                memoryUse == AiMemoryUse.ON -> AI_TOOLS + AI_MEMORY_TOOLS
-                else -> AI_TOOLS
+                else ->
+                    AI_TOOLS + (if (memoryUse == AiMemoryUse.ON) AI_MEMORY_TOOLS else emptyList()) +
+                        (if (settings.fullAccess) AI_FULL_ACCESS_TOOLS else emptyList())
             }
-        val prompt = systemPrompt + aiMemoryPrompt(current.memory.instructions, memories, memoryUse)
+        val prompt =
+            systemPrompt + aiMemoryPrompt(current.memory.instructions, memories, memoryUse) +
+                (if (settings.fullAccess) aiFullAccessPrompt(current) else "")
         val run =
-            AiAnswerRun(appActions, history, tools, memories, newId) { messages, offered ->
+            AiAnswerRun(appActions, history, tools, memories, newId, settings.fullAccess) { messages, offered ->
                 request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered)
             }
         _state.update { it.copy(sending = true, failure = null, stopped = false) }
@@ -630,13 +720,13 @@ internal class AiAssistantController(
                     if (run.records.isNotEmpty()) addAnswer(run, chatId)
                     val failure = AiFailure(error.kind, error.detail)
                     _state.update { it.copy(sending = false, failure = failure) }
-                    // A key that stopped working goes back to the check card, which says why, unless
-                    // the key was replaced while the question was on its way.
-                    if (error.kind == AiErrorKind.INVALID_KEY && generation == keyGeneration) {
-                        forgetCheck(settings.provider)
-                        if (_state.value.settings.provider == settings.provider) {
-                            _state.update { it.copy(connectionTest = AiConnectionTest.Failed(failure)) }
-                        }
+                    // Once no key works any more, the chat goes back to the check card, which says why,
+                    // unless a key was added or removed while the question was on its way.
+                    val latest = _state.value
+                    if (error.kind == AiErrorKind.INVALID_KEY && generation == keyGeneration &&
+                        latest.settings.provider == settings.provider && !latest.keyChecked
+                    ) {
+                        _state.update { it.copy(connectionTest = AiConnectionTest.Failed(failure)) }
                     }
                 } catch (cancelled: CancellationException) {
                     if (run.records.isNotEmpty()) {
@@ -720,28 +810,89 @@ internal class AiAssistantController(
         current.copy(chat = chat.copy(messages = messages))
     }
 
-    /** Unlocks the key for this one request only; it is never kept in the state. */
+    /**
+     * Asks the service, trying its keys from the one in use until one answers. Each key is unlocked
+     * for its one request only and never kept in the state. [markChecked] records the setup on the
+     * key that answered.
+     */
     private suspend fun request(
         settings: AiAssistantSettings,
         messages: List<AiWireMessage>,
         timeoutMs: Long,
         reasoningEffort: String? = null,
         tools: List<AiTool> = emptyList(),
+        markChecked: Boolean = true,
     ): AiReply {
         val provider = settings.provider
         val baseUrl = settings.baseUrlFor(provider)
         if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
-        val key = unlockKey(provider)
-        val request = AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort, tools, provider.format)
+        val setup = aiCheckedSetup(settings, provider).takeIf { markChecked }
+        return withEachKey(provider, setup) { key, last ->
+            complete(
+                AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, reasoningEffort, tools, provider.format),
+                waitWhenRateLimited = last,
+            )
+        }
+    }
+
+    /** One key only, for its check. */
+    private suspend fun requestWithKey(
+        settings: AiAssistantSettings,
+        id: String,
+        messages: List<AiWireMessage>,
+        timeoutMs: Long,
+    ): AiReply {
+        val provider = settings.provider
+        val baseUrl = settings.baseUrlFor(provider)
+        if (chatCompletionsUrl(baseUrl) == null) throw AiChatException(AiErrorKind.BAD_ADDRESS)
+        val key = unlockKey(provider, id)
+        return complete(AiChatRequest(baseUrl, settings.modelFor(provider), key, messages, timeoutMs, null, emptyList(), provider.format))
+    }
+
+    /**
+     * Runs [call] with [provider]'s keys, the one in use first, until one answers; a key that is
+     * rejected, out of credit or rate-limited hands over to the next at once. The key that answers
+     * is in use from then on. When every key fails, the last key's error is thrown.
+     */
+    private suspend fun <T> withEachKey(
+        provider: AiProvider,
+        setup: String?,
+        call: suspend (key: String, last: Boolean) -> T,
+    ): T {
+        val current = _state.value
+        val saved = current.keys[provider].orEmpty()
+        val start = saved.indexOfFirst { it.id == current.keyInUse(provider) }.coerceAtLeast(0)
+        val ordered = saved.drop(start) + saved.take(start)
+        var failure = AiChatException(AiErrorKind.NO_KEY)
+        for ((index, key) in ordered.withIndex()) {
+            try {
+                val result = call(unlockKey(provider, key.id), index == ordered.lastIndex)
+                keyAnswered(provider, key.id, setup)
+                return result
+            } catch (error: AiChatException) {
+                if (error.kind !in KEY_SWITCH_PROBLEMS) throw error
+                if (error.kind == AiErrorKind.INVALID_KEY) forgetKeyCheck(provider, key.id)
+                failure = error
+            }
+        }
+        throw failure
+    }
+
+    /** Asks again while the model is busy; a rate limit waits only when no other key is left to try. */
+    private suspend fun complete(
+        request: AiChatRequest,
+        waitWhenRateLimited: Boolean = true,
+    ): AiReply {
         val busyWaits = busyRetryDelaysMs.iterator()
         var wrongModelAnswers = 0
         while (true) {
             try {
                 return withContext(io) { aiCall { transport.complete(request) } }
             } catch (error: AiChatException) {
+                val waits = error.kind in BUSY_PROBLEMS && (error.kind != AiErrorKind.RATE_LIMITED || waitWhenRateLimited)
                 when {
                     error.kind == AiErrorKind.NOT_A_CHAT_MODEL && wrongModelAnswers++ < AI_NOT_A_CHAT_MODEL_RETRIES -> Unit
-                    error.kind in BUSY_PROBLEMS && busyWaits.hasNext() -> delay(busyWaits.next())
+                    waits && busyWaits.hasNext() -> delay(busyWaits.next())
                     else -> throw error
                 }
             }
@@ -756,19 +907,60 @@ internal class AiAssistantController(
             throw aiConnectionFailure(error)
         }
 
-    private suspend fun unlockKey(provider: AiProvider): String =
-        when (val stored = withContext(io) { keyStore.load(provider) }) {
+    private suspend fun unlockKey(
+        provider: AiProvider,
+        id: String,
+    ): String =
+        when (val stored = withContext(io) { keyStore.load(provider, id) }) {
             is StoredAiKey.Found -> stored.key
             StoredAiKey.Missing -> throw AiChatException(AiErrorKind.NO_KEY)
             StoredAiKey.Unreadable -> {
-                _state.update { it.copy(keyHints = it.keyHints - provider, checkedSetups = it.checkedSetups - provider) }
+                _state.update { current ->
+                    val rest = current.keys[provider].orEmpty().filterNot { it.id == id }
+                    current.copy(keys = if (rest.isEmpty()) current.keys - provider else current.keys + (provider to rest))
+                }
                 throw AiChatException(AiErrorKind.KEY_UNREADABLE)
             }
         }
 
-    private fun forgetCheck(provider: AiProvider) {
-        _state.update { it.copy(checkedSetups = it.checkedSetups - provider) }
-        scope.launch { withContext(io) { keyStore.clearChecked(provider) } }
+    /** The key answered: questions try it first from now on, and [setup], when given, counts as checked. */
+    private suspend fun keyAnswered(
+        provider: AiProvider,
+        id: String,
+        setup: String?,
+    ) {
+        _state.update { it.copy(keysInUse = it.keysInUse + (provider to id)) }
+        val known =
+            _state.value.keys[provider]
+                .orEmpty()
+                .firstOrNull { it.id == id }
+        if (setup != null && known != null && known.checkedSetup != setup) markKeyChecked(provider, id, setup)
+    }
+
+    private suspend fun markKeyChecked(
+        provider: AiProvider,
+        id: String,
+        setup: String,
+    ) {
+        updateKey(provider, id) { it.copy(checkedSetup = setup) }
+        withContext(io) { keyStore.markChecked(provider, id, setup) }
+    }
+
+    private fun forgetKeyCheck(
+        provider: AiProvider,
+        id: String,
+    ) {
+        updateKey(provider, id) { it.copy(checkedSetup = null) }
+        scope.launch { withContext(io) { keyStore.clearChecked(provider, id) } }
+    }
+
+    private fun updateKey(
+        provider: AiProvider,
+        id: String,
+        change: (AiSavedKey) -> AiSavedKey,
+    ) = _state.update { current ->
+        val saved = current.keys[provider] ?: return@update current
+        current.copy(keys = current.keys + (provider to saved.map { if (it.id == id) change(it) else it }))
     }
 
     /** Merges the open chat into the saved ones and writes what the retention keeps. */
@@ -786,7 +978,7 @@ internal class AiAssistantController(
     }
 
     private fun changeSetup(change: (AiAssistantSettings) -> AiAssistantSettings) {
-        testJob?.cancel()
+        stopTests()
         updateSettings(change)
         _state.update { it.copy(connectionTest = AiConnectionTest.Idle) }
     }

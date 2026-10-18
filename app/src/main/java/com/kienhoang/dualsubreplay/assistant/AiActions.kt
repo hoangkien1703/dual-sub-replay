@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import org.json.JSONArray
@@ -167,6 +168,58 @@ internal sealed interface AiAction {
     data class RestoreMemory(
         val memory: AiMemory,
     ) : AiAction
+
+    /** Full access only: one of the assistant's own settings; [value] passed [aiOwnSettingValue]. */
+    data class ChangeAiSetting(
+        val setting: AiOwnSetting,
+        val value: String,
+    ) : AiAction
+
+    /** Full access only: a key the user typed in this chat. Its text never shows in notes, labels or logs. */
+    class AddApiKey(
+        val key: String,
+    ) : AiAction {
+        val ending: String get() = key.trim().takeLast(AI_KEY_ENDING_LENGTH)
+
+        override fun equals(other: Any?) = other is AddApiKey && other.key == key
+
+        override fun hashCode() = key.hashCode()
+
+        override fun toString() = "AddApiKey(ending=$ending)"
+    }
+
+    /** Full access only: a saved key, by its service and last characters. */
+    data class RemoveApiKey(
+        val provider: AiProvider,
+        val ending: String,
+    ) : AiAction
+
+    /** Full access only: reads saved words whose word, reading or meaning contains [query]; all when null. */
+    data class FindSavedWords(
+        val query: String?,
+    ) : AiAction
+
+    /** Full access only: deletes every saved entry of [word]. */
+    data class DeleteSavedWord(
+        val word: String,
+    ) : AiAction
+
+    /** Full access only: null keeps that part as it is; at least one is set. */
+    data class EditSavedWord(
+        val word: String,
+        val meaning: String?,
+        val reading: String?,
+    ) : AiAction
+
+    /** Only Undo of [DeleteSavedWord] and [EditSavedWord] runs this; the model cannot ask for it. */
+    data class RestoreSavedWords(
+        val words: List<SavedWord>,
+    ) : AiAction
+
+    /** Full access only. */
+    data class Reset(
+        val target: AiResetTarget,
+    ) : AiAction
 }
 
 /**
@@ -183,7 +236,24 @@ internal val AiAction.alwaysAsks: Boolean
  * type, so a subtitle line cannot change the app or plant a memory on its own.
  */
 internal val AiAction.asksAfterOtherText: Boolean
-    get() = alwaysAsks || this is AiAction.ChangeSetting || this is AiAction.SaveMemory || this is AiAction.ForgetMemory
+    get() =
+        alwaysAsks || this is AiAction.ChangeSetting || this is AiAction.SaveMemory || this is AiAction.ForgetMemory ||
+            asksWithFullAccess || this is AiAction.ChangeAiSetting || this is AiAction.AddApiKey ||
+            this is AiAction.DeleteSavedWord || this is AiAction.EditSavedWord
+
+/**
+ * With full access, only what can't be undone still waits for the user's tap: removing a key and
+ * resetting settings.
+ */
+internal val AiAction.asksWithFullAccess: Boolean
+    get() = this is AiAction.RemoveApiKey || this is AiAction.Reset
+
+/** Whether [action] waits for the user's tap; [otherText] means subtitles, files or error text were read. */
+internal fun aiActionAsks(
+    action: AiAction,
+    fullAccess: Boolean,
+    otherText: Boolean,
+): Boolean = (if (fullAccess) action.asksWithFullAccess else action.alwaysAsks) || (otherText && action.asksAfterOtherText)
 
 /** What a chip shows next to the action; also how it is saved. */
 internal enum class AiActionKind(
@@ -203,8 +273,11 @@ internal val AiAction.kind: AiActionKind
         when (this) {
             is AiAction.LookAtVideo -> AiActionKind.LOOK
             is AiAction.Playback -> AiActionKind.PLAYBACK
-            is AiAction.ChangeSetting -> AiActionKind.SETTING
-            is AiAction.SaveWord, is AiAction.RemoveSavedWord -> AiActionKind.WORD
+            is AiAction.ChangeSetting, is AiAction.ChangeAiSetting, is AiAction.AddApiKey, is AiAction.RemoveApiKey, is AiAction.Reset ->
+                AiActionKind.SETTING
+            is AiAction.SaveWord, is AiAction.RemoveSavedWord, is AiAction.FindSavedWords, is AiAction.DeleteSavedWord,
+            is AiAction.EditSavedWord, is AiAction.RestoreSavedWords,
+            -> AiActionKind.WORD
             is AiAction.SearchYouTube, is AiAction.OpenVideo -> AiActionKind.VIDEO
             is AiAction.ChangeTranslation -> AiActionKind.TRANSLATION
             is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> AiActionKind.MEMORY
@@ -235,6 +308,7 @@ internal fun aiActionNote(action: AiAction): String =
                 action.googleTranslate?.let { if (it) "Turn Google Translate on" else "Translate on the device" },
                 action.targetLanguage?.let { "Translate to ${TranslationLanguages.displayName(it)}" },
             ).joinToString("; ")
+        else -> aiFullAccessActionNote(action)
     }
 
 internal sealed interface AiActionParse {
@@ -277,7 +351,7 @@ internal fun parseAiAction(
         AI_FORGET_MEMORY_TOOL ->
             numberedMemory(arguments, "number", memories)?.let { AiActionParse.Valid(AiAction.ForgetMemory(it)) }
                 ?: invalid(memoryNumbers(memories))
-        else -> invalid("There is no action called \"${call.name}\".")
+        else -> parseFullAccessAction(call.name, arguments) ?: invalid("There is no action called \"${call.name}\".")
     }
 }
 
@@ -285,13 +359,13 @@ private fun lookLines(arguments: JSONObject): Int =
     arguments.optInt("lines_around", MAX_AI_LOOK_LINES_AROUND).coerceIn(0, MAX_AI_LOOK_LINES_AROUND)
 
 /** An argument's value; null when it is missing or JSON null, which models send for unused options. */
-private fun argument(
+internal fun argument(
     arguments: JSONObject,
     name: String,
 ): Any? = arguments.opt(name)?.takeUnless { it == JSONObject.NULL }
 
 /** Trimmed text of at most [maxChars], or null when missing, blank or too long. */
-private fun text(
+internal fun text(
     arguments: JSONObject,
     name: String,
     maxChars: Int,
@@ -374,7 +448,7 @@ internal fun aiLanguageCode(value: String): String? {
     return TranslationLanguages.all.firstOrNull { it.name.equals(trimmed, ignoreCase = true) }?.code
 }
 
-private fun aiSwitch(value: String): String? =
+internal fun aiSwitch(value: String): String? =
     when (value.trim().lowercase(Locale.ROOT)) {
         "on", "true", "yes", "enabled", "enable", "1" -> "on"
         "off", "false", "no", "disabled", "disable", "0" -> "off"
@@ -413,13 +487,16 @@ private val CHOICE_ALIASES =
         "top" to "above",
     )
 
-private val SETTING_CHOICE_ALIASES =
+// Lazy because AiSetting's entries read this file's lists: built eagerly, a first use of
+// AiSetting would run this file's initializer while the entries are still null.
+private val SETTING_CHOICE_ALIASES by lazy {
     mapOf(
         AiSetting.APP_COLORS to mapOf("white" to "light", "green" to "forest", "purple" to "plum", "blue" to "navy", "dark" to "deep_teal"),
         AiSetting.OVERLAY_BACKGROUND to mapOf("green" to "forest", "purple" to "plum", "blue" to "navy"),
         AiSetting.ACCENT_COLOR to
             mapOf("teal" to "cyan", "green" to "mint", "yellow" to "amber", "red" to "rose", "pink" to "rose", "purple" to "lavender"),
     )
+}
 
 private val DEVICE_LANGUAGE_WORDS = setOf("device", "system", "auto", "automatic", "default", "phone", "follow_device", "follow_the_device")
 
@@ -521,7 +598,7 @@ internal fun aiSettingValues(setting: AiSetting): String =
         else -> choiceList(setting.choices)
     }
 
-private fun choiceList(choices: List<String>): String =
+internal fun choiceList(choices: List<String>): String =
     if (choices.size <= 2) choices.joinToString(" or ") else choices.dropLast(1).joinToString(", ") + " or " + choices.last()
 
 internal const val AI_LOOK_TOOL = "look_at_video"
@@ -534,7 +611,7 @@ internal const val AI_TRANSLATION_TOOL = "change_translation"
 internal const val AI_SAVE_MEMORY_TOOL = "save_memory"
 internal const val AI_FORGET_MEMORY_TOOL = "forget_memory"
 
-private fun schema(
+internal fun schema(
     properties: JSONObject,
     vararg required: String,
 ): String =
@@ -544,7 +621,7 @@ private fun schema(
         .apply { if (required.isNotEmpty()) put("required", JSONArray(required.toList())) }
         .toString()
 
-private fun stringProperty(
+internal fun stringProperty(
     description: String,
     choices: List<String>? = null,
 ): JSONObject = JSONObject().put("type", "string").put("description", description).apply { choices?.let { put("enum", JSONArray(it)) } }

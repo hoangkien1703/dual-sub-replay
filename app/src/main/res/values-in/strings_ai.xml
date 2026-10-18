@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">Layanan AI mengirim balasan yang tidak dapat dibaca aplikasi.</string>
     <string name="ai_settings_enabled_title">Asisten AI</string>
     <string name="ai_settings_enabled_description">Menampilkan tombol AI di kanan atas. Jika dimatikan, tidak ada yang dikirim ke layanan AI dan masalah muncul di ikon seperti biasa.</string>
-    <string name="ai_settings_key_heading">Kunci AI (API key)</string>
-    <string name="ai_settings_key_saved">Kunci %1$s tersimpan, berakhiran %2$s</string>
     <string name="ai_settings_remove_key">Hapus kunci</string>
     <string name="ai_settings_test">Uji koneksi</string>
     <string name="ai_settings_test_passed">Terhubung. Asisten siap digunakan.</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">Chat hanya tersimpan di ponsel ini dan tidak pernah dicadangkan. Jika dimatikan, chat dilupakan saat aplikasi ditutup dan chat yang tersimpan dihapus.</string>
     <string name="ai_settings_delete_history">Hapus riwayat chat sekarang</string>
     <string name="ai_settings_history_deleted">Riwayat chat dihapus.</string>
-    <string name="ai_settings_advanced">Lanjutan</string>
     <string name="ai_settings_service">Layanan AI</string>
     <string name="ai_provider_custom">Lainnya (kompatibel dengan OpenAI)</string>
     <string name="ai_settings_base_url">Alamat layanan (https://…/v1)</string>
@@ -198,4 +195,32 @@
     <string name="ai_action_memory_save_button">Simpan</string>
     <string name="ai_action_memory_forget_button">Lupakan</string>
     <string name="ai_action_manage">Kelola</string>
+    <string name="ai_settings_keys_section">Kunci API</string>
+    <string name="ai_settings_model_section">Model dan berpikir</string>
+    <string name="ai_settings_permissions_section">Izin</string>
+    <string name="ai_settings_keys_none">Belum ada kunci</string>
+    <string name="ai_settings_service_choose">Pilih layanan AI</string>
+    <string name="ai_settings_test_all">Uji semua kunci</string>
+    <string name="ai_settings_keys_fallback">Jika kunci ditolak, kehabisan kredit, atau mencapai batasnya, asisten otomatis beralih ke kunci berikutnya.</string>
+    <string name="ai_settings_keys_full">Anda sudah menyimpan kunci maksimum untuk layanan ini (%1$d). Hapus satu untuk menambah yang lain.</string>
+    <string name="ai_settings_add_key">Tambah kunci lain</string>
+    <string name="ai_settings_key_in_use">Berfungsi · sedang dipakai</string>
+    <string name="ai_settings_key_works">Berfungsi</string>
+    <string name="ai_settings_key_ending">Kunci berakhiran %1$s</string>
+    <string name="ai_settings_thinking_title">Berpikir</string>
+    <string name="ai_settings_full_access_title">Akses penuh untuk asisten</string>
+    <string name="ai_settings_full_access_description">Asisten juga bisa mengubah pengaturan AI-nya sendiri, menambah atau menghapus kunci, mengubah atau menghapus kata tersimpan, dan mengatur ulang pengaturan. Pencarian, perubahan terjemahan, dan muat ulang tidak lagi meminta konfirmasi.</string>
+    <string name="ai_settings_full_access_warning">Menghapus kunci dan mengatur ulang pengaturan tetap menunggu ketukan Anda. Setelah asisten membaca subtitle, file, atau teks galat, setiap perubahan menunggu ketukan Anda.</string>
+    <string name="ai_settings_permissions_default">Mati secara bawaan. Saat mati, asisten tidak bisa menyentuh kunci, pengaturan AI, atau kata tersimpan selain menyimpan kata baru.</string>
+    <string name="ai_action_key_add">Tambah kunci berakhiran %1$s</string>
+    <string name="ai_action_key_added">Kunci %1$s berakhiran %2$s disimpan</string>
+    <string name="ai_action_key_already">Kunci %1$s berakhiran %2$s sudah tersimpan</string>
+    <string name="ai_action_key_remove">Hapus kunci %1$s berakhiran %2$s</string>
+    <string name="ai_action_key_remove_button">Hapus</string>
+    <string name="ai_action_words_find">Membaca kata tersimpan Anda</string>
+    <string name="ai_action_word_delete">Hapus “%1$s” dari kosakata Anda</string>
+    <string name="ai_action_word_edit">Ubah “%1$s” di kosakata Anda</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="other">%1$d kunci</item>
+    </plurals>
 </resources>
