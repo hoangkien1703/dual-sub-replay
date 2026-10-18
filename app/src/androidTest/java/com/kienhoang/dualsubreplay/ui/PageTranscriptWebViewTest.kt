@@ -27,13 +27,45 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * The full transcript comes from the page when YouTube refuses the app's own download: the
  * offline page's track address answers with nothing unless it carries the page player's token,
- * exactly like YouTube's web addresses marked `exp=xpe`.
+ * exactly like YouTube's web addresses marked `exp=xpe`, and the app keeps the document the page
+ * player itself downloads.
  */
 class PageTranscriptWebViewTest {
     @get:Rule val compose = createComposeRule()
 
     @Test
-    fun thePageFetchesTheWholeTrackWhenTheDownloadIsRefused() {
+    fun theTranscriptComesFromThePagePlayersOwnDownloadWhenTheAppsIsRefused() =
+        withOfflinePage(OFFLINE_PAGE, PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload())) { model, page, requests ->
+            compose.waitUntil(30_000) { model.state.value.resolvedSourceLanguage == "zh-Hans" }
+            val state = model.state.value
+            assertFalse("The full transcript loaded, so live subtitles are not needed", state.liveFallback)
+            assertTrue(state.generatedCaptions)
+            // The app never asks again with the token: it keeps what the page player downloaded.
+            assertEquals("Only the page player sent its token: $requests", 1, requests.count { it.contains("pot=TOKEN") })
+            assertEquals("Captions the app switched on are switched back off", "{}", javascript(page, "JSON.stringify(currentTrack)"))
+        }
+
+    @Test
+    fun captionsThePageLoadsLaterReplaceLiveSubtitles() =
+        withOfflinePage(
+            OFFLINE_PAGE.replace("const playerLoadsCaptionsWhenAsked = true;", "const playerLoadsCaptionsWhenAsked = false;"),
+            PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload(), pageTimeoutMs = 2_000),
+        ) { model, page, _ ->
+            compose.waitUntil(30_000) { model.state.value.liveFallback }
+            val problem = model.state.value.fullTranscriptProblem ?: ""
+            assertTrue("The sheet says why: $problem", problem.contains("LOGIN_REQUIRED"))
+            // Playback starts: the page player downloads the captions on its own.
+            javascript(page, "startPlaying()")
+            compose.waitUntil(30_000) { !model.state.value.liveFallback && model.state.value.resolvedSourceLanguage == "zh-Hans" }
+            assertTrue(model.state.value.generatedCaptions)
+            assertEquals(null, model.state.value.fullTranscriptProblem)
+        }
+
+    private fun withOfflinePage(
+        offlinePage: String,
+        provider: CaptionProvider,
+        block: (AppViewModel, WebView, List<String>) -> Unit,
+    ) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val application = instrumentation.targetContext.applicationContext as Application
         val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
@@ -49,9 +81,7 @@ class PageTranscriptWebViewTest {
             .putString("target_language", "en")
             .commit()
         lateinit var model: AppViewModel
-        instrumentation.runOnMainSync {
-            model = AppViewModel(application, PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload()))
-        }
+        instrumentation.runOnMainSync { model = AppViewModel(application, provider) }
         val page = AtomicReference<WebView>()
         val captionRequests = Collections.synchronizedList(mutableListOf<String>())
         try {
@@ -67,7 +97,7 @@ class PageTranscriptWebViewTest {
                                 WebResourceResponse("application/json", "UTF-8", ByteArrayInputStream(body.toByteArray()))
                             }
                             request.isForMainFrame ->
-                                WebResourceResponse("text/html", "UTF-8", ByteArrayInputStream(OFFLINE_PAGE.toByteArray()))
+                                WebResourceResponse("text/html", "UTF-8", ByteArrayInputStream(offlinePage.toByteArray()))
                             else -> WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0)))
                         }
                     },
@@ -75,15 +105,8 @@ class PageTranscriptWebViewTest {
                     LearningPlayerRoot(model)
                 }
             }
-            compose.waitUntil(30_000) { model.state.value.resolvedSourceLanguage == "zh-Hans" }
-            val state = model.state.value
-            assertFalse("The full transcript loaded, so live subtitles are not needed", state.liveFallback)
-            assertTrue(state.generatedCaptions)
-            assertTrue(
-                "The page fetched the track with its own token: $captionRequests",
-                captionRequests.any { it.contains("pot=TOKEN") && it.contains("fmt=json3") },
-            )
-            assertEquals("Captions the app switched on are switched back off", "{}", javascript(page.get(), "JSON.stringify(currentTrack)"))
+            compose.waitUntil(30_000) { page.get() != null }
+            block(model, page.get(), captionRequests)
         } finally {
             instrumentation.runOnMainSync { model.viewModelScope.cancel() }
             val editor = preferences.edit().clear()
@@ -141,13 +164,16 @@ class PageTranscriptWebViewTest {
               if (option === 'tracklist') return [{languageCode: 'zh-Hans', kind: 'asr'}];
               return currentTrack;
             };
+            const playerLoadsCaptionsWhenAsked = true;
+            function playerDownload() {
+              const request = new XMLHttpRequest();
+              request.open('GET', '/api/timedtext?v=abcdefghijk&lang=zh-Hans&kind=asr&pot=TOKEN&c=MWEB&fmt=json3');
+              request.send();
+            }
+            window.startPlaying = playerDownload;
             player.setOption = function(module, option, value) {
               currentTrack = value || {};
-              if (currentTrack.languageCode) {
-                setTimeout(function() {
-                  fetch('/api/timedtext?v=abcdefghijk&lang=' + currentTrack.languageCode + '&kind=asr&pot=TOKEN&c=MWEB&fmt=srv3');
-                }, 200);
-              }
+              if (playerLoadsCaptionsWhenAsked && currentTrack.languageCode) setTimeout(playerDownload, 200);
             };
             player.getPlayerResponse = function() {
               return {

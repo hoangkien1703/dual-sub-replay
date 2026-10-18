@@ -1,8 +1,10 @@
 package com.kienhoang.dualsubreplay.data
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import org.json.JSONObject
@@ -28,7 +30,7 @@ class PageTranscriptSourceTest {
             assertEquals("zh-Hans", request.target?.languageCode)
             assertEquals(expected?.optString("languageCode"), request.target?.languageCode)
             assertTrue(request.target!!.generated)
-            source.offerReply(request, PageTranscriptReply.Working)
+            source.offerReply(request, PageTranscriptReply.Working("page-address"))
             assertFalse(result.isCompleted)
             source.offerReply(request, PageTranscriptReply.Done(JSON3))
             val track = result.await()!!
@@ -47,8 +49,7 @@ class PageTranscriptSourceTest {
             source.offerTracks(request, PAGE_TRACKS)
             assertEquals("en", request.target?.languageCode)
             assertFalse(request.target!!.generated)
-            source.offerReply(request, PageTranscriptReply.Failed("empty-with-token"))
-            assertNull(result.await())
+            result.cancel()
         }
 
     @Test fun anotherVideoOnThePageIsIgnored() =
@@ -70,6 +71,8 @@ class PageTranscriptSourceTest {
             val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null)) }
             source.offerTracks(awaitRequest(source), """{"videoDetails":{"videoId":"$VIDEO"},"captions":null}""")
             assertNull(result.await())
+            assertEquals(PageTranscriptProblem.NO_TRACKS, source.problem(VIDEO))
+            assertNull("Nothing left to watch for", source.pending(VIDEO))
         }
 
     @Test fun anUnreadableDocumentIsNoTranscript() =
@@ -80,13 +83,65 @@ class PageTranscriptSourceTest {
             source.offerTracks(request, PAGE_TRACKS)
             source.offerReply(request, PageTranscriptReply.Done("<html>sorry</html>"))
             assertNull(result.await())
+            assertEquals(PageTranscriptProblem.UNREADABLE, source.problem(VIDEO))
         }
 
-    @Test fun aPageThatNeverAnswersTimesOut() =
+    @Test fun aPageThatNeverAnswersTimesOutButKeepsWatching() =
         runBlocking {
             val source = PageTranscriptSource()
             assertNull(source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null), timeoutMs = 50))
+            assertEquals(PageTranscriptProblem.NO_ANSWER, source.problem(VIDEO))
+            assertTrue("The page keeps watching the same video", source.pending(VIDEO)!!.late)
+            assertNull(source.problem("bbbbbbbbbbb"))
+        }
+
+    @Test fun captionsThePageLoadsLaterAreAnnouncedAndKeptForTheNextRequest() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val choice = CaptionLanguageChoice(emptyList(), null)
+            val first = async { source.transcript(VIDEO, choice, timeoutMs = 300) }
+            val request = awaitRequest(source)
+            source.offerTracks(request, PAGE_TRACKS)
+            source.offerReply(request, PageTranscriptReply.Working("waiting-for-captions"))
+            assertNull(first.await())
+            assertEquals(PageTranscriptProblem.WAITING_FOR_CAPTIONS, source.problem(VIDEO))
+            val announced = async(start = CoroutineStart.UNDISPATCHED) { source.lateTranscripts.first() }
+            // Live subtitles turned the page's captions on; the player downloaded the track.
+            source.offerReply(source.pending(VIDEO)!!, PageTranscriptReply.Done(JSON3, "zh-Hans", true))
+            assertEquals(VIDEO, announced.await())
             assertNull(source.pending(VIDEO))
+            val track = source.transcript(VIDEO, choice, timeoutMs = 50)!!
+            assertEquals(listOf("你好", "再见"), track.cues.map { it.text })
+            assertNull("The kept transcript is used once", source.transcript(VIDEO, choice, timeoutMs = 50))
+        }
+
+    @Test fun aRetryIsANewAttemptOnThePage() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val choice = CaptionLanguageChoice(emptyList(), null)
+            val first = async { source.transcript(VIDEO, choice, timeoutMs = 50) }
+            source.offerTracks(awaitRequest(source), PAGE_TRACKS)
+            assertNull(first.await())
+            val watching = source.pending(VIDEO)!!
+            val retry = async { source.transcript(VIDEO, choice) }
+            while (source.pending(VIDEO) === watching) yield()
+            val request = awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) }
+            assertTrue(request.target!!.attempt > watching.target!!.attempt)
+            assertFalse(request.late)
+            assertNull("A new attempt clears the old reason", source.problem(VIDEO))
+            retry.cancel()
+        }
+
+    @Test fun thePageMayFindTheSameLanguageAsAnotherKind() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(listOf("en"), null)) }
+            val request = awaitRequest(source)
+            source.offerTracks(request, PAGE_TRACKS)
+            source.offerReply(request, PageTranscriptReply.Done(JSON3, "en", true))
+            val track = result.await()!!
+            assertEquals("en", track.languageCode)
+            assertTrue(track.isGenerated)
         }
 
     @Test fun aNewRequestReplacesTheOldOne() =
@@ -129,10 +184,7 @@ class PageTranscriptSourceTest {
                         },
                     ).fetch(VIDEO, emptyList(), null)
                 }
-            source.offerReply(
-                awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) },
-                PageTranscriptReply.Failed("no-page-request"),
-            )
+            awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) }
             gate.complete(Unit)
             assertSame(DOWNLOADED, result.await())
         }

@@ -45,10 +45,12 @@ Paths below are relative to
   handles formats. Do not spread YouTube extraction details into UI/translation code.
   `RecentCaptionTracks.kt` wraps the provider with a small, expiring disk cache of recent tracks,
   so a video reopened after Android closed the app does not download its captions again.
-  `PageFirstCaptionProvider.kt` sits under that cache: the YouTube page in the WebView fetches the
-  chosen track itself through `PageTranscriptSource.kt` (`ui/PageTranscriptReader.kt` runs the page
-  scripts; the page's own cookies and proof-of-origin token go with it) while
-  `YouTubeCaptionProvider` runs alongside as the fallback; the first success wins. See the
+  `PageFirstCaptionProvider.kt` sits under that cache: the YouTube page in the WebView gets the
+  chosen track through `PageTranscriptSource.kt` (`ui/PageTranscriptReader.kt` runs the page
+  scripts) while `YouTubeCaptionProvider` runs alongside as the fallback; the first success wins.
+  The page keeps a copy of the caption replies its own player downloads (they carry the page's
+  cookies and proof-of-origin token), and keeps watching after live subtitles take over, so
+  captions the player loads later still give the full transcript. See the
   [spec](../specs/2026-10-18-page-first-full-transcript.md).
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve

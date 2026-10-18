@@ -8,11 +8,13 @@ import kotlinx.coroutines.selects.select
 /**
  * Asks the YouTube page for the transcript and runs [download] (the app's own lookup) at the same
  * time; the first success wins. When the page cannot help, the download's result or error stands,
- * so its messages and the live-subtitle fallback stay as they were.
+ * so its messages and the live-subtitle fallback stay as they were; the page keeps watching after
+ * that and announces a late transcript on [PageTranscriptSource.lateTranscripts].
  */
 internal class PageFirstCaptionProvider(
     private val page: PageTranscriptSource,
     private val download: CaptionProvider,
+    private val pageTimeoutMs: Long = PAGE_TRANSCRIPT_TIMEOUT_MS,
 ) : CaptionProvider {
     override suspend fun fetch(
         videoId: String,
@@ -20,7 +22,7 @@ internal class PageFirstCaptionProvider(
         learningLanguage: String?,
     ): CaptionTrackResult =
         coroutineScope {
-            val fromPage = async { page.transcript(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage)) }
+            val fromPage = async { page.transcript(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), pageTimeoutMs) }
             val downloaded = async { attempt { download.fetch(videoId, preferredLanguages, learningLanguage) } }
             select {
                 fromPage.onAwait { track ->

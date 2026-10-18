@@ -2,7 +2,8 @@
 
 ## Status
 
-Implemented (physical-phone and live-YouTube checks pending). On 2026-10-18 the owner reported that the full dual-subtitle
+Implemented, revised once (physical-phone and live-YouTube checks pending). The first version
+failed on the owner's phone; see [Revision 1](#revision-1-keep-the-players-own-download). On 2026-10-18 the owner reported that the full dual-subtitle
 transcript still does not load (PR #123's attempt did not fix it) and asked why other projects
 still work. After the cause was explained in the project thread, the owner picked "Page first"
 on the decision card: the YouTube page in the app's WebView fetches the whole caption track, and
@@ -142,3 +143,75 @@ Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator: the cloud machine
 | The transcript script in headless Chromium 1194 on an offline `m.youtube.com` page whose track answers only with `pot`: tried the track address (empty), switched captions on, took the page's own request, fetched `json3` with `pot`, switched captions back off, reported done | Passed (scratch Playwright run, not committed) |
 | `PageTranscriptWebViewTest` (same offline page in the app's WebView, download refused, transcript loads) | Not run locally (no emulator); runs in CI's `managed-device-tests` |
 | Physical phone and live YouTube | Not run; owner's preview test |
+
+## Revision 1: keep the player's own download
+
+### Problem
+
+On 2026-10-18 the owner tested PR build 435 on a phone with a Japanese video: the sheet stayed on
+live subtitles ("Translating live captions…") with "Retry full transcript". Live subtitles showing
+the video's captions prove the page player had already downloaded the whole track, so the page
+had the data and the first version failed to take it. Reading the code found these causes (the
+phone gave no detail, so which one hit is not known):
+
+- The page asked YouTube a second time, changing the player's address (format, sometimes host,
+  with cookies), and any change could get an empty answer.
+- The page job gave up 15 s after it started. Phone players often load captions only once the
+  video plays, so the job could end before the player ever asked; live subtitles turned captions
+  on later, after the job was over.
+- "Retry full transcript" reused the failed job: jobs were kept per video on the page, so a retry
+  got the old failure back at once.
+- Only player requests carrying `pot` were used.
+- The reason stayed in logcat, so phone tests could not say which step failed.
+
+The owner picked keeping the player's own download, changed in this PR (#125).
+
+### Approach
+
+1. `WEB_CAPTION_CAPTURE_SCRIPT`, added as a document-start script (and run again inside every job
+   for WebViews without document-start scripts), wraps `XMLHttpRequest` and `fetch` on YouTube
+   pages. When a `/api/timedtext` reply for a YouTube host arrives, it keeps a copy of the text
+   (skipping auto-translated `tlang` tracks, replies over 8 MiB, and keeping the last eight
+   tracks). It never changes a request or a reply; `fetch` replies are read through `clone()`.
+2. `webPageTranscriptScript` is one job per attempt (`PageCaptionTarget.attempt`): it fetches the
+   track's own address from the page (enough where YouTube asks no token), then waits for the kept
+   copy of the target track. For the first 15 s it switches the page's captions to that track so
+   the player downloads it, and switches them back only if nobody changed them since. After that
+   it keeps watching and also accepts the same language as another kind (auto-generated or not).
+   A job never fails on its own; it reports its step (`page-address`, `no-player`,
+   `waiting-for-captions`).
+3. `PageTranscriptSource`: when the provider's 25 s wait ends, the request stays open as a late
+   watch (polled every 1.5 s). A document that arrives later is kept and announced on
+   `lateTranscripts`; `AppViewModel` reloads the video while live subtitles are on, and the next
+   request uses the kept document. A retry is a new attempt. The reason the page gave nothing
+   (`PageTranscriptProblem`) is recorded per video.
+4. The live-subtitles sheet shows why the full transcript is missing: the page's reason (localized)
+   and the app download's English error text.
+
+### Acceptance criteria
+
+- [x] The transcript is built from the page player's own download; the app sends no second request
+  with the page's token (`PageTranscriptWebViewTest`, headless Chromium run).
+- [x] Captions the player loads after live subtitles took over replace them with the full transcript
+  without a tap (`PageTranscriptWebViewTest.captionsThePageLoadsLaterReplaceLiveSubtitles`,
+  `PageTranscriptSourceTest`).
+- [x] A retry starts a new attempt on the page (`PageTranscriptSourceTest`, `PageTranscriptScriptsTest`,
+  headless Chromium run).
+- [x] The capture only reads `/api/timedtext` replies on YouTube hosts, skips `tlang` and oversized
+  replies, and does nothing on other sites (`PageTranscriptScriptsTest`, headless Chromium run).
+- [x] The sheet names the page's reason and the download's error, in all 8 interface languages.
+- [ ] On the owner's phone, a Japanese and an English video show the full transcript, at the latest
+  a few seconds after playback starts.
+
+### Validation result (revision 1)
+
+Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator: the cloud machine has no KVM).
+
+| Check | Result |
+| --- | --- |
+| `PageTranscriptSourceTest`, `PageTranscriptScriptsTest` | Passed |
+| Scripts in headless Chromium 1194 on an offline `m.youtube.com` page whose track answers only with `pot`: (a) captions switched on, player XHR kept, 2 requests in total (address without token, player's own), captions switched back off; (b) player loads captions only later (XHR `arraybuffer`): job waits, then finishes, and a retry (new attempt) finishes at once; (c) player uses `fetch(new Request(...))`: kept, `tlang` reply ignored; (d) `example.com`: nothing installed | Passed (scratch Playwright run, not committed) |
+| `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` | Passed |
+| `PageTranscriptWebViewTest` (both tests) | Not run locally (no emulator); runs in CI's `managed-device-tests` |
+| Physical phone and live YouTube | Not run; owner's preview test |
+
