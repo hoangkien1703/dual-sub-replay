@@ -9,6 +9,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.translation.GoogleWebSpeech
+import com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE
+import com.kienhoang.dualsubreplay.translation.speaksWithGoogle
+import com.kienhoang.dualsubreplay.translation.storedTranslationEngine
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +31,7 @@ internal class WordPronouncer(context: Context) {
     private val resources = context.resources
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val cache = PronunciationCache(File(application.cacheDir, "pronunciation"))
+    private val googleSpeech = GoogleWebSpeech()
     private var speech: Job? = null
     private var disposed = false
     var message by mutableStateOf<String?>(null)
@@ -67,7 +72,8 @@ internal class WordPronouncer(context: Context) {
     /**
      * Replays the recorded speech when [word] was the last word pronounced. Otherwise records it to
      * a file, keeps that file for the next replay and plays it; engines that cannot record speak it
-     * directly instead.
+     * directly instead. Chinese is first fetched from Google's online voice while Google translates
+     * subtitles; the phone's voices are the fallback.
      */
     private suspend fun pronounce(
         word: String,
@@ -76,6 +82,14 @@ internal class WordPronouncer(context: Context) {
         val volume = readPronunciationVolume(application)
         cache.lookup(word, language)?.let { audio ->
             if (withTimeoutOrNull(15_000) { playSpeechFile(audio, volume) } == true) return PronunciationResult.SPOKEN
+        }
+        if (speaksWithGoogle(word, language, translationEngine())) {
+            val online = cache.prepare(word, language, extension = "mp3")
+            if (googleSpeech.record(word, language, online)) {
+                cache.markReady()
+                if (withTimeoutOrNull(15_000) { playSpeechFile(online, volume) } == true) return PronunciationResult.SPOKEN
+            }
+            cache.clear()
         }
         val file = cache.prepare(word, language)
         val recorded = attempt(word, language, volume) { synthesize(word, file) && file.length() > 0 }
@@ -90,6 +104,11 @@ internal class WordPronouncer(context: Context) {
         if (recorded != PronunciationResult.SPOKEN && recorded != PronunciationResult.PLAYBACK_FAILED) return recorded
         return attempt(word, language, volume) { speak(word) }
     }
+
+    private fun translationEngine() =
+        storedTranslationEngine(
+            application.getSharedPreferences("dual_sub_preferences", 0).getString(TRANSLATION_ENGINE_PREFERENCE, null),
+        )
 
     private suspend fun attempt(
         word: String,

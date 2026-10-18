@@ -10,6 +10,8 @@ DualSub Replay includes these libraries, all under the Apache License 2.0 (full 
 - Kuromoji 0.9.0 (code only): Copyright 2010-2015 Atilika Inc. and contributors. Its NOTICE file
   is kept in the APK under META-INF. The Japanese dictionary it uses is downloaded on first use
   and is not part of the app.
+- HanLP pinyin and traditional-to-simplified tables (data only): Copyright hankcs.
+- jieba Chinese word list (data only), under the MIT License (text at the end).
 
 Source and full notices: https://github.com/hoangkien1703/dual-sub-replay/blob/main/THIRD_PARTY_NOTICES.md
 
@@ -216,3 +218,29 @@ Source and full notices: https://github.com/hoangkien1703/dual-sub-replay/blob/m
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+
+jieba Chinese word list
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Sun Junyi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

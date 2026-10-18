@@ -2,14 +2,22 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
+import com.kienhoang.dualsubreplay.data.ChineseMorphology
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class SubtitleWordHighlightTest {
+    @Before
+    fun loadChinese() {
+        // The app splits Chinese once its bundled data loads; test that, not the stand-in.
+        assertTrue(ChineseMorphology.awaitReady())
+    }
+
     @Test fun mapsWordTimingsOntoCharacterRanges() {
         val segment = SubtitleSegment(
             id = 1,

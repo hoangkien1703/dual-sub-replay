@@ -92,6 +92,7 @@ internal class AndroidPronunciationEngine(
                 it.locale,
                 it.isNetworkConnectionRequired,
                 TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty(),
+                it.quality,
             )
         }
 

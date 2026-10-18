@@ -17,6 +17,7 @@ import com.kienhoang.dualsubreplay.data.ImmersionRepository
 import com.kienhoang.dualsubreplay.data.ImmersionTimeTracker
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStore
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
+import com.kienhoang.dualsubreplay.data.LearnerData
 import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
@@ -317,6 +318,8 @@ class AppViewModel internal constructor(
     init {
         // Japanese word analysis downloads its dictionary here the first time Japanese is shown.
         JapaneseMorphology.useStore(JapaneseDictionaryStore(File(application.filesDir, "japanese-dictionary")))
+        // Chinese word analysis reads data packaged in the APK.
+        LearnerData.useAssets(application.assets)
     }
 
     /** Settings → Translation → Languages on this device. */

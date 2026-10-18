@@ -36,18 +36,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiPendingQuestion
 import com.kienhoang.dualsubreplay.assistant.aiGrammarContext
+import com.kienhoang.dualsubreplay.data.GrammarLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
-import com.kienhoang.dualsubreplay.data.JapaneseMorphology
+import com.kienhoang.dualsubreplay.data.HskLevel
 import com.kienhoang.dualsubreplay.data.JlptLevel
-import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.grammarForSelection
-import com.kienhoang.dualsubreplay.data.japaneseGrammar
+import com.kienhoang.dualsubreplay.data.grammarLanguage
+import com.kienhoang.dualsubreplay.data.grammarMatches
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
-/** How each grammar meaning reads to the learner: the rule points here, the catalogue in [GRAMMAR_POINT_TEXT]. */
-internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy { GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT }
+/**
+ * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
+ * catalogue in [GRAMMAR_POINT_TEXT], Chinese in `LearnerGrammarText.kt`.
+ */
+internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + CHINESE_GRAMMAR_TEXT
+}
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
     mapOf(
@@ -158,8 +164,9 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese selection, read from its whole subtitle line, and the button that asks
- * the assistant about the whole line ([onAskedAi] then closes the card); nothing for other languages.
+ * The grammar of a Japanese or Chinese selection, read from its whole subtitle line, and
+ * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
+ * nothing for other languages.
  */
 @Composable
 internal fun GrammarExplanations(
@@ -168,9 +175,9 @@ internal fun GrammarExplanations(
 ) {
     val segment = selection.segment
     val line = (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
-    if (!LanguageAwareTokenizer.isJapanese(line, selection.wordLanguage)) return
+    val language = grammarLanguage(line, selection.wordLanguage) ?: return
     val revision = tokenizerRevision()
-    val lineMatches = remember(line, revision) { JapaneseMorphology.morphemes(line)?.let(::japaneseGrammar).orEmpty() }
+    val lineMatches = remember(line, language, revision) { grammarMatches(line, language).orEmpty() }
     val matches =
         remember(lineMatches, selection.token) {
             val range = selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
@@ -202,7 +209,7 @@ private fun AiGrammarButton(
                     otherLine = if (selection.translated) segment?.originalText else segment?.translatedText,
                     otherLanguage = TranslationLanguages.displayName(selection.meaningLanguage),
                     selected = selection.token.text,
-                    foundPoints = found.map { "${it.form} (N${it.level.number})" },
+                    foundPoints = found.map { "${it.form} (${it.level.code})" },
                 )
             host.controller.askFromApp(AiPendingQuestion(question, context, line))
             onAsked()
@@ -225,17 +232,26 @@ internal fun GrammarPointList(matches: List<GrammarMatch>) {
     }
 }
 
-/** A small "N3" label, so learners see how advanced each point is. */
+/** A small "N3" or "HSK 2" label, so learners see how advanced each point is. */
 @Composable
-private fun JlptBadge(level: JlptLevel) {
-    val description = stringResource(R.string.grammar_jlpt_level_description, level.number)
+private fun LevelBadge(level: GrammarLevel) {
+    val label =
+        when (level) {
+            is JlptLevel -> stringResource(R.string.grammar_jlpt_level, level.number)
+            is HskLevel -> stringResource(R.string.grammar_hsk_level, level.label)
+        }
+    val description =
+        when (level) {
+            is JlptLevel -> stringResource(R.string.grammar_jlpt_level_description, level.number)
+            is HskLevel -> stringResource(R.string.grammar_hsk_level_description, level.label)
+        }
     Surface(
         modifier = Modifier.padding(top = 2.dp).testTag("grammar_level").semantics { contentDescription = description },
         shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
         Text(
-            stringResource(R.string.grammar_jlpt_level, level.number),
+            label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp).clearAndSetSemantics { },
@@ -252,19 +268,29 @@ private fun GrammarPointCard(match: GrammarMatch) {
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(match.form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    JlptBadge(match.level)
+            val text = grammarPointText(stringResource(meaningText(match.meanings.first())), match.form)
+            if (match.form.length <= SIDE_BY_SIDE_FORM_LENGTH) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        GrammarForm(match.form)
+                        LevelBadge(match.level)
+                    }
+                    Text(text, modifier = Modifier.weight(1f))
                 }
-                Text(stringResource(meaningText(match.meanings.first())), modifier = Modifier.weight(1f))
+            } else {
+                // A long form beside the text would squeeze it into a narrow column.
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    GrammarForm(match.form, Modifier.weight(1f, fill = false))
+                    LevelBadge(match.level)
+                }
+                Text(text, modifier = Modifier.padding(top = 4.dp))
             }
             val others = match.meanings.drop(1)
             if (others.isNotEmpty()) {
                 if (showAll) {
                     others.forEach { meaning ->
                         Text(
-                            stringResource(meaningText(meaning)),
+                            grammarPointText(stringResource(meaningText(meaning)), match.form),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp).testTag("grammar_alternate"),
@@ -278,3 +304,42 @@ private fun GrammarPointCard(match: GrammarMatch) {
         }
     }
 }
+
+@Composable
+private fun GrammarForm(
+    form: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(form, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = modifier)
+}
+
+/** Forms up to this many characters sit beside their explanation; longer ones go above it. */
+private const val SIDE_BY_SIDE_FORM_LENGTH = 8
+
+/**
+ * [text] without a leading label that only repeats [form] ("对: to, toward" under 对 duì,
+ * "Would rather: would prefer to" under would rather), so the card does not say it twice. A label
+ * that adds something ("Question: do comes first", "A 比 B + adjective" under 比 bǐ) stays.
+ */
+internal fun grammarPointText(
+    text: String,
+    form: String,
+): String {
+    val colon = text.indexOfFirst { it == ':' || it == '：' }
+    if (colon <= 0) return text
+    val label = text.substring(0, colon)
+    val rest = text.substring(colon + 1).trimStart()
+    if (rest.isEmpty()) return text
+    val labelWords = words(label)
+    val repeats = labelWords.isNotEmpty() && words(form).containsAll(labelWords)
+    return if (repeats) rest.replaceFirstChar { it.titlecase() } else text
+}
+
+private fun words(text: String): List<String> =
+    text
+        .lowercase()
+        .replace('’', '\'')
+        .split(NOT_A_WORD)
+        .filter(String::isNotEmpty)
+
+private val NOT_A_WORD = Regex("[^\\p{L}\\p{N}]+")

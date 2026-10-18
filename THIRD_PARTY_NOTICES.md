@@ -21,7 +21,13 @@ Current releases bundle only:
 - Kotlin / Coroutines: Apache-2.0.
 - Kuromoji 0.9.0 (`com.atilika.kuromoji:kuromoji-ipadic`, code only): Apache-2.0, copyright 2010-2015 Atilika Inc. and contributors. Its license and notice files are kept in the APK under `META-INF/`.
 
-The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries above with the Apache-2.0 text, and the ML Kit translation terms.
+- Chinese learner data (data files only, no library code), copied at build time from Maven Central into the APK's `assets/learner-data/`:
+  - jieba's Chinese word list (`dict.txt` in `com.huaban:jieba-analysis:1.0.2`, an Apache-2.0 jar): MIT, copyright (c) 2013 Sun Junyi. The app keeps the words seen at least 4 times, sorted.
+  - HanLP's pinyin and traditional-to-simplified tables (`pinyin.txt`, `t2s.txt` in `com.hankcs:hanlp:portable-1.8.6`): Apache-2.0, copyright hankcs.
+
+The HSK levels of the Chinese grammar points are taken from the grammar syllabus and word list of the *Chinese Proficiency Grading Standards for International Chinese Language Education* (GF0025-2021), as published in [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT). Only the level numbers are used; the lists are not part of the app.
+
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text and jieba's MIT notice, and the ML Kit translation terms.
 
 ## Japanese dictionary (downloaded on first use)
 

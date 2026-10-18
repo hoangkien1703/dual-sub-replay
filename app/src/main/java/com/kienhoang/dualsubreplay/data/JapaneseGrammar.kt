@@ -1,27 +1,14 @@
 package com.kienhoang.dualsubreplay.data
 
 /**
- * One grammar point in a sentence: its usual written [form] (〜 stands for the word it attaches
- * to), the characters it covers, its [meanings] (the likeliest in this sentence first) and the
- * JLPT [level] it is taught at.
+ * Finds the grammar points of a sentence from its analyzer morphemes, the way Renshuu and
+ * ichi.moe do: the analyzer tags each piece, and a list of patterns names them. The catalogue
+ * (`JapaneseGrammarCatalogue.kt`) holds most points as data; the rules below handle the few whose
+ * meaning depends on the words around them. Longer points win and each morpheme belongs to one
+ * point, so the た of 〜ました or the parts of 〜わけにはいかない are not listed again on their own.
  */
-internal data class GrammarMatch(
-    val form: String,
-    val start: Int,
-    val end: Int,
-    val meanings: List<GrammarMeaning>,
-    val level: JlptLevel = JlptLevel.N5,
-)
-
-/** A rule's hit: how many morphemes from the start index it covers, and what it is. */
-private class RuleHit(
-    val length: Int,
-    val form: String,
-    val meanings: List<GrammarMeaning>,
-    val level: JlptLevel? = null,
-)
-
-private typealias GrammarRule = (List<Morpheme>, Int) -> RuleHit?
+internal fun japaneseGrammar(morphemes: List<Morpheme>): List<GrammarMatch> =
+    matchGrammar(morphemes, GRAMMAR_CATALOGUE, GRAMMAR_RULES) { form -> RULE_LEVELS[form] ?: JlptLevel.N5 }
 
 private const val PARTICLE = "助詞"
 private const val AUXILIARY = "助動詞"
@@ -32,48 +19,6 @@ private const val DEPENDENT = "非自立"
 private const val SUFFIX = "接尾"
 private const val CASE = "格助詞"
 private const val CONJUNCTIVE = "接続助詞"
-
-/** A point found at [index]; a lower [priority] wins between hits of the same length. */
-private class Candidate(
-    val priority: Int,
-    val index: Int,
-    val hit: RuleHit,
-)
-
-/**
- * Finds the grammar points of a sentence from its analyzer morphemes, the way Renshuu and
- * ichi.moe do: the analyzer tags each piece, and a list of patterns names them. The catalogue
- * (`JapaneseGrammarCatalogue.kt`) holds most points as data; the rules below handle the few whose
- * meaning depends on the words around them. Longer points win and each morpheme belongs to one
- * point, so the た of 〜ました or the parts of 〜わけにはいかない are not listed again on their own.
- */
-internal fun japaneseGrammar(morphemes: List<Morpheme>): List<GrammarMatch> {
-    val catalogue =
-        GRAMMAR_CATALOGUE.flatMapIndexed { priority, pattern ->
-            morphemes.indices.mapNotNull { index ->
-                pattern
-                    .lengthAt(morphemes, index)
-                    .takeIf { it > 0 }
-                    ?.let { Candidate(priority, index, RuleHit(it, pattern.form, pattern.meanings, pattern.level)) }
-            }
-        }
-    val rules =
-        GRAMMAR_RULES.flatMapIndexed { priority, rule ->
-            morphemes.indices.mapNotNull { index ->
-                rule(morphemes, index)?.let { hit -> Candidate(GRAMMAR_CATALOGUE.size + priority, index, hit) }
-            }
-        }
-    val accepted = mutableListOf<Pair<IntRange, GrammarMatch>>()
-    val ordered = (catalogue + rules).sortedWith(compareBy({ -it.hit.length }, { it.priority }, { it.index }))
-    for (candidate in ordered) {
-        val range = candidate.index until candidate.index + candidate.hit.length
-        if (accepted.any { (taken, _) -> range.first <= taken.last && range.last >= taken.first }) continue
-        val hit = candidate.hit
-        val level = hit.level ?: RULE_LEVELS[hit.form] ?: JlptLevel.N5
-        accepted += range to GrammarMatch(hit.form, morphemes[range.first].start, morphemes[range.last].end, hit.meanings, level)
-    }
-    return accepted.map { it.second }.sortedWith(compareBy({ it.start }, { it.end }))
-}
 
 /** The JLPT level of the points the rules below find; any form not listed is N5. */
 private val RULE_LEVELS =
@@ -117,20 +62,6 @@ private val RULE_LEVELS =
         "に対して" to JlptLevel.N3,
         "に対する" to JlptLevel.N3,
     )
-
-/**
- * The grammar points that belong to a selection from [start] to [end]: those inside or overlapping
- * it, and one that starts right after it (体育館 + に), since particles and endings follow their word.
- */
-internal fun grammarForSelection(
-    matches: List<GrammarMatch>,
-    start: Int,
-    end: Int,
-): List<GrammarMatch> {
-    val inside = matches.filter { it.start < end && it.end > start }
-    val following = matches.filter { it.start == end }.take(1)
-    return (inside + following).distinct()
-}
 
 private fun Morpheme.isParticle(vararg details: String) = pos == PARTICLE && (details.isEmpty() || detail in details)
 

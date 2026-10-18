@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Chinese grammar points for learners of Chinese. Keep the Chinese words and examples as they are. -->
+    <string name="grammar_zh_budebu">不得不: have no choice but to</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…: not only… but also…</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…: no matter…, (always)…</string>
+    <string name="grammar_zh_buru">A 不如 B: A is not as good as B; it would be better to…</string>
+    <string name="grammar_zh_buyong">不用: there is no need to</string>
+    <string name="grammar_zh_bie">别 / 不要 + verb: don’t (do it)</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过: but, however</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…: although…, (still)…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…: because… (so)…: the reason, then the result</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…: if…, then…</string>
+    <string name="grammar_zh_zhiyao">只要…就…: as long as…, (then)…</string>
+    <string name="grammar_zh_zhiyou">只有…才…: only if…, (only then)…</string>
+    <string name="grammar_zh_jiran">既然…就…: since (given that)…, then…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…: even if…, still…</string>
+    <string name="grammar_zh_lian">连…都 / 也…: even…</string>
+    <string name="grammar_zh_chule">除了…(以外): except…; besides…</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说: for (someone), from their point of view</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B: not A, but B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来: looks like, sounds like, seems</string>
+    <string name="grammar_zh_youdianr">有点儿 + adjective: a bit (usually something unwanted)</string>
+    <string name="grammar_zh_yidianr">一点儿: a little (adjective + 一点儿 = a bit more…)</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + adjective: more and more…</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B: the more A, the more B</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B: doing A and B at the same time</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了: about to happen, very soon</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + verb: doing it right now (in progress)</string>
+    <string name="grammar_zh_yixia">Verb + 一下: do it briefly (have a quick look, wait a moment)</string>
+    <string name="grammar_zh_direction">Verb + 来 / 去 (…): the direction of the action (来 toward the speaker, 去 away)</string>
+    <string name="grammar_zh_potential">Verb + 得 / 不 + result: can / can’t (听不懂 = can’t understand)</string>
+    <string name="grammar_zh_result">Verb + result: shows how the action ends (做完 = finish, 听懂 = understand, 找到 = find)</string>
+    <string name="grammar_zh_rang">让 / 叫 + someone + verb: let or make someone do something</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B: take A as B (formal)</string>
+    <string name="grammar_zh_ma">吗: turns a sentence into a yes/no question</string>
+    <string name="grammar_zh_ne">呢: and what about…?; softens a question; or an action still going on</string>
+    <string name="grammar_zh_shi">是: is, am, are (links two nouns: 我是学生)</string>
+    <string name="grammar_zh_you">有: have; there is</string>
+    <string name="grammar_zh_zai">在: at, in (a place); or be at a place</string>
+    <string name="grammar_zh_hen">很: very (often just links the subject to an adjective)</string>
+    <string name="grammar_zh_tai">太 (…了): too…; or so… (了 adds feeling)</string>
+    <string name="grammar_zh_dou">都: all, both (comes before the verb)</string>
+    <string name="grammar_zh_ye">也: also, too (comes before the verb)</string>
+    <string name="grammar_zh_he">和: and (joins nouns, not sentences); with</string>
+    <string name="grammar_zh_question_word">Question word: what, who, where, how, how many, why (stands where the answer would be)</string>
+    <string name="grammar_zh_de_shihou">…的时候: when…, at the time of…</string>
+    <string name="grammar_zh_location">Place word after the noun: 桌子上 = on the table, 房间里 = in the room</string>
+    <string name="grammar_zh_qing">请 + verb: please (do)</string>
+    <string name="grammar_zh_hui">会: can (a learned skill); will probably</string>
+    <string name="grammar_zh_neng">能: can (be able to, or be allowed to)</string>
+    <string name="grammar_zh_xiang">想 + verb: want to, would like to</string>
+    <string name="grammar_zh_de">的: links a describing word or an owner to a noun (我的书 = my book)</string>
+    <string name="grammar_zh_le_completed">Verb + 了: the action is completed</string>
+    <string name="grammar_zh_guo">Verb + 过: have done it before (an experience)</string>
+    <string name="grammar_zh_zhe">Verb + 着: a lasting state or an action going on (穿着 = wearing)</string>
+    <string name="grammar_zh_de_degree">Verb + 得 + description: how (well) it is done (跑得很快)</string>
+    <string name="grammar_zh_bi">A 比 B + adjective: A is more… than B</string>
+    <string name="grammar_zh_zui">最: the most</string>
+    <string name="grammar_zh_jiu">就: then; right away; exactly; only (stresses that it is soon or easy)</string>
+    <string name="grammar_zh_yijing">已经 (…了): already</string>
+    <string name="grammar_zh_gei">给: give; for, to (给他打电话 = phone him)</string>
+    <string name="grammar_zh_dui">对: to, toward, about (对…感兴趣); or correct</string>
+    <string name="grammar_zh_cong">从: from (a place or a time); 从…到…: from… to…</string>
+    <string name="grammar_zh_li">离: the distance from (A 离 B 很远 = A is far from B)</string>
+    <string name="grammar_zh_wang">往: toward (a direction)</string>
+    <string name="grammar_zh_yiqi">一起: together (跟…一起 = together with)</string>
+    <string name="grammar_zh_hai">还: still; also; even more (还有 = there is also)</string>
+    <string name="grammar_zh_zai_again">再: again (in the future); then (先…再…)</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺: very, really (how strong the adjective is)</string>
+    <string name="grammar_zh_keyi">可以: may, can (permission or possibility)</string>
+    <string name="grammar_zh_yao">要: want; need to; will (soon)</string>
+    <string name="grammar_zh_ba_particle">吧: a suggestion (let’s…) or checking (…right?)</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是: how often (often, usually, always)</string>
+    <string name="grammar_zh_before_after">…以前 / …以后: before… / after… (comes after the event)</string>
+    <string name="grammar_zh_ordinal">第 + number: an order number (第一 = first)</string>
+    <string name="grammar_zh_mei_every">每 (+ measure word): every (often with 都)</string>
+    <string name="grammar_zh_le_change">了 at the end: something has changed or is new now</string>
+    <string name="grammar_zh_v_not_v">Verb 不 verb: a yes/no question (去不去 = going or not?)</string>
+    <string name="grammar_zh_reduplication">Doubled verb (看看, 试一试): do it a little, give it a try</string>
+    <string name="grammar_zh_ba">把 + object + verb + result: does something to the object (the object comes before the verb)</string>
+    <string name="grammar_zh_bei">被: passive, the subject receives the action (often something unwanted)</string>
+    <string name="grammar_zh_de_adverbial">Description + 地 + verb: how the action is done (慢慢地走)</string>
+    <string name="grammar_zh_geng">更: even more</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…): first (…, then…)</string>
+    <string name="grammar_zh_ranhou">然后: then, after that</string>
+    <string name="grammar_zh_haishi">还是: or (in questions); still; had better</string>
+    <string name="grammar_zh_huozhe">或者: or (in statements)</string>
+    <string name="grammar_zh_cai">才: only then, not until (later or harder than expected)</string>
+    <string name="grammar_zh_you_again">又: again (it already happened again); 又 A 又 B: both A and B</string>
+    <string name="grammar_zh_bijiao">比较: fairly, rather; to compare</string>
+    <string name="grammar_zh_zhi">只: only (before the verb)</string>
+    <string name="grammar_zh_yiding">一定: surely, definitely; must</string>
+    <string name="grammar_zh_zhongyu">终于: finally (after waiting or effort)</string>
+    <string name="grammar_zh_mashang">马上: right away, immediately</string>
+    <string name="grammar_zh_yizhi">一直: all the time, continuously; straight ahead</string>
+    <string name="grammar_zh_qishi">其实: actually, in fact</string>
+    <string name="grammar_zh_gang">刚 / 刚刚: just (a moment ago); 刚才: a moment ago</string>
+    <string name="grammar_zh_yinggai">应该: should, ought to</string>
+    <string name="grammar_zh_bixu">必须: must, have to</string>
+    <string name="grammar_zh_xuyao">需要: need (to)</string>
+    <string name="grammar_zh_yuanyi">愿意: be willing to</string>
+    <string name="grammar_zh_weile">为了: in order to; for the sake of</string>
+    <string name="grammar_zh_guanyu">关于: about, on the topic of</string>
+    <string name="grammar_zh_gen">跟: with, and (跟…一起 = together with)</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样: A is the same as B</string>
+    <string name="grammar_zh_haoxiang">好像: it seems, as if</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ adjective): so…, like this / like that</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦: add feeling (surprise, excitement, a softer tone)</string>
+    <string name="grammar_zh_shi_de">是…的: stresses when, where or how something happened</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B: as soon as A, (then) B</string>
+    <string name="grammar_zh_yushi">于是: so, and then (what happened next)</string>
+    <string name="grammar_zh_duome">多么 + adjective!: how…! (strong feeling)</string>
+    <string name="grammar_zh_yuanlai">原来: originally; so it turns out (you just realized)</string>
+    <string name="grammar_zh_daodi">到底: on earth (in questions); after all</string>
+    <string name="grammar_zh_shenzhi">甚至: even (going further than expected)</string>
+    <string name="grammar_zh_fouze">否则 / 不然: otherwise, or else</string>
+    <string name="grammar_zh_jingran">竟然 / 居然: unexpectedly, to your surprise</string>
+    <string name="grammar_zh_nandao">难道…?: surely not…? (a question that expects no)</string>
+    <string name="grammar_zh_jinguan">尽管: although; feel free to</string>
+    <string name="grammar_zh_suizhe">随着: along with, as (something changes)</string>
+    <string name="grammar_zh_fanzheng">反正: anyway, in any case</string>
+    <string name="grammar_zh_bijing">毕竟: after all</string>
+    <string name="grammar_zh_weibi">未必: not necessarily</string>
+    <string name="grammar_zh_jianzhi">简直: simply, practically (strong feeling)</string>
+    <string name="grammar_zh_wanyi">万一: if by any chance (something bad)</string>
+    <string name="grammar_zh_zongzhi">总之: in short, anyway</string>
+    <string name="grammar_zh_zhiyu">至于: as for…</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B: rather than A, it is better to B</string>
+    <string name="grammar_zh_ningke">宁可: would rather (even at a cost)</string>
+    <string name="grammar_zh_hebi">何必…?: why bother…? (there is no need)</string>
+    <string name="grammar_zh_yimian">以免: so as to avoid</string>
+    <string name="grammar_zh_yibian_so">以便: so that, to make it easier to</string>
+    <string name="grammar_zh_conger">从而: thus, thereby</string>
+    <string name="grammar_zh_guran">固然: admittedly, it is true that… (but)</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况: besides, moreover; let alone</string>
+    <string name="grammar_zh_men">们: makes a word for people plural (朋友们 = friends)</string>
+    <string name="grammar_zh_yong">用 + thing + verb: do something with or using it</string>
+    <string name="grammar_zh_wei_for">为 + someone: for someone, on behalf of (为你高兴 = happy for you)</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝: toward, facing (向我走来 = come toward me)</string>
+    <string name="grammar_zh_yiwei_thought">以为: thought (usually wrongly), assumed</string>
+    <string name="grammar_zh_er">而: and, yet, while (joins two ideas, more formal)</string>
+    <string name="grammar_zh_bing">并: and also; 并不 / 并没有: not at all, actually not</string>
+    <string name="grammar_zh_you_by">由: by (who does it); from (由我负责 = I am in charge)</string>
+    <string name="grammar_zh_suo">所 + verb: what… (formal; 我所知道的 = what I know)</string>
+    <string name="grammar_zh_zhishi">只是: just, only; but (a softer 但是)</string>
+    <string name="grammar_zh_youyu">由于: because of, due to (formal)</string>
+    <string name="grammar_zh_genju">根据: according to; 通过: through, by means of; 按照: following (the rules)</string>
+    <string name="grammar_zh_yu_at">于: at, in, to, from (formal written Chinese)</string>
+    <string name="grammar_zh_yi_by">以: with, by means of, as (formal)</string>
+    <string name="grammar_zh_zhi_of">之: the formal 的 (三分之一 = one third)</string>
+    <string name="grammar_zh_measure">Measure word: number or this / that + measure word + noun (一本书, 这个人)</string>
+    <string name="grammar_zh_bu">不: not (now, the future, habits, and with adjectives)</string>
+    <string name="grammar_zh_mei">没 / 没有: did not, have not (past actions); 没有 + noun: not have</string>
+    <string name="grammar_zh_zhiyi">A 之一: one of A (最好的电影之一 = one of the best films)</string>
+    <string name="grammar_zh_duiyu">对于: as for, regarding (对于这个问题 = on this question)</string>
+    <string name="grammar_zh_yinci">因此: so, therefore (the result of what was just said)</string>
+    <string name="grammar_zh_raner">然而: however (more formal than 但是)</string>
+    <string name="grammar_zh_chufei">除非: unless; only if (除非…才 / 否则…)</string>
+    <string name="grammar_zh_yaome">要么 A 要么 B: either A or B (choose one)</string>
+    <string name="grammar_zh_ji_you">既 A 又 / 也 B: both A and B</string>
+    <string name="grammar_zh_tongshi">同时: at the same time; meanwhile, also</string>
+    <string name="grammar_zh_shide">(像)…似的: as if, like (他像孩子似的 = he is like a child)</string>
+    <string name="grammar_zh_zicong">自从 / 自: since (a time in the past, until now)</string>
+    <string name="grammar_zh_yiji">以及: and, as well as (formal; joins the last item of a list)</string>
+    <string name="grammar_zh_ti">替: for, on behalf of (替我谢谢他 = thank him for me)</string>
+</resources>
