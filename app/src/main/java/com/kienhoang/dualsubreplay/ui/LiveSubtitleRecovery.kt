@@ -116,5 +116,8 @@ internal fun LiveSubtitlePanel(
                 },
             )
         }
+        state.fullTranscriptProblem?.let { problem ->
+            Text(problem, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }

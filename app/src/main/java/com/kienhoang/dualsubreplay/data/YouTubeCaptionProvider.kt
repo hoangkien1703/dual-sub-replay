@@ -422,6 +422,31 @@ internal fun selectCaptionTrack(
     }
 }
 
+/** The languages of [tracks], one per base language, named as YouTube names them. */
+internal fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> =
+    (0 until tracks.length())
+        .mapNotNull(tracks::optJSONObject)
+        .mapNotNull { track ->
+            val code = track.optString("languageCode").takeIf(String::isNotBlank) ?: return@mapNotNull null
+            CaptionLanguage(
+                code = code,
+                name =
+                    track
+                        .optJSONObject("name")
+                        ?.let(::captionName)
+                        .orEmpty()
+                        .ifBlank { code.uppercase() },
+            )
+        }.distinctBy { it.code.substringBefore('-').lowercase() }
+
+private fun captionName(name: JSONObject): String {
+    name.optString("simpleText").takeIf(String::isNotBlank)?.let { return it }
+    val runs = name.optJSONArray("runs") ?: return ""
+    return (0 until runs.length())
+        .mapNotNull(runs::optJSONObject)
+        .joinToString(separator = "") { it.optString("text") }
+}
+
 internal fun readUtf8WithLimit(
     input: InputStream,
     maxBytes: Int = MAX_YOUTUBE_RESPONSE_BYTES,
@@ -712,30 +737,6 @@ class YouTubeCaptionProvider(
             cues = cues,
             availableLanguages = availableLanguages(tracks),
         )
-    }
-
-    private fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> =
-        (0 until tracks.length())
-            .mapNotNull(tracks::optJSONObject)
-            .mapNotNull { track ->
-                val code = track.optString("languageCode").takeIf(String::isNotBlank) ?: return@mapNotNull null
-                CaptionLanguage(
-                    code = code,
-                    name =
-                        track
-                            .optJSONObject("name")
-                            ?.let(::captionName)
-                            .orEmpty()
-                            .ifBlank { code.uppercase() },
-                )
-            }.distinctBy { it.code.substringBefore('-').lowercase() }
-
-    private fun captionName(name: JSONObject): String {
-        name.optString("simpleText").takeIf(String::isNotBlank)?.let { return it }
-        val runs = name.optJSONArray("runs") ?: return ""
-        return (0 until runs.length())
-            .mapNotNull(runs::optJSONObject)
-            .joinToString(separator = "") { it.optString("text") }
     }
 
     private suspend fun fetchCaptionCues(

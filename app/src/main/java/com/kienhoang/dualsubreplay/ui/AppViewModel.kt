@@ -22,6 +22,9 @@ import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.PageFirstCaptionProvider
+import com.kienhoang.dualsubreplay.data.PageTranscriptProblem
+import com.kienhoang.dualsubreplay.data.PageTranscriptSource
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
@@ -69,6 +72,8 @@ data class DualSubUiState(
     val liveOriginal: String? = null,
     val liveTranslated: String? = null,
     val retryingTranscript: Boolean = false,
+    /** Why the full transcript is missing while live subtitles stand in, or null. */
+    val fullTranscriptProblem: String? = null,
     val browserUrl: String = YOUTUBE_HOME_URL,
     val browserNavigationRequestId: Long = 0L,
     val activeVideoId: String? = null,
@@ -292,11 +297,16 @@ internal fun initialGuideCompleted(
 class AppViewModel internal constructor(
     application: Application,
     private val captionProvider: CaptionProvider,
+    private val pageTranscripts: PageTranscriptSource = PageTranscriptSource.Shared,
 ) : AndroidViewModel(application) {
     constructor(application: Application) : this(
         application,
         // Survives Android closing the app in the background, so returning skips the caption download.
-        RecentCaptionTracks(YouTubeCaptionProvider(), File(application.cacheDir, "recent-caption-tracks")),
+        // The YouTube page fetches the track first; the app's own lookup runs alongside as the fallback.
+        RecentCaptionTracks(
+            PageFirstCaptionProvider(PageTranscriptSource.Shared, YouTubeCaptionProvider()),
+            File(application.cacheDir, "recent-caption-tracks"),
+        ),
     )
 
     private val preferences = application.getSharedPreferences("dual_sub_preferences", 0)
@@ -566,6 +576,15 @@ class AppViewModel internal constructor(
         if (_state.value.preloadModelsEnabled) {
             val source = _state.value.sourcePreference.takeUnless { it == "auto" } ?: "en"
             warmTranslationModel(sourceLanguage = source, targetLanguage = _state.value.targetLanguage)
+        }
+        // The page got the full transcript after live subtitles took over: load it.
+        viewModelScope.launch {
+            pageTranscripts.lateTranscripts.collect { videoId ->
+                val current = _state.value
+                if (current.activeVideoId == videoId && current.liveFallback && !current.retryingTranscript) {
+                    loadVideo(videoId, showPanel = current.subtitlePanelVisible)
+                }
+            }
         }
     }
 
@@ -1233,6 +1252,7 @@ class AppViewModel internal constructor(
                 liveOriginal = if (preserveLive) it.liveOriginal else null,
                 liveTranslated = if (preserveLive) it.liveTranslated else null,
                 retryingTranscript = preserveLive,
+                fullTranscriptProblem = if (preserveLive) it.fullTranscriptProblem else null,
                 activeVideoId = videoId,
                 playbackPaused = if (playbackKnown) it.playbackPaused else true,
                 subtitlePanelVisible = showPanel,
@@ -1268,6 +1288,7 @@ class AppViewModel internal constructor(
                             liveOriginal = null,
                             liveTranslated = null,
                             retryingTranscript = false,
+                            fullTranscriptProblem = null,
                             resolvedSourceLanguage = track.languageCode,
                             sourcePreference =
                                 resolvedSourcePreference(
@@ -1291,6 +1312,7 @@ class AppViewModel internal constructor(
                             stage = LoadStage.READY,
                             liveFallback = true,
                             retryingTranscript = false,
+                            fullTranscriptProblem = fullTranscriptProblem(videoId, error),
                             statusMessage =
                                 if (current.liveOriginal !=
                                     null
@@ -1595,6 +1617,25 @@ class AppViewModel internal constructor(
         @StringRes id: Int,
         vararg args: Any,
     ): String = localizedContext().getString(id, *args)
+
+    /** Why the page and the app's own download both gave no full transcript of [videoId]. */
+    private fun fullTranscriptProblem(
+        videoId: String,
+        downloadError: Exception,
+    ): String {
+        val page =
+            when (pageTranscripts.problem(videoId)) {
+                PageTranscriptProblem.NO_ANSWER -> text(R.string.status_transcript_page_no_answer)
+                PageTranscriptProblem.NO_TRACKS -> text(R.string.status_transcript_page_no_tracks)
+                PageTranscriptProblem.NO_PLAYER -> text(R.string.status_transcript_page_no_player)
+                PageTranscriptProblem.WAITING_FOR_CAPTIONS -> text(R.string.status_transcript_page_waiting)
+                PageTranscriptProblem.UNREADABLE -> text(R.string.status_transcript_page_unreadable)
+                null -> null
+            }
+        // The error's own message is English diagnostic text, like Google's failure detail.
+        val detail = downloadError.message?.takeIf(String::isNotBlank) ?: downloadError.javaClass.simpleName
+        return listOfNotNull(page, text(R.string.status_transcript_download_failed, detail)).joinToString("\n")
+    }
 
     /** A language's name in the interface language, for use inside [text] messages. */
     private fun languageName(code: String): String = languageDisplayName(code, localizedContext().interfaceLocale())

@@ -386,6 +386,8 @@ internal fun SingleYouTubePage(
                     WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
                     YOUTUBE_DOCUMENT_START_ORIGINS,
                 )
+                // Before the page player loads, so its caption downloads are kept for the full transcript.
+                WebViewCompat.addDocumentStartJavaScript(this, WEB_CAPTION_CAPTURE_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
             }
 
             webViewClient = object : WebViewClient() {
@@ -554,6 +556,8 @@ internal fun SingleYouTubePage(
             )
         }
     }
+
+    PageTranscriptReader(webView, active = lifecycleStarted)
 
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect

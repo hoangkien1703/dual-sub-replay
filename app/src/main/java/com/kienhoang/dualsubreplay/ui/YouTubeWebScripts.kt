@@ -1,5 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.MAX_PAGE_TRANSCRIPT_LENGTH
+import com.kienhoang.dualsubreplay.data.PageCaptionTarget
+import com.kienhoang.dualsubreplay.data.PageTranscriptReply
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -650,4 +653,292 @@ internal fun webClipReplayScript(
           return true;
         })();
         """.trimIndent()
+}
+
+/**
+ * Returns the caption part of the page player's response (tracks, audio tracks, title) for
+ * `PageTranscriptSource`, or null before the player has one. Read-only: it changes nothing.
+ */
+internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+      const player = document.getElementById('movie_player');
+      let response = null;
+      try { response = player && typeof player.getPlayerResponse === 'function' ? player.getPlayerResponse() : null; } catch (_) {}
+      if (!response) response = window.ytInitialPlayerResponse || null;
+      const details = response && response.videoDetails;
+      if (!details || !details.videoId) return null;
+      const renderer = response.captions && response.captions.playerCaptionsTracklistRenderer;
+      return JSON.stringify({
+        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
+        captions: renderer ? { playerCaptionsTracklistRenderer: {
+          captionTracks: Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [],
+          audioTracks: renderer.audioTracks || [],
+          defaultAudioTrackIndex: renderer.defaultAudioTrackIndex || 0
+        } } : null
+      });
+    })();
+    """.trimIndent()
+
+internal const val CAPTION_CAPTURE_STATE_KEY = "__dualSubCaptionCaptureV1"
+
+/**
+ * Keeps a copy of every caption track the YouTube page player downloads, so the app can build the
+ * full transcript from the very document the player received: the player's request already carries
+ * the page's cookies and proof-of-origin token (`pot`), which YouTube now demands and the app's own
+ * lookup cannot supply. Added at document start (and again by [webPageTranscriptScript] where that
+ * is unsupported). It only reads `/api/timedtext` replies from YouTube hosts, skips auto-translated
+ * tracks and replies over 8 MiB, keeps the last eight tracks, and never changes a request or reply.
+ */
+internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return;
+      const key = '$CAPTION_CAPTURE_STATE_KEY';
+      if (window[key]) return;
+      const capture = window[key] = { tracks: {}, order: [] };
+      capture.timedText = function(value) {
+        try {
+          const url = new URL(String(value), window.location.href);
+          const urlHost = url.hostname.toLowerCase().replace(/\.$/, '');
+          if (url.protocol !== 'https:' || !(urlHost === 'youtube.com' || urlHost.endsWith('.youtube.com')) ||
+              url.pathname !== '/api/timedtext' || !url.searchParams.get('v') || url.searchParams.get('tlang')) return null;
+          return url;
+        } catch (_) {
+          return null;
+        }
+      };
+      capture.keep = function(url, text) {
+        if (typeof text !== 'string' || !text.trim() || text.length > $MAX_PAGE_TRANSCRIPT_LENGTH) return;
+        const track = {
+          videoId: url.searchParams.get('v'),
+          languageCode: url.searchParams.get('lang') || '',
+          generated: url.searchParams.get('kind') === 'asr',
+          text: text
+        };
+        const id = track.videoId + '|' + track.languageCode + '|' + track.generated;
+        if (!capture.tracks[id]) capture.order.push(id);
+        capture.tracks[id] = track;
+        while (capture.order.length > 8) delete capture.tracks[capture.order.shift()];
+      };
+      try {
+        const open = XMLHttpRequest.prototype.open;
+        const send = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function(method, address) {
+          this.__dualSubTimedText = capture.timedText(address);
+          return open.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function() {
+          const request = this;
+          const url = request.__dualSubTimedText;
+          if (url) {
+            request.addEventListener('load', function() {
+              try {
+                if (request.status < 200 || request.status >= 300) return;
+                const type = request.responseType;
+                if (type === '' || type === 'text') capture.keep(url, request.responseText);
+                else if (type === 'json' && request.response) capture.keep(url, JSON.stringify(request.response));
+                else if (type === 'arraybuffer' && request.response) capture.keep(url, new TextDecoder().decode(request.response));
+              } catch (_) {}
+            });
+          }
+          return send.apply(this, arguments);
+        };
+      } catch (_) {}
+      try {
+        const pageFetch = window.fetch;
+        if (typeof pageFetch === 'function') {
+          window.fetch = function(input) {
+            const reply = pageFetch.apply(window, arguments);
+            try {
+              const url = capture.timedText(input && typeof input === 'object' && 'url' in input ? input.url : input);
+              if (url) {
+                reply.then(function(response) {
+                  if (response && response.ok) response.clone().text().then(function(text) { capture.keep(url, text); }, function() {});
+                }, function() {});
+              }
+            } catch (_) {}
+            return reply;
+          };
+        }
+      } catch (_) {}
+    })();
+    """.trimIndent()
+
+internal const val PAGE_TRANSCRIPT_STATE_KEY = "__dualSubPageTranscriptV2"
+
+/** How long one attempt may switch the page's captions on to make the player download the track. */
+internal const val PAGE_CAPTION_SWITCH_MS = 15_000
+
+/**
+ * Gets [target]'s caption track from the page and reports `working` (with the step it is on) or
+ * `done` (with the document and its track) as JSON text. Each attempt is one job: a retry is a new
+ * attempt and starts again, and older jobs are dropped. The job first fetches the track's own
+ * address from the page, which works where YouTube does not demand a proof-of-origin token. Then it
+ * waits for the page player to download the track (see [WEB_CAPTION_CAPTURE_SCRIPT]); for the first
+ * [PAGE_CAPTION_SWITCH_MS] it switches the page's captions to that track so the player does so, and
+ * switches them back if nobody changed them since. After that it keeps watching, so captions the
+ * player loads later (when the video plays, or live subtitles turn them on) still finish the job.
+ */
+internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
+    // Fixed key order (Android's JSONObject keeps insertion order, the JVM's does not).
+    val targetLiteral =
+        "{\"videoId\":${JSONObject.quote(target.videoId)},\"languageCode\":${JSONObject.quote(target.languageCode)}," +
+            "\"generated\":${target.generated},\"baseUrl\":${JSONObject.quote(target.baseUrl)},\"attempt\":\"${target.attempt}\"}"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          $WEB_CAPTION_CAPTURE_SCRIPT
+          const capture = window['$CAPTION_CAPTURE_STATE_KEY'];
+          if (!capture) return null;
+          const target = $targetLiteral;
+          const key = '$PAGE_TRANSCRIPT_STATE_KEY';
+          const state = window[key] || (window[key] = { jobs: {} });
+          $PAGE_TRANSCRIPT_FUNCTIONS
+          Object.keys(state.jobs).forEach(function(id) {
+            if (id === target.attempt) return;
+            state.restoreTrack(state.jobs[id]);
+            delete state.jobs[id];
+          });
+          let job = state.jobs[target.attempt];
+          if (!job) {
+            job = state.jobs[target.attempt] = { status: 'working', step: 'page-address', started: Date.now() };
+            state.start(job, target);
+          }
+          state.check(job, target);
+          return JSON.stringify({
+            status: job.status,
+            step: job.step,
+            text: job.status === 'done' ? job.text : null,
+            languageCode: job.languageCode || null,
+            generated: !!job.generated
+          });
+        })();
+        """.trimIndent()
+}
+
+/** `state.*` helpers for [webPageTranscriptScript]. */
+private val PAGE_TRANSCRIPT_FUNCTIONS =
+    """
+    state.player = function() {
+      const player = document.getElementById('movie_player');
+      return player && typeof player.getOption === 'function' &&
+        typeof player.setOption === 'function' ? player : null;
+    };
+    state.usable = function(text) {
+      return typeof text === 'string' && text.trim().length > 0 && text.length <= $MAX_PAGE_TRANSCRIPT_LENGTH;
+    };
+    state.download = function(address, target) {
+      const url = capture.timedText(address);
+      if (!url || url.searchParams.get('v') !== target.videoId) return Promise.resolve('');
+      // The page's own host keeps the request same-origin, so the page's cookies go with it.
+      url.host = window.location.host;
+      url.searchParams.set('lang', target.languageCode);
+      if (target.generated) url.searchParams.set('kind', 'asr'); else url.searchParams.delete('kind');
+      url.searchParams.set('fmt', 'json3');
+      return fetch(url.toString(), { credentials: 'include' })
+        .then(function(response) { return response.ok ? response.text() : ''; })
+        .catch(function() { return ''; });
+    };
+    state.captured = function(target, sameLanguage) {
+      const exact = capture.tracks[target.videoId + '|' + target.languageCode + '|' + target.generated];
+      if (exact && state.usable(exact.text)) return exact;
+      if (!sameLanguage) return null;
+      const base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+      for (let index = capture.order.length - 1; index >= 0; index--) {
+        const track = capture.tracks[capture.order[index]];
+        if (track && track.videoId === target.videoId && base(track.languageCode) === base(target.languageCode) &&
+            state.usable(track.text)) return track;
+      }
+      return null;
+    };
+    state.finish = function(job, track) {
+      state.restoreTrack(job);
+      job.status = 'done';
+      job.text = track.text;
+      job.languageCode = track.languageCode;
+      job.generated = track.generated;
+    };
+    state.showTrack = function(job, target) {
+      const player = state.player();
+      if (!player || job.switched) return;
+      let active = null;
+      try { active = player.getOption('captions', 'track'); } catch (_) {}
+      job.previous = active && typeof active === 'object' && Object.keys(active).length ? active : null;
+      let track = { languageCode: target.languageCode };
+      if (target.generated) track.kind = 'asr';
+      try {
+        if (typeof player.loadModule === 'function') player.loadModule('captions');
+        const list = player.getOption('captions', 'tracklist', { includeAsr: true });
+        const match = Array.isArray(list) && list.find(function(item) {
+          return item && item.languageCode === target.languageCode && (item.kind === 'asr') === target.generated;
+        });
+        if (match) track = match;
+      } catch (_) {}
+      try {
+        player.setOption('captions', 'track', track);
+        job.switched = true;
+        job.shownLanguage = target.languageCode;
+      } catch (_) {}
+    };
+    state.restoreTrack = function(job) {
+      const player = state.player();
+      if (!player || !job.switched) return;
+      job.switched = false;
+      let active = null;
+      try { active = player.getOption('captions', 'track'); } catch (_) {}
+      // Captions changed since (by live subtitles or the user) stay as they are.
+      if (!active || active.languageCode !== job.shownLanguage) return;
+      try { player.setOption('captions', 'track', job.previous || {}); } catch (_) {}
+    };
+    state.start = function(job, target) {
+      state.download(target.baseUrl, target).then(function(text) {
+        job.addressTried = true;
+        if (job.status === 'working' && state.usable(text)) {
+          state.finish(job, { text: text, languageCode: target.languageCode, generated: target.generated });
+        }
+      });
+    };
+    state.check = function(job, target) {
+      if (job.status !== 'working') return;
+      const elapsed = Date.now() - job.started;
+      const track = state.captured(target, elapsed > $PAGE_CAPTION_SWITCH_MS);
+      if (track) {
+        state.finish(job, track);
+        return;
+      }
+      if (!job.addressTried && elapsed < 5000) return;
+      if (elapsed > $PAGE_CAPTION_SWITCH_MS) {
+        state.restoreTrack(job);
+      } else if (state.player()) {
+        state.showTrack(job, target);
+      }
+      job.step = state.player() ? 'waiting-for-captions' : 'no-player';
+    };
+    """.trim()
+
+/** Reads what [webPageTranscriptScript] returned through `evaluateJavascript`. */
+internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {
+    val json = decodeScriptString(rawValue)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return PageTranscriptReply.Working()
+    val step = json.optString("step").takeIf { it.matches(Regex("[a-z-]{1,40}")) }
+    val text = json.optString("text")
+    if (json.optString("status") != "done" || text.isBlank()) return PageTranscriptReply.Working(step)
+    return PageTranscriptReply.Done(
+        text,
+        json.optString("languageCode").takeIf { it.matches(Regex("[a-zA-Z]{2,3}(-[a-zA-Z0-9]+)*")) },
+        json.optBoolean("generated"),
+    )
+}
+
+/** The string a page script returned through `evaluateJavascript` (which JSON-quotes it), or null. */
+internal fun decodeScriptString(rawValue: String?): String? {
+    if (rawValue.isNullOrBlank() || rawValue == "null") return null
+    return runCatching { JSONTokener(rawValue).nextValue() as? String }.getOrNull()?.takeIf(String::isNotBlank)
 }

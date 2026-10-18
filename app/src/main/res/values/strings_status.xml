@@ -18,6 +18,12 @@
     <string name="status_live_subtitles_title">Live subtitles</string>
     <string name="status_retrying_full_transcript">Retrying full transcript…</string>
     <string name="status_retry_full_transcript">Retry full transcript</string>
+    <string name="status_transcript_page_no_answer">Full transcript: the YouTube page hasn\'t answered for this video yet. The app keeps checking.</string>
+    <string name="status_transcript_page_no_tracks">Full transcript: YouTube lists no captions for this video.</string>
+    <string name="status_transcript_page_no_player">Full transcript: the YouTube player isn\'t ready yet. The app keeps checking.</string>
+    <string name="status_transcript_page_waiting">Full transcript: YouTube hasn\'t loaded the captions yet. It appears by itself once they load, usually after the video starts playing.</string>
+    <string name="status_transcript_page_unreadable">Full transcript: the captions YouTube sent couldn\'t be read.</string>
+    <string name="status_transcript_download_failed">App download: %1$s</string>
     <string name="translation_issue_button">Translation problem</string>
     <string name="translation_issue_on_device_title">Using on-device translation</string>
     <string name="translation_issue_on_device_message">Google Translate isn\'t working right now, so this video is translated on your device. The app checks Google again every 2 minutes and on the next video.</string>
