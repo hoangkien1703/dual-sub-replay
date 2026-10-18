@@ -547,7 +547,7 @@ internal fun SubtitleSettingsDialog(
 
                     if (aiAssistant != null) {
                         Section(MoreSettingsSection.AI_ASSISTANT, Icons.Default.AutoAwesome) {
-                            AiAssistantSettingsSection(aiAssistant)
+                            AiAssistantSettingsSection(aiAssistant, nested = true)
                         }
                     }
 
@@ -641,12 +641,39 @@ private fun ExpandableSettingsSection(
     onToggle: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    SettingsExpandableCard(
+        title = stringResource(section.titleRes),
+        summary = stringResource(section.summaryRes),
+        icon = icon,
+        expanded = expanded,
+        onToggle = onToggle,
+        testTag = "settings_section_${section.key}",
+        content = content,
+    )
+}
+
+/**
+ * A card that opens to show its settings, as on the More settings page: an icon, a title, a
+ * one-line summary, and the settings below a divider while [expanded]. Inside another card,
+ * [color] sets it apart.
+ */
+@Composable
+internal fun SettingsExpandableCard(
+    title: String,
+    summary: String,
+    icon: ImageVector,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    testTag: String,
+    color: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     val expansionState =
         stringResource(if (expanded) R.string.settings_section_expanded else R.string.settings_section_collapsed)
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = color,
     ) {
         Column {
             Row(
@@ -655,7 +682,7 @@ private fun ExpandableSettingsSection(
                         .fillMaxWidth()
                         .clickable(role = Role.Button, onClick = onToggle)
                         .semantics { stateDescription = expansionState }
-                        .testTag("settings_section_${section.key}")
+                        .testTag(testTag)
                         .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -671,9 +698,9 @@ private fun ExpandableSettingsSection(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(section.titleRes), style = MaterialTheme.typography.titleSmall)
+                    Text(title, style = MaterialTheme.typography.titleSmall)
                     Text(
-                        stringResource(section.summaryRes),
+                        summary,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

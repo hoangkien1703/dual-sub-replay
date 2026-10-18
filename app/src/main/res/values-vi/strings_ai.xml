@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">Dịch vụ AI gửi câu trả lời mà ứng dụng không đọc được.</string>
     <string name="ai_settings_enabled_title">Trợ lý AI</string>
     <string name="ai_settings_enabled_description">Hiện nút AI ở góc trên bên phải. Khi tắt, không có gì được gửi tới dịch vụ AI và các sự cố hiện ở biểu tượng thông thường.</string>
-    <string name="ai_settings_key_heading">Khóa AI (API key)</string>
-    <string name="ai_settings_key_saved">Đã lưu khóa %1$s, kết thúc bằng %2$s</string>
     <string name="ai_settings_remove_key">Xóa khóa</string>
     <string name="ai_settings_test">Kiểm tra kết nối</string>
     <string name="ai_settings_test_passed">Đã kết nối. Trợ lý đã sẵn sàng.</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">Các cuộc trò chuyện chỉ nằm trên điện thoại này và không bao giờ được sao lưu. Khi tắt, cuộc trò chuyện bị quên khi đóng ứng dụng và các cuộc trò chuyện đã lưu bị xóa.</string>
     <string name="ai_settings_delete_history">Xóa lịch sử trò chuyện ngay</string>
     <string name="ai_settings_history_deleted">Đã xóa lịch sử trò chuyện.</string>
-    <string name="ai_settings_advanced">Nâng cao</string>
     <string name="ai_settings_service">Dịch vụ AI</string>
     <string name="ai_provider_custom">Khác (tương thích OpenAI)</string>
     <string name="ai_settings_base_url">Địa chỉ dịch vụ (https://…/v1)</string>
@@ -198,4 +195,32 @@
     <string name="ai_action_memory_save_button">Lưu</string>
     <string name="ai_action_memory_forget_button">Quên</string>
     <string name="ai_action_manage">Quản lý</string>
+    <string name="ai_settings_keys_section">Khóa API</string>
+    <string name="ai_settings_model_section">Mô hình và mức suy nghĩ</string>
+    <string name="ai_settings_permissions_section">Quyền</string>
+    <string name="ai_settings_keys_none">Chưa có khóa</string>
+    <string name="ai_settings_service_choose">Chọn dịch vụ AI</string>
+    <string name="ai_settings_test_all">Kiểm tra tất cả khóa</string>
+    <string name="ai_settings_keys_fallback">Khi một khóa bị từ chối, hết tín dụng hoặc chạm giới hạn, trợ lý sẽ tự chuyển sang khóa tiếp theo.</string>
+    <string name="ai_settings_keys_full">Bạn đã lưu số khóa tối đa cho dịch vụ này (%1$d). Hãy xóa một khóa để thêm khóa khác.</string>
+    <string name="ai_settings_add_key">Thêm khóa khác</string>
+    <string name="ai_settings_key_in_use">Hoạt động · đang dùng</string>
+    <string name="ai_settings_key_works">Hoạt động</string>
+    <string name="ai_settings_key_ending">Khóa kết thúc bằng %1$s</string>
+    <string name="ai_settings_thinking_title">Mức suy nghĩ</string>
+    <string name="ai_settings_full_access_title">Toàn quyền cho trợ lý</string>
+    <string name="ai_settings_full_access_description">Cho phép trợ lý thay đổi cả cài đặt AI của chính nó, thêm hoặc xóa khóa, sửa hoặc xóa từ đã lưu và đặt lại cài đặt. Tìm kiếm, đổi bản dịch và tải lại không cần hỏi trước nữa.</string>
+    <string name="ai_settings_full_access_warning">Xóa khóa và đặt lại cài đặt vẫn chờ bạn nhấn. Sau khi trợ lý đọc phụ đề, tệp hoặc nội dung lỗi, mọi thay đổi đều chờ bạn nhấn.</string>
+    <string name="ai_settings_permissions_default">Tắt theo mặc định. Khi tắt, trợ lý không thể đụng tới khóa, cài đặt AI hay từ đã lưu, ngoài việc lưu từ mới.</string>
+    <string name="ai_action_key_add">Thêm khóa kết thúc bằng %1$s</string>
+    <string name="ai_action_key_added">Đã lưu khóa %1$s kết thúc bằng %2$s</string>
+    <string name="ai_action_key_already">Khóa %1$s kết thúc bằng %2$s đã được lưu</string>
+    <string name="ai_action_key_remove">Xóa khóa %1$s kết thúc bằng %2$s</string>
+    <string name="ai_action_key_remove_button">Xóa</string>
+    <string name="ai_action_words_find">Đã đọc các từ đã lưu</string>
+    <string name="ai_action_word_delete">Xóa “%1$s” khỏi từ vựng</string>
+    <string name="ai_action_word_edit">Sửa “%1$s” trong từ vựng</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="other">%1$d khóa</item>
+    </plurals>
 </resources>

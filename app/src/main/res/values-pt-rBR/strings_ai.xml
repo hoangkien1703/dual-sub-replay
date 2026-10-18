@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">O serviço de IA enviou uma resposta que o app não conseguiu ler.</string>
     <string name="ai_settings_enabled_title">Assistente de IA</string>
     <string name="ai_settings_enabled_description">Mostra o botão de IA no canto superior direito. Desligado, nada é enviado a um serviço de IA e os problemas aparecem no ícone de sempre.</string>
-    <string name="ai_settings_key_heading">Chave de IA (API key)</string>
-    <string name="ai_settings_key_saved">Chave do %1$s salva, termina em %2$s</string>
     <string name="ai_settings_remove_key">Remover chave</string>
     <string name="ai_settings_test">Testar conexão</string>
     <string name="ai_settings_test_passed">Conectado. O assistente está pronto.</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">As conversas ficam só neste celular e nunca entram em backups. Desligado esquece a conversa ao fechar o app e apaga as conversas salvas.</string>
     <string name="ai_settings_delete_history">Apagar histórico agora</string>
     <string name="ai_settings_history_deleted">Histórico de conversas apagado.</string>
-    <string name="ai_settings_advanced">Avançado</string>
     <string name="ai_settings_service">Serviço de IA</string>
     <string name="ai_provider_custom">Outro (compatível com OpenAI)</string>
     <string name="ai_settings_base_url">Endereço do serviço (https://…/v1)</string>
@@ -198,4 +195,33 @@
     <string name="ai_action_memory_save_button">Salvar</string>
     <string name="ai_action_memory_forget_button">Esquecer</string>
     <string name="ai_action_manage">Gerenciar</string>
+    <string name="ai_settings_keys_section">Chaves de API</string>
+    <string name="ai_settings_model_section">Modelo e raciocínio</string>
+    <string name="ai_settings_permissions_section">Permissões</string>
+    <string name="ai_settings_keys_none">Nenhuma chave ainda</string>
+    <string name="ai_settings_service_choose">Escolher um serviço de IA</string>
+    <string name="ai_settings_test_all">Testar todas as chaves</string>
+    <string name="ai_settings_keys_fallback">Se uma chave for recusada, ficar sem crédito ou atingir o limite, o assistente passa sozinho para a próxima chave.</string>
+    <string name="ai_settings_keys_full">Você já salvou o máximo de chaves para este serviço (%1$d). Remova uma para adicionar outra.</string>
+    <string name="ai_settings_add_key">Adicionar outra chave</string>
+    <string name="ai_settings_key_in_use">Funciona · em uso</string>
+    <string name="ai_settings_key_works">Funciona</string>
+    <string name="ai_settings_key_ending">Chave terminada em %1$s</string>
+    <string name="ai_settings_thinking_title">Raciocínio</string>
+    <string name="ai_settings_full_access_title">Acesso total para o assistente</string>
+    <string name="ai_settings_full_access_description">Permite também que o assistente mude as próprias configurações de IA, adicione ou remova chaves, altere ou exclua palavras salvas e redefina as configurações. Buscas, mudanças de tradução e recarregamentos não pedem mais confirmação.</string>
+    <string name="ai_settings_full_access_warning">Remover uma chave e redefinir as configurações ainda esperam seu toque. Depois que o assistente lê legendas, arquivos ou texto de erro, toda mudança espera seu toque.</string>
+    <string name="ai_settings_permissions_default">Desligado por padrão. Assim, o assistente não pode mexer em chaves, configurações de IA ou palavras salvas, além de salvar palavras novas.</string>
+    <string name="ai_action_key_add">Adicionar uma chave terminada em %1$s</string>
+    <string name="ai_action_key_added">Chave de %1$s salva, terminada em %2$s</string>
+    <string name="ai_action_key_already">A chave de %1$s terminada em %2$s já estava salva</string>
+    <string name="ai_action_key_remove">Remover a chave de %1$s terminada em %2$s</string>
+    <string name="ai_action_key_remove_button">Remover</string>
+    <string name="ai_action_words_find">Leu suas palavras salvas</string>
+    <string name="ai_action_word_delete">Excluir “%1$s” do seu vocabulário</string>
+    <string name="ai_action_word_edit">Alterar “%1$s” no seu vocabulário</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="one">%1$d chave</item>
+        <item quantity="other">%1$d chaves</item>
+    </plurals>
 </resources>

@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">The AI service sent a reply the app couldn\'t read.</string>
     <string name="ai_settings_enabled_title">AI assistant</string>
     <string name="ai_settings_enabled_description">Shows the AI button at the top right. When off, nothing is sent to an AI service and problems show in their usual icon.</string>
-    <string name="ai_settings_key_heading">AI key (API key)</string>
-    <string name="ai_settings_key_saved">%1$s key saved, ending in %2$s</string>
     <string name="ai_settings_remove_key">Remove key</string>
     <string name="ai_settings_test">Test connection</string>
     <string name="ai_settings_test_passed">Connected. The assistant is ready.</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">Chats stay only on this phone and are never backed up. Off forgets a chat when the app closes and deletes saved chats.</string>
     <string name="ai_settings_delete_history">Delete chat history now</string>
     <string name="ai_settings_history_deleted">Chat history deleted.</string>
-    <string name="ai_settings_advanced">Advanced</string>
     <string name="ai_settings_service">AI service</string>
     <string name="ai_provider_gemini" translatable="false">Google Gemini</string>
     <string name="ai_provider_openai" translatable="false">OpenAI</string>
@@ -204,4 +201,33 @@
     <string name="ai_action_memory_save_button">Save</string>
     <string name="ai_action_memory_forget_button">Forget</string>
     <string name="ai_action_manage">Manage</string>
+    <string name="ai_settings_keys_section">API keys</string>
+    <string name="ai_settings_model_section">Model and thinking</string>
+    <string name="ai_settings_permissions_section">Permissions</string>
+    <string name="ai_settings_keys_none">No key yet</string>
+    <string name="ai_settings_service_choose">Choose an AI service</string>
+    <string name="ai_settings_test_all">Test all keys</string>
+    <string name="ai_settings_keys_fallback">When a key is rejected, runs out of credit or hits its limit, the assistant switches to the next key on its own.</string>
+    <string name="ai_settings_keys_full">You\'ve saved the most keys for this service (%1$d). Remove one to add another.</string>
+    <string name="ai_settings_add_key">Add another key</string>
+    <string name="ai_settings_key_in_use">Works · in use now</string>
+    <string name="ai_settings_key_works">Works</string>
+    <string name="ai_settings_key_ending">Key ending in %1$s</string>
+    <string name="ai_settings_thinking_title">Thinking</string>
+    <string name="ai_settings_full_access_title">Full access for the assistant</string>
+    <string name="ai_settings_full_access_description">Also lets the assistant change its own AI settings, add or remove keys, change or delete saved words, and reset settings. Searches, translation changes and reloads no longer ask first.</string>
+    <string name="ai_settings_full_access_warning">Removing a key and resetting settings still wait for your tap. After the assistant reads subtitles, files or error text, every change waits for your tap.</string>
+    <string name="ai_settings_permissions_default">Off by default. When off, the assistant can\'t touch keys, AI settings or saved words beyond saving new ones.</string>
+    <string name="ai_action_key_add">Add a key ending in %1$s</string>
+    <string name="ai_action_key_added">Saved a %1$s key ending in %2$s</string>
+    <string name="ai_action_key_already">The %1$s key ending in %2$s is already saved</string>
+    <string name="ai_action_key_remove">Remove the %1$s key ending in %2$s</string>
+    <string name="ai_action_key_remove_button">Remove</string>
+    <string name="ai_action_words_find">Read your saved words</string>
+    <string name="ai_action_word_delete">Delete “%1$s” from your vocabulary</string>
+    <string name="ai_action_word_edit">Change “%1$s” in your vocabulary</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="one">%1$d key</item>
+        <item quantity="other">%1$d keys</item>
+    </plurals>
 </resources>

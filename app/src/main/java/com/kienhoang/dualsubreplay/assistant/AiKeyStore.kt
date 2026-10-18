@@ -111,63 +111,148 @@ internal sealed interface StoredAiKey {
     data object Unreadable : StoredAiKey
 }
 
+/** At most this many keys are kept for one service. */
+internal const val MAX_AI_KEYS_PER_SERVICE = 10
+
 /**
- * One API key per service, encrypted; the last 4 characters are kept apart to show which key it is.
- * Next to each key is the setup it last answered with (see [aiCheckedSetup]); a new key starts unchecked.
+ * One saved key, without the key itself: [hint] is its last characters and [checkedSetup] the
+ * setup it last answered with (see [aiCheckedSetup]), or null when unchecked.
+ */
+internal data class AiSavedKey(
+    val id: String,
+    val hint: String,
+    val checkedSetup: String? = null,
+)
+
+/** What adding a key gave: its id (a key saved before keeps its own), or [Full]. */
+internal sealed interface AiKeyAdded {
+    data class Saved(
+        val id: String,
+        /** The same key was saved before; nothing changed. */
+        val existing: Boolean,
+    ) : AiKeyAdded
+
+    data object Full : AiKeyAdded
+}
+
+/**
+ * Several API keys per service, encrypted, in the order they were added; the last 4 characters
+ * are kept apart to show which key it is. Next to each key is the setup it last answered with;
+ * a new key starts unchecked. The key with [LEGACY_KEY_ID] uses the names of the time when each
+ * service had one key, so a key saved then keeps working; [ORDER_PREFIX] lists the ids once a
+ * service has more than that one.
  */
 internal class AiKeyStore(
     private val storage: SecretStorage,
     private val cipher: SecretCipher,
+    private val newId: () -> String = {
+        java.util.UUID
+            .randomUUID()
+            .toString()
+            .take(ID_LENGTH)
+    },
 ) {
-    fun save(
+    fun keys(provider: AiProvider): List<AiSavedKey> =
+        ids(provider).mapNotNull { id ->
+            storage.get(name(KEY_PREFIX, provider, id))?.let {
+                AiSavedKey(
+                    id = id,
+                    hint = storage.get(name(HINT_PREFIX, provider, id)).orEmpty(),
+                    checkedSetup = storage.get(name(CHECKED_PREFIX, provider, id))?.takeIf { it.isNotEmpty() },
+                )
+            }
+        }
+
+    /** Saves [apiKey] after the service's other keys; the same key saved again keeps its place. */
+    fun add(
         provider: AiProvider,
         apiKey: String,
-    ) {
+    ): AiKeyAdded {
         val trimmed = apiKey.trim()
         require(trimmed.isNotEmpty())
+        keys(provider)
+            .filter { it.hint == trimmed.takeLast(HINT_LENGTH) }
+            .firstOrNull { (load(provider, it.id) as? StoredAiKey.Found)?.key == trimmed }
+            ?.let { return AiKeyAdded.Saved(it.id, existing = true) }
+        // Read again: a saved key the phone could no longer unlock was just removed.
+        val current = keys(provider)
+        if (current.size >= MAX_AI_KEYS_PER_SERVICE) return AiKeyAdded.Full
+        val taken = current.map { it.id }.toSet() + LEGACY_KEY_ID
+        val id = if (current.isEmpty()) LEGACY_KEY_ID else generateSequence(newId).first { it !in taken }
         val sealed = Base64.getEncoder().encodeToString(cipher.encrypt(trimmed.toByteArray(Charsets.UTF_8)))
         storage.put(
             mapOf(
-                KEY_PREFIX + provider.key to sealed,
-                HINT_PREFIX + provider.key to trimmed.takeLast(HINT_LENGTH),
-                CHECKED_PREFIX + provider.key to "",
+                name(KEY_PREFIX, provider, id) to sealed,
+                name(HINT_PREFIX, provider, id) to trimmed.takeLast(HINT_LENGTH),
+                name(CHECKED_PREFIX, provider, id) to "",
+                ORDER_PREFIX + provider.key to (current.map { it.id } + id).joinToString(ORDER_SEPARATOR),
             ),
         )
+        return AiKeyAdded.Saved(id, existing = false)
     }
 
-    fun load(provider: AiProvider): StoredAiKey {
-        val sealed = storage.get(KEY_PREFIX + provider.key) ?: return StoredAiKey.Missing
+    fun load(
+        provider: AiProvider,
+        id: String,
+    ): StoredAiKey {
+        val sealed = storage.get(name(KEY_PREFIX, provider, id)) ?: return StoredAiKey.Missing
         return try {
             StoredAiKey.Found(String(cipher.decrypt(Base64.getDecoder().decode(sealed)), Charsets.UTF_8))
         } catch (_: GeneralSecurityException) {
-            remove(provider)
+            remove(provider, id)
             StoredAiKey.Unreadable
         } catch (_: IllegalArgumentException) {
-            remove(provider)
+            remove(provider, id)
             StoredAiKey.Unreadable
         }
     }
 
-    /** The last characters of the saved key, or null when none is saved. Reading it needs no decryption. */
-    fun hint(provider: AiProvider): String? =
-        storage.get(KEY_PREFIX + provider.key)?.let { storage.get(HINT_PREFIX + provider.key).orEmpty() }
-
-    /** The setup the saved key last worked with, or null when it has not been checked since it was saved. */
-    fun checkedSetup(provider: AiProvider): String? =
-        storage.get(CHECKED_PREFIX + provider.key)?.takeIf { it.isNotEmpty() && storage.get(KEY_PREFIX + provider.key) != null }
-
+    /** Records the setup [id] answered with; a key removed meanwhile stays removed. */
     fun markChecked(
         provider: AiProvider,
+        id: String,
         setup: String,
     ) {
-        storage.put(mapOf(CHECKED_PREFIX + provider.key to setup))
+        if (storage.get(name(KEY_PREFIX, provider, id)) != null) storage.put(mapOf(name(CHECKED_PREFIX, provider, id) to setup))
     }
 
-    fun clearChecked(provider: AiProvider) {
-        storage.remove(listOf(CHECKED_PREFIX + provider.key))
+    fun clearChecked(
+        provider: AiProvider,
+        id: String,
+    ) {
+        storage.remove(listOf(name(CHECKED_PREFIX, provider, id)))
     }
 
-    fun remove(provider: AiProvider) {
-        storage.remove(listOf(KEY_PREFIX + provider.key, HINT_PREFIX + provider.key, CHECKED_PREFIX + provider.key))
+    fun remove(
+        provider: AiProvider,
+        id: String,
+    ) {
+        val rest = ids(provider).filter { it != id }
+        storage.remove(listOf(name(KEY_PREFIX, provider, id), name(HINT_PREFIX, provider, id), name(CHECKED_PREFIX, provider, id)))
+        if (rest.isEmpty()) {
+            storage.remove(listOf(ORDER_PREFIX + provider.key))
+        } else {
+            storage.put(mapOf(ORDER_PREFIX + provider.key to rest.joinToString(ORDER_SEPARATOR)))
+        }
+    }
+
+    private fun ids(provider: AiProvider): List<String> {
+        val order = storage.get(ORDER_PREFIX + provider.key)
+        if (order != null) return order.split(ORDER_SEPARATOR).filter { it.isNotEmpty() }
+        return if (storage.get(name(KEY_PREFIX, provider, LEGACY_KEY_ID)) != null) listOf(LEGACY_KEY_ID) else emptyList()
+    }
+
+    private fun name(
+        prefix: String,
+        provider: AiProvider,
+        id: String,
+    ): String = if (id == LEGACY_KEY_ID) prefix + provider.key else prefix + provider.key + "." + id
+
+    private companion object {
+        /** The first key of a service, stored under the names one key per service used. */
+        const val LEGACY_KEY_ID = "0"
+        const val ORDER_PREFIX = "keys_"
+        const val ORDER_SEPARATOR = ","
+        const val ID_LENGTH = 8
     }
 }

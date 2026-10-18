@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">AI 서비스가 앱에서 읽을 수 없는 답변을 보냈습니다.</string>
     <string name="ai_settings_enabled_title">AI 도우미</string>
     <string name="ai_settings_enabled_description">오른쪽 위에 AI 버튼을 표시합니다. 끄면 AI 서비스로 아무것도 보내지 않으며 문제는 평소 아이콘에 표시됩니다.</string>
-    <string name="ai_settings_key_heading">AI 키(API 키)</string>
-    <string name="ai_settings_key_saved">%1$s 키 저장됨, 끝자리 %2$s</string>
     <string name="ai_settings_remove_key">키 삭제</string>
     <string name="ai_settings_test">연결 테스트</string>
     <string name="ai_settings_test_passed">연결되었습니다. 도우미를 사용할 수 있습니다.</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">대화는 이 휴대전화에만 저장되며 백업되지 않습니다. 끄면 앱을 닫을 때 대화를 잊고 저장된 대화를 삭제합니다.</string>
     <string name="ai_settings_delete_history">지금 대화 기록 삭제</string>
     <string name="ai_settings_history_deleted">대화 기록을 삭제했습니다.</string>
-    <string name="ai_settings_advanced">고급</string>
     <string name="ai_settings_service">AI 서비스</string>
     <string name="ai_provider_custom">기타(OpenAI 호환)</string>
     <string name="ai_settings_base_url">서비스 주소(https://…/v1)</string>
@@ -198,4 +195,32 @@
     <string name="ai_action_memory_save_button">저장</string>
     <string name="ai_action_memory_forget_button">잊기</string>
     <string name="ai_action_manage">관리</string>
+    <string name="ai_settings_keys_section">API 키</string>
+    <string name="ai_settings_model_section">모델과 생각</string>
+    <string name="ai_settings_permissions_section">권한</string>
+    <string name="ai_settings_keys_none">아직 키가 없습니다</string>
+    <string name="ai_settings_service_choose">AI 서비스 선택</string>
+    <string name="ai_settings_test_all">모든 키 테스트</string>
+    <string name="ai_settings_keys_fallback">키가 거부되거나 크레딧이 떨어지거나 한도에 도달하면 도우미가 자동으로 다음 키로 전환합니다.</string>
+    <string name="ai_settings_keys_full">이 서비스에 저장할 수 있는 최대 키 수(%1$d개)에 도달했습니다. 다른 키를 추가하려면 하나를 삭제하세요.</string>
+    <string name="ai_settings_add_key">다른 키 추가</string>
+    <string name="ai_settings_key_in_use">작동함 · 사용 중</string>
+    <string name="ai_settings_key_works">작동함</string>
+    <string name="ai_settings_key_ending">%1$s(으)로 끝나는 키</string>
+    <string name="ai_settings_thinking_title">생각</string>
+    <string name="ai_settings_full_access_title">도우미에게 전체 권한 허용</string>
+    <string name="ai_settings_full_access_description">도우미가 자신의 AI 설정 변경, 키 추가·삭제, 저장한 단어 수정·삭제, 설정 초기화도 할 수 있습니다. 검색, 번역 변경, 다시 불러오기도 먼저 묻지 않습니다.</string>
+    <string name="ai_settings_full_access_warning">키 삭제와 설정 초기화는 여전히 탭을 기다립니다. 도우미가 자막, 파일, 오류 문구를 읽은 뒤에는 모든 변경이 탭을 기다립니다.</string>
+    <string name="ai_settings_permissions_default">기본값은 꺼짐입니다. 꺼져 있으면 도우미는 새 단어 저장 외에는 키, AI 설정, 저장한 단어를 건드릴 수 없습니다.</string>
+    <string name="ai_action_key_add">%1$s(으)로 끝나는 키 추가</string>
+    <string name="ai_action_key_added">%2$s(으)로 끝나는 %1$s 키를 저장했습니다</string>
+    <string name="ai_action_key_already">%2$s(으)로 끝나는 %1$s 키는 이미 저장되어 있습니다</string>
+    <string name="ai_action_key_remove">%2$s(으)로 끝나는 %1$s 키 삭제</string>
+    <string name="ai_action_key_remove_button">삭제</string>
+    <string name="ai_action_words_find">저장한 단어를 읽었습니다</string>
+    <string name="ai_action_word_delete">단어장에서 “%1$s” 삭제</string>
+    <string name="ai_action_word_edit">단어장의 “%1$s” 수정</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="other">키 %1$d개</item>
+    </plurals>
 </resources>

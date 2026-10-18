@@ -4,7 +4,8 @@ package com.kienhoang.dualsubreplay.assistant
  * One answer: asks the service, runs the actions it asks for, and asks again with their results,
  * at most [MAX_AI_REQUESTS_PER_ANSWER] times. What it has done so far stays readable after a
  * failure, so an action that already ran still shows with its Undo. [tools] are offered only with
- * [app]; [memories] is the numbered list of saved memories the model sees with this answer.
+ * [app], and only offered tools run; [memories] is the numbered list of saved memories the model
+ * sees with this answer. [fullAccess] lets most changes run at once ([aiActionAsks]).
  */
 internal class AiAnswerRun(
     private val app: AiAppActions?,
@@ -12,6 +13,7 @@ internal class AiAnswerRun(
     tools: List<AiTool>,
     private val memories: List<AiMemory>,
     private val newId: () -> String,
+    private val fullAccess: Boolean = false,
     private val ask: suspend (messages: List<AiWireMessage>, tools: List<AiTool>) -> AiReply,
 ) {
     private val texts = mutableListOf<String>()
@@ -75,15 +77,30 @@ internal class AiAnswerRun(
                 is AiActionParse.Invalid -> return "Not done: ${parsed.reason}"
                 is AiActionParse.Valid -> parsed.action
             }
+        // A model can name a tool it was not offered, such as a full-access one while full access is
+        // off; memory says why its tools are missing.
+        if (tools.none { it.name == call.name }) {
+            val reason = if (action.kind == AiActionKind.MEMORY) app.refusal(action) else null
+            return "Not done: " + (reason ?: "There is no action called \"${call.name}\".")
+        }
         if (action is AiAction.LookAtVideo) {
             otherText = true
             record(action, app.describe(action), AiActionState.DONE)
             return app.lookAtVideo(action.linesAround)
         }
+        if (action is AiAction.FindSavedWords) {
+            otherText = true
+            val outcome = app.perform(action)
+            record(action, app.describe(action), AiActionState.DONE)
+            return when (outcome) {
+                is AiActionOutcome.Done -> outcome.note
+                is AiActionOutcome.Refused -> "Not done: ${outcome.reason}"
+            }
+        }
         refusal(app, action)?.let { return "Not done: $it" }
         changes++
         val text = app.describe(action)
-        if (action.alwaysAsks || (otherText && action.asksAfterOtherText)) {
+        if (aiActionAsks(action, fullAccess, otherText)) {
             waiting[record(action, text, AiActionState.WAITING).id] = action
             return "Not done yet: the user sees a \"${text.button}\" button for this and decides. Tell them to tap it if they want it."
         }
@@ -107,6 +124,8 @@ internal class AiAnswerRun(
                 "at most $MAX_AI_ACTIONS_PER_ANSWER actions run for one question. Tell the user what is left to do."
             action is AiAction.OpenVideo && history.none { it.role == AiRole.USER && action.videoId in it.text } ->
                 "only a YouTube link the user typed in this chat can be opened. Offer a YouTube search instead."
+            action is AiAction.AddApiKey && history.none { it.role == AiRole.USER && action.key.trim() in it.text } ->
+                "only a key the user typed in their own message can be saved. Ask them to add it in AI settings → API keys."
             else -> app.refusal(action)
         }
 

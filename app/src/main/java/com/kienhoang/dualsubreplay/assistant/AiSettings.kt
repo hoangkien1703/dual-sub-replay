@@ -17,6 +17,7 @@ internal const val AI_THINKING_PREFERENCE = "ai_thinking"
 internal const val AI_INTRO_SEEN_PREFERENCE = "ai_intro_seen"
 internal const val AI_MEMORY_ENABLED_PREFERENCE = "ai_memory_enabled"
 internal const val AI_NEWS_SEEN_PREFERENCE = "ai_news_seen"
+internal const val AI_FULL_ACCESS_PREFERENCE = "ai_full_access"
 private const val AI_MODEL_PREFERENCE_PREFIX = "ai_model_"
 
 private const val DAY_MS = 24L * 60 * 60 * 1000
@@ -82,6 +83,11 @@ internal data class AiAssistantSettings(
     val memoryEnabled: Boolean = true,
     /** The last "what's new" note seen, up to [AI_NEWS_VERSION]. */
     val newsSeen: Int = 0,
+    /**
+     * Off by default. On, the assistant may also change its own AI settings, add or remove keys,
+     * change or delete saved words and reset settings ([AI_FULL_ACCESS_TOOLS]).
+     */
+    val fullAccess: Boolean = false,
 ) {
     /** People who answered the intro before the current note see it once at the top of the chat. */
     val showsNews: Boolean get() = enabled && introSeen && newsSeen < AI_NEWS_VERSION
@@ -106,6 +112,7 @@ internal fun readAiAssistantSettings(preferences: SharedPreferences): AiAssistan
         introSeen = preferences.getBoolean(AI_INTRO_SEEN_PREFERENCE, false),
         memoryEnabled = preferences.getBoolean(AI_MEMORY_ENABLED_PREFERENCE, true),
         newsSeen = preferences.getInt(AI_NEWS_SEEN_PREFERENCE, 0),
+        fullAccess = preferences.getBoolean(AI_FULL_ACCESS_PREFERENCE, false),
     )
 
 internal fun writeAiAssistantSettings(
@@ -121,6 +128,7 @@ internal fun writeAiAssistantSettings(
         putBoolean(AI_INTRO_SEEN_PREFERENCE, settings.introSeen)
         putBoolean(AI_MEMORY_ENABLED_PREFERENCE, settings.memoryEnabled)
         putInt(AI_NEWS_SEEN_PREFERENCE, settings.newsSeen)
+        putBoolean(AI_FULL_ACCESS_PREFERENCE, settings.fullAccess)
         AiProvider.entries.forEach { provider ->
             val model = settings.models[provider]
             if (model == null) {

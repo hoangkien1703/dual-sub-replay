@@ -100,7 +100,16 @@ internal fun BindAiAppActions(
     val changeMode by rememberUpdatedState(onPlayerModeChange)
     DisposableEffect(host, viewModel, context) {
         val actions =
-            AppAiActions(context, viewModel, host.player, { mode }, { changeMode(it) }, host.controller::closePanel, host.controller)
+            AppAiActions(
+                context,
+                viewModel,
+                host.player,
+                { mode },
+                { changeMode(it) },
+                host.controller::closePanel,
+                host.controller,
+                AiFullAccessActions(context, viewModel, host.controller),
+            )
         host.controller.appActions = actions
         onDispose { if (host.controller.appActions === actions) host.controller.appActions = null }
     }
@@ -336,6 +345,7 @@ internal class AppAiActions(
     private val setPlayerMode: (PlayerExperienceMode) -> Unit,
     private val closePanel: () -> Unit,
     private val memory: AiMemoryKeeper,
+    private val fullAccess: AiFullAccessActions? = null,
 ) : AiAppActions {
     private val state: DualSubUiState get() = viewModel.state.value
 
@@ -348,6 +358,7 @@ internal class AppAiActions(
 
     override fun refusal(action: AiAction): String? {
         memory.memoryRefusal(action)?.let { return it }
+        if (isFullAccessAction(action)) return fullAccess?.refusal(action) ?: "Full access is not available here."
         val needsPlayer =
             action is AiAction.Playback || (action is AiAction.ChangeSetting && action.setting == AiSetting.PLAYBACK_SPEED)
         if (needsPlayer && !player.bound) return "The video player is not ready."
@@ -355,6 +366,12 @@ internal class AppAiActions(
     }
 
     override fun describe(action: AiAction): AiActionText =
+        when {
+            isFullAccessAction(action) -> fullAccess?.describe(action) ?: AiActionText(aiActionNote(action))
+            else -> describeApp(action)
+        }
+
+    private fun describeApp(action: AiAction): AiActionText =
         when (action) {
             is AiAction.LookAtVideo -> AiActionText(string(R.string.ai_action_look))
             is AiAction.Playback -> AiActionText(string(playbackLabel(action.command)))
@@ -370,6 +387,8 @@ internal class AppAiActions(
             // Only Undo runs it, and Undo shows on the save's own chip.
             is AiAction.RemoveSavedWord -> AiActionText(action.word)
             is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> memoryText(action)
+            // describe() names the full-access actions.
+            else -> AiActionText(aiActionNote(action))
         }
 
     private fun memoryText(action: AiAction): AiActionText =
@@ -405,6 +424,10 @@ internal class AppAiActions(
     override suspend fun perform(action: AiAction): AiActionOutcome {
         refusal(action)?.let { return AiActionOutcome.Refused(it) }
         val label = describe(action).label
+        if (isFullAccessAction(action)) {
+            return fullAccess?.perform(action, label)
+                ?: AiActionOutcome.Refused("Full access is not available here.")
+        }
         return when (action) {
             is AiAction.LookAtVideo -> AiActionOutcome.Done(label, aiActionNote(action))
             is AiAction.Playback -> playback(action.command, label)
@@ -423,6 +446,7 @@ internal class AppAiActions(
             is AiAction.ChangeTranslation -> changeTranslation(action, label)
             is AiAction.RemoveSavedWord -> removeWord(action, label)
             is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> changeMemory(action)
+            else -> AiActionOutcome.Refused("Full access is not available here.")
         }
     }
 

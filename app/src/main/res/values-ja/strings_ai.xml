@@ -62,8 +62,6 @@
     <string name="ai_error_bad_reply">AI サービスからアプリが読み取れない返信が届きました。</string>
     <string name="ai_settings_enabled_title">AI アシスタント</string>
     <string name="ai_settings_enabled_description">右上に AI ボタンを表示します。オフにすると AI サービスには何も送信されず、問題はいつものアイコンに表示されます。</string>
-    <string name="ai_settings_key_heading">AI キー (API キー)</string>
-    <string name="ai_settings_key_saved">%1$s のキーを保存済み (末尾 %2$s)</string>
     <string name="ai_settings_remove_key">キーを削除</string>
     <string name="ai_settings_test">接続をテスト</string>
     <string name="ai_settings_test_passed">接続しました。アシスタントを使えます。</string>
@@ -79,7 +77,6 @@
     <string name="ai_settings_history_description">チャットはこのスマートフォンにだけ保存され、バックアップされることはありません。オフにすると、アプリを閉じたときにチャットが消え、保存済みのチャットも削除されます。</string>
     <string name="ai_settings_delete_history">今すぐチャット履歴を削除</string>
     <string name="ai_settings_history_deleted">チャット履歴を削除しました。</string>
-    <string name="ai_settings_advanced">詳細設定</string>
     <string name="ai_settings_service">AI サービス</string>
     <string name="ai_provider_custom">その他 (OpenAI 互換)</string>
     <string name="ai_settings_base_url">サービスのアドレス (https://…/v1)</string>
@@ -198,4 +195,32 @@
     <string name="ai_action_memory_save_button">保存</string>
     <string name="ai_action_memory_forget_button">忘れる</string>
     <string name="ai_action_manage">管理</string>
+    <string name="ai_settings_keys_section">API キー</string>
+    <string name="ai_settings_model_section">モデルと思考</string>
+    <string name="ai_settings_permissions_section">権限</string>
+    <string name="ai_settings_keys_none">キーはまだありません</string>
+    <string name="ai_settings_service_choose">AI サービスを選ぶ</string>
+    <string name="ai_settings_test_all">すべてのキーをテスト</string>
+    <string name="ai_settings_keys_fallback">キーが拒否されたり、クレジットが切れたり、上限に達したりすると、アシスタントは自動で次のキーに切り替えます。</string>
+    <string name="ai_settings_keys_full">このサービスのキーは上限（%1$d 個）まで保存されています。追加するには 1 つ削除してください。</string>
+    <string name="ai_settings_add_key">別のキーを追加</string>
+    <string name="ai_settings_key_in_use">使用可能・使用中</string>
+    <string name="ai_settings_key_works">使用可能</string>
+    <string name="ai_settings_key_ending">末尾が %1$s のキー</string>
+    <string name="ai_settings_thinking_title">思考</string>
+    <string name="ai_settings_full_access_title">アシスタントにフルアクセスを許可</string>
+    <string name="ai_settings_full_access_description">アシスタントが自分の AI 設定の変更、キーの追加・削除、保存した単語の変更・削除、設定のリセットもできるようになります。検索、翻訳の変更、再読み込みも確認なしで行います。</string>
+    <string name="ai_settings_full_access_warning">キーの削除と設定のリセットは、引き続きタップを待ちます。アシスタントが字幕、ファイル、エラー文を読んだ後は、すべての変更がタップを待ちます。</string>
+    <string name="ai_settings_permissions_default">既定ではオフです。オフの間、アシスタントは新しい単語の保存以外で、キー、AI 設定、保存した単語に触れられません。</string>
+    <string name="ai_action_key_add">末尾が %1$s のキーを追加</string>
+    <string name="ai_action_key_added">末尾が %2$s の %1$s キーを保存しました</string>
+    <string name="ai_action_key_already">末尾が %2$s の %1$s キーは保存済みです</string>
+    <string name="ai_action_key_remove">末尾が %2$s の %1$s キーを削除</string>
+    <string name="ai_action_key_remove_button">削除</string>
+    <string name="ai_action_words_find">保存した単語を読みました</string>
+    <string name="ai_action_word_delete">「%1$s」を単語帳から削除</string>
+    <string name="ai_action_word_edit">単語帳の「%1$s」を変更</string>
+    <plurals name="ai_settings_keys_count">
+        <item quantity="other">キー %1$d 個</item>
+    </plurals>
 </resources>
