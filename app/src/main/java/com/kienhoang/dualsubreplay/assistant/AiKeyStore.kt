@@ -256,3 +256,42 @@ internal class AiKeyStore(
         const val ID_LENGTH = 8
     }
 }
+
+/**
+ * The Tavily search key, encrypted like the AI keys in the same file, so backups leave it out too.
+ * One key; saving another replaces it.
+ */
+internal class AiSearchKeyStore(
+    private val storage: SecretStorage,
+    private val cipher: SecretCipher,
+) {
+    /** The last 4 characters of the saved key, or null when none is saved. */
+    fun hint(): String? = storage.get(TAVILY_KEY)?.let { storage.get(TAVILY_HINT).orEmpty() }
+
+    fun save(key: String) {
+        val trimmed = key.trim()
+        require(trimmed.isNotEmpty())
+        val sealed = Base64.getEncoder().encodeToString(cipher.encrypt(trimmed.toByteArray(Charsets.UTF_8)))
+        storage.put(mapOf(TAVILY_KEY to sealed, TAVILY_HINT to trimmed.takeLast(HINT_LENGTH)))
+    }
+
+    fun load(): StoredAiKey {
+        val sealed = storage.get(TAVILY_KEY) ?: return StoredAiKey.Missing
+        return try {
+            StoredAiKey.Found(String(cipher.decrypt(Base64.getDecoder().decode(sealed)), Charsets.UTF_8))
+        } catch (_: GeneralSecurityException) {
+            remove()
+            StoredAiKey.Unreadable
+        } catch (_: IllegalArgumentException) {
+            remove()
+            StoredAiKey.Unreadable
+        }
+    }
+
+    fun remove() = storage.remove(listOf(TAVILY_KEY, TAVILY_HINT))
+
+    private companion object {
+        const val TAVILY_KEY = "search_key_tavily"
+        const val TAVILY_HINT = "search_hint_tavily"
+    }
+}

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -231,6 +232,8 @@ internal fun AiKeyButtons(
                     notice =
                         when {
                             text.isBlank() -> R.string.ai_key_clipboard_empty
+                            // A Tavily key pasted here is a search key, not an AI service's.
+                            controller.saveTavilyKey(text) -> R.string.ai_search_tavily_saved
                             controller.saveKey(text) == null -> R.string.ai_key_not_a_key
                             else -> null
                         }
@@ -239,7 +242,10 @@ internal fun AiKeyButtons(
             modifier = Modifier.testTag("ai_paste_key"),
         ) { Text(stringResource(R.string.ai_paste_key)) }
     }
-    notice?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+    notice?.let {
+        val color = if (it == R.string.ai_search_tavily_saved) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+        Text(stringResource(it), color = color, style = MaterialTheme.typography.bodySmall)
+    }
 }
 
 private fun ClipData.firstText(context: android.content.Context): String? =
@@ -259,6 +265,7 @@ private enum class AiSettingsSection(
 ) {
     KEYS("keys", R.string.ai_settings_keys_section, Icons.Default.Key),
     MODEL("model", R.string.ai_settings_model_section, Icons.Default.Tune),
+    SEARCH("search", R.string.ai_search_section, Icons.Default.TravelExplore),
     MEMORY("memory", R.string.ai_memory_title, Icons.Default.Psychology),
     HISTORY("history", R.string.ai_history, Icons.Default.History),
     PERMISSIONS("permissions", R.string.ai_settings_permissions_section, Icons.Default.Shield),
@@ -306,6 +313,7 @@ internal fun AiAssistantSettingsSection(
                 when (section) {
                     AiSettingsSection.KEYS -> AiKeySettings(aiState, controller)
                     AiSettingsSection.MODEL -> AiModelSettings(aiState, controller)
+                    AiSettingsSection.SEARCH -> AiSearchSettings(aiState, controller)
                     AiSettingsSection.MEMORY -> AiMemorySettings(aiState, controller)
                     AiSettingsSection.HISTORY -> AiHistorySettings(aiState, controller)
                     AiSettingsSection.PERMISSIONS -> AiPermissionSettings(aiState, controller)
@@ -337,6 +345,7 @@ private fun aiSectionSummary(
         AiSettingsSection.MODEL ->
             settings.modelFor(settings.provider).ifEmpty { stringResource(R.string.ai_settings_model) } + " · " +
                 stringResource(R.string.ai_effort_button, stringResource(settings.thinking.labelRes))
+        AiSettingsSection.SEARCH -> aiSearchSummary(aiState)
         AiSettingsSection.MEMORY ->
             stringResource(R.string.ai_action_setting, stringResource(R.string.ai_memory_enabled_title), onOff(settings.memoryEnabled))
         AiSettingsSection.HISTORY ->
@@ -532,7 +541,7 @@ private fun AiTypedKeyField(controller: AiAssistantController) {
     )
     TextButton(
         onClick = {
-            if (controller.saveKey(typed) == null) invalid = true else typed = ""
+            if (controller.saveTavilyKey(typed) || controller.saveKey(typed) != null) typed = "" else invalid = true
         },
         enabled = typed.isNotBlank(),
         modifier = Modifier.testTag("ai_save_key"),

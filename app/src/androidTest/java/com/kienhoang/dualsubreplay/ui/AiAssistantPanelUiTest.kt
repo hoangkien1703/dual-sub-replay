@@ -60,10 +60,12 @@ import com.kienhoang.dualsubreplay.assistant.AiModelInfo
 import com.kienhoang.dualsubreplay.assistant.AiPanelPage
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiReply
+import com.kienhoang.dualsubreplay.assistant.AiSearchKeyStore
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.AiSettingsStorage
 import com.kienhoang.dualsubreplay.assistant.AiThinking
 import com.kienhoang.dualsubreplay.assistant.AiToolCall
+import com.kienhoang.dualsubreplay.assistant.AiWebSearchMode
 import com.kienhoang.dualsubreplay.assistant.InMemoryAiMemoryStorage
 import com.kienhoang.dualsubreplay.assistant.SecretCipher
 import com.kienhoang.dualsubreplay.assistant.SecretStorage
@@ -110,25 +112,25 @@ class AiAssistantPanelUiTest {
     private var settings = AiAssistantSettings(introSeen = true, newsSeen = AI_NEWS_VERSION)
     private val memory = InMemoryAiMemoryStorage()
 
-    private val keyStore =
-        AiKeyStore(
-            object : SecretStorage {
-                override fun get(name: String) = secrets[name]
+    private val secretStorage =
+        object : SecretStorage {
+            override fun get(name: String) = secrets[name]
 
-                override fun put(values: Map<String, String>) {
-                    secrets += values
-                }
+            override fun put(values: Map<String, String>) {
+                secrets += values
+            }
 
-                override fun remove(names: List<String>) {
-                    names.forEach(secrets::remove)
-                }
-            },
-            object : SecretCipher {
-                override fun encrypt(plain: ByteArray) = plain.reversedArray()
+            override fun remove(names: List<String>) {
+                names.forEach(secrets::remove)
+            }
+        }
+    private val secretCipher =
+        object : SecretCipher {
+            override fun encrypt(plain: ByteArray) = plain.reversedArray()
 
-                override fun decrypt(sealed: ByteArray) = sealed.reversedArray()
-            },
-        )
+            override fun decrypt(sealed: ByteArray) = sealed.reversedArray()
+        }
+    private val keyStore = AiKeyStore(secretStorage, secretCipher)
 
     private val controller by lazy {
         AiAssistantController(
@@ -160,6 +162,7 @@ class AiAssistantPanelUiTest {
             io = Dispatchers.Unconfined,
             modelLister = { _, _, _ -> listOf(AiModelInfo("gemini-flash-latest"), AiModelInfo("gemma-4-31b-it", free = true)) },
             memoryStorage = memory,
+            searchKeys = AiSearchKeyStore(secretStorage, secretCipher),
         )
     }
 
@@ -672,6 +675,50 @@ class AiAssistantPanelUiTest {
             composeRule.onNodeWithTag("ai_section_keys").performScrollTo().performClick()
             composeRule.waitForIdle()
             saveUiEvidence("ai_settings_keys_light")
+        } finally {
+            preferences.edit().remove(APP_COLOR_THEME_PREFERENCE).commit()
+        }
+    }
+
+    @Test
+    fun searchAndScreenSettingsSaveATavilyKeyAndSwitchTheSearches() {
+        checkedGeminiKey()
+        val preferences = InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", 0)
+        try {
+            showTopBarAndPanel(DualSubUiState())
+            composeRule.runOnIdle {
+                controller.openPanel()
+                controller.showPage(AiPanelPage.SETTINGS)
+            }
+            composeRule
+                .onNodeWithTag("ai_section_search")
+                .performScrollTo()
+                .assertTextContains("YouTube On", substring = true)
+                .performClick()
+            composeRule.onNodeWithTag("ai_youtube_search_switch").performScrollTo().assertIsOn()
+            composeRule.onNodeWithTag("ai_screen_switch").performScrollTo().assertIsOn()
+
+            composeRule.onNodeWithTag("ai_web_search_service").performScrollTo().performClick()
+            assertEquals(AiWebSearchMode.SERVICE, settings.webSearch)
+            composeRule.onNodeWithTag("ai_web_search_unavailable").performScrollTo().assertIsDisplayed()
+
+            composeRule.onNodeWithTag("ai_web_search_tavily").performScrollTo().performClick()
+            composeRule.onNodeWithTag("ai_get_tavily_key").performScrollTo().assertIsDisplayed()
+            saveUiEvidence("ai_settings_search")
+            composeRule.onNodeWithTag("ai_tavily_key_field").performScrollTo().performTextInput("tvly-dev-abcdefghijkl9876")
+            composeRule.onNodeWithTag("ai_save_tavily_key").performScrollTo().performClick()
+            composeRule.onNodeWithTag("ai_tavily_key_row").performScrollTo().assertTextContains("9876", substring = true)
+            assertEquals(AiWebSearchMode.TAVILY, settings.webSearch)
+            assertFalse(secrets.values.any { "tvly-dev-abcdefghijkl9876" in it })
+            saveUiEvidence("ai_settings_search_tavily")
+
+            composeRule.onNodeWithTag("ai_screen_switch").performScrollTo().performClick()
+            assertFalse(settings.screenLook)
+
+            preferences.edit().putString(APP_COLOR_THEME_PREFERENCE, AppColorThemeOption.LIGHT.key).commit()
+            composeRule.onNodeWithTag("ai_web_search_service").performScrollTo().performClick()
+            composeRule.waitForIdle()
+            saveUiEvidence("ai_settings_search_light")
         } finally {
             preferences.edit().remove(APP_COLOR_THEME_PREFERENCE).commit()
         }

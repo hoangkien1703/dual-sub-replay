@@ -7,11 +7,17 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 
-/** At most this many actions run for one question; reading the screen does not count. */
+/** At most this many actions run for one question; reading the screen, searches and video suggestions do not count. */
 internal const val MAX_AI_ACTIONS_PER_ANSWER = 3
 
-/** One question asks the service at most this many times: once, then again after each round of actions. */
-internal const val MAX_AI_REQUESTS_PER_ANSWER = 4
+/** Videos one answer can suggest with an Open card, from the app's YouTube search. */
+internal const val MAX_AI_VIDEO_SUGGESTIONS = 5
+
+/**
+ * One question asks the service at most this many times: once, then again after each round of
+ * actions, for example a screenshot, a search, then the suggestions it found.
+ */
+internal const val MAX_AI_REQUESTS_PER_ANSWER = 6
 
 /** Lines before and after the current one that reading the screen returns at most. */
 internal const val MAX_AI_LOOK_LINES_AROUND = 2
@@ -134,9 +140,25 @@ internal sealed interface AiAction {
         val query: String,
     ) : AiAction
 
+    /** [title] is the title the app's search found for it, never the model's; null for a link the user typed. */
     data class OpenVideo(
         val videoId: String,
+        val title: String? = null,
     ) : AiAction
+
+    /** Reads YouTube's search results; changes nothing. */
+    data class FindVideos(
+        val query: String,
+        val subtitlesOnly: Boolean = false,
+    ) : AiAction
+
+    /** Reads web search results; changes nothing. Also names a search Claude's own web search ran. */
+    data class WebSearch(
+        val query: String,
+    ) : AiAction
+
+    /** Takes a screenshot of the app for the model; changes nothing. */
+    data object LookAtScreen : AiAction
 
     /** Null keeps that part as it is; at least one is set. */
     data class ChangeTranslation(
@@ -260,6 +282,8 @@ internal enum class AiActionKind(
     val key: String,
 ) {
     LOOK("look"),
+    SCREEN("screen"),
+    WEB("web"),
     PLAYBACK("playback"),
     SETTING("setting"),
     WORD("word"),
@@ -278,7 +302,9 @@ internal val AiAction.kind: AiActionKind
             is AiAction.SaveWord, is AiAction.RemoveSavedWord, is AiAction.FindSavedWords, is AiAction.DeleteSavedWord,
             is AiAction.EditSavedWord, is AiAction.RestoreSavedWords,
             -> AiActionKind.WORD
-            is AiAction.SearchYouTube, is AiAction.OpenVideo -> AiActionKind.VIDEO
+            is AiAction.SearchYouTube, is AiAction.OpenVideo, is AiAction.FindVideos -> AiActionKind.VIDEO
+            is AiAction.WebSearch -> AiActionKind.WEB
+            AiAction.LookAtScreen -> AiActionKind.SCREEN
             is AiAction.ChangeTranslation -> AiActionKind.TRANSLATION
             is AiAction.SaveMemory, is AiAction.ForgetMemory, is AiAction.RemoveMemory, is AiAction.RestoreMemory -> AiActionKind.MEMORY
         }
@@ -303,6 +329,9 @@ internal fun aiActionNote(action: AiAction): String =
         is AiAction.RestoreMemory -> "Put back the memory \"${action.memory.text}\""
         is AiAction.SearchYouTube -> "Search YouTube for \"${action.query}\""
         is AiAction.OpenVideo -> "Open the YouTube video ${action.videoId}"
+        is AiAction.FindVideos -> "Search YouTube for \"${action.query}\"" + if (action.subtitlesOnly) " (videos with subtitles)" else ""
+        is AiAction.WebSearch -> "Search the web for \"${action.query}\""
+        AiAction.LookAtScreen -> "Take a screenshot of the app"
         is AiAction.ChangeTranslation ->
             listOfNotNull(
                 action.googleTranslate?.let { if (it) "Turn Google Translate on" else "Translate on the device" },
@@ -346,6 +375,14 @@ internal fun parseAiAction(
                 ?.let(YouTubeUrlParser::extractVideoId)
                 ?.let { AiActionParse.Valid(AiAction.OpenVideo(it)) }
                 ?: invalid("Give a YouTube video link or 11-character video ID.")
+        AI_FIND_VIDEOS_TOOL ->
+            text(arguments, "query", MAX_QUERY_CHARS)
+                ?.let { AiActionParse.Valid(AiAction.FindVideos(it, argument(arguments, "subtitles_only") == true)) }
+                ?: invalid("Give a search query of at most $MAX_QUERY_CHARS characters.")
+        AI_WEB_SEARCH_TOOL ->
+            text(arguments, "query", MAX_QUERY_CHARS)?.let { AiActionParse.Valid(AiAction.WebSearch(it)) }
+                ?: invalid("Give a search query of at most $MAX_QUERY_CHARS characters.")
+        AI_SCREEN_TOOL -> AiActionParse.Valid(AiAction.LookAtScreen)
         AI_TRANSLATION_TOOL -> parseTranslation(arguments)
         AI_SAVE_MEMORY_TOOL -> parseSaveMemory(arguments, memories)
         AI_FORGET_MEMORY_TOOL ->
@@ -680,14 +717,21 @@ internal val AI_TOOLS: List<AiTool> by lazy {
         ),
         AiTool(
             AI_SEARCH_TOOL,
-            "Search YouTube in the app. The user sees a Search button and nothing happens until they tap it.",
+            "Open YouTube's search page in the app for the user to browse. To suggest videos yourself, use " +
+                "$AI_FIND_VIDEOS_TOOL when it is offered. The user sees a Search button and nothing happens until they tap it.",
             schema(JSONObject().put("query", stringProperty("The search words.")), "query"),
         ),
         AiTool(
             AI_OPEN_VIDEO_TOOL,
-            "Open a YouTube video whose link the user typed in this chat. Never invent or guess a link. The user sees an " +
-                "Open button and nothing happens until they tap it.",
-            schema(JSONObject().put("link", stringProperty("The YouTube link or video ID exactly as the user typed it.")), "link"),
+            "Open a YouTube video whose link the user typed in this chat, or one $AI_FIND_VIDEOS_TOOL found. Never invent " +
+                "or guess a link. The user sees an Open button and nothing happens until they tap it.",
+            schema(
+                JSONObject().put(
+                    "link",
+                    stringProperty("The YouTube link exactly as the user typed it, or the video ID from the search results."),
+                ),
+                "link",
+            ),
         ),
         AiTool(
             AI_TRANSLATION_TOOL,
@@ -812,4 +856,7 @@ internal interface AiAppActions {
     fun describe(action: AiAction): AiActionText
 
     suspend fun perform(action: AiAction): AiActionOutcome
+
+    /** A screenshot of the app with the assistant panel hidden, or null when the screen can't be copied now. */
+    suspend fun captureScreen(): AiAttachment? = null
 }

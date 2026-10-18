@@ -37,14 +37,20 @@ internal data class AiToolCall(
 
 /**
  * What the model answered: text, actions it asks for, or both. [model] is the model that answered,
- * when the service says. [rawContent] is Claude's whole answer when it asked for actions, sent back
- * unchanged with their results ([AiWireMessage.rawContent]); null for other services.
+ * when the service says. [rawContent] is Claude's whole answer when it asked for actions or paused,
+ * sent back unchanged with their results ([AiWireMessage.rawContent]); null for other services.
  */
 internal data class AiReply(
     val text: String,
     val toolCalls: List<AiToolCall> = emptyList(),
     val model: String = "",
     val rawContent: String? = null,
+    /** Pages the service's own web search cited. */
+    val sources: List<AiWebSource> = emptyList(),
+    /** What Claude's own web search looked for. */
+    val webQueries: List<String> = emptyList(),
+    /** Claude stopped a long web search (`pause_turn`); sending [rawContent] back lets it go on. */
+    val paused: Boolean = false,
 )
 
 /** The calls in a reply's `message.tool_calls`; calls without a name are skipped. */

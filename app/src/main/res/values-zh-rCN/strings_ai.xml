@@ -223,4 +223,29 @@
     <plurals name="ai_settings_keys_count">
         <item quantity="other">%1$d 个密钥</item>
     </plurals>
+
+    <!-- Search and screen (2026-10-18) -->
+    <string name="ai_action_open_found_video">打开“%1$s”</string>
+    <string name="ai_action_find_videos">已在 YouTube 上搜索“%1$s”</string>
+    <string name="ai_action_web_search">已在网上搜索“%1$s”</string>
+    <string name="ai_action_look_screen">已查看屏幕</string>
+    <string name="ai_sources_title">来源</string>
+    <string name="ai_search_section">搜索和屏幕</string>
+    <string name="ai_search_summary">YouTube %1$s · 网页：%2$s · 屏幕 %3$s</string>
+    <string name="ai_search_youtube_title">查找 YouTube 视频</string>
+    <string name="ai_search_youtube_description">助手可以自己搜索 YouTube 来推荐视频。免费，不需要密钥。</string>
+    <string name="ai_search_web_title">网页搜索</string>
+    <string name="ai_search_web_off">关闭</string>
+    <string name="ai_search_web_service">AI 服务</string>
+    <string name="ai_search_web_tavily">Tavily</string>
+    <string name="ai_search_web_off_note">助手根据模型已有的知识回答。</string>
+    <string name="ai_search_web_service_note">%1$s 需要时会自己上网搜索。每次搜索会在你的 %1$s 账单上另计费用，约 1 美分。</string>
+    <string name="ai_search_web_service_unavailable">%1$s 在本应用中不能上网搜索。请选择 Tavily，或使用 Claude、OpenRouter 或 OpenAI。</string>
+    <string name="ai_search_web_tavily_note">用你自己的 Tavily 密钥免费使用：每月 1,000 次搜索，无需银行卡。适用于所有 AI 服务。</string>
+    <string name="ai_search_tavily_steps">登录 Tavily，复制你的 API 密钥（以 tvly- 开头），然后粘贴到这里。</string>
+    <string name="ai_search_tavily_key_label">Tavily 密钥</string>
+    <string name="ai_search_tavily_not_a_key">这不是 Tavily 密钥。Tavily 密钥以 tvly- 开头。</string>
+    <string name="ai_search_tavily_saved">已保存为你的 Tavily 搜索密钥（AI 设置 → 搜索和屏幕）。</string>
+    <string name="ai_search_screen_title">查看屏幕</string>
+    <string name="ai_search_screen_description">助手需要看东西时可以给应用截图。图片只发送到你的 AI 服务，永远不会保存。</string>
 </resources>

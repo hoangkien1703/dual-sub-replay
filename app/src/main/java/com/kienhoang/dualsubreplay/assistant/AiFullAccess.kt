@@ -24,6 +24,9 @@ internal enum class AiOwnSetting(
     THINKING("ai_thinking"),
     MEMORY("ai_memory"),
     CHAT_HISTORY("ai_chat_history"),
+    YOUTUBE_SEARCH("ai_youtube_search"),
+    WEB_SEARCH("ai_web_search"),
+    SCREEN("ai_screen"),
 }
 
 internal enum class AiResetTarget(
@@ -94,7 +97,8 @@ internal fun aiOwnSettingValue(
         AiOwnSetting.SERVICE -> aiServiceFromText(raw)?.key
         AiOwnSetting.MODEL -> raw.trim().takeIf { it.isNotEmpty() && it.length <= MAX_MODEL_CHARS && it.none(Char::isWhitespace) }
         AiOwnSetting.THINKING -> AiThinking.entries.firstOrNull { it.key == key }?.key
-        AiOwnSetting.MEMORY -> aiSwitch(raw)
+        AiOwnSetting.MEMORY, AiOwnSetting.YOUTUBE_SEARCH, AiOwnSetting.SCREEN -> aiSwitch(raw)
+        AiOwnSetting.WEB_SEARCH -> AiWebSearchMode.entries.firstOrNull { it.key == key }?.key
         AiOwnSetting.CHAT_HISTORY ->
             listOfNotNull(key, HISTORY_ALIASES[key], HISTORY_ALIASES[key.removeSuffix("_days").removeSuffix("days").trim('_')])
                 .firstOrNull { candidate -> ChatHistoryRetention.entries.any { it.key == candidate } }
@@ -107,7 +111,9 @@ internal fun aiOwnSettingValues(setting: AiOwnSetting): String =
         AiOwnSetting.SERVICE -> choiceList(AiProvider.entries.map { it.key })
         AiOwnSetting.MODEL -> "a model name the service offers, for example ${AiProvider.GEMINI.defaultModel}"
         AiOwnSetting.THINKING -> choiceList(AiThinking.entries.map { it.key })
-        AiOwnSetting.MEMORY -> "on or off"
+        AiOwnSetting.MEMORY, AiOwnSetting.YOUTUBE_SEARCH, AiOwnSetting.SCREEN -> "on or off"
+        AiOwnSetting.WEB_SEARCH ->
+            choiceList(AiWebSearchMode.entries.map { it.key }) + " (service is the AI service's own paid search; tavily needs a Tavily key)"
         AiOwnSetting.CHAT_HISTORY -> choiceList(ChatHistoryRetention.entries.map { it.key })
     }
 
@@ -273,6 +279,9 @@ internal fun aiFullAccessPrompt(state: AiAssistantUiState): String =
         append("\n- ai_thinking: ").append(settings.thinking.key)
         append("\n- ai_memory: ").append(if (settings.memoryEnabled) "on" else "off")
         append("\n- ai_chat_history: ").append(settings.historyRetention.key)
+        append("\n- ai_youtube_search: ").append(if (settings.youtubeSearch) "on" else "off")
+        append("\n- ai_web_search: ").append(settings.webSearch.key)
+        append("\n- ai_screen: ").append(if (settings.screenLook) "on" else "off")
         append("\nSaved API keys (last 4 characters):")
         if (state.keys.values.all { it.isEmpty() }) append(" none")
         state.keys.forEach { (provider, keys) ->

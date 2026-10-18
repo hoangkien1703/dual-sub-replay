@@ -25,16 +25,13 @@ class AiAssistantViewModel(
     }
 
     private val transport = AiHttpTransport()
+    private val secrets = SharedPreferencesSecretStorage(application.getSharedPreferences(AI_KEYS_PREFERENCES, 0))
 
     internal val controller =
         AiAssistantController(
             scope = viewModelScope,
             transport = transport,
-            keyStore =
-                AiKeyStore(
-                    SharedPreferencesSecretStorage(application.getSharedPreferences(AI_KEYS_PREFERENCES, 0)),
-                    KeystoreSecretCipher(),
-                ),
+            keyStore = AiKeyStore(secrets, KeystoreSecretCipher()),
             settingsStorage =
                 object : AiSettingsStorage {
                     override fun load() = readAiAssistantSettings(settingsPreferences)
@@ -56,5 +53,7 @@ class AiAssistantViewModel(
 
                     override fun save(data: AiMemoryData) = memory.save(data)
                 },
+            searchKeys = AiSearchKeyStore(secrets, KeystoreSecretCipher()),
+            poster = transport,
         )
 }

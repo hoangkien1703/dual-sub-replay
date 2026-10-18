@@ -224,4 +224,29 @@
         <item quantity="one">%1$d chave</item>
         <item quantity="other">%1$d chaves</item>
     </plurals>
+
+    <!-- Search and screen (2026-10-18) -->
+    <string name="ai_action_open_found_video">Abrir “%1$s”</string>
+    <string name="ai_action_find_videos">Pesquisou “%1$s” no YouTube</string>
+    <string name="ai_action_web_search">Pesquisou “%1$s” na web</string>
+    <string name="ai_action_look_screen">Olhou a tela</string>
+    <string name="ai_sources_title">Fontes</string>
+    <string name="ai_search_section">Pesquisa e tela</string>
+    <string name="ai_search_summary">YouTube %1$s · Web: %2$s · Tela %3$s</string>
+    <string name="ai_search_youtube_title">Encontrar vídeos do YouTube</string>
+    <string name="ai_search_youtube_description">O assistente pode pesquisar no YouTube para sugerir vídeos. Grátis, sem chave.</string>
+    <string name="ai_search_web_title">Pesquisa na web</string>
+    <string name="ai_search_web_off">Desativada</string>
+    <string name="ai_search_web_service">Serviço de IA</string>
+    <string name="ai_search_web_tavily">Tavily</string>
+    <string name="ai_search_web_off_note">O assistente responde com o que o modelo já sabe.</string>
+    <string name="ai_search_web_service_note">%1$s pesquisa na web quando precisa. Cada pesquisa custa um pouco mais na sua conta do %1$s, cerca de um centavo de dólar.</string>
+    <string name="ai_search_web_service_unavailable">%1$s não pesquisa na web neste app. Escolha Tavily, ou use Claude, OpenRouter ou OpenAI.</string>
+    <string name="ai_search_web_tavily_note">Grátis com sua própria chave do Tavily: 1.000 pesquisas por mês, sem cartão. Funciona com qualquer serviço de IA.</string>
+    <string name="ai_search_tavily_steps">Entre no Tavily, copie sua chave de API (começa com tvly-) e cole aqui.</string>
+    <string name="ai_search_tavily_key_label">Chave do Tavily</string>
+    <string name="ai_search_tavily_not_a_key">Isso não é uma chave do Tavily. As chaves do Tavily começam com tvly-.</string>
+    <string name="ai_search_tavily_saved">Salva como sua chave de pesquisa do Tavily (Configurações de IA → Pesquisa e tela).</string>
+    <string name="ai_search_screen_title">Olhar a tela</string>
+    <string name="ai_search_screen_description">O assistente pode tirar uma captura de tela do app quando precisa ver algo. A imagem vai só para o seu serviço de IA e nunca é salva.</string>
 </resources>

@@ -35,10 +35,11 @@ import com.kienhoang.dualsubreplay.assistant.aiSubtitleLineContext
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 
-/** The assistant, the page video's controls it may use, and the bundled app guide it reads. */
+/** The assistant, the page video's controls it may use, its screenshots, and the bundled app guide it reads. */
 internal class AiAssistantHost(
     val controller: AiAssistantController,
     val player: AiPlayerControls = AiPlayerControls(),
+    val screen: AiScreenCapture = AiScreenCapture(),
     val guide: () -> String,
 )
 
@@ -171,7 +172,7 @@ internal fun AiErrorKind.messageRes(): Int =
         AiErrorKind.NO_CREDIT -> R.string.ai_error_no_credit
         AiErrorKind.UNKNOWN_MODEL -> R.string.ai_error_unknown_model
         AiErrorKind.RATE_LIMITED -> R.string.ai_error_rate_limited
-        AiErrorKind.BAD_REQUEST, AiErrorKind.UNSUPPORTED_TOOLS -> R.string.ai_error_bad_request
+        AiErrorKind.BAD_REQUEST, AiErrorKind.UNSUPPORTED_TOOLS, AiErrorKind.UNSUPPORTED_WEB_SEARCH -> R.string.ai_error_bad_request
         AiErrorKind.SERVER, AiErrorKind.NOT_A_CHAT_MODEL -> R.string.ai_error_server
         AiErrorKind.NETWORK -> R.string.ai_error_network
         AiErrorKind.TIMEOUT -> R.string.ai_error_timeout
