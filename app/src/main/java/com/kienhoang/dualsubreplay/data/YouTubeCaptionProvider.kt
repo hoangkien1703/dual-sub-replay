@@ -657,7 +657,7 @@ class YouTubeCaptionProvider(
         languages: CaptionLanguageChoice,
         deadlineNanos: Long,
     ): CaptionTrackResult? {
-        val page = pageSource.playerResponse(videoId) ?: return null
+        val page = pageSource.playerResponse(videoId) ?: return pageTranscriptResult(pageSource.transcripts(videoId), languages)
         return try {
             captionResultFromPlayerResponse(
                 root = page,
@@ -675,7 +675,7 @@ class YouTubeCaptionProvider(
             throw error
         } catch (error: Exception) {
             reportCaptionFailure("page", error)
-            null
+            pageTranscriptResult(pageSource.transcripts(videoId), languages)
         }
     }
 
@@ -773,16 +773,23 @@ class YouTubeCaptionProvider(
         val selected =
             selectCaptionTrack(renderer, languages.preferred, root.optJSONObject("videoDetails"), languages.learning)
                 ?: throw NoCaptionTracksException("No compatible caption track was found.")
+        val pageCues =
+            pageVideoId
+                ?.let { pageTranscriptFor(pageSource.transcripts(it), selected) }
+                ?.let { CaptionDocumentParser.parse(it.text) }
+                .orEmpty()
         val cues =
-            fetchCaptionCues(
-                baseUrl =
-                    selected.getString("baseUrl").let { baseUrl ->
-                        pageVideoId?.let { withPageTimedTextParameters(baseUrl, pageSource.timedTextParameters(it)) } ?: baseUrl
-                    },
-                userAgent = userAgent,
-                deadlineNanos = deadlineNanos,
-                withPageCookies = pageVideoId != null,
-            )
+            pageCues.ifEmpty {
+                fetchCaptionCues(
+                    baseUrl =
+                        selected.getString("baseUrl").let { baseUrl ->
+                            pageVideoId?.let { withPageTimedTextParameters(baseUrl, pageSource.timedTextParameters(it)) } ?: baseUrl
+                        },
+                    userAgent = userAgent,
+                    deadlineNanos = deadlineNanos,
+                    withPageCookies = pageVideoId != null,
+                )
+            }
 
         return CaptionTrackResult(
             languageCode = selected.optString("languageCode", "en"),

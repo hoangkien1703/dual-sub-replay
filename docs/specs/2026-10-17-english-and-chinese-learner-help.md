@@ -215,6 +215,16 @@ OpenNLP model itself, because OpenNLP's loader asks Android's XML parser for a f
   skips the player request YouTube's bot check refuses. Offline tests cover the parsing and the
   download; the live page path is unverified until the owner's phone test, because cloud
   addresses can't load m.youtube.com.
+- **Page caption documents (after the third phone test, 2026-10-18).** The owner reported the bug
+  was still there with the track-list change, so the page now also keeps the caption documents its
+  own player downloads: `WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT` (document start and after each load)
+  wraps `fetch` and `XMLHttpRequest` only to copy finished `/api/timedtext` responses (no
+  auto-translated `tlang` tracks, 8 MiB cap, newest 4 kept), and asks again from the page for a
+  request made before it was installed. Live-caption mode already turns the page captions on, so
+  the full transcript arrives as soon as the page shows captions, and the app reloads at once
+  instead of waiting for the next retry. The provider uses a matching page document before any
+  request. Checked in Chromium against a simulated YouTube page (XHR text and arraybuffer, fetch
+  with a Request, an earlier request, `tlang` skipped); live YouTube still unverified from the cloud.
 - **Tests and loading.** Tests that tokenize English or Chinese now wait for the analyzers first,
   so they no longer depend on whether the background load has finished.
 

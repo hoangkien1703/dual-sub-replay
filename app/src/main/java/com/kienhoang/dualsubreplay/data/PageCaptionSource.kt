@@ -22,6 +22,11 @@ class PageCaptionSource {
 
     @Volatile private var timedTextParameters: Pair<String, Map<String, String>>? = null
 
+    private val transcripts = ArrayDeque<PageTranscript>()
+
+    /** Called on the main thread when the page hands over a caption document for a video. */
+    @Volatile var onTranscript: (videoId: String) -> Unit = {}
+
     /** The page's user agent, so downloads look like the page that is playing the video. */
     @Volatile var userAgent: String? = null
 
@@ -46,6 +51,19 @@ class PageCaptionSource {
         timedTextParameters = parameters
     }
 
+    /** Records a caption document the page's own player downloaded; the newest 4 are kept. */
+    fun recordTranscript(transcript: PageTranscript) {
+        if (!PAGE_VIDEO_ID.matches(transcript.videoId) || transcript.text.length > MAX_PAGE_TRANSCRIPT_LENGTH) return
+        synchronized(transcripts) {
+            transcripts.removeAll { it.id == transcript.id }
+            transcripts.addLast(transcript)
+            while (transcripts.size > MAX_PAGE_TRANSCRIPTS) transcripts.removeFirst()
+        }
+        onTranscript(transcript.videoId)
+    }
+
+    fun transcripts(videoId: String): List<PageTranscript> = synchronized(transcripts) { transcripts.filter { it.videoId == videoId } }
+
     fun hasTracks(videoId: String): Boolean = tracks?.videoId == videoId
 
     fun playerResponse(videoId: String): JSONObject? =
@@ -62,6 +80,35 @@ class PageCaptionSource {
 }
 
 private val PAGE_VIDEO_ID = Regex("^[A-Za-z0-9_-]{11}$")
+private const val MAX_PAGE_TRANSCRIPTS = 4
+
+/** The same 8 MiB limit as the provider's own downloads, counted in characters. */
+internal const val MAX_PAGE_TRANSCRIPT_LENGTH = 8 * 1024 * 1024
+
+/** A caption document (`json3`, `srv3` or XML) the page's player downloaded for one track. */
+data class PageTranscript(
+    val videoId: String,
+    val languageCode: String,
+    val kind: String,
+    val text: String,
+) {
+    val id: String get() = "$videoId|$languageCode|$kind"
+    val generated: Boolean get() = kind == "asr"
+}
+
+/**
+ * The page document for [track] (same language and same generated or creator kind), or, with no
+ * [track], the newest document. Null when the page has none that fits.
+ */
+internal fun pageTranscriptFor(
+    transcripts: List<PageTranscript>,
+    track: JSONObject?,
+): PageTranscript? {
+    if (track == null) return transcripts.lastOrNull()
+    val language = track.optString("languageCode")
+    val generated = isGeneratedTrack(track)
+    return transcripts.lastOrNull { it.languageCode.equals(language, ignoreCase = true) && it.generated == generated }
+}
 
 /** Fields the page's player adds to its caption requests and YouTube may check. */
 internal val PAGE_TIMED_TEXT_PARAMETERS =
@@ -88,4 +135,36 @@ internal fun withPageTimedTextParameters(
     val builder = parsed.newBuilder()
     parameters.forEach { (name, value) -> if (parsed.queryParameter(name) == null) builder.addQueryParameter(name, value) }
     return builder.build().toString()
+}
+
+/**
+ * A result from the page's caption documents alone (no track list): the user's chosen language
+ * when the page has it, otherwise the newest document. Null when none parses.
+ */
+internal fun pageTranscriptResult(
+    transcripts: List<PageTranscript>,
+    languages: CaptionLanguageChoice,
+): CaptionTrackResult? {
+    val preferred = languages.preferred.map { it.substringBefore('-').lowercase() }
+    val ordered =
+        transcripts.sortedByDescending { transcript ->
+            val index = preferred.indexOf(transcript.languageCode.substringBefore('-').lowercase())
+            if (index >= 0) preferred.size - index else 0
+        }
+    for (transcript in ordered) {
+        val cues = CaptionDocumentParser.parse(transcript.text)
+        if (cues.isEmpty()) continue
+        return CaptionTrackResult(
+            languageCode = transcript.languageCode.ifBlank { "en" },
+            isGenerated = transcript.generated,
+            cues = cues,
+            availableLanguages =
+                transcripts
+                    .map { it.languageCode }
+                    .filter(String::isNotBlank)
+                    .distinctBy { it.substringBefore('-').lowercase() }
+                    .map { CaptionLanguage(it, it.uppercase()) },
+        )
+    }
+    return null
 }

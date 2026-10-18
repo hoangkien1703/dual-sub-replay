@@ -1,5 +1,8 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.MAX_PAGE_TRANSCRIPT_LENGTH
+import com.kienhoang.dualsubreplay.data.PageTranscript
+import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -684,4 +687,141 @@ internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
 internal fun parsePageCaptionTracks(rawValue: String?): String? {
     if (rawValue.isNullOrBlank() || rawValue == "null") return null
     return runCatching { JSONTokener(rawValue).nextValue() as? String }.getOrNull()?.takeIf(String::isNotBlank)
+}
+
+internal const val PAGE_TRANSCRIPT_STATE_KEY = "__dualSubPageTranscriptV1"
+
+/**
+ * Keeps a copy of the caption documents the page's own player downloads (`/api/timedtext`), so
+ * the full transcript can come from the page when YouTube refuses the app's own lookup. It wraps
+ * `fetch` and `XMLHttpRequest` only to read finished responses; requests and responses are passed
+ * on unchanged. Installed at document start and again after each page load; safe to run twice.
+ */
+internal val WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      const key = '$PAGE_TRANSCRIPT_STATE_KEY';
+      if (window[key]) return true;
+      const state = window[key] = { documents: {}, order: [], fetching: {} };
+      state.timedTextUrl = function(value) {
+        try {
+          const url = new URL(String(value), window.location.href);
+          const urlHost = url.hostname.toLowerCase();
+          if (url.protocol !== 'https:' || !(urlHost === 'youtube.com' || urlHost.endsWith('.youtube.com')) ||
+              url.pathname !== '/api/timedtext' || !url.searchParams.get('v') || url.searchParams.get('tlang')) return null;
+          return url;
+        } catch (_) { return null; }
+      };
+      state.record = function(value, text) {
+        const url = state.timedTextUrl(value);
+        if (!url || typeof text !== 'string' || !text.trim() || text.length > $MAX_PAGE_TRANSCRIPT_LENGTH) return;
+        const entry = {
+          videoId: url.searchParams.get('v'),
+          languageCode: url.searchParams.get('lang') || '',
+          kind: url.searchParams.get('kind') || '',
+          text: text
+        };
+        const id = entry.videoId + '|' + entry.languageCode + '|' + entry.kind;
+        state.documents[id] = entry;
+        state.order = state.order.filter(function(item) { return item !== id; });
+        state.order.push(id);
+        while (state.order.length > 4) delete state.documents[state.order.shift()];
+      };
+      state.fetchEarlier = function(videoId) {
+        // Requests made before this script ran are still listed by the browser; ask again from the page.
+        if (state.fetching[videoId] || typeof performance === 'undefined' || !performance.getEntriesByType) return;
+        const entry = performance.getEntriesByType('resource').reverse().find(function(item) {
+          const url = state.timedTextUrl(item.name);
+          return url && url.searchParams.get('v') === videoId;
+        });
+        if (!entry || !state.originalFetch) return;
+        state.fetching[videoId] = true;
+        state.originalFetch.call(window, entry.name, { credentials: 'include' })
+          .then(function(response) { return response.ok ? response.text() : ''; })
+          .then(function(text) { state.record(entry.name, text); })
+          .catch(function() {})
+          .then(function() { setTimeout(function() { delete state.fetching[videoId]; }, 10000); });
+      };
+      if (typeof window.fetch === 'function') {
+        state.originalFetch = window.fetch;
+        window.fetch = function(input) {
+          const result = state.originalFetch.apply(this, arguments);
+          try {
+            const address = typeof input === 'string' ? input : (input && input.url);
+            if (state.timedTextUrl(address)) {
+              result.then(function(response) {
+                if (response && response.ok) response.clone().text().then(function(text) { state.record(address, text); }).catch(function() {});
+              }).catch(function() {});
+            }
+          } catch (_) {}
+          return result;
+        };
+      }
+      const open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, address) {
+        try {
+          if (state.timedTextUrl(address) && !this.__dualSubTranscript) {
+            this.__dualSubTranscript = true;
+            const request = this;
+            request.addEventListener('load', function() {
+              try {
+                if (request.status < 200 || request.status >= 300) return;
+                const type = request.responseType;
+                let text = null;
+                if (type === '' || type === 'text') text = request.responseText;
+                else if (type === 'arraybuffer' && request.response) text = new TextDecoder('utf-8').decode(request.response);
+                else if (type === 'json' && request.response) text = JSON.stringify(request.response);
+                state.record(request.responseURL || address, text);
+              } catch (_) {}
+            });
+          }
+        } catch (_) {}
+        return open.apply(this, arguments);
+      };
+      return true;
+    })();
+    """.trimIndent()
+
+/** Caption documents the page holds for [videoId] that are not in [knownIds] yet, as JSON text. */
+internal fun webPageTranscriptReadScript(
+    videoId: String,
+    knownIds: Collection<String>,
+): String {
+    val known = knownIds.joinToString(prefix = "[", postfix = "]", separator = ",") { JSONObject.quote(it) }
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          const state = window['$PAGE_TRANSCRIPT_STATE_KEY'];
+          if (!state) return null;
+          const videoId = ${JSONObject.quote(videoId)};
+          const known = $known;
+          const found = Object.keys(state.documents).filter(function(id) {
+            return state.documents[id].videoId === videoId && known.indexOf(id) < 0;
+          }).map(function(id) { return state.documents[id]; });
+          if (!found.length && !Object.keys(state.documents).some(function(id) { return state.documents[id].videoId === videoId; })) {
+            try { state.fetchEarlier(videoId); } catch (_) {}
+          }
+          return found.length ? JSON.stringify(found) : null;
+        })();
+        """.trimIndent()
+}
+
+/** The documents [webPageTranscriptReadScript] returned through `evaluateJavascript`. */
+internal fun parsePageTranscripts(rawValue: String?): List<PageTranscript> {
+    val decoded = parsePageCaptionTracks(rawValue) ?: return emptyList()
+    val array = runCatching { JSONArray(decoded) }.getOrNull() ?: return emptyList()
+    return (0 until array.length()).mapNotNull { index ->
+        val item = array.optJSONObject(index) ?: return@mapNotNull null
+        PageTranscript(
+            videoId = item.optString("videoId"),
+            languageCode = item.optString("languageCode"),
+            kind = item.optString("kind"),
+            text = item.optString("text"),
+        ).takeIf { it.videoId.isNotBlank() && it.text.isNotBlank() && it.text.length <= MAX_PAGE_TRANSCRIPT_LENGTH }
+    }
 }

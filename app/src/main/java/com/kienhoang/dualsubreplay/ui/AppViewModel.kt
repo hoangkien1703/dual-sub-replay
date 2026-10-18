@@ -18,6 +18,7 @@ import com.kienhoang.dualsubreplay.data.ImmersionTimeTracker
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStore
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
 import com.kienhoang.dualsubreplay.data.LearnerData
+import com.kienhoang.dualsubreplay.data.PageCaptionSource
 import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
@@ -315,6 +316,7 @@ class AppViewModel internal constructor(
     internal val immersion = ImmersionRepository.get(application)
 
     init {
+        PageCaptionSource.Shared.onTranscript = ::retryWithPageTranscript
         // Japanese word analysis downloads its dictionary here the first time Japanese is shown.
         JapaneseMorphology.useStore(JapaneseDictionaryStore(File(application.filesDir, "japanese-dictionary")))
         // English and Chinese word analysis reads data packaged in the APK.
@@ -494,6 +496,7 @@ class AppViewModel internal constructor(
         }
 
     override fun onCleared() {
+        PageCaptionSource.Shared.onTranscript = {}
         flushImmersion()
         loadingJob?.cancel()
         preferences.unregisterOnSharedPreferenceChangeListener(visibilityListener)
@@ -1189,6 +1192,14 @@ class AppViewModel internal constructor(
                     loadVideo(videoId, showPanel = current.subtitlePanelVisible)
                 }
             }
+    }
+
+    /** The page's player downloaded captions for a video whose full transcript failed: try again now. */
+    private fun retryWithPageTranscript(videoId: String) {
+        val current = _state.value
+        if (current.activeVideoId == videoId && current.liveFallback && !current.retryingTranscript) {
+            loadVideo(videoId, showPanel = current.subtitlePanelVisible)
+        }
     }
 
     fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }

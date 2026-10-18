@@ -389,6 +389,11 @@ internal fun SingleYouTubePage(
                     WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
                     YOUTUBE_DOCUMENT_START_ORIGINS,
                 )
+                WebViewCompat.addDocumentStartJavaScript(
+                    this,
+                    WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT,
+                    YOUTUBE_DOCUMENT_START_ORIGINS,
+                )
             }
 
             webViewClient = object : WebViewClient() {
@@ -470,6 +475,7 @@ internal fun SingleYouTubePage(
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         CookieManager.getInstance().flush()
                         view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
+                        view.evaluateJavascript(WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT, null)
                         view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
                         view.evaluateJavascript(
                             webLiveCaptionConfigurationScript(currentLiveCaptionCaptureEnabled),
@@ -822,14 +828,28 @@ internal fun WebPageErrorCard(
     }
 }
 
-/** Hands the page's caption track list to [PageCaptionSource] once per watched video. */
+/**
+ * Every [PAGE_TRANSCRIPT_READ_INTERVAL_MS], hands the page's caption track list (until it has one
+ * for the watched video) and new caption documents its player downloaded to [PageCaptionSource].
+ */
 private fun readPageCaptionTracks(
     webView: WebView,
     url: String,
 ) {
     val videoId = browseVideoSelection(url)?.videoId ?: return
-    if (PageCaptionSource.Shared.hasTracks(videoId)) return
-    webView.evaluateJavascript(WEB_PAGE_CAPTION_TRACKS_SCRIPT) { rawValue ->
-        parsePageCaptionTracks(rawValue)?.let(PageCaptionSource.Shared::recordPlayerResponse)
+    val now = android.os.SystemClock.elapsedRealtime()
+    if (now - lastPageTranscriptReadMs < PAGE_TRANSCRIPT_READ_INTERVAL_MS) return
+    lastPageTranscriptReadMs = now
+    val source = PageCaptionSource.Shared
+    if (!source.hasTracks(videoId)) {
+        webView.evaluateJavascript(WEB_PAGE_CAPTION_TRACKS_SCRIPT) { rawValue ->
+            parsePageCaptionTracks(rawValue)?.let(source::recordPlayerResponse)
+        }
+    }
+    webView.evaluateJavascript(webPageTranscriptReadScript(videoId, source.transcripts(videoId).map { it.id })) { rawValue ->
+        parsePageTranscripts(rawValue).forEach(source::recordTranscript)
     }
 }
+
+private const val PAGE_TRANSCRIPT_READ_INTERVAL_MS = 2_000L
+private var lastPageTranscriptReadMs = 0L

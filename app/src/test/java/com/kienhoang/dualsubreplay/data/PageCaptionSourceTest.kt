@@ -1,6 +1,9 @@
 package com.kienhoang.dualsubreplay.data
 
+import com.kienhoang.dualsubreplay.ui.WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT
 import com.kienhoang.dualsubreplay.ui.parsePageCaptionTracks
+import com.kienhoang.dualsubreplay.ui.parsePageTranscripts
+import com.kienhoang.dualsubreplay.ui.webPageTranscriptReadScript
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -112,5 +115,105 @@ class PageCaptionSourceTest {
         assertEquals("MWEB", download.url.queryParameter("c"))
         assertEquals("PageAgent", download.header("User-Agent"))
         assertEquals("VISITOR_INFO1_LIVE=x", download.header("Cookie"))
+    }
+
+    private val json3 = """{"events":[{"tStartMs":0,"dDurationMs":1500,"segs":[{"utf8":"from the page"}]}]}"""
+
+    private fun refusingClient(requests: MutableList<Request>): OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor { chain ->
+                val request = chain.request()
+                requests += request
+                Response
+                    .Builder()
+                    .request(request)
+                    .protocol(Protocol.HTTP_1_1)
+                    .code(200)
+                    .message("OK")
+                    .body("""{"playabilityStatus":{"status":"LOGIN_REQUIRED"}}""".toResponseBody("application/json".toMediaType()))
+                    .build()
+            }.build()
+
+    @Test
+    fun theCaptionsThePagePlayerDownloadedNeedNoRequestAtAll() {
+        val requests = mutableListOf<Request>()
+        val source = PageCaptionSource()
+        source.recordPlayerResponse(pageResponse)
+        source.recordTranscript(PageTranscript("abcdefghijk", "en", "asr", json3))
+
+        val result = runBlocking { YouTubeCaptionProvider(refusingClient(requests), source).fetch("abcdefghijk", emptyList()) }
+
+        assertEquals("from the page", result.cues.single().text)
+        assertTrue(result.isGenerated)
+        assertEquals(emptyList<Request>(), requests)
+    }
+
+    @Test
+    fun aPageDocumentWorksEvenWithoutTheTrackList() {
+        val requests = mutableListOf<Request>()
+        val source = PageCaptionSource()
+        source.recordTranscript(PageTranscript("abcdefghijk", "ja", "", json3))
+
+        val result = runBlocking { YouTubeCaptionProvider(refusingClient(requests), source).fetch("abcdefghijk", emptyList()) }
+
+        assertEquals("ja", result.languageCode)
+        assertFalse(result.isGenerated)
+        assertEquals(listOf(CaptionLanguage("ja", "JA")), result.availableLanguages)
+        assertEquals(emptyList<Request>(), requests)
+    }
+
+    @Test
+    fun aPageDocumentMatchesItsTrackByLanguageAndKind() {
+        val creator = PageTranscript("abcdefghijk", "en", "", "a")
+        val generated = PageTranscript("abcdefghijk", "en", "asr", "b")
+        val track = org.json.JSONObject("""{"languageCode":"en","kind":"asr"}""")
+        assertEquals(generated, pageTranscriptFor(listOf(generated, creator), track))
+        assertNull(pageTranscriptFor(listOf(creator), track))
+        assertEquals(creator, pageTranscriptFor(listOf(generated, creator), null))
+    }
+
+    @Test
+    fun theChosenLanguageWinsAmongPageDocuments() {
+        val english = PageTranscript("abcdefghijk", "en", "", json3)
+        val chinese = PageTranscript("abcdefghijk", "zh-Hans", "", json3)
+        val result = pageTranscriptResult(listOf(chinese, english), CaptionLanguageChoice(listOf("zh"), null))
+        assertEquals("zh-Hans", result?.languageCode)
+        assertNull(
+            pageTranscriptResult(listOf(PageTranscript("abcdefghijk", "en", "", "not captions")), CaptionLanguageChoice(emptyList(), null)),
+        )
+    }
+
+    @Test
+    fun onlyTheNewestFourPageDocumentsAreKept() {
+        val source = PageCaptionSource()
+        var told = 0
+        source.onTranscript = { told++ }
+        listOf("en", "ja", "zh", "ko", "vi").forEach { source.recordTranscript(PageTranscript("abcdefghijk", it, "", json3)) }
+        source.recordTranscript(PageTranscript("bad", "en", "", json3))
+        assertEquals(listOf("ja", "zh", "ko", "vi"), source.transcripts("abcdefghijk").map { it.languageCode })
+        assertEquals(5, told)
+    }
+
+    @Test
+    fun pageDocumentsAreDecodedFromTheReadScript() {
+        val raw =
+            org.json.JSONObject.quote(
+                """[{"videoId":"abcdefghijk","languageCode":"en","kind":"asr","text":"x"},{"videoId":"","text":"y"}]""",
+            )
+        assertEquals(listOf(PageTranscript("abcdefghijk", "en", "asr", "x")), parsePageTranscripts(raw))
+        assertEquals(emptyList<PageTranscript>(), parsePageTranscripts("null"))
+    }
+
+    @Test
+    fun pageTranscriptScriptsRecheckTheOriginAndOnlyReadResponses() {
+        listOf(WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT, webPageTranscriptReadScript("abcdefghijk", listOf("a|b|"))).forEach { script ->
+            assertTrue(script.contains("window.location.protocol !== 'https:'"))
+            assertTrue(script.contains("host.endsWith('.youtube.com')"))
+        }
+        assertTrue(WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT.contains("url.pathname !== '/api/timedtext'"))
+        assertTrue(WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT.contains("url.searchParams.get('tlang')"))
+        assertTrue(WEB_PAGE_TRANSCRIPT_CAPTURE_SCRIPT.contains("return open.apply(this, arguments);"))
+        assertTrue(webPageTranscriptReadScript("abcdefghijk", listOf("a|b|")).contains("const known = [\"a|b|\"];"))
     }
 }
