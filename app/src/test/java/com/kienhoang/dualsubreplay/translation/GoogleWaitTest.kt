@@ -72,4 +72,12 @@ class GoogleWaitTest {
         val slow = GoogleSlowException(2_000L, CompletableDeferred<Unit>())
         assertEquals("Google Translate did not answer within 2 s; the app keeps waiting for it in the background.", slow.message)
     }
+
+    @Test fun theSlowDetailAddsWhatTheAddressesDidSoFar() {
+        assertEquals(
+            "Google Translate did not answer within 2 s; the app keeps waiting for it in the background. " +
+                "So far: translate.googleapis.com/translate_a/t: no connection within 5 s.",
+            googleSlowDetail(2_000L, "translate.googleapis.com/translate_a/t: no connection within 5 s"),
+        )
+    }
 }

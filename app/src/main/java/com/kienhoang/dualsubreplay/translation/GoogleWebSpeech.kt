@@ -21,11 +21,20 @@ import kotlin.coroutines.resume
 /*
  * Online voice: the speech endpoint Google Translate's web page reads text aloud with. Like the
  * translation endpoints it needs no key but is not an official API, so callers fall back to the
- * phone's own voices whenever it fails. Used for Chinese, where many phones have no Mandarin
- * voice installed and Google's voice sounds natural.
+ * phone's own voices whenever it fails. Every language uses it while Google translates subtitles
+ * (owner decision 2026-10-19): many phones lack a voice for the language learned, Chinese above all,
+ * and Google's voices sound natural. When no address answers, the phone speaks at once for a while.
  */
 
-internal const val GOOGLE_SPEECH_URL = "https://translate.googleapis.com/translate_tts"
+/** Addresses in the order they are tried; the one that last answered is tried first. */
+internal enum class GoogleSpeechEndpoint(
+    val url: String,
+    val client: String,
+) {
+    API("https://translate.googleapis.com/translate_tts", "gtx"),
+    WEB("https://translate.google.com/translate_tts", "tw-ob"),
+    EXTENSION("https://clients5.google.com/translate_tts", "gtx"),
+}
 
 /** Google reads at most about 200 characters per request; longer text is left to the phone. */
 internal const val MAX_GOOGLE_SPEECH_CHARS = 200
@@ -34,16 +43,21 @@ internal const val MAX_GOOGLE_SPEECH_CHARS = 200
 internal const val MAX_GOOGLE_SPEECH_BYTES = 512 * 1024
 private const val GOOGLE_SPEECH_TIMEOUT_MS = 8_000L
 
+/** A short connect timeout, so an unreachable address hands over to the next one quickly. */
+private const val GOOGLE_SPEECH_CONNECT_TIMEOUT_MS = 3_000L
+
 /**
  * Google's voice for a subtitle [language], or null when the phone's voices are used instead.
- * Only Mandarin: simplified or mainland Chinese is read with Google's mainland voice, traditional
- * or Taiwanese Chinese with its Taiwanese voice. Hong Kong and Macau text is often Cantonese, so it
- * stays with the phone.
+ * Simplified or mainland Chinese is read with Google's mainland voice, traditional or Taiwanese
+ * Chinese with its Taiwanese voice; Hong Kong and Macau text is often Cantonese, so it stays with
+ * the phone. Other languages use Google's voice of that language; Google answers a language it has
+ * no voice for with an error, and the phone speaks instead.
  */
 internal fun googleSpeechLanguage(language: String): String? {
     val locale = Locale.forLanguageTag(language.trim().replace('_', '-'))
-    if (locale.language != "zh" && locale.language != "cmn") return null
     return when {
+        locale.language.isBlank() || locale.language in setOf("und", "auto", "yue") -> null
+        locale.language != "zh" && locale.language != "cmn" -> locale.language
         locale.country in setOf("HK", "MO") -> null
         locale.script == "Hant" || locale.country == "TW" -> "zh-TW"
         else -> "zh-CN"
@@ -64,12 +78,13 @@ internal fun speaksWithGoogle(
 internal fun googleSpeechUrl(
     text: String,
     googleLanguage: String,
+    endpoint: GoogleSpeechEndpoint = GoogleSpeechEndpoint.API,
 ): HttpUrl =
-    GOOGLE_SPEECH_URL
+    endpoint.url
         .toHttpUrl()
         .newBuilder()
         .addQueryParameter("ie", "UTF-8")
-        .addQueryParameter("client", "gtx")
+        .addQueryParameter("client", endpoint.client)
         .addQueryParameter("tl", googleLanguage)
         .addQueryParameter("q", text.trim())
         .build()
@@ -82,34 +97,94 @@ internal fun looksLikeMp3(bytes: ByteArray): Boolean =
                 (bytes[0] == 0xFF.toByte() && (bytes[1].toInt() and 0xE0) == 0xE0)
         )
 
-class GoogleWebSpeech(
-    private val client: OkHttpClient =
+/** What one address answered: audio, an answer without audio (no voice for the text), or nothing (unreachable or refused). */
+private sealed interface SpeechReply {
+    class Audio(
+        val bytes: ByteArray,
+    ) : SpeechReply
+
+    data object NoAudio : SpeechReply
+
+    data object Down : SpeechReply
+}
+
+/**
+ * Remembers, for every [GoogleWebSpeech] in the app, when no Google address answered, so the phone
+ * speaks at once for [restMs] instead of waiting for Google on every word.
+ */
+internal class GoogleSpeechHealth(
+    private val restMs: Long = GOOGLE_RECHECK_INTERVAL_MS,
+    private val now: () -> Long = System::currentTimeMillis,
+) {
+    @Volatile private var downSince: Long? = null
+
+    @Volatile var preferred = 0
+
+    fun isResting(): Boolean = downSince?.let { now() - it < restMs } == true
+
+    fun markDown() {
+        downSince = now()
+    }
+
+    fun markUp(endpoint: Int) {
+        downSince = null
+        preferred = endpoint
+    }
+
+    companion object {
+        val Shared = GoogleSpeechHealth()
+    }
+}
+
+class GoogleWebSpeech internal constructor(
+    private val client: OkHttpClient,
+    private val health: GoogleSpeechHealth,
+) {
+    constructor() : this(
         OkHttpClient
             .Builder()
-            .connectTimeout(GOOGLE_SPEECH_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .connectTimeout(GOOGLE_SPEECH_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .readTimeout(GOOGLE_SPEECH_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .callTimeout(GOOGLE_SPEECH_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .build(),
-) {
-    /** Writes Google's MP3 of [text] in [language] to [file]; false when Google has no voice for it or fails. */
+        GoogleSpeechHealth.Shared,
+    )
+
+    /**
+     * Writes Google's MP3 of [text] in [language] to [file], trying each address; false when Google has
+     * no voice for it, or no address answered (then the next words skip Google for a while).
+     */
     suspend fun record(
         text: String,
         language: String,
         file: File,
     ): Boolean {
         val googleLanguage = googleSpeechLanguage(language) ?: return false
-        if (text.isBlank() || text.trim().length > MAX_GOOGLE_SPEECH_CHARS) return false
-        val request =
-            Request
-                .Builder()
-                .url(googleSpeechUrl(text, googleLanguage))
-                .get()
-                .build()
-        val audio = download(request)?.takeIf(::looksLikeMp3) ?: return false
-        return withContext(Dispatchers.IO) { runCatching { file.writeBytes(audio) }.isSuccess }
+        if (text.isBlank() || text.trim().length > MAX_GOOGLE_SPEECH_CHARS || health.isResting()) return false
+        val endpoints = GoogleSpeechEndpoint.entries
+        var answered = false
+        for (index in googleClientOrder(health.preferred, endpoints.size)) {
+            val request =
+                Request
+                    .Builder()
+                    .url(googleSpeechUrl(text, googleLanguage, endpoints[index]))
+                    .get()
+                    .build()
+            when (val reply = download(request)) {
+                is SpeechReply.Audio -> {
+                    health.markUp(index)
+                    return withContext(Dispatchers.IO) { runCatching { file.writeBytes(reply.bytes) }.isSuccess }
+                }
+                SpeechReply.NoAudio -> answered = true
+                SpeechReply.Down -> Unit
+            }
+        }
+        // An address that answered without audio has no voice for this text; that is not an outage.
+        if (!answered) health.markDown()
+        return false
     }
 
-    private suspend fun download(request: Request): ByteArray? =
+    private suspend fun download(request: Request): SpeechReply =
         suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
@@ -119,23 +194,26 @@ class GoogleWebSpeech(
                         call: Call,
                         error: IOException,
                     ) {
-                        if (continuation.isActive) continuation.resume(null)
+                        if (continuation.isActive) continuation.resume(SpeechReply.Down)
                     }
 
                     override fun onResponse(
                         call: Call,
                         response: Response,
                     ) {
-                        val body =
-                            response.use {
-                                val stream = it.body?.byteStream()
-                                if (!it.isSuccessful || stream == null) null else runCatching { readBytesWithLimit(stream) }.getOrNull()
-                            }
-                        if (continuation.isActive) continuation.resume(body)
+                        val reply = response.use(::readSpeechReply)
+                        if (continuation.isActive) continuation.resume(reply)
                     }
                 },
             )
         }
+
+    private fun readSpeechReply(response: Response): SpeechReply {
+        if (isBlockedGoogleStatus(response.code) || response.code >= 500) return SpeechReply.Down
+        val stream = response.body?.byteStream()
+        val bytes = if (!response.isSuccessful || stream == null) null else runCatching { readBytesWithLimit(stream) }.getOrNull()
+        return bytes?.takeIf(::looksLikeMp3)?.let(SpeechReply::Audio) ?: SpeechReply.NoAudio
+    }
 }
 
 /** The whole of [input], or null once it passes [maxBytes]. */

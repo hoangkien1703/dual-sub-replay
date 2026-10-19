@@ -60,7 +60,15 @@ internal fun Context.onWifi(): Boolean {
 class GoogleSlowException(
     val waitMs: Long,
     val pending: Deferred<*>,
-) : IOException("Google Translate did not answer within ${waitMs / 1_000} s; the app keeps waiting for it in the background.")
+) : IOException(googleSlowDetail(waitMs))
+
+/** The problem detail while Google is waited for in the background, with what its addresses did [soFar]. */
+internal fun googleSlowDetail(
+    waitMs: Long,
+    soFar: String? = null,
+): String =
+    "Google Translate did not answer within ${waitMs / 1_000} s; the app keeps waiting for it in the background." +
+        soFar?.let { " So far: $it." }.orEmpty()
 
 /**
  * Starts [request] in [scope], which outlives the caller, and waits at most [waitMs] for it: returns
