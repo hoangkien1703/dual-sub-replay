@@ -145,4 +145,10 @@
     <string name="language_downloads_back">Back</string>
     <string name="settings_google_translate_title">Google Translate (online)</string>
     <string name="settings_google_translate_description">On by default. Better translations, especially for Japanese. Sends subtitle text to Google. This is not an official Google service, so it can stop working; the app then translates on your device until Google works again. Turn off to always translate on your device.</string>
+    <string name="settings_google_wait_title">Wait for Google</string>
+    <string name="settings_google_wait_description">How long a line waits for Google Translate before it shows a translation from YouTube or your device. Google keeps trying in the background, and its translation replaces the line when it arrives. Automatic waits 2 seconds on mobile data and 4 on Wi-Fi.</string>
+    <string name="settings_google_wait_auto">Automatic</string>
+    <string name="settings_google_wait_2">2 s</string>
+    <string name="settings_google_wait_4">4 s</string>
+    <string name="settings_google_wait_8">8 s</string>
 </resources>

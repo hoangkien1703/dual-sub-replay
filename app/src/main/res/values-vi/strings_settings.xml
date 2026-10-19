@@ -145,4 +145,10 @@
     <string name="language_downloads_back">Quay lại</string>
     <string name="settings_google_translate_title">Google Dịch (trực tuyến)</string>
     <string name="settings_google_translate_description">Bật theo mặc định. Bản dịch tốt hơn, nhất là tiếng Nhật. Gửi nội dung phụ đề tới Google. Đây không phải dịch vụ chính thức của Google nên có thể ngừng hoạt động; khi đó ứng dụng dịch trên thiết bị cho đến khi Google hoạt động lại. Tắt để luôn dịch trên thiết bị của bạn.</string>
+    <string name="settings_google_wait_title">Chờ Google</string>
+    <string name="settings_google_wait_description">Thời gian mỗi dòng chờ Google Dịch trước khi hiện bản dịch từ YouTube hoặc từ thiết bị. Google vẫn được thử tiếp ở chế độ nền, và bản dịch của Google sẽ thay thế dòng đó khi có. Tự động chờ 2 giây khi dùng dữ liệu di động và 4 giây khi dùng Wi-Fi.</string>
+    <string name="settings_google_wait_auto">Tự động</string>
+    <string name="settings_google_wait_2">2 giây</string>
+    <string name="settings_google_wait_4">4 giây</string>
+    <string name="settings_google_wait_8">8 giây</string>
 </resources>

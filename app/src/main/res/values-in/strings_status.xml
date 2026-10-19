@@ -28,5 +28,7 @@
     <string name="translation_issue_button">Masalah terjemahan</string>
     <string name="translation_issue_on_device_title">Memakai terjemahan di perangkat</string>
     <string name="translation_issue_on_device_message">Google Terjemahan sedang tidak berfungsi, jadi video ini diterjemahkan di perangkat Anda. Aplikasi mencoba Google lagi setiap 2 menit dan pada video berikutnya.</string>
+    <string name="translation_issue_youtube_title">Memakai terjemahan YouTube</string>
+    <string name="translation_issue_youtube_message">Google Terjemahan sedang tidak berfungsi, jadi video ini memakai teks terjemahan dari YouTube sendiri; baris yang tidak diterjemahkan YouTube diterjemahkan di perangkat Anda. Aplikasi mencoba Google lagi setiap 2 menit dan di video berikutnya.</string>
     <string name="translation_issue_try_google">Coba Google lagi</string>
 </resources>

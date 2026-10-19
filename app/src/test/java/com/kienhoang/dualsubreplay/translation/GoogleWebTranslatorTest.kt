@@ -15,6 +15,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.net.UnknownHostException
 
 class GoogleWebTranslatorTest {
     @Test fun joinsEverySentenceSegment() {
@@ -185,6 +186,42 @@ class GoogleWebTranslatorTest {
             )
             // Each endpoint once: waiting a few seconds does not lift a block.
             assertEquals(GoogleEndpoint.entries.size, calls)
+        }
+
+    @Test fun anUnreachableAddressHandsOverToTheNext() =
+        runBlocking {
+            val seen = mutableListOf<GoogleEndpoint>()
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = emptyList(),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            seen += endpoint
+                            if (endpoint == GoogleEndpoint.BATCH) UNREACHABLE to "" else 200 to batchReply(texts.map { "ok" })
+                        },
+                )
+            assertEquals("ok", translator.translate("ja", "en", "テスト"))
+            assertEquals(listOf(GoogleEndpoint.BATCH, GoogleEndpoint.EXTENSION_BATCH), seen)
+        }
+
+    @Test fun everyAddressUnreachableIsRetriedAndThenFailsAsUnreachable() =
+        runBlocking {
+            var calls = 0
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = listOf(0L),
+                    client =
+                        fakeGoogle { _, _ ->
+                            calls++
+                            UNREACHABLE to ""
+                        },
+                )
+            val failure = runCatching { translator.translate("ja", "en", "テスト") }.exceptionOrNull() as GoogleTranslateException
+            assertTrue(failure.unreachable)
+            assertTrue(failure.retryable)
+            assertEquals("Google Translate could not be reached (translate.googleapis.com/translate_a/t).", failure.message)
+            // Every address, then every address again after the one pause.
+            assertEquals(GoogleEndpoint.entries.size * 2, calls)
         }
 
     @Test fun aBlankLineKeepsTheOthersAndIsAskedAgainAloneElsewhere() =
@@ -371,6 +408,7 @@ class GoogleWebTranslatorTest {
                     val texts = (0 until form.size).filter { form.name(it) == "q" }.map(form::value)
                     val endpoint = GoogleEndpoint.entries.single { request.url.toString().startsWith(it.url) }
                     val (code, body) = reply(endpoint, texts)
+                    if (code == UNREACHABLE) throw UnknownHostException(request.url.host)
                     Response
                         .Builder()
                         .request(request)
@@ -381,4 +419,9 @@ class GoogleWebTranslatorTest {
                         .build()
                 },
             ).build()
+
+    private companion object {
+        /** A status [fakeGoogle] answers by failing to connect. */
+        const val UNREACHABLE = -1
+    }
 }

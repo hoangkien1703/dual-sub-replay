@@ -92,6 +92,7 @@ internal enum class AiSetting(
     LOCK_OVERLAY_TO_VIDEO("lock_overlay_to_video"),
     AVOID_VIDEO_CONTROLS("avoid_video_controls"),
     REMEMBER_DRAGGED_POSITION("remember_dragged_position"),
+    GOOGLE_WAIT("google_wait", listOf("auto", "2", "4", "8")),
     NATURAL_SUBTITLE_FLOW("natural_subtitle_flow", asks = true),
     PRELOAD_TRANSLATION_MODELS("preload_translation_models", asks = true),
     ORIGINAL_CAPTION_LANGUAGE("original_caption_language", emptyList(), asks = true),
@@ -572,6 +573,7 @@ internal fun aiSettingValue(
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "auto" else aiLanguageCode(raw)
         AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
         AiSetting.DAILY_GOAL -> aiDailyGoal(key)
+        AiSetting.GOOGLE_WAIT -> aiGoogleWait(key)
         else ->
             listOfNotNull(key, SETTING_CHOICE_ALIASES[setting]?.get(key), CHOICE_ALIASES[key])
                 .firstOrNull { it in setting.choices }
@@ -584,6 +586,20 @@ private fun aiAppLanguage(raw: String): String? {
     AI_APP_LANGUAGES.firstOrNull { it.equals(trimmed, ignoreCase = true) }?.let { return it }
     val language = (aiLanguageCode(trimmed) ?: trimmed).substringBefore('-').lowercase(Locale.ROOT)
     return AI_APP_LANGUAGES.drop(1).firstOrNull { it.substringBefore('-').lowercase(Locale.ROOT) == language }
+}
+
+/** "auto", or 2, 4 or 8 seconds from "4", "4 s" or "4 seconds". */
+private fun aiGoogleWait(key: String): String? {
+    if (key in setOf("auto", "automatic", "default")) return "auto"
+    val seconds =
+        key
+            .removeSuffix("seconds")
+            .removeSuffix("second")
+            .removeSuffix("secs")
+            .removeSuffix("sec")
+            .removeSuffix("s")
+            .trim('_')
+    return seconds.takeIf { it in AiSetting.GOOGLE_WAIT.choices }
 }
 
 private fun aiDailyGoal(key: String): String? {
@@ -649,6 +665,10 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> "auto, or the code of a language the open video has captions in"
         AiSetting.APP_LANGUAGE -> choiceList(setting.choices) + " (device follows the phone)"
         AiSetting.DAILY_GOAL -> choiceList(setting.choices) + " (minutes a day)"
+        AiSetting.GOOGLE_WAIT ->
+            choiceList(setting.choices) +
+                " (seconds a subtitle line waits for Google Translate before YouTube's or the device's translation shows; " +
+                "auto waits 2 on mobile data and 4 on Wi-Fi)"
         else -> choiceList(setting.choices)
     }
 

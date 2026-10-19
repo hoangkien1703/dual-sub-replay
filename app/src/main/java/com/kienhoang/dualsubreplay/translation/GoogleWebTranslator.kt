@@ -48,7 +48,7 @@ internal val GOOGLE_RETRY_DELAYS_MS = listOf(1_000L, 3_000L, 7_000L)
 internal const val GOOGLE_RECHECK_INTERVAL_MS = 120_000L
 
 /**
- * Endpoints in the order they are tried. A refused one (HTTP 403/429) hands over to the next, and the
+ * Endpoints in the order they are tried. A refused (HTTP 403/429) or unreachable one hands over to the next, and the
  * one that last worked is tried first. The batch endpoints translate many texts in one request.
  */
 internal enum class GoogleEndpoint(
@@ -76,11 +76,13 @@ class GoogleTranslateException(
     val blocked: Boolean = false,
     /** The HTTP status Google answered with, when it answered with an error. */
     val status: Int? = null,
+    /** The address could not be reached at all; another address may still work. */
+    val unreachable: Boolean = false,
 ) : IOException(message, cause)
 
 /** The same error naming [endpoint], so the problem details say which Google address failed. */
 private fun GoogleTranslateException.at(endpoint: GoogleEndpoint): GoogleTranslateException =
-    GoogleTranslateException("${message.orEmpty().removeSuffix(".")} (${endpoint.label}).", cause, retryable, blocked, status)
+    GoogleTranslateException("${message.orEmpty().removeSuffix(".")} (${endpoint.label}).", cause, retryable, blocked, status, unreachable)
 
 /** Every address refused or answered blank: the detail lists each one with its status. */
 internal fun googleRefusedEverywhere(refusals: List<Pair<GoogleEndpoint, GoogleTranslateException>>): GoogleTranslateException {
@@ -361,14 +363,15 @@ class GoogleWebTranslator(
                 try {
                     sendAll(endpoints[index], source, target, texts)
                 } catch (error: GoogleTranslateException) {
-                    if (!error.blocked) throw error
+                    if (!error.blocked && !error.unreachable) throw error
                     refusals += endpoints[index] to error
                     continue
                 }
             preferredEndpoint = index
             return translated
         }
-        throw googleRefusedEverywhere(refusals)
+        // An address that could not be reached is worth retrying after a pause; refusals are not.
+        throw refusals.firstOrNull { (_, error) -> error.unreachable }?.second ?: googleRefusedEverywhere(refusals)
     }
 
     /** One request for a batch endpoint, one per text for the other. Errors name the address. */
@@ -433,7 +436,12 @@ class GoogleWebTranslator(
                     ) {
                         if (continuation.isActive) {
                             continuation.resumeWithException(
-                                GoogleTranslateException("Google Translate could not be reached.", error, retryable = true),
+                                GoogleTranslateException(
+                                    "Google Translate could not be reached.",
+                                    error,
+                                    retryable = true,
+                                    unreachable = true,
+                                ),
                             )
                         }
                     }

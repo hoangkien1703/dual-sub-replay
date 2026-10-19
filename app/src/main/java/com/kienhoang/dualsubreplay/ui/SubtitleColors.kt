@@ -191,4 +191,5 @@ val RESETTABLE_SETTING_KEYS =
         TAP_TO_LEARN_PREFERENCE,
         WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
         com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
+        com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
     )

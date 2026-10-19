@@ -28,5 +28,7 @@
     <string name="translation_issue_button">Problema de traducción</string>
     <string name="translation_issue_on_device_title">Usando la traducción en el dispositivo</string>
     <string name="translation_issue_on_device_message">Google Traductor no funciona en este momento, así que este video se traduce en tu dispositivo. La app vuelve a probar Google cada 2 minutos y en el siguiente video.</string>
+    <string name="translation_issue_youtube_title">Usando la traducción de YouTube</string>
+    <string name="translation_issue_youtube_message">Google Traductor no funciona ahora mismo, así que este video usa los subtítulos traducidos del propio YouTube; las líneas que YouTube no traduce se traducen en tu dispositivo. La app vuelve a probar Google cada 2 minutos y en el siguiente video.</string>
     <string name="translation_issue_try_google">Volver a probar Google</string>
 </resources>

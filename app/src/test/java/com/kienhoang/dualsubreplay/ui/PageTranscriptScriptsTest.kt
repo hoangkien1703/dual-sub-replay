@@ -3,6 +3,8 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.MAX_PAGE_TRANSCRIPT_LENGTH
 import com.kienhoang.dualsubreplay.data.PageCaptionTarget
 import com.kienhoang.dualsubreplay.data.PageTranscriptReply
+import com.kienhoang.dualsubreplay.data.PageTranslationReply
+import com.kienhoang.dualsubreplay.data.PageTranslationTarget
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -81,6 +83,53 @@ class PageTranscriptScriptsTest {
         assertTrue(script.contains("if (!asGiven) {"))
         // YouTube's empty answer without a token does not finish the job.
         assertTrue(script.contains("job.status === 'working' && state.cues(text)"))
+    }
+
+    @Test
+    fun youTubesTranslationIsAskedForLikeLingoTubeAndStaysOnYouTube() {
+        val script = webPageTranslationScript(PageTranslationTarget("abcdefghijk", "ja", false, "vi", attempt = 3))
+        assertTrue(script.contains("window.location.protocol !== 'https:'"))
+        assertTrue(script.contains("host.endsWith('.youtube.com')"))
+        assertTrue(
+            script.contains(
+                """const target = {"videoId":"abcdefghijk","languageCode":"ja","generated":false,"translateTo":"vi","attempt":"3"};""",
+            ),
+        )
+        assertTrue(script.contains("const key = '$PAGE_TRANSLATION_STATE_KEY';"))
+        // The source address passes the same /api/timedtext check before tlang is added.
+        assertEquals(1, Regex("fetch\\(").findAll(script).count())
+        assertTrue(script.contains("if (target.translateTo) url.searchParams.set('tlang', target.translateTo);"))
+        assertTrue(script.contains("state.download(found.address, found.request, true)"))
+        // Otherwise the player itself downloads the translated track, and the captions are switched back.
+        assertTrue(script.contains("translationLanguage: { languageCode: target.translateTo"))
+        assertTrue(script.contains("state.restoreTrack(job);"))
+        assertTrue(script.contains("job.status = 'unavailable';"))
+    }
+
+    @Test
+    fun theCaptureKeepsYouTubesTranslationsApartFromTheOriginals() {
+        val capture = WEB_CAPTION_CAPTURE_SCRIPT
+        assertTrue(capture.contains("capture.timedText(value) || capture.timedText(value, true)"))
+        assertTrue(capture.contains("!url.searchParams.get('tlang') !== !translated) return null;"))
+        assertTrue(capture.contains("capture.translations[translation] = text;"))
+        assertTrue(capture.contains("capture.translationOrder.length > 4"))
+    }
+
+    @Test
+    fun translationRepliesAreReadSafely() {
+        fun raw(json: String) = JSONObject.quote(json)
+
+        assertEquals(
+            PageTranslationReply.Done("<transcript/>"),
+            parsePageTranslationReply(raw("""{"status":"done","text":"<transcript/>"}""")),
+        )
+        assertEquals(
+            PageTranslationReply.Unavailable,
+            parsePageTranslationReply(raw("""{"status":"unavailable","step":"not-translatable"}""")),
+        )
+        assertEquals(PageTranslationReply.Working("no-track"), parsePageTranslationReply(raw("""{"status":"working","step":"no-track"}""")))
+        assertEquals(PageTranslationReply.Working(null), parsePageTranslationReply(raw("""{"status":"done","text":""}""")))
+        assertEquals(PageTranslationReply.Working(), parsePageTranslationReply(null))
     }
 
     @Test

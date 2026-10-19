@@ -145,4 +145,10 @@
     <string name="language_downloads_back">Atrás</string>
     <string name="settings_google_translate_title">Google Traductor (en línea)</string>
     <string name="settings_google_translate_description">Activado de forma predeterminada. Traducciones mejores, sobre todo del japonés. Envía el texto de los subtítulos a Google. No es un servicio oficial de Google, así que puede dejar de funcionar; entonces la app traduce en tu dispositivo hasta que Google vuelva a funcionar. Desactívalo para traducir siempre en tu dispositivo.</string>
+    <string name="settings_google_wait_title">Esperar a Google</string>
+    <string name="settings_google_wait_description">Cuánto espera una línea a Google Traductor antes de mostrar una traducción de YouTube o de tu dispositivo. Google se sigue intentando en segundo plano y su traducción sustituye a la línea cuando llega. Automático espera 2 segundos con datos móviles y 4 con Wi-Fi.</string>
+    <string name="settings_google_wait_auto">Automático</string>
+    <string name="settings_google_wait_2">2 s</string>
+    <string name="settings_google_wait_4">4 s</string>
+    <string name="settings_google_wait_8">8 s</string>
 </resources>

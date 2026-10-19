@@ -558,6 +558,7 @@ internal fun SingleYouTubePage(
     }
 
     PageTranscriptReader(webView, active = lifecycleStarted)
+    PageTranslationReader(webView, active = lifecycleStarted)
 
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect

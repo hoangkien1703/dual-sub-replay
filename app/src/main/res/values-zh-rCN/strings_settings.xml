@@ -145,4 +145,10 @@
     <string name="language_downloads_back">返回</string>
     <string name="settings_google_translate_title">Google 翻译（在线）</string>
     <string name="settings_google_translate_description">默认开启。翻译质量更好，尤其是日语。会将字幕文本发送给 Google。这不是 Google 的官方服务，可能会停止工作；届时应用会在设备上翻译，直到 Google 恢复。关闭后将始终在设备上翻译。</string>
+    <string name="settings_google_wait_title">等待 Google</string>
+    <string name="settings_google_wait_description">每行在显示 YouTube 或设备翻译之前等待 Google 翻译的时间。Google 会在后台继续尝试，译文到达后会替换该行。自动：移动数据等待 2 秒，Wi-Fi 等待 4 秒。</string>
+    <string name="settings_google_wait_auto">自动</string>
+    <string name="settings_google_wait_2">2 秒</string>
+    <string name="settings_google_wait_4">4 秒</string>
+    <string name="settings_google_wait_8">8 秒</string>
 </resources>

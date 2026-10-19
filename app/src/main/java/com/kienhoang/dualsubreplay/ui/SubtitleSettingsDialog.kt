@@ -1026,6 +1026,7 @@ private fun OnlineTranslationSettingsRows(
         },
         testTag = "google_translate_switch",
     )
+    if (google) GoogleWaitSettings(settings.googleWait, actions.selectGoogleWait)
 }
 
 @Composable

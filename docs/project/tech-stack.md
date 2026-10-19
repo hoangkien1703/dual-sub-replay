@@ -69,9 +69,17 @@ Paths below are relative to
   (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
   translation through the chosen engine. `prefetchInBackground` translates minutes 2 to 5 one request
   at a time. A line Google leaves blank is asked again alone and, if still blank, translated on the
-  device by itself. A failure moves that video to on-device translation
-  (`DualSubUiState.onDeviceFallback`), shows `ui/OnlineTranslationNotice.kt`'s top-right icon, and
-  checks Google again every 2 minutes; the next load tries Google first. See the
+  device by itself. A failure moves that video off Google (`DualSubUiState.onDeviceFallback`): the
+  page fetches YouTube's own translation of the caption track (`data/PageTranslationSource.kt`,
+  `webPageTranslationScript`, matched to rows by `ui/YouTubeTranslation.kt`; see the
+  [YouTube translation spec](../specs/2026-10-19-youtube-translation-fallback.md)) and rows it does
+  not cover translate on the device. It shows `ui/OnlineTranslationNotice.kt`'s top-right icon, and
+  checks Google again every 2 minutes; the next load tries Google first (on mobile data, right after a
+  failure there, it starts without Google and checks it at once). A row waits for Google only
+  `translation/GoogleWait.kt`'s `googleWaitMs` (Settings → Translation → Wait for Google): `awaitWithin`
+  then moves the video off Google while the request runs on in the load's supervisor scope, and its
+  answer brings the video back to Google (see the
+  [quick switch spec](../specs/2026-10-19-quick-switch-when-google-is-slow.md)). See the
   [blank-lines spec](../specs/2026-10-09-google-blank-lines-and-five-minutes-ahead.md).
   See the [spec](../specs/2026-10-05-opt-in-google-translate.md).
 - `assistant/` is the AI assistant.

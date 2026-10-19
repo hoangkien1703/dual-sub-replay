@@ -27,17 +27,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.translation.GoogleWait
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 
 /** Chooses the translation engine from Settings → Translation, or tries Google again from the top-right icon. */
 internal class TranslationEngineActions(
     val select: (TranslationEngine) -> Unit,
     val tryGoogleAgain: () -> Unit = {},
+    val selectGoogleWait: (GoogleWait) -> Unit = {},
 )
 
 /** What Settings → Translation shows about the online engine. */
 internal data class OnlineTranslationSettings(
     val engine: TranslationEngine = TranslationEngine.ON_DEVICE,
+    val googleWait: GoogleWait = GoogleWait.AUTO,
 )
 
 internal val LocalTranslationEngineActions = staticCompositionLocalOf<TranslationEngineActions?> { null }
@@ -46,9 +49,13 @@ internal val LocalTranslationEngineActions = staticCompositionLocalOf<Translatio
 internal sealed interface TranslationIssue {
     val detail: String?
 
-    /** Google failed, so this video translates on the device until Google answers again. */
+    /**
+     * Google failed, so this video translates without it until Google answers again: with YouTube's
+     * own translated captions when [youTube], otherwise on the device.
+     */
     data class OnDeviceFallback(
         override val detail: String?,
+        val youTube: Boolean = false,
     ) : TranslationIssue
 
     /** Translation stopped; the original captions keep playing. */
@@ -62,7 +69,7 @@ internal fun DualSubUiState.translationIssue(): TranslationIssue? =
     when {
         activeVideoId == null -> null
         translationError != null -> TranslationIssue.Unavailable(translationError)
-        onDeviceFallback -> TranslationIssue.OnDeviceFallback(onlineTranslationFailureDetail)
+        onDeviceFallback -> TranslationIssue.OnDeviceFallback(onlineTranslationFailureDetail, youTube = youTubeTranslationFallback)
         else -> null
     }
 
@@ -114,16 +121,26 @@ internal fun TranslationIssueDetails(
     onAction: () -> Unit,
 ) {
     val fallback = issue is TranslationIssue.OnDeviceFallback
+    val youTube = (issue as? TranslationIssue.OnDeviceFallback)?.youTube == true
     Column(
         Modifier.widthIn(max = 300.dp).padding(start = 16.dp, end = 8.dp, top = 8.dp).testTag("translation_issue_details"),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
-            stringResource(if (fallback) R.string.translation_issue_on_device_title else R.string.player_translation_unavailable),
+            stringResource(
+                when {
+                    youTube -> R.string.translation_issue_youtube_title
+                    fallback -> R.string.translation_issue_on_device_title
+                    else -> R.string.player_translation_unavailable
+                },
+            ),
             style = MaterialTheme.typography.titleSmall,
         )
         if (fallback) {
-            Text(stringResource(R.string.translation_issue_on_device_message), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(if (youTube) R.string.translation_issue_youtube_message else R.string.translation_issue_on_device_message),
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
         // Diagnostic text (for example the HTTP status) so a report says why it failed.
         issue.detail?.let {

@@ -64,6 +64,10 @@ class AiActionsTest {
     @Test
     fun theNewSettingsTakeTheirDocumentedValues() {
         assertEquals("above", setting("translation_position", "Above"))
+        assertEquals("auto", setting("google_wait", "Automatic"))
+        assertEquals("4", setting("google_wait", "4 seconds"))
+        assertEquals("8", setting("google_wait", "8s"))
+        assertEquals(null, setting("google_wait", "3"))
         assertEquals("below", setting("translation_position", "under"))
         assertEquals("-10", setting("portrait_panel_position", "-10%"))
         assertEquals("0", setting("portrait_panel_position", "0"))
