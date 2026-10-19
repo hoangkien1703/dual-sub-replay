@@ -25,6 +25,7 @@ import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.PageFirstCaptionProvider
 import com.kienhoang.dualsubreplay.data.PageTranscriptProblem
 import com.kienhoang.dualsubreplay.data.PageTranscriptSource
+import com.kienhoang.dualsubreplay.data.PageTranslationSource
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
@@ -48,6 +49,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -62,6 +64,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.time.LocalDate
 import com.kienhoang.dualsubreplay.data.activeWordIndex as timedActiveWordIndex
 
@@ -124,9 +127,15 @@ data class DualSubUiState(
      * checked again every [GOOGLE_RECHECK_INTERVAL_MS] and tried again on the next load.
      */
     val onDeviceFallback: Boolean = false,
+    /** During [onDeviceFallback], the lines come from YouTube's own translated captions (the device fills gaps). */
+    val youTubeTranslationFallback: Boolean = false,
     /** Why Google failed (English diagnostic text, e.g. the HTTP status), shown in the top-right problem details. */
     val onlineTranslationFailureDetail: String? = null,
 )
+
+/** [state] translating with Google again, without the fallback and its reasons. */
+private fun withGoogleAgain(state: DualSubUiState): DualSubUiState =
+    state.copy(onDeviceFallback = false, youTubeTranslationFallback = false, onlineTranslationFailureDetail = null, translationError = null)
 
 /** The engine actually translating right now: Google, unless this video fell back to on-device. */
 internal fun DualSubUiState.translatesWithGoogle(): Boolean = translationEngine == TranslationEngine.GOOGLE_WEB && !onDeviceFallback
@@ -298,6 +307,7 @@ class AppViewModel internal constructor(
     application: Application,
     private val captionProvider: CaptionProvider,
     private val pageTranscripts: PageTranscriptSource = PageTranscriptSource.Shared,
+    private val pageTranslations: PageTranslationSource = PageTranslationSource.Shared,
 ) : AndroidViewModel(application) {
     constructor(application: Application) : this(
         application,
@@ -1090,7 +1100,7 @@ class AppViewModel internal constructor(
 
     /** The problem details' "Try Google again", and the periodic check once Google answers again. */
     fun tryGoogleTranslationAgain() {
-        _state.update { it.copy(onDeviceFallback = false, onlineTranslationFailureDetail = null, translationError = null) }
+        _state.update(::withGoogleAgain)
     }
 
     private fun setSubtitleColorKey(
@@ -1155,6 +1165,7 @@ class AppViewModel internal constructor(
                 selectedLearningWord = null,
                 translationEngine = DEFAULT_TRANSLATION_ENGINE,
                 onDeviceFallback = false,
+                youTubeTranslationFallback = false,
                 onlineTranslationFailureDetail = null,
             )
         }
@@ -1267,6 +1278,7 @@ class AppViewModel internal constructor(
                 errorMessage = null,
                 // Every load, of this video again or the next one, tries Google first.
                 onDeviceFallback = false,
+                youTubeTranslationFallback = false,
                 onlineTranslationFailureDetail = null,
             )
         }
@@ -1303,7 +1315,7 @@ class AppViewModel internal constructor(
                         )
                     }
 
-                    followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, natural)
+                    followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, track.isGenerated, natural)
                 } catch (error: Exception) {
                     if (error is CancellationException) throw error
                     _state.update { current ->
@@ -1352,13 +1364,14 @@ class AppViewModel internal constructor(
         videoId: String,
         generation: Long,
         sourceLanguage: String,
+        generated: Boolean,
         natural: Boolean,
     ) {
         _state
             .map { Triple(it.captionFormat, it.targetLanguage, it.onDeviceFallback) }
             .distinctUntilChanged()
             .collectLatest { (format, target) ->
-                runStoredTranslation(rawStore, videoId, generation, sourceLanguage, target, format, natural)
+                runStoredTranslation(rawStore, videoId, generation, sourceLanguage to generated, target, format, natural)
             }
     }
 
@@ -1366,11 +1379,12 @@ class AppViewModel internal constructor(
         rawStore: SubtitleStore,
         videoId: String,
         generation: Long,
-        sourceLanguage: String,
+        source: Pair<String, Boolean>,
         targetLanguage: String,
         format: CaptionFormat,
         natural: Boolean,
     ) {
+        val (sourceLanguage, generated) = source
         var displayStore: SubtitleStore? = null
         liveCaptionTracker.reset()
         captionHighlightResolver.reset()
@@ -1424,12 +1438,23 @@ class AppViewModel internal constructor(
                 val fallback = _state.value.onDeviceFallback
                 coroutineScope {
                     if (fallback) launch { recheckGoogle(sourceLanguage, targetLanguage) }
+                    // Like LingoTube: YouTube's own translated captions, asked for while the rows already show.
+                    val fromYouTube =
+                        if (fallback) {
+                            async { youTubeTranslations(checkNotNull(displayStore), videoId, generation, sourceLanguage to generated, targetLanguage) }
+                        } else {
+                            null
+                        }
                     translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
                         showTranslationModelDownload(videoId, generation, downloading)
                     }) { translate ->
-                        if (fallback) {
-                            // Rows Google already translated keep its translation; the rest translate on the device.
-                            follow { text -> googleTranslator.cachedTranslation(sourceLanguage, targetLanguage, text) ?: translate(text) }
+                        if (fromYouTube != null) {
+                            // Rows Google already translated keep its translation, then YouTube's; the rest translate on the device.
+                            follow { text ->
+                                googleTranslator.cachedTranslation(sourceLanguage, targetLanguage, text)
+                                    ?: fromYouTube.await()[text]
+                                    ?: translate(text)
+                            }
                         } else {
                             follow(translate = translate)
                         }
@@ -1490,6 +1515,31 @@ class AppViewModel internal constructor(
     ): String {
         val onDownloadingChange = { downloading: Boolean -> showTranslationModelDownload(videoId, generation, downloading) }
         return translator.withSession(source, target, onDownloadingChange) { translate -> translate(text) }
+    }
+
+    /**
+     * YouTube's own translation of this video's caption track, from the page (as LingoTube gets its
+     * second line), paired with the texts the rows translate; empty when YouTube has none for it.
+     */
+    private suspend fun youTubeTranslations(
+        store: SubtitleStore,
+        videoId: String,
+        generation: Long,
+        source: Pair<String, Boolean>,
+        targetLanguage: String,
+    ): Map<String, String> {
+        val cues = pageTranslations.translation(videoId, source.first, source.second, targetLanguage)
+        val rows =
+            try {
+                if (cues == null) emptyList() else withContext(Dispatchers.IO) { store.read(0 until store.size) }
+            } catch (error: IOException) {
+                emptyList()
+            }
+        val translations = if (cues == null) emptyMap() else youTubeRowTranslations(rows, cues, targetLanguage)
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) current else current.copy(youTubeTranslationFallback = translations.isNotEmpty())
+        }
+        return translations
     }
 
     private fun showTranslationModelDownload(

@@ -28,5 +28,7 @@
     <string name="translation_issue_button">翻译出现问题</string>
     <string name="translation_issue_on_device_title">正在使用设备端翻译</string>
     <string name="translation_issue_on_device_message">Google 翻译目前无法使用，此视频改为在设备上翻译。应用每 2 分钟以及在下一个视频时会再次尝试 Google。</string>
+    <string name="translation_issue_youtube_title">正在使用 YouTube 翻译</string>
+    <string name="translation_issue_youtube_message">Google 翻译目前无法使用，因此此视频使用 YouTube 自己的翻译字幕；YouTube 没有翻译的行会在设备上翻译。应用每 2 分钟以及在下一个视频时会再次尝试 Google。</string>
     <string name="translation_issue_try_google">再次尝试 Google</string>
 </resources>

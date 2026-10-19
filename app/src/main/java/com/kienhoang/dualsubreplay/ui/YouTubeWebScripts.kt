@@ -3,6 +3,8 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.MAX_PAGE_TRANSCRIPT_LENGTH
 import com.kienhoang.dualsubreplay.data.PageCaptionTarget
 import com.kienhoang.dualsubreplay.data.PageTranscriptReply
+import com.kienhoang.dualsubreplay.data.PageTranslationReply
+import com.kienhoang.dualsubreplay.data.PageTranslationTarget
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -675,7 +677,7 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return;
       const key = '$CAPTION_CAPTURE_STATE_KEY';
       if (window[key]) return;
-      const capture = window[key] = { tracks: {}, order: [], transcripts: {}, transcriptOrder: [] };
+      const capture = window[key] = { tracks: {}, order: [], transcripts: {}, transcriptOrder: [], translations: {}, translationOrder: [] };
       capture.pageVideo = function() {
         try {
           const address = new URL(window.location.href);
@@ -698,15 +700,17 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
         }
       };
       capture.watch = function(value) {
-        const url = capture.timedText(value);
+        const url = capture.timedText(value) || capture.timedText(value, true);
         return url ? { url: url } : capture.panelReply(value);
       };
-      capture.timedText = function(value) {
+      // An original track's address, or with [translated] one YouTube translates (it carries tlang).
+      capture.timedText = function(value, translated) {
         try {
           const url = new URL(String(value), window.location.href);
           const urlHost = url.hostname.toLowerCase().replace(/\.$/, '');
           if (url.protocol !== 'https:' || !(urlHost === 'youtube.com' || urlHost.endsWith('.youtube.com')) ||
-              url.pathname !== '/api/timedtext' || !url.searchParams.get('v') || url.searchParams.get('tlang')) return null;
+              url.pathname !== '/api/timedtext' || !url.searchParams.get('v') ||
+              !url.searchParams.get('tlang') !== !translated) return null;
           return url;
         } catch (_) {
           return null;
@@ -728,6 +732,15 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
           text: text
         };
         const id = track.videoId + '|' + track.languageCode + '|' + track.generated;
+        const translatedTo = url.searchParams.get('tlang');
+        if (translatedTo) {
+          // YouTube's own translation of that track, kept apart so it is never taken for the original.
+          const translation = id + '|' + translatedTo;
+          if (!capture.translations[translation]) capture.translationOrder.push(translation);
+          capture.translations[translation] = text;
+          while (capture.translationOrder.length > 4) delete capture.translations[capture.translationOrder.shift()];
+          return;
+        }
         if (!capture.tracks[id]) capture.order.push(id);
         capture.tracks[id] = track;
         while (capture.order.length > 8) delete capture.tracks[capture.order.shift()];
@@ -954,6 +967,8 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
         url.searchParams.set('fmt', 'json3');
         options = { credentials: 'include' };
       }
+      // YouTube's own translation of the track, as LingoTube asks for it: the same address with tlang.
+      if (target.translateTo) url.searchParams.set('tlang', target.translateTo);
       // As given, the address goes out exactly as the page player (and LingoTube) would send it.
       return fetch(url.toString(), options)
         .then(function(response) { return response.ok ? response.text() : ''; })
@@ -995,6 +1010,9 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
         });
         if (match) track = match;
       } catch (_) {}
+      if (target.translateTo) {
+        track = Object.assign({}, track, { translationLanguage: { languageCode: target.translateTo, languageName: target.translateTo } });
+      }
       try {
         player.setOption('captions', 'track', track);
         job.switched = true;
@@ -1146,6 +1164,141 @@ private const val PANEL_SEGMENT_SELECTORS =
 
 /** How often a job tries to open the transcript panel (about 2.5 s apart) before giving up. */
 internal const val PANEL_OPEN_TRIES = 4
+
+internal const val PAGE_TRANSLATION_STATE_KEY = "__dualSubPageTranslationV1"
+
+/**
+ * Gets YouTube's own translation of [target]'s caption track from the page, as LingoTube does, and
+ * reports `working` (with its step), `done` (with the document) or `unavailable` (YouTube does not
+ * translate this track into that language) as JSON text. The job finds the track in the page
+ * player's details, fetches its address with `tlang` from the page (as `json3`, then as YouTube gave
+ * it), and otherwise, for the first [PAGE_CAPTION_SWITCH_MS], switches the page's captions to the
+ * translated track so the player downloads it (kept by [WEB_CAPTION_CAPTURE_SCRIPT]) and switches
+ * them back. One job per attempt, apart from the transcript's jobs.
+ */
+internal fun webPageTranslationScript(target: PageTranslationTarget): String {
+    // Fixed key order (Android's JSONObject keeps insertion order, the JVM's does not).
+    val targetLiteral =
+        "{\"videoId\":${JSONObject.quote(target.videoId)},\"languageCode\":${JSONObject.quote(target.languageCode)}," +
+            "\"generated\":${target.generated},\"translateTo\":${JSONObject.quote(target.translateTo)},\"attempt\":\"${target.attempt}\"}"
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+          if (window.location.protocol !== 'https:' ||
+              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          $WEB_CAPTION_CAPTURE_SCRIPT
+          const capture = window['$CAPTION_CAPTURE_STATE_KEY'];
+          if (!capture) return null;
+          const target = $targetLiteral;
+          const key = '$PAGE_TRANSLATION_STATE_KEY';
+          const state = window[key] || (window[key] = { jobs: {} });
+          $PAGE_TRANSCRIPT_FUNCTIONS
+          $PAGE_TRANSLATION_FUNCTIONS
+          Object.keys(state.jobs).forEach(function(id) {
+            if (id === target.attempt) return;
+            state.restoreTrack(state.jobs[id]);
+            delete state.jobs[id];
+          });
+          let job = state.jobs[target.attempt];
+          if (!job) job = state.jobs[target.attempt] = { status: 'working', step: 'no-track', started: Date.now() };
+          state.translationCheck(job, target);
+          return JSON.stringify({ status: job.status, step: job.step, text: job.status === 'done' ? job.text : null });
+        })();
+        """.trimIndent()
+}
+
+/** `state.*` helpers for [webPageTranslationScript], on top of [PAGE_TRANSCRIPT_FUNCTIONS]. */
+private val PAGE_TRANSLATION_FUNCTIONS =
+    """
+    state.base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+    state.translationTrack = function(target) {
+      const player = document.getElementById('movie_player');
+      const responses = [];
+      try { if (player && typeof player.getPlayerResponse === 'function') responses.push(player.getPlayerResponse()); } catch (_) {}
+      responses.push(window.ytInitialPlayerResponse || null);
+      for (let index = 0; index < responses.length; index++) {
+        const response = responses[index];
+        if (!response || !response.videoDetails || response.videoDetails.videoId !== target.videoId) continue;
+        const renderer = response.captions && response.captions.playerCaptionsTracklistRenderer;
+        const tracks = renderer && Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [];
+        const track = tracks.find(function(item) {
+          return item && item.languageCode === target.languageCode && (item.kind === 'asr') === target.generated;
+        }) || tracks.find(function(item) { return item && state.base(item.languageCode) === state.base(target.languageCode); });
+        if (!track) continue;
+        const languages = Array.isArray(renderer.translationLanguages) ? renderer.translationLanguages : [];
+        const language = languages.find(function(item) { return item && item.languageCode === target.translateTo; }) ||
+          languages.find(function(item) { return item && state.base(item.languageCode) === state.base(target.translateTo); });
+        let address = '';
+        try { if (track.baseUrl) address = new URL(String(track.baseUrl), window.location.href).toString(); } catch (_) {}
+        return {
+          address: address,
+          translatable: track.isTranslatable !== false && (!languages.length || !!language),
+          request: {
+            videoId: target.videoId,
+            languageCode: String(track.languageCode),
+            generated: track.kind === 'asr',
+            translateTo: language ? String(language.languageCode) : target.translateTo
+          }
+        };
+      }
+      return null;
+    };
+    state.translationStart = function(job, target) {
+      const found = state.translationTrack(target);
+      if (!found) return;
+      if (!found.translatable) {
+        job.status = 'unavailable';
+        job.step = 'not-translatable';
+        return;
+      }
+      job.request = found.request;
+      job.step = 'page-address';
+      state.download(found.address, found.request, false).then(function(text) {
+        return state.cues(text) ? text : state.download(found.address, found.request, true);
+      }).then(function(text) {
+        job.addressTried = true;
+        if (job.status === 'working' && state.cues(text)) {
+          job.status = 'done';
+          job.text = text;
+        }
+      });
+    };
+    state.translationCheck = function(job, target) {
+      if (job.status !== 'working') return;
+      if (!job.request) {
+        state.translationStart(job, target);
+        return;
+      }
+      const request = job.request;
+      const kept = capture.translations[request.videoId + '|' + request.languageCode + '|' + request.generated + '|' + request.translateTo];
+      if (state.cues(kept)) {
+        state.restoreTrack(job);
+        job.status = 'done';
+        job.text = kept;
+        return;
+      }
+      const elapsed = Date.now() - job.started;
+      if (!job.addressTried && elapsed < 5000) return;
+      if (elapsed > $PAGE_CAPTION_SWITCH_MS) {
+        state.restoreTrack(job);
+      } else if (state.player()) {
+        state.showTrack(job, request);
+      }
+      job.step = state.player() ? 'waiting-for-captions' : 'no-player';
+    };
+    """.trim()
+
+/** Reads what [webPageTranslationScript] returned through `evaluateJavascript`. */
+internal fun parsePageTranslationReply(rawValue: String?): PageTranslationReply {
+    val json = decodeScriptString(rawValue)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return PageTranslationReply.Working()
+    val step = json.optString("step").takeIf { it.matches(Regex("[a-z-]{1,40}")) }
+    val text = json.optString("text")
+    return when {
+        json.optString("status") == "unavailable" -> PageTranslationReply.Unavailable
+        json.optString("status") == "done" && text.isNotBlank() -> PageTranslationReply.Done(text)
+        else -> PageTranslationReply.Working(step)
+    }
+}
 
 /** Reads what [webPageTranscriptScript] returned through `evaluateJavascript`. */
 internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {

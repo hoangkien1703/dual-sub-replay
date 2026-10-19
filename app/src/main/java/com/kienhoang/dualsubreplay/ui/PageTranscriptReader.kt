@@ -5,6 +5,7 @@ import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.kienhoang.dualsubreplay.data.PageTranscriptSource
+import com.kienhoang.dualsubreplay.data.PageTranslationSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -52,6 +53,36 @@ internal fun PageTranscriptReader(
                 } else {
                     source.offerReply(request, parsePageTranscriptReply(rawValue))
                 }
+            }
+        }
+    }
+}
+
+/**
+ * While the app waits for YouTube's own translation of the video on the page, runs
+ * [webPageTranslationScript] on [webView] and hands its answers to [source]. Does nothing while no
+ * request is open.
+ */
+@Composable
+internal fun PageTranslationReader(
+    webView: WebView,
+    active: Boolean,
+    source: PageTranslationSource = PageTranslationSource.Shared,
+) {
+    LaunchedEffect(webView, active) {
+        if (!active) return@LaunchedEffect
+        var runningSince = 0L
+        while (isActive) {
+            delay(PAGE_TRANSCRIPT_POLL_MS)
+            val now = SystemClock.elapsedRealtime()
+            if (runningSince != 0L && now - runningSince < PAGE_TRANSCRIPT_SCRIPT_TIMEOUT_MS) continue
+            val url = webView.url.orEmpty()
+            if (!isYouTubeWebUrl(url)) continue
+            val request = source.pending(browseVideoSelection(url)?.videoId) ?: continue
+            runningSince = now
+            webView.evaluateJavascript(webPageTranslationScript(request.target)) { rawValue ->
+                if (runningSince == now) runningSince = 0L
+                source.offer(request, parsePageTranslationReply(rawValue))
             }
         }
     }
