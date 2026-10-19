@@ -211,6 +211,39 @@ class GoogleWebTranslatorTest {
             assertEquals(listOf(GoogleEndpoint.BATCH, GoogleEndpoint.EXTENSION_BATCH), seen)
         }
 
+    @Test fun theAddressThatWorkedIsKeptAndTriedFirstAfterARestart() =
+        runBlocking {
+            val memory = FakeAddressMemory()
+            val seen = mutableListOf<GoogleEndpoint>()
+            val client =
+                fakeGoogle { endpoint, texts ->
+                    seen += endpoint
+                    if (endpoint == GoogleEndpoint.WEB_BATCH) 200 to batchReply(texts.map { "ok" }) else UNREACHABLE to ""
+                }
+            assertEquals(
+                "ok",
+                GoogleWebTranslator(retryDelaysMs = emptyList(), client = client, addressMemory = memory).translate("ja", "en", "a"),
+            )
+            assertEquals(listOf("WEB_BATCH"), memory.writes)
+            seen.clear()
+            // A new translator, as after a restart, starts with the kept address.
+            assertEquals(
+                "ok",
+                GoogleWebTranslator(retryDelaysMs = emptyList(), client = client, addressMemory = memory).translate("ja", "en", "b"),
+            )
+            assertEquals(listOf(GoogleEndpoint.WEB_BATCH), seen)
+            // Still the same address: nothing new to write.
+            assertEquals(listOf("WEB_BATCH"), memory.writes)
+        }
+
+    @Test fun anUnknownKeptAddressStartsFromTheFirst() {
+        val memory = FakeAddressMemory().apply { kept = "GONE" }
+        assertEquals(0, rememberedAddress(memory, GoogleEndpoint.entries))
+        assertEquals(0, rememberedAddress(null, GoogleEndpoint.entries))
+        memory.kept = "SINGLE"
+        assertEquals(GoogleEndpoint.SINGLE.ordinal, rememberedAddress(memory, GoogleEndpoint.entries))
+    }
+
     @Test fun everyAddressUnreachableIsRetriedAndThenFailsAsUnreachable() =
         runBlocking {
             var calls = 0
@@ -472,6 +505,18 @@ class GoogleWebTranslatorTest {
                         .build()
                 },
             ).build()
+
+    private class FakeAddressMemory : GoogleAddressMemory {
+        var kept: String? = null
+        val writes = mutableListOf<String>()
+
+        override fun read(): String? = kept
+
+        override fun write(name: String) {
+            kept = name
+            writes += name
+        }
+    }
 
     private companion object {
         /** A status [fakeGoogle] answers by failing to connect. */

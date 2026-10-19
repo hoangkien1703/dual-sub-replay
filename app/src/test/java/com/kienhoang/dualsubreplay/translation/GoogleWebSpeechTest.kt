@@ -114,6 +114,38 @@ class GoogleWebSpeechTest {
             )
         }
 
+    @Test fun theVoiceAddressThatWorkedIsKeptAcrossARestart() =
+        runBlocking {
+            val file = File.createTempFile("speech", ".mp3").apply { deleteOnExit() }
+            var kept: String? = null
+            val memory =
+                object : GoogleAddressMemory {
+                    override fun read(): String? = kept
+
+                    override fun write(name: String) {
+                        kept = name
+                    }
+                }
+            val health = GoogleSpeechHealth().apply { rememberIn(memory) }
+            assertTrue(
+                speech(health) { host ->
+                    if (host ==
+                        "clients5.google.com"
+                    ) {
+                        200 to mp3
+                    } else {
+                        429 to ByteArray(0)
+                    }
+                }.record("银行", "zh", file),
+            )
+            assertEquals("EXTENSION", kept)
+            // After a restart the kept address is asked first.
+            val restarted = GoogleSpeechHealth().apply { rememberIn(memory) }
+            val asked = mutableListOf<String>()
+            assertTrue(speech(restarted, asked) { 200 to mp3 }.record("你好", "zh", file))
+            assertEquals(listOf("clients5.google.com:你好"), asked)
+        }
+
     @Test fun whenNoAddressAnswersThePhoneSpeaksAtOnceForTwoMinutes() =
         runBlocking {
             val file = File.createTempFile("speech", ".mp3").apply { deleteOnExit() }

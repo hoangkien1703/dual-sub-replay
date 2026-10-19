@@ -10,8 +10,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.translation.GOOGLE_SPEECH_ADDRESS_KEY
 import com.kienhoang.dualsubreplay.translation.GoogleWebSpeech
 import com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE
+import com.kienhoang.dualsubreplay.translation.googleAddressMemory
 import com.kienhoang.dualsubreplay.translation.speaksWithGoogle
 import com.kienhoang.dualsubreplay.translation.storedTranslationEngine
 import kotlinx.coroutines.CancellationException
@@ -32,7 +34,7 @@ internal class WordPronouncer(context: Context) {
     private val resources = context.resources
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val cache = PronunciationCache(File(application.cacheDir, "pronunciation"))
-    private val googleSpeech = GoogleWebSpeech()
+    private val googleSpeech = GoogleWebSpeech(application.googleAddressMemory(GOOGLE_SPEECH_ADDRESS_KEY))
     private var speech: Job? = null
     private var disposed = false
     private var lastResult: PronunciationResult? = null
