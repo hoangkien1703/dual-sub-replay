@@ -65,14 +65,79 @@ class PageTranscriptSourceTest {
             result.cancel()
         }
 
-    @Test fun aVideoWithoutTracksEndsTheRequestAtOnce() =
+    @Test fun aVideoWithoutTracksStopsTheWaitButKeepsWatching() =
         runBlocking {
-            val source = PageTranscriptSource()
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
             val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null)) }
-            source.offerTracks(awaitRequest(source), """{"videoDetails":{"videoId":"$VIDEO"},"captions":null}""")
+            val request = awaitRequest(source)
+            source.offerTracks(request, NO_TRACKS)
+            now = PAGE_NO_TRACKS_GRACE_MS - 1
+            source.offerTracks(request, NO_TRACKS)
+            yield()
+            assertFalse("The player may still list its tracks", result.isCompleted)
+            now = PAGE_NO_TRACKS_GRACE_MS
+            source.offerTracks(request, NO_TRACKS)
             assertNull(result.await())
             assertEquals(PageTranscriptProblem.NO_TRACKS, source.problem(VIDEO))
-            assertNull("Nothing left to watch for", source.pending(VIDEO))
+            assertEquals(
+                "player details 0 tracks, captions menu 0, downloaded 0, playability LOGIN_REQUIRED",
+                source.problemDetail(VIDEO),
+            )
+            val watching = source.pending(VIDEO)!!
+            assertTrue("The page keeps watching the same video", watching.late)
+            assertTrue("and goes to YouTube's transcript panel", watching.target!!.panelOnly)
+            assertEquals("", watching.target!!.baseUrl)
+        }
+
+    @Test fun captionsThePlayerDownloadedGiveTheTranscriptWhenItsDetailsListNone() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), "en")) }
+            val request = awaitRequest(source)
+            source.offerTracks(request, FROM_PLAYER)
+            val target = request.target!!
+            assertEquals("en", target.languageCode)
+            assertTrue(target.generated)
+            assertEquals("No address to try: the page waits for the player's own download", "", target.baseUrl)
+            source.offerReply(request, PageTranscriptReply.Done(JSON3, "en", true))
+            assertEquals(listOf("你好", "再见"), result.await()!!.cues.map { it.text })
+        }
+
+    @Test fun theTranscriptPanelGivesALateTranscriptInTheLinesOwnLanguage() =
+        runBlocking {
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
+            val choice = CaptionLanguageChoice(emptyList(), null)
+            val result = async { source.transcript(VIDEO, choice) }
+            val request = awaitRequest(source)
+            source.offerTracks(request, NO_TRACKS)
+            now = PAGE_NO_TRACKS_GRACE_MS
+            source.offerTracks(request, NO_TRACKS)
+            assertNull(result.await())
+            val announced = async(start = CoroutineStart.UNDISPATCHED) { source.lateTranscripts.first() }
+            source.offerReply(source.pending(VIDEO)!!, PageTranscriptReply.Done(PANEL_LINES, "en", false, panel = true))
+            assertEquals(VIDEO, announced.await())
+            val track = source.transcript(VIDEO, choice, timeoutMs = 50)!!
+            assertEquals(listOf("今日は", "いい天気ですね"), track.cues.map { it.text })
+            assertEquals("The guess gives way to the lines' writing system", "ja", track.languageCode)
+        }
+
+    @Test fun anUntrustedTrackAddressIsNotUsedButTheTrackIs() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(listOf("en"), null)) }
+            val request = awaitRequest(source)
+            source.offerTracks(
+                request,
+                PAGE_TRACKS.replace(
+                    "https://www.youtube.com/api/timedtext?v=$VIDEO&lang=en",
+                    "https://example.com/api/timedtext?v=$VIDEO&lang=en",
+                ),
+            )
+            assertEquals("en", request.target?.languageCode)
+            assertEquals("", request.target?.baseUrl)
+            result.cancel()
         }
 
     @Test fun anUnreadableDocumentIsNoTranscript() =
@@ -199,11 +264,15 @@ class PageTranscriptSourceTest {
 
     @Test fun whenBothFailTheDownloadsErrorStands() =
         runBlocking {
-            val source = PageTranscriptSource()
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
             val failure = CaptionUnavailableException("This video does not provide a public caption track.")
             val download = FakeDownload { throw failure }
             val result = async { runCatching { PageFirstCaptionProvider(source, download).fetch(VIDEO, emptyList(), null) } }
-            source.offerTracks(awaitRequest(source), """{"videoDetails":{"videoId":"$VIDEO"}}""")
+            val request = awaitRequest(source)
+            source.offerTracks(request, """{"videoDetails":{"videoId":"$VIDEO"}}""")
+            now = PAGE_NO_TRACKS_GRACE_MS
+            source.offerTracks(request, """{"videoDetails":{"videoId":"$VIDEO"}}""")
             // Coroutines may hand back a copy of the exception with a recovered stack trace.
             val error = result.await().exceptionOrNull()
             assertTrue(error is CaptionUnavailableException)
@@ -252,6 +321,20 @@ class PageTranscriptSourceTest {
                ],
                "audioTracks":[],"defaultAudioTrackIndex":0}}}
             """.trimIndent()
+        val NO_TRACKS =
+            """{"videoDetails":{"videoId":"$VIDEO"},"captions":{"playerCaptionsTracklistRenderer":{"captionTracks":[]}},""" +
+                """"found":{"details":0,"menu":0,"downloaded":0,"playability":"LOGIN_REQUIRED"}}"""
+
+        /** What the page script sends when only the player's captions menu and its downloads list tracks. */
+        val FROM_PLAYER =
+            """
+            {"videoDetails":{"videoId":"$VIDEO","title":"AI news","shortDescription":""},
+             "captions":{"playerCaptionsTracklistRenderer":{
+               "captionTracks":[{"languageCode":"en","kind":"asr","vssId":"a.en","name":{"simpleText":"English (auto-generated)"},"baseUrl":""}],
+               "audioTracks":[],"defaultAudioTrackIndex":0}},
+             "found":{"details":0,"menu":1,"downloaded":1,"playability":"OK"}}
+            """.trimIndent()
+        val PANEL_LINES = """{"panelLines":[{"startMs":0,"text":"今日は"},{"startMs":1500,"text":"いい天気ですね"}]}"""
         val JSON3 =
             """{"events":[{"tStartMs":0,"dDurationMs":1500,"segs":[{"utf8":"你好"}]},{"tStartMs":2000,"dDurationMs":1500,"segs":[{"utf8":"再见"}]}]}"""
     }

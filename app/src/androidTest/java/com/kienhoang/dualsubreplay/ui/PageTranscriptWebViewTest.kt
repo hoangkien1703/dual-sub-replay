@@ -61,6 +61,41 @@ class PageTranscriptWebViewTest {
             assertEquals(null, model.state.value.fullTranscriptProblem)
         }
 
+    @Test
+    fun captionsThePlayerDownloadedAreUsedWhenItsDetailsListNoTrack() =
+        withOfflinePage(
+            OFFLINE_PAGE
+                .replace("captions: {playerCaptionsTracklistRenderer", "noCaptions: {playerCaptionsTracklistRenderer")
+                .replace(
+                    "if (option === 'tracklist') return [{languageCode: 'zh-Hans', kind: 'asr'}];",
+                    "if (option === 'tracklist') return [];",
+                ).replace("window.startPlaying = playerDownload;", "window.startPlaying = playerDownload; playerDownload();"),
+            PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload()),
+        ) { model, _, _ ->
+            // As on the owner's phone: YouTube's player shows captions, its details list none.
+            compose.waitUntil(30_000) { model.state.value.resolvedSourceLanguage == "zh-Hans" }
+            assertFalse(model.state.value.liveFallback)
+            assertTrue(model.state.value.generatedCaptions)
+        }
+
+    @Test
+    fun youTubesTranscriptPanelIsTheLastResort() =
+        withOfflinePage(
+            OFFLINE_PAGE
+                .replace("captions: {playerCaptionsTracklistRenderer", "noCaptions: {playerCaptionsTracklistRenderer")
+                .replace(
+                    "if (option === 'tracklist') return [{languageCode: 'zh-Hans', kind: 'asr'}];",
+                    "if (option === 'tracklist') return [];",
+                ).replace("const playerLoadsCaptionsWhenAsked = true;", "const playerLoadsCaptionsWhenAsked = false;")
+                .replace("</script></body>", "</script>" + PANEL_PAGE_PART + "</body>"),
+            PageFirstCaptionProvider(PageTranscriptSource.Shared, RefusedDownload()),
+        ) { model, page, _ ->
+            compose.waitUntil(60_000) { !model.state.value.liveFallback && model.state.value.resolvedSourceLanguage == "zh" }
+            assertFalse("The panel names no auto-generated track", model.state.value.generatedCaptions)
+            val clicks = javascript(page, "clicks.join(',')")
+            assertTrue("The description was unfolded, then the transcript opened: $clicks", clicks.startsWith("more,transcript"))
+        }
+
     private fun withOfflinePage(
         offlinePage: String,
         provider: CaptionProvider,
@@ -91,6 +126,8 @@ class PageTranscriptWebViewTest {
                         page.compareAndSet(null, view)
                         val url = request.url
                         when {
+                            url.path == "/youtubei/v1/get_transcript" ->
+                                WebResourceResponse("application/json", "UTF-8", ByteArrayInputStream(PANEL_REPLY.toByteArray()))
                             url.path == "/api/timedtext" -> {
                                 captionRequests += url.query.orEmpty()
                                 val body = if (url.getQueryParameter("pot") == "TOKEN") JSON3 else ""
@@ -151,6 +188,36 @@ class PageTranscriptWebViewTest {
     companion object {
         private const val JSON3 =
             """{"events":[{"tStartMs":0,"dDurationMs":1500,"segs":[{"utf8":"你好"}]},{"tStartMs":2000,"dDurationMs":1500,"segs":[{"utf8":"再见"}]}]}"""
+
+        private const val PANEL_REPLY =
+            """{"actions":[{"updateEngagementPanelAction":{"content":{"transcriptRenderer":{"content":{"transcriptSearchPanelRenderer":""" +
+                """{"body":{"transcriptSegmentListRenderer":{"initialSegments":[""" +
+                """{"transcriptSegmentRenderer":{"startMs":"0","endMs":"1500","snippet":{"runs":[{"text":"你好"}]}}},""" +
+                """{"transcriptSegmentRenderer":{"startMs":"2000","endMs":"3500","snippet":{"runs":[{"text":"再见"}]}}}]}}}}}}}}]}"""
+
+        /** A folded description whose transcript button opens YouTube's transcript panel. */
+        private val PANEL_PAGE_PART =
+            """
+            <ytm-slim-video-information-renderer><button class="slim-video-information-show-more">more</button></ytm-slim-video-information-renderer>
+            <div id="description"></div><div id="panel"></div>
+            <script>
+            var clicks = [];
+            document.querySelector('.slim-video-information-show-more').addEventListener('click', function() {
+              clicks.push('more');
+              document.getElementById('description').innerHTML =
+                '<ytm-video-description-transcript-section-renderer><button>Show transcript</button></ytm-video-description-transcript-section-renderer>';
+              document.querySelector('ytm-video-description-transcript-section-renderer button').addEventListener('click', function() {
+                clicks.push('transcript');
+                fetch('/youtubei/v1/get_transcript', {method: 'POST', body: '{}'}).then(function(reply) { return reply.json(); }).then(function() {
+                  document.getElementById('panel').innerHTML =
+                    '<ytm-engagement-panel-section-list-renderer><button class="close-button" onclick="clicks.push(\'close\')">x</button>' +
+                    '<ytm-transcript-segment-renderer><div class="segment-timestamp">0:00</div><div class="segment-text">你好</div></ytm-transcript-segment-renderer>' +
+                    '</ytm-engagement-panel-section-list-renderer>';
+                });
+              });
+            });
+            </script>
+            """.trimIndent()
 
         private val OFFLINE_PAGE =
             """

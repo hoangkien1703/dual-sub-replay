@@ -4,12 +4,19 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicLong
 
 /** How long the provider waits for the page before relying on its own download alone. */
 internal const val PAGE_TRANSCRIPT_TIMEOUT_MS = 25_000L
+
+/**
+ * How long the page may list no caption track before the provider stops waiting for it. The player
+ * can fill in its track list, or download captions, a few seconds after the video's details appear.
+ */
+internal const val PAGE_NO_TRACKS_GRACE_MS = 8_000L
 
 /** The same 8 MiB limit as the provider's own downloads, counted in characters. */
 internal const val MAX_PAGE_TRANSCRIPT_LENGTH = 8 * 1024 * 1024
@@ -22,6 +29,8 @@ internal data class PageCaptionTarget(
     val baseUrl: String,
     /** Each request is its own attempt on the page, so a retry starts again instead of reusing a result. */
     val attempt: Long = 0,
+    /** The page listed no track: [languageCode] is a guess, and the page goes to its transcript panel. */
+    val panelOnly: Boolean = false,
 )
 
 /** What the page's transcript script reported on one poll. */
@@ -31,11 +40,15 @@ internal sealed interface PageTranscriptReply {
         val step: String? = null,
     ) : PageTranscriptReply
 
-    /** The page has the document; [languageCode] and [generated] name the track it came from. */
+    /**
+     * The page has the document; [languageCode] and [generated] name the track it came from. With
+     * [panel], [text] came from YouTube's transcript panel (see [parseTranscriptPanel]).
+     */
     data class Done(
         val text: String,
         val languageCode: String? = null,
         val generated: Boolean? = null,
+        val panel: Boolean = false,
     ) : PageTranscriptReply
 }
 
@@ -44,7 +57,7 @@ enum class PageTranscriptProblem {
     /** The page never answered for this video (not on screen, or the page player had no details yet). */
     NO_ANSWER,
 
-    /** The page player lists no caption track for this video. */
+    /** Neither the page player's details, its captions menu nor its downloads list a caption track. */
     NO_TRACKS,
 
     /** The page has no player to switch captions on with. */
@@ -61,12 +74,16 @@ enum class PageTranscriptProblem {
  * Hands the full transcript over from the YouTube page in the app's WebView. YouTube often refuses
  * the app's own caption requests with its bot check, while the page, with its cookies and its
  * proof-of-origin token, plays the same video. The provider asks for a video; the page side reads
- * the page player's track list, picks the track the provider's own rules would pick, and takes the
- * document the page player downloads (see `webPageTranscriptScript`). Only one request is open at a
- * time. When the provider stops waiting, the page keeps watching the same video, and a document
- * that arrives later is kept and announced on [lateTranscripts] so the app can load it.
+ * the page player's track list (its details, else its captions menu and the captions it already
+ * downloaded), picks the track the provider's own rules would pick, and takes the document the page
+ * player downloads, or, as the last resort, the lines of YouTube's own transcript panel (see
+ * `webPageTranscriptScript`). Only one request is open at a time. When the provider stops waiting,
+ * the page keeps watching the same video, and a document that arrives later is kept and announced
+ * on [lateTranscripts] so the app can load it.
  */
-class PageTranscriptSource {
+class PageTranscriptSource(
+    private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
+) {
     internal class Request(
         val videoId: String,
         val choice: CaptionLanguageChoice,
@@ -74,12 +91,21 @@ class PageTranscriptSource {
     ) {
         internal val document = CompletableDeferred<PageDocument?>()
 
+        /** Completed when the provider should stop waiting early; the page keeps watching. */
+        internal val stopWaiting = CompletableDeferred<Unit>()
+
         @Volatile var target: PageCaptionTarget? = null
             internal set
 
         @Volatile internal var languages: List<CaptionLanguage> = emptyList()
 
         @Volatile internal var step: String? = null
+
+        /** When the page first listed no track for this video, or null while it has not. */
+        @Volatile internal var noTracksSince: Long? = null
+
+        /** What the page last said about its track sources, in English, for the problem's detail. */
+        @Volatile internal var found: String? = null
 
         /** Set once the provider stopped waiting and the page only watches for captions. */
         @Volatile internal var late = false
@@ -89,6 +115,7 @@ class PageTranscriptSource {
         val target: PageCaptionTarget,
         val languages: List<CaptionLanguage>,
         val text: String,
+        val panel: Boolean = false,
     )
 
     private val attempts = AtomicLong()
@@ -99,6 +126,8 @@ class PageTranscriptSource {
     @Volatile private var ready: Pair<Request, PageDocument>? = null
 
     @Volatile private var problem: Pair<String, PageTranscriptProblem>? = null
+
+    @Volatile private var problemDetail: String? = null
 
     private val late = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
@@ -122,17 +151,34 @@ class PageTranscriptSource {
         if (kept != null) request.document.complete(null)
         var waiting = true
         try {
-            var document = kept ?: withTimeoutOrNull(timeoutMs) { request.document.await() }
+            var document =
+                kept ?: withTimeoutOrNull(timeoutMs) {
+                    select {
+                        request.document.onAwait { it }
+                        request.stopWaiting.onAwait { null }
+                    }
+                }
             // An answer that came in just as the wait ended is still taken.
             if (document == null && !watchLater(request)) document = request.document.await()
             waiting = false
             if (document == null) return null
-            val cues = runCatching { CaptionDocumentParser.parse(document.text) }.getOrDefault(emptyList())
+            val cues =
+                runCatching {
+                    if (document.panel) parseTranscriptPanel(document.text) else CaptionDocumentParser.parse(document.text)
+                }.getOrDefault(emptyList())
             if (cues.isEmpty()) {
                 fail(request, PageTranscriptProblem.UNREADABLE)
                 return null
             }
-            return CaptionTrackResult(document.target.languageCode, document.target.generated, cues, document.languages)
+            val language =
+                if (document.target.panelOnly) {
+                    // The guess gives way to the lines' own writing system, when it names one.
+                    textScriptLanguages(cues.joinToString(" ") { it.text }, mustDominate = true).firstOrNull()
+                        ?: document.target.languageCode
+                } else {
+                    document.target.languageCode
+                }
+            return CaptionTrackResult(language, document.target.generated, cues, document.languages)
         } finally {
             // Cancelled (another source won, or the video changed): the page stops for this request.
             synchronized(this) { if (waiting && current === request) current = null }
@@ -142,12 +188,22 @@ class PageTranscriptSource {
     /** Why the page gave no transcript for [videoId] the last time it was asked, if it gave none. */
     fun problem(videoId: String): PageTranscriptProblem? = problem?.takeIf { it.first == videoId }?.second
 
+    /**
+     * English diagnostic text on where the page looked for [videoId]'s captions, beside [problem]
+     * (for example "player details 0 tracks, captions menu 0, downloaded 0, playability LOGIN_REQUIRED").
+     */
+    fun problemDetail(videoId: String): String? = problemDetail?.takeIf { problem?.first == videoId }
+
     /** The open request for the video now on the page, if any; a late one only watches. */
     internal fun pending(pageVideoId: String?): Request? = current?.takeIf { it.videoId == pageVideoId && !it.document.isCompleted }
 
     /**
      * Picks the track to fetch from the page player's caption details (see
-     * `WEB_PAGE_CAPTION_TRACKS_SCRIPT`). A page that has the video but no track ends the request.
+     * `WEB_PAGE_CAPTION_TRACKS_SCRIPT`). A track without a trusted address is still taken: the page
+     * then waits for the player's own download of it. A page that lists no track for
+     * [PAGE_NO_TRACKS_GRACE_MS] stops the provider's wait and gets a [PageCaptionTarget.panelOnly]
+     * target: the page keeps watching for captions the player downloads and opens its transcript
+     * panel, so either still gives a late full transcript.
      */
     internal fun offerTracks(
         request: Request,
@@ -157,15 +213,20 @@ class PageTranscriptSource {
         val root = runCatching { JSONObject(json) }.getOrNull() ?: return
         val details = root.optJSONObject("videoDetails")
         if (details?.optString("videoId") != request.videoId) return
+        request.found = pageTrackSources(root)
         val renderer = root.optJSONObject("captions")?.optJSONObject("playerCaptionsTracklistRenderer")
         val tracks = renderer?.optJSONArray("captionTracks")
         val track = renderer?.let { selectCaptionTrack(it, request.choice.preferred, details, request.choice.learning) }
-        val baseUrl = track?.optString("baseUrl").orEmpty()
-        if (tracks == null || track == null || trustedYouTubeCaptionUrl(baseUrl) == null) {
-            fail(request, PageTranscriptProblem.NO_TRACKS)
-            request.document.complete(null)
+        if (tracks == null || track == null) {
+            val since = request.noTracksSince ?: clock().also { request.noTracksSince = it }
+            if (clock() - since < PAGE_NO_TRACKS_GRACE_MS) return
+            // Last resort: YouTube's own transcript panel, in the language the lines turn out to be.
+            val guess = request.choice.preferred.firstOrNull() ?: request.choice.learning ?: "en"
+            request.target = PageCaptionTarget(request.videoId, guess, false, "", request.attempt, panelOnly = true)
+            request.stopWaiting.complete(Unit)
             return
         }
+        val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
         request.languages = availableLanguages(tracks)
         request.target =
             PageCaptionTarget(request.videoId, track.optString("languageCode", "en"), isGeneratedTrack(track), baseUrl, request.attempt)
@@ -188,7 +249,7 @@ class PageTranscriptSource {
                         languageCode = reply.languageCode ?: target.languageCode,
                         generated = reply.generated ?: target.generated,
                     )
-                val document = PageDocument(track, request.languages, reply.text)
+                val document = PageDocument(track, request.languages, reply.text, reply.panel)
                 val announce =
                     synchronized(this) {
                         if (current !== request) return
@@ -208,6 +269,7 @@ class PageTranscriptSource {
     private fun watchLater(request: Request): Boolean {
         val reason =
             when {
+                request.target?.panelOnly == true -> PageTranscriptProblem.NO_TRACKS
                 request.target == null -> PageTranscriptProblem.NO_ANSWER
                 request.step == "no-player" -> PageTranscriptProblem.NO_PLAYER
                 else -> PageTranscriptProblem.WAITING_FOR_CAPTIONS
@@ -224,6 +286,7 @@ class PageTranscriptSource {
         request: Request,
         reason: PageTranscriptProblem,
     ) {
+        problemDetail = listOfNotNull(request.found, request.step?.let { "step $it" }).joinToString(", ").ifBlank { null }
         problem = request.videoId to reason
         // Fixed categories only, like the provider's: never page text or addresses in logcat.
         android.util.Log.w("CaptionRecovery", "page: ${reason.name.lowercase()}")
@@ -233,4 +296,20 @@ class PageTranscriptSource {
         /** The one app-wide page: there is exactly one YouTube WebView. */
         val Shared = PageTranscriptSource()
     }
+}
+
+/**
+ * Where the page found caption tracks, from the `found` counts of `WEB_PAGE_CAPTION_TRACKS_SCRIPT`,
+ * as English diagnostic text; numbers and YouTube's fixed playability status only, never page text.
+ */
+internal fun pageTrackSources(root: JSONObject): String? {
+    val found = root.optJSONObject("found") ?: return null
+    val count = { key: String -> found.optInt(key).coerceIn(0, 999) }
+    val playability = found.optString("playability").takeIf { it.matches(Regex("[A-Z_]{1,30}")) && it != "OK" }
+    return listOfNotNull(
+        "player details ${count("details")} tracks",
+        "captions menu ${count("menu")}",
+        "downloaded ${count("downloaded")}",
+        playability?.let { "playability $it" },
+    ).joinToString(", ")
 }

@@ -24,6 +24,7 @@
     <string name="status_transcript_page_waiting">Transkrip lengkap: YouTube belum memuat teksnya. Transkrip akan muncul sendiri setelah dimuat, biasanya setelah video mulai diputar.</string>
     <string name="status_transcript_page_unreadable">Transkrip lengkap: teks yang dikirim YouTube tidak dapat dibaca.</string>
     <string name="status_transcript_download_failed">Unduhan aplikasi: %1$s</string>
+    <string name="status_transcript_page_detail">Pemeriksaan halaman: %1$s</string>
     <string name="translation_issue_button">Masalah terjemahan</string>
     <string name="translation_issue_on_device_title">Memakai terjemahan di perangkat</string>
     <string name="translation_issue_on_device_message">Google Terjemahan sedang tidak berfungsi, jadi video ini diterjemahkan di perangkat Anda. Aplikasi mencoba Google lagi setiap 2 menit dan pada video berikutnya.</string>
