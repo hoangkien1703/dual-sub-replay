@@ -65,6 +65,25 @@ class PageTranscriptScriptsTest {
     }
 
     @Test
+    fun theTrackListSaysWhetherThePlayerHasLoadedLikeLingoTubeChecks() {
+        val tracks = WEB_PAGE_CAPTION_TRACKS_SCRIPT
+        assertTrue(tracks.contains("holder.getAttribute('loading')"))
+        assertTrue(tracks.contains("holder.getAttribute('playable')"))
+        assertTrue(tracks.contains("ready: (!loading || loading === 'false') && (!playable || playable === 'true')"))
+    }
+
+    @Test
+    fun theJobAlsoTriesTheTrackAddressAsYouTubeGaveIt() {
+        val script = webPageTranscriptScript(target)
+        assertTrue(script.contains("state.download(target.baseUrl, target, false)"))
+        assertTrue(script.contains("state.download(target.baseUrl, target, true)"))
+        // Only the json3 variant is rewritten; both pass the same /api/timedtext check first.
+        assertTrue(script.contains("if (!asGiven) {"))
+        // YouTube's empty answer without a token does not finish the job.
+        assertTrue(script.contains("job.status === 'working' && state.cues(text)"))
+    }
+
+    @Test
     fun theCaptureOnlyReadsRepliesAndNeverChangesThem() {
         val capture = WEB_CAPTION_CAPTURE_SCRIPT
         // Installed once per page.

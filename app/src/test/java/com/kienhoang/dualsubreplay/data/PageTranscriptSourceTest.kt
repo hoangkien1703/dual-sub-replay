@@ -90,6 +90,26 @@ class PageTranscriptSourceTest {
             assertEquals("", watching.target!!.baseUrl)
         }
 
+    @Test fun anEmptyListCountsOnlyOnceThePlayerHasLoaded() =
+        runBlocking {
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null), timeoutMs = 300) }
+            val request = awaitRequest(source)
+            val loading = NO_TRACKS.replace("{\"videoDetails\"", "{\"ready\":false,\"videoDetails\"")
+            repeat(3) {
+                source.offerTracks(request, loading)
+                now += PAGE_NO_TRACKS_GRACE_MS
+            }
+            assertNull("No transcript-panel fallback while the player loads", request.target)
+            assertNull(result.await())
+            assertEquals(PageTranscriptProblem.NO_PLAYER, source.problem(VIDEO))
+            // The player finished loading and lists its tracks: they are used.
+            source.offerTracks(source.pending(VIDEO)!!, PAGE_TRACKS)
+            assertEquals("zh-Hans", request.target?.languageCode)
+            assertFalse(request.target!!.panelOnly)
+        }
+
     @Test fun captionsThePlayerDownloadedGiveTheTranscriptWhenItsDetailsListNone() =
         runBlocking {
             val source = PageTranscriptSource()

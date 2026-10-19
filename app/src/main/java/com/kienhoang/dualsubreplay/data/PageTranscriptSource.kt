@@ -60,7 +60,7 @@ enum class PageTranscriptProblem {
     /** Neither the page player's details, its captions menu nor its downloads list a caption track. */
     NO_TRACKS,
 
-    /** The page has no player to switch captions on with. */
+    /** The page has no player to switch captions on with, or its player never finished loading. */
     NO_PLAYER,
 
     /** The page player has not downloaded the captions yet; the page keeps watching for them. */
@@ -103,6 +103,9 @@ class PageTranscriptSource(
 
         /** When the page first listed no track for this video, or null while it has not. */
         @Volatile internal var noTracksSince: Long? = null
+
+        /** Set while the page's player says it is still loading and lists no track yet. */
+        @Volatile internal var loading = false
 
         /** What the page last said about its track sources, in English, for the problem's detail. */
         @Volatile internal var found: String? = null
@@ -201,9 +204,10 @@ class PageTranscriptSource(
      * Picks the track to fetch from the page player's caption details (see
      * `WEB_PAGE_CAPTION_TRACKS_SCRIPT`). A track without a trusted address is still taken: the page
      * then waits for the player's own download of it. A page that lists no track for
-     * [PAGE_NO_TRACKS_GRACE_MS] stops the provider's wait and gets a [PageCaptionTarget.panelOnly]
-     * target: the page keeps watching for captions the player downloads and opens its transcript
-     * panel, so either still gives a late full transcript.
+     * [PAGE_NO_TRACKS_GRACE_MS], counted only once its player has finished loading, stops the
+     * provider's wait and gets a [PageCaptionTarget.panelOnly] target: the page keeps watching for
+     * captions the player downloads and opens its transcript panel, so either still gives a late
+     * full transcript.
      */
     internal fun offerTracks(
         request: Request,
@@ -218,6 +222,12 @@ class PageTranscriptSource(
         val tracks = renderer?.optJSONArray("captionTracks")
         val track = renderer?.let { selectCaptionTrack(it, request.choice.preferred, details, request.choice.learning) }
         if (tracks == null || track == null) {
+            // Like LingoTube, an empty list counts only once the page's player has finished loading.
+            request.loading = !root.optBoolean("ready", true)
+            if (request.loading) {
+                request.noTracksSince = null
+                return
+            }
             val since = request.noTracksSince ?: clock().also { request.noTracksSince = it }
             if (clock() - since < PAGE_NO_TRACKS_GRACE_MS) return
             // Last resort: YouTube's own transcript panel, in the language the lines turn out to be.
@@ -270,6 +280,7 @@ class PageTranscriptSource(
         val reason =
             when {
                 request.target?.panelOnly == true -> PageTranscriptProblem.NO_TRACKS
+                request.target == null && request.loading -> PageTranscriptProblem.NO_PLAYER
                 request.target == null -> PageTranscriptProblem.NO_ANSWER
                 request.step == "no-player" -> PageTranscriptProblem.NO_PLAYER
                 else -> PageTranscriptProblem.WAITING_FOR_CAPTIONS

@@ -2,10 +2,11 @@
 
 ## Status
 
-Implemented, revised twice (physical-phone and live-YouTube checks pending). The first version
+Implemented, revised three times (physical-phone and live-YouTube checks pending). The first version
 failed on the owner's phone; see [Revision 1](#revision-1-keep-the-players-own-download). Revision 1
 then stopped on an empty track list; see
-[Revision 2](#revision-2-no-dead-end-on-an-empty-track-list-and-the-transcript-panel). On 2026-10-18 the owner reported that the full dual-subtitle
+[Revision 2](#revision-2-no-dead-end-on-an-empty-track-list-and-the-transcript-panel).
+[Revision 3](#revision-3-what-lingotube-does-differently) adds what LingoTube does differently. On 2026-10-18 the owner reported that the full dual-subtitle
 transcript still does not load (PR #123's attempt did not fix it) and asked why other projects
 still work. After the cause was explained in the project thread, the owner picked "Page first"
 on the decision card: the YouTube page in the app's WebView fetches the whole caption track, and
@@ -308,3 +309,68 @@ Local runs on 2026-10-18 (JDK 21, Android SDK 36, no emulator).
 ### Release intent
 
 `release:patch` (default; no other intent from the owner).
+
+## Revision 3: what LingoTube does differently
+
+### Problem
+
+Seeing the same screenshot as Revision 2 ("YouTube lists no captions" while live subtitles showed
+the captions), the owner noted that LingoTube shows the full dual transcript of the same video and
+asked why it works and ours does not. On 2026-10-19 the owner supplied LingoTube's APK (1.8.4,
+`com.springwalk.lingotube`); it was decompiled with JADX and its injected `lingo.js` was decoded.
+LingoTube uses the same WebView setup as ours (default user agent, third-party cookies, no request
+interception, no requests to YouTube from its own code) and reads the same
+`movie_player.getPlayerResponse()` track list. Revision 2 already covers most of the differences
+(no dead end on one read, relative addresses, keep watching). Two remain:
+
+- LingoTube reads the track list only once the page's `#player` element says `loading="false"` and
+  `playable="true"`, and reads it again whenever that element changes. Revision 2 starts its 8 s
+  no-tracks grace time on the first read, even while the player is still loading, and may give up
+  (and go to the transcript panel) before the player has listed its tracks.
+- LingoTube fetches the track's `baseUrl` exactly as YouTube gave it (default XML, no changed
+  parameters), from the page. Ours only fetches a rewritten `json3` address before waiting for the
+  player's own download.
+
+Other LingoTube safety nets were seen but are out of scope: it can replace its whole `lingo.js`
+through Firebase Remote Config (fixes without an app update), it asks its own server for captions
+users saved, and its second line is YouTube's own translation (`&tlang=`).
+
+The owner asked for the fix ("yes create PR for this") and chose to build it as a follow-up on top of
+#130 (Revision 2) rather than a competing PR.
+
+### Approach
+
+1. `WEB_PAGE_CAPTION_TRACKS_SCRIPT` reports `ready`: false while `#player` has `loading` other than
+   `false` or `playable` other than `true`; a page without those attributes counts as ready.
+2. `PageTranscriptSource.offerTracks` does not start (and resets) the no-tracks grace time while the
+   page is not ready; tracks listed while loading are still used. A request whose wait ends while
+   the player is still loading reports `NO_PLAYER` ("the YouTube player isn't ready yet").
+3. The page job tries the `json3` address first (it carries word timings), then the track's address
+   unchanged with the page's default credentials, before waiting for the player's download. Only a
+   reply with caption lines (`segs`, `<text>` or `<p>`) finishes the job, so YouTube's empty or
+   malformed answer without a token does not end it.
+
+### Acceptance criteria
+
+- [x] Reads while the player is loading do not start the grace time or open the transcript panel,
+  and tracks listed after loading are used (`PageTranscriptSourceTest`).
+- [x] The track list reports readiness from `#player`'s `loading`/`playable` attributes, and the job
+  tries the unchanged address on YouTube's `/api/timedtext` only after `json3` gave no lines
+  (`PageTranscriptScriptsTest`, headless Chromium run).
+- [ ] On the owner's phone, the English video from the screenshot shows the full transcript.
+
+### Validation result (revision 3)
+
+Local runs on 2026-10-19 (JDK 21, Android SDK 36, no emulator).
+
+| Check | Result |
+| --- | --- |
+| `PageTranscriptSourceTest`, `PageTranscriptScriptsTest` | Passed |
+| Scripts in headless Chromium 1194 on an offline `m.youtube.com` page: `#player` loading → `ready` false, then true; relative address resolved to `m.youtube.com`; `json3` answered empty, the unchanged address answered XML, job done with 2 requests; `example.com`: both scripts return null | Passed (scratch Playwright run, not committed) |
+| `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` | Passed |
+| `PageTranscriptWebViewTest` | Not run locally (no emulator); runs in CI's `managed-device-tests` |
+| Physical phone and live YouTube | Not run; owner's preview test |
+
+### Release intent
+
+`release:patch` (default; no other intent from the owner). Merge after #130.
