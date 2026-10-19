@@ -40,7 +40,9 @@ import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.translation.DEFAULT_TRANSLATION_ENGINE
 import com.kienhoang.dualsubreplay.translation.GOOGLE_EARLY_CHECK_POLL_MS
 import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
+import com.kienhoang.dualsubreplay.translation.GOOGLE_TRANSLATE_ADDRESS_KEY
 import com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE
+import com.kienhoang.dualsubreplay.translation.googleAddressMemory
 import com.kienhoang.dualsubreplay.translation.GoogleSlowException
 import com.kienhoang.dualsubreplay.translation.googleSlowDetail
 import com.kienhoang.dualsubreplay.translation.GoogleWait
@@ -342,7 +344,11 @@ class AppViewModel internal constructor(
         OnDeviceTranslator(
             cacheDirectory = File(application.cacheDir, "subtitle-translations"),
         )
-    private val googleTranslator = GoogleWebTranslator(cacheDirectory = File(application.cacheDir, "google-translations"))
+    private val googleTranslator =
+        GoogleWebTranslator(
+            cacheDirectory = File(application.cacheDir, "google-translations"),
+            addressMemory = application.googleAddressMemory(GOOGLE_TRANSLATE_ADDRESS_KEY),
+        )
 
     /** Google failed or was too slow on mobile data and has not answered since. */
     @Volatile private var googleFailedOnMobile = false

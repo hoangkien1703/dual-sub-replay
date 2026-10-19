@@ -239,6 +239,8 @@ class GoogleWebTranslator(
             .readTimeout(GOOGLE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .callTimeout(GOOGLE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .build(),
+    /** Keeps the address that last worked across restarts; null keeps it only while this translator lives. */
+    private val addressMemory: GoogleAddressMemory? = null,
 ) {
     // Separate from the on-device caches, so switching engines never shows the other engine's result.
     private val diskCache = cacheDirectory?.let { TranslationDiskCache(it) }
@@ -246,7 +248,7 @@ class GoogleWebTranslator(
     // Five minutes ahead, with row prefixes, is a few hundred texts; keep them all in memory.
     private val cache = TranslationCache(maxEntries = 1_024, maxCharacters = 256_000)
 
-    @Volatile private var preferredEndpoint = 0
+    @Volatile private var preferredEndpoint = rememberedAddress(addressMemory, GoogleEndpoint.entries)
 
     private val failures = MutableStateFlow<String?>(null)
 
@@ -420,7 +422,10 @@ class GoogleWebTranslator(
                     failures.value = googleFailureList(refusals)
                     continue
                 }
-            preferredEndpoint = index
+            if (index != preferredEndpoint) {
+                preferredEndpoint = index
+                addressMemory?.write(endpoints[index].name)
+            }
             return translated
         }
         // An address that could not be reached is worth retrying after a pause; refusals are not.

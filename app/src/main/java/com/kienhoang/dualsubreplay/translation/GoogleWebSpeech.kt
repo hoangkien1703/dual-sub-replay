@@ -119,6 +119,16 @@ internal class GoogleSpeechHealth(
     @Volatile private var downSince: Long? = null
 
     @Volatile var preferred = 0
+        private set
+
+    @Volatile private var memory: GoogleAddressMemory? = null
+
+    /** Starts from the address [memory] kept before a restart, and keeps the next one that works there. */
+    fun rememberIn(memory: GoogleAddressMemory) {
+        if (this.memory != null) return
+        this.memory = memory
+        preferred = rememberedAddress(memory, GoogleSpeechEndpoint.entries)
+    }
 
     fun isResting(): Boolean = downSince?.let { now() - it < restMs } == true
 
@@ -128,7 +138,9 @@ internal class GoogleSpeechHealth(
 
     fun markUp(endpoint: Int) {
         downSince = null
+        if (endpoint == preferred) return
         preferred = endpoint
+        memory?.write(GoogleSpeechEndpoint.entries[endpoint].name)
     }
 
     companion object {
@@ -140,14 +152,15 @@ class GoogleWebSpeech internal constructor(
     private val client: OkHttpClient,
     private val health: GoogleSpeechHealth,
 ) {
-    constructor() : this(
+    /** [addressMemory] keeps the address that last worked across restarts. */
+    constructor(addressMemory: GoogleAddressMemory? = null) : this(
         OkHttpClient
             .Builder()
             .connectTimeout(GOOGLE_SPEECH_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .readTimeout(GOOGLE_SPEECH_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .callTimeout(GOOGLE_SPEECH_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .build(),
-        GoogleSpeechHealth.Shared,
+        GoogleSpeechHealth.Shared.apply { addressMemory?.let(::rememberIn) },
     )
 
     /**
