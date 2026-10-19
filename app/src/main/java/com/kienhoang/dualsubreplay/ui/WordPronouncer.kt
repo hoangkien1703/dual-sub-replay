@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
@@ -34,6 +35,7 @@ internal class WordPronouncer(context: Context) {
     private val googleSpeech = GoogleWebSpeech()
     private var speech: Job? = null
     private var disposed = false
+    private var lastResult: PronunciationResult? = null
     var message by mutableStateOf<String?>(null)
         private set
     var showSpeechSettings by mutableStateOf(false)
@@ -45,6 +47,7 @@ internal class WordPronouncer(context: Context) {
         if (cache.lookup(word, language) == null) message = resources.getString(R.string.practice_preparing_pronunciation)
         speech = scope.launch {
             val result = pronounce(word, language)
+            lastResult = result
             showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
             message =
                 when (result) {
@@ -72,8 +75,8 @@ internal class WordPronouncer(context: Context) {
     /**
      * Replays the recorded speech when [word] was the last word pronounced. Otherwise records it to
      * a file, keeps that file for the next replay and plays it; engines that cannot record speak it
-     * directly instead. Chinese is first fetched from Google's online voice while Google translates
-     * subtitles; the phone's voices are the fallback.
+     * directly instead. While Google translates subtitles, every language is first fetched from
+     * Google's online voice; the phone's voices are the fallback.
      */
     private suspend fun pronounce(
         word: String,
@@ -129,9 +132,17 @@ internal class WordPronouncer(context: Context) {
         }
 
     fun openSpeechSettings() {
+        val noVoice = lastResult == PronunciationResult.NO_VOICE
         stop()
+        // No voice for the language: the speech engine's own voice download page comes first.
+        val actions =
+            listOfNotNull(
+                TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA.takeIf { noVoice },
+                "com.android.settings.TTS_SETTINGS",
+                Settings.ACTION_ACCESSIBILITY_SETTINGS,
+            )
         val opened =
-            listOf("com.android.settings.TTS_SETTINGS", Settings.ACTION_ACCESSIBILITY_SETTINGS).any { action ->
+            actions.any { action ->
                 runCatching { application.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
             }
         if (!opened) {

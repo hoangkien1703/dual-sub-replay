@@ -4,6 +4,9 @@ import com.kienhoang.dualsubreplay.data.ResponseLimitExceededException
 import com.kienhoang.dualsubreplay.data.readUtf8WithLimit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -18,7 +21,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
 import java.io.IOException
+import java.io.InterruptedIOException
+import java.net.ConnectException
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -33,6 +40,9 @@ import kotlin.coroutines.resumeWithException
 
 internal const val MAX_GOOGLE_RESPONSE_BYTES = 1024 * 1024
 private const val GOOGLE_REQUEST_TIMEOUT_MS = 15_000L
+
+/** An address that cannot be connected to hands over to the next one after this long, not the full request time. */
+private const val GOOGLE_CONNECT_TIMEOUT_MS = 5_000L
 
 /** One request carries at most this many texts and characters, well under the endpoints' limits. */
 internal const val MAX_GOOGLE_BATCH_TEXTS = 128
@@ -61,6 +71,9 @@ internal enum class GoogleEndpoint(
 
     /** One text per request; since September 2026 `gtx` is refused here for some users, so it uses `at`. */
     SINGLE("https://translate.googleapis.com/translate_a/single", "at", batch = false),
+
+    /** Google Translate's own web host, another way in when the others cannot be reached (2026-10-19). */
+    WEB_BATCH("https://translate.google.com/translate_a/t", "gtx", batch = true),
     ;
 
     /** Host and path, so the problem details say which address failed. */
@@ -83,6 +96,36 @@ class GoogleTranslateException(
 /** The same error naming [endpoint], so the problem details say which Google address failed. */
 private fun GoogleTranslateException.at(endpoint: GoogleEndpoint): GoogleTranslateException =
     GoogleTranslateException("${message.orEmpty().removeSuffix(".")} (${endpoint.label}).", cause, retryable, blocked, status, unreachable)
+
+/** Why the phone could not reach an address, in words, so the problem details say more than "could not be reached". */
+internal fun connectionProblem(error: IOException): String =
+    when (error) {
+        is UnknownHostException -> "address lookup (DNS) failed"
+        is ConnectException -> "connection refused"
+        is SSLException -> "secure connection failed: ${error.message}"
+        is InterruptedIOException ->
+            if (error.message.orEmpty().contains("connect", ignoreCase = true)) {
+                "no connection within ${GOOGLE_CONNECT_TIMEOUT_MS / 1_000} s"
+            } else {
+                "no reply within ${GOOGLE_REQUEST_TIMEOUT_MS / 1_000} s"
+            }
+        else -> "${error.javaClass.simpleName}: ${error.message}"
+    }
+
+/** What each tried address did, such as "translate.googleapis.com/translate_a/t: connection refused". */
+internal fun googleFailureList(failures: List<Pair<GoogleEndpoint, GoogleTranslateException>>): String =
+    failures.joinToString("; ") { (endpoint, error) ->
+        val reason = error.status?.let { "HTTP $it" } ?: (error.cause as? IOException)?.let(::connectionProblem) ?: "blank reply"
+        "${endpoint.label}: $reason"
+    }
+
+/** Every address failed and at least one could not be reached: worth retrying, and the detail says why each failed. */
+internal fun googleUnreachableEverywhere(failures: List<Pair<GoogleEndpoint, GoogleTranslateException>>): GoogleTranslateException =
+    GoogleTranslateException(
+        "Google Translate could not be reached on any address: ${googleFailureList(failures)}.",
+        retryable = true,
+        unreachable = true,
+    )
 
 /** Every address refused or answered blank: the detail lists each one with its status. */
 internal fun googleRefusedEverywhere(refusals: List<Pair<GoogleEndpoint, GoogleTranslateException>>): GoogleTranslateException {
@@ -192,7 +235,7 @@ class GoogleWebTranslator(
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
-            .connectTimeout(GOOGLE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .connectTimeout(GOOGLE_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .readTimeout(GOOGLE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .callTimeout(GOOGLE_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .build(),
@@ -204,6 +247,14 @@ class GoogleWebTranslator(
     private val cache = TranslationCache(maxEntries = 1_024, maxCharacters = 256_000)
 
     @Volatile private var preferredEndpoint = 0
+
+    private val failures = MutableStateFlow<String?>(null)
+
+    /**
+     * What the addresses tried by the latest request did so far (see [googleFailureList]); null while
+     * it has not failed anywhere yet. The player shows it while it waits for Google in the background.
+     */
+    val problems: StateFlow<String?> = failures.asStateFlow()
 
     /** [text] through Google, or null when every Google address leaves it blank. */
     suspend fun translate(
@@ -358,6 +409,7 @@ class GoogleWebTranslator(
     ): List<String?> {
         val refusals = mutableListOf<Pair<GoogleEndpoint, GoogleTranslateException>>()
         val endpoints = GoogleEndpoint.entries
+        failures.value = null
         for (index in googleClientOrder(preferredEndpoint, endpoints.size)) {
             val translated =
                 try {
@@ -365,13 +417,21 @@ class GoogleWebTranslator(
                 } catch (error: GoogleTranslateException) {
                     if (!error.blocked && !error.unreachable) throw error
                     refusals += endpoints[index] to error
+                    failures.value = googleFailureList(refusals)
                     continue
                 }
             preferredEndpoint = index
             return translated
         }
         // An address that could not be reached is worth retrying after a pause; refusals are not.
-        throw refusals.firstOrNull { (_, error) -> error.unreachable }?.second ?: googleRefusedEverywhere(refusals)
+        throw if (refusals.any { (_, error) ->
+                error.unreachable
+            }
+        ) {
+            googleUnreachableEverywhere(refusals)
+        } else {
+            googleRefusedEverywhere(refusals)
+        }
     }
 
     /** One request for a batch endpoint, one per text for the other. Errors name the address. */
@@ -437,7 +497,7 @@ class GoogleWebTranslator(
                         if (continuation.isActive) {
                             continuation.resumeWithException(
                                 GoogleTranslateException(
-                                    "Google Translate could not be reached.",
+                                    "Google Translate could not be reached, ${connectionProblem(error)}.",
                                     error,
                                     retryable = true,
                                     unreachable = true,

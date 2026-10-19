@@ -42,6 +42,7 @@ import com.kienhoang.dualsubreplay.translation.GOOGLE_EARLY_CHECK_POLL_MS
 import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
 import com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.GoogleSlowException
+import com.kienhoang.dualsubreplay.translation.googleSlowDetail
 import com.kienhoang.dualsubreplay.translation.GoogleWait
 import com.kienhoang.dualsubreplay.translation.GoogleWebTranslator
 import com.kienhoang.dualsubreplay.translation.OnDeviceTranslator
@@ -55,7 +56,6 @@ import com.kienhoang.dualsubreplay.translation.storedGoogleWait
 import com.kienhoang.dualsubreplay.translation.storedTranslationEngine
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -1720,19 +1720,27 @@ class AppViewModel internal constructor(
                 statusMessage = status,
             )
         }
-        if (error is GoogleSlowException) catchUpWithGoogle(videoId, generation, error.pending)
+        if (error is GoogleSlowException) catchUpWithGoogle(videoId, generation, error)
     }
 
     /**
      * Google's request outlived the row's wait: once it answers, the video goes back to Google and its
      * lines replace the device's; if it fails, its error becomes the reason the top-right icon shows.
+     * Meanwhile the reason lists what each Google address did so far.
      */
     private fun catchUpWithGoogle(
         videoId: String,
         generation: Long,
-        pending: Deferred<*>,
+        slow: GoogleSlowException,
     ) {
-        pending.invokeOnCompletion { cause ->
+        val progress =
+            viewModelScope.launch {
+                googleTranslator.problems.collect { soFar ->
+                    if (soFar != null) showGoogleSlowDetail(videoId, generation, googleSlowDetail(slow.waitMs, soFar))
+                }
+            }
+        slow.pending.invokeOnCompletion { cause ->
+            progress.cancel()
             if (cause is CancellationException) return@invokeOnCompletion
             if (cause == null) googleFailedOnMobile = false
             _state.update { current ->
@@ -1742,6 +1750,17 @@ class AppViewModel internal constructor(
                     else -> current.copy(onlineTranslationFailureDetail = cause.message)
                 }
             }
+        }
+    }
+
+    private fun showGoogleSlowDetail(
+        videoId: String,
+        generation: Long,
+        detail: String,
+    ) {
+        _state.update { current ->
+            val waiting = isCurrentLoad(current, videoId, generation) && current.onDeviceFallback
+            if (waiting) current.copy(onlineTranslationFailureDetail = detail) else current
         }
     }
 

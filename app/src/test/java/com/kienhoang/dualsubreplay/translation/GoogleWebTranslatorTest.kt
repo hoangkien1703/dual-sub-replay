@@ -15,7 +15,12 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.IOException
+import java.io.InterruptedIOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.net.ssl.SSLHandshakeException
 
 class GoogleWebTranslatorTest {
     @Test fun joinsEverySentenceSegment() {
@@ -95,6 +100,7 @@ class GoogleWebTranslatorTest {
         assertEquals("en", batch.queryParameter("tl"))
         assertEquals(null, batch.queryParameter("dt"))
         assertEquals("clients5.google.com", googleTranslateUrl(GoogleEndpoint.EXTENSION_BATCH, "ja", "en").host)
+        assertEquals("translate.google.com", googleTranslateUrl(GoogleEndpoint.WEB_BATCH, "ja", "en").host)
         val single = googleTranslateUrl(GoogleEndpoint.SINGLE, "ja", "en")
         assertEquals("at", single.queryParameter("client"))
         assertEquals("t", single.queryParameter("dt"))
@@ -181,7 +187,8 @@ class GoogleWebTranslatorTest {
             assertTrue((refusal as GoogleTranslateException).blocked)
             assertEquals(
                 "Google Translate refused on every address: translate.googleapis.com/translate_a/t HTTP 429, " +
-                    "clients5.google.com/translate_a/t HTTP 429, translate.googleapis.com/translate_a/single HTTP 429.",
+                    "clients5.google.com/translate_a/t HTTP 429, translate.googleapis.com/translate_a/single HTTP 429, " +
+                    "translate.google.com/translate_a/t HTTP 429.",
                 refusal.message,
             )
             // Each endpoint once: waiting a few seconds does not lift a block.
@@ -219,10 +226,56 @@ class GoogleWebTranslatorTest {
             val failure = runCatching { translator.translate("ja", "en", "テスト") }.exceptionOrNull() as GoogleTranslateException
             assertTrue(failure.unreachable)
             assertTrue(failure.retryable)
-            assertEquals("Google Translate could not be reached (translate.googleapis.com/translate_a/t).", failure.message)
+            // The detail says why each address failed, not only that Google could not be reached.
+            assertEquals(
+                "Google Translate could not be reached on any address: " +
+                    GoogleEndpoint.entries.joinToString("; ") { "${it.label}: address lookup (DNS) failed" } + ".",
+                failure.message,
+            )
+            assertEquals(
+                GoogleEndpoint.entries.joinToString("; ") { "${it.label}: address lookup (DNS) failed" },
+                translator.problems.value,
+            )
             // Every address, then every address again after the one pause.
             assertEquals(GoogleEndpoint.entries.size * 2, calls)
         }
+
+    @Test fun problemsListEachFailedAddressAndClearWhenTheNextRequestStarts() =
+        runBlocking {
+            var refuseFirst = true
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = emptyList(),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            when {
+                                endpoint == GoogleEndpoint.BATCH && refuseFirst -> 429 to ""
+                                endpoint == GoogleEndpoint.EXTENSION_BATCH -> UNREACHABLE to ""
+                                endpoint == GoogleEndpoint.SINGLE -> 403 to ""
+                                else -> 200 to batchReply(texts.map { "ok" })
+                            }
+                        },
+                )
+            assertNull(translator.problems.value)
+            assertEquals(listOf("ok", "ok"), translator.translateAll("ja", "en", listOf("a", "b")))
+            assertEquals(
+                "translate.googleapis.com/translate_a/t: HTTP 429; clients5.google.com/translate_a/t: address lookup (DNS) failed; " +
+                    "translate.googleapis.com/translate_a/single: HTTP 403",
+                translator.problems.value,
+            )
+            refuseFirst = false
+            assertEquals(listOf("ok", "ok"), translator.translateAll("ja", "en", listOf("c", "d")))
+            assertNull(translator.problems.value)
+        }
+
+    @Test fun connectionProblemsAreSaidInWords() {
+        assertEquals("address lookup (DNS) failed", connectionProblem(UnknownHostException("x")))
+        assertEquals("connection refused", connectionProblem(ConnectException("refused")))
+        assertEquals("no connection within 5 s", connectionProblem(SocketTimeoutException("connect timed out")))
+        assertEquals("no reply within 15 s", connectionProblem(InterruptedIOException("timeout")))
+        assertEquals("secure connection failed: handshake", connectionProblem(SSLHandshakeException("handshake")))
+        assertEquals("IOException: reset", connectionProblem(IOException("reset")))
+    }
 
     @Test fun aBlankLineKeepsTheOthersAndIsAskedAgainAloneElsewhere() =
         runBlocking {
@@ -260,7 +313,7 @@ class GoogleWebTranslatorTest {
                         },
                 )
             assertNull(translator.translate("ja", "en", "空"))
-            assertEquals(listOf("gtx", "dict-chrome-ex", "at"), seen)
+            assertEquals(GoogleEndpoint.entries.map { it.client }, seen)
             assertNull(translator.cachedTranslation("ja", "en", "空"))
             assertFalse(translator.responds("ja", "en", "空"))
         }
