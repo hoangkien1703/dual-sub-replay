@@ -13,6 +13,7 @@ import com.kienhoang.dualsubreplay.assistant.aiSettingValue
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.DAILY_GOAL_CHOICES
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.translation.GoogleWait
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -44,6 +45,7 @@ class AiAssistantActionsTest {
         assertEquals(listOf("device") + APP_LANGUAGES.map { it.tag }, AI_APP_LANGUAGES)
         assertEquals(listOf("off") + DAILY_GOAL_CHOICES.map { it.toString() }, AI_DAILY_GOALS)
         assertEquals(TranslationPosition.entries.map { it.storageValue }, AiSetting.TRANSLATION_POSITION.choices)
+        assertEquals(GoogleWait.entries.map { it.storageValue }, AiSetting.GOOGLE_WAIT.choices)
     }
 
     @Test

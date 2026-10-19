@@ -145,4 +145,10 @@
     <string name="language_downloads_back">Voltar</string>
     <string name="settings_google_translate_title">Google Tradutor (online)</string>
     <string name="settings_google_translate_description">Ativado por padrão. Traduções melhores, principalmente do japonês. Envia o texto das legendas ao Google. Não é um serviço oficial do Google, então pode parar de funcionar; nesse caso, o app traduz no seu dispositivo até o Google voltar a funcionar. Desative para sempre traduzir no seu dispositivo.</string>
+    <string name="settings_google_wait_title">Esperar pelo Google</string>
+    <string name="settings_google_wait_description">Quanto tempo uma linha espera pelo Google Tradutor antes de mostrar uma tradução do YouTube ou do seu dispositivo. O Google continua sendo tentado em segundo plano, e a tradução dele substitui a linha quando chega. Automático espera 2 segundos nos dados móveis e 4 no Wi-Fi.</string>
+    <string name="settings_google_wait_auto">Automático</string>
+    <string name="settings_google_wait_2">2 s</string>
+    <string name="settings_google_wait_4">4 s</string>
+    <string name="settings_google_wait_8">8 s</string>
 </resources>

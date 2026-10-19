@@ -27,17 +27,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.translation.GoogleWait
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 
 /** Chooses the translation engine from Settings → Translation, or tries Google again from the top-right icon. */
 internal class TranslationEngineActions(
     val select: (TranslationEngine) -> Unit,
     val tryGoogleAgain: () -> Unit = {},
+    val selectGoogleWait: (GoogleWait) -> Unit = {},
 )
 
 /** What Settings → Translation shows about the online engine. */
 internal data class OnlineTranslationSettings(
     val engine: TranslationEngine = TranslationEngine.ON_DEVICE,
+    val googleWait: GoogleWait = GoogleWait.AUTO,
 )
 
 internal val LocalTranslationEngineActions = staticCompositionLocalOf<TranslationEngineActions?> { null }

@@ -508,7 +508,9 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     val phraseSelection = remember { PhraseSelectionController() }
     val translationEngineActions =
-        remember(viewModel) { TranslationEngineActions(viewModel::setTranslationEngine, viewModel::tryGoogleTranslationAgain) }
+        remember(viewModel) {
+            TranslationEngineActions(viewModel::setTranslationEngine, viewModel::tryGoogleTranslationAgain, viewModel::setGoogleWait)
+        }
     val aiViewModel: AiAssistantViewModel = viewModel()
     val aiAssistant = remember(aiViewModel) { AiAssistantHost(aiViewModel.controller) { aiViewModel.guide } }
     CompositionLocalProvider(

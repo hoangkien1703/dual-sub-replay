@@ -145,4 +145,10 @@
     <string name="language_downloads_back">뒤로</string>
     <string name="settings_google_translate_title">Google 번역(온라인)</string>
     <string name="settings_google_translate_description">기본으로 켜져 있습니다. 특히 일본어 번역 품질이 더 좋습니다. 자막 텍스트를 Google로 보냅니다. Google 공식 서비스가 아니므로 작동이 멈출 수 있으며, 그때는 Google이 다시 작동할 때까지 기기에서 번역합니다. 끄면 항상 기기에서 번역합니다.</string>
+    <string name="settings_google_wait_title">Google 대기 시간</string>
+    <string name="settings_google_wait_description">YouTube 또는 기기의 번역을 표시하기 전에 각 줄이 Google 번역을 기다리는 시간입니다. Google은 백그라운드에서 계속 시도하며, 번역이 도착하면 그 줄을 바꿉니다. 자동은 모바일 데이터에서 2초, Wi-Fi에서 4초 기다립니다.</string>
+    <string name="settings_google_wait_auto">자동</string>
+    <string name="settings_google_wait_2">2초</string>
+    <string name="settings_google_wait_4">4초</string>
+    <string name="settings_google_wait_8">8초</string>
 </resources>
