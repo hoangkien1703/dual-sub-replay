@@ -782,7 +782,9 @@ internal val WEB_CAPTION_CAPTURE_SCRIPT: String =
  * track, which happens while YouTube's own player shows captions, the tracks come from the player's
  * captions menu and from the caption tracks the player already downloaded (kept by
  * [WEB_CAPTION_CAPTURE_SCRIPT], which this script also makes sure is installed). `found` counts each
- * source for the app's diagnostics. It changes nothing on the page.
+ * source for the app's diagnostics. `ready` is false while the page's `#player` says it is still
+ * loading or not playable, the signal LingoTube waits for before it reads the track list (a page
+ * without those attributes counts as ready). It changes nothing on the page.
  */
 internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
     """
@@ -844,7 +846,11 @@ internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
           return true;
         });
       }
+      const holder = document.getElementById('player');
+      const loading = holder && holder.getAttribute('loading');
+      const playable = holder && holder.getAttribute('playable');
       return JSON.stringify({
+        ready: (!loading || loading === 'false') && (!playable || playable === 'true'),
         videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
         captions: { playerCaptionsTracklistRenderer: {
           captionTracks: tracks,
@@ -870,7 +876,8 @@ internal const val PAGE_CAPTION_SWITCH_MS = 15_000
  * Gets [target]'s caption track from the page and reports `working` (with the step it is on) or
  * `done` (with the document and its track) as JSON text. Each attempt is one job: a retry is a new
  * attempt and starts again, and older jobs are dropped. The job first fetches the track's own
- * address from the page, which works where YouTube does not demand a proof-of-origin token. Then it
+ * address from the page, as `json3` and then exactly as YouTube gave it (LingoTube's request), which
+ * works where YouTube does not demand a proof-of-origin token. Then it
  * waits for the page player to download the track (see [WEB_CAPTION_CAPTURE_SCRIPT]); for the first
  * [PAGE_CAPTION_SWITCH_MS] it switches the page's captions to that track so the player does so, and
  * switches them back if nobody changed them since. After that it keeps watching, so captions the
@@ -932,15 +939,23 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
     state.usable = function(text) {
       return typeof text === 'string' && text.trim().length > 0 && text.length <= $MAX_PAGE_TRANSCRIPT_LENGTH;
     };
-    state.download = function(address, target) {
+    state.cues = function(text) {
+      return state.usable(text) && /"segs"|<text[\s>]|<p[\s>]/.test(text);
+    };
+    state.download = function(address, target, asGiven) {
       const url = capture.timedText(address);
       if (!url || url.searchParams.get('v') !== target.videoId) return Promise.resolve('');
-      // The page's own host keeps the request same-origin, so the page's cookies go with it.
-      url.host = window.location.host;
-      url.searchParams.set('lang', target.languageCode);
-      if (target.generated) url.searchParams.set('kind', 'asr'); else url.searchParams.delete('kind');
-      url.searchParams.set('fmt', 'json3');
-      return fetch(url.toString(), { credentials: 'include' })
+      let options = {};
+      if (!asGiven) {
+        // The page's own host keeps the request same-origin, so the page's cookies go with it.
+        url.host = window.location.host;
+        url.searchParams.set('lang', target.languageCode);
+        if (target.generated) url.searchParams.set('kind', 'asr'); else url.searchParams.delete('kind');
+        url.searchParams.set('fmt', 'json3');
+        options = { credentials: 'include' };
+      }
+      // As given, the address goes out exactly as the page player (and LingoTube) would send it.
+      return fetch(url.toString(), options)
         .then(function(response) { return response.ok ? response.text() : ''; })
         .catch(function() { return ''; });
     };
@@ -997,9 +1012,12 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       try { player.setOption('captions', 'track', job.previous || {}); } catch (_) {}
     };
     state.start = function(job, target) {
-      state.download(target.baseUrl, target).then(function(text) {
+      state.download(target.baseUrl, target, false).then(function(text) {
+        // json3 first, for its word timings; then the address as YouTube gave it.
+        return state.cues(text) ? text : state.download(target.baseUrl, target, true);
+      }).then(function(text) {
         job.addressTried = true;
-        if (job.status === 'working' && state.usable(text)) {
+        if (job.status === 'working' && state.cues(text)) {
           state.finish(job, { text: text, languageCode: target.languageCode, generated: target.generated });
         }
       });
