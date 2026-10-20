@@ -32,7 +32,8 @@ https://hoangkien1703.github.io/dual-sub-replay/vi/ (Vietnamese).
    rely on Bing's index, so this is how AI assistants find the guide pages.
 5. **Earn links from places learners already look.** Each is a backlink that helps
    ranking and a direct source of users and stars:
-   - List the app on AlternativeTo as an alternative to Language Reactor and similar tools.
+   - List the app on AlternativeTo as an alternative to Language Reactor and similar tools
+     (ready-to-paste listing in [AI recommendations](ai-recommendations.md#alternativeto-listing)).
    - Propose it to curated lists such as awesome open-source Android app lists, following
      each list's contribution rules.
    - Post once per community with the drafts in [launch kit](launch-kit.md): a language
