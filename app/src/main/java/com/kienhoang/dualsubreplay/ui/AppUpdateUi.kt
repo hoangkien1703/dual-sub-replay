@@ -67,20 +67,25 @@ internal fun CheckForUpdatesRow(onOpen: () -> Unit) {
                         AppUpdater.check(context)
                     }
                 }.testTag("check_for_updates")
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Default.SystemUpdate, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(
+            Icons.Default.SystemUpdate,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp),
+        )
         Spacer(Modifier.width(12.dp))
         Column {
-            Text(stringResource(R.string.updates_check), style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.updates_check), style = MaterialTheme.typography.bodyMedium)
             Text(
                 if (available != null) {
                     stringResource(R.string.updates_available_short, available)
                 } else {
                     stringResource(R.string.updates_version, BuildConfig.VERSION_NAME)
                 },
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelSmall,
                 color = if (available != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
