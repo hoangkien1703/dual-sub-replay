@@ -109,13 +109,7 @@ fun DualSubApp(
     val webController = rememberYouTubeWebController()
     val pronouncer = rememberWordPronouncer()
     BindPhraseActions(state, webController, pronouncer, viewModel::translateSubtitleText)
-    val studyRunner =
-        rememberStudyPlaybackRunner(
-            webController,
-            state,
-            rememberStudySettings().value,
-            LocalStudyTools.current?.comprehension?.oneNewWordLines.orEmpty(),
-        )
+    val studyRunner = rememberStudyPlaybackRunner(webController, state)
     var showVocabulary by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
 
@@ -144,14 +138,8 @@ fun DualSubApp(
                 fullscreenLearningOverlay = fullscreenLearningOverlay,
                 onNavigationVisibilityChange = onNavigationVisibilityChange,
                 onPageChanged = viewModel::onYouTubePageChanged,
-                onPlaybackSecond = { videoId, second, caption, session ->
-                    viewModel.onWebPlaybackSecond(videoId, second, caption, session)
-                    studyRunner.onSecond(videoId, second, session)
-                },
-                onPlaybackPaused = { videoId, paused ->
-                    viewModel.onWebPlaybackPaused(videoId, paused)
-                    studyRunner.onPaused(paused)
-                },
+                onPlaybackSecond = studyRunner.afterSecond(viewModel::onWebPlaybackSecond),
+                onPlaybackPaused = studyRunner.afterPaused(viewModel::onWebPlaybackPaused),
                 onShowSubtitles = viewModel::showSubtitlePanel,
                 onHideSubtitles = viewModel::hideSubtitlePanel,
                 onRetry = viewModel::retryCaptions,

@@ -230,7 +230,7 @@ internal fun StudyWordActions(
     val showKnown = tools.settings.knownWords && language != null && key != null
     if (!showKnown && !tools.ankiAvailable) return
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (showKnown && language != null && key != null) {
+        if (showKnown) {
             val known = key in tools.known
             FilterChip(
                 selected = known,

@@ -602,7 +602,12 @@ internal fun aiSettingValue(
         AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
         AiSetting.DAILY_GOAL -> aiDailyGoal(key)
         AiSetting.GOOGLE_WAIT -> aiGoogleWait(key)
-        AiSetting.STUDY_REPEAT_COUNT -> key.removeSuffix("times").removeSuffix("x").trim('_').takeIf { it in setting.choices }
+        AiSetting.STUDY_REPEAT_COUNT ->
+            key
+                .removeSuffix("times")
+                .removeSuffix("x")
+                .trim('_')
+                .takeIf { it in setting.choices }
         else ->
             listOfNotNull(key, SETTING_CHOICE_ALIASES[setting]?.get(key), CHOICE_ALIASES[key])
                 .firstOrNull { it in setting.choices }

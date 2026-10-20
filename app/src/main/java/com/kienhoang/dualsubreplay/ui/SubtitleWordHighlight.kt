@@ -201,12 +201,14 @@ internal fun rememberAnnotatedSubtitleText(
         }
     val newWordRanges =
         remember(text, tokens, languageCode, study?.known, study?.learning) {
-            study?.let { tools ->
+            if (study == null) {
+                emptyList()
+            } else {
                 tokens
                     .ifEmpty { LanguageAwareTokenizer.tokenize(text, languageCode) }
-                    .filter(tools::isNew)
+                    .filter(study::isNew)
                     .map { it.startIndex until it.endIndex }
-            }.orEmpty()
+            }
         }
     return remember(text, spans, tokens, activeWordIndex, baseColor, highlightColor, wordLearningEnabled, newWordRanges) {
         annotatedSubtitleText(

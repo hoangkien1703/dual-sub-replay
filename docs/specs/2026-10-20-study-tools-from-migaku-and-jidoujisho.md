@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved for implementation. On 2026-10-20 the owner read the study of Migaku and
+Implemented (PR open for the owner's phone test). On 2026-10-20 the owner read the study of Migaku and
 jidoujisho (report in the project's shared files, `migaku-jidoujisho-study/recommendations.md`)
 and asked for all six recommended picks in one PR,
 "to see whether they work", each with a setting so users can turn it on or off. That authorizes this
@@ -104,24 +104,24 @@ scope, not merge or release.
 
 ## Acceptance criteria
 
-- [ ] Driver: Pause after each line pauses once at a line's end and not again after resume; Read
+- [x] Driver: Pause after each line pauses once at a line's end and not again after resume; Read
   first pauses at the next line's start; Repeat plays a line N times then moves on; Pause on one new
   word pauses only after listed lines; a user seek resets without pausing at once; nothing happens
   while paused, in live fallback, or with Normal and skip silence off (`StudyPlaybackDriverTest`).
-- [ ] Skip silence: speeds up only in gaps over 1.5 s, restores before the next line, Jump plays
+- [x] Skip silence: speeds up only in gaps over 1.5 s, restores before the next line, Jump plays
   from just before the next line, restores on pause and seek (`StudyPlaybackDriverTest`).
-- [ ] Listen first turns `ALWAYS` into `PAUSED` and leaves `NEVER` alone (`StudySettingsTest`).
-- [ ] Known words: keys use the dictionary form, lower case; the score counts word occurrences only;
+- [x] Listen first turns `ALWAYS` into `PAUSED` and leaves `NEVER` alone (`StudySettingsTest`).
+- [x] Known words: keys use the dictionary form, lower case; the score counts word occurrences only;
   saved words count as learning; lines with exactly one new word are listed (`KnownWordsTest`).
-- [ ] Anki note fields escape HTML and link the line's time; duplicates are skipped by id
+- [x] Anki note fields escape HTML and link the line's time; duplicates are skipped by id
   (`AnkiDroidNotesTest`).
-- [ ] Blur box and gap-speed scripts check the origin; the transcript script keeps one `fetch(` and
+- [x] Blur box and gap-speed scripts check the origin; the transcript script keeps one `fetch(` and
   carries `pageToken`; the token script only loads the interpreter from `www.google.com/js/th/` and
   posts only to the page's own `att/get` and `GenerateIT` (`StudyWebScriptsTest`,
   `PageTranscriptScriptsTest`).
-- [ ] Every new setting is in `RESETTABLE_SETTING_KEYS`, the AI setting list, the assistant guide and
+- [x] Every new setting is in `RESETTABLE_SETTING_KEYS`, the AI setting list, the assistant guide and
   all 8 languages (existing AI and language tests).
-- [ ] CI parity commands pass.
+- [x] CI parity commands pass.
 
 ## Validation plan
 
@@ -183,9 +183,18 @@ Built as planned, in one PR. What landed and where it differs from the plan:
 - Tests: `StudyPlaybackTest` (driver, Listen first visibility and stored settings, in place of the
   planned `StudyPlaybackDriverTest`/`StudySettingsTest`), `KnownWordsTest`, `AnkiDroidNotesTest`,
   `StudyWebScriptsTest`, additions to `PageTranscriptScriptsTest`, `PageTranscriptSourceTest`,
-  `AiActionsTest`, `AiAssistantActionsTest` and `SubtitleHighlightTest`.
+  `AiActionsTest`, `AiAssistantActionsTest` and `SubtitleHighlightTest`. `StudyToolsUiTest` (device)
+  checks the settings section, the score chip and Mark all as known, and saves screenshots in the
+  dark and light themes.
 - Docs: AGENTS.md, tech-stack.md, PRIVACY.md and THIRD_PARTY_NOTICES.md.
 
 ## Validation result
 
-To be filled after validation.
+- Passed in the cloud container (2026-10-20): `formatCheck`, `complexityCheck`, `testDebugUnitTest`
+  (847 tests, 0 failures, including every new test above), `lintDebug`, `assembleDebug`,
+  `assembleDebugAndroidTest`, and `python3 -m unittest discover -s tools/tests` (34 tests).
+- Managed-device tests (including `StudyToolsUiTest`): run only in PR CI, as the container has no
+  emulator; see the PR's latest Android CI run.
+- Not verified here: every play mode, skip silence, known words, AnkiDroid and the blur box on a
+  phone, and page-token captions against live YouTube. Live minting was deliberately not run from
+  the cloud; it is for the owner's phone test with the preview build.

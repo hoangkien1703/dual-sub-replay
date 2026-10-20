@@ -34,7 +34,7 @@ internal val STUDY_SETTING_KEYS =
     )
 
 /** How the video plays around each subtitle line (Settings → Study tools → Play mode). */
-internal enum class StudyPlayMode(
+enum class StudyPlayMode(
     val storageValue: String,
     @StringRes val titleRes: Int,
     @StringRes val descriptionRes: Int,

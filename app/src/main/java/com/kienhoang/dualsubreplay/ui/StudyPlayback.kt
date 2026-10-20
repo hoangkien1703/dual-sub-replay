@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import kotlin.math.abs
@@ -208,8 +209,8 @@ internal class StudyPlaybackDriver {
         index: Int,
     ): StudyAction? {
         val next = tick.segments.getOrNull(index + 1)
-        val inGap = next != null && (index < 0 || tick.timeMs >= tick.segments[index].endMs)
-        if (!inGap || next == null) return if (gapRate != null) normalSpeed() else null
+        val inGap = index < 0 || tick.timeMs >= tick.segments[index].endMs
+        if (next == null || !inGap) return if (gapRate != null) normalSpeed() else null
         val remaining = next.startMs - tick.timeMs
         val rate = skip.rate
         return when {
@@ -285,6 +286,20 @@ internal class StudyPlaybackRunner(
         this.paused = paused
     }
 
+    /** The page's paused tick for [next] (the view model), then for the play modes. */
+    fun afterPaused(next: (String, Boolean) -> Unit): (String, Boolean) -> Unit =
+        { videoId, paused ->
+            next(videoId, paused)
+            onPaused(paused)
+        }
+
+    /** The page's playback tick for [next] (the view model), then for the play modes. */
+    fun afterSecond(next: (String, Float, LiveCaptionSample?, String) -> Unit): (String, Float, LiveCaptionSample?, String) -> Unit =
+        { videoId, second, caption, sessionId ->
+            next(videoId, second, caption, sessionId)
+            onSecond(videoId, second, sessionId)
+        }
+
     fun onSecond(
         videoId: String,
         second: Float,
@@ -321,10 +336,11 @@ private const val MS_PER_SECOND = 1_000f
 internal fun rememberStudyPlaybackRunner(
     controller: YouTubeWebController,
     state: DualSubUiState,
-    settings: StudySettings,
-    newWordLines: Set<Int>,
 ): StudyPlaybackRunner {
     val runner = remember(controller) { StudyPlaybackRunner(controller) }
+    val settings by rememberStudySettings()
+    val comprehension = LocalStudyTools.current?.comprehension
+    val newWordLines = comprehension?.oneNewWordLines.orEmpty()
     SideEffect {
         runner.state = state
         runner.settings = settings
