@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">Pembaruan aplikasi</string>
+    <string name="settings_section_updates_summary">Perbarui otomatis</string>
+    <string name="updates_check">Periksa pembaruan</string>
+    <string name="updates_version">Versi %1$s</string>
+    <string name="updates_available_short">Versi %1$s tersedia</string>
+    <string name="updates_checking">Memeriksa pembaruan…</string>
+    <string name="updates_up_to_date">Anda memakai versi terbaru (%1$s).</string>
+    <string name="updates_available">Versi %1$s tersedia. Versi Anda %2$s.</string>
+    <string name="updates_first_time_note">Pertama kali, Android meminta Anda mengizinkan DualSub Replay memasang aplikasi. Kata tersimpan dan setelan Anda tetap ada.</string>
+    <string name="updates_whats_new">Yang baru</string>
+    <string name="updates_update">Perbarui</string>
+    <string name="updates_not_now">Nanti</string>
+    <string name="updates_downloading">Mengunduh versi %1$s…</string>
+    <string name="updates_hide">Sembunyikan</string>
+    <string name="updates_ready">Versi %1$s siap dipasang.</string>
+    <string name="updates_install">Pasang</string>
+    <string name="updates_installing">Memasang… Aplikasi tertutup selama pembaruan.</string>
+    <string name="updates_try_again">Coba lagi</string>
+    <string name="updates_close">Tutup</string>
+    <string name="updates_open_github">Buka GitHub</string>
+    <string name="updates_unsupported">Salinan aplikasi ini dibuat di komputer, jadi tidak bisa memperbarui dirinya sendiri. Dapatkan versi terbaru di GitHub.</string>
+    <string name="updates_problem_offline">Tidak dapat menghubungi GitHub. Periksa koneksi Anda, lalu coba lagi.</string>
+    <string name="updates_problem_busy">GitHub sedang sibuk. Coba lagi dalam beberapa menit.</string>
+    <string name="updates_problem_github">GitHub mengirim jawaban yang tidak terduga. Coba lagi nanti.</string>
+    <string name="updates_problem_checksum">Unduhan tidak cocok dengan checksum GitHub, jadi dihapus.</string>
+    <string name="updates_problem_wrong_app">Unduhan bukan versi yang lebih baru dari aplikasi ini, jadi tidak dipasang.</string>
+    <string name="updates_problem_install">Android tidak dapat memasang pembaruan.</string>
+    <string name="updates_problem_cancelled">Pembaruan dibatalkan.</string>
+    <string name="updates_auto_title">Perbarui otomatis</string>
+    <string name="updates_auto_description">Sekali sehari saat Anda membuka aplikasi, memeriksa versi baru di GitHub, mengunduhnya lewat Wi-Fi, dan memasangnya saat Anda keluar dari aplikasi, tidak pernah saat video diputar.</string>
+    <string name="updates_auto_unavailable">Salinan aplikasi ini tidak bisa memperbarui dirinya sendiri.</string>
+</resources>

@@ -25,6 +25,8 @@
 
 Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
 
+**Updating:** open the menu at the top left and tap **Check for updates**. To get new versions without asking, turn on **Settings → More settings → App updates → Update automatically**.
+
 > **About preview builds:** they install as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
 
 ## See it in action

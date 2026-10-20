@@ -120,6 +120,9 @@ internal enum class AiSetting(
     BLUR_BOX("blur_box"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
+    /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
+    APP_AUTO_UPDATE("auto_update", asks = true),
+
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
     ;
@@ -735,6 +738,10 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (beta: auto makes a token on the YouTube page only when captions come back empty and then uses it first on " +
                 "later videos while that works; on always asks with a token first; off never makes one)"
+        AiSetting.APP_AUTO_UPDATE ->
+            choiceList(setting.choices) +
+                " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +
+                "Wi-Fi and installs it when the user leaves the app; off by default, then only the menu's Check for updates asks)"
         else -> choiceList(setting.choices)
     }
 

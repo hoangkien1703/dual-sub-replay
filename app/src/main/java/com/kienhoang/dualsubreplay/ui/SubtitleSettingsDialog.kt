@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewDay
@@ -101,6 +102,7 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_translation_title,
         R.string.settings_section_translation_summary,
     ),
+    UPDATES("updates", R.string.settings_section_updates_title, R.string.settings_section_updates_summary),
 
     /** Only in builds with the assistant ([LocalAiAssistant] is set). */
     AI_ASSISTANT("ai_assistant", R.string.settings_section_ai_title, R.string.settings_section_ai_summary),
@@ -549,6 +551,10 @@ internal fun SubtitleSettingsDialog(
                             SettingsSectionDivider()
                             LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
                         }
+                    }
+
+                    Section(MoreSettingsSection.UPDATES, Icons.Default.SystemUpdate) {
+                        AppUpdateSettingsSection()
                     }
 
                     if (aiAssistant != null) {

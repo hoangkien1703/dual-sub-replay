@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Send to AnkiDroid (Settings → Study tools): AnkiDroid asks apps for this before they add cards. -->
     <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE" />
+    <!-- Check for updates (drawer) and Update automatically: the app installs its own newer
+         GitHub release. Android still asks once to allow installs from this app. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
         <package android:name="com.ichi2.anki" />
@@ -72,5 +75,9 @@
             android:name=".playback.WebVideoPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <receiver
+            android:name=".update.AppUpdateReceiver"
+            android:exported="false" />
     </application>
 </manifest>

@@ -9,7 +9,6 @@
     <string name="navigation_app_language">Bahasa aplikasi</string>
     <string name="navigation_device_language">Bahasa perangkat</string>
     <string name="navigation_cancel">Batal</string>
-    <string name="navigation_latest_version">Lihat versi terbaru aplikasi di %1$s.</string>
     <string name="navigation_no_browser">Tidak ada browser untuk membuka GitHub.</string>
     <string name="navigation_licenses">Lisensi sumber terbuka</string>
     <string name="navigation_loading_license">Memuat lisensi…</string>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">App updates</string>
+    <string name="settings_section_updates_summary">Update automatically</string>
+    <string name="updates_check">Check for updates</string>
+    <string name="updates_version">Version %1$s</string>
+    <string name="updates_available_short">Version %1$s is available</string>
+    <string name="updates_checking">Checking for updates…</string>
+    <string name="updates_up_to_date">You have the latest version (%1$s).</string>
+    <string name="updates_available">Version %1$s is available. You have %2$s.</string>
+    <string name="updates_first_time_note">The first time, Android asks you to allow installing apps from DualSub Replay. Your saved words and settings stay.</string>
+    <string name="updates_whats_new">What\'s new</string>
+    <string name="updates_update">Update</string>
+    <string name="updates_not_now">Not now</string>
+    <string name="updates_downloading">Downloading version %1$s…</string>
+    <string name="updates_hide">Hide</string>
+    <string name="updates_ready">Version %1$s is ready to install.</string>
+    <string name="updates_install">Install</string>
+    <string name="updates_installing">Installing… The app closes while it updates.</string>
+    <string name="updates_try_again">Try again</string>
+    <string name="updates_close">Close</string>
+    <string name="updates_open_github">Open GitHub</string>
+    <string name="updates_unsupported">This copy of the app was built on a computer, so it can\'t update itself. Get the latest version on GitHub.</string>
+    <string name="updates_problem_offline">Couldn\'t reach GitHub. Check your connection and try again.</string>
+    <string name="updates_problem_busy">GitHub is busy right now. Try again in a few minutes.</string>
+    <string name="updates_problem_github">GitHub sent an unexpected answer. Try again later.</string>
+    <string name="updates_problem_checksum">The download didn\'t match GitHub\'s checksum, so it was deleted.</string>
+    <string name="updates_problem_wrong_app">The download isn\'t a newer version of this app, so it wasn\'t installed.</string>
+    <string name="updates_problem_install">Android couldn\'t install the update.</string>
+    <string name="updates_problem_cancelled">The update was cancelled.</string>
+    <string name="updates_auto_title">Update automatically</string>
+    <string name="updates_auto_description">Once a day when you open the app, checks GitHub for a new version, downloads it on Wi-Fi and installs it when you leave the app, never while a video plays.</string>
+    <string name="updates_auto_unavailable">This copy of the app can\'t update itself.</string>
+</resources>

@@ -49,13 +49,6 @@ class AppLanguageTest {
     }
 
     @Test
-    fun theLinkSentenceSplitsAroundItsSlot() {
-        assertEquals("Check it on " to ".", splitAroundLink("Check it on %1\$s."))
-        assertEquals("" to " で確認", splitAroundLink("%1\$s で確認"))
-        assertEquals("No slot " to "", splitAroundLink("No slot"))
-    }
-
-    @Test
     fun localeConfigOffersExactlyTheTranslatedLanguages() {
         val config = parse(File(resources, "xml/locales_config.xml"))
         val names = config.getElementsByTagName("locale")

@@ -42,7 +42,8 @@ class NavigationRecoveryUiTest {
             .performTouchInput { click(androidx.compose.ui.geometry.Offset(width - 4f, height / 2f)) }
         compose.onNodeWithText("Practice").assertIsDisplayed()
         compose.onNodeWithText("Open-source licenses").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("settings_github_link").assertIsDisplayed()
+        compose.onNodeWithTag("check_for_updates").assertIsDisplayed()
+        compose.onNodeWithText("Check for updates").assertIsDisplayed()
         saveUiEvidence("navigation-drawer")
         compose.onNodeWithText("Open-source licenses").performClick()
         compose.onNodeWithText("Close").assertIsDisplayed().performClick()

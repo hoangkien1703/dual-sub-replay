@@ -17,7 +17,6 @@ FORBIDDEN_PERMISSIONS = {
     "android.permission.READ_EXTERNAL_STORAGE",
     "android.permission.MANAGE_EXTERNAL_STORAGE",
     "android.permission.SYSTEM_ALERT_WINDOW",
-    "android.permission.REQUEST_INSTALL_PACKAGES",
     "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
     "android.permission.POST_NOTIFICATIONS",
     "android.permission.WAKE_LOCK",
