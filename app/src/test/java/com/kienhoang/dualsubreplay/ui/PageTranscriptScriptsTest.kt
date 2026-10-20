@@ -33,7 +33,9 @@ class PageTranscriptScriptsTest {
         assertTrue(
             script.contains(
                 """const target = {"videoId":"abcdefghijk","languageCode":"zh-Hans","generated":true,""" +
-                    """"baseUrl":${JSONObject.quote(target.baseUrl)},"attempt":"7","panelOnly":false,"pageToken":false};""",
+                    """"baseUrl":${JSONObject.quote(
+                        target.baseUrl,
+                    )},"attempt":"7","panelOnly":false,"pageToken":false,"tokenFirst":false};""",
             ),
         )
         // Every address the page fetches or keeps passes the same YouTube-host, /api/timedtext check.
@@ -75,18 +77,38 @@ class PageTranscriptScriptsTest {
     }
 
     @Test
-    fun aPageTokenIsTriedOnlyWhenTurnedOnAndStaysInThePage() {
+    fun aPageTokenIsTriedOnlyWhenAllowedAndStaysInThePage() {
         val script = webPageTranscriptScript(target.copy(pageToken = true))
-        assertTrue(script.contains(""""panelOnly":false,"pageToken":true};"""))
+        assertTrue(script.contains(""""panelOnly":false,"pageToken":true,"tokenFirst":false};"""))
         // Still one fetch: the token only joins the same /api/timedtext address, as the web player sends it.
         assertEquals(1, Regex("fetch\\(").findAll(script).count())
         assertTrue(script.contains("url.searchParams.set('pot', token);"))
         assertTrue(script.contains("url.searchParams.set('c', 'WEB');"))
-        assertTrue(script.contains("if (!target.pageToken || job.status !== 'working') return;"))
+        assertTrue(script.contains("if (!target.pageToken || job.status !== 'working') return giveUp();"))
         assertTrue(script.contains("tries >= $PAGE_TOKEN_TRIES"))
-        // The reply names how far the token got, never the token.
-        assertTrue(script.contains("token: job.token || null"))
+        // The reply names how far the token got and how the page got the lines, never the token.
+        assertTrue(script.contains("token: job.token || null,"))
+        assertTrue(script.contains("via: job.via || null"))
         assertFalse(script.contains("token: token"))
+    }
+
+    @Test
+    fun automaticAsksPlainlyFirstAndOnAsksWithTheTokenFirst() {
+        val script = webPageTranscriptScript(target.copy(pageToken = true, tokenFirst = true))
+        assertTrue(script.contains(""""pageToken":true,"tokenFirst":true};"""))
+        assertTrue(script.contains("state.withToken(job, target, function() { state.plain(job, target, null); });"))
+        assertTrue(script.contains("state.plain(job, target, function() { state.withToken(job, target, null); });"))
+        // Each way says it got the lines, so Automatic can remember which one YouTube wants.
+        assertTrue(script.contains("job.via = 'address';"))
+        assertTrue(script.contains("job.via = 'token';"))
+        assertTrue(script.contains("if (!job.via) job.via = track.panel ? 'panel' : 'player';"))
+    }
+
+    @Test
+    fun theReplySaysHowThePageGotTheLines() {
+        fun reply(via: String) = JSONObject.quote("""{"status":"done","text":"x","via":"$via"}""")
+        assertEquals("token", (parsePageTranscriptReply(reply("token")) as PageTranscriptReply.Done).via)
+        assertNull((parsePageTranscriptReply(reply("evil")) as PageTranscriptReply.Done).via)
     }
 
     @Test

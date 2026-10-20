@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">ジャンプ</string>
     <string name="study_known_words_title">既知の単語</string>
-    <string name="study_known_words_description">単語カードで知っている単語に印を付けます。字幕パネルに、各動画をどれだけ知っているかが表示されます。</string>
+    <string name="study_known_words_description">各動画のうち既に知っている割合を表示し、字幕で新しい単語に印を付けられます。単語カードの「この単語を知っている」は、これがオフでも単語を記録します。</string>
     <string name="study_mark_new_words_title">字幕で新しい単語に印を付ける</string>
     <string name="study_mark_new_words_description">知らない単語や保存していない単語に薄い背景を付けます。</string>
     <string name="study_known_words_clear">既知の単語を消去</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">すべての言語で、既知として印を付けた単語がすべて消去されます。保存した単語は残ります。</string>
     <string name="study_known_words_clear_confirm">消去</string>
     <string name="study_anki_title">AnkiDroid に送る</string>
-    <string name="study_anki_description">AnkiDroid が入っているとき、単語カードと「練習 → エクスポート」に「AnkiDroid に送る」を表示します。カードは DualSub Replay デッキに入ります。</string>
+    <string name="study_anki_description">AnkiDroid がインストールされていると、単語カードと練習 → エクスポートに「AnkiDroid に送る」を表示します。カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマートフォンでは、起動中しかカードを受け付けません。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>
-    <string name="study_page_token_description">YouTube が空の字幕を返したとき、YouTube のページが YouTube のウェブプレーヤーと同じように自分の発信元証明トークンを作り、もう一度取得します。試験的な機能です。</string>
+    <string name="study_page_token_description">自動では、YouTube が空の字幕を返したときだけトークンを使い、それでうまくいく間は次の動画から最初にトークンを使います。オンは常に最初にトークンを使います。オフはトークンを作りません。</string>
     <string name="study_comprehension_chip">既知 %1$d%%</string>
     <string name="study_comprehension_title">この動画の既知の単語</string>
     <string name="study_comprehension_known">この動画の単語の %1$d%% を知っています。</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">AnkiDroid に送りました</string>
     <string name="study_anki_not_installed">このスマートフォンに AnkiDroid が入っていません。</string>
     <string name="study_anki_permission_denied">AnkiDroid の権限が許可されなかったので、カードは追加されませんでした。</string>
-    <string name="study_anki_failed">AnkiDroid がカードを受け付けませんでした。AnkiDroid を一度開いてから、もう一度お試しください。</string>
+    <string name="study_anki_failed">AnkiDroid がカードを受け付けませんでした。AnkiDroid を開いてバックグラウンドで動かしたまま戻り、もう一度お試しください。</string>
     <string name="study_anki_send_all">すべて AnkiDroid に送る</string>
     <string name="study_anki_all_sent_before">すべての単語はすでに AnkiDroid に送られています。</string>
     <plurals name="study_repeat_count">
@@ -68,4 +68,12 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">%1$d 語を AnkiDroid に送りました。</item>
     </plurals>
+    <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
+    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、字幕で新しい単語に印を付けられるようになります。あとで設定 → 学習ツールで変更できます。</string>
+    <string name="study_known_words_offer_confirm">オンにする</string>
+    <string name="study_known_words_offer_dismiss">今はしない</string>
+    <string name="study_page_token_auto">自動</string>
+    <string name="study_page_token_on">オン</string>
+    <string name="study_page_token_off">オフ</string>
+    <string name="study_anki_open">AnkiDroid を開く</string>
 </resources>

@@ -109,6 +109,9 @@ class AiActionsTest {
         assertEquals("on", setting("blur_box", "true"))
         assertEquals("off", setting("send_to_ankidroid", "off"))
         assertTrue(AiAction.ChangeSetting(AiSetting.PAGE_TOKEN_CAPTIONS, "on").alwaysAsks)
+        assertEquals("auto", setting("page_token_captions", "Automatic"))
+        assertEquals("on", setting("page_token_captions", "always"))
+        assertEquals("off", setting("page_token_captions", "false"))
         assertTrue(!AiAction.ChangeSetting(AiSetting.SKIP_SILENCE, "2x").alwaysAsks)
     }
 

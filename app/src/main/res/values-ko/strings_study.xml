@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">건너뛰기</string>
     <string name="study_known_words_title">아는 단어</string>
-    <string name="study_known_words_description">단어 카드에서 아는 단어를 표시하세요. 자막 패널에 각 동영상을 얼마나 아는지 표시됩니다.</string>
+    <string name="study_known_words_description">각 동영상에서 이미 아는 비율을 보여 주고 자막에서 새 단어를 표시할 수 있습니다. 단어 카드의 \"이 단어를 알아요\"는 이 기능이 꺼져 있어도 단어를 저장합니다.</string>
     <string name="study_mark_new_words_title">자막에서 새 단어 표시</string>
     <string name="study_mark_new_words_description">모르고 저장하지 않은 단어에 옅은 배경을 넣습니다.</string>
     <string name="study_known_words_clear">아는 단어 지우기</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">모든 언어에서 아는 단어로 표시한 단어가 모두 지워집니다. 저장한 단어는 남습니다.</string>
     <string name="study_known_words_clear_confirm">지우기</string>
     <string name="study_anki_title">AnkiDroid로 보내기</string>
-    <string name="study_anki_description">AnkiDroid가 설치되어 있으면 단어 카드와 연습 → 내보내기에 AnkiDroid로 보내기가 나타납니다. 카드는 DualSub Replay 덱에 들어갑니다.</string>
+    <string name="study_anki_description">AnkiDroid가 설치되어 있으면 단어 카드와 연습 → 내보내기에 AnkiDroid로 보내기를 표시합니다. 카드는 DualSub Replay 덱에 들어갑니다. AnkiDroid를 백그라운드에서 열어 두세요. 많은 휴대전화에서 AnkiDroid는 실행 중일 때만 카드를 받습니다.</string>
     <string name="study_blur_box_title">흐림 상자</string>
     <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
     <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>
-    <string name="study_page_token_description">YouTube가 빈 자막을 보내면, YouTube 페이지가 YouTube 웹 플레이어처럼 자체 출처 증명 토큰을 만들어 다시 요청합니다. 실험 기능입니다.</string>
+    <string name="study_page_token_description">자동은 YouTube가 빈 자막을 보낼 때만 토큰을 사용하고, 그 방법이 계속 통하는 동안 다음 동영상부터 토큰을 먼저 사용합니다. 켜기는 항상 토큰을 먼저 사용합니다. 끄기는 토큰을 만들지 않습니다.</string>
     <string name="study_comprehension_chip">아는 단어 %1$d%%</string>
     <string name="study_comprehension_title">이 동영상의 아는 단어</string>
     <string name="study_comprehension_known">이 동영상 단어의 %1$d%%를 알고 있습니다.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">AnkiDroid로 보냄</string>
     <string name="study_anki_not_installed">이 휴대전화에 AnkiDroid가 설치되어 있지 않습니다.</string>
     <string name="study_anki_permission_denied">AnkiDroid 권한이 허용되지 않아 카드가 추가되지 않았습니다.</string>
-    <string name="study_anki_failed">AnkiDroid가 카드를 받지 않았습니다. AnkiDroid를 한 번 열고 다시 시도하세요.</string>
+    <string name="study_anki_failed">AnkiDroid가 카드를 받지 않았습니다. AnkiDroid를 열어 백그라운드에서 실행해 둔 뒤 돌아와 다시 시도하세요.</string>
     <string name="study_anki_send_all">모두 AnkiDroid로 보내기</string>
     <string name="study_anki_all_sent_before">모든 단어를 이미 AnkiDroid로 보냈습니다.</string>
     <plurals name="study_repeat_count">
@@ -68,4 +68,12 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">단어 %1$d개를 AnkiDroid로 보냈습니다.</item>
     </plurals>
+    <string name="study_known_words_offer_title">아는 단어를 켤까요?</string>
+    <string name="study_known_words_offer_message">자막 패널에 각 동영상에서 이미 아는 비율이 표시되고, 자막에서 새 단어를 표시할 수 있습니다. 나중에 설정 → 학습 도구에서 바꿀 수 있습니다.</string>
+    <string name="study_known_words_offer_confirm">켜기</string>
+    <string name="study_known_words_offer_dismiss">나중에</string>
+    <string name="study_page_token_auto">자동</string>
+    <string name="study_page_token_on">켜기</string>
+    <string name="study_page_token_off">끄기</string>
+    <string name="study_anki_open">AnkiDroid 열기</string>
 </resources>

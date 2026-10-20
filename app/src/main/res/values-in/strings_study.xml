@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Lompat</string>
     <string name="study_known_words_title">Kata yang dikenal</string>
-    <string name="study_known_words_description">Tandai kata yang Anda kenal di kartu kata. Panel subtitle menunjukkan seberapa banyak isi setiap video yang sudah Anda kenal.</string>
+    <string name="study_known_words_description">Menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal dan bisa menandai kata baru di subtitle. \"Saya tahu kata ini\" di kartu kata tetap menyimpan katamu walau ini dimatikan.</string>
     <string name="study_mark_new_words_title">Tandai kata baru di subtitle</string>
     <string name="study_mark_new_words_description">Memberi latar terang pada kata yang belum dikenal dan belum disimpan.</string>
     <string name="study_known_words_clear">Hapus kata yang dikenal</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">Semua kata yang Anda tandai sebagai dikenal, di semua bahasa, akan dilupakan. Kata yang disimpan tetap ada.</string>
     <string name="study_known_words_clear_confirm">Hapus</string>
     <string name="study_anki_title">Kirim ke AnkiDroid</string>
-    <string name="study_anki_description">Menampilkan Kirim ke AnkiDroid di kartu kata dan di Latihan → Ekspor saat AnkiDroid terpasang. Kartu masuk ke dek DualSub Replay.</string>
+    <string name="study_anki_description">Menampilkan Kirim ke AnkiDroid di kartu kata dan di Latihan → Ekspor jika AnkiDroid terpasang. Kartu masuk ke dek DualSub Replay. Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>
-    <string name="study_page_token_description">Saat YouTube mengirim subtitle kosong, halaman YouTube membuat token bukti asal sendiri, seperti pemutar web YouTube, lalu meminta lagi. Eksperimental.</string>
+    <string name="study_page_token_description">Otomatis memakai token hanya saat YouTube mengirim subtitle kosong, lalu memakainya lebih dulu di video berikutnya selama cara itu masih berhasil. Nyala selalu memakai token lebih dulu. Mati tidak pernah membuat token.</string>
     <string name="study_comprehension_chip">Dikenal %1$d%%</string>
     <string name="study_comprehension_title">Kata yang dikenal di video ini</string>
     <string name="study_comprehension_known">Anda mengenal %1$d%% kata di video ini.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">Terkirim ke AnkiDroid</string>
     <string name="study_anki_not_installed">AnkiDroid tidak terpasang di ponsel ini.</string>
     <string name="study_anki_permission_denied">Izin AnkiDroid tidak diberikan, jadi tidak ada kartu yang ditambahkan.</string>
-    <string name="study_anki_failed">AnkiDroid tidak menerima kartu. Buka AnkiDroid sekali, lalu coba lagi.</string>
+    <string name="study_anki_failed">AnkiDroid tidak menerima kartu. Buka AnkiDroid, biarkan berjalan di latar belakang, lalu kembali dan coba lagi.</string>
     <string name="study_anki_send_all">Kirim semua ke AnkiDroid</string>
     <string name="study_anki_all_sent_before">Semua kata sudah dikirim ke AnkiDroid.</string>
     <plurals name="study_repeat_count">
@@ -68,4 +68,12 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">%1$d kata dikirim ke AnkiDroid.</item>
     </plurals>
+    <string name="study_known_words_offer_title">Nyalakan Kata yang dikenal?</string>
+    <string name="study_known_words_offer_message">Panel subtitle lalu menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal, dan kata baru bisa ditandai di subtitle. Kamu bisa mengubahnya nanti di Setelan → Alat belajar.</string>
+    <string name="study_known_words_offer_confirm">Nyalakan</string>
+    <string name="study_known_words_offer_dismiss">Nanti saja</string>
+    <string name="study_page_token_auto">Otomatis</string>
+    <string name="study_page_token_on">Nyala</string>
+    <string name="study_page_token_off">Mati</string>
+    <string name="study_anki_open">Buka AnkiDroid</string>
 </resources>

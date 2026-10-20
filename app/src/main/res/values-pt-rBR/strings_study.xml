@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Pular</string>
     <string name="study_known_words_title">Palavras conhecidas</string>
-    <string name="study_known_words_description">Marque no cartão da palavra as palavras que você conhece. O painel de legendas mostra quanto de cada vídeo você já conhece.</string>
+    <string name="study_known_words_description">Mostra quanto de cada vídeo você já conhece e pode marcar palavras novas nas legendas. \"Conheço esta palavra\" no cartão da palavra guarda suas palavras mesmo com isto desligado.</string>
     <string name="study_mark_new_words_title">Marcar palavras novas nas legendas</string>
     <string name="study_mark_new_words_description">Dá um fundo claro às palavras que você não conhece nem salvou.</string>
     <string name="study_known_words_clear">Limpar palavras conhecidas</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">Todas as palavras que você marcou como conhecidas, em todos os idiomas, são esquecidas. As palavras salvas ficam.</string>
     <string name="study_known_words_clear_confirm">Limpar</string>
     <string name="study_anki_title">Enviar para o AnkiDroid</string>
-    <string name="study_anki_description">Mostra Enviar para o AnkiDroid no cartão da palavra e em Praticar → Exportar quando o AnkiDroid está instalado. Os cartões vão para um baralho DualSub Replay.</string>
+    <string name="study_anki_description">Mostra Enviar ao AnkiDroid no cartão da palavra e em Prática → Exportar quando o AnkiDroid está instalado. Os cartões vão para um baralho DualSub Replay. Mantenha o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
     <string name="study_blur_box_title">Caixa desfocada</string>
     <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
     <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>
-    <string name="study_page_token_description">Quando o YouTube envia legendas vazias, a página do YouTube cria seu próprio token de prova de origem, como o player web do YouTube faz, e pede de novo. Experimental.</string>
+    <string name="study_page_token_description">Automático usa um token só quando o YouTube envia legendas vazias e depois o usa primeiro nos próximos vídeos enquanto continuar funcionando. Ligado sempre usa um token primeiro. Desligado nunca cria um.</string>
     <string name="study_comprehension_chip">Conhecidas %1$d%%</string>
     <string name="study_comprehension_title">Palavras conhecidas neste vídeo</string>
     <string name="study_comprehension_known">Você conhece %1$d%% das palavras deste vídeo.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">Enviado para o AnkiDroid</string>
     <string name="study_anki_not_installed">O AnkiDroid não está instalado neste celular.</string>
     <string name="study_anki_permission_denied">A permissão do AnkiDroid não foi dada, então nenhum cartão foi adicionado.</string>
-    <string name="study_anki_failed">O AnkiDroid não aceitou o cartão. Abra o AnkiDroid uma vez e tente de novo.</string>
+    <string name="study_anki_failed">O AnkiDroid não aceitou o cartão. Abra o AnkiDroid, deixe-o em segundo plano, volte e tente de novo.</string>
     <string name="study_anki_send_all">Enviar tudo para o AnkiDroid</string>
     <string name="study_anki_all_sent_before">Todas as palavras já foram enviadas para o AnkiDroid.</string>
     <plurals name="study_repeat_count">
@@ -78,4 +78,12 @@
         <item quantity="many">%1$d palavras enviadas para o AnkiDroid.</item>
         <item quantity="other">%1$d palavras enviadas para o AnkiDroid.</item>
     </plurals>
+    <string name="study_known_words_offer_title">Ligar Palavras conhecidas?</string>
+    <string name="study_known_words_offer_message">O painel de legendas passa a mostrar quanto de cada vídeo você já conhece, e palavras novas podem ser marcadas nas legendas. Você pode mudar isso depois em Configurações → Ferramentas de estudo.</string>
+    <string name="study_known_words_offer_confirm">Ligar</string>
+    <string name="study_known_words_offer_dismiss">Agora não</string>
+    <string name="study_page_token_auto">Automático</string>
+    <string name="study_page_token_on">Ligado</string>
+    <string name="study_page_token_off">Desligado</string>
+    <string name="study_anki_open">Abrir o AnkiDroid</string>
 </resources>

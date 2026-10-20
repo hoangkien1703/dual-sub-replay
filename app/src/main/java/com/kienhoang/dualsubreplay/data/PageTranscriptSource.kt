@@ -33,7 +33,46 @@ internal data class PageCaptionTarget(
     val panelOnly: Boolean = false,
     /** Settings → Study tools: the page may mint its own proof-of-origin token for the track's address. */
     val pageToken: Boolean = false,
+    /** The page asks with its token first and without it only if that fails (On, or Automatic once a token was needed). */
+    val tokenFirst: Boolean = false,
 )
+
+/**
+ * Settings → Study tools → Load captions with a page token (beta). [AUTO] asks with a token only
+ * when the plain request comes back empty and, once a token worked, asks with it first on later
+ * videos until a plain request works again; [ON] always asks with it first, as Migaku does.
+ */
+enum class PageTokenMode(
+    val storageValue: String,
+) {
+    AUTO("auto"),
+    ON("on"),
+    OFF("off"),
+}
+
+/** The stored mode; the beta's first switch kept a Boolean, where on meant [PageTokenMode.ON]. */
+internal fun storedPageTokenMode(value: Any?): PageTokenMode =
+    when (value) {
+        true -> PageTokenMode.ON
+        is String -> PageTokenMode.entries.firstOrNull { it.storageValue == value } ?: PageTokenMode.AUTO
+        else -> PageTokenMode.AUTO
+    }
+
+/**
+ * Whether Automatic should ask with the token first from now on, after a document came [via] the
+ * plain address (`address`) or the token (`token`); null when nothing changes.
+ */
+internal fun learnedTokenFirst(
+    mode: PageTokenMode,
+    remembered: Boolean,
+    via: String?,
+): Boolean? =
+    when {
+        mode != PageTokenMode.AUTO -> null
+        via == "token" && !remembered -> true
+        via == "address" && remembered -> false
+        else -> null
+    }
 
 /** What the page's transcript script reported on one poll. */
 internal sealed interface PageTranscriptReply {
@@ -55,6 +94,8 @@ internal sealed interface PageTranscriptReply {
         val languageCode: String? = null,
         val generated: Boolean? = null,
         val panel: Boolean = false,
+        /** How the page got it: `address`, `token`, `player` (the player's own download) or `panel`. */
+        val via: String? = null,
     ) : PageTranscriptReply
 }
 
@@ -143,8 +184,14 @@ class PageTranscriptSource(
 
     private val late = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
-    /** Settings → Study tools → Load captions with a page token (beta); targets made from now on carry it. */
-    @Volatile var pageTokenEnabled: Boolean = false
+    /** Settings → Study tools → Load captions with a page token (beta); targets made from now on follow it. */
+    @Volatile var pageTokenMode: PageTokenMode = PageTokenMode.AUTO
+
+    /** Automatic's memory that YouTube wanted a token: later videos then ask with it first. */
+    @Volatile var tokenRemembered: Boolean = false
+
+    /** Told when Automatic learns that a token is needed (true) or no longer needed (false), to keep it. */
+    @Volatile var onTokenLearned: ((Boolean) -> Unit)? = null
 
     /** Video ids whose full transcript the page got after the provider stopped waiting. */
     val lateTranscripts: SharedFlow<String> = late.asSharedFlow()
@@ -250,6 +297,8 @@ class PageTranscriptSource(
         }
         val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
         request.languages = availableLanguages(tracks)
+        val mode = pageTokenMode
+        val pageToken = mode != PageTokenMode.OFF && baseUrl.isNotEmpty()
         request.target =
             PageCaptionTarget(
                 request.videoId,
@@ -257,7 +306,8 @@ class PageTranscriptSource(
                 isGeneratedTrack(track),
                 baseUrl,
                 request.attempt,
-                pageToken = pageTokenEnabled && baseUrl.isNotEmpty(),
+                pageToken = pageToken,
+                tokenFirst = pageToken && (mode == PageTokenMode.ON || tokenRemembered),
             )
     }
 
@@ -275,6 +325,10 @@ class PageTranscriptSource(
             }
             is PageTranscriptReply.Done -> {
                 if (reply.text.length > MAX_PAGE_TRANSCRIPT_LENGTH) return
+                learnedTokenFirst(pageTokenMode, tokenRemembered, reply.via)?.let { needed ->
+                    tokenRemembered = needed
+                    onTokenLearned?.invoke(needed)
+                }
                 // The page may have found the same language as another kind (auto-generated or not).
                 val track =
                     target.copy(

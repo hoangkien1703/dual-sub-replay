@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">跳过</string>
     <string name="study_known_words_title">已认识的词</string>
-    <string name="study_known_words_description">在单词卡上标记你认识的词。字幕面板会显示你对每个视频已经认识多少。</string>
+    <string name="study_known_words_description">显示每个视频中你已认识的比例，并可在字幕中标出新词。即使关闭此项，词卡上的“我认识这个词”也会记下你的词。</string>
     <string name="study_mark_new_words_title">在字幕中标记新词</string>
     <string name="study_mark_new_words_description">给既不认识也没保存的词加上浅色背景。</string>
     <string name="study_known_words_clear">清除已认识的词</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">所有语言中标记为认识的词都会被忘记。已保存的词会保留。</string>
     <string name="study_known_words_clear_confirm">清除</string>
     <string name="study_anki_title">发送到 AnkiDroid</string>
-    <string name="study_anki_description">安装了 AnkiDroid 时，在单词卡和“练习 → 导出”中显示“发送到 AnkiDroid”。卡片会放入 DualSub Replay 牌组。</string>
+    <string name="study_anki_description">安装 AnkiDroid 后，在词卡和练习 → 导出中显示“发送到 AnkiDroid”。卡片会放入 DualSub Replay 牌组。请让 AnkiDroid 在后台保持打开：在很多手机上，它只在运行时接受卡片。</string>
     <string name="study_blur_box_title">模糊框</string>
     <string name="study_blur_box_description">在视频上放一个模糊框，遮住画面里自带的字幕。拖动可移动，拖动角可调整大小。</string>
     <string name="study_page_token_title">用页面令牌加载字幕（测试版）</string>
-    <string name="study_page_token_description">YouTube 返回空字幕时，YouTube 页面会像 YouTube 网页播放器一样生成自己的来源证明令牌并再次请求。实验功能。</string>
+    <string name="study_page_token_description">自动：只在 YouTube 返回空字幕时使用令牌，只要仍然有效，之后的视频会先用令牌。开启：总是先用令牌。关闭：从不生成令牌。</string>
     <string name="study_comprehension_chip">已认识 %1$d%%</string>
     <string name="study_comprehension_title">这个视频中已认识的词</string>
     <string name="study_comprehension_known">你认识这个视频中 %1$d%% 的词。</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">已发送到 AnkiDroid</string>
     <string name="study_anki_not_installed">这部手机没有安装 AnkiDroid。</string>
     <string name="study_anki_permission_denied">没有授予 AnkiDroid 权限，所以没有添加卡片。</string>
-    <string name="study_anki_failed">AnkiDroid 没有接受这张卡片。请先打开一次 AnkiDroid 再试。</string>
+    <string name="study_anki_failed">AnkiDroid 没有接受这张卡片。请打开 AnkiDroid 并让它在后台运行，然后回来再试。</string>
     <string name="study_anki_send_all">全部发送到 AnkiDroid</string>
     <string name="study_anki_all_sent_before">所有词都已经发送到 AnkiDroid。</string>
     <plurals name="study_repeat_count">
@@ -68,4 +68,12 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">已将 %1$d 个词发送到 AnkiDroid。</item>
     </plurals>
+    <string name="study_known_words_offer_title">要开启已认识的词吗？</string>
+    <string name="study_known_words_offer_message">开启后，字幕面板会显示每个视频中你已认识的比例，并可在字幕中标出新词。之后可在设置 → 学习工具中更改。</string>
+    <string name="study_known_words_offer_confirm">开启</string>
+    <string name="study_known_words_offer_dismiss">暂不</string>
+    <string name="study_page_token_auto">自动</string>
+    <string name="study_page_token_on">开启</string>
+    <string name="study_page_token_off">关闭</string>
+    <string name="study_anki_open">打开 AnkiDroid</string>
 </resources>

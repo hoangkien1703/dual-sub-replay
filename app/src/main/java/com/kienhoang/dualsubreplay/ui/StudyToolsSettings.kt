@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
+import com.kienhoang.dualsubreplay.data.PageTokenMode
 import kotlinx.coroutines.launch
 
 /** More settings → Study tools: play modes, skip silence, known words, AnkiDroid, blur box and page tokens. */
@@ -84,13 +86,14 @@ internal fun StudyToolsSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(BLUR_BOX_PREFERENCE, it).apply() },
         testTag = "blur_box_switch",
     )
-    SettingsSwitchRow(
-        title = stringResource(R.string.study_page_token_title),
-        description = stringResource(R.string.study_page_token_description),
-        checked = settings.pageTokenCaptions,
-        onCheckedChange = { preferences.edit().putBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, it).apply() },
-        testTag = "page_token_switch",
-    )
+    PageTokenSettings(settings.pageTokenCaptions) { mode ->
+        // A new choice starts over: Automatic learns again whether YouTube wants a token.
+        preferences
+            .edit()
+            .putString(PAGE_TOKEN_CAPTIONS_PREFERENCE, mode.storageValue)
+            .remove(PAGE_TOKEN_NEEDED_PREFERENCE)
+            .apply()
+    }
 }
 
 @Composable
@@ -166,6 +169,40 @@ private fun SkipSilenceSettings(
         }
     }
 }
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PageTokenSettings(
+    mode: PageTokenMode,
+    onChange: (PageTokenMode) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Text(stringResource(R.string.study_page_token_title))
+        Text(
+            stringResource(R.string.study_page_token_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PageTokenMode.entries.forEach { option ->
+                FilterChip(
+                    selected = mode == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(pageTokenModeLabel(option))) },
+                    modifier = Modifier.testTag("page_token_${option.storageValue}"),
+                )
+            }
+        }
+    }
+}
+
+@StringRes
+internal fun pageTokenModeLabel(mode: PageTokenMode): Int =
+    when (mode) {
+        PageTokenMode.AUTO -> R.string.study_page_token_auto
+        PageTokenMode.ON -> R.string.study_page_token_on
+        PageTokenMode.OFF -> R.string.study_page_token_off
+    }
 
 /** How many words are marked as known, with Clear known words behind a confirmation. */
 @Composable

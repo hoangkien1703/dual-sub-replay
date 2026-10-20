@@ -1,8 +1,11 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class StudyPlaybackTest {
@@ -109,7 +112,7 @@ class StudyPlaybackTest {
 
     @Test
     fun newWordLinesPausesOnlyOnLinesWithOneNewWord() {
-        val settings = StudySettings(playMode = StudyPlayMode.NEW_WORD_LINES)
+        val settings = StudySettings(playMode = StudyPlayMode.NEW_WORD_LINES, knownWords = true)
         val asked = play(StudyPlaybackDriver(), settings, 900, 11_000, newWordLines = setOf(1))
         assertEquals(listOf(StudyAction.Pause), asked.map { it.second })
         assertEquals(5_000 - STUDY_PAUSE_LEAD_MS, asked.single().first, 33.0)
@@ -179,9 +182,12 @@ class StudyPlaybackTest {
         assertEquals(5, storedStudyRepeatCount(5))
         assertEquals(DEFAULT_STUDY_REPEAT_COUNT, storedStudyRepeatCount(4))
         val defaults = StudySettings()
-        assertEquals(false, defaults.pageTokenCaptions)
+        assertEquals(PageTokenMode.AUTO, defaults.pageTokenCaptions)
         assertEquals(false, defaults.blurBox)
-        assertEquals(true, defaults.knownWords)
+        assertEquals("Off until the user turns it on", false, defaults.knownWords)
+        assertTrue(shouldOfferKnownWords(defaults, offeredBefore = false))
+        assertFalse("Offered once", shouldOfferKnownWords(defaults, offeredBefore = true))
+        assertFalse(shouldOfferKnownWords(defaults.copy(knownWords = true), offeredBefore = false))
     }
 
     private fun assertEquals(

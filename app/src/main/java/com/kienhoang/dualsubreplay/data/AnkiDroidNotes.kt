@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.data
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import kotlinx.coroutines.CancellationException
@@ -12,6 +13,7 @@ import java.util.Locale
 /** AnkiDroid's public content provider and the permission it asks for (no AnkiDroid library). */
 internal const val ANKIDROID_AUTHORITY = "com.ichi2.anki.flashcards"
 internal const val ANKIDROID_PERMISSION = "com.ichi2.anki.permission.READ_WRITE_DATABASE"
+internal const val ANKIDROID_PACKAGE = "com.ichi2.anki"
 
 internal const val ANKI_DECK_NAME = "DualSub Replay"
 internal const val ANKI_NOTE_TYPE_NAME = "DualSub Replay"
@@ -110,6 +112,15 @@ internal class AnkiDroidNotes(
     fun permitted(): Boolean = context.checkSelfPermission(ANKIDROID_PERMISSION) == PackageManager.PERMISSION_GRANTED
 
     fun wasSent(id: String): Boolean = sentIds.getBoolean(id, false)
+
+    /**
+     * Opens AnkiDroid. On many phones its provider answers only while AnkiDroid runs, so a card it
+     * refused goes in once AnkiDroid was opened and left in the background.
+     */
+    fun open() {
+        val launch = context.packageManager.getLaunchIntentForPackage(ANKIDROID_PACKAGE) ?: return
+        runCatching { context.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+    }
 
     suspend fun send(words: List<SavedWord>): AnkiSendResult =
         withContext(Dispatchers.IO) {

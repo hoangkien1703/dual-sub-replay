@@ -904,7 +904,7 @@ internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
     val targetLiteral =
         "{\"videoId\":${JSONObject.quote(target.videoId)},\"languageCode\":${JSONObject.quote(target.languageCode)}," +
             "\"generated\":${target.generated},\"baseUrl\":${JSONObject.quote(target.baseUrl)},\"attempt\":\"${target.attempt}\"," +
-            "\"panelOnly\":${target.panelOnly},\"pageToken\":${target.pageToken}}"
+            "\"panelOnly\":${target.panelOnly},\"pageToken\":${target.pageToken},\"tokenFirst\":${target.tokenFirst}}"
     return """
         (function() {
           const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
@@ -936,7 +936,8 @@ internal fun webPageTranscriptScript(target: PageCaptionTarget): String {
             languageCode: job.languageCode || null,
             generated: !!job.generated,
             panel: !!job.panel,
-            token: job.token || null
+            token: job.token || null,
+            via: job.via || null
           });
         })();
         """.trimIndent()
@@ -999,6 +1000,7 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       job.languageCode = track.languageCode;
       job.generated = track.generated;
       job.panel = !!track.panel;
+      if (!job.via) job.via = track.panel ? 'panel' : 'player';
     };
     state.showTrack = function(job, target) {
       const player = state.player();
@@ -1036,24 +1038,39 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       try { player.setOption('captions', 'track', job.previous || {}); } catch (_) {}
     };
     state.start = function(job, target) {
+      // On, or Automatic once a token was needed: the token first, then the plain address.
+      if (target.tokenFirst) {
+        state.withToken(job, target, function() { state.plain(job, target, null); });
+      } else {
+        state.plain(job, target, function() { state.withToken(job, target, null); });
+      }
+    };
+    state.plain = function(job, target, otherwise) {
       state.download(target.baseUrl, target, false).then(function(text) {
         // json3 first, for its word timings; then the address as YouTube gave it.
         return state.cues(text) ? text : state.download(target.baseUrl, target, true);
       }).then(function(text) {
         job.addressTried = true;
         if (job.status === 'working' && state.cues(text)) {
+          job.via = 'address';
           state.finish(job, { text: text, languageCode: target.languageCode, generated: target.generated });
-        } else {
-          state.withToken(job, target);
+        } else if (otherwise) {
+          otherwise();
         }
       });
     };
-    state.withToken = function(job, target) {
-      if (!target.pageToken || job.status !== 'working') return;
+    state.withToken = function(job, target, otherwise) {
+      let gaveUp = false;
+      const giveUp = function() {
+        if (gaveUp || job.status !== 'working') return;
+        gaveUp = true;
+        if (otherwise) otherwise();
+      };
+      if (!target.pageToken || job.status !== 'working') return giveUp();
       const tokens = window['$PAGE_TOKEN_STATE_KEY'];
       if (!tokens || typeof tokens.mint !== 'function') {
         job.token = 'not-ready';
-        return;
+        return giveUp();
       }
       job.token = 'minting';
       let tries = 0;
@@ -1069,14 +1086,17 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
           if (job.status !== 'working') return;
           if (state.cues(text)) {
             job.token = 'worked';
+            job.via = 'token';
             state.finish(job, { text: text, languageCode: target.languageCode, generated: target.generated });
           } else if (last) {
             job.token = 'empty';
+            giveUp();
           }
         }, function() {
           // No token could be made: the next tries would only ask BotGuard again.
           job.token = tokens.problem || 'mint-failed';
           tries = $PAGE_TOKEN_TRIES;
+          giveUp();
         });
         // Like the web player, a slow answer does not hold up the next request.
         setTimeout(attempt, $PAGE_TOKEN_RETRY_MS);
@@ -1356,8 +1376,12 @@ internal fun parsePageTranscriptReply(rawValue: String?): PageTranscriptReply {
         json.optString("languageCode").takeIf { it.matches(Regex("[a-zA-Z]{2,3}(-[a-zA-Z0-9]+)*")) },
         json.optBoolean("generated"),
         panel = json.optBoolean("panel"),
+        via = (json.opt("via") as? String)?.takeIf { it in PAGE_TRANSCRIPT_VIAS },
     )
 }
+
+/** How [webPageTranscriptScript] may say it got the document. */
+private val PAGE_TRANSCRIPT_VIAS = setOf("address", "token", "player", "panel")
 
 /** The string a page script returned through `evaluateJavascript` (which JSON-quotes it), or null. */
 internal fun decodeScriptString(rawValue: String?): String? {

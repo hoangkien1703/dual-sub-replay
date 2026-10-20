@@ -23,6 +23,7 @@ import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
+import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.validClipRange
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -201,7 +202,7 @@ private fun aiStudySettingValue(
         AiSetting.MARK_NEW_WORDS -> onOff(study.markNewWords)
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
-        AiSetting.PAGE_TOKEN_CAPTIONS -> onOff(study.pageTokenCaptions)
+        AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
         else -> null
     }
 
@@ -634,7 +635,12 @@ internal class AppAiActions(
             AiSetting.MARK_NEW_WORDS -> editor.putBoolean(MARK_NEW_WORDS_PREFERENCE, on)
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
-            AiSetting.PAGE_TOKEN_CAPTIONS -> editor.putBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, on)
+            AiSetting.PAGE_TOKEN_CAPTIONS ->
+                editor
+                    .putString(
+                        PAGE_TOKEN_CAPTIONS_PREFERENCE,
+                        storedPageTokenMode(value).storageValue,
+                    ).remove(PAGE_TOKEN_NEEDED_PREFERENCE)
             else -> return false
         }
         return true
@@ -778,7 +784,7 @@ internal class AppAiActions(
             AiSetting.MARK_NEW_WORDS -> switch(R.string.study_mark_new_words_title, value)
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
-            AiSetting.PAGE_TOKEN_CAPTIONS -> switch(R.string.study_page_token_title, value)
+            AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

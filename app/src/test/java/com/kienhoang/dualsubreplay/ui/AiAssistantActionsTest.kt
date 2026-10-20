@@ -5,6 +5,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_APP_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_LANGUAGES
 import com.kienhoang.dualsubreplay.assistant.AI_DAILY_GOALS
 import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
+import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_PLAY_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_REPEAT_COUNTS
@@ -15,6 +16,7 @@ import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiSettingValue
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.DAILY_GOAL_CHOICES
+import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.GoogleWait
 import org.junit.Assert.assertEquals
@@ -52,6 +54,7 @@ class AiAssistantActionsTest {
         assertEquals(StudyPlayMode.entries.map { it.storageValue }, AI_STUDY_PLAY_MODES)
         assertEquals(SkipSilence.entries.map { it.storageValue }, AI_SKIP_SILENCE)
         assertEquals(STUDY_REPEAT_COUNTS.map { it.toString() }, AI_STUDY_REPEAT_COUNTS)
+        assertEquals(PageTokenMode.entries.map { it.storageValue }, AI_PAGE_TOKEN_MODES)
     }
 
     @Test
@@ -69,8 +72,9 @@ class AiAssistantActionsTest {
                         playMode = StudyPlayMode.REPEAT_LINE,
                         repeatCount = 5,
                         skipSilence = SkipSilence.JUMP,
-                        knownWords = false,
+                        knownWords = true,
                         blurBox = true,
+                        pageTokenCaptions = PageTokenMode.ON,
                     ),
             )
         for (current in listOf(

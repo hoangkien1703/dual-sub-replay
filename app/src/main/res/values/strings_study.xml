@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Jump</string>
     <string name="study_known_words_title">Known words</string>
-    <string name="study_known_words_description">Mark words you know on the word card. The subtitle panel shows how much of each video you already know.</string>
+    <string name="study_known_words_description">Shows how much of each video you already know and can mark new words in subtitles. \"I know this word\" on the word card keeps your words even while this is off.</string>
     <string name="study_mark_new_words_title">Mark new words in subtitles</string>
     <string name="study_mark_new_words_description">Gives words that are neither known nor saved a light background.</string>
     <string name="study_known_words_clear">Clear known words</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">Every word you marked as known, in every language, is forgotten. Saved words stay.</string>
     <string name="study_known_words_clear_confirm">Clear</string>
     <string name="study_anki_title">Send to AnkiDroid</string>
-    <string name="study_anki_description">Shows Send to AnkiDroid on the word card and in Practice → Export when AnkiDroid is installed. Cards go to a DualSub Replay deck.</string>
+    <string name="study_anki_description">Shows Send to AnkiDroid on the word card and in Practice → Export when AnkiDroid is installed. Cards go to a DualSub Replay deck. Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
     <string name="study_blur_box_title">Blur box</string>
     <string name="study_blur_box_description">Puts a blurred box on the video to hide subtitles burned into the picture. Drag it to move it, and drag its corner to resize it.</string>
     <string name="study_page_token_title">Load captions with a page token (beta)</string>
-    <string name="study_page_token_description">When YouTube sends empty captions, the YouTube page makes its own proof-of-origin token, as YouTube\'s web player does, and asks again. Experimental.</string>
+    <string name="study_page_token_description">Automatic asks with a token only when YouTube sends empty captions, then asks with one first on the next videos while that keeps working. On always asks with a token first. Off never makes one.</string>
     <string name="study_comprehension_chip">Known %1$d%%</string>
     <string name="study_comprehension_title">Known words in this video</string>
     <string name="study_comprehension_known">You know %1$d%% of the words in this video.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">Sent to AnkiDroid</string>
     <string name="study_anki_not_installed">AnkiDroid is not installed on this phone.</string>
     <string name="study_anki_permission_denied">AnkiDroid\'s permission was not given, so no card was added.</string>
-    <string name="study_anki_failed">AnkiDroid did not accept the card. Open AnkiDroid once and try again.</string>
+    <string name="study_anki_failed">AnkiDroid did not accept the card. Open AnkiDroid, leave it running in the background, then come back and try again.</string>
     <string name="study_anki_send_all">Send all to AnkiDroid</string>
     <string name="study_anki_all_sent_before">Every word was already sent to AnkiDroid.</string>
     <plurals name="study_repeat_count">
@@ -73,4 +73,12 @@
         <item quantity="one">%1$d word sent to AnkiDroid.</item>
         <item quantity="other">%1$d words sent to AnkiDroid.</item>
     </plurals>
+    <string name="study_known_words_offer_title">Turn on Known words?</string>
+    <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and new words can be marked in subtitles. You can change this later in Settings → Study tools.</string>
+    <string name="study_known_words_offer_confirm">Turn on</string>
+    <string name="study_known_words_offer_dismiss">Not now</string>
+    <string name="study_page_token_auto">Automatic</string>
+    <string name="study_page_token_on">On</string>
+    <string name="study_page_token_off">Off</string>
+    <string name="study_anki_open">Open AnkiDroid</string>
 </resources>

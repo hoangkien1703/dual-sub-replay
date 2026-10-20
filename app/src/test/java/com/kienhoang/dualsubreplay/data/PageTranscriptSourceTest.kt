@@ -200,22 +200,63 @@ class PageTranscriptSourceTest {
             assertNull("The kept transcript is used once", source.transcript(VIDEO, choice, timeoutMs = 50))
         }
 
-    @Test fun aPageTokenIsAskedForOnlyWhenTurnedOnAndItsStateIsInTheDetail() =
+    @Test fun aPageTokenIsAskedForUnlessOffAndItsStateIsInTheDetail() =
         runBlocking {
             val source = PageTranscriptSource()
             val choice = CaptionLanguageChoice(emptyList(), null)
+            source.pageTokenMode = PageTokenMode.OFF
             val off = async { source.transcript(VIDEO, choice, timeoutMs = 50) }
             val plain = awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) }
-            assertFalse("Off by default", plain.target!!.pageToken)
+            assertFalse(plain.target!!.pageToken)
             assertNull(off.await())
-            source.pageTokenEnabled = true
-            val on = async { source.transcript("bbbbbbbbbbb", choice, timeoutMs = 300) }
+            source.pageTokenMode = PageTokenMode.AUTO
+            val auto = async { source.transcript("bbbbbbbbbbb", choice, timeoutMs = 300) }
             val request = awaitRequest(source, "bbbbbbbbbbb").also { source.offerTracks(it, PAGE_TRACKS.replace(VIDEO, "bbbbbbbbbbb")) }
-            assertTrue(request.target!!.pageToken)
+            assertTrue("Automatic by default", request.target!!.pageToken)
+            assertFalse("Automatic asks plainly first", request.target!!.tokenFirst)
             source.offerReply(request, PageTranscriptReply.Working("waiting-for-captions", "refused-403"))
-            assertNull(on.await())
+            assertNull(auto.await())
             assertEquals("step waiting-for-captions, page token refused-403", source.problemDetail("bbbbbbbbbbb"))
+            source.pageTokenMode = PageTokenMode.ON
+            val on = async { source.transcript("ccccccccccc", choice, timeoutMs = 50) }
+            val always = awaitRequest(source, "ccccccccccc").also { source.offerTracks(it, PAGE_TRACKS.replace(VIDEO, "ccccccccccc")) }
+            assertTrue(always.target!!.tokenFirst)
+            assertNull(on.await())
         }
+
+    @Test fun automaticRemembersThatYouTubeWantedAToken() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val learned = mutableListOf<Boolean>()
+            source.onTokenLearned = { learned += it }
+            val choice = CaptionLanguageChoice(emptyList(), null)
+            val first = async { source.transcript(VIDEO, choice) }
+            val request = awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) }
+            source.offerReply(request, PageTranscriptReply.Done(JSON3, "zh-Hans", true, via = "token"))
+            first.await()
+            assertEquals(listOf(true), learned)
+            // The next video asks with the token first.
+            val second = async { source.transcript("bbbbbbbbbbb", choice) }
+            val next = awaitRequest(source, "bbbbbbbbbbb").also { source.offerTracks(it, PAGE_TRACKS.replace(VIDEO, "bbbbbbbbbbb")) }
+            assertTrue(next.target!!.tokenFirst)
+            // The token failed there but the plain address worked: plain first again.
+            source.offerReply(next, PageTranscriptReply.Done(JSON3, "zh-Hans", true, via = "address"))
+            second.await()
+            assertEquals(listOf(true, false), learned)
+            assertFalse(source.tokenRemembered)
+        }
+
+    @Test fun onlyAutomaticLearnsFromHowTheLinesCame() {
+        assertEquals(true, learnedTokenFirst(PageTokenMode.AUTO, remembered = false, via = "token"))
+        assertEquals(false, learnedTokenFirst(PageTokenMode.AUTO, remembered = true, via = "address"))
+        assertNull(learnedTokenFirst(PageTokenMode.AUTO, remembered = true, via = "token"))
+        assertNull(learnedTokenFirst(PageTokenMode.AUTO, remembered = true, via = "player"))
+        assertNull(learnedTokenFirst(PageTokenMode.ON, remembered = false, via = "token"))
+        assertEquals(PageTokenMode.ON, storedPageTokenMode(true))
+        assertEquals(PageTokenMode.AUTO, storedPageTokenMode(false))
+        assertEquals(PageTokenMode.OFF, storedPageTokenMode("off"))
+        assertEquals(PageTokenMode.AUTO, storedPageTokenMode(null))
+    }
 
     @Test fun aRetryIsANewAttemptOnThePage() =
         runBlocking {

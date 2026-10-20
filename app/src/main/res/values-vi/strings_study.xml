@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Nhảy qua</string>
     <string name="study_known_words_title">Từ đã biết</string>
-    <string name="study_known_words_description">Đánh dấu từ bạn đã biết trên thẻ từ. Bảng phụ đề cho biết bạn đã biết bao nhiêu phần của mỗi video.</string>
+    <string name="study_known_words_description">Cho biết bạn đã biết bao nhiêu phần của mỗi video và có thể đánh dấu từ mới trong phụ đề. Nút \"Tôi biết từ này\" trên thẻ từ vẫn lưu các từ của bạn kể cả khi tắt mục này.</string>
     <string name="study_mark_new_words_title">Đánh dấu từ mới trong phụ đề</string>
     <string name="study_mark_new_words_description">Tô nền nhạt cho những từ chưa biết và chưa lưu.</string>
     <string name="study_known_words_clear">Xóa từ đã biết</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">Mọi từ bạn đã đánh dấu là đã biết, ở mọi ngôn ngữ, sẽ bị quên. Từ đã lưu vẫn còn.</string>
     <string name="study_known_words_clear_confirm">Xóa</string>
     <string name="study_anki_title">Gửi sang AnkiDroid</string>
-    <string name="study_anki_description">Hiện nút Gửi sang AnkiDroid trên thẻ từ và trong Luyện tập → Xuất khi máy có cài AnkiDroid. Thẻ được thêm vào bộ thẻ DualSub Replay.</string>
+    <string name="study_anki_description">Hiện nút Gửi sang AnkiDroid trên thẻ từ và trong Luyện tập → Xuất khi đã cài AnkiDroid. Thẻ được đưa vào bộ thẻ DualSub Replay. Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
     <string name="study_blur_box_title">Ô làm mờ</string>
     <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
     <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>
-    <string name="study_page_token_description">Khi YouTube trả về phụ đề trống, trang YouTube tự tạo mã xác minh nguồn gốc giống trình phát web của YouTube rồi yêu cầu lại. Đang thử nghiệm.</string>
+    <string name="study_page_token_description">Tự động chỉ dùng mã khi YouTube trả về phụ đề trống, rồi dùng mã ngay từ đầu cho các video sau khi cách đó vẫn hiệu quả. Bật luôn dùng mã trước. Tắt không bao giờ tạo mã.</string>
     <string name="study_comprehension_chip">Đã biết %1$d%%</string>
     <string name="study_comprehension_title">Từ đã biết trong video này</string>
     <string name="study_comprehension_known">Bạn biết %1$d%% số từ trong video này.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">Đã gửi sang AnkiDroid</string>
     <string name="study_anki_not_installed">Điện thoại này chưa cài AnkiDroid.</string>
     <string name="study_anki_permission_denied">Chưa cấp quyền cho AnkiDroid nên không thẻ nào được thêm.</string>
-    <string name="study_anki_failed">AnkiDroid không nhận thẻ. Hãy mở AnkiDroid một lần rồi thử lại.</string>
+    <string name="study_anki_failed">AnkiDroid không nhận thẻ. Hãy mở AnkiDroid, để nó chạy trong nền, rồi quay lại và thử lại.</string>
     <string name="study_anki_send_all">Gửi tất cả sang AnkiDroid</string>
     <string name="study_anki_all_sent_before">Mọi từ đều đã được gửi sang AnkiDroid.</string>
     <plurals name="study_repeat_count">
@@ -68,4 +68,12 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">Đã gửi %1$d từ sang AnkiDroid.</item>
     </plurals>
+    <string name="study_known_words_offer_title">Bật Từ đã biết?</string>
+    <string name="study_known_words_offer_message">Khi đó bảng phụ đề sẽ cho biết bạn đã biết bao nhiêu phần của mỗi video, và có thể đánh dấu từ mới trong phụ đề. Bạn có thể đổi lại sau trong Cài đặt → Công cụ học.</string>
+    <string name="study_known_words_offer_confirm">Bật</string>
+    <string name="study_known_words_offer_dismiss">Để sau</string>
+    <string name="study_page_token_auto">Tự động</string>
+    <string name="study_page_token_on">Bật</string>
+    <string name="study_page_token_off">Tắt</string>
+    <string name="study_anki_open">Mở AnkiDroid</string>
 </resources>

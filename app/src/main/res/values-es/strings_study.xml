@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Saltar</string>
     <string name="study_known_words_title">Palabras conocidas</string>
-    <string name="study_known_words_description">Marca en la tarjeta de palabra las palabras que conoces. El panel de subtítulos muestra cuánto de cada video ya conoces.</string>
+    <string name="study_known_words_description">Muestra cuánto de cada video ya conoces y puede marcar las palabras nuevas en los subtítulos. \"Conozco esta palabra\" en la tarjeta de palabra guarda tus palabras aunque esto esté desactivado.</string>
     <string name="study_mark_new_words_title">Marcar palabras nuevas en los subtítulos</string>
     <string name="study_mark_new_words_description">Da un fondo claro a las palabras que no conoces ni has guardado.</string>
     <string name="study_known_words_clear">Borrar palabras conocidas</string>
@@ -33,11 +33,11 @@
     <string name="study_known_words_clear_message">Se olvidan todas las palabras que marcaste como conocidas, en todos los idiomas. Las palabras guardadas se quedan.</string>
     <string name="study_known_words_clear_confirm">Borrar</string>
     <string name="study_anki_title">Enviar a AnkiDroid</string>
-    <string name="study_anki_description">Muestra Enviar a AnkiDroid en la tarjeta de palabra y en Práctica → Exportar cuando AnkiDroid está instalado. Las tarjetas van a un mazo DualSub Replay.</string>
+    <string name="study_anki_description">Muestra Enviar a AnkiDroid en la tarjeta de palabra y en Práctica → Exportar cuando AnkiDroid está instalado. Las tarjetas van a un mazo DualSub Replay. Mantén AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras se está ejecutando.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>
-    <string name="study_page_token_description">Cuando YouTube envía subtítulos vacíos, la página de YouTube crea su propio token de prueba de origen, como hace el reproductor web de YouTube, y vuelve a pedirlos. Experimental.</string>
+    <string name="study_page_token_description">Automático usa un token solo cuando YouTube envía subtítulos vacíos y luego lo usa primero en los siguientes videos mientras siga funcionando. Sí siempre usa un token primero. No nunca crea uno.</string>
     <string name="study_comprehension_chip">Conocidas %1$d%%</string>
     <string name="study_comprehension_title">Palabras conocidas en este video</string>
     <string name="study_comprehension_known">Conoces el %1$d%% de las palabras de este video.</string>
@@ -50,7 +50,7 @@
     <string name="study_sent_to_anki">Enviada a AnkiDroid</string>
     <string name="study_anki_not_installed">AnkiDroid no está instalado en este teléfono.</string>
     <string name="study_anki_permission_denied">No se dio el permiso de AnkiDroid, así que no se añadió ninguna tarjeta.</string>
-    <string name="study_anki_failed">AnkiDroid no aceptó la tarjeta. Abre AnkiDroid una vez y vuelve a intentarlo.</string>
+    <string name="study_anki_failed">AnkiDroid no aceptó la tarjeta. Abre AnkiDroid, déjalo en segundo plano, vuelve y inténtalo de nuevo.</string>
     <string name="study_anki_send_all">Enviar todo a AnkiDroid</string>
     <string name="study_anki_all_sent_before">Todas las palabras ya se enviaron a AnkiDroid.</string>
     <plurals name="study_repeat_count">
@@ -78,4 +78,12 @@
         <item quantity="many">%1$d palabras enviadas a AnkiDroid.</item>
         <item quantity="other">%1$d palabras enviadas a AnkiDroid.</item>
     </plurals>
+    <string name="study_known_words_offer_title">¿Activar Palabras conocidas?</string>
+    <string name="study_known_words_offer_message">El panel de subtítulos mostrará cuánto de cada video ya conoces y se podrán marcar las palabras nuevas en los subtítulos. Puedes cambiarlo luego en Ajustes → Herramientas de estudio.</string>
+    <string name="study_known_words_offer_confirm">Activar</string>
+    <string name="study_known_words_offer_dismiss">Ahora no</string>
+    <string name="study_page_token_auto">Automático</string>
+    <string name="study_page_token_on">Sí</string>
+    <string name="study_page_token_off">No</string>
+    <string name="study_anki_open">Abrir AnkiDroid</string>
 </resources>

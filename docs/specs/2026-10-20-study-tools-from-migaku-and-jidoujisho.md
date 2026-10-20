@@ -64,7 +64,15 @@ scope, not merge or release.
 - AnkiDroid asks for its permission the first time; a refusal or failure shows a short message on
   the card (no crash). Without AnkiDroid installed no Anki button shows.
 - The blur box shows on the YouTube page's player (inline and fullscreen) only while the setting is on.
-- With page-token captions on, a failure falls back to everything the page already does.
+- Page-token captions have three modes (owner request after the first phone test, 2026-10-20):
+  Automatic (default) asks with a token only after a plain request came back empty and, once a token
+  worked, asks with it first on later videos until a plain request works again; On always asks with
+  a token first (as Migaku does); Off never makes one. A failure falls back to everything the page
+  already does.
+- Known words is off by default (owner request, 2026-10-20). "I know this word" always shows on the
+  word card; the first time it is used while Known words is off, a dialog offers once to turn it on.
+- AnkiDroid often accepts cards only while it runs in the background (owner's phone test). The
+  setting says so, and a refused card shows the reason with an Open AnkiDroid button.
 
 ## Technical constraints / invariants
 
@@ -198,3 +206,22 @@ Built as planned, in one PR. What landed and where it differs from the plan:
 - Not verified here: every play mode, skip silence, known words, AnkiDroid and the blur box on a
   phone, and page-token captions against live YouTube. Live minting was deliberately not run from
   the cloud; it is for the owner's phone test with the preview build.
+
+## Follow-up after the owner's first phone test (2026-10-20)
+
+Kien tested preview build 461 and asked for four changes, all in PR #137:
+
+- Known words off by default, with a one-time offer on the first "I know this word"
+  (`shouldOfferKnownWords`, `known_words_offered`). The word card keeps known words while the tool is
+  off, so the offer can count the first word.
+- Page-token captions as Automatic / On / Off (`PageTokenMode` in `data/PageTranscriptSource.kt`).
+  The page reports how it got the lines (`via`: address, token, player or panel); Automatic keeps
+  `page_token_needed` from that (`learnedTokenFirst`). A stored on/off from build 461 reads as On or
+  Automatic. Choosing a mode in Settings, or through the assistant, forgets what Automatic learned.
+- AnkiDroid: the setting description and the refusal message say to keep AnkiDroid open in the
+  background, and a refused card offers Open AnkiDroid (its launch intent).
+- The "Known %" chip no longer blinks: the last count stays while lines are counted again (it used
+  to drop to nothing and come back), and a new number counts to its value over 600 ms.
+- Tests: `PageTranscriptSourceTest` (modes and Automatic's memory), `PageTranscriptScriptsTest`
+  (token-first order and `via`), `AiActionsTest`, `AiAssistantActionsTest`, `StudyPlaybackTest`
+  (defaults and the offer), `StudyToolsUiTest` (modes in Settings and the offer dialog on a device).

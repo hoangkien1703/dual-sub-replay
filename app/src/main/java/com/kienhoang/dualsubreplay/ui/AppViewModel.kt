@@ -37,6 +37,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
+import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.translation.DEFAULT_TRANSLATION_ENGINE
 import com.kienhoang.dualsubreplay.translation.GOOGLE_EARLY_CHECK_POLL_MS
 import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
@@ -541,10 +542,13 @@ class AppViewModel internal constructor(
                     )
                 }
             }
-            if (key == PAGE_TOKEN_CAPTIONS_PREFERENCE || key == null) {
-                pageTranscripts.pageTokenEnabled = preferences.getBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, false)
-            }
+            if (key == PAGE_TOKEN_CAPTIONS_PREFERENCE || key == PAGE_TOKEN_NEEDED_PREFERENCE || key == null) readPageTokenMode()
         }
+
+    private fun readPageTokenMode() {
+        pageTranscripts.pageTokenMode = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE])
+        pageTranscripts.tokenRemembered = preferences.getBoolean(PAGE_TOKEN_NEEDED_PREFERENCE, false)
+    }
 
     override fun onCleared() {
         flushImmersion()
@@ -612,7 +616,8 @@ class AppViewModel internal constructor(
     init {
         preferences.edit().remove(KARAOKE_TIMING_MODE_PREFERENCE).apply()
         preferences.registerOnSharedPreferenceChangeListener(visibilityListener)
-        pageTranscripts.pageTokenEnabled = preferences.getBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, false)
+        readPageTokenMode()
+        pageTranscripts.onTokenLearned = { needed -> preferences.edit().putBoolean(PAGE_TOKEN_NEEDED_PREFERENCE, needed).apply() }
         viewModelScope.launch {
             try {
                 vocabulary.refresh()

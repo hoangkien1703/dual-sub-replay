@@ -57,6 +57,7 @@ internal val AI_STUDY_PLAY_MODES = listOf("normal", "pause_after_line", "read_fi
 
 /** The keys of `SkipSilence`; a test keeps them equal. */
 internal val AI_SKIP_SILENCE = listOf("off", "2x", "4x", "jump")
+internal val AI_PAGE_TOKEN_MODES = listOf("auto", "on", "off")
 
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5")
@@ -114,7 +115,7 @@ internal enum class AiSetting(
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     BLUR_BOX("blur_box"),
-    PAGE_TOKEN_CAPTIONS("page_token_captions", asks = true),
+    PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
@@ -578,6 +579,16 @@ private val SETTING_CHOICE_ALIASES by lazy {
                 "one_new_word" to "new_word_lines",
             ),
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
+        AiSetting.PAGE_TOKEN_CAPTIONS to
+            mapOf(
+                "automatic" to "auto",
+                "true" to "on",
+                "always" to "on",
+                "enabled" to "on",
+                "false" to "off",
+                "never" to "off",
+                "disabled" to "off",
+            ),
     )
 }
 
@@ -711,7 +722,9 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.STUDY_REPEAT_COUNT -> choiceList(setting.choices) + " (plays of each line in repeat_line)"
         AiSetting.SKIP_SILENCE -> choiceList(setting.choices) + " (gaps over 1.5 s with no subtitle line play faster or are jumped)"
         AiSetting.PAGE_TOKEN_CAPTIONS ->
-            choiceList(setting.choices) + " (beta: the YouTube page makes its own token when captions come back empty)"
+            choiceList(setting.choices) +
+                " (beta: auto makes a token on the YouTube page only when captions come back empty and then uses it first on " +
+                "later videos while that works; on always asks with a token first; off never makes one)"
         else -> choiceList(setting.choices)
     }
 
