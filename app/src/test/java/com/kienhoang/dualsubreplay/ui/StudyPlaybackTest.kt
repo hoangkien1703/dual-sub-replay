@@ -112,12 +112,12 @@ class StudyPlaybackTest {
 
     @Test
     fun newWordLinesPausesOnlyOnLinesWithOneNewWord() {
-        val settings = StudySettings(playMode = StudyPlayMode.NEW_WORD_LINES, knownWords = true)
+        val settings = StudySettings(playMode = StudyPlayMode.NEW_WORD_LINES, knownWordsMode = KnownWordsMode.MANUAL)
         val asked = play(StudyPlaybackDriver(), settings, 900, 11_000, newWordLines = setOf(1))
         assertEquals(listOf(StudyAction.Pause), asked.map { it.second })
         assertEquals(5_000 - STUDY_PAUSE_LEAD_MS, asked.single().first, 33.0)
         // Without the known-word list the mode cannot tell, so the video plays normally.
-        assertEquals(StudyPlayMode.NORMAL, settings.copy(knownWords = false).effectivePlayMode)
+        assertEquals(StudyPlayMode.NORMAL, settings.copy(knownWordsMode = KnownWordsMode.OFF).effectivePlayMode)
     }
 
     @Test
@@ -184,10 +184,14 @@ class StudyPlaybackTest {
         val defaults = StudySettings()
         assertEquals(PageTokenMode.AUTO, defaults.pageTokenCaptions)
         assertEquals(false, defaults.blurBox)
-        assertEquals("Off until the user turns it on", false, defaults.knownWords)
-        assertTrue(shouldOfferKnownWords(defaults, offeredBefore = false))
-        assertFalse("Offered once", shouldOfferKnownWords(defaults, offeredBefore = true))
-        assertFalse(shouldOfferKnownWords(defaults.copy(knownWords = true), offeredBefore = false))
+        assertEquals("Automatic by default", KnownWordsMode.AUTO, defaults.knownWordsMode)
+        assertEquals(10, defaults.knownWordsAfter)
+        assertTrue(defaults.knownWords)
+        assertFalse(defaults.copy(knownWordsMode = KnownWordsMode.OFF).knownWords)
+        assertEquals(KnownWordsMode.MANUAL, storedKnownWordsMode("manual"))
+        assertEquals(KnownWordsMode.AUTO, storedKnownWordsMode(null))
+        assertEquals(20, storedKnownWordsAfter(20))
+        assertEquals(DEFAULT_KNOWN_WORDS_AFTER, storedKnownWordsAfter(7))
     }
 
     private fun assertEquals(

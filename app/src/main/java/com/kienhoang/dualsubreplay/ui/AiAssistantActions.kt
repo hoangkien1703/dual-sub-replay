@@ -198,7 +198,8 @@ private fun aiStudySettingValue(
         AiSetting.STUDY_PLAY_MODE -> study.playMode.storageValue
         AiSetting.STUDY_REPEAT_COUNT -> study.repeatCount.toString()
         AiSetting.SKIP_SILENCE -> study.skipSilence.storageValue
-        AiSetting.KNOWN_WORDS -> onOff(study.knownWords)
+        AiSetting.KNOWN_WORDS -> study.knownWordsMode.storageValue
+        AiSetting.KNOWN_WORDS_AFTER -> study.knownWordsAfter.toString()
         AiSetting.MARK_NEW_WORDS -> onOff(study.markNewWords)
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
@@ -631,7 +632,8 @@ internal class AppAiActions(
             AiSetting.STUDY_PLAY_MODE -> editor.putString(STUDY_PLAY_MODE_PREFERENCE, storedStudyPlayMode(value).storageValue)
             AiSetting.STUDY_REPEAT_COUNT -> editor.putInt(STUDY_REPEAT_COUNT_PREFERENCE, storedStudyRepeatCount(value.toIntOrNull() ?: 0))
             AiSetting.SKIP_SILENCE -> editor.putString(SKIP_SILENCE_PREFERENCE, storedSkipSilence(value).storageValue)
-            AiSetting.KNOWN_WORDS -> editor.putBoolean(KNOWN_WORDS_PREFERENCE, on)
+            AiSetting.KNOWN_WORDS -> editor.putString(KNOWN_WORDS_PREFERENCE, storedKnownWordsMode(value).storageValue)
+            AiSetting.KNOWN_WORDS_AFTER -> editor.putInt(KNOWN_WORDS_AFTER_PREFERENCE, storedKnownWordsAfter(value.toIntOrNull() ?: 0))
             AiSetting.MARK_NEW_WORDS -> editor.putBoolean(MARK_NEW_WORDS_PREFERENCE, on)
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
@@ -780,7 +782,14 @@ internal class AppAiActions(
                 named(R.string.study_play_mode_repeat, context.resources.getQuantityString(R.plurals.study_repeat_count, count, count))
             }
             AiSetting.SKIP_SILENCE -> named(R.string.study_skip_silence_title, string(storedSkipSilence(value).labelRes))
-            AiSetting.KNOWN_WORDS -> switch(R.string.study_known_words_title, value)
+            AiSetting.KNOWN_WORDS -> named(R.string.study_known_words_title, string(storedKnownWordsMode(value).labelRes))
+            AiSetting.KNOWN_WORDS_AFTER -> {
+                val count = storedKnownWordsAfter(value.toIntOrNull() ?: 0)
+                named(
+                    R.string.study_known_words_after_title,
+                    context.resources.getQuantityString(R.plurals.study_repeat_count, count, count),
+                )
+            }
             AiSetting.MARK_NEW_WORDS -> switch(R.string.study_mark_new_words_title, value)
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)

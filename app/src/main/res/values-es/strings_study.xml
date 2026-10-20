@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Saltar</string>
     <string name="study_known_words_title">Palabras conocidas</string>
-    <string name="study_known_words_description">Muestra cuánto de cada video ya conoces y puede marcar las palabras nuevas en los subtítulos. \"Conozco esta palabra\" en la tarjeta de palabra guarda tus palabras aunque esto esté desactivado.</string>
+    <string name="study_known_words_description">Muestra cuánto de cada video ya conoces. Automático también cuenta una palabra como conocida cuando la has visto en suficientes líneas (cada línea cuenta una vez por video; las palabras guardadas no cuentan). Manual usa solo \"Conozco esta palabra\" en la tarjeta de palabra.</string>
     <string name="study_mark_new_words_title">Marcar palabras nuevas en los subtítulos</string>
     <string name="study_mark_new_words_description">Da un fondo claro a las palabras que no conoces ni has guardado.</string>
     <string name="study_known_words_clear">Borrar palabras conocidas</string>
@@ -78,12 +78,13 @@
         <item quantity="many">%1$d palabras enviadas a AnkiDroid.</item>
         <item quantity="other">%1$d palabras enviadas a AnkiDroid.</item>
     </plurals>
-    <string name="study_known_words_offer_title">¿Activar Palabras conocidas?</string>
-    <string name="study_known_words_offer_message">El panel de subtítulos mostrará cuánto de cada video ya conoces y se podrán marcar las palabras nuevas en los subtítulos. Puedes cambiarlo luego en Ajustes → Herramientas de estudio.</string>
-    <string name="study_known_words_offer_confirm">Activar</string>
-    <string name="study_known_words_offer_dismiss">Ahora no</string>
     <string name="study_page_token_auto">Automático</string>
     <string name="study_page_token_on">Sí</string>
     <string name="study_page_token_off">No</string>
     <string name="study_anki_open">Abrir AnkiDroid</string>
+    <string name="study_known_words_auto">Automático</string>
+    <string name="study_known_words_manual">Manual</string>
+    <string name="study_known_words_off">No</string>
+    <string name="study_known_words_after_title">Contar como conocida después de verla</string>
+    <string name="study_word_seen">Vista %1$d de %2$d veces</string>
 </resources>

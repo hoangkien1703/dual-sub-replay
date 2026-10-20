@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Jump</string>
     <string name="study_known_words_title">Known words</string>
-    <string name="study_known_words_description">Shows how much of each video you already know and can mark new words in subtitles. \"I know this word\" on the word card keeps your words even while this is off.</string>
+    <string name="study_known_words_description">Shows how much of each video you already know. Automatic also counts a word as known once you have seen it in enough lines (each line counts once per video; saved words are not counted). Manual uses only \"I know this word\" on the word card.</string>
     <string name="study_mark_new_words_title">Mark new words in subtitles</string>
     <string name="study_mark_new_words_description">Gives words that are neither known nor saved a light background.</string>
     <string name="study_known_words_clear">Clear known words</string>
@@ -73,12 +73,13 @@
         <item quantity="one">%1$d word sent to AnkiDroid.</item>
         <item quantity="other">%1$d words sent to AnkiDroid.</item>
     </plurals>
-    <string name="study_known_words_offer_title">Turn on Known words?</string>
-    <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and new words can be marked in subtitles. You can change this later in Settings → Study tools.</string>
-    <string name="study_known_words_offer_confirm">Turn on</string>
-    <string name="study_known_words_offer_dismiss">Not now</string>
     <string name="study_page_token_auto">Automatic</string>
     <string name="study_page_token_on">On</string>
     <string name="study_page_token_off">Off</string>
     <string name="study_anki_open">Open AnkiDroid</string>
+    <string name="study_known_words_auto">Automatic</string>
+    <string name="study_known_words_manual">Manual</string>
+    <string name="study_known_words_off">Off</string>
+    <string name="study_known_words_after_title">Count a word as known after seeing it</string>
+    <string name="study_word_seen">Seen %1$d of %2$d times</string>
 </resources>

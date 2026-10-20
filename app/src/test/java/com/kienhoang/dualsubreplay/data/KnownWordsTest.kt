@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -77,5 +78,54 @@ class KnownWordsTest {
             restarted.clearAll()
             assertTrue(restarted.words("ja").value.isEmpty())
             assertEquals(0, restarted.total.value)
+        }
+
+    @Test
+    fun aWordBecomesKnownAfterItPlayedInEnoughLines() {
+        var counts = emptyMap<String, Int>()
+        repeat(2) { counts = countEncounters(counts, listOf("cats", "cats", "like", "i", "dogs"), setOf("i"), setOf("dogs"), 3).counts }
+        // A word twice in a line counts once; known and saved words are not counted.
+        assertEquals(mapOf("cats" to 2, "like" to 2), counts)
+        val third = countEncounters(counts, listOf("cats"), emptySet(), emptySet(), 3)
+        assertEquals(setOf("cats"), third.nowKnown)
+        assertEquals(mapOf("like" to 2), third.counts)
+    }
+
+    @Test
+    fun eachLineCountsOncePerVideo() {
+        val lines = LineEncounters()
+        assertTrue(lines.take("aaaaaaaaaaa", 3))
+        assertFalse("Replaying a line adds nothing", lines.take("aaaaaaaaaaa", 3))
+        assertTrue(lines.take("aaaaaaaaaaa", 4))
+        assertFalse(lines.take("aaaaaaaaaaa", -1))
+        assertTrue("A new video starts again", lines.take("bbbbbbbbbbb", 3))
+        assertTrue(lines.take("aaaaaaaaaaa", 3))
+    }
+
+    @Test
+    fun seenCountsSurviveTheirFileAndIgnoreBrokenLines() {
+        val counts = mapOf("cats" to 4, "猫" to 1)
+        assertEquals(counts, parseSeenCounts(seenCountsText(counts)))
+        assertEquals(mapOf("ok" to 2), parseSeenCounts("ok\t2\n!!\t3\nnone\nbig\t5000\nzero\t0"))
+    }
+
+    @Test
+    fun encountersAreKeptAndMarkingAWordStartsItsCountAgain() =
+        runBlocking {
+            val directory = File(folder.root, "known-words")
+            val repository = KnownWordsRepository(directory)
+            repeat(3) { repository.encounter("en", listOf("cats", "dogs"), learning = emptySet(), threshold = 3) }
+            assertEquals(setOf("cats", "dogs"), repository.words("en").value)
+            repository.encounter("en", listOf("birds"), learning = emptySet(), threshold = 3)
+            repository.flush()
+            assertEquals(
+                mapOf("birds" to 1),
+                KnownWordsRepository(directory).seen("en").let { flow ->
+                    withTimeout(5_000) { flow.first { it.isNotEmpty() } }
+                },
+            )
+            repository.setKnown("en", listOf("birds"), known = false)
+            assertTrue(repository.seen("en").value.isEmpty())
+            assertEquals(2, repository.total.value)
         }
 }

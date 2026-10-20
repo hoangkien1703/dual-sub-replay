@@ -87,12 +87,17 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
         saveUiEvidence("study-tools-settings")
 
-        // Known words is off at first; Mark new words belongs to it, so it goes with it.
-        assertTrue(composeRule.onAllNodes(hasTestTag("mark_new_words_switch")).fetchSemanticsNodes().isEmpty())
-        composeRule.onNodeWithTag("known_words_switch").performScrollTo().performClick()
+        // Known words is Automatic at first, with its count; Mark new words goes with Known words.
+        composeRule.onNodeWithTag("known_words_after_10").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("known_words_after_20").performScrollTo().performClick()
         composeRule.onNodeWithTag("mark_new_words_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("known_words_switch").performScrollTo().performClick()
+        composeRule.onNodeWithTag("known_words_off").performScrollTo().performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("mark_new_words_switch")).fetchSemanticsNodes().isEmpty() }
+        composeRule.runOnIdle {
+            assertEquals("off", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
+            assertEquals(20, preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, 0))
+        }
+        composeRule.onNodeWithTag("known_words_auto").performScrollTo().performClick()
         // Page tokens: Automatic by default, then On.
         composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
@@ -116,7 +121,7 @@ class StudyToolsUiTest {
             val tools =
                 remember {
                     StudyTools(KnownWordsRepository(File(context.cacheDir, "known-words-ui-test")), AnkiDroidNotes(context), scope).apply {
-                        settings = StudySettings(knownWords = true, markNewWords = true)
+                        settings = StudySettings(markNewWords = true)
                         language = "en"
                         known = setOf("i", "like")
                         comprehension = VideoComprehension(3, 2, 0, setOf("cats"), setOf(0))
@@ -143,7 +148,7 @@ class StudyToolsUiTest {
     }
 
     @Test
-    fun theFirstKnownWordOffersToTurnOnKnownWordsOnce() {
+    fun theWordCardShowsHowOftenAutomaticSawTheWord() {
         val selection =
             LearningWordSelection(AnalyzedToken("cats", 7, 11, PartOfSpeech.NOUN), "en", "vi", null, null, translated = false)
         composeRule.setContent {
@@ -151,11 +156,12 @@ class StudyToolsUiTest {
             val tools =
                 remember {
                     StudyTools(
-                        KnownWordsRepository(File(context.cacheDir, "known-words-offer-test")),
+                        KnownWordsRepository(File(context.cacheDir, "known-words-seen-test")),
                         AnkiDroidNotes(context),
                         scope,
                     ).apply {
-                        wordsLanguage = "en"
+                        language = "en"
+                        seen = mapOf("cats" to 4)
                     }
                 }
             CompositionLocalProvider(LocalStudyTools provides tools) {
@@ -167,13 +173,8 @@ class StudyToolsUiTest {
             }
         }
 
-        composeRule.onNodeWithTag("known_word_toggle").assertIsDisplayed().performClick()
-        composeRule.onNodeWithTag("turn_on_known_words").assertIsDisplayed()
-        saveUiEvidence("study-known-words-offer")
-        composeRule.onNodeWithTag("turn_on_known_words").performClick()
-        composeRule.runOnIdle {
-            assertTrue(preferences.getBoolean(KNOWN_WORDS_PREFERENCE, false))
-            assertTrue(preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false))
-        }
+        composeRule.onNodeWithText("Seen 4 of 10 times").assertIsDisplayed()
+        composeRule.onNodeWithTag("known_word_toggle").assertIsDisplayed()
+        saveUiEvidence("study-known-word-seen")
     }
 }

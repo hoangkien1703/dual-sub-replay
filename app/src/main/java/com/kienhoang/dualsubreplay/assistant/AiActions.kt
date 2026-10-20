@@ -58,6 +58,8 @@ internal val AI_STUDY_PLAY_MODES = listOf("normal", "pause_after_line", "read_fi
 /** The keys of `SkipSilence`; a test keeps them equal. */
 internal val AI_SKIP_SILENCE = listOf("off", "2x", "4x", "jump")
 internal val AI_PAGE_TOKEN_MODES = listOf("auto", "on", "off")
+internal val AI_KNOWN_WORDS_MODES = listOf("auto", "manual", "off")
+internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
 
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5")
@@ -111,7 +113,8 @@ internal enum class AiSetting(
     STUDY_PLAY_MODE("study_play_mode", AI_STUDY_PLAY_MODES),
     STUDY_REPEAT_COUNT("study_repeat_count", AI_STUDY_REPEAT_COUNTS),
     SKIP_SILENCE("skip_silence", AI_SKIP_SILENCE),
-    KNOWN_WORDS("known_words"),
+    KNOWN_WORDS("known_words", AI_KNOWN_WORDS_MODES),
+    KNOWN_WORDS_AFTER("known_words_after", AI_KNOWN_WORDS_AFTER),
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     BLUR_BOX("blur_box"),
@@ -579,6 +582,8 @@ private val SETTING_CHOICE_ALIASES by lazy {
                 "one_new_word" to "new_word_lines",
             ),
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
+        AiSetting.KNOWN_WORDS to
+            mapOf("automatic" to "auto", "on" to "auto", "true" to "auto", "enabled" to "auto", "false" to "off", "disabled" to "off"),
         AiSetting.PAGE_TOKEN_CAPTIONS to
             mapOf(
                 "automatic" to "auto",
@@ -613,7 +618,7 @@ internal fun aiSettingValue(
         AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
         AiSetting.DAILY_GOAL -> aiDailyGoal(key)
         AiSetting.GOOGLE_WAIT -> aiGoogleWait(key)
-        AiSetting.STUDY_REPEAT_COUNT ->
+        AiSetting.STUDY_REPEAT_COUNT, AiSetting.KNOWN_WORDS_AFTER ->
             key
                 .removeSuffix("times")
                 .removeSuffix("x")
@@ -720,6 +725,11 @@ internal fun aiSettingValues(setting: AiSetting): String =
                 "until each line ends, repeat_line plays each line study_repeat_count times, new_word_lines pauses after lines " +
                 "with exactly one new word and needs known_words on; all need the full transcript)"
         AiSetting.STUDY_REPEAT_COUNT -> choiceList(setting.choices) + " (plays of each line in repeat_line)"
+        AiSetting.KNOWN_WORDS ->
+            choiceList(setting.choices) +
+                " (auto also counts a word as known after it played in known_words_after lines, each line once per video; " +
+                "manual uses only the word card's button; off hides the score)"
+        AiSetting.KNOWN_WORDS_AFTER -> choiceList(setting.choices) + " (lines a word must play in before auto counts it as known)"
         AiSetting.SKIP_SILENCE -> choiceList(setting.choices) + " (gaps over 1.5 s with no subtitle line play faster or are jumped)"
         AiSetting.PAGE_TOKEN_CAPTIONS ->
             choiceList(setting.choices) +

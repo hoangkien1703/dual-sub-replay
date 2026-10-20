@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Lompat</string>
     <string name="study_known_words_title">Kata yang dikenal</string>
-    <string name="study_known_words_description">Menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal dan bisa menandai kata baru di subtitle. \"Saya tahu kata ini\" di kartu kata tetap menyimpan katamu walau ini dimatikan.</string>
+    <string name="study_known_words_description">Menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal. Otomatis juga menghitung kata sebagai dikenal setelah kamu melihatnya di cukup banyak baris (tiap baris dihitung sekali per video; kata yang disimpan tidak dihitung). Manual hanya memakai \"Saya tahu kata ini\" di kartu kata.</string>
     <string name="study_mark_new_words_title">Tandai kata baru di subtitle</string>
     <string name="study_mark_new_words_description">Memberi latar terang pada kata yang belum dikenal dan belum disimpan.</string>
     <string name="study_known_words_clear">Hapus kata yang dikenal</string>
@@ -68,12 +68,13 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">%1$d kata dikirim ke AnkiDroid.</item>
     </plurals>
-    <string name="study_known_words_offer_title">Nyalakan Kata yang dikenal?</string>
-    <string name="study_known_words_offer_message">Panel subtitle lalu menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal, dan kata baru bisa ditandai di subtitle. Kamu bisa mengubahnya nanti di Setelan → Alat belajar.</string>
-    <string name="study_known_words_offer_confirm">Nyalakan</string>
-    <string name="study_known_words_offer_dismiss">Nanti saja</string>
     <string name="study_page_token_auto">Otomatis</string>
     <string name="study_page_token_on">Nyala</string>
     <string name="study_page_token_off">Mati</string>
     <string name="study_anki_open">Buka AnkiDroid</string>
+    <string name="study_known_words_auto">Otomatis</string>
+    <string name="study_known_words_manual">Manual</string>
+    <string name="study_known_words_off">Mati</string>
+    <string name="study_known_words_after_title">Hitung sebagai dikenal setelah dilihat</string>
+    <string name="study_word_seen">Dilihat %1$d dari %2$d kali</string>
 </resources>

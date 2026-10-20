@@ -4,6 +4,8 @@ import com.kienhoang.dualsubreplay.assistant.AI_ACCENT_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_LANGUAGES
 import com.kienhoang.dualsubreplay.assistant.AI_DAILY_GOALS
+import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_AFTER
+import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
 import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
@@ -55,6 +57,8 @@ class AiAssistantActionsTest {
         assertEquals(SkipSilence.entries.map { it.storageValue }, AI_SKIP_SILENCE)
         assertEquals(STUDY_REPEAT_COUNTS.map { it.toString() }, AI_STUDY_REPEAT_COUNTS)
         assertEquals(PageTokenMode.entries.map { it.storageValue }, AI_PAGE_TOKEN_MODES)
+        assertEquals(KnownWordsMode.entries.map { it.storageValue }, AI_KNOWN_WORDS_MODES)
+        assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)
     }
 
     @Test
@@ -72,7 +76,8 @@ class AiAssistantActionsTest {
                         playMode = StudyPlayMode.REPEAT_LINE,
                         repeatCount = 5,
                         skipSilence = SkipSilence.JUMP,
-                        knownWords = true,
+                        knownWordsMode = KnownWordsMode.MANUAL,
+                        knownWordsAfter = 20,
                         blurBox = true,
                         pageTokenCaptions = PageTokenMode.ON,
                     ),

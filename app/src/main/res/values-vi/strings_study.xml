@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">Nhảy qua</string>
     <string name="study_known_words_title">Từ đã biết</string>
-    <string name="study_known_words_description">Cho biết bạn đã biết bao nhiêu phần của mỗi video và có thể đánh dấu từ mới trong phụ đề. Nút \"Tôi biết từ này\" trên thẻ từ vẫn lưu các từ của bạn kể cả khi tắt mục này.</string>
+    <string name="study_known_words_description">Cho biết bạn đã biết bao nhiêu phần của mỗi video. Tự động còn tính một từ là đã biết khi bạn đã gặp nó trong đủ số dòng (mỗi dòng chỉ tính một lần mỗi video; từ đã lưu không được tính). Thủ công chỉ dùng nút \"Tôi biết từ này\" trên thẻ từ.</string>
     <string name="study_mark_new_words_title">Đánh dấu từ mới trong phụ đề</string>
     <string name="study_mark_new_words_description">Tô nền nhạt cho những từ chưa biết và chưa lưu.</string>
     <string name="study_known_words_clear">Xóa từ đã biết</string>
@@ -68,12 +68,13 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">Đã gửi %1$d từ sang AnkiDroid.</item>
     </plurals>
-    <string name="study_known_words_offer_title">Bật Từ đã biết?</string>
-    <string name="study_known_words_offer_message">Khi đó bảng phụ đề sẽ cho biết bạn đã biết bao nhiêu phần của mỗi video, và có thể đánh dấu từ mới trong phụ đề. Bạn có thể đổi lại sau trong Cài đặt → Công cụ học.</string>
-    <string name="study_known_words_offer_confirm">Bật</string>
-    <string name="study_known_words_offer_dismiss">Để sau</string>
     <string name="study_page_token_auto">Tự động</string>
     <string name="study_page_token_on">Bật</string>
     <string name="study_page_token_off">Tắt</string>
     <string name="study_anki_open">Mở AnkiDroid</string>
+    <string name="study_known_words_auto">Tự động</string>
+    <string name="study_known_words_manual">Thủ công</string>
+    <string name="study_known_words_off">Tắt</string>
+    <string name="study_known_words_after_title">Tính là đã biết sau khi gặp</string>
+    <string name="study_word_seen">Đã gặp %1$d/%2$d lần</string>
 </resources>

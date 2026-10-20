@@ -69,8 +69,12 @@ scope, not merge or release.
   worked, asks with it first on later videos until a plain request works again; On always asks with
   a token first (as Migaku does); Off never makes one. A failure falls back to everything the page
   already does.
-- Known words is off by default (owner request, 2026-10-20). "I know this word" always shows on the
-  word card; the first time it is used while Known words is off, a dialog offers once to turn it on.
+- Known words is Automatic by default (owner decision, 2026-10-20, replacing a short-lived "off with
+  a one-time offer"), or Manual or Off. Automatic counts each different word of a line that plays,
+  once per line per video (replays, seeks back and Repeat each line add nothing; Kien picked this
+  on a decision card), and a word becomes known after 10 such lines (Settings: 5, 10 or 20). Saved
+  words are never counted. "I know this word" still marks at once, and marking either way restarts
+  that word's count. The word card shows "Seen 4 of 10 times".
 - AnkiDroid often accepts cards only while it runs in the background (owner's phone test). The
   setting says so, and a refused card shows the reason with an Open AnkiDroid button.
 
@@ -225,3 +229,22 @@ Kien tested preview build 461 and asked for four changes, all in PR #137:
 - Tests: `PageTranscriptSourceTest` (modes and Automatic's memory), `PageTranscriptScriptsTest`
   (token-first order and `via`), `AiActionsTest`, `AiAssistantActionsTest`, `StudyPlaybackTest`
   (defaults and the offer), `StudyToolsUiTest` (modes in Settings and the offer dialog on a device).
+
+### Automatic known words (2026-10-20, after preview build 462)
+
+Kien asked for an automatic mode by default (10% per encounter) and asked to discuss first. Agreed
+plan, built in PR #137:
+
+- `KnownWordsMode` (Automatic default, Manual, Off) and `knownWordsAfter` (5, 10 or 20) in
+  `ui/StudySettings.kt`; the one-time offer dialog from build 462 is gone.
+- `countEncounters`, `LineEncounters`, `parseSeenCounts` and `KnownWordsRepository.encounter` in
+  `data/KnownWords.kt`. Counts live in `files/known-words/<language>.seen`, written 30 s after the
+  first change, on pause and when the screen goes; words reaching the count are written as known at
+  once. `CountPlayedLines` in `ui/StudyTools.kt` counts a line when it is the current line while the
+  video plays, reusing the per-line word keys the Known % score already makes.
+- Performance: no extra tokenizing; each new line costs a map update of about ten entries, and a
+  file write at most every 30 s.
+- The assistant gets `known_words` (auto, manual, off) and `known_words_after`.
+- Tests: `KnownWordsTest` (counting, once per line per video, the counts file, the repository),
+  `StudyPlaybackTest`, `AiActionsTest`, `AiAssistantActionsTest`, `StudyToolsUiTest` (modes and the
+  word card's "Seen 4 of 10 times").

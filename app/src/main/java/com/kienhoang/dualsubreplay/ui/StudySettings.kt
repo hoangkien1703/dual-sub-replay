@@ -16,7 +16,8 @@ import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 internal const val STUDY_PLAY_MODE_PREFERENCE = "study_play_mode"
 internal const val STUDY_REPEAT_COUNT_PREFERENCE = "study_repeat_count"
 internal const val SKIP_SILENCE_PREFERENCE = "skip_silence"
-internal const val KNOWN_WORDS_PREFERENCE = "known_words_enabled"
+internal const val KNOWN_WORDS_PREFERENCE = "known_words_mode"
+internal const val KNOWN_WORDS_AFTER_PREFERENCE = "known_words_after"
 internal const val MARK_NEW_WORDS_PREFERENCE = "mark_new_words"
 internal const val ANKIDROID_PREFERENCE = "ankidroid_enabled"
 internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
@@ -25,9 +26,6 @@ internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
 /** Automatic page tokens: YouTube wanted a token, so later videos ask with it first. */
 internal const val PAGE_TOKEN_NEEDED_PREFERENCE = "page_token_needed"
 
-/** The word card offered to turn Known words on once, after the first "I know this word". */
-internal const val KNOWN_WORDS_OFFERED_PREFERENCE = "known_words_offered"
-
 /** The Study tools settings, all reset by Reset all settings. */
 internal val STUDY_SETTING_KEYS =
     listOf(
@@ -35,12 +33,12 @@ internal val STUDY_SETTING_KEYS =
         STUDY_REPEAT_COUNT_PREFERENCE,
         SKIP_SILENCE_PREFERENCE,
         KNOWN_WORDS_PREFERENCE,
+        KNOWN_WORDS_AFTER_PREFERENCE,
         MARK_NEW_WORDS_PREFERENCE,
         ANKIDROID_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
-        KNOWN_WORDS_OFFERED_PREFERENCE,
     )
 
 /** How the video plays around each subtitle line (Settings → Study tools → Play mode). */
@@ -70,6 +68,30 @@ internal enum class SkipSilence(
     JUMP("jump", R.string.study_skip_silence_jump, null),
 }
 
+/**
+ * Settings → Study tools → Known words (owner decision 2026-10-20). [AUTO] also counts a word as
+ * known once the user saw it in [StudySettings.knownWordsAfter] played lines; [MANUAL] uses only
+ * "I know this word"; [OFF] hides the score and the word card's button.
+ */
+internal enum class KnownWordsMode(
+    val storageValue: String,
+    @StringRes val labelRes: Int,
+) {
+    AUTO("auto", R.string.study_known_words_auto),
+    MANUAL("manual", R.string.study_known_words_manual),
+    OFF("off", R.string.study_known_words_off),
+}
+
+/** How many played lines Automatic known words needs to count a word as known. */
+internal val KNOWN_WORDS_AFTER_CHOICES = listOf(5, 10, 20)
+
+internal const val DEFAULT_KNOWN_WORDS_AFTER = 10
+
+internal fun storedKnownWordsMode(value: String?): KnownWordsMode =
+    KnownWordsMode.entries.firstOrNull { it.storageValue == value } ?: KnownWordsMode.AUTO
+
+internal fun storedKnownWordsAfter(value: Int): Int = value.takeIf { it in KNOWN_WORDS_AFTER_CHOICES } ?: DEFAULT_KNOWN_WORDS_AFTER
+
 /** How many times Repeat each line plays a line. */
 internal val STUDY_REPEAT_COUNTS = listOf(2, 3, 5)
 
@@ -79,13 +101,16 @@ internal data class StudySettings(
     val playMode: StudyPlayMode = StudyPlayMode.NORMAL,
     val repeatCount: Int = DEFAULT_STUDY_REPEAT_COUNT,
     val skipSilence: SkipSilence = SkipSilence.OFF,
-    /** Off until the user turns it on (or accepts the word card's offer after the first known word). */
-    val knownWords: Boolean = false,
+    val knownWordsMode: KnownWordsMode = KnownWordsMode.AUTO,
+    val knownWordsAfter: Int = DEFAULT_KNOWN_WORDS_AFTER,
     val markNewWords: Boolean = false,
     val ankiDroid: Boolean = true,
     val blurBox: Boolean = false,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
+    /** Known words is on (Automatic or Manual): the score, new-word marks and "I know this word" show. */
+    val knownWords: Boolean get() = knownWordsMode != KnownWordsMode.OFF
+
     /** Pause on lines with one new word needs the known-word list; without it the video plays normally. */
     val effectivePlayMode: StudyPlayMode
         get() = if (playMode == StudyPlayMode.NEW_WORD_LINES && !knownWords) StudyPlayMode.NORMAL else playMode
@@ -104,7 +129,8 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         playMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
         repeatCount = storedStudyRepeatCount(preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, DEFAULT_STUDY_REPEAT_COUNT)),
         skipSilence = storedSkipSilence(preferences.getString(SKIP_SILENCE_PREFERENCE, null)),
-        knownWords = preferences.getBoolean(KNOWN_WORDS_PREFERENCE, false),
+        knownWordsMode = storedKnownWordsMode(preferences.getString(KNOWN_WORDS_PREFERENCE, null)),
+        knownWordsAfter = storedKnownWordsAfter(preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, DEFAULT_KNOWN_WORDS_AFTER)),
         markNewWords = preferences.getBoolean(MARK_NEW_WORDS_PREFERENCE, false),
         ankiDroid = preferences.getBoolean(ANKIDROID_PREFERENCE, true),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),

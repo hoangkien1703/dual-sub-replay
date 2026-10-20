@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">ジャンプ</string>
     <string name="study_known_words_title">既知の単語</string>
-    <string name="study_known_words_description">各動画のうち既に知っている割合を表示し、字幕で新しい単語に印を付けられます。単語カードの「この単語を知っている」は、これがオフでも単語を記録します。</string>
+    <string name="study_known_words_description">各動画のうち既に知っている割合を表示します。自動では、十分な数の行で見た単語も既知として数えます（1行は動画ごとに1回だけ数え、保存した単語は数えません）。手動では単語カードの「この単語を知っている」だけを使います。</string>
     <string name="study_mark_new_words_title">字幕で新しい単語に印を付ける</string>
     <string name="study_mark_new_words_description">知らない単語や保存していない単語に薄い背景を付けます。</string>
     <string name="study_known_words_clear">既知の単語を消去</string>
@@ -68,12 +68,13 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">%1$d 語を AnkiDroid に送りました。</item>
     </plurals>
-    <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
-    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、字幕で新しい単語に印を付けられるようになります。あとで設定 → 学習ツールで変更できます。</string>
-    <string name="study_known_words_offer_confirm">オンにする</string>
-    <string name="study_known_words_offer_dismiss">今はしない</string>
     <string name="study_page_token_auto">自動</string>
     <string name="study_page_token_on">オン</string>
     <string name="study_page_token_off">オフ</string>
     <string name="study_anki_open">AnkiDroid を開く</string>
+    <string name="study_known_words_auto">自動</string>
+    <string name="study_known_words_manual">手動</string>
+    <string name="study_known_words_off">オフ</string>
+    <string name="study_known_words_after_title">既知とするまでに見る回数</string>
+    <string name="study_word_seen">%2$d回中%1$d回見ました</string>
 </resources>

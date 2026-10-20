@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
@@ -49,6 +50,7 @@ import com.kienhoang.dualsubreplay.data.AnkiProblem
 import com.kienhoang.dualsubreplay.data.AnkiSendResult
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.LineEncounters
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.VideoComprehension
 import com.kienhoang.dualsubreplay.data.knownWordKey
@@ -85,11 +87,11 @@ internal class StudyTools(
     var language by mutableStateOf<String?>(null)
         internal set
 
-    /** The known-word language of the open video's subtitles, whether or not Known words is on. */
-    var wordsLanguage by mutableStateOf<String?>(null)
+    var known by mutableStateOf<Set<String>>(emptySet())
         internal set
 
-    var known by mutableStateOf<Set<String>>(emptySet())
+    /** Automatic known words: how often each word of [language] not known yet was seen. */
+    var seen by mutableStateOf<Map<String, Int>>(emptyMap())
         internal set
 
     /** Saved words of [language], which count as being learned rather than new. */
@@ -130,6 +132,8 @@ internal val LocalStudyTools = staticCompositionLocalOf<StudyTools?> { null }
 
 private val NO_WORDS = MutableStateFlow<Set<String>>(emptySet())
 
+private val NO_COUNTS = MutableStateFlow<Map<String, Int>>(emptyMap())
+
 /** Keeps [StudyTools] current with the open video's subtitles, the settings and the saved words. */
 @Composable
 internal fun rememberStudyTools(
@@ -141,10 +145,9 @@ internal fun rememberStudyTools(
     val tools = remember(context) { StudyTools(KnownWordsRepository.get(context), AnkiDroidNotes(context), scope) }
     val settings by rememberStudySettings()
     val sourceCode = state.resolvedSourceLanguage
-    val wordsLanguage = knownWordLanguage(sourceCode)
-    val language = wordsLanguage.takeIf { settings.knownWords }
-    // Kept even while Known words is off, for the word card's "I know this word".
-    val known by remember(wordsLanguage) { wordsLanguage?.let(tools.repository::words) ?: NO_WORDS }.collectAsState()
+    val language = knownWordLanguage(sourceCode).takeIf { settings.knownWords }
+    val known by remember(language) { language?.let(tools.repository::words) ?: NO_WORDS }.collectAsState()
+    val seen by remember(language) { language?.let(tools.repository::seen) ?: NO_COUNTS }.collectAsState()
     val learning =
         remember(savedWords, language) {
             savedWords
@@ -167,15 +170,43 @@ internal fun rememberStudyTools(
     val lineKeys = counted?.takeIf { it.first == videoId }?.second
     val comprehension = remember(lineKeys, known, learning) { lineKeys?.let { videoComprehension(it, known, learning) } }
     LaunchedEffect(settings.ankiDroid) { tools.ankiInstalled = settings.ankiDroid && tools.anki.installed() }
+    CountPlayedLines(tools, state, language, lineKeys, learning, settings)
     SideEffect {
         tools.settings = settings
         tools.language = language
-        tools.wordsLanguage = wordsLanguage
         tools.known = known
+        tools.seen = seen
         tools.learning = learning
         tools.comprehension = comprehension
     }
     return tools
+}
+
+/**
+ * Automatic known words: each line that plays counts its words once per video (Kien's choice,
+ * 2026-10-20). A paused video counts nothing; the counts are written when it pauses or the screen goes.
+ */
+@Composable
+private fun CountPlayedLines(
+    tools: StudyTools,
+    state: DualSubUiState,
+    language: String?,
+    lineKeys: List<List<String>>?,
+    learning: Set<String>,
+    settings: StudySettings,
+) {
+    val lines = remember { LineEncounters() }
+    val counting = settings.knownWordsMode == KnownWordsMode.AUTO && language != null && lineKeys != null
+    val videoId = state.activeVideoId
+    val index = state.currentIndex
+    val playing = !state.playbackPaused
+    LaunchedEffect(counting, videoId, index, playing) {
+        if (!counting || !playing || videoId == null || language == null) return@LaunchedEffect
+        val keys = lineKeys?.getOrNull(index) ?: return@LaunchedEffect
+        if (lines.take(videoId, index)) tools.repository.encounter(language, keys, learning, settings.knownWordsAfter)
+    }
+    LaunchedEffect(playing) { if (!playing) tools.repository.flush() }
+    DisposableEffect(tools) { onDispose { tools.repository.flushSoon() } }
 }
 
 /** The background of a word that is neither known nor saved, from the highlight color. */
@@ -237,9 +268,8 @@ private fun ComprehensionDialog(
 }
 
 /**
- * The word card's "I know this word" (always, for a single word in the video's language) and "Send
- * to AnkiDroid" (when that tool is on). While Known words is off, the first "I know this word"
- * offers once to turn it on.
+ * The word card's "I know this word" (while Known words is on, for a single word in the video's
+ * language, with how often Automatic saw it) and "Send to AnkiDroid" (when that tool is on).
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -248,24 +278,16 @@ internal fun StudyWordActions(
     meaning: String,
 ) {
     val tools = LocalStudyTools.current ?: return
-    val context = LocalContext.current
-    val preferences = remember(context) { studyPreferences(context) }
-    var offering by remember { mutableStateOf(false) }
-    val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.wordsLanguage }
+    val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.language }
     val key = selection.token.takeIf { !selection.isPhrase && !selection.translated }?.let(::knownWordKey)
-    val showKnown = language != null && key != null
+    val showKnown = tools.settings.knownWords && language != null && key != null
     if (!showKnown && !tools.ankiAvailable) return
+    val known = showKnown && key in tools.known
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showKnown) {
-            val known = key in tools.known
             FilterChip(
                 selected = known,
-                onClick = {
-                    tools.setKnown(language, key, !known)
-                    offering =
-                        !known && shouldOfferKnownWords(tools.settings, preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false))
-                    if (offering) preferences.edit().putBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, true).apply()
-                },
+                onClick = { tools.setKnown(language, key, !known) },
                 label = { Text(stringResource(R.string.study_known_word_toggle)) },
                 leadingIcon =
                     if (known) {
@@ -278,41 +300,15 @@ internal fun StudyWordActions(
         }
         if (tools.ankiAvailable) AnkiSendChip(tools, selection, meaning)
     }
-    if (offering) {
-        KnownWordsOfferDialog(
-            onTurnOn = {
-                offering = false
-                preferences.edit().putBoolean(KNOWN_WORDS_PREFERENCE, true).apply()
-            },
-            onDismiss = { offering = false },
+    val seen = if (showKnown && !known && tools.settings.knownWordsMode == KnownWordsMode.AUTO) tools.seen[key] ?: 0 else 0
+    if (seen > 0) {
+        Text(
+            stringResource(R.string.study_word_seen, seen, tools.settings.knownWordsAfter),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.testTag("known_word_seen"),
         )
     }
-}
-
-/** The first "I know this word" while Known words is off offers to turn it on, once. */
-internal fun shouldOfferKnownWords(
-    settings: StudySettings,
-    offeredBefore: Boolean,
-): Boolean = !settings.knownWords && !offeredBefore
-
-@Composable
-private fun KnownWordsOfferDialog(
-    onTurnOn: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.study_known_words_offer_title)) },
-        text = { Text(stringResource(R.string.study_known_words_offer_message)) },
-        confirmButton = {
-            TextButton(onClick = onTurnOn, modifier = Modifier.testTag("turn_on_known_words")) {
-                Text(stringResource(R.string.study_known_words_offer_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.study_known_words_offer_dismiss)) }
-        },
-    )
 }
 
 @Composable

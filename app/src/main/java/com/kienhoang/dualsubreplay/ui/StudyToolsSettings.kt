@@ -54,12 +54,10 @@ internal fun StudyToolsSettingsSection() {
     SettingsSectionDivider()
     SkipSilenceSettings(settings.skipSilence) { skip -> preferences.edit().putString(SKIP_SILENCE_PREFERENCE, skip.storageValue).apply() }
     SettingsSectionDivider()
-    SettingsSwitchRow(
-        title = stringResource(R.string.study_known_words_title),
-        description = stringResource(R.string.study_known_words_description),
-        checked = settings.knownWords,
-        onCheckedChange = { preferences.edit().putBoolean(KNOWN_WORDS_PREFERENCE, it).apply() },
-        testTag = "known_words_switch",
+    KnownWordsSettings(
+        settings = settings,
+        onModeChange = { mode -> preferences.edit().putString(KNOWN_WORDS_PREFERENCE, mode.storageValue).apply() },
+        onAfterChange = { count -> preferences.edit().putInt(KNOWN_WORDS_AFTER_PREFERENCE, count).apply() },
     )
     if (settings.knownWords) {
         SettingsSwitchRow(
@@ -165,6 +163,51 @@ private fun SkipSilenceSettings(
                     label = { Text(stringResource(option.labelRes)) },
                     modifier = Modifier.testTag("skip_silence_${option.storageValue}"),
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun KnownWordsSettings(
+    settings: StudySettings,
+    onModeChange: (KnownWordsMode) -> Unit,
+    onAfterChange: (Int) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Text(stringResource(R.string.study_known_words_title))
+        Text(
+            stringResource(R.string.study_known_words_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            KnownWordsMode.entries.forEach { option ->
+                FilterChip(
+                    selected = settings.knownWordsMode == option,
+                    onClick = { onModeChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("known_words_${option.storageValue}"),
+                )
+            }
+        }
+        if (settings.knownWordsMode == KnownWordsMode.AUTO) {
+            Text(
+                stringResource(R.string.study_known_words_after_title),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                KNOWN_WORDS_AFTER_CHOICES.forEach { option ->
+                    FilterChip(
+                        selected = settings.knownWordsAfter == option,
+                        onClick = { onAfterChange(option) },
+                        label = { Text(pluralStringResource(R.plurals.study_repeat_count, option, option)) },
+                        modifier = Modifier.testTag("known_words_after_$option"),
+                    )
+                }
             }
         }
     }

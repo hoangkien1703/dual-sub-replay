@@ -25,7 +25,7 @@
     <string name="study_skip_silence_4x">4×</string>
     <string name="study_skip_silence_jump">跳过</string>
     <string name="study_known_words_title">已认识的词</string>
-    <string name="study_known_words_description">显示每个视频中你已认识的比例，并可在字幕中标出新词。即使关闭此项，词卡上的“我认识这个词”也会记下你的词。</string>
+    <string name="study_known_words_description">显示每个视频中你已认识的比例。自动模式下，在足够多的行中见过的词也会算作已认识（每行在每个视频中只算一次；已保存的词不计）。手动模式只使用词卡上的“我认识这个词”。</string>
     <string name="study_mark_new_words_title">在字幕中标记新词</string>
     <string name="study_mark_new_words_description">给既不认识也没保存的词加上浅色背景。</string>
     <string name="study_known_words_clear">清除已认识的词</string>
@@ -68,12 +68,13 @@
     <plurals name="study_anki_sent_count">
         <item quantity="other">已将 %1$d 个词发送到 AnkiDroid。</item>
     </plurals>
-    <string name="study_known_words_offer_title">要开启已认识的词吗？</string>
-    <string name="study_known_words_offer_message">开启后，字幕面板会显示每个视频中你已认识的比例，并可在字幕中标出新词。之后可在设置 → 学习工具中更改。</string>
-    <string name="study_known_words_offer_confirm">开启</string>
-    <string name="study_known_words_offer_dismiss">暂不</string>
     <string name="study_page_token_auto">自动</string>
     <string name="study_page_token_on">开启</string>
     <string name="study_page_token_off">关闭</string>
     <string name="study_anki_open">打开 AnkiDroid</string>
+    <string name="study_known_words_auto">自动</string>
+    <string name="study_known_words_manual">手动</string>
+    <string name="study_known_words_off">关闭</string>
+    <string name="study_known_words_after_title">见过几次后算作认识</string>
+    <string name="study_word_seen">已见 %1$d/%2$d 次</string>
 </resources>
