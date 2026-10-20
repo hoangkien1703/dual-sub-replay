@@ -1,0 +1,363 @@
+{
+  "app": "DualSub Replay v1.7.0 (release APK from GitHub releases/latest)",
+  "device": "Android emulator, Pixel 7 profile, Android 16 (API 36) Google APIs x86_64, 1080x2400 @ 420 dpi, English UI, demo-mode status bar (9:41, full battery/signal), do-not-disturb on",
+  "recorded": "2026-10-20 with adb shell screenrecord --bit-rate 10000000",
+  "audio": "none (Android screenrecord captures video only); add voice-over / music in editing",
+  "timing_note": "'second' values are measured from the start of each file (±0.5 s). Files end at the last screen change, so a static tail may be cut.",
+  "grammar_note": "Grammar sections are the app's on-device grammar points (CEFR / JLPT / HSK badges); the 'Explain the grammar with AI' button needs the user's own API key and was not used.",
+  "files": [
+    {
+      "file": "EN_a_dual_subtitles.mp4",
+      "language": "English",
+      "shows": "a. Dual subtitles playing from the start of the video: English line + Vietnamese translation, word colors, highlight moving line to line.",
+      "duration_s": 17.2,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 0.1,
+          "action": "playback from 0:00 (started just before recording)"
+        }
+      ],
+      "source_video": {
+        "title": "How NASA Will Observe the Universe with SPHEREx",
+        "channel": "NASA Science",
+        "url": "https://www.youtube.com/watch?v=V-UhPS1Jwl4",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "English (United States), human-made",
+        "translation": "English -> Vietnamese"
+      }
+    },
+    {
+      "file": "EN_b_tap_line_replay.mp4",
+      "language": "English",
+      "shows": "b. Tapping an earlier subtitle line: the highlight jumps back two lines and the video rewinds and replays it.",
+      "duration_s": 21.2,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 4.3,
+          "action": "tap subtitle line two above the active one (video jumps back and replays it)"
+        },
+        {
+          "second": 8.6,
+          "action": "highlight now on the tapped line, replaying"
+        }
+      ],
+      "source_video": {
+        "title": "How NASA Will Observe the Universe with SPHEREx",
+        "channel": "NASA Science",
+        "url": "https://www.youtube.com/watch?v=V-UhPS1Jwl4",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "English (United States), human-made",
+        "translation": "English -> Vietnamese"
+      }
+    },
+    {
+      "file": "EN_c_word_card.mp4",
+      "language": "English",
+      "shows": "c. Tap 'filled' -> Translate -> word card (Verb, CEFR A1 badge, dictionary form 'fill', Vietnamese meaning, Grammar: 'will have + past participle' B2), tap speaker, Save to vocabulary -> Saved.",
+      "duration_s": 12.9,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 1.6,
+          "action": "tap word 'filled' (line: the telescope will have filled...)"
+        },
+        {
+          "second": 4.1,
+          "action": "tap Translate (opens word card: Verb A1, dictionary form, meaning, Grammar B2)"
+        },
+        {
+          "second": 7.8,
+          "action": "tap pronunciation speaker"
+        },
+        {
+          "second": 11.3,
+          "action": "tap Save to vocabulary"
+        }
+      ],
+      "source_video": {
+        "title": "How NASA Will Observe the Universe with SPHEREx",
+        "channel": "NASA Science",
+        "url": "https://www.youtube.com/watch?v=V-UhPS1Jwl4",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "English (United States), human-made",
+        "translation": "English -> Vietnamese"
+      }
+    },
+    {
+      "file": "EXTRA_d_saved_words_practice.mp4",
+      "language": "app-wide (shows words from all three)",
+      "shows": "d. Menu -> Practice: saved words list (spectral, filled, 生えてます, 知道) -> Practice due words -> flashcard 知道/zhīdao -> Show meaning (meaning + the sentence from the video) -> Good -> next card 生えてます -> Show meaning -> Good.",
+      "duration_s": 21.3,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 1.3,
+          "action": "tap menu"
+        },
+        {
+          "second": 3.2,
+          "action": "tap Practice (saved words list: 4 words from EN/JA/ZH)"
+        },
+        {
+          "second": 6.6,
+          "action": "tap Practice due words"
+        },
+        {
+          "second": 9.5,
+          "action": "tap Show meaning (知道 / zhīdao: Know + example line from the video)"
+        },
+        {
+          "second": 13.4,
+          "action": "tap Good · 3 days"
+        },
+        {
+          "second": 16.3,
+          "action": "tap Show meaning (next word: 生えてます)"
+        },
+        {
+          "second": 20.5,
+          "action": "tap Good · 3 days"
+        }
+      ]
+    },
+    {
+      "file": "EXTRA_e_settings_translation.mp4",
+      "language": "app-wide (shows words from all three)",
+      "shows": "e. Menu -> Settings: Languages (Original language, Translate to), slow scroll through Reading options and More settings, expand 'Captions & translation' (Google Translate online, Wait for Google, natural subtitle flow, model preloading) and scroll slowly.",
+      "duration_s": 23.3,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 1.3,
+          "action": "tap menu"
+        },
+        {
+          "second": 3.2,
+          "action": "tap Settings (Languages: Original language / Translate to)"
+        },
+        {
+          "second": 6.6,
+          "action": "slow scroll down past Reading options"
+        },
+        {
+          "second": 10.5,
+          "action": "slow scroll down to More settings"
+        },
+        {
+          "second": 17.0,
+          "action": "tap Captions & translation (Google Translate online, wait for Google, natural subtitle flow, model preloading, languages on device)"
+        },
+        {
+          "second": 19.4,
+          "action": "slow scroll through translation options"
+        }
+      ]
+    },
+    {
+      "file": "JA_a_dual_subtitles.mp4",
+      "language": "Japanese",
+      "shows": "a. Dual subtitles from the start: Japanese line + English translation over Tokyo Station at night, word colors, highlight moving.",
+      "duration_s": 19.1,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 0.2,
+          "action": "playback from 0:00 (started just before recording)"
+        }
+      ],
+      "source_video": {
+        "title": "【東京】ライトアップされた丸の内を散歩してみた！ 12/20-101",
+        "channel": "スーツ 旅行 / Suit Travel",
+        "url": "https://www.youtube.com/watch?v=pyA_99ieIxA",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Japanese, human-made",
+        "translation": "Japanese -> English"
+      }
+    },
+    {
+      "file": "JA_b_tap_line_replay.mp4",
+      "language": "Japanese",
+      "shows": "b. Tapping an earlier subtitle line: highlight jumps back two lines and the video replays it (night illuminations, taxis).",
+      "duration_s": 21.3,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 6.9,
+          "action": "tap subtitle line two above the active one (video jumps back and replays it)"
+        },
+        {
+          "second": 11.1,
+          "action": "highlight now on the tapped line, replaying"
+        }
+      ],
+      "source_video": {
+        "title": "【東京】ライトアップされた丸の内を散歩してみた！ 12/20-101",
+        "channel": "スーツ 旅行 / Suit Travel",
+        "url": "https://www.youtube.com/watch?v=pyA_99ieIxA",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Japanese, human-made",
+        "translation": "Japanese -> English"
+      }
+    },
+    {
+      "file": "JA_c_word_card.mp4",
+      "language": "Japanese",
+      "shows": "c. Tap 生えてます -> Translate -> word card (Verb, reading はえてます, dictionary form 生える, meaning 'It's growing', Grammar: ～て N5, ～ます N5, が N5), tap speaker, scroll, Save to vocabulary -> Saved.",
+      "duration_s": 17.0,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 1.6,
+          "action": "tap word '生えてます' (line: 近所とかにも生えてますが...)"
+        },
+        {
+          "second": 4.3,
+          "action": "tap Translate (opens word card: reading はえてます, dictionary form 生える, meaning, Grammar ~て/~ます/が N5)"
+        },
+        {
+          "second": 8.2,
+          "action": "tap pronunciation speaker"
+        },
+        {
+          "second": 11.6,
+          "action": "scroll word card to show all grammar points and Save button"
+        },
+        {
+          "second": 15.4,
+          "action": "tap Save to vocabulary"
+        }
+      ],
+      "source_video": {
+        "title": "【東京】ライトアップされた丸の内を散歩してみた！ 12/20-101",
+        "channel": "スーツ 旅行 / Suit Travel",
+        "url": "https://www.youtube.com/watch?v=pyA_99ieIxA",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Japanese, human-made",
+        "translation": "Japanese -> English"
+      }
+    },
+    {
+      "file": "JA_f_fullscreen_landscape.mp4",
+      "language": "Japanese",
+      "shows": "f. (optional) Fullscreen landscape playback of Tokyo Station illuminations with the dual-subtitle overlay at the top. Between lines the overlay briefly shows the status 'Subtitles ready near playback'.",
+      "duration_s": 15.3,
+      "resolution": "2400x1080",
+      "events": [
+        {
+          "second": 0.1,
+          "action": "fullscreen landscape playback (video ~0:50), dual subtitle overlay at top"
+        }
+      ],
+      "source_video": {
+        "title": "【東京】ライトアップされた丸の内を散歩してみた！ 12/20-101",
+        "channel": "スーツ 旅行 / Suit Travel",
+        "url": "https://www.youtube.com/watch?v=pyA_99ieIxA",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Japanese, human-made",
+        "translation": "Japanese -> English"
+      }
+    },
+    {
+      "file": "ZH_a_dual_subtitles.mp4",
+      "language": "Mandarin Chinese",
+      "shows": "a. Dual subtitles playing (video ~0:15-0:34): simplified Chinese line + English, word colors, highlight moving; presenter and gold title card.",
+      "duration_s": 19.2,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 0.1,
+          "action": "playback from about 0:15 of the video"
+        }
+      ],
+      "source_video": {
+        "title": "【硬核】一口气了解黄金 | 为什么暴涨? 投资黄金需要注意什么?",
+        "channel": "小Lin说",
+        "url": "https://www.youtube.com/watch?v=B4jIyufgy-s",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Chinese (Simplified), human-made",
+        "translation": "Chinese (Simplified) -> English"
+      }
+    },
+    {
+      "file": "ZH_alt_a_chili_oil_dual_subtitles.mp4",
+      "language": "Mandarin Chinese",
+      "shows": "Alternate for ZH a: dual subtitles from the start of a chili-oil cooking video (nice food close-ups, but sparse narration with ~5 s gaps).",
+      "duration_s": 18.9,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 0.1,
+          "action": "playback from 0:00 (started just before recording)"
+        }
+      ],
+      "source_video": {
+        "title": "私家调料必备【辣椒油】(红油辣子) 还是自己做的最香｜尚食厨房",
+        "channel": "尚食厨房 ShangshiKitchen",
+        "url": "https://www.youtube.com/watch?v=FyeT5belDf4",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Chinese, human-made",
+        "translation": "Chinese -> English"
+      }
+    },
+    {
+      "file": "ZH_b_tap_line_replay.mp4",
+      "language": "Mandarin Chinese",
+      "shows": "b. Tapping an earlier subtitle line: highlight jumps back two lines and the video replays it (presenter on camera).",
+      "duration_s": 21.3,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 4.7,
+          "action": "tap subtitle line two above the active one (video jumps back and replays it)"
+        },
+        {
+          "second": 9.1,
+          "action": "highlight now on the tapped line, replaying"
+        }
+      ],
+      "source_video": {
+        "title": "【硬核】一口气了解黄金 | 为什么暴涨? 投资黄金需要注意什么?",
+        "channel": "小Lin说",
+        "url": "https://www.youtube.com/watch?v=B4jIyufgy-s",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Chinese (Simplified), human-made",
+        "translation": "Chinese (Simplified) -> English"
+      }
+    },
+    {
+      "file": "ZH_c_word_card.mp4",
+      "language": "Mandarin Chinese",
+      "shows": "c. Tap 知道 -> Translate -> word card (Verb, pinyin zhīdao, meaning 'Know', Grammar: …了 le HSK 1 'something has changed or is new now'), tap speaker, Save to vocabulary -> Saved. Word colors visible in the line before the tap.",
+      "duration_s": 13.2,
+      "resolution": "1080x2400",
+      "events": [
+        {
+          "second": 1.6,
+          "action": "tap word '知道' (line: 你看到最后就知道了)"
+        },
+        {
+          "second": 4.2,
+          "action": "tap Translate (opens word card: Verb, pinyin zhīdao, meaning Know, Grammar …了 le HSK 1)"
+        },
+        {
+          "second": 8.1,
+          "action": "tap pronunciation speaker"
+        },
+        {
+          "second": 11.6,
+          "action": "tap Save to vocabulary"
+        }
+      ],
+      "source_video": {
+        "title": "【硬核】一口气了解黄金 | 为什么暴涨? 投资黄金需要注意什么?",
+        "channel": "小Lin说",
+        "url": "https://www.youtube.com/watch?v=B4jIyufgy-s",
+        "licence": "Creative Commons Attribution licence (reuse allowed)",
+        "captions": "Chinese (Simplified), human-made",
+        "translation": "Chinese (Simplified) -> English"
+      }
+    }
+  ]
+}
