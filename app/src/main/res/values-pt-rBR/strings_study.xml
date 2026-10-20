@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">Ferramentas de estudo</string>
+    <string name="settings_section_study_summary">Modos de reprodução, pular silêncios, palavras conhecidas, AnkiDroid, caixa desfocada</string>
+    <string name="study_play_mode_title">Modo de reprodução</string>
+    <string name="study_play_mode_normal">Normal</string>
+    <string name="study_play_mode_normal_description">O vídeo toca como sempre.</string>
+    <string name="study_play_mode_pause_after">Pausar depois de cada linha</string>
+    <string name="study_play_mode_pause_after_description">Pausa quando cada linha de legenda termina. Toque em reproduzir para a próxima.</string>
+    <string name="study_play_mode_read_first">Ler primeiro</string>
+    <string name="study_play_mode_read_first_description">Para no início de cada linha para você lê-la antes de ouvi-la.</string>
+    <string name="study_play_mode_listen_first">Ouvir primeiro</string>
+    <string name="study_play_mode_listen_first_description">Esconde as legendas enquanto o vídeo toca e depois pausa após cada linha e as mostra.</string>
+    <string name="study_play_mode_repeat">Repetir cada linha</string>
+    <string name="study_play_mode_repeat_description">Toca cada linha algumas vezes antes de seguir.</string>
+    <string name="study_play_mode_new_word">Pausar em linhas com uma palavra nova</string>
+    <string name="study_play_mode_new_word_description">Só pausa depois das linhas com exatamente uma palavra que você ainda não conhece. Precisa de Palavras conhecidas.</string>
+    <string name="study_play_mode_needs_known_words">Ative Palavras conhecidas abaixo para usar este modo.</string>
+    <string name="study_play_mode_note">Os modos de reprodução e pular silêncios funcionam quando a transcrição completa está carregada, não com legendas ao vivo.</string>
+    <string name="study_skip_silence_title">Pular silêncios</string>
+    <string name="study_skip_silence_description">Partes sem linha de legenda por mais de 1,5 segundo tocam mais rápido ou são puladas. Sua velocidade volta antes da próxima linha.</string>
+    <string name="study_skip_silence_off">Desligado</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">Pular</string>
+    <string name="study_known_words_title">Palavras conhecidas</string>
+    <string name="study_known_words_description">Mostra quanto de cada vídeo você já conhece. Automático também conta uma palavra como conhecida quando você a viu em linhas suficientes (cada linha conta uma vez por vídeo; palavras salvas não contam). Manual usa só \"Conheço esta palavra\" no cartão da palavra.</string>
+    <string name="study_mark_new_words_title">Marcar palavras novas nas legendas</string>
+    <string name="study_mark_new_words_description">Dá um fundo claro às palavras que você não conhece nem salvou.</string>
+    <string name="study_known_words_clear">Limpar palavras conhecidas</string>
+    <string name="study_known_words_clear_title">Limpar palavras conhecidas?</string>
+    <string name="study_known_words_clear_message">Todas as palavras que você marcou como conhecidas, em todos os idiomas, são esquecidas. As palavras salvas ficam.</string>
+    <string name="study_known_words_clear_confirm">Limpar</string>
+    <string name="study_anki_title">Enviar para o AnkiDroid</string>
+    <string name="study_anki_description">Mostra Enviar ao AnkiDroid no cartão da palavra e em Prática → Exportar quando o AnkiDroid está instalado. Os cartões vão para um baralho DualSub Replay. Mantenha o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
+    <string name="study_blur_box_title">Caixa desfocada</string>
+    <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
+    <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>
+    <string name="study_page_token_description">Automático usa um token só quando o YouTube envia legendas vazias e depois o usa primeiro nos próximos vídeos enquanto continuar funcionando. Ligado sempre usa um token primeiro. Desligado nunca cria um.</string>
+    <string name="study_comprehension_chip">Conhecidas %1$d%%</string>
+    <string name="study_comprehension_title">Palavras conhecidas neste vídeo</string>
+    <string name="study_comprehension_known">Você conhece %1$d%% das palavras deste vídeo.</string>
+    <string name="study_mark_all_known">Marcar todas as palavras novas como conhecidas</string>
+    <string name="study_mark_all_known_confirm">Marcar como conhecidas</string>
+    <string name="study_close">Fechar</string>
+    <string name="study_known_word_toggle">Conheço esta palavra</string>
+    <string name="study_send_to_anki">Enviar para o AnkiDroid</string>
+    <string name="study_sending_to_anki">Enviando…</string>
+    <string name="study_sent_to_anki">Enviado para o AnkiDroid</string>
+    <string name="study_anki_not_installed">O AnkiDroid não está instalado neste celular.</string>
+    <string name="study_anki_permission_denied">A permissão do AnkiDroid não foi dada, então nenhum cartão foi adicionado.</string>
+    <string name="study_anki_failed">O AnkiDroid não aceitou o cartão. Abra o AnkiDroid, deixe-o em segundo plano, volte e tente de novo.</string>
+    <string name="study_anki_send_all">Enviar tudo para o AnkiDroid</string>
+    <string name="study_anki_all_sent_before">Todas as palavras já foram enviadas para o AnkiDroid.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="one">%1$d vez</item>
+        <item quantity="many">%1$d vezes</item>
+        <item quantity="other">%1$d vezes</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="one">%1$d palavra marcada como conhecida</item>
+        <item quantity="many">%1$d palavras marcadas como conhecidas</item>
+        <item quantity="other">%1$d palavras marcadas como conhecidas</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="one">%1$d palavra nova</item>
+        <item quantity="many">%1$d palavras novas</item>
+        <item quantity="other">%1$d palavras novas</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="one">Marcar %1$d palavra como conhecida? Você pode desmarcar uma palavra no cartão dela.</item>
+        <item quantity="many">Marcar %1$d palavras como conhecidas? Você pode desmarcar uma palavra no cartão dela.</item>
+        <item quantity="other">Marcar %1$d palavras como conhecidas? Você pode desmarcar uma palavra no cartão dela.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="one">%1$d palavra enviada para o AnkiDroid.</item>
+        <item quantity="many">%1$d palavras enviadas para o AnkiDroid.</item>
+        <item quantity="other">%1$d palavras enviadas para o AnkiDroid.</item>
+    </plurals>
+    <string name="study_page_token_auto">Automático</string>
+    <string name="study_page_token_on">Ligado</string>
+    <string name="study_page_token_off">Desligado</string>
+    <string name="study_anki_open">Abrir o AnkiDroid</string>
+    <string name="study_known_words_auto">Automático</string>
+    <string name="study_known_words_manual">Manual</string>
+    <string name="study_known_words_off">Desligado</string>
+    <string name="study_known_words_after_title">Contar como conhecida depois de vê-la</string>
+    <string name="study_word_seen">Vista %1$d de %2$d vezes</string>
+    <string name="study_known_words_offer_title">Ligar Palavras conhecidas?</string>
+    <string name="study_known_words_offer_message">O painel de legendas passa a mostrar quanto de cada vídeo você já conhece, e as palavras que você vê com frequência contam como conhecidas sozinhas. Você pode mudar isso depois em Configurações → Ferramentas de estudo.</string>
+    <string name="study_known_words_offer_confirm">Ligar</string>
+    <string name="study_known_words_offer_dismiss">Agora não</string>
+</resources>

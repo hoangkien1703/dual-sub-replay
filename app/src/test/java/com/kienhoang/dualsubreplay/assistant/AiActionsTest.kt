@@ -96,6 +96,31 @@ class AiActionsTest {
     }
 
     @Test
+    fun theStudySettingsTakeTheirDocumentedValues() {
+        assertEquals("listen_first", setting("study_play_mode", "Listen first"))
+        assertEquals("pause_after_line", setting("study_play_mode", "pause after each line"))
+        assertEquals("normal", setting("study_play_mode", "off"))
+        assertEquals(null, setting("study_play_mode", "shadowing"))
+        assertEquals("3", setting("study_repeat_count", "3 times"))
+        assertEquals(null, setting("study_repeat_count", "4"))
+        assertEquals("2x", setting("skip_silence", "2"))
+        assertEquals("jump", setting("skip_silence", "skip"))
+        assertEquals("off", setting("skip_silence", "Off"))
+        assertEquals("on", setting("blur_box", "true"))
+        assertEquals("off", setting("send_to_ankidroid", "off"))
+        assertTrue(AiAction.ChangeSetting(AiSetting.PAGE_TOKEN_CAPTIONS, "on").alwaysAsks)
+        assertEquals("auto", setting("page_token_captions", "Automatic"))
+        assertEquals("auto", setting("known_words", "on"))
+        assertEquals("manual", setting("known_words", "Manual"))
+        assertEquals("off", setting("known_words", "off"))
+        assertEquals("20", setting("known_words_after", "20 times"))
+        assertEquals(null, setting("known_words_after", "7"))
+        assertEquals("on", setting("page_token_captions", "always"))
+        assertEquals("off", setting("page_token_captions", "false"))
+        assertTrue(!AiAction.ChangeSetting(AiSetting.SKIP_SILENCE, "2x").alwaysAsks)
+    }
+
+    @Test
     fun settingsThatReloadDownloadOrRebuildAlwaysAsk() {
         val asking =
             listOf(
@@ -103,13 +128,15 @@ class AiActionsTest {
                 AiSetting.PRELOAD_TRANSLATION_MODELS,
                 AiSetting.ORIGINAL_CAPTION_LANGUAGE,
                 AiSetting.APP_LANGUAGE,
+                AiSetting.PAGE_TOKEN_CAPTIONS,
             )
         assertEquals(asking, AiSetting.entries.filter { it.asks })
         assertTrue(AiAction.ChangeSetting(AiSetting.APP_LANGUAGE, "vi").alwaysAsks)
         assertTrue(!AiAction.ChangeSetting(AiSetting.APP_COLORS, "light").alwaysAsks)
         val description = AI_TOOLS.first { it.name == AI_SETTING_TOOL }.description
         assertTrue(
-            "natural_subtitle_flow, preload_translation_models, original_caption_language, app_language show an Apply button" in
+            "natural_subtitle_flow, preload_translation_models, original_caption_language, app_language, page_token_captions " +
+                "show an Apply button" in
                 description,
         )
         assertTrue("app_colors: deep_teal, black, navy, slate, plum, forest or light" in description)

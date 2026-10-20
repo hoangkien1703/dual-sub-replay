@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">Study tools</string>
+    <string name="settings_section_study_summary">Play modes, skip silence, known words, AnkiDroid, blur box</string>
+    <string name="study_play_mode_title">Play mode</string>
+    <string name="study_play_mode_normal">Normal</string>
+    <string name="study_play_mode_normal_description">The video plays as usual.</string>
+    <string name="study_play_mode_pause_after">Pause after each line</string>
+    <string name="study_play_mode_pause_after_description">Pauses when each subtitle line ends. Press play for the next line.</string>
+    <string name="study_play_mode_read_first">Read first</string>
+    <string name="study_play_mode_read_first_description">Stops at the start of each line so you can read it before you hear it.</string>
+    <string name="study_play_mode_listen_first">Listen first</string>
+    <string name="study_play_mode_listen_first_description">Hides subtitles while the video plays, then pauses after each line and shows them.</string>
+    <string name="study_play_mode_repeat">Repeat each line</string>
+    <string name="study_play_mode_repeat_description">Plays each line several times before going on.</string>
+    <string name="study_play_mode_new_word">Pause on lines with one new word</string>
+    <string name="study_play_mode_new_word_description">Pauses only after lines with exactly one word you do not know yet. Needs Known words.</string>
+    <string name="study_play_mode_needs_known_words">Turn on Known words below to use this mode.</string>
+    <string name="study_play_mode_note">Play modes and skip silence work when the full transcript is loaded, not with live subtitles.</string>
+    <string name="study_skip_silence_title">Skip silence</string>
+    <string name="study_skip_silence_description">Parts with no subtitle line for more than 1.5 seconds play faster or are skipped. Your own speed comes back before the next line.</string>
+    <string name="study_skip_silence_off">Off</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">Jump</string>
+    <string name="study_known_words_title">Known words</string>
+    <string name="study_known_words_description">Shows how much of each video you already know. Automatic also counts a word as known once you have seen it in enough lines (each line counts once per video; saved words are not counted). Manual uses only \"I know this word\" on the word card.</string>
+    <string name="study_mark_new_words_title">Mark new words in subtitles</string>
+    <string name="study_mark_new_words_description">Gives words that are neither known nor saved a light background.</string>
+    <string name="study_known_words_clear">Clear known words</string>
+    <string name="study_known_words_clear_title">Clear known words?</string>
+    <string name="study_known_words_clear_message">Every word you marked as known, in every language, is forgotten. Saved words stay.</string>
+    <string name="study_known_words_clear_confirm">Clear</string>
+    <string name="study_anki_title">Send to AnkiDroid</string>
+    <string name="study_anki_description">Shows Send to AnkiDroid on the word card and in Practice → Export when AnkiDroid is installed. Cards go to a DualSub Replay deck. Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
+    <string name="study_blur_box_title">Blur box</string>
+    <string name="study_blur_box_description">Puts a blurred box on the video to hide subtitles burned into the picture. Drag it to move it, and drag its corner to resize it.</string>
+    <string name="study_page_token_title">Load captions with a page token (beta)</string>
+    <string name="study_page_token_description">Automatic asks with a token only when YouTube sends empty captions, then asks with one first on the next videos while that keeps working. On always asks with a token first. Off never makes one.</string>
+    <string name="study_comprehension_chip">Known %1$d%%</string>
+    <string name="study_comprehension_title">Known words in this video</string>
+    <string name="study_comprehension_known">You know %1$d%% of the words in this video.</string>
+    <string name="study_mark_all_known">Mark all new words as known</string>
+    <string name="study_mark_all_known_confirm">Mark as known</string>
+    <string name="study_close">Close</string>
+    <string name="study_known_word_toggle">I know this word</string>
+    <string name="study_send_to_anki">Send to AnkiDroid</string>
+    <string name="study_sending_to_anki">Sending…</string>
+    <string name="study_sent_to_anki">Sent to AnkiDroid</string>
+    <string name="study_anki_not_installed">AnkiDroid is not installed on this phone.</string>
+    <string name="study_anki_permission_denied">AnkiDroid\'s permission was not given, so no card was added.</string>
+    <string name="study_anki_failed">AnkiDroid did not accept the card. Open AnkiDroid, leave it running in the background, then come back and try again.</string>
+    <string name="study_anki_send_all">Send all to AnkiDroid</string>
+    <string name="study_anki_all_sent_before">Every word was already sent to AnkiDroid.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="one">%1$d time</item>
+        <item quantity="other">%1$d times</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="one">%1$d word marked as known</item>
+        <item quantity="other">%1$d words marked as known</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="one">%1$d new word</item>
+        <item quantity="other">%1$d new words</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="one">Mark %1$d word as known? You can unmark a word on its word card.</item>
+        <item quantity="other">Mark %1$d words as known? You can unmark a word on its word card.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="one">%1$d word sent to AnkiDroid.</item>
+        <item quantity="other">%1$d words sent to AnkiDroid.</item>
+    </plurals>
+    <string name="study_page_token_auto">Automatic</string>
+    <string name="study_page_token_on">On</string>
+    <string name="study_page_token_off">Off</string>
+    <string name="study_anki_open">Open AnkiDroid</string>
+    <string name="study_known_words_auto">Automatic</string>
+    <string name="study_known_words_manual">Manual</string>
+    <string name="study_known_words_off">Off</string>
+    <string name="study_known_words_after_title">Count a word as known after seeing it</string>
+    <string name="study_word_seen">Seen %1$d of %2$d times</string>
+    <string name="study_known_words_offer_title">Turn on Known words?</string>
+    <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and words you see often count as known by themselves. You can change this later in Settings → Study tools.</string>
+    <string name="study_known_words_offer_confirm">Turn on</string>
+    <string name="study_known_words_offer_dismiss">Not now</string>
+</resources>

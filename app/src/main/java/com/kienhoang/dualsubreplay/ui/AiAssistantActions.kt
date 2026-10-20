@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,6 +23,7 @@ import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
+import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.validClipRange
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -137,6 +139,7 @@ internal data class AiStoredSettings(
     val rememberDraggedPosition: Boolean = true,
     /** An `APP_LANGUAGES` tag, or "device". */
     val appLanguage: String = "device",
+    val study: StudySettings = StudySettings(),
 )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -152,6 +155,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         avoidVideoControls = preferences.getBoolean(AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE, true),
         rememberDraggedPosition = preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true),
         appLanguage = AppLanguageSettings.selected(context)?.tag ?: "device",
+        study = readStudySettings(preferences),
     )
 }
 
@@ -182,6 +186,24 @@ private fun aiStoredSettingValue(
         AiSetting.AVOID_VIDEO_CONTROLS -> onOff(stored.avoidVideoControls)
         AiSetting.REMEMBER_DRAGGED_POSITION -> onOff(stored.rememberDraggedPosition)
         AiSetting.APP_LANGUAGE -> stored.appLanguage
+        else -> aiStudySettingValue(stored.study, setting)
+    }
+
+/** The Study tools settings (2026-10-20). */
+private fun aiStudySettingValue(
+    study: StudySettings,
+    setting: AiSetting,
+): String? =
+    when (setting) {
+        AiSetting.STUDY_PLAY_MODE -> study.playMode.storageValue
+        AiSetting.STUDY_REPEAT_COUNT -> study.repeatCount.toString()
+        AiSetting.SKIP_SILENCE -> study.skipSilence.storageValue
+        AiSetting.KNOWN_WORDS -> study.knownWordsMode.storageValue
+        AiSetting.KNOWN_WORDS_AFTER -> study.knownWordsAfter.toString()
+        AiSetting.MARK_NEW_WORDS -> onOff(study.markNewWords)
+        AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
+        AiSetting.BLUR_BOX -> onOff(study.blurBox)
+        AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
         else -> null
     }
 
@@ -593,9 +615,36 @@ internal class AppAiActions(
                 // Like the settings page: turning it off forgets the dragged positions.
                 if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             }
-            else -> return false
+            else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
+        return true
+    }
+
+    /** Writes a Study tools setting as its settings page does; false when [setting] is not one. */
+    private fun putStudySetting(
+        editor: SharedPreferences.Editor,
+        setting: AiSetting,
+        value: String,
+    ): Boolean {
+        val on = value == "on"
+        when (setting) {
+            AiSetting.STUDY_PLAY_MODE -> editor.putString(STUDY_PLAY_MODE_PREFERENCE, storedStudyPlayMode(value).storageValue)
+            AiSetting.STUDY_REPEAT_COUNT -> editor.putInt(STUDY_REPEAT_COUNT_PREFERENCE, storedStudyRepeatCount(value.toIntOrNull() ?: 0))
+            AiSetting.SKIP_SILENCE -> editor.putString(SKIP_SILENCE_PREFERENCE, storedSkipSilence(value).storageValue)
+            AiSetting.KNOWN_WORDS -> editor.putString(KNOWN_WORDS_PREFERENCE, storedKnownWordsMode(value).storageValue)
+            AiSetting.KNOWN_WORDS_AFTER -> editor.putInt(KNOWN_WORDS_AFTER_PREFERENCE, storedKnownWordsAfter(value.toIntOrNull() ?: 0))
+            AiSetting.MARK_NEW_WORDS -> editor.putBoolean(MARK_NEW_WORDS_PREFERENCE, on)
+            AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
+            AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
+            AiSetting.PAGE_TOKEN_CAPTIONS ->
+                editor
+                    .putString(
+                        PAGE_TOKEN_CAPTIONS_PREFERENCE,
+                        storedPageTokenMode(value).storageValue,
+                    ).remove(PAGE_TOKEN_NEEDED_PREFERENCE)
+            else -> return false
+        }
         return true
     }
 
@@ -718,7 +767,34 @@ internal class AppAiActions(
                     R.string.onboarding_goal_dialog_title,
                     value.toIntOrNull()?.let { string(R.string.onboarding_duration_minutes, it) } ?: string(R.string.onboarding_goal_off),
                 )
-            // settingLabel names the others.
+            else -> studySettingLabel(setting, value)
+        }
+
+    /** Labels of the Study tools settings (2026-10-20). */
+    private fun studySettingLabel(
+        setting: AiSetting,
+        value: String,
+    ): String =
+        when (setting) {
+            AiSetting.STUDY_PLAY_MODE -> named(R.string.study_play_mode_title, string(storedStudyPlayMode(value).titleRes))
+            AiSetting.STUDY_REPEAT_COUNT -> {
+                val count = storedStudyRepeatCount(value.toIntOrNull() ?: 0)
+                named(R.string.study_play_mode_repeat, context.resources.getQuantityString(R.plurals.study_repeat_count, count, count))
+            }
+            AiSetting.SKIP_SILENCE -> named(R.string.study_skip_silence_title, string(storedSkipSilence(value).labelRes))
+            AiSetting.KNOWN_WORDS -> named(R.string.study_known_words_title, string(storedKnownWordsMode(value).labelRes))
+            AiSetting.KNOWN_WORDS_AFTER -> {
+                val count = storedKnownWordsAfter(value.toIntOrNull() ?: 0)
+                named(
+                    R.string.study_known_words_after_title,
+                    context.resources.getQuantityString(R.plurals.study_repeat_count, count, count),
+                )
+            }
+            AiSetting.MARK_NEW_WORDS -> switch(R.string.study_mark_new_words_title, value)
+            AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
+            AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
+            AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
+            // settingLabel and otherSettingLabel name the others.
             else -> value
         }
 

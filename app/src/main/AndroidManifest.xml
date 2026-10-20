@@ -8,8 +8,12 @@
     <!-- Keeps a playing video's earphone controls and notification alive with the screen off. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Send to AnkiDroid (Settings → Study tools): AnkiDroid asks apps for this before they add cards. -->
+    <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE" />
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+        <package android:name="com.ichi2.anki" />
+        <provider android:authorities="com.ichi2.anki.flashcards" />
     </queries>
 
     <application

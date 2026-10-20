@@ -54,7 +54,23 @@ Paths below are relative to
   captions the player loads later still give the full transcript. When the player never downloads
   the track, the page opens YouTube's own transcript panel and `data/TranscriptPanelParser.kt`
   reads its lines (line timing only). See the
-  [spec](../specs/2026-10-18-page-first-full-transcript.md).
+  [spec](../specs/2026-10-18-page-first-full-transcript.md). With Settings → Study tools → Load
+  captions with a page token (beta, owner request 2026-10-20; Automatic by default, On, Off), a page whose plain
+  track request comes back empty mints its own proof-of-origin token the way YouTube's web player
+  does (`ui/PageTokenScript.kt`: BotGuard's challenge from the page's own `att/get`, its interpreter
+  only from `https://www.google.com/js/th/`, `GenerateIT` on the page's own origin) and asks again
+  with `pot`. After a token worked, Automatic asks with it first on later videos until a plain
+  request works again; On always asks with it first. The token stays in the page; only a short state code reaches the problem detail.
+- Study tools (owner request 2026-10-20, [spec](../specs/2026-10-20-study-tools-from-migaku-and-jidoujisho.md)),
+  each with its own switch under Settings → Study tools (`ui/StudySettings.kt`,
+  `ui/StudyToolsSettings.kt`): play modes and skip silence (`ui/StudyPlayback.kt`) decide on the
+  page's 33 ms playback ticks and only send pause, seek and speed scripts (`ui/StudyWebScripts.kt`)
+  to the one page video, with the full transcript only; known words (`data/KnownWords.kt`,
+  `files/known-words/<language>.txt`, kept through Reset all settings) give the subtitle panel's
+  comprehension score, new-word marks and the one-new-word play mode; Send to AnkiDroid
+  (`data/AnkiDroidNotes.kt`) adds notes through AnkiDroid's public content provider with its
+  runtime permission, without the AnkiDroid library; the blur box is a page element over the
+  player (`webBlurBoxScript`) that hides subtitles burned into the picture.
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve
   bounded loading and cancellation when changing long-video behavior.

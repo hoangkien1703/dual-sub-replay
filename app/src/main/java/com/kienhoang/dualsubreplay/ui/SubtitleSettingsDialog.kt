@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExpandLess
@@ -93,6 +94,7 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_word_learning_title,
         R.string.settings_section_word_learning_summary,
     ),
+    STUDY("study", R.string.settings_section_study_title, R.string.settings_section_study_summary),
     OVERLAY("overlay", R.string.settings_section_overlay_title, R.string.settings_section_overlay_summary),
     TRANSLATION(
         "translation",
@@ -515,6 +517,10 @@ internal fun SubtitleSettingsDialog(
                             wordLearningActiveOnly = wordLearningActiveOnly,
                             onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
                         )
+                    }
+
+                    Section(MoreSettingsSection.STUDY, Icons.Default.AutoStories) {
+                        StudyToolsSettingsSection()
                     }
 
                     Section(MoreSettingsSection.OVERLAY, Icons.Default.Fullscreen) {

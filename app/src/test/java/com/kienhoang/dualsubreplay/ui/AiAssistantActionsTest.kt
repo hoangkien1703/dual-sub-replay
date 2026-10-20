@@ -4,7 +4,13 @@ import com.kienhoang.dualsubreplay.assistant.AI_ACCENT_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_LANGUAGES
 import com.kienhoang.dualsubreplay.assistant.AI_DAILY_GOALS
+import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_AFTER
+import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
+import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
+import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
+import com.kienhoang.dualsubreplay.assistant.AI_STUDY_PLAY_MODES
+import com.kienhoang.dualsubreplay.assistant.AI_STUDY_REPEAT_COUNTS
 import com.kienhoang.dualsubreplay.assistant.AI_SUBTITLE_COLORS
 import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiPlayback
@@ -12,6 +18,7 @@ import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiSettingValue
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.DAILY_GOAL_CHOICES
+import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.GoogleWait
 import org.junit.Assert.assertEquals
@@ -46,6 +53,12 @@ class AiAssistantActionsTest {
         assertEquals(listOf("off") + DAILY_GOAL_CHOICES.map { it.toString() }, AI_DAILY_GOALS)
         assertEquals(TranslationPosition.entries.map { it.storageValue }, AiSetting.TRANSLATION_POSITION.choices)
         assertEquals(GoogleWait.entries.map { it.storageValue }, AiSetting.GOOGLE_WAIT.choices)
+        assertEquals(StudyPlayMode.entries.map { it.storageValue }, AI_STUDY_PLAY_MODES)
+        assertEquals(SkipSilence.entries.map { it.storageValue }, AI_SKIP_SILENCE)
+        assertEquals(STUDY_REPEAT_COUNTS.map { it.toString() }, AI_STUDY_REPEAT_COUNTS)
+        assertEquals(PageTokenMode.entries.map { it.storageValue }, AI_PAGE_TOKEN_MODES)
+        assertEquals(KnownWordsMode.entries.map { it.storageValue }, AI_KNOWN_WORDS_MODES)
+        assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)
     }
 
     @Test
@@ -53,7 +66,22 @@ class AiAssistantActionsTest {
         val state =
             DualSubUiState(fontScale = 1.25f, captionFormat = CaptionFormat.WHOLE_SENTENCE, originalVisibility = CaptionVisibility.PAUSED)
         val stored =
-            AiStoredSettings(appColors = "light", pronunciationVolume = 1.25f, rememberDraggedPosition = false, appLanguage = "pt-BR")
+            AiStoredSettings(
+                appColors = "light",
+                pronunciationVolume = 1.25f,
+                rememberDraggedPosition = false,
+                appLanguage = "pt-BR",
+                study =
+                    StudySettings(
+                        playMode = StudyPlayMode.REPEAT_LINE,
+                        repeatCount = 5,
+                        skipSilence = SkipSilence.JUMP,
+                        knownWordsMode = KnownWordsMode.MANUAL,
+                        knownWordsAfter = 20,
+                        blurBox = true,
+                        pageTokenCaptions = PageTokenMode.ON,
+                    ),
+            )
         for (current in listOf(
             state,
             DualSubUiState(portraitPanelOffsetFraction = -0.15f, dailyGoalMinutes = 30, sourcePreference = "ja"),

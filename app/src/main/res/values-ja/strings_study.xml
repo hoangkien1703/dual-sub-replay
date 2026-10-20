@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">学習ツール</string>
+    <string name="settings_section_study_summary">再生モード、無音スキップ、既知の単語、AnkiDroid、ぼかしボックス</string>
+    <string name="study_play_mode_title">再生モード</string>
+    <string name="study_play_mode_normal">通常</string>
+    <string name="study_play_mode_normal_description">動画をいつも通り再生します。</string>
+    <string name="study_play_mode_pause_after">各行の後で一時停止</string>
+    <string name="study_play_mode_pause_after_description">字幕の各行が終わると一時停止します。再生を押すと次の行に進みます。</string>
+    <string name="study_play_mode_read_first">先に読む</string>
+    <string name="study_play_mode_read_first_description">各行の始めで止まるので、聞く前に読めます。</string>
+    <string name="study_play_mode_listen_first">先に聞く</string>
+    <string name="study_play_mode_listen_first_description">再生中は字幕を隠し、各行の後で一時停止して字幕を表示します。</string>
+    <string name="study_play_mode_repeat">各行を繰り返す</string>
+    <string name="study_play_mode_repeat_description">各行を何回か再生してから次に進みます。</string>
+    <string name="study_play_mode_new_word">新しい単語が1つの行で一時停止</string>
+    <string name="study_play_mode_new_word_description">まだ知らない単語がちょうど1つある行の後だけ一時停止します。既知の単語が必要です。</string>
+    <string name="study_play_mode_needs_known_words">このモードを使うには、下の既知の単語をオンにしてください。</string>
+    <string name="study_play_mode_note">再生モードと無音スキップは、字幕全体が読み込まれたときに働きます。ライブ字幕では働きません。</string>
+    <string name="study_skip_silence_title">無音スキップ</string>
+    <string name="study_skip_silence_description">字幕のない部分が1.5秒より長いと、速く再生するかスキップします。次の行の前に元の速度に戻ります。</string>
+    <string name="study_skip_silence_off">オフ</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">ジャンプ</string>
+    <string name="study_known_words_title">既知の単語</string>
+    <string name="study_known_words_description">各動画のうち既に知っている割合を表示します。自動では、十分な数の行で見た単語も既知として数えます（1行は動画ごとに1回だけ数え、保存した単語は数えません）。手動では単語カードの「この単語を知っている」だけを使います。</string>
+    <string name="study_mark_new_words_title">字幕で新しい単語に印を付ける</string>
+    <string name="study_mark_new_words_description">知らない単語や保存していない単語に薄い背景を付けます。</string>
+    <string name="study_known_words_clear">既知の単語を消去</string>
+    <string name="study_known_words_clear_title">既知の単語を消去しますか？</string>
+    <string name="study_known_words_clear_message">すべての言語で、既知として印を付けた単語がすべて消去されます。保存した単語は残ります。</string>
+    <string name="study_known_words_clear_confirm">消去</string>
+    <string name="study_anki_title">AnkiDroid に送る</string>
+    <string name="study_anki_description">AnkiDroid がインストールされていると、単語カードと練習 → エクスポートに「AnkiDroid に送る」を表示します。カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマートフォンでは、起動中しかカードを受け付けません。</string>
+    <string name="study_blur_box_title">ぼかしボックス</string>
+    <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
+    <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>
+    <string name="study_page_token_description">自動では、YouTube が空の字幕を返したときだけトークンを使い、それでうまくいく間は次の動画から最初にトークンを使います。オンは常に最初にトークンを使います。オフはトークンを作りません。</string>
+    <string name="study_comprehension_chip">既知 %1$d%%</string>
+    <string name="study_comprehension_title">この動画の既知の単語</string>
+    <string name="study_comprehension_known">この動画の単語の %1$d%% を知っています。</string>
+    <string name="study_mark_all_known">新しい単語をすべて既知にする</string>
+    <string name="study_mark_all_known_confirm">既知にする</string>
+    <string name="study_close">閉じる</string>
+    <string name="study_known_word_toggle">この単語を知っている</string>
+    <string name="study_send_to_anki">AnkiDroid に送る</string>
+    <string name="study_sending_to_anki">送信中…</string>
+    <string name="study_sent_to_anki">AnkiDroid に送りました</string>
+    <string name="study_anki_not_installed">このスマートフォンに AnkiDroid が入っていません。</string>
+    <string name="study_anki_permission_denied">AnkiDroid の権限が許可されなかったので、カードは追加されませんでした。</string>
+    <string name="study_anki_failed">AnkiDroid がカードを受け付けませんでした。AnkiDroid を開いてバックグラウンドで動かしたまま戻り、もう一度お試しください。</string>
+    <string name="study_anki_send_all">すべて AnkiDroid に送る</string>
+    <string name="study_anki_all_sent_before">すべての単語はすでに AnkiDroid に送られています。</string>
+    <plurals name="study_repeat_count">
+        <item quantity="other">%1$d 回</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="other">%1$d 語を既知にしています</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="other">新しい単語 %1$d 語</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="other">%1$d 語を既知にしますか？単語カードで印を外せます。</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="other">%1$d 語を AnkiDroid に送りました。</item>
+    </plurals>
+    <string name="study_page_token_auto">自動</string>
+    <string name="study_page_token_on">オン</string>
+    <string name="study_page_token_off">オフ</string>
+    <string name="study_anki_open">AnkiDroid を開く</string>
+    <string name="study_known_words_auto">自動</string>
+    <string name="study_known_words_manual">手動</string>
+    <string name="study_known_words_off">オフ</string>
+    <string name="study_known_words_after_title">既知とするまでに見る回数</string>
+    <string name="study_word_seen">%2$d回中%1$d回見ました</string>
+    <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
+    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 学習ツールで変更できます。</string>
+    <string name="study_known_words_offer_confirm">オンにする</string>
+    <string name="study_known_words_offer_dismiss">今はしない</string>
+</resources>

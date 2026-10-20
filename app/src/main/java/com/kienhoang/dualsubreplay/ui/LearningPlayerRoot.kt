@@ -513,11 +513,14 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     val aiViewModel: AiAssistantViewModel = viewModel()
     val aiAssistant = remember(aiViewModel) { AiAssistantHost(aiViewModel.controller) { aiViewModel.guide } }
+    val studySavedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
+    val studyTools = rememberStudyTools(state, studySavedWords)
     CompositionLocalProvider(
         LocalPhraseSelection provides phraseSelection,
         LocalLanguageDownloads provides viewModel.languageDownloads,
         LocalTranslationEngineActions provides translationEngineActions,
         LocalAiAssistant provides aiAssistant,
+        LocalStudyTools provides studyTools,
     ) {
         Box(Modifier.fillMaxSize()) {
             DualSubApp(
@@ -753,6 +756,7 @@ internal fun LearningSubtitleOverlay(
                                 highlightColor = highlightColor,
                                 wordLearningEnabled = shouldHighlightPos,
                                 languageCode = originalLanguageCode,
+                                markNewWords = true,
                             )
                             if (wordLearningEnabled && tapToLearnEnabled) {
                                 SelectableSubtitleText(

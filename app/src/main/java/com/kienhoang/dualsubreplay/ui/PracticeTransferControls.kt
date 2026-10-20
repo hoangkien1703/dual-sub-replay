@@ -157,6 +157,12 @@ internal fun PracticeTransferControls(
                 exportBackupFormat = backup
                 exporter.launch(if (backup) "DualSub-Practice.json" else "DualSub-Anki.tsv")
             },
+            sendToAnki = {
+                AnkiSendAllButton(words) { result ->
+                    exportChoice = false
+                    controller.message = result
+                }
+            },
         )
     }
     controller.document?.let { ImportPracticeDialog(controller, it) }
@@ -274,6 +280,7 @@ private fun TransferColumnPicker(
 private fun ExportPracticeDialog(
     onDismiss: () -> Unit,
     onExport: (Boolean) -> Unit,
+    sendToAnki: @Composable () -> Unit = {},
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -283,6 +290,7 @@ private fun ExportPracticeDialog(
                 Text(stringResource(R.string.practice_export_description))
                 TextButton(onClick = { onExport(true) }) { Text(stringResource(R.string.practice_export_full_backup)) }
                 TextButton(onClick = { onExport(false) }) { Text(stringResource(R.string.practice_export_anki_text)) }
+                sendToAnki()
             }
         },
         confirmButton = {},

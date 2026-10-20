@@ -52,11 +52,23 @@ internal val AI_APP_LANGUAGES = listOf("device", "en", "vi", "es", "pt-BR", "ja"
 /** "off" or the minutes of `DAILY_GOAL_CHOICES`, which a test keeps equal. */
 internal val AI_DAILY_GOALS = listOf("off", "5", "10", "15", "20", "30", "45", "60")
 
+/** The keys of `StudyPlayMode`; a test keeps them equal. */
+internal val AI_STUDY_PLAY_MODES = listOf("normal", "pause_after_line", "read_first", "listen_first", "repeat_line", "new_word_lines")
+
+/** The keys of `SkipSilence`; a test keeps them equal. */
+internal val AI_SKIP_SILENCE = listOf("off", "2x", "4x", "jump")
+internal val AI_PAGE_TOKEN_MODES = listOf("auto", "on", "off")
+internal val AI_KNOWN_WORDS_MODES = listOf("auto", "manual", "off")
+internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
+
+/** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
+internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5")
+
 /**
  * A setting the assistant may change, in the order the settings page shows them. [choices] lists
  * the values it takes; a setting without choices takes a number within [range], or a language.
  * Most run at once with Undo; one that [asks] reloads the video's subtitles, downloads language
- * models, or rebuilds the screen, so it waits for the user's tap.
+ * models, rebuilds the screen, or turns on page-token captions (beta), so it waits for the user's tap.
  */
 internal enum class AiSetting(
     val key: String,
@@ -98,6 +110,15 @@ internal enum class AiSetting(
     ORIGINAL_CAPTION_LANGUAGE("original_caption_language", emptyList(), asks = true),
     APP_LANGUAGE("app_language", AI_APP_LANGUAGES, asks = true),
     DAILY_GOAL("daily_goal", AI_DAILY_GOALS),
+    STUDY_PLAY_MODE("study_play_mode", AI_STUDY_PLAY_MODES),
+    STUDY_REPEAT_COUNT("study_repeat_count", AI_STUDY_REPEAT_COUNTS),
+    SKIP_SILENCE("skip_silence", AI_SKIP_SILENCE),
+    KNOWN_WORDS("known_words", AI_KNOWN_WORDS_MODES),
+    KNOWN_WORDS_AFTER("known_words_after", AI_KNOWN_WORDS_AFTER),
+    MARK_NEW_WORDS("mark_new_words"),
+    SEND_TO_ANKIDROID("send_to_ankidroid"),
+    BLUR_BOX("blur_box"),
+    PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
@@ -550,6 +571,29 @@ private val SETTING_CHOICE_ALIASES by lazy {
         AiSetting.OVERLAY_BACKGROUND to mapOf("green" to "forest", "purple" to "plum", "blue" to "navy"),
         AiSetting.ACCENT_COLOR to
             mapOf("teal" to "cyan", "green" to "mint", "yellow" to "amber", "red" to "rose", "pink" to "rose", "purple" to "lavender"),
+        AiSetting.STUDY_PLAY_MODE to
+            mapOf(
+                "off" to "normal",
+                "pause" to "pause_after_line",
+                "pause_after_each_line" to "pause_after_line",
+                "repeat" to "repeat_line",
+                "repeat_each_line" to "repeat_line",
+                "new_words" to "new_word_lines",
+                "one_new_word" to "new_word_lines",
+            ),
+        AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
+        AiSetting.KNOWN_WORDS to
+            mapOf("automatic" to "auto", "on" to "auto", "true" to "auto", "enabled" to "auto", "false" to "off", "disabled" to "off"),
+        AiSetting.PAGE_TOKEN_CAPTIONS to
+            mapOf(
+                "automatic" to "auto",
+                "true" to "on",
+                "always" to "on",
+                "enabled" to "on",
+                "false" to "off",
+                "never" to "off",
+                "disabled" to "off",
+            ),
     )
 }
 
@@ -574,6 +618,12 @@ internal fun aiSettingValue(
         AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
         AiSetting.DAILY_GOAL -> aiDailyGoal(key)
         AiSetting.GOOGLE_WAIT -> aiGoogleWait(key)
+        AiSetting.STUDY_REPEAT_COUNT, AiSetting.KNOWN_WORDS_AFTER ->
+            key
+                .removeSuffix("times")
+                .removeSuffix("x")
+                .trim('_')
+                .takeIf { it in setting.choices }
         else ->
             listOfNotNull(key, SETTING_CHOICE_ALIASES[setting]?.get(key), CHOICE_ALIASES[key])
                 .firstOrNull { it in setting.choices }
@@ -669,6 +719,22 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (seconds a subtitle line waits for Google Translate before YouTube's or the device's translation shows; " +
                 "auto waits 2 on mobile data and 4 on Wi-Fi)"
+        AiSetting.STUDY_PLAY_MODE ->
+            choiceList(setting.choices) +
+                " (pause_after_line pauses after each line, read_first stops at each line's start, listen_first hides subtitles " +
+                "until each line ends, repeat_line plays each line study_repeat_count times, new_word_lines pauses after lines " +
+                "with exactly one new word and needs known_words on; all need the full transcript)"
+        AiSetting.STUDY_REPEAT_COUNT -> choiceList(setting.choices) + " (plays of each line in repeat_line)"
+        AiSetting.KNOWN_WORDS ->
+            choiceList(setting.choices) +
+                " (auto also counts a word as known after it played in known_words_after lines, each line once per video; " +
+                "manual uses only the word card's button; off hides the score)"
+        AiSetting.KNOWN_WORDS_AFTER -> choiceList(setting.choices) + " (lines a word must play in before auto counts it as known)"
+        AiSetting.SKIP_SILENCE -> choiceList(setting.choices) + " (gaps over 1.5 s with no subtitle line play faster or are jumped)"
+        AiSetting.PAGE_TOKEN_CAPTIONS ->
+            choiceList(setting.choices) +
+                " (beta: auto makes a token on the YouTube page only when captions come back empty and then uses it first on " +
+                "later videos while that works; on always asks with a token first; off never makes one)"
         else -> choiceList(setting.choices)
     }
 

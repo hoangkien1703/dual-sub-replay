@@ -195,6 +195,7 @@ private fun OriginalCardText(
             highlightColor = highlightColor,
             wordLearningEnabled = shouldHighlightPos,
             languageCode = resolvedSourceLanguage,
+            markNewWords = true,
         )
     if (wordLearningEnabled && tapToLearnEnabled) {
         SelectableSubtitleText(
