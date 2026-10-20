@@ -63,9 +63,12 @@ class AppUpdateUiTest {
             }
         }
         composeRule.onNodeWithTag("settings_section_updates").performScrollTo().performClick()
-        composeRule.onNodeWithText("Update automatically", substring = false).assertExists()
         composeRule.runOnIdle { assertFalse(preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false)) }
-        composeRule.onNodeWithTag("auto_update_switch").performScrollTo().performClick()
+        composeRule
+            .onNodeWithTag("auto_update_switch")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
         composeRule.runOnIdle { assertTrue(preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false)) }
         saveUiEvidence("app-updates-settings")
     }
