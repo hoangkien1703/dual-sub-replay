@@ -77,4 +77,8 @@
     <string name="study_known_words_off">Mati</string>
     <string name="study_known_words_after_title">Hitung sebagai dikenal setelah dilihat</string>
     <string name="study_word_seen">Dilihat %1$d dari %2$d kali</string>
+    <string name="study_known_words_offer_title">Nyalakan Kata yang dikenal?</string>
+    <string name="study_known_words_offer_message">Panel subtitle lalu menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal, dan kata yang sering kamu lihat otomatis dihitung sebagai dikenal. Kamu bisa mengubahnya nanti di Setelan → Alat belajar.</string>
+    <string name="study_known_words_offer_confirm">Nyalakan</string>
+    <string name="study_known_words_offer_dismiss">Nanti saja</string>
 </resources>

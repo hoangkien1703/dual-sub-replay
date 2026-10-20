@@ -87,6 +87,10 @@ internal class StudyTools(
     var language by mutableStateOf<String?>(null)
         internal set
 
+    /** The known-word language of the open video's subtitles, also while Known words is off. */
+    var wordsLanguage by mutableStateOf<String?>(null)
+        internal set
+
     var known by mutableStateOf<Set<String>>(emptySet())
         internal set
 
@@ -145,8 +149,10 @@ internal fun rememberStudyTools(
     val tools = remember(context) { StudyTools(KnownWordsRepository.get(context), AnkiDroidNotes(context), scope) }
     val settings by rememberStudySettings()
     val sourceCode = state.resolvedSourceLanguage
-    val language = knownWordLanguage(sourceCode).takeIf { settings.knownWords }
-    val known by remember(language) { language?.let(tools.repository::words) ?: NO_WORDS }.collectAsState()
+    val wordsLanguage = knownWordLanguage(sourceCode)
+    val language = wordsLanguage.takeIf { settings.knownWords }
+    // Kept even while Known words is off, for the word card's "I know this word".
+    val known by remember(wordsLanguage) { wordsLanguage?.let(tools.repository::words) ?: NO_WORDS }.collectAsState()
     val seen by remember(language) { language?.let(tools.repository::seen) ?: NO_COUNTS }.collectAsState()
     val learning =
         remember(savedWords, language) {
@@ -174,6 +180,7 @@ internal fun rememberStudyTools(
     SideEffect {
         tools.settings = settings
         tools.language = language
+        tools.wordsLanguage = wordsLanguage
         tools.known = known
         tools.seen = seen
         tools.learning = learning
@@ -268,8 +275,9 @@ private fun ComprehensionDialog(
 }
 
 /**
- * The word card's "I know this word" (while Known words is on, for a single word in the video's
- * language, with how often Automatic saw it) and "Send to AnkiDroid" (when that tool is on).
+ * The word card's "I know this word" (for a single word in the video's language, with how often
+ * Automatic saw it) and "Send to AnkiDroid" (when that tool is on). While Known words is off (the
+ * default), the first "I know this word" offers once to turn Automatic known words on.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -278,16 +286,24 @@ internal fun StudyWordActions(
     meaning: String,
 ) {
     val tools = LocalStudyTools.current ?: return
-    val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.language }
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
+    var offering by remember { mutableStateOf(false) }
+    val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.wordsLanguage }
     val key = selection.token.takeIf { !selection.isPhrase && !selection.translated }?.let(::knownWordKey)
-    val showKnown = tools.settings.knownWords && language != null && key != null
+    val showKnown = language != null && key != null
     if (!showKnown && !tools.ankiAvailable) return
     val known = showKnown && key in tools.known
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showKnown) {
             FilterChip(
                 selected = known,
-                onClick = { tools.setKnown(language, key, !known) },
+                onClick = {
+                    tools.setKnown(language, key, !known)
+                    val offeredBefore = preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false)
+                    offering = !known && shouldOfferKnownWords(tools.settings, offeredBefore)
+                    if (offering) preferences.edit().putBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, true).apply()
+                },
                 label = { Text(stringResource(R.string.study_known_word_toggle)) },
                 leadingIcon =
                     if (known) {
@@ -309,6 +325,41 @@ internal fun StudyWordActions(
             modifier = Modifier.testTag("known_word_seen"),
         )
     }
+    if (offering) {
+        KnownWordsOfferDialog(
+            onTurnOn = {
+                offering = false
+                preferences.edit().putString(KNOWN_WORDS_PREFERENCE, KnownWordsMode.AUTO.storageValue).apply()
+            },
+            onDismiss = { offering = false },
+        )
+    }
+}
+
+/** The first "I know this word" while Known words is off offers to turn it on, once. */
+internal fun shouldOfferKnownWords(
+    settings: StudySettings,
+    offeredBefore: Boolean,
+): Boolean = !settings.knownWords && !offeredBefore
+
+@Composable
+private fun KnownWordsOfferDialog(
+    onTurnOn: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.study_known_words_offer_title)) },
+        text = { Text(stringResource(R.string.study_known_words_offer_message)) },
+        confirmButton = {
+            TextButton(onClick = onTurnOn, modifier = Modifier.testTag("turn_on_known_words")) {
+                Text(stringResource(R.string.study_known_words_offer_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.study_known_words_offer_dismiss)) }
+        },
+    )
 }
 
 @Composable

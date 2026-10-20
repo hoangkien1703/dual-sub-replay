@@ -87,7 +87,9 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
         saveUiEvidence("study-tools-settings")
 
-        // Known words is Automatic at first, with its count; Mark new words goes with Known words.
+        // Known words is off at first; Automatic shows its count, and Mark new words goes with Known words.
+        assertTrue(composeRule.onAllNodes(hasTestTag("mark_new_words_switch")).fetchSemanticsNodes().isEmpty())
+        composeRule.onNodeWithTag("known_words_auto").performScrollTo().performClick()
         composeRule.onNodeWithTag("known_words_after_10").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("known_words_after_20").performScrollTo().performClick()
         composeRule.onNodeWithTag("mark_new_words_switch").performScrollTo().assertIsDisplayed()
@@ -97,7 +99,6 @@ class StudyToolsUiTest {
             assertEquals("off", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
             assertEquals(20, preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, 0))
         }
-        composeRule.onNodeWithTag("known_words_auto").performScrollTo().performClick()
         // Page tokens: Automatic by default, then On.
         composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
@@ -121,7 +122,7 @@ class StudyToolsUiTest {
             val tools =
                 remember {
                     StudyTools(KnownWordsRepository(File(context.cacheDir, "known-words-ui-test")), AnkiDroidNotes(context), scope).apply {
-                        settings = StudySettings(markNewWords = true)
+                        settings = StudySettings(knownWordsMode = KnownWordsMode.AUTO, markNewWords = true)
                         language = "en"
                         known = setOf("i", "like")
                         comprehension = VideoComprehension(3, 2, 0, setOf("cats"), setOf(0))
@@ -160,7 +161,9 @@ class StudyToolsUiTest {
                         AnkiDroidNotes(context),
                         scope,
                     ).apply {
+                        settings = StudySettings(knownWordsMode = KnownWordsMode.AUTO)
                         language = "en"
+                        wordsLanguage = "en"
                         seen = mapOf("cats" to 4)
                     }
                 }
@@ -176,5 +179,40 @@ class StudyToolsUiTest {
         composeRule.onNodeWithText("Seen 4 of 10 times").assertIsDisplayed()
         composeRule.onNodeWithTag("known_word_toggle").assertIsDisplayed()
         saveUiEvidence("study-known-word-seen")
+    }
+
+    @Test
+    fun theFirstKnownWordOffersToTurnOnKnownWordsOnce() {
+        val selection =
+            LearningWordSelection(AnalyzedToken("cats", 7, 11, PartOfSpeech.NOUN), "en", "vi", null, null, translated = false)
+        composeRule.setContent {
+            val scope = rememberCoroutineScope()
+            val tools =
+                remember {
+                    StudyTools(
+                        KnownWordsRepository(File(context.cacheDir, "known-words-offer-test")),
+                        AnkiDroidNotes(context),
+                        scope,
+                    ).apply {
+                        wordsLanguage = "en"
+                    }
+                }
+            CompositionLocalProvider(LocalStudyTools provides tools) {
+                DualSubTheme {
+                    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        Column(Modifier.padding(12.dp)) { StudyWordActions(selection, "mèo") }
+                    }
+                }
+            }
+        }
+
+        composeRule.onNodeWithTag("known_word_toggle").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("turn_on_known_words").assertIsDisplayed()
+        saveUiEvidence("study-known-words-offer")
+        composeRule.onNodeWithTag("turn_on_known_words").performClick()
+        composeRule.runOnIdle {
+            assertEquals("auto", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
+            assertTrue(preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false))
+        }
     }
 }

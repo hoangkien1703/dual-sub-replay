@@ -82,4 +82,8 @@
     <string name="study_known_words_off">Off</string>
     <string name="study_known_words_after_title">Count a word as known after seeing it</string>
     <string name="study_word_seen">Seen %1$d of %2$d times</string>
+    <string name="study_known_words_offer_title">Turn on Known words?</string>
+    <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and words you see often count as known by themselves. You can change this later in Settings → Study tools.</string>
+    <string name="study_known_words_offer_confirm">Turn on</string>
+    <string name="study_known_words_offer_dismiss">Not now</string>
 </resources>

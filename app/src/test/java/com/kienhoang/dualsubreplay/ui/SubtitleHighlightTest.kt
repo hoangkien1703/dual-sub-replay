@@ -213,6 +213,7 @@ class SubtitleWordHighlightTest {
                 PAGE_TOKEN_CAPTIONS_PREFERENCE,
                 PAGE_TOKEN_NEEDED_PREFERENCE,
                 KNOWN_WORDS_AFTER_PREFERENCE,
+                KNOWN_WORDS_OFFERED_PREFERENCE,
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)

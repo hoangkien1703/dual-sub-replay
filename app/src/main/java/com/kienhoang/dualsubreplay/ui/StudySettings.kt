@@ -26,6 +26,9 @@ internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
 /** Automatic page tokens: YouTube wanted a token, so later videos ask with it first. */
 internal const val PAGE_TOKEN_NEEDED_PREFERENCE = "page_token_needed"
 
+/** The word card offered to turn Known words on once, after the first "I know this word". */
+internal const val KNOWN_WORDS_OFFERED_PREFERENCE = "known_words_offered"
+
 /** The Study tools settings, all reset by Reset all settings. */
 internal val STUDY_SETTING_KEYS =
     listOf(
@@ -39,6 +42,7 @@ internal val STUDY_SETTING_KEYS =
         BLUR_BOX_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
+        KNOWN_WORDS_OFFERED_PREFERENCE,
     )
 
 /** How the video plays around each subtitle line (Settings → Study tools → Play mode). */
@@ -71,7 +75,8 @@ internal enum class SkipSilence(
 /**
  * Settings → Study tools → Known words (owner decision 2026-10-20). [AUTO] also counts a word as
  * known once the user saw it in [StudySettings.knownWordsAfter] played lines; [MANUAL] uses only
- * "I know this word"; [OFF] hides the score and the word card's button.
+ * "I know this word"; [OFF] (the default) hides the score, and the word card's first "I know this
+ * word" offers once to turn Automatic on.
  */
 internal enum class KnownWordsMode(
     val storageValue: String,
@@ -88,7 +93,7 @@ internal val KNOWN_WORDS_AFTER_CHOICES = listOf(5, 10, 20)
 internal const val DEFAULT_KNOWN_WORDS_AFTER = 10
 
 internal fun storedKnownWordsMode(value: String?): KnownWordsMode =
-    KnownWordsMode.entries.firstOrNull { it.storageValue == value } ?: KnownWordsMode.AUTO
+    KnownWordsMode.entries.firstOrNull { it.storageValue == value } ?: KnownWordsMode.OFF
 
 internal fun storedKnownWordsAfter(value: Int): Int = value.takeIf { it in KNOWN_WORDS_AFTER_CHOICES } ?: DEFAULT_KNOWN_WORDS_AFTER
 
@@ -101,7 +106,7 @@ internal data class StudySettings(
     val playMode: StudyPlayMode = StudyPlayMode.NORMAL,
     val repeatCount: Int = DEFAULT_STUDY_REPEAT_COUNT,
     val skipSilence: SkipSilence = SkipSilence.OFF,
-    val knownWordsMode: KnownWordsMode = KnownWordsMode.AUTO,
+    val knownWordsMode: KnownWordsMode = KnownWordsMode.OFF,
     val knownWordsAfter: Int = DEFAULT_KNOWN_WORDS_AFTER,
     val markNewWords: Boolean = false,
     val ankiDroid: Boolean = true,

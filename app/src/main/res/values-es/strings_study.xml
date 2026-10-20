@@ -87,4 +87,8 @@
     <string name="study_known_words_off">No</string>
     <string name="study_known_words_after_title">Contar como conocida después de verla</string>
     <string name="study_word_seen">Vista %1$d de %2$d veces</string>
+    <string name="study_known_words_offer_title">¿Activar Palabras conocidas?</string>
+    <string name="study_known_words_offer_message">El panel de subtítulos mostrará cuánto de cada video ya conoces, y las palabras que ves a menudo contarán como conocidas por sí solas. Puedes cambiarlo luego en Ajustes → Herramientas de estudio.</string>
+    <string name="study_known_words_offer_confirm">Activar</string>
+    <string name="study_known_words_offer_dismiss">Ahora no</string>
 </resources>

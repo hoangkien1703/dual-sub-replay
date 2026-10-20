@@ -77,4 +77,8 @@
     <string name="study_known_words_off">オフ</string>
     <string name="study_known_words_after_title">既知とするまでに見る回数</string>
     <string name="study_word_seen">%2$d回中%1$d回見ました</string>
+    <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
+    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 学習ツールで変更できます。</string>
+    <string name="study_known_words_offer_confirm">オンにする</string>
+    <string name="study_known_words_offer_dismiss">今はしない</string>
 </resources>

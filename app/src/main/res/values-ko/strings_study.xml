@@ -77,4 +77,8 @@
     <string name="study_known_words_off">끄기</string>
     <string name="study_known_words_after_title">아는 단어로 세기까지 볼 횟수</string>
     <string name="study_word_seen">%2$d번 중 %1$d번 봤어요</string>
+    <string name="study_known_words_offer_title">아는 단어를 켤까요?</string>
+    <string name="study_known_words_offer_message">자막 패널에 각 동영상에서 이미 아는 비율이 표시되고, 자주 보는 단어는 저절로 아는 단어로 셉니다. 나중에 설정 → 학습 도구에서 바꿀 수 있습니다.</string>
+    <string name="study_known_words_offer_confirm">켜기</string>
+    <string name="study_known_words_offer_dismiss">나중에</string>
 </resources>

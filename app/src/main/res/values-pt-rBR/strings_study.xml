@@ -87,4 +87,8 @@
     <string name="study_known_words_off">Desligado</string>
     <string name="study_known_words_after_title">Contar como conhecida depois de vê-la</string>
     <string name="study_word_seen">Vista %1$d de %2$d vezes</string>
+    <string name="study_known_words_offer_title">Ligar Palavras conhecidas?</string>
+    <string name="study_known_words_offer_message">O painel de legendas passa a mostrar quanto de cada vídeo você já conhece, e as palavras que você vê com frequência contam como conhecidas sozinhas. Você pode mudar isso depois em Configurações → Ferramentas de estudo.</string>
+    <string name="study_known_words_offer_confirm">Ligar</string>
+    <string name="study_known_words_offer_dismiss">Agora não</string>
 </resources>

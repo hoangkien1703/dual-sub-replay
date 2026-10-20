@@ -69,8 +69,9 @@ scope, not merge or release.
   worked, asks with it first on later videos until a plain request works again; On always asks with
   a token first (as Migaku does); Off never makes one. A failure falls back to everything the page
   already does.
-- Known words is Automatic by default (owner decision, 2026-10-20, replacing a short-lived "off with
-  a one-time offer"), or Manual or Off. Automatic counts each different word of a line that plays,
+- Known words is Off by default (owner decision, 2026-10-20, after trying Automatic as the default
+  in build 463), or Automatic or Manual. "I know this word" always shows on the word card, and its
+  first use while Known words is off offers once to turn Automatic on. Automatic counts each different word of a line that plays,
   once per line per video (replays, seeks back and Repeat each line add nothing; Kien picked this
   on a decision card), and a word becomes known after 10 such lines (Settings: 5, 10 or 20). Saved
   words are never counted. "I know this word" still marks at once, and marking either way restarts
@@ -248,3 +249,11 @@ plan, built in PR #137:
 - Tests: `KnownWordsTest` (counting, once per line per video, the counts file, the repository),
   `StudyPlaybackTest`, `AiActionsTest`, `AiAssistantActionsTest`, `StudyToolsUiTest` (modes and the
   word card's "Seen 4 of 10 times").
+
+### Off by default again (2026-10-20, after preview build 463)
+
+Kien changed his mind: Known words is Off by default, and the one-time offer on the first "I know
+this word" is back (`shouldOfferKnownWords`, `known_words_offered`); accepting it turns on
+Automatic. "I know this word" shows while Known words is off, so the word card keeps known words
+for the video's language either way (`StudyTools.wordsLanguage`). Automatic, Manual, the 5/10/20
+count and "Seen 4 of 10 times" stay as built.

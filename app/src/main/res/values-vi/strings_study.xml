@@ -77,4 +77,8 @@
     <string name="study_known_words_off">Tắt</string>
     <string name="study_known_words_after_title">Tính là đã biết sau khi gặp</string>
     <string name="study_word_seen">Đã gặp %1$d/%2$d lần</string>
+    <string name="study_known_words_offer_title">Bật Từ đã biết?</string>
+    <string name="study_known_words_offer_message">Khi đó bảng phụ đề sẽ cho biết bạn đã biết bao nhiêu phần của mỗi video, và những từ bạn gặp thường xuyên sẽ tự được tính là đã biết. Bạn có thể đổi lại sau trong Cài đặt → Công cụ học.</string>
+    <string name="study_known_words_offer_confirm">Bật</string>
+    <string name="study_known_words_offer_dismiss">Để sau</string>
 </resources>
