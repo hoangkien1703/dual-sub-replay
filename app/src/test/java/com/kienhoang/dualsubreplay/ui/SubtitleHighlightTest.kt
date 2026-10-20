@@ -203,6 +203,14 @@ class SubtitleWordHighlightTest {
                 com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
                 "auto_pronounce",
                 PRONUNCIATION_VOLUME_PREFERENCE,
+                STUDY_PLAY_MODE_PREFERENCE,
+                STUDY_REPEAT_COUNT_PREFERENCE,
+                SKIP_SILENCE_PREFERENCE,
+                KNOWN_WORDS_PREFERENCE,
+                MARK_NEW_WORDS_PREFERENCE,
+                ANKIDROID_PREFERENCE,
+                BLUR_BOX_PREFERENCE,
+                PAGE_TOKEN_CAPTIONS_PREFERENCE,
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)

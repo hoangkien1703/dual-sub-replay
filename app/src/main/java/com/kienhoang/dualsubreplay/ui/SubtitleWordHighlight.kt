@@ -72,6 +72,8 @@ internal fun annotatedSubtitleText(
     alignedOriginalTokens: List<AnalyzedToken>? = null,
     preparedTokens: List<AnalyzedToken>? = null,
     preparedSpans: List<SubtitleWordSpan>? = null,
+    newWordRanges: List<IntRange> = emptyList(),
+    newWordColor: Color = Color.Unspecified,
 ): AnnotatedString {
     if (text.isBlank()) return AnnotatedString("")
     CaptionTimingDiagnostics.record("presentation") { "presentation word=$activeWordIndex" }
@@ -125,6 +127,13 @@ internal fun annotatedSubtitleText(
             }
         }
 
+        // Study tools: words that are neither known nor saved get a light background.
+        newWordRanges.forEach { range ->
+            if (range.first >= 0 && range.last < text.length && range.first <= range.last) {
+                addStyle(SpanStyle(background = newWordColor), range.first, range.last + 1)
+            }
+        }
+
         // Active spoken-word karaoke highlight
         if (activeSpan != null) {
             if (wordLearningEnabled) {
@@ -173,8 +182,10 @@ internal fun rememberAnnotatedSubtitleText(
     wordLearningEnabled: Boolean = false,
     languageCode: String? = null,
     alignedOriginalTokens: List<AnalyzedToken>? = null,
+    markNewWords: Boolean = false,
 ): AnnotatedString {
     val spans = remember(text, words) { subtitleWordSpans(text, words) }
+    val study = LocalStudyTools.current?.takeIf { markNewWords && it.marksNewWords(languageCode) }
     val tokens =
         remember(text, wordLearningEnabled, languageCode, alignedOriginalTokens, tokenizerRevision()) {
             when {
@@ -188,7 +199,16 @@ internal fun rememberAnnotatedSubtitleText(
                 else -> LanguageAwareTokenizer.tokenize(text, languageCode)
             }
         }
-    return remember(text, spans, tokens, activeWordIndex, baseColor, highlightColor, wordLearningEnabled) {
+    val newWordRanges =
+        remember(text, tokens, languageCode, study?.known, study?.learning) {
+            study?.let { tools ->
+                tokens
+                    .ifEmpty { LanguageAwareTokenizer.tokenize(text, languageCode) }
+                    .filter(tools::isNew)
+                    .map { it.startIndex until it.endIndex }
+            }.orEmpty()
+        }
+    return remember(text, spans, tokens, activeWordIndex, baseColor, highlightColor, wordLearningEnabled, newWordRanges) {
         annotatedSubtitleText(
             text,
             words,
@@ -200,6 +220,8 @@ internal fun rememberAnnotatedSubtitleText(
             alignedOriginalTokens,
             tokens,
             spans,
+            newWordRanges,
+            newWordTint(highlightColor),
         )
     }
 }

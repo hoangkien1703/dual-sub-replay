@@ -28,9 +28,9 @@ enum class CaptionVisibility(
 internal fun storedCaptionVisibility(value: String?): CaptionVisibility =
     CaptionVisibility.entries.firstOrNull { it.name == value } ?: CaptionVisibility.ALWAYS
 
-internal fun DualSubUiState.showOriginal() = originalVisibility.visible(playbackPaused)
+internal fun DualSubUiState.showOriginal() = studyCaptionVisibility(originalVisibility, studyPlayMode).visible(playbackPaused)
 
-internal fun DualSubUiState.showTranslation() = translatedVisibility.visible(playbackPaused)
+internal fun DualSubUiState.showTranslation() = studyCaptionVisibility(translatedVisibility, studyPlayMode).visible(playbackPaused)
 
 /** Hiding the transcript for an overlay must not disconnect its live timing source. */
 internal fun shouldCaptureCaptionsForPresentation(
@@ -81,4 +81,5 @@ internal fun shouldSuppressNativeCaptions(
     mode: PlayerExperienceMode,
 ): Boolean =
     liveCapture || mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY ||
-        state.originalVisibility != CaptionVisibility.ALWAYS || state.translatedVisibility != CaptionVisibility.ALWAYS
+        state.originalVisibility != CaptionVisibility.ALWAYS || state.translatedVisibility != CaptionVisibility.ALWAYS ||
+        state.studyPlayMode == StudyPlayMode.LISTEN_FIRST

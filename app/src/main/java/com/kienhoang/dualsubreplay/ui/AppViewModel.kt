@@ -107,6 +107,8 @@ data class DualSubUiState(
     val generatedCaptions: Boolean = false,
     val segments: List<SubtitleSegment> = emptyList(),
     val playbackPaused: Boolean = false,
+    /** Settings → Study tools → Play mode; Listen first shows subtitles only while paused. */
+    val studyPlayMode: StudyPlayMode = StudyPlayMode.NORMAL,
     val originalVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     val translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     val currentIndex: Int = -1,
@@ -425,6 +427,7 @@ class AppViewModel internal constructor(
                         ?: YOUTUBE_HOME_URL,
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
+                studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
                 fontScale = normalizeFontScale(preferences.getFloat("font_scale", 1f)),
                 portraitPanelOffsetFraction =
                     normalizePortraitPanelOffsetFraction(
@@ -529,13 +532,17 @@ class AppViewModel internal constructor(
 
     private val visibilityListener =
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == ORIGINAL_VISIBILITY || key == TRANSLATED_VISIBILITY || key == null) {
+            if (key == ORIGINAL_VISIBILITY || key == TRANSLATED_VISIBILITY || key == STUDY_PLAY_MODE_PREFERENCE || key == null) {
                 _state.update {
                     it.copy(
                         originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                         translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
+                        studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
                     )
                 }
+            }
+            if (key == PAGE_TOKEN_CAPTIONS_PREFERENCE || key == null) {
+                pageTranscripts.pageTokenEnabled = preferences.getBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, false)
             }
         }
 
@@ -605,6 +612,7 @@ class AppViewModel internal constructor(
     init {
         preferences.edit().remove(KARAOKE_TIMING_MODE_PREFERENCE).apply()
         preferences.registerOnSharedPreferenceChangeListener(visibilityListener)
+        pageTranscripts.pageTokenEnabled = preferences.getBoolean(PAGE_TOKEN_CAPTIONS_PREFERENCE, false)
         viewModelScope.launch {
             try {
                 vocabulary.refresh()
@@ -1229,6 +1237,7 @@ class AppViewModel internal constructor(
                 customColorsEnabled = true,
                 originalVisibility = CaptionVisibility.ALWAYS,
                 translatedVisibility = CaptionVisibility.ALWAYS,
+                studyPlayMode = StudyPlayMode.NORMAL,
                 captionFormat = CaptionFormat.SHORT_PHRASES,
                 translationPosition = TranslationPosition.BELOW,
                 lockOverlayToVideo = false,

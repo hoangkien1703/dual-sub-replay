@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">Công cụ học</string>
+    <string name="settings_section_study_summary">Chế độ phát, bỏ qua đoạn im lặng, từ đã biết, AnkiDroid, ô làm mờ</string>
+    <string name="study_play_mode_title">Chế độ phát</string>
+    <string name="study_play_mode_normal">Bình thường</string>
+    <string name="study_play_mode_normal_description">Video phát như thường lệ.</string>
+    <string name="study_play_mode_pause_after">Dừng sau mỗi dòng</string>
+    <string name="study_play_mode_pause_after_description">Dừng khi mỗi dòng phụ đề kết thúc. Nhấn phát để nghe dòng tiếp theo.</string>
+    <string name="study_play_mode_read_first">Đọc trước</string>
+    <string name="study_play_mode_read_first_description">Dừng ở đầu mỗi dòng để bạn đọc trước khi nghe.</string>
+    <string name="study_play_mode_listen_first">Nghe trước</string>
+    <string name="study_play_mode_listen_first_description">Ẩn phụ đề khi video đang phát, rồi dừng sau mỗi dòng và hiện phụ đề.</string>
+    <string name="study_play_mode_repeat">Lặp lại mỗi dòng</string>
+    <string name="study_play_mode_repeat_description">Phát mỗi dòng vài lần rồi mới sang dòng tiếp theo.</string>
+    <string name="study_play_mode_new_word">Dừng ở dòng có một từ mới</string>
+    <string name="study_play_mode_new_word_description">Chỉ dừng sau những dòng có đúng một từ bạn chưa biết. Cần bật Từ đã biết.</string>
+    <string name="study_play_mode_needs_known_words">Bật Từ đã biết bên dưới để dùng chế độ này.</string>
+    <string name="study_play_mode_note">Chế độ phát và bỏ qua đoạn im lặng hoạt động khi đã tải toàn bộ phụ đề, không dùng với phụ đề trực tiếp.</string>
+    <string name="study_skip_silence_title">Bỏ qua đoạn im lặng</string>
+    <string name="study_skip_silence_description">Những đoạn không có dòng phụ đề nào dài hơn 1,5 giây sẽ phát nhanh hơn hoặc được bỏ qua. Tốc độ của bạn trở lại trước dòng tiếp theo.</string>
+    <string name="study_skip_silence_off">Tắt</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">Nhảy qua</string>
+    <string name="study_known_words_title">Từ đã biết</string>
+    <string name="study_known_words_description">Đánh dấu từ bạn đã biết trên thẻ từ. Bảng phụ đề cho biết bạn đã biết bao nhiêu phần của mỗi video.</string>
+    <string name="study_mark_new_words_title">Đánh dấu từ mới trong phụ đề</string>
+    <string name="study_mark_new_words_description">Tô nền nhạt cho những từ chưa biết và chưa lưu.</string>
+    <string name="study_known_words_clear">Xóa từ đã biết</string>
+    <string name="study_known_words_clear_title">Xóa từ đã biết?</string>
+    <string name="study_known_words_clear_message">Mọi từ bạn đã đánh dấu là đã biết, ở mọi ngôn ngữ, sẽ bị quên. Từ đã lưu vẫn còn.</string>
+    <string name="study_known_words_clear_confirm">Xóa</string>
+    <string name="study_anki_title">Gửi sang AnkiDroid</string>
+    <string name="study_anki_description">Hiện nút Gửi sang AnkiDroid trên thẻ từ và trong Luyện tập → Xuất khi máy có cài AnkiDroid. Thẻ được thêm vào bộ thẻ DualSub Replay.</string>
+    <string name="study_blur_box_title">Ô làm mờ</string>
+    <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
+    <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>
+    <string name="study_page_token_description">Khi YouTube trả về phụ đề trống, trang YouTube tự tạo mã xác minh nguồn gốc giống trình phát web của YouTube rồi yêu cầu lại. Đang thử nghiệm.</string>
+    <string name="study_comprehension_chip">Đã biết %1$d%%</string>
+    <string name="study_comprehension_title">Từ đã biết trong video này</string>
+    <string name="study_comprehension_known">Bạn biết %1$d%% số từ trong video này.</string>
+    <string name="study_mark_all_known">Đánh dấu mọi từ mới là đã biết</string>
+    <string name="study_mark_all_known_confirm">Đánh dấu đã biết</string>
+    <string name="study_close">Đóng</string>
+    <string name="study_known_word_toggle">Tôi biết từ này</string>
+    <string name="study_send_to_anki">Gửi sang AnkiDroid</string>
+    <string name="study_sending_to_anki">Đang gửi…</string>
+    <string name="study_sent_to_anki">Đã gửi sang AnkiDroid</string>
+    <string name="study_anki_not_installed">Điện thoại này chưa cài AnkiDroid.</string>
+    <string name="study_anki_permission_denied">Chưa cấp quyền cho AnkiDroid nên không thẻ nào được thêm.</string>
+    <string name="study_anki_failed">AnkiDroid không nhận thẻ. Hãy mở AnkiDroid một lần rồi thử lại.</string>
+    <string name="study_anki_send_all">Gửi tất cả sang AnkiDroid</string>
+    <string name="study_anki_all_sent_before">Mọi từ đều đã được gửi sang AnkiDroid.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="other">%1$d lần</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="other">Đã đánh dấu %1$d từ là đã biết</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="other">%1$d từ mới</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="other">Đánh dấu %1$d từ là đã biết? Bạn có thể bỏ đánh dấu một từ trên thẻ từ của nó.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="other">Đã gửi %1$d từ sang AnkiDroid.</item>
+    </plurals>
+</resources>

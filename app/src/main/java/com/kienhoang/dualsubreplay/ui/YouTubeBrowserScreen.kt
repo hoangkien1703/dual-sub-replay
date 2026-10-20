@@ -267,6 +267,22 @@ internal class YouTubeWebController {
     fun setPlaybackSpeed(rate: Float) {
         scriptAction?.invoke(webPlaybackSpeedScript(rate))
     }
+
+    /** True while a saved word's clip is about to play or plays; the play modes leave it alone. */
+    val clipPlaying: Boolean get() = pendingClip != null || playingClipVideo != null
+
+    /** Pauses the video with it at [second] (Read first). */
+    fun seekPaused(second: Float) {
+        scriptAction?.invoke(webSeekPausedScript(second))
+    }
+
+    /** Skip silence: plays at [rate] for at most [safetyMs], or brings the user's speed back when null. */
+    fun setGapSpeed(
+        rate: Float?,
+        safetyMs: Long,
+    ) {
+        scriptAction?.invoke(webGapSpeedScript(rate, safetyMs))
+    }
 }
 
 @Composable
@@ -559,6 +575,7 @@ internal fun SingleYouTubePage(
 
     PageTranscriptReader(webView, active = lifecycleStarted)
     PageTranslationReader(webView, active = lifecycleStarted)
+    StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
 
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect

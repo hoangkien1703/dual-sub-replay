@@ -46,6 +46,8 @@ internal fun PageTranscriptReader(
             val started = now
             runningSince = started
             val script = target?.let(::webPageTranscriptScript) ?: WEB_PAGE_CAPTION_TRACKS_SCRIPT
+            // Installs the page's token maker first (once per page; later runs return at once).
+            if (target?.pageToken == true) webView.evaluateJavascript(WEB_PAGE_TOKEN_SCRIPT, null)
             webView.evaluateJavascript(script) { rawValue ->
                 if (runningSince == started) runningSince = 0L
                 if (target == null) {

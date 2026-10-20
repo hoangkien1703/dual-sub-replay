@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">학습 도구</string>
+    <string name="settings_section_study_summary">재생 모드, 무음 건너뛰기, 아는 단어, AnkiDroid, 흐림 상자</string>
+    <string name="study_play_mode_title">재생 모드</string>
+    <string name="study_play_mode_normal">보통</string>
+    <string name="study_play_mode_normal_description">동영상을 평소처럼 재생합니다.</string>
+    <string name="study_play_mode_pause_after">각 줄 뒤에 일시정지</string>
+    <string name="study_play_mode_pause_after_description">자막 한 줄이 끝날 때마다 일시정지합니다. 재생을 누르면 다음 줄로 넘어갑니다.</string>
+    <string name="study_play_mode_read_first">먼저 읽기</string>
+    <string name="study_play_mode_read_first_description">각 줄의 시작에서 멈춰 듣기 전에 읽을 수 있습니다.</string>
+    <string name="study_play_mode_listen_first">먼저 듣기</string>
+    <string name="study_play_mode_listen_first_description">재생 중에는 자막을 숨기고, 각 줄 뒤에 일시정지하며 자막을 보여 줍니다.</string>
+    <string name="study_play_mode_repeat">각 줄 반복</string>
+    <string name="study_play_mode_repeat_description">각 줄을 여러 번 재생한 뒤 다음으로 넘어갑니다.</string>
+    <string name="study_play_mode_new_word">새 단어가 하나인 줄에서 일시정지</string>
+    <string name="study_play_mode_new_word_description">아직 모르는 단어가 정확히 하나 있는 줄 뒤에서만 일시정지합니다. 아는 단어가 필요합니다.</string>
+    <string name="study_play_mode_needs_known_words">이 모드를 쓰려면 아래의 아는 단어를 켜세요.</string>
+    <string name="study_play_mode_note">재생 모드와 무음 건너뛰기는 전체 자막이 불러와졌을 때 작동하며, 실시간 자막에서는 작동하지 않습니다.</string>
+    <string name="study_skip_silence_title">무음 건너뛰기</string>
+    <string name="study_skip_silence_description">자막 줄이 없는 부분이 1.5초보다 길면 빠르게 재생하거나 건너뜁니다. 다음 줄 전에 원래 속도로 돌아옵니다.</string>
+    <string name="study_skip_silence_off">끄기</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">건너뛰기</string>
+    <string name="study_known_words_title">아는 단어</string>
+    <string name="study_known_words_description">단어 카드에서 아는 단어를 표시하세요. 자막 패널에 각 동영상을 얼마나 아는지 표시됩니다.</string>
+    <string name="study_mark_new_words_title">자막에서 새 단어 표시</string>
+    <string name="study_mark_new_words_description">모르고 저장하지 않은 단어에 옅은 배경을 넣습니다.</string>
+    <string name="study_known_words_clear">아는 단어 지우기</string>
+    <string name="study_known_words_clear_title">아는 단어를 지울까요?</string>
+    <string name="study_known_words_clear_message">모든 언어에서 아는 단어로 표시한 단어가 모두 지워집니다. 저장한 단어는 남습니다.</string>
+    <string name="study_known_words_clear_confirm">지우기</string>
+    <string name="study_anki_title">AnkiDroid로 보내기</string>
+    <string name="study_anki_description">AnkiDroid가 설치되어 있으면 단어 카드와 연습 → 내보내기에 AnkiDroid로 보내기가 나타납니다. 카드는 DualSub Replay 덱에 들어갑니다.</string>
+    <string name="study_blur_box_title">흐림 상자</string>
+    <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
+    <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>
+    <string name="study_page_token_description">YouTube가 빈 자막을 보내면, YouTube 페이지가 YouTube 웹 플레이어처럼 자체 출처 증명 토큰을 만들어 다시 요청합니다. 실험 기능입니다.</string>
+    <string name="study_comprehension_chip">아는 단어 %1$d%%</string>
+    <string name="study_comprehension_title">이 동영상의 아는 단어</string>
+    <string name="study_comprehension_known">이 동영상 단어의 %1$d%%를 알고 있습니다.</string>
+    <string name="study_mark_all_known">새 단어를 모두 아는 단어로 표시</string>
+    <string name="study_mark_all_known_confirm">아는 단어로 표시</string>
+    <string name="study_close">닫기</string>
+    <string name="study_known_word_toggle">이 단어를 알아요</string>
+    <string name="study_send_to_anki">AnkiDroid로 보내기</string>
+    <string name="study_sending_to_anki">보내는 중…</string>
+    <string name="study_sent_to_anki">AnkiDroid로 보냄</string>
+    <string name="study_anki_not_installed">이 휴대전화에 AnkiDroid가 설치되어 있지 않습니다.</string>
+    <string name="study_anki_permission_denied">AnkiDroid 권한이 허용되지 않아 카드가 추가되지 않았습니다.</string>
+    <string name="study_anki_failed">AnkiDroid가 카드를 받지 않았습니다. AnkiDroid를 한 번 열고 다시 시도하세요.</string>
+    <string name="study_anki_send_all">모두 AnkiDroid로 보내기</string>
+    <string name="study_anki_all_sent_before">모든 단어를 이미 AnkiDroid로 보냈습니다.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="other">%1$d번</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="other">아는 단어로 표시한 단어 %1$d개</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="other">새 단어 %1$d개</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="other">단어 %1$d개를 아는 단어로 표시할까요? 단어 카드에서 표시를 해제할 수 있습니다.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="other">단어 %1$d개를 AnkiDroid로 보냈습니다.</item>
+    </plurals>
+</resources>

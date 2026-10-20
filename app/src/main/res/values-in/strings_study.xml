@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">Alat belajar</string>
+    <string name="settings_section_study_summary">Mode putar, lewati jeda sunyi, kata yang dikenal, AnkiDroid, kotak buram</string>
+    <string name="study_play_mode_title">Mode putar</string>
+    <string name="study_play_mode_normal">Normal</string>
+    <string name="study_play_mode_normal_description">Video diputar seperti biasa.</string>
+    <string name="study_play_mode_pause_after">Jeda setelah setiap baris</string>
+    <string name="study_play_mode_pause_after_description">Berhenti sejenak saat setiap baris subtitle selesai. Tekan putar untuk baris berikutnya.</string>
+    <string name="study_play_mode_read_first">Baca dulu</string>
+    <string name="study_play_mode_read_first_description">Berhenti di awal setiap baris agar Anda bisa membacanya sebelum mendengarnya.</string>
+    <string name="study_play_mode_listen_first">Dengar dulu</string>
+    <string name="study_play_mode_listen_first_description">Menyembunyikan subtitle saat video diputar, lalu berhenti setelah setiap baris dan menampilkannya.</string>
+    <string name="study_play_mode_repeat">Ulangi setiap baris</string>
+    <string name="study_play_mode_repeat_description">Memutar setiap baris beberapa kali sebelum lanjut.</string>
+    <string name="study_play_mode_new_word">Jeda di baris dengan satu kata baru</string>
+    <string name="study_play_mode_new_word_description">Hanya berhenti setelah baris yang berisi tepat satu kata yang belum Anda kenal. Perlu Kata yang dikenal.</string>
+    <string name="study_play_mode_needs_known_words">Aktifkan Kata yang dikenal di bawah untuk memakai mode ini.</string>
+    <string name="study_play_mode_note">Mode putar dan lewati jeda sunyi bekerja saat transkrip lengkap dimuat, tidak dengan subtitle langsung.</string>
+    <string name="study_skip_silence_title">Lewati jeda sunyi</string>
+    <string name="study_skip_silence_description">Bagian tanpa baris subtitle lebih dari 1,5 detik diputar lebih cepat atau dilewati. Kecepatan Anda kembali sebelum baris berikutnya.</string>
+    <string name="study_skip_silence_off">Mati</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">Lompat</string>
+    <string name="study_known_words_title">Kata yang dikenal</string>
+    <string name="study_known_words_description">Tandai kata yang Anda kenal di kartu kata. Panel subtitle menunjukkan seberapa banyak isi setiap video yang sudah Anda kenal.</string>
+    <string name="study_mark_new_words_title">Tandai kata baru di subtitle</string>
+    <string name="study_mark_new_words_description">Memberi latar terang pada kata yang belum dikenal dan belum disimpan.</string>
+    <string name="study_known_words_clear">Hapus kata yang dikenal</string>
+    <string name="study_known_words_clear_title">Hapus kata yang dikenal?</string>
+    <string name="study_known_words_clear_message">Semua kata yang Anda tandai sebagai dikenal, di semua bahasa, akan dilupakan. Kata yang disimpan tetap ada.</string>
+    <string name="study_known_words_clear_confirm">Hapus</string>
+    <string name="study_anki_title">Kirim ke AnkiDroid</string>
+    <string name="study_anki_description">Menampilkan Kirim ke AnkiDroid di kartu kata dan di Latihan → Ekspor saat AnkiDroid terpasang. Kartu masuk ke dek DualSub Replay.</string>
+    <string name="study_blur_box_title">Kotak buram</string>
+    <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
+    <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>
+    <string name="study_page_token_description">Saat YouTube mengirim subtitle kosong, halaman YouTube membuat token bukti asal sendiri, seperti pemutar web YouTube, lalu meminta lagi. Eksperimental.</string>
+    <string name="study_comprehension_chip">Dikenal %1$d%%</string>
+    <string name="study_comprehension_title">Kata yang dikenal di video ini</string>
+    <string name="study_comprehension_known">Anda mengenal %1$d%% kata di video ini.</string>
+    <string name="study_mark_all_known">Tandai semua kata baru sebagai dikenal</string>
+    <string name="study_mark_all_known_confirm">Tandai sebagai dikenal</string>
+    <string name="study_close">Tutup</string>
+    <string name="study_known_word_toggle">Saya tahu kata ini</string>
+    <string name="study_send_to_anki">Kirim ke AnkiDroid</string>
+    <string name="study_sending_to_anki">Mengirim…</string>
+    <string name="study_sent_to_anki">Terkirim ke AnkiDroid</string>
+    <string name="study_anki_not_installed">AnkiDroid tidak terpasang di ponsel ini.</string>
+    <string name="study_anki_permission_denied">Izin AnkiDroid tidak diberikan, jadi tidak ada kartu yang ditambahkan.</string>
+    <string name="study_anki_failed">AnkiDroid tidak menerima kartu. Buka AnkiDroid sekali, lalu coba lagi.</string>
+    <string name="study_anki_send_all">Kirim semua ke AnkiDroid</string>
+    <string name="study_anki_all_sent_before">Semua kata sudah dikirim ke AnkiDroid.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="other">%1$d kali</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="other">%1$d kata ditandai sebagai dikenal</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="other">%1$d kata baru</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="other">Tandai %1$d kata sebagai dikenal? Anda bisa membatalkan tanda di kartu katanya.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="other">%1$d kata dikirim ke AnkiDroid.</item>
+    </plurals>
+</resources>

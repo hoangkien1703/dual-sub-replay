@@ -123,6 +123,7 @@ internal fun WordLearningDialog(
                         }
                     }
                     if (saved) Text(stringResource(R.string.practice_saved_to_vocabulary), modifier = Modifier.testTag("word_saved"))
+                    StudyWordActions(selection, meaning)
                     if (selection.isPhrase) WordByWord(selection.parts, onSpeakPart)
                 }
             }

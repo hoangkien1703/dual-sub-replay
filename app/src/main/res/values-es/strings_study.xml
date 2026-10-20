@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <string name="settings_section_study_title">Herramientas de estudio</string>
+    <string name="settings_section_study_summary">Modos de reproducción, saltar silencios, palabras conocidas, AnkiDroid, recuadro difuminado</string>
+    <string name="study_play_mode_title">Modo de reproducción</string>
+    <string name="study_play_mode_normal">Normal</string>
+    <string name="study_play_mode_normal_description">El video se reproduce como siempre.</string>
+    <string name="study_play_mode_pause_after">Pausar después de cada línea</string>
+    <string name="study_play_mode_pause_after_description">Pausa cuando termina cada línea de subtítulos. Pulsa reproducir para la siguiente.</string>
+    <string name="study_play_mode_read_first">Leer primero</string>
+    <string name="study_play_mode_read_first_description">Se detiene al inicio de cada línea para que la leas antes de oírla.</string>
+    <string name="study_play_mode_listen_first">Escuchar primero</string>
+    <string name="study_play_mode_listen_first_description">Oculta los subtítulos mientras el video se reproduce y luego pausa después de cada línea y los muestra.</string>
+    <string name="study_play_mode_repeat">Repetir cada línea</string>
+    <string name="study_play_mode_repeat_description">Reproduce cada línea varias veces antes de seguir.</string>
+    <string name="study_play_mode_new_word">Pausar en líneas con una palabra nueva</string>
+    <string name="study_play_mode_new_word_description">Solo pausa después de las líneas con exactamente una palabra que aún no conoces. Necesita Palabras conocidas.</string>
+    <string name="study_play_mode_needs_known_words">Activa Palabras conocidas abajo para usar este modo.</string>
+    <string name="study_play_mode_note">Los modos de reproducción y saltar silencios funcionan cuando se carga la transcripción completa, no con subtítulos en directo.</string>
+    <string name="study_skip_silence_title">Saltar silencios</string>
+    <string name="study_skip_silence_description">Las partes sin línea de subtítulos de más de 1,5 segundos se reproducen más rápido o se saltan. Tu velocidad vuelve antes de la siguiente línea.</string>
+    <string name="study_skip_silence_off">No</string>
+    <string name="study_skip_silence_2x">2×</string>
+    <string name="study_skip_silence_4x">4×</string>
+    <string name="study_skip_silence_jump">Saltar</string>
+    <string name="study_known_words_title">Palabras conocidas</string>
+    <string name="study_known_words_description">Marca en la tarjeta de palabra las palabras que conoces. El panel de subtítulos muestra cuánto de cada video ya conoces.</string>
+    <string name="study_mark_new_words_title">Marcar palabras nuevas en los subtítulos</string>
+    <string name="study_mark_new_words_description">Da un fondo claro a las palabras que no conoces ni has guardado.</string>
+    <string name="study_known_words_clear">Borrar palabras conocidas</string>
+    <string name="study_known_words_clear_title">¿Borrar las palabras conocidas?</string>
+    <string name="study_known_words_clear_message">Se olvidan todas las palabras que marcaste como conocidas, en todos los idiomas. Las palabras guardadas se quedan.</string>
+    <string name="study_known_words_clear_confirm">Borrar</string>
+    <string name="study_anki_title">Enviar a AnkiDroid</string>
+    <string name="study_anki_description">Muestra Enviar a AnkiDroid en la tarjeta de palabra y en Práctica → Exportar cuando AnkiDroid está instalado. Las tarjetas van a un mazo DualSub Replay.</string>
+    <string name="study_blur_box_title">Recuadro difuminado</string>
+    <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
+    <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>
+    <string name="study_page_token_description">Cuando YouTube envía subtítulos vacíos, la página de YouTube crea su propio token de prueba de origen, como hace el reproductor web de YouTube, y vuelve a pedirlos. Experimental.</string>
+    <string name="study_comprehension_chip">Conocidas %1$d%%</string>
+    <string name="study_comprehension_title">Palabras conocidas en este video</string>
+    <string name="study_comprehension_known">Conoces el %1$d%% de las palabras de este video.</string>
+    <string name="study_mark_all_known">Marcar todas las palabras nuevas como conocidas</string>
+    <string name="study_mark_all_known_confirm">Marcar como conocidas</string>
+    <string name="study_close">Cerrar</string>
+    <string name="study_known_word_toggle">Conozco esta palabra</string>
+    <string name="study_send_to_anki">Enviar a AnkiDroid</string>
+    <string name="study_sending_to_anki">Enviando…</string>
+    <string name="study_sent_to_anki">Enviada a AnkiDroid</string>
+    <string name="study_anki_not_installed">AnkiDroid no está instalado en este teléfono.</string>
+    <string name="study_anki_permission_denied">No se dio el permiso de AnkiDroid, así que no se añadió ninguna tarjeta.</string>
+    <string name="study_anki_failed">AnkiDroid no aceptó la tarjeta. Abre AnkiDroid una vez y vuelve a intentarlo.</string>
+    <string name="study_anki_send_all">Enviar todo a AnkiDroid</string>
+    <string name="study_anki_all_sent_before">Todas las palabras ya se enviaron a AnkiDroid.</string>
+    <plurals name="study_repeat_count">
+        <item quantity="one">%1$d vez</item>
+        <item quantity="many">%1$d veces</item>
+        <item quantity="other">%1$d veces</item>
+    </plurals>
+    <plurals name="study_known_words_count">
+        <item quantity="one">%1$d palabra marcada como conocida</item>
+        <item quantity="many">%1$d palabras marcadas como conocidas</item>
+        <item quantity="other">%1$d palabras marcadas como conocidas</item>
+    </plurals>
+    <plurals name="study_new_words">
+        <item quantity="one">%1$d palabra nueva</item>
+        <item quantity="many">%1$d palabras nuevas</item>
+        <item quantity="other">%1$d palabras nuevas</item>
+    </plurals>
+    <plurals name="study_mark_all_known_message">
+        <item quantity="one">¿Marcar %1$d palabra como conocida? Puedes desmarcar una palabra en su tarjeta.</item>
+        <item quantity="many">¿Marcar %1$d palabras como conocidas? Puedes desmarcar una palabra en su tarjeta.</item>
+        <item quantity="other">¿Marcar %1$d palabras como conocidas? Puedes desmarcar una palabra en su tarjeta.</item>
+    </plurals>
+    <plurals name="study_anki_sent_count">
+        <item quantity="one">%1$d palabra enviada a AnkiDroid.</item>
+        <item quantity="many">%1$d palabras enviadas a AnkiDroid.</item>
+        <item quantity="other">%1$d palabras enviadas a AnkiDroid.</item>
+    </plurals>
+</resources>

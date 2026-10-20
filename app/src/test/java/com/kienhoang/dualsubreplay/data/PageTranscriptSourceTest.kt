@@ -200,6 +200,23 @@ class PageTranscriptSourceTest {
             assertNull("The kept transcript is used once", source.transcript(VIDEO, choice, timeoutMs = 50))
         }
 
+    @Test fun aPageTokenIsAskedForOnlyWhenTurnedOnAndItsStateIsInTheDetail() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val choice = CaptionLanguageChoice(emptyList(), null)
+            val off = async { source.transcript(VIDEO, choice, timeoutMs = 50) }
+            val plain = awaitRequest(source).also { source.offerTracks(it, PAGE_TRACKS) }
+            assertFalse("Off by default", plain.target!!.pageToken)
+            assertNull(off.await())
+            source.pageTokenEnabled = true
+            val on = async { source.transcript("bbbbbbbbbbb", choice, timeoutMs = 300) }
+            val request = awaitRequest(source, "bbbbbbbbbbb").also { source.offerTracks(it, PAGE_TRACKS.replace(VIDEO, "bbbbbbbbbbb")) }
+            assertTrue(request.target!!.pageToken)
+            source.offerReply(request, PageTranscriptReply.Working("waiting-for-captions", "refused-403"))
+            assertNull(on.await())
+            assertEquals("step waiting-for-captions, page token refused-403", source.problemDetail("bbbbbbbbbbb"))
+        }
+
     @Test fun aRetryIsANewAttemptOnThePage() =
         runBlocking {
             val source = PageTranscriptSource()

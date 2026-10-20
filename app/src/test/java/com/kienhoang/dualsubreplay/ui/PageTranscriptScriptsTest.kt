@@ -33,7 +33,7 @@ class PageTranscriptScriptsTest {
         assertTrue(
             script.contains(
                 """const target = {"videoId":"abcdefghijk","languageCode":"zh-Hans","generated":true,""" +
-                    """"baseUrl":${JSONObject.quote(target.baseUrl)},"attempt":"7","panelOnly":false};""",
+                    """"baseUrl":${JSONObject.quote(target.baseUrl)},"attempt":"7","panelOnly":false,"pageToken":false};""",
             ),
         )
         // Every address the page fetches or keeps passes the same YouTube-host, /api/timedtext check.
@@ -72,6 +72,35 @@ class PageTranscriptScriptsTest {
         assertTrue(tracks.contains("holder.getAttribute('loading')"))
         assertTrue(tracks.contains("holder.getAttribute('playable')"))
         assertTrue(tracks.contains("ready: (!loading || loading === 'false') && (!playable || playable === 'true')"))
+    }
+
+    @Test
+    fun aPageTokenIsTriedOnlyWhenTurnedOnAndStaysInThePage() {
+        val script = webPageTranscriptScript(target.copy(pageToken = true))
+        assertTrue(script.contains(""""panelOnly":false,"pageToken":true};"""))
+        // Still one fetch: the token only joins the same /api/timedtext address, as the web player sends it.
+        assertEquals(1, Regex("fetch\\(").findAll(script).count())
+        assertTrue(script.contains("url.searchParams.set('pot', token);"))
+        assertTrue(script.contains("url.searchParams.set('c', 'WEB');"))
+        assertTrue(script.contains("if (!target.pageToken || job.status !== 'working') return;"))
+        assertTrue(script.contains("tries >= $PAGE_TOKEN_TRIES"))
+        // The reply names how far the token got, never the token.
+        assertTrue(script.contains("token: job.token || null"))
+        assertFalse(script.contains("token: token"))
+    }
+
+    @Test
+    fun theTokenScriptStaysOnYouTubeAndLoadsBotGuardOnlyFromGoogle() {
+        val script = WEB_PAGE_TOKEN_SCRIPT
+        assertTrue(script.contains("window.location.protocol !== 'https:'"))
+        assertTrue(script.contains("host.endsWith('.youtube.com')"))
+        val fetched = Regex("fetch\\('([^']+)'").findAll(script).map { it.groupValues[1] }.toList()
+        assertEquals(listOf("/youtubei/v1/att/get?prettyPrint=false", "/api/jnn/v1/GenerateIT"), fetched)
+        assertTrue(script.contains("url.hostname === 'www.google.com' && url.pathname.indexOf('/js/th/') === 0"))
+        assertTrue(script.contains("url.protocol === 'https:'"))
+        // It never sends the token anywhere itself.
+        assertFalse(script.contains("XMLHttpRequest"))
+        assertFalse(script.contains("sendBeacon"))
     }
 
     @Test
@@ -198,6 +227,12 @@ class PageTranscriptScriptsTest {
             parsePageTranscriptReply(raw("""{"status":"working","step":"waiting-for-captions"}""")),
         )
         assertEquals(PageTranscriptReply.Working(null), parsePageTranscriptReply(raw("""{"status":"working","step":"Bad step!"}""")))
+        assertEquals(
+            PageTranscriptReply.Working("waiting-for-captions", "refused-403"),
+            parsePageTranscriptReply(raw("""{"status":"working","step":"waiting-for-captions","token":"refused-403"}""")),
+        )
+        assertEquals(PageTranscriptReply.Working(null, null), parsePageTranscriptReply(raw("""{"status":"working","token":null}""")))
+        assertEquals(PageTranscriptReply.Working(null, null), parsePageTranscriptReply(raw("""{"status":"working","token":"AbC+/="}""")))
         assertEquals(PageTranscriptReply.Working(null), parsePageTranscriptReply(raw("""{"status":"done","text":""}""")))
         assertEquals(PageTranscriptReply.Working(), parsePageTranscriptReply("null"))
         assertEquals(PageTranscriptReply.Working(), parsePageTranscriptReply(null))

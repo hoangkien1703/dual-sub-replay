@@ -32,6 +32,8 @@ Current releases bundle only:
 
 The HSK levels of the Chinese grammar points are taken from the grammar syllabus and word list of the *Chinese Proficiency Grading Standards for International Chinese Language Education* (GF0025-2021), as published in [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT). Only the level numbers are used; the lists are not part of the app.
 
+Study tools (2026-10-20) include no third-party code or data. Load captions with a page token (beta) follows the proof-of-origin token flow that LuanRT's [BgUtils](https://github.com/LuanRT/BgUtils) (MIT) documents, written for this app; it uses YouTube's own public web values that the web player sends. Send to AnkiDroid talks to AnkiDroid's public content provider directly, without the AnkiDroid API library. The play modes, known words and blur box are ideas seen in Migaku and jidoujisho (GPL-3.0); none of their code, assets, data, keys or endpoints are used.
+
 The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, and the ML Kit translation terms.
 
 ## Japanese dictionary (downloaded on first use)

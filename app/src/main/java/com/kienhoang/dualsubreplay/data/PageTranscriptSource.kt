@@ -31,13 +31,19 @@ internal data class PageCaptionTarget(
     val attempt: Long = 0,
     /** The page listed no track: [languageCode] is a guess, and the page goes to its transcript panel. */
     val panelOnly: Boolean = false,
+    /** Settings → Study tools: the page may mint its own proof-of-origin token for the track's address. */
+    val pageToken: Boolean = false,
 )
 
 /** What the page's transcript script reported on one poll. */
 internal sealed interface PageTranscriptReply {
-    /** Still working; [step] is `page-address`, `no-player` or `waiting-for-captions`. */
+    /**
+     * Still working; [step] is `page-address`, `no-player` or `waiting-for-captions`. [token] says how
+     * the page's own proof-of-origin token went (`minting`, `sent`, `empty`, or what failed), when used.
+     */
     data class Working(
         val step: String? = null,
+        val token: String? = null,
     ) : PageTranscriptReply
 
     /**
@@ -112,6 +118,9 @@ class PageTranscriptSource(
 
         /** Set once the provider stopped waiting and the page only watches for captions. */
         @Volatile internal var late = false
+
+        /** How the page's own proof-of-origin token went, for the problem's detail. */
+        @Volatile internal var token: String? = null
     }
 
     internal class PageDocument(
@@ -133,6 +142,9 @@ class PageTranscriptSource(
     @Volatile private var problemDetail: String? = null
 
     private val late = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    /** Settings → Study tools → Load captions with a page token (beta); targets made from now on carry it. */
+    @Volatile var pageTokenEnabled: Boolean = false
 
     /** Video ids whose full transcript the page got after the provider stopped waiting. */
     val lateTranscripts: SharedFlow<String> = late.asSharedFlow()
@@ -239,7 +251,14 @@ class PageTranscriptSource(
         val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
         request.languages = availableLanguages(tracks)
         request.target =
-            PageCaptionTarget(request.videoId, track.optString("languageCode", "en"), isGeneratedTrack(track), baseUrl, request.attempt)
+            PageCaptionTarget(
+                request.videoId,
+                track.optString("languageCode", "en"),
+                isGeneratedTrack(track),
+                baseUrl,
+                request.attempt,
+                pageToken = pageTokenEnabled && baseUrl.isNotEmpty(),
+            )
     }
 
     /** Takes the page's answer for the request's track; parsing happens on the provider's side. */
@@ -250,7 +269,10 @@ class PageTranscriptSource(
         if (request !== current) return
         val target = request.target ?: return
         when (reply) {
-            is PageTranscriptReply.Working -> reply.step?.let { request.step = it }
+            is PageTranscriptReply.Working -> {
+                reply.step?.let { request.step = it }
+                reply.token?.let { request.token = it }
+            }
             is PageTranscriptReply.Done -> {
                 if (reply.text.length > MAX_PAGE_TRANSCRIPT_LENGTH) return
                 // The page may have found the same language as another kind (auto-generated or not).
@@ -297,7 +319,10 @@ class PageTranscriptSource(
         request: Request,
         reason: PageTranscriptProblem,
     ) {
-        problemDetail = listOfNotNull(request.found, request.step?.let { "step $it" }).joinToString(", ").ifBlank { null }
+        problemDetail =
+            listOfNotNull(request.found, request.step?.let { "step $it" }, request.token?.let { "page token $it" })
+                .joinToString(", ")
+                .ifBlank { null }
         problem = request.videoId to reason
         // Fixed categories only, like the provider's: never page text or addresses in logcat.
         android.util.Log.w("CaptionRecovery", "page: ${reason.name.lowercase()}")
