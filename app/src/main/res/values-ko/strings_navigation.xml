@@ -9,7 +9,6 @@
     <string name="navigation_app_language">앱 언어</string>
     <string name="navigation_device_language">기기 언어</string>
     <string name="navigation_cancel">취소</string>
-    <string name="navigation_latest_version">%1$s에서 앱의 최신 버전을 확인하세요.</string>
     <string name="navigation_no_browser">GitHub를 열 수 있는 브라우저가 없습니다.</string>
     <string name="navigation_licenses">오픈소스 라이선스</string>
     <string name="navigation_loading_license">라이선스를 불러오는 중…</string>

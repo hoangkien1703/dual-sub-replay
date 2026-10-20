@@ -79,13 +79,14 @@ internal fun AppNavigation(
                         Column(Modifier.padding(horizontal = 4.dp)) {
                             HorizontalDivider(Modifier.padding(vertical = 16.dp))
                             AppLanguageButton()
-                            SettingsRepositoryLink(beforeOpen = { drawer.close() })
+                            DrawerFooter(beforeOpen = { drawer.close() })
                         }
                     }
                 }
             }
         },
     ) {
+        AppUpdateDialogHost()
         content {
             Box(
                 modifier = Modifier.size(width = 72.dp, height = 48.dp)

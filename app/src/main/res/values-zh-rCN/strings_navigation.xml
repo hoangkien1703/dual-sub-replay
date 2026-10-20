@@ -9,7 +9,6 @@
     <string name="navigation_app_language">应用语言</string>
     <string name="navigation_device_language">设备语言</string>
     <string name="navigation_cancel">取消</string>
-    <string name="navigation_latest_version">在 %1$s 上查看应用的最新版本。</string>
     <string name="navigation_no_browser">没有可用于打开 GitHub 的浏览器。</string>
     <string name="navigation_licenses">开源许可</string>
     <string name="navigation_loading_license">正在加载许可…</string>

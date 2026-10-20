@@ -201,6 +201,7 @@ class SubtitleWordHighlightTest {
                 WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
                 com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
                 com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
+                com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE,
                 "auto_pronounce",
                 PRONUNCIATION_VOLUME_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,

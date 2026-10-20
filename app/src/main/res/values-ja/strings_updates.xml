@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">アプリの更新</string>
+    <string name="settings_section_updates_summary">自動で更新</string>
+    <string name="updates_check">アップデートを確認</string>
+    <string name="updates_version">バージョン %1$s</string>
+    <string name="updates_available_short">バージョン %1$s があります</string>
+    <string name="updates_checking">アップデートを確認しています…</string>
+    <string name="updates_up_to_date">最新バージョン（%1$s）です。</string>
+    <string name="updates_available">バージョン %1$s があります。現在は %2$s です。</string>
+    <string name="updates_first_time_note">初回は、DualSub Replay からのアプリのインストールを許可するよう Android が求めます。保存した単語と設定はそのまま残ります。</string>
+    <string name="updates_whats_new">新機能</string>
+    <string name="updates_update">更新</string>
+    <string name="updates_not_now">後で</string>
+    <string name="updates_downloading">バージョン %1$s をダウンロードしています…</string>
+    <string name="updates_hide">閉じる</string>
+    <string name="updates_ready">バージョン %1$s をインストールできます。</string>
+    <string name="updates_install">インストール</string>
+    <string name="updates_installing">インストールしています… 更新中はアプリが閉じます。</string>
+    <string name="updates_try_again">再試行</string>
+    <string name="updates_close">閉じる</string>
+    <string name="updates_open_github">GitHub を開く</string>
+    <string name="updates_unsupported">このアプリはパソコンでビルドされたため、自動で更新できません。最新バージョンは GitHub から入手してください。</string>
+    <string name="updates_problem_offline">GitHub に接続できません。接続を確認して、もう一度お試しください。</string>
+    <string name="updates_problem_busy">GitHub が混み合っています。数分後にもう一度お試しください。</string>
+    <string name="updates_problem_github">GitHub から予期しない応答がありました。後でもう一度お試しください。</string>
+    <string name="updates_problem_checksum">ダウンロードしたファイルが GitHub のチェックサムと一致しなかったため、削除しました。</string>
+    <string name="updates_problem_wrong_app">ダウンロードしたファイルはこのアプリの新しいバージョンではないため、インストールしませんでした。</string>
+    <string name="updates_problem_install">Android がアップデートをインストールできませんでした。</string>
+    <string name="updates_problem_cancelled">アップデートはキャンセルされました。</string>
+    <string name="updates_auto_title">自動で更新</string>
+    <string name="updates_auto_description">1 日 1 回、アプリを開いたときに GitHub で新しいバージョンを確認し、Wi-Fi でダウンロードして、アプリを離れたときにインストールします。動画の再生中にはインストールしません。</string>
+    <string name="updates_auto_unavailable">このアプリは自動で更新できません。</string>
+</resources>

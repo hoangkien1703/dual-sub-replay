@@ -9,7 +9,6 @@
     <string name="navigation_app_language">App language</string>
     <string name="navigation_device_language">Device language</string>
     <string name="navigation_cancel">Cancel</string>
-    <string name="navigation_latest_version">Check the latest version of the app on %1$s.</string>
     <string name="navigation_no_browser">No browser is available to open GitHub.</string>
     <string name="navigation_licenses">Open-source licenses</string>
     <string name="navigation_loading_license">Loading license…</string>

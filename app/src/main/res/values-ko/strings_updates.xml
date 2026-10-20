@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">앱 업데이트</string>
+    <string name="settings_section_updates_summary">자동 업데이트</string>
+    <string name="updates_check">업데이트 확인</string>
+    <string name="updates_version">버전 %1$s</string>
+    <string name="updates_available_short">버전 %1$s 사용 가능</string>
+    <string name="updates_checking">업데이트를 확인하는 중…</string>
+    <string name="updates_up_to_date">최신 버전(%1$s)을 사용 중입니다.</string>
+    <string name="updates_available">버전 %1$s을(를) 사용할 수 있습니다. 현재 버전은 %2$s입니다.</string>
+    <string name="updates_first_time_note">처음에는 Android가 DualSub Replay의 앱 설치를 허용할지 묻습니다. 저장한 단어와 설정은 그대로 유지됩니다.</string>
+    <string name="updates_whats_new">새로운 기능</string>
+    <string name="updates_update">업데이트</string>
+    <string name="updates_not_now">나중에</string>
+    <string name="updates_downloading">버전 %1$s 다운로드 중…</string>
+    <string name="updates_hide">숨기기</string>
+    <string name="updates_ready">버전 %1$s을(를) 설치할 준비가 되었습니다.</string>
+    <string name="updates_install">설치</string>
+    <string name="updates_installing">설치 중… 업데이트하는 동안 앱이 닫힙니다.</string>
+    <string name="updates_try_again">다시 시도</string>
+    <string name="updates_close">닫기</string>
+    <string name="updates_open_github">GitHub 열기</string>
+    <string name="updates_unsupported">이 앱은 컴퓨터에서 빌드되어 스스로 업데이트할 수 없습니다. GitHub에서 최신 버전을 받으세요.</string>
+    <string name="updates_problem_offline">GitHub에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="updates_problem_busy">지금 GitHub가 바쁩니다. 몇 분 후에 다시 시도하세요.</string>
+    <string name="updates_problem_github">GitHub에서 예상치 못한 응답이 왔습니다. 나중에 다시 시도하세요.</string>
+    <string name="updates_problem_checksum">다운로드한 파일이 GitHub의 체크섬과 일치하지 않아 삭제했습니다.</string>
+    <string name="updates_problem_wrong_app">다운로드한 파일이 이 앱의 새 버전이 아니어서 설치하지 않았습니다.</string>
+    <string name="updates_problem_install">Android가 업데이트를 설치하지 못했습니다.</string>
+    <string name="updates_problem_cancelled">업데이트가 취소되었습니다.</string>
+    <string name="updates_auto_title">자동 업데이트</string>
+    <string name="updates_auto_description">하루에 한 번 앱을 열 때 GitHub에서 새 버전을 확인하고, Wi-Fi에서 다운로드한 뒤 앱을 나갈 때 설치합니다. 동영상 재생 중에는 설치하지 않습니다.</string>
+    <string name="updates_auto_unavailable">이 앱은 스스로 업데이트할 수 없습니다.</string>
+</resources>

@@ -25,6 +25,8 @@ class ForbiddenPermissionTests(unittest.TestCase):
         self.assertTrue(report_apk.is_forbidden_permission("android.permission.POST_NOTIFICATIONS"))
         self.assertTrue(report_apk.is_forbidden_permission("android.permission.WAKE_LOCK"))
         self.assertFalse(report_apk.is_forbidden_permission("android.permission.INTERNET"))
+        # Check for updates installs the app's own newer GitHub release (owner request 2026-10-20).
+        self.assertFalse(report_apk.is_forbidden_permission("android.permission.REQUEST_INSTALL_PACKAGES"))
 
 
 if __name__ == "__main__":

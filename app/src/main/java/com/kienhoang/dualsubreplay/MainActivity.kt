@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.kienhoang.dualsubreplay.ui.AppLanguageSettings
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
+import com.kienhoang.dualsubreplay.update.AppUpdater
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
@@ -31,6 +32,16 @@ class MainActivity : ComponentActivity() {
         updateImmersiveMode(resources.configuration)
         setContent { LearningPlayerRoot(viewModel) }
         handleIntent(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        AppUpdater.onAppStarted(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) AppUpdater.onAppStopped(this)
     }
 
     override fun onNewIntent(intent: Intent) {

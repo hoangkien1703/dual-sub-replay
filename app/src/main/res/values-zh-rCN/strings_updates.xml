@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">应用更新</string>
+    <string name="settings_section_updates_summary">自动更新</string>
+    <string name="updates_check">检查更新</string>
+    <string name="updates_version">版本 %1$s</string>
+    <string name="updates_available_short">有新版本 %1$s</string>
+    <string name="updates_checking">正在检查更新…</string>
+    <string name="updates_up_to_date">已是最新版本（%1$s）。</string>
+    <string name="updates_available">有新版本 %1$s。当前版本为 %2$s。</string>
+    <string name="updates_first_time_note">第一次更新时，Android 会请你允许 DualSub Replay 安装应用。已保存的单词和设置都会保留。</string>
+    <string name="updates_whats_new">新功能</string>
+    <string name="updates_update">更新</string>
+    <string name="updates_not_now">以后再说</string>
+    <string name="updates_downloading">正在下载版本 %1$s…</string>
+    <string name="updates_hide">隐藏</string>
+    <string name="updates_ready">版本 %1$s 已可以安装。</string>
+    <string name="updates_install">安装</string>
+    <string name="updates_installing">正在安装… 更新时应用会关闭。</string>
+    <string name="updates_try_again">重试</string>
+    <string name="updates_close">关闭</string>
+    <string name="updates_open_github">打开 GitHub</string>
+    <string name="updates_unsupported">这个应用是在电脑上构建的，无法自行更新。请在 GitHub 获取最新版本。</string>
+    <string name="updates_problem_offline">无法连接 GitHub。请检查网络后重试。</string>
+    <string name="updates_problem_busy">GitHub 现在很忙。请过几分钟再试。</string>
+    <string name="updates_problem_github">GitHub 返回了意外的结果。请稍后再试。</string>
+    <string name="updates_problem_checksum">下载的文件与 GitHub 的校验和不一致，已删除。</string>
+    <string name="updates_problem_wrong_app">下载的文件不是这个应用的新版本，因此没有安装。</string>
+    <string name="updates_problem_install">Android 无法安装此更新。</string>
+    <string name="updates_problem_cancelled">更新已取消。</string>
+    <string name="updates_auto_title">自动更新</string>
+    <string name="updates_auto_description">每天打开应用时检查一次 GitHub 上的新版本，在 Wi-Fi 下下载，并在你离开应用时安装；视频播放时不会安装。</string>
+    <string name="updates_auto_unavailable">这个应用无法自行更新。</string>
+</resources>

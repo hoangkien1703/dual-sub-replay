@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">Atualizações do app</string>
+    <string name="settings_section_updates_summary">Atualizar automaticamente</string>
+    <string name="updates_check">Verificar atualizações</string>
+    <string name="updates_version">Versão %1$s</string>
+    <string name="updates_available_short">Versão %1$s disponível</string>
+    <string name="updates_checking">Verificando atualizações…</string>
+    <string name="updates_up_to_date">Você tem a versão mais recente (%1$s).</string>
+    <string name="updates_available">A versão %1$s está disponível. Você tem a %2$s.</string>
+    <string name="updates_first_time_note">Na primeira vez, o Android pede que você permita instalar apps pelo DualSub Replay. Suas palavras salvas e configurações continuam.</string>
+    <string name="updates_whats_new">Novidades</string>
+    <string name="updates_update">Atualizar</string>
+    <string name="updates_not_now">Agora não</string>
+    <string name="updates_downloading">Baixando a versão %1$s…</string>
+    <string name="updates_hide">Ocultar</string>
+    <string name="updates_ready">A versão %1$s está pronta para instalar.</string>
+    <string name="updates_install">Instalar</string>
+    <string name="updates_installing">Instalando… O app fecha enquanto atualiza.</string>
+    <string name="updates_try_again">Tentar de novo</string>
+    <string name="updates_close">Fechar</string>
+    <string name="updates_open_github">Abrir o GitHub</string>
+    <string name="updates_unsupported">Esta cópia do app foi compilada em um computador, então não pode se atualizar sozinha. Baixe a versão mais recente no GitHub.</string>
+    <string name="updates_problem_offline">Não foi possível acessar o GitHub. Verifique sua conexão e tente de novo.</string>
+    <string name="updates_problem_busy">O GitHub está ocupado agora. Tente de novo em alguns minutos.</string>
+    <string name="updates_problem_github">O GitHub enviou uma resposta inesperada. Tente mais tarde.</string>
+    <string name="updates_problem_checksum">O download não correspondeu à soma de verificação do GitHub, então foi excluído.</string>
+    <string name="updates_problem_wrong_app">O download não é uma versão mais nova deste app, então não foi instalado.</string>
+    <string name="updates_problem_install">O Android não conseguiu instalar a atualização.</string>
+    <string name="updates_problem_cancelled">A atualização foi cancelada.</string>
+    <string name="updates_auto_title">Atualizar automaticamente</string>
+    <string name="updates_auto_description">Uma vez por dia, ao abrir o app, procura uma versão nova no GitHub, baixa pelo Wi-Fi e instala quando você sai do app, nunca enquanto um vídeo está tocando.</string>
+    <string name="updates_auto_unavailable">Esta cópia do app não pode se atualizar sozinha.</string>
+</resources>

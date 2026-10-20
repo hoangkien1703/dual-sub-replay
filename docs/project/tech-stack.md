@@ -71,6 +71,13 @@ Paths below are relative to
   (`data/AnkiDroidNotes.kt`) adds notes through AnkiDroid's public content provider with its
   runtime permission, without the AnkiDroid library; the blur box is a page element over the
   player (`webBlurBoxScript`) that hides subtitles burned into the picture.
+- App updates (owner request 2026-10-20, [spec](../specs/2026-10-20-check-for-updates.md)):
+  `update/AppUpdater.kt` asks GitHub's releases API only when the drawer's Check for updates is
+  tapped, or once a day with Settings → App updates → Update automatically (off by default; Wi-Fi
+  downloads, installed when the app leaves the screen and no video plays). Official builds follow
+  `releases/latest`, preview builds newer builds of the same PR on `preview`
+  (`data/AppUpdates.kt`). Each APK must match GitHub's SHA-256 digest, be this package and be
+  newer before `PackageInstaller` gets it (`REQUEST_INSTALL_PACKAGES`); Android checks the signature.
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve
   bounded loading and cancellation when changing long-video behavior.

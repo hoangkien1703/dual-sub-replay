@@ -9,7 +9,6 @@
     <string name="navigation_app_language">アプリの言語</string>
     <string name="navigation_device_language">端末の言語</string>
     <string name="navigation_cancel">キャンセル</string>
-    <string name="navigation_latest_version">アプリの最新バージョンは %1$s で確認できます。</string>
     <string name="navigation_no_browser">GitHub を開けるブラウザがありません。</string>
     <string name="navigation_licenses">オープンソースライセンス</string>
     <string name="navigation_loading_license">ライセンスを読み込んでいます…</string>
