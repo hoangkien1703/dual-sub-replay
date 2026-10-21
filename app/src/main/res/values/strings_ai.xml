@@ -216,7 +216,7 @@
     <string name="ai_settings_thinking_title">Thinking</string>
     <string name="ai_settings_full_access_title">Full access for the assistant</string>
     <string name="ai_settings_full_access_description">Also lets the assistant change its own AI settings, add or remove keys, change or delete saved words, and reset settings. Searches, translation changes and reloads no longer ask first.</string>
-    <string name="ai_settings_full_access_warning">Removing a key and resetting settings still wait for your tap. After the assistant reads subtitles, files or error text, every change waits for your tap.</string>
+    <string name="ai_settings_full_access_warning">Removing a key and resetting settings still wait for your tap. Other changes run at once, even after the assistant reads subtitles, web pages or files, so a page could change a setting; you can undo it.</string>
     <string name="ai_settings_permissions_default">Off by default. When off, the assistant can\'t touch keys, AI settings or saved words beyond saving new ones.</string>
     <string name="ai_action_key_add">Add a key ending in %1$s</string>
     <string name="ai_action_key_added">Saved a %1$s key ending in %2$s</string>

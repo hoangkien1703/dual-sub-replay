@@ -18,7 +18,10 @@ private class FakeApp : AiAppActions {
 
     override fun refusal(action: AiAction) = refusal
 
-    override fun describe(action: AiAction) = AiActionText("label: ${aiActionNote(action)}", if (action.asksAfterOtherText) "Go" else null)
+    override fun describe(action: AiAction): AiActionText {
+        val asks = action.asksAfterOtherText || action.asksWithFullAccess
+        return AiActionText("label: ${aiActionNote(action)}", if (asks) "Go" else null)
+    }
 
     override suspend fun perform(action: AiAction): AiActionOutcome {
         performed += action
@@ -401,21 +404,22 @@ class AiAnswerRunTest {
     }
 
     @Test
-    fun withFullAccessChangesAfterReadingSubtitlesStillWait() {
+    fun withFullAccessChangesStillRunAtOnceAfterReadingSubtitles() {
         replies += AiReply("", listOf(call(AI_LOOK_TOOL, "{}")))
         replies += AiReply("", listOf(call(AI_CHANGE_AI_SETTING_TOOL, """{"setting":"ai_memory","value":"off"}""")))
         val run = run(fullAccess = true)
-        assertTrue(app.performed.isEmpty())
-        assertEquals(listOf<AiAction>(AiAction.ChangeAiSetting(AiOwnSetting.MEMORY, "off")), run.waiting.values.toList())
+        assertEquals(listOf<AiAction>(AiAction.ChangeAiSetting(AiOwnSetting.MEMORY, "off")), app.performed)
+        assertTrue(run.waiting.isEmpty())
     }
 
     @Test
-    fun readingSavedWordsCountsAsOtherText() {
+    fun withFullAccessResetsStillWaitAfterReadingSavedWords() {
         replies += AiReply("", listOf(call(AI_FIND_WORDS_TOOL, """{"query":"cat"}""")))
-        replies += AiReply("", listOf(call(AI_DELETE_WORD_TOOL, """{"word":"cat"}""")))
+        replies +=
+            AiReply("", listOf(call(AI_DELETE_WORD_TOOL, """{"word":"cat"}"""), call(AI_RESET_TOOL, """{"what":"all_settings"}""")))
         val run = run(question("Delete the word cat"), fullAccess = true)
-        assertEquals(listOf<AiAction>(AiAction.FindSavedWords("cat")), app.performed)
-        assertEquals(listOf<AiAction>(AiAction.DeleteSavedWord("cat")), run.waiting.values.toList())
+        assertEquals(listOf(AiAction.FindSavedWords("cat"), AiAction.DeleteSavedWord("cat")), app.performed)
+        assertEquals(listOf<AiAction>(AiAction.Reset(AiResetTarget.ALL_SETTINGS)), run.waiting.values.toList())
     }
 
     @Test
@@ -565,6 +569,19 @@ class AiAnswerRunTest {
         assertEquals(listOf(true, false), webSearchFlags)
         assertTrue(run.webSearchRefused)
         assertEquals("Done!", run.text)
+    }
+
+    @Test
+    fun theServicesOwnSearchMakesSettingChangesInTheSameReplyWait() {
+        val setting = call(AI_SETTING_TOOL, """{"setting":"text_size","value":"200"}""")
+        val page = AiWebSource("Page", "https://site.example/")
+        // Claude names its queries; OpenRouter only lists the pages it cited.
+        replies += AiReply("", listOf(setting), sources = listOf(page), webQueries = listOf("best subtitle size"))
+        val claude = searchRun(question("Search the web for a good subtitle size"), webSearch = true)
+        replies += AiReply("", listOf(setting), sources = listOf(page))
+        val openRouter = searchRun(question("Search the web for a good subtitle size"), webSearch = true)
+        assertTrue(app.performed.isEmpty())
+        assertEquals(listOf(1, 1), listOf(claude.waiting.size, openRouter.waiting.size))
     }
 
     @Test

@@ -78,6 +78,8 @@ internal class AiAnswerRun(
             continuing = reply.paused
             reply.sources.forEach(::addSource)
             reply.webQueries.forEach { query -> recordSearch(AiAction.WebSearch(query)) }
+            // The service's own web search read pages as well, like the app's Tavily search.
+            if (reply.webQueries.isNotEmpty() || reply.sources.isNotEmpty()) otherText = true
             if (round == MAX_AI_REQUESTS_PER_ANSWER) break
             if (reply.paused) {
                 messages += AiWireMessage(AiRole.ASSISTANT, reply.text, rawContent = reply.rawContent)

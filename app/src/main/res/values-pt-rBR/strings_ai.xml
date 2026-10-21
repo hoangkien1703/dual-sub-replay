@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">Raciocínio</string>
     <string name="ai_settings_full_access_title">Acesso total para o assistente</string>
     <string name="ai_settings_full_access_description">Permite também que o assistente mude as próprias configurações de IA, adicione ou remova chaves, altere ou exclua palavras salvas e redefina as configurações. Buscas, mudanças de tradução e recarregamentos não pedem mais confirmação.</string>
-    <string name="ai_settings_full_access_warning">Remover uma chave e redefinir as configurações ainda esperam seu toque. Depois que o assistente lê legendas, arquivos ou texto de erro, toda mudança espera seu toque.</string>
+    <string name="ai_settings_full_access_warning">Remover uma chave e redefinir as configurações ainda esperam seu toque. As outras mudanças acontecem na hora, mesmo depois que o assistente lê legendas, páginas da web ou arquivos, então uma página poderia mudar uma configuração; você pode desfazer.</string>
     <string name="ai_settings_permissions_default">Desligado por padrão. Assim, o assistente não pode mexer em chaves, configurações de IA ou palavras salvas, além de salvar palavras novas.</string>
     <string name="ai_action_key_add">Adicionar uma chave terminada em %1$s</string>
     <string name="ai_action_key_added">Chave de %1$s salva, terminada em %2$s</string>

@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">Razonamiento</string>
     <string name="ai_settings_full_access_title">Acceso total para el asistente</string>
     <string name="ai_settings_full_access_description">Permite además que el asistente cambie sus propios ajustes de IA, añada o quite claves, cambie o elimine palabras guardadas y restablezca los ajustes. Las búsquedas, los cambios de traducción y las recargas ya no piden confirmación.</string>
-    <string name="ai_settings_full_access_warning">Quitar una clave y restablecer los ajustes siguen esperando a que toques. Después de que el asistente lea subtítulos, archivos o texto de error, cada cambio espera a que toques.</string>
+    <string name="ai_settings_full_access_warning">Quitar una clave y restablecer los ajustes siguen esperando a que toques. Los demás cambios se aplican al momento, incluso después de que el asistente lea subtítulos, páginas web o archivos, así que una página podría cambiar un ajuste; puedes deshacerlo.</string>
     <string name="ai_settings_permissions_default">Desactivado de forma predeterminada. Así, el asistente no puede tocar claves, ajustes de IA ni palabras guardadas, salvo guardar palabras nuevas.</string>
     <string name="ai_action_key_add">Añadir una clave que termina en %1$s</string>
     <string name="ai_action_key_added">Clave de %1$s guardada, termina en %2$s</string>
