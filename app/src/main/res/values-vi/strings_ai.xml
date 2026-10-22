@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">Mức suy nghĩ</string>
     <string name="ai_settings_full_access_title">Toàn quyền cho trợ lý</string>
     <string name="ai_settings_full_access_description">Cho phép trợ lý thay đổi cả cài đặt AI của chính nó, thêm hoặc xóa khóa, sửa hoặc xóa từ đã lưu và đặt lại cài đặt. Tìm kiếm, đổi bản dịch và tải lại không cần hỏi trước nữa.</string>
-    <string name="ai_settings_full_access_warning">Xóa khóa và đặt lại cài đặt vẫn chờ bạn nhấn. Sau khi trợ lý đọc phụ đề, tệp hoặc nội dung lỗi, mọi thay đổi đều chờ bạn nhấn.</string>
+    <string name="ai_settings_full_access_warning">Xóa khóa và đặt lại cài đặt vẫn chờ bạn nhấn. Các thay đổi khác chạy ngay, kể cả sau khi trợ lý đọc phụ đề, trang web hoặc tệp, nên một trang web có thể đổi cài đặt; bạn có thể hoàn tác.</string>
     <string name="ai_settings_permissions_default">Tắt theo mặc định. Khi tắt, trợ lý không thể đụng tới khóa, cài đặt AI hay từ đã lưu, ngoài việc lưu từ mới.</string>
     <string name="ai_action_key_add">Thêm khóa kết thúc bằng %1$s</string>
     <string name="ai_action_key_added">Đã lưu khóa %1$s kết thúc bằng %2$s</string>

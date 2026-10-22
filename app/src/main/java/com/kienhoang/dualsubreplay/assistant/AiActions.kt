@@ -279,28 +279,26 @@ internal val AiAction.alwaysAsks: Boolean
             (this is AiAction.ChangeSetting && setting.asks)
 
 /**
- * Setting and memory changes also wait for a tap when the answer rests on text the user did not
- * type, so a subtitle line cannot change the app or plant a memory on its own.
+ * Without full access, setting and memory changes also wait for a tap when the answer rests on text
+ * the user did not type, so a subtitle line or a web page cannot change the app or plant a memory on
+ * its own.
  */
 internal val AiAction.asksAfterOtherText: Boolean
-    get() =
-        alwaysAsks || this is AiAction.ChangeSetting || this is AiAction.SaveMemory || this is AiAction.ForgetMemory ||
-            asksWithFullAccess || this is AiAction.ChangeAiSetting || this is AiAction.AddApiKey ||
-            this is AiAction.DeleteSavedWord || this is AiAction.EditSavedWord
+    get() = alwaysAsks || this is AiAction.ChangeSetting || this is AiAction.SaveMemory || this is AiAction.ForgetMemory
 
 /**
  * With full access, only what can't be undone still waits for the user's tap: removing a key and
- * resetting settings.
+ * resetting settings. The owner chose this even after other people's text was read (2026-10-21).
  */
 internal val AiAction.asksWithFullAccess: Boolean
     get() = this is AiAction.RemoveApiKey || this is AiAction.Reset
 
-/** Whether [action] waits for the user's tap; [otherText] means subtitles, files or error text were read. */
+/** Whether [action] waits for the user's tap; [otherText] means subtitles, web pages, files or error text were read. */
 internal fun aiActionAsks(
     action: AiAction,
     fullAccess: Boolean,
     otherText: Boolean,
-): Boolean = (if (fullAccess) action.asksWithFullAccess else action.alwaysAsks) || (otherText && action.asksAfterOtherText)
+): Boolean = if (fullAccess) action.asksWithFullAccess else action.alwaysAsks || (otherText && action.asksAfterOtherText)
 
 /** What a chip shows next to the action; also how it is saved. */
 internal enum class AiActionKind(

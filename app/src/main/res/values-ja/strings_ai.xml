@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">思考</string>
     <string name="ai_settings_full_access_title">アシスタントにフルアクセスを許可</string>
     <string name="ai_settings_full_access_description">アシスタントが自分の AI 設定の変更、キーの追加・削除、保存した単語の変更・削除、設定のリセットもできるようになります。検索、翻訳の変更、再読み込みも確認なしで行います。</string>
-    <string name="ai_settings_full_access_warning">キーの削除と設定のリセットは、引き続きタップを待ちます。アシスタントが字幕、ファイル、エラー文を読んだ後は、すべての変更がタップを待ちます。</string>
+    <string name="ai_settings_full_access_warning">キーの削除と設定のリセットは、引き続きタップを待ちます。ほかの変更は、アシスタントが字幕、ウェブページ、ファイルを読んだ後でもすぐに実行されるため、ページの内容で設定が変わることがあります。元に戻せます。</string>
     <string name="ai_settings_permissions_default">既定ではオフです。オフの間、アシスタントは新しい単語の保存以外で、キー、AI 設定、保存した単語に触れられません。</string>
     <string name="ai_action_key_add">末尾が %1$s のキーを追加</string>
     <string name="ai_action_key_added">末尾が %2$s の %1$s キーを保存しました</string>

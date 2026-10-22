@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">Berpikir</string>
     <string name="ai_settings_full_access_title">Akses penuh untuk asisten</string>
     <string name="ai_settings_full_access_description">Asisten juga bisa mengubah pengaturan AI-nya sendiri, menambah atau menghapus kunci, mengubah atau menghapus kata tersimpan, dan mengatur ulang pengaturan. Pencarian, perubahan terjemahan, dan muat ulang tidak lagi meminta konfirmasi.</string>
-    <string name="ai_settings_full_access_warning">Menghapus kunci dan mengatur ulang pengaturan tetap menunggu ketukan Anda. Setelah asisten membaca subtitle, file, atau teks galat, setiap perubahan menunggu ketukan Anda.</string>
+    <string name="ai_settings_full_access_warning">Menghapus kunci dan mengatur ulang pengaturan tetap menunggu ketukan Anda. Perubahan lain langsung berjalan, bahkan setelah asisten membaca subtitle, halaman web, atau file, jadi sebuah halaman bisa mengubah pengaturan; Anda bisa membatalkannya.</string>
     <string name="ai_settings_permissions_default">Mati secara bawaan. Saat mati, asisten tidak bisa menyentuh kunci, pengaturan AI, atau kata tersimpan selain menyimpan kata baru.</string>
     <string name="ai_action_key_add">Tambah kunci berakhiran %1$s</string>
     <string name="ai_action_key_added">Kunci %1$s berakhiran %2$s disimpan</string>

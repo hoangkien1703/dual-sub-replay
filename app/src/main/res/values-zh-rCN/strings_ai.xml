@@ -210,7 +210,7 @@
     <string name="ai_settings_thinking_title">思考</string>
     <string name="ai_settings_full_access_title">给助手完全权限</string>
     <string name="ai_settings_full_access_description">助手还可以更改自己的 AI 设置、添加或删除密钥、修改或删除已保存的单词，以及重置设置。搜索、更改翻译和重新加载也不再先询问。</string>
-    <string name="ai_settings_full_access_warning">删除密钥和重置设置仍需你点按确认。助手读取字幕、文件或错误信息后，所有更改都需你点按确认。</string>
+    <string name="ai_settings_full_access_warning">删除密钥和重置设置仍需你点按确认。其他更改会立即执行，即使助手刚读取了字幕、网页或文件，因此网页内容可能会改动设置；你可以撤销。</string>
     <string name="ai_settings_permissions_default">默认关闭。关闭时，除了保存新单词，助手无法改动密钥、AI 设置或已保存的单词。</string>
     <string name="ai_action_key_add">添加以 %1$s 结尾的密钥</string>
     <string name="ai_action_key_added">已保存以 %2$s 结尾的 %1$s 密钥</string>

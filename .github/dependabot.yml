@@ -1,0 +1,30 @@
+# Monthly update PRs, one per ecosystem, so new library or action versions don't go unnoticed.
+# Security fixes come sooner once Dependabot alerts are on (Settings > Security).
+# Release labels follow AGENTS.md: app and workflow updates release as a patch (the default),
+# promo-video tooling is never shipped, so it skips the release.
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      gradle:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /tools/promo-video
+    schedule:
+      interval: monthly
+    labels: ["release:skip"]
+    groups:
+      promo-video:
+        patterns: ["*"]
