@@ -114,7 +114,7 @@ jobs:
 
       - name: Install Android build SDK
         if: steps.resume.outputs.build == 'true'
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
 
       - name: Set up Gradle cache
         if: steps.resume.outputs.build == 'true'

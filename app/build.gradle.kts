@@ -179,7 +179,7 @@ androidComponents {
 
 android {
     namespace = "com.kienhoang.dualsubreplay"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.kienhoang.dualsubreplay"

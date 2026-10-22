@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.kienhoang.dualsubreplay.benchmarktests"
-    compileSdk = 36
+    compileSdk = 37
     targetProjectPath = ":app"
     defaultConfig {
         minSdk = 28
