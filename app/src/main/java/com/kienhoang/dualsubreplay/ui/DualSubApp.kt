@@ -895,6 +895,12 @@ internal fun SubtitleTimeline(
     }
 
     KeepActiveRowOnScreen(listState, state.currentIndex)
+    PrepareUpcomingTokens(
+        segments = state.segments,
+        currentIndex = state.currentIndex,
+        languageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
+        enabled = state.wordLearningEnabled,
+    )
 
     val showOriginal = state.showOriginal()
     val showTranslation = state.showTranslation()

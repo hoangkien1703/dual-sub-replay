@@ -196,7 +196,8 @@ class PlaybackArchitectureTest {
         assertTrue(enabled.contains("player.loadModule('captions')"))
         assertTrue(enabled.contains("player.setOption('captions', 'track', track)"))
         assertTrue(disabled.contains("existing.restoreCaptions()"))
-        assertTrue(enabled.contains("requestVideoFrameCallback"))
+        // Captions take their time from video.currentTime; no callback runs on every video frame.
+        assertFalse(enabled.contains("requestVideoFrameCallback"))
         assertTrue(enabled.contains("state.ensureCaptions()"))
         assertTrue(disabled.contains("existing.restoreCaptions()"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains(LIVE_CAPTION_CAPTURE_STATE_KEY))
@@ -219,6 +220,17 @@ class PlaybackArchitectureTest {
         assertTrue(script.contains("player.setOption('captions', 'track', sync.optionTrack(player, wanted))"))
         assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains(CAPTION_TRACK_SYNC_STATE_KEY))
         assertTrue(webLiveCaptionConfigurationScript(true).contains("trackSync.choose(player)"))
+        // Every snapshot poll runs the sync: the spoken language is worked out once per video and track list.
+        assertTrue(script.contains("if (!target && sync.spokenFor !== spokenKey) {"))
+    }
+
+    @Test
+    fun livePollSkipsTheCaptionButtonSearchOnceCaptionsAreOn() {
+        val enabled = webLiveCaptionConfigurationScript(true)
+        val earlyReturn = enabled.indexOf("if (activeTrack && state.captionWasEnabled !== null) return;")
+
+        assertTrue(earlyReturn >= 0)
+        assertTrue(earlyReturn < enabled.indexOf("const button = state.captionButton();"))
     }
 
     @Test

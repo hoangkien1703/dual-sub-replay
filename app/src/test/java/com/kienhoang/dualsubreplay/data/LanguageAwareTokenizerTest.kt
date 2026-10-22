@@ -17,6 +17,14 @@ class LanguageAwareTokenizerTest {
     }
 
     @Test
+    fun aLineSplitAgainComesFromTheCacheUntilAnAnalyzerLoads() {
+        val first = LanguageAwareTokenizer.tokenize("The cache keeps this line", "en")
+
+        assertTrue(first === LanguageAwareTokenizer.tokenize("The cache keeps this line", "en"))
+        assertTrue(first !== LanguageAwareTokenizer.tokenize("The cache keeps this line", "fr"))
+    }
+
+    @Test
     fun segmentsJapaneseTextIntoMorphemes() {
         val text = "日本語を勉強します"
         val tokens = LanguageAwareTokenizer.tokenize(text, languageCode = "ja")

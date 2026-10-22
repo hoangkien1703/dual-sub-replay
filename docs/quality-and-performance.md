@@ -59,6 +59,31 @@ not clear app data. Keep onboarding, screen, power, compilation state, and devic
 temperature comparable. This is separate from extended live-playback memory
 and subtitle timing, which require a repeatable live-device session.
 
+## CPU use around the YouTube page
+
+`PageCpuUseTest` (managed device, part of PR CI) runs the complete player on an offline
+YouTube-like page and measures CPU milliseconds a second of the app's process and WebView's
+page (`sandboxed_process`) processes: 30 s playing, 30 s paused, 30 s on a page without a video.
+The "Report page CPU use" step prints the numbers in the job summary; the test fails over its
+budget. Emulator numbers include software rendering and are noisy, so compare runs of the same
+workflow, not absolute values. See the [spec](specs/2026-10-22-lighter-cpu-use.md) for the
+pacing rules (100 ms page reads only while a video plays) and the measured before/after.
+
+On a phone, compare the released app and a preview build under the same conditions (same
+video, brightness, Wi-Fi, about the same battery level and temperature):
+
+- Without a computer: watch for 30 minutes, then open Settings › Battery › Battery usage
+  and note the app's share and minutes of use.
+- With a computer (USB debugging on), while a video plays:
+
+  ```powershell
+  adb shell top -d 5 -n 6 -o PID,%CPU,NAME | findstr /i "dualsub sandboxed"
+  ```
+
+  Add both lines: the app's own process and WebView's `sandboxed_process` (the page). Repeat
+  paused and on the home feed. Android Studio's profiler (CPU, system trace) shows where the time
+  goes when a number looks wrong.
+
 ## Translation evaluation
 
 The explicit benchmark-only `journey=translation` evaluates six fixed pairs

@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -17,6 +18,8 @@ import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 internal data class SubtitleWordSpan(
     val wordIndex: Int,
@@ -170,6 +173,31 @@ internal fun tokenizerRevision(): Int =
     JapaneseMorphology.revision.collectAsState().value +
         EnglishMorphology.revision.collectAsState().value +
         ChineseMorphology.revision.collectAsState().value
+
+/** Rows split ahead of the playing line; about a screenful of subtitle rows. */
+private const val UPCOMING_TOKEN_ROWS = 12
+
+/**
+ * While word learning is on, splits the rows about to play on a background thread, so the screen
+ * thread finds them in [LanguageAwareTokenizer]'s cache instead of running the analyzer itself.
+ */
+@Composable
+internal fun PrepareUpcomingTokens(
+    segments: List<SubtitleSegment>,
+    currentIndex: Int,
+    languageCode: String?,
+    enabled: Boolean,
+) {
+    val revision = tokenizerRevision()
+    LaunchedEffect(segments, currentIndex, languageCode, enabled, revision) {
+        if (!enabled || segments.isEmpty()) return@LaunchedEffect
+        val first = currentIndex.coerceIn(0, segments.lastIndex)
+        val texts = segments.subList(first, minOf(segments.size, first + UPCOMING_TOKEN_ROWS)).map { it.originalText }
+        withContext(Dispatchers.Default) {
+            texts.forEach { LanguageAwareTokenizer.tokenize(it, languageCode) }
+        }
+    }
+}
 
 /** Expensive language analysis is independent of the changing spoken-word index. */
 @Composable

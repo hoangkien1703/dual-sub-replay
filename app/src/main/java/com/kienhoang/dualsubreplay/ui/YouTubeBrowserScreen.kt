@@ -70,10 +70,12 @@ import com.kienhoang.dualsubreplay.playback.webVideoCommandScript
 import java.net.URI
 import java.util.Collections
 import java.util.WeakHashMap
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -81,7 +83,8 @@ private const val BROWSER_LOG_TAG = "DualSubBrowser"
 // Keep native karaoke tracking close to YouTube's own transcript cadence. 250 ms
 // polling made spoken-word changes visibly trail fast speech by up to a quarter
 // second; 100 ms keeps the highlight responsive without polling every frame.
-private const val PLAYBACK_POLL_INTERVAL_MS = 100L
+// A paused video or a page without one is read less often (PagePollPacing.kt).
+private const val PLAYBACK_POLL_INTERVAL_MS = PLAYBACK_POLL_PLAYING_MS
 private const val SIGN_IN_POLL_INTERVAL_MS = 500L
 
 // Earphone buttons and the media notification need the video's state also off screen.
@@ -577,12 +580,16 @@ internal fun SingleYouTubePage(
     PageTranslationReader(webView, active = lifecycleStarted)
     StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
 
+    val pollNow = remember(webView) { Channel<Unit>(Channel.CONFLATED) }
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
         if (!lifecycleStarted) return@LaunchedEffect
         val gate = PlaybackSnapshotGate()
         val clock = CaptionPlaybackClock()
         var pending = false
         var lastRequest = 0L
+        var lastUrl: String? = null
+        var latest: WebPlaybackSnapshot? = null
+        var woken = false
         val ticker =
             launch {
                 while (isActive) {
@@ -599,13 +606,18 @@ internal fun SingleYouTubePage(
                             snapshot.sessionId,
                         )
                     }
-                    delay(33)
+                    delay(playbackTickIntervalMs(latest))
                 }
             }
         try {
             while (isActive) {
                 val now = android.os.SystemClock.elapsedRealtime()
-                if (webView.url.orEmpty().let(::isYouTubeWebUrl) && (!pending || now - lastRequest > 500)) {
+                val url = webView.url.orEmpty()
+                val due =
+                    woken || url != lastUrl ||
+                        now - lastRequest >= playbackPollIntervalMs(browseVideoSelection(url) != null, latest)
+                if (due && isYouTubeWebUrl(url) && (!pending || now - lastRequest > 500)) {
+                    lastUrl = url
                     pending = true
                     val requestedUrl = webView.url
                     val ticket = gate.request()
@@ -615,6 +627,7 @@ internal fun SingleYouTubePage(
                         if (lastRequest == requestedAt) pending = false
                         val snapshot = parseWebPlaybackSnapshot(rawValue) ?: return@evaluateJavascript
                         if (!gate.accept(ticket, requestedUrl, webView.url, snapshot.url)) return@evaluateJavascript
+                        latest = snapshot
                         controller.observePage(snapshot.url)
                         youtubePlayerControlsVisible.value = snapshot.controlsVisible
                         youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
@@ -630,7 +643,8 @@ internal fun SingleYouTubePage(
                         }
                     }
                 }
-                delay(PLAYBACK_POLL_INTERVAL_MS)
+                // A play, pause or seek the app sent is read back at once, not after the slower wait.
+                woken = withTimeoutOrNull(PLAYBACK_POLL_INTERVAL_MS) { pollNow.receive() } != null
             }
         } finally {
             ticker.cancel()
@@ -660,17 +674,23 @@ internal fun SingleYouTubePage(
     }
 
     DisposableEffect(controller, webView) {
-        controller.bindScripts { script -> webView.evaluateJavascript(script, null) }
+        controller.bindScripts { script ->
+            webView.evaluateJavascript(script, null)
+            pollNow.trySend(Unit)
+        }
         val token = controller.bind { second ->
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 webView.evaluateJavascript(webReplayScript(second), null)
+                pollNow.trySend(Unit)
             }
         }
         onDispose { controller.unbind(token) }
     }
 
     fun refreshMediaState() {
-        if (!webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+        // Only a watch page's video is published, so other pages need no script run.
+        val url = webView.url.orEmpty()
+        if (!isYouTubeWebUrl(url) || browseVideoSelection(url) == null) {
             WebVideoBridge.publish(null)
             return
         }

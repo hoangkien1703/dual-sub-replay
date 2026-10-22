@@ -177,6 +177,36 @@ object LanguageAwareTokenizer {
      */
     fun tokenize(text: String, languageCode: String? = null): List<AnalyzedToken> {
         if (text.isBlank()) return emptyList()
+        // A row scrolled back into view, or split again by another screen, comes from the cache.
+        val key = TokenCacheKey(text, languageCode, analyzerRevision())
+        synchronized(tokenCache) { tokenCache[key] }?.let { return it }
+        val tokens = tokenizeUncached(text, languageCode)
+        synchronized(tokenCache) { tokenCache[key] = tokens }
+        return tokens
+    }
+
+    private data class TokenCacheKey(
+        val text: String,
+        val languageCode: String?,
+        val revision: Int,
+    )
+
+    private const val TOKEN_CACHE_ENTRIES = 512
+
+    private val tokenCache =
+        object : LinkedHashMap<TokenCacheKey, List<AnalyzedToken>>(64, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TokenCacheKey, List<AnalyzedToken>>?): Boolean =
+                size > TOKEN_CACHE_ENTRIES
+        }
+
+    /** Grows whenever an analyzer finishes loading, so lines split by the heuristic before are split again. */
+    private fun analyzerRevision(): Int =
+        JapaneseMorphology.revision.value + EnglishMorphology.revision.value + ChineseMorphology.revision.value
+
+    private fun tokenizeUncached(
+        text: String,
+        languageCode: String?,
+    ): List<AnalyzedToken> {
         val isJapaneseOrCjk = (languageCode != null && (languageCode.startsWith("ja") || languageCode.startsWith("zh")))
             || isCjk(text)
 
