@@ -85,7 +85,7 @@ buttons, the media notification) is read back at once.
 5. `PageCpuUseTest` (managed device): the complete player on an offline YouTube-like page
    (150 feed items, time display every 250 ms, a caption every 2 s, 300 transcript lines with
    word learning and word highlight on). It measures CPU milliseconds a second of the app's
-   process and WebView's page processes for 30 s playing, 20 s paused and 20 s on a page
+   process and WebView's page processes for 30 s playing, 30 s paused and 30 s on a page
    without a video, logs them, and fails over budget. CI prints the numbers in the job summary.
 
 ## Acceptance criteria

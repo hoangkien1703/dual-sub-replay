@@ -20,6 +20,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -114,8 +115,8 @@ class PageCpuUseTest {
 
     /** CPU milliseconds a second, for the app's process and WebView's page processes. */
     private data class CpuUse(
-        val app: Long,
-        val page: Long,
+        val app: Double,
+        val page: Double,
     ) {
         val total get() = app + page
     }
@@ -131,12 +132,13 @@ class PageCpuUseTest {
         val seconds = (System.nanoTime() - started) / 1e9
         val use =
             CpuUse(
-                app = ((Process.getElapsedCpuTime() - appBefore) / seconds).toLong(),
-                page = pageProcessCpuMs()?.let { after -> pageBefore?.let { ((after - it) / seconds).toLong() } } ?: 0,
+                app = (Process.getElapsedCpuTime() - appBefore) / seconds,
+                page = pageProcessCpuMs()?.let { after -> pageBefore?.let { (after - it) / seconds } } ?: 0.0,
             )
         Log.i(
             CPU_LOG_TAG,
-            "scenario=$scenario app_ms_per_s=${use.app} page_ms_per_s=${use.page} total_ms_per_s=${use.total}" +
+            "scenario=$scenario app_ms_per_s=${use.app.oneDecimal()} page_ms_per_s=${use.page.oneDecimal()} " +
+                "total_ms_per_s=${use.total.oneDecimal()}" +
                 (if (pageBefore == null) " page_process=unreadable" else ""),
         )
         return use
@@ -159,6 +161,8 @@ class PageCpuUseTest {
         }
         return ticks * 1000 / ticksPerSecond
     }
+
+    private fun Double.oneDecimal(): String = String.format(Locale.ROOT, "%.1f", this)
 
     private fun shell(command: String): String =
         InstrumentationRegistry
@@ -213,11 +217,11 @@ class PageCpuUseTest {
     companion object {
         private const val SETTLE_MS = 5_000L
         private const val PLAYING_MS = 30_000L
-        private const val IDLE_MS = 20_000L
+        private const val IDLE_MS = 30_000L
 
         // Loose until CI has measured both versions; the spec records the numbers they come from.
-        private const val PLAYING_BUDGET_MS_PER_SECOND = 600L
-        private const val IDLE_BUDGET_MS_PER_SECOND = 600L
+        private const val PLAYING_BUDGET_MS_PER_SECOND = 600.0
+        private const val IDLE_BUDGET_MS_PER_SECOND = 600.0
 
         /** YouTube's churn: a feed, a time display and progress bar every 250 ms, a caption every 2 s. */
         private val FEED =
