@@ -29,7 +29,6 @@ class FullscreenCaptionClockTest {
                             view.evaluateJavascript(webLiveCaptionConfigurationScript(true)) {
                                 view.evaluateJavascript(
                                     """
-                                    window['$LIVE_CAPTION_CAPTURE_STATE_KEY'].latestMediaSecond = 1;
                                     document.querySelector('video')._time = 12;
                                     document.querySelector('.ytp-caption-segment').textContent = 'New caption';
                                     """.trimIndent(),

@@ -150,7 +150,6 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             enabled: true,
             text: '',
             revision: 0,
-            latestMediaSecond: null,
             captionMediaSecond: null,
             captionWasEnabled: null,
             enabledByApp: false,
@@ -209,10 +208,12 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
           };
           state.ensureCaptions = function() {
             if (!state.enabled || !state.trustedOrigin()) return;
-            const button = state.captionButton();
             const player = state.player();
-            const pressed = !!button && button.getAttribute('aria-pressed') === 'true';
             const activeTrack = state.activeCaptionTrack(player);
+            // Every snapshot poll lands here; once captions are on, skip the document-wide button search.
+            if (activeTrack && state.captionWasEnabled !== null) return;
+            const button = state.captionButton();
+            const pressed = !!button && button.getAttribute('aria-pressed') === 'true';
             if (state.captionWasEnabled === null) {
               state.captionWasEnabled = pressed || !!activeTrack;
             }
@@ -271,35 +272,14 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             state.videoId = videoId;
             state.languageCode = languageCode;
             const video = state.activeVideo();
-            // Android's fullscreen custom video surface can stop frame callbacks on
-            // the page element. Timestamp new captions from the same media clock as
-            // playback snapshots, never from the last (possibly frozen) frame.
+            // Timestamp new captions from the same media clock as playback snapshots
+            // (fullscreen custom video surfaces can freeze the page element's frames).
             const mediaSecond = video && Number.isFinite(video.currentTime)
               ? video.currentTime
               : null;
             state.text = text;
             state.captionMediaSecond = mediaSecond;
             state.revision += 1;
-          };
-          state.frameLoop = function() {
-            if (!state.enabled || !state.trustedOrigin()) return;
-            const video = state.activeVideo();
-            if (!video) {
-              setTimeout(state.frameLoop, 120);
-              return;
-            }
-            const onFrame = function(_, metadata) {
-              if (!state.enabled) return;
-              state.latestMediaSecond = metadata && Number.isFinite(metadata.mediaTime)
-                ? metadata.mediaTime
-                : (Number.isFinite(video.currentTime) ? video.currentTime : null);
-              state.frameLoop();
-            };
-            if (typeof video.requestVideoFrameCallback === 'function') {
-              video.requestVideoFrameCallback(onFrame);
-            } else {
-              setTimeout(function() { onFrame(0, { mediaTime: video.currentTime }); }, 40);
-            }
           };
 
           // YouTube rewrites its time display, feed and comments all the time; only caption
@@ -328,7 +308,6 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
           window[key] = state;
           state.ensureCaptions();
           state.recordCaption();
-          state.frameLoop();
           return true;
         })();
         """.trimIndent()
@@ -460,7 +439,14 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
       const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
       if (!tracks.length || !videoId) return null;
       const target = sync.target && sync.target.videoId === videoId ? sync.target : null;
-      const language = target ? target.languageCode : sync.spokenLanguage(renderer, tracks, response.videoDetails);
+      // run() comes with every snapshot poll; the spoken language scans the title and description
+      // with a dozen script patterns, so work it out once per video and track list.
+      const spokenKey = videoId + '|' + tracks.length;
+      if (!target && sync.spokenFor !== spokenKey) {
+        sync.spoken = sync.spokenLanguage(renderer, tracks, response.videoDetails);
+        sync.spokenFor = spokenKey;
+      }
+      const language = target ? target.languageCode : sync.spoken;
       if (!language) return null;
       const generated = target ? target.generated : false;
       const same = tracks.filter(function(track) { return sync.base(track.languageCode) === sync.base(language); });
