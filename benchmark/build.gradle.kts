@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.kienhoang.dualsubreplay.benchmarktests"
-    compileSdk = 36
+    compileSdk = 37
     targetProjectPath = ":app"
     defaultConfig {
         minSdk = 28
@@ -31,6 +31,6 @@ androidComponents {
 
 dependencies {
     implementation("androidx.test.ext:junit:1.2.1")
-    implementation("androidx.test.uiautomator:uiautomator:2.3.0")
+    implementation("androidx.test.uiautomator:uiautomator:2.4.0")
     implementation("androidx.benchmark:benchmark-macro-junit4:1.4.1")
 }
