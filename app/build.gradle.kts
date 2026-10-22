@@ -279,14 +279,14 @@ android {
 }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2026.06.01"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2026.06.01"))
+    implementation(platform("androidx.compose:compose-bom:2026.09.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.09.00"))
 
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
-    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.webkit:webkit:1.14.0")
     // Media session and media notification only (earphone buttons); the video stays in the WebView.
-    implementation("androidx.media:media:1.7.1")
+    implementation("androidx.media:media:1.8.0")
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
@@ -299,7 +299,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.mlkit:translate:17.0.3")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:5.5.0")
     // Japanese morphological analysis (MeCab IPADIC dictionary), Apache-2.0, pure Java.
     // The APK keeps only its code; the dictionary files are excluded from packaging below.
     implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
@@ -311,11 +311,11 @@ dependencies {
     learnerData("net.sf.extjwnl:extjwnl-data-wn31:1.2")
     learnerData("com.huaban:jieba-analysis:1.0.2")
     learnerData("com.hankcs:hanlp:portable-1.8.6")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.json:json:20240303")
+    testImplementation("org.json:json:20260814")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
