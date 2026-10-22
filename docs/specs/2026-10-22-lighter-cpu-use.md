@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. On 2026-10-22 the owner asked how to make sure the app isn't too heavy on the
+Validated (offline and emulator; the owner's phone check is still open). On 2026-10-22 the owner asked how to make sure the app isn't too heavy on the
 phone's CPU (project thread "Phone CPU usage"). After a code review of likely hotspots, the
 owner picked "Fixes + CI CPU check": fix the four spots found, add a CI check with a CPU budget,
 and give phone steps to compare before and after. That authorizes this scope, not merge or
@@ -90,14 +90,14 @@ buttons, the media notification) is read back at once.
 
 ## Acceptance criteria
 
-- [ ] While playing, page reads stay every 100 ms and the karaoke clock every 33 ms.
-- [ ] Paused or not-started videos are read every 250 ms, pages without a video every 500 ms,
+- [x] While playing, page reads stay every 100 ms and the karaoke clock every 33 ms.
+- [x] Paused or not-started videos are read every 250 ms, pages without a video every 500 ms,
   and app-sent commands are read back at once.
-- [ ] No `requestVideoFrameCallback` loop; captions keep their `video.currentTime` timestamps.
-- [ ] Existing unit, WebView fixture and player tests pass.
-- [ ] `PageCpuUseTest` reports numbers for main (before) and this change (after) and stays
+- [x] No `requestVideoFrameCallback` loop; captions keep their `video.currentTime` timestamps.
+- [x] Existing unit, WebView fixture and player tests pass.
+- [x] `PageCpuUseTest` reports numbers for main (before) and this change (after) and stays
   within its budget.
-- [ ] Headless Chromium on the YouTube-like page shows less page-side work paused and without a
+- [x] Headless Chromium on the YouTube-like page shows less page-side work paused and without a
   video, and no more while playing.
 
 ## Validation plan
@@ -125,8 +125,48 @@ change.
 
 ## Implementation result
 
-To be filled after CI.
+As planned. The CPU test went in first (commits 767c031 and 45b63d9) so CI measured main's code
+before the fixes (0b62bbd). The first run rounded to whole milliseconds, which showed the paused
+and no-video scenarios as 0, so the test now reports tenths and measures those for 30 s.
+Budgets: 40 ms a second playing, 5 ms a second paused or without a video, about three times
+what CI measured.
 
 ## Validation result
 
-To be filled after CI.
+Cloud container: `formatCheck`, `complexityCheck`, `testDebugUnitTest` (including the new
+`PagePollPacingTest`, the cache test in `LanguageAwareTokenizerTest` and the new
+`PlaybackArchitectureTest` assertions), `lintDebug`, `assembleDebug` and
+`assembleDebugAndroidTest` passed.
+
+Headless Chromium (Playwright 1.56, mobile viewport, 4x CPU slowdown, canvas video stream,
+YouTube-like page, the app's old and new scripts with the old and new pacing), page main thread
+in ms a second, two runs each:
+
+| Scenario | Script before | Script after | All page tasks before | All page tasks after |
+| --- | --- | --- | --- | --- |
+| Playing | 24.5, 25.6 | 9.2, 7.2 | 110.7, 111.9 | 79.9, 73.9 |
+| Paused | 7.3, 5.4 | 7.3, 6.2 | 76.0, 69.5 | 55.1, 51.6 |
+| No video | 0.0, 0.0 | 0.0, 0.0 | 33.8, 34.8 | 8.5, 9.9 |
+
+"All page tasks" includes the test page's own work (canvas animation, time display), which did
+not change; the app's share of it fell by about a third while playing and three quarters without
+a video.
+
+PR CI emulator (`PageCpuUseTest`, API 36 x86_64, swiftshader), CPU ms a second of the app's
+process + WebView's page process:
+
+| Scenario | main (45b63d9) | this change (0b62bbd) |
+| --- | --- | --- |
+| Playing | 6.1 + 9.3 = 15.4 | 4.6 + 8.7 = 13.2 |
+| Paused | 0.4 + 1.0 = 1.4 | 0.3 + 1.0 = 1.3 |
+| No video | 0.3 + 0.7 = 1.0 | 0.3 + 0.3 = 0.6 |
+
+An earlier run on main (767c031, whole milliseconds) gave 11 playing, so runs vary by about a
+third. Conclusion: on CI hardware the app's own work around the page is about 1.5% of one CPU
+core while playing and close to nothing otherwise; the fixes trim it, but most of a phone's CPU
+use while watching is YouTube's page and video decoding. Phones are slower than the CI host, so
+expect a few times these numbers there.
+
+Not verified: a physical phone and live YouTube (owner's phone check, steps in
+[quality-and-performance.md](../quality-and-performance.md#cpu-use-around-the-youtube-page)).
+Final-head CI and preview: see PR #144.

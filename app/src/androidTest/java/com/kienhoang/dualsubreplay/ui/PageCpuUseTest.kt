@@ -219,9 +219,10 @@ class PageCpuUseTest {
         private const val PLAYING_MS = 30_000L
         private const val IDLE_MS = 30_000L
 
-        // Loose until CI has measured both versions; the spec records the numbers they come from.
-        private const val PLAYING_BUDGET_MS_PER_SECOND = 600.0
-        private const val IDLE_BUDGET_MS_PER_SECOND = 600.0
+        // About three times what CI measured on 2026-10-22 (13 ms playing, about 1 ms paused or without
+        // a video; runs vary by a third). The spec records the numbers.
+        private const val PLAYING_BUDGET_MS_PER_SECOND = 40.0
+        private const val IDLE_BUDGET_MS_PER_SECOND = 5.0
 
         /** YouTube's churn: a feed, a time display and progress bar every 250 ms, a caption every 2 s. */
         private val FEED =
