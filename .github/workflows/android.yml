@@ -152,6 +152,15 @@ jobs:
           -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
           --no-parallel --max-workers=2 --stacktrace
 
+      - name: Report page CPU use
+        if: always()
+        run: |
+          # PageCpuUseTest logs CPU milliseconds a second per scenario (docs/specs/2026-10-22-lighter-cpu-use.md).
+          lines=$(grep -rahoE "scenario=[a-z_]+ app_ms_per_s=[0-9]+ page_ms_per_s=[0-9]+ total_ms_per_s=[0-9]+( page_process=unreadable)?" \
+            app/build/outputs/androidTest-results/managedDevice/ 2>/dev/null | sort -u || true)
+          echo "${lines:-No PageCpuUseTest results found.}"
+          { echo "### Page CPU use (ms of CPU per second)"; echo '```'; echo "${lines:-No results found.}"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload managed-device reports
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
