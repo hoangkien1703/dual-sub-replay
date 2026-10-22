@@ -15,19 +15,19 @@
     "validate:links": "node scripts/validate-links.mjs"
   },
   "dependencies": {
-    "@fontsource/noto-sans-jp": "5.3.0",
+    "@fontsource/noto-sans-jp": "5.3.1",
     "@fontsource/roboto": "5.3.0",
-    "@remotion/cli": "4.0.515",
-    "@remotion/google-fonts": "4.0.515",
+    "@remotion/cli": "4.0.536",
+    "@remotion/google-fonts": "4.0.536",
     "ffmpeg-static": "5.3.0",
     "ffprobe-static": "3.1.0",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
-    "remotion": "4.0.515"
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.536"
   },
   "devDependencies": {
-    "@types/react": "19.1.10",
-    "@types/react-dom": "19.1.7",
-    "typescript": "5.9.2"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2"
   }
 }
