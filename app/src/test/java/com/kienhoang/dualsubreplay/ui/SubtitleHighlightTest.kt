@@ -210,6 +210,8 @@ class SubtitleWordHighlightTest {
                 KNOWN_WORDS_PREFERENCE,
                 MARK_NEW_WORDS_PREFERENCE,
                 ANKIDROID_PREFERENCE,
+                SEND_TO_APP_PREFERENCE,
+                ANKICONNECT_DECK_PREFERENCE,
                 BLUR_BOX_PREFERENCE,
                 PAGE_TOKEN_CAPTIONS_PREFERENCE,
                 PAGE_TOKEN_NEEDED_PREFERENCE,

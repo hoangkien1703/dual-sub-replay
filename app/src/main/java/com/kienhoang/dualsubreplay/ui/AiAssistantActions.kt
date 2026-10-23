@@ -206,6 +206,7 @@ private fun aiStudySettingValue(
         AiSetting.KNOWN_WORDS_AFTER -> study.knownWordsAfter.toString()
         AiSetting.MARK_NEW_WORDS -> onOff(study.markNewWords)
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
+        AiSetting.SEND_TO_APP -> study.sendTo.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
         AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
         else -> null
@@ -641,6 +642,7 @@ internal class AppAiActions(
             AiSetting.KNOWN_WORDS_AFTER -> editor.putInt(KNOWN_WORDS_AFTER_PREFERENCE, storedKnownWordsAfter(value.toIntOrNull() ?: 0))
             AiSetting.MARK_NEW_WORDS -> editor.putBoolean(MARK_NEW_WORDS_PREFERENCE, on)
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
+            AiSetting.SEND_TO_APP -> editor.putString(SEND_TO_APP_PREFERENCE, storedFlashcardApp(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
             AiSetting.PAGE_TOKEN_CAPTIONS ->
                 editor
@@ -797,6 +799,7 @@ internal class AppAiActions(
             }
             AiSetting.MARK_NEW_WORDS -> switch(R.string.study_mark_new_words_title, value)
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
+            AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
             AiSetting.APP_AUTO_UPDATE -> switch(R.string.updates_auto_title, value)

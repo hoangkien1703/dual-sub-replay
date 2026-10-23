@@ -19,6 +19,7 @@ gets fixes. The app can update itself from its menu (Check for updates).
 - Updates download only over HTTPS from GitHub, must match the release's SHA-256 checksum, and
   Android refuses any APK not signed with the app's own key.
 - AI service keys are encrypted with the Android Keystore and left out of backups.
-- The YouTube page has no JavaScript bridge into the app, and cleartext HTTP is off.
+- The YouTube page has no JavaScript bridge into the app, and cleartext HTTP is off, except to
+  `127.0.0.1` (AnkiConnect on the same phone, used only when Send to is set to AnkiConnect).
 - The AI assistant asks before changing settings after it read subtitles, web pages or files,
   unless the user turned on Full access.

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
+    <!-- Study tools (2026-10-20): play modes, skip silence, known words, Send to (AnkiDroid, AnkiConnect), blur box, page token -->
     <string name="settings_section_study_title">Study tools</string>
-    <string name="settings_section_study_summary">Play modes, skip silence, known words, AnkiDroid, blur box</string>
+    <string name="settings_section_study_summary">Play modes, skip silence, known words, Send to, blur box</string>
     <string name="study_play_mode_title">Play mode</string>
     <string name="study_play_mode_normal">Normal</string>
     <string name="study_play_mode_normal_description">The video plays as usual.</string>
@@ -32,8 +32,18 @@
     <string name="study_known_words_clear_title">Clear known words?</string>
     <string name="study_known_words_clear_message">Every word you marked as known, in every language, is forgotten. Saved words stay.</string>
     <string name="study_known_words_clear_confirm">Clear</string>
-    <string name="study_anki_title">Send to AnkiDroid</string>
-    <string name="study_anki_description">Shows Send to AnkiDroid on the word card and in Practice → Export when AnkiDroid is installed. Cards go to a DualSub Replay deck. Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
+    <string name="study_anki_title">Send to flashcard apps</string>
+    <string name="study_anki_description">Shows a Send to button on the word card and in Practice → Export. It sends to AnkiDroid unless you pick another app with ▾ on the button or below; the button then shows that app.</string>
+    <string name="study_send_to_app_title">Send words to</string>
+    <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
+    <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>
+    <string name="study_ankidroid_description">Cards go to a DualSub Replay deck. Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
+    <string name="study_ankiconnect_description">Sends to AnkiConnect on this phone (127.0.0.1:8765), which the AnkiConnect Android app, Yomitan and asbplayer use. Open AnkiConnect Android once so its server runs. Where AnkiConnect cannot make a DualSub Replay note type, cards use Anki\'s Basic note type.</string>
+    <string name="study_ankiconnect_deck_title">AnkiConnect deck</string>
+    <string name="study_ankiconnect_deck_value">Deck: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">Automatic (DualSub Replay, else Default)</string>
+    <string name="study_ankiconnect_deck_choose">Choose deck</string>
+    <string name="study_ankiconnect_deck_loading">Loading decks…</string>
     <string name="study_blur_box_title">Blur box</string>
     <string name="study_blur_box_description">Puts a blurred box on the video to hide subtitles burned into the picture. Drag it to move it, and drag its corner to resize it.</string>
     <string name="study_page_token_title">Load captions with a page token (beta)</string>
@@ -45,14 +55,19 @@
     <string name="study_mark_all_known_confirm">Mark as known</string>
     <string name="study_close">Close</string>
     <string name="study_known_word_toggle">I know this word</string>
-    <string name="study_send_to_anki">Send to AnkiDroid</string>
+    <string name="study_send_to_anki">Send to %1$s</string>
+    <string name="study_send_to_choose">Choose where to send</string>
     <string name="study_sending_to_anki">Sending…</string>
-    <string name="study_sent_to_anki">Sent to AnkiDroid</string>
+    <string name="study_sent_to_anki">Sent to %1$s</string>
     <string name="study_anki_not_installed">AnkiDroid is not installed on this phone.</string>
     <string name="study_anki_permission_denied">AnkiDroid\'s permission was not given, so no card was added.</string>
     <string name="study_anki_failed">AnkiDroid did not accept the card. Open AnkiDroid, leave it running in the background, then come back and try again.</string>
-    <string name="study_anki_send_all">Send all to AnkiDroid</string>
-    <string name="study_anki_all_sent_before">Every word was already sent to AnkiDroid.</string>
+    <string name="study_anki_send_all">Send all to %1$s</string>
+    <string name="study_anki_all_sent_before">Every word was already sent to %1$s.</string>
+    <string name="study_ankiconnect_not_running">Nothing answered at AnkiConnect\'s address. Open AnkiConnect Android (or your AnkiConnect tool), check that its server is on, then try again.</string>
+    <string name="study_ankiconnect_failed">AnkiConnect did not accept the card.</string>
+    <string name="study_ankiconnect_failed_detail">AnkiConnect did not accept the card: %1$s</string>
+    <string name="study_ankiconnect_open">Open AnkiConnect Android</string>
     <plurals name="study_repeat_count">
         <item quantity="one">%1$d time</item>
         <item quantity="other">%1$d times</item>
@@ -70,8 +85,8 @@
         <item quantity="other">Mark %1$d words as known? You can unmark a word on its word card.</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="one">%1$d word sent to AnkiDroid.</item>
-        <item quantity="other">%1$d words sent to AnkiDroid.</item>
+        <item quantity="one">%1$d word sent to %2$s.</item>
+        <item quantity="other">%1$d words sent to %2$s.</item>
     </plurals>
     <string name="study_page_token_auto">Automatic</string>
     <string name="study_page_token_on">On</string>

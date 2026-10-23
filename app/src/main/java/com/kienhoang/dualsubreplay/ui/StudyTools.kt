@@ -3,21 +3,28 @@ package com.kienhoang.dualsubreplay.ui
 import android.content.res.Resources
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.ANKIDROID_PERMISSION
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.AnkiProblem
 import com.kienhoang.dualsubreplay.data.AnkiSendResult
@@ -72,12 +81,14 @@ private const val NEW_WORD_TINT_ALPHA = 0.24f
 
 /**
  * The Study tools of the open video (Settings → Study tools): its known words and how much of it is
- * known, and AnkiDroid. Provided by `LearningPlayerRoot`; null in screens built without it.
+ * known, and the flashcard apps Send to sends to. Provided by `LearningPlayerRoot`; null in screens
+ * built without it.
  */
 @Stable
 internal class StudyTools(
     internal val repository: KnownWordsRepository,
     internal val anki: AnkiDroidNotes,
+    internal val ankiConnect: AnkiConnectNotes,
     private val scope: CoroutineScope,
 ) {
     var settings by mutableStateOf(StudySettings())
@@ -108,7 +119,32 @@ internal class StudyTools(
     var ankiInstalled by mutableStateOf(false)
         internal set
 
-    val ankiAvailable: Boolean get() = settings.ankiDroid && ankiInstalled
+    /**
+     * Send to shows while its setting is on and AnkiDroid is installed, or AnkiConnect was picked
+     * (in Settings, for phones without AnkiDroid).
+     */
+    val sendToAvailable: Boolean get() = settings.ankiDroid && (ankiInstalled || settings.sendTo == FlashcardApp.ANKICONNECT)
+
+    fun wasSent(
+        app: FlashcardApp,
+        id: String,
+    ): Boolean =
+        when (app) {
+            FlashcardApp.ANKIDROID -> anki.wasSent(id)
+            FlashcardApp.ANKICONNECT -> ankiConnect.wasSent(id)
+        }
+
+    suspend fun send(
+        app: FlashcardApp,
+        words: List<SavedWord>,
+    ): AnkiSendResult =
+        when (app) {
+            FlashcardApp.ANKIDROID -> anki.send(words)
+            FlashcardApp.ANKICONNECT -> ankiConnect.send(words, settings.ankiConnectDeck)
+        }
+
+    /** AnkiDroid asks for its permission before the first card; AnkiConnect asks for none. */
+    fun needsPermission(app: FlashcardApp): Boolean = app == FlashcardApp.ANKIDROID && anki.installed() && !anki.permitted()
 
     /** True when words that are neither known nor saved get a tint in subtitles in [languageCode]. */
     fun marksNewWords(languageCode: String?): Boolean =
@@ -146,7 +182,10 @@ internal fun rememberStudyTools(
 ): StudyTools {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val tools = remember(context) { StudyTools(KnownWordsRepository.get(context), AnkiDroidNotes(context), scope) }
+    val tools =
+        remember(context) {
+            StudyTools(KnownWordsRepository.get(context), AnkiDroidNotes(context), AnkiConnectNotes.create(context), scope)
+        }
     val settings by rememberStudySettings()
     val sourceCode = state.resolvedSourceLanguage
     val wordsLanguage = knownWordLanguage(sourceCode)
@@ -276,7 +315,7 @@ private fun ComprehensionDialog(
 
 /**
  * The word card's "I know this word" (for a single word in the video's language, with how often
- * Automatic saw it) and "Send to AnkiDroid" (when that tool is on). While Known words is off (the
+ * Automatic saw it) and the Send to button (when that tool is on). While Known words is off (the
  * default), the first "I know this word" offers once to turn Automatic known words on.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -292,7 +331,7 @@ internal fun StudyWordActions(
     val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.wordsLanguage }
     val key = selection.token.takeIf { !selection.isPhrase && !selection.translated }?.let(::knownWordKey)
     val showKnown = language != null && key != null
-    if (!showKnown && !tools.ankiAvailable) return
+    if (!showKnown && !tools.sendToAvailable) return
     val known = showKnown && key in tools.known
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showKnown) {
@@ -314,7 +353,7 @@ internal fun StudyWordActions(
                 modifier = Modifier.testTag("known_word_toggle"),
             )
         }
-        if (tools.ankiAvailable) AnkiSendChip(tools, selection, meaning)
+        if (tools.sendToAvailable) SendToButton(tools, selection, meaning)
     }
     val seen = if (showKnown && !known && tools.settings.knownWordsMode == KnownWordsMode.AUTO) tools.seen[key] ?: 0 else 0
     if (seen > 0) {
@@ -362,103 +401,227 @@ private fun KnownWordsOfferDialog(
     )
 }
 
+/**
+ * The word card's split Send to button (owner design 2026-10-23): the main part sends to the app
+ * last picked (AnkiDroid at first) and names it; ▾ lists the apps, and picking one remembers it
+ * and sends there at once.
+ */
 @Composable
-private fun AnkiSendChip(
+private fun SendToButton(
     tools: StudyTools,
     selection: LearningWordSelection,
     meaning: String,
 ) {
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
     val word = savedWordFrom(selection, meaning, online = false)
+    val app = tools.settings.sendTo
     val scope = rememberCoroutineScope()
     var sending by remember(selection) { mutableStateOf(false) }
-    var sent by remember(selection) { mutableStateOf(tools.anki.wasSent(word.id)) }
-    var problem by remember(selection) { mutableStateOf<AnkiProblem?>(null) }
-    val send = {
+    var sentNow by remember(selection) { mutableStateOf(emptySet<FlashcardApp>()) }
+    var problem by remember(selection) { mutableStateOf<Pair<FlashcardApp, AnkiSendResult>?>(null) }
+    var menu by remember { mutableStateOf(false) }
+    val sent = app in sentNow || tools.wasSent(app, word.id)
+    val send: (FlashcardApp) -> Unit = { to ->
         sending = true
+        problem = null
         scope.launch {
-            val result = tools.anki.send(listOf(word))
+            val result = tools.send(to, listOf(word))
             sending = false
-            problem = result.problem
-            sent = result.problem == null
+            if (result.problem == null) sentNow = sentNow + to else problem = to to result
         }
-        Unit
     }
     val permission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) send() else problem = AnkiProblem.NO_PERMISSION
-        }
-    Column {
-        FilterChip(
-            selected = sent,
-            enabled = !sending && !sent && meaning.isNotBlank(),
-            onClick = { if (tools.anki.permitted()) send() else permission.launch(ANKIDROID_PERMISSION) },
-            label = {
-                Text(
-                    stringResource(
-                        when {
-                            sent -> R.string.study_sent_to_anki
-                            sending -> R.string.study_sending_to_anki
-                            else -> R.string.study_send_to_anki
-                        },
-                    ),
-                )
-            },
-            leadingIcon = { Icon(Icons.Default.Style, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) },
-            modifier = Modifier.testTag("send_to_anki"),
-        )
-        problem?.let {
-            Text(stringResource(ankiProblemText(it)), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-        }
-        // On many phones AnkiDroid accepts cards only while it runs; opening it once lets the next try work.
-        if (problem == AnkiProblem.FAILED) {
-            TextButton(onClick = { tools.anki.open() }, modifier = Modifier.testTag("open_ankidroid")) {
-                Text(stringResource(R.string.study_anki_open))
+            if (granted) {
+                send(FlashcardApp.ANKIDROID)
+            } else {
+                problem =
+                    FlashcardApp.ANKIDROID to AnkiSendResult(problem = AnkiProblem.NO_PERMISSION)
             }
+        }
+    val start: (FlashcardApp) -> Unit = { to -> if (tools.needsPermission(to)) permission.launch(ANKIDROID_PERMISSION) else send(to) }
+    val name = stringResource(app.nameRes)
+    Column {
+        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            FilterChip(
+                selected = sent,
+                enabled = !sending && !sent && meaning.isNotBlank(),
+                onClick = { start(app) },
+                label = {
+                    Text(
+                        when {
+                            sent -> stringResource(R.string.study_sent_to_anki, name)
+                            sending -> stringResource(R.string.study_sending_to_anki)
+                            else -> stringResource(R.string.study_send_to_anki, name)
+                        },
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Style,
+                        contentDescription = null,
+                        modifier = Modifier.size(FilterChipDefaults.IconSize),
+                    )
+                },
+                shape = SEND_TO_MAIN_SHAPE,
+                modifier = Modifier.testTag("send_to_anki"),
+            )
+            Box {
+                FilterChip(
+                    selected = false,
+                    enabled = !sending && meaning.isNotBlank(),
+                    onClick = { menu = true },
+                    label = { Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.study_send_to_choose)) },
+                    shape = SEND_TO_MENU_SHAPE,
+                    modifier = Modifier.testTag("send_to_menu"),
+                )
+                SendToMenu(
+                    expanded = menu,
+                    current = app,
+                    onDismiss = { menu = false },
+                    onPick = { picked ->
+                        menu = false
+                        preferences.edit().putString(SEND_TO_APP_PREFERENCE, picked.storageValue).apply()
+                        if (picked !in sentNow && !tools.wasSent(picked, word.id)) start(picked)
+                    },
+                )
+            }
+        }
+        problem?.let { (to, result) ->
+            Text(
+                sendProblemText(LocalResources.current, to, result),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            SendProblemAction(tools, to, result.problem)
         }
     }
 }
 
-@StringRes
-internal fun ankiProblemText(problem: AnkiProblem): Int =
-    when (problem) {
-        AnkiProblem.NOT_INSTALLED -> R.string.study_anki_not_installed
-        AnkiProblem.NO_PERMISSION -> R.string.study_anki_permission_denied
-        AnkiProblem.FAILED -> R.string.study_anki_failed
+private val SEND_TO_MAIN_SHAPE = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp, topEnd = 2.dp, bottomEnd = 2.dp)
+private val SEND_TO_MENU_SHAPE = RoundedCornerShape(topStart = 2.dp, bottomStart = 2.dp, topEnd = 8.dp, bottomEnd = 8.dp)
+
+/** The Send to button's list: every flashcard app, with a check by the one in use. */
+@Composable
+private fun SendToMenu(
+    expanded: Boolean,
+    current: FlashcardApp,
+    onDismiss: () -> Unit,
+    onPick: (FlashcardApp) -> Unit,
+) {
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        FlashcardApp.entries.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(stringResource(option.nameRes)) },
+                onClick = { onPick(option) },
+                leadingIcon = {
+                    if (option == current) Icon(Icons.Default.Check, contentDescription = null) else Spacer(Modifier.size(24.dp))
+                },
+                modifier = Modifier.testTag("send_to_option_${option.storageValue}"),
+            )
+        }
+    }
+}
+
+/**
+ * On many phones AnkiDroid accepts cards only while it runs, and AnkiConnect Android's server runs
+ * only after it was opened: opening the app once lets the next try work.
+ */
+@Composable
+private fun SendProblemAction(
+    tools: StudyTools,
+    app: FlashcardApp,
+    problem: AnkiProblem?,
+) {
+    when {
+        app == FlashcardApp.ANKIDROID && problem == AnkiProblem.FAILED ->
+            TextButton(onClick = { tools.anki.open() }, modifier = Modifier.testTag("open_ankidroid")) {
+                Text(stringResource(R.string.study_anki_open))
+            }
+        app == FlashcardApp.ANKICONNECT && problem == AnkiProblem.NOT_RUNNING && tools.ankiConnect.canOpen() ->
+            TextButton(onClick = { tools.ankiConnect.open() }, modifier = Modifier.testTag("open_ankiconnect")) {
+                Text(stringResource(R.string.study_ankiconnect_open))
+            }
+    }
+}
+
+/** What stopped a send to [app], with AnkiConnect's own words when it gave some. */
+internal fun sendProblemText(
+    resources: Resources,
+    app: FlashcardApp,
+    result: AnkiSendResult,
+): String =
+    when (result.problem) {
+        null -> ""
+        AnkiProblem.NOT_INSTALLED -> resources.getString(R.string.study_anki_not_installed)
+        AnkiProblem.NO_PERMISSION -> resources.getString(R.string.study_anki_permission_denied)
+        AnkiProblem.NOT_RUNNING -> resources.getString(R.string.study_ankiconnect_not_running)
+        AnkiProblem.FAILED ->
+            when {
+                app == FlashcardApp.ANKIDROID -> resources.getString(R.string.study_anki_failed)
+                result.detail.isNullOrBlank() -> resources.getString(R.string.study_ankiconnect_failed)
+                else -> resources.getString(R.string.study_ankiconnect_failed_detail, result.detail)
+            }
     }
 
-/** The export dialog's "Send all to AnkiDroid", when AnkiDroid is installed and the setting is on. */
+/**
+ * The export dialog's "Send all to …" with the same ▾ list as the word card, when Send to shows.
+ * Picking another app remembers it and sends every word there.
+ */
 @Composable
 internal fun AnkiSendAllButton(
     words: List<SavedWord>,
     onResult: (String) -> Unit,
 ) {
     val tools = LocalStudyTools.current ?: return
-    if (!tools.ankiAvailable || words.isEmpty()) return
+    if (!tools.sendToAvailable || words.isEmpty()) return
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
-    val send = {
-        scope.launch { onResult(ankiResultText(resources, tools.anki.send(words))) }
-        Unit
+    var menu by remember { mutableStateOf(false) }
+    val app = tools.settings.sendTo
+    val send: (FlashcardApp) -> Unit = { to ->
+        scope.launch { onResult(sendResultText(resources, to, tools.send(to, words))) }
     }
     val permission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) send() else onResult(resources.getString(R.string.study_anki_permission_denied))
+            if (granted) send(FlashcardApp.ANKIDROID) else onResult(resources.getString(R.string.study_anki_permission_denied))
         }
-    TextButton(
-        onClick = { if (tools.anki.permitted()) send() else permission.launch(ANKIDROID_PERMISSION) },
-        modifier = Modifier.testTag("send_all_to_anki"),
-    ) { Text(stringResource(R.string.study_anki_send_all)) }
+    val start: (FlashcardApp) -> Unit = { to -> if (tools.needsPermission(to)) permission.launch(ANKIDROID_PERMISSION) else send(to) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        TextButton(onClick = { start(app) }, modifier = Modifier.testTag("send_all_to_anki")) {
+            Text(stringResource(R.string.study_anki_send_all, stringResource(app.nameRes)))
+        }
+        Box {
+            IconButton(onClick = { menu = true }, modifier = Modifier.testTag("send_all_menu")) {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.study_send_to_choose))
+            }
+            SendToMenu(
+                expanded = menu,
+                current = app,
+                onDismiss = { menu = false },
+                onPick = { picked ->
+                    menu = false
+                    preferences.edit().putString(SEND_TO_APP_PREFERENCE, picked.storageValue).apply()
+                    start(picked)
+                },
+            )
+        }
+    }
 }
 
-private fun ankiResultText(
+internal fun sendResultText(
     resources: Resources,
+    app: FlashcardApp,
     result: AnkiSendResult,
 ): String {
-    val sent = resources.getQuantityString(R.plurals.study_anki_sent_count, result.sent, result.sent)
+    val name = resources.getString(app.nameRes)
+    val sent = resources.getQuantityString(R.plurals.study_anki_sent_count, result.sent, result.sent, name)
     return when {
-        result.problem != null ->
-            listOfNotNull(sent.takeIf { result.sent > 0 }, resources.getString(ankiProblemText(result.problem))).joinToString(" ")
-        result.sent == 0 -> resources.getString(R.string.study_anki_all_sent_before)
+        result.problem != null -> listOfNotNull(sent.takeIf { result.sent > 0 }, sendProblemText(resources, app, result)).joinToString(" ")
+        result.sent == 0 -> resources.getString(R.string.study_anki_all_sent_before, name)
         else -> sent
     }
 }

@@ -61,6 +61,9 @@ internal val AI_PAGE_TOKEN_MODES = listOf("auto", "on", "off")
 internal val AI_KNOWN_WORDS_MODES = listOf("auto", "manual", "off")
 internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
 
+/** Where Send to sends words (`FlashcardApp`), which a test keeps equal. */
+internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
+
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5")
 
@@ -117,6 +120,7 @@ internal enum class AiSetting(
     KNOWN_WORDS_AFTER("known_words_after", AI_KNOWN_WORDS_AFTER),
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
+    SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
     BLUR_BOX("blur_box"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
@@ -583,6 +587,7 @@ private val SETTING_CHOICE_ALIASES by lazy {
                 "one_new_word" to "new_word_lines",
             ),
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
+        AiSetting.SEND_TO_APP to mapOf("anki" to "ankidroid", "anki_droid" to "ankidroid", "anki_connect" to "ankiconnect"),
         AiSetting.KNOWN_WORDS to
             mapOf("automatic" to "auto", "on" to "auto", "true" to "auto", "enabled" to "auto", "false" to "off", "disabled" to "off"),
         AiSetting.PAGE_TOKEN_CAPTIONS to

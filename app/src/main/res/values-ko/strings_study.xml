@@ -2,7 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">학습 도구</string>
-    <string name="settings_section_study_summary">재생 모드, 무음 건너뛰기, 아는 단어, AnkiDroid, 흐림 상자</string>
+    <string name="settings_section_study_summary">재생 모드, 무음 건너뛰기, 아는 단어, 보내기, 흐림 상자</string>
     <string name="study_play_mode_title">재생 모드</string>
     <string name="study_play_mode_normal">보통</string>
     <string name="study_play_mode_normal_description">동영상을 평소처럼 재생합니다.</string>
@@ -32,8 +32,8 @@
     <string name="study_known_words_clear_title">아는 단어를 지울까요?</string>
     <string name="study_known_words_clear_message">모든 언어에서 아는 단어로 표시한 단어가 모두 지워집니다. 저장한 단어는 남습니다.</string>
     <string name="study_known_words_clear_confirm">지우기</string>
-    <string name="study_anki_title">AnkiDroid로 보내기</string>
-    <string name="study_anki_description">AnkiDroid가 설치되어 있으면 단어 카드와 연습 → 내보내기에 AnkiDroid로 보내기를 표시합니다. 카드는 DualSub Replay 덱에 들어갑니다. AnkiDroid를 백그라운드에서 열어 두세요. 많은 휴대전화에서 AnkiDroid는 실행 중일 때만 카드를 받습니다.</string>
+    <string name="study_anki_title">플래시카드 앱으로 보내기</string>
+    <string name="study_anki_description">단어 카드와 연습 → 내보내기에 보내기 버튼을 표시합니다. 버튼의 ▾ 또는 아래에서 다른 앱을 고르지 않으면 AnkiDroid로 보냅니다. 고른 앱은 버튼에 표시됩니다.</string>
     <string name="study_blur_box_title">흐림 상자</string>
     <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
     <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>
@@ -45,14 +45,14 @@
     <string name="study_mark_all_known_confirm">아는 단어로 표시</string>
     <string name="study_close">닫기</string>
     <string name="study_known_word_toggle">이 단어를 알아요</string>
-    <string name="study_send_to_anki">AnkiDroid로 보내기</string>
+    <string name="study_send_to_anki">%1$s로 보내기</string>
     <string name="study_sending_to_anki">보내는 중…</string>
-    <string name="study_sent_to_anki">AnkiDroid로 보냄</string>
+    <string name="study_sent_to_anki">%1$s로 보냄</string>
     <string name="study_anki_not_installed">이 휴대전화에 AnkiDroid가 설치되어 있지 않습니다.</string>
     <string name="study_anki_permission_denied">AnkiDroid 권한이 허용되지 않아 카드가 추가되지 않았습니다.</string>
     <string name="study_anki_failed">AnkiDroid가 카드를 받지 않았습니다. AnkiDroid를 열어 백그라운드에서 실행해 둔 뒤 돌아와 다시 시도하세요.</string>
-    <string name="study_anki_send_all">모두 AnkiDroid로 보내기</string>
-    <string name="study_anki_all_sent_before">모든 단어를 이미 AnkiDroid로 보냈습니다.</string>
+    <string name="study_anki_send_all">모두 %1$s로 보내기</string>
+    <string name="study_anki_all_sent_before">모든 단어를 이미 %1$s로 보냈습니다.</string>
     <plurals name="study_repeat_count">
         <item quantity="other">%1$d번</item>
     </plurals>
@@ -66,7 +66,7 @@
         <item quantity="other">단어 %1$d개를 아는 단어로 표시할까요? 단어 카드에서 표시를 해제할 수 있습니다.</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="other">단어 %1$d개를 AnkiDroid로 보냈습니다.</item>
+        <item quantity="other">단어 %1$d개를 %2$s로 보냈습니다.</item>
     </plurals>
     <string name="study_page_token_auto">자동</string>
     <string name="study_page_token_on">켜기</string>
@@ -81,4 +81,17 @@
     <string name="study_known_words_offer_message">자막 패널에 각 동영상에서 이미 아는 비율이 표시되고, 자주 보는 단어는 저절로 아는 단어로 셉니다. 나중에 설정 → 학습 도구에서 바꿀 수 있습니다.</string>
     <string name="study_known_words_offer_confirm">켜기</string>
     <string name="study_known_words_offer_dismiss">나중에</string>
+    <string name="study_send_to_app_title">단어를 보낼 곳</string>
+    <string name="study_ankidroid_description">카드는 DualSub Replay 덱에 들어갑니다. AnkiDroid를 백그라운드에서 열어 두세요. 많은 휴대폰에서 AnkiDroid는 실행 중일 때만 카드를 받습니다.</string>
+    <string name="study_ankiconnect_description">이 휴대폰의 AnkiConnect(127.0.0.1:8765)로 보냅니다. AnkiConnect Android 앱, Yomitan, asbplayer가 쓰는 주소입니다. 서버가 실행되도록 AnkiConnect Android를 한 번 여세요. AnkiConnect가 DualSub Replay 노트 유형을 만들 수 없으면 카드는 Anki의 Basic 노트 유형을 씁니다.</string>
+    <string name="study_ankiconnect_deck_title">AnkiConnect 덱</string>
+    <string name="study_ankiconnect_deck_value">덱: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">자동(DualSub Replay, 없으면 Default)</string>
+    <string name="study_ankiconnect_deck_choose">덱 선택</string>
+    <string name="study_ankiconnect_deck_loading">덱을 불러오는 중…</string>
+    <string name="study_send_to_choose">보낼 곳 선택</string>
+    <string name="study_ankiconnect_not_running">AnkiConnect 주소에서 응답이 없습니다. AnkiConnect Android(또는 사용하는 AnkiConnect 도구)를 열고 서버가 켜져 있는지 확인한 뒤 다시 시도하세요.</string>
+    <string name="study_ankiconnect_failed">AnkiConnect가 카드를 받지 않았습니다.</string>
+    <string name="study_ankiconnect_failed_detail">AnkiConnect가 카드를 받지 않았습니다: %1$s</string>
+    <string name="study_ankiconnect_open">AnkiConnect Android 열기</string>
 </resources>

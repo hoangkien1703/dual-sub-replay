@@ -2,7 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">学習ツール</string>
-    <string name="settings_section_study_summary">再生モード、無音スキップ、既知の単語、AnkiDroid、ぼかしボックス</string>
+    <string name="settings_section_study_summary">再生モード、無音スキップ、既知の単語、送信先、ぼかしボックス</string>
     <string name="study_play_mode_title">再生モード</string>
     <string name="study_play_mode_normal">通常</string>
     <string name="study_play_mode_normal_description">動画をいつも通り再生します。</string>
@@ -32,8 +32,8 @@
     <string name="study_known_words_clear_title">既知の単語を消去しますか？</string>
     <string name="study_known_words_clear_message">すべての言語で、既知として印を付けた単語がすべて消去されます。保存した単語は残ります。</string>
     <string name="study_known_words_clear_confirm">消去</string>
-    <string name="study_anki_title">AnkiDroid に送る</string>
-    <string name="study_anki_description">AnkiDroid がインストールされていると、単語カードと練習 → エクスポートに「AnkiDroid に送る」を表示します。カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマートフォンでは、起動中しかカードを受け付けません。</string>
+    <string name="study_anki_title">単語カードアプリに送る</string>
+    <string name="study_anki_description">単語カードと「練習」→「エクスポート」に「送る」ボタンを表示します。ボタンの ▾ または下の設定で別のアプリを選ばない限り AnkiDroid に送ります。選んだアプリはボタンに表示されます。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>
@@ -45,14 +45,14 @@
     <string name="study_mark_all_known_confirm">既知にする</string>
     <string name="study_close">閉じる</string>
     <string name="study_known_word_toggle">この単語を知っている</string>
-    <string name="study_send_to_anki">AnkiDroid に送る</string>
+    <string name="study_send_to_anki">%1$s に送る</string>
     <string name="study_sending_to_anki">送信中…</string>
-    <string name="study_sent_to_anki">AnkiDroid に送りました</string>
+    <string name="study_sent_to_anki">%1$s に送りました</string>
     <string name="study_anki_not_installed">このスマートフォンに AnkiDroid が入っていません。</string>
     <string name="study_anki_permission_denied">AnkiDroid の権限が許可されなかったので、カードは追加されませんでした。</string>
     <string name="study_anki_failed">AnkiDroid がカードを受け付けませんでした。AnkiDroid を開いてバックグラウンドで動かしたまま戻り、もう一度お試しください。</string>
-    <string name="study_anki_send_all">すべて AnkiDroid に送る</string>
-    <string name="study_anki_all_sent_before">すべての単語はすでに AnkiDroid に送られています。</string>
+    <string name="study_anki_send_all">すべて %1$s に送る</string>
+    <string name="study_anki_all_sent_before">すべての単語はすでに %1$s に送られています。</string>
     <plurals name="study_repeat_count">
         <item quantity="other">%1$d 回</item>
     </plurals>
@@ -66,7 +66,7 @@
         <item quantity="other">%1$d 語を既知にしますか？単語カードで印を外せます。</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="other">%1$d 語を AnkiDroid に送りました。</item>
+        <item quantity="other">%1$d 語を %2$s に送りました。</item>
     </plurals>
     <string name="study_page_token_auto">自動</string>
     <string name="study_page_token_on">オン</string>
@@ -81,4 +81,17 @@
     <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 学習ツールで変更できます。</string>
     <string name="study_known_words_offer_confirm">オンにする</string>
     <string name="study_known_words_offer_dismiss">今はしない</string>
+    <string name="study_send_to_app_title">単語の送信先</string>
+    <string name="study_ankidroid_description">カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
+    <string name="study_ankiconnect_description">このスマホの AnkiConnect(127.0.0.1:8765)に送ります。AnkiConnect Android アプリ、Yomitan、asbplayer が使うアドレスです。サーバーが動くように AnkiConnect Android を一度開いてください。AnkiConnect が DualSub Replay ノートタイプを作れない場合、カードは Anki の Basic ノートタイプを使います。</string>
+    <string name="study_ankiconnect_deck_title">AnkiConnect のデッキ</string>
+    <string name="study_ankiconnect_deck_value">デッキ: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">自動(DualSub Replay、なければ Default)</string>
+    <string name="study_ankiconnect_deck_choose">デッキを選ぶ</string>
+    <string name="study_ankiconnect_deck_loading">デッキを読み込み中…</string>
+    <string name="study_send_to_choose">送信先を選ぶ</string>
+    <string name="study_ankiconnect_not_running">AnkiConnect のアドレスから応答がありません。AnkiConnect Android(またはお使いの AnkiConnect ツール)を開き、サーバーがオンになっているか確認してから、もう一度お試しください。</string>
+    <string name="study_ankiconnect_failed">AnkiConnect がカードを受け付けませんでした。</string>
+    <string name="study_ankiconnect_failed_detail">AnkiConnect がカードを受け付けませんでした: %1$s</string>
+    <string name="study_ankiconnect_open">AnkiConnect Android を開く</string>
 </resources>

@@ -85,13 +85,18 @@ internal fun unsentAnkiWords(
     sent: (String) -> Boolean,
 ): List<SavedWord> = words.distinctBy { it.id }.filterNot { sent(it.id) }
 
-internal enum class AnkiProblem { NOT_INSTALLED, NO_PERMISSION, FAILED }
+/** Why a send stopped: AnkiDroid missing or not permitted, nothing answering at AnkiConnect's address, or a refusal. */
+internal enum class AnkiProblem { NOT_INSTALLED, NO_PERMISSION, NOT_RUNNING, FAILED }
 
-/** What one send did: notes added, words sent before (skipped), and any problem that stopped it. */
+/**
+ * What one send did: notes added, words sent before (skipped), and any problem that stopped it,
+ * with AnkiConnect's own error text when it gave one.
+ */
 internal data class AnkiSendResult(
     val sent: Int = 0,
     val skipped: Int = 0,
     val problem: AnkiProblem? = null,
+    val detail: String? = null,
 )
 
 /**

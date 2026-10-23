@@ -2,7 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">Alat belajar</string>
-    <string name="settings_section_study_summary">Mode putar, lewati jeda sunyi, kata yang dikenal, AnkiDroid, kotak buram</string>
+    <string name="settings_section_study_summary">Mode putar, lewati jeda sunyi, kata yang dikenal, Kirim ke, kotak buram</string>
     <string name="study_play_mode_title">Mode putar</string>
     <string name="study_play_mode_normal">Normal</string>
     <string name="study_play_mode_normal_description">Video diputar seperti biasa.</string>
@@ -32,8 +32,8 @@
     <string name="study_known_words_clear_title">Hapus kata yang dikenal?</string>
     <string name="study_known_words_clear_message">Semua kata yang Anda tandai sebagai dikenal, di semua bahasa, akan dilupakan. Kata yang disimpan tetap ada.</string>
     <string name="study_known_words_clear_confirm">Hapus</string>
-    <string name="study_anki_title">Kirim ke AnkiDroid</string>
-    <string name="study_anki_description">Menampilkan Kirim ke AnkiDroid di kartu kata dan di Latihan → Ekspor jika AnkiDroid terpasang. Kartu masuk ke dek DualSub Replay. Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
+    <string name="study_anki_title">Kirim ke aplikasi kartu hafalan</string>
+    <string name="study_anki_description">Menampilkan tombol Kirim ke di kartu kata dan di Latihan → Ekspor. Tombol ini mengirim ke AnkiDroid kecuali Anda memilih aplikasi lain dengan ▾ di tombol atau di bawah; tombol lalu menampilkan aplikasi itu.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>
@@ -45,14 +45,14 @@
     <string name="study_mark_all_known_confirm">Tandai sebagai dikenal</string>
     <string name="study_close">Tutup</string>
     <string name="study_known_word_toggle">Saya tahu kata ini</string>
-    <string name="study_send_to_anki">Kirim ke AnkiDroid</string>
+    <string name="study_send_to_anki">Kirim ke %1$s</string>
     <string name="study_sending_to_anki">Mengirim…</string>
-    <string name="study_sent_to_anki">Terkirim ke AnkiDroid</string>
+    <string name="study_sent_to_anki">Terkirim ke %1$s</string>
     <string name="study_anki_not_installed">AnkiDroid tidak terpasang di ponsel ini.</string>
     <string name="study_anki_permission_denied">Izin AnkiDroid tidak diberikan, jadi tidak ada kartu yang ditambahkan.</string>
     <string name="study_anki_failed">AnkiDroid tidak menerima kartu. Buka AnkiDroid, biarkan berjalan di latar belakang, lalu kembali dan coba lagi.</string>
-    <string name="study_anki_send_all">Kirim semua ke AnkiDroid</string>
-    <string name="study_anki_all_sent_before">Semua kata sudah dikirim ke AnkiDroid.</string>
+    <string name="study_anki_send_all">Kirim semua ke %1$s</string>
+    <string name="study_anki_all_sent_before">Semua kata sudah dikirim ke %1$s.</string>
     <plurals name="study_repeat_count">
         <item quantity="other">%1$d kali</item>
     </plurals>
@@ -66,7 +66,7 @@
         <item quantity="other">Tandai %1$d kata sebagai dikenal? Anda bisa membatalkan tanda di kartu katanya.</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="other">%1$d kata dikirim ke AnkiDroid.</item>
+        <item quantity="other">%1$d kata dikirim ke %2$s.</item>
     </plurals>
     <string name="study_page_token_auto">Otomatis</string>
     <string name="study_page_token_on">Nyala</string>
@@ -81,4 +81,17 @@
     <string name="study_known_words_offer_message">Panel subtitle lalu menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal, dan kata yang sering kamu lihat otomatis dihitung sebagai dikenal. Kamu bisa mengubahnya nanti di Setelan → Alat belajar.</string>
     <string name="study_known_words_offer_confirm">Nyalakan</string>
     <string name="study_known_words_offer_dismiss">Nanti saja</string>
+    <string name="study_send_to_app_title">Kirim kata ke</string>
+    <string name="study_ankidroid_description">Kartu masuk ke dek DualSub Replay. Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
+    <string name="study_ankiconnect_description">Mengirim ke AnkiConnect di ponsel ini (127.0.0.1:8765), yang dipakai aplikasi AnkiConnect Android, Yomitan, dan asbplayer. Buka AnkiConnect Android sekali agar servernya berjalan. Jika AnkiConnect tidak bisa membuat jenis catatan DualSub Replay, kartu memakai jenis catatan Basic dari Anki.</string>
+    <string name="study_ankiconnect_deck_title">Dek AnkiConnect</string>
+    <string name="study_ankiconnect_deck_value">Dek: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">Otomatis (DualSub Replay, jika tidak ada Default)</string>
+    <string name="study_ankiconnect_deck_choose">Pilih dek</string>
+    <string name="study_ankiconnect_deck_loading">Memuat dek…</string>
+    <string name="study_send_to_choose">Pilih tujuan pengiriman</string>
+    <string name="study_ankiconnect_not_running">Tidak ada yang menjawab di alamat AnkiConnect. Buka AnkiConnect Android (atau alat AnkiConnect Anda), pastikan servernya aktif, lalu coba lagi.</string>
+    <string name="study_ankiconnect_failed">AnkiConnect tidak menerima kartu.</string>
+    <string name="study_ankiconnect_failed_detail">AnkiConnect tidak menerima kartu: %1$s</string>
+    <string name="study_ankiconnect_open">Buka AnkiConnect Android</string>
 </resources>

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -33,11 +36,12 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import kotlinx.coroutines.launch
 
-/** More settings → Study tools: play modes, skip silence, known words, AnkiDroid, blur box and page tokens. */
+/** More settings → Study tools: play modes, skip silence, known words, Send to, blur box and page tokens. */
 @Composable
 internal fun StudyToolsSettingsSection() {
     val context = LocalContext.current
@@ -77,6 +81,17 @@ internal fun StudyToolsSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(ANKIDROID_PREFERENCE, it).apply() },
         testTag = "ankidroid_switch",
     )
+    if (settings.ankiDroid) {
+        SendToSettings(
+            settings = settings,
+            onAppChange = { app -> preferences.edit().putString(SEND_TO_APP_PREFERENCE, app.storageValue).apply() },
+            onDeckChange = { deck ->
+                val editor = preferences.edit()
+                if (deck == null) editor.remove(ANKICONNECT_DECK_PREFERENCE) else editor.putString(ANKICONNECT_DECK_PREFERENCE, deck)
+                editor.apply()
+            },
+        )
+    }
     SettingsSwitchRow(
         title = stringResource(R.string.study_blur_box_title),
         description = stringResource(R.string.study_blur_box_description),
@@ -236,6 +251,135 @@ private fun PageTokenSettings(
                 )
             }
         }
+    }
+}
+
+/**
+ * Where the Send to button sends words: the same choice as the button's ▾ list. AnkiConnect also
+ * picks its deck, from the decks AnkiConnect lists (Automatic: DualSub Replay, else Default).
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SendToSettings(
+    settings: StudySettings,
+    onAppChange: (FlashcardApp) -> Unit,
+    onDeckChange: (String?) -> Unit,
+) {
+    var choosingDeck by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth().padding(start = 16.dp, bottom = 6.dp)) {
+        Text(stringResource(R.string.study_send_to_app_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlashcardApp.entries.forEach { option ->
+                FilterChip(
+                    selected = settings.sendTo == option,
+                    onClick = { onAppChange(option) },
+                    label = { Text(stringResource(option.nameRes)) },
+                    modifier = Modifier.testTag("send_to_app_${option.storageValue}"),
+                )
+            }
+        }
+        Text(
+            stringResource(
+                if (settings.sendTo ==
+                    FlashcardApp.ANKICONNECT
+                ) {
+                    R.string.study_ankiconnect_description
+                } else {
+                    R.string.study_ankidroid_description
+                },
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (settings.sendTo == FlashcardApp.ANKICONNECT) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(
+                        R.string.study_ankiconnect_deck_value,
+                        settings.ankiConnectDeck ?: stringResource(R.string.study_ankiconnect_deck_automatic),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { choosingDeck = true }, modifier = Modifier.testTag("ankiconnect_choose_deck")) {
+                    Text(stringResource(R.string.study_ankiconnect_deck_choose))
+                }
+            }
+        }
+    }
+    if (choosingDeck) {
+        AnkiConnectDeckDialog(
+            chosen = settings.ankiConnectDeck,
+            onPick = { deck ->
+                choosingDeck = false
+                onDeckChange(deck)
+            },
+            onDismiss = { choosingDeck = false },
+        )
+    }
+}
+
+/** The decks AnkiConnect lists, asked when the dialog opens, with Automatic first. */
+@Composable
+private fun AnkiConnectDeckDialog(
+    chosen: String?,
+    onPick: (String?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val ankiConnect = remember(context) { AnkiConnectNotes.create(context) }
+    // null while loading; a failure shows that nothing answered.
+    val decks by produceState<Result<List<String>>?>(null) { value = runCatching { ankiConnect.deckNames() } }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.study_ankiconnect_deck_title)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                val loaded = decks
+                when {
+                    loaded == null -> Text(stringResource(R.string.study_ankiconnect_deck_loading))
+                    loaded.isFailure ->
+                        Text(
+                            stringResource(R.string.study_ankiconnect_not_running),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    else -> {
+                        DeckOption(
+                            stringResource(R.string.study_ankiconnect_deck_automatic),
+                            chosen == null,
+                            "ankiconnect_deck_automatic",
+                        ) { onPick(null) }
+                        loaded.getOrDefault(emptyList()).sorted().forEach { deck ->
+                            DeckOption(deck, chosen == deck, "ankiconnect_deck_option") { onPick(deck) }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_cancel)) } },
+    )
+}
+
+@Composable
+private fun DeckOption(
+    name: String,
+    selected: Boolean,
+    testTag: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 4.dp)
+                .testTag(testTag),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = onClick)
+        Spacer(Modifier.size(8.dp))
+        Text(name)
     }
 }
 
