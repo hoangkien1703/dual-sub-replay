@@ -6,9 +6,11 @@ import java.util.concurrent.TimeUnit
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** Regression coverage for the August 2026 YouTube caption retrieval incident. */
@@ -254,6 +256,42 @@ class YouTubeCaptionProviderTest {
         assertEquals(listOf("zh", "ja"), textScriptLanguages("北京旅行"))
         assertEquals(emptyList<String>(), textScriptLanguages("Learn Japanese in 10 minutes"))
         assertEquals(emptyList<String>(), textScriptLanguages("Tokyo 東京 and Kyoto 京都 trip", mustDominate = true))
+    }
+
+    @Test
+    fun japaneseBeatsTheCreatorsRomajiTrack() {
+        // The owner's screenshots (trQnGgAwHfY): "日本語 (ラテン文字) - Romaji" and "日本語 (自動生成)".
+        val renderer = captionRenderer(manual("ko"), manual("zh-Hant"), manual("ja-Latn"), generated("ja"))
+
+        assertEquals("ja", spokenCaptionLanguage(renderer))
+        assertEquals("a.ja", selectCaptionTrack(renderer, emptyList())?.optString("vssId"))
+        assertEquals("a.ja", selectCaptionTrack(renderer, listOf("ja"))?.optString("vssId"))
+        // A creator's Japanese track still beats the auto-generated one; Romaji stays last.
+        val withCreatorTrack = captionRenderer(manual("ja-Latn"), generated("ja"), manual("ja"))
+        assertEquals(".ja", selectCaptionTrack(withCreatorTrack, listOf("ja"))?.optString("vssId"))
+    }
+
+    @Test
+    fun romajiIsTakenOnlyWhenTheLanguageHasNothingElse() {
+        val renderer = captionRenderer(manual("en"), manual("ja-Latn"))
+
+        assertEquals(".ja-Latn", selectCaptionTrack(renderer, listOf("ja"))?.optString("vssId"))
+        assertFalse(isRomanizedTrack(manual("zh-Hant")))
+        assertTrue(isRomanizedTrack(manual("zh-Latn-pinyin")))
+    }
+
+    @Test
+    fun languageListNamesJapaneseByItsJapaneseTrack() {
+        val tracks =
+            JSONArray()
+                .put(manual("ja-Latn").put("name", JSONObject().put("simpleText", "日本語 (ラテン文字) - Romaji")))
+                .put(generated("ja").put("name", JSONObject().put("simpleText", "日本語 (自動生成)")))
+                .put(manual("en").put("name", JSONObject().put("simpleText", "英語")))
+
+        assertEquals(
+            listOf(CaptionLanguage("ja", "日本語 (自動生成)"), CaptionLanguage("en", "英語")),
+            availableLanguages(tracks),
+        )
     }
 
     private fun captionRenderer(vararg tracks: JSONObject): JSONObject {

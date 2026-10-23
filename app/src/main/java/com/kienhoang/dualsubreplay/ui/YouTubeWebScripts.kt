@@ -387,6 +387,8 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
         typeof player.setOption === 'function' ? player : null;
     };
     sync.base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+    // Romaji and other romanized tracks (ja-Latn), as isRomanizedTrack in YouTubeCaptionProvider.kt.
+    sync.romanized = function(code) { return /-latn(-|$)/i.test(String(code || '')); };
     sync.isGenerated = function(track) {
       return !!track && (track.kind === 'asr' || String(track.vssId || track.vss_id || '').indexOf('a.') === 0);
     };
@@ -449,7 +451,10 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
       const language = target ? target.languageCode : sync.spoken;
       if (!language) return null;
       const generated = target ? target.generated : false;
-      const same = tracks.filter(function(track) { return sync.base(track.languageCode) === sync.base(language); });
+      const sameBase = tracks.filter(function(track) { return sync.base(track.languageCode) === sync.base(language); });
+      // A romanized track only when the choice is one, or the language has nothing else.
+      const sameScript = sameBase.filter(function(track) { return sync.romanized(track.languageCode) === sync.romanized(language); });
+      const same = sameScript.length ? sameScript : sameBase;
       const track = same.find(function(item) { return item.languageCode === language && sync.isGenerated(item) === generated; }) ||
         same.find(function(item) { return sync.isGenerated(item) === generated; }) ||
         same.find(function(item) { return !sync.isGenerated(item); }) || same[0];
@@ -972,9 +977,12 @@ private val PAGE_TRANSCRIPT_FUNCTIONS =
       if (exact && state.usable(exact.text)) return exact;
       if (!sameLanguage) return null;
       const base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+      const romanized = function(code) { return /-latn(-|$)/i.test(String(code || '')); };
       for (let index = capture.order.length - 1; index >= 0; index--) {
         const track = capture.tracks[capture.order[index]];
+        // Never Romaji (ja-Latn) in place of the Japanese track, or the other way round.
         if (track && track.videoId === target.videoId && state.usable(track.text) &&
+            romanized(track.languageCode) === romanized(target.languageCode) &&
             (target.panelOnly || base(track.languageCode) === base(target.languageCode))) return track;
       }
       return null;
@@ -1260,6 +1268,7 @@ internal fun webPageTranslationScript(target: PageTranslationTarget): String {
 private val PAGE_TRANSLATION_FUNCTIONS =
     """
     state.base = function(code) { return String(code || '').split('-')[0].toLowerCase(); };
+    state.romanized = function(code) { return /-latn(-|$)/i.test(String(code || '')); };
     state.translationTrack = function(target) {
       const player = document.getElementById('movie_player');
       const responses = [];
@@ -1272,7 +1281,10 @@ private val PAGE_TRANSLATION_FUNCTIONS =
         const tracks = renderer && Array.isArray(renderer.captionTracks) ? renderer.captionTracks : [];
         const track = tracks.find(function(item) {
           return item && item.languageCode === target.languageCode && (item.kind === 'asr') === target.generated;
-        }) || tracks.find(function(item) { return item && state.base(item.languageCode) === state.base(target.languageCode); });
+        }) || tracks.find(function(item) {
+          return item && state.base(item.languageCode) === state.base(target.languageCode) &&
+            state.romanized(item.languageCode) === state.romanized(target.languageCode);
+        });
         if (!track) continue;
         const languages = Array.isArray(renderer.translationLanguages) ? renderer.translationLanguages : [];
         const language = languages.find(function(item) { return item && item.languageCode === target.translateTo; }) ||

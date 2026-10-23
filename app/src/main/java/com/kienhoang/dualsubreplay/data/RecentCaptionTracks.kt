@@ -121,7 +121,8 @@ internal class RecentCaptionTracks(
 
     private companion object {
         // 2: Auto also weighs the title's script and the learning language; older picks are dropped.
-        const val VERSION = 2
+        // 3: a Romaji (ja-Latn) track no longer beats the Japanese one; saved Romaji picks are dropped.
+        const val VERSION = 3
         val KEY_PATTERN = Regex("[a-f0-9]{64}")
     }
 }
