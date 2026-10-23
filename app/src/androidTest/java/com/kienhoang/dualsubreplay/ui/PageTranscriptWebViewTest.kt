@@ -182,6 +182,7 @@ class PageTranscriptWebViewTest {
             videoId: String,
             preferredLanguages: List<String>,
             learningLanguage: String?,
+            preferredTrack: String?,
         ): CaptionTrackResult = throw CaptionUnavailableException("Player returned LOGIN_REQUIRED: Sign in to confirm you're not a bot")
     }
 

@@ -1,8 +1,5 @@
 package com.kienhoang.dualsubreplay.data
 
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -12,6 +9,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 
 /** Regression coverage for the August 2026 YouTube caption retrieval incident. */
 class YouTubeCaptionProviderTest {
@@ -28,9 +28,10 @@ class YouTubeCaptionProviderTest {
 
     @Test
     fun requestsWordTimedFormatsBeforeLegacyFallback() {
-        val urls = captionCandidateUrls(
-            "https://www.youtube.com/api/timedtext?v=test&lang=en&fmt=srv3",
-        )
+        val urls =
+            captionCandidateUrls(
+                "https://www.youtube.com/api/timedtext?v=test&lang=en&fmt=srv3",
+            )
 
         assertEquals(listOf("json3", "srv3", null), urls.map { it.queryParameter("fmt") })
         assertEquals(listOf("test", "test", "test"), urls.map { it.queryParameter("v") })
@@ -281,17 +282,58 @@ class YouTubeCaptionProviderTest {
     }
 
     @Test
-    fun languageListNamesJapaneseByItsJapaneseTrack() {
+    fun languageListOffersEveryTrackButRomajiNextToJapanese() {
         val tracks =
             JSONArray()
                 .put(manual("ja-Latn").put("name", JSONObject().put("simpleText", "日本語 (ラテン文字) - Romaji")))
                 .put(generated("ja").put("name", JSONObject().put("simpleText", "日本語 (自動生成)")))
-                .put(manual("en").put("name", JSONObject().put("simpleText", "英語")))
+                .put(manual("ja").put("name", JSONObject().put("simpleText", "日本語")))
+                .put(manual("zh-Hans").put("name", JSONObject().put("simpleText", "中国語 (簡体字)")))
+                .put(manual("zh-Hant").put("name", JSONObject().put("simpleText", "中国語 (繁体字)")))
+                .put(
+                    JSONObject()
+                        .put(
+                            "languageCode",
+                            "en",
+                        ).put("vssId", ".en.nP7-2PuUl7o")
+                        .put("name", JSONObject().put("simpleText", "英語 - Slow")),
+                ).put(manual("en").put("name", JSONObject().put("simpleText", "英語")))
 
         assertEquals(
-            listOf(CaptionLanguage("ja", "日本語 (自動生成)"), CaptionLanguage("en", "英語")),
+            listOf(
+                CaptionLanguage("ja", "日本語 (自動生成)", "a.ja", generated = true),
+                CaptionLanguage("ja", "日本語", ".ja"),
+                CaptionLanguage("zh-Hans", "中国語 (簡体字)", ".zh-Hans"),
+                CaptionLanguage("zh-Hant", "中国語 (繁体字)", ".zh-Hant"),
+                CaptionLanguage("en", "英語 - Slow", ".en.nP7-2PuUl7o"),
+                CaptionLanguage("en", "英語", ".en"),
+            ),
             availableLanguages(tracks),
         )
+    }
+
+    @Test
+    fun romajiIsListedWhenJapaneseHasNoOtherTrack() {
+        val tracks = JSONArray().put(manual("ja-Latn")).put(manual("en"))
+
+        assertEquals(listOf(".ja-Latn", ".en"), availableLanguages(tracks).map { it.trackId })
+    }
+
+    @Test
+    fun pickedTrackWinsWhileTheVideoHasIt() {
+        val renderer = captionRenderer(manual("ja"), generated("ja"), manual("zh-Hans"), manual("zh-Hant"))
+
+        assertEquals("a.ja", selectCaptionTrack(renderer, listOf("ja"), preferredTrack = "a.ja")?.optString("vssId"))
+        assertEquals(".zh-Hant", selectCaptionTrack(renderer, listOf("zh"), preferredTrack = ".zh-Hant")?.optString("vssId"))
+        // A track the video does not have falls back to the usual rules.
+        assertEquals(".ja", selectCaptionTrack(renderer, listOf("ja"), preferredTrack = "a.en")?.optString("vssId"))
+    }
+
+    @Test
+    fun trackWithoutAnIdGetsTheOneYouTubeWouldGive() {
+        assertEquals("a.ja", captionTrackId(JSONObject().put("languageCode", "ja").put("kind", "asr")))
+        assertEquals(".en", captionTrackId(JSONObject().put("languageCode", "en")))
+        assertEquals(".en.nP7", captionTrackId(JSONObject().put("languageCode", "en").put("vssId", ".en.nP7")))
     }
 
     private fun captionRenderer(vararg tracks: JSONObject): JSONObject {

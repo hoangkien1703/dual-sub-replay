@@ -21,6 +21,7 @@ class CaptionRecoveryStateTest {
                 videoId: String,
                 preferredLanguages: List<String>,
                 learningLanguage: String?,
+                preferredTrack: String?,
             ): CaptionTrackResult {
                 attempts++
                 if (attempts == 1) throw CaptionUnavailableException("Simulated HTTP 429")

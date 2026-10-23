@@ -267,7 +267,10 @@ internal fun aiActionRefusal(
         action is AiAction.ChangeSetting && action.setting == AiSetting.ORIGINAL_CAPTION_LANGUAGE &&
             !shouldAcceptSourcePreference(action.value, state.availableSourceLanguages) ->
             "The open video has no captions in ${TranslationLanguages.displayName(action.value)}. It has: " +
-                state.availableSourceLanguages.joinToString(", ") { "${it.code} (${TranslationLanguages.displayName(it.code)})" } + "."
+                state.availableSourceLanguages
+                    .map { "${it.code} (${TranslationLanguages.displayName(it.code)})" }
+                    .distinct()
+                    .joinToString(", ") + "."
         else -> null
     }
 
