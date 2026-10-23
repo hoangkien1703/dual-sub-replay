@@ -222,6 +222,8 @@ class PlaybackArchitectureTest {
         assertTrue(webLiveCaptionConfigurationScript(true).contains("trackSync.choose(player)"))
         // Every snapshot poll runs the sync: the spoken language is worked out once per video and track list.
         assertTrue(script.contains("if (!target && sync.spokenFor !== spokenKey) {"))
+        // Romaji (ja-Latn) is never shown in place of the Japanese track.
+        assertTrue(script.contains("sync.romanized(track.languageCode) === sync.romanized(language)"))
     }
 
     @Test

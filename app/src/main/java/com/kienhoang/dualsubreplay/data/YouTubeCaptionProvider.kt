@@ -294,6 +294,13 @@ internal fun isGeneratedTrack(track: JSONObject): Boolean =
 private fun baseLanguage(track: JSONObject): String =
     track.optString("languageCode").substringBefore('-').lowercase()
 
+/**
+ * A romanized track, such as `ja-Latn` ("Japanese (Latin) - Romaji"): same base language as the
+ * real captions, but written in Latin letters, so it is never the one to study or translate.
+ */
+internal fun isRomanizedTrack(track: JSONObject): Boolean =
+    track.optString("languageCode").split('-').drop(1).any { it.equals("Latn", ignoreCase = true) }
+
 private fun JSONArray.objects(): List<JSONObject> = (0 until length()).mapNotNull(::optJSONObject)
 
 /** The user's explicit source languages (empty for Auto) and the language they study, if known. */
@@ -402,7 +409,9 @@ internal fun spokenCaptionLanguage(
 
 /**
  * An explicit source-language choice wins, then the spoken language, then any other track.
- * Within a language a creator-written track beats the auto-generated one.
+ * Within a language a creator-written track beats the auto-generated one, and a romanized track
+ * comes last: a Japanese video with only auto-generated Japanese and a creator's Romaji track
+ * gets the Japanese one.
  */
 internal fun selectCaptionTrack(
     renderer: JSONObject,
@@ -418,14 +427,19 @@ internal fun selectCaptionTrack(
         val preferenceScore = if (preferenceIndex >= 0) 1_000 - preferenceIndex * 100 else 0
         val spokenScore = if (language == spoken) 500 else 0
         val manualScore = if (isGeneratedTrack(track)) 0 else 20
-        preferenceScore + spokenScore + manualScore
+        val romanizedScore = if (isRomanizedTrack(track)) -40 else 0
+        preferenceScore + spokenScore + manualScore + romanizedScore
     }
 }
 
-/** The languages of [tracks], one per base language, named as YouTube names them. */
+/**
+ * The languages of [tracks], one per base language, named as YouTube names them; a language's
+ * romanized track names it only when it has no other.
+ */
 internal fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> =
     (0 until tracks.length())
         .mapNotNull(tracks::optJSONObject)
+        .sortedBy(::isRomanizedTrack)
         .mapNotNull { track ->
             val code = track.optString("languageCode").takeIf(String::isNotBlank) ?: return@mapNotNull null
             CaptionLanguage(
