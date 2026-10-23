@@ -44,6 +44,7 @@ class RestoredHighlightPlaybackTest {
                         videoId: String,
                         preferredLanguages: List<String>,
                         learningLanguage: String?,
+                        preferredTrack: String?,
                     ): CaptionTrackResult =
                         CaptionTrackResult(
                             "en",

@@ -104,6 +104,13 @@ data class DualSubUiState(
     val dailyGoalPromptCompleted: Boolean = false,
     val dailyGoalMinutes: Int = 0,
     val availableSourceLanguages: List<CaptionLanguage> = emptyList(),
+    /**
+     * The caption track the user picked for [activeVideoId] (its `vssId`), or null to let the
+     * language decide. Another video starts from the language again.
+     */
+    val pickedTrack: String? = null,
+    /** The id of the caption track the transcript came from; counts only while [availableSourceLanguages] lists it. */
+    val loadedTrackId: String = "",
     val resolvedSourceLanguage: String? = null,
     val generatedCaptions: Boolean = false,
     val segments: List<SubtitleSegment> = emptyList(),
@@ -244,6 +251,32 @@ private const val LEARNING_LANGUAGE_PREFERENCE = "learning_language"
 
 internal fun preferredCaptionLanguages(sourcePreference: String): List<String> =
     sourcePreference.takeUnless { it == "auto" }?.let(::listOf).orEmpty()
+
+/** The start of a source choice that names one caption track instead of a language. */
+internal const val TRACK_CHOICE_PREFIX = "track:"
+
+/** The source choice for [language]'s own track, or its language code when the track is unknown. */
+internal fun trackChoiceCode(language: CaptionLanguage): String =
+    if (language.trackId.isBlank()) language.code else TRACK_CHOICE_PREFIX + language.trackId
+
+/** The track a source choice names, if it names one the video has. */
+internal fun pickedCaptionTrack(
+    choice: String,
+    availableSourceLanguages: List<CaptionLanguage>,
+): CaptionLanguage? =
+    choice
+        .takeIf { it.startsWith(TRACK_CHOICE_PREFIX) }
+        ?.removePrefix(TRACK_CHOICE_PREFIX)
+        ?.let { id -> availableSourceLanguages.firstOrNull { it.trackId == id } }
+
+/** What the source list shows as chosen: Auto, the loaded track, or the chosen language while loading. */
+internal fun sourceChoiceSelection(state: DualSubUiState): String =
+    when {
+        state.sourcePreference == "auto" -> "auto"
+        state.loadedTrackId.isNotBlank() && state.availableSourceLanguages.any { it.trackId == state.loadedTrackId } ->
+            TRACK_CHOICE_PREFIX + state.loadedTrackId
+        else -> state.sourcePreference
+    }
 
 internal fun resolvedSourcePreference(
     requested: String,
@@ -832,22 +865,40 @@ class AppViewModel internal constructor(
             }
     }
 
+    /**
+     * [language] is "auto", a language code, or a track from the video's list ([trackChoiceCode]).
+     * A track is kept for this video only; its language becomes the preference for later videos.
+     */
     fun setSourcePreference(language: String) {
-        val normalized = language.takeIf { it == "auto" } ?: TranslationLanguages.normalize(language)
         val current = _state.value
+        val track = pickedCaptionTrack(language, current.availableSourceLanguages)
+        if (language.startsWith(TRACK_CHOICE_PREFIX) && track == null) return
+        val normalized =
+            track?.let { TranslationLanguages.normalize(it.code) }
+                ?: language.takeIf { it == "auto" }
+                ?: TranslationLanguages.normalize(language)
         if (!shouldAcceptSourcePreference(normalized, current.availableSourceLanguages)) return
-        if (current.sourcePreference == normalized) return
+        if (track != null) {
+            if (current.sourcePreference == normalized && current.loadedTrackId == track.trackId) return
+        } else if (current.sourcePreference == normalized) {
+            return
+        }
         preferences.edit().putString("preferred_caption_language", normalized).apply()
         liveTranslationJob?.cancel()
         liveTranslationGate.reset()
-        _state.update { it.copy(sourcePreference = normalized) }
+        _state.update { it.copy(sourcePreference = normalized, pickedTrack = track?.trackId) }
         val videoId = _state.value.activeVideoId ?: return
         loadVideo(videoId, showPanel = true)
     }
 
-    /** Fetches [videoId]'s captions in the chosen original language, or Auto's pick when none is chosen. */
+    /** Fetches [videoId]'s captions in the picked track or chosen original language, or Auto's pick when none is chosen. */
     private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult =
-        captionProvider.fetch(videoId, preferredCaptionLanguages(_state.value.sourcePreference), learningLanguage())
+        captionProvider.fetch(
+            videoId,
+            preferredCaptionLanguages(_state.value.sourcePreference),
+            learningLanguage(),
+            _state.value.pickedTrack,
+        )
 
     private fun learningLanguage(): String? =
         storedLearningLanguage(
@@ -1313,6 +1364,8 @@ class AppViewModel internal constructor(
                 retryingTranscript = false,
                 subtitlePanelVisible = true,
                 availableSourceLanguages = emptyList(),
+                pickedTrack = null,
+                loadedTrackId = "",
                 resolvedSourceLanguage = null,
                 generatedCaptions = false,
                 segments = emptyList(),
@@ -1359,6 +1412,7 @@ class AppViewModel internal constructor(
                 playbackPaused = if (playbackKnown) it.playbackPaused else true,
                 subtitlePanelVisible = showPanel,
                 availableSourceLanguages = emptyList(),
+                pickedTrack = if (it.activeVideoId == videoId) it.pickedTrack else null,
                 resolvedSourceLanguage = if (preserveLive) it.resolvedSourceLanguage else null,
                 generatedCaptions = false,
                 segments = emptyList(),
@@ -1396,6 +1450,7 @@ class AppViewModel internal constructor(
                                     track.languageCode,
                                 ),
                             availableSourceLanguages = track.availableLanguages,
+                            loadedTrackId = track.trackId,
                             generatedCaptions = track.isGenerated,
                             segments = emptyList(),
                             stage = LoadStage.TRANSLATING,

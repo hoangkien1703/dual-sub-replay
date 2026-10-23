@@ -135,6 +135,7 @@ class RecentCaptionTracksTest {
             videoId: String,
             preferredLanguages: List<String>,
             learningLanguage: String?,
+            preferredTrack: String?,
         ): CaptionTrackResult {
             calls += 1
             if (failures > 0) {

@@ -146,6 +146,9 @@ class PageTranscriptSource(
 
         @Volatile internal var languages: List<CaptionLanguage> = emptyList()
 
+        /** The id of the track [target] names, so the result can say which track it is. */
+        @Volatile internal var trackId: String = ""
+
         @Volatile internal var step: String? = null
 
         /** When the page first listed no track for this video, or null while it has not. */
@@ -169,6 +172,7 @@ class PageTranscriptSource(
         val languages: List<CaptionLanguage>,
         val text: String,
         val panel: Boolean = false,
+        val trackId: String = "",
     )
 
     private val attempts = AtomicLong()
@@ -240,7 +244,7 @@ class PageTranscriptSource(
                 } else {
                     document.target.languageCode
                 }
-            return CaptionTrackResult(language, document.target.generated, cues, document.languages)
+            return CaptionTrackResult(language, document.target.generated, cues, document.languages, document.trackId)
         } finally {
             // Cancelled (another source won, or the video changed): the page stops for this request.
             synchronized(this) { if (waiting && current === request) current = null }
@@ -279,7 +283,16 @@ class PageTranscriptSource(
         request.found = pageTrackSources(root)
         val renderer = root.optJSONObject("captions")?.optJSONObject("playerCaptionsTracklistRenderer")
         val tracks = renderer?.optJSONArray("captionTracks")
-        val track = renderer?.let { selectCaptionTrack(it, request.choice.preferred, details, request.choice.learning) }
+        val track =
+            renderer?.let {
+                selectCaptionTrack(
+                    it,
+                    request.choice.preferred,
+                    details,
+                    request.choice.learning,
+                    request.choice.track,
+                )
+            }
         if (tracks == null || track == null) {
             // Like LingoTube, an empty list counts only once the page's player has finished loading.
             request.loading = !root.optBoolean("ready", true)
@@ -297,6 +310,7 @@ class PageTranscriptSource(
         }
         val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
         request.languages = availableLanguages(tracks)
+        request.trackId = captionTrackId(track)
         val mode = pageTokenMode
         val pageToken = mode != PageTokenMode.OFF && baseUrl.isNotEmpty()
         request.target =
@@ -335,7 +349,12 @@ class PageTranscriptSource(
                         languageCode = reply.languageCode ?: target.languageCode,
                         generated = reply.generated ?: target.generated,
                     )
-                val document = PageDocument(track, request.languages, reply.text, reply.panel)
+                // Another kind of the same language is another track, whose id the page did not say.
+                val trackId =
+                    request.trackId
+                        .takeIf { track.languageCode == target.languageCode && track.generated == target.generated }
+                        .orEmpty()
+                val document = PageDocument(track, request.languages, reply.text, reply.panel, trackId)
                 val announce =
                     synchronized(this) {
                         if (current !== request) return

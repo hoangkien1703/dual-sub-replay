@@ -40,9 +40,15 @@ data class CaptionTrackResult(
     val isGenerated: Boolean,
     val cues: List<RawCaptionCue>,
     val availableLanguages: List<CaptionLanguage> = emptyList(),
+    /** YouTube's id of the track the cues came from (`vssId`, such as `a.ja`), or blank when unknown. */
+    val trackId: String = "",
 )
 
+/** One caption track of a video, as the "Original caption language" list offers it. */
 data class CaptionLanguage(
     val code: String,
     val name: String,
+    /** YouTube's id of this track (`vssId`); blank for a language without a known track. */
+    val trackId: String = "",
+    val generated: Boolean = false,
 )
