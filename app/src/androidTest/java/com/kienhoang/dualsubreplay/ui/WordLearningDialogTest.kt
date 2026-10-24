@@ -6,8 +6,8 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.*
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
-import org.junit.Assert.*
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,9 +17,12 @@ class WordLearningDialogTest {
     private val selection = LearningWordSelection(AnalyzedToken("word", 0, 4, PartOfSpeech.NOUN), "en", "vi",
         "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false)
 
-    @Before @After fun openAllSections() {
-        studyPreferences(InstrumentationRegistry.getInstrumentation().targetContext).edit()
-            .apply { WORD_CARD_SECTION_KEYS.forEach(::remove) }.commit()
+    @Before
+    @After
+    fun openAllSections() {
+        val editor = studyPreferences(InstrumentationRegistry.getInstrumentation().targetContext).edit()
+        WORD_CARD_SECTION_KEYS.forEach(editor::remove)
+        editor.commit()
     }
 
     @Test fun pronouncesOnceAndSavesOnlineClipChoiceWithoutOfflineOption() {

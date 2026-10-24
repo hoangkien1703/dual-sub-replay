@@ -1,10 +1,10 @@
 package com.kienhoang.dualsubreplay.ui
 
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -33,7 +33,9 @@ class GrammarExplanationsUiTest {
     @Before
     @After
     fun openAllSections() {
-        preferences.edit().apply { WORD_CARD_SECTION_KEYS.forEach(::remove) }.commit()
+        val editor = preferences.edit()
+        WORD_CARD_SECTION_KEYS.forEach(editor::remove)
+        editor.commit()
     }
 
     @Test
