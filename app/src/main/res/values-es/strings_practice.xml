@@ -89,6 +89,7 @@
     <string name="practice_copy">Copiar</string>
     <string name="practice_copied">Copiado</string>
     <string name="practice_translate">Traducir</string>
+    <string name="practice_all_actions">Todas las acciones</string>
     <string name="practice_clear_selection">Borrar selección</string>
     <string name="practice_tap_another_word">Toca otra palabra para seleccionar una frase</string>
     <string name="practice_translation_unavailable">Traducción no disponible</string>
