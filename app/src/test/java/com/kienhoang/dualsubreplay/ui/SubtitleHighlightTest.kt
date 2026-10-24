@@ -213,6 +213,7 @@ class SubtitleWordHighlightTest {
                 SEND_TO_APP_PREFERENCE,
                 ANKICONNECT_DECK_PREFERENCE,
                 BLUR_BOX_PREFERENCE,
+                KANJI_DETAILS_PREFERENCE,
                 PAGE_TOKEN_CAPTIONS_PREFERENCE,
                 PAGE_TOKEN_NEEDED_PREFERENCE,
                 KNOWN_WORDS_AFTER_PREFERENCE,

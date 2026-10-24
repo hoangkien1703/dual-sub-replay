@@ -32,9 +32,14 @@ Current releases bundle only:
 
 The HSK levels of the Chinese grammar points are taken from the grammar syllabus and word list of the *Chinese Proficiency Grading Standards for International Chinese Language Education* (GF0025-2021), as published in [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT). Only the level numbers are used; the lists are not part of the app.
 
+- Japanese kanji data (data files only, `app/src/main/learner-data/`, made by `tools/kanji/build_kanji_data.py`):
+  - `ja-kanji.txt` (readings, meanings, stroke counts, grades and Hán Việt readings of the 2,136 jōyō and 863 jinmeiyō kanji) comes from [KANJIDIC2](https://www.edrdg.org/kanjidic/kanjidic2.xml.gz) database version 2026-296, Copyright James William Breen and the Electronic Dictionary Research and Development Group, used under [CC BY-SA 4.0](https://www.edrdg.org/edrdg/licence.html). Fifteen Hán Việt readings KANJIDIC2 gives for another form of the character are corrected (listed in the build script). Each kanji's parts in the same file come from KanjiVG.
+  - `ja-kanji-strokes.txt` (stroke order paths) comes from [KanjiVG](https://kanjivg.tagaini.net) release r20260714, Copyright Ulrich Apel and contributors, used under CC BY-SA 3.0.
+  - Both files are adaptations shared under the same licences (CC BY-SA 4.0 and CC BY-SA 3.0); the app's code stays MIT. `ja-radicals.txt` (the 214 Kangxi radicals' names) and the memory stories `ja-kanji-stories-en.txt` and `ja-kanji-stories-vi.txt` are written for this app (MIT). No mnemonics from WaniKani, Koohii, Kanji alive or other sources are used.
+
 Study tools (2026-10-20) include no third-party code or data. Load captions with a page token (beta) follows the proof-of-origin token flow that LuanRT's [BgUtils](https://github.com/LuanRT/BgUtils) (MIT) documents, written for this app; it uses YouTube's own public web values that the web player sends. Send to AnkiDroid talks to AnkiDroid's public content provider directly, without the AnkiDroid API library. Send to AnkiConnect (2026-10-23) speaks AnkiConnect's public JSON protocol to the phone's own address; no code of AnkiConnect or AnkiConnect Android (GPL-3.0) is used. The play modes, known words and blur box are ideas seen in Migaku and jidoujisho (GPL-3.0); none of their code, assets, data, keys or endpoints are used.
 
-The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, and the ML Kit translation terms.
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, the KANJIDIC2 and KanjiVG credits, and the ML Kit translation terms.
 
 ## Japanese dictionary (downloaded on first use)
 

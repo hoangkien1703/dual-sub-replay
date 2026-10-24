@@ -1,0 +1,2139 @@
+# Vietnamese memory stories for the 2,136 jōyō kanji, one per line: kanji, keyword, story.
+# Written for DualSub Replay and shared under the app's MIT licence. Each story builds the kanji
+# from the parts KanjiVG names (ja-kanji.txt), and ends with its Hán Việt reading in capitals.
+一	một	Một nét ngang duy nhất: số MỘT, NHẤT như trong "thống nhất", "nhất định".
+七	bảy	Một nét ngang bị nét móc cắt ngang, trông như số 7 lộn ngược: bảy, THẤT như "thất tịch".
+三	ba	Ba nét ngang chồng lên nhau: số ba, TAM như "tam giác".
+上	trên	Cột mốc 卜 dựng trên mặt đất 一: thứ ở phía trên là THƯỢNG, như "thượng lưu".
+下	dưới	Cột mốc 卜 treo bên dưới đường 一: thứ ở dưới là HẠ, như "hạ cánh".
+中	giữa	Mũi tên 丨 xuyên qua chính giữa cái khung 口: ở giữa, TRUNG như "trung tâm".
+九	chín	Cánh tay dài 丿 gập lại thành móc 乙, còn thiếu một là đủ mười: chín, CỬU như "cửu long".
+二	hai	Hai nét ngang, nét trên ngắn nét dưới dài: số hai, NHỊ như "nhị phân".
+五	năm	Giữa hai đường 二 là nét bắt chéo, như năm điểm giao nhau: năm, NGŨ như "ngũ quan".
+人	người	Hai chân đang bước, nhìn nghiêng: con người, NHÂN như "nhân loại".
+休	nghỉ	Người 亻 dựa lưng vào gốc cây 木 để nghỉ ngơi: HƯU như "hưu trí".
+先	trước	Đôi chân 儿 bước lên trước mọi người: đi trước, TIÊN như "tiên phong".
+入	vào	Hai nét chụm lại như mũi tên chỉ vào cửa lều: đi vào, NHẬP như "nhập khẩu".
+八	tám	Hai nét tách ra hai bên như chia đôi cái bánh: số tám, BÁT như "bát giác".
+六	sáu	Cái nắp 亠 đậy lên tám 八: số sáu, LỤC như "lục địa".
+円	yên; tròn	Cái hộp úp 冂 có khe bỏ xu: đồng yên tròn, VIÊN như "viên mãn".
+出	ra	Núi 山 nhô ra khỏi cái hộp mở 凵: đi ra, XUẤT như "xuất khẩu".
+力	sức mạnh	Cánh tay gồng cơ bắp: sức mạnh, LỰC như "lực sĩ".
+十	mười	Hai nét cắt nhau như dấu cộng: số mười, THẬP như "thập tự".
+千	nghìn	Thêm một nét phẩy 丿 lên mười 十 là thành nghìn: THIÊN như "thiên lý".
+口	miệng	Một ô vuông mở: cái miệng, KHẨU như "khẩu trang".
+右	phải	Bàn tay đưa thức ăn vào miệng 口: tay ăn cơm là tay phải, HỮU như "hữu ngạn".
+名	tên	Buổi tối 夕 trời tối, phải dùng miệng 口 gọi tên mình: DANH như "danh thiếp".
+四	bốn	Trong khung 囗 có hai cái chân 儿: căn phòng bốn bức tường, TỨ như "tứ phía".
+土	đất	Mầm cây nhú lên khỏi mặt đất: đất, THỔ như "thổ địa".
+夕	buổi tối	Mặt trăng khuyết vừa ló: buổi chiều tối, TỊCH như "thất tịch".
+大	to	Người dang rộng hai tay: to lớn, ĐẠI như "đại học".
+天	trời	Phía trên người to lớn 大 còn một 一 tầng nữa: bầu trời, THIÊN như "thiên đường".
+女	phụ nữ	Người phụ nữ ngồi quỳ, hai tay đan lại: NỮ như "nữ sinh".
+子	con	Em bé quấn tã, dang hai tay: đứa con, TỬ như "phụ tử".
+字	chữ	Dưới mái nhà 宀, đứa trẻ 子 ngồi tập viết chữ: TỰ như "văn tự".
+学	học	Đứa trẻ 子 ngồi dưới mái 冖, ánh sáng ⺍ chiếu xuống: học hành, HỌC như "học sinh".
+小	nhỏ	Một nét nhỏ với hai giọt bắn hai bên: nhỏ, TIỂU như "tiểu học".
+山	núi	Ba đỉnh núi, đỉnh giữa cao nhất: núi, SƠN như "giang sơn".
+川	sông	Ba dòng nước chảy xuôi: con sông, XUYÊN như "sơn xuyên".
+左	trái	Bàn tay cầm dụng cụ 工 bằng tay trái, tay phải làm việc: bên trái, TẢ như "tả hữu".
+年	năm	Người nông dân vác bó lúa khô 干 mỗi mùa gặt: một năm, NIÊN như "thanh niên".
+手	tay	Bàn tay xòe các ngón, cổ tay bên dưới: bàn tay, THỦ như "thủ công".
+文	văn	Cái nắp 亠 trên hai nét chéo 乂 như hoa văn khắc trên bia: VĂN như "văn học".
+日	ngày; mặt trời	Mặt trời có vạch ngang ở giữa: ngày, NHẬT như "nhật ký".
+早	sớm	Mặt trời 日 vừa nhô lên trên cột mốc 十: buổi sáng sớm, TẢO như "tảo hôn".
+月	trăng; tháng	Vầng trăng khuyết có hai vệt trên mặt: mặt trăng, tháng, NGUYỆT như "nguyệt san".
+木	cây	Thân cây với cành vươn lên và rễ cắm xuống: cây, MỘC như "mộc mạc".
+本	sách; gốc	Cây 木 có vạch đánh dấu gốc rễ: gốc, sách, BẢN/BỔN như "căn bản".
+村	làng	Cây 木 và đất đo từng tấc 寸 chia lô: làng xóm, THÔN như "nông thôn".
+林	rừng nhỏ	Hai cây 木 đứng cạnh nhau: rừng cây, LÂM như "lâm nghiệp".
+校	trường	Dưới tán cây 木, mọi người giao lưu 交 học hỏi: trường học, HIỆU như "học hiệu".
+森	rừng rậm	Ba cây 木 chen nhau, dày hơn rừng 林: rừng rậm, SÂM như "sâm lâm".
+正	đúng	Dừng 止 đúng vạch 一: ngay thẳng, CHÍNH như "chính xác".
+気	khí	Hơi nước 气 bốc lên nghi ngút: khí, tinh thần, KHÍ như "không khí".
+水	nước	Dòng chảy ở giữa, giọt nước bắn hai bên: nước, THỦY như "thủy triều".
+火	lửa	Ngọn lửa bốc lên, tia lửa bắn hai bên: lửa, HỎA như "hỏa hoạn".
+犬	chó	Con vật to 大 có thêm một chấm 丶 làm tai: con chó, KHUYỂN như "khuyển nho".
+玉	ngọc	Vua 王 có thêm một chấm 丶 quý giá: viên ngọc, NGỌC như "ngọc bích".
+王	vua	Ba nét trời, người, đất được nối bằng một nét dọc: nhà vua, VƯƠNG như "vương quốc".
+生	sống	Cây non mọc lên khỏi mặt đất: sự sống, SINH như "sinh nhật".
+田	ruộng	Thửa ruộng chia thành bốn ô: ruộng lúa, ĐIỀN như "điền viên".
+男	đàn ông	Người dùng sức 力 cày ruộng 田: đàn ông, NAM như "nam giới".
+町	thị trấn	Ruộng 田 nằm dọc theo con đường 丁: thị trấn, ĐINH.
+白	trắng	Mặt trời 日 có tia sáng phía trên: màu trắng, BẠCH như "bạch tuyết".
+百	trăm	Một 一 đặt trên trắng 白: một trăm, BÁCH như "bách khoa".
+目	mắt	Con mắt dựng đứng, có hai vạch con ngươi: mắt, MỤC như "mục tiêu".
+石	đá	Hòn đá 口 lăn xuống chân vách núi: đá, THẠCH như "thạch anh".
+空	bầu trời; trống	Nhìn qua lỗ 穴 thấy bầu trời trống trải: KHÔNG như "không gian".
+立	đứng	Người đứng trên mặt đất, đầu như cái nắp 亠: đứng, LẬP như "thành lập".
+竹	tre	Hai thân tre với lá rủ xuống: cây tre, TRÚC như "trúc lâm".
+糸	sợi chỉ	Cuộn tơ xoắn ở trên, sợi buông xuống dưới: sợi chỉ, MỊCH.
+耳	tai	Cái tai với các nếp gấp bên trong: tai, NHĨ như "nhĩ khoa".
+花	hoa	Cây cỏ 艹 biến đổi 化 từ nụ thành hoa: HOA như "hoa quả".
+草	cỏ	Cây 艹 mọc sớm 早 mùa xuân: cỏ, THẢO như "thảo mộc".
+虫	sâu bọ	Con sâu đầu to, đuôi nhỏ: côn trùng, TRÙNG như "côn trùng".
+見	nhìn	Con mắt 目 có đôi chân 儿 đi khắp nơi để nhìn: KIẾN như "kiến thức".
+貝	vỏ sò	Vỏ sò như con mắt 目 trên hai chân 八, ngày xưa dùng làm tiền: BỐI như "bảo bối".
+赤	đỏ	Lửa cháy trên mặt đất 土 rực đỏ: XÍCH như "xích đạo".
+足	chân; đủ	Đầu gối 口 trên cẳng chân và bàn chân: chân, đủ, TÚC như "mãn túc".
+車	xe	Cỗ xe nhìn từ trên xuống: thùng xe ở giữa, trục và bánh hai bên: XA như "xa lộ".
+金	vàng; tiền	Những hạt vàng nằm dưới đất, dưới mái che: vàng, tiền, KIM như "kim loại".
+雨	mưa	Những giọt mưa rơi từ đám mây dưới bầu trời: mưa, VŨ như "vũ lượng".
+青	xanh	Mầm cây non dưới ánh trăng 月, xanh tươi: THANH như "thanh niên".
+音	âm thanh	Đứng 立 lên mở miệng như mặt trời 日 phát ra tiếng: ÂM như "âm nhạc".
+万	vạn	Một 一 nét với nét móc dài: mười nghìn, VẠN như "vạn vật".
+丸	tròn	Số chín 九 ôm một chấm 丶 lăn tròn: tròn, HOÀN như "hoàn hảo".
+交	giao	Người cha 父 đội nắp 亠 bắt chéo chân: giao nhau, GIAO như "giao thông".
+京	kinh đô	Tòa nhà cao có mái 亠, cổng 口 và cột nhỏ 小: kinh đô, KINH như "kinh thành".
+今	bây giờ	Người 人 dưới mái nhà thêm một 一 nét: ngay bây giờ, KIM như "kim cổ".
+会	gặp; hội	Mọi người 人 tụ lại dưới mái nhà để nói 云 chuyện: hội họp, HỘI như "hội nghị".
+体	cơ thể	Phần gốc 本 của con người 亻: cơ thể, THỂ như "thể dục".
+何	cái gì	Người 亻 cái gì cũng có thể 可 làm, hỏi lại: gì? HÀ như "vô hà".
+作	làm	Người 亻 cầm cưa 乍 để làm ra đồ vật: TÁC như "tác phẩm".
+元	gốc	Hai 二 nét trên đôi chân 儿: cái đầu của người, gốc khởi đầu, NGUYÊN như "nguyên thủy".
+兄	anh trai	Cái miệng 口 to trên đôi chân 儿: người anh hay ra lệnh, HUYNH như "huynh đệ".
+光	ánh sáng	Tia sáng ⺌ chiếu trên đôi chân 儿 người: ánh sáng, QUANG như "quang minh".
+公	công cộng	Chia 八 cái riêng tư 厶 ra cho mọi người: công cộng, CÔNG như "công viên".
+内	bên trong	Người 人 bước vào trong cái khung 冂: bên trong, NỘI như "nội thất".
+冬	mùa đông	Đi chậm 夂 trên băng 冫: mùa đông, ĐÔNG như "đông chí".
+刀	đao	Lưỡi dao với cán cong: dao, ĐAO như "đao kiếm".
+分	chia; phút	Dùng dao 刀 chia thành tám 八 phần: phân chia, PHÂN như "phân số".
+切	cắt	Bảy 七 nhát dao 刀: cắt, THIẾT như "thiết yếu".
+前	trước	Hai sừng 八, mặt trăng 月 và con dao 刂: mũi thuyền rẽ nước phía trước, TIỀN như "tiền tuyến".
+北	bắc	Hai người 匕 ngồi quay lưng vào nhau tránh gió bắc: BẮC như "bắc cực".
+午	buổi trưa	Cái chày 干 dựng thẳng, không còn bóng: buổi trưa, NGỌ như "chính ngọ".
+半	một nửa	Số mười 十 bị chẻ đôi ở giữa: một nửa, BÁN như "bán cầu".
+南	nam	Mười 十 căn lều 冂 phơi lúa khô 干 ở phương nam ấm áp: NAM như "Việt Nam".
+原	đồng bằng; gốc	Dưới vách núi 厂, dòng nước trắng 白 chảy thành suối nhỏ 小: nguồn gốc, NGUYÊN như "nguyên nhân".
+友	bạn	Hai bàn tay 又 nắm lấy nhau: bạn bè, HỮU như "bằng hữu".
+古	cũ	Câu chuyện truyền qua mười 十 cái miệng 口: xưa cũ, CỔ như "cổ đại".
+台	cái bệ	Cái bệ riêng 厶 để cái miệng 口 diễn thuyết: ĐÀI như "đài phát thanh".
+合	hợp	Cái nắp 人 一 đậy khít lên miệng 口: vừa khít, HỢP như "hợp tác".
+同	giống nhau	Một 一 cái miệng 口 dưới cùng mái 冂: giống nhau, ĐỒNG như "đồng ý".
+回	vòng; lần	Ô vuông 口 trong ô vuông 囗 xoay vòng: quay về, HỒI như "hồi hương".
+図	bản đồ	Những đường vẽ ⺍ trong khung 囗: bản đồ, ĐỒ như "đồ họa".
+国	đất nước	Viên ngọc 玉 được bảo vệ trong biên giới 囗: đất nước, QUỐC như "quốc tế".
+園	vườn	Khu vực rào 囗 có đất 土, ao 口 và cây cỏ như áo 衣: vườn, VIÊN như "công viên".
+地	đất	Đất 土 vốn là 也 thứ dưới chân ta: mặt đất, ĐỊA như "địa lý".
+場	nơi	Mảnh đất 土 nơi mặt trời mọc 旦 rọi sáng: nơi chốn, TRƯỜNG như "quảng trường".
+声	giọng	Kẻ sĩ 士 cất cao giọng trên bục: giọng nói, THANH như "âm thanh".
+売	bán	Kẻ sĩ 士 đội mũ 冖, chân 儿 đi rao bán hàng: MẠI như "mua bán".
+夏	mùa hè	Cái đầu 自 lê bước chậm 夂 dưới nắng: mùa hè, HẠ như "hạ chí".
+外	bên ngoài	Xem bói 卜 vào buổi tối 夕 ngoài trời: bên ngoài, NGOẠI như "ngoại quốc".
+多	nhiều	Tối 夕 nối tối 夕: nhiều, ĐA như "đa số".
+夜	đêm	Dưới tấm màn 亠 bóng tối, người 亻 đi về trong chiều tối 夕: ban đêm, DẠ như "dạ hội".
+太	mập; to	Người to 大 lại thêm một chấm 丶 bụng: mập, to, THÁI như "thái dương".
+妹	em gái	Người con gái 女 chưa 未 lớn: em gái, MUỘI như "tỷ muội".
+姉	chị	Người con gái 女 tự đi chợ 市 một mình: chị gái, TỈ như "tỷ muội".
+室	phòng	Dưới mái nhà 宀, nơi cuối cùng ta đến 至: căn phòng, THẤT như "phòng thất".
+家	nhà	Con heo 豕 dưới mái nhà 宀: nhà nào xưa cũng nuôi heo, GIA như "gia đình".
+寺	chùa	Mảnh đất 土 thiêng từng tấc 寸 nơi các nhà sư ở: ngôi chùa, TỰ như "tự viện".
+少	ít	Vật nhỏ 小 lại bị nét phẩy 丿 cắt đi: ít ỏi, THIỂU như "thiểu số".
+岩	đá tảng	Hòn đá 石 to như núi 山: tảng đá, NHAM như "nham thạch".
+工	công việc	Cây thước thợ mộc hình chữ I: công việc, CÔNG như "công nhân".
+市	chợ	Tấm vải 巾 treo dưới mái 亠 làm biển hiệu: chợ, thành phố, THỊ như "thành thị".
+帰	trở về	Treo thanh kiếm 刂 bên cây chổi 帚: người lính trở về nhà, QUY như "hồi quy".
+広	rộng	Ngôi nhà 广 có cái sân riêng 厶: rộng rãi, QUẢNG như "quảng trường".
+店	cửa hàng	Ngôi nhà 广 nơi thầy bói 占 mở hàng: cửa tiệm, ĐIẾM như "tửu điếm".
+弓	cây cung	Hình dáng cong của cây cung đang giương: CUNG như "cung tên".
+引	kéo	Kéo dây 丨 cung 弓 lại: kéo, DẪN như "hấp dẫn".
+弟	em trai	Cậu em quấn dây quanh cây cung 弓 bắt chước anh: em trai, ĐỆ như "huynh đệ".
+弱	yếu	Hai cây cung 弓 để trên băng 冫 bị mềm đi: yếu, NHƯỢC như "nhược điểm".
+強	mạnh	Cây cung 弓 và con bọ 虫 vỏ cứng: mạnh mẽ, CƯỜNG như "cường quốc".
+当	trúng	Tia nhỏ ⺌ bắn ra khi chổi ⺕ đập trúng: đúng, ĐƯƠNG như "đương nhiên".
+形	hình dạng	Cái khung 开 có nét lông 彡 vẽ lên: hình dạng, HÌNH như "hình học".
+後	sau	Bước 彳 chân bị buộc sợi chỉ 幺, đi chậm 夂: tụt lại phía sau, HẬU như "hậu quả".
+心	trái tim	Trái tim với những giọt máu quanh nó: tâm, TÂM như "tâm hồn".
+思	nghĩ	Bộ não như thửa ruộng 田 nằm trên trái tim 心: suy nghĩ, TƯ như "tư duy".
+戸	cửa	Cánh cửa đơn có thanh ngang phía trên: cửa, HỘ như "hộ khẩu".
+才	tài năng	Bàn tay 扌 làm được mọi việc: tài năng, TÀI như "thiên tài".
+教	dạy	Ông già 耂 gõ nhẹ 攵 đứa trẻ 子 để dạy học: GIÁO như "giáo viên".
+数	số	Người phụ nữ 女 đếm từng hạt gạo 米 và gạch 攵 đi: con số, SỐ như "số lượng".
+新	mới	Đứng 立 cạnh cây 木, chặt bằng rìu 斤: gỗ mới tinh, TÂN như "tân binh".
+方	phương hướng	Cái nắp 亠 trên cây cày chỉ một hướng: phương hướng, PHƯƠNG như "phương pháp".
+明	sáng	Mặt trời 日 và mặt trăng 月 cùng chiếu: sáng sủa, MINH như "thông minh".
+星	ngôi sao	Mặt trời 日 sinh ra 生 trên trời đêm: ngôi sao, TINH như "hành tinh".
+春	mùa xuân	Ba 三 người 人 tắm nắng mặt trời 日: mùa xuân, XUÂN như "thanh xuân".
+昼	buổi trưa	Mặt trời đo bằng thước 尺 từ lúc rạng sáng 旦 tới giữa ban ngày, buổi trưa: TRÚ như "trú dạ".
+時	thời gian	Nhìn mặt trời 日 từ chùa 寺 để biết giờ: thời gian, THỜI như "thời tiết".
+晴	trời quang	Mặt trời 日 trên bầu trời xanh 青: trời quang đãng, TÌNH như "tình thiên".
+曜	thứ	Ngày 日 bay qua như chim 隹 có cánh 羽: các thứ trong tuần, DIỆU như "diệu nhật".
+書	viết	Cây bút 聿 đặt trên trang giấy mỗi ngày 日: viết, THƯ như "thư viện".
+朝	buổi sáng	Mặt trời 日 nhô lên giữa cỏ 十 khi mặt trăng 月 còn trên trời: buổi sáng, TRIỀU như "triều đình".
+来	đến	Cây lúa 米 nặng bông cúi xuống khi mùa gặt đến: LAI như "tương lai".
+東	phía đông	Mặt trời 日 mọc sau rặng cây 木: phía đông, ĐÔNG như "đông phương".
+楽	vui	Dây đàn trắng 白 căng trên thân gỗ 木: âm nhạc, vui vẻ, LẠC như "lạc quan".
+歌	bài hát	Hết miệng này đến miệng khác 哥 há rộng 欠 cất bài hát: CA như "ca sĩ".
+止	dừng	Dấu chân đặt chắc trên mặt đất: dừng lại, CHỈ như "đình chỉ".
+歩	đi bộ	Dừng 止 một chút rồi bước thêm ít 少 bước: đi bộ, BỘ như "tiến bộ".
+母	mẹ	Người phụ nữ có hai chấm là bầu sữa nuôi con: mẹ, MẪU như "mẫu thân".
+毎	mỗi	Bà mẹ 毋 đội nón 𠂉 làm việc nhà mỗi ngày: MỖI như "mỗi người".
+毛	lông	Nhúm lông với những sợi cong ra: lông, MAO như "mao mạch".
+池	ao	Nước 氵 cứ thế 也 đứng yên: cái ao, TRÌ như "điện trì".
+汽	hơi nước	Nước 氵 bốc thành hơi 气: hơi nước, KHÍ như "khí xa".
+活	sống	Nước 氵 trên lưỡi 舌 giữ ta sống: sinh hoạt, HOẠT như "hoạt động".
+海	biển	Nước 氵 ở đó mỗi 毎 ngày không bao giờ hết: biển, HẢI như "hải quân".
+点	điểm	Thầy bói 占 đọc các chấm lửa 灬: dấu chấm, ĐIỂM như "điểm số".
+父	cha	Hai bàn tay bắt chéo cầm rìu: người cha, PHỤ như "phụ huynh".
+牛	bò	Đầu con bò có sừng nhìn từ phía trước: bò, NGƯU như "ngưu lang".
+理	lý lẽ	Viên ngọc 王 được mài theo thớ của nó như đường làng 里: lý lẽ, LÝ như "lý do".
+用	dùng	Cái thùng có quai, sẵn sàng để dùng: sử dụng, DỤNG như "tác dụng".
+画	bức tranh	Trong khung 凵 vẽ thửa ruộng 由 dưới đường chân trời 一: bức tranh, nét vẽ, HOẠCH như "kế hoạch".
+番	số thứ tự	Chia 釆 từng thửa ruộng 田 và đánh số thứ tự: lượt, PHIÊN như "luân phiên".
+直	thẳng	Mười 十 con mắt 目 nhìn thẳng: ngay thẳng, TRỰC như "trực tiếp".
+矢	mũi tên	Mũi tên có đuôi lông xuyên qua người to 大: mũi tên, THỈ.
+知	biết	Lời từ miệng 口 bay thẳng như mũi tên 矢: hiểu biết, TRI như "tri thức".
+社	công ty	Người ta tụ họp nơi bàn thờ 礻 thần đất 土: xã hội, công ty, XÃ như "xã hội".
+秋	mùa thu	Lúa 禾 phơi bên đống lửa 火: mùa thu gặt hái, THU như "thu hoạch".
+科	khoa	Lúa 禾 đong bằng đấu 斗 rồi chia loại: phân khoa, KHOA như "khoa học".
+答	trả lời	Thẻ tre 竹 khớp 合 với nhau: câu trả lời, ĐÁP như "đáp án".
+算	tính	Que tre 竹 đếm bằng mắt 目 và hai tay 廾: tính toán, TOÁN như "toán học".
+米	gạo	Hạt gạo văng ra tứ phía: gạo, MỄ.
+紙	giấy	Sợi tơ 糸 ép mỏng theo nghề gia truyền 氏: giấy, CHỈ như "chỉ tiền".
+細	mảnh	Sợi chỉ 糸 kéo ngang thửa ruộng 田: mảnh, nhỏ, TẾ như "tinh tế".
+組	nhóm	Các sợi chỉ 糸 xếp chồng 且 rồi tết lại: nhóm, TỔ như "tổ chức".
+絵	tranh	Sợi chỉ 糸 gặp nhau 会 dệt thành bức tranh: HỘI như "hội họa".
+線	đường kẻ	Sợi chỉ 糸 chảy dài như dòng suối 泉: đường thẳng, TUYẾN như "tuyến đường".
+羽	lông vũ	Hai cánh chim song song: lông vũ, VŨ như "vũ mao".
+考	suy nghĩ	Ông già 耂 chống gậy cong 丂 dừng lại suy nghĩ: KHẢO như "tham khảo".
+聞	nghe	Cái tai 耳 áp vào cổng 門: nghe ngóng, VĂN như "tân văn".
+肉	thịt	Tảng thịt lộ cả xương sườn: thịt, NHỤC như "nhục dục".
+自	tự mình	Cái mũi 目 ta chỉ vào khi nói "tôi": tự mình, TỰ như "tự do".
+船	thuyền	Con thuyền 舟 chở tám 八 miệng 口 ăn: tàu thuyền, THUYỀN như "thuyền trưởng".
+色	màu sắc	Người 𠂊 cúi xuống người kia 巴: má ửng màu, SẮC như "sắc đẹp".
+茶	trà	Người 人 hái lá 艹 trên cây 木: trà, TRÀ như "trà đạo".
+行	đi	Bước chân 彳 bên trái, bước chân bên phải: đi, HÀNH như "hành trình".
+西	phía tây	Con chim đậu vào tổ lúc mặt trời lặn: phía tây, TÂY như "tây phương".
+親	cha mẹ	Đứng 立 trên cây 木 nhìn 見 con về: cha mẹ, THÂN như "thân thiết".
+角	sừng; góc	Cái sừng có vân khắc: sừng, góc, GIÁC như "tam giác".
+言	nói	Lời nói thoát ra từ miệng 口: NGÔN như "ngôn ngữ".
+計	kế hoạch	Nói 言 đếm tới mười 十: đo tính, kế hoạch, KẾ như "kế toán".
+記	ghi	Tự nói 言 với mình 己 rồi ghi lại: ghi chép, KÍ như "ký ức".
+話	nói chuyện	Lời 言 từ cái lưỡi 舌: nói chuyện, THOẠI như "điện thoại".
+語	ngôn ngữ	Lời nói 言 của tôi 吾: ngôn ngữ, NGỮ như "ngữ pháp".
+読	đọc	Đọc to 言 như người bán hàng 売 rao: đọc, ĐỘC như "độc giả".
+谷	thung lũng	Nước rẽ quanh khe 口 giữa hai sườn đồi: thung lũng, CỐC như "sơn cốc".
+買	mua	Cái lưới 罒 đầy vỏ sò 貝 để trả tiền: mua, MÃI như "mua bán".
+走	chạy	Đất 土 tung lên dưới đôi chân 龰: chạy, TẨU như "tẩu thoát".
+近	gần	Đi 辶 chỉ một tầm rìu 斤 ném: gần, CẬN như "cận thị".
+通	đi qua	Đi 辶 xuyên qua ống 甬: thông qua, THÔNG như "giao thông".
+週	tuần	Đi 辶 hết một vòng 周: một tuần, CHU như "chu kỳ".
+道	con đường	Cái đầu 首 dẫn lối khi đi 辶: con đường, ĐẠO như "đạo lý".
+遠	xa	Mặc áo dài 衣 đi 辶 trên đất 土 mãi: xa xôi, VIỄN như "viễn cảnh".
+里	làng	Ruộng 日 trên đất: làng quê, LÝ như "lý trưởng".
+野	cánh đồng	Làng 里 có đất để sẵn 予: cánh đồng, DÃ như "hoang dã".
+長	dài	Ông già tóc dài bay trong gió: dài, TRƯỜNG như "trường thọ".
+門	cổng	Hai cánh cửa mở hai bên: cổng, MÔN như "chuyên môn".
+間	khoảng	Mặt trời 日 chiếu qua khe cổng 門: khoảng giữa, GIAN như "thời gian".
+雪	tuyết	Mưa 雨 có thể quét ⺕ bằng chổi: tuyết, TUYẾT như "bạch tuyết".
+雲	mây	Mưa 雨 báo hiệu 云 trước: đám mây, VÂN như "phong vân".
+電	điện	Mưa 雨 và tia sét đánh xuống ruộng 日: điện, ĐIỆN như "điện thoại".
+頭	cái đầu	Hạt đậu 豆 đặt trên cái đầu 頁: đầu, ĐẦU như "đầu não".
+顔	khuôn mặt	Chàng trai đẹp 彦 với cái đầu 頁: khuôn mặt, NHAN như "nhan sắc".
+風	gió	Con bọ 虫 bị thổi dưới cánh buồm 几: gió, PHONG như "phong cảnh".
+食	ăn	Cái nắp đậy bát thức ăn ngon: ăn, THỰC như "thực phẩm".
+首	cổ	Mái tóc trên cái đầu 自: cổ, đầu, THỦ như "thủ đô".
+馬	ngựa	Con ngựa bờm bay và bốn chân 灬: ngựa, MÃ như "mã đáo thành công".
+高	cao	Tòa tháp cao có mái 亠, cửa sổ 口 và cổng 冂: cao, CAO như "cao thủ".
+魚	cá	Con cá có đầu 𠂊, thân vảy 田 và vây đuôi 灬: cá, NGƯ như "ngư dân".
+鳥	chim	Con chim có mắt, lông và móng 灬: chim, ĐIỂU như "điểu học".
+鳴	hót	Con chim 鳥 mở miệng 口: hót, kêu, MINH như "cộng minh".
+麦	lúa mì	Bông lúa 龶 được dẫm chậm 夂 trong mùa đông: lúa mì, MẠCH như "kiều mạch".
+黄	vàng	Cánh đồng 由 lúa chín 龷 đung đưa 八: màu vàng, HOÀNG như "hoàng kim".
+黒	đen	Muội lửa 灬 bám đen cả làng 里: màu đen, HẮC như "hắc ám".
+丁	khu phố	Cây đinh 亅 dưới một 一 nét: khu phố, ĐINH như "bạch đinh".
+世	thế giới	Hai mươi 廿 năm thêm một nét: một thế hệ, THẾ như "thế giới".
+両	cả hai	Một 一 đòn gánh trên cái khung 冂 chia hai bên 山: cả hai, LẠNG như "lưỡng".
+主	chủ	Ngọn lửa 丶 cháy trên cây đèn của vua 王: người chủ, CHỦ như "chủ nhân".
+乗	cưỡi	Nghìn 千 người leo lên cây 木: cưỡi, đi xe, THỪA như "thừa thắng".
+予	trước	Bàn tay trao trước 了 vật gì: dự trước, DƯ như "dự định".
+事	việc	Bàn tay ⺕ cầm cây móc 亅 vừa nói 口: công việc, SỰ như "sự việc".
+仕	phục vụ	Người 亻 là kẻ sĩ 士 ra làm quan phục vụ: SĨ như "sĩ quan".
+他	khác	Người 亻 cũng là 也 người khác: người khác, THA như "tha hương".
+代	thay	Người 亻 cắm cọc 弋 giữ chỗ: thay thế, ĐẠI như "đại diện".
+住	ở	Người 亻 làm chủ 主 nơi mình ở: TRỤ như "trụ sở".
+使	dùng	Người 亻 sai viên quan 吏 đi làm việc: dùng người, SỬ như "sứ giả".
+係	phụ trách	Người 亻 nối với dòng dõi 系: người phụ trách, liên hệ, HỆ như "quan hệ".
+倍	gấp đôi	Người 亻 đứng 立 lại thêm một miệng 口 ăn: gấp đôi, BỘI như "bội số".
+全	toàn bộ	Người 人 cầm trọn viên ngọc 王: toàn bộ, TOÀN như "an toàn".
+具	dụng cụ	Con mắt 目 trên hai chân 八: đồ dùng, CỤ như "dụng cụ".
+写	chép; chụp	Tấm phủ 冖 lên vật được trao 与: sao chép, TẢ như "miêu tả".
+列	hàng	Xương 歹 chặt bằng dao 刂 xếp thành hàng: LIỆT như "liệt kê".
+助	giúp	Sức 力 chồng thêm 且 để giúp: TRỢ như "hỗ trợ".
+勉	cố gắng	Không được miễn 免 việc gì, phải dùng hết sức 力: cố gắng, MIỄN như "cần miễn".
+動	chuyển động	Vật nặng 重 cần sức 力 mới chuyển động được: ĐỘNG như "hoạt động".
+勝	thắng	Hai 二 người 人 dồn hết cơ bắp 月 và sức 力 để giành chiến thắng: THẮNG như "thắng lợi".
+化	biến đổi	Người 亻 đứng cạnh người lộn ngược 匕: biến hóa, HÓA như "văn hóa".
+区	khu	Khu vực kín 匸 bị chia bởi dấu chéo 乂: khu vực, KHU như "khu phố".
+医	bác sĩ	Mũi tên 矢 cất trong hộp 匸, thầy thuốc rút ra chữa trị: Y như "y học", "bác sĩ".
+去	rời đi	Rời đi, bỏ lại vật riêng 厶 dưới đất 土: đã qua, KHỨ như "quá khứ".
+反	ngược lại	Bàn tay 又 đẩy ngược vào vách đá 厂: chống lại, PHẢN như "phản đối".
+取	lấy	Bàn tay 又 túm lấy cái tai 耳: lấy, THỦ như "thủ đắc".
+受	nhận	Bàn tay ⺤ trao vật qua tấm che 冖 cho bàn tay kia 又: nhận, THỤ như "thụ động".
+号	số hiệu	Cái miệng 口 hô to số hiệu trên một 一 vạch: HIỆU như "phù hiệu".
+向	hướng về	Cửa sổ 口 của ngôi nhà 冂 hướng ra mặt trời: HƯỚNG như "phương hướng".
+君	bạn; ngài	Bàn tay ⺕ cầm gậy 尹 và cái miệng 口 ra lệnh: quân vương, bạn, QUÂN như "quân tử".
+味	vị	Cái miệng 口 nếm trái cây chưa 未 chín: mùi vị, VỊ như "hương vị".
+命	mệnh	Người 人 quỳ 卩 nghe một 一 cái miệng 口 ra lệnh: số mệnh, MỆNH như "sinh mệnh".
+和	hòa	Lúa 禾 đủ cho mọi miệng 口: hòa thuận, HÒA như "hòa bình".
+品	hàng hóa	Ba cái hộp 口 hàng chồng lên nhau: hàng hóa, PHẨM như "sản phẩm".
+員	nhân viên	Cái miệng 口 trên đồng tiền 貝: người được trả lương, VIÊN như "nhân viên".
+商	buôn bán	Đứng 立 ở quầy 冂, chân 儿 và miệng 口 rao giá: buôn bán, THƯƠNG như "thương mại".
+問	hỏi	Cái miệng 口 ở cổng 門 hỏi han: câu hỏi, VẤN như "vấn đề".
+坂	con dốc	Đất 土 dựng ngược 反 lên: con dốc, PHẢN.
+央	trung tâm	Người to 大 đứng ngay giữa 丨 khung: trung tâm, ƯƠNG như "trung ương".
+始	bắt đầu	Người phụ nữ 女 trên bệ 台 của sự sống: bắt đầu, THỦY như "khai thủy".
+委	ủy thác	Người phụ nữ 女 cúi mình như bông lúa 禾: giao phó, ỦY như "ủy ban".
+守	bảo vệ	Bàn tay 寸 canh giữ dưới mái nhà 宀: bảo vệ, THỦ như "thủ môn".
+安	yên ổn; rẻ	Người phụ nữ 女 an toàn dưới mái nhà 宀: yên ổn, AN như "bình an".
+定	định	Bàn chân 疋 đặt vững dưới mái nhà 宀: cố định, ĐỊNH như "quyết định".
+実	quả; thật	Dưới mái 宀 ba 三 người 人 ăn quả thật của công sức: THỰC như "sự thực".
+客	khách	Mỗi 各 người đến dưới mái nhà 宀: khách, KHÁCH như "du khách".
+宮	cung điện	Mái nhà 宀 phủ dãy phòng 呂 nối nhau: cung điện, CUNG như "hoàng cung".
+宿	nhà trọ	Một trăm 百 người 亻 dưới một mái 宀: nhà trọ, TÚC như "ký túc xá".
+寒	lạnh	Dưới mái 宀, chất ba 三 lớp rơm 八 chống băng 冫: lạnh, HÀN như "hàn đới".
+対	đối	Chữ 文 một bên, bàn tay 寸 một bên: đối diện, ĐỐI như "đối thoại".
+局	cục	Thân người 尸 cúi bên câu chữ 句: cơ quan, CỤC như "bưu cục".
+屋	mái nhà	Thân người 尸 về đến 至 dưới mái nhà: ỐC như "ốc xá".
+岸	bờ	Núi 山 vách 厂 bên mép nước khô 干: bờ, NGẠN như "hải ngạn".
+島	đảo	Con chim 鳥 đậu trên núi 山 giữa biển: hòn đảo, ĐẢO như "bán đảo".
+州	châu	Những chấm đất 丶 giữa dòng sông 川: châu, CHÂU như "châu Á".
+帳	sổ tay	Tấm vải 巾 dài 長: rèm, sổ sách, TRƯỚNG như "trướng".
+平	phẳng	Cái cân 干 hai đĩa bằng nhau: bằng phẳng, BÌNH như "hòa bình".
+幸	hạnh phúc	Có đất 土 trên miền khô 干: may mắn, HẠNH như "hạnh phúc".
+度	độ	Hai mươi 廿 bàn tay 又 đo ngôi nhà 广: mức độ, ĐỘ như "nhiệt độ".
+庫	nhà kho	Tòa nhà 广 để xe 車: nhà kho, KHỐ như "kho khố".
+庭	sân vườn	Ngôi nhà 广 có sân triều 廷 bên ngoài: sân vườn, ĐÌNH như "gia đình".
+式	nghi thức	Cọc 弋 và dụng cụ 工 bày theo kiểu cố định: nghi thức, THỨC như "hình thức".
+役	nhiệm vụ	Bước 彳 đi mang binh khí 殳: nhiệm vụ, DỊCH như "dịch vụ".
+待	chờ	Bước 彳 tới chùa 寺 và chờ: đợi, ĐÃI như "chiêu đãi".
+急	vội	Người 𠂊 cầm chổi ⺕, tim 心 đập nhanh: vội vàng, CẤP như "khẩn cấp".
+息	hơi thở	Cái mũi 自 và trái tim 心: hơi thở, TỨC như "nghỉ ngơi" ("hưu tức").
+悪	xấu	Trái tim 心 bị đè dưới 亜 méo mó: xấu xa, ÁC như "độc ác".
+悲	buồn	Trái tim 心 nói không 非: buồn, BI như "bi kịch".
+想	ý nghĩ	Nhìn 目 cây 木 bằng cả trái tim 心: tư tưởng, TƯỞNG như "lý tưởng".
+意	ý nghĩa	Âm thanh 音 của trái tim 心: ý, Ý như "ý nghĩa".
+感	cảm giác	Cây giáo 戈 và một 一 cái miệng 口 hét lên từ tim 心: cảm xúc, CẢM như "cảm giác".
+所	nơi	Cánh cửa 戸 và cây rìu 斤: nơi người tiều phu ở, SỞ như "trụ sở".
+打	đánh	Bàn tay 扌 đóng đinh 丁: đánh, ĐẢ như "đả đảo".
+投	ném	Bàn tay 扌 cầm binh khí 殳: ném, ĐẦU như "đầu tư".
+拾	nhặt	Bàn tay 扌 khép 合 lại quanh vật gì: nhặt lên, THẬP.
+持	cầm	Bàn tay 扌 cầm chìa khóa chùa 寺: cầm, có, TRÌ như "duy trì".
+指	ngón tay	Bàn tay 扌 bốc món ngon 旨: ngón tay, CHỈ như "chỉ đạo".
+放	thả	Đánh 攵 tung chiếc lồng ra mọi hướng 方: thả ra, PHÓNG như "giải phóng".
+整	sắp xếp	Bó 束 lại, gõ 攵 cho thẳng, cho đúng 正: sắp xếp, chỉnh đốn, CHỈNH như "điều chỉnh".
+旅	du lịch	Người 亻 đi dưới lá cờ 𠂉 về một hướng 方: chuyến du lịch, LỮ như "lữ khách".
+族	bộ tộc	Mũi tên 矢 dưới một lá cờ 𠂉 về một hướng 方: bộ tộc, TỘC như "dân tộc".
+昔	ngày xưa	Bao nhiêu ngày 日 hai tay 廾 làm lụng: ngày xưa, TÍCH như "cổ tích".
+昭	sáng sủa	Mặt trời 日 được gọi 召 ra chiếu sáng: sáng sủa, CHIÊU như "chiêu".
+暑	nóng	Mặt trời 日 thiêu đốt người 者: nóng bức, THỬ như "tị thử".
+暗	tối	Mặt trời 日 tắt, chỉ còn âm thanh 音: tối tăm, ÁM như "hắc ám".
+曲	cong; bài nhạc	Thửa ruộng 曰 có luống cong 廾: uốn cong, KHÚC như "ca khúc".
+有	có	Bàn tay cầm miếng thịt 月: có, HỮU như "sở hữu".
+服	quần áo	Thân người 月 quỳ 卩 để bàn tay 又 mặc áo: quần áo, PHỤC như "phục trang".
+期	kỳ	Tuần trăng 月 kia 其: thời kỳ, KỲ như "kỳ hạn".
+板	tấm ván	Gỗ 木 ép ngược 反 cho phẳng: tấm ván, BẢN như "bảng".
+柱	cột	Cây 木 đỡ nhà của chủ 主: cái cột, TRỤ như "trụ cột".
+根	rễ	Phần của cây 木 dừng 艮 lại dưới đất: rễ, CĂN như "căn bản".
+植	trồng	Dựng cây 木 thẳng 直 xuống đất: trồng, THỰC như "thực vật".
+業	nghề nghiệp	Con dê 羊 và cây 木 dưới giá 业 bận rộn: nghề nghiệp, NGHIỆP như "công nghiệp".
+様	dáng vẻ	Cây 木, dê 羊 và nước 氺 đều đúng dáng: dáng vẻ, DẠNG như "đa dạng".
+横	ngang	Thân cây 木 vàng 黄 nằm ngang: ngang, HOÀNH như "tung hoành".
+橋	cây cầu	Gỗ 木 dựng cao 喬 qua sông: cây cầu, KIỀU như "kiều".
+次	tiếp theo	Thở 欠 ra hai 冫 lần: tiếp theo, THỨ như "thứ tự".
+歯	răng	Cái miệng 凵 có hàng răng như hạt gạo 米 chặn 止 thức ăn: răng, XỈ như "nha xỉ".
+死	chết	Bộ xương 歹 và người gục xuống 匕: cái chết, TỬ như "sinh tử".
+氷	băng	Nước 水 thêm một chấm 丶 lạnh: băng, BĂNG như "băng tuyết".
+決	quyết định	Nước 氵 phá vỡ con đê lớn 大: quyết định dứt khoát, QUYẾT như "quyết tâm".
+油	dầu	Chất lỏng 氵 có lý do 由 để cháy: dầu, DU như "dầu hỏa".
+波	sóng	Nước 氵 có lớp da 皮 gợn lên: sóng, BA như "ba lan".
+注	rót; chú ý	Nước 氵 do ông chủ 主 rót: rót, CHÚ như "chú ý".
+泳	bơi	Nước 氵 dài mãi 永: bơi lội, VỊNH như "du vịnh".
+洋	đại dương	Nước 氵 mênh mông như đàn cừu 羊: đại dương, DƯƠNG như "đại dương".
+流	chảy	Nước 氵 cuốn em bé 亠 厶 xuôi dòng sông 川: dòng chảy, LƯU như "lưu thông".
+消	dập tắt	Nước 氵 làm lửa chỉ còn giống 肖 hình bóng: dập tắt, TIÊU như "tiêu diệt".
+深	sâu	Nước 氵 ngập cái lưới 㓁 mắc trên cây 木: sâu, THÂM như "thâm sâu".
+温	ấm	Nước 氵 trong đĩa 皿 dưới nắng 日: ấm áp, ÔN như "ôn hòa".
+港	cảng	Nước 氵 ở ngã ba đường 巷 nơi thuyền đậu: bến cảng, CẢNG như "hải cảng".
+湖	hồ	Nước 氵 cổ 古 như vầng trăng 月: cái hồ, HỒ như "hồ nước".
+湯	nước nóng	Nước 氵 dưới mặt trời mọc 旦: nước nóng, THANG như "thang".
+漢	Hán	Nước 氵, cỏ 艹 và người chồng 夫 bên sông: nhà Hán, HÁN như "Hán tự".
+炭	than	Tro 灰 từ lửa trên núi 山: than, THÁN như "thán khí".
+物	vật	Con bò 牛 không phải 勿 người: đồ vật, VẬT như "động vật".
+球	quả bóng	Viên ngọc 王 ai cũng muốn 求: quả cầu, CẦU như "địa cầu".
+由	lý do	Mầm cây 丨 mọc từ thửa ruộng 日: lý do, DO như "tự do".
+申	trình bày	Tia chớp 丨 xuyên qua ruộng 日: trình bày, thưa, THÂN như "thân thỉnh".
+界	thế giới	Thửa ruộng 田 có ranh giới 介 bao quanh: thế giới, GIỚI như "biên giới".
+畑	ruộng cạn	Ruộng 田 khai phá bằng lửa 火: ruộng cạn, ĐÈN (chữ Nhật tự tạo).
+病	bệnh	Bệnh 疒 đứng hàng thứ ba 丙: ốm đau, BỆNH như "bệnh viện".
+発	xuất phát	Bước chân 癶 hai 二 chân 儿 lên đường: xuất phát, PHÁT như "phát triển".
+登	leo	Bước chân 癶 bước lên cái bệ 豆: leo lên, ĐĂNG như "đăng ký".
+皮	da	Bàn tay lột da bằng dao: da, BÌ như "bì phu".
+皿	đĩa	Cái đĩa trên chân đế: đĩa, MÃNH.
+相	lẫn nhau	Con mắt 目 nhìn cây 木, cây nhìn lại: lẫn nhau, TƯƠNG như "tương lai".
+県	tỉnh	Con mắt 目 trông coi vùng nhỏ 小: tỉnh, HUYỆN (HUYỀN) như "huyện".
+真	thật	Mười 十 con mắt 目 nhìn dụng cụ 具: không lừa được, CHÂN như "chân thật".
+着	mặc; đến	Bộ da cừu 羊 khoác lên trước mắt 目: mặc vào, đến nơi, KHÁN (TRƯỚC).
+短	ngắn	Mũi tên 矢 ngắn như hạt đậu 豆: ngắn, ĐOẢN như "đoản mệnh".
+研	mài	Hòn đá 石 mài cho phẳng 开: mài giũa, NGHIÊN như "nghiên cứu".
+礼	lễ	Trước bàn thờ 礻 cúi mình như móc câu 乙: lễ nghi, LỄ như "lễ phép".
+神	thần	Bên bàn thờ 礻 có tia chớp 申: thần linh, THẦN như "thần thánh".
+祭	lễ hội	Miếng thịt 月 đặt lên bàn thờ 示: lễ hội, TẾ như "cúng tế".
+福	phúc	Bên bàn thờ 礻, một 一 miệng 口 ăn và thửa ruộng 田 đầy: phúc, PHÚC như "hạnh phúc".
+秒	giây	Vài 少 hạt lúa 禾: đơn vị rất nhỏ, giây, MIỂU.
+究	nghiên cứu	Cái hang 穴 thám hiểm chín 九 lần: nghiên cứu, CỨU như "nghiên cứu".
+章	chương	Âm thanh 音 ghi lại thành mười 十 đoạn: chương, CHƯƠNG như "huy chương".
+童	trẻ em	Đứng 立 giữa làng 里: đứa trẻ, ĐỒNG như "nhi đồng".
+笛	sáo	Ống tre 竹 có lý do 由 cất tiếng: cây sáo, ĐỊCH như "mục địch".
+第	thứ	Thẻ tre 竹 buộc dây cung 弓 theo thứ tự: thứ nhất, ĐỆ như "đệ nhất".
+筆	bút	Cán tre 竹 cầm bút 聿: cây bút, BÚT như "bút ký".
+等	bằng nhau	Thẻ tre 竹 ở chùa 寺 cắt bằng nhau: bình đẳng, ĐẲNG như "bình đẳng".
+箱	cái hộp	Tre 竹 đan quanh nhau 相: cái hộp, TƯƠNG.
+級	cấp	Sợi chỉ 糸 vươn 及 lên từng bậc: cấp bậc, CẤP như "đẳng cấp".
+終	kết thúc	Sợi chỉ 糸 hết vào mùa đông 冬: kết thúc, CHUNG như "chung kết".
+緑	màu xanh lá	Sợi chỉ 糸 nhuộm nước 氺 cây: màu xanh lá, LỤC như "diệp lục".
+練	luyện tập	Sợi chỉ 糸 dệt từ phía đông 東 lúc bình minh: luyện tập, LUYỆN như "huấn luyện".
+羊	con cừu	Đầu cừu có hai sừng: con cừu, DƯƠNG như "sơn dương".
+美	đẹp	Con cừu ⺷ to 大: đẹp, MỸ như "mỹ thuật".
+習	học	Đôi cánh 羽 trắng 白 vỗ đi vỗ lại: học tập, TẬP như "luyện tập".
+者	người	Ông già 耂 dưới mặt trời 日: người, GIẢ như "tác giả".
+育	nuôi	Em bé 亠 厶 được nuôi bằng thịt 月: nuôi dưỡng, DỤC như "giáo dục".
+苦	đắng; khổ	Cỏ 艹 già 古 có vị đắng: khổ, KHỔ như "khổ sở".
+荷	hành lý	Cây 艹 gánh cái gì 何: hành lý, HÀ như "hà".
+落	rơi	Lá 艹 rơi xuống nước 氵 của mỗi 各 dòng: rơi rụng, LẠC như "lạc hậu".
+葉	lá	Cỏ 艹 mọc phủ cây 木 khắp thế gian 世: đó là lá, DIỆP như "diệp lục".
+薬	thuốc	Loài cây 艹 đem lại niềm vui 楽 sống: thuốc, DƯỢC như "dược phẩm".
+血	máu	Giọt máu nhỏ vào cái đĩa 皿 khi cúng tế: máu, HUYẾT như "huyết áp".
+表	bề mặt	Chiếc áo 衣 có hoa văn 二 丨 thêu bên ngoài: bề mặt, BIỂU như "biểu hiện".
+詩	thơ	Lời 言 ngâm nga ở chùa 寺: bài thơ, THI như "thi sĩ".
+調	điều tra	Lời 言 đi khắp vòng 周 sự việc: điều tra, ĐIỀU như "điều tra".
+談	trò chuyện	Lời 言 nóng như ngọn lửa 炎: bàn bạc trò chuyện, ĐÀM như "đàm thoại".
+豆	đậu	Cái bát cao có nắp đựng hạt 口: hạt đậu, ĐẬU như "đậu phụ".
+負	thua	Người 𠂊 cõng món nợ 貝 nặng: thua, gánh vác, PHỤ như "thắng phụ".
+起	thức dậy	Tự mình 己 chạy 走 đi: thức dậy, KHỞI như "khởi động".
+路	con đường	Mỗi 各 bàn chân 足 đi trên con đường: LỘ như "lộ trình".
+身	thân thể	Thân người phụ nữ mang thai nhìn nghiêng: thân, THÂN như "thân thể".
+転	xoay	Bánh xe 車 nói 云 xoay tròn: lăn, CHUYỂN như "chuyển động".
+軽	nhẹ	Chiếc xe 車 một tay 又 đẩy trên đất 土: nhẹ, KHINH như "khinh khí".
+農	nông nghiệp	Cúi 曲 trên ruộng từ lúc bình minh 辰: nông nghiệp, NÔNG như "nông dân".
+返	trả lại	Đi 辶 ngược lại 反: trả lại, PHẢN như "phản hồi".
+追	đuổi	Đi 辶 theo đội quân 𠂤: đuổi theo, TRUY như "truy đuổi".
+送	gửi	Đi 辶 cầm món quà bằng hai tay 关: gửi, TỐNG như "tống tiễn".
+速	nhanh	Đi 辶 với bó hàng 束 nhẹ: nhanh, TỐC như "tốc độ".
+進	tiến	Con chim 隹 chỉ bước 辶 về phía trước: tiến lên, TIẾN như "tiến bộ".
+遊	chơi	Đứa trẻ 子 chạy 辶 dưới lá cờ 𠂉 khắp hướng 方: vui chơi, DU như "du lịch".
+運	vận chuyển	Đội quân 軍 di chuyển 辶: vận chuyển, vận may, VẬN như "vận động".
+部	bộ phận	Đứng 立 lên nói 口 cho vùng ⻏ của mình: bộ phận, BỘ như "bộ trưởng".
+都	thủ đô	Người 者 quan trọng sống ở ấp ⻏ này: thủ đô, ĐÔ như "đô thị".
+配	phân phối	Bình rượu 酉 tự mình 己 chia ra: phân phát, PHỐI như "phân phối".
+酒	rượu	Chất lỏng 氵 từ bình rượu 酉: rượu, TỬU như "tửu lượng".
+重	nặng	Nghìn 千 làng 里 chồng lên nhau: nặng, TRỌNG như "trọng lượng".
+鉄	sắt	Kim loại 金 bị mất 失 vì gỉ: sắt, THIẾT như "thiết bị".
+銀	bạc	Kim loại 金 dừng 艮 ngay dưới vàng: bạc, NGÂN như "ngân hàng".
+開	mở	Hai tay 开 đẩy cổng 門 mở ra: mở, KHAI như "khai trương".
+院	viện	Tòa nhà hoàn hảo 完 trên gò ⻖: viện, VIỆN như "bệnh viện".
+陽	ánh nắng	Mặt trời 旦 chiếu lên sườn đồi ⻖: ánh nắng, DƯƠNG như "thái dương".
+階	tầng	Bậc thang lên đồi ⻖ mà tất cả 皆 phải leo: tầng, GIAI như "giai cấp".
+集	tụ tập	Chim 隹 tụ lại trên cây 木: tập hợp, TẬP như "tập trung".
+面	mặt	Khuôn mặt có sống mũi ở giữa và khung quanh: mặt, DIỆN như "diện mạo".
+題	đề tài	Đúng như vậy 是 ở đầu 頁 trang: đề tài, ĐỀ như "chủ đề".
+飲	uống	Ăn 飠 mà há miệng 欠: uống, ẨM như "ẩm thực".
+館	tòa nhà	Tòa nhà của quan 官 có chỗ ăn 飠: quán, QUÁN như "đại sứ quán".
+駅	nhà ga	Nơi ngựa 馬 nghỉ sau mỗi chặng đo bằng thước 尺: nhà ga, DỊCH như "dịch trạm".
+鼻	mũi	Chỉ vào mình 自 là chỉ cái mũi, trên ruộng 田 và hai tay 廾: mũi, TỊ.
+不	không	Con chim bay lên mà không 一 chạm tới trời: không, BẤT như "bất ngờ".
+争	tranh giành	Hai bàn tay ⺕ 𠂊 giằng co một cái móc 亅: tranh giành, TRANH như "chiến tranh".
+井	giếng	Hai 二 tấm ván bắt chéo hai 廾 tấm khác: miệng giếng, TỈNH như "tỉnh".
+付	gắn	Người 亻 dùng tay 寸 gắn vào: đính kèm, PHÓ như "giao phó".
+令	mệnh lệnh	Người 人 dưới một 一 mái nhà quỳ マ nghe lệnh: mệnh lệnh, LỆNH như "lệnh".
+以	bằng	Người 人 cầm cày 丶 làm việc bằng công cụ: DĨ như "dĩ nhiên".
+仲	quan hệ	Người 亻 ở giữa 中 hai bạn: quan hệ, TRỌNG như "trọng tài".
+伝	truyền	Người 亻 nói 云 lại điều đã nghe: truyền đạt, VÂN (TRUYỀN) như "truyền".
+位	vị trí	Chỗ người 亻 đứng 立: vị trí, VỊ như "đơn vị".
+低	thấp	Người 亻 chìm xuống đáy 氏 一: thấp, ĐÊ như "đê tiện".
+佐	trợ tá	Người 亻 đứng bên trái 左: trợ tá, TÁ như "đại tá".
+例	ví dụ	Người 亻 đứng trong hàng 列 làm mẫu: ví dụ, LỆ như "thí dụ".
+便	tiện	Người 亻 thay đổi 更 mọi thứ cho tiện: tiện lợi, TIỆN như "tiện lợi".
+信	tin	Người 亻 giữ lời 言: tin tưởng, TÍN như "uy tín".
+倉	kho	Mái 人 trên cửa 口 nơi cất lúa: kho, THƯƠNG như "thương khố".
+候	khí hậu	Người 亻 xem trời như mũi tên 矢 trong gió: khí hậu, HẬU như "khí hậu".
+借	mượn	Người 亻 hỏi lại thứ đã cho từ xưa 昔: vay mượn, TÁ như "tá điền".
+健	khỏe	Người 亻 xây dựng 建 cơ thể: khỏe mạnh, KIỆN như "sức khỏe" ("kiện khang").
+側	bên	Người 亻 đứng theo quy tắc 則 ở một bên: bên cạnh, TRẮC như "trắc diện".
+働	làm việc	Người 亻 chuyển động 動: làm việc, ĐỘNG như "lao động".
+億	trăm triệu	Người 亻 có ý 意 tưởng đáng trăm triệu: ỨC như "ức".
+兆	điềm báo	Vết nứt như chân 儿 và băng 冫 trên mai rùa bói toán: điềm báo, TRIỆU như "triệu chứng".
+児	đứa trẻ	Đứa trẻ có cái đầu to trên đôi chân 儿: nhi đồng, NHI như "nhi khoa".
+共	cùng nhau	Hai tay 八 cùng nâng vật: cùng nhau, CỘNG như "cộng đồng".
+兵	lính	Hai tay 八 cầm rìu 斤 trên đồi 丘: người lính, BINH như "binh lính".
+典	điển	Cuốn sách cong 曲 đặt trên giá 八: kinh điển, ĐIỂN như "từ điển".
+冷	lạnh	Băng 冫 theo lệnh 令: lạnh, LÃNH như "lãnh đạm".
+初	lần đầu	Con dao 刀 cắt vải 衤 lần đầu tiên: đầu tiên, SƠ như "sơ cấp".
+別	chia tay	Cái miệng 口 và con dao 刂 tách mọi thứ: chia lìa, BIỆT như "tạm biệt".
+利	lợi	Con dao 刂 gặt lúa 禾: lợi ích, LỢI như "lợi nhuận".
+刷	in	Thân người 尸 cầm khăn 巾 và dao 刂 lau khuôn: in ấn, LOÁT như "ấn loát".
+副	phó	Thửa ruộng 田 được cắt 刂 ra phần thứ hai: phó, PHÓ như "phó giám đốc".
+功	công lao	Tay nghề 工 cộng sức lực 力: công lao, CÔNG như "thành công".
+加	thêm	Sức 力 thêm tiếng miệng 口 cổ vũ: thêm vào, GIA như "gia tăng".
+努	cố gắng	Người hầu 奴 dồn sức 力: cố gắng, NỖ như "nỗ lực".
+労	lao động	Sức 力 dưới mái 冖 mồ hôi ⺍ nhỏ giọt: lao động, LAO như "lao động".
+勇	dũng cảm	Người đàn ông 男 không quỳ マ trước ai: dũng cảm, DŨNG như "anh dũng".
+包	gói	Em bé 己 được gói bọc 勹 lại: BAO như "bao bì".
+卒	tốt nghiệp	Nắp 亠 trên hai người 从 và mười 十 năm học: tốt nghiệp, TỐT như "tốt nghiệp".
+協	hợp tác	Mười 十 người góp sức 劦 hợp tác: HIỆP như "hiệp hội".
+単	đơn	Một tấm giáp 甲 có chấm nhỏ ⺍: đơn giản, ĐƠN như "đơn giản".
+博	bác sĩ; rộng	Mười 十 chuyên môn 専 cùng lúc 甫: học rộng, BÁC như "bác sĩ".
+印	con dấu	Bàn tay ấn con dấu 卩: con dấu, ẤN như "ấn tượng".
+参	đi; tham gia	Người riêng 厶 to lớn 大 tóc dài 彡 đi lễ: tham gia, THAM như "tham gia".
+司	quản lý	Một 一 cái miệng 口 ra lệnh: người cai quản, TƯ như "tư lệnh".
+各	mỗi	Bàn chân 夂 đi tới từng cửa 口: mỗi, CÁC như "các vị".
+周	chu vi	Điều tốt 吉 trong khung 冂 bao quanh: vòng quanh, CHU như "chu vi".
+唱	hát	Cái miệng 口 hát vang 昌: ca xướng, XƯỚNG như "đề xướng".
+器	đồ đựng	Bốn cái miệng 口 quanh con chó to 大 canh đồ: dụng cụ, KHÍ như "vũ khí".
+固	cứng	Vật cũ 古 bị bao kín 囗: cứng chắc, CỐ như "cố định".
+城	thành	Đất 土 trở thành 成 pháo đài: thành trì, THÀNH như "thành phố".
+埼	mũi đất	Đất 土 nhô ra kỳ lạ 奇: mũi đất, KỲ.
+塩	muối	Đất 土, cái nón 𠂉, miệng 口 và cái đĩa 皿: muối, DIÊM như "diêm điền".
+変	thay đổi	Cũng 亦 bước chậm 夂 khác thường: thay đổi, BIẾN như "biến hóa".
+夫	chồng	Người to 大 cài trâm lên tóc: chồng, PHU như "phu nhân".
+失	mất	Người chồng 夫 để vật tuột 丿 khỏi tay: đánh mất, THẤT như "thất bại".
+奈	Nara	Bàn thờ 示 lớn 大: Nara, NẠI như "nại hà".
+好	thích	Người mẹ 女 bên đứa con 子: yêu thích, HẢO như "hảo hạng".
+媛	công chúa	Người phụ nữ 女 được bạn 友 đưa tay ⺤ nắm: mỹ nữ, công chúa, VIỆN.
+季	mùa	Lúa 禾 và con 子 lớn lên theo mùa: mùa, QUÝ như "tứ quý".
+孫	cháu	Đứa con 子 nối dòng dõi 系: cháu, TÔN như "tôn tử".
+完	hoàn thành	Ngôi nhà 宀 từ đầu 元 đến cuối: hoàn tất, HOÀN như "hoàn thành".
+官	quan	Mái nhà 宀 che những cái miệng 口 nhà nước: quan chức, QUAN như "quan chức".
+害	tác hại	Cái miệng 口 dưới mái nhà 宀 nói lời độc 龶: tác hại, HẠI như "nguy hại".
+富	giàu	Mái nhà 宀 có một 一 miệng 口 ăn và ruộng 田 đầy: giàu có, PHÚ như "phú quý".
+察	quan sát	Dưới mái 宀, xem lễ hội 祭 để đoán: quan sát, SÁT như "cảnh sát".
+岐	ngã rẽ	Đường núi 山 rẽ nhánh 支: ngã rẽ, KÌ như "phân kỳ".
+岡	đồi	Núi 山 trong khung 冂: ngọn đồi, CƯƠNG như "Cương".
+崎	mũi đất	Núi 山 nhô ra kỳ lạ 奇 trên biển: mũi đất, KHI.
+巣	tổ	Chim nhỏ ⺍ trong tổ trên cây quả 果: tổ chim, SÀO như "sào huyệt".
+差	chênh lệch	Con dê 羊 và cây thước 工 cạnh nhau chênh lệch: SAI như "sai biệt".
+希	hy vọng	Sợi đan chéo 乂 thành vải 布 quý hiếm: hy vọng, HY như "hy vọng".
+席	chỗ ngồi	Hai mươi 廿 tấm vải 巾 lót trong nhà 广: chỗ ngồi, TỊCH như "chủ tịch".
+帯	thắt lưng	Tấm vải 巾 quấn hai mươi 廿 vòng dưới lớp phủ 冖: thắt lưng, ĐỚI như "nhiệt đới".
+底	đáy	Chân móng 氐 của ngôi nhà 广: đáy, ĐỂ như "triệt để".
+府	phủ	Tòa nhà 广 nơi giấy tờ được đóng 付 dấu: cơ quan, PHỦ như "chính phủ".
+康	khỏe	Ngôi nhà 广 có người hầu 隶 mang nước 氺: khỏe mạnh, an khang, KHANG như "khang an".
+建	xây dựng	Bước dài 廴 và cây bút 聿 vẽ bản thiết kế: xây dựng, KIẾN như "kiến trúc".
+径	lối đi	Bước 彳 trên đất 土 có bàn tay 又 dọn: lối đi, KÍNH như "đường kính".
+徒	đi bộ	Bước 彳 và chạy 走: đi bộ, ĐỒ như "đồ đệ".
+徳	đức	Bước 彳 đi có mười 十 con mắt 罒 và một tấm lòng 心: đạo đức, ĐỨC như "đức tính".
+必	chắc chắn	Trái tim 心 bị nét phẩy 丿 xuyên qua: chắc chắn, TẤT như "tất nhiên".
+念	ý niệm	Trái tim 心 lúc này 今: ý nghĩ, NIỆM như "kỷ niệm".
+愛	yêu	Bàn tay ⺤ che 冖 trái tim 心 khi bước chậm 夂: tình yêu, ÁI như "ái tình".
+成	trở thành	Người 𠂊 cầm giáo 戈 trở thành anh hùng: THÀNH như "thành công".
+戦	chiến tranh	Một 単 ngọn giáo 戈: chiến tranh, CHIẾN như "chiến đấu".
+折	gấp; gãy	Bàn tay 扌 cầm rìu 斤: bẻ gãy, gấp lại, CHIẾT như "chiết khấu".
+挙	giơ lên	Bàn tay 手 giơ lên tám 八 vật nhỏ ⺍: CỬ như "tuyển cử".
+改	cải	Tự 己 đánh 攵 vào mình để thay đổi: cải cách, CẢI như "cải thiện".
+敗	thất bại	Vỏ sò 貝 bị đánh 攵 vỡ: thất bại, BẠI như "thất bại".
+散	tản ra	Đập 攵 miếng thịt 月 tản ra khắp nơi: TÁN như "giải tán".
+料	phí	Gạo 米 đong bằng đấu 斗: vật liệu, chi phí, LIỆU như "nguyên liệu".
+旗	lá cờ	Tấm vải 𠂉 kia 其 bay theo hướng gió 方: lá cờ, KỲ như "quốc kỳ".
+昨	hôm qua	Mặt trời 日 vừa mới qua 乍: hôm qua, TẠC như "tạc nhật".
+景	phong cảnh	Mặt trời 日 trên kinh đô 京: phong cảnh, CẢNH như "cảnh sắc".
+最	nhất	Lấy 取 thứ tốt nhất dưới mặt trời 曰: nhất, TỐI như "tối đa".
+望	mong	Ngắm trăng tròn 月 từ vương quốc 王 đã mất 亡: mong ngóng, VỌNG như "hy vọng".
+未	chưa	Cây 木 có cành trên chưa mọc dài: chưa, VỊ như "vị thành niên".
+末	cuối	Cây 木 có nét dài ở ngọn: phần cuối, MẠT như "mạt vận".
+札	thẻ	Miếng gỗ 木 có móc 乙: tấm thẻ, TRÁT như "trát".
+材	gỗ; vật liệu	Cây 木 có tài 才 năng ẩn bên trong: gỗ, vật liệu, TÀI như "tài liệu".
+束	bó	Thân cây 木 bị buộc ngang giữa 口: bó lại, THÚC như "thúc".
+松	cây thông	Cây 木 của mọi người 公, xanh quanh năm: cây thông, TÙNG như "tùng bách".
+果	quả	Cây 木 có quả 田 tròn trên ngọn: trái cây, QUẢ như "kết quả".
+栃	cây dẻ ngựa	Cây 木 dưới vách 厂 có vạn 万 hạt: cây dẻ ngựa, LỊCH (chữ Nhật tự tạo).
+栄	thịnh vượng	Cây 木 dưới mái 冖 được ánh sáng ⺍ rọi: thịnh vượng, VINH như "vinh quang".
+案	kế hoạch	Ngồi yên 安 bên bàn gỗ 木 lập kế hoạch: phương án, ÁN như "đề án".
+梅	mơ	Cây 木 nở hoa mỗi 毎 xuân: cây mơ, MAI như "hoa mai".
+梨	lê	Cây 木 mang lại lợi 利 nhuận: quả lê, LÊ như "lê".
+械	máy móc	Bộ phận gỗ 木 ràng buộc theo khuôn phép 戒: máy móc, GIỚI như "cơ giới".
+極	cực	Cây cột 木 kéo từ đất tới trời bằng tay 又 và miệng 口: cực điểm, CỰC như "bắc cực".
+標	biển hiệu	Tấm gỗ 木 có phiếu 票 đánh dấu: biển báo, TIÊU như "mục tiêu".
+機	máy	Gỗ 木 với bao nhiêu 幾 chi tiết nhỏ: khung cửi, máy móc, CƠ như "cơ hội".
+欠	thiếu	Người há miệng ngáp: thiếu, KHIẾM như "khiếm khuyết".
+残	còn lại	Xương 歹 còn lại sau trận giáo 戈: sót lại, TÀN như "tàn dư".
+氏	họ	Rễ cây gia phả nhô khỏi mặt đất: dòng họ, THỊ như "thị tộc".
+民	dân	Dòng họ 氏 thêm một nét: dân chúng, DÂN như "nhân dân".
+求	yêu cầu	Giọt 丶 nước 氺 cầu xin từ trời: yêu cầu, CẦU như "yêu cầu".
+沖	ngoài khơi	Nước 氵 ở giữa 中: ngoài khơi, XUNG như "Okinawa".
+治	cai trị; chữa	Nước 氵 giữ trên bệ 台 đập: cai trị, chữa trị, TRỊ như "chính trị".
+法	luật	Nước 氵 chảy đi 去 một chiều: phép tắc, PHÁP như "pháp luật".
+泣	khóc	Nước 氵 rơi từ người đứng 立: khóc, KHẤP như "khấp".
+浅	nông	Nước 氵 lội qua được bằng giáo 戋: nông cạn, THIỂN như "thiển cận".
+浴	tắm	Nước 氵 trong thung lũng 谷: tắm, DỤC như "dục thất".
+清	trong sạch	Nước 氵 xanh 青 như trời: trong sạch, THANH như "thanh khiết".
+満	đầy	Nước 氵 và cỏ 艹 tràn cả hai 両 bên: đầy, MÃN như "mãn nguyện".
+滋	bổ dưỡng	Nước 氵 tưới cỏ 艹 và đất đen 玄: bổ dưỡng, TƯ như "tư bổ".
+漁	đánh cá	Nước 氵 và cá 魚: đánh cá, NGƯ như "ngư nghiệp".
+潟	đầm phá	Nước 氵 bị đất bọc 勹 lại như cái cối 臼: đầm phá, TÍCH.
+灯	đèn	Ngọn lửa 火 trên cây đinh 丁: cây đèn, ĐĂNG như "hải đăng".
+無	không có	Mọi thứ cháy trong lửa 灬: không còn gì, VÔ như "vô ích".
+然	như thế	Thịt 月 chó 犬 trên lửa 灬: tự nhiên như thế, NHIÊN như "tự nhiên".
+焼	nướng; đốt	Lửa 火 chất cao 尭: nướng, đốt, THIÊU như "thiêu đốt".
+照	chiếu sáng	Ngọn lửa 灬 sáng 昭: chiếu sáng, CHIẾU như "tham chiếu".
+熊	gấu	Con vật có năng lực 能 lớn và bốn chân 灬: con gấu, HÙNG như "hùng".
+熱	nóng	Cục đất 土 tròn 丸 nung trên lửa 灬: nóng, NHIỆT như "nhiệt độ".
+牧	chăn nuôi	Gõ 攵 lùa đàn bò 牛: chăn nuôi, MỤC như "mục đồng".
+特	đặc biệt	Con bò 牛 nuôi ở chùa 寺: đặc biệt, ĐẶC như "đặc biệt".
+産	sinh đẻ	Đứng 立 dưới vách 厂 sinh 生 con: sinh đẻ, SẢN như "sản xuất".
+的	mục tiêu	Hồng tâm trắng 白 bị cái muôi 勺 ném trúng: mục tiêu, ĐÍCH như "mục đích".
+省	bộ; suy ngẫm	Nhìn 目 lại vài 少 việc mình làm: tự xét, TỈNH như "phản tỉnh", bộ.
+祝	chúc mừng	Người anh 兄 trước bàn thờ 礻: chúc mừng, CHÚC như "chúc tụng".
+票	phiếu	Tấm che 覀 trên hòm 示 thờ: lá phiếu, PHIẾU như "bỏ phiếu".
+種	hạt giống	Hạt lúa 禾 nặng 重 để gieo: hạt giống, CHỦNG như "chủng loại".
+積	chất đống	Lúa 禾 chất đống bắt người 責 kiểm: tích lũy, TÍCH như "diện tích".
+競	cạnh tranh	Hai người anh 兄 đứng 立 cạnh nhau: cạnh tranh, CẠNH như "cạnh tranh".
+笑	cười	Cây tre 竹 cong như người 夭 đang cười: cười, TIẾU như "tiếu lâm".
+管	ống	Ống tre 竹 của quan 官: ống, quản lý, QUẢN như "quản lý".
+節	đốt; mùa	Đốt tre 竹 nối tiếp 即 nhau: đốt, mùa, TIẾT như "thời tiết".
+約	hứa	Sợi chỉ 糸 buộc vào cái muôi 勺: lời hứa, ƯỚC như "hẹn ước".
+結	buộc	Sợi chỉ 糸 buộc lấy may 吉: thắt, KẾT như "kết hôn".
+給	lương	Sợi chỉ 糸 vừa khít 合 công việc: tiền lương, CẤP như "cung cấp".
+続	tiếp tục	Sợi chỉ 糸 bán 売 nối nhau: tiếp tục, TỤC như "liên tục".
+縄	dây thừng	Sợi 糸 xoắn như tia chớp 电: dây thừng, THẰNG.
+置	đặt	Đặt cái lưới 罒 thẳng 直 xuống: đặt, TRÍ như "vị trí".
+群	bầy	Người đứng đầu 君 và đàn dê 羊: bầy đàn, QUẦN như "quần chúng".
+老	già	Ông lão 耂 lưng còng như cái thìa 匕: già, LÃO như "lão già".
+臣	bề tôi	Con mắt lớn cúi nhìn xuống: bề tôi, THẦN như "quân thần".
+良	tốt	Dừng 艮 lại có thêm chấm: tốt, LƯƠNG như "lương thiện".
+芸	nghệ thuật	Cây cỏ 艹 biết nói 云: nghệ thuật, VÂN (NGHỆ) như "nghệ".
+芽	mầm	Cây 艹 nhú cái nanh 牙: mầm, NHA như "nha".
+英	Anh	Bông hoa 艹 ở trung tâm 央: anh tài, nước Anh, ANH như "anh hùng".
+茨	gai	Loài cây 艹 kế tiếp 次 đâm vào chân: cây gai, TỲ.
+菜	rau	Bàn tay ⺤ hái lá 艹 trên cây 木: rau, THÁI như "thái".
+街	phố	Đi 行 giữa những lô đất 圭: đường phố, NHAI như "nhai".
+衣	quần áo	Cổ áo 亠 và tay áo: quần áo, Y như "y phục".
+要	cần	Người phụ nữ 女 dưới tấm che 覀 chống tay lên hông: cần thiết, YẾU như "quan trọng yếu".
+覚	nhớ	Nhìn 見 dưới mái 冖 có ánh sáng ⺍: tỉnh ngộ, ghi nhớ, GIÁC như "cảm giác".
+観	ngắm	Con chim 隹 có mào 𠂉 nhìn 見 ngắm mọi thứ: QUAN như "tham quan".
+訓	dạy	Lời 言 chảy như sông 川: dạy bảo, HUẤN như "huấn luyện".
+試	thử	Lời 言 theo khuôn 式: thử, THÍ như "thí nghiệm".
+説	giải thích	Lời 言 người anh 兄 tách 八 mọi chuyện: giải thích, THUYẾT như "tiểu thuyết".
+課	bài học	Lời 言 kết trái 果: bài học, KHÓA như "khóa học".
+議	bàn luận	Lời 言 về lẽ phải 義: bàn luận, NGHỊ như "hội nghị".
+貨	hàng hóa	Tiền 貝 đổi 化 chủ: hàng hóa, HÓA như "hóa đơn".
+賀	chúc mừng	Thêm 加 tiền 貝 làm quà: chúc mừng, HẠ như "chúc hạ".
+軍	quân đội	Xe 車 dưới lớp vải phủ 冖: quân đội, QUÂN như "quân sự".
+輪	bánh xe	Xe 車 có nan như trang sách 冊: bánh xe, LUÂN như "luân phiên".
+辞	từ chức	Lời cay 辛 từ cái lưỡi 舌: từ chức, TỪ như "từ điển".
+辺	vùng lân cận	Đi 辶 tới mép dao 刀: vùng lân cận, BIÊN như "biên giới".
+連	dẫn theo	Xe 車 đi 辶 nối đuôi: dẫn theo, LIÊN như "liên lạc".
+達	đạt	Con dê 羊 đi 辶 trên đất 土 tới đích: đạt được, ĐẠT như "đạt được".
+選	chọn	Đi 辶 qua hướng đông nam 巽 để chọn: tuyển chọn, TUYỂN như "tuyển chọn".
+郡	quận	Làng ⻏ của vị chúa 君: quận, QUẬN như "quận".
+量	lượng	Cân cả làng 里 lúc rạng sáng 旦: số lượng, LƯỢNG như "chất lượng".
+録	ghi	Kim loại 金 khắc bằng chổi ⺕ nhỏ nước 氺: ghi chép, LỤC như "ký lục".
+鏡	gương	Kim loại 金 phản chiếu đôi chân 儿 và âm thanh 音: tấm gương, KÍNH như "kính".
+関	cửa ải	Cánh cổng 門 với trời 天 phía sau: cửa ải, QUAN như "quan hệ".
+阜	gò đất	Những gò đất 𠂤 chồng lên mười 十: gò, PHỤ như "Gifu".
+阪	dốc	Gò đất ⻖ dựng ngược 反: con dốc, PHẢN như "Osaka".
+陸	đất liền	Gò đất ⻖ và đất 土 có chân 儿: đất liền, LỤC như "lục địa".
+隊	đội	Đàn heo 豕 xếp hàng trên gò ⻖: đội ngũ, ĐỘI như "quân đội".
+静	yên tĩnh	Màu xanh 青 bình yên sau tranh giành 争: yên tĩnh, TĨNH như "tĩnh lặng".
+順	thứ tự	Dòng sông 川 chảy qua đầu 頁 theo thứ tự: thuận theo, THUẬN như "thuận lợi".
+願	mong ước	Mong ước từ cánh đồng 原 trong đầu 頁: nguyện vọng, NGUYỆN như "tự nguyện".
+類	loại	Gạo 米, chó to 大 và cái đầu 頁: đủ loại, LOẠI như "chủng loại".
+飛	bay	Con chim dang cánh 升 cất cánh: bay, PHI như "phi cơ".
+飯	cơm	Ăn 飠 đi ăn lại 反: bữa cơm, PHẠN như "phạn điếm".
+養	nuôi	Cho cừu 羊 ăn 食: nuôi dưỡng, DƯỠNG như "dinh dưỡng".
+香	hương thơm	Lúa 禾 phơi nắng 日 tỏa mùi thơm: HƯƠNG như "hương vị".
+験	kiểm tra	Con ngựa 馬 được mọi 僉 người kiểm tra: thí nghiệm, NGHIỆM như "kinh nghiệm".
+鹿	hươu	Con hươu có gạc 广 và chân 比 đang chạy: hươu, LỘC như "lộc".
+久	lâu	Người 𠂊 bị giữ lại rất lâu: lâu dài, CỬU như "vĩnh cửu".
+仏	Phật	Người 亻 không còn gì riêng 厶: đức Phật, PHẬT như "Phật giáo".
+仮	tạm thời	Người 亻 lật qua lật lại 反: tạm thời, giả, PHẢN (GIẢ) như "giả".
+件	vụ việc	Người 亻 và con bò 牛: vụ việc, KIỆN như "sự kiện".
+任	nhiệm vụ	Người 亻 gánh vác 壬: trách nhiệm, NHẬM (NHIỆM) như "nhiệm vụ".
+似	giống	Người 亻 được làm theo 以 người khác: giống nhau, TỰ như "tương tự".
+余	thừa	Mái 人 che chút đồ nhỏ 小: dư thừa, DƯ như "dư thừa".
+価	giá trị	Người 亻 đậy tấm che 覀 lên hàng định giá trị: giá, GIÁ như "giá cả".
+保	bảo vệ	Người 亻 che chở em bé 呆: bảo vệ, BẢO như "bảo vệ".
+修	tu dưỡng	Người 亻 gõ 攵 và chải 彡 mình cho chỉnh tề: tu dưỡng, TU như "tu sửa".
+個	cá nhân	Người 亻 đứng vững 固 một mình: cá nhân, CÁ như "cá thể".
+停	dừng	Người 亻 dừng chân ở đình 亭: dừng lại, ĐÌNH như "đình chỉ".
+備	chuẩn bị	Người 亻 cất cỏ 艹 dưới vách 厂 để dùng 用: chuẩn bị, BỊ như "chuẩn bị".
+像	tượng	Người 亻 to như con voi 象: bức tượng, TƯỢNG như "tưởng tượng".
+再	lại	Thêm một 一 lớp lên khung 冂 đất 土: lại lần nữa, TÁI như "tái phát".
+刊	xuất bản	Khắc 刂 bản gỗ khô 干: xuất bản, SAN như "tuần san".
+判	phán xét	Con dao 刂 chia đôi 半: phán xét, PHÁN như "phán quyết".
+制	chế độ	Cắt 刂 vải 巾, cột con bò 牛: chế độ, CHẾ như "hạn chế".
+則	quy tắc	Tiền 貝 và con dao 刂: quy tắc, TẮC như "nguyên tắc".
+効	hiệu quả	Hòa 交 với sức 力: hiệu quả, HIỆU như "hiệu lực".
+務	nhiệm vụ	Vung giáo 矛 đánh 攵 dồn hết sức 力: nhiệm vụ, VỤ như "nghĩa vụ".
+勢	thế lực	Cục đất 土 tròn 丸 ném bằng sức 力: thế lực, THẾ như "tư thế".
+厚	dày	Đứa trẻ 子 dưới vách 厂 được che nắng 日 dày: dày, HẬU như "nồng hậu".
+句	câu	Cái miệng 口 bọc 勹 lấy chữ: câu, CÚ như "câu cú".
+可	có thể	Cái miệng 口 nói chắc như đóng đinh 丁: được, có thể, KHẢ như "khả năng".
+史	lịch sử	Bàn tay cầm bút ghi chép ở giữa 口: lịch sử, SỬ như "lịch sử".
+告	báo	Con bò 牛 và cái miệng 口: thông báo, CÁO như "báo cáo".
+喜	vui mừng	Cái trống và miệng 口 hô điều tốt 吉: vui mừng, HỈ như "song hỉ".
+営	kinh doanh	Đèn nhỏ ⺍ dưới mái 冖 trên các phòng 呂: kinh doanh, DOANH như "doanh nghiệp".
+因	nguyên nhân	Người to 大 trong cái khung 囗: nguyên nhân, NHÂN như "nhân quả".
+団	đoàn	Hàng rào 囗 mỗi người một tấc 寸: đoàn thể, ĐOÀN như "đoàn kết".
+囲	bao quanh	Cái giếng 井 trong hàng rào 囗: bao quanh, VI như "phạm vi".
+圧	áp lực	Đất 土 bị vách 厂 đè: áp lực, ÁP như "áp lực".
+在	ở	Người 亻 ở trên đất 土: tồn tại, TẠI như "hiện tại".
+均	bằng	Đất 土 bọc 勹 đều hai 冫 lớp: bằng nhau, QUÂN như "bình quân".
+型	khuôn	Đất 土 bị ép 刑 thành hình: khuôn mẫu, HÌNH như "mô hình".
+基	nền móng	Đất 土 kia 其 nằm dưới mọi thứ: nền tảng, CƠ như "cơ bản".
+堂	sảnh	Tòa nhà đáng quý 尚 trên nền đất 土: sảnh đường, ĐƯỜNG như "thiên đường".
+報	báo	Hạnh phúc 幸 hay con dấu 卩 do bàn tay 又 đưa tin: báo, BÁO như "báo cáo".
+境	biên giới	Mảnh đất 土 nơi âm thanh 音 của tiếng khác dừng lại 竟: biên giới, CẢNH như "cảnh giới".
+墓	mộ	Đất 土 không được 莫 đào: ngôi mộ, MỘ như "phần mộ".
+増	tăng	Đất 土 đắp thêm lên chỗ cũ 曽: tăng lên, TĂNG như "tăng trưởng".
+士	kẻ sĩ	Một chữ thập cao trên nét ngang dài: kẻ sĩ gánh vác mọi việc, SĨ như "chiến sĩ".
+夢	giấc mơ	Mắt 罒 khép dưới chăn 冖 trong đêm 夕 cỏ 艹 lặng: giấc mơ, MỘNG như "mộng mơ".
+妻	vợ	Người phụ nữ 女 tay cầm chổi ⺕: người vợ, THÊ như "thê tử".
+婦	phụ nữ	Người phụ nữ 女 cầm chổi 帚: phụ nữ, PHỤ như "phụ nữ".
+容	chứa	Mái 宀 phủ cả thung lũng 谷: chứa đựng, DONG như "dung (dong) mạo".
+寄	ghé	Chuyện lạ 奇 ghé vào dưới mái nhà 宀: ghé qua, KÍ như "ký gửi".
+導	dẫn dắt	Bàn tay 寸 chỉ đường 道: dẫn dắt, ĐẠO như "lãnh đạo".
+居	ở	Thân người 尸 ngồi trên vật cũ 古: ở yên, CƯ như "cư dân".
+属	thuộc về	Thân 尸 bò đầy côn trùng 虫 thuộc về nó: thuộc, THUỘC như "phụ thuộc".
+布	vải	Bàn tay căng tấm vải 巾: vải, BỐ như "bố thí".
+師	thầy	Lá cờ vải 巾 trên đoàn quân: bậc thầy, SƯ như "giáo sư".
+常	thường	Tấm vải 巾 quý 尚 mặc hằng ngày: thông thường, THƯỜNG như "bình thường".
+幹	thân cây	Thân khô 干 lớn sớm 早 hơn người 人: thân cây, CÁN như "cán bộ".
+序	thứ tự	Tòa nhà 广 vào trước 予: thứ tự, TỰ như "trật tự".
+弁	hùng biện	Chuyện riêng 厶 nâng bằng hai tay 廾: biện luận, BIỆN như "hùng biện".
+張	căng	Kéo cung 弓 cho dài 長: căng ra, TRƯƠNG như "khẩn trương".
+往	đi	Bước 彳 về phía chủ 主: đi tới, VÃNG như "dĩ vãng".
+得	được	Bước 彳 ra lúc rạng sáng 旦 dùng tay 寸 mà có được: ĐẮC như "đắc ý".
+復	phục hồi	Bước 彳 lại về ngày 日 chậm 夂: phục hồi, PHỤC như "khôi phục".
+志	ý chí	Trái tim 心 của kẻ sĩ 士: ý chí, CHÍ như "ý chí".
+応	đáp ứng	Trái tim 心 dưới mái nhà 广 đáp lại người khác: ỨNG như "đáp ứng".
+快	dễ chịu	Trái tim 忄 mở rộng 夬: dễ chịu, KHOÁI như "khoái lạc".
+性	tính chất	Trái tim 忄 sinh 生 ra đã có: bản tính, TÍNH như "tính cách".
+情	tình cảm	Trái tim 忄 xanh 青 như tuổi trẻ: tình cảm, TÌNH như "tình yêu".
+態	thái độ	Năng lực 能 cộng trái tim 心: thái độ, THÁI như "trạng thái".
+慣	quen	Trái tim 忄 bị xuyên 貫 mãi đến quen: thói quen, QUÁN như "tập quán".
+技	kỹ năng	Bàn tay 扌 tỉa cành 支: kỹ năng, KĨ như "kỹ thuật".
+招	mời	Bàn tay 扌 vẫy gọi 召: mời, CHIÊU như "chiêu đãi".
+授	truyền dạy	Bàn tay 扌 trao 受 lại: truyền dạy, THỤ như "giáo thụ".
+採	hái	Bàn tay 扌 vươn móng 采 hái trên cây: thu hái, THẢI (THÁI) như "thái dụng".
+接	tiếp xúc	Bàn tay 扌 chạm người phụ nữ 女 đứng 立 gần: tiếp xúc, TIẾP như "trực tiếp".
+提	đề xuất	Bàn tay 扌 nâng điều đúng 是 lên: đề xuất, ĐỀ như "đề nghị".
+損	tổn thất	Bàn tay 扌 lấy của nhân viên 員: thiệt hại, TỔN như "tổn thất".
+支	chống đỡ	Bàn tay 又 cầm cành cây 十: chống đỡ, CHI như "chi nhánh".
+政	chính trị	Đánh 攵 cho mọi việc đúng 正: chính trị, CHÍNH (CHÁNH) như "chính phủ".
+故	lý do; cũ	Gõ 攵 vào vật cũ 古: lý do, đã mất, CỐ như "cố hương".
+救	cứu	Đánh 攵 dẹp theo lời cầu 求: cứu giúp, CỨU như "cứu hộ".
+断	cắt đứt	Cây rìu 斤 chặt đứt bó lúa 米: cắt đứt, ĐOẠN như "đoạn tuyệt".
+旧	cũ	Một nét 丨 bên những ngày 日 xưa: cũ, CỰU như "cựu chiến binh".
+易	dễ	Mặt trời 日 không 勿 khó thấy: dễ, DỊ như "dị dàng"; DỊCH như "mậu dịch".
+暴	bạo lực	Mặt trời 日 cùng 共 nước 氺 bùng ra: dữ dội, BẠO như "bạo lực".
+条	điều khoản	Cành cây 木 bước chậm 夂: điều khoản, ĐIỀU như "điều luật".
+枝	cành	Cây 木 rẽ nhánh 支: cành cây, CHI như "chi".
+査	điều tra	Cây 木 chất 且 lại để kiểm: điều tra, TRA như "điều tra".
+格	tư cách	Mỗi 各 cây 木 một vị trí: tư cách, CÁCH như "tính cách".
+桜	anh đào	Cây 木 có hoa nhỏ ⺍ người con gái 女 yêu: hoa anh đào, TÍ (ANH) như "anh đào".
+検	kiểm tra	Cây 木 mọi 僉 người đều kiểm: kiểm tra, KIỂM như "kiểm tra".
+構	cấu trúc	Gỗ 木 chồng ba 三 lần lại 再: cấu trúc, CẤU như "cấu tạo".
+武	võ	Một 一 nhát chặn 止 ngọn giáo 弋: võ sĩ, VŨ (VÕ) như "võ thuật".
+歴	lịch sử	Khu rừng 林 dưới vách 厂 dừng 止 ở đó từ lâu: lịch sử, LỊCH như "lịch sử".
+殺	giết	Binh khí 殳 đập cây 木 thành dấu chéo 乂: giết, SÁT như "sát nhân".
+毒	độc	Bà mẹ 毋 trát ba 三 lớp phấn: chất độc, ĐỘC như "độc dược".
+比	so sánh	Hai cái thìa 匕 đặt cạnh nhau: so sánh, TỈ như "tỷ lệ".
+永	vĩnh viễn	Nước 水 thêm một chấm 丶 chảy mãi: vĩnh viễn, VĨNH như "vĩnh cửu".
+河	sông	Nước 氵 có thể 可 chở thuyền: dòng sông, HÀ như "sơn hà".
+液	chất lỏng	Nước 氵 trong đêm 夜: chất lỏng, DỊCH như "dịch thể".
+混	trộn	Nước 氵 với đủ loại con cháu 昆: trộn lẫn, HỖN như "hỗn hợp".
+減	giảm	Nước 氵 sau vách 厂 bị giáo 戈 rạch: giảm đi, GIẢM như "giảm giá".
+測	đo	Nước 氵 đo theo quy tắc 則: đo lường, TRẮC như "dự trắc".
+準	tiêu chuẩn	Nước 氵 phẳng như chim cắt 隼 bay: tiêu chuẩn, CHUẨN như "chuẩn bị".
+演	biểu diễn	Nước 氵 chảy dưới mái nhà con hổ 寅: biểu diễn, DIỄN như "diễn viên".
+潔	trong sạch	Nước 氵, dao 刀 và sợi 糸 để lau: trong sạch, KHIẾT như "tinh khiết".
+災	tai họa	Sông 巛 lũ và lửa 火: tai họa, TAI như "thiên tai".
+燃	cháy	Lửa 火 làm việc tự nhiên 然 của nó: cháy, NHIÊN như "nhiên liệu".
+版	bản in	Miếng gỗ 片 lật ngược 反: bản in, BẢN như "xuất bản".
+犯	tội phạm	Con chó ⺨ tấn công người quỳ 㔾: phạm tội, PHẠM như "tội phạm".
+状	tình trạng	Con chó 犬 trên tấm ván ⺦: tình trạng, TRẠNG như "trạng thái".
+独	một mình	Con chó ⺨ chơi với con bọ 虫: một mình, ĐỘC như "cô độc".
+率	tỉ lệ	Sợi đen 玄 với giọt 冫 trên mười 十: tỉ lệ, SUẤT như "xác suất".
+現	hiện ra	Viên ngọc 王 nhìn 見 thấy được: hiện ra, HIỆN như "hiện tại".
+留	ở lại	Con thỏ 卯 ở lại ruộng 田: lưu lại, LƯU như "lưu học".
+略	tóm lược	Mỗi 各 thửa ruộng 田 tóm gọn: lược bớt, LƯỢC như "chiến lược".
+益	lợi ích	Cái đĩa 皿 tràn đầy 八: lợi ích, ÍCH như "lợi ích".
+眼	con mắt	Con mắt 目 dừng 艮 lại trên vật: nhãn cầu, NHÃN như "nhãn khoa".
+破	xé rách	Hòn đá 石 xé toạc lớp da 皮: phá vỡ, PHÁ như "phá hủy".
+確	chắc chắn	Hòn đá 石 và con chim 隹 trên mái cao 宀: chắc chắn, XÁC như "chính xác".
+示	chỉ ra	Cái bàn thờ có đồ cúng: chỉ ra, THỊ như "biểu thị".
+祖	tổ tiên	Trên bàn thờ 礻, các đời chồng 且 lên nhau: tổ tiên, TỔ như "tổ tiên".
+禁	cấm	Rừng cây 林 bao quanh bàn thờ 示: cấm vào, CẤM như "cấm kỵ".
+移	di chuyển	Nhiều 多 cây lúa 禾 được cấy sang: di chuyển, DI như "di dân".
+程	mức độ	Lúa 禾 trình 呈 ra theo lượng: mức độ, TRÌNH như "trình độ".
+税	thuế	Lúa 禾 nộp cho người anh 兄 chia 八 ra: thuế, THUẾ như "thuế".
+築	xây	Tre 竹 và gỗ 木 ghép lại bằng tay nghề 工: xây dựng, TRÚC như "kiến trúc".
+粉	bột	Gạo 米 chia 分 nhỏ: bột, PHẤN như "phấn hoa".
+精	tinh	Gạo 米 xát trắng xanh 青: tinh túy, TINH như "tinh thần".
+紀	biên niên	Sợi chỉ 糸 câu chuyện của chính mình 己: biên niên, KỈ như "kỉ niệm".
+素	yếu tố	Ba 三 sợi chỉ 糸 buông thẳng mộc mạc: yếu tố, TỐ như "nguyên tố".
+経	trải qua	Sợi chỉ 糸 tay 又 đưa qua đất 土: trải qua, KINH như "kinh nghiệm".
+統	thống nhất	Các sợi chỉ 糸 dồn 充 về một: thống nhất, THỐNG như "thống nhất".
+絶	đoạn tuyệt	Sợi chỉ 糸 mất màu 色: đoạn tuyệt, TUYỆT như "tuyệt đối".
+綿	bông	Sợi 糸 từ vải 巾 trắng 白: bông, MIÊN như "miên".
+総	tổng	Sợi 糸 kéo bởi trái tim 心 chung 公: tổng thể, TỔNG như "tổng thống".
+編	đan	Sợi 糸 đan bên cửa 戸 như sách 冊: biên soạn, BIÊN như "biên tập".
+績	thành tích	Sợi 糸 mình có trách nhiệm 責 kéo: thành tích, TÍCH như "thành tích".
+織	dệt	Sợi 糸 dệt theo âm thanh 音 nhịp như giáo 戈: dệt, CHỨC như "tổ chức".
+罪	tội	Cái lưới 罒 bắt kẻ không 非 ngay: tội, TỘI như "tội phạm".
+義	nghĩa	Con dê 羊 trên ta 我: lẽ phải, NGHĨA như "chính nghĩa".
+耕	cày	Cái cày 耒 quanh giếng 井: cày ruộng, CANH như "canh tác".
+職	công việc	Tai 耳 nghe âm thanh 音 và ngọn giáo 戈: công việc, CHỨC như "chức vụ".
+肥	béo	Thịt 月 cuộn như con rắn 巴: béo, PHÌ như "phì nhiêu".
+能	năng lực	Con gấu có thân 月 và móng 匕: năng lực, NĂNG như "năng lực".
+脈	mạch	Cơ thể 月 có những dòng 𠂢 bên trong: mạch, MẠCH như "mạch máu".
+興	hưng thịnh	Hai tay 𦥑 cùng 同 nâng 八: hưng thịnh, HƯNG như "phục hưng".
+舎	nhà nhỏ	Mái 人 trên điều tốt 吉: ngôi nhà, XÁ như "ký túc xá".
+航	đi biển	Con thuyền 舟 dưới nắp 亠 rẽ sóng đi biển, HÀNG như "hàng hải".
+術	nghệ thuật	Đi 行 quanh cây 朮: kỹ thuật, THUẬT như "nghệ thuật".
+衛	phòng vệ	Đi 行 vòng quanh mặc giáp da 韋 để phòng vệ, VỆ như "vệ binh".
+製	chế tạo	Cách thức 制 làm quần áo 衣: chế tạo, CHẾ như "chế tạo".
+複	phức tạp	Áo 衤 mặc chồng lại 复: phức tạp, PHỨC như "phức tạp".
+規	quy tắc	Người chồng 夫 nhìn 見 theo khuôn phép: quy tắc, QUY như "quy định".
+解	giải	Con dao 刀 cắt sừng 角 con bò 牛: tháo gỡ, GIẢI như "giải quyết".
+設	thiết lập	Lời 言 và binh khí 殳 để dựng trại: thiết lập, THIẾT như "thiết kế".
+許	cho phép	Lời 言 nói vào buổi trưa 午: cho phép, HỨA như "hứa".
+証	bằng chứng	Lời 言 đúng 正: bằng chứng, CHỨNG như "chứng minh".
+評	đánh giá	Lời 言 nói công bằng 平 để đánh giá, BÌNH như "phê bình".
+講	giảng	Lời 言 dựng lại ba 三 lần nữa 再: giảng bài, GIẢNG như "giảng đường".
+謝	cảm ơn	Lời 言 bắn 射 thẳng từ lòng: cảm ơn, TẠ như "cảm tạ".
+識	nhận biết	Lời 言, âm 音 và dấu giáo 戈: nhận biết, THỨC như "kiến thức".
+護	bảo vệ	Lời 言 canh chim 隻 trong cỏ 艹: bảo hộ, HỘ như "bảo hộ".
+豊	phong phú	Bát 豆 đầy cong 曲 lên: dồi dào, PHONG như "phong phú".
+象	con voi	Con voi có vòi 𠂊 và thân như heo 豕: voi, TƯỢNG như "hiện tượng".
+財	tài sản	Tiền 貝 từ tài năng 才: tài sản, TÀI như "tài chính".
+貧	nghèo	Tiền 貝 bị chia 分 mãi: nghèo, BẦN như "bần cùng".
+責	trách nhiệm	Món nợ 貝 dưới gai 龶: trách nhiệm, TRÁCH như "trách nhiệm".
+貯	tiết kiệm	Tiền 貝 cất dưới mái 宀 trên cây đinh 丁: tiết kiệm, TRỮ như "dự trữ".
+貸	cho vay	Tiền 貝 thay thế 代 cho mình: cho vay, THẢI như "thải".
+費	chi phí	Tiền 貝 bay như mũi cung 弓: chi phí, PHÍ như "lãng phí".
+貿	mậu dịch	Con thỏ 卯 đổi vỏ sò 貝: buôn bán, MẬU như "mậu dịch".
+資	vốn	Đồng tiền 貝 kế tiếp 次: vốn, TƯ như "đầu tư".
+賛	tán thành	Hai người chồng 夫 góp tiền 貝: tán thành, TÁN như "tán thành".
+賞	giải thưởng	Sự tôn trọng 尚 trả bằng tiền 貝: giải thưởng, THƯỞNG như "giải thưởng".
+質	chất	Tiền 貝 và rìu 斤 thử chất: chất lượng, CHẤT như "chất lượng".
+輸	vận chuyển	Xe 車 chở hàng đi vào 入: vận chuyển, THÂU như "vận thâu".
+述	trình bày	Đi 辶 theo nhánh cây 朮 mà trình bày, THUẬT như "tường thuật".
+迷	lạc	Đi 辶 giữa ruộng lúa 米 tứ phía: lạc đường, MÊ như "mê cung".
+逆	ngược	Đi 辶 như mầm cây lộn ngược 屮: ngược lại, NGHỊCH như "nghịch lý".
+造	tạo ra	Bước 辶 ra loan báo 告 điều mình tạo ra, TẠO như "sáng tạo".
+過	vượt quá	Bước 辶 qua khung 冂 và cái miệng 口 rồi đi vượt quá, QUÁ như "quá khứ".
+適	thích hợp	Bước 辶 dưới nắp 亠 tới chiếc hộp 冂 cũ 古 vừa khít: thích hợp, THÍCH như "thích ứng".
+酸	chua	Hũ rượu 酉 để suốt mùa đông 夂 bên người 允: hóa chua, TOAN như "axit toan".
+鉱	khoáng	Kim loại 金 đào từ hố rộng 広: khoáng thạch, KHOÁNG như "khoáng sản".
+銅	đồng	Kim loại 金 cùng 同 màu đồng xu: đồng đỏ, ĐỒNG như "đồng thau".
+防	phòng thủ	Gò đất ⻖ đắp khắp các hướng 方 để phòng thủ, PHÒNG như "phòng vệ".
+限	giới hạn	Gò đất ⻖ nơi phải dừng lại 艮: giới hạn, HẠN như "hạn chế".
+険	hiểm trở	Gò đất ⻖ nơi một 一 người 人 kêu lên 口: hiểm trở, HIỂM như "nguy hiểm".
+際	ranh giới	Gò đất ⻖ nơi mở lễ hội 祭 ở ranh giới, TẾ như "quốc tế".
+雑	lộn xộn	Chín 九 cây 木 đầy chim 隹 đủ loại: lộn xộn, TẠP như "tạp hóa".
+非	không phải	Hai cánh vỗ ngược chiều nhau: không phải, PHI như "phi pháp".
+領	lãnh thổ	Mệnh lệnh 令 ban ra từ cái đầu 頁: cai quản lãnh thổ, LĨNH như "thủ lĩnh".
+額	trán	Cái đầu 頁 của khách 客 cúi trán chào; tấm biển, NGẠCH như "hạn ngạch".
+飼	nuôi	Thức ăn 飠 do người quản 司 trại phát: nuôi thú, TỰ như "tự dưỡng".
+並	hàng	Hai người đứng cạnh nhau 业 trên một 一 vạch: xếp hàng, TỊNH như "tịnh hành".
+乱	rối loạn	Cái lưỡi 舌 uốn éo 乙 làm mọi thứ rối loạn, LOẠN như "nổi loạn".
+乳	sữa	Bàn tay ⺤ bế đứa con 子 đang bú 乙 sữa, NHŨ như "nhũ mẫu".
+亡	chết	Nắp 亠 đậy chỗ trốn 匸: mất đi, chết, VONG như "tử vong".
+仁	nhân từ	Người 亻 luôn nghĩ tới hai 二 người khác: nhân từ, NHÂN như "nhân đạo".
+供	dâng	Người 亻 dâng lễ bằng cả hai tay cùng 共 lúc, CUNG như "cung cấp".
+俳	diễn viên	Người 亻 không phải 非 chính mình trên sân khấu: diễn viên, BÀI như "bài ưu".
+俵	bao	Người 亻 vác bao có nhãn ở bề mặt 表: bao gạo, BIỂU như "biểu".
+値	giá trị	Người 亻 nhìn thẳng 直 vào cái giá: giá trị, TRỊ như "trị giá".
+傷	vết thương	Người 亻 bị đánh khi mặt trời 日 lên 旦: vết thương, THƯƠNG như "bị thương".
+優	dịu dàng	Người 亻 bên kẻ u sầu 憂 thì dịu dàng và ưu tú, ƯU như "ưu tú".
+党	đảng	Anh em 兄 cùng tôn trọng 尚 một lý tưởng lập đảng, ĐẢNG như "chính đảng".
+冊	cuốn sách	Thẻ tre buộc trong khung 冂: một cuốn sách, SÁCH như "sách vở".
+処	xử lý	Bước chậm 夂 tới bàn 几 mà xử lý, XỨ như "xứ sở".
+券	vé	Mảnh lớn 大 cắt bằng dao 刀: tấm vé, KHOÁN như "chứng khoán".
+刻	khắc	Hình con lợn 亥 khắc bằng dao 刂, KHẮC như "điêu khắc".
+割	chia	Gây hại 害 bằng dao 刂: chia cắt, CÁT như "cát cứ".
+創	sáng tạo	Dao 刂 đẽo gỗ dựng kho 倉 đầu tiên: sáng tạo, SÁNG như "sáng lập".
+劇	kịch	Hổ 虍 và lợn 豕 đánh nhau bằng dao 刂: vở kịch, KỊCH như "kịch bản".
+勤	siêng năng	Sức lực 力 dồn vào đồng hoa 菫: siêng năng, CẦN như "cần cù".
+危	nguy hiểm	Người 𠂊 đứng trên vách đá 厄: nguy hiểm, NGUY như "nguy cơ".
+卵	trứng	Hai nửa 卯 có lòng đỏ 丶 trong mỗi bên: quả trứng, NOÃN như "noãn bào".
+厳	nghiêm khắc	Dưới vách đá 厂 người dám 敢 làm vẫn nghiêm khắc, NGHIÊM như "nghiêm túc".
+収	thu	Bàn tay 又 gom một cành 丨: thu hoạch, THU như "thu nhập".
+后	hoàng hậu	Cái miệng 口 dưới vách 厂 ra lệnh: hoàng hậu, HẬU như "hậu cung".
+否	không	Cái miệng 口 nói không 不: phủ nhận, PHỦ như "phủ định".
+吸	hút	Miệng 口 vươn ra 及 hút không khí, HẤP như "hô hấp".
+呼	gọi	Miệng 口 cất tiếng hỏi 乎: kêu gọi, HÔ như "hô hào".
+善	thiện	Con cừu 羊 và cái miệng 口 hiền: lương thiện, THIỆN như "từ thiện".
+困	khốn khó	Cái cây 木 bị nhốt trong rào 囗: khốn khó, KHỐN như "khốn đốn".
+垂	rủ xuống	Ngàn 千 cành rủ xuống mặt đất 土, THÙY như "thùy mị".
+域	khu vực	Đất 土 có ai đó 或 canh giữ: khu vực, VỰC như "lĩnh vực".
+奏	tấu	Ba 三 người 人 tấu nhạc lên trời 天, TẤU như "hòa tấu".
+奮	phấn chấn	Con chim 隹 lớn 大 bay lên từ ruộng 田: phấn chấn, PHẤN như "hưng phấn".
+姿	dáng	Người phụ nữ 女 bước tiếp theo 次: dáng người đẹp, TƯ như "tư thế".
+存	tồn tại	Người 亻 và đứa trẻ 子 còn sống: tồn tại, TỒN như "bảo tồn".
+孝	hiếu thảo	Đứa con 子 cõng người già 耂: hiếu thảo, HIẾU như "hiếu kính".
+宅	nhà	Dưới mái 宀 cây bám rễ 乇: nhà ở, TRẠCH như "dinh thự trạch".
+宇	mái hiên	Mái 宀 trên hai 二 cái móc 亅: mái hiên, vũ trụ, VŨ như "vũ trụ".
+宗	tôn giáo	Bày lễ 示 dưới mái 宀: tôn giáo, TÔNG như "tông phái".
+宙	không trung	Mái 宀 che những gì đến từ 由 trên: không trung, TRỤ như "vũ trụ".
+宝	báu vật	Viên ngọc 玉 dưới mái 宀: báu vật, BẢO như "bảo vật".
+宣	tuyên bố	Dưới mái 宀 tiếng nói vang xa 亘: tuyên bố, TUYÊN như "tuyên truyền".
+密	bí mật	Dưới mái 宀 trong núi 山 tất phải 必 giữ bí mật, MẬT như "mật thám".
+寸	tấc	Bàn tay có chấm chỗ bắt mạch: một tấc, THỐN như "thốn".
+専	chuyên	Thửa ruộng 由 đo 寸 cho riêng một chủ: chuyên biệt, CHUYÊN như "chuyên môn".
+射	bắn	Thân 身 và tay 寸 nhắm rồi bắn, XẠ như "xạ thủ".
+将	tướng	Gỗ chẻ ⺦ và móng vuốt ⺤ đo 寸 kỹ: vị tướng, TƯỚNG như "tướng quân".
+尊	tôn kính	Tám 八 vò rượu 酉 cầm trên tay 寸: tôn kính, TÔN như "tôn trọng".
+就	nhận chức	Ở kinh đô 京 người hợp lẽ 尤 nhận chức, TỰU như "thành tựu".
+尺	thước	Thân người 尸 duỗi chân 八: một thước, XÍCH như "xích".
+届	gửi tới	Thân người 尸 mang nông sản 由 gửi tới, GIỚI như "giới".
+展	mở rộng	Thân người 尸 mở hai tay 廾: mở rộng, TRIỂN như "phát triển".
+層	tầng	Thân người 尸 trên tầng cũ 曽: tầng lớp, TẰNG như "tằng".
+己	bản thân	Sợi dây uốn ngược về bản thân, KỶ như "tự kỷ".
+巻	cuộn	Hai 二 tay lớn 大 cuộn mình 己 lại: cuộn sách, QUYỂN như "quyển".
+幕	màn	Tấm vải 巾 không được 莫 nhìn xuyên: tấm màn, MẠC như "khai mạc".
+干	khô	Cây sào trên giá 十 phơi nắng cho khô, CAN như "can".
+幼	thơ ấu	Sức 力 còn nhỏ 幺: thơ ấu, ẤU như "ấu thơ".
+庁	sở	Tòa nhà 广 trên phố 丁: sở hành chính, SẢNH như "sảnh".
+座	chỗ ngồi	Dưới mái 广 người ta ngồi 坐: chỗ ngồi, TỌA như "tọa đàm".
+延	kéo dài	Bước dài 廴 giữ cho đúng 正: kéo dài, DUYÊN như "duyên".
+律	luật	Bước 彳 từng bước với cây bút 聿: viết luật, LUẬT như "pháp luật".
+従	tuân theo	Bước 彳 chân 疋 theo sau: tuân theo, TÒNG như "phục tòng".
+忘	quên	Trái tim 心 đã chết 亡: quên lãng, VONG như "vong ân".
+忠	trung thành	Trái tim 心 ngay chính giữa 中: trung thành, TRUNG như "trung nghĩa".
+恩	ơn	Trái tim 心 là nguyên nhân 因: ân huệ, ơn nghĩa, ÂN như "ân nhân".
+憲	hiến pháp	Mái 宀, mắt 罒 và tim 心 canh giữ hiến pháp, HIẾN như "hiến chương".
+我	ta	Bàn tay 丿 cầm ngọn kích 戈: ta, NGÃ như "bản ngã".
+批	phê bình	Bàn tay 扌 so sánh 比: phê bình, PHÊ như "phê duyệt".
+承	chấp nhận	Bàn tay 手 nhận nước 水 qua ba 三 đợt: chấp nhận, THỪA như "thừa nhận".
+担	gánh	Bàn tay 扌 nhấc lên lúc rạng sáng 旦: gánh vác, ĐẢM như "đảm nhận".
+拝	bái lạy	Bàn tay 扌 nâng như nhánh lúa 丰: bái lạy, BÀI như "bài".
+拡	mở rộng	Bàn tay 扌 làm cho rộng 広: mở rộng, KHUẾCH như "khuếch đại".
+捨	vứt bỏ	Bàn tay 扌 ném ra khỏi nhà 舎: vứt bỏ, XẢ như "xả thân".
+探	tìm	Bàn tay 扌 mò dưới nắp 冖 cạnh cây 木: tìm kiếm, THÁM như "thám tử".
+推	đẩy	Bàn tay 扌 đẩy con chim 隹: suy đoán, THÔI như "thôi".
+揮	vẫy	Bàn tay 扌 vẫy gọi đạo quân 軍, HUY như "chỉ huy".
+操	điều khiển	Bàn tay 扌 trên cây 木 có chim hót 品: điều khiển, THAO như "thao tác".
+敬	kính trọng	Cỏ 艹, câu nói 句 và roi 攵 dạy dỗ: kính trọng, KÍNH như "kính yêu".
+敵	kẻ thù	Đánh 攵 ông già 古 dưới nắp 亠: kẻ thù, ĐỊCH như "địch thủ".
+映	chiếu	Mặt trời 日 ở giữa 央: phản chiếu, ÁNH như "phản ánh".
+晩	tối	Ngày 日 được miễn 免 việc: buổi tối, MẠN như "mạn".
+暖	ấm áp	Mặt trời 日 và bàn tay ⺤ người bạn 友: ấm áp, NOÃN như "noãn".
+暮	chiều tà	Mặt trời 日 không được 莫 ở lại: chiều tà, MỘ như "mộ".
+朗	trong sáng	Vầng trăng 月 đẹp 良 trong sáng, LÃNG như "lãng mạn".
+机	bàn	Gỗ 木 làm thành cái bàn 几, KỶ như "kỷ trà".
+枚	tấm	Gỗ 木 đập 攵 cho dẹt: tấm mỏng, MAI như "mai".
+染	nhuộm	Nước 氵 chín 九 lần qua vỏ cây 木: nhuộm màu, NHIỄM như "ô nhiễm".
+株	gốc cây	Cái cây 木 cưa còn gốc đỏ 朱: gốc cây, cổ phần, CHU như "chu".
+棒	gậy	Gỗ 木 dâng 奉 thành cây gậy, BỔNG như "bổng".
+模	mô phỏng	Khuôn gỗ 木 không được 莫 sai: mô phỏng, MÔ như "mô hình".
+権	quyền	Cái cây 木 chim 隹 đậu cao nhất: quyền lực, QUYỀN như "quyền lợi".
+樹	cây cối	Gỗ 木, cái trống 壴 và bàn tay 寸 trồng: cây cối, THỤ như "cổ thụ".
+欲	ham muốn	Thung lũng 谷 há miệng 欠: lòng ham muốn, DỤC như "dục vọng".
+段	bậc	Vũ khí 殳 đục bậc vào vách: bậc thang, ĐOẠN như "giai đoạn".
+沿	dọc theo	Nước 氵 chảy dọc theo tám 八 cửa 口 thung lũng, DUYÊN như "duyên hải".
+泉	suối	Nước 水 trắng 白: dòng suối, TUYỀN như "hoàng tuyền".
+洗	rửa	Nước 氵 trước 先 mọi thứ: rửa sạch, TẨY như "tẩy rửa".
+派	phe phái	Dòng nước 氵 rẽ nhánh 𠂢: phe phái, PHÁI như "phái đoàn".
+済	xong	Nước 氵 làm cho đều 斉: giải quyết xong, TẾ như "kinh tế".
+源	nguồn	Nước 氵 từ đồng cỏ 原: cội nguồn, NGUYÊN như "nguồn gốc nguyên".
+潮	thủy triều	Nước 氵 dâng lên buổi sáng 朝: thủy triều, TRIỀU như "triều cường".
+激	dữ dội	Nước 氵 được thả 放 trắng 白 xóa bọt: dữ dội, KÍCH như "kích động".
+灰	tro	Lửa 火 dưới vách 厂 để lại tro tàn, KHÔI như "khôi".
+熟	chín	Thưởng 享 trái tròn 丸 trên lửa 灬: chín muồi, THỤC như "thành thục".
+片	mảnh	Nửa khúc gỗ chẻ đôi: một mảnh, PHIẾN như "phiến đá".
+班	tổ	Con dao 刂 giữa hai viên ngọc 王: chia tổ, BAN như "ban nhạc".
+異	khác	Thửa ruộng 田 chung 共 của những người khác nhau, DỊ như "dị biệt".
+疑	nghi ngờ	Cái thìa 匕, mũi tên 矢 và bàn chân 疋 dừng lại: nghi ngờ, NGHI như "nghi vấn".
+痛	đau	Bệnh 疒 dùng 用 hết sức: cơn đau, THỐNG như "thống khổ".
+皇	hoàng đế	Viên ngọc 王 trắng 白 trên đầu: hoàng đế, HOÀNG như "hoàng gia".
+盛	thịnh vượng	Cái đĩa 皿 trở thành 成 cả núi: thịnh vượng, THỊNH như "hưng thịnh".
+盟	liên minh	Lời thề sáng 明 trên đĩa 皿 máu: liên minh, MINH như "đồng minh".
+看	trông	Bàn tay 手 che trên mắt 目: trông coi, KHÁN như "khán giả".
+砂	cát	Đá 石 vỡ thành ít 少: hạt cát, SA như "sa mạc".
+磁	nam châm	Hòn đá 石 mọc cỏ 艹 sợi huyền 玄: nam châm, TỪ như "từ tính".
+私	riêng tư	Lúa 禾 giữ cho mình 厶: riêng tư, TƯ như "tư nhân".
+秘	bí mật	Lúa 禾 tất phải 必 giấu: bí mật, BÍ như "bí quyết".
+穀	ngũ cốc	Kẻ sĩ 士 đậy 冖 lúa 禾 rồi đập 殳: ngũ cốc, CỐC như "cốc".
+穴	hang	Mái 宀 che tám 八 chân bò vào: cái hang, HUYỆT như "huyệt đạo".
+窓	cửa sổ	Cái lỗ 穴 cho trái tim 心 tôi 厶 nhìn ra: cửa sổ, SONG như "song cửa".
+筋	cơ bắp	Thanh tre 竹 trên xương sườn 肋: cơ bắp, CÂN như "cân".
+策	kế sách	Que tre 竹 gai 朿 bày ra: kế sách, SÁCH như "chính sách".
+簡	đơn giản	Thẻ tre 竹 có khoảng trống 間: đơn giản, GIẢN như "giản dị".
+糖	đường	Gạo 米 thời nhà Đường 唐 nấu thành đường, ĐƯỜNG như "đường phèn".
+系	dòng dõi	Sợi chỉ 糸 treo từ một nét 丿 phía trên: dòng dõi, hệ thống, HỆ như "hệ thống".
+紅	đỏ thắm	Sợi chỉ 糸 do thợ 工 nhuộm: đỏ thắm, HỒNG như "hồng quân".
+納	nộp	Sợi chỉ 糸 cất vào trong 内 kho: nộp vào, NẠP như "nạp tiền".
+純	thuần khiết	Sợi chỉ 糸 ở trại 屯 chưa nhuộm: thuần khiết, THUẦN như "đơn thuần".
+絹	lụa	Sợi 糸 nhả ra từ miệng 口 dưới trăng 月: tơ lụa, QUYÊN như "quyên".
+縦	dọc	Sợi chỉ 糸 theo 従 nhau xuống: chiều dọc, SỈ như "sỉ".
+縮	co lại	Sợi chỉ 糸 để qua đêm ở quán trọ 宿 co lại, SÚC như "súc".
+署	sở	Đôi mắt 罒 theo dõi ai đó 者: sở, ký tên, THỰ như "ký thự".
+翌	hôm sau	Lông vũ 羽 dựng 立 lên để bay hôm sau, DỰC như "dực".
+聖	thánh	Tai 耳 và miệng 口 trên vua 王: bậc thánh, THÁNH như "thánh nhân".
+肺	phổi	Thịt 月 nơi chợ 市 không khí họp: lá phổi, PHẾ như "phế quản".
+胃	dạ dày	Thửa ruộng 田 trên thịt 月: dạ dày, VỊ như "vị".
+背	lưng	Thịt 月 quay về phía bắc 北: cái lưng, BỐI như "bối cảnh".
+胸	ngực	Thịt 月 bọc 勹 trái tim dữ 凶: lồng ngực, HUNG như "hung".
+脳	não	Thịt 月 có tia nhỏ ⺍ trong hộp 凶: bộ não, NÃO như "đầu não".
+腸	ruột	Thịt 月 cuộn lại khi mặt trời 日 lên 旦: ruột, TRÀNG như "đại tràng".
+腹	bụng	Thịt 月 lại đầy sau một ngày 日: cái bụng, PHÚC như "phúc mạc".
+臓	nội tạng	Thịt 月 làm kho 蔵 bên trong: nội tạng, TẠNG như "ngũ tạng".
+臨	đối diện	Người hầu 臣 nhìn xuống hàng hóa 品: đối diện, LÂM như "lâm thời".
+至	đến	Mũi tên 厶 cắm xuống đất 土: đến nơi, CHÍ như "chí".
+舌	lưỡi	Ngàn 千 lời từ một cái miệng 口: cái lưỡi, THIỆT như "thiệt".
+若	trẻ	Cỏ 艹 hái bằng tay phải 右: non trẻ, NHƯỢC như "nhược".
+著	tác giả	Cỏ 艹 và ai đó 者 viết sách: tác giả, TRỨ như "trứ danh".
+蒸	hấp	Cỏ 艹 được giúp 丞 trên lửa 灬: hấp hơi, CHƯNG như "chưng cất".
+蔵	kho	Cỏ 艹 giấu ngọn kích 戈 và người hầu 臣: nhà kho, TÀNG như "tàng trữ".
+蚕	tằm	Con sâu 虫 của trời 天: con tằm, TÀM như "tàm tang".
+衆	quần chúng	Máu 血 chung của nhiều người 亻: quần chúng, CHÚNG như "đại chúng".
+裁	may cắt	Ngọn kích 戈 cắt áo 衣 trên đất 土: may cắt, xét xử, TÀI như "trọng tài".
+装	trang phục	Người khỏe 壮 mặc áo 衣 đẹp: trang phục, TRANG như "trang bị".
+裏	mặt trái	Chiếc áo 衣 có làng 里 khâu bên trong: mặt trái, LÝ như "lý".
+補	bổ sung	Áo 衤 vá lần đầu 甫: bổ sung, BỔ như "bổ khuyết".
+視	nhìn	Ở bàn thờ 礻 mà thấy 見: nhìn, THỊ như "thị lực".
+覧	xem	Người hầu 臣 cúi xuống thấy 見: xem xét, LÃM như "triển lãm".
+討	đánh dẹp	Lời 言 và bàn tay 寸 cùng đánh: đánh dẹp, THẢO như "thảo luận".
+訪	thăm	Lời 言 mang đi khắp hướng 方: đi thăm, PHỎNG như "phỏng vấn".
+訳	dịch	Lời 言 đo 尺 sang tiếng khác: phiên dịch, DỊCH như "biên dịch".
+詞	từ	Lời 言 của người quản 司: từ ngữ, TỪ như "danh từ".
+誌	tạp chí	Lời 言 ý chí 志 được ghi lại: tạp chí, CHÍ như "tạp chí".
+認	công nhận	Lời 言 nhẫn 忍 mà nói ra: công nhận, NHẬN như "thừa nhận".
+誕	sinh ra	Lời 言 kéo dài 延 tên tuổi: sinh ra, ĐẢN như "sinh đản".
+誠	thành thật	Lời 言 trở thành 成 việc làm: thành thật, THÀNH như "chân thành".
+誤	sai lầm	Lời 言 nói 呉 sai: sai lầm, NGỘ như "ngộ nhận".
+論	luận	Lời 言 của người 人 bàn về một 一 cuốn sách 冊: tranh luận, LUẬN như "lý luận".
+諸	các	Lời 言 từ người 者 này người khác: các, CHƯ như "chư vị".
+警	cảnh báo	Lời 言 kính nể 敬: cảnh báo, CẢNH như "cảnh sát".
+貴	quý	Vỏ sò 貝 cất giữa 中: quý giá, QUÝ như "quý tộc".
+賃	tiền thuê	Tiền 貝 cho trách nhiệm 任: tiền thuê, NHẪM như "nhẫm".
+退	rút lui	Bước 辶 rồi dừng 艮 lại quay về: rút lui, THOÁI như "thoái lui".
+遺	để lại	Bước 辶 đi bỏ lại đồ quý 貴: để lại, DI như "di sản".
+郵	bưu	Thư rủ 垂 xuống làng ⻏: bưu chính, BƯU như "bưu điện".
+郷	quê	Ngôi làng ⻏ nơi bạn dừng 艮 chân: quê hương, HƯƠNG như "cố hương".
+針	kim	Kim loại 金 mảnh như nét số mười 十: cây kim, CHÂM như "châm cứu".
+銭	tiền xu	Kim loại 金 cắt bằng kích 戈: đồng tiền xu, TIỀN như "tiền tệ".
+鋼	thép	Kim loại 金 từ núi 岡: thép, CƯƠNG như "cương".
+閉	đóng	Cổng 門 có then 才 cài ngang: đóng lại, BẾ như "bế mạc".
+閣	nội các	Mỗi 各 cổng 門 của lầu cao: nội các, CÁC như "lầu các".
+降	xuống	Bước chậm 夂 xuống gò ⻖: đi xuống, GIÁNG như "giáng sinh".
+陛	bệ hạ	Bậc đất 土 xếp kề 比 nhau trên gò ⻖: bệ hạ, BỆ như "bệ".
+除	loại bỏ	Gò đất ⻖ thừa 余 quá: loại bỏ, TRỪ như "trừ khử".
+障	cản trở	Gò đất ⻖ cắm huy hiệu 章 chặn đường: cản trở, CHƯỚNG như "chướng ngại".
+難	khó	Con chim 隹 bị người chồng 夫 bắt trong cỏ 艹: khó khăn, NAN như "nan giải".
+革	da thuộc	Tấm da căng ra với đầu 廿 và miệng 口: da thuộc, CÁCH như "cách mạng".
+頂	đỉnh	Cây đinh 丁 trên đỉnh đầu 頁, ĐÍNH như "đính".
+預	gửi	Trước 予 hết bằng cái đầu 頁: gửi gắm, DỰ như "dự trữ".
+骨	xương	Thịt 月 dưới khớp phía trên: xương, CỐT như "cốt nhục".
+丈	trượng	Bàn tay cầm thước qua một 一 nét: một trượng, TRƯỢNG như "trượng phu".
+与	cho	Một 一 bàn tay cong lại để cho, DỮ như "dữ".
+且	và lại	Đống đá trên một 一 nền: và lại, THẢ như "thả".
+丘	đồi	Cái rìu 斤 trên một 一 mặt đất: ngọn đồi, KHÂU như "khâu".
+丙	thứ ba	Một 一 mái có người trong 内: thứ ba, BÍNH như "giáp ất bính".
+串	xiên	Hai cái miệng 口 bị xuyên qua giữa 中: que xiên, XUYẾN như "xuyến".
+丹	son đỏ	Một chấm 丶 đỏ trong khung 冂: son đỏ, ĐAN như "đan sa".
+丼	tô	Thức ăn 丶 rơi vào giếng 井: một tô cơm, TỈNH như "tỉnh".
+乏	thiếu	Một nét 丿 gạch qua chút 之 còn lại: thiếu thốn, PHẠP như "phạp".
+乙	ất	Lưỡi câu, can thứ hai: ất, ẤT như "giáp ất".
+乞	xin	Người 𠂉 cúi gập 乙: xin xỏ, KHẤT như "hành khất".
+乾	khô	Nắng sớm 早 bên kẻ xin 乞 mưa: khô hạn, CAN như "can".
+亀	rùa	Cái đầu 𠂊 trên mai 日 có đuôi: con rùa, QUY như "quy".
+了	xong	Đứa bé quấn tay, nét móc 亅 kết thúc: xong, LIỄU như "liễu".
+互	lẫn nhau	Hai 二 móc 彑 khóa vào nhau: lẫn nhau, HỖ như "hỗ trợ".
+亜	châu Á	Hai 二 bức tường quanh cái miệng 口: châu Á, Á như "Á châu".
+享	hưởng	Đứa trẻ 子 dưới nắp 亠 há miệng 口: thụ hưởng, HƯỞNG như "hưởng thụ".
+亭	đình	Mái cao 亠 trên phố 丁: cái đình, ĐÌNH như "đình làng".
+介	trung gian	Người 人 đứng giữa hai nét 丨: trung gian, GIỚI như "giới thiệu".
+仙	tiên	Người 亻 trên núi 山: ông tiên, TIÊN như "thần tiên".
+仰	ngửa	Người 亻 quỳ 卩 ngửa mặt nhìn lên, NGƯỠNG như "ngưỡng mộ".
+企	dự định	Người 人 dừng 止 lại để dự định, XÍ như "xí nghiệp".
+伎	kỹ năng	Người 亻 có một nhánh 支 kỹ năng, KỸ như "kỹ nữ".
+伏	nằm phục	Người 亻 nằm như con chó 犬: nằm phục, PHỤC như "phục kích".
+伐	chặt	Người 亻 cầm kích 戈: chặt cây, PHẠT như "chinh phạt".
+伯	bác	Người 亻 tóc bạc 白: ông bác, BÁ như "bá tước".
+伴	đi cùng	Người 亻 là nửa 半 kia của bạn: đi cùng, BẠN như "bạn bè".
+伸	duỗi	Người 亻 nói 申 thẳng ra: duỗi dài, THÂN như "thân".
+伺	thăm hỏi	Người 亻 trước người quản 司: thăm hỏi, TỨ như "tứ".
+但	nhưng	Người 亻 lúc rạng đông 旦: nhưng mà, ĐÃN như "đãn".
+佳	đẹp	Người 亻 như viên ngọc vuông 圭: tốt đẹp, GIAI như "giai nhân".
+併	gộp	Người 亻 đứng song song 并: gộp lại, TÍNH như "tính".
+侍	hầu	Người 亻 ở chùa 寺: kẻ hầu, võ sĩ, THỊ như "thị vệ".
+依	dựa vào	Người 亻 quấn áo 衣: dựa vào, Ỷ như "ỷ lại".
+侮	khinh	Người 亻 mỗi 毎 lần đều chê: khinh miệt, VŨ như "vũ nhục".
+侯	hầu tước	Người 亻 cầm mũi tên 矢: hầu tước, HẦU như "chư hầu".
+侵	xâm lấn	Người 亻 cầm chổi ⺕ lẻn dưới nắp 冖 vào 又: xâm lấn, XÂM như "xâm lược".
+侶	bạn đồng hành	Người 亻 có xương sống 呂: bạn đồng hành, LỮ như "lữ".
+促	thúc giục	Người 亻 đẩy bằng chân 足: thúc giục, XÚC như "xúc tiến".
+俊	tài giỏi	Người 亻 bước 夂 trước mọi người 允: tài giỏi, TUẤN như "tuấn tú".
+俗	phong tục	Người 亻 ở thung lũng 谷: phong tục, TỤC như "tục ngữ".
+俸	lương	Người 亻 được trả cho việc phụng 奉 sự: lương bổng, BỔNG như "bổng lộc".
+俺	tao	Người 亻 che 奄 hết mọi thứ: tao, YÊM như "yêm".
+倒	đổ	Người 亻 đến 到 nơi ngã sấp: đổ xuống, ĐẢO như "đảo ngược".
+倣	bắt chước	Người 亻 được thả 放 để chép: bắt chước, PHỎNG như "mô phỏng".
+倫	luân lý	Người 亻 và sách 冊 gắn kết người 人: luân lý, LUÂN như "luân thường".
+倹	tiết kiệm	Người 亻 chung một 一 miệng 口 với người 人 khác: tiết kiệm, KIỆM như "cần kiệm".
+偉	vĩ đại	Người 亻 mặc giáp da 韋: vĩ đại, VĨ như "vĩ nhân".
+偏	thiên lệch	Người 亻 bên cửa 戸 chỉ một cuốn sách 冊: thiên lệch, THIÊN như "thiên vị".
+偵	dò thám	Người 亻 ngay 貞 thẳng dò xét: dò thám, TRINH như "trinh thám".
+偶	ngẫu nhiên	Người 亻 gặp con khỉ 禺 ngẫu nhiên, NGẪU như "ngẫu nhiên".
+偽	giả	Người 亻 làm 為 trò bịp: giả dối, NGỤY như "ngụy tạo".
+傍	bên cạnh	Người 亻 đứng 立 một phía 方: bên cạnh, BÀNG như "bàng quan".
+傑	kiệt xuất	Người 亻 dang chân 舛 trên cây 木: kiệt xuất, KIỆT như "hào kiệt".
+傘	ô	Mọi người 人 dưới nan 十 dù: cái ô, TẢN như "tản".
+催	tổ chức	Người 亻 gọi chim 隹 về núi 山: tổ chức, THÔI như "thôi miên".
+傲	kiêu ngạo	Người 亻 được thả 放 trên đất 土: kiêu ngạo, NGẠO như "ngạo mạn".
+債	nợ	Người 亻 bị trách 責 vì tiền: món nợ, TRÁI như "trái phiếu".
+傾	nghiêng	Người 亻 nghiêng một lúc 頃: nghiêng, KHUYNH như "khuynh hướng".
+僅	chỉ một chút	Người 亻 có ba 三 ngọn cỏ 艹: chỉ một chút, CẬN như "cận".
+僕	tôi tớ	Người 亻 vác gánh nặng 菐: tôi tớ, BỘC như "nô bộc".
+僚	đồng liêu	Người 亻 bên đống lửa lớn 大 dưới mặt trời 日: đồng liêu, LIÊU như "quan liêu".
+僧	nhà sư	Người 亻 trước kia 曽 đã xuất gia: nhà sư, TĂNG như "tăng ni".
+儀	nghi lễ	Người 亻 làm điều nghĩa 義: nghi lễ, NGHI như "nghi thức".
+儒	nhà nho	Người 亻 được cần 需 tới vì hiểu biết: nhà nho, NHO như "nho giáo".
+償	đền bù	Người 亻 trả lại phần thưởng 賞: đền bù, THƯỜNG như "bồi thường".
+充	đầy	Đứa trẻ dưới nắp 亠 lớn 允 lên đầy chỗ: đầy đủ, SUNG như "sung túc".
+克	vượt qua	Người anh 兄 già 古 vượt qua khó khăn, KHẮC như "khắc phục".
+免	miễn	Người 𠂊 chạy đi bằng chân 儿: được miễn, MIỄN như "miễn phí".
+兼	kiêm	Bàn tay ⺕ cầm hai 八 bó lúa 丨: kiêm cả hai, KIÊM như "kiêm nhiệm".
+冒	mạo hiểm	Mũ 冂 kéo che mắt 目: mạo hiểm, MẠO như "mạo hiểm".
+冗	thừa	Cái nắp 冖 trên bàn 几 không cần: thừa thãi, NHŨNG như "nhũng".
+冠	vương miện	Nắp 冖 đội lên đầu 元 bằng tay 寸: vương miện, QUAN như "quan".
+冥	tối tăm	Nắp 冖 che mặt trời 日 sáu 六 ngày: tối tăm, MINH như "minh phủ".
+冶	luyện kim	Băng 冫 tan bên lò trên bệ 台: luyện kim, DÃ như "dã kim".
+凄	rùng rợn	Băng 冫 bên người vợ 妻 lúc nửa đêm: rùng rợn, THÊ như "thê lương".
+准	chuẩn	Băng 冫 trên con chim 隹 gần như chim: bán, CHUẨN như "phê chuẩn".
+凍	đóng băng	Băng 冫 theo gió đông 東 tới: đóng băng, ĐỐNG như "đông đống".
+凝	đông đặc	Băng 冫 làm nỗi nghi 疑 cứng lại: đông đặc, NGƯNG như "ngưng tụ".
+凡	tầm thường	Cái bàn 几 có một chấm 丶: tầm thường, PHÀM như "phàm nhân".
+凶	hung dữ	Dấu chéo 乂 bị nhốt trong hộp 凵: hung dữ, HUNG như "hung ác".
+凸	lồi	Cái hộp 凵 nhô một 一 bên: lồi lên, ĐỘT như "đột".
+凹	lõm	Cái hộp 凵 lõm ở giữa, AO như "ao".
+刃	lưỡi dao	Thanh đao 刀 có chấm 丶 ở mép: lưỡi dao, NHẬN như "nhận".
+刈	cắt cỏ	Con dao 刂 chéo 乂 qua cỏ: cắt cỏ, NGẢI như "ngải".
+刑	hình phạt	Cái giá 开 và con dao 刂: hình phạt, HÌNH như "hình sự".
+到	đến nơi	Tới cùng 至 với con dao 刂: đến nơi, ĐÁO như "chu đáo".
+刹	chùa	Cây 木 khắc dấu bằng dao 刂: cột chùa, SÁT như "cổ sát".
+刺	đâm	Gai 朿 và dao 刂: đâm, THÍCH như "kích thích".
+削	gọt	Dao 刂 gọt cho giống 肖 mẫu: gọt bớt, TƯỚC như "tước bỏ".
+剖	mổ xẻ	Đứng 立 nói 口 rồi cầm dao 刂: mổ xẻ, PHẨU như "giải phẫu".
+剛	cứng rắn	Núi 岡 và dao 刂: cứng rắn, CƯƠNG như "cương trực".
+剝	bóc	Cái mõm 彑 và nước 氺 cùng con dao 刂: bóc vỏ, BÁC như "bác đoạt".
+剣	kiếm	Người 人 một 一 miệng 口 cầm dao 刂: thanh kiếm, KIẾM như "kiếm thuật".
+剤	thuốc	Cắt 刂 thành phần đều 斉: liều thuốc, TỀ như "dược tề".
+剰	dư thừa	Cưỡi 乗 rồi cắt 刂 phần còn: dư thừa, THẶNG như "thặng dư".
+劣	kém	Ít 少 sức 力: kém cỏi, LIỆT như "ưu liệt".
+励	khích lệ	Vạn 万 sức 力 dưới vách 厂: khích lệ, LỆ như "khích lệ".
+劾	vạch tội	Sức 力 con lợn 亥 bị xét xử: vạch tội, HẶC như "đàn hặc".
+勃	bột phát	Đứa trẻ 子 dưới nắp 冖 bột phát sức 力, BỘT như "bột phát".
+勅	sắc lệnh	Bó 束 quyền lực 力: sắc lệnh, SẮC như "sắc phong".
+勘	trực giác	Sức 力 rất lớn 甚 để cảm nhận: trực giác, KHÁM như "khám".
+募	tuyển mộ	Sức 力 không được 莫 thiếu: tuyển mộ, MỘ như "chiêu mộ".
+勧	khuyên	Con chim 隹 có sức 力 gọi đàn: khuyên bảo, KHUYẾN như "khuyến khích".
+勲	công lao	Hành động 動 vượt qua lửa 灬: công lao, HUÂN như "huân chương".
+勾	cong	Bọc 勹 một vật riêng 厶: cong, CÂU như "câu lưu".
+匂	thơm	Cái thìa 匕 bọc 勹 trong lá thơm: mùi thơm, CÁI như "cái".
+匠	thợ	Cái rìu 斤 trong hộp 匚: người thợ, TƯỢNG như "nghệ nhân tượng".
+匹	con	Đôi chân 儿 sau chỗ nấp 匸: con thú nhỏ, THẤT như "thất phu".
+匿	giấu	Người trẻ 若 trong chỗ nấp 匸: giấu kín, NẶC như "nặc danh".
+升	thăng	Hai tay 廾 cầm cái đấu đong, THĂNG như "thăng".
+卑	hèn	Nét 丿 trên ruộng 田 và chữ thập 十: thấp hèn, TI như "tự ti".
+卓	bàn	Bói 卜 sớm 早 trên cái bàn cao: xuất sắc, TRÁC như "trác tuyệt".
+占	bói	Cái miệng 口 đọc vết nứt 卜: bói toán, CHIẾM như "chiếm".
+即	ngay	Dừng 艮 lại quỳ 卩 ngay: tức thì, TỨC như "tức khắc".
+却	trái lại	Đi 去 rồi quỳ 卩 xuống: trái lại, KHƯỚC như "từ khước".
+卸	bán sỉ	Giữa trưa 午 người quỳ 卩 dỡ hàng: bán sỉ, TÁ như "tá".
+厄	tai ương	Người quỳ 卩 dưới vách 厂: tai ương, ÁCH như "ách vận".
+厘	ly	Ngôi làng 里 dưới vách 厂 đếm xu nhỏ: một ly, LY như "li ti ly".
+又	lại	Bàn tay phải lại vươn ra, HỰU như "hựu".
+及	đạt tới	Bàn tay 又 với tới người 丿 phía trước: đạt tới, CẬP như "phổ cập".
+双	đôi	Hai bàn tay 又: một đôi, SONG như "song song".
+叔	chú	Ở trên 上 mà nhỏ 小 trong tay 又: ông chú, THÚC như "thúc phụ".
+叙	kể	Quá nhiều 余 trong tay 又 để kể: tường thuật, TỰ như "tự sự".
+叫	hét	Cái miệng 口 thắt lại 丨 rồi bật ra: hét lên, KHIẾU như "khiếu nại".
+召	triệu tập	Thanh đao 刀 trên cái miệng 口: triệu tập, TRIỆU như "triệu hồi".
+吉	tốt lành	Cái miệng 口 người quân tử 士 nói điều tốt lành, CÁT như "cát tường".
+吏	viên chức	Cái miệng 口 nắm thước 丈: viên chức, LẠI như "quan lại".
+吐	nôn	Miệng 口 nôn ra đất 土, THỔ như "thổ huyết".
+吟	ngâm	Miệng 口 hát lên lúc này 今: ngâm thơ, NGÂM như "ngâm vịnh".
+含	ngậm	Lúc này 今 đang ngậm trong miệng 口: chứa đựng, HÀM như "hàm ý".
+吹	thổi	Cái miệng 口 há 欠 ra hơi: thổi, XUY như "cổ xuy".
+呂	xương sống	Hai cái miệng 口 nối bằng nét 丿: xương sống, LỮ như "lữ".
+呈	dâng	Cái miệng 口 trên vua 王: dâng lên, TRÌNH như "trình bày".
+呉	cho	Cái miệng 口 trên người dang chân 八: cho, NGÔ như "nước Ngô".
+呪	nguyền rủa	Cái miệng 口 người anh 兄 nguyền rủa, CHÚ như "thần chú".
+咲	nở	Cái miệng 口 cười lên trời 天: hoa nở, TIẾU như "tiếu".
+咽	họng	Cái miệng 口 và nguyên nhân 因 nghẹn: cổ họng, YẾT như "yết hầu".
+哀	buồn	Cái miệng 口 giấu trong áo 衣 khóc: buồn thương, AI như "bi ai".
+哲	triết học	Gấp 折 lời trong miệng 口: triết học, TRIẾT như "triết lý".
+哺	bú	Cái miệng 口 được bú lần đầu 甫, BỘ như "bộ nhũ".
+唄	bài hát	Miệng 口 hát lấy vỏ sò 貝: bài hát, BÁI như "bái".
+唆	xúi giục	Miệng 口 kẻ bước 夂 chậm tới: xúi giục, TOA như "toa rập".
+唇	môi	Cái miệng 口 dưới con rồng 辰: đôi môi, THẦN như "thần".
+唐	nhà Đường	Dưới mái 广 bàn tay ⺕ và miệng 口 nhà Đường, ĐƯỜNG như "Đường thi".
+唯	chỉ	Miệng 口 chỉ đáp lời con chim 隹: duy nhất, DUY như "duy nhất".
+唾	nước bọt	Từ miệng 口 rủ 垂 xuống: nước bọt, THÓA như "thóa mạ".
+啓	khai mở	Mở cửa 戸 và gõ 攵 cho miệng 口 mở: khai mở, KHẢI như "khải hoàn".
+喉	cổ họng	Cái miệng 口 của hầu tước 侯: cổ họng, HẦU như "yết hầu".
+喚	gọi	Cái miệng 口 lớn 大 như hộp 冂: hô gọi, HOÁN như "hô hoán".
+喝	quát	Cái miệng 口 la cả ngày 日: quát tháo, HÁT như "hát".
+喩	ví dụ	Cái miệng 口 so một 一 vầng trăng 月 với dòng sông 巜: ví dụ, DỤ như "thí dụ".
+喪	tang	Mười 十 cái miệng 口 khóc trong áo 衣: tang lễ, TANG như "tang chế".
+喫	ăn uống	Cái miệng 口 giữ lời thề 契: ăn uống, KHIẾT như "khiết".
+嗅	ngửi	Cái miệng 口 ngửi mùi hôi 臭 như chó 犬, KHỨU như "khứu giác".
+嗣	kế tự	Cái miệng 口 có sách 冊 của người quản 司: người kế tự, TỰ như "tự".
+嘆	than thở	Cái miệng 口 người chồng 夫 nằm trong cỏ 艹: than thở, THÁN như "cảm thán".
+嘱	dặn dò	Cái miệng 口 nơi mình thuộc 属 về: dặn dò, CHÚC như "di chúc".
+嘲	chế giễu	Cái miệng 口 cười mỗi sáng 朝: chế giễu, TRÀO như "trào phúng".
+噴	phun	Cái miệng 口 phun vỏ sò 貝 bằng hai tay 廾: phun trào, PHÚN như "phún xuất".
+嚇	dọa	Cái miệng 口 đỏ 赤 vì giận: đe dọa, HÁCH như "hách dịch".
+囚	tù nhân	Người 人 trong vòng rào 囗: tù nhân, TÙ như "tù tội".
+圏	vòng	Cuộn 巻 trong rào 囗: một vòng, QUYỂN như "khí quyển".
+坊	cậu bé	Đất 土 khắp các hướng 方: cậu bé, PHƯỜNG như "phường".
+坑	hố	Đất 土 dưới nắp 亠 và bàn 几: cái hố, KHANH như "khanh".
+坪	tsubo	Đất 土 bằng 平: một tsubo đất, BÌNH như "bình".
+垣	hàng rào	Đất 土 vây 亘 quanh: hàng rào, VIÊN như "viên".
+埋	chôn	Đất 土 trong làng 里: chôn vùi, MAI như "mai táng".
+執	nắm	Hạnh phúc 幸 nắm tròn 丸 trong tay: nắm giữ, CHẤP như "cố chấp".
+培	vun	Đất 土 vun chỗ đứng 立 nói 口: vun trồng, BỒI như "bồi dưỡng".
+堀	hào	Đất 土 uốn 屈 sang bên: con hào, QUẬT như "quật".
+堅	vững	Người hầu 臣 đặt tay 又 trên đất 土: vững chắc, KIÊN như "kiên cố".
+堆	đống	Đất 土 chất nơi chim 隹 làm tổ: thành đống, ĐÔI như "đôi".
+堕	rơi	Đất 土 rơi khỏi gò ⻖ mình có 有: sa đọa, ĐỌA như "sa đọa".
+堤	đê	Đất 土 vừa đúng 是: con đê, CHỈ như "chỉ".
+堪	chịu đựng	Đất 土 gánh nặng rất lớn 甚: chịu đựng, KHAM như "kham khổ".
+塀	tường	Đất 土 dưới thân 尸 đá khô 干: bức tường, BÌNH như "bình phong".
+塁	thành lũy	Ruộng 田 đóng băng 冫 trên đất 土: thành lũy, LỖI như "lỗi".
+塊	cục	Đất 土 hình con ma 鬼: một cục, KHỐI như "khối".
+塑	nặn	Đất 土 nặn lúc trăng non 朔: tượng nặn, TỐ như "điêu tố".
+塔	tháp	Đất 土 và cỏ 艹 khớp 合 nhau: ngọn tháp, THÁP như "bảo tháp".
+塗	sơn	Nước 氵 và đất 土 quá nhiều 余: sơn trát, ĐỒ như "đồ".
+塚	gò mộ	Đất 土 dưới nắp 冖 nơi lợn 豕 nằm: gò mộ, TRỦNG như "trủng".
+塞	chặn	Ba 三 tay và đất 土 dưới mái 宀: chặn lại, TẮC như "tắc nghẽn".
+塡	lấp	Đất 土 thật 眞: lấp đầy, ĐIỀN như "điền".
+塾	trường tư	Thưởng 享 vòng tròn 丸 trên đất 土 học: trường tư, THỤC như "tư thục".
+墜	rơi	Đội quân 隊 rơi xuống đất 土: rơi rụng, TRỤY như "trụy lạc".
+墨	mực	Đất 土 đen 黒: thỏi mực, MẶC như "mặc".
+墳	mộ	Đất 土 đắp vỏ sò 貝 bằng hai tay 廾: ngôi mộ, PHẦN như "phần mộ".
+墾	khai hoang	Con mèo 豸 dừng 艮 trên đất 土 khai hoang, KHẨN như "khai khẩn".
+壁	tường	Thân 尸 và miệng 口 cay 辛 dựa vào đất 土: bức tường, BÍCH như "bích họa".
+壇	bục	Đất 土 dưới nắp 亠 lúc bình minh 旦: bục giảng, ĐÀN như "diễn đàn".
+壊	phá hủy	Đất 土 có lệ từ mắt 罒 trên áo 衣: phá hủy, HOẠI như "phá hoại".
+壌	đất	Đất 土 sáu 六 lớp ba 三 tầng: thổ nhưỡng, NHƯỠNG như "thổ nhưỡng".
+壮	khỏe mạnh	Kẻ sĩ 士 và gỗ chẻ ⺦: khỏe mạnh, TRÁNG như "hùng tráng".
+壱	một	Kẻ sĩ 士 dưới nắp 冖 với cái thìa 匕: số một, NHẤT như "nhất".
+奇	kỳ lạ	Lớn 大 mà làm được 可: kỳ lạ, KÌ như "kì diệu".
+奉	dâng	Ba 三 tay nâng vật lớn 大: dâng lên, PHỤNG như "phụng sự".
+契	giao ước	Con dao 刀 khắc lời giao ước lớn 大, KHẾ như "khế ước".
+奔	chạy	Người lớn 大 hai tay 廾 chạy, BÔN như "bôn ba".
+奥	bên trong	Gạo 米 cất nhiều 大 trong hộp 冂 sâu bên trong, ÁO như "áo".
+奨	khuyến khích	Vị tướng 将 làm bạn lớn 大: khuyến khích, TƯỞNG như "tưởng thưởng".
+奪	cướp	Bàn tay 寸 tóm con chim 隹 lớn 大: cướp đoạt, ĐOẠT như "chiếm đoạt".
+奴	nô lệ	Người phụ nữ 女 bị nắm tay 又: nô lệ, NÔ như "nô lệ".
+如	như	Người phụ nữ 女 nói 口 giống như vậy, NHƯ như "như ý".
+妃	phi	Người phụ nữ 女 bên chính mình 己: hoàng phi, PHI như "vương phi".
+妄	hão huyền	Người phụ nữ 女 đã mất 亡: hão huyền, VỌNG như "vọng tưởng".
+妊	có thai	Người phụ nữ 女 mang 壬 con: có thai, NHÂM như "nhâm thần".
+妖	yêu quái	Người phụ nữ 女 nghiêng đầu 夭: yêu quái, YÊU như "yêu tinh".
+妙	tuyệt diệu	Người phụ nữ 女 trẻ 少: tuyệt diệu, DIỆU như "kỳ diệu".
+妥	thỏa đáng	Bàn tay ⺤ đặt trên người phụ nữ 女: thỏa đáng, THỎA như "thỏa thuận".
+妨	cản	Người phụ nữ 女 đứng khắp hướng 方: cản trở, PHƯƠNG như "phương hại".
+妬	ghen	Người phụ nữ 女 lòng như đá 石: ghen tị, ĐỐ như "đố kỵ".
+姓	họ	Người phụ nữ 女 sinh 生 ra dòng họ, TÍNH như "bách tính".
+姫	công chúa	Người phụ nữ 女 có người hầu 臣: công chúa, CƠ như "cơ thiếp".
+姻	hôn nhân	Người phụ nữ 女 là nguyên nhân 因 nối hai nhà: hôn nhân, NHÂN như "hôn nhân".
+威	uy nghiêm	Người phụ nữ 女 dưới ngọn kích 戈 bên vách 厂: uy nghiêm, UY như "uy quyền".
+娘	con gái	Người phụ nữ 女 tốt 良: con gái, NƯƠNG như "cô nương".
+娠	mang thai	Người phụ nữ 女 tháng con rồng 辰: mang thai, THẦN như "nhâm thần".
+娯	giải trí	Người phụ nữ 女 cho 呉 niềm vui: giải trí, NGU như "giải trí ngu lạc".
+婆	bà già	Người phụ nữ 女 da nhăn như sóng 波: bà già, BÀ như "bà".
+婚	kết hôn	Người phụ nữ 女 lúc hoàng hôn 昏 làm lễ: kết hôn, HÔN như "hôn lễ".
+婿	con rể	Người phụ nữ 女 dẫn về người có chân 疋 và thịt 月: con rể, TẾ như "phu tế".
+媒	mai mối	Người phụ nữ 女 quen người nọ 某: mai mối, MÔI như "môi giới".
+嫁	cô dâu	Người phụ nữ 女 về nhà 家 chồng: cô dâu, GIÁ như "giá thú".
+嫉	ghen ghét	Người phụ nữ 女 bệnh 疾 vì đố kỵ: ghen ghét, TẬT như "tật đố".
+嫌	ghét	Người phụ nữ 女 phải kiêm 兼 hai việc: ghét bỏ, HIỀM như "hiềm khích".
+嫡	chính thất	Người phụ nữ 女 dưới mái 亠 cũ 古: chính thất, ĐÍCH như "đích tôn".
+嬢	cô gái	Người phụ nữ 女 mặc sáu 六 áo ba 三 lớp: cô gái, NƯƠNG như "nương tử".
+孔	lỗ	Đứa trẻ 子 nhìn qua cái móc 乙: lỗ hổng, KHỔNG như "Khổng Tử".
+孤	mồ côi	Đứa trẻ 子 lẻ loi như quả dưa 瓜: mồ côi, CÔ như "cô đơn".
+宛	gửi tới	Dưới mái 宀 lúc chiều 夕 quỳ 卩 viết thư gửi tới, UYỂN như "uyển".
+宜	thích hợp	Lại 且 thêm có mái 宀: thích hợp, NGHI như "tiện nghi".
+宰	cai quản	Người cay nghiệt 辛 dưới mái 宀: cai quản, TỂ như "tể tướng".
+宴	tiệc	Người phụ nữ 女 dưới mái 宀 cả ngày 日: bữa tiệc, YẾN như "yến tiệc".
+宵	đêm	Mái 宀 dưới vầng trăng 月 nhỏ ⺌: đầu đêm, TIÊU như "nguyên tiêu".
+寂	cô đơn	Ông chú 叔 một mình dưới mái 宀: cô đơn, TỊCH như "tịch mịch".
+寛	khoan dung	Dưới mái 宀 cỏ 艹 thấy 見 mọc tự do: khoan dung, KHOAN như "khoan hồng".
+寝	ngủ	Dưới mái 宀 trên gỗ chẻ ⺦ bàn tay 又 nghỉ: đi ngủ, TẨM như "tẩm cung".
+寡	góa	Dưới mái 宀 bản thân 自 chỉ một phần 分: góa bụa, QUẢ như "quả phụ".
+寧	yên bình	Trái tim 心 và đôi mắt 罒 nghỉ dưới mái 宀: yên bình, NINH như "an ninh".
+審	xét xử	Dưới mái 宀 lần lượt 番 xét xử, THẨM như "thẩm phán".
+寮	ký túc xá	Mái 宀 trên đống lửa lớn 大 cho học trò nhỏ 小: ký túc xá, LIÊU như "liêu".
+寿	sống lâu	Ba 三 nét và bàn tay 寸 đếm năm: sống lâu, THỌ như "trường thọ".
+封	niêm phong	Viên ngọc vuông 圭 ấn bằng tay 寸: niêm phong, PHONG như "phong bì".
+尉	sĩ quan	Thân 尸 bày 示 tay 寸 cấp bậc: sĩ quan, ÚY như "đại úy".
+尋	hỏi	Tay ⺕, nghề 工, miệng 口 và tay 寸: hỏi han, TẦM như "sưu tầm".
+尚	tôn trọng	Khói ⺌ bốc từ cửa sổ 冋: tôn trọng, THƯỢNG như "cao thượng".
+尻	mông	Thân 尸 cong như số chín 九: cái mông, KHÀO như "khào".
+尼	ni cô	Thân 尸 cúi xuống bên cái thìa 匕: ni cô, NI như "tăng ni".
+尽	cạn	Một thước 尺 băng 冫 tan hết: cạn kiệt, TẬN như "tận tụy".
+尾	đuôi	Thân 尸 có lông 毛 phía sau: cái đuôi, VĨ như "vĩ thanh".
+尿	nước tiểu	Thân 尸 tiết ra nước 水: nước tiểu, NIỆU như "tiết niệu".
+屈	cúi	Thân 尸 cúi xuống để ra 出: khuất phục, KHUẤT như "khuất phục".
+履	giày dép	Thân 尸 đi về 復 mãi: giày dép, LÝ như "lý lịch".
+屯	đồn	Mầm 屮 đâm qua đất: đồn trú, ĐỒN như "đồn điền".
+岬	mũi đất	Ngọn núi 山 như giáp 甲 nhô ra biển: mũi đất, GIÁP như "giáp".
+岳	núi cao	Ngọn đồi 丘 trên núi 山: núi cao, NHẠC như "Ngũ Nhạc".
+峠	đèo	Ngọn núi 山 đi lên 上 rồi xuống 下: con đèo, ĐÈO như "đèo".
+峡	hẻm núi	Núi 山 kẹp người lớn 大 hai 二 bên: hẻm núi, HIỆP như "hải hiệp".
+峰	đỉnh	Núi 山 bước 夂 lên tới mũi nhọn: đỉnh núi, PHONG như "cao phong".
+崇	sùng bái	Núi 山 trên tôn giáo 宗: sùng bái, SÙNG như "sùng kính".
+崖	vách đá	Núi 山 có vách 厂 đá vuông 圭: vách đá, NHAI như "nhai".
+崩	sụp đổ	Núi 山 trên hai vầng trăng 朋: sụp đổ, BĂNG như "băng hoại".
+嵐	bão	Gió 風 trên núi 山: cơn bão, LAM như "lam".
+巡	tuần tra	Bước 辶 dọc sông 巛: tuần tra, TUẦN như "tuần tra".
+巧	khéo	Nghề 工 với đường uốn 丂: khéo léo, XẢO như "tinh xảo".
+巨	to lớn	Thước thợ 工 trong hộp 匚: to lớn, CỰ như "cự phú".
+巾	khăn	Tấm vải treo trên sào: cái khăn, CÂN như "khăn cân".
+帆	buồm	Vải 巾 tầm thường 凡 trên mọi thuyền: cánh buồm, PHÀM như "phàm".
+帝	hoàng đế	Nắp 亠 và vải 巾 dưới mái 冖: hoàng đế, ĐẾ như "đế vương".
+帥	chỉ huy	Lá cờ vải 巾 bên đoàn quân: chỉ huy, SOÁI hay SUẤT như "thống suất".
+帽	mũ	Vải 巾 đội lên khi mạo 冒 hiểm: cái mũ, MẠO như "mạo".
+幅	chiều rộng	Vải 巾 rộng như ruộng 田: chiều rộng, BỨC như "bức tranh".
+幣	tiền	Mảnh 小 vải 巾 đập 攵 thành tiền: tiền tệ, TỆ như "tiền tệ".
+幻	ảo ảnh	Sợi chỉ ngắn 幺 móc lấy tâm trí: ảo ảnh, HUYỄN như "huyễn hoặc".
+幽	u tịch	Sợi chỉ 幺 giấu trong núi 山: u tịch, U như "u ám".
+幾	bao nhiêu	Sợi chỉ 幺 và ngọn kích 戈 người 人 cầm: bao nhiêu, KỈ như "kỉ hà".
+床	giường	Gỗ 木 dưới mái 广: chiếc giường, SÀNG như "lâm sàng".
+庶	thường dân	Dưới mái 广 hai mươi 廿 người bên lửa 灬: thường dân, THỨ như "thứ dân".
+庸	bình thường	Tay ⺕ dưới mái 广 dùng 用 mỗi ngày: bình thường, DONG như "trung dong".
+廃	bãi bỏ	Ngôi nhà 广 lúc ra đi 発: bãi bỏ, PHẾ như "phế bỏ".
+廉	rẻ	Dưới mái 广 cầm hai bó 兼: giá rẻ, LIÊM như "liêm khiết".
+廊	hành lang	Người con trai 郎 đi dưới mái 广: hành lang, LANG như "hành lang".
+廷	triều đình	Bước dài 廴 của vua 壬: triều đình, ĐÌNH như "pháp đình".
+弄	đùa	Hai tay 廾 đùa với viên ngọc 王: đùa nghịch, LỘNG như "lộng quyền".
+弊	tệ hại	Đánh 攵 nhỏ 小 bằng hai tay 廾: tệ hại, TỆ như "tệ nạn".
+弐	hai	Cây cọc 弋 trên hai 二 nét: số hai, NHỊ như "nhị".
+弔	viếng	Cây cung 弓 trên cột 丨: viếng người chết, ĐIẾU như "phúng điếu".
+弥	càng thêm	Cây cung 弓 và chút 小 nữa: càng thêm, DI như "di".
+弦	dây cung	Cây cung 弓 có sợi dây huyền 玄: dây cung, HUYỀN như "huyền".
+弧	vòng cung	Cung 弓 cong như quả dưa 瓜: vòng cung, HỒ như "hồ".
+弾	đạn	Cây cung 弓 bắn đơn 単 giản: viên đạn, ĐẠN như "đạn dược".
+彙	thu thập	Cái mõm 彑 dưới nắp 冖 trên quả 果: thu thập, VỰNG như "từ vựng".
+彩	màu sắc	Hột 采 và nét lông 彡: màu sắc, THÁI như "sắc thái".
+彫	khắc	Khắp xung quanh 周 có nét lông 彡: chạm khắc, ĐIÊU như "điêu khắc".
+彰	rõ ràng	Huy hiệu 章 có tia 彡 sáng: rõ ràng, CHƯƠNG như "biểu chương".
+影	bóng	Cảnh vật 景 có nét lông 彡: cái bóng, ẢNH như "nhiếp ảnh".
+彼	anh ấy	Bước 彳 về phía người mặc da 皮: anh ấy, BỈ như "bỉ thử".
+征	chinh phục	Bước 彳 tới làm cho đúng 正: chinh phục, CHINH như "chinh phạt".
+徐	từ từ	Bước 彳 mang quá nhiều 余: từ từ, TỪ như "từ từ".
+御	kính	Bước 彳 tới người bán sỉ 卸: kính trọng, NGỰ như "ngự".
+循	tuân theo	Bước 彳 sau tấm khiên 盾: tuân theo, TUẦN như "tuần hoàn".
+微	nhỏ bé	Bước 彳 tới núi 山 rồi gõ 攵 nhẹ: nhỏ bé, VI như "vi mô".
+徴	dấu hiệu	Bước 彳 tới vua 王 núi 山 rồi đánh 攵: dấu hiệu, TRƯNG như "đặc trưng".
+徹	xuyên suốt	Bước 彳 nuôi 育 một cú đánh 攵 thấu qua: xuyên suốt, TRIỆT như "triệt để".
+忌	kiêng kỵ	Bản thân 己 trên trái tim 心: kiêng kỵ, KỊ như "kị húy".
+忍	chịu đựng	Lưỡi dao 刃 trên trái tim 心: chịu đựng, NHẪN như "nhẫn nại".
+忙	bận	Trái tim 忄 đã chết 亡 vì việc: bận rộn, MANG như "mang".
+怒	giận	Trái tim 心 kẻ nô lệ 奴: tức giận, NỘ như "phẫn nộ".
+怖	sợ	Trái tim 忄 bị quấn vải 布: sợ hãi, PHỐ như "khủng phố".
+怠	lười	Trái tim 心 ngồi trên bệ 台: lười biếng, ĐÃI như "đãi".
+怨	oán	Trái tim 心 quỳ 卩 lúc chiều 夕: oán hận, OÁN như "oán thù".
+怪	kỳ quái	Trái tim 忄 bên bàn tay 又 trên đất 土: kỳ quái, QUÁI như "quái vật".
+恋	yêu	Trái tim 心 cũng 亦 đập vì người khác: tình yêu, LUYẾN như "lưu luyến".
+恐	sợ hãi	Nghề 工 tầm thường 凡 trên tim 心: sợ hãi, KHỦNG như "khủng bố".
+恒	luôn luôn	Trái tim 忄 trải 亘 mọi ngày: luôn luôn, HẰNG như "vĩnh hằng".
+恣	tùy tiện	Trái tim 心 muốn điều kế tiếp 次: tùy tiện, TỨ như "phóng tứ".
+恥	xấu hổ	Lỗ tai 耳 nóng trên trái tim 心: xấu hổ, SỈ như "liêm sỉ".
+恨	hận	Trái tim 忄 dừng 艮 lại: oán hận, HẬN như "thù hận".
+恭	cung kính	Cùng 共 với trái tim ⺗: cung kính, CUNG như "cung kính".
+恵	ân huệ	Thửa ruộng 由 trên trái tim 心: ân huệ, HUỆ như "ân huệ".
+悔	hối hận	Trái tim 忄 mỗi 毎 đêm: hối hận, HỐI như "hối cải".
+悟	giác ngộ	Trái tim 忄 tự nói "ta" 吾: giác ngộ, NGỘ như "giác ngộ".
+悠	xa xôi	Người 亻 gõ 攵 vào trái tim 心 nơi xa: xa xôi, DU như "du dương".
+患	bệnh	Que xiên 串 qua trái tim 心: bệnh hoạn, HOẠN như "hoạn nạn".
+悦	vui sướng	Trái tim 忄 và người anh 兄 cười 八: vui sướng, DUYỆT như "duyệt".
+悩	phiền não	Trái tim 忄 có tia ⺍ trong hộp 凶: phiền não, NÃO như "phiền não".
+悼	thương tiếc	Trái tim 忄 thương người xuất chúng 卓: thương tiếc, ĐIỆU như "truy điệu".
+惑	bối rối	Có một 或 trái tim 心: bối rối, HOẶC như "mê hoặc".
+惜	tiếc	Trái tim 忄 nhớ ngày xưa 昔: tiếc nuối, TÍCH như "thương tích".
+惧	sợ hãi	Trái tim 忄 cầm dụng cụ 具: sợ hãi, CỤ như "cụ".
+惨	thảm	Trái tim 忄 bối rối 参: thê thảm, THẢM như "thảm họa".
+惰	lười biếng	Trái tim 忄 bên trái 左 dưới trăng 月: lười biếng, NỌA như "nọa".
+愁	buồn rầu	Trái tim 心 mùa thu 秋: buồn rầu, SẦU như "sầu muộn".
+愉	vui	Trái tim 忄 bước vào 入 thuyền trăng 月: vui thích, DU như "du khoái".
+愚	ngu	Trái tim 心 con khỉ 禺: ngu dại, NGU như "ngu muội".
+慄	run sợ	Trái tim 忄 dưới cây dẻ 栗: run sợ, LẬT như "lật".
+慈	từ bi	Cỏ 艹 và sợi huyền 玄 trên trái tim 心: từ bi, TỪ như "từ bi".
+慌	hoảng hốt	Trái tim 忄 nơi hoang 荒 vu: hoảng hốt, HOẢNG như "hoảng loạn".
+慎	thận trọng	Trái tim 忄 thật 真: thận trọng, THẬN như "cẩn thận".
+慕	mến mộ	Trái tim ⺗ không được 莫 quên: mến mộ, MỘ như "ngưỡng mộ".
+慢	ngạo mạn	Trái tim 忄 mắt 罒 ngày 日 tay 又 nghỉ: ngạo mạn, MẠN như "ngạo mạn".
+慨	than thở	Trái tim 忄 cho chuyện đã 既 qua: than thở, KHÁI như "cảm khái".
+慮	suy nghĩ	Con hổ 虍 trên sự nghĩ 思: suy nghĩ, LỰ như "lo lự".
+慰	an ủi	Trái tim 心 dưới viên sĩ quan 尉: an ủi, ÚY như "an úy".
+慶	mừng	Trái tim 心 bước 夂 vào nhà 广: vui mừng, KHÁNH như "quốc khánh".
+憂	lo âu	Trăm 百 trái tim 心 dưới nắp 冖 bước chậm 夂: lo âu, ƯU như "ưu sầu".
+憎	ghét	Trái tim 忄 trước kia 曽 yêu: căm ghét, TĂNG như "tăng ố".
+憤	phẫn nộ	Trái tim 忄 với mười 十 vỏ sò 貝 hai tay 廾: phẫn nộ, PHẪN như "phẫn uất".
+憧	khao khát	Trái tim 忄 của trẻ 童: khao khát, SUNG như "sung".
+憩	nghỉ ngơi	Cái lưỡi 舌 và hơi thở 息: nghỉ ngơi, KHẾ như "khế".
+憬	ngưỡng mộ	Trái tim 忄 hướng về cảnh 景: ngưỡng mộ, CẢNH như "cảnh".
+憶	nhớ	Trái tim 忄 giữ ý 意: ghi nhớ, ỨC như "ký ức".
+憾	tiếc nuối	Trái tim 忄 đầy cảm xúc 感 chưa nói: tiếc nuối, HÁM như "di hám".
+懇	thân thiết	Con mèo 豸 dừng 艮 bên tim 心: thân thiết, KHẨN như "khẩn thiết".
+懐	nhớ	Trái tim 忄 có lệ mắt 罒 trên áo 衣: nhớ nhung, HOÀI như "hoài niệm".
+懲	trừng phạt	Dấu hiệu 徴 hằn trên tim 心: trừng phạt, TRỪNG như "trừng trị".
+懸	treo	Cả quận 縣 treo trên trái tim 心: treo lơ lửng, HUYỀN như "huyền".
+戒	răn	Hai tay 廾 cầm ngọn kích 戈: răn dạy, GIỚI như "giới luật".
+戚	họ hàng	Ngọn kích 戊 che trên 上 những đứa nhỏ 小: họ hàng, THÍCH như "thân thích".
+戯	đùa	Ngọn kích 戈 trống rỗng 虚 để đùa: trò chơi, HÍ như "du hí".
+戴	đội	Mười 十 ngọn kích 戈 trên vật lạ 異: đội lên đầu, ĐÁI như "ái đái".
+戻	quay lại	Người lớn 大 ở cửa 戸: quay lại, LỆ như "lệ".
+房	buồng	Cánh cửa 戸 khắp hướng 方: căn buồng, PHÒNG như "phòng ốc".
+扇	quạt	Cánh cửa 戸 bằng lông vũ 羽: cái quạt, PHIẾN như "phiến".
+扉	cánh cửa	Cái cửa 戸 không phải 非 tường: cánh cửa, PHI như "phi".
+払	trả	Bàn tay 扌 trao đi của riêng 厶: trả tiền, PHẤT như "phất".
+扱	xử lý	Bàn tay 扌 vươn ra 及: xử lý, HẤP như "hấp".
+扶	giúp đỡ	Bàn tay 扌 cho người chồng 夫: giúp đỡ, PHÙ như "phù trợ".
+抄	trích	Bàn tay 扌 lấy ít 少: trích lục, SAO như "sao chép".
+把	nắm	Bàn tay 扌 nắm con rắn 巴: nắm chặt, BẢ như "bả".
+抑	đè nén	Bàn tay 扌 đè người quỳ 卩: đè nén, ỨC như "ức chế".
+抗	chống	Bàn tay 扌 giơ dưới nắp 亠 bên bàn 几: chống lại, KHÁNG như "kháng chiến".
+抜	rút	Bàn tay 扌 kéo người bạn 友 ra: rút ra, BẠT như "đề bạt".
+択	chọn	Bàn tay 扌 đo 尺 từng cái: lựa chọn, TRẠCH như "tuyển trạch".
+披	mở	Bàn tay 扌 mở tấm da 皮: mở ra, PHI như "phi lộ".
+抱	ôm	Bàn tay 扌 bọc 包 lấy: ôm, BÃO như "hoài bão".
+抵	chống	Bàn tay 扌 đẩy vào nền 氐: chống cự, ĐỂ như "để kháng".
+抹	xóa	Bàn tay 扌 chà cái ngọn 末: xóa bỏ, MẠT như "xóa mạt".
+押	ấn	Bàn tay 扌 đeo giáp 甲: ấn mạnh, ÁP như "áp lực".
+抽	rút	Bàn tay 扌 rút từ ruộng 由: rút ra, TRỪU như "trừu tượng".
+拉	kéo	Bàn tay 扌 kéo người đang đứng 立: lôi kéo, LẠP như "Lạp Tinh".
+拍	vỗ	Bàn tay 扌 trắng 白 vì vỗ: vỗ tay, PHÁCH như "nhịp phách".
+拐	bắt cóc	Bàn tay 扌 cầm dao 刀 bịt miệng 口: bắt cóc, QUẢI như "quải".
+拒	từ chối	Bàn tay 扌 giơ vật khổng lồ 巨: từ chối, CỰ như "cự tuyệt".
+拓	khai phá	Bàn tay 扌 dời đá 石: khai phá, THÁC như "khai thác".
+拘	bắt giữ	Bàn tay 扌 giữ câu nói 句: bắt giữ, CÂU như "câu lưu".
+拙	vụng	Bàn tay 扌 thò ra 出: vụng về, CHUYẾT như "chuyết".
+拠	căn cứ	Bàn tay 扌 xử lý 処 chỗ đứng: căn cứ, CỨ như "căn cứ".
+括	buộc	Bàn tay 扌 buộc cái lưỡi 舌: buộc lại, QUÁT như "tổng quát".
+拭	lau	Bàn tay 扌 theo kiểu 式: lau chùi, THỨC như "thức".
+拳	nắm đấm	Hai 二 người 人 và bàn tay 手 nắm: nắm đấm, QUYỀN như "quyền anh".
+拶	chào	Bàn tay 扌 bên sông 巛 lúc chiều 夕: chào hỏi, TẠT như "tạt".
+拷	tra tấn	Bàn tay 扌 tính 考 cơn đau: tra tấn, KHẢO như "khảo tra".
+挑	thách	Bàn tay 扌 đọc điềm 兆: thách thức, THIÊU như "thiêu".
+挟	kẹp	Bàn tay 扌 có hai 二 người 人 giữa: kẹp lại, HIỆP như "hiệp".
+挨	chào hỏi	Bàn tay 扌 cầm mũi tên 矢 riêng 厶: chào hỏi, AI như "ai".
+挫	bong gân	Bàn tay 扌 bị đè chỗ ngồi 坐: bong gân, TỎA như "tỏa chiết".
+振	lắc	Bàn tay 扌 lắc con rồng 辰, CHẤN như "chấn động".
+挿	cắm	Bàn tay 扌 cắm ngàn 千 ngày 日 vào: cắm vào, SÁP như "sáp nhập".
+捉	bắt	Bàn tay 扌 tóm cái chân 足: bắt lấy, TRÓC như "bộ tróc".
+捕	bắt	Bàn tay 扌 lần đầu 甫 tóm: bắt giữ, BỘ như "đãi bộ".
+捗	tiến triển	Bàn tay 扌 bước 歩 tới: tiến triển, DUỆ như "duệ".
+捜	tìm	Bàn tay 扌 cầm đuốc 申 lại 又: tìm kiếm, SƯU như "sưu tầm".
+据	đặt	Bàn tay 扌 đặt chỗ ở 居: lắp đặt, CỨ như "cứ".
+捻	vặn	Bàn tay 扌 mang ước 念 muốn: vặn xoắn, NIỆP như "niệp".
+掃	quét	Bàn tay 扌 cầm chổi ⺕ và khăn 巾: quét dọn, TẢO như "tảo".
+掌	lòng bàn tay	Bàn tay 手 được quý 尚: lòng bàn tay, CHƯỞNG như "chưởng môn".
+排	bài trừ	Bàn tay 扌 nói không 非: bài trừ, BÀI như "bài xích".
+掘	đào	Bàn tay 扌 cúi 屈 xuống đào, QUẬT như "quật".
+掛	treo	Bàn tay 扌 treo viên ngọc 圭 và que bói 卜, QUẢI như "quải".
+控	kiềm chế	Bàn tay 扌 giữ trống 空: kiềm chế, KHỐNG như "khống chế".
+措	đặt	Bàn tay 扌 cất chuyện xưa 昔: đặt sang bên, THỐ như "thố".
+掲	treo lên	Bàn tay 扌 treo bảng ban ngày 日: treo lên, YẾT như "yết thị".
+描	vẽ	Bàn tay 扌 vẽ cây non 苗: phác họa, MIÊU như "miêu tả".
+揚	giương	Bàn tay 扌 giương lúc rạng đông 旦: kéo lên, DƯƠNG như "tuyên dương".
+換	đổi	Bàn tay 扌 đổi cái lớn 大: trao đổi, HOÁN như "hoán đổi".
+握	nắm	Bàn tay 扌 nắm mái nhà 屋: nắm chặt, ÁC như "ác".
+援	giúp	Bàn tay 扌 có móng ⺤ kéo người bạn 友: giúp đỡ, VIỆN như "viện trợ".
+揺	rung	Bàn tay 扌 có móng ⺤ trên cái lon 缶: rung lắc, DAO như "dao động".
+搬	chuyên chở	Bàn tay 扌 cho thuyền chở 般: chuyên chở, BAN như "ban vận".
+搭	lên xe	Bàn tay 扌 xếp 合 bó cỏ 艹 lên: lên xe, ĐÁP như "đáp".
+携	mang theo	Bàn tay 扌 mang con chim 隹 theo: mang theo, HUỀ như "đề huề".
+搾	vắt	Bàn tay 扌 trong lỗ hẹp 窄: vắt ép, TRÁ như "áp trá".
+摂	thu nhận	Bàn tay 扌 và tai 耳 thu nhận, NHIẾP như "nhiếp chính".
+摘	hái	Bàn tay 扌 dưới nắp 亠 cũ 古: hái, TRÍCH như "trích dẫn".
+摩	xoa	Bàn tay 手 xoa sợi gai 麻: cọ xát, MA như "ma sát".
+摯	chân thành	Bàn tay 手 kiên trì 執: chân thành, CHÍ như "chân chí".
+撃	tấn công	Xe 車 và vũ khí 殳 trong tay 手: tấn công, KÍCH như "công kích".
+撤	rút lui	Bàn tay 扌 nuôi 育 cú đánh 攵 rồi rút: rút lui, TRIỆT như "triệt thoái".
+撮	chụp	Bàn tay 扌 hết mức 最: chụp ảnh, TOÁT như "toát".
+撲	đánh	Bàn tay 扌 đánh gánh nặng 菐: đánh, PHÁC như "phác".
+擁	ôm ấp	Bàn tay 扌 ôm con chim 隹 dưới nắp 亠: ôm ấp, ỦNG như "ủng hộ".
+擦	cọ	Bàn tay 扌 đoán 察 bằng sờ: cọ xát, SÁT như "ma sát".
+擬	bắt chước	Bàn tay 扌 nghi ngờ 疑: bắt chước, NGHĨ như "mô nghĩ".
+攻	tấn công	Nghề 工 đánh 攵: tấn công, CÔNG như "công kích".
+敏	nhanh nhẹn	Mỗi 毎 cú đánh 攵 đều nhanh: nhanh nhẹn, MẪN như "mẫn cảm".
+敢	dám	Lỗ tai 耳 bị đánh 攵 vẫn không sợ: dám làm, CẢM như "dũng cảm".
+敷	trải	Lần đầu 甫 đập 攵 khắp hướng 方: trải ra, PHU như "phu".
+斉	đều	Câu văn 文 trên hai 二 nét: đều nhau, TỀ như "chỉnh tề".
+斎	trai giới	Đều 斉 và bày lễ 示: trai giới, TRAI như "trai giới".
+斑	đốm	Câu văn 文 giữa hai viên ngọc 王: đốm, BAN như "ban".
+斗	cái đấu	Cái muôi có chấm 丶: cái đấu, ĐẨU như "Bắc Đẩu".
+斜	nghiêng	Quá nhiều 余 trong đấu 斗 làm nó nghiêng: chéo, TÀ như "tà dương".
+斤	cái rìu	Lưỡi rìu trên cán: cái rìu, CÂN như "cân".
+斥	bác bỏ	Cái rìu 斤 có mảnh 丶 văng ra: bác bỏ, XÍCH như "bài xích".
+斬	chém	Xe 車 và rìu 斤: chém đầu, TRẢM như "xử trảm".
+施	ban	Lá cờ 方 phấp phới 也 trên dân: ban phát, THI như "thi hành".
+旋	xoay	Lá cờ 方 trên bàn chân 疋 đi vòng: xoay vòng, TOÀN như "toàn".
+既	đã	Thức ăn dừng 艮 người quay đi 旡: đã rồi, KÝ như "ký vãng".
+旦	rạng sáng	Mặt trời 日 trên đường chân trời 一: rạng sáng, ĐÁN như "nguyên đán".
+旨	ngon	Cái thìa 匕 trên bữa ăn trong ngày 日: ngon miệng, CHỈ như "tôn chỉ".
+旬	tuần	Bọc 勹 mặt trời 日 lại: một tuần mười ngày, TUẦN như "thượng tuần".
+旺	thịnh vượng	Mặt trời 日 và vua 王: thịnh vượng, VƯỢNG như "hưng vượng".
+昆	côn trùng	Dưới mặt trời 日 chúng so 比 bì: côn trùng, CÔN như "côn trùng".
+昇	lên	Mặt trời 日 lên như cái đấu 升 nâng: bay lên, THĂNG như "thăng tiến".
+昧	tối	Mặt trời 日 chưa 未 lên: tối tăm, MUỘI như "ngu muội".
+是	đúng	Mặt trời 日 trên bàn chân 疋 đi thẳng: đúng, THỊ như "thị phi".
+普	phổ biến	Mặt trời 日 trên hàng 並 người: phổ biến, PHỔ như "phổ thông".
+晶	pha lê	Ba mặt trời 日 lấp lánh: pha lê, TINH như "kết tinh".
+暁	bình minh	Mặt trời 日 lên cao 尭: bình minh, HIẾU như "hiếu".
+暇	rảnh	Những ngày 日 mượn 叚 để nghỉ: rảnh rỗi, HẠ như "hưu hạ".
+暦	lịch	Ngày 日 dưới vách 厂 đếm theo rừng 林: tờ lịch, LỊCH như "dương lịch".
+暫	tạm thời	Một nhát chém 斬 trước khi ngày 日 hết: tạm thời, TẠM như "tạm biệt".
+曇	trời âm u	Mây 雲 che mặt trời 日: trời âm u, ĐÀM như "đàm".
+曖	mơ hồ	Mặt trời 日 nhìn qua tình yêu 愛: mơ hồ, ÁI như "ái muội".
+更	thay đổi	Thêm một 一 ngày 日 trên dấu chéo 乂: thay đổi, CANH như "canh tân".
+曹	quan	Khúc cong 曲 trên ngày 日 làm việc: quan lại, TÀO như "Tào Tháo".
+曽	trước kia	Hơi 八 trên nồi trên ruộng 田 ngày 日: trước kia, TẰNG như "tằng tổ".
+替	thay	Hai người chồng 夫 trên một ngày 日: thay thế, THẾ như "thay thế".
+朕	trẫm	Thịt 月 của trời 天: trẫm, TRẪM như "trẫm".
+朱	đỏ son	Cây 木 chưa 未 chặt lõi đỏ: đỏ son, CHU như "chu sa".
+朴	giản dị	Cây 木 và que bói 卜: giản dị, PHÁC như "chất phác".
+朽	mục	Cây 木 cong 丂 vì già: mục nát, HỦ như "hủ bại".
+杉	tuyết tùng	Cây 木 có lá kim như lông 彡: cây tuyết tùng, SAM như "sam".
+杯	chén	Gỗ 木 chưa 不 đầy: cái chén, BÔI như "bôi".
+析	phân tích	Gỗ 木 chẻ bằng rìu 斤: phân tích, TÍCH như "phân tích".
+枕	gối	Gỗ 木 dưới đầu người 冘: cái gối, CHẨM như "chẩm".
+枠	khung	Gỗ 木 chín 九 mười 十: cái khung, KHUNG như "khung".
+枢	then chốt	Gỗ 木 trong khu 区: then chốt, XU như "xu".
+枯	khô héo	Cây 木 già 古: khô héo, KHÔ như "khô".
+架	giá	Gỗ 木 thêm 加 lên: cái giá, GIÁ như "giá sách".
+柄	cán	Gỗ 木 thứ ba 丙: cái cán, BÍNH như "bính".
+某	nào đó	Cây 木 ngọt 甘: người nào đó, MỖ như "mỗ".
+柔	mềm	Ngọn mâu 矛 trên cây 木 cong: mềm mại, NHU như "nhu đạo".
+柳	liễu	Cây 木 bên con thỏ 卯: cây liễu, LIỄU như "dương liễu".
+柵	hàng rào	Gỗ 木 như thẻ sách 冊: hàng rào, SÁCH như "sách".
+柿	hồng	Cây 木 ở chợ 市: quả hồng, THỊ như "thị".
+栓	nút	Gỗ 木 làm cho kín 全: cái nút, XUYÊN như "xuyên".
+核	hạt nhân	Hạt cây 木 con lợn 亥: hạt nhân, HẠCH như "hạch tâm".
+栽	trồng	Ngọn kích 戈 và đất 土 cho cây 木: trồng cây, TÀI như "tài bồi".
+桁	xà	Gỗ 木 đi 行 ngang: cây xà, HÀNH như "hành".
+桃	đào	Cây 木 có điềm 兆: cây đào, ĐÀO như "hoa đào".
+桑	dâu tằm	Những bàn tay 又 hái lá trên cây 木: cây dâu tằm, TANG như "tang thương".
+桟	giàn	Gỗ 木 và kích 戈 ba 三 hàng: giàn giáo, SAN như "san".
+梗	cuống	Cây 木 lớn muộn 更 thành cuống hoa, NGẠNH như "tâm ngạnh".
+棄	vứt bỏ	Dưới nắp 亠 đứa bé 厶 bị hai tay 廾 bỏ bên cây 木: vứt bỏ, KHÍ như "từ bỏ khí".
+棋	cờ	Quân gỗ 木 trên bàn đó 其: cờ tướng, KỲ như "kỳ thủ".
+棚	kệ	Ván gỗ 木 kề nhau như bạn 朋: cái kệ, BẰNG như "bằng".
+棟	nóc nhà	Thanh gỗ 木 phía đông 東: nóc nhà, ĐỐNG như "lương đống".
+棺	quan tài	Gỗ 木 cho viên quan 官: quan tài, QUAN như "quan tài".
+椅	ghế	Gỗ 木 làm chỗ ngồi lạ 奇: cái ghế, Ỷ như "ỷ tử".
+椎	xương sống	Gỗ 木 chim 隹 đậu: chày, xương sống, CHUY như "cột sống chuy".
+楷	chữ khải	Gỗ 木 để mọi người 皆 viết rõ: chữ khải, KHẢI như "khải thư".
+楼	lầu	Gỗ 木, gạo 米 và người phụ nữ 女 trên cao: tòa lầu, LÂU như "lâu đài".
+概	đại khái	Gỗ 木 đã 既 được đẽo: đại khái, KHÁI như "khái niệm".
+槽	bồn	Gỗ 木 chứa nước cho văn phòng 曹: cái bồn, TÀO như "tào".
+欄	cột	Gỗ 木 bên cổng 門 có bó 束: lan can, cột, LAN như "lan can".
+欧	châu Âu	Khu 区 ngáp 欠 về phía tây: châu Âu, ÂU như "Âu châu".
+欺	lừa	Cái ngáp 欠 đó 其 giấu lời dối: lừa gạt, KHI như "khi quân".
+款	khoản	Kẻ sĩ 士 bày 示 cái miệng mở 欠: điều khoản, KHOẢN như "khoản".
+歓	vui mừng	Con chim 隹 mở miệng 欠: vui mừng, HOAN như "hoan hô".
+歳	tuổi	Dừng 止 bên vách 厂 cầm kích 戈 đếm năm: tuổi tác, TUẾ như "vạn tuế".
+殉	tử vì đạo	Chết 歹 trong mười ngày 旬: tử vì đạo, TUẪN như "tuẫn tiết".
+殊	đặc biệt	Cái chết 歹 trong áo đỏ 朱: đặc biệt, THÙ như "đặc thù".
+殖	sinh sôi	Chết 歹 rồi mọc thẳng 直 lại: sinh sôi, THỰC như "sinh thực".
+殴	đánh	Vũ khí 殳 trong khu 区: đánh đập, ẨU như "ẩu đả".
+殻	vỏ	Kẻ sĩ 士 dưới nắp 冖 trên bàn 几 đập bằng gậy 殳: cái vỏ, XÁC như "xác".
+殿	điện	Thân 尸 cùng 共 vũ khí 殳: cung điện, ĐIỆN như "cung điện".
+毀	phá	Cái cối 臼 trên đất 土 bị gậy 殳 đập: phá hủy, HỦY như "hủy hoại".
+氾	tràn	Nước 氵 tràn qua đất quỳ 卩: lan tràn, PHIẾM như "phiếm lạm".
+汁	nước canh	Nước 氵 từ mười 十 trái: nước canh, TRẤP như "trấp".
+汎	rộng	Nước 氵 tầm thường 凡 khắp nơi: rộng khắp, PHIẾM như "phiếm thần".
+汗	mồ hôi	Nước 氵 khi khô 干 người: mồ hôi, HÃN như "hãn".
+汚	bẩn	Nước 氵 trên hai 二 nét cong: dơ bẩn, Ô như "ô nhiễm".
+江	sông	Nước 氵 và nghề 工: dòng sông, GIANG như "giang sơn".
+汰	sàng lọc	Nước 氵 nhiều 太 để rửa: sàng lọc, THẢI như "đào thải".
+沃	màu mỡ	Nước 氵 trên ruộng non 夭: màu mỡ, ỐC như "phì ốc".
+沈	chìm	Nước 氵 trên người 冘 chìm xuống, TRẦM như "trầm lặng".
+沙	cát	Nước 氵 có ít 少 sỏi: cát, SA như "sa mạc".
+没	chìm	Nước 氵 trên vũ khí 殳: chìm nghỉm, MỘT như "mai một".
+沢	đầm lầy	Nước 氵 sâu một thước 尺: đầm lầy, TRẠCH như "trạch".
+沸	sôi	Nước 氵 sủi quanh cây cung 弓: đun sôi, PHÍ như "phí đằng".
+沼	ao	Nước 氵 gọi 召 ếch về: cái ao, CHIỂU như "chiểu".
+況	tình hình	Nước 氵 cho người anh 兄: tình hình, HUỐNG như "tình huống".
+泊	trọ	Nước 氵 trắng 白 nơi thả neo: ngủ trọ, BẠC như "phiêu bạc".
+泌	tiết ra	Nước 氵 tất 必 phải chảy ra: tiết ra, BÍ như "phân bí".
+泡	bong bóng	Nước 氵 bọc 包 không khí: bong bóng, BÀO như "bào".
+泥	bùn	Nước 氵 dưới chân ni cô 尼: bùn lầy, NÊ như "nê".
+泰	yên ổn	Ba 三 người 人 lớn 大 trên nước 氺 lặng: yên ổn, THÁI như "thái bình".
+洞	hang động	Nước 氵 trong cùng 同 một hố: hang động, ĐỖNG như "động".
+津	bến	Nước 氵 nơi cây bút 聿 ghi tên thuyền: bến cảng, TÂN như "tân".
+洪	lũ	Nước 氵 dồn cùng 共 lúc: cơn lũ, HỒNG như "hồng thủy".
+浄	sạch	Nước 氵 tranh 争 với bụi bẩn: sạch sẽ, TỊNH như "thanh tịnh".
+浜	bãi biển	Nước 氵 nơi binh lính 兵 đổ bộ: bãi biển, TÂN như "hải tân".
+浦	vịnh	Nước 氵 lần đầu 甫 gặp đất: vịnh nhỏ, PHỔ như "phổ".
+浪	sóng	Nước 氵 đẹp 良 cuộn: sóng, LÃNG như "lãng du".
+浮	nổi	Nước 氵 nâng đứa trẻ 子 bằng bàn tay ⺤: nổi lên, PHÙ như "phù du".
+浸	ngâm	Nước 氵 trên tay 又 cầm chổi ⺕: ngâm, TẨM như "tẩm".
+涙	nước mắt	Nước 氵 khi trở về 戻: nước mắt, LỆ như "rơi lệ".
+涯	chân trời	Nước 氵 bên vách 厂 đá vuông 圭: chân trời, NHAI như "thiên nhai".
+涼	mát	Nước 氵 ở kinh đô 京: mát mẻ, LƯƠNG như "thê lương".
+淑	thục nữ	Nước 氵 và ông chú 叔: thục nữ, THỤC như "hiền thục".
+淡	nhạt	Nước 氵 trên ngọn lửa 炎: nhạt nhòa, ĐẠM như "đạm bạc".
+淫	dâm	Nước 氵 và móng ⺤ trên số chín 壬: dâm đãng, DÂM như "dâm ô".
+添	thêm	Nước 氵 bên tim ⺗ người trẻ 夭: thêm vào, THIÊM như "thiêm".
+渇	khát	Nước 氵 hết vào ban ngày 日: khát nước, KHÁT như "khát vọng".
+渉	lội qua	Nước 氵 bước 歩 qua: lội qua, THIỆP như "can thiệp".
+渋	chát	Nước 氵 dừng 止 trên lưỡi như băng 冫: vị chát, SÁP như "sáp".
+渓	khe suối	Nước 氵, móng ⺤ và người chồng 夫: khe suối, KHÊ như "khê".
+渡	sang	Nước 氵 qua từng độ 度: đi sang, ĐỘ như "quá độ".
+渦	xoáy nước	Nước 氵 xoáy trong hộp 冂 quanh miệng 口: xoáy nước, OA như "oa".
+湧	trào ra	Nước 氵 có dũng khí 勇 trào ra, DŨNG như "dũng".
+湾	vịnh	Nước 氵 cong như cây cung 弓: cái vịnh, LOAN như "Đài Loan".
+湿	ẩm	Nước 氵 dưới mặt trời 日 vẫn ướt: ẩm ướt, THẤP như "thấp khớp".
+溝	rãnh	Nước 氵 đào lại 再 ba 三 lần: con rãnh, CÂU như "câu".
+溶	tan	Nước 氵 chứa 容 nó: tan chảy, DONG như "dung dịch dong".
+溺	chết đuối	Nước 氵 trên người yếu 弱: chết đuối, NỊCH như "nịch".
+滅	diệt	Nước 氵 trên ngọn kích 戈 và lửa 火: tiêu diệt, DIỆT như "hủy diệt".
+滑	trơn	Nước 氵 trên xương 骨: trơn trượt, HOẠT như "hoạt".
+滝	thác	Nước 氵 đổ như con rồng 竜: thác nước, LONG như "long".
+滞	đình trệ	Nước 氵 bị buộc dải 帯: đình trệ, TRỆ như "trì trệ".
+滴	giọt	Nước 氵 nhỏ từ nắp 亠 cũ 古: giọt nước, TÍCH như "tích".
+漂	trôi	Nước 氵 mang lá phiếu 票: trôi nổi, PHIÊU như "phiêu lưu".
+漆	sơn mài	Nước 氵 từ cây 木 nhỏ 氺 xuống: sơn mài, TẤT như "tất".
+漏	rò	Nước 氵 như mưa 雨 trên thân 尸: rò rỉ, LẬU như "tiết lậu".
+漠	sa mạc	Nước 氵 không thể 莫 tìm: sa mạc, MẠC như "sa mạc".
+漫	lan man	Nước 氵 tràn mắt 罒 cả ngày 日: lan man, MẠN như "lãng mạn".
+漬	ngâm	Nước 氵 bị trách 責 vì vị chua: ngâm muối, TÍ như "tí".
+漸	dần dần	Nước 氵 chém 斬 đá từng chút: dần dần, TIỆM như "tiệm tiến".
+潜	lặn	Nước 氵 đổi 替 chỗ: lặn xuống, TIỀM như "tiềm ẩn".
+潤	ẩm	Nước 氵 tháng nhuận 閏: ẩm ướt, NHUẬN như "lợi nhuận".
+潰	nghiền	Nước 氵 trên đồ quý 貴: nghiền nát, HỘI như "hội".
+澄	trong	Nước 氵 dâng 登 lên: trong veo, TRỪNG như "trừng".
+濁	đục	Nước 氵 có sâu 虫 dưới mắt 罒: đục ngầu, TRỌC như "ô trọc".
+濃	đậm	Nước 氵 của nhà nông 農: đậm đặc, NÙNG như "nùng".
+濫	tràn lan	Nước 氵 không ai trông 監: tràn lan, LẠM như "lạm dụng".
+濯	giặt	Nước 氵 trên lông 羽 chim 隹: giặt giũ, TRẠC như "tẩy trạc".
+瀬	ghềnh	Nước 氵 bạn tin 頼: ghềnh thác, LẠI như "lại".
+炉	lò	Lửa 火 sau cánh cửa 戸: cái lò, LÔ như "hỏa lô".
+炊	nấu	Lửa 火 và cái miệng há 欠: nấu cơm, XUY như "xuy".
+炎	ngọn lửa	Lửa 火 chồng lửa: ngọn lửa, VIÊM như "viêm".
+為	làm	Một chấm 丶 bọc 勹 trên lửa 灬: làm, VI như "hành vi".
+烈	mãnh liệt	Một hàng 列 trên lửa 灬: mãnh liệt, LIỆT như "liệt sĩ".
+焦	cháy sém	Con chim 隹 trên lửa 灬: cháy sém, TIÊU như "tiêu điểm".
+煎	rang	Lửa 灬 ở phía trước 前: rang, TIỄN như "tiễn".
+煙	khói	Lửa 火 dưới nắp 覀 trên đất 土: khói, YÊN như "yên".
+煩	phiền	Lửa 火 trong đầu 頁: phiền muộn, PHIỀN như "phiền phức".
+煮	nấu	Ai đó 者 trên lửa 灬: nấu chín, CHỬ như "chử".
+燥	khô	Lửa 火 dưới cây 木 có chim 品: khô ráo, TÁO như "khô táo".
+爆	nổ	Lửa 火 và sự bùng 暴 phát: nổ tung, BỘC như "bộc phát".
+爪	móng	Bàn tay chụp xuống có móng: móng vuốt, TRẢO như "trảo".
+爵	tước	Bàn tay ⺤ trên mắt 罒 dừng 艮 tay 寸: tước vị, TƯỚC như "tước vị".
+爽	sảng khoái	Người lớn 大 có gió chéo 爻: sảng khoái, SẢNG như "sảng khoái".
+牙	nanh	Nét móc 亅 và nét phẩy 丿 như cái răng cong: răng nanh, NHA như "nha khoa".
+牲	vật tế	Con bò 牛 hiến mạng 生: vật tế, SINH như "hi sinh".
+犠	hy sinh	Con bò 牛 hiến vì nghĩa 義: hy sinh, HI như "hi sinh".
+狂	điên	Con chó ⺨ tưởng mình là vua 王: điên cuồng, CUỒNG như "cuồng nhiệt".
+狙	nhắm	Con chó ⺨ lại 且 nhắm: ngắm bắn, THƯ như "thư kích".
+狩	săn	Con chó ⺨ canh 守 giữ: đi săn, THÚ như "thú".
+狭	hẹp	Con chó ⺨ kẹp giữa hai 二 người 人: chật hẹp, HIỆP như "hiệp".
+猛	dữ dội	Con chó ⺨ đầu đàn 孟: dữ dội, MÃNH như "mãnh liệt".
+猟	săn bắn	Con chó ⺨ đuổi chuột 鼡: săn bắn, LIỆP như "liệp".
+猫	mèo	Con chó ⺨ trong cây non 苗: con mèo, MIÊU như "miêu".
+献	dâng	Con chó 犬 mang từ phương nam 南: dâng lên, HIẾN như "cống hiến".
+猶	vẫn	Con chó ⺨ bên vò rượu 酉: vẫn còn, DO như "do dự".
+猿	khỉ	Con chó ⺨ mặc áo dài 衣 trên đất 土: con khỉ, VIÊN như "viên".
+獄	nhà tù	Hai con chó ⺨ 犬 và lời 言 giữa: nhà tù, NGỤC như "địa ngục".
+獣	thú	Con chó 犬 trong ruộng 田 có miệng 口: dã thú, THÚ như "thú vật".
+獲	bắt được	Con chó ⺨ bắt được chim 隹 trong cỏ 艹, HOẠCH như "thu hoạch".
+玄	huyền bí	Sợi chỉ 幺 dưới nắp 亠: huyền bí, HUYỀN như "huyền bí".
+玩	chơi	Viên ngọc 王 lúc đầu 元: chơi đùa, NGOẠN như "ngoạn mục".
+珍	quý hiếm	Ngọc 王 cho người 人 tóc dài 彡: quý hiếm, TRÂN như "trân châu".
+珠	ngọc trai	Viên ngọc 王 đỏ 朱: ngọc trai, CHÂU như "trân châu".
+琴	đàn	Hai viên ngọc 王 ngân vang lúc này 今: cây đàn, CẦM như "cầm".
+瑠	lưu ly	Viên ngọc 王 giữ 留 ánh mắt: lưu ly, LƯU như "lưu ly".
+璃	thủy tinh	Ngọc 王 dưới nắp 亠 có dấu chân thú 禸: thủy tinh, LY như "lưu ly".
+璧	ngọc bích	Ngọc 玉 dưới thân 尸 miệng 口 cay 辛: ngọc bích, BÍCH như "hoàn bích".
+環	vòng	Viên ngọc 王 có mắt 罒 quanh: cái vòng, HOÀN như "tuần hoàn".
+璽	ngọc tỷ	Ngươi 爾 và ngọc 玉: ngọc tỷ, TỈ như "ngọc tỉ".
+瓦	ngói	Miếng mái cong có chấm 丶: viên ngói, NGÕA như "ngõa".
+瓶	bình	Cái hũ ngói 瓦 khô 干: cái bình, BÌNH như "bình hoa".
+甘	ngọt	Cái miệng 廿 ngậm gì đó: ngọt ngào, CAM như "cam".
+甚	rất	Đồ ngọt 甘 cho một đôi 匹: rất nhiều, THẬM như "thậm chí".
+甲	áo giáp	Mặt trời 日 trên cán 丨: áo giáp, hạng nhất, GIÁP như "giáp ất".
+畏	kính sợ	Ruộng 田 trên người cúi một 一 hàng: kính sợ, ÚY như "kính úy".
+畔	bờ ruộng	Một nửa 半 ruộng 田: bờ ruộng, BẠN như "hồ bạn".
+畜	gia súc	Sợi chỉ huyền 玄 buộc thú vào ruộng 田: gia súc, SÚC như "súc vật".
+畝	luống	Nắp 亠 trên ruộng 田 lâu 久 ngày: luống cày, MẪU như "mẫu".
+畳	chiếu	Ruộng 田 phủ 冖 thêm 且 lớp: chiếu tatami, ĐIỆP như "trùng điệp".
+畿	kinh kỳ	Sợi chỉ 幺 và ngọn kích 戈 canh ruộng 田: kinh kỳ, KÌ như "kinh kì".
+疎	xa cách	Bàn chân 疋 và bó củi 束 rời nhau: xa cách, SƠ như "sơ sài".
+疫	dịch bệnh	Bệnh 疒 đánh như vũ khí 殳: dịch bệnh, DỊCH như "miễn dịch".
+疲	mệt	Bệnh 疒 trong da 皮: mệt mỏi, BÌ như "bì".
+疾	nhanh	Bệnh 疒 nhanh như mũi tên 矢: nhanh chóng, TẬT như "tật bệnh".
+症	triệu chứng	Bệnh 疒 cần chỉnh lại cho đúng 正: triệu chứng, CHỨNG như "chứng bệnh".
+痕	vết sẹo	Bệnh 疒 dừng 艮 lại để lại vết sẹo, NGÂN như "ngân".
+痘	đậu mùa	Bệnh 疒 có hạt đậu 豆 trên da: bệnh đậu mùa, ĐẬU như "thủy đậu".
+痢	tiêu chảy	Bệnh 疒 không lợi 利 cho ai: tiêu chảy, LỊ như "kiết lị".
+痩	gầy	Bệnh 疒 của ông lão 叟: gầy đi, SẤU như "sấu".
+痴	ngốc	Bệnh 疒 của sự biết 知: ngốc nghếch, SI như "si mê".
+瘍	khối u	Bệnh 疒 nổi lên như mặt trời 旦: khối u, DƯƠNG như "ung dương".
+療	chữa	Bệnh 疒 bên đống lửa lớn 大: chữa trị, LIỆU như "điều trị liệu pháp".
+癒	lành	Bệnh 疒 trên tim 心 bước 入 vào yên: lành bệnh, DŨ như "dũ".
+癖	tật	Bệnh 疒 của cái miệng 口 cay 辛: thói tật, PHÍCH như "phích".
+皆	mọi người	So sánh 比 các mái đầu bạc 白: mọi người, GIAI như "giai".
+盆	khay	Cái đĩa 皿 chia 分 cho lễ Vu Lan: cái khay, BỒN như "bồn".
+盗	ăn trộm	Đĩa 皿 kế tiếp 次 biến mất: ăn trộm, ĐẠO như "đạo tặc".
+監	giám sát	Người hầu 臣 cúi trên đĩa 皿: giám sát, GIÁM như "giám đốc".
+盤	mâm	Cái đĩa 皿 để chở 般: cái mâm, BÀN như "bàn cờ".
+盲	mù	Đôi mắt 目 đã chết 亡: mù lòa, MANH như "manh mục".
+盾	khiên	Con mắt 目 sau chữ thập 十 dưới vách 厂: tấm khiên, THUẪN như "mâu thuẫn".
+眉	lông mày	Sợi lông 丿 trên mắt 目: lông mày, MI như "mi mục".
+眠	ngủ	Mắt 目 của dân 民 khép lại: ngủ, MIÊN như "thôi miên".
+眺	ngắm	Con mắt 目 đọc điềm 兆 nơi xa: ngắm nhìn, THIẾU như "thiếu".
+睡	ngủ	Mí mắt 目 rủ 垂 xuống: buồn ngủ, THỤY như "thụy".
+督	đốc thúc	Con mắt 目 của ông chú 叔: đốc thúc, ĐỐC như "giám đốc".
+睦	hòa thuận	Mắt 目 trên cùng gò đất 土: hòa thuận, MỤC như "hòa mục".
+瞬	chớp mắt	Con mắt 目 nhanh như hoa 舜: chớp mắt, THUẤN như "thuấn".
+瞭	rõ	Con mắt 目 bên lửa lớn 大 dưới mặt trời 日: rõ ràng, LIỆU như "minh liệu".
+瞳	con ngươi	Con mắt 目 của đứa trẻ 童: con ngươi, ĐỒNG như "đồng tử".
+矛	ngọn mâu	Cái móc 亅 trên cán dài: ngọn mâu, MÂU như "mâu thuẫn".
+矯	nắn	Mũi tên 矢 làm cho cao 喬 thẳng: uốn nắn, KIỂU như "kiểu chính".
+砕	đập vỡ	Hòn đá 石 vỡ chín 九 mười 十 mảnh: đập vỡ, TOÁI như "phấn toái".
+砲	pháo	Hòn đá 石 bọc 包 lửa: khẩu pháo, PHÁO như "pháo binh".
+硝	diêm tiêu	Đá 石 giống 肖 muối: diêm tiêu, TIÊU như "tiêu".
+硫	lưu huỳnh	Đá 石 chảy như sông 川: lưu huỳnh, LƯU như "lưu huỳnh".
+硬	cứng	Đá 石 càng muộn 更 càng cứng, NGẠNH như "cứng ngạnh".
+碁	cờ vây	Trò chơi đá 石 đó 其: cờ vây, KỲ như "kỳ".
+碑	bia	Đá 石 cho người hèn 卑 đã khuất: tấm bia, BI như "bi ký".
+磨	mài	Sợi gai 麻 chà đá 石: mài, MA như "ma sát".
+礁	đá ngầm	Đá 石 cháy 焦 dưới nước: đá ngầm, TIỀU như "tiều".
+礎	nền móng	Đá 石 dưới nhà nước Sở 楚: nền móng, SỞ như "cơ sở".
+祈	cầu nguyện	Ở bàn thờ 礻 có cái rìu 斤: cầu nguyện, KÌ như "kì nguyện".
+祉	phúc lợi	Ở bàn thờ 礻 ta dừng 止 lại: phúc lợi, CHỈ như "phúc chỉ".
+祥	điềm lành	Bàn thờ 礻 có con cừu 羊: điềm lành, TƯỜNG như "cát tường".
+禅	thiền	Ở bàn thờ 礻 đơn giản 単: thiền, THIỀN như "thiền định".
+禍	tai họa	Bàn thờ 礻 có miệng 口 trong hộp 冂: tai họa, HỌA như "tai họa".
+秀	ưu tú	Hạt lúa 禾 vươn từ 乃 đám đông: ưu tú, TÚ như "tuấn tú".
+租	thuế	Lúa 禾 và lại 且: thuế ruộng, TÔ như "tô thuế".
+秩	trật tự	Lúa 禾 không được mất 失: trật tự, TRẬT như "trật tự".
+称	gọi	Lúa 禾 cân từng chút 小: gọi tên, XƯNG như "xưng hô".
+稚	non nớt	Lúa 禾 và chim 隹 nhỏ: non nớt, TRĨ như "ấu trĩ".
+稲	lúa	Hạt 禾 hái bằng tay ⺤ trên ruộng cũ 旧: cây lúa, ĐẠO như "đạo điền".
+稼	kiếm tiền	Lúa 禾 cho cả nhà 家: kiếm tiền, GIÁ như "giá".
+稽	suy xét	Lúa 禾 hợp lý 尤 và ngon 旨: suy xét, KÊ như "hoạt kê".
+稿	bản thảo	Lúa 禾 chất cao 高: bản thảo, CẢO như "bản cảo".
+穂	bông lúa	Lúa 禾 được ơn 恵: bông lúa, TUỆ như "tuệ".
+穏	yên ổn	Lúa 禾 cầm bằng tay ⺤ trên tim 心: yên ổn, ỔN như "ổn định".
+穫	gặt	Lúa 禾 bắt trong cỏ 艹 bằng tay 又: gặt hái, HOẠCH như "thu hoạch".
+突	đột ngột	Con chó lớn 大 lao ra khỏi hang 穴: đột ngột, ĐỘT như "đột phá".
+窃	trộm	Cắt 切 qua cái lỗ 穴: ăn trộm, THIẾT như "thiết".
+窒	nghẹt	Cái lỗ 穴 tới tận cùng 至: nghẹt thở, TRẤT như "trất".
+窟	hang	Cái lỗ 穴 phải cúi 屈 vào: hang động, QUẬT như "quật".
+窮	cùng cực	Thân 身 cong như cung 弓 trong hang 穴: cùng cực, CÙNG như "bần cùng".
+窯	lò nung	Hố 穴 trên con cừu 羊 trên lửa 灬: lò nung, DIÊU như "diêu".
+竜	rồng	Đứng 立 trên thân cuộn: con rồng, LONG như "long".
+端	mép	Đứng 立 trên núi 山 mà 而 vẫn ở mép, ĐOAN như "cực đoan".
+符	dấu hiệu	Thẻ tre 竹 trao 付 tay: dấu hiệu, PHÙ như "phù hiệu".
+筒	ống	Tre 竹 suốt dọc như nhau 同: cái ống, ĐỒNG như "đồng".
+箇	cái	Thanh tre 竹 cứng 固 lại: đếm từng cái, CÁ như "cá nhân".
+箋	giấy	Thẻ tre 竹 cắt bằng kích 戈: tờ giấy, TIÊN như "hoa tiên".
+箸	đũa	Que tre 竹 ai đó 者 dùng: đôi đũa, TRỢ như "trợ".
+範	khuôn mẫu	Tre 竹 và xe 車 có dấu 卩: khuôn mẫu, PHẠM như "mô phạm".
+篤	thân hậu	Mái tre 竹 che con ngựa 馬: thân hậu, ĐỐC như "đốc".
+簿	sổ	Thẻ tre 竹 thấm nước 氵 lần đầu 甫: cuốn sổ, BỘ như "danh bộ".
+籍	hộ tịch	Tre 竹 và cái cày 耒 thuở xưa 昔: hộ tịch, TỊCH như "quốc tịch".
+籠	giỏ	Tre 竹 đan quanh con rồng 龍: cái giỏ, LUNG như "lung".
+粋	tinh túy	Gạo 米 lọc chín 九 mười 十 lần: tinh túy, TÚY như "thuần túy".
+粒	hạt	Gạo 米 đứng 立 từng hạt: hạt, LẠP như "lạp".
+粗	thô	Gạo 米 lại 且 chưa xát: thô ráp, THÔ như "thô sơ".
+粘	dính	Gạo 米 dùng để bói 占: dẻo dính, NIÊM như "niêm phong".
+粛	nghiêm trang	Cây bút 聿 trên gạo 米: nghiêm trang, TÚC như "nghiêm túc".
+粧	trang điểm	Bột gạo 米 trong nhà 庄: trang điểm, TRANG như "hóa trang".
+糧	lương thực	Gạo 米 với số lượng 量: lương thực, LƯƠNG như "lương thảo".
+糾	tra hỏi	Sợi chỉ 糸 xoắn 丨 chặt: tra hỏi, CỦ như "củ".
+紋	hoa văn	Sợi chỉ 糸 dệt thành văn 文: hoa văn, VĂN như "văn".
+紛	rối	Sợi chỉ 糸 tách 分 ra: rối ren, PHÂN như "phân vân".
+紡	kéo sợi	Sợi chỉ 糸 xe khắp hướng 方: kéo sợi, PHƯỞNG như "phưởng".
+索	dây	Mười 十 sợi chỉ 糸 dưới nắp 冖: sợi dây, TÁC như "tác".
+紫	tím	Sợi chỉ 糸 này 此: màu tím, TỬ như "tử".
+累	chồng chất	Ruộng 田 trên sợi chỉ 糸: chồng chất, LŨY như "tích lũy".
+紳	thân sĩ	Đai chỉ 糸 của người nói 申: thân sĩ, THÂN như "thân sĩ".
+紹	giới thiệu	Sợi chỉ 糸 triệu 召 gọi: giới thiệu, THIỆU như "giới thiệu".
+紺	xanh đậm	Sợi chỉ 糸 nhuộm ngọt 甘 đậm: xanh đậm, CÁM như "cám".
+絞	vắt	Sợi chỉ 糸 đan 交 nhau: vắt, GIẢO như "giảo hình".
+絡	quấn	Sợi chỉ 糸 cho mỗi 各 người: quấn quýt, LẠC như "liên lạc".
+継	nối	Sợi chỉ 糸 và gạo 米 truyền lại: nối tiếp, KẾ như "kế thừa".
+維	sợi	Sợi chỉ 糸 buộc con chim 隹: sợi xơ, DUY như "duy trì".
+綱	dây thừng	Sợi 糸 từ núi 岡: dây thừng, CƯƠNG như "cương lĩnh".
+網	lưới	Sợi chỉ 糸 và tấm lưới 罒 cho kẻ chết 亡: cái lưới, VÕNG như "võng".
+綻	sứt chỉ	Sợi chỉ 糸 quyết 定 đứt: sứt chỉ, TRÁN như "trán".
+緊	căng	Người hầu 臣 có tay 又 trên sợi 糸: căng thẳng, KHẨN như "khẩn cấp".
+緒	đầu mối	Sợi chỉ 糸 ai đó 者 bắt đầu: đầu mối, TỰ như "tình tự".
+締	thắt	Sợi chỉ 糸 vua 帝 buộc: thắt chặt, ĐỀ như "đề".
+緩	lỏng	Sợi 糸 được tay ⺤ nới cho bạn 友: lỏng ra, HOÃN như "trì hoãn".
+緯	ngang	Sợi chỉ 糸 da thuộc 韋 chạy ngang: hàng ngang, VĨ như "vĩ độ".
+緻	tinh tế	Sợi chỉ 糸 đến 致 sát nhau: tinh tế, TRÍ như "tinh trí".
+縁	duyên	Sợi chỉ 糸 giữa cái mõm 彑 và con lợn 豕: duyên phận, DUYÊN như "nhân duyên".
+縛	trói	Sợi dây 糸 quấn lần đầu 甫: trói, PHƯỢC như "trói phược".
+縫	may	Sợi chỉ 糸 tạo cuộc gặp 逢: may vá, PHÙNG như "phùng".
+繁	phồn thịnh	Sợi chỉ 糸 khéo 敏 mọc dày: phồn thịnh, PHỒN như "phồn hoa".
+繊	mảnh	Sợi chỉ 糸 trên đất 土 cắt bằng kích 戈: mảnh mai, TIÊM như "tiêm".
+繕	sửa	Sợi chỉ 糸 cho điều tốt 善: sửa chữa, THIỆN như "tu thiện".
+繭	kén	Cỏ 艹, hộp 冂, sợi 糸 và con sâu 虫: cái kén, KIỂN như "kiển".
+繰	quấn	Sợi chỉ 糸 quấn quanh cây 木 có chim 品 hót, SÀO như "sào".
+缶	lon	Cái nồi có nắp: cái lon, PHẪU như "phẫu".
+罰	phạt	Mắt 罒 trên lời 言 và dao 刂: hình phạt, PHẠT như "xử phạt".
+罵	chửi	Mắt 罒 trên con ngựa 馬: chửi mắng, MẠ như "thóa mạ".
+罷	bãi	Tấm lưới 罒 trên tài năng 能: bãi bỏ, BÃI như "bãi công".
+羅	lưới	Tấm lưới 罒 bằng sợi 維: lụa mỏng, LA như "la".
+羞	xấu hổ	Con cừu 羊 và con trâu 丑: xấu hổ, TU như "tu sỉ".
+羨	ghen tị	Con cừu 羊 và nước dãi 氵 từ miệng há 欠: ghen tị, TIỆN như "tiện".
+翁	ông lão	Người công 公 có tóc như lông 羽: ông lão, ÔNG như "lão ông".
+翻	lật	Lông vũ 羽 thay phiên 番: lật lại, PHIÊN như "phiên dịch".
+翼	cánh	Lông 羽 trên vật lạ 異: đôi cánh, DỰC như "cánh tả dực".
+耐	chịu	Bộ râu 而 nắm bằng tay 寸: chịu đựng, NẠI như "nhẫn nại".
+耗	hao	Cái cày 耒 làm mòn lông 毛: hao mòn, HÁO như "háo tổn".
+聴	nghe	Tai 耳 và mười 十 mắt 罒 cùng trái tim 心: lắng nghe, THÍNH như "thính giả".
+肌	da	Thịt 月 trên bàn 几: làn da, CƠ như "cơ bắp".
+肖	giống	Thịt 月 nhỏ ⺌: giống nhau, TIẾU như "tiếu tượng".
+肘	khuỷu tay	Thịt 月 cạnh bàn tay 寸: khuỷu tay, TRỬU như "trửu".
+肝	gan	Thịt 月 làm khô 干 máu: lá gan, CAN như "can đảm".
+股	đùi	Thịt 月 bị gậy 殳 đánh chỗ chân chia: bắp đùi, CỔ như "cổ phần".
+肢	tay chân	Thịt 月 phân nhánh 支: tay chân, CHI như "tứ chi".
+肩	vai	Thịt 月 dưới khung cửa 戸: bờ vai, KIÊN như "kiên".
+肪	mỡ	Thịt 月 lan khắp hướng 方: mỡ, PHƯƠNG như "chi phương".
+肯	đồng ý	Thịt 月 dừng 止 lại gật đầu: đồng ý, KHẲNG như "khẳng định".
+胆	gan dạ	Thịt 月 lúc rạng đông 旦: gan dạ, ĐẢM như "can đảm".
+胎	thai	Thịt 月 làm bệ 台 cho sự sống: bào thai, THAI như "thai nhi".
+胞	bao	Thịt 月 bọc 包 lại: cái bao, BÀO như "tế bào".
+胴	thân mình	Thịt 月 như nhau 同 khắp quanh: thân mình, ĐỖNG như "đỗng".
+脂	mỡ	Thịt 月 ngon 旨: mỡ, CHI như "chi".
+脅	đe dọa	Ba sức 力 trên thịt 月: đe dọa, HIẾP như "uy hiếp".
+脇	nách	Thịt 月 cạnh ba sức 力: nách, HIẾP như "hiếp".
+脊	cột sống	Người 人 hai 二 nét trên thịt 月: cột sống, TÍCH như "tích".
+脚	chân	Thịt 月 đi thay 却: cái chân, CƯỚC như "cước bộ".
+脱	cởi	Thịt 月 người anh 兄 cười 八 lột ra: cởi bỏ, THOÁT như "giải thoát".
+腎	thận	Người hầu 臣 đặt tay 又 trên thịt 月: quả thận, THẬN như "thận".
+腐	thối	Thịt 肉 trong kho phủ 府: thối rữa, HỦ như "hủ bại".
+腕	cánh tay	Thịt 月 vươn tới địa chỉ 宛: cánh tay, OẢN như "oản".
+腫	sưng	Thịt 月 trở nên nặng 重: sưng tấy, THŨNG như "thũng".
+腰	eo	Thịt 月 cần 要 để đứng: vòng eo, YÊU như "yêu".
+腺	tuyến	Thịt 月 có dòng suối 泉: tuyến, TUYẾN như "tuyến giáp".
+膚	da	Vằn hổ 虍 trên dạ dày 胃: làn da, PHU như "bì phu".
+膜	màng	Thịt 月 không được 莫 rách: lớp màng, MÔ như "mô".
+膝	đầu gối	Thịt 月 như cây 木 bên nước 氺: đầu gối, TẤT như "tất".
+膨	phình	Thịt 月 bên cái trống 壴 có lông 彡: phình to, BÀNH như "bành trướng".
+膳	mâm cơm	Thịt 月 dọn cho người tốt 善: mâm cơm, THIỆN như "ngự thiện".
+臆	nhút nhát	Thịt 月 đầy ý 意 nghĩ: nhút nhát, ỨC như "ức đoán".
+臭	hôi	Cái mũi 自 to 大: mùi hôi, XÚ như "xú uế".
+致	đem đến	Tới 至 rồi đánh 攵: đem đến, TRÍ như "nhất trí".
+臼	cối	Cái bát đá có rãnh: cối giã, CỮU như "cữu".
+舗	cửa hàng	Người 人 gặp may 吉 lần đầu 甫: cửa hàng, PHỔ như "phổ".
+舞	múa	Hai chân dang 舛 tay vẫy: nhảy múa, VŨ như "vũ điệu".
+舟	thuyền	Con thuyền có mái chèo, CHU như "chu".
+般	chở	Con thuyền 舟 đẩy bằng sào 殳: chuyên chở, BAN như "nhất ban".
+舶	tàu	Con thuyền 舟 trắng 白: tàu lớn, BẠC như "bạc".
+舷	mạn thuyền	Con thuyền 舟 có mép huyền 玄: mạn thuyền, HUYỀN như "huyền".
+艇	xuồng	Thuyền 舟 cho triều đình 廷: chiếc xuồng, ĐĨNH như "tiềm đĩnh".
+艦	chiến hạm	Thuyền 舟 canh 監 giữ: chiến hạm, HẠM như "hạm đội".
+艶	bóng bẩy	Màu 色 dồi dào 豊: bóng bẩy, DIỄM như "diễm lệ".
+芋	khoai	Cỏ 艹 trên rễ móc 亅: củ khoai, DỤ như "dụ".
+芝	cỏ	Cỏ 艹 của 之 sân: bãi cỏ, CHI như "chi".
+芯	bấc	Cỏ 艹 có lõi 心: bấc đèn, TÂM như "tâm".
+芳	thơm	Cỏ 艹 bay khắp hướng 方: thơm ngát, PHƯƠNG như "phương thảo".
+苗	cây con	Cỏ 艹 trên ruộng 田: cây con, MIÊU như "miêu".
+苛	hà khắc	Cỏ 艹 có thể 可 làm đau: hà khắc, HÀ như "hà khắc".
+茂	um tùm	Cỏ 艹 bên ngọn kích 戊: um tùm, MẬU như "mậu".
+茎	thân cây	Cỏ 艹 tay 又 cầm trên đất 土: thân cây, HÀNH như "hành".
+荒	hoang	Cỏ 艹 trên người chết 亡 bên sông 川: hoang tàn, HOANG như "hoang dã".
+荘	trang viên	Cỏ 艹 quanh ngôi nhà vững 壮: trang viên, TRANG như "trang trại".
+菊	hoa cúc	Cỏ 艹 bọc 勹 hạt gạo 米: hoa cúc, CÚC như "cúc".
+菌	vi khuẩn	Cỏ 艹 mọc trên lúa 禾 trong hộp 囗: vi khuẩn, KHUẨN như "vi khuẩn".
+菓	bánh kẹo	Cỏ 艹 trên trái 果: bánh kẹo, QUẢ như "quả".
+華	hoa lệ	Cỏ 艹 nở trên thân 丨: hoa lệ, HOA như "phồn hoa".
+萎	héo	Cỏ 艹 giao cho ủy ban 委: héo úa, NUY như "nuy".
+葛	sắn dây	Cỏ 艹 quấn 勹 người 人 ban ngày 日: sắn dây, CÁT như "cát".
+葬	chôn cất	Cỏ 艹 trên người chết 死 hai tay 廾 nâng: chôn cất, TÁNG như "an táng".
+蓄	tích trữ	Cỏ 艹 cho gia súc 畜: tích trữ, SÚC như "súc tích".
+蓋	nắp	Cỏ 艹 trùm 去 lên đĩa 皿: cái nắp, CÁI như "cái".
+蔑	khinh miệt	Cỏ 艹 trong mắt 罒 dưới kích 戈: khinh miệt, MIỆT như "miệt thị".
+蔽	che	Cỏ 艹 trên hộp 冂 nhỏ 小 bị đập 攵: che đậy, TẾ như "ẩn tế".
+薄	mỏng	Cỏ 艹 trong nước 氵 lần đầu 甫: mỏng manh, BẠC như "bạc nhược".
+薦	tiến cử	Cỏ 艹 bên nhà 广 trên lửa 灬: tiến cử, TIẾN như "tiến cử".
+薪	củi	Cỏ 艹 mới 新 chặt: củi đốt, TÂN như "tân".
+薫	hương thơm	Cỏ 艹 nặng 重 trên lửa 灬: hương thơm, HUÂN như "huân".
+藍	chàm	Cỏ 艹 được giám 監 sát: màu chàm, LAM như "xanh lam".
+藤	tử đằng	Cỏ 艹 trên trăng 月 và nước 氺: hoa tử đằng, ĐẰNG như "đằng".
+藩	phiên trấn	Cỏ 艹 bên nước 氵 theo phiên 番: phiên trấn, PHIÊN như "phiên".
+藻	rong biển	Cỏ 艹 trong nước 氵 bên cây 木 có chim 品: rong biển, TẢO như "tảo".
+虎	hổ	Vằn hổ 虍 trên chân 儿: con hổ, HỔ như "mãnh hổ".
+虐	ngược đãi	Con hổ 虍 giơ móng vuốt: ngược đãi, NGƯỢC như "ngược đãi".
+虚	trống rỗng	Con hổ 虍 trên chỗ trống 业: trống rỗng, HƯ như "hư không".
+虜	tù binh	Con hổ 虍 trên người đàn ông 男: tù binh, LỖ như "phu lỗ".
+虞	lo sợ	Con hổ 虍 cho 呉 nỗi sợ: lo sợ, NGU như "ngu".
+虹	cầu vồng	Con sâu 虫 chế 工 bằng ánh sáng: cầu vồng, HỒNG như "hồng".
+蚊	muỗi	Con côn trùng 虫 viết 文 lên da: con muỗi, VĂN như "văn".
+蛇	rắn	Con sâu 虫 dưới mái 宀 đuôi như thìa 匕: con rắn, XÀ như "xà".
+蛍	đom đóm	Ánh nhỏ ⺍ trên con sâu 虫: đom đóm, HUỲNH như "huỳnh quang".
+蛮	man rợ	Cũng 亦 như con sâu 虫: man rợ, MAN như "dã man".
+蜂	ong	Con côn trùng 虫 bước 夂 có ngòi: con ong, PHONG như "phong".
+蜜	mật ong	Dưới mái 宀 côn trùng 虫 tất 必 làm mật ong, MẬT như "mật".
+融	tan	Cái vạc 鬲 và con sâu 虫: tan chảy, DUNG như "dung hòa".
+衝	đâm vào	Đi 行 với vật nặng 重: đâm vào, XUNG như "xung đột".
+衡	cân bằng	Đi 行 gánh con cá lớn 大: cân bằng, HÀNH như "cân hành".
+衰	suy yếu	Chiếc áo 衣 quanh cái miệng 口 yếu: suy yếu, SUY như "suy thoái".
+衷	tấm lòng	Nét 丨 xuyên miệng 口 trong áo 衣: tấm lòng, TRUNG như "trung thành".
+袋	túi	Chiếc áo 衣 dùng thay 代: cái túi, ĐẠI như "đại".
+袖	tay áo	Áo 衤 nơi tay thò ra 由: tay áo, TỤ như "lãnh tụ".
+被	bị	Áo 衤 bằng da 皮: phủ lên, BỊ như "bị động".
+裂	rách	Một đường 列 qua áo 衣: xé rách, LIỆT như "phân liệt".
+裕	dư dả	Áo 衤 đầy thung lũng 谷: dư dả, DỤ như "phú dụ".
+裸	trần truồng	Áo 衤 lột như vỏ trái 果: trần truồng, LỎA như "lõa thể".
+裾	gấu áo	Áo 衤 ở 居 chỗ thấp: gấu áo, CƯ như "cư".
+褐	nâu	Áo 衤 phơi ban ngày 日: màu nâu, HẠT như "hạt".
+褒	khen	Áo 衣 bọc người bảo 保 vệ: khen ngợi, BAO như "bao".
+襟	cổ áo	Áo 衤 chỗ cấm 禁 nhìn: cổ áo, KHÂM như "khâm".
+襲	tập kích	Con rồng 龍 trên áo 衣: tập kích, TẬP như "tập kích".
+覆	lật úp	Nắp 覀 trở lại 復: lật úp, PHÚC như "phúc".
+覇	bá chủ	Nắp 覀 bằng da 革 dưới trăng 月: bá chủ, BÁ như "bá chủ".
+触	chạm	Cái sừng 角 chạm con sâu 虫: tiếp xúc, XÚC như "tiếp xúc".
+訂	đính chính	Lời 言 đóng đinh 丁 cho đúng: đính chính, ĐÍNH như "đính".
+訃	cáo phó	Lời 言 của thầy bói 卜: cáo phó, PHÓ như "cáo phó".
+託	gửi gắm	Lời 言 bám rễ 乇: gửi gắm, THÁC như "ủy thác".
+訟	kiện tụng	Lời 言 nơi công 公 cộng: kiện tụng, TỤNG như "tố tụng".
+訴	tố cáo	Lời 言 bác bỏ 斥: tố cáo, TỐ như "tố cáo".
+診	khám bệnh	Lời 言 với người 人 tóc dài 彡: khám bệnh, CHẨN như "chẩn đoán".
+詐	lừa đảo	Lời 言 bịa 乍 ra: lừa đảo, TRÁ như "trá hình".
+詔	chiếu chỉ	Lời 言 triệu 召 gọi: chiếu chỉ, CHIẾU như "chiếu thư".
+詠	ngâm vịnh	Lời 言 cho muôn đời 永: ngâm vịnh, VỊNH như "vịnh".
+詣	đi lễ	Lời 言 ngon 旨 lành: đi lễ, NGHỆ như "tạo nghệ".
+詮	lý giải	Lời 言 trọn vẹn 全: lý giải, THUYÊN như "thuyên".
+詰	nhồi	Lời 言 may mắn 吉 nhồi vào: nhồi nhét, CẬT như "cật vấn".
+該	đó	Lời 言 nói về con lợn 亥: cái đó, CAI như "cai".
+詳	chi tiết	Lời 言 về từng con cừu 羊: chi tiết, TƯỜNG như "tường tận".
+誇	khoe	Lời 言 to lớn 大: khoe khoang, KHOA như "khoa trương".
+誉	danh dự	Tia nhỏ ⺍ trên lời 言: danh dự, DỰ như "danh dự".
+誓	thề	Gấp 折 lời 言 lại: lời thề, THỆ như "tuyên thệ".
+誘	dụ dỗ	Lời 言 xuất sắc 秀: dụ dỗ, DỤ như "dụ dỗ".
+誰	ai	Lời 言 hỏi con chim 隹: ai đó, THÙY như "thùy".
+請	mời	Lời 言 xanh 青 trong: mời, THỈNH như "thỉnh cầu".
+諦	từ bỏ	Lời 言 của vua 帝: chân lý, từ bỏ, ĐẾ như "chân đế".
+諧	hài hòa	Lời 言 cho mọi người 皆: hài hòa, HÀI như "hài hước".
+諭	khuyên bảo	Lời 言 đi vào 入 như dao 刂: khuyên bảo, DỤ như "dụ".
+諮	hỏi ý	Lời 言 cho cái miệng 口 kế 次: hỏi ý kiến, TƯ như "tư vấn".
+諾	ưng thuận	Lời 言 của người trẻ 若: ưng thuận, NẶC như "hứa nặc".
+謀	mưu	Lời 言 với người nọ 某: mưu kế, MƯU như "âm mưu".
+謁	yết kiến	Lời 言 ban ngày 日 trước vua: yết kiến, YẾT như "yết kiến".
+謄	sao chép	Lời 言 của trẫm 朕 chép lại: sao chép, ĐẰNG như "đằng".
+謎	câu đố	Lời 言 lạc 迷 lối: câu đố, MÊ như "mê".
+謙	khiêm tốn	Lời 言 kiêm 兼 hai bên: khiêm tốn, KHIÊM như "khiêm nhường".
+謡	ca dao	Lời 言 hát gõ móng ⺤ vào lon 缶: ca dao, DAO như "ca dao".
+謹	kính cẩn	Lời 言 nói trên ba 三 ngọn cỏ 艹: kính cẩn, CẨN như "cẩn thận".
+譜	bản nhạc	Lời 言 phổ 普 khắp: bản nhạc, PHỔ như "phổ nhạc".
+譲	nhường	Lời 言 sáu 六 lớp ba 三 tầng: nhường nhịn, NHƯỢNG như "nhượng bộ".
+豚	lợn	Thịt 月 con heo 豕: con lợn, ĐỒN như "đồn".
+豪	hào kiệt	Con lợn 豕 dưới mái cao 亠: hào kiệt, HÀO như "hào hoa".
+貌	dung mạo	Con mèo 豸 mặt trắng 白 trên chân 儿: dung mạo, MẠO như "diện mạo".
+貞	trinh tiết	Bói 卜 bằng vỏ sò 貝: trinh tiết, TRINH như "trinh".
+貢	cống nạp	Nghề 工 và vỏ sò 貝: cống nạp, CỐNG như "cống hiến".
+販	bán	Vỏ sò 貝 quay về 反: buôn bán, PHÁN như "phán".
+貪	tham lam	Bây giờ 今 chỉ muốn vỏ sò 貝: tham lam, THAM như "tham lam".
+貫	xuyên qua	Sợi dây xâu qua vỏ sò 貝 của mẹ 毋: xuyên qua, QUÁN như "quán triệt".
+貼	dán	Vỏ sò 貝 dán lên lúc bói 占: dán, THIẾP như "thiếp".
+賂	hối lộ	Vỏ sò 貝 cho mỗi 各 quan: hối lộ, LỘ như "hối lộ".
+賄	đút lót	Vỏ sò 貝 mình có 有 đem trao: đút lót, HỐI như "hối lộ".
+賊	giặc	Vỏ sò 貝 cướp bằng mười 十 ngọn kích 戈: giặc cướp, TẶC như "hải tặc".
+賓	khách quý	Vài 少 vỏ sò 貝 dưới mái 宀 cho khách quý, TÂN như "tân khách".
+賜	ban thưởng	Vỏ sò 貝 cho dễ 易 dàng: ban thưởng, TỨ như "ân tứ".
+賠	bồi thường	Vỏ sò 貝 người đứng 立 nói 口 trả: bồi thường, BỒI như "bồi thường".
+賢	hiền	Người hầu 臣 đặt tay 又 trên vỏ sò 貝: hiền tài, HIỀN như "hiền triết".
+賦	thuế	Vỏ sò 貝 do võ 武 sĩ thu: thuế, PHÚ như "thiên phú".
+賭	đánh bạc	Vỏ sò 貝 ai đó 者 đặt cược: đánh bạc, ĐỔ như "đổ bác".
+購	mua	Vỏ sò 貝 trả lại 再 ba 三 lần: mua, CẤU như "cấu".
+贈	tặng	Vỏ sò 貝 gửi trước kia 曽: tặng quà, TẶNG như "tặng phẩm".
+赦	tha	Vết đỏ 赤 bị đánh 攵 bay: tha thứ, XÁ như "ân xá".
+赴	đi tới	Chạy 走 tới thầy bói 卜: đi tới, PHÓ như "phó".
+超	vượt	Chạy 走 khi được gọi 召: vượt qua, SIÊU như "siêu việt".
+越	vượt qua	Chạy 走 qua ngọn kích 戈 bên vách 厂: vượt qua, VIỆT như "Việt Nam".
+趣	thú vị	Chạy 走 và lấy 取 ý chính: thú vị, THÚ như "hứng thú".
+距	khoảng cách	Cái chân 足 và vật khổng lồ 巨: khoảng cách, CỰ như "cự ly".
+跡	dấu vết	Bàn chân 足 cũng 亦 để lại vết: dấu vết, TÍCH như "di tích".
+跳	nhảy	Bàn chân 足 theo điềm 兆: nhảy lên, KHIÊU như "khiêu vũ".
+践	giẫm	Bàn chân 足 trên ba 三 ngọn kích 戈: giẫm lên, TIỄN như "thực tiễn".
+踊	nhảy múa	Bàn chân 足 dùng 用 mọi nhịp: nhảy múa, DŨNG như "dũng".
+踏	bước	Bàn chân 足 trong giày 沓: bước đi, ĐẠP như "đạp".
+踪	dấu chân	Bàn chân 足 dẫn tới miếu 宗: dấu chân, TUNG như "tung tích".
+蹴	đá	Bàn chân 足 nhắm 就 quả bóng: đá, XÚC như "xúc cúc".
+躍	nhảy vọt	Bàn chân 足 có lông 羽 như chim 隹: nhảy vọt, DƯỢC như "dược tiến".
+軌	đường ray	Chiếc xe 車 trên chín 九 vệt: đường ray, QUỸ như "quỹ đạo".
+軒	mái hiên	Chiếc xe 車 phơi khô 干 dưới mái hiên, HIÊN như "hiên ngang".
+軟	mềm	Chiếc xe 車 thiếu 欠 lò xo thì không mềm, NHUYỄN như "nhuyễn".
+軸	trục	Chiếc xe 車 quay từ 由 cái trục, TRỤC như "trục xe".
+較	so sánh	Những chiếc xe 車 lẫn 交 nhau: so sánh, GIẢO như "tỉ giảo".
+載	chở	Chiếc xe 車 chở ngọn kích 戈 trên đất 土: chất lên, TẢI như "vận tải".
+輝	tỏa sáng	Ánh sáng 光 trên đạo quân 軍: tỏa sáng, HUY như "huy hoàng".
+輩	bạn bè	Không 非 một mình trong xe 車: bạn bè, BỐI như "tiền bối".
+轄	cai quản	Chiếc xe 車 gây hại 害 nếu không giữ: cai quản, HẠT như "quản hạt".
+辛	cay	Đứng 立 trên chữ thập 十 kim: cay đắng, TÂN như "tân khổ".
+辣	cay nồng	Bó 束 cay 辛: cay nồng, LẠT như "lạt".
+辱	nhục	Con rồng 辰 bị tay 寸 nắm: làm nhục, NHỤC như "sỉ nhục".
+込	chen	Bước 辶 rồi đi vào 入: chen chúc, LIÊU như "liêu".
+迅	nhanh	Bước 辶 nhanh như mười 十 con chim 乙: thần tốc, TẤN như "tấn tốc".
+迎	đón	Bước 辶 ra và quỳ 卩: đón tiếp, NGHÊNH như "hoan nghênh".
+迫	áp sát	Bước 辶 tới ánh trắng 白: áp sát, BÁCH như "cấp bách".
+迭	thay	Bước 辶 đi khi bị mất 失: thay đổi, ĐIỆT như "điệt".
+逃	trốn	Bước 辶 đi khi thấy điềm 兆: trốn chạy, ĐÀO như "đào tẩu".
+透	trong suốt	Bước 辶 qua người tài 秀: trong suốt, THẤU như "thấu".
+逐	đuổi	Bước 辶 theo con lợn 豕: đuổi theo, TRỤC như "trục xuất".
+逓	chuyển	Bước 辶 cầm khăn 巾 bên vách 厂: chuyển tiếp, ĐỆ như "đệ trình".
+途	đường	Bước 辶 mang quá nhiều 余: con đường, ĐỒ như "tiền đồ".
+逝	qua đời	Bước 辶 đi gập 折 người: qua đời, THỆ như "tạ thế thệ".
+逮	bắt	Bước 辶 theo kẻ nô 隶: bắt giữ, ĐÃI như "đãi bộ".
+逸	lạc	Bước 辶 đi được miễn 免: lạc lối, DẬT như "dật sự".
+遂	hoàn thành	Bước 辶 cùng con lợn 豕 tới cùng: hoàn thành, TOẠI như "toại nguyện".
+遅	chậm	Bước 辶 cõng con cừu 羊 trên thân 尸: chậm trễ, TRÌ như "trì hoãn".
+遇	gặp	Bước 辶 rồi gặp con khỉ 禺: gặp gỡ, NGỘ như "tao ngộ".
+遍	khắp	Bước 辶 cầm sách 冊 tới mọi cửa 戸: khắp nơi, BIẾN như "phổ biến".
+違	khác	Bước 辶 vòng quanh trong da 韋: khác biệt, VI như "vi phạm".
+遜	khiêm nhường	Bước 辶 sau đứa cháu 孫: khiêm nhường, TỐN như "khiêm tốn".
+遡	ngược dòng	Bước 辶 về trăng non 朔: ngược dòng, TỐ như "tố".
+遣	phái đi	Bước 辶 ra từ giữa 中: phái đi, KHIỂN như "điều khiển".
+遭	gặp phải	Bước 辶 vào văn phòng 曹: gặp phải, TAO như "tao ngộ".
+遮	chắn	Bước 辶 trước dân 庶: chặn chắn, GIÀ như "già".
+遵	tuân thủ	Bước 辶 sau người được kính 尊: tuân thủ, TUÂN như "tuân lệnh".
+遷	dời	Bước 辶 mang mình 己 dưới nắp 覀 lớn 大: dời đi, THIÊN như "biến thiên".
+避	tránh	Bước 辶 xa cái miệng 口 cay 辛: tránh né, TỊ như "tị nạn".
+還	trả lại	Bước 辶 về với mắt 罒 trên vòng: trả lại, HOÀN như "hoàn trả".
+那	gì	Hai 二 ngôi làng ⻏: cái gì, NA như "sát na".
+邦	nước	Cây 丰 trong làng ⻏: đất nước, BANG như "liên bang".
+邪	tà ác	Răng nanh 牙 trong làng ⻏: tà ác, TÀ như "tà ma".
+邸	dinh thự	Ngôi làng ⻏ của dòng họ 氏: dinh thự, ĐỂ như "quan để".
+郊	ngoại ô	Làng ⻏ hòa 交 với đồng: ngoại ô, GIAO như "giao ngoại".
+郎	chàng trai	Cậu bé tốt 良 từ làng ⻏: chàng trai, LANG như "tân lang".
+郭	thành quách	Tường làng ⻏ để hưởng 享 bình yên: thành quách, QUÁCH như "quách".
+酌	rót rượu	Vò rượu 酉 và cái muôi 勺: rót rượu, CHƯỚC như "châm chước".
+酎	rượu mạnh	Vò rượu 酉 cầm trên tay 寸: rượu mạnh, TRỮU như "trữu".
+酔	say	Vò rượu 酉 uống chín 九 mười 十 lần: say rượu, TÚY như "say túy lúy".
+酢	giấm	Vò rượu 酉 để cho 乍 chua: giấm, TẠC như "tạc".
+酪	bơ sữa	Vò rượu 酉 cho mỗi 各 con bò: bơ sữa, LẠC như "lạc".
+酬	đền đáp	Vò rượu 酉 dâng cho châu 州: đền đáp, THÙ như "thù lao".
+酵	lên men	Vò rượu 酉 chăm như con hiếu 孝: lên men, DIẾU như "diếu tố".
+酷	tàn khốc	Vò rượu 酉 tiết lộ 告 sự ác: tàn khốc, KHỐC như "khốc liệt".
+醒	tỉnh	Vò rượu 酉 dưới sao 星: tỉnh dậy, TỈNH như "thức tỉnh".
+醜	xấu xí	Vò rượu 酉 và con ma 鬼: xấu xí, XÚ như "xú".
+醸	ủ	Vò rượu 酉 mặc sáu 六 áo ba 三 lớp: ủ rượu, NHƯỠNG như "nhưỡng tửu".
+采	hái	Bàn tay ⺤ hái trên cây 木: hái lượm, THÁI như "phong thái".
+釈	giải thích	Tách 釆 rồi đo 尺: giải thích, THÍCH như "chú thích".
+釜	nồi	Kim loại 金 của cha 父: cái nồi, PHỦ như "phủ".
+釣	câu cá	Kim loại 金 và cái muôi 勺: câu cá, ĐIẾU như "điếu ngư".
+鈍	cùn	Kim loại 金 bỏ trong trại 屯: cùn, ĐỘN như "trì độn".
+鈴	chuông	Kim loại 金 ra lệnh 令: cái chuông nhỏ, LINH như "linh".
+鉛	chì	Kim loại 金 ở cửa 口 thung lũng: chì, DUYÊN như "duyên".
+鉢	bát	Kim loại 金 ở gốc 本: cái bát, BÁT như "y bát".
+銃	súng	Kim loại 金 đầy 充 thuốc: khẩu súng, SÚNG như "súng".
+銘	khắc tên	Kim loại 金 có tên 名: khắc tên, MINH như "minh văn".
+鋭	sắc bén	Kim loại 金 của người anh 兄 cười 八: sắc bén, NHUỆ như "tinh nhuệ".
+鋳	đúc	Kim loại 金 cho trường thọ 寿: đúc, CHÚ như "chú tạo".
+錠	khóa	Kim loại 金 xác định 定: ổ khóa, ĐĨNH như "đĩnh".
+錦	gấm	Chỉ kim 金 trên vải 巾 trắng 白: gấm vóc, CẨM như "cẩm tú".
+錬	luyện	Kim loại 金 từ lò phía đông 東: tôi luyện, LUYỆN như "rèn luyện".
+錮	giam	Kim loại 金 cứng 固: giam cầm, CỐ như "cấm cố".
+錯	lẫn lộn	Kim loại 金 thuở xưa 昔: lẫn lộn, THÁC như "thác loạn".
+鍋	nồi	Kim loại 金 trên miệng 口 trong hộp 冂: cái nồi, OA như "oa".
+鍛	rèn	Kim loại 金 đánh từng bậc 段: rèn, ĐOÁN như "đoán luyện".
+鍵	chìa khóa	Kim loại 金 xây 建 nên ổ: chìa khóa, KIỆN như "kiện".
+鎌	liềm	Kim loại 金 cầm cùng hai bó 兼: cái liềm, LIÊM như "liêm".
+鎖	xích	Kim loại 金 với vỏ sò 貝 nhỏ ⺌: dây xích, TỎA như "phong tỏa".
+鎮	trấn an	Kim loại 金 thật 真 đè xuống: trấn an, TRẤN như "trấn tĩnh".
+鐘	chuông	Kim loại 金 do đứa trẻ 童 gõ: cái chuông, CHUNG như "chung".
+鑑	gương	Kim loại 金 để soi 監: tấm gương, GIÁM như "giám định".
+閑	nhàn rỗi	Cái cây 木 trong cổng 門: nhàn rỗi, NHÀN như "an nhàn".
+閥	phe cánh	Cổng 門 đóng bởi kẻ chặt 伐 người: phe cánh, PHIỆT như "tài phiệt".
+閲	duyệt	Người anh 兄 cười 八 ở cổng 門: duyệt xét, DUYỆT như "kiểm duyệt".
+闇	bóng tối	Âm thanh 音 sau cổng 門: bóng tối, ÁM như "ám".
+闘	chiến đấu	Ở cổng 門 cầm hạt đậu 豆 trong tay 寸: chiến đấu, ĐẤU như "đấu tranh".
+阻	ngăn	Gò đất ⻖ lại 且 thêm: ngăn cản, TRỞ như "trở ngại".
+附	gắn	Gò đất ⻖ dính 付 vào: gắn kèm, PHỤ như "phụ lục".
+陣	trận	Gò đất ⻖ có xe 車: trận địa, TRẬN như "trận đánh".
+陥	rơi vào	Gò đất ⻖ nơi người 𠂊 rơi vào hố cũ 旧, HÃM như "hãm hại".
+陪	theo hầu	Gò đất ⻖ nơi đứng 立 nói 口: theo hầu, BỒI như "bồi thẩm".
+陰	bóng râm	Gò đất ⻖ nơi lúc này 今 có mây 云: bóng râm, ÂM như "âm dương".
+陳	trưng bày	Gò đất ⻖ hướng đông 東: trưng bày, TRẦN như "trần thuật".
+陵	lăng mộ	Gò đất ⻖ có đất 土 chân 儿 bước chậm 夂: lăng mộ, LĂNG như "lăng tẩm".
+陶	gốm	Gò đất ⻖ bọc 勹 cái lon 缶: đồ gốm, ĐÀO như "đào nghệ".
+隅	góc	Gò đất ⻖ nơi khỉ 禺 trốn: góc khuất, NGUNG như "ngung".
+隆	cao	Gò đất ⻖ nơi sự sống 生 bước 夂 lên: cao lớn, LONG như "hưng long".
+随	theo	Gò đất ⻖ mình có 有 đi ⻌ theo: đi theo, TÙY như "tùy tùng".
+隔	cách ly	Gò đất ⻖ bên cái vạc 鬲: cách ly, CÁCH như "cách biệt".
+隙	khe hở	Gò đất ⻖ có chút 小 nắng 日 lọt qua: khe hở, KHÍCH như "hiềm khích".
+隠	giấu	Gò đất ⻖ nơi bàn tay ⺤ giấu trái tim 心: che giấu, ẨN như "ẩn nấp".
+隣	láng giềng	Gò đất ⻖ có gạo 米 và chân nhảy 舛: láng giềng, LÂN như "lân cận".
+隷	nô lệ	Kẻ sĩ 士 bày 示 ra kẻ nô 隶: nô lệ, LỆ như "nô lệ".
+隻	chiếc	Bàn tay 又 cầm một con chim 隹: một chiếc, CHÍCH như "chích".
+雄	đực	Con chim 隹 có cánh tay khỏe 厷: con đực, HÙNG như "anh hùng".
+雅	thanh nhã	Răng nanh 牙 và con chim 隹: thanh nhã, NHÃ như "tao nhã".
+雇	thuê	Con chim 隹 ở cửa 戸: thuê mướn, CỐ như "cố nông".
+雌	cái	Con chim 隹 này 此: con cái, THƯ như "thư hùng".
+離	rời	Con chim 隹 bay khỏi dấu chân thú 禸: rời xa, LY như "chia ly".
+雰	bầu không khí	Mưa 雨 chia 分 nhỏ: bầu không khí, PHÂN như "phân".
+零	số không	Mưa 雨 theo lệnh 令 rơi: số không, LINH như "linh".
+雷	sấm	Mưa 雨 trên ruộng 田: tiếng sấm, LÔI như "lôi".
+需	nhu cầu	Mưa 雨 mà 而 vẫn cần: nhu cầu, NHU như "nhu cầu".
+震	rung chuyển	Mưa 雨 và con rồng 辰: rung chuyển, CHẤN như "địa chấn".
+霊	linh hồn	Mưa 雨 trên một 一 miếu 业: linh hồn, LINH như "linh hồn".
+霜	sương giá	Mưa 雨 đọng lại 相: sương giá, SƯƠNG như "sương".
+霧	sương mù	Mưa 雨 làm nhiệm vụ 務: sương mù, VỤ như "vụ".
+露	sương	Mưa 雨 trên đường 路: giọt sương, LỘ như "bộc lộ".
+靴	giày	Da 革 thay 化 chân: đôi giày, NGOA như "ngoa".
+韓	Hàn Quốc	Nắng sớm 早 trên da thuộc 韋: Hàn Quốc, HÀN như "Hàn Quốc".
+韻	vần	Âm 音 của nhân viên 員: vần điệu, VẬN như "vận".
+響	vang	Âm 音 quê nhà 郷: vang vọng, HƯỞNG như "ảnh hưởng".
+頃	lúc	Cái thìa 匕 bên đầu 頁: khoảng lúc, KHOẢNH như "khoảnh khắc".
+項	hạng mục	Nghề 工 và cái đầu 頁: hạng mục, HẠNG như "hạng mục".
+須	cần phải	Râu 彡 bên đầu 頁: cần phải, TU như "tất tu".
+頑	bướng	Khởi đầu 元 của cái đầu 頁: bướng bỉnh, NGOAN như "ngoan cố".
+頒	phân phát	Chia 分 cho mỗi cái đầu 頁: phân phát, BAN như "ban bố".
+頓	bỗng	Cái đầu 頁 ở trại 屯 cúi bỗng: đột ngột, ĐỐN như "đốn".
+頰	má	Người 人 lớn 大 bên đầu 頁: đôi má, GIÁP như "giáp".
+頻	thường xuyên	Bước 歩 tới cái đầu 頁 nhiều lần: thường xuyên, TẦN như "tần suất".
+頼	nhờ cậy	Bó 束 trên đầu 頁: nhờ cậy, LẠI như "ỷ lại".
+顎	cằm	Hai 二 cái miệng 口 dưới đầu 頁: cái cằm, NGẠC như "ngạc".
+顕	hiện rõ	Mặt trời 日 trên cái đầu 頁: hiện rõ, HIỂN như "hiển thị".
+顧	nhìn lại	Thuê 雇 cái đầu 頁 để nhìn lại, CỐ như "chiếu cố".
+飢	đói	Thức ăn 飠 trên bàn 几 trống: đói, CƠ như "cơ hàn".
+飽	no	Thức ăn 飠 bọc 包 bên trong: no nê, BÃO như "bão hòa".
+飾	trang trí	Thức ăn 飠 dưới khăn 巾: trang trí, SỨC như "trang sức".
+餅	bánh dày	Thức ăn ⻞ giã khô 干: bánh dày, BÍNH như "bính".
+餌	mồi	Thức ăn ⻞ bên tai 耳: mồi câu, NHỊ như "nhị".
+餓	chết đói	Thức ăn 飠 cho bụng tôi 我: chết đói, NGẠ như "ngạ quỷ".
+駄	ngựa thồ	Con ngựa 馬 mập 太: ngựa thồ, ĐÀ như "đà".
+駆	phi	Con ngựa 馬 phi qua khu 区: phi nước đại, KHU như "khu trục".
+駐	đóng quân	Con ngựa 馬 bên chủ 主: đóng quân, TRÚ như "trú quân".
+駒	ngựa con	Con ngựa 馬 có câu 句 hát: ngựa con, CÂU như "câu".
+騎	cưỡi ngựa	Con ngựa 馬 lạ 奇: cưỡi ngựa, KỊ như "kị binh".
+騒	ồn ào	Con ngựa 馬 có con sâu 虫 trong tay 又: ồn ào, TAO như "tao loạn".
+騰	tăng vọt	Con ngựa 馬 nhảy qua trăng 月: tăng vọt, ĐẰNG như "phi đằng".
+驚	ngạc nhiên	Con ngựa 馬 kính sợ 敬: ngạc nhiên, KINH như "kinh ngạc".
+骸	hài cốt	Xương 骨 con lợn 亥: hài cốt, HÀI như "hài cốt".
+髄	tủy	Xương 骨 mình có 有 đi ⻌ qua: tủy xương, TỦY như "cốt tủy".
+髪	tóc	Tóc dài 髟 của người bạn 友: mái tóc, PHÁT như "phát".
+鬱	u uất	Cây 木 trên lon 缶 thảo 鬯 có lông 彡: u uất, UẤT như "uất ức".
+鬼	quỷ	Cái đầu 田 trên chân 儿 có đuôi 厶: con quỷ, QUỶ như "ma quỷ".
+魂	hồn	Con ma 鬼 nói 云: linh hồn, HỒN như "linh hồn".
+魅	quyến rũ	Con ma 鬼 chưa 未 thấy: quyến rũ, MỊ như "mị lực".
+魔	ma quỷ	Sợi gai 麻 và con ma 鬼: ma quỷ, MA như "ma thuật".
+鮮	tươi	Cá 魚 và cừu 羊: tươi sống, TIÊN như "tươi tiên".
+鯨	cá voi	Con cá 魚 to như kinh đô 京: cá voi, KÌNH như "kình ngư".
+鶏	gà	Con chim 鳥 trong tay ⺤ người chồng 夫: con gà, KÊ như "kê".
+鶴	hạc	Con chim 鳥 cùng chim 隹 dưới mái 宀: con hạc, HẠC như "tiên hạc".
+麓	chân núi	Con hươu 鹿 bên rừng 林: chân núi, LỘC như "lộc".
+麗	đẹp	Con hươu 鹿 có sừng trên một 一 nét: xinh đẹp, LỆ như "mỹ lệ".
+麺	mì	Lúa mì 麦 với mặt 面: sợi mì, MIẾN như "miến".
+麻	cây gai	Rừng 林 dưới mái 广: cây gai, MA như "ma túy".
+黙	im lặng	Con chó 犬 đen 黒: im lặng, MẶC như "trầm mặc".
+鼓	trống	Hạt đậu 豆 may 吉 và cành 支: cái trống, CỔ như "cổ vũ".
+齢	tuổi	Răng 歯 theo lệnh 令: tuổi tác, LINH như "linh".
+𠮟	mắng	Cái miệng 口 nói bảy 七 lời: mắng mỏ, SẤT như "sất trá".

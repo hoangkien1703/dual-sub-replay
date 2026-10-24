@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">Kanji</string>
+    <string name="kanji_back">Voltar para %1$s</string>
+    <string name="kanji_grade_school">Série escolar %1$d</string>
+    <string name="kanji_grade_secondary">Ensino médio</string>
+    <string name="kanji_grade_names">Usado em nomes</string>
+    <string name="kanji_radical">radical %1$s</string>
+    <string name="kanji_on">On</string>
+    <string name="kanji_kun">Kun</string>
+    <string name="kanji_how_to_write">Como escrever</string>
+    <string name="kanji_play">Reproduzir</string>
+    <string name="kanji_stroke_order_description">Ordem dos traços de %1$s, %2$s</string>
+    <string name="kanji_parts">Partes</string>
+    <string name="kanji_part_radical">radical</string>
+    <string name="kanji_part_sound">som %1$s</string>
+    <string name="kanji_part_sound_plain">som</string>
+    <string name="kanji_how_to_remember">Como lembrar</string>
+    <string name="kanji_memory_story">História para lembrar</string>
+    <string name="kanji_my_story">Minha história</string>
+    <string name="kanji_my_story_hint">Escreva sua própria história (fica salva neste celular)</string>
+    <string name="kanji_ai_story_button">Outra história com IA</string>
+    <string name="kanji_ai_story_question">Me dê outra história curta para lembrar o kanji %1$s, construída a partir das partes dele, e um jeito fácil de lembrar as leituras.</string>
+    <string name="practice_meaning_edit">Editar significado</string>
+    <string name="practice_meaning_done">Pronto</string>
+    <string name="study_kanji_details_title">Detalhes de kanji</string>
+    <string name="study_kanji_details_description">Palavras em japonês mostram cada kanji com a ordem dos traços, as partes e uma história para lembrar.</string>
+    <plurals name="kanji_strokes">
+        <item quantity="one">%1$d traço</item>
+        <item quantity="many">%1$d traços</item>
+        <item quantity="other">%1$d traços</item>
+    </plurals>
+</resources>

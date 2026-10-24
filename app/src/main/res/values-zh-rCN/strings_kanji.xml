@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">汉字</string>
+    <string name="kanji_back">返回 %1$s</string>
+    <string name="kanji_grade_school">小学 %1$d 年级</string>
+    <string name="kanji_grade_secondary">中学</string>
+    <string name="kanji_grade_names">用于人名</string>
+    <string name="kanji_radical">部首 %1$s</string>
+    <string name="kanji_on">音读</string>
+    <string name="kanji_kun">训读</string>
+    <string name="kanji_how_to_write">写法</string>
+    <string name="kanji_play">播放</string>
+    <string name="kanji_stroke_order_description">%1$s 的笔顺,%2$s</string>
+    <string name="kanji_parts">部件</string>
+    <string name="kanji_part_radical">部首</string>
+    <string name="kanji_part_sound">声旁 %1$s</string>
+    <string name="kanji_part_sound_plain">声旁</string>
+    <string name="kanji_how_to_remember">记忆方法</string>
+    <string name="kanji_memory_story">记忆故事</string>
+    <string name="kanji_my_story">我的故事</string>
+    <string name="kanji_my_story_hint">写下你自己的故事(保存在这台手机上)</string>
+    <string name="kanji_ai_story_button">用 AI 再讲一个故事</string>
+    <string name="kanji_ai_story_question">请用汉字 %1$s 的部件再编一个简短的记忆故事,并给出一个记住它读音的简单方法。</string>
+    <string name="practice_meaning_edit">编辑释义</string>
+    <string name="practice_meaning_done">完成</string>
+    <string name="study_kanji_details_title">汉字详情</string>
+    <string name="study_kanji_details_description">日语单词会显示每个汉字的笔顺、部件和记忆故事。</string>
+    <plurals name="kanji_strokes">
+        <item quantity="other">%1$d 画</item>
+    </plurals>
+</resources>

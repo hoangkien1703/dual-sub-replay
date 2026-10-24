@@ -138,4 +138,41 @@ class WordLearningDialogTest {
         compose.onNodeWithTag("close_word_card").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, dismissed) }
     }
+
+    @Test
+    fun japaneseWordShowsItsMeaningBoxAndEachKanjisPage() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LearnerData.useAssets(context.assets)
+        val stories = MyKanjiStories.inDirectory(context.filesDir)
+        stories.set("葉", "")
+        val word = AnalyzedToken("葉っぱ", 0, 3, PartOfSpeech.NOUN)
+        val leaf =
+            selection.copy(
+                token = word,
+                parts = listOf(word),
+                wordLanguage = "ja",
+                segment = SubtitleSegment(1, 1000, 3000, "葉っぱが落ちた", null),
+            )
+        compose.setContent {
+            DualSubTheme { WordLearningDialog(leaf, false, { "lá cây" }, { _, _ -> }, {}, null, {}) }
+        }
+        compose.onNodeWithTag("word_meaning_panel").assertIsDisplayed()
+        compose.onNodeWithTag("word_meaning_text").assertTextEquals("lá cây")
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("kanji_row_葉")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("kanji_row_葉").performScrollTo().assertIsDisplayed()
+        saveUiEvidence("word-card-japanese-kanji")
+
+        compose.onNodeWithTag("kanji_row_葉").performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("kanji_han_viet")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("kanji_han_viet").assertTextEquals("DIỆP")
+        compose.onNodeWithTag("kanji_part_世").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("kanji_story").performScrollTo().assertTextContains("DIỆP", substring = true)
+        saveUiEvidence("kanji-page")
+        compose.onNodeWithTag("kanji_play_strokes").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_my_story").performScrollTo().performTextInput("Leaves of the world tree")
+        compose.waitUntil(5_000) { stories.get("葉") == "Leaves of the world tree" }
+        compose.onNodeWithTag("kanji_back").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_section").assertExists()
+        stories.set("葉", "")
+    }
 }

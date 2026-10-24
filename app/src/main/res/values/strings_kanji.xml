@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">Kanji</string>
+    <string name="kanji_back">Back to %1$s</string>
+    <string name="kanji_grade_school">School grade %1$d</string>
+    <string name="kanji_grade_secondary">Secondary school</string>
+    <string name="kanji_grade_names">Used in names</string>
+    <string name="kanji_radical">radical %1$s</string>
+    <string name="kanji_on">On</string>
+    <string name="kanji_kun">Kun</string>
+    <string name="kanji_how_to_write">How to write</string>
+    <string name="kanji_play">Play</string>
+    <string name="kanji_stroke_order_description">Stroke order of %1$s, %2$s</string>
+    <string name="kanji_parts">Parts</string>
+    <string name="kanji_part_radical">radical</string>
+    <string name="kanji_part_sound">sound %1$s</string>
+    <string name="kanji_part_sound_plain">sound</string>
+    <string name="kanji_how_to_remember">How to remember</string>
+    <string name="kanji_memory_story">Memory story</string>
+    <string name="kanji_my_story">My story</string>
+    <string name="kanji_my_story_hint">Write your own story (kept on this phone)</string>
+    <string name="kanji_ai_story_button">Another story with AI</string>
+    <string name="kanji_ai_story_question">Give me another short memory story for the kanji %1$s, built from its parts, and an easy way to remember its readings.</string>
+    <string name="practice_meaning_edit">Edit meaning</string>
+    <string name="practice_meaning_done">Done</string>
+    <string name="study_kanji_details_title">Kanji details</string>
+    <string name="study_kanji_details_description">Japanese words show each kanji with its stroke order, parts and a memory story.</string>
+    <plurals name="kanji_strokes">
+        <item quantity="one">%1$d stroke</item>
+        <item quantity="other">%1$d strokes</item>
+    </plurals>
+</resources>
