@@ -33,6 +33,7 @@ import com.kienhoang.dualsubreplay.data.VideoComprehension
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -80,11 +81,13 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("study_repeat_3").performScrollTo().performClick()
         composeRule.onNodeWithTag("skip_silence_2x").performScrollTo().performClick()
         composeRule.onNodeWithTag("blur_box_switch").performScrollTo().performClick()
+        composeRule.onNodeWithTag("kanji_details_switch").performScrollTo().performClick()
         composeRule.runOnIdle {
             assertEquals("repeat_line", preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null))
             assertEquals(3, preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, 0))
             assertEquals("2x", preferences.getString(SKIP_SILENCE_PREFERENCE, null))
             assertTrue(preferences.getBoolean(BLUR_BOX_PREFERENCE, false))
+            assertFalse("Kanji details is on until turned off", preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true))
         }
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
         saveUiEvidence("study-tools-settings")

@@ -11,6 +11,7 @@
     <string name="navigation_cancel">Cancel</string>
     <string name="navigation_no_browser">No browser is available to open GitHub.</string>
     <string name="navigation_licenses">Open-source licenses</string>
+    <string name="navigation_github_repository">See the GitHub repo</string>
     <string name="navigation_loading_license">Loading license…</string>
     <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. The app is free software under the MIT License and comes without warranty. The licences of the libraries it includes follow; the full list is in THIRD_PARTY_NOTICES.md in the GitHub repository.</string>
     <string name="navigation_close">Close</string>

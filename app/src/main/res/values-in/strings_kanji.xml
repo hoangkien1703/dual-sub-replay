@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">Kanji</string>
+    <string name="kanji_back">Kembali ke %1$s</string>
+    <string name="kanji_grade_school">Kelas %1$d SD</string>
+    <string name="kanji_grade_secondary">Sekolah menengah</string>
+    <string name="kanji_grade_names">Dipakai untuk nama</string>
+    <string name="kanji_radical">radikal %1$s</string>
+    <string name="kanji_on">On</string>
+    <string name="kanji_kun">Kun</string>
+    <string name="kanji_how_to_write">Cara menulis</string>
+    <string name="kanji_play">Putar</string>
+    <string name="kanji_stroke_order_description">Urutan goresan %1$s, %2$s</string>
+    <string name="kanji_parts">Bagian</string>
+    <string name="kanji_part_radical">radikal</string>
+    <string name="kanji_part_sound">bunyi %1$s</string>
+    <string name="kanji_part_sound_plain">bunyi</string>
+    <string name="kanji_how_to_remember">Cara mengingat</string>
+    <string name="kanji_memory_story">Cerita untuk mengingat</string>
+    <string name="kanji_my_story">Ceritaku</string>
+    <string name="kanji_my_story_hint">Tulis ceritamu sendiri (disimpan di ponsel ini)</string>
+    <string name="kanji_ai_story_button">Cerita lain dengan AI</string>
+    <string name="kanji_ai_story_question">Berikan satu cerita pendek lain untuk mengingat kanji %1$s, dibangun dari bagian-bagiannya, dan cara mudah mengingat cara bacanya.</string>
+    <string name="practice_meaning_edit">Edit arti</string>
+    <string name="practice_meaning_done">Selesai</string>
+    <string name="study_kanji_details_title">Detail kanji</string>
+    <string name="study_kanji_details_description">Kata bahasa Jepang menampilkan setiap kanji dengan urutan goresan, bagian, dan cerita untuk mengingatnya.</string>
+    <plurals name="kanji_strokes">
+        <item quantity="other">%1$d goresan</item>
+    </plurals>
+</resources>

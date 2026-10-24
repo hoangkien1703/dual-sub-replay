@@ -122,6 +122,7 @@ internal enum class AiSetting(
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
     BLUR_BOX("blur_box"),
+    KANJI_DETAILS("kanji_details"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */

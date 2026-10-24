@@ -107,6 +107,7 @@ class AiActionsTest {
         assertEquals("jump", setting("skip_silence", "skip"))
         assertEquals("off", setting("skip_silence", "Off"))
         assertEquals("on", setting("blur_box", "true"))
+        assertEquals("off", setting("kanji_details", "off"))
         assertEquals("off", setting("send_to_ankidroid", "off"))
         assertEquals("ankiconnect", setting("send_to_app", "AnkiConnect"))
         assertEquals("ankiconnect", setting("send_to_app", "anki connect"))
