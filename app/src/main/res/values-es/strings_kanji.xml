@@ -24,8 +24,8 @@
     <string name="kanji_ai_story_question">Dame otra historia corta para recordar el kanji %1$s, construida con sus partes, y una forma fácil de recordar sus lecturas.</string>
     <string name="practice_meaning_edit">Editar significado</string>
     <string name="practice_meaning_done">Listo</string>
-    <string name="study_kanji_details_title">Detalles de kanji</string>
-    <string name="study_kanji_details_description">Las palabras japonesas muestran cada kanji con su orden de trazos, sus partes y una historia para recordarlo.</string>
+    <string name="study_kanji_details_title">Detalles de caracteres</string>
+    <string name="study_kanji_details_description">Las palabras en japonés y en chino muestran cada carácter con su orden de trazos, sus partes y una historia para recordarlo.</string>
     <plurals name="kanji_strokes">
         <item quantity="one">%1$d trazo</item>
         <item quantity="many">%1$d trazos</item>

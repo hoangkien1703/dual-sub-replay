@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">漢字</string>
+    <string name="hanzi_traditional">繁体字 %1$s</string>
+    <string name="hanzi_simplified">簡体字 %1$s</string>
+    <string name="hanzi_part_meaning">意符</string>
+    <string name="hanzi_words">単語</string>
+    <string name="hanzi_story_of_simplified">覚えるための話(簡体字 %1$s)</string>
+    <string name="hanzi_ai_story_question">中国語の漢字「%1$s」の部品を使った短い覚え方の話をもう一つと、ピンインと声調を覚える簡単なコツを教えてください。</string>
+</resources>

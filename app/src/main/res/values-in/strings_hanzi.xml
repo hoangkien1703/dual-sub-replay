@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">Karakter</string>
+    <string name="hanzi_traditional">tradisional %1$s</string>
+    <string name="hanzi_simplified">sederhana %1$s</string>
+    <string name="hanzi_part_meaning">makna</string>
+    <string name="hanzi_words">Kata</string>
+    <string name="hanzi_story_of_simplified">Cerita untuk mengingat (bentuk sederhana %1$s)</string>
+    <string name="hanzi_ai_story_question">Berikan satu cerita pendek lain untuk mengingat karakter Mandarin %1$s, dibangun dari bagian-bagiannya, dan cara mudah mengingat pinyin dan nadanya.</string>
+</resources>

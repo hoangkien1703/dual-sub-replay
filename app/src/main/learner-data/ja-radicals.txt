@@ -1,5 +1,6 @@
-# The 214 Kangxi radicals for the word card's kanji pages, written for DualSub Replay (MIT).
-# Format (tab separated): number, forms (the main form first, then the shapes it takes inside a kanji),
+# The 214 Kangxi radicals for the word card's kanji and Chinese character pages, written for DualSub
+# Replay (MIT). Format (tab separated): number, forms (the main form first, then the shapes it takes
+# inside a character, including simplified Chinese forms such as 钅 and 鸟),
 # English name, Vietnamese name (bộ), Vietnamese meaning.
 1	一	one	Nhất	một
 2	丨	line	Cổn	nét sổ
@@ -63,7 +64,7 @@
 60	彳	step	Xích	bước chân
 61	心 忄 ⺗	heart	Tâm	trái tim
 62	戈	halberd	Qua	cây giáo
-63	戶 戸	door	Hộ	cánh cửa
+63	戶 戸 户	door	Hộ	cánh cửa
 64	手 扌 龵	hand	Thủ	bàn tay
 65	支	branch	Chi	cành
 66	攴 攵	strike	Phộc	đánh nhẹ
@@ -147,19 +148,19 @@
 144	行	go	Hành	đi
 145	衣 衤	clothes	Y	áo
 146	襾 西 覀	cover	Á	che đậy
-147	見	see	Kiến	nhìn thấy
+147	見 见	see	Kiến	nhìn thấy
 148	角	horn	Giác	cái sừng
 149	言 訁 讠	words	Ngôn	lời nói
 150	谷	valley	Cốc	thung lũng
 151	豆	bean	Đậu	hạt đậu
 152	豕	pig	Thỉ	con lợn
 153	豸	cat-like animal	Trãi	loài thú
-154	貝	shell	Bối	vỏ sò
+154	貝 贝	shell	Bối	vỏ sò
 155	赤	red	Xích	màu đỏ
 156	走	run	Tẩu	chạy
 157	足 ⻊	foot	Túc	bàn chân
 158	身	body	Thân	thân thể
-159	車	car	Xa	cái xe
+159	車 车	car	Xa	cái xe
 160	辛	bitter	Tân	cay đắng
 161	辰	morning	Thần	buổi sớm
 162	辵 辶 ⻌ ⻍	walk	Sước	bước đi
@@ -167,9 +168,9 @@
 164	酉	wine	Dậu	bình rượu
 165	釆	separate	Biện	phân biệt
 166	里	village	Lý	làng
-167	金 釒	gold	Kim	kim loại
-168	長 镸	long	Trường	dài
-169	門	gate	Môn	cổng
+167	金 釒 钅	gold	Kim	kim loại
+168	長 镸 长	long	Trường	dài
+169	門 门	gate	Môn	cổng
 170	阜 ⻖ 阝	mound	Phụ	gò đất
 171	隶	slave	Đãi	kịp
 172	隹	old bird	Chuy	chim đuôi ngắn
@@ -178,16 +179,16 @@
 175	非	wrong	Phi	không phải
 176	面	face	Diện	gương mặt
 177	革	leather	Cách	da thú
-178	韋	tanned leather	Vi	da thuộc
+178	韋 韦	tanned leather	Vi	da thuộc
 179	韭	leek	Cửu	rau hẹ
 180	音	sound	Âm	âm thanh
-181	頁	head	Hiệt	cái đầu
-182	風	wind	Phong	gió
-183	飛	fly	Phi	bay
-184	食 飠 𩙿	eat	Thực	ăn
+181	頁 页	head	Hiệt	cái đầu
+182	風 风	wind	Phong	gió
+183	飛 飞	fly	Phi	bay
+184	食 飠 𩙿 饣	eat	Thực	ăn
 185	首	neck	Thủ	cái đầu
 186	香	fragrance	Hương	mùi thơm
-187	馬	horse	Mã	con ngựa
+187	馬 马	horse	Mã	con ngựa
 188	骨	bone	Cốt	xương
 189	高	tall	Cao	cao
 190	髟	long hair	Bưu	tóc dài
@@ -195,9 +196,9 @@
 192	鬯	herbs	Sưởng	rượu thơm
 193	鬲	cauldron	Cách	cái vạc
 194	鬼	ghost	Quỷ	ma quỷ
-195	魚	fish	Ngư	con cá
-196	鳥	bird	Điểu	con chim
-197	鹵	salt	Lỗ	muối
+195	魚 鱼	fish	Ngư	con cá
+196	鳥 鸟	bird	Điểu	con chim
+197	鹵 卤	salt	Lỗ	muối
 198	鹿	deer	Lộc	con hươu
 199	麥 麦	wheat	Mạch	lúa mì
 200	麻	hemp	Ma	cây gai
@@ -210,8 +211,8 @@
 207	鼓	drum	Cổ	cái trống
 208	鼠	rat	Thử	con chuột
 209	鼻	nose	Tị	cái mũi
-210	齊 斉	even	Tề	ngang bằng
-211	齒 歯	tooth	Xỉ	răng
-212	龍 竜	dragon	Long	con rồng
-213	龜 亀	turtle	Quy	con rùa
+210	齊 斉 齐	even	Tề	ngang bằng
+211	齒 歯 齿	tooth	Xỉ	răng
+212	龍 竜 龙	dragon	Long	con rồng
+213	龜 亀 龟	turtle	Quy	con rùa
 214	龠	flute	Dược	ống sáo

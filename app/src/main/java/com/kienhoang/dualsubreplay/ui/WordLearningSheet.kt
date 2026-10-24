@@ -52,8 +52,7 @@ internal fun WordLearningDialog(
     var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
     var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
-    var kanjiPage by remember(selection) { mutableStateOf<String?>(null) }
-    val showKanji = rememberStudySettings().value.kanjiDetails && isJapaneseWord(selection)
+    var characterPage by remember(selection) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val canClip = validClipRange(selection.videoId, selection.segment?.startMs ?: -1, selection.segment?.endMs ?: -1)
 
@@ -86,9 +85,9 @@ internal fun WordLearningDialog(
             ) {
                 WordCardHeader(selection.token.text, onSpeak, onDismiss)
                 Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val openKanji = kanjiPage
-                    if (openKanji != null) {
-                        KanjiPage(openKanji, selection, onBack = { kanjiPage = null }, onAskedAi = onDismiss)
+                    val openCharacter = characterPage
+                    if (openCharacter != null) {
+                        CharacterPage(openCharacter, selection, onBack = { characterPage = null }, onAskedAi = onDismiss)
                         return@Column
                     }
                     MeaningPanel(
@@ -103,7 +102,7 @@ internal fun WordLearningDialog(
                     )
                     error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
                     WordCardDetails(selection, speechMessage, onSpeechSettings)
-                    if (showKanji) KanjiSection(selection) { kanjiPage = it }
+                    CharacterSection(selection) { characterPage = it }
                     GrammarExplanations(selection, onAskedAi = onDismiss)
                     if (canClip) {
                         ClipChoice(stringResource(R.string.practice_online_example), online, {
@@ -335,3 +334,31 @@ internal fun partOfSpeechLabel(partOfSpeech: PartOfSpeech): Int =
         PartOfSpeech.UNALIGNED -> R.string.practice_pos_unaligned
         PartOfSpeech.OTHER -> R.string.practice_pos_other
     }
+
+/** Japanese words list their kanji, Chinese words their characters (Settings → Study tools → Character details). */
+@Composable
+private fun CharacterSection(
+    selection: LearningWordSelection,
+    onOpen: (String) -> Unit,
+) {
+    if (!rememberStudySettings().value.kanjiDetails) return
+    when {
+        isJapaneseWord(selection) -> KanjiSection(selection, onOpen)
+        isChineseWord(selection) -> HanziSection(selection, onOpen)
+    }
+}
+
+/** The kanji or Chinese character page opened from [CharacterSection], shown in place of the card. */
+@Composable
+private fun CharacterPage(
+    literal: String,
+    selection: LearningWordSelection,
+    onBack: () -> Unit,
+    onAskedAi: () -> Unit,
+) {
+    if (isChineseWord(selection)) {
+        HanziPage(literal, selection, onBack, onAskedAi)
+    } else {
+        KanjiPage(literal, selection, onBack, onAskedAi)
+    }
+}

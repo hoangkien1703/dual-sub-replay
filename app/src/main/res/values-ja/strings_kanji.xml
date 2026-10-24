@@ -25,7 +25,7 @@
     <string name="practice_meaning_edit">意味を編集</string>
     <string name="practice_meaning_done">完了</string>
     <string name="study_kanji_details_title">漢字の詳細</string>
-    <string name="study_kanji_details_description">日本語の単語で、各漢字の書き順・部品・覚え方の話を表示します。</string>
+    <string name="study_kanji_details_description">日本語と中国語の単語で、各漢字の書き順・部品・覚え方の話を表示します。</string>
     <plurals name="kanji_strokes">
         <item quantity="other">%1$d画</item>
     </plurals>

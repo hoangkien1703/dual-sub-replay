@@ -25,7 +25,7 @@
     <string name="practice_meaning_edit">编辑释义</string>
     <string name="practice_meaning_done">完成</string>
     <string name="study_kanji_details_title">汉字详情</string>
-    <string name="study_kanji_details_description">日语单词会显示每个汉字的笔顺、部件和记忆故事。</string>
+    <string name="study_kanji_details_description">日语和中文单词会显示每个汉字的笔顺、部件和记忆故事。</string>
     <plurals name="kanji_strokes">
         <item quantity="other">%1$d 画</item>
     </plurals>

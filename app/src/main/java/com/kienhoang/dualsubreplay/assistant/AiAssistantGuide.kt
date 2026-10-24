@@ -111,3 +111,26 @@ internal fun aiKanjiContext(
         append("\nParts (KanjiVG): ").append(parts.joinToString(", ").ifEmpty { "none, it is a simple shape" })
         bundledStory?.let { append("\nThe story the app already showed (write a different one): ").append(it) }
     }
+
+/** What the assistant gets with "Another story with AI" on a Chinese character page. */
+internal fun aiHanziContext(
+    hanzi: String,
+    word: String,
+    meanings: List<String>,
+    pinyin: List<String>,
+    hanViet: List<String>,
+    parts: List<String>,
+    bundledStory: String?,
+): String =
+    buildString {
+        append("The learner is studying the Chinese character ")
+            .append(hanzi)
+            .append(" from the word ")
+            .append(word.trim())
+            .append(".\n")
+        append("Meanings (Make Me a Hanzi): ").append(meanings.joinToString("; ").ifEmpty { "unknown" })
+        append("\nPinyin: ").append(pinyin.joinToString(", ").ifEmpty { "unknown" })
+        if (hanViet.isNotEmpty()) append("\nHán Việt (the learner is Vietnamese): ").append(hanViet.joinToString(", "))
+        append("\nParts: ").append(parts.joinToString(", ").ifEmpty { "none, it is a simple shape" })
+        bundledStory?.let { append("\nThe story the app already showed (write a different one): ").append(it) }
+    }
