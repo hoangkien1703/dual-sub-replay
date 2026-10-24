@@ -6,7 +6,9 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.*
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -14,6 +16,14 @@ class WordLearningDialogTest {
     @get:Rule val compose = createComposeRule()
     private val selection = LearningWordSelection(AnalyzedToken("word", 0, 4, PartOfSpeech.NOUN), "en", "vi",
         "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false)
+
+    @Before
+    @After
+    fun openAllSections() {
+        val editor = studyPreferences(InstrumentationRegistry.getInstrumentation().targetContext).edit()
+        WORD_CARD_SECTION_KEYS.forEach(editor::remove)
+        editor.commit()
+    }
 
     @Test fun pronouncesOnceAndSavesOnlineClipChoiceWithoutOfflineOption() {
         var spoken = 0
@@ -173,6 +183,10 @@ class WordLearningDialogTest {
         compose.waitUntil(5_000) { stories.get("葉") == "Leaves of the world tree" }
         compose.onNodeWithTag("kanji_back").performScrollTo().performClick()
         compose.onNodeWithTag("kanji_section").assertExists()
+        compose.onNodeWithTag("kanji_section_header").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_row_葉").assertDoesNotExist()
+        compose.onNodeWithTag("kanji_section_count", useUnmergedTree = true).assertTextEquals("1")
+        saveUiEvidence("word-card-kanji-hidden")
         stories.set("葉", "")
     }
 
@@ -210,6 +224,9 @@ class WordLearningDialogTest {
         compose.waitUntil(5_000) { stories.get("叶") == "A mouth on ten leaves" }
         compose.onNodeWithTag("hanzi_back").performScrollTo().performClick()
         compose.onNodeWithTag("hanzi_section").assertExists()
+        compose.onNodeWithTag("hanzi_section_header").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_row_叶").assertDoesNotExist()
+        compose.onNodeWithTag("hanzi_section_count", useUnmergedTree = true).assertTextEquals("2")
         stories.set("叶", "")
     }
 }
