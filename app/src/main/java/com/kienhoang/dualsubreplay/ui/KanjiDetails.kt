@@ -499,7 +499,8 @@ private fun KanjiMemory(
                 color = colors.secondaryContainer,
                 contentColor = colors.onSecondaryContainer,
                 shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth().testTag("kanji_story"),
+                // One node, so TalkBack reads the label and the story together.
+                modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("kanji_story"),
             ) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.kanji_memory_story), style = MaterialTheme.typography.labelLarge, color = colors.primary)
