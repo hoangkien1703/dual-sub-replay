@@ -1,6 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.key
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -8,17 +11,30 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.CefrLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
 import com.kienhoang.dualsubreplay.data.HskLevel
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class GrammarExplanationsUiTest {
     @get:Rule
     val compose = createComposeRule()
+
+    private val preferences = studyPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+
+    @Before
+    @After
+    fun openAllSections() {
+        preferences.edit().apply { WORD_CARD_SECTION_KEYS.forEach(::remove) }.commit()
+    }
 
     @Test
     fun showsTheLikeliestMeaningAndRevealsTheOthers() {
@@ -72,6 +88,33 @@ class GrammarExplanationsUiTest {
         compose.onNodeWithText("A plan, or something you can see is coming (gonna in speech)").assertIsDisplayed()
         compose.onNodeWithContentDescription("CEFR level A2").assertIsDisplayed()
         saveUiEvidence("grammar-hsk-and-cefr")
+    }
+
+    @Test
+    fun headingHidesThePointsAndTheChoiceIsRemembered() {
+        val matches =
+            listOf(
+                GrammarMatch("に", 3, 4, listOf(GrammarMeaning.PLACE_EXIST)),
+                GrammarMatch("〜てくれる", 6, 9, listOf(GrammarMeaning.FAVOR_RECEIVE)),
+            )
+        // A new key is a new word card, which reads the stored choice again.
+        val card = mutableIntStateOf(0)
+        compose.setContent { DualSubTheme { key(card.intValue) { GrammarPointList(matches) } } }
+
+        compose.onAllNodesWithTag("grammar_point").assertCountEquals(2)
+        compose.onNodeWithTag("grammar_section_count").assertDoesNotExist()
+        compose.onNodeWithTag("grammar_section_header").performClick()
+
+        compose.onAllNodesWithTag("grammar_point").assertCountEquals(0)
+        compose.onNodeWithTag("grammar_section_count").assertTextEquals("2")
+        saveUiEvidence("grammar-hidden")
+        compose.runOnIdle { assertFalse(preferences.getBoolean(WORD_CARD_GRAMMAR_OPEN_PREFERENCE, true)) }
+
+        compose.runOnIdle { card.intValue++ }
+        compose.onAllNodesWithTag("grammar_point").assertCountEquals(0)
+        compose.onNodeWithTag("grammar_section_header").performClick()
+        compose.onAllNodesWithTag("grammar_point").assertCountEquals(2)
+        compose.runOnIdle { assertTrue(preferences.getBoolean(WORD_CARD_GRAMMAR_OPEN_PREFERENCE, false)) }
     }
 
     @Test

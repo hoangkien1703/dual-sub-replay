@@ -134,8 +134,12 @@ internal fun KanjiSection(
         value = withContext(Dispatchers.IO) { runCatching { kanjiRows(selection.token.text, language) }.getOrDefault(emptyList()) }
     }
     if (rows.isEmpty()) return
-    Column(Modifier.fillMaxWidth().testTag("kanji_section"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.kanji_section_title), style = MaterialTheme.typography.titleSmall)
+    CollapsibleWordCardSection(
+        title = stringResource(R.string.kanji_section_title),
+        count = rows.size,
+        preferenceKey = WORD_CARD_KANJI_OPEN_PREFERENCE,
+        testTag = "kanji_section",
+    ) {
         rows.forEach { row ->
             CharacterRowCard(
                 literal = row.info.literal,

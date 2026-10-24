@@ -138,3 +138,21 @@ As planned. Story language follows the word's meaning language or the interface 
 ## Validation result
 
 Local results and PR CI are recorded in the PR.
+
+## Follow-up: hiding the Kanji, Characters and Grammar sections (owner request 2026-10-24)
+
+The Kanji (Japanese), Characters (Chinese) and Grammar sections can be long, so each heading
+now has an arrow (▾ open, ▸ hidden). A tap on the heading hides or shows the section; while
+hidden, the heading shows how many kanji, characters or grammar points it holds. Each section
+remembers its own choice for every later word card, also after a restart
+(`word_card_kanji_open`, `word_card_hanzi_open`, `word_card_grammar_open` in the app
+preferences, open by default, cleared by Reset all settings). The "Explain the grammar with AI"
+button stays visible. Code: `ui/WordCardSection.kt`.
+
+Acceptance criteria:
+
+- A tap on a heading hides its rows and shows the count; another tap shows them again.
+- A new word card opens each section the way the user last left it.
+- Tests: `GrammarExplanationsUiTest.headingHidesThePointsAndTheChoiceIsRemembered`, the kanji and
+  Chinese character checks in `WordLearningDialogTest`, and the reset key list in
+  `SubtitleHighlightTest`.

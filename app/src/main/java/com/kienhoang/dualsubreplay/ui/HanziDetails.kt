@@ -119,8 +119,12 @@ internal fun HanziSection(
             }
     }
     if (rows.isEmpty()) return
-    Column(Modifier.fillMaxWidth().testTag("hanzi_section"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.hanzi_section_title), style = MaterialTheme.typography.titleSmall)
+    CollapsibleWordCardSection(
+        title = stringResource(R.string.hanzi_section_title),
+        count = rows.size,
+        preferenceKey = WORD_CARD_HANZI_OPEN_PREFERENCE,
+        testTag = "hanzi_section",
+    ) {
         rows.forEach { row ->
             CharacterRowCard(
                 literal = row.info.literal,
