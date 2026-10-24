@@ -24,8 +24,8 @@
     <string name="kanji_ai_story_question">Give me another short memory story for the kanji %1$s, built from its parts, and an easy way to remember its readings.</string>
     <string name="practice_meaning_edit">Edit meaning</string>
     <string name="practice_meaning_done">Done</string>
-    <string name="study_kanji_details_title">Kanji details</string>
-    <string name="study_kanji_details_description">Japanese words show each kanji with its stroke order, parts and a memory story.</string>
+    <string name="study_kanji_details_title">Character details</string>
+    <string name="study_kanji_details_description">Japanese and Chinese words show each character with its stroke order, parts and a memory story.</string>
     <plurals name="kanji_strokes">
         <item quantity="one">%1$d stroke</item>
         <item quantity="other">%1$d strokes</item>

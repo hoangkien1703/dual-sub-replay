@@ -175,4 +175,41 @@ class WordLearningDialogTest {
         compose.onNodeWithTag("kanji_section").assertExists()
         stories.set("葉", "")
     }
+
+    @Test
+    fun chineseWordShowsEachCharactersPage() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LearnerData.useAssets(context.assets)
+        val stories = myHanziStories(context.filesDir)
+        stories.set("叶", "")
+        val word = AnalyzedToken("树叶", 0, 2, PartOfSpeech.NOUN, reading = "shù yè")
+        val leaves =
+            selection.copy(
+                token = word,
+                parts = listOf(word),
+                wordLanguage = "zh-Hans",
+                segment = SubtitleSegment(1, 1000, 3000, "树叶掉了", null),
+            )
+        compose.setContent {
+            DualSubTheme { WordLearningDialog(leaves, false, { "lá cây" }, { _, _ -> }, {}, null, {}) }
+        }
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("hanzi_row_叶")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("hanzi_row_树").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("hanzi_row_叶").performScrollTo().assertIsDisplayed()
+        saveUiEvidence("word-card-chinese-characters")
+
+        compose.onNodeWithTag("hanzi_row_叶").performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("hanzi_han_viet")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("hanzi_han_viet").assertTextEquals("DIỆP")
+        compose.onNodeWithTag("hanzi_pinyin").assertTextContains("yè", substring = true)
+        compose.onNodeWithTag("hanzi_part_口").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("hanzi_story").performScrollTo().assertTextContains("DIỆP", substring = true)
+        saveUiEvidence("hanzi-page")
+        compose.onNodeWithTag("kanji_play_strokes").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_my_story").performScrollTo().performTextInput("A mouth on ten leaves")
+        compose.waitUntil(5_000) { stories.get("叶") == "A mouth on ten leaves" }
+        compose.onNodeWithTag("hanzi_back").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_section").assertExists()
+        stories.set("叶", "")
+    }
 }

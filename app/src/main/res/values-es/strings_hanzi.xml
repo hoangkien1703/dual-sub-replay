@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">Caracteres</string>
+    <string name="hanzi_traditional">tradicional %1$s</string>
+    <string name="hanzi_simplified">simplificado %1$s</string>
+    <string name="hanzi_part_meaning">significado</string>
+    <string name="hanzi_words">Palabras</string>
+    <string name="hanzi_story_of_simplified">Historia para recordar (de la forma simplificada %1$s)</string>
+    <string name="hanzi_ai_story_question">Dame otra historia corta para recordar el carácter chino %1$s, construida con sus partes, y una forma fácil de recordar su pinyin y su tono.</string>
+</resources>

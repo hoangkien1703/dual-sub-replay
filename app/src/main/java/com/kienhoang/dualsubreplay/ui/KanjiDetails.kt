@@ -87,7 +87,7 @@ private const val STROKE_MS_PER_STROKE = 450
 private const val MY_STORY_SAVE_DELAY_MS = 600L
 private const val SHOWN_MEANINGS = 4
 
-/** Japanese words get the Kanji section (Settings → Study tools → Kanji details). */
+/** Japanese words get the Kanji section (Settings → Study tools → Character details). */
 internal fun isJapaneseWord(selection: LearningWordSelection): Boolean =
     LanguageAwareTokenizer.isJapanese(selection.token.text, selection.wordLanguage) && kanjiIn(selection.token.text).isNotEmpty()
 
@@ -115,7 +115,7 @@ internal fun kunReadingText(reading: String): String {
 }
 
 @Composable
-private fun storyLanguage(selection: LearningWordSelection): String =
+internal fun storyLanguage(selection: LearningWordSelection): String =
     kanjiStoryLanguage(selection.meaningLanguage, currentInterfaceLocale().language)
 
 /**
@@ -136,41 +136,49 @@ internal fun KanjiSection(
     if (rows.isEmpty()) return
     Column(Modifier.fillMaxWidth().testTag("kanji_section"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(stringResource(R.string.kanji_section_title), style = MaterialTheme.typography.titleSmall)
-        rows.forEach { row -> KanjiRowCard(row, hanViet) { onOpen(row.info.literal) } }
+        rows.forEach { row ->
+            CharacterRowCard(
+                literal = row.info.literal,
+                hanViet =
+                    row.info.hanViet
+                        .firstOrNull()
+                        ?.takeIf { hanViet },
+                details =
+                    listOfNotNull(row.keyword, pluralStringResource(R.plurals.kanji_strokes, row.info.strokes, row.info.strokes))
+                        .joinToString(" · "),
+                testTag = "kanji_row_${row.info.literal}",
+            ) { onOpen(row.info.literal) }
+        }
     }
 }
 
+/** One character's row in a word card's Kanji or Characters section; a tap opens its page. */
 @Composable
-private fun KanjiRowCard(
-    row: KanjiRow,
-    hanViet: Boolean,
+internal fun CharacterRowCard(
+    literal: String,
+    hanViet: String?,
+    details: String,
+    testTag: String,
     onClick: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     Surface(
         color = colors.surfaceContainerHighest,
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).testTag("kanji_row_${row.info.literal}"),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).testTag(testTag),
     ) {
         Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(row.info.literal, fontSize = 32.sp)
+            Text(literal, fontSize = 32.sp)
             Column(Modifier.weight(1f).padding(start = 14.dp)) {
-                if (hanViet) {
-                    row.info.hanViet.firstOrNull()?.let {
-                        Text(
-                            it.uppercase(Locale.ROOT),
-                            color = colors.primary,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
+                hanViet?.let {
+                    Text(
+                        it.uppercase(Locale.ROOT),
+                        color = colors.primary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
-                val strokes = pluralStringResource(R.plurals.kanji_strokes, row.info.strokes, row.info.strokes)
-                Text(
-                    listOfNotNull(row.keyword, strokes).joinToString(" · "),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.onSurfaceVariant,
-                )
+                Text(details, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
             }
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = colors.onSurfaceVariant)
         }
@@ -338,15 +346,39 @@ private fun KanjiWriting(
     literal: String,
     strokes: List<String>,
 ) {
-    if (strokes.isEmpty()) return
+    CharacterWriting(literal, strokes.size) { modifier, progress, shown, highlightLast, guides ->
+        KanjiDrawing(strokes, modifier, progress, shown, highlightLast, guides)
+    }
+}
+
+/**
+ * Draws a character in [modifier]'s box: [progress] counts strokes, its fraction drawing part of
+ * the next one; otherwise [shown] whole strokes, the last in the accent color with highlightLast.
+ */
+internal typealias CharacterDrawing = @Composable (
+    modifier: Modifier,
+    progress: Float?,
+    shown: Int,
+    highlightLast: Boolean,
+    guides: Boolean,
+) -> Unit
+
+/** How to write: the character drawn stroke by stroke when Play is tapped, then each stroke numbered. */
+@Composable
+internal fun CharacterWriting(
+    literal: String,
+    strokeCount: Int,
+    drawing: CharacterDrawing,
+) {
+    if (strokeCount == 0) return
     val colors = MaterialTheme.colorScheme
-    val progress = remember(literal) { Animatable(strokes.size.toFloat()) }
+    val progress = remember(literal) { Animatable(strokeCount.toFloat()) }
     val scope = rememberCoroutineScope()
     var plays by remember(literal) { mutableIntStateOf(0) }
     LaunchedEffect(plays) {
         if (plays == 0) return@LaunchedEffect
         progress.snapTo(0f)
-        progress.animateTo(strokes.size.toFloat(), tween(strokes.size * STROKE_MS_PER_STROKE, easing = LinearEasing))
+        progress.animateTo(strokeCount.toFloat(), tween(strokeCount * STROKE_MS_PER_STROKE, easing = LinearEasing))
     }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -361,30 +393,30 @@ private fun KanjiWriting(
             stringResource(
                 R.string.kanji_stroke_order_description,
                 literal,
-                pluralStringResource(R.plurals.kanji_strokes, strokes.size, strokes.size),
+                pluralStringResource(R.plurals.kanji_strokes, strokeCount, strokeCount),
             )
         Surface(
             color = colors.surfaceContainerHighest,
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier.align(Alignment.CenterHorizontally).semantics { contentDescription = description },
         ) {
-            KanjiDrawing(strokes, Modifier.size(150.dp).padding(8.dp), progress = progress.value, guides = true)
+            drawing(Modifier.size(150.dp).padding(8.dp), progress.value, strokeCount, false, true)
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            strokes.indices.forEach { index -> StrokeFrame(strokes, index) }
+            (0 until strokeCount).forEach { index -> StrokeFrame(index, drawing) }
         }
     }
 }
 
 @Composable
 private fun StrokeFrame(
-    strokes: List<String>,
     index: Int,
+    drawing: CharacterDrawing,
     size: Dp = 46.dp,
 ) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHighest, shape = RoundedCornerShape(8.dp)) {
         Box {
-            KanjiDrawing(strokes, Modifier.size(size).padding(3.dp), shown = index + 1, highlightLast = true, guides = true)
+            drawing(Modifier.size(size).padding(3.dp), null, index + 1, true, true)
             Text(
                 (index + 1).toString(),
                 style = MaterialTheme.typography.labelSmall,
@@ -432,13 +464,13 @@ private fun KanjiDrawing(
     }
 }
 
-private fun DrawScope.drawGuides(color: Color) {
+internal fun DrawScope.drawGuides(color: Color) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(6f, 6f))
     drawLine(color, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), pathEffect = dash)
     drawLine(color, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), pathEffect = dash)
 }
 
-private fun partOf(
+internal fun partOf(
     path: Path,
     fraction: Float,
 ): Path {
@@ -450,32 +482,46 @@ private fun partOf(
 @Composable
 private fun KanjiParts(page: KanjiPageData) {
     if (page.parts.isEmpty()) return
-    val colors = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(stringResource(R.string.kanji_parts), style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             page.parts.forEach { part ->
-                Surface(
-                    color = colors.surfaceContainerHighest,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.testTag("kanji_part_${part.part.shape}"),
-                ) {
-                    Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(part.part.shape, fontSize = 22.sp)
-                        Column(Modifier.padding(start = 6.dp)) {
-                            val name = listOfNotNull(part.hanViet, part.meaning).joinToString(" · ")
-                            if (name.isNotEmpty()) Text(name, style = MaterialTheme.typography.bodyMedium)
-                            val tags =
-                                listOfNotNull(
-                                    stringResource(R.string.kanji_part_radical).takeIf { part.part.isRadical },
-                                    page.soundReadings[part.part.shape]?.let { stringResource(R.string.kanji_part_sound, it) }
-                                        ?: stringResource(R.string.kanji_part_sound_plain).takeIf { part.part.givesSound },
-                                )
-                            if (tags.isNotEmpty()) {
-                                Text(tags.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = colors.primary)
-                            }
-                        }
-                    }
+                PartChip(
+                    shape = part.part.shape,
+                    name = listOfNotNull(part.hanViet, part.meaning).joinToString(" · "),
+                    tags =
+                        listOfNotNull(
+                            stringResource(R.string.kanji_part_radical).takeIf { part.part.isRadical },
+                            page.soundReadings[part.part.shape]?.let { stringResource(R.string.kanji_part_sound, it) }
+                                ?: stringResource(R.string.kanji_part_sound_plain).takeIf { part.part.givesSound },
+                        ),
+                    testTag = "kanji_part_${part.part.shape}",
+                )
+            }
+        }
+    }
+}
+
+/** One part of a character: its shape, its name, and tags such as radical or sound. */
+@Composable
+internal fun PartChip(
+    shape: String,
+    name: String,
+    tags: List<String>,
+    testTag: String,
+) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        color = colors.surfaceContainerHighest,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.testTag(testTag),
+    ) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(shape, fontSize = 22.sp)
+            Column(Modifier.padding(start = 6.dp)) {
+                if (name.isNotEmpty()) Text(name, style = MaterialTheme.typography.bodyMedium)
+                if (tags.isNotEmpty()) {
+                    Text(tags.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = colors.primary)
                 }
             }
         }
@@ -491,32 +537,42 @@ private fun KanjiMemory(
     selection: LearningWordSelection,
     onAskedAi: () -> Unit,
 ) {
-    val colors = MaterialTheme.colorScheme
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.kanji_how_to_remember), style = MaterialTheme.typography.titleSmall)
-        page.story?.let { story ->
-            Surface(
-                color = colors.secondaryContainer,
-                contentColor = colors.onSecondaryContainer,
-                shape = RoundedCornerShape(14.dp),
-                // One node, so TalkBack reads the label and the story together.
-                modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("kanji_story"),
-            ) {
-                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(stringResource(R.string.kanji_memory_story), style = MaterialTheme.typography.labelLarge, color = colors.primary)
-                    Text(story.story, style = MaterialTheme.typography.bodyLarge)
-                }
-            }
-        }
-        MyStoryField(literal)
+        page.story?.let { MemoryStoryCard(stringResource(R.string.kanji_memory_story), it.story, "kanji_story") }
+        val context = LocalContext.current
+        MyStoryField(literal, remember(context) { MyKanjiStories.inDirectory(context.filesDir) }, "kanji_my_story")
         AiKanjiStoryButton(literal, page, hanViet, selection, onAskedAi)
     }
 }
 
 @Composable
-private fun MyStoryField(literal: String) {
-    val context = LocalContext.current
-    val stories = remember(context) { MyKanjiStories.inDirectory(context.filesDir) }
+internal fun MemoryStoryCard(
+    label: String,
+    story: String,
+    testTag: String,
+) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        color = colors.secondaryContainer,
+        contentColor = colors.onSecondaryContainer,
+        shape = RoundedCornerShape(14.dp),
+        // One node, so TalkBack reads the label and the story together.
+        modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag(testTag),
+    ) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, style = MaterialTheme.typography.labelLarge, color = colors.primary)
+            Text(story, style = MaterialTheme.typography.bodyLarge)
+        }
+    }
+}
+
+@Composable
+internal fun MyStoryField(
+    literal: String,
+    stories: MyKanjiStories,
+    testTag: String,
+) {
     var text by remember(literal) { mutableStateOf<String?>(null) }
     LaunchedEffect(literal) { text = withContext(Dispatchers.IO) { stories.get(literal).orEmpty() } }
     val current = text ?: return
@@ -534,7 +590,7 @@ private fun MyStoryField(literal: String) {
         },
         label = { Text(stringResource(R.string.kanji_my_story)) },
         placeholder = { Text(stringResource(R.string.kanji_my_story_hint)) },
-        modifier = Modifier.fillMaxWidth().testTag("kanji_my_story"),
+        modifier = Modifier.fillMaxWidth().testTag(testTag),
     )
 }
 

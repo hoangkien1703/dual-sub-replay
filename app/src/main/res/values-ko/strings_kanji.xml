@@ -25,7 +25,7 @@
     <string name="practice_meaning_edit">뜻 편집</string>
     <string name="practice_meaning_done">완료</string>
     <string name="study_kanji_details_title">한자 자세히</string>
-    <string name="study_kanji_details_description">일본어 단어에서 각 한자의 획순, 부분, 기억용 이야기를 보여 줍니다.</string>
+    <string name="study_kanji_details_description">일본어와 중국어 단어에서 각 한자의 획순, 부분, 기억용 이야기를 보여 줍니다.</string>
     <plurals name="kanji_strokes">
         <item quantity="other">%1$d획</item>
     </plurals>

@@ -1,0 +1,3004 @@
+# English memory stories for the 3,000 HSK 3.0 characters (simplified), one per line: character,
+# keyword, story. Written for DualSub Replay and shared under the app's MIT licence. Each story
+# builds the character from the parts Make Me a Hanzi names (zh-hanzi.txt) and gives the pinyin
+# of the part that carries the sound.
+爱	love	A claw 爫 reaches under a cover 冖 to hold a friend 友 close: love.
+八	eight	Two strokes splitting apart, like a cake cut in half and in half again: eight.
+爸	dad	Father 父 on top, 巴 (bā) below for the sound: bà, dad.
+吧	particle ba	A mouth 口 that ends with a soft 巴 (bā): the suggestion particle ba, "let's".
+白	white	The sun 日 with a ray of light shining on top: white.
+百	hundred	One 一 on top of white 白: one hundred.
+班	squad	A knife 刂 between two jewels 王: split into squads.
+半	half	A cow 牛 with two drops 丷 on top, cut down the middle: half.
+帮	help	A country 邦 (bāng) raises its cloth 巾 flag to help: help.
+包	wrap	Arms 勹 wrapped around a baby 巳: wrap, bag.
+杯	cup	Wood 木 that is not 不 full: a cup.
+北	north	Two people 匕 sitting back to back, turning away from the cold north.
+备	prepare	Walking 夂 out to the field 田 before the harvest: prepare.
+本	book	A tree 木 with a line marking its root: the origin, and a book made from it.
+比	compare	Two spoons 匕 side by side: compare.
+边	side	Walking 辶 with all your strength 力 to reach the edge: side, edge.
+别	don't	Another 另 thing cut off with a knife 刂: separate, other, don't.
+病	ill	Sickness 疒 that comes in third 丙: ill.
+不	not	A bird flying up, never 一 reaching the sky: not.
+菜	dish	Plants 艹 you collect 采 (cǎi): vegetables, a dish.
+茶	tea	A person 人 picking leaves 艹 from a tree 木: tea.
+差	difference	A sheep 羊 and a carpenter's square 工 side by side: the difference.
+常	usual	An esteemed 尚 cloth 巾 worn every day: usual.
+场	field	Soil 土 with flags waving 勿 over it: an open field, a place.
+唱	chant	A mouth 口 singing prosperously 昌: chant.
+车	car	A cart seen from above, its axle and wheels drawn as 七 over 十: vehicle.
+吃	eat	A mouth 口 that begs 乞 (qǐ) for food: eat.
+出	go out	A sprout 屮 growing up out of a box 凵: go out.
+穿	wear	A tooth 牙 boring a hole like a cave 穴 (xué): pierce, then thread clothes on: wear.
+床	bed	Wood 木 under a roof 广: a bed, floor.
+次	next	Breathing 欠 out two 冫 times: the next one.
+从	from	One person 人 walking behind another: follow, from.
+错	wrong	Gold 钅 from the past 昔 that you counted wrong: mistake, wrong.
+答	answer	Bamboo slips ⺮ that fit together 合: an answer to a question.
+打	hit	A hand 扌 hammering a nail 丁: hit.
+大	big	A person standing with arms stretched wide: big.
+蛋	egg	An insect 虫 under a bolt 疋 of cloth, laying eggs: egg.
+到	arrive	Reach the end 至 with a knife 刂: arrive.
+道	road	A head 首 leading the way as you walk 辶: road, way.
+得	gain	Step 彳 out at daybreak 旦 with your hand 寸 and gain something.
+地	ground	Soil 土 that just is 也 there under your feet: ground.
+的	of	White 白 next to a spoon 勺: the target's white spot, now the little word "of".
+等	wait	Bamboo ⺮ slips filed in rank at the court 寺: rank, equal, and wait your turn.
+弟	younger brother	The little brother winds string around a bow 弓, copying the older one: younger brother.
+第	ordinal	Bamboo ⺮ slips in order like a younger brother 弟 (dì) after an older one: the ordinal number, "-th".
+点	point	A fortune teller 占 reading dots of fire 灬: a point, a mark.
+电	electric	A flash 乚 bending down out of a cloud 曰: lightning, electricity.
+店	shop	A house 广 where a fortune teller 占 sets up: a shop.
+东	east	Simplified from a sun behind a tree; drawn now as 七 above 小: east.
+动	move	A cloud 云 pushed by strength 力: move.
+都	all	A city 阝 where the people 者 (zhě) all live: capital; all.
+读	read	Words 讠 that you sell 卖 by saying them aloud: read.
+对	right	A hand 又 measuring an inch 寸 exactly: correct, facing.
+多	many	Evening 夕 after evening 夕: many.
+饿	hungry	Food 饣 is what I 我 (wǒ) want: hungry.
+儿	child	A small child on two little legs 丿 乚: child, son.
+二	two	Two flat strokes, one above the other: two.
+饭	meal	Food 饣 you turn over 反 (fǎn) in the pot: cooked rice, a meal.
+方	direction	A lid 亠 on a plough pointing in one direction: direction, way, person.
+房	room	A door 户 to a square 方 (fāng) space: house, room.
+放	release	Strike 攵 the cage in every direction 方: release.
+飞	fly	A bird's wing beating once, with two feathers: fly.
+非	not	Two wings beating in opposite ways: not, wrong.
+分	divide	Eight 八 pieces cut with a knife 刀: divide, a part, a minute.
+风	wind	A sail 几 with a cross 乂 swirling inside: wind.
+服	clothes	A body 月 kneeling 卩 as a hand 又 dresses it: clothes.
+干	do	A club with a crossbar 一 on a pole 十: dry; also do, work.
+高	tall	A tall tower with a roof 亠, a window 口 and a high gate 冋: tall, high.
+告	tell	A cow 牛 and a mouth 口: announce, tell.
+哥	big brother	One "can" 可 on top of another: the big brother who can do it all.
+歌	song	One mouth after another 哥 opening wide 欠 to sing a song.
+个	measure word	A person 人 with one stick 丨 under them: one of something, the general measure word.
+给	give	Thread 纟 that joins 合 (hé) two hands: give.
+跟	follow	A foot 足 at someone's heel, with 艮 (gèn) for the sound: heel, follow, with.
+工	work	A tool with a flat top and bottom 一 joined by a post 丄: work.
+关	close	Two bolts 丷 sliding over the big gate 天: close, the pass; relation.
+馆	hall	A public 官 (guān) building where food 饣 is served: hall, shop.
+贵	expensive	Shells 贝 piled up 中 to the brim 一: expensive, precious.
+国	country	A jewel 玉 protected inside borders 囗: a country.
+果	fruit	A tree 木 with a big round fruit 田 on top: fruit, result.
+过	pass	Walking 辶 an inch 寸 past the line: pass, go over.
+还	still	Walking 辶 back because it's not 不 done yet: return; still.
+孩	child	A child 子 with 亥 (hài) for the sound: hái, a child.
+汉	Chinese	Water 氵 and a hand 又: the Han river, so the Chinese people.
+好	good	A woman 女 with her child 子: good.
+号	number	A mouth 口 shouting a call 丂 (kǎo): a call, a sign, a number.
+喝	drink	A mouth 口 asking "what" 曷 (hé) there is to drink: drink.
+和	harmony	Grain 禾 for every mouth 口: peace and harmony.
+很	very	A step 彳 that stops 艮 (gèn) hard: very.
+后	after	A ruler with a mouth 口 giving orders from behind: behind, after.
+候	wait	A person 亻 standing at the target 矦 (hóu) waiting: wait; time.
+花	flower	A plant 艹 that changes 化 from bud to bloom: flower.
+话	speech	Words 讠 from the tongue 舌: speech.
+坏	bad	Soil 土 that is no 不 (bù) good: bad, broken.
+欢	happy	A hand 又 waving and a wide-open yawning mouth 欠: happy.
+回	turn around	A box 口 inside a box 囗, spinning around: turn around, times.
+会	meet	People 人 gathering under a cloud 云 of talk: meet; can, will.
+火	fire	Flames leaping up with sparks on each side: fire.
+机	machine	A small table 几 (jī) made of wood 木: a device, a machine; chance.
+鸡	chicken	A hand 又 grabbing a bird 鸟: chicken.
+几	how many	A small table on two legs 丿 乙: a few; how many?
+记	remember	Words 讠 for yourself 己 (jǐ): note down, remember.
+家	house	A pig 豕 under the roof 宀: in old times every house kept one. Home, family.
+假	fake	A person 亻 who is false 叚 (jiǎ): fake; a holiday.
+间	between	The sun 日 shining in through a gate 门: the space between.
+见	see	A man 儿 under a big eye 冂: see, meet.
+教	teach	A child learning filial piety 孝 (xiào) with a tap 攵 of the rod: teach.
+叫	call	A mouth 口 tangled 丩 (jiū) in a shout: call, be called.
+觉	feel	Light ⺍ under a roof 冖 and an eye that sees 见: become aware, feel; sleep.
+姐	big sister	A woman 女 with 且 (qiě) for the sound: jiě, big sister.
+介	between	A person 人 standing between two sides: go-between, introduce.
+今	now	A person 人 under a roof at this moment: now, today.
+进	enter	Walking 辶 to the well 井 (jǐng): advance, come in.
+京	capital	A tall building with a lid 亠, a gate 口 and little 小 pillars: the capital.
+净	clean	Ice 冫 water you fight 争 (zhēng) over because it's pure: clean.
+九	nine	A long arm 丿 bent with a hook 乙, one short of ten: nine.
+就	just	Going to the capital 京 (jīng), especially 尤 the best: approach; just, right away.
+开	open	Two hands 廾 lifting the bar 一 off a door: open, start.
+看	watch	A hand 手 over the eye 目: watch.
+考	consider	An old man 耂 with a bent cane 丂 stopping to consider.
+渴	thirsty	Water 氵, "what" 曷 (hé) is there to drink? thirsty.
+客	guest	Each 各 person who comes under your roof 宀: a guest.
+课	lesson	Words 讠 that bear fruit 果 (guǒ): a lesson, a class.
+口	mouth	An open square: a mouth.
+块	piece	Soil 土 broken off decisively 夬 (guài): a lump, a piece; a yuan.
+快	fast	A heart 忄 that decides 夬 quickly: fast, happy.
+来	come	A wheat plant 未 with its grains 丷: an old gift from heaven that came: come.
+老	old	An old man 耂 bent over like a spoon 匕: old.
+了	complete	A child with no arms, a hook 亅 finished: complete.
+累	tired	Thread 糸 piled up on the field 田: pile up; tired.
+冷	cold	Ice 冫 by order 令: cold.
+里	inside	A field 田 on the soil 土: a village, a unit of distance; inside.
+两	two	Two people 从 side by side under one 一 yoke 冂: two, both.
+零	zero	Rain 雨 by order 令: spill; zero.
+六	six	A lid 亠 sitting on top of eight 八 legs: six.
+楼	building	Wood 木 stacked like 娄 (lóu): a building with floors.
+路	road	Each 各 foot 足 walks the road.
+妈	mom	A woman 女 with a horse 马 (mǎ) for the sound: mā, mom.
+马	horse	A horse in a few strokes: mane, legs and a flat base 一: horse.
+吗	question ma	A mouth 口 and a horse 马 (mǎ): the question word ma?
+买	buy	A hook 乛 over a head 头 bending down to pay: buy.
+慢	slow	A heart 忄 that stretches out long 曼 (màn): slow.
+忙	busy	A heart 忄 that has died 亡: busy.
+毛	fur	A tuft of hair with strands curling out: fur, hair.
+么	what	A slash 丿 over a private 厶 thing: the little ending of shénme, what.
+没	not have	Water 氵 swallowing a weapon 殳: sunk, gone, not have.
+妹	younger sister	A woman 女 who is not yet 未 grown: the younger sister.
+门	door	A doorway in three strokes, a dot 丶 on top of the post 丨: door, gate.
+们	plural men	People 亻 at the gate 门 (mén): the plural ending (wǒmen, we).
+米	rice	Grains of rice scattered in every direction: rice.
+面	face	A face with the nose in the middle and a frame around it: face, mask.
+名	name	In the evening 夕 dark, you call out with your mouth 口 so people know who you are: your name.
+明	bright	The sun 日 and the moon 月 together: bright.
+拿	take	A hand 手 closing together 合 (hé) on something: take, hold.
+哪	which	A mouth 口 asking about that 那 (nà): which? where?
+那	that	A town 阝 far over there: that.
+奶	milk	A woman 女 with 乃 (nǎi) for the sound: milk; grandma.
+男	man	The one with power 力 who works the rice field 田: man.
+南	south	Ten 十 tents 冂 with dry 干 crops in the warm south.
+难	hard	A hand 又 trying to catch a bird 隹: hard.
+脑	brain	Flesh ⺼ under the lid 亠 of the skull, a cross 凶 marking the spot: brain.
+呢	particle ne	A mouth 口 with a nun 尼 (ní) for the sound: the soft question ne.
+能	can	A bear: head 厶, body of flesh ⺼ and claws 匕. Strong as a bear: able, can.
+你	you	A person 亻 you call 尔 (ěr) "you": you.
+年	year	A farmer carries a bundle of dry 干 rice once every year.
+您	you (polite)	You 你 held in the heart 心: the polite you.
+牛	cow	A cow's head with horns seen from the front: cow.
+女	woman	A woman kneeling with her arms crossed gracefully: woman.
+旁	beside	Standing 立 at the side of a square 方 (fāng): beside.
+跑	run	Feet 足 wrapped 包 (bāo) in motion: run.
+朋	friend	Two moons 月 side by side, two people walking together: friend.
+票	ticket	A covered 覀 slip laid on the altar 示: a slip of paper, a ticket, a vote.
+七	seven	A cross whose tail hooks down and away, like a 7 drawn upside down: seven.
+期	period	That 其 phase of the moon 月: a period of time.
+起	get up	Run 走 by yourself 己: get up and go.
+气	air	Wisps of steam rising in layers: air, gas, breath; anger.
+汽	steam	Water 氵 turning into steam 气: vapor.
+前	front	Two horns 丷 and a line 一 over the cut 刖 feet marching ahead: in front, before.
+钱	money	Metal 钅 in small 戋 (jiān) pieces: coins, money.
+请	please	Words 讠 as clear and green 青 (qīng) as spring: ask, invite, please.
+球	ball	A jewel 王 that everyone requests 求: a ball, a sphere.
+去	go	Soil 土 left behind a private 厶 bundle: go away, leave.
+热	hot	Holding 执 (zhí) your hands over a fire 灬: hot.
+人	person	Two legs walking, seen from the side: a person.
+认	recognize	Words 讠 about a person 人 (rén): recognize, know.
+日	sun	The sun with a line across its middle: sun, day.
+肉	meat	A slab of meat with the ribs showing.
+三	three	Three flat strokes stacked up: three.
+山	mountain	Three peaks, the middle one tallest: mountain.
+商	trade	A lid 亠 with horns 丷 over a bright 冏 shop window: trade, business.
+上	up	A mark ⺊ standing above the line 一: up, on, go up.
+少	few	Something small 小 with one slash 丿 cut off: even fewer.
+绍	connect	Thread 纟 that summons 召 (zhào) people together: connect, introduce.
+身	body	A pregnant woman's body seen from the side.
+什	what	A person 亻 with ten 十 things: odds and ends; the "what" of shénme.
+生	life	A plant sprouting up out of the ground: life, birth.
+师	teacher	A knife 刂 wielded skillfully round and round 帀: master, teacher.
+十	ten	Two lines crossing like a plus sign: ten.
+时	time	The sun 日 moving an inch 寸 across the sky: time.
+识	know	Words 讠 that are only 只 (zhī) yours once learned: knowledge, know.
+事	matter	A hand 彐 holding a writing stick 亅 over a record 口 under one 一 heading: a matter, a job.
+试	try	Words 讠 put to a formula 式 (shì): try, test.
+视	look	An altar 礻 (shì) you look at 见 closely: look at, view.
+是	is	The sun 日 over a straight 疋 path: correct, so "to be", yes.
+手	hand	A hand with its fingers spread and the wrist below: hand.
+书	book	A brush with a line 丨 drawn straight down: writing, a book.
+树	tree	Wood 木 that grows right 对 (duì) up: a tree.
+谁	who	Words 讠 asking about a bird 隹 (zhuī) on the roof: who?
+水	water	A stream in the middle with drops splashing on both sides: water.
+睡	drowsy	Eyelids 目 that droop 垂: drowsy.
+说	say	Words 讠 traded like cash 兑 (duì): speak, say.
+四	four	An enclosure 囗 with two legs 儿 inside: a room with four walls. Four.
+送	send	Walk 辶 with a gift held by two hands 关: send off.
+诉	tell	Words 讠 of scolding 斥 (chì): accuse, tell.
+岁	year of age	A mountain 山 of evenings 夕 passed: a year, years old.
+他	he	A person 亻 who is also 也 there: he, another.
+她	she	A woman 女 who is also 也 there: she.
+太	too	Big 大 with one extra dot 丶: too, very; great.
+体	body	A person's 亻 main 本 part: the body.
+天	heaven	Above the big 大 person with arms open is one 一 more line: the sky, heaven.
+条	strip	Walking 夂 past a long branch of a tree 木: a strip, a clause; long things.
+听	listen	A mouth 口 and an axe 斤 (jīn) chopping the air: sound reaching your ears, listen.
+同	same	Every 凡 mouth 口 under one roof saying the same: same, together.
+图	picture	Winter 冬 drawn inside a frame 囗: a picture, a map.
+外	outside	Fortune telling 卜 done in the evening 夕, outside under the stars.
+玩	play	A jewel 王 at the beginning 元: play with.
+晚	evening	The sun 日 is spared 免 (miǎn) for today: evening, late.
+网	net	A frame 冂 with crossing threads 乂: a net, the internet.
+忘	forget	A heart 心 that has died 亡: forget.
+文	writing	A lid 亠 over crossing ✕ strokes 乂, like patterns carved into a tablet: writing.
+问	ask	A mouth 口 at the gate 门 (mén): ask.
+我	I	A hand 扌 holding a spear 戈: I, me.
+五	five	Two lines 二 with a twisted cross between them, like the five points where threads cross: five.
+午	noon	A pestle 干 standing straight up with its shadow gone: noon.
+西	west	A bird sitting in its nest as the sun sets: west.
+息	breath	The nose 自 and the heart 心: breath.
+习	practice	A wing flapping again and again with two ice 冫 drops: practice.
+洗	wash	Water 氵 before 先 anything else: wash.
+喜	happy	A drum 壴 above a singing mouth 口: happy, like.
+系	system	A slash 丿 over hanging thread 糸: tie, connect; system.
+下	down	A mark 卜 hanging below the line 一: whatever is under the line is down.
+先	ahead	Feet with legs 儿 striding out in front of everyone: ahead, first.
+现	appear	Jade 王 you can see 见 (jiàn): appear, now.
+想	think	The heart 心 with 相 (xiāng) for the sound: think, want, miss.
+小	small	A tiny line with two small dots splashing beside it: small.
+校	school	Under the trees 木, people mingle 交 to learn: school.
+笑	laugh	Bamboo ⺮ bending like a young 夭 person laughing: laugh, smile.
+些	some	This 此 (cǐ) and two 二 more: a few, some.
+写	write	A cover 冖 over the pen giving 与: write.
+谢	thank	Words 讠 shot 射 (shè) back: thank.
+新	new	A freshly cut 斤 tree from the relatives' 亲 woods: new.
+星	star	A sun 日 being born 生 in the night sky: star.
+行	go	Steps 彳 on the left, more steps on the right: going along the road.
+兴	thrive	Small ⺍ sparks over one 一 base, with eight 八 legs holding it up: rise, thrive; interest.
+休	rest	A person 亻 leaning against a tree 木 to take a rest.
+学	study	A child 子 under a cover 冖 with light ⺍ shining in from above: studying.
+样	kind	Wood 木 carved like a sheep 羊 (yáng): a shape, a pattern, a kind.
+要	need	A woman 女 under a cover 覀 holding her waist: need, important.
+爷	grandpa	A father 父 with a seal 卩 of age: grandfather.
+也	also	A curving stroke 乚 with arms: also, too.
+页	page	A head over a shell 贝 shape: a page, a sheet.
+一	one	A single horizontal stroke: one finger held flat, the simplest number there is.
+衣	clothes	A collar 亠 and sleeves of a robe: clothes.
+医	doctor	An arrow 矢 hidden 匸 in a box, pulled out by the doctor: medicine.
+影	shadow	Scenery 景 with hair 彡 lines: a shadow.
+用	use	A bucket with a handle, ready to use.
+友	friend	Two hands 又 holding each other: friend.
+有	have	A hand holding a piece of meat 月: have.
+右	right	A hand reaching to bring food to the mouth 口: most people eat with the right hand.
+雨	rain	Drops of rain falling from a cloud under the sky: rain.
+语	language	Words 讠 that I 吾 (wú) speak: language.
+元	first	Two 二 lines above a man 儿: the head, first; also a yuan.
+远	far	Walking 辶 since the very first 元 (yuán) day: far.
+院	courtyard	A town 阝 with a complete 完 (wán) walled yard: courtyard, institute.
+月	moon	A crescent moon with two lines on its face: moon, month.
+再	again	One 一 more fish 冉 on the line: again.
+在	at	Talent 才 (cái) put to the soil 土: exist, be at.
+早	early	The sun 日 just above the ten 十 o'clock line of the horizon: early in the morning.
+怎	how	A heart 心 stopped at first 乍 (zhà) by doubt: how? why?
+站	stand	Standing 立 to take 占 (zhàn) a spot: stand, station.
+找	look for	A hand 扌 holding a spear 戈 out searching: look for.
+这	this	Walking 辶 to the writing 文 right here: this.
+着	ongoing zhe	Eyes 目 under a sheep 羊 watching all along: the "-ing" particle; touch.
+真	true	A straight 直 look on a steady table 几: true, real.
+正	correct	Stop 止 at the line 一 exactly: correct.
+知	know	Words from the mouth 口 that fly straight as an arrow 矢: you know.
+中	middle	A line 丨 shot straight through the middle of a box 口: middle, inside.
+重	heavy	A thousand 千 villages 里 piled up: heavy.
+住	live	A person 亻 who is master 主 of a house: live, dwell.
+准	accurate	Ice 冫 still enough for a bird 隹 (zhuī) to aim: accurate, allow.
+桌	table	A tall 卓 (zhuó) stand of wood 木: table.
+子	child	A baby wrapped in a blanket with arms out: child.
+字	character	Under a roof 宀 a child 子 learns to write characters.
+走	walk	Someone 土 on a stepping foot 止: walk.
+最	most	Take 取 everything under the sun 日: the most.
+昨	yesterday	The sun 日 that has just been made 乍: yesterday.
+左	left	A hand holding a carpenter's tool 工, which you hold in the left hand: left.
+作	make	A person 亻 cutting with a saw 乍 to make things.
+坐	sit	Two people 从 sitting on the ground 土: sit.
+做	do	A person 亻 who makes things happen for a reason 故 (gù): do, make.
+啊	ah	A mouth 口 going 阿 (ā): ah!
+安	peaceful	A woman 女 safe under a roof 宀: peaceful, cheap.
+般	kind	A boat 舟 rowed with a pole 殳: way, manner, kind.
+板	board	Wood 木 bent back 反 flat: a board.
+办	handle	Strength 力 with two drops 八 (bā) of sweat: handle, manage.
+饱	full	Food 饣 wrapped 包 (bāo) inside: full.
+报	report	A hand 扌 bringing a kneeling 卩 prisoner in hand 又: report, repay; newspaper.
+背	back	North 北 (běi) facing flesh ⺼: the back.
+笔	pen	Bamboo ⺮ tipped with hair 毛: brush, pen.
+必	certain	A heart 心 pierced by a slash 丿: certain, without fail.
+变	change	A hand 又 that also 亦 turns things around: change.
+便	convenient	A person 亻 who changes 更 things to make life convenient.
+遍	everywhere	Walking 辶 flat 扁 (biǎn) across the land: everywhere; a time.
+表	show	Fur 毛 on the outside of clothes 衣: outside, show; a watch.
+部	part	A town 阝 with 咅 (pǒu) for the sound: a part, a department.
+才	only just	A sprout pushing through the ground like a hand 扌: talent; only just.
+参	take part	A big 大 person under a private 厶 hat with flowing hair 彡: join in.
+餐	meal	A hand 又 at the bones 歺 above food 食: a meal.
+草	grass	Plants 艹 that grow early 早 in spring: grass.
+层	layer	A body 尸 over clouds 云 stacked up: layer, floor.
+查	check	The sun 旦 rising behind a tree 木 lights everything up: check.
+长	long	An old man with long hair and a stick over one 一 line: long; grow, elder.
+超	transcend	Run 走 when summoned 召: transcend, super-.
+晨	morning	The sun 日 at early morning 辰 (chén): dawn.
+称	call	Grain 禾 weighed by you 尔: weigh; call, name.
+成	become	An adult man 丁 with a spear 戈: accomplish, become.
+楚	clear	A forest 林 over a foot path 疋: clear; pain.
+处	place	Walking 夂 to plant a flag 卜: a place; handle.
+船	boat	A boat 舟 with a sail 几 and an opening 口: ship.
+吹	blow	A mouth 口 that yawns 欠 out air: blow.
+春	spring	The sun 日 warming the growing plants above: spring.
+词	word	Words 讠 that take charge 司 (sī): a word, a phrase.
+带	belt	A robe tied with a belt above 卅, a cover 冖 and the cloth 巾 hanging below: belt; bring.
+单	single	Two horns 丷 on one tall fork: single, only one; a list.
+但	however	A person 亻 at daybreak 旦: however.
+当	serve as	A small ⺌ sweep of the hand 彐: act as, should; just at.
+倒	collapse	A person 亻 who arrives 到 face down: collapse.
+灯	lamp	A fire 火 on a nail 丁: lamp.
+低	low	A person 亻 bowing down to the base 氐 (dī): low.
+典	classic	A book bent 曲 on a stand 八: a law code, a classic.
+掉	drop	A hand 扌 letting go of something high 卓 (zhuó): drop, lose.
+定	fix	A foot 疋 set firmly under the roof 宀: fix, determine.
+冬	winter	Walking 夂 over two drops of ice ⺀: winter.
+懂	understand	A heart 忄 directed 董 (dǒng) the right way: understand.
+度	degree	Twenty 廿 hands 又 measure the house 广: degree, times.
+短	short	An arrow 矢 as short as a bean 豆: short.
+段	section	A hand with a chisel 殳 cutting stone into pieces: a section, a stretch.
+队	team	People 人 gathered at one town 阝: a team, a line.
+而	and yet	A beard hanging under a chin: and, but, and yet.
+发	send out	A hand 又 throwing out a spear: send out, issue; hair.
+法	law	Water 氵 that goes 去 one way: the law.
+份	portion	The share 分 (fēn) a person 亻 gets: a portion, a copy.
+封	seal	A square jewel 圭 pressed by hand 寸: seal.
+复	again	A person 亻 walking 夂 back each day 日: return, again; repeat.
+该	should	Words 讠 with 亥 (hài) for the sound: should, ought to.
+改	reform	Strike 攵 yourself 己 to change: reform.
+感	feel	All 咸 of the heart 心 touched: feel, be moved.
+刚	just now	A knife 刂 on a hard ridge 冈 (gāng): hard, firm; just now.
+更	even more	A hand 乂 under a speaking 曰 line 一, changing the watch: change; even more.
+公	public	Split 八 what is private 厶 so everyone shares it: public.
+共	together	Two hands 八 lifting something together.
+狗	dog	An animal 犭 with 句 (jù) for the sound: dog.
+够	enough	Much 多 with 句 (jù) for the sound: enough.
+故	reason	Old 古 (gǔ) things tapped 攵 into the present: reason; old; on purpose.
+顾	look after	A head 页 turning back in hardship 厄 (è): look back, look after.
+观	look	See 见 again 又: look at, view.
+惯	habit	A heart 忄 pierced through 贯 (guàn) the same way each time: habit.
+广	wide	A dot 丶 roof over a cliff 厂 shelter: a wide building; broad.
+海	sea	Water 氵 there every 每 (měi) day: the sea.
+喊	shout	A mouth 口 using all 咸 (xián) its breath: shout.
+合	fit	A lid 亼 that closes over a mouth 口: fit, join together.
+河	river	Water 氵 that can 可 carry boats: a river.
+黑	black	Soot rising from a fire 灬 up through a window: black.
+红	red	Thread 纟 with 工 (gōng) for the sound: red.
+忽	suddenly	A heart 心 hit by a flag 勿 (wù) flapping past: suddenly; ignore.
+湖	lake	Water 氵 with 胡 (hú) for the sound: lake.
+护	protect	A hand 扌 guarding the door 户 (hù): protect.
+划	row	A spear 戈 and a knife 刂 cutting lines: row a boat, scratch, plan.
+画	picture	A field 田 drawn inside a frame 凵 under a top line 一: picture, draw.
+换	change	A hand 扌 trading for plenty 奂 (huàn): exchange, change.
+黄	yellow	A jade pendant 由 hanging on its two strings 八: yellow.
+活	lively	Water 氵 on the tongue 舌 keeps you alive: lively.
+或	or	A spear 戈 guarding a walled 口 town on its line 一 of land: perhaps, or.
+级	level	Thread 纟 reaching 及 (jí) step by step: level, grade.
+急	urgent	A heart 心 like grass being cut 刍 (chú) fast: hurried, urgent.
+己	self	A rope bent back on itself: self.
+计	count	Words 讠 counting to ten 十 (shí): count, plan.
+际	border	A town 阝 where the altar 示 (shì) marks the edge: border, between.
+绩	result	Thread 纟 spun as your duty 责 (zé): achievement, result.
+加	add	Power 力 added to a mouth 口 cheering: add.
+检	check	Wood 木 checked all 佥 (qiān) over: inspect, check.
+件	item	A person 亻 sorting out an ox 牛: an item, a matter.
+健	healthy	A person 亻 who builds 建 their body: healthy.
+讲	speak	Words 讠 drawn up like water from a well 井 (jǐng): talk, explain.
+交	cross	A person 六 with crossed 乂 legs: cross, hand over, make friends.
+角	horn	A horn with lines carved on it: horn, corner.
+饺	dumpling	Food 饣 folded 交 (jiāo) closed: dumpling.
+脚	foot	Flesh ⺼ that steps back 却 (què): foot.
+接	receive	A hand 扌 reaching out to 妾 (qiè): receive, connect, meet.
+街	street	Going 行 between square jewels 圭 of land: street.
+节	festival	A grass 艹 stalk with a joint: a section, a festival; save.
+结	tie	Thread 纟 tied for luck 吉 (jí): knot, tie; result.
+借	borrow	A person 亻 asking for what was lent long ago 昔: borrow.
+斤	jin	An axe: a cliff-shaped 厂 head over 下 a handle: axe; a jin weight.
+近	near	Walk 辶 just an axe's 斤 throw: near.
+经	pass through	Thread 纟 with 工 (gōng) for the sound, the long warp threads: pass through; classic.
+睛	eye	An eye 目 as clear as 青 (qīng): eyeball.
+静	quiet	The blue 青 calm after a contest 争: quiet.
+久	long time	A person 勹 dragging something slowly: a long time.
+酒	wine	Liquid 氵 from the wine jar 酉: alcohol.
+举	raise	A hand 扌 lifting something up to thrive 兴: raise, lift.
+句	sentence	Words from a mouth 口 wrapped 勹 into one piece: a sentence.
+卡	card	Something stuck between up 上 and down 卜: blocked; a card.
+康	healthy	A house 广 with a helping 隶 hand: healthy, at peace.
+靠	lean on	Two people back to back 非, telling 告 (gào) each other to hold: lean on, depend on.
+科	course	Grain 禾 measured with a dipper 斗 and sorted into classes: course, department.
+可	can	A mouth 口 hammered like a nail 丁 saying yes: can, OK.
+克	overcome	A big brother 兄 under a weapon 十: overcome; a gram.
+刻	engrave	The hog's 亥 sign cut with a knife 刂: engrave.
+空	empty	A cave 穴 with 工 (gōng) for the sound: empty, the sky; free time.
+哭	cry	Two crying eyes 口 口 over a dog 犬 howling: cry.
+筷	chopsticks	Bamboo ⺮ that's quick 快 (kuài): chopsticks.
+拉	drag	A hand 扌 drags the one standing 立: kidnap, Latin.
+蓝	blue	A plant 艹 watched 监 (jiān) in the dye pot: indigo, blue.
+篮	basket	Bamboo ⺮ with 监 (jiān) for the sound: basket.
+乐	happy	A slash 丿 strummed over a small 小 instrument: music; happy.
+离	leave	A beast with a lid 亠 of a head, a mark 凶 and tracks 禸: leave, apart from.
+礼	ceremony	An altar 礻 with a bowing curve 乚: ceremony, gift, manners.
+理	logic	A jewel 王 cut along the village 里 rule of its grain: logic, reason.
+力	power	A flexed arm with a bulging muscle: power.
+利	profit	A knife 刂 cutting grain 禾: profit, advantage.
+例	example	A person 亻 standing in a row 列: an example.
+脸	face	Flesh ⺼ that shows it all 佥 (qiān): face.
+练	practice	Thread 纟 sorted like a card 柬 (jiǎn): refine; practice.
+凉	cool	Ice 冫 in the capital 京 (jīng): cool.
+亮	bright	A tall lamp: lid 亠, window 口, roof 冖 and stand 几 shining: bright.
+辆	measure for cars	A cart 车 with two 两 (liǎng) wheels: the measure word for vehicles.
+量	quantity	Weigh the village 里 at daybreak 旦: quantity.
+留	stay	A rabbit 卯 staying in the rice field 田: stay, detain.
+流	flow	Water 氵 trailing like a pennant 㐬 (liú): flow.
+旅	travel	A banner 方 leading a clan 氏 on the road: travel.
+绿	green	Thread 纟 with 录 (lù) for the sound: green.
+论	discuss	Words 讠 in logical order 仑 (lún): discuss.
+卖	sell	Ten 十 more on top of buy 买: sell.
+满	full	Water 氵 over the grass 艹 and both 两 banks: full.
+猫	cat	An animal 犭 in the sprouts 苗 (miáo), mewing miáo: cat.
+末	end	A tree 木 with a long line at its tip: the end.
+目	eye	An eye turned on its side, with the pupil lines inside: eye.
+鸟	bird	A bird in a few strokes: head, eye, wing and tail: bird.
+弄	play with	Two hands 廾 playing with jade 玉: fiddle with, do, make.
+努	strive	A servant 奴 putting in power 力: strive.
+爬	climb	Claws 爪 that crawl like a snake 巴 (bā): climb, crawl.
+怕	afraid	A heart 忄 gone white 白 (bái): afraid.
+排	exclude	A hand 扌 that says not 非: exclude.
+碰	bump	A stone 石 coming together 並 (bìng) with another: bump into, touch.
+篇	article	Bamboo ⺮ strips laid flat 扁 to write on: an article, a chapter.
+片	slice	Half of a split log: a slice, a flat piece; a film.
+漂	drift	Water 氵 carrying a ballot 票: drift.
+平	flat	A scale 干 with two equal pans: flat, even, peace.
+瓶	bottle	A pottery 瓦 jar with 并 (bìng) for the sound: bottle.
+普	universal	The sun 日 over a row 並 of people: universal.
+其	its	A basket 甘 on a stand 一 with two legs 八: its, that.
+骑	ride	A horse 马 with 奇 (qí) for the sound: ride.
+千	thousand	A slash 丿 placed on ten 十 makes it a hundred times bigger: thousand.
+墙	wall	Soil 土 piled up by a miser 啬 (sè) to keep things in: wall.
+且	moreover	A pile of stones on one 一 base: moreover, also.
+青	blue	A sprout under the moon 月, young and blue-green: blue.
+轻	light	A cart 车 so light one hand 又 can do the work 工 (gōng): light, gentle.
+清	pure	Water 氵 as blue 青 as the sky: pure.
+情	feelings	A heart 忄 as blue 青 and fresh as youth: feelings.
+晴	clear	The sun 日 in a blue 青 sky: clear weather.
+秋	autumn	Grain 禾 drying beside the fire 火: autumn harvest.
+求	ask for	Water 氺 drops around one 一 line, begging for more: seek, ask for.
+取	take	A hand 又 grabbing an ear 耳: take.
+全	whole	Jade 玉 put away 入 safe and complete: whole, all.
+确	sure	Stone 石 as hard as a horn 角 (jiǎo): firm, sure.
+然	so	Dog meat 肰 (rán) on the fire 灬: burning; so, like that.
+让	let	Words 讠 that put someone above 上 (shàng) you: let, give way.
+如	like	A woman 女 whose mouth 口 says the same: like, as.
+入	enter	Two strokes leaning in, like an arrow pointing into a tent opening: enter.
+色	color	A person ⺈ kneeling over another 巴: looks, color.
+声	voice	A gentleman 士 raising his voice from the platform.
+省	province	An eye 目 that looks at the few 少 (shǎo) things that matter: save, leave out; province.
+实	real	A head 头 under a roof 宀, someone really at home: real, true.
+食	eat	A lid over a bowl of good food: eat.
+使	use	A person 亻 sent by an official 吏: envoy; make, use.
+示	show	Two 二 lines over small 小 drops: an altar where signs are shown: show.
+市	market	A lid 亠 roof over cloth 巾 stalls: market, city.
+适	suitable	Walking 辶 where the tongue 舌 (shé) likes: suitable, comfortable.
+室	room	Under a roof 宀, the place you arrive 至 at last: a room.
+收	receive	Tying 丩 (jiū) things up with a tap 攵: gather, receive.
+受	receive	A claw 爫 passing something under the cover 冖 into another hand 又: receive, bear.
+舒	comfortable	A house 舍 that gives 予 (yǔ) you room: relaxed, comfortable.
+熟	cooked	Who 孰 (shú) is over the fire 灬? cooked, ripe; familiar.
+数	number	Tapping 攵 through the stars 娄 (lóu) one by one: count, number.
+顺	smooth	A head 页 going along with the stream 川 (chuān): obey, smooth.
+司	manage	A mouth 口 giving orders with a raised arm: manage; office.
+思	think	The brain like a rice field 田 sitting over the heart 心: think.
+算	calculate	Bamboo ⺮ beads on a tool 具 of an abacus: calculate.
+虽	although	An insect 虫 with a big mouth 口: small, although.
+随	follow	Walking 迶 along the town 阝 roads behind others: follow.
+所	place	An axe 斤 at the door 户: a place; that which.
+它	it	A roof 宀 over a curled snake 匕: it.
+态	attitude	A heart 心 that's too 太 (tài) much on show: attitude, manner.
+堂	hall	An esteemed 尚 building on solid soil 土: hall.
+讨	ask for	Words 讠 measured by the inch 寸: discuss, ask for.
+套	cover	Something big 大 wrapped in long 镸 cloth: a cover, a set.
+特	special	A cow 牛 kept at the temple 寺: special.
+疼	ache	A sickness 疒 that bites like winter 冬 (dōng): ache.
+提	lift	A hand 扌 with 是 (shì) for the sound: lift, carry; mention.
+题	topic	A head 页 with 是 (shì) for the sound: forehead, a title, a question.
+铁	iron	Metal 钅 that loses 失 (shī) its shine to rust: iron.
+庭	garden	A building 广 with a court 廷 outside: garden.
+停	stop	A person 亻 stopping at the pavilion 亭: halt.
+挺	quite	A hand 扌 standing up straight in the court 廷 (tíng): upright; quite.
+通	pass through	Walk 辶 through a tube 甬: pass through.
+头	head	A big 大 man with two drops ⺀ on his head: head.
+推	push	A hand 扌 pushes the bird 隹 to guess its path.
+腿	leg	Flesh ⺼ you step back 退 (tuì) with: leg.
+完	complete	A house 宀 from the beginning 元 to the end: complete.
+碗	bowl	A stone 石 dish curved 宛 (wǎn): bowl.
+万	ten thousand	One 一 line with a long hook below: ten thousand, countless.
+王	king	Three lines for heaven, people and earth, joined by one line through them: the king.
+往	toward	A step 彳 toward the king 王 (wáng): go toward; past.
+为	for	A dot 丶 of help added to strength 力: do; for.
+位	rank	Where a person 亻 stands 立: rank, position.
+味	taste	A mouth 口 tasting fruit that is not yet 未 ripe: flavor.
+喂	hey	A mouth 口 calling out when afraid 畏 (wèi): hey! hello? feed.
+温	warm	Water 氵 kept warm 昷 (wēn): warm.
+闻	hear	An ear 耳 at the gate 门 (mén): hear, smell; news.
+务	task	Walking 夂 with all your strength 力: a task, affairs.
+物	thing	A cow 牛 is not 勿 a person: a thing.
+夏	summer	A head 自 dragging slowly 夂 in the heat: summer.
+相	mutual	An eye 目 looking at a tree 木, and the tree looking back: mutual.
+响	sound	A mouth 口 facing 向 (xiàng) you: a sound, ring.
+向	toward	A window 口 in a house facing one way: toward, direction.
+像	like	A person 亻 with 象 (xiàng) for the sound: resemble, like; image.
+鞋	shoe	Leather 革 with 圭 (guī) for the sound: shoe.
+心	heart	A heart with drops of blood around it: heart, mind.
+信	trust	A person 亻 standing by their words 言: trust.
+姓	surname	A woman 女 gives life 生: the surname.
+须	must	Hair 彡 on the face 页: beard; must.
+许	allow	Words 讠 with 午 (wǔ) for the sound: allow, promise; perhaps.
+选	choose	Walking 辶 up first 先 (xiān): choose.
+雪	snow	Rain 雨 you can sweep 彐 up with a hand: snow.
+言	say	Words coming out of a mouth 口: say.
+颜	face	An elegant 彦 (yàn) head 页: face, color.
+眼	eyeball	An eye 目 that stops 艮 on things: eyeball.
+阳	sun	The side of the hill 阝 the sun 日 shines on: sun, yang.
+养	raise	A sheep 羊 (yáng) and a child 儿: raise, keep.
+药	medicine	A plant 艹 with 约 (yuē) for the sound: medicine.
+业	business	A rack of tools standing on one 一 base: trade, work, business.
+夜	night	Under a lid 亠 of darkness, a person 亻 walks home in the evening 夕 light: night.
+宜	good	Moreover 且 under a roof 宀: all is good.
+已	already	A snake that has already stopped coiling: already.
+以	by means of	A person 人 holding a tool: use, by means of, so as to.
+椅	chair	Wood 木 for a strange 奇 seat: a chair.
+亿	hundred million	A person 亻 with 乙 (yǐ) for the sound: a hundred million.
+意	meaning	The sound 音 of the heart 心: meaning, mind.
+因	cause	A big 大 man in a box 囗: the cause.
+阴	shade	The side of the hill 阝 under the moon 月: shade, yin, cloudy.
+音	sound	Stand 立 up and open your mouth like the sun 日 to make a sound.
+银	silver	Metal 钅 with 艮 (gèn) for the sound: silver; money.
+印	stamp	A hand pressing down a seal 卩: stamp.
+应	should	Small ⺍ things kept on one 一 shelf in a house 广: should; respond.
+英	England	A flower 艹 in the center 央: excellent, hero, England.
+迎	welcome	Walking 辶 out to look up 卬 (áng) at a guest: welcome.
+永	forever	Water 水 flowing on and on: forever.
+由	from	A field with a sprout sticking out of it: cause, from.
+油	oil	A liquid 氵 with a reason 由 to burn: oil.
+游	swim	Water 氵 to swim 斿 (yóu) in: swim, travel.
+又	again	A right hand reaching out again.
+于	at	Two 二 lines with a hook 亅 hanging down: at, in, to.
+鱼	fish	A fish: head ⺈, scaled body 田 and tail 一: fish.
+育	raise	A baby head-down 亠 厶 above a mother's flesh ⺼: give birth, educate.
+园	garden	A wall 囗 around the first 元 (yuán) plot: garden, park.
+原	origin	A spring 泉 (quán) under a cliff 厂: source, original.
+愿	wish	The source 原 (yuán) of the heart 心: wish, willing.
+越	the more	Walking 走 past with a halberd 戉 (yuè): go over, the more; Vietnam.
+云	cloud	Two 二 lines over a curl 厶 of vapor: cloud.
+运	transport	Walking 辶 with the clouds 云 (yún): carry, move; luck.
+咱	we	A mouth 口 saying "ourselves" 自 (zì): we, us (you and me).
+脏	dirty	Flesh ⺼ from a village 庄 (zhuāng) farm: organs; dirty.
+澡	bath	Water 氵 with birds chirping 喿 (zào): a bath.
+占	take	A mouth 口 reading the crack ⺊: divine; take a place.
+照	shine	A bright 昭 fire 灬: shine.
+者	person	An old man 耂 under the sun 日: a person, someone.
+直	straight	Ten 十 eyes 目 looking straight ahead: straight, honest.
+只	only	A mouth 口 with two short strokes 八: only; measure word for animals.
+纸	paper	Fibre 纟 with 氏 (shì) for the sound: paper.
+钟	clock	Metal 钅 struck in the middle 中 (zhōng): a bell, a clock.
+周	week	A border 冂 around land 土 and a well 口: all around; a week.
+主	master	The flame 丶 burning on top of the king's 王 lamp: the master.
+助	help	Power 力 piled up 且 to help.
+装	attire	A robust 壮 man in fine garments 衣: attire.
+自	oneself	The nose 目 you point to when you say "me": oneself.
+租	rent	Grain 禾 paid again and again 且: rent.
+组	group	Threads 纟 laid one upon another 且 (qiě): group, form.
+嘴	mouth	A mouth 口 with a beak 觜 (zī): mouth.
+座	seat	Under a roof 广 people sit 坐: a seat.
+按	press	A hand 扌 bringing peace 安 (ān): press, according to.
+把	grasp	A hand 扌 around a snake 巴: grasp.
+搬	transport	A hand 扌 for the carrier 般 boat: transport.
+保	protect	A person 亻 guarding a baby 呆: protect, keep.
+被	by	Clothing 衤 of skin 皮 (pí): a quilt; the passive "by".
+币	currency	A slash 丿 over cloth 巾 money: currency.
+标	mark	A tree 木 with a sign 示 on it: a mark, a sign.
+并	and	Two drops 丷 over things opening 开 side by side: combine; and.
+播	broadcast	A hand 扌 scattering seeds 番 (fān): sow, broadcast.
+补	mend	Clothing 衤 patched with 卜 (bǔ) for the sound: mend, add.
+布	cloth	A hand stretching cloth 巾: linen, spread.
+步	step	Two feet 止 one in front of the other: a step.
+材	lumber	A tree 木 with talent 才 in it: lumber, material.
+采	pick	A hand 爫 picking from a tree 木: pick, gather.
+彩	coloring	Dice 采 and hair 彡 strokes: coloring.
+曾	once	Steam 丷 rising from a pot over heat 日: once, ever.
+察	examine	A roof 宀 over a sacrifice 祭 (jì) watched closely: examine.
+产	produce	A lid 亠 and two drops 丷 under a cliff 厂 (chǎng): give birth, produce.
+厂	factory	A cliff overhang to work under: factory.
+朝	face	The morning sun 龺 (gān) with the moon 月 still out: morning; face toward; dynasty.
+吵	noisy	A mouth 口 with 少 (shǎo) for the sound: noisy, argue.
+衬	lining	Clothing 衤 an inch 寸 (cùn) beneath: lining, shirt.
+城	castle	Soil 土 that becomes 成 a fortress: castle.
+程	journey	Grain 禾 laid out as you present 呈 (chéng) it: rule, order; journey.
+持	hold	A hand 扌 holding the temple 寺 key: hold, have.
+充	fill	A child under a lid 亠 grows 允 to fill it.
+初	first	A knife 刀 cutting cloth 衤 for the first time.
+除	remove	The surplus 余 taken out of the town 阝: remove, except.
+础	base	Stone 石 that goes out 出 (chū) under the post: foundation stone.
+传	pass on	A person 亻 focusing 专 (zhuān) on passing it on: pass on, spread.
+创	create	A knife 刂 cutting into the granary 仓 (cāng): wound; create.
+此	this	A foot 止 (zhǐ) stopped beside a spoon 匕: this, here.
+村	village	Trees 木 measured out by the inch 寸 into plots: a village.
+存	keep	A child 子 kept safe with 才 (cái) for the sound: exist, keep, save.
+达	reach	Walking 辶 a big 大 (dà) way: reach, arrive.
+代	substitute	A person 亻 with a stake 弋 holding their place: substitute, generation.
+待	wait	Step 彳 to the temple 寺 and wait.
+刀	sword	A blade with a curved handle: sword, knife.
+导	guide	A hand 寸 pointing a coiled 巳 path: lead, guide.
+底	bottom	The base 氐 of a building 广: bottom.
+调	adjust	Words 讠 that go all round 周 (zhōu): tune, adjust; move.
+订	book	Words 讠 nailed 丁 (dīng) down: fix, order, book.
+断	cut off	An axe 斤 cutting through rice 米 stalks: cut off, decline.
+顿	pause	A head 页 bowing with 屯 (tún) for the sound: pause; a meal, a time.
+烦	annoyed	A head 页 on fire 火: annoyed, troubled.
+反	against	A hand 又 pushing back against a cliff 厂: against, anti-.
+范	model	A plant 艹 with 氾 (fàn) for the sound: a model, a pattern.
+防	guard	A hill wall 阝 built square 方 (fāng): guard against.
+访	visit	Words 讠 asked on every side 方 (fāng): visit, interview.
+啡	coffee	A mouth 口 with 非 (fēi) for the sound: the fēi of kāfēi, coffee.
+费	cost	Money 贝 that is not 弗 (fú) kept: cost, fee, spend.
+丰	plenty	Three 三 heads of grain on one stalk 丨: plentiful.
+否	no	A mouth 口 saying not 不: no.
+夫	husband	A big 大 man with a hairpin: husband.
+福	luck	An altar 礻 with a full 畐 (fú) jar: blessing, good fortune.
+父	father	Two hands crossing, holding an axe: father.
+付	pay	A hand 寸 handing something to a person 亻: pay.
+负	carry	A person ⺈ carrying a load of shells 贝: bear; lose, owe; negative.
+富	rich	A roof 宀 over a full 畐 (fú) jar: rich.
+概	outline	Wood 木 that has already 既 been shaped: an outline.
+赶	hurry	Walking 走 fast with 干 (gàn) for the sound: hurry, catch up, drive away.
+敢	daring	An ear 耳 struck 攵 but not afraid: daring.
+格	status	Each 各 tree 木 in its place: status, rank.
+各	each	Feet 夂 walking to each mouth 口 at the door: each.
+根	root	The part of a tree 木 that stops 艮 underground: root.
+功	achievement	Craft 工 plus power 力: achievement.
+姑	aunt	An older 古 (gǔ) woman 女: father's sister, aunt.
+古	old	A story told by ten 十 mouths 口 over the years: old.
+挂	hang	A hand 扌 hanging a jade tablet 圭 (guī): hang.
+怪	strange	A heart 忄 that thinks even the holy 圣 is odd: strange; blame.
+管	manage	A bamboo ⺮ pipe for the official 官 (guān): tube; manage.
+光	light	Small ⺌ flames on top of a person 兀: light; only.
+规	rule	What a grown man 夫 (fū) sees 见 is right: rule, regulation.
+哈	ha	A mouth 口 with 合 (hé) for the sound: ha ha!
+害	harm	Under a roof 宀, a mouth 口 piled with plenty 丰 of trouble: harm.
+何	what	A person 亻 who can 可 do anything asks: what?
+互	mutual	Two 二 hooks hooked into each other: mutual.
+华	splendid	Ten 十 changes 化 (huà) of bloom: splendid; Chinese.
+化	change	A person 亻 standing next to a person upside down 匕: change, transform.
+环	ring	Jade 王 with 不 (bù) for the sound: a ring; surround.
+婚	marriage	A woman 女 at dusk 昏, the wedding hour: marriage.
+积	pile up	Grain 禾 piled up with 只 (zhī) for the sound: accumulate.
+基	foundation	That 其 soil 土 under everything: foundation.
+及	reach	A hand 又 catching a person from behind: reach; and; in time.
+极	extreme	The tree 木 top you reach 及 (jí): extreme, pole.
+集	gather	Birds 隹 gathering on a tree 木.
+纪	record	Threads 纟 tied for yourself 己 (jǐ) to remember: record, era; discipline.
+技	skill	A hand 扌 shaping a branch 支: skill.
+济	help	Water 氵 crossed evenly 齐 (qí): ferry across, help.
+继	continue	Thread 纟 tied on with rice 米 grains: continue.
+价	price	A go-between 介 (jiè) person 亻 setting it: price, value.
+架	frame	Wood 木 added 加 on top: a rack, frame.
+坚	firm	A hand 又 pressing the soil 土 hard: firm, hard.
+简	simple	Bamboo ⺮ slips with gaps between 间 (jiān): simple; a letter.
+建	build	A long stride 廴 and a brush 聿 drawing plans: build.
+将	will	A bed 丬 at evening 夕 with a hand 寸 setting things: will, about to; general.
+蕉	banana	A plant 艹 with 焦 (jiāo) for the sound: banana.
+较	compare	A cart 车 crossed 交 (jiāo) with another to compare: compare, rather.
+解	untie	A knife 刀 cutting the horn 角 off a cow 牛: untie, solve.
+界	world	A rice field 田 with a boundary 介 around it: the world.
+金	gold	Nuggets of gold buried under the earth below a roof: gold, money.
+仅	only	A person 亻 with one hand 又: only, merely.
+尽	use up	A ruler 尺 measuring the last drops ⺀: use up, to the end.
+紧	tight	A hand 又 pulling thread 糸 tight: tight, urgent.
+精	refined	Rice 米 polished blue 青 white: refined, spirit.
+景	scenery	The sun 日 over the capital 京: scenery.
+警	warn	Words 言 of awe 敬: warn.
+境	border	Land 土 where it finally 竟 (jìng) ends: border, situation.
+旧	old	A line 丨 next to many old days 日: old times.
+救	save	Strike 攵 down what is requested 求: save, rescue.
+具	tool	An eye 目 on two legs 八: a tool.
+剧	drama	A knife 刂 at home 居 (jū): a dramatic play; severe.
+据	according to	A hand 扌 holding the place you live 居 (jū): occupy; according to.
+决	decide	Ice 冫 cracked decisively 夬: decide.
+绝	cut off	Thread 纟 cut with 色 (sè) for the sound: cut off; absolutely.
+咖	coffee	A mouth 口 adding 加 (jiā) a sound: the kā of kāfēi, coffee.
+恐	afraid	A heart 心 bound tight 巩 (gǒng) by fear: afraid.
+苦	bitter	Old 古 grass 艹 tastes bitter: suffering.
+裤	trousers	Clothing 衤 with 库 (kù) for the sound: trousers.
+况	situation	Ice 冫 next to the big brother 兄: the situation, and besides.
+困	distressed	A tree 木 boxed in an enclosure 囗: distressed, stuck.
+浪	waves	Good 良 water 氵 rolling: waves, wandering.
+类	kind	Rice 米 grains of a big 大 harvest sorted: kind, type.
+李	plum	A tree 木 with 子 (zǐ) for the sound: plum; a surname.
+历	history	Strength 力 (lì) spent under a cliff 厂 over the years: experience, history.
+立	stand	A person standing on the ground with a lid 亠 for a head: stand.
+丽	beautiful	Two antlers 丶 冂 under one 一 line: beautiful.
+连	connect	A cart 车 moving 辶 goods from one town to the next: connect; even.
+联	unite	An ear 耳 at the pass 关 (guān): join, unite.
+烈	ardent	A file 列 over the fire 灬: ardent, violent.
+领	lead	A head 页 giving commands 令 (lìng): neck, collar; lead.
+另	another	A mouth 口 over strength 力 to spare: another, separate.
+龙	dragon	A twisting beast with a tail 丿 and claws 尤: dragon.
+录	record	A hand 彐 over drops 氺 of ink: record, write down.
+乱	chaos	A tongue 舌 twisted 乚: chaos, messy.
+落	fall	Leaves 艹 falling with 洛 (luò) for the sound: fall, drop.
+麻	hemp	A grove 林 under a roof 广: hemp, numb.
+冒	risk	A hat 日 over the eyes 目, going ahead blind: risk; give off.
+媒	go-between	A woman 女 who knows so-and-so 某: a go-between.
+每	every	A mother 母 (mǔ) with a hairpin on top: each, every.
+美	beautiful	A big 大 man wearing a crown of sheep 羊 horns: beautiful.
+迷	lost	Walk 辶 among rice 米 paths in every direction: lost.
+民	people	An eye 巳 pierced by a spear 戈, the old mark of a servant: the people.
+命	life	A command 令 from the mouth 口: an order; fate, life.
+某	certain	Sweet 甘 tree 木: a certain someone.
+母	mother	A woman with two dots for her breasts: mother.
+木	tree	A trunk with branches spreading up and roots reaching down: tree.
+内	inside	A person 人 stepping into a box 冂: inside.
+念	thought	The heart 心 now 今: a thought.
+娘	mother	A good 良 (liáng) woman 女: mother, young woman.
+农	farming	A cover 冖 over a tilling figure: farming, farmer.
+暖	warm	The sun 日 with 爰 (yuán) for the sound: warm.
+拍	clap	A hand 扌 gone white 白 from clapping: beat.
+牌	sign	A wooden slice 片 for a humble 卑 (bēi) notice: a sign, a card, a brand.
+派	group	Water 氵 splitting off like branches of a clan 氏: a branch, a group; send.
+判	judge	A knife 刂 cutting things in half 半: judge.
+胖	fat	Flesh ⺼ half 半 (bàn) again as much: fat.
+配	distribute	A wine jar 酉 shared out by yourself 己: distribute.
+批	criticism	A hand 扌 that compares 比: criticism.
+皮	skin	A hand peeling skin off with a knife.
+啤	beer	A mouth 口 with 卑 (bēi) for the sound: the pí of píjiǔ, beer.
+品	goods	Three boxes 口 of goods stacked up.
+评	judge	Words 讠 that are fair and flat 平 (píng): judge, review.
+苹	apple	A plant 艹 with 平 (píng) for the sound: the píng of píngguǒ, apple.
+破	tear	A stone 石 ripping through the skin 皮: tear, break.
+齐	even	Writing 文 with neat rows below: even, all together.
+奇	strange	Big 大 and able 可: strange.
+器	tool	Four vessels 口 guarded by a dog 犬: a tool, an instrument.
+强	strong	A bow 弓 with a bug 虽 on its string: strong.
+桥	bridge	Wood 木 rising tall 乔 (qiáo): bridge.
+巧	skilled	Craft 工 with a twisted 丂 line: skilled.
+切	cut	Seven 七 strokes of the sword 刀: cut.
+亲	relative	Standing 立 by one 一 small 小 family tree: relative, dear; kiss.
+庆	celebrate	A big 大 party in the house 广: celebrate.
+区	ward	A hidden enclosure 匸 cut by an ✕ 乂: a ward, a district.
+缺	lack	A jar 缶 with a decisive 夬 (guài) crack: missing, lack.
+裙	skirt	Clothing 衤 fit for a lord 君 (jūn): skirt.
+群	group	The leader 君 and his sheep 羊: a flock, a group.
+任	duty	A person 亻 carrying a load 壬: responsibility, duty.
+仍	still	A person 亻 (rén) who then 乃 keeps going: still.
+容	contain	A roof 宀 over a valley 谷: holds a lot, contain, looks.
+赛	race	Shells 贝 offered under a roof 宀 as a prize: race, contest.
+散	scatter	A hand 攵 tossing meat ⺼ about: scatter; take a walk.
+沙	sand	Water 氵 with few 少 stones: sand.
+衫	shirt	Clothing 衤 with 彡 (shān) for the sound: shirt.
+善	good	A sheep 羊 and a kind mouth 口: good.
+伤	hurt	A person 亻 hit with force 力: hurt, wound.
+设	set up	Words 讠 and a tool 殳: set up, design.
+社	society	An altar 礻 to the soil 土 god: the community, society.
+深	deep	Water 氵 deep 罙 down: deep.
+神	god	At the altar 礻, a flash of lightning 申: a god.
+升	rise	A ladle lifting ten 十 measures up: rise; a liter.
+胜	win	Flesh ⺼ full of life 生 (shēng): win, victory.
+失	lose	A husband 夫 who lets something slip 丿: lose.
+石	stone	A rock 口 rolled down beneath a cliff: stone.
+始	begin	A woman 女 on the pedestal 台 of life: begin.
+世	world	Twenty 廿 years and one more line: a generation, the world.
+式	ceremony	A stake 弋 and a carpenter's tool 工 set out in a fixed style: ceremony.
+似	resemble	A person 亻 made by means of 以 another: resemble.
+势	force	Power 力 held 执 (zhí) firmly: force, power, trend.
+首	head	A head 自 with two horns 丷 of hair: head, first; a song.
+输	lose	A cart 车 with 俞 (yú) for the sound: transport; lose.
+属	belong	A body 尸 with 禹 (yǔ) below, one of the family: belong to; category.
+术	skill	A tree 木 with one extra dot 丶 of know-how: skill, method.
+束	bundle	A tree 木 trunk tied around the middle 口: bundle.
+双	pair	Two hands 又: a pair.
+死	death	Bones 歹 and a person bent over 匕: death.
+速	fast	Walk 辶 with a light bundle 束: fast.
+台	stand	A private 厶 platform where a mouth 口 makes speeches: a stand.
+谈	talk	Words 讠 flaming 炎 (yán) back and forth: talk, chat.
+汤	soup	Water 氵 warmed in the bright 昜 (yáng) sun: soup.
+糖	sugar	Rice 米 from the T'ang 唐 court, boiled down to sugar.
+甜	sweet	Sweet 甘 on the tongue 舌: sweet.
+跳	hop	A foot 足 reading omens 兆: hop, leap.
+痛	pain	A sickness 疒 that runs through like a path 甬 (yǒng): pain.
+突	sudden	A dog 犬 bursting out of a cave 穴: sudden, stick out.
+土	earth	A sprout pushing up through the ground: soil, earth.
+团	group	Talent 才 gathered inside one wall 囗: a ball, a group.
+退	retreat	Walk 辶 and stop 艮, then go back: retreat.
+望	hope	Gazing at the full moon 月 from a lost 亡 kingdom 王: hope.
+危	danger	A person 㔾 crouching under the edge of a cliff 厃: danger.
+围	surround	A wall 囗 with 韦 (wéi) for the sound: surround.
+伟	great	A person 亻 with 韦 (wéi) for the sound: great.
+卫	guard	A bent figure 乛 standing guard on one 一 line: guard, protect.
+握	grip	A hand 扌 holding the roof 屋: grip.
+屋	roof	A body 尸 that has arrived 至 under its roof: house, shop.
+武	warrior	Stop 止 the halberd 弋 with one 一 blow: warrior.
+舞	dance	Feet apart 舛 and arms waving: dance.
+误	mistake	Words 讠 with 吴 (wú) for the sound: a mistake; delay.
+希	hope	Crossed ✕ 乂 threads woven into rare linen 布: hope.
+戏	play	A hand 又 doing tricks with a spear 戈: a play, a show; play.
+显	show	The sun 日 lighting up the work 业 (yè): obvious, show.
+险	danger	A hill 阝 with 佥 (qiān) for the sound: steep, dangerous.
+线	line	Thread 纟 cut small 戋 (jiān): a thread, a line.
+乡	village	Winding strokes like a country path: countryside, home village.
+香	fragrance	Grain 禾 in the sun 日 smells sweet: fragrance.
+箱	box	Bamboo ⺮ with 相 (xiāng) for the sound: a box, a trunk.
+象	elephant	A pig 豕 body with a trunk ⺈ and a mouth 口: elephant; image.
+消	put out	Water 氵 makes the fire look like 肖 nothing: put out.
+效	effect	Tapping 攵 things to cross 交 (jiāo) over into results: effect.
+血	blood	A drop of blood falling into the dish 皿 at a sacrifice.
+形	shape	A frame 开 with hair 彡 brushed on: shape, form.
+幸	happiness	Soil 土 over dry 干 land: good luck, happiness.
+性	nature	The heart 忄 you are born 生 with: nature, sex.
+修	repair	Distant 攸 (yōu) work, brushed 彡 neat: repair, build; study.
+需	demand	Rain 雨 and yet 而 more: demand, need.
+续	continue	Thread 纟 that you sell 卖 (mài) by the length: continue.
+宣	proclaim	Under a roof 宀 a voice spans 亘 far: proclaim.
+训	teach	Words 讠 flowing like a stream 川 (chuān): teach, train.
+压	press	Soil 土 with a drop 丶 under a cliff 厂: press, pressure.
+烟	smoke	Fire 火 is the cause 因 (yīn): smoke, cigarettes.
+演	perform	Water 氵 flowing under the tiger's 寅 roof: perform.
+验	test	A horse 马 checked all 佥 (qiān) over: test, check.
+羊	sheep	A sheep's head with two horns: sheep.
+义	justice	A dot 丶 over a cross 乂 (yì): what is right, justice; meaning.
+艺	art	A plant 艹 with 乙 (yǐ) for the sound: art, skill.
+议	discuss	Words 讠 about what is right 义 (yì): discuss.
+易	easy	The sun 日 not 勿 hard to see: easy.
+营	camp	Grass 艹 roofs 冖 over tents in a row 吕: camp; run a business.
+赢	win	Lost 吂 money 贝 and meat ⺼ won back: win.
+泳	swim	Water 氵 that goes on forever 永: swim.
+优	excellent	A person 亻 who especially 尤 (yóu) stands out: excellent.
+邮	mail	A town 阝 with 由 (yóu) for the sound: post, mail.
+预	in advance	A head 页 that gives 予 (yǔ) thought beforehand: in advance.
+员	member	A mouth 口 over a shell 贝: a person on the payroll, a member.
+约	agreement	Thread 纟 tied in a spoon 勺 shape: an agreement; about.
+杂	mixed	Nine 九 things on a tree 木: mixed, various.
+造	create	Walk 辶 out and announce 告 what you will create.
+责	duty	Money 贝 you owe under a growing 龶 debt: duty, blame.
+增	increase	Soil 土 piled on what's already 曾 (céng) there: increase.
+展	unfold	A body 尸 spreading out clothing 衣: unfold, display.
+张	stretch	A bow 弓 drawn long 长 (zhǎng): stretch, open; a sheet.
+章	chapter	Sounds 音 written down at ten 十 points: a chapter, a badge.
+争	fight	A hand ⺈ and a hand 彐 pulling at one hook 亅: fight over.
+整	whole	An order 敕 to make things straight 正 (zhèng): neat, whole.
+证	prove	Words 讠 that are straight 正 (zhèng): prove; a certificate.
+支	support	A hand 又 holding a branch 十: support, branch.
+汁	juice	Water 氵 from ten 十 fruits: juice, soup.
+值	value	A person 亻 straight 直 (zhí) in worth: value, be worth.
+职	job	An ear 耳 that only 只 (zhī) listens for duty: job, post.
+止	stop	A footprint planted firmly on the ground: stop.
+指	finger	A hand 扌 that tastes delicious 旨 food: the finger you lick.
+至	arrive	An arrow 厶 lands in the soil 土: arrive, the end.
+志	will	The heart 心 of a samurai 士: will, intention.
+制	make	Cloth 巾 cut with a knife 刂: make; system, control.
+终	end	Thread 纟 run out by winter 冬 (dōng): end, finally.
+种	kind	Grain 禾 from the center 中 (zhōng): seed, kind; plant.
+众	crowd	Three people 人 together: a crowd.
+猪	pig	An animal 犭 with 者 (zhě) for the sound: pig.
+注	pour	Water 氵 poured by the master 主: pour, pay attention.
+祝	celebrate	The big brother 兄 at the altar 礻: celebrate.
+抓	grab	A hand 扌 with claws 爪 (zhǎo): grab.
+专	special	One 一 thread wound tight on a spindle: special, focused.
+转	turn	A cart 车 turning with 专 (zhuān) for the sound: turn, pass on.
+状	shape	A dog 犬 by a bed 丬 (zhuàng): form, shape, condition.
+追	chase	Walking 辶 after a slash 丿 and 㠯 (yǐ) ahead: chase.
+资	capital	Shells 贝 in order 次 (cì): money, resources.
+总	overall	Many mouths 口 under two drops 丷, with one heart 心: overall, always.
+足	foot	A kneecap 口 on top of a leg and foot: foot, also "enough".
+族	clan	A flag 方 over an arrow 矢: a clan, an ethnic group.
+阿	a-	A hill 阝 with 可 (kě) for the sound: the friendly name prefix ā.
+矮	short	An arrow 矢 bent low 委 (wěi): short.
+案	plan	Relax 安 at a wooden 木 desk and draw up a plan.
+暗	dark	The sun 日 gone, only sound 音 left: dark.
+巴	hope	A snake 巳 open-mouthed, longing: hope for; stick to; bus.
+摆	arrange	A hand 扌 with 罢 (bà) for the sound: put out, arrange; swing.
+败	lose	A shell 贝 (bèi) struck 攵 to pieces: defeat, fail.
+伴	accompany	A person 亻 who is your half 半: accompany.
+薄	thin	A plant 艹 with 溥 (pǔ) for the sound: thin.
+宝	treasure	A jewel 玉 under a roof 宀: treasure.
+抱	embrace	A hand 扌 that wraps 包: embrace.
+贝	shell	A shell drawn as a box 冂 above a person 人: shell, old money.
+倍	times	A person 亻 with 咅 (pǒu) for the sound: double, times.
+笨	stupid	Bamboo ⺮ still just a root 本 (běn): clumsy, stupid.
+毕	finish	Comparing 比 (bǐ) all ten 十 done: finish.
+闭	close	A gate 门 blocked with a bar 才: close.
+避	avoid	Walking 辶 away from the law 辟 (pì): avoid, hide.
+编	weave	Thread 纟 laid flat 扁 (biǎn): weave, compile, edit.
+辩	debate	Words 讠 between two bitter 辛 sides: argue, debate.
+冰	ice	Water 水 turned to ice 冫: ice.
+兵	soldier	Two hands 八 holding an axe 丘: soldier.
+擦	rub	A hand 扌 that guesses 察 by touch: rub.
+财	wealth	Shells 贝 earned with talent 才 (cái): wealth.
+操	handle	A hand 扌 among chirping birds 喿 (zào): hold, handle; exercise.
+测	measure	Water 氵 measured by the rule 则 (zé): measure.
+抄	copy	A hand 扌 copying a few 少 (shǎo) lines: copy.
+潮	tide	Water 氵 that rises in the morning 朝: the tide.
+彻	thorough	A step 彳 that cuts 切 right through: thorough.
+沉	sink	Too much 冗 water 氵: sink, heavy.
+诚	honest	Words 讠 that come true 成 (chéng): honest.
+承	bear	Three 三 hands under a hanging 了 load: bear, undertake.
+迟	late	Walking 辶 one foot-ruler 尺 (chǐ) at a time: late, slow.
+尺	ruler	A body 尸 with a long stride 乚: a measuring foot, a ruler.
+冲	rush	Ice 冫 water rushing through the middle 中 (zhōng): rinse; rush.
+虫	insect	A bug with a big head and a little tail: insect.
+抽	extract	A hand 扌 pulls from the field 由: extract.
+窗	window	A hole 穴 with a chimney 囱 (cōng) opening: window.
+纯	pure	Thread 纟 with 屯 (tún) for the sound: pure silk, pure.
+刺	pierce	Thorns 朿 and a knife 刂: pierce.
+粗	coarse	Rice 米 moreover 且 unpolished: coarse.
+促	urge	A person 亻 pushing with the foot 足: urge.
+寸	measure	A hand with a dot where the pulse is: one inch, measure.
+措	set aside	A hand 扌 puts away the old 昔: set aside.
+袋	bag	A garment 衣 used as a substitute 代: a bag.
+戴	wear	Ten 十 pieces of finery, different 異, under a spear 戈: wear on the head.
+担	carry	A hand 扌 lifts at daybreak 旦: carry on the shoulder.
+淡	pale	Water 氵 on flames 炎: thin, pale.
+登	climb	Footsteps 癶 going up onto a bean 豆 stand: climb.
+敌	enemy	A tongue 舌 met by a strike 攵: enemy.
+递	pass	Walking 辶 to the younger brother 弟 (dì): hand over.
+顶	top	A head 页 with a nail 丁 (dīng) on top: top, peak.
+斗	fight	Ten 十 hands with dippers: a dipper; fight.
+豆	bean	A tall dish with a lid holding beans 口.
+独	alone	An animal 犭 with an insect 虫: alone.
+堵	block	Soil 土 piled by 者 (zhě) someone: wall, block.
+肚	belly	Flesh ⺼ round like a mound of soil 土 (tǔ): belly.
+锻	forge	Metal 钅 worked in sections 段 (duàn): forge, temper.
+恶	evil	A heart 心 that is second-rate 亚 (yà): evil; disgusting.
+耳	ear	An ear with its folds drawn inside: ear.
+翻	flip	Feathers 羽 that take turns 番: flip over.
+肥	fat	Flesh ⺼ with 巴 (bā) for the sound: fat, fertile.
+纷	numerous	Threads 纟 divided 分 (fēn) every which way: tangled, numerous.
+奋	strive	A big 大 man straining over the field 田: strive, exert.
+符	symbol	Bamboo ⺮ tallies handed over 付 (fù) to match: a sign, a symbol; fit.
+府	government office	A building 广 where things are attached 付 and stamped: government office.
+腐	rot	Meat 肉 handed over 付 (fù) and left in a shed 广: rot.
+妇	woman	A woman 女 with a broom 彐 in hand: married woman.
+附	attach	A hill 阝 with 付 (fù) for the sound: attach, near.
+盖	cover	A dish 皿 with a sheep 羊 shaped lid: cover; build.
+隔	separate	A wall 阝 next to the cauldron 鬲 (lì): separate, partition.
+供	offer	A person 亻 offers something together 共 with both hands.
+构	structure	Wood 木 hooked 勾 (gōu) together: build, structure.
+购	buy	Money 贝 hooked 勾 (gōu) for goods: buy.
+骨	bone	Bones 冎 with flesh ⺼ beneath: bone.
+固	hard	Something old 古 enclosed 囗: hard, solid.
+瓜	melon	Vines with a melon 厶 hanging at the base: melon.
+官	official	A roof 宀 over a pile of records 㠯: an official.
+逛	stroll	Walking 辶 around crazily 狂 (kuáng): wander, stroll, shop.
+归	return	A broom 彐 hand coming back home: return.
+裹	wrap	Clothing 衣 wrapped round a fruit 果 (guǒ): wrap.
+含	contain	Now 今 held in the mouth 口: contain.
+寒	cold	A roof 宀 with ice under it: cold.
+航	sail	A boat 舟 riding high 亢 (kàng): sail, fly.
+毫	tiny hair	Hair 毛 under a tall roof 亠 口 冖: fine hair; the least bit.
+厚	thick	A child 子 under a cliff 厂 wrapped up from the sun 日: thick.
+乎	particle hu	A slash 丿 and two puffs 丷 of breath: a breathy question particle.
+呼	call	A mouth 口 asking a question 乎: call out.
+户	household	A door 尸 with a dot 丶 handle: door, household.
+怀	bosom	A heart 忄 with 不 (bù) for the sound: bosom, keep in mind.
+缓	slow	Thread 纟 let out slowly 爰 (yuán): slow, delay.
+挥	wave	A hand 扌 directing an army 军: wave, wield.
+汇	gather	Water 氵 flowing into a box 匚: gather; exchange.
+伙	partner	A person 亻 sharing the fire 火 (huǒ): partner, group.
+货	goods	Money 贝 changed 化 (huà) into things: goods.
+获	obtain	Grass 艹 by a dog 犾 on the hunt: catch, obtain.
+圾	garbage	Soil 土 with 及 (jí) for the sound: the jī of lājī, garbage.
+激	excite	Water 氵 crashing over 敫 (jiǎo): surge, excite.
+即	at once	A kneeling 卩 person right at the food: immediately; namely.
+季	season	Grain 禾 and children 子 grow with the seasons.
+既	since	A person 旡 turning away from the finished food: already, since.
+寄	send	A strange 奇 (qí) parcel under a roof 宀: send, mail; lodge.
+减	reduce	Ice 冫 melting from all 咸 (xián): reduce, subtract.
+渐	gradually	Water 氵 chopping 斩 (zhǎn) away bit by bit: gradually.
+江	river	Water 氵 with 工 (gōng) for the sound: a big river.
+奖	prize	Something big 大 for the general 丬 夕: a prize, an award.
+降	descend	A hill 阝 with feet stepping down 夅 (jiàng): come down, fall.
+阶	step	A hill 阝 with steps between 介 (jiè): stairs, rank.
+巾	towel	A cloth hung on a pole: a towel.
+劲	strength	Strength 力 pulled taut like a warp thread: strength, vigor.
+禁	forbid	A grove 林 around the altar 示: forbidden.
+惊	startle	A heart 忄 in the big capital 京 (jīng): startled, surprised.
+竟	after all	A person 儿 finishing the music 音: in the end, after all.
+镜	mirror	Metal 钅 that finally 竟 (jìng) shows your face: mirror, lens.
+究	research	A hole 穴 explored nine 九 times: research.
+居	live	An old 古 (gǔ) door 户 you live behind: live, reside.
+局	office	A ruler 尺 and a mouth 口 deciding measures: bureau; a game, situation.
+巨	huge	A huge carpenter's square in a box 匚: huge.
+距	distance	A leg 足 and something gigantic 巨: distance.
+聚	gather	Taking 取 people standing side by side 乑: gather.
+卷	roll	A curled-up kneeling 㔾 scroll under 龹 (quǎn): roll; a volume.
+均	equal	Soil 土 spread equally 匀 (yún): even, equal.
+棵	measure for trees	A tree 木 with fruit 果 (guǒ): the measure word for trees.
+宽	wide	A roof 宀 over 苋 (xiàn) greens spread out: wide.
+矿	mine	Stone 石 dug from broad 广 (guǎng) pits: mine, ore.
+扩	expand	A hand 扌 making it broad 广: expand.
+括	fasten	A hand 扌 ties the tongue 舌: fasten, bundle.
+垃	garbage	Soil 土 standing 立 (lì) in a heap: the lā of lājī, garbage.
+辣	pungent	Spicy 辛 bundles 束: pungent, harsh.
+郎	young man	A good 良 (liáng) man from the town 阝: young man, husband.
+雷	thunder	Rain 雨 over the rice field 田: thunder.
+泪	tears	Water 氵 from the eye 目: tears.
+厘	centi-	A cliff 厂 over a village 里 (lǐ) far below: a tiny unit, centimetre.
+俩	two	A person 亻 and two 两 (liǎng): the two of them.
+炼	refine	Fire 火 picking 柬 (jiǎn) the good from the bad: refine, smelt.
+良	good	Stopping 艮 with a dot on top: good.
+粮	grain	Good 良 (liáng) rice 米: grain, food.
+疗	cure	A sickness 疒 cleared 了 (le): cure, treat.
+聊	chat	Ears 耳 with 卯 (mǎo) for the sound: chat.
+料	material	Rice 米 measured with a dipper 斗: material; expect.
+列	row	Bones 歹 cut with a knife 刂 laid in a row.
+林	grove	Two trees 木 side by side: a grove.
+临	near	A person bending over a line 丨 of goods: approach, be near.
+陆	land	A hill 阝 with 击 (jī) for the sound: land.
+律	law	Step 彳 by step with a brush 聿: write the law.
+虑	worry	A tiger 虍 over the heart 心: worry, consider.
+率	rate	A lid 亠 and a string 幺 stretched across ten 十 notches: lead; rate.
+轮	wheel	A cart 车 with logical 仑 (lún) spokes: wheel; turn.
+络	net	Thread 纟 linking each 各 (gè) point: net, network.
+码	code	A stone 石 counter with 马 (mǎ) for the sound: a number, a code.
+帽	cap	Cloth 巾 put on at risk 冒: a cap.
+梦	dream	Two trees 林 like closed eyes in the evening 夕: dream.
+秘	secret	Grain 禾 you must 必 hide: secret.
+密	secret	A quiet 宓 (mì) mountain 山: dense, secret.
+免	spare	A person ⺈ 口 slipping free on running legs 儿: spare, exempt.
+描	sketch	A hand 扌 draws the seedling 苗: sketch.
+摸	touch	A hand 扌 feeling where you can't 莫 (mò) see: touch.
+模	imitation	Wood 木 that must not 莫 differ: a mold, imitation.
+默	silent	A dog 犬 in the dark 黑: silent.
+闹	noisy	The market 市 crowding the gate 门: noisy; make trouble.
+宁	peaceful	A nail 丁 (dīng) holding fast under the roof 宀: peaceful; rather.
+浓	thick	Water 氵 rich like farm 农 (nóng) soil: thick, strong.
+盘	plate	A boat 舟 shaped dish 皿: plate, tray.
+培	cultivate	Soil 土 heaped with 咅 (pǒu) for the sound: earth up, cultivate, train.
+婆	old woman	A woman 女 with skin like waves 波: an old woman.
+迫	urge	Walk 辶 toward the white 白 light: urge, imminent.
+妻	wife	A woman 女 with a hand 彐 holding a hairpin 十: wife.
+企	plan	A person 人 who stops 止 to plan.
+浅	shallow	Water 氵 you can cross with halberds 戋: shallow.
+穷	poor	All your strength 力 stuck in a cave 穴: poor; exhausted.
+趋	tend	Walking 走 fast to the mown 刍 (chú) field: hurry toward, tend.
+趣	interest	Walking 走 over to take 取 (qǔ) a look: interest, fun.
+圈	circle	A wall 囗 rolled round like a scroll 卷 (juǎn): circle, ring.
+权	power	A tree 木 grasped by a hand 又: power, right.
+泉	spring	White 白 water 水: a spring.
+却	rather	Go 去 and kneel 卩 instead: rather, retreat.
+燃	burn	Fire 火 doing what it naturally 然 does: burn.
+弱	weak	Two bows 弓 left out on the ice 冫 go soft: weak.
+伞	umbrella	An umbrella: a person 人 shaped canopy on a pole: umbrella.
+扫	sweep	A hand 扌 with a broom 彐: sweep.
+森	forest	Three trees 木: a forest.
+晒	dry in sun	The sun 日 in the west 西 (xī): dry in the sun.
+闪	flash	A person 人 glimpsed at the gate 门: flash, dodge.
+赏	reward	Shells 贝 still 尚 (shàng) given out: reward; admire.
+尚	still	Small ⺌ smoke rising from the window 口 of a house 冂: esteem; still.
+烧	burn	Fire 火 with 尧 (yáo) for the sound: burn, roast.
+申	say	Lightning 丨 striking through a field 日: say, report.
+甚	tremendously	Sweet 甘 things for an equal 匹 pair: tremendously.
+诗	poem	Words 讠 measured at court 寺 (sì): poem.
+施	carry out	A flag 方 waved over 㐌 people: carry out, give.
+湿	wet	Water 氵 that shows 显 (xiǎn): wet, damp.
+史	history	A hand writing with a pen in the middle 口: history.
+士	scholar	A man standing firm on the ground: a scholar, a soldier.
+释	explain	Separating 釆 out each meaning: explain, release.
+守	protect	A hand 寸 guarding under the roof 宀: protect.
+授	instruct	A hand 扌 that passes 受 things on: instruct, grant.
+售	sell	A bird 隹 chattering with its mouth 口 at the stall: sell.
+叔	uncle	Above 上 and small 小 in hand 又: an uncle.
+殊	especially	Death 歹 in vermilion 朱 robes: especially.
+暑	hot	The sun 日 beating on someone 者: hot summer heat.
+述	state	Walking 辶 through your skill 术 (shù) step by step: tell, state.
+刷	brush	A body 尸 bent over with a cloth 巾 and a blade 刂: brush, scrub; swipe.
+帅	handsome	A blade 刂 and a flag 巾: the commander; handsome.
+松	pine	The public's 公 tree 木, green all year: pine.
+俗	customs	A person 亻 of the valley 谷: customs, vulgar.
+塑	model	Soil 土 shaped at the new moon 朔: a model.
+酸	sour	Wine 酉 left to dawdle 夋 (qūn) too long: sour.
+孙	grandchild	A child 子 of a child, smaller 小 still: grandchild.
+缩	shrink	Thread 纟 drawn in for the night 宿 (sù): shrink.
+躺	lie down	A body 身 with 尚 (shàng) for the sound: lie down.
+梯	ladder	Wood 木 in steps like brothers 弟 (dì): ladder, stairs.
+替	exchange	Two husbands 夫 over one day 日: exchange.
+填	fill	Soil 土 filled in for real 真 (zhēn): fill.
+挑	choose	A hand 扌 reading omens 兆 (zhào): pick, choose; carry on a pole.
+贴	stick	Money 贝 with 占 (zhàn) for the sound: stick, paste; subsidy.
+童	child	Standing 立 in the village 里: a child.
+统	unite	Threads 纟 filled 充 (chōng) into one rope: unite, all.
+投	throw	A hand 扌 with a weapon 殳: throw.
+透	transparent	Walk 辶 past the excellent 秀: transparent.
+途	route	Walk 辶 with too much 余: route, road.
+脱	take off	Flesh ⺼ traded 兑 (duì) out of its skin: shed, take off.
+袜	sock	Clothing 衤 at the end 末 (mò) of the leg: sock.
+弯	bend	A bow 弓 also 亦 curved: bend, curve.
+微	delicate	Step 彳 to the mountain 山 and strike 攵 gently: delicate.
+维	maintain	Thread 纟 tying a bird 隹 (zhuī) down: hold together, maintain.
+尾	tail	A body 尸 with fur 毛 behind: a tail.
+未	not yet	A tree 木 whose top branch has not yet grown.
+谓	call	Words 讠 from the stomach 胃 (wèi): say, call.
+稳	steady	Grain 禾 stored when you're anxious 急: steady, stable.
+无	without	One 一 lame 尢 man with nothing: without, no.
+吸	suck	The mouth 口 reaches out 及 to suck in air.
+席	seat	Twenty 廿 cloth 巾 cushions in a building 广: seats.
+细	thin	Thread 纟 as fine as the lines of a field 田 (tián): thin, fine.
+鲜	fresh	Fish 鱼 and mutton 羊: fresh, tasty.
+咸	salty	One 一 mouth 口 under a halberd 戊: all; salty.
+县	county	Moreover 且 a private 厶 district: county.
+限	limit	A hill 阝 where you stop 艮 (gèn): limit.
+项	item	A head 页 with 工 (gōng) for the sound: neck; item.
+销	sell	Metal 钅 melted to look like 肖 (xiào) new: melt; sell.
+型	mould	Soil 土 punished 刑 into shape: mould, type.
+醒	wake up	A wine jar 酉 under the stars 星: wake up, sober up.
+兄	big brother	A big mouth 口 on legs 儿: the big brother who bosses you around.
+胸	chest	Flesh ⺼ of the breast 匈 (xiōng): chest.
+秀	excel	Grain 禾 that rises from 乃 the rest: excel.
+序	order	A building 广 entered beforehand 予: preface, order.
+寻	look for	A hand 彐 measuring inch 寸 by inch: search.
+迅	fast	Walking 辶 flying 卂 (xùn): fast.
+牙	tooth	Two teeth meeting: tooth.
+亚	Asia	A building 业 between two lines 一: second; Asia.
+呀	ya	A mouth 口 showing its teeth 牙 (yá): oh! ya!
+延	extend	A slash 丿 pulled along a slow road 㢟: extend, delay.
+严	strict	Asia 亚 under a cliff 厂: strict.
+研	polish	A stone 石 rubbed flat 开: polish, sharpen, study.
+盐	salt	A dish 皿 of earth 圤 dug up: salt.
+扬	raise	A hand 扌 raising it to the bright 昜 (yáng) sky: raise, spread.
+腰	waist	Flesh ⺼ at the essential 要 (yào) middle: waist.
+摇	shake	A hand 扌 shaking a vase 䍃 (yáo): shake, rock.
+叶	leaf	Ten 十 mouths 口 of leaves: leaf.
+依	rely on	A person 亻 in clothes 衣 (yī) not their own: rely on, according to.
+姨	aunt	A woman 女 with 夷 (yí) for the sound: aunt (mother's sister).
+移	move	Many 多 grain 禾 plants moved: shift, move.
+遗	leave behind	Walking 辶 away from something precious 贵: leave behind, lose.
+疑	doubt	A spoon 匕, a dart 矢 and a foot 疋 that stops: doubt.
+译	translate	Words 讠 passed into another language: translate.
+益	benefit	Water 水 overflowing a dish 皿: benefit.
+引	pull	A line 丨 pulled back on a bow 弓: pull.
+映	reflect	The sun 日 in the center 央: reflect, project.
+勇	brave	Strength 力 on the path 甬 (yǒng): brave.
+幼	infancy	Little 幺 power 力: infancy.
+余	surplus	A person 人 under a roof with some left over: surplus.
+与	give	One 一 hand bent to give.
+玉	jewel	A king's 王 treasure has one extra dot 丶: the jewel.
+遇	meet	Walk 辶 and meet a monkey 禺.
+圆	round	A wall 囗 around a member 员 (yuán): round, circle; a yuan.
+源	source	Water 氵 from the meadow 原: the source.
+阅	read	Cash 兑 checked at the gate 门: inspect, read.
+载	carry	A cart 车 with 哉 (zāi) for the sound: carry, load.
+赞	praise	Money 贝 for those who advance 兟 (shēn): praise, support.
+则	rule	A blade 刂 carving into a shell 贝: a rule; then.
+择	choose	A hand 扌 picking out the best: choose.
+战	war	A spear 戈 with 占 (zhàn) for the sound: war, battle.
+丈	length	A hand holding a measuring rod across one 一 stroke: length, ten feet.
+招	invite	A hand 扌 waving to summon 召: invite.
+召	summon	A sword 刀 over a mouth 口: summon.
+折	fold	A hand 扌 with an axe 斤: break, fold.
+针	needle	Metal 钅 ten 十 times thinner: needle.
+阵	burst	Carts 车 lined up on a hill 阝: battle line; a burst, a spell.
+征	conquer	Step 彳 forth to make it correct 正: conquer.
+政	politics	Strike 攵 things until they are correct 正: politics.
+之	of	A foot stepping on with a dot 丶 on top: of, it.
+植	plant	Set a tree 木 straight 直 in the ground: plant.
+址	site	Soil 土 where you stop 止 (zhǐ): site, address.
+质	quality	Ten 十 shells 贝 under a cliff 厂 weighed for worth: quality, nature.
+治	govern	Water 氵 kept on the pedestal 台 of a dam: govern, cure.
+致	do	Arrive 至 and strike 攵: do, send.
+智	wisdom	Knowing 知 as clear as the sun 日: wisdom.
+置	put	Put a net 罒 straight 直 down: place, put.
+逐	pursue	Walk 辶 after the pig 豕: pursue.
+著	author	Grass 艹 and someone 者 who writes: an author, renowned.
+综	sum up	Threads 纟 gathered to the ancestor 宗 (zōng): sum up.
+阻	block	A hill 阝 piled up 且 (qiě) in the way: block.
+碍	hinder	A stone 石 with 㝵 (dé) for the sound: hinder.
+岸	shore	A mountain 山 cliff 厂 at the dry 干 edge of the water: shore.
+拔	pull out	A hand 扌 pulling up 犮 (bá): pull out.
+拜	bow	Two hands 手 pressed together: bow, worship.
+版	edition	A slice 片 of wood turned back 反: printing block, edition.
+扮	dress up	A hand 扌 dividing 分 (fēn) out roles: dress up as.
+棒	rod	Wood 木 offered 奉 as a stick: a rod.
+悲	sad	A heart 心 saying no 非: sad.
+辈	generation	Carts 车 in rows that are not 非 (fēi) the same age: a generation.
+鼻	nose	The self 自 over 畀 (bì): nose.
+彼	he	Step 彳 toward the one in pelt 皮: he, that.
+壁	wall	Soil 土 with 辟 (pì) for the sound: wall.
+宾	guest	A soldier 兵 under your roof 宀: guest.
+饼	cake	Food 饣 pressed together 并 (bìng): flat cake.
+玻	glass	Jade 王 like skin 皮 (pí): the bō of bōli, glass.
+博	broad	Ten 十 things announced 尃 (fū): broad, rich; exhibition.
+猜	guess	An animal 犭 with 青 (qīng) for the sound: guess.
+裁	cut	A spear 戈 cutting ten 十 lengths of cloth 衣: cut, judge.
+册	volume	Bamboo strips 冂 tied with one 一 cord: a book, a volume.
+叉	fork	A hand 又 with a dot 丶 caught between fingers: fork, cross.
+插	insert	A hand 扌 pushing in like a pestle 臿 (chā): insert.
+拆	tear down	A hand 扌 with 斥 (chì) for the sound: tear open, take apart.
+柴	firewood	Wood 木 right here 此 (cǐ) for the fire: firewood.
+肠	intestines	Flesh ⺼ with 昜 (yáng) for the sound: intestines.
+尝	taste	Clouds 云 still 尚 (shàng) on the tongue: taste, try.
+偿	repay	A person 亻 who tastes 尝 (cháng) what was owed: repay.
+倡	advocate	A person 亻 shining 昌 (chāng) the way: lead, advocate.
+乘	ride	Two feet 北 climbing a grain 禾 stalk: ride; multiply.
+池	pond	Water 氵 that just is 也 there, still: a pond.
+愁	grieve	An autumn 秋 heart 心: grieve.
+丑	ugly	A knife 刀 on two 二 lines: ugly; a clown.
+臭	smelly	A nose 自 over a dog 犬: smelly.
+厨	kitchen	Beans 豆 measured by the inch 寸 under a cliff 厂: kitchen.
+触	touch	A horn 角 touching an insect 虫: contact.
+闯	rush	A horse 马 bursting through the gate 门: rush in.
+辞	resign	Spicy 辛 words from the tongue 舌: resign, a word.
+聪	clever	Ears 耳 that gather 总 (zǒng) everything: clever.
+脆	crisp	Flesh ⺼ in danger 危 of snapping: brittle, crisp.
+呆	dull	A mouth 口 on a block of wood 木: dull; stay.
+贷	loan	Money 贝 that stands in 代 (dài): a loan.
+胆	gall	Flesh ⺼ that rises with the dawn 旦 (dàn): gall bladder, courage.
+旦	daybreak	The sun 日 over the horizon 一: daybreak.
+弹	bullet	A bow 弓 that fires a single 单 (dān) shot: bullet; play an instrument.
+挡	block	A hand 扌 put up just in time 当 (dāng): block.
+德	virtue	A step 彳 with ten 十 eyes 罒 on one 一 heart 心: virtue.
+丢	lose	A king's 王 private 厶 treasure gone: lose.
+冻	freeze	Ice 冫 in the east 东 (dōng) wind: freeze.
+洞	cave	Water 氵 in the same 同 hole: a cave.
+毒	poison	A mother 母 under a growing 龶 weed: poison.
+堆	piled up	Soil 土 heaped up where birds 隹 nest: piled high.
+吨	ton	A mouth 口 with 屯 (tún) for the sound: a ton.
+盾	shield	An eye 目 behind ten 十 under a cliff 厂: a shield.
+朵	measure for flowers	Flowers 几 blooming on a tree 木: a flower, a cloud (measure word).
+躲	hide	A body 身 tucked behind a cluster of flowers 朵 (duǒ): hide.
+尔	you	A person ⺈ over something small 小: you; that.
+乏	scarce	A slash 丿 through what 之 is left: scarce.
+罚	punish	An eye 罒 watching words 讠 and a knife 刂: punish, fine.
+繁	luxuriant	Clever 敏 threads 糸 grow thick: luxuriant.
+返	return	Walk 辶 back the other way 反: return.
+泛	general	Water 氵 drifting poorly 乏 (fá): float, broad, general.
+仿	imitate	A person 亻 copying a square 方 (fāng) shape: imitate.
+疯	crazy	A sickness 疒 of the wind 风 (fēng): crazy.
+肤	skin	Flesh ⺼ of a man 夫 (fū): skin.
+扶	aid	A hand 扌 for the husband 夫: aid.
+幅	measure for pictures	Cloth 巾 filled 畐 (fú) wide: width; measure word for paintings.
+辅	assist	A cart 车 with 甫 (fǔ) for the sound: assist.
+傅	tutor	A person 亻 who announces 尃 (fū) the lesson: tutor, master.
+纲	outline	The thread 纟 along a ridge 冈 (gāng): the main rope, an outline.
+钢	steel	Metal 钅 as hard as a ridge 冈 (gāng): steel.
+糕	cake	Rice 米 with a lamb 羔 (gāo) for the sound: cake.
+搞	do	A hand 扌 reaching high 高 (gāo): do, make, get.
+革	leather	A hide stretched out on twenty 廿 pegs: leather; reform.
+沟	ditch	Water 氵 in a hooked 勾 (gōu) channel: ditch.
+估	estimate	A person 亻 pricing old 古 (gǔ) things: estimate.
+鼓	drum	A drum 壴 beaten by a hand with a stick 支 (zhī): drum.
+冠	crown	A cover 冖 placed on the head 元 by hand 寸: a crown.
+鬼	ghost	A scary face over a body 乚 with a private 厶 tail: ghost.
+柜	cabinet	Wood 木 made huge 巨 (jù): cabinet.
+滚	roll	Water 氵 boiling like a rolling robe 衮 (gǔn): boil, roll; get lost!
+锅	pot	Metal 钅 with 呙 (guō) for the sound: pot, wok.
+汗	sweat	Water 氵 when you are dry 干: sweat.
+豪	heroic	A tall 高 wild boar 豕: bold, heroic; grand.
+核	nucleus	The hog's 亥 tree 木 seed: a nucleus, core.
+盒	box	A dish 皿 with a fitted 合 (hé) lid: a box.
+贺	congratulate	Adding 加 money 贝 to someone's luck: congratulate.
+恨	resent	A heart 忄 that stops 艮: resent.
+猴	monkey	An animal 犭 with 侯 (hóu) for the sound: monkey.
+胡	reckless	Old 古 (gǔ) meat ⺼ hanging from a chin: beard; foreign; reckless.
+糊	paste	Rice 米 cooked to a mess 胡 (hú): paste; muddled.
+虎	tiger	Tiger stripes 虍 on legs 几: tiger.
+滑	slippery	Water 氵 on bone 骨: slippery.
+慌	confused	A heart 忄 in a laid waste 荒 land: confused, flustered.
+灰	ash	What's left of a fire 火 after a hand stirs it: ash, grey.
+恢	restore	A heart 忄 stirred from the ashes 灰 (huī): restore; vast.
+悔	regret	A heart 忄 that aches every 每 (měi) day: regret.
+惠	kindness	A heart 心 under a spool of thread: kindness, favor.
+击	strike	A fist striking down into a box 凵: hit, attack.
+肌	muscle	Flesh ⺼ with 几 (jī) for the sound: muscle.
+辑	edit	A cart 车 loaded while whispering 咠 (qì) plans: collect, edit.
+籍	register	Bamboo ⺮ slips listing the ploughed 耤 (jí) land: register, membership.
+挤	squeeze	A hand 扌 pushing everyone even 齐 (qí): squeeze, crowded.
+夹	clip	A man 夫 squeezed between two drops 丷: press between, clip.
+甲	shell	A box 冂 of armor with a crack down the middle: shell, armor; first.
+驾	drive	A horse 马 with 加 (jiā) for the sound: drive.
+肩	shoulder	Flesh ⺼ under a door 户 shaped bone: shoulder.
+艰	hard	A hand 又 that stops 艮: hard.
+剪	scissors	A knife 刀 in front 前 (qián): scissors, cut.
+键	key	Metal 钅 that builds 建 (jiàn) the lock: key; keyboard key.
+郊	suburb	A town 阝 where the roads cross 交 (jiāo) into country: suburb.
+胶	glue	Flesh ⺼ that joins 交 (jiāo): glue, rubber.
+戒	commandment	Two hands 廾 hold a halberd 戈: a warning, commandment.
+届	session	A body 尸 sitting through 由: a session, a class year.
+竞	compete	Standing 立 up to an elder brother 兄: compete.
+敬	respect	Tapping 攵 a careless 苟 person into line: respect.
+拒	refuse	A hand 扌 holding up something gigantic 巨: refuse.
+俱	all	A person 亻 with 具 (jù) for the sound: all, together.
+军	army	A cover 冖 over a cart 车 of soldiers: army.
+烤	bake	Fire 火 with 考 (kǎo) for the sound: roast, bake.
+颗	measure for grains	A fruit 果 the size of a head 页 (yè): a grain, a bead (measure word).
+咳	cough	A mouth 口 with 亥 (hài) for the sound: cough.
+肯	be willing	A foot 止 on the flesh ⺼, not budging: agree, be willing.
+控	hold back	A hand 扌 kept empty 空: hold back.
+库	warehouse	A building 广 where carts 车 are kept: storehouse.
+款	article	A gentleman 士 shows 示 an open mouth 欠: an article, goodwill.
+狂	mad	An animal 犭 that thinks it's king 王 (wáng): mad, wild.
+亏	loss	Two 二 lines with a crooked hook: loss; luckily.
+览	view	Looking 见 over everything: view, look over.
+烂	rotten	Fire 火 with 兰 (lán) for the sound: overcooked, rotten.
+朗	clear	The good 良 moon 月 is bright and clear.
+劳	labor	Strength 力 under a load 冖 of grass 艹: labor.
+梨	pear	A tree 木 that brings profit 利: pear.
+璃	glass	Jade 王 with 离 (lí) for the sound: the lí of bōli, glass.
+厉	strict	Ten thousand 万 strokes on a whetstone under a cliff 厂: sharp, strict.
+励	encourage	Strength 力 sharpened like a whetstone 厉 (lì): encourage.
+怜	pity	A heart 忄 with 令 (lìng) for the sound: pity.
+帘	curtain	Cloth 巾 at a cave 穴 entrance: curtain.
+恋	romance	A heart 心 that also 亦 beats for another: romance.
+邻	neighbor	A town 阝 with 令 (lìng) for the sound: neighbor.
+铃	bell	Metal 钅 that gives orders 令 (lìng): bell.
+龄	age	Teeth 齿 with 令 (lìng) for the sound: age.
+令	order	A person 人 kneeling under a roof: an order; make, cause.
+漏	leak	Water 氵 dripping through a roof 屚 (lòu): leak.
+逻	patrol	Walking 辶 with a net 罗 (luó): patrol; the luó of luójí, logic.
+骂	scold	A mouth 口 yelling like a horse 马 (mǎ): scold, curse.
+漫	overflow	Water 氵 spreading long 曼 (màn): overflow; free, comics.
+矛	spear	A spear with a hooked head: spear.
+贸	trade	Money 贝 with 卯 (mǎo) for the sound: trade.
+貌	looks	A beast 豸 and its face 皃 (mào): looks, appearance.
+煤	coal	Fire 火 from some 某 (mǒu) black stone: coal.
+眠	sleep	The eyes 目 of the people 民 close: sleep.
+秒	second	A few 少 grains 禾: a tiny unit, a second.
+敏	quick	Every 每 (měi) tap 攵 noticed: quick, sharp.
+摩	rub	A hand 手 rubs the hemp 麻: rub, polish.
+漠	desert	Water 氵 that must not 莫 be found: a desert.
+幕	curtain	Cloth 巾 that must not 莫 be seen through: a curtain.
+奈	how	A big 大 man before the altar 示: how can it be helped?
+耐	endure	A beard 而 held by a hand 寸: endure.
+偶	by chance	A person 亻 meets a monkey 禺 by chance; a pair.
+陪	accompany	A town 阝 with 咅 (pǒu) for the sound: keep company.
+赔	compensate	Money 贝 with 咅 (pǒu) for the sound: compensate; lose money.
+喷	spray	A mouth 口 with 贲 (bēn) for the sound: spray, spurt.
+盆	tray	A dish 皿 divided 分 for the Bon festival: a tray.
+披	drape	A hand 扌 putting on a skin 皮 (pí): drape over the shoulders.
+脾	spleen	Flesh ⺼ with 卑 (bēi) for the sound: spleen; temper.
+匹	animal	Legs 儿 behind a hiding place 匸: a small animal, an equal.
+骗	cheat	A horse 马 trick played flat 扁 (biǎn) out: cheat.
+拼	put together	A hand 扌 joining 并 (bìng) pieces: piece together; spell.
+频	frequent	A head 页 that walks 步 by again and again: frequent.
+凭	rely on	Trusting 任 your weight to a table 几: lean on, rely on.
+泼	splash	Water 氵 sent out 发: splash.
+葡	grape	A plant 艹 creeping 匍 (pú) on a vine: the pú of pútáo, grape.
+启	open	A mouth 口 at the door 户: open, begin.
+弃	abandon	Two hands 廾 casting away a bundle 亠 厶: abandon.
+签	sign	Bamboo ⺮ slips everyone 佥 (qiān) signs: sign; a label.
+欠	lack	A person yawning with mouth open: lack, missing.
+枪	gun	Wood 木 with 仓 (cāng) for the sound: spear, gun.
+抢	grab	A hand 扌 raiding the granary 仓 (cāng): grab, rob.
+悄	quiet	A heart 忄 like 肖 (xiào) a whisper: quiet.
+敲	knock	Tapping 攴 on a tall 高 (gāo) door: knock.
+瞧	look	An eye 目 with 焦 (jiāo) for the sound: look, see.
+琴	zither	Strings 玨 on top, 今 (jīn) below for the sound: a stringed instrument.
+勤	diligent	Strength 力 put into the yellow loam 堇 (jǐn): hard-working.
+曲	song	A bent frame 曰 with a line 丨 through it: crooked; a song.
+劝	advise	A hand 又 adding strength 力: urge, advise.
+染	dye	A spring 氿 of dye dripping onto wood 木: dye; infect.
+扰	disturb	A hand 扌 poking especially 尤 (yóu) hard: disturb.
+绕	wind round	Thread 纟 wound with 尧 (yáo) for the sound: go around.
+忍	endure	A blade 刃 over the heart 心: endure.
+扔	throw	A hand 扌 and then 乃 (nǎi) it's gone: throw.
+荣	glory	Grass 艹 and trees 木 thriving under a cover 冖: glory.
+绒	velvet	Thread 纟 with 戎 (róng) for the sound: wool, velvet.
+软	soft	A cart 车 that's lacking 欠 (qiàn) in strength: soft.
+润	moist	Water 氵 in a leap 闰 (rùn) month: moist, smooth.
+洒	sprinkle	Water 氵 thrown to the west 西 (xī): sprinkle, spill.
+杀	kill	A cross 乂 over a tree 木: kill.
+傻	silly	A person 亻 with a head 囟 that drags 夂 its feet 八: silly.
+扇	fan	Feathers 羽 swinging like a door 户: fan.
+稍	slightly	Grain 禾 just like 肖 (xiào) a sprout: slightly.
+蛇	snake	An insect 虫 with 它 (tā) for the sound: snake.
+舍	give up	A person 人 with a tongue 舌 (shé) under a roof: house; give up.
+射	shoot	The body 身 and the hand 寸 aim and shoot.
+摄	take photo	A hand 扌 catching whispers 聂 (niè): take in; photograph.
+伸	stretch	A person 亻 who says 申 it out: stretch.
+剩	left over	A knife 刂 cutting what's left to ride 乘 (chéng): leftovers.
+拾	pick up	A hand 扌 that fits 合 around something: pick it up.
+驶	drive	A horse 马 with 史 (shǐ) for the sound: drive, sail.
+饰	decorate	Cloth 巾 laid out for a feast 饣 (shí): decorate.
+柿	persimmon	A tree 木 at the market 市: the persimmon.
+寿	long life	Plenty 丰 of inches 寸 of years: long life, age.
+瘦	thin	A sickness 疒 of an old man 叟 (sǒu): thin.
+蔬	vegetable	A plant 艹 with 疏 (shū) for the sound: vegetables.
+鼠	mouse	A mouse with a mortar 臼 head, paws and a tail: mouse.
+摔	fall	A hand 扌 slipping off the lead 率 (shuài): fall, throw down.
+硕	large	A stone 石 the size of a head 页: large; a master's degree.
+私	private	Grain 禾 kept for me 厶: private.
+搜	search	A hand 扌 of an old man 叟 (sǒu) feeling around: search.
+肃	solemn	A brush 肀 held over the page, still and grave: solemn.
+宿	lodge	A hundred 佰 people sleeping under a roof 宀: lodge, dorm.
+碎	broken	Stone 石 smashed by a soldier 卒 (zú): broken, bits.
+损	damage	A hand 扌 harming a staff member 员 (yuán): damage, lose.
+索	rope	Ten 十 threads 糸 under a cover 冖: a rope, search.
+锁	lock	Metal 钅 holding small ⺌ treasures 贝: lock.
+抬	lift	A hand 扌 raising a platform 台 (tái): lift.
+坦	flat	Soil 土 as level as the dawn 旦 (dàn) horizon: flat, open.
+逃	escape	Walk 辶 off at the omen 兆: escape.
+桃	peach	A tree 木 with an omen 兆: the peach.
+萄	grape	A plant 艹 with 匋 (táo) for the sound: the táo of pútáo, grape.
+厅	hall	A cliff-like 厂 roof with 丁 (dīng) for the sound: a hall.
+偷	steal	A person 亻 with 俞 (yú) for the sound: steal.
+吐	vomit	A mouth 口 throwing up onto the soil 土: vomit, spit.
+兔	rabbit	A running figure 免 with a dot 丶 of a tail: rabbit.
+托	support	A hand 扌 holding up 乇 (tuō): hold up; entrust.
+违	violate	Walking 辶 the other way with 韦 (wéi) for the sound: go against.
+唯	only	A mouth 口 that says yes to the bird 隹: only.
+委	entrust	A woman 女 bending like grain 禾: entrust, leave it to her.
+胃	stomach	A field 田 of food over flesh ⺼: stomach.
+慰	consolation	A heart 心 under the officer 尉: consolation.
+卧	lie down	A body 臣 stretched beside a stick 卜: lie down.
+污	dirty	Water 氵 at a loss 亏 (kuī): dirty, polluted.
+夕	evening	A crescent moon half hidden: evening.
+析	analyze	Wood 木 split by an axe 斤: analyze.
+悉	know	A heart 心 that can tell apart 釆 each detail: know well.
+惜	regret	A heart 忄 for once upon a time 昔: regret, pity.
+吓	scare	A mouth 口 shouting down 下 (xià): scare.
+闲	idle	Wood 木 across the gate 门: closed, idle, free time.
+献	offer	A dog 犬 brought from the south 南: offering.
+详	detailed	Words 讠 with 羊 (yáng) for the sound: detailed.
+享	enjoy	A child 子 under a lid 亠 with an open mouth 口: enjoy, receive.
+歇	rest	A yawn 欠 asking "what" 曷 (hé) to do next: rest.
+协	cooperate	Ten 十 hands set to work 办: cooperate.
+斜	diagonal	Too much 余 in the dipper 斗 tips it: diagonal.
+辛	spicy	Stand 立 on a cross 十 of needles: spicy, bitter.
+欣	glad	A wide-open mouth 欠 with 斤 (jīn) for the sound: glad.
+雄	male	A bird 隹 with a strong arm 厷: male, hero.
+熊	bear	An animal with great ability 能 and four paws 灬: bear.
+虚	void	A tiger 虍 over an empty 业 place: void.
+询	inquire	Words 讠 every ten days 旬 (xún): inquire.
+押	push	A hand 扌 in armor 甲: push.
+鸭	duck	A bird 鸟 with 甲 (jiǎ) for the sound: duck.
+厌	dislike	A dog 犬 (quǎn) under a cliff 厂, sick of it all: dislike.
+艳	gorgeous	Rich 丰 color 色: gorgeous.
+央	center	A big 大 man in the middle of a frame 冂: center.
+邀	invite	Walking 辶 with music 敫 (jiǎo) to fetch guests: invite.
+咬	bite	A mouth 口 whose teeth cross 交 (jiāo): bite.
+乙	second	A fish hook, the second of the stems: the latter.
+忆	recall	A heart 忄 with 乙 (yǐ) for the sound: remember.
+谊	friendship	Fitting 宜 (yí) words 讠: friendship.
+饮	drink	Food 饣 with a gaping mouth 欠: drink.
+硬	hard	A stone 石 that grows late 更: hard.
+拥	hug	A hand 扌 put to use 用 (yòng) around you: hug, have.
+幽	secluded	Short threads 幺 hidden in the mountains 山: secluded, deep.
+尤	especially	A lame 尢 man with one extra dot 丶: especially.
+犹	as if	An animal 犭 especially 尤 (yóu) hesitant: hesitate; just like.
+羽	feathers	Two wings side by side: feathers.
+域	region	Land 土 that someone 或 guards: a region.
+豫	hesitate	An elephant 象 with 予 (yǔ) for the sound: hesitate.
+怨	resent	A heart 心 tossing in bed 夗 (yuàn) at night: resent.
+灾	disaster	Fire 火 under a roof 宀: disaster.
+仔	young	A person 亻 with a child 子 (zǐ): young; careful.
+暂	temporary	A sun 日 chopped 斩 (zhǎn) short: temporary.
+糟	messy	Rice 米 dregs with 曹 (cáo) for the sound: dregs; a mess.
+赠	give	Money 贝 added to what's already 曾 (céng) there: give as a gift.
+摘	pick	A hand 扌 taking fruit off a stalk 啇: pick, take off.
+涨	rise	Water 氵 stretching 张 (zhāng) up: rise.
+掌	palm	A hand 手 held in esteem 尚: the palm.
+珍	rare	A jewel 王 for a person 人 with long hair 彡: rare.
+诊	examine	Words 讠 with 㐱 (zhěn) for the sound: examine a patient.
+振	shake	A hand 扌 shakes the dragon 辰.
+震	quake	Rain 雨 and a dragon 辰: quake.
+挣	struggle	A hand 扌 fighting 争 (zhēng): struggle; earn.
+织	weave	Threads 纟 woven one by one 只 (zhī): weave.
+执	hold	A hand 扌 clutching a pellet 丸: hold, carry out.
+珠	pearl	A vermilion 朱 jewel 王: a pearl.
+竹	bamboo	Two bamboo stalks with leaves hanging down: bamboo.
+筑	build	Bamboo ⺮ bound tight 巩: build.
+撞	bump	A hand 扌 knocking like a child 童 (tóng) at play: bump, crash.
+紫	purple	This 此 thread 糸: purple.
+醉	drunk	Wine 酉 that finishes off 卒 (zú) a soldier: drunk.
+尊	respect	A hand 寸 offering a jar of wine 酋: respect.
+遵	obey	Walk 辶 behind the revered 尊: obey.
+挨	next to	A hand 扌 with 矣 (yǐ) for the sound: be next to; suffer.
+傲	proud	A person 亻 strutting 敖 (áo) around: proud.
+罢	stop	A net 罒 you can't get out 去 of: stop, quit.
+榜	list	A board on a tree 木 at the side 旁 (páng) of the road: a list of names.
+傍	near	A person 亻 at your side 旁 (páng): near; evening (bàngwǎn).
+胞	womb	Flesh ⺼ wrapped 包 (bāo) round: womb; sibling; cell.
+暴	violent	Sun 日 and water 水 both 共 raging: violent.
+爆	explode	Fire 火 and an outburst 暴: explode.
+奔	rush	A big 大 man running through the plants 卉: rush.
+逼	force	Walking 辶 into a full 畐 (fú) space: press, force.
+扁	flat	A flat board hung by a door 户: flat.
+拨	dial	A hand 扌 sending out 发: stir, dial, allocate.
+波	wave	Water 氵 with a skin 皮 rippling: waves.
+捕	capture	A hand 扌 for the first time 甫 seizes: capture.
+踩	step on	A foot 足 picking 采 (cǎi) a spot: step on.
+残	ruined	Bones 歹 broken small 戋 (jiān): damaged, cruel.
+惨	wretched	A heart 忄 nonplussed 参: wretched.
+仓	granary	A person 人 at a kneeling 㔾 doorway: storehouse.
+藏	hide	Grass 艹 over something good 臧 (zāng): hide, store.
+厕	toilet	A cliff 厂 shelter with rules 则 (zé): toilet.
+侧	side	A person 亻 standing by the rule 则 (zé): side.
+策	plan	Bamboo ⺮ with thorns 朿 (cì): a whip; a plan, a policy.
+昌	prosper	Sun 日 over speaking 曰: bright, prosperous.
+畅	smooth	Stretching 申 out in the bright 昜 (yáng) sun: smooth, free.
+炒	stir-fry	Fire 火 with 少 (shǎo) for the sound: stir-fry.
+撤	withdraw	A hand 扌 brings up 育 a strike 攵 to pull back: withdraw.
+撑	prop up	A hand 扌 with a palm 掌 (zhǎng) holding it up: prop up.
+崇	revere	A mountain 山 over a religion 宗: revere.
+宠	pamper	A dragon 龙 (lóng) kept under the roof 宀: pamper, pet.
+储	store	A person 亻 keeping all 诸 (zhū) of it: store.
+串	string	Two things 口 strung on a line 丨: a string, a skewer.
+醋	vinegar	Wine 酉 from long past 昔: vinegar; jealousy.
+搭	put up	A hand 扌 with 荅 (dá) for the sound: put up, build; take (a bus).
+诞	birth	Words 讠 extended 延 (yán) on the big day: birth.
+党	party	Brothers 兄 who esteem 尚 the same ideas form a party.
+档	file	Wood 木 shelving that is appropriate 当 (dāng): files; grade.
+岛	island	A bird 鸟 resting on a mountain 山 in the sea: island.
+蹈	dance	Feet 足 that ladle 舀 (yǎo) up and down: dance, step.
+盗	steal	The next 次 dish 皿 vanishes: steal.
+滴	drop	Water 氵 hanging from a stalk 啇 (dì): a drop.
+抵	resist	A hand 扌 pushing at the base 氐: resist, reach.
+帝	emperor	A cloth 巾 covered altar under a standing 立 top: emperor, god.
+吊	hang	A mouth 口 over hanging cloth 巾: hang; mourn.
+跌	fall	A foot 足 that loses 失 its grip: stumble, fall.
+督	coach	The uncle's 叔 eye 目 on you: coach, command.
+赌	gamble	Money 贝 with 者 (zhě) for the sound: gamble, bet.
+渡	cross	Water 氵 crossed by degrees 度: ferry.
+端	end	Standing 立 at the very tip 耑 (duān): end; upright; carry level.
+蹲	squat	Feet 足 bowing low in respect 尊 (zūn): squat.
+夺	seize	A big 大 man grabbing it with his hand 寸: seize.
+额	forehead	A head 页 with 客 (kè) for the sound: forehead; amount.
+恩	kindness	The heart 心 is the cause 因: kindness, grace.
+番	turn	Rice 米 seeds sown on the field 田: a turn, a time; foreign.
+凡	ordinary	A table 几 with one dot 丶 on it: ordinary.
+犯	commit	An animal 犭 with a kneeling 㔾 victim: commit (a crime).
+肺	lung	Flesh ⺼ with 巿 (fú) for the sound: lung.
+废	waste	A building 广 that's been sent off 发 (fā): abandoned, waste.
+氛	atmosphere	Air 气 divided 分 (fēn) all round: atmosphere.
+粉	powder	Rice 米 divided 分 small: flour, powder.
+愤	angry	A heart 忄 with 贲 (bēn) for the sound: angry.
+峰	peak	A mountain 山 with 夆 (féng) for the sound: peak.
+锋	edge	Metal 钅 with 夆 (féng) for the sound: blade edge, tip.
+奉	offer	A big 大 gift held up in both hands: offer, respectfully.
+佛	Buddha	A person 亻 who is not 弗 (fú) bound: Buddha.
+浮	float	Water 氵 brooding 孚 (fú) like a hen on eggs: float.
+副	vice-	A knife 刂 splitting a full 畐 (fú) jar into two: second, deputy; a pair.
+肝	liver	Flesh ⺼ with 干 (gān) for the sound: liver.
+杆	pole	Wood 木 with 干 (gān) for the sound: pole, rod.
+岗	post	A mountain 山 ridge 冈 (gāng): a hill post; a job post.
+港	harbor	Water 氵 at the fork in the road 巷 where ships stop: harbor.
+稿	draft	Grain 禾 stacked tall 高: straw, a draft.
+攻	attack	A craft 工 of striking 攵: attack.
+宫	palace	A roof 宀 over many rooms 吕: palace.
+巩	firm	Work 工 (gōng) bound for any 凡 weather: firm.
+贡	tribute	Work 工 (gōng) and shells 贝 offered up: tribute, contribute.
+孤	orphan	A child 子 alone like a melon 瓜 on the vine: orphan.
+谷	valley	Water parting around a mouth 口 between hills: valley.
+股	thigh	Flesh ⺼ with 殳 (shū) for the sound: thigh; a share.
+刮	scrape	A knife 刂 at the tongue 舌: scrape; blow (wind).
+拐	turn	A hand 扌 taking another 另 away: kidnap; turn; cane.
+贯	string through	A string 毌 through a pile of shells 贝: pierce, run through.
+轨	track	A cart 车 with 九 (jiǔ) for the sound: track, rail.
+跪	kneel	A foot 足 in danger 危 (wēi): kneel.
+憾	regret	A heart 忄 full of emotion 感 left unsaid: regret.
+耗	consume	A plough 耒 worn down to hair 毛 (máo): consume, waste.
+狠	ruthless	An animal 犭 that won't stop 艮: ruthless, fierce.
+横	sideways	Yellow 黄 tree 木 trunks lying sideways.
+衡	balance	Going 行 with a big 大 fish on a pole: balance.
+宏	grand	A roof 宀 over a strong forearm 厷 (gōng): vast, grand.
+洪	flood	Water 氵 all together 共: a flood.
+壶	pot	A scholar's 士 lid 冖 over a stand 业: kettle, pot.
+幻	illusion	A short thread 幺 that hooks the mind: illusion.
+患	affliction	A skewer 串 through the heart 心: affliction.
+皇	emperor	A white 白 jewel 王 on the head: the emperor.
+辉	brilliance	Light 光 over the army 军 (jūn): brilliance.
+毁	destroy	A weapon 殳 striking work 工 in a mortar 臼: destroy.
+绘	draw	Thread 纟 gathered 会 (huì) into a picture: draw, paint.
+慧	wise	A heart 心 like a comet 彗 (huì): wise.
+昏	dusk	The sun 日 sinking below the clan 氏 village: dusk; faint.
+混	mix	Water 氵 with descendants 昆 of every kind: mix.
+吉	good luck	The gentleman's 士 mouth 口 speaks good luck.
+疾	rapid	A sickness 疒 as fast as a dart 矢: rapid.
+佳	beautiful	A person 亻 like a square jewel 圭: beautiful, good.
+嘉	praise	A drum 壴 adding 加 (jiā) cheer: fine, praise.
+尖	pointed	Small 小 over big 大: sharp, pointed.
+监	supervise	A person leaning over a dish 皿 of water to look: supervise; prison.
+捡	pick up	A hand 扌 gathering it all 佥 (qiān): pick up.
+剑	sword	A blade 刂 with 佥 (qiān) for the sound: sword.
+舰	warship	A boat 舟 seen 见 (jiàn) from afar: warship.
+践	tread	Feet 足 treading small 戋 (jiān) steps: tread, carry out.
+鉴	mirror	Metal 金 polished to look into: mirror; examine.
+箭	arrow	Bamboo ⺮ that flies in front 前 (qián): arrow.
+酱	sauce	A general's 丬 夕 jar of fermented wine 酉: sauce, paste.
+骄	proud	A horse 马 holding its head tall 乔 (qiáo): proud.
+焦	char	A bird 隹 over the fire 灬: char, hurry.
+揭	lift	A hand 扌 lifting the lid to see what 曷 (hé) is there: lift, reveal.
+杰	hero	A tree 木 over fire 灬, standing out: outstanding, hero.
+洁	clean	Water 氵 that brings luck 吉 (jí): clean.
+截	cut off	A spear 戈 cutting a bird 隹 off its perch 十: cut off; a section.
+井	well	Two 二 crossed by two: a well.
+径	path	A step 彳 and a hand 又 at work 工 (gōng): a path; diameter.
+纠	correct	Threads 纟 tangled 丩 (jiū): tangle; correct.
+捐	donate	A hand 扌 giving away something small 肙 (yuàn): donate.
+菌	germ	A plant 艹 stored in a granary 囷 (qūn): mushroom, germ.
+刊	publish	Carving 刂 dry 干 wood blocks: publish.
+抗	resist	A hand 扌 raised high 亢 (kàng): resist.
+扣	button	A hand 扌 at a mouth 口 (kǒu) shaped hole: button; deduct.
+酷	cruel	A wine jar 酉 that reveals 告 cruelty: cruel, severe.
+跨	stride	A foot 足 stretching extravagantly 夸 (kuā): straddle, cross.
+阔	wide	A gate 门 lively 活 (huó) and wide: broad, rich.
+啦	la	A mouth 口 pulling 拉 (lā) out a final la: done!
+赖	rely on	Money 贝 with 剌 (là) for the sound: rely on; deny; bad.
+栏	railing	Wood 木 with 兰 (lán) for the sound: railing, column.
+懒	lazy	A heart 忄 that relies 赖 (lài) on others: lazy.
+牢	firm	An ox 牛 kept under a roof 宀: pen, prison; firm.
+梁	beam	Wood 木 cut 刅 to span the water 氵: beam, bridge.
+谅	forgive	Words 讠 as big as the capital 京 (jīng): forgive, understand.
+裂	split	A file 列 through the garment 衣: split, tear.
+灵	spirit	A hand 彐 over fire 火: spirit, clever, nimble.
+炉	stove	A fire 火 in the home 户: stove.
+露	dew	Rain 雨 on the path 路: dew, expose.
+略	abbreviate	Each 各 field 田 summed up: abbreviate, outline.
+嘛	ma	A mouth 口 with 麻 (má) for the sound: the "obviously" ma.
+埋	bury	Soil 土 in the village 里: bury.
+麦	wheat	Ears of grain 龶 that you tread on slowly 夂 in winter: wheat, barley.
+馒	steamed bun	Food 饣 with 曼 (màn) for the sound: steamed bun.
+盲	blind	Eyes 目 that have died 亡: blind.
+梅	plum	A tree 木 with 每 (měi) for the sound: plum blossom.
+蒙	cover	Grass 艹 over a covered 冡 (méng) mound: cover; Mongolia.
+盟	alliance	A bright 明 vow over a dish 皿 of blood: alliance.
+猛	fierce	An animal 犭 with 孟 (mèng) for the sound: fierce.
+棉	cotton	Silk 帛 that grows on a tree 木: cotton.
+妙	exquisite	A young 少 woman 女: exquisite.
+灭	put out	One 一 lid over a fire 火: put out.
+膜	membrane	Flesh ⺼ with 莫 (mò) for the sound: film, membrane.
+磨	polish	Hemp 麻 rubbing stone 石: polish.
+墨	ink	Black 黑 earth 土: ink.
+谋	plan	Words 讠 about some 某 (mǒu) scheme: plan, plot.
+墓	grave	Soil 土 where you must not 莫 dig: grave.
+纳	accept	Thread 纟 drawn inside 内 (nèi): take in, accept.
+泥	mud	Water 氵 at the nun's 尼 feet: mud.
+扭	twist	A hand 扌 with 丑 (chǒu) for the sound: twist.
+怒	angry	A slave's 奴 heart 心: angry.
+诺	promise	Words 讠 saying "as if" 若 (ruò) it's done: promise.
+盼	look forward	Eyes 目 split 分 (fēn) wide, watching: hope for, look forward to.
+泡	bubbles	Water 氵 that wraps 包 air: bubbles.
+炮	cannon	Fire 火 wrapped 包 (bāo) in iron: cannon; firecracker.
+偏	slanted	A person 亻 leaning flat 扁 (biǎn) to one side: slanted, biased.
+贫	poor	Money 贝 divided 分 (fēn) up till none is left: poor.
+聘	hire	Ears 耳 with 甹 (pīng) for the sound: engage, hire.
+屏	screen	A door 户 joined 并 (bìng) into a panel: screen.
+坡	slope	Earth 土 like skin 皮 (pí) on a hill: slope.
+扑	pounce	A hand 扌 with 卜 (bǔ) for the sound: throw oneself at, pounce.
+铺	spread	Metal 钅 with 甫 (fǔ) for the sound: spread out; a shop, a bed.
+欺	deceive	That 其 yawn 欠 hides a lie: deceive.
+旗	flag	A banner 方 with 其 (qí) for the sound: flag.
+恰	exactly	A heart 忄 that fits 合 (hé) just right: exactly.
+迁	move	Walking 辶 a thousand 千 (qiān) miles: move house.
+牵	lead	A big 大 man leading an ox 牛 on a rope 冖: lead, pull.
+铅	lead (metal)	Metal 钅 with 几 (jǐ) and 口 shaped like a pool: lead; pencil.
+谦	humble	Words 讠 that hold both 兼 (jiān) sides: humble.
+潜	submerge	Water 氵 that exchanges 替 places: submerge.
+歉	sorry	Lacking 欠 in both 兼 (jiān) hands: sorry; poor harvest.
+茄	eggplant	A plant 艹 with 加 (jiā) for the sound: eggplant; tomato.
+侵	invade	A person 亻 with a broom 彐 sweeping 又 under the roof 冖: invade.
+倾	lean	A person 亻 leaning for a moment 顷 (qǐng): lean, pour out.
+渠	canal	A ditch 洰 lined with wood 木: canal.
+券	ticket	A knife 刀 cutting under 龹 (quǎn): a voucher, a ticket.
+融	dissolve	A cauldron 鬲 and an insect 虫: dissolve, melt.
+乳	milk	Brooding 孚 (fú) over a baby with a curve 乚: breast, milk.
+若	if	Grass 艹 held in the right 右 hand: as if, if.
+塞	stuff in	Soil 土 stuffed under a roof 宀: block, stuff in; frontier.
+丧	mourning	Death 亡 below, cries above: mourning; lose.
+勺	spoon	A wrap 勹 holding a dot 丶: spoon, ladle.
+舌	tongue	A thousand 千 words from one mouth 口: the tongue.
+涉	wade	Walking 步 through water 氵: wade; be involved.
+审	examine	A roof 宀 over 申 (shēn) reported facts: examine, try.
+牲	sacrifice	A cow 牛 whose life 生 is given: sacrifice.
+圣	holy	A hand 又 on the soil 土: holy, sage.
+盛	prosper	A dish 皿 that turns into 成 a heap: prosper.
+薯	potato	A plant 艹 with 署 (shǔ) for the sound: yam, potato.
+爽	refreshing	A big 大 man with crossing 爻 breezes: refreshing.
+税	tax	Grain 禾 traded 兑 (duì) to the state: tax.
+寺	temple	An inch 寸 of holy soil 土 where monks live: temple.
+苏	revive	A plant 艹 put to work 办: revive; Su.
+素	plain	Plain thread 糸 under a growing 龶 sprout: white, plain; vegetarian.
+塔	tower	Earth 土 with 荅 (dá) for the sound: tower, pagoda.
+踏	step	A foot 足 in shoes 沓: step, trample.
+叹	sigh	A mouth 口 and a hand 又: sigh.
+探	explore	A hand 扌 reaching among the trees 木: explore, visit.
+趟	trip	Walking 走 with 尚 (shàng) for the sound: a trip.
+掏	dig out	A hand 扌 in pottery 匋 (táo): take out of a pocket.
+踢	kick	A foot 足 that changes 易 (yì) the ball's way: kick.
+添	add	Water 氵 added with shame 忝 (tiǎn): add.
+田	rice field	A field divided into four paddies: rice field.
+铜	copper	Metal 钅 the same 同 (tóng) color as a sunset: copper.
+徒	on foot	Step 彳 and run 走: on foot, a follower.
+吞	swallow	A mouth 口 swallowing the sky 天 (tiān): swallow.
+拖	drag	A hand 扌 dragging a person 亻 also 也 along: drag, delay.
+挖	dig	A hand 扌 making a hollow 穵 (wā): dig.
+娃	baby	A girl 女 like jade 圭: baby, doll.
+哇	wow	A mouth 口 with 圭 (guī) for the sound: wow!
+湾	bay	Water 氵 that bends 弯 (wān): bay.
+顽	stubborn	A head 页 stuck at the first 元 (yuán) idea: stubborn, naughty.
+亡	die	A person under a lid 亠, hidden away: die, lose.
+旺	flourishing	The sun 日 and a king 王: flourishing.
+威	might	A woman 女 under a halberd 戌: might, power.
+乌	crow	A bird with a slash 丿 for its black eye: crow; black.
+伍	team of five	Five 五 people 亻: a squad, the ranks.
+悟	enlightenment	A heart 忄 that says I 吾: enlightenment.
+牺	sacrifice	An ox 牛 led west 西 (xī) to the altar: sacrifice.
+嫌	dislike	A woman 女 doing two things at once 兼: dislike.
+陷	sink	A hill 阝 with a pit 臽 (xiàn): fall into, trap.
+祥	auspicious	An altar 礻 with a sheep 羊: auspicious.
+晓	dawn	The sun 日 with 尧 (yáo) for the sound: dawn; know.
+胁	threaten	Flesh ⺼ handled 办 roughly: flank; threaten.
+谐	harmonious	Words 讠 that all 皆 (jiē) agree: harmonious; humorous.
+械	machine	Wood 木 parts bound by rules 戒: a contraption, a machine.
+薪	firewood	Grass 艹 that is new 新: firewood.
+凶	evil	An X 乂 trapped in an open box 凵: evil, bad luck.
+袖	sleeve	Clothes 衤 from which 由 the arm comes: a sleeve.
+绪	mood	Thread 纟 with 者 (zhě) for the sound: thread's end; mood.
+悬	hang	A county 县 flag held high by the heart 心: hang, suspend.
+旋	rotation	A flag 方 on a foot 疋 going around: rotation.
+循	follow	Step 彳 behind the shield 盾: follow.
+讯	message	Words 讠 that fly 卂 (xùn) fast: message.
+炎	flame	Fire 火 on fire: flame, inflammation.
+沿	along	Water 氵 flowing past a table 几 and a mouth 口: along, edge.
+宴	banquet	A banquet 妟 (yàn) under the roof 宀: banquet.
+洋	ocean	Water 氵 as wide as a flock of sheep 羊: ocean, Western.
+仰	look up	A person 亻 looking up high 卬: look up to.
+氧	oxygen	Air 气 with 羊 (yáng) for the sound: oxygen.
+耀	shine	Light 光 on a pheasant's 翟 tail: dazzle, shine.
+野	field	A village 里 with land set aside beforehand 予: open fields.
+液	liquid	Water 氵 at night 夜: liquid.
+仪	ceremony	A person 亻 doing what is right 义 (yì): ceremony; instrument.
+异	different	Two hands 廾 holding up a snake 巳: different, strange.
+隐	hidden	A hill 阝 to hide behind when anxious 急: hidden.
+忧	worry	A heart 忄 especially 尤 (yóu) heavy: worry.
+娱	amuse	A woman 女 with 吴 (wú) for the sound: amuse, entertainment.
+愉	pleased	A heart 忄 with 俞 (yú) for the sound: pleased.
+予	give	A shuttle passing thread from hand to hand, hooked like 丁: give.
+宇	universe	A roof 宀 with 于 (yú) for the sound: house; universe.
+欲	greed	A yawning 欠 valley 谷 of greed.
+誉	fame	Words 言 that make you thrive 兴: fame, praise.
+援	aid	A hand 扌 pulling 爰 (yuán) someone up: aid.
+缘	fate	Thread 纟 with 彖 (tuàn) for the sound: edge; fate, reason.
+跃	leap	A foot 足 young 夭 (yāo) and springy: leap.
+晕	dizzy	A sun 日 ringed by an army 军 (jūn) halo: halo; dizzy.
+允	allow	A private 厶 nod over a man 儿: allow.
+遭	encounter	Walk 辶 into the office 曹: encounter.
+扎	tie	A hand 扌 tying with a cord 乚: tie; prick.
+炸	explode	A sudden 乍 (zhà) fire 火: explode; deep-fry.
+宅	home	Under a roof 宀 a plant takes root 乇: home.
+债	debt	A person's 亻 duty 责 (zé) to pay: debt.
+账	account	Money 贝 in a long 长 (zhǎng) list: accounts.
+障	barrier	A hill 阝 like a chapter 章 (zhāng) ending: barrier.
+哲	philosophy	Folding 折 words in the mouth 口: philosophy.
+镇	town	Metal 钅 weight that is real 真 (zhēn): press down; a town.
+症	symptom	Sickness 疒 to set correct 正: a symptom.
+枝	branch	A tree 木 branching 支: branch.
+殖	multiply	Death 歹 then straight 直 new growth: multiply.
+忠	loyalty	A heart 心 right in the middle 中: loyalty.
+肿	swollen	Flesh ⺼ puffed up in the middle 中 (zhōng): swollen.
+粥	porridge	Rice 米 between two bows 弓 of steam: porridge.
+诸	all	Words 讠 to everyone 者 (zhě): all, various.
+煮	boil	Someone 者 over the fire 灬: boil.
+驻	stay	A horse 马 resting by its master 主 (zhǔ): station, stay.
+柱	pillar	A tree 木 that holds up the master's 主 house: pillar.
+赚	earn	Money 贝 from both 兼 (jiān) sides: earn.
+庄	village	A house 广 on the soil 土: village, farm; solemn.
+壮	strong	A scholar 士 by a bed 丬 (zhuàng): strong, robust.
+捉	catch	A hand 扌 grabs the leg 足: catch.
+咨	consult	A mouth 口 asking in order 次 (cì): consult.
+宗	religion	Show 示 under a roof 宀: religion.
+纵	vertical	Thread 纟 following 从 (cóng) down: vertical; let loose.
+奏	play music	Hands raised to heaven 天: play music; report to the throne.
+祖	ancestor	At the altar 礻, generations piled 且 up: ancestor.
+钻	drill	Metal 钅 with 占 (zhàn) for the sound: drill; diamond.
+罪	crime	A net 罒 for those who are not 非 right: crime.
+哎	hey	A mouth 口 with 艾 (ài) for the sound: hey! oh!
+哀	sorrow	A mouth 口 hidden in a garment 衣 weeps: sorrow.
+癌	cancer	A sickness 疒 hard as a rock cliff 嵒 (yán): cancer.
+蔼	friendly	Plants 艹 at a polite visit 谒 (yè): lush; friendly.
+艾	mugwort	A plant 艹 with 乂 (yì) for the sound: mugwort.
+唉	alas	A mouth 口 with 矣 (yǐ) for the sound: alas, sigh.
+隘	narrow pass	A hill 阝 with 益 (yì) for the sound: narrow pass.
+昂	hold high	The sun 日 lofty 卬 (áng) in the sky: hold high; expensive.
+凹	concave	A shape with a dip in the top line 一: concave.
+熬	simmer	Fire 灬 with 敖 (áo) for the sound: simmer; endure.
+奥	mysterious	A big 大 man finding rice 米 deep in the house 宀: deep, mysterious.
+澳	bay	Water 氵 in a deep 奥 (ào) cove: bay; Australia, Macau.
+扒	dig	A hand 扌 with 八 (bā) for the sound: cling, dig, strip.
+叭	trumpet	A mouth 口 with 八 (bā) for the sound: trumpet (lǎba).
+芭	banana plant	A plant 艹 with 巴 (bā) for the sound: plantain; ballet (bā lěi).
+靶	target	Leather 革 with 巴 (bā) for the sound: target.
+坝	dam	Soil 土 with 贝 (bèi) for the sound: dam, dyke.
+霸	tyrant	Rain 雨 over leather 革 and moon 月: tyrant, rule by force.
+掰	break apart	Two hands 手 with divide 分 between them: break apart.
+柏	cypress	A tree 木 with 白 (bái) for the sound: cypress.
+扳	pull	A hand 扌 turning it in reverse 反 (fǎn): pull, turn round.
+颁	issue	Pages 页 divided 分 out: issue, award.
+斑	spot	A sentence 文 between two jewels 王: a spot, speck.
+拌	mix	A hand 扌 cutting in half 半 (bàn): mix.
+瓣	petal	A melon 瓜 between two bitter 辛 halves: petal, segment.
+邦	country	A rich 丰 town 阝: country.
+绑	tie	Thread 纟 binding a country 邦 (bāng): tie up.
+谤	slander	Words 讠 from the side 旁 (páng): slander.
+磅	pound	A stone 石 weight at the side 旁 (páng): pound; scales.
+镑	pound sterling	Metal 钅 coin with 旁 (páng) for the sound: pound sterling.
+煲	pot	Fire 火 that keeps 保 (bǎo) the soup warm: pot; to stew.
+堡	fort	Earth 土 walls that protect 保 (bǎo): fort.
+豹	leopard	A beast 豸 with 勺 (sháo) for the sound: leopard.
+曝	expose	The sun 日 beating down hard 暴 (bào): expose.
+卑	humble	A white 白 cap over ten 十: low, humble.
+碑	monument	A stone 石 for the lowly 卑 dead: a monument.
+狈	wretched	An animal 犭 with 贝 (bèi) for the sound: the wolf in lángbèi, in a sorry state.
+惫	exhausted	A heart 思 that drags 夂 its feet: exhausted.
+崩	crumble	A mountain 山 over two moons 朋: crumble.
+绷	stretch tight	Thread 纟 with 朋 (péng) for the sound: stretch tight.
+蹦	hop	Feet 足 with 崩 (bēng) for the sound: hop, bounce.
+鄙	despise	A mean 啚 (bǐ) little town 阝: vulgar; despise.
+毙	kill	Dead 死 compared 比 (bǐ) side by side: kill, shoot dead.
+痹	numb	A sickness 疒 with 畀 (bì) for the sound: numb.
+碧	jade green	A stone 石 like amber 珀: jade green, blue.
+蔽	cover	Grass 艹 over something broken 敝 (bì): cover, hide.
+弊	harm	Two hands 廾 breaking 敝 (bì) it: drawback, fraud.
+臂	arm	Flesh ⺼ with 辟 (pì) for the sound: arm.
+鞭	whip	Leather 革 that's handy 便 (biàn): whip.
+贬	devalue	Money 贝 grown poor 乏: devalue, demote.
+辨	tell apart	A knife 刂 between two bitter 辛 choices: tell apart.
+辫	braid	Thread 纟 between two bitter 辛 strands: braid.
+飙	whirlwind	A storm 猋 of wind 风: whirlwind; soar.
+憋	hold in	A heart 心 broken 敝 (bì) but held in: suppress, stifle.
+彬	refined	A forest 林 (lín) brushed 彡 neat: refined.
+滨	shore	Water 氵 where guests 宾 (bīn) come: shore.
+缤	colourful	Threads 纟 for guests 宾 (bīn): colourful (bīnfēn).
+丙	third	One 一 roof with a person inside 内: third class.
+秉	hold	A hand 彐 holding grain 禾: hold, uphold.
+柄	handle	Wood 木 for the third 丙: a handle, a pattern.
+剥	peel	A knife 刂 with 录 (lù) for the sound: peel; exploit.
+伯	uncle	A person 亻 with white 白 (bái) hair: father's elder brother, uncle.
+驳	refute	A horse 马 crossed 爻 by stripes: mottled; refute.
+泊	stay overnight	White 白 water 氵 at anchor: stay overnight.
+勃	vigorous	Strength 力 like a comet 孛 (bèi): vigorous.
+舶	ship	A white 白 boat 舟: a liner, ship.
+脖	neck	Flesh ⺼ with 孛 (bèi) for the sound: neck.
+搏	fight	A hand 扌 with 尃 (fū) for the sound: fight, wrestle.
+膊	upper arm	Flesh ⺼ with 尃 (fū) for the sound: upper arm.
+卜	divine	A crack 丨 with a branch 丶 on a burnt bone: divine.
+哺	nurse	A mouth 口 fed for the first time 甫: nurse, suckle.
+怖	fear	A heart 忄 wrapped in linen 布: fear.
+睬	pay attention	An eye 目 that picks 采 (cǎi) you out: notice.
+惭	ashamed	A heart 忄 chopped 斩 (zhǎn): ashamed.
+灿	brilliant	Fire 火 on a mountain 山 (shān): brilliant.
+苍	dark green	Grass 艹 by the granary 仓 (cāng): dark green, grey.
+沧	vast sea	Water 氵 with 仓 (cāng) for the sound: vast, the blue sea.
+舱	cabin	A boat 舟 storeroom 仓 (cāng): cabin.
+糙	rough	Rice 米 still being made 造 (zào): coarse, rough.
+曹	official	Two rows above the sun 日: officials; a surname.
+槽	tank	Wood 木 for the office 曹 water: a tub, tank.
+蹭	rub	Feet 足 with 曾 (céng) for the sound: rub; freeload.
+岔	fork	A mountain 山 divided 分: a fork in the road.
+刹	brake	A knife 刂 that kills 杀 (shā) the speed: brake; a temple; an instant.
+诧	surprised	Words 讠 from the house 宅 (zhái): surprised.
+掺	mix	A hand 扌 with 参 (cān) for the sound: mix in.
+搀	help along	A hand 扌 holding someone spared 免 from falling: support by the arm.
+馋	greedy	Food 饣 eyed by a rabbit 兔: greedy.
+禅	Zen	An altar 礻 where one sits single 单 (dān): Zen, meditation.
+缠	wrap	Thread 纟 wound around a store 㢆 (chán): wrap, pester.
+铲	shovel	Metal 钅 that produces 产 (chǎn) a hole: shovel.
+阐	explain	A gate 门 opened single 单 (dān) wide: explain.
+颤	tremble	A head 页 with 亶 (dǎn) for the sound: tremble.
+猖	rampant	An animal 犭 in full sunshine 昌 (chāng): rampant.
+嫦	moon goddess	A woman 女 with 常 (cháng) for the sound: Cháng'é, the moon goddess.
+敞	open	Tapping 攵 it open still 尚 (shàng) wider: open, spacious.
+钞	banknote	Metal 钅 with 少 (shǎo) for the sound: banknote.
+巢	nest	Three twigs 巛 over a fruit 果 tree: nest.
+嘲	ridicule	A mouth 口 laughing every morning 朝: ridicule.
+扯	pull	A hand 扌 with 止 (zhǐ) for the sound: pull; chat.
+臣	retainer	A big eye looking down humbly: the retainer.
+尘	dust	Small 小 bits of soil 土: dust.
+辰	time	A cliff 厂 with two 二 marks: early morning; time.
+陈	display	A hill 阝 facing east 东: arrange, display; old.
+趁	take advantage	Walking 走 with 㐱 (zhěn) for the sound: while, take the chance.
+呈	present	A mouth 口 above a king 王: present, offer.
+惩	punish	A heart 心 summoned 征 (zhēng) to answer: punish.
+澄	clear	Water 氵 that ascends 登: clear.
+橙	orange	A tree 木 with 登 (dēng) for the sound: orange.
+逞	show off	Walking 辶 to present 呈 (chéng) yourself: show off.
+秤	scale	Grain 禾 weighed level 平: steelyard, scale.
+痴	foolish	Sickness 疒 of knowing 知: foolish.
+弛	loosen	A bow 弓 with 也 (yě) for the sound: loosen.
+驰	gallop	A horse 马 with 也 (yě) for the sound: gallop.
+齿	tooth	Teeth 人 in an open mouth 凵 with 止 (zhǐ) for the sound: tooth.
+侈	wasteful	A person 亻 with too much 多: wasteful.
+耻	shame	An ear 耳 that stops 止 (zhǐ) at bad words: shame.
+斥	reject	An axe 斤 with a chip 丶 flying off: reject.
+赤	red	Fire burning on the earth 土 makes it glow red.
+翅	wing	Feathers 羽 that hold up 支 (zhī) the body: wing.
+仇	enemy	A person 亻 with 九 (jiǔ) for the sound: enemy, hatred.
+绸	silk	Thread 纟 woven all round 周 (zhōu): silk cloth.
+畴	category	Fields 田 laid out for long life 寿 (shòu): farmland; category.
+酬	repay	A wine jar 酉 for the state 州: repay, reward.
+稠	thick	Grain 禾 packed all round 周 (zhōu): thick, dense.
+筹	plan	Bamboo ⺮ tallies for a long life 寿 (shòu) plan: chip; plan, raise funds.
+瞅	look	An eye 目 with 秋 (qiū) for the sound: look, glance.
+橱	cabinet	Wood 木 for the kitchen 厨 (chú): cabinet.
+畜	livestock	Mysterious 玄 threads tie the beasts to the field 田: livestock.
+揣	tuck	A hand 扌 with 耑 (duān) for the sound: tuck into clothes; guess.
+踹	kick	A foot 足 with 耑 (duān) for the sound: kick, stamp.
+川	river	Three lines of water flowing down: river.
+喘	pant	A mouth 口 with 耑 (duān) for the sound: pant.
+炊	cook	Fire 火 and an open mouth 欠: cook rice.
+垂	hang down	A tree with branches drooping over 士 and 卄: hang down.
+捶	pound	A hand 扌 hanging 垂 (chuí) down hard: beat, pound.
+锤	hammer	Metal 钅 hanging 垂 (chuí) on a handle: hammer.
+唇	lips	A mouth 口 under the dragon 辰: lips.
+醇	mellow	Wine 酉 worth savoring 享: mellow, pure.
+蠢	stupid	Insects 虫 wriggling in spring 春 (chūn): stupid.
+戳	poke	A spear 戈 with 翟 (dí) for the sound: poke; a stamp.
+绰	ample	Thread 纟 with 卓 (zhuó) for the sound: ample, graceful.
+瓷	porcelain	Pottery 瓦 fired in order 次 (cì): porcelain.
+慈	kind	A heart 心 like 兹 (zī) young shoots: kind.
+磁	magnetic	Stone 石 with 兹 (zī) for the sound: magnet.
+赐	bestow	Money 贝 changing 易 (yì) hands from above: bestow.
+匆	hurried	A flag 勿 flapping with an extra dot 丶 of haste: hurried.
+囱	chimney	Smoke 夂 rising inside a frame 囗: chimney.
+葱	scallion	A plant 艹 with 怱 (cōng) for the sound: scallion.
+丛	thicket	People following 从 (cóng) each other on one 一 patch: thicket, clump.
+凑	gather	Ice 冫 with 奏 (zòu) for the sound: gather together.
+簇	cluster	Bamboo ⺮ shoots of one clan 族 (zú): cluster.
+窜	flee	Something strung 串 out of a hole 穴: flee, scurry.
+催	urge	A person 亻 with 崔 (cuī) for the sound: urge, hurry.
+摧	destroy	A hand 扌 knocking down the high 崔 (cuī): destroy.
+粹	pure	Rice 米 sifted by a soldier 卒 (zú): pure, essence.
+翠	emerald	Feathers 羽 with 卒 (zú) for the sound: kingfisher green.
+搓	rub	A hand 扌 with 差 (chā) for the sound: rub between hands.
+磋	consult	Stone 石 polished till the difference 差 is gone: consult.
+挫	sprain	A hand 扌 crushed where you sit 坐: sprain.
+歹	bad	A bone 夕 under one 一 line: corpse; bad.
+逮	apprehend	Walk 辶 after the slave 隶: apprehend.
+怠	neglect	A heart 心 on a pedestal 台 does nothing: neglect, lazy.
+丹	red	A frame 冂 with a red pellet and a lid 亠: red, pill.
+耽	delay	An ear 耳 that wanders 冘 (yín): delay; indulge.
+荡	sway	Hot soup 汤 sloshing over the grass 艹: sway, swing.
+叨	nag	A mouth 口 sharp as a knife 刀 (dāo): nag, chatter.
+捣	pound	A hand 扌 with 岛 (dǎo) for the sound: pound; make trouble.
+祷	pray	An altar 礻 for long life 寿 (shòu): pray.
+悼	grieve	A heart 忄 for the eminent 卓: grieve.
+稻	rice plant	Grain 禾 you ladle 舀 (yǎo) out of the paddy: rice plant.
+蹬	pedal	A foot 足 rising 登 (dēng): step on, pedal.
+邓	Deng	A hand 又 at a town 阝: the surname Deng.
+凳	stool	A table 几 you climb 登 (dēng) on: stool.
+瞪	stare	Eyes 目 rising 登 (dēng) wide: stare.
+堤	embankment	Soil 土 that is just so 是: an embankment.
+迪	enlighten	Walking 辶 for a reason 由: guide, enlighten.
+涤	wash	Water 氵 in strips 条 (tiáo): wash, cleanse.
+笛	flute	Bamboo ⺮ the breath goes through 由: flute.
+蒂	stem	A plant 艹 with 帝 (dì) for the sound: fruit stem.
+缔	conclude	Thread 纟 tied by the emperor 帝 (dì): conclude, form.
+颠	top	A head 页 with 真 (zhēn) for the sound: top; jolt, upside down.
+巅	summit	The top 颠 (diān) of a mountain 山: summit.
+甸	suburb	A field 田 (tián) wrapped 勹 around a city: outskirts.
+垫	pad	Soil 土 held 执 (zhí) under: pad, cushion.
+淀	settle	Water 氵 that's decided 定 (dìng) to stay: sediment; starch.
+惦	miss	A heart 忄 thinking of the shop 店 (diàn): miss, think of.
+奠	found	A big 大 man setting down a jar of wine 酋: found; offering.
+殿	hall	A body 尸 together 共 with a weapon 殳: a palace hall, Mr.
+刁	sly	A knife hooked the wrong way: sly, crafty.
+叼	hold in mouth	A mouth 口 holding something sly 刁 (diāo): carry in the mouth.
+雕	carve	A bird 隹 with 周 (zhōu) for the sound: eagle; carve.
+钓	fish	Metal 钅 bent into a spoon 勺 hook: fish with a line.
+爹	dad	Father 父 with 多 (duō) for the sound: dad.
+迭	transfer	Walk 辶 out when you lose 失: transfer.
+谍	spy	Words 讠 with 枼 (yè) for the sound: spy.
+叠	pile up	Things 叒 stacked over a drawer 冝: pile up, fold.
+碟	dish	A flat 枼 stone 石: small dish, disc.
+丁	nail	A nail: man; a small cube.
+叮	sting	A mouth 口 with a nail 丁 (dīng): sting; urge.
+盯	stare	An eye 目 nailed 丁 (dīng) on: stare at.
+鼎	cauldron	A cauldron 目 on its three legs: cauldron.
+钉	nail	Metal 钅 nail 丁 (dīng): nail.
+董	director	Grass 艹 over 重 (zhòng) weight: direct; a surname.
+栋	beam	Wood 木 with 东 (dōng) for the sound: ridgepole; a building.
+兜	pocket	A helmet 白 over a man 儿: pouch, pocket; go round.
+抖	shake	A hand 扌 shaking a dipper 斗 (dǒu): shake, tremble.
+陡	steep	A hill 阝 you walk 走 straight up: steep.
+逗	tease	Walking 辶 with beans 豆 (dòu) for the sound: tease, amuse.
+睹	see	An eye 目 with 者 (zhě) for the sound: see.
+杜	stop	A tree 木 with 土 (tǔ) for the sound: prevent; a surname.
+妒	jealous	A woman 女 at the door 户 (hù): jealous.
+兑	exchange	A brother 兄 with two horns 丷: exchange, cash.
+敦	honest	A tap 攵 that shares 享 kindly: honest, sincere.
+盹	doze	An eye 目 with 屯 (tún) for the sound: doze.
+炖	stew	Fire 火 with 屯 (tún) for the sound: stew.
+哆	shiver	A mouth 口 with 多 (duō) for the sound: shiver.
+舵	rudder	A boat 舟 with 它 (tā) for the sound: rudder.
+堕	fall	Soil 土 with 陏 (duò) for the sound: fall, degenerate.
+惰	lazy	A heart 忄 left 左 lying in the flesh ⺼: lazy.
+讹	falsehood	Words 讠 that change 化 (huà): rumour; extort.
+俄	Russia	A person 亻 with 我 (wǒ) for the sound: Russia; suddenly.
+娥	pretty	A woman 女 with 我 (wǒ) for the sound: pretty woman.
+鹅	goose	A bird 鸟 with 我 (wǒ) for the sound: goose.
+厄	hardship	A kneeling 㔾 person under a cliff 厂: hardship.
+遏	check	Walking 辶 asking "what" 曷 (hé) stops you: curb.
+鳄	crocodile	A fish 鱼 with 咢 (è) for the sound: crocodile.
+饵	bait	Food 饣 for an ear 耳 (ěr): bait.
+伐	fell	A person 亻 with a halberd 戈: fell trees, attack.
+阀	valve	A gate 门 that cuts 伐 (fá) the flow: valve; clique.
+帆	sail	Cloth 巾 so commonplace 凡 on every boat: a sail.
+贩	peddle	Money 贝 turned over 反 (fǎn): peddle, trade.
+芳	fragrant	Grass 艹 blowing in every direction 方: fragrant.
+妨	hinder	A woman 女 standing in every direction 方: hinder.
+肪	fat	Flesh ⺼ with 方 (fāng) for the sound: animal fat.
+纺	spin	Thread 纟 spun square 方 (fāng) on the wheel: spin.
+绯	crimson	Thread 纟 with 非 (fēi) for the sound: crimson; romance (fēiwén).
+匪	bandit	A box 匚 of what's not 非 (fēi) yours: bandit.
+诽	slander	Words 讠 that are not 非 (fēi) true: slander.
+沸	boil	Water 氵 that cannot 弗 (fú) stay still: boil.
+芬	fragrance	A plant 艹 whose scent divides 分 (fēn) the air: fragrance.
+吩	instruct	A mouth 口 dividing 分 (fēn) out jobs: instruct.
+坟	grave	Soil 土 with writing 文 (wén) on it: grave.
+焚	burn	Fire 火 under a forest 林: burn.
+粪	dung	Rice 米 that all 共 (gòng) turns into: dung.
+蜂	bee	An insect 虫 with 夆 (féng) for the sound: bee.
+冯	Feng	A horse 马 on ice 冫: the surname Feng.
+逢	meet	Walking 辶 with 夆 (féng) for the sound: meet by chance.
+缝	sew	Thread 纟 that brings edges to meet 逢 (féng): sew; a seam, a crack.
+讽	mock	Words 讠 carried on the wind 风 (fēng): mock, satirize.
+凤	phoenix	A hand 又 inside a sail 几: phoenix.
+孵	hatch	Brooding 孚 over eggs 卵: hatch.
+敷	apply	Tapping 攵 it on with 旉 (fū) for the sound: apply, spread on.
+伏	bow down	A person 亻 lies down like a dog 犬: bow down.
+俘	captive	A person 亻 seized like an egg under a claw 孚 (fú): captive.
+袱	wrapping cloth	Cloth 衤 lying flat 伏 (fú) around a bundle: wrapping cloth.
+辐	spoke	A cart 车 with 畐 (fú) for the sound: wheel spoke; radiate.
+抚	stroke	A hand 扌 with 无 (wú) for the sound: stroke, comfort; raise.
+斧	axe	An axe 斤 with 父 (fù) for the sound: axe.
+俯	bow down	A person 亻 bowing at the prefecture 府 (fǔ): bow down.
+咐	instruct	A mouth 口 handing over 付 (fù) orders: instruct.
+赴	proceed	Run 走 to the diviner 卜: proceed to.
+赋	bestow	Money 贝 for the army 武: tax; endow, give.
+腹	belly	Flesh ⺼ that comes back 复 (fù) round: belly.
+缚	tie	Thread 纟 with 尃 (fū) for the sound: tie up.
+覆	cover	A cover 覀 that comes back 復: capsize, cover.
+尬	awkward	A lame 尢 man stuck between 介 (jiè): awkward.
+丐	beggar	A person bent below 下 asking: beggar.
+钙	calcium	Metal 钅 with 丐 (gài) for the sound: calcium.
+溉	irrigate	Water 氵 with 既 (jì) for the sound: irrigate.
+甘	sweet	A mouth with something sweet 二 inside 卄: sweet; willing.
+竿	pole	Bamboo ⺮ with 干 (gān) for the sound: bamboo pole.
+尴	embarrassed	A lame 尢 man being watched 监 (jiān): embarrassed.
+冈	ridge	A cross 乂 under a frame 冂 of hills: ridge.
+缸	vat	A jar 缶 with 工 (gōng) for the sound: vat, tank.
+杠	bar	Wood 木 with 工 (gōng) for the sound: bar, carrying pole.
+膏	paste	Flesh ⺼ with 高 (gāo) for the sound: fat, ointment, paste.
+戈	spear	A halberd with a hooked blade: dagger-axe.
+胳	arm	Flesh ⺼ with 各 (gè) for the sound: arm (gēbo).
+鸽	pigeon	A bird 鸟 with 合 (hé) for the sound: pigeon, dove.
+搁	put	A hand 扌 placing it in the pavilion 阁 (gé): put down; shelve.
+割	divide	Harm 害 done by a knife 刂: divide, split.
+阁	pavilion	A gate 门 with 各 (gè) for the sound: pavilion, cabinet.
+耕	plow	A plow 耒 around the well 井: till the field.
+耿	upright	An ear 耳 and a fire 火: bright; honest, upright.
+弓	bow	The curving shape of a drawn bow.
+恭	respect	Together 共 with the heart ⺗: respectful.
+躬	bow	A body 身 bent like a bow 弓 (gōng): bow; oneself.
+拱	arch	Hands 扌 all 共 (gòng) together: cup hands; arch.
+勾	bent	Wrap 勹 something private 厶: bent, slope.
+钩	hook	A metal 钅 hook 勾 (gōu): hook.
+沽	buy	Water 氵 with 古 (gǔ) for the sound: buy, sell (wine).
+菇	mushroom	A plant 艹 with 姑 (gū) for the sound: mushroom.
+辜	guilt	Old 古 (gǔ) and bitter 辛: crime; let down.
+雇	hire	A bird 隹 at the door 户 (hù): hire.
+寡	few	A head 頁 divided by a knife 刀 under a roof 宀: few; widowed.
+卦	divination sign	Divining 卜 with jade tablets 圭 (guī): a trigram.
+乖	well-behaved	A thousand 千 over north 北: well-behaved, clever.
+棺	coffin	Wood 木 for the bureaucrat 官: a coffin.
+灌	irrigate	Water 氵 poured like a heron 雚 (guàn) diving: irrigate, pour.
+罐	jar	A jar 缶 with 雚 (guàn) for the sound: jar, can.
+龟	turtle	A head ⺈ on a shell like 电: turtle.
+闺	boudoir	A gate 门 with 圭 (guī) for the sound: women's chambers.
+瑰	rose	Jade 王 with a ghost 鬼 (guǐ): rare gem; rose (méigui).
+桂	cinnamon	A tree 木 with 圭 (guī) for the sound: cassia, cinnamon.
+棍	stick	Wood 木 with 昆 (kūn) for the sound: stick, club.
+郭	outer wall	A tall building 享 at the city 阝 edge: outer wall; a surname.
+骇	shocked	A horse 马 with 亥 (hài) for the sound: frightened, shocked.
+酣	tipsy	Wine 酉 that's sweet 甘 (gān): merry with wine; deep (sleep).
+函	letter	Something folded 了 in a box 凵: letter, case.
+涵	contain	Water 氵 held in a case 函 (hán): contain, include.
+韩	Korea	Sunlight 龺 over tanned leather 韦: Korea; Han.
+罕	rare	An empty 干 net ⺳: rare.
+旱	drought	The sun 日 over dry 干 land: drought.
+捍	defend	A hand 扌 with 旱 (hàn) for the sound: defend.
+焊	weld	Fire 火 drying 旱 (hàn) metal together: weld.
+撼	shake	A hand 扌 that moves 感 (gǎn) you: shake.
+杭	Hangzhou	Wood 木 with 亢 (kàng) for the sound: Hangzhou.
+浩	vast	Water 氵 with 告 (gào) for the sound: vast.
+呵	breathe out	A mouth 口 with 可 (kě) for the sound: breathe out; ha ha.
+禾	grain	A tree 木 with its head drooping 丿 under grain: cereal plant.
+阂	barrier	A gate 门 with 亥 (hài) for the sound: barrier, estrangement.
+荷	load	What 何 the plant 艹 carries: a load.
+赫	glowing	Red 赤 beside red: glowing, illustrious.
+鹤	crane	A bird 鸟 flying high 隺 (hè): crane.
+嘿	hey	A mouth 口 with 黑 (hēi) for the sound: hey!
+痕	mark	Sickness 疒 that stops 艮 and leaves a mark: a scar.
+哼	hum	A mouth 口 with 亨 (hēng) for the sound: hum; snort.
+恒	always	A heart 忄 that spans 亘 every day: always.
+轰	boom	A pair 双 of carts 车 crashing: boom, bombard.
+哄	coax	A mouth 口 talking to all 共 (gòng): coax; uproar.
+烘	toast	Fire 火 around everything 共 (gòng): dry by the fire, toast.
+弘	great	A bow 弓 drawn wide with a private 厶 mark: great, broad.
+虹	rainbow	An insect 虫 crafted 工 of light: a rainbow.
+喉	throat	A mouth 口 for the marquis 侯: the throat.
+吼	roar	A mouth 口 with 孔 (kǒng) for the sound: roar.
+弧	arc	A bow 弓 curved like a melon 瓜: an arc.
+唬	bluff	A mouth 口 with a tiger 虎 (hǔ): scare, bluff.
+沪	Shanghai	Water 氵 with 户 (hù) for the sound: Shanghai.
+哗	uproar	A mouth 口 with 华 (huá) for the sound: uproar.
+猾	cunning	An animal 犭 with 骨 (gǔ) for the sound: cunning.
+徊	pace	Stepping 彳 back 回 and forth: pace, linger.
+淮	Huai river	Water 氵 with 隹 (zhuī) for the sound: the Huai river.
+槐	locust tree	A tree 木 with 鬼 (guǐ) for the sound: Chinese scholar tree.
+唤	call	A mouth 口 with 奂 (huàn) for the sound: call out.
+焕	shine	Fire 火 with 奂 (huàn) for the sound: shine.
+痪	paralysis	A sickness 疒 with 奂 (huàn) for the sound: paralysis.
+荒	waste	Blades 芒 of grass by a stream 川 (chuān): barren, waste.
+凰	phoenix	Royal 皇 (huáng) inside a sail 几: female phoenix.
+煌	brilliant	Fire 火 fit for royalty 皇 (huáng): brilliant.
+恍	absent-minded	A heart 忄 dazzled by light 光 (guāng): in a daze; suddenly.
+晃	sway	The sun 日 flashing light 光 (guāng): dazzle; sway.
+谎	lie	Words 讠 as empty as a wasteland 荒 (huāng): lie.
+徽	emblem	A step 彳 by a mountain 山, thread 系 and a tap 攵: badge, emblem.
+卉	plants	Ten 十 kinds of grass 艹: plants.
+讳	taboo	Words 讠 with 韦 (wéi) for the sound: taboo, avoid saying.
+贿	bribe	Money 贝 you have 有: bribe.
+秽	filthy	Grain 禾 left for years 岁 (suì): dirty, foul.
+浑	muddy	Water 氵 stirred by an army 军 (jūn): muddy; whole.
+魂	soul	A ghost 鬼 that says 云: the soul.
+豁	open	A valley 谷 with 害 (hài) for the sound: open, clear; give up.
+祸	disaster	An altar 礻 with 呙 (guō) for the sound: disaster.
+惑	perplexity	Some 或 heart 心: perplexity.
+霍	suddenly	Birds 隹 caught in sudden rain 雨: suddenly; a surname.
+讥	mock	Words 讠 with 几 (jī) for the sound: mock.
+饥	hungry	Food 饣 on an empty table 几 (jī): hungry, famine.
+缉	arrest	Thread 纟 with 咠 (qì) for the sound: seize, arrest.
+畸	odd	A field 田 shaped strange 奇: irregular, abnormal.
+稽	consider	Grain 禾 that is reasonable 尤 and delicious 旨: think, consider.
+棘	thorn	Thorns 朿 beside thorns: thorny, brambles.
+嫉	jealous	A woman 女 sick 疾 with envy: jealous.
+脊	spine	Vertebrae 人 stacked over flesh ⺼: spine.
+忌	abhor	The self 己 over the heart 心: abhor, mourning.
+剂	dose	A knife 刂 cutting even 齐 (qí) doses: dose, preparation.
+迹	trace	Walking 辶 with 亦 (yì) for the sound: footprint, trace.
+祭	sacrifice	A hand 寸 laying meat ⺼ on the altar 示: offer sacrifice.
+寂	lonely	An uncle 叔 alone under a roof 宀: lonely.
+颊	cheek	The side of a head 页 pressed 夹 (jiā) in: cheek.
+贾	merchant	Shells 贝 under a cover 覀: merchant; a surname.
+嫁	bride	A woman 女 goes to a house 家: a bride.
+稼	earn	Grain 禾 for the house 家: earn money.
+奸	treacherous	A woman 女 with 干 (gān) for the sound: wicked, treacherous.
+歼	wipe out	A thousand 千 bones 歹: annihilate.
+兼	both	A hand 彐 holding two grain 禾 stalks under two drops 丷: both, together.
+煎	roast	Fire 灬 in front 前: broil, roast.
+拣	pick	A hand 扌 choosing like a card 柬 (jiǎn): pick, sort.
+柬	card	A bundle 束 of notes with two 八 marks: card, letter.
+俭	frugal	A person 亻 who counts it all 佥 (qiān): frugal.
+荐	recommend	Grass 艹 that lives on 存 year after year: recommend.
+贱	cheap	Money 贝 cut small 戋 (jiān): cheap, lowly.
+溅	splash	Water 氵 with 贱 (jiàn) for the sound: splash.
+姜	ginger	A sheep 羊 over a woman 女: ginger; a surname.
+浆	thick liquid	Water 水 under a general's 丬 夕 mark: thick liquid, starch.
+僵	stiff	A person 亻 frozen at the border 畺 (jiāng): stiff.
+疆	border	A bow 弓 and soil 土 guarding the boundary 畺: frontier.
+桨	oar	Wood 木 under a general's 丬 夕 mark: oar.
+匠	artisan	An axe 斤 in a box 匚: an artisan.
+浇	pour	Water 氵 with 尧 (yáo) for the sound: water, pour on.
+娇	delicate	A woman 女 standing tall 乔 (qiáo): delicate, pampered.
+椒	pepper	A tree 木 with 叔 (shū) for the sound: pepper.
+跤	tumble	Feet 足 crossing 交 (jiāo): stumble, wrestle.
+礁	reef	A stone 石 charred 焦 under water: a reef.
+嚼	chew	A mouth 口 with 爵 (jué) for the sound: chew.
+狡	cunning	An animal 犭 crossing 交 (jiāo) its tracks: cunning.
+绞	twist	Threads 纟 crossed 交 (jiāo): twist, wring.
+矫	correct	An arrow 矢 held up tall 乔 (qiáo) to straighten: correct.
+搅	stir	A hand 扌 with 觉 (jué) for the sound: stir; disturb.
+缴	hand over	Thread 纟 with 敫 (jiǎo) for the sound: hand over, pay.
+轿	sedan chair	A tall 乔 (qiáo) carriage 车: sedan chair.
+酵	ferment	A wine jar 酉 tended with filial piety 孝: fermentation.
+皆	all	Compare 比 all the white 白 heads: everyone.
+劫	rob	Force 力 that takes it away 去: rob; disaster.
+捷	quick	A hand 扌 that's nimble 疌 (jié): quick; victory.
+竭	exhaust	Standing 立 till what 曷 (hé) is left: exhaust.
+诫	warn	Words 讠 of warning 戒 (jiè): admonish.
+津	port	Water 氵 where the brush 聿 writes the ships' names: a port.
+筋	tendon	Bamboo ⺮ strong ribs 肋 in the body: tendon, muscle.
+锦	brocade	Silk 帛 woven with gold 钅: brocade.
+谨	cautious	Words 讠 with 堇 (jǐn) for the sound: careful.
+晋	advance	The second 亚 sun 日: advance; Jin state.
+浸	soak	Water 氵 with a hand 彐 dipping under a cover 冖: soak.
+茎	stem	A plant 艹 rising on a long warp-like stalk: stem.
+荆	thorn	A plant 艹 opening 开 with knife-like 刂 thorns: brambles.
+晶	crystal	Three suns 日 sparkle: crystal.
+兢	cautious	Two overcomers 克 side by side, trembling: cautious.
+阱	trap	A hill 阝 with a well 井 (jǐng) hidden: pit, trap.
+颈	neck	A head 页 on a long warp-like stem: neck.
+窘	embarrassed	A lord 君 (jūn) stuck in a hole 穴: awkward, hard up.
+揪	grab	A hand 扌 with 秋 (qiū) for the sound: grab, pull.
+灸	moxibustion	Fire 火 held for a long 久 (jiǔ) time: moxibustion.
+舅	uncle	A man 男 with 臼 (jiù) for the sound: mother's brother.
+拘	arrest	A hand 扌 holds a phrase 句: arrest, be concerned.
+鞠	bow	Leather 革 ball 匊 (jū): bend, bow.
+菊	chrysanthemum	A plant 艹 with 匊 (jū) for the sound: chrysanthemum.
+橘	tangerine	A tree 木 with 矞 (yù) for the sound: tangerine.
+沮	dejected	Water 氵 with 且 (qiě) for the sound: stop; dejected.
+矩	rule	An arrow 矢 as huge 巨 (jù) as a carpenter's square: rule, square.
+炬	torch	Fire 火 held up big 巨 (jù): torch.
+惧	fear	A heart 忄 with a tool 具 in hand: fear.
+锯	saw	Metal 钅 with 居 (jū) for the sound: saw.
+倦	weary	A person 亻 curled up 卷 (juǎn): weary.
+诀	knack	Words 讠 of parting 夬 (jué): farewell; knack, secret.
+掘	dig	A hand 扌 bends 屈 to dig.
+崛	rise	A mountain 山 bending 屈 (qū) up: rise abruptly.
+爵	noble	A hand 爫 holding a goblet 罒 良 with a hand 寸: noble title.
+倔	stubborn	A person 亻 who won't bend 屈: stubborn.
+君	lord	A ruler 尹 giving orders by mouth 口: lord, gentleman.
+钧	jun	Metal 钅 weighed equal 匀 (yún): thirty jin; your (respectful).
+俊	handsome	A person 亻 with 夋 (qūn) for the sound: handsome, talented.
+峻	steep	A mountain 山 with 夋 (qūn) for the sound: high, steep; stern.
+骏	fine horse	A horse 马 with 夋 (qūn) for the sound: fine horse.
+竣	complete	Standing 立 at the end with 夋 (qūn) for the sound: complete.
+凯	triumph	A table 几 with 岂 (qǐ) for the sound: triumph.
+慨	sigh	A heart 忄 for what has previously 既 happened: sigh.
+楷	square style	Wood 木 for all 皆 to write clearly: square style.
+勘	intuition	Tremendous 甚 power 力 to sense: intuition, check.
+堪	endure	Soil 土 that bears tremendous 甚 loads: endure.
+侃	chat	A person 亻 with words 口 flowing like a stream 川: chat away.
+砍	chop	A stone 石 axe with 欠 (qiàn) for the sound: chop.
+槛	threshold	Wood 木 with 监 (jiān) for the sound: threshold.
+慷	generous	A heart 忄 that's healthy 康 (kāng): generous.
+扛	shoulder	A hand 扌 at work 工 (gōng) lifting: carry on the shoulder.
+苛	torment	Grass 艹 that can 可 sting: torment, harsh.
+磕	knock	A stone 石 with 盍 (hé) for the sound: knock, bump.
+壳	shell	A scholar 士 over a case 冗: shell, husk.
+垦	reclaim	Soil 土 with 艮 (gèn) for the sound: open up land.
+恳	sincere	A heart 心 with 艮 (gèn) for the sound: sincere.
+啃	gnaw	A mouth 口 that's willing 肯 (kěn): gnaw.
+坑	pit	Soil 土 with 亢 (kàng) for the sound: pit; cheat.
+吭	make a sound	A mouth 口 raised high 亢 (kàng): throat; utter a sound.
+孔	hole	A child 子 with an open mouth 乚: hole; Confucius.
+抠	dig out	A hand 扌 in a small area 区 (qū): pick, dig; stingy.
+枯	wither	An old 古 tree 木: wither.
+窟	cavern	A hole 穴 you bend 屈 into: a cavern.
+夸	praise	Big 大 words at a loss 亏: boast, praise.
+垮	collapse	Earth 土 bragging 夸 (kuā) too big: collapse.
+挎	carry on arm	A hand 扌 with 夸 (kuā) for the sound: carry on the arm.
+筐	basket	Bamboo ⺮ with 匡 (kuāng) for the sound: basket.
+旷	vast	The sun 日 over a broad 广 (guǎng) plain: vast, empty; skip (class).
+框	frame	Wood 木 with 匡 (kuāng) for the sound: frame.
+窥	peep	A hole 穴 to look at the rules 规 (guī): peep.
+魁	chief	One who fought 斗 a ghost 鬼 (guǐ): chief, leader.
+馈	present	Precious 贵 (guì) food 饣 given: present; feedback.
+溃	burst	Water 氵 with 贵 (guì) for the sound: burst, collapse.
+愧	ashamed	A heart 忄 haunted by a ghost 鬼 (guǐ): ashamed.
+昆	insect	Under the sun 日 they compare 比: insects, descendants.
+捆	tie up	A hand 扌 trapping 困 (kùn) it: tie up; a bundle.
+廓	outline	A building 广 with outer walls 郭 (guō): outline; wide.
+喇	horn	A mouth 口 with 剌 (là) for the sound: the lǎ of lǎba, horn.
+腊	cured meat	Meat ⺼ from the past 昔 year: cured meat; the twelfth month.
+蜡	wax	An insect 虫 with 昔 (xī) for the sound: wax, candle.
+兰	orchid	An orchid with petals 丷 over three 三 leaves: orchid.
+拦	block	A hand 扌 with 兰 (lán) for the sound: block.
+婪	greedy	A woman 女 eyeing the whole forest 林 (lín): greedy.
+澜	waves	Water 氵 with 阑 (lán) for the sound: big waves.
+揽	take on	A hand 扌 grabbing all it sees 览 (lǎn): take on, embrace.
+缆	cable	Thread 纟 with 览 (lǎn) for the sound: cable.
+滥	overflow	Water 氵 that no one supervises 监 (jiān): overflow, excessive.
+狼	wolf	An animal 犭 with 良 (liáng) for the sound: wolf.
+廊	corridor	The son 郎 walks under the roof 广: a corridor.
+捞	scoop	A hand 扌 laboring 劳 (láo) in the water: scoop up, fish out.
+姥	grandma	An old 老 (lǎo) woman 女: maternal grandmother.
+唠	chatter	A mouth 口 laboring 劳 (láo) on: chatter.
+涝	waterlogged	Water 氵 with 劳 (láo) for the sound: waterlogged fields.
+勒	rein in	Leather 革 pulled with strength 力: rein in; strangle.
+垒	rampart	Soil 土 piled up 厽 (lěi): rampart; base.
+磊	heap of stones	Three stones 石 piled up: heap of rocks; open-hearted.
+蕾	bud	A plant 艹 with 雷 (léi) for the sound: flower bud.
+棱	edge	Wood 木 with 夌 (líng) for the sound: edge, corner.
+愣	stunned	A heart 忄 with eyes 罒 frozen square 方: dazed.
+黎	multitude	Millet 黍 for the many: multitude; dawn; Li.
+吏	official	A mouth 口 that holds the rule 丈: an official.
+隶	slave	A hand 彐 over drops 氺 of grain: slave, servant.
+粒	grain	Rice 米 standing 立 one by one: grains.
+莲	lotus	A plant 艹 with 连 (lián) for the sound: lotus.
+廉	bargain	Under a roof 广 hold two stalks 兼: a bargain, honest.
+敛	gather	Tapping 攵 everything 佥 (qiān) in: collect; restrain.
+链	chain	Metal 钅 links joined 连 (lián): chain.
+辽	distant	Walking 辶 with 了 (liǎo) for the sound: far, distant.
+僚	colleague	A person 亻 by the sacrificial fire 尞 (liào): official, colleague.
+寥	few	A roof 宀 with wind 翏 (liù) blowing through: sparse, few.
+潦	careless	Water 氵 with 尞 (liào) for the sound: flood; careless.
+咧	grin	A mouth 口 stretched in a line 列 (liè): grin.
+劣	inferior	Few 少 powers 力: inferior.
+猎	hunt	A dog 犭 with 昔 (xī) for the sound: hunt.
+拎	carry	A hand 扌 with 令 (lìng) for the sound: carry by hand.
+淋	drench	Water 氵 through a forest 林 (lín): drench, pour.
+赁	rent	Money 贝 entrusted 任: rent.
+凌	rise above	Ice 冫 with 夌 (líng) for the sound: ice; rise high; insult.
+陵	tomb hill	A hill 阝 with 夌 (líng) for the sound: hill; tomb.
+岭	ridge	A mountain 山 with 令 (lìng) for the sound: mountain ridge.
+溜	slip	Water 氵 that won't stay 留 (liú): slide, slip away.
+刘	Liu	Writing 文 and a blade 刂: the surname Liu.
+浏	browse	Water 氵 flowing by Liu 刘 (liú): clear; browse.
+瘤	tumor	A sickness 疒 that stays 留 (liú): tumor.
+柳	willow	A tree 木 by the rabbit 卯: the willow.
+遛	stroll	Walking 辶 slowly to stay 留 (liú) out: stroll, walk the dog.
+咙	throat	A mouth 口 with a dragon 龙 (lóng): throat.
+胧	hazy	The moon 月 with a dragon 龙 (lóng) cloud: hazy.
+聋	deaf	An ear 耳 deafened by a dragon 龙 (lóng): deaf.
+笼	cage	Bamboo ⺮ to hold a dragon 龙 (lóng): cage, steamer.
+隆	grand	A hill 阝 where life 生 walks 夂 one 一 way up: grand, prosperous.
+窿	hole	A cave 穴 with 隆 (lóng) for the sound: hole, cavity.
+拢	gather	A hand 扌 holding a dragon 龙 (lóng) close: gather, draw near.
+垄	ridge	A dragon 龙 (lóng) of soil 土: field ridge; monopoly.
+搂	hug	A hand 扌 with 娄 (lóu) for the sound: hug.
+陋	crude	A hill 阝 with a poor 丙 hut 乚: crude, ugly.
+芦	reed	A plant 艹 by the door 户 (hù): reed.
+卤	brine	A jar 囗 with salt 乂 and a lid ⺊: brine; stew in soy.
+虏	captive	A tiger 虍 (hǔ) grip of force 力: capture, captive.
+鲁	rash	A fish 鱼 that talks 日: rough, rash; Lu.
+赂	bribe	Money 贝 for each 各 official: bribe.
+鹿	deer	A deer with antlers 广 and legs 比 running: deer.
+碌	busy	A stone 石 with 录 (lù) for the sound: busy; mediocre.
+吕	Lü	Two mouths 口 in tune: a pitch; the surname Lü.
+侣	companion	A person 亻 in tune 吕 (lǚ) with you: companion.
+铝	aluminium	Metal 钅 with 吕 (lǚ) for the sound: aluminium.
+屡	repeatedly	A body 尸 with 娄 (lóu) for the sound: again and again.
+缕	strand	Thread 纟 with 娄 (lóu) for the sound: strand, wisp.
+履	footwear	A body 尸 that returns 復 again and again: footwear, perform.
+滤	filter	Water 氵 thought over 虑 (lǜ) carefully: filter.
+孪	twins	Also 亦 a second child 子: twins.
+卵	egg	Two eggs in a kneeling 卩 shape: egg, ovum.
+掠	plunder	A hand 扌 raiding the capital 京 (jīng): plunder; sweep past.
+抡	swing	A hand 扌 with 仑 (lún) for the sound: swing, brandish.
+伦	ethics	People 亻 in logical order 仑 (lún): human relations, ethics.
+罗	net	A net 罒 cast in the evening 夕: net; gather.
+萝	radish	A plant 艹 with 罗 (luó) for the sound: radish (luóbo).
+螺	snail	An insect 虫 with 累 (lèi) for the sound: snail, spiral.
+裸	naked	Clothes 衤 off like fruit 果 peel: naked.
+迈	stride	Walking 辶 ten thousand 万 steps: stride; old.
+脉	pulse	Flesh ⺼ with vessels running long 永: pulse, vein.
+蛮	barbarian	Also 亦 an insect 虫: a barbarian.
+瞒	hide	Eyes 目 covered with grass 艹 on both 两 sides: hide the truth.
+蔓	vine	A plant 艹 growing long 曼 (màn): vine.
+芒	awn	A plant 艹 with 亡 (wáng) for the sound: awn; silvergrass; ray.
+氓	rogue	People 民 who are lost 亡 (wáng): rogue (liúmáng).
+茫	vast	A plant 艹 with 汒 (máng) for the sound: boundless, vague.
+莽	reckless	A dog 犬 in the grass 艹 with two hands 廾: thicket; reckless.
+茅	thatch	A plant 艹 like a spear 矛 (máo): thatch grass.
+髦	fashionable	Long hair 髟 with 毛 (máo) for the sound: fashionable (shímáo).
+茂	luxuriant	Grass 艹 by a halberd 戊: overgrown, luxuriant.
+玫	rose	Jade 王 with 攵 for the sound: rose (méigui).
+枚	sheet	Wood 木 struck 攵 flat: a sheet, counter for flat things.
+眉	eyebrow	Hair 尸 over an eye 目: eyebrow.
+霉	mold	Rain 雨 every 每 (měi) day: mold; bad luck.
+昧	dark	The sun 日 not yet 未 up: dark, foolish.
+媚	charming	A woman 女 with fine eyebrows 眉 (méi): charming, flatter.
+魅	charm	A ghost 鬼 not yet 未 seen: fascination, charm.
+闷	stuffy	A heart 心 shut behind a gate 门 (mén): stuffy, gloomy.
+萌	sprout	Grass 艹 with 明 (míng) for the sound: a bud sprouts.
+朦	dim	The moon 月 covered by 蒙 (méng), also the sound: dim, hazy.
+孟	eldest	A child 子 set on a dish 皿 like a throne: the eldest, great.
+弥	fill	A bow 弓 with 尔 (ěr) for the sound: fill up, spread everywhere.
+谜	riddle	Words 讠 that bewitch 迷 (mí) you: a riddle.
+觅	seek	A claw 爫 reaching while the eyes see 见: seek, search for.
+泌	ooze	Water 氵 that must 必 come out: ooze.
+蜜	honey	Insects 虫 with 宓 (mì) for the sound: honey.
+绵	continuous	A thread 纟 of silk 帛 that never breaks: continuous, soft.
+勉	effort	Excused 免 from nothing, you use all your power 力: effort, study.
+缅	remote	A thread 纟 with 面 (miàn) for the sound: distant, think of far things.
+苗	seedling	Grass 艹 in the rice field 田: a seedling.
+瞄	aim	An eye 目 with 苗 (miáo) for the sound: take aim.
+渺	vast	Water 氵 with 眇 (miǎo) for the sound: vast and faint.
+庙	temple	A building 广 holding an altar 由: a temple.
+蔑	disdain	Grass 艹 over an eye 罒 and a guard 戍 who looks down: disdain.
+鸣	cry	The mouth 口 of a bird 鸟: a bird call, to sound.
+铭	engrave	Metal 钅 with a name 名 (míng), also the sound: engrave.
+谬	absurd	Words 讠 with 翏 (liù) for the sound, like wind: absurd, wrong.
+蘑	mushroom	Grass 艹 with 磨 (mó) for the sound: mushroom.
+魔	evil spirit	Hemp 麻 and a ghost 鬼: a witch, evil spirit.
+抹	erase	A hand 扌 rubs out the end 末: erase.
+沫	foam	Water 氵 with 末 (mò) for the sound: foam, bubbles.
+陌	strange	A town 阝 of a hundred 百 strangers: unfamiliar.
+莫	do not	Grass 艹 over 旲, the sun sinking: no, do not.
+寞	lonely	A roof 宀 with 莫 (mò) for the sound: lonely, still.
+牡	male	An ox 牛 with 土 (tǔ) for the sound: a male animal.
+亩	mu	A lid 亠 over a field 田: mu, a unit of land.
+姆	nanny	A woman 女 like a mother 母 (mǔ), also the sound: nanny.
+沐	bathe	Water 氵 with 木 (mù) for the sound: bathe, wash.
+牧	pasture	Strike 攵 the cows 牛 along: pasture, herd.
+募	recruit	Power 力 that must not 莫 be lacking: recruit.
+睦	friendly	An eye 目 with 坴 (lù) for the sound: friendly looks.
+慕	yearn	A heart ⺗ that must not 莫 forget: yearn for.
+暮	twilight	The sun 日 that must not 莫 stay: twilight.
+穆	solemn	Grain 禾 with 㣎 (mù) for the sound: solemn, reverent.
+呐	shout	A mouth 口 with 内 (nèi) for the sound: shout.
+乃	then	A bent slash 丿, like a pregnant woman: then, indeed.
+囊	bag	A mouth 口 with 襄 (xiāng) for the sound: a bag, sack.
+挠	scratch	A hand 扌 with 尧 (yáo) for the sound: scratch.
+恼	annoyed	The heart 忄 under a lid 亠 with a culprit 凶: annoyed.
+馁	hungry	Food 饣 with 妥 (tuǒ) for the sound: hungry, lose heart.
+嫩	tender	A woman 女 with 敕 (chì) for the sound: tender, young.
+尼	nun	A body 尸 bent over a spoon 匕: a nun.
+拟	draft	A hand 扌 with 以 (yǐ) for the sound: draft, plan.
+逆	against	Walking 辶 with 屰 (nì), upside down, also the sound: go against.
+匿	hide	Young 若 one in a hiding place 匸: hide.
+腻	greasy	Meat ⺼ with 贰 (èr) for the sound: greasy, too much.
+黏	sticky	Millet 黍 with 占 (zhàn) for the sound: sticky.
+酿	brew	Wine 酉 with 良 (liáng) for the sound: brew, ferment.
+尿	urine	A body 尸 making water 水: urine.
+捏	pinch	A hand 扌 with 圼 (niè) for the sound: pinch, knead.
+拧	twist	A hand 扌 with 宁 (níng) for the sound: twist, wring.
+凝	congeal	Ice 冫 makes doubt 疑 stiffen: congeal.
+纽	button	Thread 纟 with 丑 (chǒu) for the sound: a knot, a button.
+奴	slave	A woman 女 in hand 又: a slave, a guy.
+虐	tyrannize	A tiger 虍 with claws out: tyrannize.
+挪	move	A hand 扌 with 那 (nà) for the sound: move, shift.
+哦	oh	A mouth 口 with 我 (wǒ) for the sound: oh!
+欧	Europe	A ward 区 that yawns 欠 to the west: Europe.
+殴	beat	A weapon 殳 in the ward 区: assault, beat.
+呕	vomit	A mouth 口 with 区 (qū) for the sound: vomit.
+趴	lie prone	A foot 足 with 八 (bā) for the sound: lie face down.
+帕	scarf	Cloth 巾 that is white 白: a scarf, handkerchief.
+徘	pace	A step 彳 with 非 (fēi) for the sound: pace back and forth.
+潘	Pan	Water 氵 with 番 (fān) for the sound: a river, the surname Pan.
+攀	climb	A hand 手 on a railing 樊 (fán), also the sound: climb.
+叛	rebel	Half 半 (bàn) for the sound, turned in reverse 反: rebel.
+畔	levee	Half 半 a field 田: the paddy ridge, levee.
+乓	pong	A mound 丘 with a dot 丶 bouncing off: pong, as in ping pong.
+庞	huge	A dragon 龙 inside a building 广: huge.
+膀	shoulder	Flesh ⺼ at the side 旁 (páng), also the sound: shoulder, wing.
+抛	throw	A hand 扌, nine 九 times with strength 力: throw, toss.
+刨	plane	A knife 刂 with 包 (bāo) for the sound: a carpenter's plane.
+袍	robe	Clothes 衤 that wrap 包 (bāo), also the sound: a robe.
+胚	embryo	Flesh ⺼ with 丕 (pī) for the sound: embryo.
+沛	abundant	Water 氵 swirling 巿 around: a flood, abundant.
+佩	wear	A person 亻 with common 凡 cloth 巾 hung at the belt: wear, admire.
+抨	attack	A hand 扌 with 平 (píng) for the sound: attack in words.
+烹	cook	Fire 灬 with 亨 (hēng) for the sound: cook.
+棚	shelf	Wood 木 boards side by side like companions 朋: a shelf.
+蓬	unkempt	Grass 艹 with 逢 (féng) for the sound: messy, overgrown.
+鹏	roc	A bird 鸟 with 朋 (péng) for the sound: a giant bird.
+篷	awning	Bamboo ⺮ with 逢 (féng) for the sound: an awning, sail.
+膨	swell	Flesh ⺼ with 彭 (péng) for the sound: swell.
+捧	hold up	Hands 扌 making an offering 奉 (fèng), also the sound: hold up with both hands.
+劈	chop	A knife 刀 with 辟 (pì) for the sound: chop, split.
+疲	tired	Sickness 疒 in the skin 皮: tired.
+辟	open up	A body 尸, a mouth 口 and a bitter 辛 blade: law; open up.
+媲	match	A woman 女 compared with another: match, rival.
+僻	remote	A person 亻 with 辟 (pì) for the sound: remote, out of the way.
+譬	example	Words 言 with 辟 (pì) for the sound: an example.
+飘	float	Wind 风 with 票 (piào) for the sound: float, drift.
+撇	cast aside	A hand 扌 with 敝 (bì) for the sound: cast aside.
+乒	ping	A mound 丘 with a slash 丿 bouncing off: ping, as in ping pong.
+坪	flat ground	Earth 土 that is flat 平 (píng), also the sound: level ground.
+萍	duckweed	Grass 艹 with 泙 (píng) for the sound: duckweed, drifting.
+颇	quite	A head 页 with skin 皮 (pí) for the sound: quite, rather.
+魄	soul	A ghost 鬼 with 白 (bái) for the sound: the soul.
+剖	dissect	A knife 刂 with 咅 (pǒu) for the sound: cut open.
+仆	servant	A person 亻 with 卜 (bǔ) for the sound: a servant.
+菩	bodhi	Grass 艹 with 咅 (pǒu) for the sound: a herb; bodhi.
+朴	simple	A tree 木 and a divining 卜 stick: plain, simple.
+浦	inlet	Water 氵 for the first time 甫 meeting land: an inlet.
+谱	score	Words 讠 with 普 (pǔ) for the sound: a chart, a music score.
+瀑	waterfall	Violent 暴 (bào) water 氵, also the sound: a waterfall.
+沏	infuse	Water 氵 with 切 (qiè) for the sound: pour hot water on tea.
+栖	perch	A tree 木 with 西 (xī) for the sound: perch, roost.
+凄	uncanny	Ice 冫 next to a wife 妻 at night: uncanny, chilling.
+戚	relative	A weapon 戊 and a younger brother 尗: grief, relatives.
+漆	lacquer	The sap 氵 of the varnish tree 桼 (qī), also the sound: lacquer, paint.
+歧	fork	Stop 止 with 支 (zhī) for the sound: a fork in the road.
+祈	pray	At the altar 礻 with an axe 斤: pray.
+棋	chess	Wood 木 with 其 (qí) for the sound: chess.
+乞	beg	A bent hook 乙 like a bowing person: beg.
+岂	how could	A mountain 山 with 己 (jǐ) for the sound: how could...?
+迄	until	Walking 辶 with 乞 (qǐ) for the sound: reach, until.
+泣	cry	Water 氵 falling from someone standing 立: cry.
+契	pledge	A knife 刀 cuts a big 大 pledge.
+砌	lay bricks	Stone 石 cut 切 (qiè), also the sound: build with stone.
+掐	pinch	A hand 扌 with 臽 (xiàn) for the sound: pinch, nip.
+洽	harmonize	Water 氵 that combines 合: blend, get along.
+虔	devout	Tiger stripes 虍 over culture 文: reverent, devout.
+钳	pliers	Metal 钅 with 甘 (gān) for the sound: pliers, pincers.
+遣	dispatch	Walk 辶 out from the middle 中: dispatch.
+谴	scold	Words 讠 with 遣 (qiǎn) for the sound: scold, condemn.
+嵌	inlay	A mountain 山, sweet 甘, and 欠 (qiàn) for the sound: inlay, embed.
+呛	choke	A mouth 口 with 仓 (cāng) for the sound: choke on smoke.
+腔	cavity	Flesh ⺼ that is hollow 空 (kōng), also the sound: a body cavity.
+乔	tall	A young 夭 person on stilts: tall.
+侨	emigrant	A person 亻 with 乔 (qiáo) for the sound: one living abroad.
+俏	pretty	A person 亻 who resembles 肖 (xiào), also the sound: pretty.
+窍	opening	A cave 穴 with 巧 (qiǎo) for the sound: an opening, a knack.
+翘	raise	Feathers 羽 with 尧 (yáo) for the sound: stick up, raise.
+撬	pry	A hand 扌 with 毳 (cuì) for the sound: pry open.
+怯	timid	A heart 忄 that wants to go away 去 (qù), also the sound: timid.
+窃	steal	Cut 切 through a hole 穴: steal.
+钦	admire	Gold 钅 with 欠 (qiàn) for the sound: admire, royal.
+秦	Qin	Grain 禾 pounded by two hands above: Qin, the dynasty that named China.
+禽	fowl	A man 人 who caught a rare beast 离: birds, fowl.
+寝	sleep	Under a roof 宀, a person 彐冖又 lying on a bed 丬: sleep.
+擎	hold up	A hand 手 with 敬 (jìng) for the sound: hold up high.
+顷	moment	A spoon 匕 by a head 页: a moment.
+丘	hill	An axe 斤 on one 一 line of ground: a hill.
+囚	prisoner	A person 人 in an enclosure 囗: a prisoner.
+驱	drive	A horse 马 with 区 (qū) for the sound: drive away, spur on.
+屈	bend	A body 尸 bends to go out 出: yield, bend.
+躯	body	A body 身 with 区 (qū) for the sound: the human body.
+娶	marry	To take 取 (qǔ) a woman 女, also the sound: take a wife.
+拳	fist	A hand 手 with 龹 (quǎn) for the sound: a fist.
+犬	dog	A big 大 animal with one dot 丶 for its ear: dog.
+雀	sparrow	A small 小 bird 隹: sparrow.
+壤	soil	Earth 土 with 襄 (xiāng) for the sound: rich soil.
+攘	repel	A hand 扌 with 襄 (xiāng) for the sound: push away, seize.
+嚷	shout	A mouth 口 with 襄 (xiāng) for the sound: shout.
+饶	plenty	Food 饣 with 尧 (yáo) for the sound: plenty; spare, forgive.
+惹	provoke	A heart 心 with 若 (ruò) for the sound: provoke, stir up.
+仁	benevolence	A person 亻 with two 二 others in mind: benevolence.
+韧	tough	Leather 韦 with 刃 (rèn) for the sound: tough, pliable.
+溶	melt	Water 氵 that contains 容 it: melt, dissolve.
+冗	superfluous	A cover 冖 on a table 几 that isn't needed: superfluous.
+柔	gentle	A spear 矛 on a tree 木 bends: gentle, soft.
+揉	knead	A soft 柔 (róu) hand 扌, also the sound: knead, rub.
+儒	Confucian	A person 亻 in demand 需 for wisdom: a Confucian.
+辱	humiliate	A dragon 辰 held by the hand 寸: humiliate.
+锐	sharp	Metal 钅 with 兑 (duì) for the sound: sharp.
+瑞	good omen	Jade 王 with 耑 (duān) for the sound: a lucky sign.
+撒	scatter	A hand 扌 scattering 散 (sàn), also the sound: let go, scatter.
+萨	bodhisattva	Grass 艹, a town 阝 and birth 产: used for sounds, as in bodhisattva.
+桑	mulberry	A tree 木 bearing berries 叒: mulberry.
+嗓	throat	A mouth 口 with 桑 (sāng) for the sound: throat, voice.
+骚	disturb	A flea 蚤 (zǎo) biting a horse 马, also the sound: disturb.
+嫂	sister-in-law	A woman 女 with 叟 (sǒu) for the sound: elder brother's wife.
+臊	smell	Flesh ⺼ with 喿 (zào) for the sound: a foul smell; shy.
+僧	monk	A person 亻 with 曾 (céng) for the sound: a Buddhist monk.
+纱	gauze	Thread 纟 with 少 (shǎo) for the sound: thin gauze.
+砂	sand	Stone 石 made few 少: sand.
+鲨	shark	A fish 鱼 with 沙 (shā) for the sound: shark.
+厦	mansion	A cliff 厂 with 夏 (xià) for the sound: a large building.
+筛	sieve	Bamboo ⺮ with 师 (shī) for the sound: a sieve.
+删	delete	A knife 刂 cutting a book 册: delete.
+煽	incite	A fan 扇 (shàn) on fire 火, also the sound: stir up.
+擅	be good at	A hand 扌 with 亶 (dǎn) for the sound: be good at; do on one's own.
+膳	meal	Meat ⺼ that is good 善 (shàn), also the sound: a meal.
+赡	support	Money 贝 with 詹 (zhān) for the sound: provide for.
+捎	bring along	A hand 扌 with 肖 (xiào) for the sound: bring along for someone.
+梢	tip	A tree 木 with 肖 (xiào) for the sound: the tip of a branch.
+哨	whistle	A mouth 口 with 肖 (xiào) for the sound: whistle.
+奢	luxury	Big 大 with 者 (zhě) for the sound: extravagant.
+慑	fear	A heart 忄 with 聂 (niè) for the sound: fear, overawe.
+绅	gentry	A silk 纟 sash with 申 (shēn) for the sound: gentry.
+肾	kidney	Flesh ⺼ under a hand 又: kidney.
+渗	seep	Water 氵 with 参 (cān) for the sound: seep through.
+慎	careful	A true 真 heart 忄: careful.
+绳	rope	Thread 纟 with 黾 for the sound: rope.
+尸	corpse	A man keeled over, legs bent 丿: corpse.
+狮	lion	An animal 犭 with 师 (shī) for the sound: lion.
+蚀	erode	An insect 虫 eating 饣: nibble away, erode, eclipse.
+矢	arrow	A slash 丿 over 天, an arrow pointing up: arrow.
+氏	clan	A family tree's root sticking out of the ground: clan, Mr.
+侍	serve	A person 亻 with 寺 (sì) for the sound: serve, attend.
+逝	pass away	Walk 辶 off folded 折: pass away.
+嗜	be fond of	A mouth 口 with 耆 (qí) for the sound: be addicted to.
+誓	vow	Fold 折 your words 言: vow.
+匙	spoon	A spoon 匕 with 是 (shì) for the sound: spoon; key.
+兽	beast	Horns 丷, eyes 田, nose 一 and mouth 口: a beast.
+抒	express	A hand 扌 that gives 予 out feelings: express.
+枢	pivot	Wood 木 in the ward 区: a hinge, pivot.
+梳	comb	Wood 木 with 㐬 (liú) for the sound: a comb.
+疏	sparse	Feet 疋 through wild land 㐬: clear out; sparse, careless.
+赎	redeem	Money 贝 for what was sold 卖 (mài), also the sound: redeem.
+署	office	Eyes 罒 watching someone 者: a government office, sign.
+蜀	Shu	Eyes 罒 on a wrapped 勹 worm 虫: the ancient state of Shu.
+曙	dawn	The sun 日 with 署 (shǔ) for the sound: daybreak.
+竖	upright	Standing 立 straight as a knife 刂, held by a hand 又: upright.
+恕	forgive	A heart 心 with 如 (rú) for the sound: forgive.
+墅	villa	Earth 土 out in the fields 野: a country villa.
+耍	play	A woman 女 wearing a beard 而: play, fool around.
+衰	decline	A garment 衣 worn round a weak mouth 口: decline.
+甩	fling	The moon 月 with a hook 乚 swinging out: fling, throw away.
+拴	tie	A hand 扌 with 全 (quán) for the sound: tie up, fasten.
+栓	plug	Wood 木 that makes it whole 全: a plug.
+涮	rinse	Water 氵 with 刷 (shuā) for the sound: rinse; dip in a hot pot.
+霜	frost	Rain 雨 inter- 相 frozen: frost.
+瞬	blink	An eye 目 as quick as a flower 舜: blink.
+烁	sparkle	The happy 乐 light of a flame 火: sparkle.
+丝	silk	Two threads on one 一 line: silk, fine thread.
+斯	this	His 其 axe 斤: this, used for sounds.
+撕	tear	A hand 扌 with 斯 (sī) for the sound: tear, rip.
+伺	visit	A person 亻 before the director 司: visit, ask humbly.
+祀	worship	An altar 礻 with 巳 (sì) for the sound: sacrifice, worship.
+饲	feed	Food 饣 with 司 (sī) for the sound: feed animals.
+肆	unrestrained	Long 镸 hair and a brush 聿: unrestrained; four.
+耸	tower	An ear 耳 with 从 (cóng) for the sound: tower up; shrug.
+讼	lawsuit	Words 讠 with 公 (gōng) for the sound: a lawsuit.
+宋	Song	A building 宀 of wood 木: the Song dynasty.
+诵	recite	Words 讠 with 甬 (yǒng) for the sound: recite, read aloud.
+颂	praise	A head 页 with 公 (gōng) for the sound: praise, ode.
+艘	ship counter	A boat 舟 with 叟 (sǒu) for the sound: counter for ships.
+嗽	cough	A mouth 口 with 欶 (shuò) for the sound: cough.
+酥	crispy	Wine 酉 with grain 禾: crispy, flaky; butter.
+溯	trace back	Water 氵 to its beginning 朔: go upstream, trace back.
+蒜	garlic	A herb 艹 with 祘 (suàn) for the sound: garlic.
+髓	marrow	Bone 骨 with what fills it: marrow, essence.
+遂	accomplish	Walk 辶 with the pig 豕 to the end: accomplish.
+隧	tunnel	A place 阝 with 遂 (suì) for the sound: a tunnel.
+嗦	suck	A mouth 口 with 索 (suǒ) for the sound: suck; shiver.
+塌	collapse	Earth 土 under the sun 日 and feathers 羽 falling: collapse.
+胎	fetus	Flesh ⺼ with 台 (tái) for the sound: fetus; tire.
+汰	sift	Water 氵 that is plump 太: wash, sift.
+泰	peaceful	Water 氺 held by a dam: great, calm.
+贪	greedy	Money 贝 with 今 (jīn) for the sound: greedy.
+摊	spread out	A hand 扌 with 难 (nán) for the sound: spread out; a street stall.
+滩	beach	Water 氵 that is hard 难 (nán) to sail, also the sound: shoal, beach.
+瘫	paralyzed	Sickness 疒 with 难 (nán) for the sound: paralyzed.
+坛	altar	Earth 土 with 云 (yún) for the sound: an altar; a forum; a jar.
+痰	phlegm	Sickness 疒 with 炎 (yán) for the sound: phlegm.
+潭	deep pool	Water 氵 with 覃 (tán) for the sound: a deep pool.
+毯	blanket	Fur 毛 with 炎 (yán) for the sound: a rug, a blanket.
+炭	charcoal	Ashes 灰 from a mountain 山 fire: charcoal.
+碳	carbon	Stone 石 with 炭 (tàn), charcoal, also the sound: carbon.
+唐	Tang	A school 广 where children read 口 and write 肀: the Tang dynasty.
+塘	pond	Earth 土 with 唐 (táng) for the sound: a pond, a dike.
+膛	chest	A hall 堂 (táng) in the flesh ⺼, also the sound: chest, bore.
+倘	if	A person 亻 with 尚 (shàng) for the sound: if, supposing.
+淌	drip	Water 氵 with 尚 (shàng) for the sound: drip, flow down.
+烫	scald	Soup 汤 (tāng) on fire 火, also the sound: scalding hot; iron.
+涛	big wave	Water 氵 with 寿 (shòu) for the sound: big waves.
+滔	torrent	Water 氵 with 舀 (yǎo) for the sound: rushing, overflowing.
+陶	pottery	A mound 阝 of clay 匋 (táo), also the sound: pottery.
+淘	wash out	Water 氵 with 匋 (táo) for the sound: sift, weed out; naughty.
+腾	soar	A horse 马 with 朕 (zhèn) for the sound: gallop, soar.
+藤	vine	A plant 艹 with 滕 (téng) for the sound: vine, rattan.
+剔	pick out	A knife 刂 with 易 (yì) for the sound: pick out, scrape off.
+屉	drawer	A body 尸 over a generation 世 of things: a drawer.
+剃	shave	A knife 刂 with 弟 (dì) for the sound: shave.
+涕	tears	Water 氵 with 弟 (dì) for the sound: tears, snot.
+惕	alert	A heart 忄 with 易 (yì) for the sound: alert, watchful.
+舔	lick	A tongue 舌 with 忝 (tiǎn) for the sound: lick.
+帖	card	Cloth 巾 with 占 (zhàn) for the sound: a card, a note; fit snugly.
+廷	court	A long stride 廴 of the ninth 壬 lord: the imperial court.
+亭	pavilion	A tall roof 亠 on the street 丁: a pavilion.
+艇	rowboat	A boat 舟 for the court 廷: a rowboat.
+捅	poke	A hand 扌 with 甬 (yǒng) for the sound: poke, jab.
+桶	bucket	Wood 木 with 甬 (yǒng) for the sound: a bucket, barrel.
+筒	tube	Bamboo ⺮ with 同 (tóng) for the sound: a tube.
+凸	convex	A shape with a bump on top of the line 一: bulging, convex.
+秃	bald	Grain 禾 for hair on a head 几: bald.
+涂	smear	Water 氵 with 余 (yú) for the sound: smear, paint, scribble.
+屠	slaughter	A body 尸 with 者 (zhě) for the sound: slaughter.
+颓	decline	A bald 秃 (tū) head 页, also the sound: decline, dejected.
+屯	barracks	A sprout 屮 pushing through the ground: a camp, barracks.
+驮	carry	A horse 马 with something big 大 (dà), also the sound: carry on the back.
+妥	proper	A hand 爫 calming a woman 女: secure, proper.
+拓	clear land	A hand 扌 moves the stone 石: clear the land.
+唾	saliva	From the mouth 口 it droops 垂: saliva.
+蛙	frog	An insect 虫 with 圭 (guī) for the sound: frog.
+瓦	tile	A drawing of curved roof tiles fitting together: tile, pottery.
+歪	crooked	Not 不 straight 正: crooked.
+丸	round	Nine 九 with a dot 丶 rolling in its arms: round, a ball.
+挽	pull	A hand 扌 with 免 (miǎn) for the sound: pull, hold back.
+惋	regret	A heart 忄 with 宛 (wǎn) for the sound: feel sorry.
+婉	graceful	A woman 女 with 宛 (wǎn) for the sound: graceful, tactful.
+腕	wrist	Flesh ⺼ with 宛 (wǎn) for the sound: wrist.
+汪	vast	Water 氵 with 王 (wáng) for the sound: vast, deep; woof.
+枉	in vain	A tree 木 with 王 (wáng) for the sound: crooked; in vain.
+妄	delusion	A woman 女 who has died 亡: a delusion.
+伪	fake	A person 亻 doing 为 (wèi), also the sound: fake.
+纬	latitude	Thread 纟 with 韦 for the sound: the weft; latitude.
+萎	wither	Grass 艹 given to the committee 委: wither.
+畏	awe	A field 田 over a bowed man on one 一 line: fear, awe.
+魏	Wei	A ghost 鬼 with 委 (wěi) for the sound: the state of Wei.
+瘟	plague	Sickness 疒 with 昷 (wēn) for the sound: plague.
+纹	pattern	Thread 纟 with 文 (wén) for the sound: lines, pattern.
+蚊	mosquito	An insect 虫 that writes 文 on your skin: a mosquito.
+吻	kiss	A mouth 口 with 勿 (wù) for the sound: kiss; lips.
+紊	disorder	Thread 糸 with 文 (wén) for the sound: tangled, disorderly.
+翁	old man	A public 公 man with feather 羽 hair: a venerable old man.
+涡	whirlpool	Water 氵 with 呙, a mouth: a whirlpool.
+窝	nest	A cave 穴 with 呙 (guō) for the sound: a nest, den.
+沃	fertile	Water 氵 on a young 夭 field: fertile.
+巫	shaman	Work 工 by people 从 with a divining rod: shaman, witch.
+呜	sob	A mouth 口 with 乌 (wū) for the sound: sobbing sound; hoot.
+吴	Wu	A mouth 口 over a person with a bent head 天: the state of Wu.
+侮	insult	A person 亻 who treats each 每 one with scorn: insult.
+捂	cover	A hand 扌 with 吾 (wú) for the sound: cover up, seal.
+勿	do not	A knife 勹 cutting bits 丿 off: do not.
+晤	meet	The sun 日 with 吾 (wú) for the sound: meet face to face.
+雾	fog	Rain 雨 with 务 (wù) for the sound: fog, mist.
+昔	past	Twenty 廿 days 日 ago: the past.
+晰	clear	The sun 日 with 析 (xī) for the sound: clear.
+稀	sparse	Grain 禾 with 希 (xī) for the sound: sparse, rare; watery.
+锡	tin	Metal 钅 with 易 (yì) for the sound: tin.
+溪	stream	Water 氵 with 奚 (xī) for the sound: a stream.
+熙	bright	Fire 灬 with 巸 (yí) for the sound: bright, prosperous.
+熄	put out	To end 息 (xī) a fire 火, also the sound: put out.
+膝	knee	Flesh ⺼ with 桼 (qī) for the sound: knee.
+嬉	play	A woman 女 who is happy 喜 (xǐ), also the sound: play.
+袭	raid	A dragon 龙 over clothes 衣 (yī), the sound: raid; inherit.
+媳	daughter-in-law	A woman 女 with 息 (xī) for the sound: daughter-in-law.
+隙	crack	A crack 日 between small 小 parts by a wall 阝: a gap.
+虾	shrimp	A sea creature 虫 with 下 (xià) for the sound: shrimp.
+瞎	blind	Hurt 害 (hài) eyes 目, also the sound: blind; recklessly.
+侠	hero	A person 亻 with 夹 (jiā) for the sound: a knight-errant.
+峡	gorge	The space between 夹 (jiā) mountains 山, also the sound: a gorge.
+狭	narrow	A dog 犭 with 夹 (jiā) for the sound: narrow.
+辖	govern	A cart 车 with 害 (hài) for the sound: the wheel pin; govern.
+霞	rosy clouds	Rain 雨 with 叚 (jiǎ) for the sound: rosy clouds at dawn or dusk.
+仙	hermit	A person 亻 on the mountain 山: a hermit, a sage.
+纤	fine	Silk 纟 with 千 (qiān) for the sound: fine, slender; fiber.
+掀	lift	A hand 扌 with 欣 (xīn) for the sound: lift a lid, stir up.
+贤	virtuous	A hand 又 holding money 贝 wisely: virtuous, able.
+弦	bowstring	A bow 弓 with a mysterious 玄 string: bowstring.
+衔	rank	Metal 钅 bit held as you go 行 (xíng), the sound: hold in the mouth; a rank.
+宪	constitution	A roof 宀 with 先 (xiān) for the sound: a constitution.
+馅	filling	Food 饣 in a pit 臽 (xiàn), also the sound: filling.
+羡	envy	A row 次 of sheep 羊 someone else owns: envy, admire.
+腺	gland	Flesh ⺼ with 泉 (quán), a spring, for the sound: gland.
+厢	wing	A building 厂 with 相 (xiāng) for the sound: a side room, a box.
+镶	inlay	Metal 钅 with 襄 (xiāng) for the sound: inlay, set.
+翔	glide	Wings 羽 with 羊 (yáng) for the sound: soar, glide.
+巷	alley	Shared 共 paths between houses 巳: an alley.
+橡	rubber	A tree 木 with 象 (xiàng) for the sound: oak; rubber.
+肖	resemble	Small ⺌ (xiǎo) for the sound, flesh ⺼ alike: resemble.
+削	shave	A knife 刂 shaves it till it resembles 肖 the model: whittle.
+宵	night	A roof 宀 with 肖 (xiào) for the sound: night.
+萧	desolate	Grass 艹 over a solemn 肃 scene: desolate, bleak.
+潇	wind and rain	Water 氵 with 萧 (xiāo) for the sound: wind and rain; free and easy.
+淆	confuse	Water 氵 with 肴 (yáo) for the sound: mixed up.
+孝	filial piety	A child 子 carrying the old 耂: filial piety.
+啸	howl	A mouth 口 with 肃 (sù) for the sound: howl, roar, whistle.
+邪	evil	A tooth 牙 by a town 阝: evil, wicked.
+挟	hold under the arm	Pressed 夹 (jiā) by the hand 扌, also the sound: hold tight; coerce.
+携	carry	A hand 扌 with 隽 (juàn) for the sound: carry, take along.
+泄	leak	Water 氵 with 世 (shì) for the sound: leak, let out.
+泻	pour out	Water 氵 with 写 (xiě) for the sound: pour out; diarrhea.
+卸	wholesale	At noon 午 the kneeling 卩 man unloads: wholesale.
+屑	crumbs	A body 尸 with 肖 (xiào) for the sound: crumbs, bits.
+懈	slack	A heart 忄 with 解 (jiě) for the sound: slack, lax.
+芯	wick	Grass 艹 with a heart 心: a wick, core.
+馨	fragrant	Incense 香 with 殸 (qìng) for the sound: fragrant.
+衅	quarrel	Blood 血 with 半 (bàn) for the sound: a quarrel, provocation.
+猩	ape	An animal 犭 with 星 (xīng) for the sound: ape.
+腥	fishy smell	Meat ⺼ with 星 (xīng) for the sound: a fishy smell.
+刑	punish	A frame 开 and a knife 刂: punish.
+汹	surging	Water 氵 with 凶 (xiōng) for the sound: turbulent, surging.
+羞	shame	A sheep 羊 and an ox 丑: feel ashamed.
+朽	decay	A tree 木 bent 丂 with age: decay.
+绣	embroider	Thread 纟 with 秀 (xiù) for the sound: embroider.
+锈	rust	Metal 钅 with 秀 (xiù) for the sound: rust.
+嗅	sniff	A mouth 口 and nose on an odor 臭 (chòu), also the sound: sniff.
+墟	ruins	Earth 土 with 虚 (xū) for the sound: ruins; a village market.
+徐	slowly	Step 彳 with too much 余 to carry: slowly.
+旭	rising sun	The sun 日 with 九 (jiǔ) for the sound: the rising sun.
+叙	narrate	Too much 余 in hand 又 to tell: narrate.
+恤	pity	A heart 忄 with 血 (xuè) for the sound: pity, relieve; a T-shirt.
+酗	drunken	A dangerous 凶 drunk 酉: drink to excess.
+絮	fluff	Thread 糸 with 如 (rú) for the sound: cotton fluff; long-winded.
+婿	son-in-law	A woman 女 with 胥 (xū) for the sound: son-in-law.
+蓄	amass	Grass 艹 for the livestock 畜: amass, store.
+喧	noisy	A mouth 口 with 宣 (xuān) for the sound: noisy.
+玄	mysterious	A thread 幺 under a lid 亠: mysterious, black.
+炫	dazzle	Fire 火 with 玄 (xuán) for the sound: dazzle; show off.
+靴	shoes	Leather 革 that changes 化 your feet: shoes.
+穴	hole	A roof 宀 over eight 八 legs crawling in: a hole.
+勋	merit	Strength 力 with 员 (yuán) for the sound: a great deed, merit.
+熏	smoke	Fire 灬 below smoke rising: smoke, cure with smoke.
+旬	ten-day period	Wrap 勹 the sun 日: a ten-day period, the season.
+巡	patrol	Walk 辶 along the river 巛: patrol.
+汛	flood season	Water 氵 with 卂 (xùn) for the sound: high water.
+驯	tame	A horse 马 with 川 (chuān) for the sound: tame.
+逊	modest	Walking 辶 with 孙 (sūn) for the sound: modest; inferior.
+丫	fork	A line 丨 that forks at the top 丷: fork; girl.
+鸦	crow	A bird 鸟 with 牙 (yá) for the sound: crow.
+芽	bud	A plant 艹 with a tusk 牙 poking out: bud.
+崖	cliff	A mountain 山 precipice 厓 (yá), also the sound: cliff.
+涯	shore	Water 氵 with 厓 (yá) for the sound: shore, limit.
+哑	mute	A mouth 口 with 亚 (yà) for the sound: mute, hoarse.
+雅	elegant	A fang 牙 and a bird 隹: gracious, elegant.
+讶	surprised	Words 讠 with 牙 (yá) for the sound: surprised.
+咽	throat	A mouth 口 and the cause 因 of choking: the throat.
+淹	drown	Water 氵 with 奄 (yǎn) for the sound: flood, drown.
+岩	boulder	A stone 石 as big as a mountain 山: boulder.
+阎	Yan	A gate 门 with 臽 (xiàn) for the sound: a village gate; Yama.
+衍	spread	Water 氵 going 行 every way: overflow, spread out.
+掩	cover	A hand 扌 with 奄 (yǎn) for the sound: cover, hide.
+雁	wild goose	A bird 倠 flying by a cliff 厂: wild goose.
+焰	flame	Fire 火 with 臽 (xiàn) for the sound: flame.
+燕	swallow	A head 廿, body 口, wings 北 and tail 灬: a swallow.
+殃	disaster	Death 歹 with 央 (yāng) for the sound: disaster.
+秧	seedling	Rice 禾 with 央 (yāng) for the sound: rice seedlings.
+杨	poplar	A tree 木 with 昜, bright: poplar, willow.
+痒	itch	Sickness 疒 with 羊 (yáng) for the sound: itch.
+漾	ripple	Water 氵 with 羕 (yàng) for the sound: ripple.
+妖	bewitching	A woman 女 with a young 夭 head bent: bewitching.
+窑	kiln	A cave 穴 where jars 缶 are fired: kiln.
+谣	rumor	Words 讠 with 䍃 (yóu) for the sound: rumor; ballad.
+遥	far	Walking 辶 with 䍃 (yóu) for the sound: far away.
+钥	key	Metal 钅 with 月 (yuè) for the sound: key.
+椰	coconut	A tree 木 with 耶 (yé) for the sound: coconut palm.
+冶	smelt	Ice 冫 melts beside the pedestal 台 furnace: smelt metal.
+伊	he, she	A person 亻 with 尹 (yǐn) for the sound: he, she; used for sounds.
+夷	foreign tribes	A big 大 man with a bow 弓: ancient foreign tribes.
+怡	joyful	A heart 忄 with 台 (tái) for the sound: joyful, pleasant.
+矣	particle	A self 厶 over an arrow 矢: a classical ending particle.
+倚	lean on	A person 亻 with 奇 (qí) for the sound: lean on, rely on.
+屹	tower	A mountain 山 with 乞 (qǐ) for the sound: stand tall.
+亦	also	A man under a lid 亠, arms out with marks by his sides: also.
+抑	repress	A hand 扌 with 卬 (áng) for the sound: press down.
+役	duty	Steps 彳 taken carrying a weapon 殳: duty, role.
+绎	unravel	Thread 纟 drawn out: unravel, interpret.
+弈	board game	Two hands 廾 with 亦 (yì) for the sound: play chess or go.
+疫	epidemic	Sickness 疒 that strikes like a weapon 殳: an epidemic.
+逸	escape	Walking 辶 away like a rabbit 兔: escape; leisure.
+裔	descendants	Clothes 衣 (yī) for the sound with 冏: descendants.
+溢	overflow	Water 氵 with 益 (yì) for the sound: overflow.
+毅	resolute	A weapon 殳 with 豙 (yì) for the sound: firm, resolute.
+翼	wing	Feathers 羽 on something uncommon 異: a wing.
+荫	shade	A tree's 艹 shade 阴 (yīn), also the sound: shade, shelter.
+姻	matrimony	A woman 女 and the cause 因 that binds two families: matrimony.
+殷	abundant	A hand with a tool 殳 by a woman 㐆 (yǐn), the sound: abundant, eager.
+瘾	addiction	Sickness 疒 that hides 隐 (yǐn), also the sound: addiction.
+婴	baby	A woman 女 under shell 贝 necklaces: a baby.
+鹰	eagle	A bird 鸟 under a roof 广 with 倠: eagle, hawk.
+荧	glimmer	Grass 艹 and a cover 冖 over fire 火: glimmer.
+盈	full	A dish 皿 with 夃 heaped on top: full, surplus.
+莹	lustrous	Grass 艹, a cover 冖 and jade 玉: lustrous like a gem.
+蝇	fly	Insects 虫 that frogs 黾 eat: a fly.
+颖	clever	A spoon 匕 for the sound, grain 禾 and a head 页: clever; a rice tip.
+佣	servant	A person 亻 put to use 用 (yòng), also the sound: hire; a servant.
+庸	ordinary	A roof 广, a hand 彐 and 用 (yòng) for the sound: ordinary.
+咏	chant	A mouth 口 with 永 (yǒng) for the sound: chant, sing.
+涌	gush	Water 氵 with 甬 (yǒng) for the sound: gush, surge.
+踊	leap	A foot 足 with 甬 (yǒng) for the sound: leap.
+悠	leisurely	A heart 心 with 攸 (yōu) for the sound: long, leisurely.
+佑	bless	A person 亻 with 右 (yòu) for the sound: help, bless.
+诱	lure	Elegant 秀 (xiù) words 讠, also the sound: lure, tempt.
+渔	fish	Catching fish 鱼 (yú) in water 氵, also the sound: to fish.
+逾	exceed	Walking 辶 with 俞 (yú) for the sound: go beyond.
+渝	change	Water 氵 with 俞 (yú) for the sound: change; Chongqing.
+愚	foolish	A monkey 禺 heart 心: foolish.
+舆	carriage	A cart 车 lifted 舁 on shoulders: a carriage; the public.
+屿	islet	A mountain 山 with 与 (yǔ) for the sound: a small island.
+驭	drive	A horse 马 with a hand 又 (yòu) for the sound: drive, control.
+郁	gloomy	A town 阝 with 有 (yǒu) for the sound: lush; gloomy.
+吁	sigh	A mouth 口 with 于 (yú) for the sound: sigh; appeal.
+狱	prison	Two dogs 犭犬 guarding words 讠: prison.
+浴	bathe	Water 氵 in the valley 谷: bathe.
+喻	metaphor	A mouth 口 with 俞 (yú) for the sound: explain; a metaphor.
+御	resist	A step 彳 with 卸 (xiè) for the sound: drive; resist; royal.
+寓	reside	A roof 宀 with 禺 (yú) for the sound: reside; imply.
+裕	abundant	Clothes 衤 filling a valley 谷: abundant.
+愈	heal	A heart 心 with 俞 (yú) for the sound: heal; more and more.
+冤	injustice	A rabbit 兔 trapped under a cover 冖: injustice.
+渊	abyss	Water 氵 whirling deep in a pool: abyss, deep.
+袁	Yuan	A person 口 wearing a long robe 衣: robe; the surname Yuan.
+曰	say	An open mouth 口 with a breath 一 coming out: to say.
+岳	peak	A hill 丘 on top of a mountain 山: a peak.
+悦	pleased	A heart 忄 with 兑 (duì) for the sound: pleased.
+粤	Cantonese	Rice 米 in an enclosure 囗 over a breath 丂: Guangdong, Cantonese.
+匀	even	A spoon 勹 measuring two equal drops 冫: even.
+陨	fall	A place 阝 with 员 (yuán) for the sound: fall from the sky.
+孕	pregnant	A woman with a child 子 inside, bent like 乃: pregnant.
+酝	brew	Wine 酉 with 云 (yún) for the sound: brew, ferment.
+韵	rhyme	A sound 音 that is even 匀 (yún), also the sound: rhyme.
+蕴	contain	Grass 艹 with 缊 (yūn) for the sound: hold inside, store.
+砸	smash	A stone 石 with 匝 (zā) for the sound: smash; fail.
+栽	plant	A tree 木 with 戈 (gē) for the sound: plant.
+宰	manage	A spicy 辛 man under the roof 宀: superintend, manage.
+攒	save up	A hand 扌 with 赞 (zàn) for the sound: save up.
+赃	loot	Money 贝 with 庄 (zhuāng) for the sound: stolen goods.
+葬	bury	Grass 艹 over the dead 死 lifted by two hands 廾: bury.
+凿	chisel	A drill 丵 making a hole 凵: chisel.
+枣	jujube	Fruit ⺀ falling from a thorny tree 朿: jujube, date.
+藻	algae	Grass 艹 with 澡 (zǎo) for the sound: algae; fine words.
+皂	soap	White 白 foam over a seven 七: soap; black.
+灶	stove	Fire 火 in a clay 土 oven: stove.
+噪	noise	The mouth 口 of chirping birds 喿 (zào), also the sound: noisy.
+燥	dry	Fire 火 with 喿 (zào) for the sound: dry.
+躁	restless	A foot 足 with 喿 (zào) for the sound: restless, rash.
+泽	marsh	Water 氵 spread wide: marsh; luster.
+贼	thief	Money 贝 (bèi) for the sound, taken with weapons 戎: thief.
+渣	dregs	Water 氵 with 查 (chá) for the sound: dregs.
+闸	floodgate	A gate 门 with 甲 (jiǎ) for the sound: floodgate; brake.
+眨	blink	An eye 目 with 乏 (fá), tired: blink.
+诈	cheat	Words 讠 with 乍 (zhà) for the sound: cheat.
+榨	press	Wood 木 with 窄 (zhǎi) for the sound: press for juice.
+窄	narrow	A cave 穴 with 乍 (zhà) for the sound: narrow.
+寨	stockade	A shelter 宀 walled with wood 木: stockade, camp.
+沾	moisten	Water 氵 with 占 (zhàn) for the sound: moisten; touch.
+粘	sticky	Rice 米 that you tell fortunes 占 with: sticky.
+瞻	gaze	An eye 目 with 詹 (zhān) for the sound: look up at.
+斩	behead	A cart 车 (chē) and an axe 斤: chop, behead.
+盏	small cup	A small 戋 (jiān) dish 皿, also the sound: small cup; lamp counter.
+崭	brand-new	A mountain 山 with 斩 (zhǎn) for the sound: towering; brand-new.
+绽	burst open	Thread 纟 with 定 (dìng) for the sound: split open, bloom.
+蘸	dip	Grass 艹 over 醮, a rite: dip in sauce or ink.
+彰	clear	A badge 章 with hair 彡 shining: clear, patent.
+仗	rely on	A person 亻 with 丈 (zhàng) for the sound: rely on; a battle.
+杖	cane	Wood 木 with 丈 (zhàng) for the sound: a walking stick.
+帐	tent	Cloth 巾 with 长 (zhǎng) for the sound: tent, curtain; account.
+胀	swell	Flesh ⺼ with 长 (zhǎng) for the sound: swell, bloat.
+沼	marsh	Water 氵 that summons 召 the frogs: a marsh.
+兆	omen	Cracks on an oracle bone, split like 儿: omen; million.
+赵	Zhao	Walking 走 with 乂: the ancient state of Zhao.
+罩	cover	A net 罒 with 卓 (zhuō) for the sound: a cover.
+肇	begin	A door 户 struck 攵 open and a brush 聿 starting to write: begin.
+遮	intercept	Walk 辶 in front of the commoners 庶: intercept.
+辙	rut	What a cart 车 leaves 育 as it moves 攵: a wheel rut.
+浙	Zhejiang	Water 氵 with 折 (zhé) for the sound: Zhejiang.
+贞	chaste	Divining ⺊ with a shell 贝: loyal, chaste.
+侦	detect	A person 亻 with 贞 (zhēn) for the sound: spy, detect.
+枕	pillow	Wood 木 under the head of a man 冘: a pillow.
+睁	open eyes	An eye 目 with 争 (zhēng) for the sound: open the eyes.
+筝	zither	Bamboo ⺮ with 争 (zhēng) for the sound: a zither; kite.
+蒸	steam	Grass 艹 over 烝 (zhēng), rising steam, also the sound: steam.
+拯	rescue	A hand 扌 that helps 丞 (chéng), also the sound: rescue.
+郑	Zheng	A town 阝 guarding a pass 关: the state of Zheng; serious.
+芝	lawn	Grass 艹 of 之 the yard: turf, lawn.
+肢	limb	Flesh ⺼ with 支 (zhī), a branch, also the sound: limb.
+脂	fat	Flesh ⺼ with 旨 (zhǐ) for the sound: fat, grease.
+旨	delicious	A spoon 匕 over the day's 日 meal: delicious, the gist.
+帜	flag	Cloth 巾 with 只 (zhī) for the sound: flag.
+峙	stand tall	A mountain 山 with 寺 (sì) for the sound: stand tall, face off.
+挚	sincere	Hands 手 held 执 (zhí) tight, also the sound: sincere.
+秩	order	Grain 禾 you must not lose 失: order.
+窒	plug up	A hole 穴 reaching the end 至: plug up.
+滞	stagnant	Water 氵 with 带 (dài) for the sound: stuck, stagnant.
+稚	young	Grain 禾 and a little bird 隹: immature, young.
+衷	heartfelt	A robe 衣 with the center 中 (zhōng), the heart, also the sound: heartfelt.
+仲	relationship	The person 亻 in the middle 中 between two friends: relationship.
+舟	boat	A boat with oars: boat.
+州	state	Islands in a stream 川: a state, a prefecture.
+洲	continent	A land 州 (zhōu) surrounded by water 氵, also the sound: continent.
+轴	axle	A cart 车 with 由 (yóu) for the sound: axle, axis.
+宙	space	A roof 宀 for what comes from 由 above: space.
+昼	noon	A measure 尺 of sun at daybreak 旦 grows to full daytime: noon.
+皱	wrinkle	Skin 皮 with 刍 (chú) for the sound: wrinkle.
+骤	sudden	A horse 马 with 聚 (jù) for the sound: gallop; sudden.
+朱	vermilion	A tree 木 with a mark 一 on its red heart: vermilion.
+株	stump	A tree 木 cut to a red 朱 stump; shares of stock.
+烛	candle	Fire 火 with 虫 (chóng) for the sound: candle.
+拄	lean on	A hand 扌 with 主 (zhǔ) for the sound: lean on a stick.
+嘱	entrust	A mouth 口 to whom you belong 属: entrust.
+瞩	gaze at	An eye 目 with 属 (shǔ) for the sound: gaze at, focus on.
+贮	store	Money 贝 kept under one 一 roof 宀: store.
+铸	cast	Metal 钅 with 寿 (shòu) for the sound: cast metal.
+爪	claw	A hand reaching down with nails: claw.
+拽	drag	A hand 扌 that tows 曳 (yè), also the sound: drag; show off.
+砖	brick	Stone 石 with 专 (zhuān) for the sound: brick.
+撰	compose	A hand 扌 with 巽 (xùn) for the sound: write, compose.
+妆	make-up	A woman 女 with 丬 for the sound: make-up.
+桩	stake	Wood 木 with 庄 (zhuāng) for the sound: stake; a matter.
+幢	building counter	Cloth 巾 with 童 (tóng) for the sound: a banner; counter for buildings.
+坠	fall	Earth 土 with 队 (duì) for the sound: fall, drop.
+缀	stitch	Thread 纟 that joins 叕 (zhuó), also the sound: stitch together.
+拙	clumsy	A hand 扌 that sticks out 出: clumsy.
+灼	burn	Fire 火 with 勺 (sháo) for the sound: burn; bright.
+卓	outstanding	Seeing ⺊ the early 早 (zǎo) dawn, also the sound: lofty, outstanding.
+浊	muddy	Water 氵 full of bugs 虫: muddy.
+酌	serve sake	A wine jar 酉 and a ladle 勺: serve sake.
+琢	carve jade	Jade 王 with 豖 (chù) for the sound: carve, polish.
+姿	figure	The woman 女 who walks next 次: a fine figure.
+兹	this	Two short threads 幺 under 八 and 一: this, now.
+滋	nourish	Water 氵 with 兹 (zī) for the sound: nourish, grow.
+踪	trace	A foot 足 leading to the shrine 宗: a footprint, trace.
+粽	rice dumpling	Rice 米 with 宗 (zōng) for the sound: a sticky rice dumpling.
+揍	beat	A hand 扌 with 奏 (zòu) for the sound: beat up.
+卒	graduate	A lid 亠 over two people 从 and ten 十 years of school: graduate.
+佐	assistant	The person 亻 at your left 左 hand: assistant.

@@ -25,7 +25,7 @@
     <string name="practice_meaning_edit">Sửa nghĩa</string>
     <string name="practice_meaning_done">Xong</string>
     <string name="study_kanji_details_title">Chi tiết chữ Hán</string>
-    <string name="study_kanji_details_description">Từ tiếng Nhật hiện từng chữ Hán với thứ tự nét, bộ phận và câu chuyện để nhớ.</string>
+    <string name="study_kanji_details_description">Từ tiếng Nhật và tiếng Trung hiện từng chữ Hán với thứ tự nét, bộ phận và câu chuyện để nhớ.</string>
     <plurals name="kanji_strokes">
         <item quantity="other">%1$d nét</item>
     </plurals>

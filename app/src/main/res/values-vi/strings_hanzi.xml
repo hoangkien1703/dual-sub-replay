@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">Chữ Hán</string>
+    <string name="hanzi_traditional">phồn thể %1$s</string>
+    <string name="hanzi_simplified">giản thể %1$s</string>
+    <string name="hanzi_part_meaning">gợi nghĩa</string>
+    <string name="hanzi_words">Từ</string>
+    <string name="hanzi_story_of_simplified">Câu chuyện để nhớ (của dạng giản thể %1$s)</string>
+    <string name="hanzi_ai_story_question">Hãy kể cho tôi một câu chuyện ngắn khác để nhớ chữ Hán %1$s trong tiếng Trung, dựa trên các bộ phận của nó, và một cách dễ nhớ pinyin và thanh điệu của nó.</string>
+</resources>

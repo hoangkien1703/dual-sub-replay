@@ -235,7 +235,7 @@ object LanguageAwareTokenizer {
     private fun isEnglishCode(languageCode: String?): Boolean =
         languageCode?.lowercase(Locale.ROOT)?.let { it == "en" || it.startsWith("en-") || it.startsWith("en_") } == true
 
-    private fun isChineseCode(languageCode: String?): Boolean =
+    internal fun isChineseCode(languageCode: String?): Boolean =
         languageCode?.lowercase(Locale.ROOT)?.let { it == "zh" || it.startsWith("zh-") || it.startsWith("zh_") } == true
 
     /** Japanese by its language code, or by kana in text whose language is unknown or not Chinese. */

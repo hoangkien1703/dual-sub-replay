@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">Characters</string>
+    <string name="hanzi_hsk_level" translatable="false">HSK %1$d</string>
+    <string name="hanzi_hsk_advanced" translatable="false">HSK 7–9</string>
+    <string name="hanzi_traditional">traditional %1$s</string>
+    <string name="hanzi_simplified">simplified %1$s</string>
+    <string name="hanzi_part_meaning">meaning</string>
+    <string name="hanzi_words">Words</string>
+    <string name="hanzi_story_of_simplified">Memory story (for the simplified form %1$s)</string>
+    <string name="hanzi_ai_story_question">Give me another short memory story for the Chinese character %1$s, built from its parts, and an easy way to remember its pinyin and tone.</string>
+</resources>

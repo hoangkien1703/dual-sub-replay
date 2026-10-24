@@ -35,6 +35,10 @@ Kanji details on the word card use these data files (not under the Apache Licens
   shared under the same licences. The memory stories and radical names are written for this app
   and are under its MIT licence.
 
+Chinese character details use Make Me a Hanzi (stroke order under the Arphic Public License,
+character facts under the GNU LGPL 3.0 or later), the HSK 3.0 character list (MIT) and Unihan
+(Unicode License). Their full notices are in the Chinese character data licence (hanzi.txt).
+
 Source and full notices: https://github.com/hoangkien1703/dual-sub-replay/blob/main/THIRD_PARTY_NOTICES.md
 
 

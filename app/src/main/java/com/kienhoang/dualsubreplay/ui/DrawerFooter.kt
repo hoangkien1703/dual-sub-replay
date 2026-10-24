@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** The app's licence, the libraries' notices, then the ML Kit translation terms. */
-internal val LICENSE_ASSETS = listOf("licenses/MIT.txt", "licenses/libraries.txt", "licenses/translation.txt")
+internal val LICENSE_ASSETS =
+    listOf("licenses/MIT.txt", "licenses/libraries.txt", "licenses/hanzi.txt", "licenses/translation.txt")
 
 internal const val PROJECT_REPOSITORY_URL = "https://github.com/hoangkien1703/dual-sub-replay"
 
