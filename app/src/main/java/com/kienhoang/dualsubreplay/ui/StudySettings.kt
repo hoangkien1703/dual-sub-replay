@@ -20,6 +20,12 @@ internal const val KNOWN_WORDS_PREFERENCE = "known_words_mode"
 internal const val KNOWN_WORDS_AFTER_PREFERENCE = "known_words_after"
 internal const val MARK_NEW_WORDS_PREFERENCE = "mark_new_words"
 internal const val ANKIDROID_PREFERENCE = "ankidroid_enabled"
+
+/** Where Send to sends words: the last app picked on the button's list or in Settings. */
+internal const val SEND_TO_APP_PREFERENCE = "send_to_app"
+
+/** The AnkiConnect deck picked in Settings, or absent for Automatic. */
+internal const val ANKICONNECT_DECK_PREFERENCE = "ankiconnect_deck"
 internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
 internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
 
@@ -39,6 +45,8 @@ internal val STUDY_SETTING_KEYS =
         KNOWN_WORDS_AFTER_PREFERENCE,
         MARK_NEW_WORDS_PREFERENCE,
         ANKIDROID_PREFERENCE,
+        SEND_TO_APP_PREFERENCE,
+        ANKICONNECT_DECK_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
@@ -87,6 +95,21 @@ internal enum class KnownWordsMode(
     OFF("off", R.string.study_known_words_off),
 }
 
+/**
+ * The flashcard app the Send to button sends to (owner decision 2026-10-23): AnkiDroid by default,
+ * or AnkiConnect, which Yomitan, asbplayer and other tools also use. Its name is a brand name.
+ */
+internal enum class FlashcardApp(
+    val storageValue: String,
+    @StringRes val nameRes: Int,
+) {
+    ANKIDROID("ankidroid", R.string.study_app_ankidroid),
+    ANKICONNECT("ankiconnect", R.string.study_app_ankiconnect),
+}
+
+internal fun storedFlashcardApp(value: String?): FlashcardApp =
+    FlashcardApp.entries.firstOrNull { it.storageValue == value } ?: FlashcardApp.ANKIDROID
+
 /** How many played lines Automatic known words needs to count a word as known. */
 internal val KNOWN_WORDS_AFTER_CHOICES = listOf(5, 10, 20)
 
@@ -110,6 +133,8 @@ internal data class StudySettings(
     val knownWordsAfter: Int = DEFAULT_KNOWN_WORDS_AFTER,
     val markNewWords: Boolean = false,
     val ankiDroid: Boolean = true,
+    val sendTo: FlashcardApp = FlashcardApp.ANKIDROID,
+    val ankiConnectDeck: String? = null,
     val blurBox: Boolean = false,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
@@ -138,6 +163,8 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         knownWordsAfter = storedKnownWordsAfter(preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, DEFAULT_KNOWN_WORDS_AFTER)),
         markNewWords = preferences.getBoolean(MARK_NEW_WORDS_PREFERENCE, false),
         ankiDroid = preferences.getBoolean(ANKIDROID_PREFERENCE, true),
+        sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
+        ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),
     )

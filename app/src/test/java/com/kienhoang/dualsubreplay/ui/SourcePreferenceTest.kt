@@ -1,7 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -39,6 +41,27 @@ class SourcePreferenceTest {
         assertTrue(shouldResetPlaybackClock(previousVideoId = null, newVideoId = "abc123"))
         assertTrue(shouldResetPlaybackClock(previousVideoId = "old", newVideoId = "new"))
         assertFalse(shouldResetPlaybackClock(previousVideoId = "same", newVideoId = "same"))
+    }
+
+    @Test fun everyTrackIsItsOwnChoiceAndTheLoadedOneIsSelected() {
+        val tracks =
+            listOf(
+                CaptionLanguage("ja", "日本語 (自動生成)", "a.ja", generated = true),
+                CaptionLanguage("ja", "日本語", ".ja"),
+            )
+        val choices = sourceLanguageChoices(tracks, "Auto (recommended)")
+
+        assertEquals(listOf("auto", "track:a.ja", "track:.ja"), choices.map { it.code })
+        assertEquals(tracks[0], pickedCaptionTrack("track:a.ja", tracks))
+        assertNull(pickedCaptionTrack("track:.en", tracks))
+        assertNull(pickedCaptionTrack("ja", tracks))
+
+        val loaded = DualSubUiState(sourcePreference = "ja", availableSourceLanguages = tracks, loadedTrackId = "a.ja")
+        assertEquals("track:a.ja", sourceChoiceSelection(loaded))
+        assertEquals("日本語 (自動生成)", sourceLanguageLabel(sourceChoiceSelection(loaded), choices, "Auto", java.util.Locale.JAPANESE))
+        assertEquals("auto", sourceChoiceSelection(loaded.copy(sourcePreference = "auto")))
+        // While the next transcript loads, the chosen language stands in.
+        assertEquals("ja", sourceChoiceSelection(loaded.copy(availableSourceLanguages = emptyList())))
     }
 
     private fun availableLanguages() = listOf(

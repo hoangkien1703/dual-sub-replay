@@ -291,15 +291,33 @@ internal fun captionCandidateUrls(baseUrl: String): List<HttpUrl> {
 internal fun isGeneratedTrack(track: JSONObject): Boolean =
     track.optString("kind") == "asr" || track.optString("vssId").startsWith("a.")
 
+/** YouTube's id of [track] (`vssId`); a track without one gets the id YouTube would give it. */
+internal fun captionTrackId(track: JSONObject): String =
+    track.optString("vssId").ifBlank {
+        val code = track.optString("languageCode")
+        if (code.isBlank()) "" else (if (isGeneratedTrack(track)) "a." else ".") + code
+    }
+
 private fun baseLanguage(track: JSONObject): String =
     track.optString("languageCode").substringBefore('-').lowercase()
 
+/**
+ * A romanized track, such as `ja-Latn` ("Japanese (Latin) - Romaji"): same base language as the
+ * real captions, but written in Latin letters, so it is never the one to study or translate.
+ */
+internal fun isRomanizedTrack(track: JSONObject): Boolean =
+    track.optString("languageCode").split('-').drop(1).any { it.equals("Latn", ignoreCase = true) }
+
 private fun JSONArray.objects(): List<JSONObject> = (0 until length()).mapNotNull(::optJSONObject)
 
-/** The user's explicit source languages (empty for Auto) and the language they study, if known. */
+/**
+ * The user's explicit source languages (empty for Auto), the language they study, if known, and
+ * the track they picked for this video, if any.
+ */
 internal data class CaptionLanguageChoice(
     val preferred: List<String>,
     val learning: String?,
+    val track: String? = null,
 )
 
 /**
@@ -401,33 +419,46 @@ internal fun spokenCaptionLanguage(
 }
 
 /**
- * An explicit source-language choice wins, then the spoken language, then any other track.
- * Within a language a creator-written track beats the auto-generated one.
+ * The track the user picked ([preferredTrack]) wins while the video has it. Otherwise an explicit
+ * source-language choice wins, then the spoken language, then any other track. Within a language
+ * a creator-written track beats the auto-generated one, and a romanized track comes last: a
+ * Japanese video with only auto-generated Japanese and a creator's Romaji track gets the Japanese one.
  */
 internal fun selectCaptionTrack(
     renderer: JSONObject,
     preferredLanguages: List<String>,
     videoDetails: JSONObject? = null,
     learningLanguage: String? = null,
+    preferredTrack: String? = null,
 ): JSONObject? {
+    val tracks = renderer.optJSONArray("captionTracks")?.objects().orEmpty()
+    preferredTrack?.takeIf(String::isNotBlank)?.let { id -> tracks.firstOrNull { captionTrackId(it) == id }?.let { return it } }
     val normalized = preferredLanguages.map { it.substringBefore('-').lowercase() }
     val spoken = spokenCaptionLanguage(renderer, videoDetails, learningLanguage)
-    return renderer.optJSONArray("captionTracks")?.objects().orEmpty().maxByOrNull { track ->
+    return tracks.maxByOrNull { track ->
         val language = baseLanguage(track)
         val preferenceIndex = normalized.indexOf(language)
         val preferenceScore = if (preferenceIndex >= 0) 1_000 - preferenceIndex * 100 else 0
         val spokenScore = if (language == spoken) 500 else 0
         val manualScore = if (isGeneratedTrack(track)) 0 else 20
-        preferenceScore + spokenScore + manualScore
+        val romanizedScore = if (isRomanizedTrack(track)) -40 else 0
+        preferenceScore + spokenScore + manualScore + romanizedScore
     }
 }
 
-/** The languages of [tracks], one per base language, named as YouTube names them. */
-internal fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> =
-    (0 until tracks.length())
-        .mapNotNull(tracks::optJSONObject)
-        .mapNotNull { track ->
-            val code = track.optString("languageCode").takeIf(String::isNotBlank) ?: return@mapNotNull null
+/**
+ * Every caption track of [tracks], named as YouTube names them, so the user can pick any of them
+ * (creator-written or auto-generated, Simplified or Traditional Chinese, each English version). A
+ * romanized track (Romaji, pinyin) is left out while its language has another track: Google
+ * Translate returns romanized lines unchanged, so it would give no translation.
+ */
+internal fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> {
+    val all = (0 until tracks.length()).mapNotNull(tracks::optJSONObject).filter { it.optString("languageCode").isNotBlank() }
+    val written = all.filterNot(::isRomanizedTrack).map(::baseLanguage).toSet()
+    return all
+        .filterNot { isRomanizedTrack(it) && baseLanguage(it) in written }
+        .map { track ->
+            val code = track.optString("languageCode")
             CaptionLanguage(
                 code = code,
                 name =
@@ -436,8 +467,11 @@ internal fun availableLanguages(tracks: JSONArray): List<CaptionLanguage> =
                         ?.let(::captionName)
                         .orEmpty()
                         .ifBlank { code.uppercase() },
+                trackId = captionTrackId(track),
+                generated = isGeneratedTrack(track),
             )
-        }.distinctBy { it.code.substringBefore('-').lowercase() }
+        }.distinctBy { it.trackId }
+}
 
 private fun captionName(name: JSONObject): String {
     name.optString("simpleText").takeIf(String::isNotBlank)?.let { return it }
@@ -504,13 +538,14 @@ class YouTubeCaptionProvider(
         videoId: String,
         preferredLanguages: List<String>,
         learningLanguage: String?,
+        preferredTrack: String?,
     ): CaptionTrackResult =
         withContext(Dispatchers.IO) {
             val deadlineNanos =
                 System.nanoTime() +
                     TimeUnit.MILLISECONDS.toNanos(CAPTION_LOOKUP_TIMEOUT_MS)
             try {
-                fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), deadlineNanos)
+                fetchInternal(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage, preferredTrack), deadlineNanos)
             } catch (error: CancellationException) {
                 // Never turn a cancelled/replaced load into a caption failure. The
                 // ViewModel uses cancellation whenever the video or language changes.
@@ -722,7 +757,7 @@ class YouTubeCaptionProvider(
                 ?: throw NoCaptionTracksException(noTracksMessage)
 
         val selected =
-            selectCaptionTrack(renderer, languages.preferred, root.optJSONObject("videoDetails"), languages.learning)
+            selectCaptionTrack(renderer, languages.preferred, root.optJSONObject("videoDetails"), languages.learning, languages.track)
                 ?: throw NoCaptionTracksException("No compatible caption track was found.")
         val cues =
             fetchCaptionCues(
@@ -736,6 +771,7 @@ class YouTubeCaptionProvider(
             isGenerated = isGeneratedTrack(selected),
             cues = cues,
             availableLanguages = availableLanguages(tracks),
+            trackId = captionTrackId(selected),
         )
     }
 

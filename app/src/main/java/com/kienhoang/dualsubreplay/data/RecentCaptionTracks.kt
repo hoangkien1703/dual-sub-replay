@@ -25,12 +25,14 @@ internal class RecentCaptionTracks(
         videoId: String,
         preferredLanguages: List<String>,
         learningLanguage: String?,
+        preferredTrack: String?,
     ): CaptionTrackResult {
-        // The learning language can change which track Auto picks, so it is part of the entry.
-        val languages = preferredLanguages + listOfNotNull(learningLanguage?.let { "learning:$it" })
+        // The learning language and a picked track change which track comes back, so they are part of the entry.
+        val languages =
+            preferredLanguages + listOfNotNull(learningLanguage?.let { "learning:$it" }, preferredTrack?.let { "track:$it" })
         val key = key(videoId, languages)
         read(key, videoId, languages)?.let { return it }
-        val track = delegate.fetch(videoId, preferredLanguages, learningLanguage)
+        val track = delegate.fetch(videoId, preferredLanguages, learningLanguage, preferredTrack)
         write(key, videoId, languages, track)
         return track
     }
@@ -121,7 +123,9 @@ internal class RecentCaptionTracks(
 
     private companion object {
         // 2: Auto also weighs the title's script and the learning language; older picks are dropped.
-        const val VERSION = 2
+        // 3: a Romaji (ja-Latn) track no longer beats the Japanese one; saved Romaji picks are dropped.
+        // 4: every track is listed with its id, and the loaded track's id is kept.
+        const val VERSION = 4
         val KEY_PATTERN = Regex("[a-f0-9]{64}")
     }
 }
@@ -140,10 +144,19 @@ private fun encodeTrack(track: CaptionTrackResult): JSONObject {
         )
     }
     val languages = JSONArray()
-    track.availableLanguages.forEach { languages.put(JSONArray().put(it.code).put(it.name)) }
+    track.availableLanguages.forEach {
+        languages.put(
+            JSONArray()
+                .put(it.code)
+                .put(it.name)
+                .put(it.trackId)
+                .put(it.generated),
+        )
+    }
     return JSONObject()
         .put("languageCode", track.languageCode)
         .put("generated", track.isGenerated)
+        .put("trackId", track.trackId)
         .put("available", languages)
         .put("cues", cues)
 }
@@ -172,8 +185,9 @@ private fun decodeTrack(entry: JSONObject): CaptionTrackResult {
         availableLanguages =
             List(languages.length()) { index ->
                 val language = languages.getJSONArray(index)
-                CaptionLanguage(language.getString(0), language.getString(1))
+                CaptionLanguage(language.getString(0), language.getString(1), language.optString(2), language.optBoolean(3))
             },
+        trackId = entry.optString("trackId"),
     )
 }
 

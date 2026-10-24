@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -22,6 +23,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
@@ -99,6 +101,11 @@ class StudyToolsUiTest {
             assertEquals("off", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
             assertEquals(20, preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, 0))
         }
+        // Send to: AnkiDroid by default; AnkiConnect adds its deck choice.
+        composeRule.onNodeWithTag("send_to_app_ankiconnect").performScrollTo().performClick()
+        composeRule.onNodeWithTag("ankiconnect_choose_deck").performScrollTo().assertIsDisplayed()
+        composeRule.runOnIdle { assertEquals("ankiconnect", preferences.getString(SEND_TO_APP_PREFERENCE, null)) }
+        saveUiEvidence("study-tools-send-to-settings")
         // Page tokens: Automatic by default, then On.
         composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
@@ -121,7 +128,12 @@ class StudyToolsUiTest {
             val scope = rememberCoroutineScope()
             val tools =
                 remember {
-                    StudyTools(KnownWordsRepository(File(context.cacheDir, "known-words-ui-test")), AnkiDroidNotes(context), scope).apply {
+                    StudyTools(
+                        KnownWordsRepository(File(context.cacheDir, "known-words-ui-test")),
+                        AnkiDroidNotes(context),
+                        AnkiConnectNotes.create(context),
+                        scope,
+                    ).apply {
                         settings = StudySettings(knownWordsMode = KnownWordsMode.AUTO, markNewWords = true)
                         language = "en"
                         known = setOf("i", "like")
@@ -159,6 +171,7 @@ class StudyToolsUiTest {
                     StudyTools(
                         KnownWordsRepository(File(context.cacheDir, "known-words-seen-test")),
                         AnkiDroidNotes(context),
+                        AnkiConnectNotes.create(context),
                         scope,
                     ).apply {
                         settings = StudySettings(knownWordsMode = KnownWordsMode.AUTO)
@@ -192,6 +205,7 @@ class StudyToolsUiTest {
                     StudyTools(
                         KnownWordsRepository(File(context.cacheDir, "known-words-offer-test")),
                         AnkiDroidNotes(context),
+                        AnkiConnectNotes.create(context),
                         scope,
                     ).apply {
                         wordsLanguage = "en"
@@ -214,5 +228,48 @@ class StudyToolsUiTest {
             assertEquals("auto", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
             assertTrue(preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false))
         }
+    }
+
+    @Test
+    fun theSendToButtonListsTheAppsAndRemembersThePick() {
+        val selection =
+            LearningWordSelection(AnalyzedToken("cats", 7, 11, PartOfSpeech.NOUN), "en", "vi", null, null, translated = false)
+        lateinit var tools: StudyTools
+        composeRule.setContent {
+            val scope = rememberCoroutineScope()
+            tools =
+                remember {
+                    StudyTools(
+                        KnownWordsRepository(File(context.cacheDir, "known-words-send-to-test")),
+                        AnkiDroidNotes(context),
+                        AnkiConnectNotes.create(context),
+                        scope,
+                    ).apply { ankiInstalled = true }
+                }
+            CompositionLocalProvider(LocalStudyTools provides tools) {
+                DualSubTheme {
+                    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        Column(Modifier.padding(12.dp)) { StudyWordActions(selection, "mèo") }
+                    }
+                }
+            }
+        }
+
+        composeRule.onNodeWithText("Send to AnkiDroid").assertIsDisplayed()
+        composeRule.onNodeWithTag("send_to_menu").performClick()
+        composeRule.onNodeWithTag("send_to_option_ankidroid").assertIsDisplayed()
+        composeRule.onNodeWithTag("send_to_option_ankiconnect").assertIsDisplayed()
+        saveUiEvidence("study-send-to-menu")
+        // Nothing serves AnkiConnect on the test phone, so the card says so.
+        composeRule.onNodeWithTag("send_to_option_ankiconnect").performClick()
+        composeRule.runOnIdle {
+            assertEquals("ankiconnect", preferences.getString(SEND_TO_APP_PREFERENCE, null))
+            tools.settings = tools.settings.copy(sendTo = FlashcardApp.ANKICONNECT)
+        }
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodes(hasText("Nothing answered", substring = true)).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithText("Send to AnkiConnect").assertIsDisplayed()
+        saveUiEvidence("study-send-to-ankiconnect")
     }
 }

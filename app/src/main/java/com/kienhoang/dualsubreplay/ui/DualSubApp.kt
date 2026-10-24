@@ -456,7 +456,7 @@ private fun DualSubExperience(
     }
     if (showQuickSettings) {
         QuickLanguageSettingsDialog(
-            sourcePreference = state.sourcePreference,
+            sourcePreference = sourceChoiceSelection(state),
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
             onSourceChange = onSourceChange,
@@ -472,7 +472,7 @@ private fun DualSubExperience(
         SubtitleSettingsDialog(
             autoPronounce = state.autoPronounce,
             onAutoPronounceChange = onAutoPronounceChange,
-            sourcePreference = state.sourcePreference,
+            sourcePreference = sourceChoiceSelection(state),
             targetLanguage = state.targetLanguage,
             availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
@@ -1198,12 +1198,19 @@ private fun sourceDescription(state: DualSubUiState): String {
     val resources = LocalResources.current
     val interfaceLocale = currentInterfaceLocale()
     val source = state.resolvedSourceLanguage?.let { resolved ->
-        val name = state.availableSourceLanguages.firstOrNull {
-            TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
-        }?.name ?: TranslationLanguages.displayName(resolved)
-        captionTrackLabel(localizedLanguageLabel(resolved, name, interfaceLocale), state.generatedCaptions) {
-            resources.getString(R.string.player_caption_track_auto_generated, it)
-        }
+        // YouTube's own name of the loaded track already says when it is auto-generated.
+        state.availableSourceLanguages.firstOrNull { state.loadedTrackId.isNotBlank() && it.trackId == state.loadedTrackId }?.name
+            ?: run {
+                val sameLanguage = state.availableSourceLanguages.filter {
+                    TranslationLanguages.normalize(it.code) == TranslationLanguages.normalize(resolved)
+                }
+                val name =
+                    (sameLanguage.firstOrNull { it.generated == state.generatedCaptions } ?: sameLanguage.firstOrNull())?.name
+                        ?: TranslationLanguages.displayName(resolved)
+                captionTrackLabel(localizedLanguageLabel(resolved, name, interfaceLocale), state.generatedCaptions) {
+                    resources.getString(R.string.player_caption_track_auto_generated, it)
+                }
+            }
     } ?: stringResource(R.string.player_finding_captions)
     return stringResource(R.string.player_source_to_target, source, languageDisplayName(state.targetLanguage, interfaceLocale))
 }

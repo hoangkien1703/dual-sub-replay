@@ -20,10 +20,12 @@ internal class PageFirstCaptionProvider(
         videoId: String,
         preferredLanguages: List<String>,
         learningLanguage: String?,
+        preferredTrack: String?,
     ): CaptionTrackResult =
         coroutineScope {
-            val fromPage = async { page.transcript(videoId, CaptionLanguageChoice(preferredLanguages, learningLanguage), pageTimeoutMs) }
-            val downloaded = async { attempt { download.fetch(videoId, preferredLanguages, learningLanguage) } }
+            val choice = CaptionLanguageChoice(preferredLanguages, learningLanguage, preferredTrack)
+            val fromPage = async { page.transcript(videoId, choice, pageTimeoutMs) }
+            val downloaded = async { attempt { download.fetch(videoId, preferredLanguages, learningLanguage, preferredTrack) } }
             select {
                 fromPage.onAwait { track ->
                     if (track != null) {

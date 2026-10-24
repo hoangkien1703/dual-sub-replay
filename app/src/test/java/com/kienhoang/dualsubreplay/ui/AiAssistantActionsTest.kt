@@ -8,6 +8,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_AFTER
 import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
 import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
+import com.kienhoang.dualsubreplay.assistant.AI_SEND_TO_APPS
 import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_PLAY_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_REPEAT_COUNTS
@@ -59,6 +60,7 @@ class AiAssistantActionsTest {
         assertEquals(PageTokenMode.entries.map { it.storageValue }, AI_PAGE_TOKEN_MODES)
         assertEquals(KnownWordsMode.entries.map { it.storageValue }, AI_KNOWN_WORDS_MODES)
         assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)
+        assertEquals(FlashcardApp.entries.map { it.storageValue }, AI_SEND_TO_APPS)
     }
 
     @Test

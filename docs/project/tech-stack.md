@@ -67,9 +67,13 @@ Paths below are relative to
   page's 33 ms playback ticks and only send pause, seek and speed scripts (`ui/StudyWebScripts.kt`)
   to the one page video, with the full transcript only; known words (`data/KnownWords.kt`,
   `files/known-words/<language>.txt`, kept through Reset all settings) give the subtitle panel's
-  comprehension score, new-word marks and the one-new-word play mode; Send to AnkiDroid
-  (`data/AnkiDroidNotes.kt`) adds notes through AnkiDroid's public content provider with its
-  runtime permission, without the AnkiDroid library; the blur box is a page element over the
+  comprehension score, new-word marks and the one-new-word play mode; the split Send to button
+  (owner design 2026-10-23, [spec](../specs/2026-10-23-send-to-button-and-ankiconnect.md)) sends
+  to the app last picked on its ▾ list or in Settings: AnkiDroid by default
+  (`data/AnkiDroidNotes.kt`, AnkiDroid's public content provider with its runtime permission,
+  without the AnkiDroid library) or AnkiConnect (`data/AnkiConnectNotes.kt`, version 6 JSON to
+  `http://127.0.0.1:8765` only, the one cleartext address `network_security_config.xml` allows);
+  the blur box is a page element over the
   player (`webBlurBoxScript`) that hides subtitles burned into the picture.
 - App updates (owner request 2026-10-20, [spec](../specs/2026-10-20-check-for-updates.md)):
   `update/AppUpdater.kt` asks GitHub's releases API only when the drawer's Check for updates is

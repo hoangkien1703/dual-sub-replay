@@ -2,7 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">Ferramentas de estudo</string>
-    <string name="settings_section_study_summary">Modos de reprodução, pular silêncios, palavras conhecidas, AnkiDroid, caixa desfocada</string>
+    <string name="settings_section_study_summary">Modos de reprodução, pular silêncios, palavras conhecidas, Enviar para, caixa desfocada</string>
     <string name="study_play_mode_title">Modo de reprodução</string>
     <string name="study_play_mode_normal">Normal</string>
     <string name="study_play_mode_normal_description">O vídeo toca como sempre.</string>
@@ -32,8 +32,8 @@
     <string name="study_known_words_clear_title">Limpar palavras conhecidas?</string>
     <string name="study_known_words_clear_message">Todas as palavras que você marcou como conhecidas, em todos os idiomas, são esquecidas. As palavras salvas ficam.</string>
     <string name="study_known_words_clear_confirm">Limpar</string>
-    <string name="study_anki_title">Enviar para o AnkiDroid</string>
-    <string name="study_anki_description">Mostra Enviar ao AnkiDroid no cartão da palavra e em Prática → Exportar quando o AnkiDroid está instalado. Os cartões vão para um baralho DualSub Replay. Mantenha o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
+    <string name="study_anki_title">Enviar para apps de flashcards</string>
+    <string name="study_anki_description">Mostra um botão Enviar para no cartão da palavra e em Prática → Exportar. Ele envia para o AnkiDroid, a menos que você escolha outro app com ▾ no botão ou aqui embaixo; então o botão mostra esse app.</string>
     <string name="study_blur_box_title">Caixa desfocada</string>
     <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
     <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>
@@ -45,14 +45,14 @@
     <string name="study_mark_all_known_confirm">Marcar como conhecidas</string>
     <string name="study_close">Fechar</string>
     <string name="study_known_word_toggle">Conheço esta palavra</string>
-    <string name="study_send_to_anki">Enviar para o AnkiDroid</string>
+    <string name="study_send_to_anki">Enviar para o %1$s</string>
     <string name="study_sending_to_anki">Enviando…</string>
-    <string name="study_sent_to_anki">Enviado para o AnkiDroid</string>
+    <string name="study_sent_to_anki">Enviado para o %1$s</string>
     <string name="study_anki_not_installed">O AnkiDroid não está instalado neste celular.</string>
     <string name="study_anki_permission_denied">A permissão do AnkiDroid não foi dada, então nenhum cartão foi adicionado.</string>
     <string name="study_anki_failed">O AnkiDroid não aceitou o cartão. Abra o AnkiDroid, deixe-o em segundo plano, volte e tente de novo.</string>
-    <string name="study_anki_send_all">Enviar tudo para o AnkiDroid</string>
-    <string name="study_anki_all_sent_before">Todas as palavras já foram enviadas para o AnkiDroid.</string>
+    <string name="study_anki_send_all">Enviar tudo para o %1$s</string>
+    <string name="study_anki_all_sent_before">Todas as palavras já foram enviadas para o %1$s.</string>
     <plurals name="study_repeat_count">
         <item quantity="one">%1$d vez</item>
         <item quantity="many">%1$d vezes</item>
@@ -74,9 +74,9 @@
         <item quantity="other">Marcar %1$d palavras como conhecidas? Você pode desmarcar uma palavra no cartão dela.</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="one">%1$d palavra enviada para o AnkiDroid.</item>
-        <item quantity="many">%1$d palavras enviadas para o AnkiDroid.</item>
-        <item quantity="other">%1$d palavras enviadas para o AnkiDroid.</item>
+        <item quantity="one">%1$d palavra enviada para o %2$s.</item>
+        <item quantity="many">%1$d palavras enviadas para o %2$s.</item>
+        <item quantity="other">%1$d palavras enviadas para o %2$s.</item>
     </plurals>
     <string name="study_page_token_auto">Automático</string>
     <string name="study_page_token_on">Ligado</string>
@@ -91,4 +91,17 @@
     <string name="study_known_words_offer_message">O painel de legendas passa a mostrar quanto de cada vídeo você já conhece, e as palavras que você vê com frequência contam como conhecidas sozinhas. Você pode mudar isso depois em Configurações → Ferramentas de estudo.</string>
     <string name="study_known_words_offer_confirm">Ligar</string>
     <string name="study_known_words_offer_dismiss">Agora não</string>
+    <string name="study_send_to_app_title">Enviar palavras para</string>
+    <string name="study_ankidroid_description">Os cartões vão para um baralho DualSub Replay. Deixe o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
+    <string name="study_ankiconnect_description">Envia para o AnkiConnect neste celular (127.0.0.1:8765), usado pelo app AnkiConnect Android, pelo Yomitan e pelo asbplayer. Abra o AnkiConnect Android uma vez para que o servidor dele funcione. Se o AnkiConnect não puder criar um tipo de nota DualSub Replay, os cartões usam o tipo de nota Basic do Anki.</string>
+    <string name="study_ankiconnect_deck_title">Baralho do AnkiConnect</string>
+    <string name="study_ankiconnect_deck_value">Baralho: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">Automático (DualSub Replay; senão, Default)</string>
+    <string name="study_ankiconnect_deck_choose">Escolher baralho</string>
+    <string name="study_ankiconnect_deck_loading">Carregando baralhos…</string>
+    <string name="study_send_to_choose">Escolher para onde enviar</string>
+    <string name="study_ankiconnect_not_running">Nada respondeu no endereço do AnkiConnect. Abra o AnkiConnect Android (ou sua ferramenta AnkiConnect), confira se o servidor dele está ligado e tente de novo.</string>
+    <string name="study_ankiconnect_failed">O AnkiConnect não aceitou o cartão.</string>
+    <string name="study_ankiconnect_failed_detail">O AnkiConnect não aceitou o cartão: %1$s</string>
+    <string name="study_ankiconnect_open">Abrir AnkiConnect Android</string>
 </resources>

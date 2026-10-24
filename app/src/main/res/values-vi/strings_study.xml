@@ -2,7 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">Công cụ học</string>
-    <string name="settings_section_study_summary">Chế độ phát, bỏ qua đoạn im lặng, từ đã biết, AnkiDroid, ô làm mờ</string>
+    <string name="settings_section_study_summary">Chế độ phát, bỏ qua đoạn im lặng, từ đã biết, Gửi sang, ô làm mờ</string>
     <string name="study_play_mode_title">Chế độ phát</string>
     <string name="study_play_mode_normal">Bình thường</string>
     <string name="study_play_mode_normal_description">Video phát như thường lệ.</string>
@@ -32,8 +32,8 @@
     <string name="study_known_words_clear_title">Xóa từ đã biết?</string>
     <string name="study_known_words_clear_message">Mọi từ bạn đã đánh dấu là đã biết, ở mọi ngôn ngữ, sẽ bị quên. Từ đã lưu vẫn còn.</string>
     <string name="study_known_words_clear_confirm">Xóa</string>
-    <string name="study_anki_title">Gửi sang AnkiDroid</string>
-    <string name="study_anki_description">Hiện nút Gửi sang AnkiDroid trên thẻ từ và trong Luyện tập → Xuất khi đã cài AnkiDroid. Thẻ được đưa vào bộ thẻ DualSub Replay. Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
+    <string name="study_anki_title">Gửi sang ứng dụng thẻ ghi nhớ</string>
+    <string name="study_anki_description">Hiện nút Gửi sang trên thẻ từ và trong Luyện tập → Xuất. Nút gửi sang AnkiDroid, trừ khi bạn chọn ứng dụng khác bằng ▾ trên nút hoặc ở bên dưới; khi đó nút sẽ hiện ứng dụng đó.</string>
     <string name="study_blur_box_title">Ô làm mờ</string>
     <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
     <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>
@@ -45,14 +45,14 @@
     <string name="study_mark_all_known_confirm">Đánh dấu đã biết</string>
     <string name="study_close">Đóng</string>
     <string name="study_known_word_toggle">Tôi biết từ này</string>
-    <string name="study_send_to_anki">Gửi sang AnkiDroid</string>
+    <string name="study_send_to_anki">Gửi sang %1$s</string>
     <string name="study_sending_to_anki">Đang gửi…</string>
-    <string name="study_sent_to_anki">Đã gửi sang AnkiDroid</string>
+    <string name="study_sent_to_anki">Đã gửi sang %1$s</string>
     <string name="study_anki_not_installed">Điện thoại này chưa cài AnkiDroid.</string>
     <string name="study_anki_permission_denied">Chưa cấp quyền cho AnkiDroid nên không thẻ nào được thêm.</string>
     <string name="study_anki_failed">AnkiDroid không nhận thẻ. Hãy mở AnkiDroid, để nó chạy trong nền, rồi quay lại và thử lại.</string>
-    <string name="study_anki_send_all">Gửi tất cả sang AnkiDroid</string>
-    <string name="study_anki_all_sent_before">Mọi từ đều đã được gửi sang AnkiDroid.</string>
+    <string name="study_anki_send_all">Gửi tất cả sang %1$s</string>
+    <string name="study_anki_all_sent_before">Mọi từ đều đã được gửi sang %1$s.</string>
     <plurals name="study_repeat_count">
         <item quantity="other">%1$d lần</item>
     </plurals>
@@ -66,7 +66,7 @@
         <item quantity="other">Đánh dấu %1$d từ là đã biết? Bạn có thể bỏ đánh dấu một từ trên thẻ từ của nó.</item>
     </plurals>
     <plurals name="study_anki_sent_count">
-        <item quantity="other">Đã gửi %1$d từ sang AnkiDroid.</item>
+        <item quantity="other">Đã gửi %1$d từ sang %2$s.</item>
     </plurals>
     <string name="study_page_token_auto">Tự động</string>
     <string name="study_page_token_on">Bật</string>
@@ -81,4 +81,17 @@
     <string name="study_known_words_offer_message">Khi đó bảng phụ đề sẽ cho biết bạn đã biết bao nhiêu phần của mỗi video, và những từ bạn gặp thường xuyên sẽ tự được tính là đã biết. Bạn có thể đổi lại sau trong Cài đặt → Công cụ học.</string>
     <string name="study_known_words_offer_confirm">Bật</string>
     <string name="study_known_words_offer_dismiss">Để sau</string>
+    <string name="study_send_to_app_title">Gửi từ tới</string>
+    <string name="study_ankidroid_description">Thẻ được đưa vào bộ thẻ DualSub Replay. Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
+    <string name="study_ankiconnect_description">Gửi tới AnkiConnect trên điện thoại này (127.0.0.1:8765), địa chỉ mà ứng dụng AnkiConnect Android, Yomitan và asbplayer dùng. Hãy mở AnkiConnect Android một lần để máy chủ của nó chạy. Nếu AnkiConnect không tạo được kiểu ghi chú DualSub Replay, thẻ sẽ dùng kiểu ghi chú Basic của Anki.</string>
+    <string name="study_ankiconnect_deck_title">Bộ thẻ AnkiConnect</string>
+    <string name="study_ankiconnect_deck_value">Bộ thẻ: %1$s</string>
+    <string name="study_ankiconnect_deck_automatic">Tự động (DualSub Replay, nếu không có thì Default)</string>
+    <string name="study_ankiconnect_deck_choose">Chọn bộ thẻ</string>
+    <string name="study_ankiconnect_deck_loading">Đang tải bộ thẻ…</string>
+    <string name="study_send_to_choose">Chọn nơi gửi</string>
+    <string name="study_ankiconnect_not_running">Không có gì trả lời tại địa chỉ của AnkiConnect. Hãy mở AnkiConnect Android (hoặc công cụ AnkiConnect bạn dùng), kiểm tra máy chủ của nó đang bật, rồi thử lại.</string>
+    <string name="study_ankiconnect_failed">AnkiConnect không nhận thẻ.</string>
+    <string name="study_ankiconnect_failed_detail">AnkiConnect không nhận thẻ: %1$s</string>
+    <string name="study_ankiconnect_open">Mở AnkiConnect Android</string>
 </resources>

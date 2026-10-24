@@ -133,14 +133,18 @@ internal class LanguagePickerState {
     }
 }
 
-/** [autoLabel] names the "auto" choice; caption track names come from YouTube as they are. */
+/**
+ * [autoLabel] names the "auto" choice; then every caption track of the video, named as YouTube
+ * names it, each its own choice ([trackChoiceCode]).
+ */
 internal fun sourceLanguageChoices(
     availableSourceLanguages: List<CaptionLanguage>,
     autoLabel: String,
 ): List<LanguageChoice> =
     listOf(LanguageChoice("auto", autoLabel)) +
-        availableSourceLanguages.map { LanguageChoice(it.code, it.name) }
+        availableSourceLanguages.map { LanguageChoice(trackChoiceCode(it), it.name) }
 
+/** [sourcePreference] is "auto", a track choice or a language code (see [sourceChoiceSelection]). */
 internal fun sourceLanguageLabel(
     sourcePreference: String,
     sourceChoices: List<LanguageChoice>,
@@ -149,6 +153,8 @@ internal fun sourceLanguageLabel(
 ): String =
     if (sourcePreference == "auto") {
         autoLabel
+    } else if (sourcePreference.startsWith(TRACK_CHOICE_PREFIX)) {
+        sourceChoices.firstOrNull { it.code == sourcePreference }?.label ?: autoLabel
     } else {
         sourceChoices
             .firstOrNull {
