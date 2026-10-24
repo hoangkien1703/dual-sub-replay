@@ -185,7 +185,7 @@ class WordLearningDialogTest {
         compose.onNodeWithTag("kanji_section").assertExists()
         compose.onNodeWithTag("kanji_section_header").performScrollTo().performClick()
         compose.onNodeWithTag("kanji_row_葉").assertDoesNotExist()
-        compose.onNodeWithTag("kanji_section_count").assertTextEquals("1")
+        compose.onNodeWithTag("kanji_section_count", useUnmergedTree = true).assertTextEquals("1")
         saveUiEvidence("word-card-kanji-hidden")
         stories.set("葉", "")
     }
@@ -226,7 +226,7 @@ class WordLearningDialogTest {
         compose.onNodeWithTag("hanzi_section").assertExists()
         compose.onNodeWithTag("hanzi_section_header").performScrollTo().performClick()
         compose.onNodeWithTag("hanzi_row_叶").assertDoesNotExist()
-        compose.onNodeWithTag("hanzi_section_count").assertTextEquals("2")
+        compose.onNodeWithTag("hanzi_section_count", useUnmergedTree = true).assertTextEquals("2")
         stories.set("叶", "")
     }
 }

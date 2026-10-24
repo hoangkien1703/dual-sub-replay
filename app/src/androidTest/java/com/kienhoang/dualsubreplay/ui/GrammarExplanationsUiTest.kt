@@ -104,11 +104,11 @@ class GrammarExplanationsUiTest {
         compose.setContent { DualSubTheme { key(card.intValue) { GrammarPointList(matches) } } }
 
         compose.onAllNodesWithTag("grammar_point").assertCountEquals(2)
-        compose.onNodeWithTag("grammar_section_count").assertDoesNotExist()
+        compose.onNodeWithTag("grammar_section_count", useUnmergedTree = true).assertDoesNotExist()
         compose.onNodeWithTag("grammar_section_header").performClick()
 
         compose.onAllNodesWithTag("grammar_point").assertCountEquals(0)
-        compose.onNodeWithTag("grammar_section_count").assertTextEquals("2")
+        compose.onNodeWithTag("grammar_section_count", useUnmergedTree = true).assertTextEquals("2")
         saveUiEvidence("grammar-hidden")
         compose.runOnIdle { assertFalse(preferences.getBoolean(WORD_CARD_GRAMMAR_OPEN_PREFERENCE, true)) }
 
