@@ -89,6 +89,7 @@
     <string name="practice_copy">Sao chép</string>
     <string name="practice_copied">Đã sao chép</string>
     <string name="practice_translate">Dịch</string>
+    <string name="practice_all_actions">Tất cả thao tác</string>
     <string name="practice_clear_selection">Bỏ chọn</string>
     <string name="practice_tap_another_word">Chạm vào từ khác để chọn cụm từ</string>
     <string name="practice_translation_unavailable">Không có bản dịch</string>

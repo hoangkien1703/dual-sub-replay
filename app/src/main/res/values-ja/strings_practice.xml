@@ -89,6 +89,7 @@
     <string name="practice_copy">コピー</string>
     <string name="practice_copied">コピーしました</string>
     <string name="practice_translate">翻訳</string>
+    <string name="practice_all_actions">すべての操作</string>
     <string name="practice_clear_selection">選択を解除</string>
     <string name="practice_tap_another_word">別の単語をタップするとフレーズを選択できます</string>
     <string name="practice_translation_unavailable">翻訳を利用できません</string>

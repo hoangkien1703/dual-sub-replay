@@ -6,11 +6,11 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -20,16 +20,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -405,21 +407,29 @@ private fun PhraseActionBar(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)),
             shadowElevation = 8.dp,
         ) {
-            Column(Modifier.padding(horizontal = 6.dp, vertical = 2.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Wraps onto a second line when large text or longer labels would not fit beside the close button.
-                    FlowRow(Modifier.weight(1f, fill = false)) {
+            // As wide as its widest line, so the close button sits at the bar's right edge.
+            Column(Modifier.width(IntrinsicSize.Max).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                val actions =
+                    listOf(
                         PhraseAction(
                             icon = if (copied) Icons.Default.Check else Icons.Default.ContentCopy,
                             label = if (copied) R.string.practice_copied else R.string.practice_copy,
-                            tag = "phrase_copy",
+                            tag = "copy",
                         ) {
                             scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
                             copied = true
+                        },
+                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onTranslate),
+                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onPronounce),
+                    )
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    actions.forEach { action ->
+                        IconButton(onClick = action.onClick, modifier = Modifier.testTag("phrase_${action.tag}")) {
+                            Icon(action.icon, contentDescription = stringResource(action.label), tint = MaterialTheme.colorScheme.primary)
                         }
-                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "phrase_translate", onTranslate)
-                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "phrase_pronounce", onPronounce)
                     }
+                    PhraseActionMenu(actions)
+                    Spacer(Modifier.weight(1f))
                     IconButton(onClick = onClose, modifier = Modifier.testTag("phrase_close")) {
                         Icon(
                             Icons.Default.Close,
@@ -446,22 +456,39 @@ private fun PhraseActionBar(
     }
 }
 
-/** One action of the phrase bar: a small icon before its label, so the action reads at a glance. */
+/** One action of the phrase bar: an icon in the bar, and the icon with its name in the ▾ list. */
+private class PhraseAction(
+    val icon: ImageVector,
+    @StringRes val label: Int,
+    val tag: String,
+    val onClick: () -> Unit,
+)
+
+/** The ▾ button listing every action with its icon and name, for anyone unsure what an icon does. */
 @Composable
-private fun PhraseAction(
-    icon: ImageVector,
-    @StringRes label: Int,
-    tag: String,
-    onClick: () -> Unit,
-) {
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.testTag(tag),
-        contentPadding = PaddingValues(start = 10.dp, end = 12.dp),
-    ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(Modifier.width(6.dp))
-        Text(stringResource(label))
+private fun PhraseActionMenu(actions: List<PhraseAction>) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("phrase_all_actions")) {
+            Icon(
+                Icons.Default.ArrowDropDown,
+                contentDescription = stringResource(R.string.practice_all_actions),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            actions.forEach { action ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(action.label)) },
+                    leadingIcon = { Icon(action.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    onClick = {
+                        expanded = false
+                        action.onClick()
+                    },
+                    modifier = Modifier.testTag("phrase_menu_${action.tag}"),
+                )
+            }
+        }
     }
 }
 

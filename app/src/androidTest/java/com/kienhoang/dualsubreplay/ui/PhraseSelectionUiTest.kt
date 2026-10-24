@@ -5,6 +5,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -122,7 +123,7 @@ class PhraseSelectionUiTest {
         tapWord(original, "really")
 
         compose.onNodeWithTag("phrase_copy").performClick()
-        compose.onNodeWithText("Copied").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Copied").assertIsDisplayed()
         compose.onNodeWithTag("phrase_pronounce").performClick()
         compose.runOnIdle {
             assertEquals(listOf("really looking forward to seeing" to false), spoken)
@@ -131,6 +132,27 @@ class PhraseSelectionUiTest {
 
         compose.onNodeWithTag("phrase_close").performClick()
         compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
+    }
+
+    @Test
+    fun allActionsListShowsEachActionByNameAndRunsIt() {
+        showCard()
+        tapWord(original, "really")
+
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_copy").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_menu_translate").assertIsDisplayed()
+        compose.onNodeWithText("Pronounce").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-all-actions")
+        compose.onNodeWithTag("phrase_menu_pronounce").performClick()
+        compose.waitForIdle()
+
+        compose.onNodeWithTag("phrase_menu_pronounce").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_action_bar").assertIsDisplayed()
+        compose.runOnIdle {
+            assertEquals(listOf("really" to false), spoken)
+            assertTrue(taps.isEmpty())
+        }
     }
 
     @Test
