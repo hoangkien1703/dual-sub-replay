@@ -6,16 +6,24 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,9 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
@@ -396,19 +406,19 @@ private fun PhraseActionBar(
             shadowElevation = 8.dp,
         ) {
             Column(Modifier.padding(horizontal = 6.dp, vertical = 2.dp)) {
-                Row {
-                    TextButton(
-                        onClick = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Wraps onto a second line when large text or longer labels would not fit beside the close button.
+                    FlowRow(Modifier.weight(1f, fill = false)) {
+                        PhraseAction(
+                            icon = if (copied) Icons.Default.Check else Icons.Default.ContentCopy,
+                            label = if (copied) R.string.practice_copied else R.string.practice_copy,
+                            tag = "phrase_copy",
+                        ) {
                             scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
                             copied = true
-                        },
-                        modifier = Modifier.testTag("phrase_copy"),
-                    ) { Text(stringResource(if (copied) R.string.practice_copied else R.string.practice_copy)) }
-                    TextButton(onClick = onTranslate, modifier = Modifier.testTag("phrase_translate")) {
-                        Text(stringResource(R.string.practice_translate))
-                    }
-                    TextButton(onClick = onPronounce, modifier = Modifier.testTag("phrase_pronounce")) {
-                        Text(stringResource(R.string.practice_pronounce))
+                        }
+                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "phrase_translate", onTranslate)
+                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "phrase_pronounce", onPronounce)
                     }
                     IconButton(onClick = onClose, modifier = Modifier.testTag("phrase_close")) {
                         Icon(
@@ -433,6 +443,25 @@ private fun PhraseActionBar(
                 }
             }
         }
+    }
+}
+
+/** One action of the phrase bar: a small icon before its label, so the action reads at a glance. */
+@Composable
+private fun PhraseAction(
+    icon: ImageVector,
+    @StringRes label: Int,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.testTag(tag),
+        contentPadding = PaddingValues(start = 10.dp, end = 12.dp),
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(stringResource(label))
     }
 }
 
