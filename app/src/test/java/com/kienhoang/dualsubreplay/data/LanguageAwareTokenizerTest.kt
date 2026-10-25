@@ -153,4 +153,18 @@ class LanguageAwareTokenizerTest {
 
         assertEquals(listOf("Un", "café", "très", "naïf"), tokens.map { it.text })
     }
+
+    @Test
+    fun keepsPersianHalfSpaceWordsWhole() {
+        val text = "من می\u200Cخواهم کتاب\u200Cها را بخوانم"
+
+        assertEquals(
+            listOf("من", "می\u200Cخواهم", "کتاب\u200Cها", "را", "بخوانم"),
+            LanguageAwareTokenizer.tokenize(text, "fa").map { it.text },
+        )
+        assertEquals(
+            listOf("من", "می\u200Cخواهم", "کتاب\u200Cها", "را", "بخوانم"),
+            LanguageAwareTokenizer.alignAndTokenizeTranslation(text, emptyList(), "fa").map { it.text },
+        )
+    }
 }

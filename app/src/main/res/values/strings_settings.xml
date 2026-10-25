@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">Spoken-word highlight</string>
     <string name="settings_natural_flow_title">Natural subtitle flow &amp; punctuation</string>
     <string name="settings_natural_flow_description">Merge auto-generated captions along speech pauses and clauses, with proper capitalization.</string>
+    <string name="settings_hide_sound_cues_title">Hide sound descriptions</string>
+    <string name="settings_hide_sound_cues_description">Remove [Music], [Applause] and similar notes before translating. Song lyrics stay, without the ♪ marks.</string>
     <string name="settings_preload_models_title">Preload translation models in background</string>
     <string name="settings_preload_models_description">Download translation models at launch so playback starts without waiting.</string>
     <string name="settings_reset_all_button">Reset all settings to defaults</string>

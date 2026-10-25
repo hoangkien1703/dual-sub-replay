@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">말하는 단어 강조 색상</string>
     <string name="settings_natural_flow_title">자연스러운 자막 흐름 및 문장 부호</string>
     <string name="settings_natural_flow_description">자동 생성 자막을 말의 쉼과 절 단위로 합치고 대소문자를 바르게 고쳐요.</string>
+    <string name="settings_hide_sound_cues_title">소리 설명 숨기기</string>
+    <string name="settings_hide_sound_cues_description">번역하기 전에 [Music], [Applause] 같은 설명을 없애요. 노래 가사는 ♪ 표시 없이 남아요.</string>
     <string name="settings_preload_models_title">백그라운드에서 번역 모델 미리 받기</string>
     <string name="settings_preload_models_description">앱을 열 때 번역 모델을 받아 두어 기다리지 않고 바로 재생할 수 있어요.</string>
     <string name="settings_reset_all_button">모든 설정을 기본값으로 초기화</string>

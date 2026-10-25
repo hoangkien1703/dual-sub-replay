@@ -332,6 +332,8 @@ internal fun SubtitleSettingsDialog(
     onPreloadModelsChange: (Boolean) -> Unit = {},
     naturalSubtitlesEnabled: Boolean = true,
     onNaturalSubtitlesChange: (Boolean) -> Unit = {},
+    hideSoundCues: Boolean = true,
+    onHideSoundCuesChange: (Boolean) -> Unit = {},
     onlineTranslation: OnlineTranslationSettings = OnlineTranslationSettings(),
     wordLearningEnabled: Boolean = true,
     onWordLearningChange: (Boolean) -> Unit = {},
@@ -545,6 +547,13 @@ internal fun SubtitleSettingsDialog(
                             checked = naturalSubtitlesEnabled,
                             onCheckedChange = onNaturalSubtitlesChange,
                             testTag = "natural_subtitles_switch",
+                        )
+                        SettingsSwitchRow(
+                            title = stringResource(R.string.settings_hide_sound_cues_title),
+                            description = stringResource(R.string.settings_hide_sound_cues_description),
+                            checked = hideSoundCues,
+                            onCheckedChange = onHideSoundCuesChange,
+                            testTag = "hide_sound_cues_switch",
                         )
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_preload_models_title),

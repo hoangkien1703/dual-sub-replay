@@ -129,6 +129,7 @@ class AiActionsTest {
         val asking =
             listOf(
                 AiSetting.NATURAL_SUBTITLE_FLOW,
+                AiSetting.HIDE_SOUND_DESCRIPTIONS,
                 AiSetting.PRELOAD_TRANSLATION_MODELS,
                 AiSetting.ORIGINAL_CAPTION_LANGUAGE,
                 AiSetting.APP_LANGUAGE,
@@ -140,8 +141,8 @@ class AiActionsTest {
         assertTrue(!AiAction.ChangeSetting(AiSetting.APP_COLORS, "light").alwaysAsks)
         val description = AI_TOOLS.first { it.name == AI_SETTING_TOOL }.description
         assertTrue(
-            "natural_subtitle_flow, preload_translation_models, original_caption_language, app_language, page_token_captions, " +
-                "auto_update " +
+            "natural_subtitle_flow, hide_sound_descriptions, preload_translation_models, original_caption_language, app_language, " +
+                "page_token_captions, auto_update " +
                 "show an Apply button" in
                 description,
         )

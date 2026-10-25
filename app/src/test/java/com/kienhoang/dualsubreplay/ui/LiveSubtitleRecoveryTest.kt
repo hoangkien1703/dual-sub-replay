@@ -17,6 +17,13 @@ class LiveSubtitleRecoveryTest {
         assertNull(liveTranslationKey(sample.copy(present = false), "abcdefghijk", "vi"))
     }
 
+    @Test fun soundDescriptionsAreLeftOutOfLiveCaptionsWhenHidden() {
+        val music = sample.copy(text = "[Music]")
+        assertNull(liveTranslationKey(music, "abcdefghijk", "vi", hideSoundCues = true))
+        assertEquals("[Music]", liveTranslationKey(music, "abcdefghijk", "vi")?.text)
+        assertEquals("Hello", liveTranslationKey(sample.copy(text = "[Applause] Hello"), "abcdefghijk", "vi", hideSoundCues = true)?.text)
+    }
+
     @Test fun rollingTextReplacesRatherThanAppendsAndDuplicateRevisionsDoNotRetranslate() {
         val gate = LiveTranslationGate()
         assertTrue(gate.update(key))

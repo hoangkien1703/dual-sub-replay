@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">発話中の単語のハイライト</string>
     <string name="settings_natural_flow_title">自然な字幕の区切りと句読点</string>
     <string name="settings_natural_flow_description">自動生成字幕を話の間や節ごとにまとめ、大文字・小文字も整えます。</string>
+    <string name="settings_hide_sound_cues_title">効果音の説明を隠す</string>
+    <string name="settings_hide_sound_cues_description">翻訳の前に [Music]、[Applause] などの説明を取り除きます。歌詞は ♪ 記号なしで残ります。</string>
     <string name="settings_preload_models_title">翻訳モデルをバックグラウンドで事前読み込み</string>
     <string name="settings_preload_models_description">起動時に翻訳モデルをダウンロードし、待たずに再生を始められるようにします。</string>
     <string name="settings_reset_all_button">すべての設定をデフォルトに戻す</string>

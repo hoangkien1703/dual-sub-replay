@@ -28,6 +28,7 @@ import com.kienhoang.dualsubreplay.data.PageTranscriptSource
 import com.kienhoang.dualsubreplay.data.PageTranslationSource
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.SavedWord
+import com.kienhoang.dualsubreplay.data.SoundCues
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
@@ -135,6 +136,7 @@ data class DualSubUiState(
     val lockOverlayToVideo: Boolean = false,
     val preloadModelsEnabled: Boolean = true,
     val naturalSubtitlesEnabled: Boolean = true,
+    val hideSoundCues: Boolean = true,
     val wordLearningEnabled: Boolean = true,
     val wordLearningTarget: String = DEFAULT_WORD_LEARNING_TARGET,
     val wordLearningActiveOnly: Boolean = true,
@@ -333,6 +335,7 @@ internal const val PRELOAD_MODELS_ENABLED_PREFERENCE = "preload_translation_mode
 /** After a switch away from Google, how long a row waits for YouTube's own translation before the device translates it. */
 private const val YOUTUBE_TRANSLATION_WAIT_MS = 1_000L
 internal const val NATURAL_SUBTITLES_PREFERENCE = "enhanced_natural_subtitles"
+internal const val HIDE_SOUND_CUES_PREFERENCE = "hide_sound_cues"
 internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enabled"
 internal const val WORD_LEARNING_TARGET_PREFERENCE = "word_learning_target"
 
@@ -540,6 +543,7 @@ class AppViewModel internal constructor(
                     storedFeatureEnabled(
                         preferences.getBoolean(NATURAL_SUBTITLES_PREFERENCE, true),
                     ),
+                hideSoundCues = preferences.getBoolean(HIDE_SOUND_CUES_PREFERENCE, true),
                 wordLearningEnabled =
                     storedFeatureEnabled(
                         preferences.getBoolean(WORD_LEARNING_ENABLED_PREFERENCE, true),
@@ -750,7 +754,7 @@ class AppViewModel internal constructor(
         val accepted =
             liveCaption?.takeIf {
                 liveTranslationGate.key != null &&
-                    liveTranslationKey(it, videoId, current.targetLanguage) == liveTranslationGate.key &&
+                    liveTranslationKey(it, videoId, current.targetLanguage, current.hideSoundCues) == liveTranslationGate.key &&
                     it.revision != rejectedLiveRevision
             }
         liveCaptionProgress = accepted?.let { reconcileLiveCaptionProgress(liveCaptionProgress, it) }
@@ -803,7 +807,13 @@ class AppViewModel internal constructor(
         seek: Boolean,
     ) {
         if (seek) rejectedLiveRevision = sample?.revision
-        val key = liveTranslationKey(sample?.takeUnless { it.revision == rejectedLiveRevision }, videoId, _state.value.targetLanguage)
+        val key =
+            liveTranslationKey(
+                sample?.takeUnless { it.revision == rejectedLiveRevision },
+                videoId,
+                _state.value.targetLanguage,
+                _state.value.hideSoundCues,
+            )
         if (!liveTranslationGate.update(key, seek)) return
         liveTranslationJob?.cancel()
         val ticket = liveTranslationGate.generation
@@ -1087,6 +1097,15 @@ class AppViewModel internal constructor(
         }
     }
 
+    fun setHideSoundCues(enabled: Boolean) {
+        preferences.edit().putBoolean(HIDE_SOUND_CUES_PREFERENCE, enabled).apply()
+        _state.update { it.copy(hideSoundCues = enabled) }
+        val videoId = _state.value.activeVideoId
+        if (videoId != null) {
+            loadVideo(videoId = videoId, showPanel = _state.value.subtitlePanelVisible)
+        }
+    }
+
     fun setWordLearningEnabled(enabled: Boolean) {
         preferences.edit().putBoolean(WORD_LEARNING_ENABLED_PREFERENCE, enabled).apply()
         _state.update { it.copy(wordLearningEnabled = enabled) }
@@ -1299,6 +1318,7 @@ class AppViewModel internal constructor(
                 lockOverlayToVideo = false,
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,
+                hideSoundCues = true,
                 wordLearningEnabled = true,
                 wordLearningTarget = DEFAULT_WORD_LEARNING_TARGET,
                 wordLearningActiveOnly = true,
@@ -1491,7 +1511,9 @@ class AppViewModel internal constructor(
         onStored: (SubtitleStore) -> Unit,
     ): CaptionTrackResult {
         currentCoroutineContext().ensureActive()
-        val merged = SubtitleMerger.merge(track.cues, enhancedNaturalFlow = natural)
+        // A track of nothing but sound descriptions keeps them rather than failing as empty.
+        val cues = if (_state.value.hideSoundCues) SoundCues.filter(track.cues).ifEmpty { track.cues } else track.cues
+        val merged = SubtitleMerger.merge(cues, enhancedNaturalFlow = natural)
         if (merged.isEmpty()) throw CaptionUnavailableException("This caption track contains no readable text.")
         onStored(SubtitleStore.create(subtitleDirectory, merged))
         // Do not retain every raw cue across the long-lived translation coroutine.
@@ -1723,7 +1745,8 @@ class AppViewModel internal constructor(
             } catch (error: IOException) {
                 emptyList()
             }
-        val translations = if (cues == null) emptyMap() else youTubeRowTranslations(rows, cues, targetLanguage)
+        val shownCues = if (cues != null && _state.value.hideSoundCues) SoundCues.filter(cues) else cues
+        val translations = if (shownCues == null) emptyMap() else youTubeRowTranslations(rows, shownCues, targetLanguage)
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) current else current.copy(youTubeTranslationFallback = translations.isNotEmpty())
         }

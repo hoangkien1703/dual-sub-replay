@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">Resaltado de la palabra hablada</string>
     <string name="settings_natural_flow_title">Flujo natural y puntuación de subtítulos</string>
     <string name="settings_natural_flow_description">Une los subtítulos generados automáticamente según las pausas y las cláusulas del habla, con mayúsculas correctas.</string>
+    <string name="settings_hide_sound_cues_title">Ocultar descripciones de sonido</string>
+    <string name="settings_hide_sound_cues_description">Quita [Music], [Applause] y notas parecidas antes de traducir. La letra de las canciones se mantiene, sin las marcas ♪.</string>
     <string name="settings_preload_models_title">Precargar modelos de traducción en segundo plano</string>
     <string name="settings_preload_models_description">Descarga los modelos de traducción al abrir la app para que la reproducción empiece sin esperas.</string>
     <string name="settings_reset_all_button">Restablecer todos los ajustes</string>
