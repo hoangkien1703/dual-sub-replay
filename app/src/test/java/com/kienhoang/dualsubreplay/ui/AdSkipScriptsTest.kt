@@ -70,7 +70,8 @@ class AdSkipScriptsTest {
         val off = webAdSkipConfigScript(false, null, emptyList(), "")
         assertTrue(off.contains("ads: false, always: false, videoId: null, segments: []"))
         assertTrue("Not installed: nothing to configure", off.contains("if (!state) return false;"))
-        assertTrue("Says whether an ad shows", off.contains("return !!(state.config.ads && state.adShowing && state.adShowing());"))
+        assertTrue("Says whether an ad shows", off.contains("if (state.config.ads && state.adShowing && state.adShowing()) return 'ad';"))
+        assertTrue(off.contains("return state.playing && state.playing() ? 'playing' : 'idle';"))
     }
 
     @Test
@@ -79,7 +80,7 @@ class AdSkipScriptsTest {
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("const hit = document.elementFromPoint(x, y);"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (hit && (button.contains(hit) || (box && box.contains(button)))) {"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("const box = hit && hit.closest('[class*=\"skip\"]');"))
-        assertTrue(WEB_AD_SKIP_SCRIPT.contains("Date.now() - state.skipSince < 300"))
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("Date.now() - state.skipSince < 100"))
         assertTrue(WEB_SKIP_TARGET_SCRIPT.contains("host.endsWith('.youtube.com')"))
         assertEquals(262.5f to 1050f, parseSkipTarget("""{"x":262.5,"y":1050}"""))
         assertEquals(null, parseSkipTarget("{}"))
@@ -88,6 +89,19 @@ class AdSkipScriptsTest {
         assertEquals(null, parseSkipTarget("""{"x":-5,"y":10}"""))
         assertEquals(null, parseSkipTarget("""{"x":"a","y":10}"""))
         assertEquals(1f to 2f, parseSkipTarget("""{"x":1,"y":2,"info":"Skip tapped: button.ytp-skip-ad-button"}"""))
+    }
+
+    @Test
+    fun anAdIsNoticedSoonWhileAVideoPlays() {
+        assertEquals(PageAdStatus.AD, parsePageAdStatus("\"ad\""))
+        assertEquals(PageAdStatus.PLAYING, parsePageAdStatus("\"playing\""))
+        assertEquals(PageAdStatus.IDLE, parsePageAdStatus("\"idle\""))
+        assertEquals(PageAdStatus.IDLE, parsePageAdStatus("false"))
+        assertEquals(PageAdStatus.IDLE, parsePageAdStatus(null))
+        assertEquals(200L, adSkipCheckDelay(PageAdStatus.AD, skipAds = true))
+        assertEquals(500L, adSkipCheckDelay(PageAdStatus.PLAYING, skipAds = true))
+        assertEquals(2_000L, adSkipCheckDelay(PageAdStatus.PLAYING, skipAds = false))
+        assertEquals(2_000L, adSkipCheckDelay(PageAdStatus.IDLE, skipAds = true))
     }
 
     @Test

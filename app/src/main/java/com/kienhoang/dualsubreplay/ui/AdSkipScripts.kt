@@ -36,6 +36,12 @@ internal const val AD_PLAYBACK_RATE = 4
 /** The open video's settings and segments are given to the page this often (it may reload or change video). */
 private const val AD_SKIP_CHECK_MS = 2_000L
 
+/**
+ * While a video plays with Skip ads on, the page is asked this often, so an ad is noticed before its Skip
+ * button shows (5 s of ad, about 1.25 s at [AD_PLAYBACK_RATE]; owner test of build 506, 2026-10-25).
+ */
+private const val AD_SKIP_PLAYING_CHECK_MS = 500L
+
 internal const val SKIP_NOTE_ELEMENT_ID = "dualsub-skip-note"
 
 /**
@@ -48,10 +54,10 @@ private const val SKIP_BUTTON_SELECTOR =
         "[class*=\"skip-button\"] button, button[class*=\"skip\"], [id^=\"skip-button\"] button"
 
 /** The app taps YouTube's Skip button at most this often; YouTube ignores a press made by a page script. */
-private const val SKIP_TAP_INTERVAL_MS = 1_500L
+private const val SKIP_TAP_INTERVAL_MS = 1_000L
 
 /** How often the app asks the page for the Skip button while an ad shows. */
-private const val SKIP_TARGET_AD_MS = 300L
+private const val SKIP_TARGET_AD_MS = 200L
 
 /** The close button of a banner ad over the playing video. */
 private const val BANNER_CLOSE_SELECTOR = ".ytp-ad-overlay-close-button, .ytp-ad-overlay-close-container button"
@@ -126,7 +132,7 @@ internal val WEB_AD_SKIP_SCRIPT: String =
         delete video.__dualSubAdRate;
         delete video.__dualSubAdMuted;
       };
-      // A new button (the next ad of several in a row) must show for 0.3 s again before it is tapped.
+      // A new button (the next ad of several in a row) must show for 0.1 s again before it is tapped.
       const trackButton = function(button) {
         if (button === state.adButton) return;
         state.adButton = button;
@@ -158,7 +164,11 @@ internal val WEB_AD_SKIP_SCRIPT: String =
         return true;
       };
       state.adShowing = function() { return adShowing(player()); };
-      // During an ad, a point of the shown Skip button in screen pixels once it has shown for 0.3 s, with
+      state.playing = function() {
+        const video = pageVideo();
+        return !!video && !video.paused && !video.ended;
+      };
+      // During an ad, a point of the shown Skip button in screen pixels once it has shown for 0.1 s, with
       // `info` on what was found for the check line in Settings; null without an ad.
       state.skipTarget = function() {
         const root = player();
@@ -169,7 +179,7 @@ internal val WEB_AD_SKIP_SCRIPT: String =
           const hidden = Array.from(root.querySelectorAll('[class*="skip"]')).slice(0, 3).map(describe);
           return { info: hidden.length ? 'Skip not shown yet (' + hidden.join(', ') + ')' : 'no Skip button' };
         }
-        if (!state.skipSince || Date.now() - state.skipSince < 300) return { info: 'Skip shown: ' + describe(button) };
+        if (!state.skipSince || Date.now() - state.skipSince < 100) return { info: 'Skip shown: ' + describe(button) };
         const rect = button.getBoundingClientRect();
         const zoom = window.devicePixelRatio || 1;
         const points = [[0.5, 0.5], [0.3, 0.5], [0.7, 0.5], [0.5, 0.3], [0.5, 0.7]];
@@ -182,7 +192,8 @@ internal val WEB_AD_SKIP_SCRIPT: String =
           const hit = document.elementFromPoint(x, y);
           const box = hit && hit.closest('[class*="skip"]');
           if (hit && (button.contains(hit) || (box && box.contains(button)))) {
-            return { x: x * zoom, y: y * zoom, info: 'Skip tapped: ' + describe(button) };
+            const shownFor = Date.now() - state.skipSince;
+            return { x: x * zoom, y: y * zoom, info: 'Skip tapped ' + shownFor + ' ms after it showed: ' + describe(button) };
           }
           covered = covered || hit;
         }
@@ -294,7 +305,8 @@ internal fun webAdSkipConfigScript(
           if (!state) return false;
           if (state.config.videoId !== $id) { state.kept = {}; state.lastTime = null; }
           state.config = { ads: $skipAds, always: $always, videoId: $id, segments: $list, note: ${JSONObject.quote(note)} };
-          return !!(state.config.ads && state.adShowing && state.adShowing());
+          if (state.config.ads && state.adShowing && state.adShowing()) return 'ad';
+          return state.playing && state.playing() ? 'playing' : 'idle';
         })();
         """.trimIndent()
 }
@@ -367,8 +379,9 @@ private suspend fun WebView.evaluate(script: String): String? {
 
 /**
  * Keeps the page's ad and sponsor skipping in step with the settings and the open video. One script
- * call every 2 s, which also says whether an ad shows; only then the app asks for the Skip button
- * every 0.3 s and taps it ([PageCpuUseTest] keeps the idle cost within budget).
+ * call, which also says whether an ad shows or the video plays, every 0.5 s while a video plays with
+ * Skip ads on and every 2 s otherwise; during an ad the app asks for the Skip button every 0.2 s and
+ * taps it ([PageCpuUseTest] keeps the cost within budget).
  */
 @Composable
 internal fun AdSkipPageScripts(
@@ -385,8 +398,7 @@ internal fun AdSkipPageScripts(
         if (!active) return@LaunchedEffect
         var videoId: String? = null
         var segments = emptyList<SponsorSegment>()
-        var lastTap = 0L
-        var taps = 0
+        val tapper = SkipTapper()
         val on = settings.skipAds || settings.skipSponsors
         val always = settings.skipSponsors && settings.alwaysSkipSponsors
         val install = if (on) WEB_AD_SKIP_SCRIPT + "\n" else ""
@@ -394,7 +406,7 @@ internal fun AdSkipPageScripts(
         withContext(Dispatchers.Main.immediate) {
             while (isActive) {
                 val url = webView.url.orEmpty()
-                var adShowing = false
+                var status = PageAdStatus.IDLE
                 if (isYouTubeWebUrl(url)) {
                     val id = browseVideoSelection(url)?.videoId?.takeIf { settings.skipSponsors }
                     if (id != videoId) {
@@ -406,25 +418,77 @@ internal fun AdSkipPageScripts(
                             AdSkipReport.sponsorParts.value = segments.size
                         }
                     }
-                    adShowing =
-                        webView.evaluate(install + webAdSkipConfigScript(settings.skipAds, videoId, segments, note, always)) == "true"
-                    if (adShowing) {
-                        val reply = webView.evaluate(WEB_SKIP_TARGET_SCRIPT)
-                        val target = parseSkipTarget(reply)
-                        val now = SystemClock.uptimeMillis()
-                        if (target != null && now - lastTap >= SKIP_TAP_INTERVAL_MS) {
-                            lastTap = now
-                            taps++
-                            tap(currentPageView(), target.first, target.second)
-                        }
-                        parseSkipInfo(reply)?.let { AdSkipReport.lastAd.value = "$it ($taps taps)" }
+                    status =
+                        parsePageAdStatus(
+                            webView.evaluate(install + webAdSkipConfigScript(settings.skipAds, videoId, segments, note, always)),
+                        )
+                    if (status ==
+                        PageAdStatus.AD
+                    ) {
+                        tapper.check(webView.evaluate(WEB_SKIP_TARGET_SCRIPT), currentPageView())
                     } else {
-                        taps = 0
+                        tapper.adGone()
                     }
                 }
                 if (!on) break
-                delay(if (adShowing) SKIP_TARGET_AD_MS else AD_SKIP_CHECK_MS)
+                delay(adSkipCheckDelay(status, settings.skipAds))
             }
         }
+    }
+}
+
+/** What the page's config call says: an ad shows, the video plays, or neither. */
+internal enum class PageAdStatus { AD, PLAYING, IDLE }
+
+internal fun parsePageAdStatus(reply: String?): PageAdStatus =
+    when (reply) {
+        "\"ad\"" -> PageAdStatus.AD
+        "\"playing\"" -> PageAdStatus.PLAYING
+        else -> PageAdStatus.IDLE
+    }
+
+/** Often during an ad, every 0.5 s while a video plays with Skip ads on, else every 2 s. */
+internal fun adSkipCheckDelay(
+    status: PageAdStatus,
+    skipAds: Boolean,
+): Long =
+    when {
+        status == PageAdStatus.AD -> SKIP_TARGET_AD_MS
+        status == PageAdStatus.PLAYING && skipAds -> AD_SKIP_PLAYING_CHECK_MS
+        else -> AD_SKIP_CHECK_MS
+    }
+
+private fun tapCount(taps: Int): String = if (taps == 1) "1 tap" else "$taps taps"
+
+/** Taps the Skip button the page reports and writes what happened to [AdSkipReport]. */
+private class SkipTapper {
+    private var lastTap = 0L
+    private var taps = 0
+    private var info: String? = null
+
+    fun check(
+        reply: String?,
+        view: View,
+    ) {
+        val target = parseSkipTarget(reply)
+        val now = SystemClock.uptimeMillis()
+        val tapped = target != null && now - lastTap >= SKIP_TAP_INTERVAL_MS
+        if (target != null && tapped) {
+            lastTap = now
+            taps++
+            tap(view, target.first, target.second)
+        }
+        // Keep the line of the last tap until the next one, rather than the page's later "tapped" replies.
+        if (target == null || tapped) info = parseSkipInfo(reply) ?: info
+        info?.let { AdSkipReport.lastAd.value = "$it (${tapCount(taps)})" }
+    }
+
+    /** After the ad: how soon it went after the last tap tells whether the tap skipped it. */
+    fun adGone() {
+        if (taps == 0) return
+        val gone = SystemClock.uptimeMillis() - lastTap
+        AdSkipReport.lastAd.value = "$info (${tapCount(taps)}), ad gone $gone ms after the last tap"
+        taps = 0
+        info = null
     }
 }

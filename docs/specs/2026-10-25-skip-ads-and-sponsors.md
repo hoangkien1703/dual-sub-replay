@@ -140,3 +140,14 @@ How other tools do it (checked 2026-10-25):
 - Checked in desktop Chromium on a fake page: a covered middle was tapped beside it, the second ad's
   new button was tapped after 0.3 s (both real clicks), a user's jump into a part kept it, and
   playing into a part, undoing the skip and returning into a part after an ad were all skipped.
+
+### Owner test of build 506 (2026-10-25)
+
+- A video with three ads: they played fast but Skip was not pressed as soon as it showed. The check
+  line read `Skip tapped: button.ytp-ad-skip-button-modern (1 taps)`, so the button was found and
+  tapped, but late: the app asked the page about ads only every 2 s, then waited 0.3 s, while at 4x
+  YouTube's Skip shows about 1.25 s into an ad. Now the page is asked every 0.5 s while a video plays
+  with Skip ads on (every 2 s when paused or off, so the idle CPU budget holds), every 0.2 s during an
+  ad, a shown button is tapped after 0.1 s, and again every 1 s if the ad stays.
+- The check line now says how long after the Skip button showed it was tapped and, after the ad, how
+  long after the last tap the ad went (a short time means the tap skipped it).
