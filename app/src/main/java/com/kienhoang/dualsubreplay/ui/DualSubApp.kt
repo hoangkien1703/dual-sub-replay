@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -460,6 +461,7 @@ private fun DualSubExperience(
         QuickLanguageSettingsDialog(
             sourcePreference = sourceChoiceSelection(state),
             targetLanguage = state.targetLanguage,
+            recentTargetLanguages = state.recentTargetLanguages,
             availableSourceLanguages = state.availableSourceLanguages,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
@@ -476,6 +478,7 @@ private fun DualSubExperience(
             onAutoPronounceChange = onAutoPronounceChange,
             sourcePreference = sourceChoiceSelection(state),
             targetLanguage = state.targetLanguage,
+            recentTargetLanguages = state.recentTargetLanguages,
             availableSourceLanguages = state.availableSourceLanguages,
             fontScale = state.fontScale,
             portraitPanelOffsetFraction = state.portraitPanelOffsetFraction,
@@ -1131,6 +1134,7 @@ internal fun LanguagePickerDialog(
     onChoice: (LanguageChoice) -> Unit,
     onDismiss: () -> Unit,
     testTagPrefix: String,
+    recentCodes: List<String> = emptyList(),
 ) {
     val interfaceLocale = currentInterfaceLocale()
     val shownChoices =
@@ -1138,6 +1142,48 @@ internal fun LanguagePickerDialog(
             choices.map { it to localizedLanguageLabel(it.code, it.label, interfaceLocale) }
         }
     val filteredChoices = shownChoices.filter { (choice, shown) -> languageChoiceMatches(choice, shown, searchQuery) }
+    // Recent picks sit above the A-Z list for a quick switch; a search shows only the matches.
+    val recentChoices =
+        if (searchQuery.isBlank()) {
+            recentCodes.mapNotNull { code ->
+                shownChoices.firstOrNull { TranslationLanguages.normalize(it.first.code) == TranslationLanguages.normalize(code) }
+            }
+        } else {
+            emptyList()
+        }
+    val selectedLabel = stringResource(R.string.player_language_selected)
+
+    @Composable
+    fun ChoiceRow(
+        choice: LanguageChoice,
+        shown: String,
+        tag: String,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onChoice(choice) }
+                .testTag(tag)
+                .padding(horizontal = 8.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(shown, modifier = Modifier.weight(1f))
+            if (TranslationLanguages.normalize(choice.code) == TranslationLanguages.normalize(selectedCode)) {
+                Text(selectedLabel, style = MaterialTheme.typography.labelSmall)
+            }
+        }
+    }
+
+    @Composable
+    fun GroupHeading(text: String) {
+        Text(
+            text,
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 2.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
@@ -1153,23 +1199,15 @@ internal fun LanguagePickerDialog(
                 Spacer(Modifier.height(8.dp))
                 val listMaxHeight = minOf(360.dp, LocalConfiguration.current.screenHeightDp.dp * 0.45f)
                 LazyColumn(Modifier.fillMaxWidth().heightIn(max = listMaxHeight)) {
-                    itemsIndexed(filteredChoices, key = { _, item -> item.first.code }) { _, (choice, shown) ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onChoice(choice) }
-                                .testTag("language_option_${testTagPrefix}_${choice.code}")
-                                .padding(horizontal = 8.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(shown, modifier = Modifier.weight(1f))
-                            if (
-                                TranslationLanguages.normalize(choice.code) ==
-                                TranslationLanguages.normalize(selectedCode)
-                            ) {
-                                Text(stringResource(R.string.player_language_selected), style = MaterialTheme.typography.labelSmall)
-                            }
+                    if (recentChoices.isNotEmpty()) {
+                        item(key = "recent_heading") { GroupHeading(stringResource(R.string.player_recent_languages)) }
+                        items(recentChoices, key = { "recent_${it.first.code}" }) { (choice, shown) ->
+                            ChoiceRow(choice, shown, "language_recent_${testTagPrefix}_${choice.code}")
                         }
+                        item(key = "all_heading") { GroupHeading(stringResource(R.string.player_all_languages)) }
+                    }
+                    itemsIndexed(filteredChoices, key = { _, item -> item.first.code }) { _, (choice, shown) ->
+                        ChoiceRow(choice, shown, "language_option_${testTagPrefix}_${choice.code}")
                     }
                 }
             }

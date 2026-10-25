@@ -100,6 +100,8 @@ data class DualSubUiState(
     val subtitlePanelVisible: Boolean = true,
     val sourcePreference: String = "auto",
     val targetLanguage: String = "vi",
+    /** Recent "Translate to" picks, newest first; see [recentLanguagesToShow]. */
+    val recentTargetLanguages: List<String> = emptyList(),
     val onboardingCompleted: Boolean = false,
     val guideCompleted: Boolean = false,
     val dailyGoalPromptCompleted: Boolean = false,
@@ -482,6 +484,8 @@ class AppViewModel internal constructor(
                         .getString("target_language", "vi")
                         ?.takeIf(TranslationLanguages::isSupported)
                         ?: "vi",
+                recentTargetLanguages =
+                    parseRecentLanguages(preferences.getString(RECENT_TARGET_LANGUAGES_PREFERENCE, null)),
                 onboardingCompleted = preferences.getBoolean("onboarding_completed", false),
                 guideCompleted =
                     initialGuideCompleted(
@@ -919,10 +923,15 @@ class AppViewModel internal constructor(
     fun setTargetLanguage(language: String) {
         val normalized = TranslationLanguages.normalize(language)
         if (!TranslationLanguages.isSupported(normalized) || _state.value.targetLanguage == normalized) return
-        preferences.edit().putString("target_language", normalized).apply()
+        val recent = rememberRecentLanguage(_state.value.recentTargetLanguages, _state.value.targetLanguage, normalized)
+        preferences
+            .edit()
+            .putString("target_language", normalized)
+            .putString(RECENT_TARGET_LANGUAGES_PREFERENCE, encodeRecentLanguages(recent))
+            .apply()
         liveTranslationJob?.cancel()
         liveTranslationGate.reset()
-        _state.update { it.copy(targetLanguage = normalized, liveTranslated = null) }
+        _state.update { it.copy(targetLanguage = normalized, recentTargetLanguages = recent, liveTranslated = null) }
     }
 
     fun completeOnboarding(
@@ -1302,6 +1311,7 @@ class AppViewModel internal constructor(
             current.copy(
                 sourcePreference = "auto",
                 targetLanguage = "vi",
+                recentTargetLanguages = emptyList(),
                 fontScale = 1f,
                 portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
                 landscapeSplitEnabled = true,

@@ -225,6 +225,7 @@ class SubtitleWordHighlightTest {
                 SKIP_ADS_PREFERENCE,
                 SKIP_SPONSORS_PREFERENCE,
                 ALWAYS_SKIP_SPONSORS_PREFERENCE,
+                RECENT_TARGET_LANGUAGES_PREFERENCE,
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)

@@ -111,6 +111,58 @@ class SubtitleUiTest {
     }
 
     @Test
+    fun translateToListShowsRecentLanguagesFirst() {
+        composeRule.setContent {
+            DualSubTheme {
+                QuickLanguageSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    recentTargetLanguages = listOf("vi", "en", "ja"),
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    onSourceChange = {},
+                    onTargetChange = {},
+                    onOpenAllSettings = {},
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("target_language_picker").performClick()
+        composeRule.onNodeWithText("Recent").assertIsDisplayed()
+        composeRule.onNodeWithTag("language_recent_target_vi").assertIsDisplayed()
+        composeRule.onNodeWithTag("language_recent_target_en").assertIsDisplayed()
+        composeRule.onNodeWithTag("language_recent_target_ja").assertIsDisplayed()
+        saveUiEvidence("translate_to_recent")
+        composeRule.onNodeWithTag("language_search").performTextInput("Jap")
+        composeRule.onNodeWithText("Recent").assertDoesNotExist()
+        composeRule.onNodeWithTag("language_recent_target_ja").assertDoesNotExist()
+        composeRule.onNodeWithTag("language_option_target_ja").assertIsDisplayed()
+    }
+
+    @Test
+    fun recentLanguageSwitchesInOneTap() {
+        var selectedTarget: String? = null
+        composeRule.setContent {
+            DualSubTheme {
+                QuickLanguageSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    recentTargetLanguages = listOf("vi", "ja"),
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    onSourceChange = {},
+                    onTargetChange = { selectedTarget = it },
+                    onOpenAllSettings = {},
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("target_language_picker").performClick()
+        composeRule.onNodeWithTag("language_recent_target_ja").performClick()
+        composeRule.runOnIdle { assertEquals("ja", selectedTarget) }
+    }
+
+    @Test
     fun webPageErrorOffersReload() {
         var reloaded = false
         composeRule.setContent {
