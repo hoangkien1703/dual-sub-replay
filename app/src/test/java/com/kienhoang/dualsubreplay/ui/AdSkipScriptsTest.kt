@@ -45,10 +45,10 @@ class AdSkipScriptsTest {
 
     @Test
     fun sponsorPartsAreSkippedOnceAndOnlyTheUsersOwnJumpIntoOneKeepsIt() {
-        assertTrue(WEB_AD_SKIP_SCRIPT.contains("window.addEventListener('timeupdate'"))
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("['timeupdate', 'seeked'].forEach(function(type) {"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("window.addEventListener('seeking'"))
         assertTrue("The timer checks too", WEB_AD_SKIP_SCRIPT.contains("if (video && !video.paused) checkSponsor(video);"))
-        assertTrue(WEB_AD_SKIP_SCRIPT.contains("else state.kept[segment.id] = true;"))
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (jumped) state.kept[segment.id] = true;"))
         assertTrue(
             "Small seeks, the return after an ad and undoing a skip are not the user's",
             WEB_AD_SKIP_SCRIPT.contains(
@@ -75,8 +75,24 @@ class AdSkipScriptsTest {
     }
 
     @Test
+    fun aSponsorPartIsSkippedOnlyOnceASeekIsDoneAndNeverFoughtOver() {
+        // Changing currentTime during a seek made YouTube's player seek again and stall (owner test, 2026-10-25).
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (video.seeking || video.readyState < 1) return;"))
+        assertFalse("The seeking handler only decides", WEB_AD_SKIP_SCRIPT.contains("if (state.config.always || !jumped) skipSponsor"))
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (!segment || state.config.always) return;"))
+        assertTrue(
+            "A part skipped less than 2 s ago is not skipped again",
+            WEB_AD_SKIP_SCRIPT.contains("segment.id !== state.skippedId || Date.now() - state.skippedAt > 2000"),
+        )
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("state.skippedId = segment.id;"))
+    }
+
+    @Test
     fun theAppTapsOnlyAShownSkipButtonThatIsReallyUnderTheTap() {
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("style.visibility === 'hidden'"))
+        // YouTube's mobile Skip box has pointer-events none around a Skip button that takes touches again.
+        assertTrue(WEB_AD_SKIP_SCRIPT.contains("window.getComputedStyle(element).pointerEvents === 'none') return false;"))
+        assertFalse(WEB_AD_SKIP_SCRIPT.contains("style.pointerEvents === 'none') return false;"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("const hit = document.elementFromPoint(x, y);"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (hit && (button.contains(hit) || (box && box.contains(button)))) {"))
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("const box = hit && hit.closest('[class*=\"skip\"]');"))
@@ -117,7 +133,7 @@ class AdSkipScriptsTest {
     @Test
     fun alwaysSkipSponsorsSkipsASeekIntoOneToo() {
         assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (!config.always && state.kept[segment.id]) return false;"))
-        assertTrue(WEB_AD_SKIP_SCRIPT.contains("if (state.config.always || !jumped) skipSponsor(video, segment);"))
+        assertTrue("A seek never keeps a part", WEB_AD_SKIP_SCRIPT.contains("if (!segment || state.config.always) return;"))
         assertTrue(webAdSkipConfigScript(true, null, emptyList(), "", always = true).contains("always: true"))
         assertTrue(webAdSkipConfigScript(true, null, emptyList(), "").contains("always: false"))
     }
