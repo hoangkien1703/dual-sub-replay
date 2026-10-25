@@ -9,8 +9,10 @@ import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SponsorSegment
 import com.kienhoang.dualsubreplay.data.SponsorSegmentSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.Locale
 
@@ -210,21 +212,24 @@ internal fun AdSkipPageScripts(
         var videoId: String? = null
         var segments = emptyList<SponsorSegment>()
         val on = settings.skipAds || settings.skipSponsors
-        while (isActive) {
-            val url = webView.url.orEmpty()
-            if (isYouTubeWebUrl(url)) {
-                if (on) webView.evaluateJavascript(WEB_AD_SKIP_SCRIPT, null)
-                val id = browseVideoSelection(url)?.videoId?.takeIf { settings.skipSponsors }
-                if (id != videoId) {
-                    videoId = id
-                    segments = emptyList()
-                    webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, id, segments, note), null)
-                    if (id != null) segments = source.segments(id)
+        // WebView calls must stay on the main thread, also after the SponsorBlock request resumes.
+        withContext(Dispatchers.Main.immediate) {
+            while (isActive) {
+                val url = webView.url.orEmpty()
+                if (isYouTubeWebUrl(url)) {
+                    if (on) webView.evaluateJavascript(WEB_AD_SKIP_SCRIPT, null)
+                    val id = browseVideoSelection(url)?.videoId?.takeIf { settings.skipSponsors }
+                    if (id != videoId) {
+                        videoId = id
+                        segments = emptyList()
+                        webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, id, segments, note), null)
+                        if (id != null) segments = source.segments(id)
+                    }
+                    webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, videoId, segments, note), null)
                 }
-                webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, videoId, segments, note), null)
+                if (!on) break
+                delay(AD_SKIP_CHECK_MS)
             }
-            if (!on) break
-            delay(AD_SKIP_CHECK_MS)
         }
     }
 }
