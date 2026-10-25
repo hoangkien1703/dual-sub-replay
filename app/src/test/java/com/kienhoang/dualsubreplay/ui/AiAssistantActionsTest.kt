@@ -81,6 +81,7 @@ class AiAssistantActionsTest {
                         knownWordsMode = KnownWordsMode.MANUAL,
                         knownWordsAfter = 20,
                         blurBox = true,
+                        kanjiDetails = false,
                         pageTokenCaptions = PageTokenMode.ON,
                     ),
             )

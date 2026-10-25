@@ -6,7 +6,9 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.*
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -14,6 +16,14 @@ class WordLearningDialogTest {
     @get:Rule val compose = createComposeRule()
     private val selection = LearningWordSelection(AnalyzedToken("word", 0, 4, PartOfSpeech.NOUN), "en", "vi",
         "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, "a word", null), false)
+
+    @Before
+    @After
+    fun openAllSections() {
+        val editor = studyPreferences(InstrumentationRegistry.getInstrumentation().targetContext).edit()
+        WORD_CARD_SECTION_KEYS.forEach(editor::remove)
+        editor.commit()
+    }
 
     @Test fun pronouncesOnceAndSavesOnlineClipChoiceWithoutOfflineOption() {
         var spoken = 0
@@ -137,5 +147,86 @@ class WordLearningDialogTest {
         compose.runOnIdle { assertEquals(listOf("forward"), spokenParts) }
         compose.onNodeWithTag("close_word_card").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, dismissed) }
+    }
+
+    @Test
+    fun japaneseWordShowsItsMeaningBoxAndEachKanjisPage() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LearnerData.useAssets(context.assets)
+        val stories = MyKanjiStories.inDirectory(context.filesDir)
+        stories.set("葉", "")
+        val word = AnalyzedToken("葉っぱ", 0, 3, PartOfSpeech.NOUN)
+        val leaf =
+            selection.copy(
+                token = word,
+                parts = listOf(word),
+                wordLanguage = "ja",
+                segment = SubtitleSegment(1, 1000, 3000, "葉っぱが落ちた", null),
+            )
+        compose.setContent {
+            DualSubTheme { WordLearningDialog(leaf, false, { "lá cây" }, { _, _ -> }, {}, null, {}) }
+        }
+        compose.onNodeWithTag("word_meaning_panel").assertIsDisplayed()
+        compose.onNodeWithTag("word_meaning_text").assertTextEquals("lá cây")
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("kanji_row_葉")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("kanji_row_葉").performScrollTo().assertIsDisplayed()
+        saveUiEvidence("word-card-japanese-kanji")
+
+        compose.onNodeWithTag("kanji_row_葉").performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("kanji_han_viet")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("kanji_han_viet").assertTextEquals("DIỆP")
+        compose.onNodeWithTag("kanji_part_世").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("kanji_story").performScrollTo().assertTextContains("DIỆP", substring = true)
+        saveUiEvidence("kanji-page")
+        compose.onNodeWithTag("kanji_play_strokes").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_my_story").performScrollTo().performTextInput("Leaves of the world tree")
+        compose.waitUntil(5_000) { stories.get("葉") == "Leaves of the world tree" }
+        compose.onNodeWithTag("kanji_back").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_section").assertExists()
+        compose.onNodeWithTag("kanji_section_header").performScrollTo().performClick()
+        compose.onNodeWithTag("kanji_row_葉").assertDoesNotExist()
+        compose.onNodeWithTag("kanji_section_count", useUnmergedTree = true).assertTextEquals("1")
+        saveUiEvidence("word-card-kanji-hidden")
+        stories.set("葉", "")
+    }
+
+    @Test
+    fun chineseWordShowsEachCharactersPage() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LearnerData.useAssets(context.assets)
+        val stories = myHanziStories(context.filesDir)
+        stories.set("叶", "")
+        val word = AnalyzedToken("树叶", 0, 2, PartOfSpeech.NOUN, reading = "shù yè")
+        val leaves =
+            selection.copy(
+                token = word,
+                parts = listOf(word),
+                wordLanguage = "zh-Hans",
+                segment = SubtitleSegment(1, 1000, 3000, "树叶掉了", null),
+            )
+        compose.setContent {
+            DualSubTheme { WordLearningDialog(leaves, false, { "lá cây" }, { _, _ -> }, {}, null, {}) }
+        }
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("hanzi_row_叶")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("hanzi_row_树").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("hanzi_row_叶").performScrollTo().assertIsDisplayed()
+        saveUiEvidence("word-card-chinese-characters")
+
+        compose.onNodeWithTag("hanzi_row_叶").performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("hanzi_han_viet")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("hanzi_han_viet").assertTextEquals("DIỆP")
+        compose.onNodeWithTag("hanzi_pinyin").assertTextContains("yè", substring = true)
+        compose.onNodeWithTag("hanzi_part_口").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("hanzi_story").performScrollTo().assertTextContains("DIỆP", substring = true)
+        saveUiEvidence("hanzi-page")
+        compose.onNodeWithTag("kanji_play_strokes").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_my_story").performScrollTo().performTextInput("A mouth on ten leaves")
+        compose.waitUntil(5_000) { stories.get("叶") == "A mouth on ten leaves" }
+        compose.onNodeWithTag("hanzi_back").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_section").assertExists()
+        compose.onNodeWithTag("hanzi_section_header").performScrollTo().performClick()
+        compose.onNodeWithTag("hanzi_row_叶").assertDoesNotExist()
+        compose.onNodeWithTag("hanzi_section_count", useUnmergedTree = true).assertTextEquals("2")
+        stories.set("叶", "")
     }
 }

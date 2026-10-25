@@ -142,6 +142,7 @@ internal data class AiStoredSettings(
     val appLanguage: String = "device",
     val study: StudySettings = StudySettings(),
     val autoUpdate: Boolean = false,
+    val adSkip: AdSkipSettings = AdSkipSettings(),
 )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -159,6 +160,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         appLanguage = AppLanguageSettings.selected(context)?.tag ?: "device",
         study = readStudySettings(preferences),
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
+        adSkip = readAdSkipSettings(preferences),
     )
 }
 
@@ -190,6 +192,9 @@ private fun aiStoredSettingValue(
         AiSetting.REMEMBER_DRAGGED_POSITION -> onOff(stored.rememberDraggedPosition)
         AiSetting.APP_LANGUAGE -> stored.appLanguage
         AiSetting.APP_AUTO_UPDATE -> onOff(stored.autoUpdate)
+        AiSetting.SKIP_ADS -> onOff(stored.adSkip.skipAds)
+        AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
+        AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
         else -> aiStudySettingValue(stored.study, setting)
     }
 
@@ -208,6 +213,7 @@ private fun aiStudySettingValue(
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
         AiSetting.SEND_TO_APP -> study.sendTo.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
+        AiSetting.KANJI_DETAILS -> onOff(study.kanjiDetails)
         AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
         else -> null
     }
@@ -626,6 +632,9 @@ internal class AppAiActions(
                 if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             }
             AiSetting.APP_AUTO_UPDATE -> editor.putBoolean(APP_AUTO_UPDATE_PREFERENCE, on)
+            AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
+            AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
+            AiSetting.ALWAYS_SKIP_SPONSORS -> editor.putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -649,6 +658,7 @@ internal class AppAiActions(
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
             AiSetting.SEND_TO_APP -> editor.putString(SEND_TO_APP_PREFERENCE, storedFlashcardApp(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
+            AiSetting.KANJI_DETAILS -> editor.putBoolean(KANJI_DETAILS_PREFERENCE, on)
             AiSetting.PAGE_TOKEN_CAPTIONS ->
                 editor
                     .putString(
@@ -798,8 +808,12 @@ internal class AppAiActions(
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
+            AiSetting.KANJI_DETAILS -> switch(R.string.study_kanji_details_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
             AiSetting.APP_AUTO_UPDATE -> switch(R.string.updates_auto_title, value)
+            AiSetting.SKIP_ADS -> switch(R.string.ads_skip_ads_title, value)
+            AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
+            AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

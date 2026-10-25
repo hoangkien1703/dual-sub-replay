@@ -9,6 +9,7 @@ import org.json.JSONObject
 import org.json.JSONTokener
 
 internal const val YOUTUBE_CAPTION_STYLE_ID = "dual-sub-hide-youtube-captions"
+internal const val YOUTUBE_OPEN_APP_STYLE_ID = "dual-sub-hide-youtube-open-app"
 internal const val LIVE_CAPTION_CAPTURE_STATE_KEY = "__dualSubLiveCaptionV1"
 internal const val MAX_LIVE_CAPTION_TEXT_LENGTH = 4_096
 internal const val CAPTION_TRACK_SYNC_STATE_KEY = "__dualSubCaptionTrackV1"
@@ -502,6 +503,52 @@ private val CAPTION_TRACK_SYNC_FUNCTIONS =
       return 'switched';
     };
     """.trim()
+
+// Links that hand the video to the YouTube app: an Android intent for its package, its own
+// vnd.youtube scheme, or the web fallback tagged with the "open app" feature names.
+private val YOUTUBE_APP_LINKS = listOf(
+    "a[href^='intent:'][href*='com.google.android.youtube']",
+    "a[href^='vnd.youtube:']",
+    "a[href*='mweb_c3_open_app']",
+    "a[href*='mweb_to_native_app']",
+)
+
+internal val YOUTUBE_OPEN_APP_CSS: String =
+    YOUTUBE_APP_LINKS.joinToString(", ") + " { display: none !important; }\n" +
+        // A separate rule: an older WebView without :has() drops only this one and still hides the link.
+        ".mobile-topbar-header-sign-in-button:has(" + YOUTUBE_APP_LINKS.joinToString(", ") + "), " +
+        YOUTUBE_APP_LINKS.joinToString(", ") { "ytm-button-renderer:has(> $it)" } + " { display: none !important; }"
+
+/**
+ * Hides m.youtube.com's "Open App" pill in the header (and any other button that opens the YouTube
+ * app), which would leave this app. The button is found by where its link goes, not by its words,
+ * so it works in every language while the "Sign in" button, search and menu stay. A style rule, so
+ * it also covers buttons YouTube draws later. Added at document start, where the page has no root
+ * element yet (so it waits for one), and again when a page finishes loading; it only adds one style
+ * element.
+ */
+internal val WEB_HIDE_OPEN_APP_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' ||
+          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      const add = function() {
+        if (document.getElementById('$YOUTUBE_OPEN_APP_STYLE_ID')) return true;
+        const root = document.head || document.documentElement;
+        if (!root) return false;
+        const style = document.createElement('style');
+        style.id = '$YOUTUBE_OPEN_APP_STYLE_ID';
+        style.textContent = ${JSONObject.quote(YOUTUBE_OPEN_APP_CSS)};
+        root.appendChild(style);
+        return true;
+      };
+      if (add()) return true;
+      const observer = new MutationObserver(function() { if (add()) observer.disconnect(); });
+      observer.observe(document, { childList: true });
+      return true;
+    })();
+    """.trimIndent()
 
 /**
  * Hides only YouTube's rendered player captions while our bilingual learning overlay is active.

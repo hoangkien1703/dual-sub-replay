@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">Chữ Hán</string>
+    <string name="kanji_back">Quay lại %1$s</string>
+    <string name="kanji_grade_school">Lớp %1$d</string>
+    <string name="kanji_grade_secondary">Trung học</string>
+    <string name="kanji_grade_names">Dùng trong tên riêng</string>
+    <string name="kanji_radical">bộ %1$s</string>
+    <string name="kanji_on">Âm On</string>
+    <string name="kanji_kun">Âm Kun</string>
+    <string name="kanji_how_to_write">Cách viết</string>
+    <string name="kanji_play">Phát</string>
+    <string name="kanji_stroke_order_description">Thứ tự nét của %1$s, %2$s</string>
+    <string name="kanji_parts">Bộ phận</string>
+    <string name="kanji_part_radical">bộ thủ</string>
+    <string name="kanji_part_sound">gợi âm %1$s</string>
+    <string name="kanji_part_sound_plain">gợi âm</string>
+    <string name="kanji_how_to_remember">Cách nhớ</string>
+    <string name="kanji_memory_story">Câu chuyện để nhớ</string>
+    <string name="kanji_my_story">Câu chuyện của tôi</string>
+    <string name="kanji_my_story_hint">Tự viết câu chuyện của bạn (lưu trên điện thoại này)</string>
+    <string name="kanji_ai_story_button">Thêm câu chuyện bằng AI</string>
+    <string name="kanji_ai_story_question">Hãy kể cho tôi một câu chuyện ngắn khác để nhớ chữ Hán %1$s, dựa trên các bộ phận của nó, và một cách dễ nhớ cách đọc của nó.</string>
+    <string name="practice_meaning_edit">Sửa nghĩa</string>
+    <string name="practice_meaning_done">Xong</string>
+    <string name="study_kanji_details_title">Chi tiết chữ Hán</string>
+    <string name="study_kanji_details_description">Từ tiếng Nhật và tiếng Trung hiện từng chữ Hán với thứ tự nét, bộ phận và câu chuyện để nhớ.</string>
+    <plurals name="kanji_strokes">
+        <item quantity="other">%1$d nét</item>
+    </plurals>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: Chinese character details (2026-10-24) -->
+    <string name="hanzi_section_title">한자</string>
+    <string name="hanzi_traditional">번체 %1$s</string>
+    <string name="hanzi_simplified">간체 %1$s</string>
+    <string name="hanzi_part_meaning">뜻</string>
+    <string name="hanzi_words">단어</string>
+    <string name="hanzi_story_of_simplified">기억용 이야기 (간체 %1$s)</string>
+    <string name="hanzi_ai_story_question">중국어 한자 %1$s의 부분으로 만든 짧은 기억용 이야기를 하나 더 들려주고, 병음과 성조를 쉽게 외우는 방법도 알려 주세요.</string>
+</resources>

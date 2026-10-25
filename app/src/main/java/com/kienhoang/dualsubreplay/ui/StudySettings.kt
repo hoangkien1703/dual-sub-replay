@@ -27,6 +27,9 @@ internal const val SEND_TO_APP_PREFERENCE = "send_to_app"
 /** The AnkiConnect deck picked in Settings, or absent for Automatic. */
 internal const val ANKICONNECT_DECK_PREFERENCE = "ankiconnect_deck"
 internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
+
+/** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
+internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
 internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
 
 /** Automatic page tokens: YouTube wanted a token, so later videos ask with it first. */
@@ -48,6 +51,7 @@ internal val STUDY_SETTING_KEYS =
         SEND_TO_APP_PREFERENCE,
         ANKICONNECT_DECK_PREFERENCE,
         BLUR_BOX_PREFERENCE,
+        KANJI_DETAILS_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
         KNOWN_WORDS_OFFERED_PREFERENCE,
@@ -136,6 +140,7 @@ internal data class StudySettings(
     val sendTo: FlashcardApp = FlashcardApp.ANKIDROID,
     val ankiConnectDeck: String? = null,
     val blurBox: Boolean = false,
+    val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
     /** Known words is on (Automatic or Manual): the score, new-word marks and "I know this word" show. */
@@ -166,6 +171,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
+        kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),
     )
 

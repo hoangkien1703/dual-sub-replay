@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_ads_title">Iklan &amp; sponsor</string>
+    <string name="settings_section_ads_summary">Lewati iklan video dan bagian sponsor</string>
+    <string name="ads_skip_ads_title">Lewati iklan</string>
+    <string name="ads_skip_ads_description">Membisukan iklan video YouTube, memutarnya dengan cepat, dan menekan Lewati begitu tombolnya muncul. Iklan banner di atas video ditutup.</string>
+    <string name="ads_skip_sponsors_title">Lewati sponsor</string>
+    <string name="ads_skip_sponsors_description">Melompati bagian sponsor saat video sampai di sana, berdasarkan daftar komunitas SponsorBlock. Bagian yang kamu tuju sendiri tetap diputar. Hanya kode pendek dari ID video yang dikirim ke sponsor.ajay.app.</string>
+    <string name="ads_always_skip_sponsors_title">Selalu lewati sponsor</string>
+    <string name="ads_always_skip_sponsors_description">Juga melewati bagian sponsor saat kamu melompat ke sana, mengetuk salah satu barisnya, atau memutar ulang kata di sana, jadi bagian sponsor tidak pernah diputar.</string>
+    <string name="ads_note">Iklan tetap dimulai, karena YouTube yang menentukan kapan iklan diputar. Jika YouTube memperingatkan soal pemblokir iklan, matikan Lewati iklan.</string>
+    <string name="ads_skipped_sponsor_note">Sponsor dilewati</string>
+    <string name="ads_last_ad_check">Iklan terakhir: %1$s</string>
+    <string name="ads_sponsor_parts_check">Bagian sponsor di video terakhir: %1$d</string>
+</resources>

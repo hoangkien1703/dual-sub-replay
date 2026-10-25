@@ -223,12 +223,16 @@ private fun AiGrammarButton(
     }
 }
 
-/** The "Grammar" heading and one card per grammar point; nothing when there are none. */
+/** The "Grammar" heading (a tap hides or shows the points) and one card per point; nothing when there are none. */
 @Composable
 internal fun GrammarPointList(matches: List<GrammarMatch>) {
     if (matches.isEmpty()) return
-    Column(Modifier.fillMaxWidth().testTag("grammar_section"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.grammar_title), style = MaterialTheme.typography.titleSmall)
+    CollapsibleWordCardSection(
+        title = stringResource(R.string.grammar_title),
+        count = matches.size,
+        preferenceKey = WORD_CARD_GRAMMAR_OPEN_PREFERENCE,
+        testTag = "grammar_section",
+    ) {
         matches.forEach { GrammarPointCard(it) }
     }
 }

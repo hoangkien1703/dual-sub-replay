@@ -23,6 +23,26 @@ DualSub Replay includes these libraries, all under the Apache License 2.0 (full 
   follow the CEFR-J Grammar Profile Version 20180315. Both may be used for research and
   commercial purposes with this citation.
 
+Kanji details on the word card use these data files (not under the Apache License):
+
+- KANJIDIC2 (database version 2026-296): Copyright James William Breen and the Electronic
+  Dictionary Research and Development Group, used under the Creative Commons
+  Attribution-ShareAlike 4.0 licence (https://www.edrdg.org/edrdg/licence.html). Readings,
+  meanings, stroke counts, grades and Hán Việt readings, with 15 Hán Việt readings corrected.
+- KanjiVG r20260714 (stroke order and parts): Copyright Ulrich Apel and contributors, used under
+  the Creative Commons Attribution-ShareAlike 3.0 licence (https://kanjivg.tagaini.net).
+- The app's kanji files made from them (learner-data/ja-kanji.txt and ja-kanji-strokes.txt) are
+  shared under the same licences. The memory stories and radical names are written for this app
+  and are under its MIT licence.
+
+Chinese character details use Make Me a Hanzi (stroke order under the Arphic Public License,
+character facts under the GNU LGPL 3.0 or later), the HSK 3.0 character list (MIT) and Unihan
+(Unicode License). Their full notices are in the Chinese character data licence (hanzi.txt).
+
+Skip sponsors uses SponsorBlock data (https://sponsor.ajay.app), asked for while a video plays and
+not stored, under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 licence
+(https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
 Source and full notices: https://github.com/hoangkien1703/dual-sub-replay/blob/main/THIRD_PARTY_NOTICES.md
 
 

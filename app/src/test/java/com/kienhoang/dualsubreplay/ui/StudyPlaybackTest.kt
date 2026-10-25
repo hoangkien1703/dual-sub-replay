@@ -184,6 +184,7 @@ class StudyPlaybackTest {
         val defaults = StudySettings()
         assertEquals(PageTokenMode.AUTO, defaults.pageTokenCaptions)
         assertEquals(false, defaults.blurBox)
+        assertTrue("Kanji details start on", defaults.kanjiDetails)
         assertEquals("Off until the user turns it on", KnownWordsMode.OFF, defaults.knownWordsMode)
         assertEquals(10, defaults.knownWordsAfter)
         assertFalse(defaults.knownWords)

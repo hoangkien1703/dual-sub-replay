@@ -32,9 +32,24 @@ Current releases bundle only:
 
 The HSK levels of the Chinese grammar points are taken from the grammar syllabus and word list of the *Chinese Proficiency Grading Standards for International Chinese Language Education* (GF0025-2021), as published in [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT). Only the level numbers are used; the lists are not part of the app.
 
+- Japanese kanji data (data files only, `app/src/main/learner-data/`, made by `tools/kanji/build_kanji_data.py`):
+  - `ja-kanji.txt` (readings, meanings, stroke counts, grades and Hán Việt readings of the 2,136 jōyō and 863 jinmeiyō kanji) comes from [KANJIDIC2](https://www.edrdg.org/kanjidic/kanjidic2.xml.gz) database version 2026-296, Copyright James William Breen and the Electronic Dictionary Research and Development Group, used under [CC BY-SA 4.0](https://www.edrdg.org/edrdg/licence.html). Fifteen Hán Việt readings KANJIDIC2 gives for another form of the character are corrected (listed in the build script). Each kanji's parts in the same file come from KanjiVG.
+  - `ja-kanji-strokes.txt` (stroke order paths) comes from [KanjiVG](https://kanjivg.tagaini.net) release r20260714, Copyright Ulrich Apel and contributors, used under CC BY-SA 3.0.
+  - Both files are adaptations shared under the same licences (CC BY-SA 4.0 and CC BY-SA 3.0); the app's code stays MIT. `ja-radicals.txt` (the 214 Kangxi radicals' names) and the memory stories `ja-kanji-stories-en.txt` and `ja-kanji-stories-vi.txt` are written for this app (MIT). No mnemonics from WaniKani, Koohii, Kanji alive or other sources are used.
+
+- Chinese character data (data files only, `app/src/main/learner-data/`, made by `tools/hanzi/build_hanzi_data.py`):
+  - `zh-hanzi-strokes.txt` (stroke outlines and centre lines of the 3,000 HSK 3.0 characters and their traditional forms) comes from [Make Me a Hanzi](https://github.com/skishore/makemeahanzi)'s `graphics.txt`, derived from the fonts AR PL KaitiM GB and AR PL UKai, Copyright 1999 Arphic Technology Co., Ltd., used and shared under the Arphic Public License (text in `app/src/main/assets/licenses/hanzi.txt`). The file says how it was changed.
+  - `zh-hanzi.txt` (pinyin, meanings, radicals, parts with the meaning and sound part) comes from Make Me a Hanzi's `dictionary.txt` (Copyright Shaunak Kishore, derived from Unihan and CJKlib), used and shared under the GNU LGPL 3.0 or later, with HSK 3.0 levels and words from [ivankra/hsk30](https://github.com/ivankra/hsk30) (MIT, Copyright 2023 Ivan Krasilnikov) and traditional forms from Unihan (Unicode License).
+  - `zh-hanviet.txt` (Hán Việt readings) comes from KANJIDIC2 (CC BY-SA 4.0, credited above) and Unihan, with about 170 readings checked and corrected by hand (listed in the build script); it is shared under CC BY-SA 4.0.
+  - The memory stories `zh-hanzi-stories-en.txt` and `zh-hanzi-stories-vi.txt` are written for this app (MIT), some starting from the app's own kanji stories. No mnemonics from Remembering the Hanzi, Mandarin Blueprint, Outlier, Skritter or other sources are used. Simplified radical forms (钅, 鸟 …) were added to `ja-radicals.txt`.
+
 Study tools (2026-10-20) include no third-party code or data. Load captions with a page token (beta) follows the proof-of-origin token flow that LuanRT's [BgUtils](https://github.com/LuanRT/BgUtils) (MIT) documents, written for this app; it uses YouTube's own public web values that the web player sends. Send to AnkiDroid talks to AnkiDroid's public content provider directly, without the AnkiDroid API library. Send to AnkiConnect (2026-10-23) speaks AnkiConnect's public JSON protocol to the phone's own address; no code of AnkiConnect or AnkiConnect Android (GPL-3.0) is used. The play modes, known words and blur box are ideas seen in Migaku and jidoujisho (GPL-3.0); none of their code, assets, data, keys or endpoints are used.
 
-The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, and the ML Kit translation terms.
+The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, the KANJIDIC2 and KanjiVG credits, the Chinese character data credits with the Arphic Public License and the GNU LGPL, and the ML Kit translation terms.
+
+## SponsorBlock segments (asked for while a video plays)
+
+Settings → Ads & sponsors → Skip sponsors uses sponsor segments from [SponsorBlock](https://sponsor.ajay.app) by Ajay Ramachandran and contributors. The app asks SponsorBlock's public API for the open video's segments, keeps them in memory only, and does not include or redistribute the database. SponsorBlock's data is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/); no SponsorBlock code is used.
 
 ## Japanese dictionary (downloaded on first use)
 

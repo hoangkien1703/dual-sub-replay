@@ -1,0 +1,218 @@
+# The 214 Kangxi radicals for the word card's kanji and Chinese character pages, written for DualSub
+# Replay (MIT). Format (tab separated): number, forms (the main form first, then the shapes it takes
+# inside a character, including simplified Chinese forms such as 钅 and 鸟),
+# English name, Vietnamese name (bộ), Vietnamese meaning.
+1	一	one	Nhất	một
+2	丨	line	Cổn	nét sổ
+3	丶	dot	Chủ	dấu chấm
+4	丿 ノ	slash	Phiệt	nét phẩy
+5	乙 乚 ⺄	second	Ất	thứ hai
+6	亅	hook	Quyết	nét móc
+7	二	two	Nhị	hai
+8	亠	lid	Đầu	cái nắp
+9	人 亻 𠆢	person	Nhân	người
+10	儿	legs	Nhân	chân người
+11	入	enter	Nhập	vào
+12	八 丷 ハ	eight	Bát	tám
+13	冂	upside-down box	Quynh	vùng biên giới
+14	冖	cover	Mịch	khăn trùm
+15	冫	ice	Băng	nước đá
+16	几	table	Kỷ	cái ghế
+17	凵	open box	Khảm	há miệng
+18	刀 刂 ⺈	knife	Đao	con dao
+19	力	power	Lực	sức mạnh
+20	勹	wrap	Bao	bao bọc
+21	匕	spoon	Chủy	cái thìa
+22	匚	box	Phương	cái hộp
+23	匸	hiding place	Hệ	che giấu
+24	十	ten	Thập	mười
+25	卜	fortune telling	Bốc	xem bói
+26	卩 ⺋ 㔾	seal	Tiết	đốt tre
+27	厂	cliff	Hán	sườn núi
+28	厶	private	Khư	riêng tư
+29	又	again	Hựu	lại nữa
+30	口	mouth	Khẩu	cái miệng
+31	囗	enclosure	Vi	vây quanh
+32	土	earth	Thổ	đất
+33	士	samurai	Sĩ	kẻ sĩ
+34	夂	winter	Truy	đến sau
+35	夊	go slowly	Tuy	đi chậm
+36	夕	evening	Tịch	buổi tối
+37	大	big	Đại	to lớn
+38	女	woman	Nữ	phụ nữ
+39	子	child	Tử	đứa con
+40	宀	roof	Miên	mái nhà
+41	寸	inch	Thốn	tấc
+42	小 ⺌ ⺍	small	Tiểu	nhỏ
+43	尢 尣	lame	Uông	yếu đuối
+44	尸	corpse	Thi	xác chết
+45	屮	sprout	Triệt	mầm non
+46	山	mountain	Sơn	núi
+47	巛 川 巜	river	Xuyên	sông
+48	工	work	Công	công việc
+49	己	self	Kỷ	bản thân
+50	巾	cloth	Cân	cái khăn
+51	干	dry	Can	khô
+52	幺	short thread	Yêu	nhỏ bé
+53	广	house on a cliff	Nghiễm	mái hiên
+54	廴	long stride	Dẫn	bước dài
+55	廾	two hands	Củng	chắp tay
+56	弋	ceremony	Dặc	bắn
+57	弓	bow	Cung	cây cung
+58	彐 彑 ⺕	snout	Kệ	đầu con nhím
+59	彡	hair	Sam	lông tóc
+60	彳	step	Xích	bước chân
+61	心 忄 ⺗	heart	Tâm	trái tim
+62	戈	halberd	Qua	cây giáo
+63	戶 戸 户	door	Hộ	cánh cửa
+64	手 扌 龵	hand	Thủ	bàn tay
+65	支	branch	Chi	cành
+66	攴 攵	strike	Phộc	đánh nhẹ
+67	文	writing	Văn	văn chương
+68	斗	dipper	Đẩu	cái đấu
+69	斤	axe	Cân	cái rìu
+70	方	direction	Phương	phương hướng
+71	无 旡	not	Vô	không
+72	日	sun	Nhật	mặt trời
+73	曰	say	Viết	nói rằng
+74	月	moon	Nguyệt	mặt trăng
+75	木	tree	Mộc	cây
+76	欠	lack	Khiếm	thiếu
+77	止	stop	Chỉ	dừng lại
+78	歹 歺	death	Đãi	cái chết
+79	殳	weapon	Thù	binh khí
+80	毋 毌 母	mother	Vô	chớ
+81	比	compare	Tỷ	so sánh
+82	毛	fur	Mao	lông
+83	氏	clan	Thị	họ
+84	气	steam	Khí	hơi nước
+85	水 氵 氺	water	Thủy	nước
+86	火 灬	fire	Hỏa	lửa
+87	爪 爫 ⺤	claw	Trảo	móng vuốt
+88	父	father	Phụ	cha
+89	爻	crossing	Hào	đan chéo
+90	爿 丬 ⺦	split wood	Tường	mảnh gỗ
+91	片	slice	Phiến	mảnh
+92	牙	fang	Nha	răng nanh
+93	牛 牜 ⺧	cow	Ngưu	con bò
+94	犬 犭 ⺨	dog	Khuyển	con chó
+95	玄	dark	Huyền	màu huyền
+96	玉 王 ⺩	jewel	Ngọc	ngọc
+97	瓜	melon	Qua	quả dưa
+98	瓦	tile	Ngõa	ngói
+99	甘	sweet	Cam	ngọt
+100	生	life	Sinh	sống
+101	用	use	Dụng	dùng
+102	田	rice field	Điền	ruộng
+103	疋 ⺪	bolt of cloth	Sơ	tấm vải
+104	疒	sickness	Nạch	bệnh tật
+105	癶	footsteps	Bát	gạt ra
+106	白	white	Bạch	màu trắng
+107	皮	skin	Bì	da
+108	皿	dish	Mãnh	cái đĩa
+109	目 罒	eye	Mục	con mắt
+110	矛	spear	Mâu	cây mâu
+111	矢	arrow	Thỉ	mũi tên
+112	石	stone	Thạch	đá
+113	示 礻	altar	Thị	bàn thờ
+114	禸	animal track	Nhựu	vết chân thú
+115	禾	grain	Hòa	cây lúa
+116	穴	hole	Huyệt	cái hang
+117	立	stand	Lập	đứng
+118	竹 ⺮	bamboo	Trúc	cây tre
+119	米	rice	Mễ	gạo
+120	糸 糹 纟	thread	Mịch	sợi tơ
+121	缶	jar	Phẫu	cái vò
+122	网 罓 ⺲ 㓁 ⺳	net	Võng	cái lưới
+123	羊 ⺶ ⺷	sheep	Dương	con dê
+124	羽	feather	Vũ	lông vũ
+125	老 耂	old	Lão	già
+126	而	beard	Nhi	mà
+127	耒	plow	Lỗi	cái cày
+128	耳	ear	Nhĩ	cái tai
+129	聿 ⺻	brush	Duật	cây bút
+130	肉 ⺼ 月	meat	Nhục	thịt
+131	臣	retainer	Thần	bề tôi
+132	自	oneself	Tự	tự mình
+133	至	arrive	Chí	đến
+134	臼 𦥑	mortar	Cữu	cái cối
+135	舌	tongue	Thiệt	cái lưỡi
+136	舛	opposite	Suyễn	trái ngược
+137	舟	boat	Chu	con thuyền
+138	艮	stopping	Cấn	dừng lại
+139	色	color	Sắc	màu sắc
+140	艸 艹 ⺿ ⺾	grass	Thảo	cỏ
+141	虍	tiger stripes	Hô	vằn hổ
+142	虫	insect	Trùng	sâu bọ
+143	血	blood	Huyết	máu
+144	行	go	Hành	đi
+145	衣 衤	clothes	Y	áo
+146	襾 西 覀	cover	Á	che đậy
+147	見 见	see	Kiến	nhìn thấy
+148	角	horn	Giác	cái sừng
+149	言 訁 讠	words	Ngôn	lời nói
+150	谷	valley	Cốc	thung lũng
+151	豆	bean	Đậu	hạt đậu
+152	豕	pig	Thỉ	con lợn
+153	豸	cat-like animal	Trãi	loài thú
+154	貝 贝	shell	Bối	vỏ sò
+155	赤	red	Xích	màu đỏ
+156	走	run	Tẩu	chạy
+157	足 ⻊	foot	Túc	bàn chân
+158	身	body	Thân	thân thể
+159	車 车	car	Xa	cái xe
+160	辛	bitter	Tân	cay đắng
+161	辰	morning	Thần	buổi sớm
+162	辵 辶 ⻌ ⻍	walk	Sước	bước đi
+163	邑 ⻏ 阝	village	Ấp	làng ấp
+164	酉	wine	Dậu	bình rượu
+165	釆	separate	Biện	phân biệt
+166	里	village	Lý	làng
+167	金 釒 钅	gold	Kim	kim loại
+168	長 镸 长	long	Trường	dài
+169	門 门	gate	Môn	cổng
+170	阜 ⻖ 阝	mound	Phụ	gò đất
+171	隶	slave	Đãi	kịp
+172	隹	old bird	Chuy	chim đuôi ngắn
+173	雨 ⻗	rain	Vũ	mưa
+174	靑 青	blue	Thanh	màu xanh
+175	非	wrong	Phi	không phải
+176	面	face	Diện	gương mặt
+177	革	leather	Cách	da thú
+178	韋 韦	tanned leather	Vi	da thuộc
+179	韭	leek	Cửu	rau hẹ
+180	音	sound	Âm	âm thanh
+181	頁 页	head	Hiệt	cái đầu
+182	風 风	wind	Phong	gió
+183	飛 飞	fly	Phi	bay
+184	食 飠 𩙿 饣	eat	Thực	ăn
+185	首	neck	Thủ	cái đầu
+186	香	fragrance	Hương	mùi thơm
+187	馬 马	horse	Mã	con ngựa
+188	骨	bone	Cốt	xương
+189	高	tall	Cao	cao
+190	髟	long hair	Bưu	tóc dài
+191	鬥	fight	Đấu	đánh nhau
+192	鬯	herbs	Sưởng	rượu thơm
+193	鬲	cauldron	Cách	cái vạc
+194	鬼	ghost	Quỷ	ma quỷ
+195	魚 鱼	fish	Ngư	con cá
+196	鳥 鸟	bird	Điểu	con chim
+197	鹵 卤	salt	Lỗ	muối
+198	鹿	deer	Lộc	con hươu
+199	麥 麦	wheat	Mạch	lúa mì
+200	麻	hemp	Ma	cây gai
+201	黃 黄	yellow	Hoàng	màu vàng
+202	黍	millet	Thử	lúa nếp
+203	黑 黒	black	Hắc	màu đen
+204	黹	embroidery	Chỉ	thêu thùa
+205	黽 黾	frog	Mãnh	con ếch
+206	鼎	tripod	Đỉnh	cái đỉnh
+207	鼓	drum	Cổ	cái trống
+208	鼠	rat	Thử	con chuột
+209	鼻	nose	Tị	cái mũi
+210	齊 斉 齐	even	Tề	ngang bằng
+211	齒 歯 齿	tooth	Xỉ	răng
+212	龍 竜 龙	dragon	Long	con rồng
+213	龜 亀 龟	turtle	Quy	con rùa
+214	龠	flute	Dược	ống sáo

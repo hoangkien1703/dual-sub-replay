@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,13 +10,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.BookmarkAdded
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.kienhoang.dualsubreplay.R
@@ -48,6 +52,7 @@ internal fun WordLearningDialog(
     var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
     var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
+    var characterPage by remember(selection) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val canClip = validClipRange(selection.videoId, selection.segment?.startMs ?: -1, selection.segment?.endMs ?: -1)
 
@@ -80,19 +85,24 @@ internal fun WordLearningDialog(
             ) {
                 WordCardHeader(selection.token.text, onSpeak, onDismiss)
                 Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    WordCardDetails(selection, speechMessage, onSpeechSettings)
-                    if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
-                    OutlinedTextField(
-                        meaning,
-                        {
+                    val openCharacter = characterPage
+                    if (openCharacter != null) {
+                        CharacterPage(openCharacter, selection, onBack = { characterPage = null }, onAskedAi = onDismiss)
+                        return@Column
+                    }
+                    MeaningPanel(
+                        meaning = meaning,
+                        language = languageDisplayName(selection.meaningLanguage, currentInterfaceLocale()),
+                        loading = loading,
+                        enabled = !loading && !saving,
+                        onChange = {
                             meaning = it
                             saved = false
                         },
-                        label = { Text(stringResource(R.string.practice_meaning_label, selection.meaningLanguage)) },
-                        enabled = !loading && !saving,
-                        modifier = Modifier.fillMaxWidth().testTag("word_meaning"),
                     )
                     error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+                    WordCardDetails(selection, speechMessage, onSpeechSettings)
+                    CharacterSection(selection) { characterPage = it }
                     GrammarExplanations(selection, onAskedAi = onDismiss)
                     if (canClip) {
                         ClipChoice(stringResource(R.string.practice_online_example), online, {
@@ -126,6 +136,65 @@ internal fun WordLearningDialog(
                     StudyWordActions(selection, meaning)
                     if (selection.isPhrase) WordByWord(selection.parts, onSpeakPart)
                 }
+            }
+        }
+    }
+}
+
+/**
+ * The meaning, the answer the learner opened the card for: a tinted panel with an accent bar and
+ * large bold text right under the word (owner request 2026-10-24). The pencil turns it into a
+ * text field to correct the meaning before saving.
+ */
+@Composable
+private fun MeaningPanel(
+    meaning: String,
+    language: String,
+    loading: Boolean,
+    enabled: Boolean,
+    onChange: (String) -> Unit,
+) {
+    var editing by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        color = colors.primaryContainer,
+        contentColor = colors.onPrimaryContainer,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().testTag("word_meaning_panel"),
+    ) {
+        Row(Modifier.height(IntrinsicSize.Min)) {
+            Box(Modifier.width(6.dp).fillMaxHeight().background(colors.primary))
+            Column(Modifier.weight(1f).padding(start = 14.dp, top = 10.dp, bottom = 12.dp)) {
+                Text(
+                    stringResource(R.string.practice_meaning_label, language),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colors.primary,
+                )
+                when {
+                    loading -> LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 12.dp, end = 14.dp))
+                    editing ->
+                        OutlinedTextField(
+                            meaning,
+                            onChange,
+                            enabled = enabled,
+                            textStyle = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 4.dp).testTag("word_meaning"),
+                        )
+                    else ->
+                        Text(
+                            meaning.ifBlank { "…" },
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 2.dp).testTag("word_meaning_text"),
+                        )
+                }
+            }
+            IconButton(onClick = { editing = !editing }, enabled = enabled, modifier = Modifier.testTag("edit_meaning")) {
+                Icon(
+                    if (editing) Icons.Default.Check else Icons.Default.Edit,
+                    contentDescription = stringResource(if (editing) R.string.practice_meaning_done else R.string.practice_meaning_edit),
+                    tint = colors.primary,
+                )
             }
         }
     }
@@ -265,3 +334,31 @@ internal fun partOfSpeechLabel(partOfSpeech: PartOfSpeech): Int =
         PartOfSpeech.UNALIGNED -> R.string.practice_pos_unaligned
         PartOfSpeech.OTHER -> R.string.practice_pos_other
     }
+
+/** Japanese words list their kanji, Chinese words their characters (Settings → Study tools → Character details). */
+@Composable
+private fun CharacterSection(
+    selection: LearningWordSelection,
+    onOpen: (String) -> Unit,
+) {
+    if (!rememberStudySettings().value.kanjiDetails) return
+    when {
+        isJapaneseWord(selection) -> KanjiSection(selection, onOpen)
+        isChineseWord(selection) -> HanziSection(selection, onOpen)
+    }
+}
+
+/** The kanji or Chinese character page opened from [CharacterSection], shown in place of the card. */
+@Composable
+private fun CharacterPage(
+    literal: String,
+    selection: LearningWordSelection,
+    onBack: () -> Unit,
+    onAskedAi: () -> Unit,
+) {
+    if (isChineseWord(selection)) {
+        HanziPage(literal, selection, onBack, onAskedAi)
+    } else {
+        KanjiPage(literal, selection, onBack, onAskedAi)
+    }
+}

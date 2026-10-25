@@ -99,6 +99,13 @@ internal fun StudyToolsSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(BLUR_BOX_PREFERENCE, it).apply() },
         testTag = "blur_box_switch",
     )
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_kanji_details_title),
+        description = stringResource(R.string.study_kanji_details_description),
+        checked = settings.kanjiDetails,
+        onCheckedChange = { preferences.edit().putBoolean(KANJI_DETAILS_PREFERENCE, it).apply() },
+        testTag = "kanji_details_switch",
+    )
     PageTokenSettings(settings.pageTokenCaptions) { mode ->
         // A new choice starts over: Automatic learns again whether YouTube wants a token.
         preferences

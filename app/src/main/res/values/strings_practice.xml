@@ -89,6 +89,7 @@
     <string name="practice_copy">Copy</string>
     <string name="practice_copied">Copied</string>
     <string name="practice_translate">Translate</string>
+    <string name="practice_all_actions">All actions</string>
     <string name="practice_clear_selection">Clear selection</string>
     <string name="practice_tap_another_word">Tap another word to select a phrase</string>
     <string name="practice_translation_unavailable">Translation unavailable</string>

@@ -29,5 +29,3 @@ body:
       options:
         - label: I searched existing issues and the roadmap first.
           required: true
-        - label: This request does not depend on downloading YouTube video or audio.
-          required: true

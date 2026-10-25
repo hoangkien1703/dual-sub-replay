@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_ads_title">Ads &amp; sponsors</string>
+    <string name="settings_section_ads_summary">Skip video ads and sponsor parts</string>
+    <string name="ads_skip_ads_title">Skip ads</string>
+    <string name="ads_skip_ads_description">Mutes YouTube video ads, plays them fast and presses Skip as soon as it appears. Banner ads on the video are closed.</string>
+    <string name="ads_skip_sponsors_title">Skip sponsors</string>
+    <string name="ads_skip_sponsors_description">Jumps over sponsor parts when the video plays into them, from SponsorBlock\'s community list. A part you jump into yourself still plays. Only a short code made from the video ID is sent to sponsor.ajay.app.</string>
+    <string name="ads_always_skip_sponsors_title">Always skip sponsors</string>
+    <string name="ads_always_skip_sponsors_description">Also skips a sponsor part when you jump into it, tap one of its lines or replay a word there, so sponsor parts never play.</string>
+    <string name="ads_note">Ads still start, because YouTube decides when they play. If YouTube warns about ad blockers, turn Skip ads off.</string>
+    <string name="ads_skipped_sponsor_note">Skipped sponsor</string>
+    <string name="ads_last_ad_check">Last ad: %1$s</string>
+    <string name="ads_sponsor_parts_check">Sponsor parts in the last video: %1$d</string>
+</resources>

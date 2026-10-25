@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Word card: kanji details and the meaning panel (2026-10-24) -->
+    <string name="kanji_section_title">漢字</string>
+    <string name="kanji_back">%1$sに戻る</string>
+    <string name="kanji_grade_school">小学%1$d年</string>
+    <string name="kanji_grade_secondary">中学以降</string>
+    <string name="kanji_grade_names">人名用</string>
+    <string name="kanji_radical">部首 %1$s</string>
+    <string name="kanji_on">音読み</string>
+    <string name="kanji_kun">訓読み</string>
+    <string name="kanji_how_to_write">書き順</string>
+    <string name="kanji_play">再生</string>
+    <string name="kanji_stroke_order_description">%1$sの書き順、%2$s</string>
+    <string name="kanji_parts">部品</string>
+    <string name="kanji_part_radical">部首</string>
+    <string name="kanji_part_sound">音符 %1$s</string>
+    <string name="kanji_part_sound_plain">音符</string>
+    <string name="kanji_how_to_remember">覚え方</string>
+    <string name="kanji_memory_story">覚えるための話</string>
+    <string name="kanji_my_story">自分の話</string>
+    <string name="kanji_my_story_hint">自分で覚え方を書く(この端末に保存)</string>
+    <string name="kanji_ai_story_button">AIで別の話</string>
+    <string name="kanji_ai_story_question">漢字「%1$s」の部品を使った短い覚え方の話をもう一つと、読み方を覚える簡単なコツを教えてください。</string>
+    <string name="practice_meaning_edit">意味を編集</string>
+    <string name="practice_meaning_done">完了</string>
+    <string name="study_kanji_details_title">漢字の詳細</string>
+    <string name="study_kanji_details_description">日本語と中国語の単語で、各漢字の書き順・部品・覚え方の話を表示します。</string>
+    <plurals name="kanji_strokes">
+        <item quantity="other">%1$d画</item>
+    </plurals>
+</resources>
