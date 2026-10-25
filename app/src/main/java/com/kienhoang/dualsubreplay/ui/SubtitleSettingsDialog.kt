@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
@@ -102,6 +103,7 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_translation_title,
         R.string.settings_section_translation_summary,
     ),
+    ADS("ads", R.string.settings_section_ads_title, R.string.settings_section_ads_summary),
     UPDATES("updates", R.string.settings_section_updates_title, R.string.settings_section_updates_summary),
 
     /** Only in builds with the assistant ([LocalAiAssistant] is set). */
@@ -557,6 +559,10 @@ internal fun SubtitleSettingsDialog(
                             SettingsSectionDivider()
                             LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
                         }
+                    }
+
+                    Section(MoreSettingsSection.ADS, Icons.Default.FastForward) {
+                        AdSkipSettingsSection()
                     }
 
                     Section(MoreSettingsSection.UPDATES, Icons.Default.SystemUpdate) {

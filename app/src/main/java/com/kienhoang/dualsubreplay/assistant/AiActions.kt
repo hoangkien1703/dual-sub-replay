@@ -125,6 +125,10 @@ internal enum class AiSetting(
     KANJI_DETAILS("kanji_details"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
+    /** Settings → Ads and sponsors (2026-10-25). */
+    SKIP_ADS("skip_ads"),
+    SKIP_SPONSORS("skip_sponsors"),
+
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
     APP_AUTO_UPDATE("auto_update", asks = true),
 
@@ -742,6 +746,14 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (beta: auto makes a token on the YouTube page only when captions come back empty and then uses it first on " +
                 "later videos while that works; on always asks with a token first; off never makes one)"
+        AiSetting.SKIP_ADS ->
+            choiceList(setting.choices) +
+                " (while a YouTube video ad shows, it is muted and played at 4x, and YouTube's Skip button is pressed as soon " +
+                "as it appears; banner ads on the player are closed; on by default)"
+        AiSetting.SKIP_SPONSORS ->
+            choiceList(setting.choices) +
+                " (jumps over the sponsor parts creators recorded in a video, as listed in SponsorBlock's community database; " +
+                "a part the user seeks into plays; on by default)"
         AiSetting.APP_AUTO_UPDATE ->
             choiceList(setting.choices) +
                 " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +

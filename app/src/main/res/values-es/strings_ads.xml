@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_ads_title">Anuncios y patrocinios</string>
+    <string name="settings_section_ads_summary">Omitir anuncios de vídeo y partes patrocinadas</string>
+    <string name="ads_skip_ads_title">Omitir anuncios</string>
+    <string name="ads_skip_ads_description">Silencia los anuncios de vídeo de YouTube, los reproduce rápido y pulsa Omitir en cuanto aparece. Se cierran los anuncios de banner sobre el vídeo.</string>
+    <string name="ads_skip_sponsors_title">Omitir patrocinios</string>
+    <string name="ads_skip_sponsors_description">Salta las partes patrocinadas de los vídeos, según la lista de la comunidad de SponsorBlock. Solo se envía a sponsor.ajay.app un código corto hecho a partir del ID del vídeo.</string>
+    <string name="ads_note">Los anuncios siguen empezando, porque YouTube decide cuándo se reproducen. Si YouTube avisa de bloqueadores de anuncios, desactiva Omitir anuncios.</string>
+    <string name="ads_skipped_sponsor_note">Patrocinio omitido</string>
+</resources>

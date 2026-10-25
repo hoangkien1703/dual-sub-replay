@@ -142,6 +142,7 @@ internal data class AiStoredSettings(
     val appLanguage: String = "device",
     val study: StudySettings = StudySettings(),
     val autoUpdate: Boolean = false,
+    val adSkip: AdSkipSettings = AdSkipSettings(),
 )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -159,6 +160,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         appLanguage = AppLanguageSettings.selected(context)?.tag ?: "device",
         study = readStudySettings(preferences),
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
+        adSkip = readAdSkipSettings(preferences),
     )
 }
 
@@ -190,6 +192,8 @@ private fun aiStoredSettingValue(
         AiSetting.REMEMBER_DRAGGED_POSITION -> onOff(stored.rememberDraggedPosition)
         AiSetting.APP_LANGUAGE -> stored.appLanguage
         AiSetting.APP_AUTO_UPDATE -> onOff(stored.autoUpdate)
+        AiSetting.SKIP_ADS -> onOff(stored.adSkip.skipAds)
+        AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
         else -> aiStudySettingValue(stored.study, setting)
     }
 
@@ -625,6 +629,8 @@ internal class AppAiActions(
                 if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             }
             AiSetting.APP_AUTO_UPDATE -> editor.putBoolean(APP_AUTO_UPDATE_PREFERENCE, on)
+            AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
+            AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -809,6 +815,8 @@ internal class AppAiActions(
             AiSetting.KANJI_DETAILS -> switch(R.string.study_kanji_details_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
             AiSetting.APP_AUTO_UPDATE -> switch(R.string.updates_auto_title, value)
+            AiSetting.SKIP_ADS -> switch(R.string.ads_skip_ads_title, value)
+            AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_ads_title">広告とスポンサー</string>
+    <string name="settings_section_ads_summary">動画広告とスポンサー部分をスキップ</string>
+    <string name="ads_skip_ads_title">広告をスキップ</string>
+    <string name="ads_skip_ads_description">YouTube の動画広告をミュートして速く再生し、［スキップ］が表示されたらすぐに押します。動画上のバナー広告は閉じます。</string>
+    <string name="ads_skip_sponsors_title">スポンサーをスキップ</string>
+    <string name="ads_skip_sponsors_description">SponsorBlock のコミュニティリストをもとに、動画内のスポンサー部分を飛ばします。sponsor.ajay.app に送るのは動画 ID から作った短いコードだけです。</string>
+    <string name="ads_note">広告の再生を決めるのは YouTube なので、広告自体は始まります。YouTube に広告ブロッカーの警告が出たら、［広告をスキップ］をオフにしてください。</string>
+    <string name="ads_skipped_sponsor_note">スポンサーをスキップしました</string>
+</resources>
