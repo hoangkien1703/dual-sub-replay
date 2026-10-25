@@ -49,9 +49,8 @@ private const val SKIP_BUTTON_SELECTOR =
 /** The app taps YouTube's Skip button at most this often; YouTube ignores a press made by a page script. */
 private const val SKIP_TAP_INTERVAL_MS = 1_500L
 
-/** How often the app asks the page for the Skip button while an ad shows, and otherwise. */
+/** How often the app asks the page for the Skip button while an ad shows. */
 private const val SKIP_TARGET_AD_MS = 300L
-private const val SKIP_TARGET_IDLE_MS = 1_000L
 
 /** The close button of a banner ad over the playing video. */
 private const val BANNER_CLOSE_SELECTOR = ".ytp-ad-overlay-close-button, .ytp-ad-overlay-close-container button"
@@ -140,6 +139,7 @@ internal val WEB_AD_SKIP_SCRIPT: String =
         }
         return true;
       };
+      state.adShowing = function() { return adShowing(player()); };
       // During an ad, the middle of the shown Skip button in screen pixels once it has shown for 0.3 s
       // (else {}); null without an ad.
       state.skipTarget = function() {
@@ -253,7 +253,7 @@ internal fun webAdSkipConfigScript(
           if (!state) return false;
           if (state.config.videoId !== $id) state.kept = {};
           state.config = { ads: $skipAds, always: $always, videoId: $id, segments: $list, note: ${JSONObject.quote(note)} };
-          return true;
+          return !!(state.config.ads && state.adShowing && state.adShowing());
         })();
         """.trimIndent()
 }
@@ -298,7 +298,18 @@ private fun tap(
 
 private const val TAP_LENGTH_MS = 60L
 
-/** Keeps the page's ad and sponsor skipping in step with the settings and the open video. */
+/** Runs [script] on the page and returns its JSON reply ("null" when it returned nothing). */
+private suspend fun WebView.evaluate(script: String): String? {
+    val reply = CompletableDeferred<String?>()
+    evaluateJavascript(script) { reply.complete(it) }
+    return reply.await()
+}
+
+/**
+ * Keeps the page's ad and sponsor skipping in step with the settings and the open video. One script
+ * call every 2 s, which also says whether an ad shows; only then the app asks for the Skip button
+ * every 0.3 s and taps it ([PageCpuUseTest] keeps the idle cost within budget).
+ */
 @Composable
 internal fun AdSkipPageScripts(
     webView: WebView,
@@ -309,53 +320,39 @@ internal fun AdSkipPageScripts(
     val settings by rememberAdSkipSettings()
     val note = stringResource(R.string.ads_skipped_sponsor_note)
     val source = remember { SponsorSegmentSource() }
+    val currentPageView by rememberUpdatedState(pageView)
     LaunchedEffect(webView, settings, note, active) {
         if (!active) return@LaunchedEffect
         var videoId: String? = null
         var segments = emptyList<SponsorSegment>()
+        var lastTap = 0L
         val on = settings.skipAds || settings.skipSponsors
         val always = settings.skipSponsors && settings.alwaysSkipSponsors
+        val install = if (on) WEB_AD_SKIP_SCRIPT + "\n" else ""
         // WebView calls must stay on the main thread, also after the SponsorBlock request resumes.
         withContext(Dispatchers.Main.immediate) {
             while (isActive) {
                 val url = webView.url.orEmpty()
+                var adShowing = false
                 if (isYouTubeWebUrl(url)) {
-                    if (on) webView.evaluateJavascript(WEB_AD_SKIP_SCRIPT, null)
                     val id = browseVideoSelection(url)?.videoId?.takeIf { settings.skipSponsors }
                     if (id != videoId) {
                         videoId = id
                         segments = emptyList()
-                        webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, id, segments, note, always), null)
+                        webView.evaluate(install + webAdSkipConfigScript(settings.skipAds, id, segments, note, always))
                         if (id != null) segments = source.segments(id)
                     }
-                    webView.evaluateJavascript(webAdSkipConfigScript(settings.skipAds, videoId, segments, note, always), null)
+                    adShowing =
+                        webView.evaluate(install + webAdSkipConfigScript(settings.skipAds, videoId, segments, note, always)) == "true"
+                    val target = if (adShowing) parseSkipTarget(webView.evaluate(WEB_SKIP_TARGET_SCRIPT)) else null
+                    val now = SystemClock.uptimeMillis()
+                    if (target != null && now - lastTap >= SKIP_TAP_INTERVAL_MS) {
+                        lastTap = now
+                        tap(currentPageView(), target.first, target.second)
+                    }
                 }
                 if (!on) break
-                delay(AD_SKIP_CHECK_MS)
-            }
-        }
-    }
-    val currentPageView by rememberUpdatedState(pageView)
-    LaunchedEffect(webView, settings.skipAds, active) {
-        if (!active || !settings.skipAds) return@LaunchedEffect
-        var lastTap = 0L
-        withContext(Dispatchers.Main.immediate) {
-            while (isActive) {
-                val reply = CompletableDeferred<String?>()
-                if (isYouTubeWebUrl(webView.url.orEmpty())) {
-                    webView.evaluateJavascript(WEB_SKIP_TARGET_SCRIPT) { reply.complete(it) }
-                } else {
-                    reply.complete(null)
-                }
-                val answer = reply.await()
-                val target = parseSkipTarget(answer)
-                val now = SystemClock.uptimeMillis()
-                if (target != null && now - lastTap >= SKIP_TAP_INTERVAL_MS) {
-                    lastTap = now
-                    tap(currentPageView(), target.first, target.second)
-                }
-                val adShowing = answer != null && answer != "null"
-                delay(if (adShowing) SKIP_TARGET_AD_MS else SKIP_TARGET_IDLE_MS)
+                delay(if (adShowing) SKIP_TARGET_AD_MS else AD_SKIP_CHECK_MS)
             }
         }
     }

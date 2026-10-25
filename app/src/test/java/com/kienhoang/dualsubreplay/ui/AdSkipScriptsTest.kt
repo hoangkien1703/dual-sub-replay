@@ -58,6 +58,7 @@ class AdSkipScriptsTest {
         val off = webAdSkipConfigScript(false, null, emptyList(), "")
         assertTrue(off.contains("ads: false, always: false, videoId: null, segments: []"))
         assertTrue("Not installed: nothing to configure", off.contains("if (!state) return false;"))
+        assertTrue("Says whether an ad shows", off.contains("return !!(state.config.ads && state.adShowing && state.adShowing());"))
     }
 
     @Test
