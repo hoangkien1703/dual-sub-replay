@@ -407,6 +407,7 @@ internal fun SingleYouTubePage(
                 )
                 // Before the page player loads, so its caption downloads are kept for the full transcript.
                 WebViewCompat.addDocumentStartJavaScript(this, WEB_CAPTION_CAPTURE_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
+                WebViewCompat.addDocumentStartJavaScript(this, WEB_HIDE_OPEN_APP_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
             }
 
             webViewClient = object : WebViewClient() {
@@ -484,6 +485,7 @@ internal fun SingleYouTubePage(
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         CookieManager.getInstance().flush()
                         view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
+                        view.evaluateJavascript(WEB_HIDE_OPEN_APP_SCRIPT, null)
                         view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
                         view.evaluateJavascript(
                             webLiveCaptionConfigurationScript(currentLiveCaptionCaptureEnabled),
