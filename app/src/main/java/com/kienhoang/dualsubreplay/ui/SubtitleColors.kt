@@ -193,4 +193,4 @@ val RESETTABLE_SETTING_KEYS =
         com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
         com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
         com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE,
-    ) + STUDY_SETTING_KEYS + WORD_CARD_SECTION_KEYS
+    ) + STUDY_SETTING_KEYS + WORD_CARD_SECTION_KEYS + AD_SKIP_SETTING_KEYS
