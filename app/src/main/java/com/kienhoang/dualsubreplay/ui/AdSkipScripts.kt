@@ -66,9 +66,9 @@ private const val BANNER_CLOSE_SELECTOR = ".ytp-ad-overlay-close-button, .ytp-ad
  * Installed once per page; does nothing until [webAdSkipConfigScript] turns it on. Every second
  * (every 0.25 s while an ad shows) it looks at the player: during an ad it mutes the page video,
  * plays it at [AD_PLAYBACK_RATE] and presses Skip once it shows, and afterwards gives the video its
- * sound and speed back. Banner ads are closed. The video's `timeupdate` (and the timer, in case it
- * is missed) jumps over a sponsor part the video plays into; the user's own jump into one (the user
- * chose to watch it) keeps it, but the player's own seeks do not.
+ * sound and speed back. Banner ads are closed. The video's `timeupdate` and `seeked` (and the timer, in
+ * case they are missed) jump over a sponsor part the video plays or seeks into, once the seek is done;
+ * the user's own jump into one (the user chose to watch it) keeps it, but the player's own seeks do not.
  */
 internal val WEB_AD_SKIP_SCRIPT: String =
     """
@@ -79,7 +79,7 @@ internal val WEB_AD_SKIP_SCRIPT: String =
       const RATE = $AD_PLAYBACK_RATE;
       const state = {
         config: { ads: false, always: false, videoId: null, segments: [], note: '' },
-        kept: {}, adVideo: null, adButton: null, skipSince: 0, lastTime: null, skippedAt: 0
+        kept: {}, adVideo: null, adButton: null, skipSince: 0, lastTime: null, skippedAt: 0, skippedId: null
       };
       window.__dualSubAdSkip = state;
       const player = function() {
@@ -92,15 +92,15 @@ internal val WEB_AD_SKIP_SCRIPT: String =
       const adShowing = function(root) {
         return !!root && (root.classList.contains('ad-showing') || root.classList.contains('ad-interrupting'));
       };
-      // Shown means on screen and not hidden, see-through or switched off by any box around it.
+      // Shown means on screen, not hidden or see-through by any box around it, and taking touches itself. The
+      // mobile player's Skip box has pointer-events none around a Skip button that takes them again (2026-10-25).
       const shown = function(element) {
         if (!element || element.disabled || element.getClientRects().length === 0) return false;
         const rect = element.getBoundingClientRect();
-        if (rect.width < 4 || rect.height < 4) return false;
+        if (rect.width < 4 || rect.height < 4 || window.getComputedStyle(element).pointerEvents === 'none') return false;
         for (let node = element; node && node.nodeType === 1; node = node.parentElement) {
           const style = window.getComputedStyle(node);
-          if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) < 0.1 ||
-              style.pointerEvents === 'none') return false;
+          if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) < 0.1) return false;
         }
         return true;
       };
@@ -233,33 +233,37 @@ internal val WEB_AD_SKIP_SCRIPT: String =
       };
       const skipSponsor = function(video, segment) {
         state.skippedAt = Date.now();
+        state.skippedId = segment.id;
         state.lastTime = segment.end;
         video.currentTime = segment.end;
         note();
       };
-      // Playing into a sponsor part jumps over it.
+      // Playing into a sponsor part jumps over it, also where a seek landed, but only once the seek is done:
+      // changing currentTime during a seek made the player seek again and stall (owner test, 2026-10-25). A part
+      // skipped less than 2 s ago is not skipped again, so the player's own seek back into it is not fought.
       const checkSponsor = function(video) {
         if (adShowing(player())) { state.lastTime = null; return; }
-        if (video.seeking) return;
+        if (video.seeking || video.readyState < 1) return;
         const segment = sponsorAt(video);
-        if (segment) skipSponsor(video, segment);
-        else state.lastTime = video.currentTime;
+        if (!segment) state.lastTime = video.currentTime;
+        else if (segment.id !== state.skippedId || Date.now() - state.skippedAt > 2000) skipSponsor(video, segment);
       };
-      window.addEventListener('timeupdate', function(event) {
-        const video = event.target;
-        if (video instanceof HTMLVideoElement && video === pageVideo()) checkSponsor(video);
-      }, true);
+      ['timeupdate', 'seeked'].forEach(function(type) {
+        window.addEventListener(type, function(event) {
+          const video = event.target;
+          if (video instanceof HTMLVideoElement && video === pageVideo()) checkSponsor(video);
+        }, true);
+      });
       window.addEventListener('seeking', function(event) {
         const video = event.target;
         if (!(video instanceof HTMLVideoElement) || video !== pageVideo()) return;
         const segment = sponsorAt(video);
-        if (!segment) return;
+        if (!segment || state.config.always) return;
         // The user's own jump into a sponsor part keeps it, unless Always skip sponsors is on. The player's own
         // seeks (small ones, its return after an ad, undoing a skip) are not the user's: they are skipped too.
         const jumped = state.lastTime !== null && Math.abs(video.currentTime - state.lastTime) >= 1.5 &&
           Date.now() - state.skippedAt > 3000;
-        if (state.config.always || !jumped) skipSponsor(video, segment);
-        else state.kept[segment.id] = true;
+        if (jumped) state.kept[segment.id] = true;
       }, true);
       const tick = function() {
         let fast = false;
@@ -353,16 +357,42 @@ internal object AdSkipReport {
     val sponsorParts = MutableStateFlow<Int?>(null)
 }
 
-/** A real tap: YouTube ignores a Skip press made by a page script, but takes the user's own touch. */
+/**
+ * A real tap: YouTube ignores a Skip press made by a page script, but takes the user's own touch. A finger's
+ * tool type makes the page see `pointerType` "touch" like a real tap, not "" (checked live 2026-10-25).
+ */
 private fun tap(
     view: View,
     x: Float,
     y: Float,
 ) {
     val time = SystemClock.uptimeMillis()
+    val properties = MotionEvent.PointerProperties().apply { toolType = MotionEvent.TOOL_TYPE_FINGER }
+    val coords =
+        MotionEvent.PointerCoords().apply {
+            this.x = x
+            this.y = y
+            pressure = 1f
+            size = 1f
+        }
     listOf(MotionEvent.ACTION_DOWN to time, MotionEvent.ACTION_UP to time + TAP_LENGTH_MS).forEach { (action, at) ->
-        val event = MotionEvent.obtain(time, at, action, x, y, 0)
-        event.source = InputDevice.SOURCE_TOUCHSCREEN
+        val event =
+            MotionEvent.obtain(
+                time,
+                at,
+                action,
+                1,
+                arrayOf(properties),
+                arrayOf(coords),
+                0,
+                0,
+                1f,
+                1f,
+                0,
+                0,
+                InputDevice.SOURCE_TOUCHSCREEN,
+                0,
+            )
         view.dispatchTouchEvent(event)
         event.recycle()
     }

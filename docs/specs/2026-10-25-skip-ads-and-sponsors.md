@@ -69,8 +69,9 @@ How other tools do it (checked 2026-10-25):
   origin (`https:` + `*.youtube.com`) like every page script, never calls `fetch(`, and only
   touches the page video's `muted`, `playbackRate` and `currentTime`, YouTube's Skip and
   banner-close buttons, and its own note element.
-- It runs on a timer every 1 s, every 0.25 s while an ad shows, plus the video's `timeupdate` and
-  `seeking` events for sponsors, so it adds little CPU.
+- It runs on a timer every 1 s, every 0.25 s while an ad shows, plus the video's `timeupdate`,
+  `seeking` and `seeked` events for sponsors, so it adds little CPU. It never changes `currentTime`
+  while a seek is still running.
 - Segments are asked only from `https://sponsor.ajay.app/api/skipSegments/<4 hex>` with
   `categories=["sponsor"]` and `actionTypes=["skip"]`, a 10 s timeout and a 1 MiB reply cap, by
   `data/SponsorSegments.kt`. Only the segments of the open video ID are kept; a segment whose
@@ -151,3 +152,45 @@ How other tools do it (checked 2026-10-25):
   ad, a shown button is tapped after 0.1 s, and again every 1 s if the ad stays.
 - The check line now says how long after the Skip button showed it was tapped and, after the ad, how
   long after the last tap the ad went (a short time means the tap skipped it).
+
+### Live check on the emulator (2026-10-25, v1.7.11 code)
+
+Checked on a Pixel 7 emulator (API 36, WebView 133, `m.youtube.com` signed out, region VN) with Chrome
+DevTools Protocol, watching real pre-roll, mid-roll and post-roll ads and SponsorBlock parts.
+
+- **Why Skip was never tapped.** YouTube's mobile Skip button is
+  `button.ytp-ad-skip-button-modern.ytp-button.ytp-ad-skip-button-icon-delhi` (CSS box 67×32 at
+  329,229 in a 412×843 viewport, `devicePixelRatio` 2.625) inside
+  `span.ytp-ad-skip-button-container-detached` → `div.ytp-ad-skip-button-slot` → `div.ytp-ad-skip-ad-slot`
+  → `div.ytp-ad-player-overlay-skip-or-preview`. That outer box has `pointer-events: none`, while the
+  button itself has `pointer-events: auto` again and takes touches (`elementFromPoint` at its middle is
+  the button). The "shown" check rejected any button with `pointer-events: none` on a box around it, so
+  the check line stayed at `Skip not shown yet (...)` for the whole ad and no tap was sent. Now only
+  the button's own `pointer-events` counts (the property is inherited, so its own value already says
+  whether it takes touches).
+- YouTube's Skip handler is a `click` listener on `div.ytp-ad-skip-button-slot` and
+  `div.ytp-ad-skip-ad-slot`; the script's `click()` (`isTrusted` false) does nothing, as found before.
+- With the fix, the app's tap at view pixel 952,643 (CSS 363,245 × 2.625) reached the button as
+  trusted `pointerdown`, `touchstart`, `pointerup`, `touchend`, `mousedown`, `mouseup` and `click`,
+  and the ad went within about 0.3–0.6 s, 0.3–0.4 s after Skip showed. The coordinates were right;
+  the tap only never happened.
+- The tap's events had `pointerType` "" while `adb shell input tap` gives "touch", because the
+  `MotionEvent` had no tool type. YouTube took it anyway, but the tap is now a finger
+  (`TOOL_TYPE_FINGER`, pressure 1), so the page sees `pointerType` "touch" like a real tap.
+- Two ads in a row (a 5 s bumper without Skip, then a skippable ad): the bumper played at 4x and the
+  second ad's new Skip button was tapped 0.32 s after it showed and skipped.
+- **Why a jump into a sponsor part stalled.** With Always skip sponsors on, the `seeking` handler set
+  `currentTime` to the part's end while the user's seek was still running. The player then finished
+  that seek at the new place and seeked once more on its own (a second `seeking` right after
+  `seeked`); jumping into a part right after opening a video took about 5 s of spinner. Now the
+  `seeking` handler only decides whether the user's jump keeps the part, and the part is skipped once
+  the seek is done (`timeupdate` or `seeked` with `seeking` false and the video's metadata loaded), with
+  one clean seek. A part the app skipped less than 2 s ago is not skipped again, so a seek of the
+  player's own back into it is not fought; the timer and `timeupdate` skip it after that. Checked live
+  on four Linus Tech Tips videos with SponsorBlock parts (jump at load, before and after the video's
+  metadata): one skip each, playing again about 1 s sooner than before; playing into a part skipped it
+  with a single 0.2 s seek.
+- Unverified: an ad in full screen (YouTube stopped serving ads to the emulator while that was being
+  tried; the full-screen page is 412×915 CSS px at 2.625, the size of the full-screen view, so the same
+  mapping applies), a Xiaomi phone, and whether YouTube varies the Skip box's `pointer-events` between
+  layouts (build 506's check line on the owner's phone showed a tap, so some layouts differ).
