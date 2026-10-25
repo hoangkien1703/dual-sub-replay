@@ -6,6 +6,8 @@
     <string name="ads_skip_ads_description">Membisukan iklan video YouTube, memutarnya dengan cepat, dan menekan Lewati begitu tombolnya muncul. Iklan banner di atas video ditutup.</string>
     <string name="ads_skip_sponsors_title">Lewati sponsor</string>
     <string name="ads_skip_sponsors_description">Melompati bagian sponsor dalam video, berdasarkan daftar komunitas SponsorBlock. Hanya kode pendek dari ID video yang dikirim ke sponsor.ajay.app.</string>
+    <string name="ads_always_skip_sponsors_title">Selalu lewati sponsor</string>
+    <string name="ads_always_skip_sponsors_description">Juga melewati bagian sponsor saat kamu melompat ke sana, mengetuk salah satu barisnya, atau memutar ulang kata di sana, jadi bagian sponsor tidak pernah diputar.</string>
     <string name="ads_note">Iklan tetap dimulai, karena YouTube yang menentukan kapan iklan diputar. Jika YouTube memperingatkan soal pemblokir iklan, matikan Lewati iklan.</string>
     <string name="ads_skipped_sponsor_note">Sponsor dilewati</string>
 </resources>

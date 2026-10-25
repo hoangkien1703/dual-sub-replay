@@ -194,6 +194,7 @@ private fun aiStoredSettingValue(
         AiSetting.APP_AUTO_UPDATE -> onOff(stored.autoUpdate)
         AiSetting.SKIP_ADS -> onOff(stored.adSkip.skipAds)
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
+        AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
         else -> aiStudySettingValue(stored.study, setting)
     }
 
@@ -631,6 +632,7 @@ internal class AppAiActions(
             AiSetting.APP_AUTO_UPDATE -> editor.putBoolean(APP_AUTO_UPDATE_PREFERENCE, on)
             AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
             AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
+            AiSetting.ALWAYS_SKIP_SPONSORS -> editor.putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -817,6 +819,7 @@ internal class AppAiActions(
             AiSetting.APP_AUTO_UPDATE -> switch(R.string.updates_auto_title, value)
             AiSetting.SKIP_ADS -> switch(R.string.ads_skip_ads_title, value)
             AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
+            AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

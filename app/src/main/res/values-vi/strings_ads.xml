@@ -6,6 +6,8 @@
     <string name="ads_skip_ads_description">Tắt tiếng quảng cáo video YouTube, phát nhanh và bấm Bỏ qua ngay khi nút này hiện ra. Quảng cáo dạng biểu ngữ trên video sẽ được đóng.</string>
     <string name="ads_skip_sponsors_title">Bỏ qua đoạn tài trợ</string>
     <string name="ads_skip_sponsors_description">Nhảy qua các đoạn tài trợ trong video, theo danh sách cộng đồng của SponsorBlock. Chỉ một mã ngắn tạo từ ID video được gửi tới sponsor.ajay.app.</string>
+    <string name="ads_always_skip_sponsors_title">Luôn bỏ qua đoạn tài trợ</string>
+    <string name="ads_always_skip_sponsors_description">Bỏ qua cả khi bạn tua vào đoạn tài trợ, chạm vào một dòng của nó hoặc phát lại một từ ở đó, nên đoạn tài trợ không bao giờ được phát.</string>
     <string name="ads_note">Quảng cáo vẫn bắt đầu, vì YouTube quyết định khi nào quảng cáo phát. Nếu YouTube cảnh báo về trình chặn quảng cáo, hãy tắt Bỏ qua quảng cáo.</string>
     <string name="ads_skipped_sponsor_note">Đã bỏ qua đoạn tài trợ</string>
 </resources>

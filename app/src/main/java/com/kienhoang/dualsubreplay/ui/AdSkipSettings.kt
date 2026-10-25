@@ -16,18 +16,23 @@ import com.kienhoang.dualsubreplay.R
 internal const val SKIP_ADS_PREFERENCE = "skip_ads"
 internal const val SKIP_SPONSORS_PREFERENCE = "skip_sponsors"
 
+/** Always skip sponsors (owner request 2026-10-25, off by default): a seek into a sponsor part is skipped too. */
+internal const val ALWAYS_SKIP_SPONSORS_PREFERENCE = "always_skip_sponsors"
+
 /** Both switches, reset by Reset all settings. */
-internal val AD_SKIP_SETTING_KEYS = listOf(SKIP_ADS_PREFERENCE, SKIP_SPONSORS_PREFERENCE)
+internal val AD_SKIP_SETTING_KEYS = listOf(SKIP_ADS_PREFERENCE, SKIP_SPONSORS_PREFERENCE, ALWAYS_SKIP_SPONSORS_PREFERENCE)
 
 internal data class AdSkipSettings(
     val skipAds: Boolean = true,
     val skipSponsors: Boolean = true,
+    val alwaysSkipSponsors: Boolean = false,
 )
 
 internal fun readAdSkipSettings(preferences: SharedPreferences): AdSkipSettings =
     AdSkipSettings(
         skipAds = preferences.getBoolean(SKIP_ADS_PREFERENCE, true),
         skipSponsors = preferences.getBoolean(SKIP_SPONSORS_PREFERENCE, true),
+        alwaysSkipSponsors = preferences.getBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, false),
     )
 
 /** The Ads and sponsors settings, following every change (from the settings page or the assistant). */
@@ -68,5 +73,14 @@ internal fun AdSkipSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(SKIP_SPONSORS_PREFERENCE, it).apply() },
         testTag = "skip_sponsors_switch",
     )
+    if (settings.skipSponsors) {
+        SettingsSwitchRow(
+            title = stringResource(R.string.ads_always_skip_sponsors_title),
+            description = stringResource(R.string.ads_always_skip_sponsors_description),
+            checked = settings.alwaysSkipSponsors,
+            onCheckedChange = { preferences.edit().putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, it).apply() },
+            testTag = "always_skip_sponsors_switch",
+        )
+    }
     SettingsHint(stringResource(R.string.ads_note))
 }

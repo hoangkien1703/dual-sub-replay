@@ -6,6 +6,8 @@
     <string name="ads_skip_ads_description">将 YouTube 视频广告静音并快速播放，“跳过”按钮一出现就自动点按。视频上的横幅广告会被关闭。</string>
     <string name="ads_skip_sponsors_title">跳过赞助片段</string>
     <string name="ads_skip_sponsors_description">根据 SponsorBlock 的社区列表跳过视频中的赞助片段。只会向 sponsor.ajay.app 发送由视频 ID 生成的一个短代码。</string>
+    <string name="ads_always_skip_sponsors_title">始终跳过赞助片段</string>
+    <string name="ads_always_skip_sponsors_description">跳转到赞助片段、点按其中的字幕行或在那里重播单词时也会跳过，因此赞助片段永远不会播放。</string>
     <string name="ads_note">广告仍会开始播放，因为何时播放由 YouTube 决定。如果 YouTube 提示广告拦截器警告，请关闭“跳过广告”。</string>
     <string name="ads_skipped_sponsor_note">已跳过赞助片段</string>
 </resources>

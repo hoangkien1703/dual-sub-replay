@@ -128,6 +128,7 @@ internal enum class AiSetting(
     /** Settings → Ads and sponsors (2026-10-25). */
     SKIP_ADS("skip_ads"),
     SKIP_SPONSORS("skip_sponsors"),
+    ALWAYS_SKIP_SPONSORS("always_skip_sponsors"),
 
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
     APP_AUTO_UPDATE("auto_update", asks = true),
@@ -753,7 +754,11 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.SKIP_SPONSORS ->
             choiceList(setting.choices) +
                 " (jumps over the sponsor parts creators recorded in a video, as listed in SponsorBlock's community database; " +
-                "a part the user seeks into plays; on by default)"
+                "a part the user seeks into plays unless always_skip_sponsors is on; on by default)"
+        AiSetting.ALWAYS_SKIP_SPONSORS ->
+            choiceList(setting.choices) +
+                " (with skip_sponsors on, a seek, a tapped line or a replay that lands in a sponsor part also jumps to its " +
+                "end, so sponsor parts never play; off by default)"
         AiSetting.APP_AUTO_UPDATE ->
             choiceList(setting.choices) +
                 " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +

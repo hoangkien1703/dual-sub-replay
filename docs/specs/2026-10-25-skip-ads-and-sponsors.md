@@ -36,7 +36,10 @@ How other tools do it (checked 2026-10-25):
     are closed. After the ad, the video's sound and speed come back as they were.
   - **Skip sponsors**: sponsor parts listed in SponsorBlock are jumped over, and a short
     "Skipped sponsor" note shows on the player.
-- The AI assistant can read and change both switches (`skip_ads`, `skip_sponsors`), at once with
+  - **Always skip sponsors** (owner request 2026-10-25 after testing build 503, off by default,
+    shown under Skip sponsors): a seek, a tapped line or a replay that lands in a sponsor part
+    jumps to its end too, so sponsor parts never play.
+- The AI assistant can read and change the switches (`skip_ads`, `skip_sponsors`, `always_skip_sponsors`), at once with
   Undo, like the other settings.
 
 ## Non-goals
@@ -106,3 +109,15 @@ How other tools do it (checked 2026-10-25):
   was jumped to 40 s once with the note, was not skipped again, and a seek into another part kept it.
 - Unverified: live YouTube ads and Skip buttons on a phone, SponsorBlock replies on a phone, and
   whether YouTube shows an ad-blocker warning.
+
+### Owner test of build 503 (2026-10-25)
+
+- Ads did play fast, but YouTube did not take the script's press of Skip; the owner had to tap
+  it. YouTube ignores a press a page script makes (`isTrusted` is false). Since then the page also
+  reports where the shown Skip button is (`WEB_SKIP_TARGET_SCRIPT`), and the app sends a real
+  touch to the view showing the page (the full-screen view while full screen), at most every
+  1.5 s, after the button has shown for 0.3 s and only when `elementFromPoint` there is the
+  button, so a tap never lands on the ad video, which opens the advertiser. A button counts as
+  shown only when it and every box around it are displayed, visible, not see-through and take
+  touches. The Skip selectors also match any `skip` button inside the player during an ad.
+- The owner asked for Always skip sponsors (above).

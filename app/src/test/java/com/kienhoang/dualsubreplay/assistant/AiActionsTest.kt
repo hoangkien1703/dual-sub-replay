@@ -109,6 +109,7 @@ class AiActionsTest {
         assertEquals("on", setting("blur_box", "true"))
         assertEquals("off", setting("skip_ads", "off"))
         assertEquals("on", setting("skip_sponsors", "on"))
+        assertEquals("on", setting("always_skip_sponsors", "true"))
         assertTrue(!AiAction.ChangeSetting(AiSetting.SKIP_ADS, "off").alwaysAsks)
         assertEquals("off", setting("kanji_details", "off"))
         assertEquals("off", setting("send_to_ankidroid", "off"))

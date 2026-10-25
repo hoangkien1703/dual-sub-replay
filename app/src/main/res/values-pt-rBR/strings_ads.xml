@@ -6,6 +6,8 @@
     <string name="ads_skip_ads_description">Silencia os anúncios em vídeo do YouTube, reproduz rápido e toca em Pular assim que ele aparece. Anúncios em banner sobre o vídeo são fechados.</string>
     <string name="ads_skip_sponsors_title">Pular patrocínios</string>
     <string name="ads_skip_sponsors_description">Pula os trechos patrocinados dos vídeos, pela lista da comunidade do SponsorBlock. Só um código curto feito a partir do ID do vídeo é enviado para sponsor.ajay.app.</string>
+    <string name="ads_always_skip_sponsors_title">Sempre pular patrocínios</string>
+    <string name="ads_always_skip_sponsors_description">Também pula um trecho patrocinado quando você avança até ele, toca em uma de suas linhas ou repete uma palavra ali, então ele nunca toca.</string>
     <string name="ads_note">Os anúncios ainda começam, porque o YouTube decide quando eles tocam. Se o YouTube avisar sobre bloqueadores de anúncios, desative Pular anúncios.</string>
     <string name="ads_skipped_sponsor_note">Patrocínio pulado</string>
 </resources>

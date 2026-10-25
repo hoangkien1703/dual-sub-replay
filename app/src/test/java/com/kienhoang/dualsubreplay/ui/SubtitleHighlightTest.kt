@@ -223,6 +223,7 @@ class SubtitleWordHighlightTest {
                 WORD_CARD_GRAMMAR_OPEN_PREFERENCE,
                 SKIP_ADS_PREFERENCE,
                 SKIP_SPONSORS_PREFERENCE,
+                ALWAYS_SKIP_SPONSORS_PREFERENCE,
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)

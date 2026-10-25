@@ -579,7 +579,7 @@ internal fun SingleYouTubePage(
     PageTranscriptReader(webView, active = lifecycleStarted)
     PageTranslationReader(webView, active = lifecycleStarted)
     StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
-    AdSkipPageScripts(webView, active = lifecycleStarted)
+    AdSkipPageScripts(webView, active = lifecycleStarted, pageView = { fullscreenSession?.view ?: webView })
 
     val pollNow = remember(webView) { Channel<Unit>(Channel.CONFLATED) }
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
