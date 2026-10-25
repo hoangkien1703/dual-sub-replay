@@ -15,6 +15,8 @@
     <string name="player_retry_full_transcript">Thử lại bản chép lời đầy đủ</string>
     <string name="player_search_languages">Tìm ngôn ngữ</string>
     <string name="player_language_selected">Đã chọn</string>
+    <string name="player_recent_languages">Gần đây</string>
+    <string name="player_all_languages">Tất cả ngôn ngữ</string>
     <string name="player_back">Quay lại</string>
     <string name="player_translating">Đang dịch…</string>
     <string name="player_downloading_translation_model">Đang tải mô hình dịch…</string>

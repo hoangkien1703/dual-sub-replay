@@ -15,6 +15,8 @@
     <string name="player_retry_full_transcript">重试完整字幕</string>
     <string name="player_search_languages">搜索语言</string>
     <string name="player_language_selected">已选择</string>
+    <string name="player_recent_languages">最近使用</string>
+    <string name="player_all_languages">所有语言</string>
     <string name="player_back">返回</string>
     <string name="player_translating">正在翻译…</string>
     <string name="player_downloading_translation_model">正在下载翻译模型…</string>
