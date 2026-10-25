@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,4 +84,8 @@ internal fun AdSkipSettingsSection() {
         )
     }
     SettingsHint(stringResource(R.string.ads_note))
+    val lastAd by AdSkipReport.lastAd.collectAsState()
+    val sponsorParts by AdSkipReport.sponsorParts.collectAsState()
+    lastAd?.let { SettingsHint(stringResource(R.string.ads_last_ad_check, it)) }
+    sponsorParts?.let { SettingsHint(stringResource(R.string.ads_sponsor_parts_check, it)) }
 }

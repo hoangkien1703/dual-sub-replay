@@ -55,9 +55,10 @@ How other tools do it (checked 2026-10-25):
 
 - An ad still starts (YouTube decides that), but it is silent and fast, and a skippable ad is
   skipped about 1 to 2 seconds after it starts. An unskippable 15-second ad takes about 4 seconds.
-- A sponsor part is jumped over once when the video plays into it. Seeking into it on purpose
+- A sponsor part is jumped over when the video plays into it. Jumping into it on purpose
   (dragging the bar, tapping a line in it, replaying a saved word there) plays it, and it is not
-  skipped again in that video.
+  skipped again in that video. The player's own seeks into a part (small seeks, its return after
+  an ad, undoing a skip within 3 s) are skipped like playing into it.
 - With a switch off, nothing changes on the page; turning Skip ads off during an ad brings the
   sound and speed back at once.
 
@@ -121,3 +122,21 @@ How other tools do it (checked 2026-10-25):
   shown only when it and every box around it are displayed, visible, not see-through and take
   touches. The Skip selectors also match any `skip` button inside the player during an ad.
 - The owner asked for Always skip sponsors (above).
+
+### Owner test of build 505 (2026-10-25)
+
+- Always skip sponsors worked, but Skip sponsors alone did not skip. With Always off, any seek that
+  landed in a part kept it, so a seek of the player's own (not the user's) could keep a part before
+  it was reached. Now a seek keeps a part only when it is a jump of at least 1.5 s from the last
+  position the video played at, with no ad since and more than 3 s after the app's own skip; any
+  other seek into a part is skipped. The app's own skip no longer keeps the part either, and the
+  page's 1 s timer checks for sponsor parts too, in case a `timeupdate` is missed.
+- Two ads in a row: the second Skip was not pressed. Each new Skip button now starts its own 0.3 s
+  wait (the page script and the app's check both notice a new button), and the app tries five points
+  of the button, so a box partly covering its middle does not stop the tap.
+- Settings → Ads & sponsors shows two check lines for phone tests: what the last ad's Skip check
+  found (for example `Skip tapped: button.ytp-skip-ad-button (2 taps)` or `... covered by div.x`),
+  and how many sponsor parts SponsorBlock listed for the last video.
+- Checked in desktop Chromium on a fake page: a covered middle was tapped beside it, the second ad's
+  new button was tapped after 0.3 s (both real clicks), a user's jump into a part kept it, and
+  playing into a part, undoing the skip and returning into a part after an ad were all skipped.
