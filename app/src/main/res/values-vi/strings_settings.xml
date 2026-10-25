@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">Tô sáng từ đang nói</string>
     <string name="settings_natural_flow_title">Ngắt phụ đề tự nhiên &amp; dấu câu</string>
     <string name="settings_natural_flow_description">Ghép phụ đề tự động tạo theo các quãng ngắt và mệnh đề trong lời nói, kèm viết hoa đúng cách.</string>
+    <string name="settings_hide_sound_cues_title">Ẩn mô tả âm thanh</string>
+    <string name="settings_hide_sound_cues_description">Bỏ [Music], [Applause] và các ghi chú tương tự trước khi dịch. Lời bài hát vẫn giữ lại, không có dấu ♪.</string>
     <string name="settings_preload_models_title">Tải trước mô hình dịch trong nền</string>
     <string name="settings_preload_models_description">Tải mô hình dịch khi mở ứng dụng để video phát ngay, không phải chờ.</string>
     <string name="settings_reset_all_button">Đặt lại tất cả cài đặt về mặc định</string>

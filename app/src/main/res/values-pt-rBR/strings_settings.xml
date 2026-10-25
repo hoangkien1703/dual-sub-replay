@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">Destaque da palavra falada</string>
     <string name="settings_natural_flow_title">Fluxo natural e pontuação das legendas</string>
     <string name="settings_natural_flow_description">Junta legendas geradas automaticamente de acordo com as pausas e orações da fala, com maiúsculas corretas.</string>
+    <string name="settings_hide_sound_cues_title">Ocultar descrições de som</string>
+    <string name="settings_hide_sound_cues_description">Remove [Music], [Applause] e notas parecidas antes de traduzir. A letra das músicas fica, sem as marcas ♪.</string>
     <string name="settings_preload_models_title">Pré-carregar modelos de tradução em segundo plano</string>
     <string name="settings_preload_models_description">Baixa os modelos de tradução ao abrir o app para a reprodução começar sem espera.</string>
     <string name="settings_reset_all_button">Redefinir todas as configurações para o padrão</string>

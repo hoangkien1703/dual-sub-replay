@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">Sorotan kata yang diucapkan</string>
     <string name="settings_natural_flow_title">Alur dan tanda baca subtitel alami</string>
     <string name="settings_natural_flow_description">Gabungkan subtitel buatan otomatis sesuai jeda bicara dan klausa, dengan huruf kapital yang tepat.</string>
+    <string name="settings_hide_sound_cues_title">Sembunyikan deskripsi suara</string>
+    <string name="settings_hide_sound_cues_description">Hapus [Music], [Applause], dan catatan serupa sebelum diterjemahkan. Lirik lagu tetap ada, tanpa tanda ♪.</string>
     <string name="settings_preload_models_title">Pramuat model terjemahan di latar belakang</string>
     <string name="settings_preload_models_description">Unduh model terjemahan saat aplikasi dibuka agar pemutaran langsung dimulai tanpa menunggu.</string>
     <string name="settings_reset_all_button">Kembalikan semua setelan ke default</string>

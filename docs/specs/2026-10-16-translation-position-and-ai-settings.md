@@ -79,6 +79,7 @@ New settings that wait for the user's tap on Apply:
 | --- | --- | --- |
 | `original_caption_language` | auto or a language the open video has | reloads the video's subtitles |
 | `natural_subtitle_flow` | on, off | reloads the video's subtitles |
+| `hide_sound_descriptions` | on, off | reloads the video's subtitles (added 2026-10-25, issue #152) |
 | `preload_translation_models` | on, off | downloads language models |
 | `app_language` | device or one of the app's interface languages | rebuilds the screen in that language |
 

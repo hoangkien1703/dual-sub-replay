@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,6 +47,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -779,6 +781,8 @@ internal fun LearningSubtitleOverlay(
                             } else {
                                 Text(
                                     text = annotated,
+                                    modifier = Modifier.lineSide(annotated, LocalLayoutDirection.current),
+                                    style = LocalTextStyle.current.inLineDirection(),
                                     fontSize = (17f * fontScale).sp,
                                     lineHeight = (21f * fontScale).sp,
                                     fontWeight = FontWeight.Medium,
@@ -833,6 +837,8 @@ internal fun LearningSubtitleOverlay(
                             } else {
                                 Text(
                                     text = annotated,
+                                    modifier = Modifier.lineSide(annotated, LocalLayoutDirection.current),
+                                    style = LocalTextStyle.current.inLineDirection(),
                                     fontSize = (14f * fontScale).sp,
                                     lineHeight = (18f * fontScale).sp,
                                     color = translatedColor,

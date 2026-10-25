@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -218,6 +220,8 @@ private fun OriginalCardText(
     } else {
         Text(
             text = annotatedOriginal,
+            modifier = Modifier.lineSide(annotatedOriginal, LocalLayoutDirection.current),
+            style = LocalTextStyle.current.inLineDirection(),
             fontSize = (17 * fontScale).sp,
             lineHeight = (22 * fontScale).sp,
             fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
@@ -295,6 +299,8 @@ private fun TranslatedCardText(
     } else {
         Text(
             text = annotatedTrans,
+            modifier = Modifier.lineSide(annotatedTrans, LocalLayoutDirection.current),
+            style = LocalTextStyle.current.inLineDirection(),
             fontSize = (14 * fontScale).sp,
             lineHeight = (18 * fontScale).sp,
             color = translatedColor,

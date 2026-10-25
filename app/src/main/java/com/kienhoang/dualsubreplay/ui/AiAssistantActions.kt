@@ -256,6 +256,7 @@ private fun aiLearningSettingValue(
         AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> onOff(state.wordLearningActiveOnly)
         AiSetting.GOOGLE_WAIT -> state.googleWait.storageValue
         AiSetting.NATURAL_SUBTITLE_FLOW -> onOff(state.naturalSubtitlesEnabled)
+        AiSetting.HIDE_SOUND_DESCRIPTIONS -> onOff(state.hideSoundCues)
         AiSetting.PRELOAD_TRANSLATION_MODELS -> onOff(state.preloadModelsEnabled)
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> state.sourcePreference
         AiSetting.DAILY_GOAL -> if (state.dailyGoalMinutes <= 0) "off" else state.dailyGoalMinutes.toString()
@@ -567,6 +568,7 @@ internal class AppAiActions(
             AiSetting.PLAYBACK_SPEED -> player.setSpeed(value.toFloat(), state.activeVideoId)
             AiSetting.GOOGLE_WAIT -> viewModel.setGoogleWait(storedGoogleWait(value))
             AiSetting.NATURAL_SUBTITLE_FLOW -> viewModel.setNaturalSubtitlesEnabled(on)
+            AiSetting.HIDE_SOUND_DESCRIPTIONS -> viewModel.setHideSoundCues(on)
             AiSetting.PRELOAD_TRANSLATION_MODELS -> viewModel.setPreloadModelsEnabled(on)
             AiSetting.ORIGINAL_CAPTION_LANGUAGE -> viewModel.setSourcePreference(value)
             AiSetting.DAILY_GOAL -> viewModel.setDailyGoal(value.toIntOrNull() ?: 0)
@@ -748,7 +750,7 @@ internal class AppAiActions(
         setting: AiSetting,
         value: String,
     ): String =
-        when (setting) {
+        SETTING_SWITCH_TITLES[setting]?.let { switch(it, value) } ?: when (setting) {
             AiSetting.TRANSLATION_POSITION ->
                 named(R.string.settings_translation_position_title, string(storedTranslationPosition(value).labelRes))
             AiSetting.PORTRAIT_PANEL_POSITION -> {
@@ -760,14 +762,6 @@ internal class AppAiActions(
             AiSetting.ACCENT_COLOR -> option(R.string.settings_accent_color_title, AppThemeAccentOption.entries, value)
             AiSetting.PRONUNCIATION_VOLUME -> string(R.string.settings_pronunciation_volume_title, value.toInt())
             AiSetting.COLORED_SUBTITLE_LINES -> named(R.string.settings_colored_lines_title, string(coloredLinesLabel(value)))
-            AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> switch(R.string.settings_active_sentence_only_title, value)
-            AiSetting.OVERLAY_IN_FULLSCREEN -> switch(R.string.settings_overlay_fullscreen_title, value)
-            AiSetting.OVERLAY_WHEN_ROTATED -> switch(R.string.settings_overlay_landscape_title, value)
-            AiSetting.MOVABLE_SUBTITLE_CONTROLS -> switch(R.string.settings_movable_controls_title, value)
-            AiSetting.AVOID_VIDEO_CONTROLS -> switch(R.string.settings_avoid_controls_title, value)
-            AiSetting.REMEMBER_DRAGGED_POSITION -> switch(R.string.settings_remember_position_title, value)
-            AiSetting.NATURAL_SUBTITLE_FLOW -> switch(R.string.settings_natural_flow_title, value)
-            AiSetting.PRELOAD_TRANSLATION_MODELS -> switch(R.string.settings_preload_models_title, value)
             AiSetting.ORIGINAL_CAPTION_LANGUAGE ->
                 named(
                     R.string.settings_original_caption_language,
@@ -888,3 +882,17 @@ internal class AppAiActions(
         return AiActionOutcome.Done(label, aiActionNote(action), listOf(undo))
     }
 }
+
+/** Settings added on 2026-10-16 or later whose label is just their switch title with on or off. */
+private val SETTING_SWITCH_TITLES =
+    mapOf(
+        AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY to R.string.settings_active_sentence_only_title,
+        AiSetting.OVERLAY_IN_FULLSCREEN to R.string.settings_overlay_fullscreen_title,
+        AiSetting.OVERLAY_WHEN_ROTATED to R.string.settings_overlay_landscape_title,
+        AiSetting.MOVABLE_SUBTITLE_CONTROLS to R.string.settings_movable_controls_title,
+        AiSetting.AVOID_VIDEO_CONTROLS to R.string.settings_avoid_controls_title,
+        AiSetting.REMEMBER_DRAGGED_POSITION to R.string.settings_remember_position_title,
+        AiSetting.NATURAL_SUBTITLE_FLOW to R.string.settings_natural_flow_title,
+        AiSetting.HIDE_SOUND_DESCRIPTIONS to R.string.settings_hide_sound_cues_title,
+        AiSetting.PRELOAD_TRANSLATION_MODELS to R.string.settings_preload_models_title,
+    )

@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -330,10 +331,12 @@ internal fun SelectableSubtitleText(
         } else {
             annotated
         }
-    Box(modifier) {
+    val side = Modifier.lineSide(text, LocalLayoutDirection.current)
+    Box(modifier.then(side)) {
         ClickableText(
             text = shown,
-            style = style,
+            modifier = side,
+            style = style.inLineDirection(),
             maxLines = maxLines,
             overflow = overflow,
             onTextLayout = { layout = it },

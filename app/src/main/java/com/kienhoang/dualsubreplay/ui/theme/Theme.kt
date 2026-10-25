@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui.theme
 import android.content.SharedPreferences
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.kienhoang.dualsubreplay.ui.DEFAULT_APP_COLOR_THEME_KEY
 import com.kienhoang.dualsubreplay.ui.DEFAULT_APP_THEME_ACCENT_KEY
 import com.kienhoang.dualsubreplay.ui.appThemeAccentColor
 import com.kienhoang.dualsubreplay.ui.findActivity
+import com.kienhoang.dualsubreplay.ui.inLineDirection
 import com.kienhoang.dualsubreplay.ui.storedAppColorTheme
 import com.kienhoang.dualsubreplay.ui.storedAppThemeAccentKey
 
@@ -185,5 +187,31 @@ fun DualSubTheme(content: @Composable () -> Unit) {
             }
         }
     }
-    MaterialTheme(colorScheme = colors, content = content)
+    MaterialTheme(colorScheme = colors, typography = contentDirectionTypography, content = content)
 }
+
+/**
+ * Material's type scale with every paragraph laid out in the direction of its own first letter
+ * (issue #152): saved Persian or Arabic meanings and chat answers keep their punctuation and numbers
+ * in place, while the app's own text stays left to right.
+ */
+private val contentDirectionTypography: Typography =
+    Typography().run {
+        Typography(
+            displayLarge = displayLarge.inLineDirection(),
+            displayMedium = displayMedium.inLineDirection(),
+            displaySmall = displaySmall.inLineDirection(),
+            headlineLarge = headlineLarge.inLineDirection(),
+            headlineMedium = headlineMedium.inLineDirection(),
+            headlineSmall = headlineSmall.inLineDirection(),
+            titleLarge = titleLarge.inLineDirection(),
+            titleMedium = titleMedium.inLineDirection(),
+            titleSmall = titleSmall.inLineDirection(),
+            bodyLarge = bodyLarge.inLineDirection(),
+            bodyMedium = bodyMedium.inLineDirection(),
+            bodySmall = bodySmall.inLineDirection(),
+            labelLarge = labelLarge.inLineDirection(),
+            labelMedium = labelMedium.inLineDirection(),
+            labelSmall = labelSmall.inLineDirection(),
+        )
+    }

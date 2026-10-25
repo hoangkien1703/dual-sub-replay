@@ -88,6 +88,8 @@
     <string name="settings_highlight_color_title">朗读词高亮</string>
     <string name="settings_natural_flow_title">自然断句与标点</string>
     <string name="settings_natural_flow_description">按语音停顿和分句合并自动生成的字幕，并修正大小写。</string>
+    <string name="settings_hide_sound_cues_title">隐藏声音描述</string>
+    <string name="settings_hide_sound_cues_description">翻译前去掉 [Music]、[Applause] 等描述。歌词会保留，但去掉 ♪ 符号。</string>
     <string name="settings_preload_models_title">在后台预加载翻译模型</string>
     <string name="settings_preload_models_description">启动时下载翻译模型，播放无需等待。</string>
     <string name="settings_reset_all_button">将所有设置恢复为默认值</string>

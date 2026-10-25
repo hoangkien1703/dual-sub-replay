@@ -109,6 +109,7 @@ internal enum class AiSetting(
     REMEMBER_DRAGGED_POSITION("remember_dragged_position"),
     GOOGLE_WAIT("google_wait", listOf("auto", "2", "4", "8")),
     NATURAL_SUBTITLE_FLOW("natural_subtitle_flow", asks = true),
+    HIDE_SOUND_DESCRIPTIONS("hide_sound_descriptions", asks = true),
     PRELOAD_TRANSLATION_MODELS("preload_translation_models", asks = true),
     ORIGINAL_CAPTION_LANGUAGE("original_caption_language", emptyList(), asks = true),
     APP_LANGUAGE("app_language", AI_APP_LANGUAGES, asks = true),

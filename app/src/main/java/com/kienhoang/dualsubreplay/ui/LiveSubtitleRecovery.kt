@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.SoundCues
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -37,13 +38,15 @@ internal fun liveTranslationKey(
     sample: LiveCaptionSample?,
     videoId: String,
     target: String,
+    hideSoundCues: Boolean = false,
 ): LiveTranslationKey? {
     if (sample == null || !sample.present || sample.videoId != videoId) return null
     val language =
         sample.languageCode
             ?.takeIf { it.matches(Regex("[a-zA-Z]{2,3}(-[a-zA-Z0-9]+)*")) }
             ?.let(TranslationLanguages::normalize) ?: return null
-    val text = sample.text.replace(Regex("\\s+"), " ").trim()
+    val spoken = sample.text.replace(Regex("\\s+"), " ").trim()
+    val text = if (hideSoundCues) SoundCues.strip(spoken) else spoken
     if (text.isEmpty() || text.length > 4_000) return null
     return LiveTranslationKey(videoId, language, target, text)
 }
