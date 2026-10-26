@@ -16,6 +16,7 @@ PAGE_PAIRS = [
     ("", "vi/"),
     ("learn-english/", "vi/learn-english/"),
     ("learn-japanese/", "vi/learn-japanese/"),
+    ("best-android-apps-learn-languages-youtube/", "vi/best-android-apps-learn-languages-youtube/"),
     ("dual-subtitles-youtube-android/", "vi/dual-subtitles-youtube-android/"),
     ("language-reactor-alternative/", "vi/language-reactor-alternative/"),
 ]
