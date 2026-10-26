@@ -5,7 +5,9 @@
 Implemented. In the "Free-moving subtitles and auto-rotate in fullscreen" project thread
 (2026-10-26) Kien asked for two changes in one PR: the fullscreen dual-subtitle box should move
 in any direction, and tapping Fullscreen should turn the video to landscape like the YouTube app.
-Merge and release stay with the owner.
+After the first preview Kien also asked for the fullscreen box to be narrower and centered "like
+YouTube does": the box sits in the middle and is only as wide as its text. Merge and release
+stay with the owner.
 
 ## Context / problem
 
@@ -22,6 +24,10 @@ Merge and release stay with the owner.
   the regular overlay, keeping the existing limits (the box stays fully on screen) and saving the
   position when the finger lifts.
 - Tapping a word, tapping the box to show its buttons, and phrase selection keep working.
+- In fullscreen the box is only as wide as its text (up to 80% of the screen, 720dp at most),
+  its lines are centered, and it starts in the middle. The sideways position is saved under a
+  new key (`overlay_side_position`), so a position saved for the old full-width box doesn't
+  park the new narrow box far off to one side; everyone starts centered once.
 - Fullscreen turns the screen to landscape (either side, following the phone) for wide videos.
   Upright videos (Shorts, phone recordings) stay upright.
 - Leaving fullscreen turns the screen upright again if it was upright before, then follows the
@@ -33,7 +39,7 @@ Merge and release stay with the owner.
 
 - A setting to turn the rotation off (can follow if wanted).
 - Entering fullscreen by turning the phone sideways.
-- Changing the box's size or the drag range.
+- Changing the regular (not fullscreen) overlay's size or alignment.
 
 ## Design
 
@@ -49,8 +55,10 @@ Merge and release stay with the owner.
 
 ## Acceptance criteria and validation
 
-- Unit: `FullscreenRotationTest` covers wide/upright/unknown video sizes and the upright angle
-  range.
+- Unit: `OverlayDragRegressionTest` covers the fullscreen line width limit (with and without the
+  buttons shown). `FullscreenRotationTest` covers wide/upright/unknown video sizes and the upright angle
+  range, and that only an activity handling rotation itself is turned (a test host that would be
+  recreated keeps its orientation).
 - Instrumented: `LearningPlayerUiTest.learningOverlayMovesDiagonallyInOneDrag` drags down-left in
   one gesture and checks both positions changed; `learningOverlayHidesActionsUntilTapped` still
   shows the buttons on a tap.

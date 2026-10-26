@@ -8,10 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performSemanticsAction
@@ -229,6 +231,14 @@ class LearningPlayerUiTest {
                 }
             }
         }
+
+        // Like YouTube's captions, a short line makes a narrow box in the middle.
+        val screen = composeRule.onRoot().getBoundsInRoot()
+        val box = composeRule.onNodeWithTag("learning_subtitle_overlay").getBoundsInRoot()
+        val boxWidth = (box.right - box.left).value
+        val screenWidth = (screen.right - screen.left).value
+        assertTrue("box fits its text: $boxWidth of $screenWidth", boxWidth < screenWidth * 0.8f)
+        assertEquals((screen.left + screen.right).value / 2f, (box.left + box.right).value / 2f, 2f)
 
         composeRule.onNodeWithTag("learning_subtitle_overlay").performTouchInput {
             down(center)

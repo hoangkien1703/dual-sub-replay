@@ -59,6 +59,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -295,6 +296,7 @@ internal fun SelectableSubtitleText(
     alignedOriginalTokens: List<AnalyzedToken>? = null,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
+    centered: Boolean = false,
 ) {
     val controller = rememberPhraseSelection()
     val owner = remember { Any() }
@@ -331,12 +333,12 @@ internal fun SelectableSubtitleText(
         } else {
             annotated
         }
-    val side = Modifier.lineSide(text, LocalLayoutDirection.current)
+    val side = lineSideUnlessCentered(text, centered)
     Box(modifier.then(side)) {
         ClickableText(
             text = shown,
             modifier = side,
-            style = style.inLineDirection(),
+            style = style.inLineDirection().centeredIf(centered),
             maxLines = maxLines,
             overflow = overflow,
             onTextLayout = { layout = it },
@@ -373,6 +375,15 @@ internal fun SelectableSubtitleText(
         }
     }
 }
+
+/** Centered lines hug their text, so they never stretch to one side. */
+@Composable
+private fun lineSideUnlessCentered(
+    text: String,
+    centered: Boolean,
+): Modifier = if (centered) Modifier else Modifier.lineSide(text, LocalLayoutDirection.current)
+
+private fun TextStyle.centeredIf(centered: Boolean): TextStyle = if (centered) copy(textAlign = TextAlign.Center) else this
 
 @Composable
 private fun PhraseActionBar(

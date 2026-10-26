@@ -28,4 +28,14 @@ class OverlayDragRegressionTest {
 
         assertEquals(fingerDeltaPx.toInt(), endShiftPx - startShiftPx)
     }
+
+    @Test
+    fun fullscreenLinesFitTheTextUpToMostOfTheScreen() {
+        // A 900dp-wide landscape phone: 80% is 720dp, minus the box's side padding.
+        assertEquals(692, fullscreenOverlayTextMaxWidthDp(900, actionsVisible = false))
+        // The settings and hide buttons take their room when shown.
+        assertEquals(608, fullscreenOverlayTextMaxWidthDp(900, actionsVisible = true))
+        // Very wide screens keep the regular 720dp cap.
+        assertEquals(692, fullscreenOverlayTextMaxWidthDp(2000, actionsVisible = false))
+    }
 }
