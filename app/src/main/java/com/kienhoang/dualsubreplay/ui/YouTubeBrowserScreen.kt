@@ -798,6 +798,8 @@ internal fun SingleYouTubePage(
         }
     }
 
+    FullscreenVideoRotation(fullscreen = fullscreenSession != null, webView = webView)
+
     fullscreenSession?.let { session ->
         Dialog(
             onDismissRequest = { webView.webChromeClient?.onHideCustomView() },

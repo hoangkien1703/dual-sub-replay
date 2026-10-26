@@ -3,9 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -43,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -78,7 +78,11 @@ internal const val AUTO_OVERLAY_LANDSCAPE_PREFERENCE = "auto_overlay_landscape"
 internal const val AUTO_AVOID_PLAYER_CONTROLS_PREFERENCE = "auto_avoid_player_controls"
 internal const val REMEMBER_OVERLAY_POSITION_PREFERENCE = "remember_overlay_position"
 internal const val OVERLAY_VERTICAL_POSITION_PREFERENCE = "overlay_vertical_position"
-internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_horizontal_position"
+
+// A new key since the fullscreen box got narrower (2026-10-26): sideways positions saved for
+// the wide box would now park it far off to one side, so everyone starts centered once.
+internal const val OVERLAY_HORIZONTAL_POSITION_PREFERENCE = "overlay_side_position"
+
 internal const val MOVABLE_OVERLAY_PREFERENCE = "movable_subtitle_box"
 
 /** Where the overlay and the CC button were dragged; forgotten when "Remember dragged position" turns off. */
@@ -93,6 +97,22 @@ internal const val DEFAULT_OVERLAY_VERTICAL_POSITION = 0.86f
 internal const val FULLSCREEN_LANDSCAPE_DEFAULT_OVERLAY_VERTICAL_POSITION = 0.08f
 internal const val DEFAULT_OVERLAY_HORIZONTAL_POSITION = 0.5f
 internal const val FULLSCREEN_OVERLAY_ESTIMATED_HEIGHT_DP = 88
+
+/** Like YouTube's captions, the fullscreen box is only as wide as its text, up to this much of the screen. */
+internal const val FULLSCREEN_OVERLAY_MAX_WIDTH_FRACTION = 0.80f
+internal const val OVERLAY_MAX_WIDTH_DP = 720
+private const val OVERLAY_ACTION_BUTTON_DP = 48
+
+/** Widest the fullscreen box's lines may be, leaving room for its padding and any shown buttons. */
+internal fun fullscreenOverlayTextMaxWidthDp(
+    screenWidthDp: Int,
+    actionsVisible: Boolean,
+): Int {
+    val box = (screenWidthDp * FULLSCREEN_OVERLAY_MAX_WIDTH_FRACTION).roundToInt().coerceAtMost(OVERLAY_MAX_WIDTH_DP)
+    val actions = if (actionsVisible) 2 * OVERLAY_ACTION_BUTTON_DP - 12 else 0
+    return (box - 28 - actions).coerceAtLeast(80)
+}
+
 internal const val PLAYER_CONTROLS_AVOIDANCE_LIFT_DP = 88
 
 enum class PlayerExperienceMode(val storageValue: String) {
@@ -685,18 +705,8 @@ internal fun LearningSubtitleOverlay(
         (parentWidthPx - selfWidthPx).coerceAtLeast(1).toFloat()
     val currentHorizontalPosition by rememberUpdatedState(horizontalPosition)
 
-    val verticalDragState = rememberDraggableState { delta ->
-        currentOnPositionChange(
-            overlayPositionAfterDrag(currentPosition, delta, dragTravelPx),
-        )
-    }
-    val horizontalDragState = rememberDraggableState { delta ->
-        currentOnHorizontalPositionChange(
-            normalizeOverlayHorizontalPosition(
-                currentHorizontalPosition + delta / horizontalDragTravelPx,
-            ),
-        )
-    }
+    val currentDragTravelPx by rememberUpdatedState(dragTravelPx)
+    val currentHorizontalDragTravelPx by rememberUpdatedState(horizontalDragTravelPx)
 
     LaunchedEffect(overlayActionsVisible) {
         if (!overlayActionsVisible) return@LaunchedEffect
@@ -706,26 +716,35 @@ internal fun LearningSubtitleOverlay(
 
     Surface(
         modifier = modifier
-            .fillMaxWidth(0.90f)
-            .widthIn(max = 720.dp)
+            .then(if (isFullscreen) Modifier else Modifier.fillMaxWidth(0.90f).widthIn(max = OVERLAY_MAX_WIDTH_DP.dp))
             .testTag("learning_subtitle_overlay")
             .onGloballyPositioned { coordinates ->
                 selfWidthPx = coordinates.size.width
                 parentWidthPx = (coordinates.parentLayoutCoordinates?.size?.width ?: 0)
             }
             .absoluteOffset { IntOffset(horizontalShiftPx, 0) }
-            .draggable(
-                state = verticalDragState,
-                orientation = Orientation.Vertical,
-                enabled = movableEnabled,
-                onDragStopped = { currentOnPositionChangeFinished() },
-            )
-            .draggable(
-                state = horizontalDragState,
-                orientation = Orientation.Horizontal,
-                enabled = movableEnabled,
-                onDragStopped = { currentOnPositionChangeFinished() },
-            )
+            // One gesture moves both ways at once, so the box follows the finger diagonally.
+            .pointerInput(movableEnabled) {
+                if (!movableEnabled) return@pointerInput
+                detectDragGestures(
+                    onDragEnd = { currentOnPositionChangeFinished() },
+                    onDragCancel = { currentOnPositionChangeFinished() },
+                ) { change, dragAmount ->
+                    change.consume()
+                    if (dragAmount.y != 0f) {
+                        currentOnPositionChange(
+                            overlayPositionAfterDrag(currentPosition, dragAmount.y, currentDragTravelPx),
+                        )
+                    }
+                    if (dragAmount.x != 0f) {
+                        currentOnHorizontalPositionChange(
+                            normalizeOverlayHorizontalPosition(
+                                currentHorizontalPosition + dragAmount.x / currentHorizontalDragTravelPx,
+                            ),
+                        )
+                    }
+                }
+            }
             .clickable { overlayActionsVisible = !overlayActionsVisible },
         shape = RoundedCornerShape(10.dp),
         color = backgroundColor,
@@ -735,7 +754,7 @@ internal fun LearningSubtitleOverlay(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .then(if (isFullscreen) Modifier else Modifier.fillMaxWidth())
                 .padding(
                     start = 14.dp,
                     end = if (overlayActionsVisible) 2.dp else 14.dp,
@@ -744,7 +763,16 @@ internal fun LearningSubtitleOverlay(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(Modifier.weight(1f)) {
+            Column(
+                modifier = if (isFullscreen) {
+                    Modifier.widthIn(
+                        max = fullscreenOverlayTextMaxWidthDp(configuration.screenWidthDp, overlayActionsVisible).dp,
+                    )
+                } else {
+                    Modifier.weight(1f)
+                },
+                horizontalAlignment = if (isFullscreen) Alignment.CenterHorizontally else Alignment.Start,
+            ) {
                 val originalLine: (@Composable () -> Unit)? =
                     content.originalText?.let { original ->
                         {
@@ -777,12 +805,14 @@ internal fun LearningSubtitleOverlay(
                                     onWordClick = onWordClick,
                                     onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
                                     overflow = TextOverflow.Ellipsis,
+                                    centered = isFullscreen,
                                 )
                             } else {
                                 Text(
                                     text = annotated,
-                                    modifier = Modifier.lineSide(annotated, LocalLayoutDirection.current),
+                                    modifier = if (isFullscreen) Modifier else Modifier.lineSide(annotated, LocalLayoutDirection.current),
                                     style = LocalTextStyle.current.inLineDirection(),
+                                    textAlign = if (isFullscreen) TextAlign.Center else TextAlign.Unspecified,
                                     fontSize = (17f * fontScale).sp,
                                     lineHeight = (21f * fontScale).sp,
                                     fontWeight = FontWeight.Medium,
@@ -833,12 +863,14 @@ internal fun LearningSubtitleOverlay(
                                     onBlankTap = { overlayActionsVisible = !overlayActionsVisible },
                                     alignedOriginalTokens = origTokens,
                                     overflow = TextOverflow.Ellipsis,
+                                    centered = isFullscreen,
                                 )
                             } else {
                                 Text(
                                     text = annotated,
-                                    modifier = Modifier.lineSide(annotated, LocalLayoutDirection.current),
+                                    modifier = if (isFullscreen) Modifier else Modifier.lineSide(annotated, LocalLayoutDirection.current),
                                     style = LocalTextStyle.current.inLineDirection(),
+                                    textAlign = if (isFullscreen) TextAlign.Center else TextAlign.Unspecified,
                                     fontSize = (14f * fontScale).sp,
                                     lineHeight = (18f * fontScale).sp,
                                     color = translatedColor,
