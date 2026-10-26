@@ -28,6 +28,19 @@ internal fun fullscreenVideoIsTall(scriptResult: String?): Boolean {
     return width > 0 && height > width
 }
 
+/**
+ * Turning the screen must not recreate the activity: that would destroy the page and end
+ * fullscreen. The app's activity handles rotation itself; other hosts (tests) are left alone.
+ */
+internal fun rotationKeepsActivity(configChanges: Int): Boolean {
+    val needed = ActivityInfo.CONFIG_ORIENTATION or ActivityInfo.CONFIG_SCREEN_SIZE
+    return configChanges and needed == needed
+}
+
+private fun Activity.keepsRunningWhenRotated(): Boolean =
+    runCatching { rotationKeepsActivity(packageManager.getActivityInfo(componentName, 0).configChanges) }
+        .getOrDefault(false)
+
 /** OrientationEventListener degrees: 0 is the phone held upright, -1 is lying flat. */
 internal fun phoneHeldUpright(degrees: Int): Boolean =
     degrees != OrientationEventListener.ORIENTATION_UNKNOWN && (degrees <= 30 || degrees >= 330)
@@ -98,7 +111,7 @@ internal fun FullscreenVideoRotation(
     fullscreen: Boolean,
     webView: WebView,
 ) {
-    val activity = LocalContext.current.findActivity() ?: return
+    val activity = LocalContext.current.findActivity()?.takeIf { it.keepsRunningWhenRotated() } ?: return
     val rotation = remember(activity) { FullscreenRotation(activity) }
     DisposableEffect(rotation) {
         onDispose { rotation.release() }
