@@ -27,6 +27,8 @@ Android may show a warning because the app comes from GitHub instead of Google P
 
 **Updating:** open the menu at the top left and tap **Check for updates**. To get new versions without asking, turn on **Settings → More settings → App updates → Update automatically**.
 
+**Obtainium:** if you use [Obtainium](https://obtainium.imranr.dev/), [add DualSub Replay to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/hoangkien1703/dual-sub-replay) to get updates straight from GitHub releases.
+
 > **About preview builds:** they install as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
 
 ## See it in action
