@@ -3,9 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -43,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -685,18 +684,8 @@ internal fun LearningSubtitleOverlay(
         (parentWidthPx - selfWidthPx).coerceAtLeast(1).toFloat()
     val currentHorizontalPosition by rememberUpdatedState(horizontalPosition)
 
-    val verticalDragState = rememberDraggableState { delta ->
-        currentOnPositionChange(
-            overlayPositionAfterDrag(currentPosition, delta, dragTravelPx),
-        )
-    }
-    val horizontalDragState = rememberDraggableState { delta ->
-        currentOnHorizontalPositionChange(
-            normalizeOverlayHorizontalPosition(
-                currentHorizontalPosition + delta / horizontalDragTravelPx,
-            ),
-        )
-    }
+    val currentDragTravelPx by rememberUpdatedState(dragTravelPx)
+    val currentHorizontalDragTravelPx by rememberUpdatedState(horizontalDragTravelPx)
 
     LaunchedEffect(overlayActionsVisible) {
         if (!overlayActionsVisible) return@LaunchedEffect
@@ -714,18 +703,28 @@ internal fun LearningSubtitleOverlay(
                 parentWidthPx = (coordinates.parentLayoutCoordinates?.size?.width ?: 0)
             }
             .absoluteOffset { IntOffset(horizontalShiftPx, 0) }
-            .draggable(
-                state = verticalDragState,
-                orientation = Orientation.Vertical,
-                enabled = movableEnabled,
-                onDragStopped = { currentOnPositionChangeFinished() },
-            )
-            .draggable(
-                state = horizontalDragState,
-                orientation = Orientation.Horizontal,
-                enabled = movableEnabled,
-                onDragStopped = { currentOnPositionChangeFinished() },
-            )
+            // One gesture moves both ways at once, so the box follows the finger diagonally.
+            .pointerInput(movableEnabled) {
+                if (!movableEnabled) return@pointerInput
+                detectDragGestures(
+                    onDragEnd = { currentOnPositionChangeFinished() },
+                    onDragCancel = { currentOnPositionChangeFinished() },
+                ) { change, dragAmount ->
+                    change.consume()
+                    if (dragAmount.y != 0f) {
+                        currentOnPositionChange(
+                            overlayPositionAfterDrag(currentPosition, dragAmount.y, currentDragTravelPx),
+                        )
+                    }
+                    if (dragAmount.x != 0f) {
+                        currentOnHorizontalPositionChange(
+                            normalizeOverlayHorizontalPosition(
+                                currentHorizontalPosition + dragAmount.x / currentHorizontalDragTravelPx,
+                            ),
+                        )
+                    }
+                }
+            }
             .clickable { overlayActionsVisible = !overlayActionsVisible },
         shape = RoundedCornerShape(10.dp),
         color = backgroundColor,
