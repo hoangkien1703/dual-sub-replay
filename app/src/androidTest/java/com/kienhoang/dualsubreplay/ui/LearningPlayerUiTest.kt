@@ -1,19 +1,28 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -193,5 +202,53 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithTag("learning_subtitle_overlay").performClick()
         composeRule.onNodeWithContentDescription("Dual-subtitle settings").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Hide dual subtitles").assertIsDisplayed()
+    }
+
+    @Test
+    fun learningOverlayMovesDiagonallyInOneDrag() {
+        val vertical = mutableFloatStateOf(0.5f)
+        val horizontal = mutableFloatStateOf(0.5f)
+        composeRule.setContent {
+            DualSubTheme {
+                Box(Modifier.fillMaxSize()) {
+                    LearningSubtitleOverlay(
+                        content =
+                            LearningOverlayContent(
+                                originalText = "What will we discuss?",
+                                translatedText = "Chúng ta sẽ thảo luận gì?",
+                                statusText = null,
+                            ),
+                        fontScale = 1f,
+                        position = vertical.floatValue,
+                        horizontalPosition = horizontal.floatValue,
+                        isFullscreen = true,
+                        modifier = Modifier.align(Alignment.Center),
+                        onPositionChange = { vertical.floatValue = it },
+                        onHorizontalPositionChange = { horizontal.floatValue = it },
+                        onSettings = {},
+                        onClose = {},
+                    )
+                }
+            }
+        }
+
+        // Like YouTube's captions, a short line makes a narrow box in the middle.
+        val screen = composeRule.onRoot().getBoundsInRoot()
+        val box = composeRule.onNodeWithTag("learning_subtitle_overlay").getBoundsInRoot()
+        val boxWidth = (box.right - box.left).value
+        val screenWidth = (screen.right - screen.left).value
+        assertTrue("box fits its text: $boxWidth of $screenWidth", boxWidth < screenWidth * 0.8f)
+        assertEquals((screen.left + screen.right).value / 2f, (box.left + box.right).value / 2f, 2f)
+
+        composeRule.onNodeWithTag("learning_subtitle_overlay").performTouchInput {
+            down(center)
+            repeat(10) { moveBy(Offset(-8f, 8f)) }
+            up()
+        }
+
+        composeRule.runOnIdle {
+            assertTrue("moved down: ${vertical.floatValue}", vertical.floatValue > 0.5f)
+            assertTrue("moved left: ${horizontal.floatValue}", horizontal.floatValue < 0.5f)
+        }
     }
 }
