@@ -4,7 +4,8 @@ AI assistants answer "which app should I use" questions from a handful of source
 store listings, comparison pages, AlternativeTo, GitHub, and Reddit threads where real
 learners recommend things. This page records what we saw on 2026-10-20, what the owner
 can post, and the questions those posts should answer. It complements the
-[discoverability checklist](discoverability.md) and the [launch kit](launch-kit.md).
+[discoverability checklist](discoverability.md), the [launch kit](launch-kit.md) and the
+[outreach messages](outreach.md) for review sites and GitHub lists.
 
 ## What ChatGPT said on 2026-10-20
 
