@@ -207,6 +207,9 @@ internal val youtubePlayerControlsVisible = MutableStateFlow(false)
 internal val youtubeNativeDialogVisible = MutableStateFlow(false)
 internal val youtubeFullscreenActive = MutableStateFlow(false)
 
+/** The watch page player's last reported frame; kept while the page briefly has no player. */
+internal val youtubePlayerFrame = MutableStateFlow<PagePlayerFrame?>(null)
+
 /** Optional request substitution lets integration tests run the complete player with offline pages. */
 internal val LocalYouTubeRequestInterceptor =
     staticCompositionLocalOf<((WebView, WebResourceRequest) -> WebResourceResponse?)?> { null }
@@ -649,6 +652,7 @@ internal fun SingleYouTubePage(
                         controller.observePage(snapshot.url)
                         youtubePlayerControlsVisible.value = snapshot.controlsVisible
                         youtubeNativeDialogVisible.value = snapshot.nativeDialogVisible
+                        if (fullscreenSession == null) snapshot.playerFrame?.let { youtubePlayerFrame.value = it }
                         reportNavigation(webView, snapshot.url)
                         val receivedAt = android.os.SystemClock.elapsedRealtime()
                         val accepted = clock.accept(snapshot, requestedAt, receivedAt, System.currentTimeMillis())
@@ -777,6 +781,7 @@ internal fun SingleYouTubePage(
             youtubePlayerControlsVisible.value = false
             youtubeNativeDialogVisible.value = false
             youtubeFullscreenActive.value = false
+            youtubePlayerFrame.value = null
             webView.webChromeClient?.onHideCustomView()
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
                 webView.evaluateJavascript(webLiveCaptionConfigurationScript(enabled = false), null)

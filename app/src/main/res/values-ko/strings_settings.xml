@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">원문 아래</string>
     <string name="settings_translation_position_above">원문 위</string>
     <string name="settings_portrait_panel_position">세로 패널 위치</string>
-    <string name="settings_portrait_panel_position_hint">세로 화면의 스크립트 패널을 위아래로 옮겨요. 아래로 내릴수록 보이는 자막 줄이 줄어요.</string>
+    <string name="settings_portrait_panel_position_hint">세로 화면의 스크립트 패널은 영상 바로 아래에서 시작해요. 위로 올리면 패널이 길어지고 영상 아래쪽을 가려요. 아래로 내리면 짧아져요.</string>
     <string name="settings_portrait_panel_higher">위로</string>
     <string name="settings_portrait_panel_default">기본값</string>
     <string name="settings_portrait_panel_lower">아래로</string>
     <string name="settings_portrait_panel_reset">위치 초기화</string>
-    <string name="settings_portrait_panel_position_center">위치: 가운데</string>
+    <string name="settings_portrait_panel_position_center">위치: 영상에 맞춤</string>
     <string name="settings_portrait_panel_position_higher_percent">위치: %1$d%% 위</string>
     <string name="settings_portrait_panel_position_lower_percent">위치: %1$d%% 아래</string>
     <string name="settings_color_ice_white">아이스 화이트</string>

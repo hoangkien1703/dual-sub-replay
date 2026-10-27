@@ -26,6 +26,7 @@ internal data class WebPlaybackSnapshot(
     val seeking: Boolean = false,
     val buffering: Boolean = false,
     val sessionId: String = "",
+    val playerFrame: PagePlayerFrame? = null,
 )
 
 internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
@@ -93,6 +94,17 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
           return isVisible(dialog) || Array.from(dialog.querySelectorAll('ytw-scrim, .ytSpecBottomSheetLayoutHost'))
             .some(isVisible);
         });
+      // Where the watch page player ends, so the portrait panel can start right under it.
+      const watchPlayer = document.getElementById('movie_player') || player;
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const playerRect = watchPlayer && !document.fullscreenElement ? watchPlayer.getBoundingClientRect() : null;
+      const playerFrame = playerRect && viewportHeight > 0 && viewportWidth > 0 &&
+          playerRect.width > 0 && playerRect.height > 0 &&
+          playerRect.bottom > 0 && playerRect.top < viewportHeight ? {
+        bottom: Math.min(playerRect.bottom, viewportHeight) / viewportHeight,
+        aspect: viewportWidth / viewportHeight
+      } : null;
       return JSON.stringify({
         url: window.location.href,
         currentSecond: second,
@@ -104,6 +116,7 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
         paused: !!video && video.paused === true,
         controlsVisible: controlsVisible,
         nativeDialogVisible: nativeDialogVisible,
+        playerFrame: playerFrame,
         liveCaption: liveState ? {
           text: liveState.text || '',
           revision: liveState.revision,
@@ -623,6 +636,16 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
             controlsVisible = json.optBoolean("controlsVisible", false),
             nativeDialogVisible = json.optBoolean("nativeDialogVisible", false),
             liveCaption = liveCaption,
+            playerFrame =
+                json.optJSONObject("playerFrame")?.let { frame ->
+                    val bottom = frame.optDouble("bottom", Double.NaN).toFloat()
+                    val aspect = frame.optDouble("aspect", Double.NaN).toFloat()
+                    if (bottom.isFinite() && bottom > 0f && bottom <= 1f && aspect.isFinite() && aspect > 0f) {
+                        PagePlayerFrame(bottomFraction = bottom, viewportAspect = aspect)
+                    } else {
+                        null
+                    }
+                },
         )
     }.getOrNull()
 }
