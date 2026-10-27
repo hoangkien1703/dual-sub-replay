@@ -23,16 +23,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import kotlin.math.abs
 import kotlin.math.round
 import kotlin.math.roundToInt
 
-internal const val PORTRAIT_PANEL_OFFSET_PREFERENCE = "portrait_panel_offset_fraction"
-internal const val DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION = 0.01f
+// Renamed when 0 changed from "fixed panel height" to "fitted under the video", so every
+// phone starts fitted once instead of keeping an offset chosen for the old layout.
+internal const val PORTRAIT_PANEL_OFFSET_PREFERENCE = "portrait_panel_fit_offset_fraction"
+internal const val DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION = 0f
 internal const val MIN_PORTRAIT_PANEL_OFFSET_FRACTION = -0.20f
 internal const val MAX_PORTRAIT_PANEL_OFFSET_FRACTION = 0.20f
 internal const val PORTRAIT_PANEL_OFFSET_STEPS = 39
 internal const val PORTRAIT_PANEL_HEADER_HEIGHT_DP = 72f
 internal const val PORTRAIT_PANEL_MIN_VIEWPORT_HEIGHT_DP = 120f
+
+/** m.youtube.com's top bar above the watch page player, used until the page reports the real player. */
+internal const val YOUTUBE_MOBILE_HEADER_HEIGHT_DP = 48f
 
 internal data class PortraitPanelGeometry(
     val topPx: Float,
@@ -49,9 +55,52 @@ internal fun normalizePortraitPanelOffsetFraction(value: Float): Float {
     return (round(clamped * 100f) / 100f).let { if (it == -0f) 0f else it }
 }
 
+/**
+ * Where the YouTube player ends inside the page: its bottom edge as a fraction of the page's
+ * height, and the page's width / height so a reading taken in another shape (rotation, split
+ * screen) is not used.
+ */
+internal data class PagePlayerFrame(
+    val bottomFraction: Float,
+    val viewportAspect: Float,
+)
+
+/**
+ * Where the panel's top sits when it fits the video: right under the player the page reported,
+ * or, before the page has reported one for this screen shape, under a 16:9 player below
+ * YouTube's top bar.
+ */
+internal fun fittedPortraitPanelTopPx(
+    availableWidthPx: Float,
+    availableHeightPx: Float,
+    playerFrame: PagePlayerFrame?,
+    estimatedHeaderHeightPx: Float,
+): Float {
+    if (!availableHeightPx.isFinite() || availableHeightPx <= 0f) return 0f
+    val width = availableWidthPx.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f
+    val measured =
+        playerFrame?.takeIf { frame ->
+            frame.bottomFraction.isFinite() && frame.bottomFraction in 0f..1f &&
+                frame.viewportAspect.isFinite() && frame.viewportAspect > 0f &&
+                width > 0f &&
+                abs(frame.viewportAspect / (width / availableHeightPx) - 1f) <= PLAYER_FRAME_ASPECT_TOLERANCE
+        }
+    if (measured != null) return measured.bottomFraction * availableHeightPx
+    val header = estimatedHeaderHeightPx.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f
+    return (header + width * 9f / 16f).coerceIn(0f, availableHeightPx)
+}
+
+private const val PLAYER_FRAME_ASPECT_TOLERANCE = 0.05f
+
+/**
+ * The panel's bottom stays at the bottom of the screen; only its top moves. At 0 the top sits on
+ * the video's bottom edge, so nothing overlaps and no gap is left. Higher (negative) makes the
+ * panel taller over the bottom of the video, lower makes it shorter. Both are a share of the
+ * available height, and the panel never gets shorter than [minimumPanelHeightPx].
+ */
 internal fun portraitPanelGeometry(
     availableHeightPx: Float,
-    baselineHeightPx: Float,
+    fittedTopPx: Float,
     offsetFraction: Float,
     minimumPanelHeightPx: Float,
 ): PortraitPanelGeometry {
@@ -63,25 +112,22 @@ internal fun portraitPanelGeometry(
             .takeIf { it.isFinite() }
             ?.coerceIn(0f, availableHeight)
             ?: 0f
-    val baselineHeight =
-        baselineHeightPx
+    val fittedTop =
+        fittedTopPx
             .takeIf { it.isFinite() }
             ?.coerceIn(0f, availableHeight)
             ?: 0f
-    val fullHeight = maxOf(baselineHeight, minimumHeight)
-    val baselineTop = availableHeight - fullHeight
     val desiredTop =
-        baselineTop +
+        fittedTop +
             normalizePortraitPanelOffsetFraction(offsetFraction) * availableHeight
     val top = desiredTop.coerceIn(0f, availableHeight - minimumHeight)
-    val height = if (top <= baselineTop) fullHeight else minOf(fullHeight, availableHeight - top)
 
-    return PortraitPanelGeometry(topPx = top, heightPx = height.coerceAtLeast(0f))
+    return PortraitPanelGeometry(topPx = top, heightPx = (availableHeight - top).coerceAtLeast(0f))
 }
 
 @Composable
 internal fun BoxScope.PortraitSubtitlePanelLayout(
-    baselineHeightFraction: Float,
+    playerFrame: PagePlayerFrame?,
     offsetFraction: Float,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -92,10 +138,17 @@ internal fun BoxScope.PortraitSubtitlePanelLayout(
             with(density) {
                 (PORTRAIT_PANEL_HEADER_HEIGHT_DP + PORTRAIT_PANEL_MIN_VIEWPORT_HEIGHT_DP).dp.toPx()
             }
+        val fittedTopPx =
+            fittedPortraitPanelTopPx(
+                availableWidthPx = constraints.maxWidth.toFloat(),
+                availableHeightPx = availableHeightPx,
+                playerFrame = playerFrame,
+                estimatedHeaderHeightPx = with(density) { YOUTUBE_MOBILE_HEADER_HEIGHT_DP.dp.toPx() },
+            )
         val geometry =
             portraitPanelGeometry(
                 availableHeightPx = availableHeightPx,
-                baselineHeightPx = availableHeightPx * baselineHeightFraction,
+                fittedTopPx = fittedTopPx,
                 offsetFraction = offsetFraction,
                 minimumPanelHeightPx = minimumPanelHeightPx,
             )

@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">Dưới bản gốc</string>
     <string name="settings_translation_position_above">Trên bản gốc</string>
     <string name="settings_portrait_panel_position">Vị trí bảng ở chế độ dọc</string>
-    <string name="settings_portrait_panel_position_hint">Di chuyển bảng chép lời ở chế độ dọc lên hoặc xuống. Đặt càng thấp thì càng hiện ít dòng phụ đề.</string>
+    <string name="settings_portrait_panel_position_hint">Bảng chép lời ở chế độ dọc bắt đầu ngay dưới video. Đặt cao hơn thì bảng dài ra và che phần dưới video; đặt thấp hơn thì bảng ngắn lại.</string>
     <string name="settings_portrait_panel_higher">Cao hơn</string>
     <string name="settings_portrait_panel_default">Mặc định</string>
     <string name="settings_portrait_panel_lower">Thấp hơn</string>
     <string name="settings_portrait_panel_reset">Đặt lại vị trí</string>
-    <string name="settings_portrait_panel_position_center">Vị trí: Chính giữa</string>
+    <string name="settings_portrait_panel_position_center">Vị trí: Vừa khít video</string>
     <string name="settings_portrait_panel_position_higher_percent">Vị trí: cao hơn %1$d%%</string>
     <string name="settings_portrait_panel_position_lower_percent">Vị trí: thấp hơn %1$d%%</string>
     <string name="settings_color_ice_white">Trắng băng</string>

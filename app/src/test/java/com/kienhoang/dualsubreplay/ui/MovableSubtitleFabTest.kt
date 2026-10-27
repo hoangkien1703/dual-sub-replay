@@ -61,10 +61,4 @@ class MovableSubtitleFabTest {
         assertEquals(1f, controlPositionFromOffsetPx(344f, 400, 40, 16), 0f)
         assertEquals(0f, controlPositionFromOffsetPx(Float.NaN, 400, 40, 16), 0f)
     }
-
-    @Test fun portraitPanelStartsNearEstimatedVideoBottom() {
-        val fraction = portraitSubtitlePanelHeightFraction(400, 900)
-        assertEquals(0.6805f, fraction, 0.01f)
-        assertEquals(0.60f, portraitSubtitlePanelHeightFraction(800, 600), 0f)
-    }
 }

@@ -317,6 +317,7 @@ private fun DualSubExperience(
                 )
         }
     val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
+    val playerFrame by youtubePlayerFrame.collectAsStateWithLifecycle()
     val tracksVisible = state.showOriginal() || state.showTranslation()
     val sideBySide =
         tracksVisible && !nativeDialogVisible &&
@@ -431,11 +432,7 @@ private fun DualSubExperience(
                     }
                     if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                         PortraitSubtitlePanelLayout(
-                            baselineHeightFraction =
-                                portraitSubtitlePanelHeightFraction(
-                                    screenWidthDp = configuration.screenWidthDp,
-                                    screenHeightDp = configuration.screenHeightDp,
-                                ),
+                            playerFrame = playerFrame,
                             offsetFraction = state.portraitPanelOffsetFraction,
                             content = panelContent,
                         )
@@ -529,16 +526,6 @@ private fun DualSubExperience(
             onDismiss = { showSettings = false },
         )
     }
-}
-
-internal fun portraitSubtitlePanelHeightFraction(
-    screenWidthDp: Int,
-    screenHeightDp: Int,
-): Float {
-    val safeHeight = screenHeightDp.coerceAtLeast(1).toFloat()
-    val estimatedVideoBottom = 56f + screenWidthDp.coerceAtLeast(0) * 9f / 16f
-    val desiredPanelTop = estimatedVideoBottom + 6f
-    return ((safeHeight - desiredPanelTop) / safeHeight).coerceIn(0.60f, 0.78f)
 }
 
 @Composable

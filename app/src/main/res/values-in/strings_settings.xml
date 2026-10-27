@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">Di bawah teks asli</string>
     <string name="settings_translation_position_above">Di atas teks asli</string>
     <string name="settings_portrait_panel_position">Posisi panel potret</string>
-    <string name="settings_portrait_panel_position_hint">Geser panel transkrip potret ke atas atau bawah. Makin rendah posisinya, makin sedikit baris subtitel yang tampil.</string>
+    <string name="settings_portrait_panel_position_hint">Panel transkrip potret dimulai tepat di bawah video. Lebih tinggi membuatnya lebih panjang dan menutupi bagian bawah video; lebih rendah membuatnya lebih pendek.</string>
     <string name="settings_portrait_panel_higher">Lebih tinggi</string>
     <string name="settings_portrait_panel_default">Default</string>
     <string name="settings_portrait_panel_lower">Lebih rendah</string>
     <string name="settings_portrait_panel_reset">Atur ulang posisi</string>
-    <string name="settings_portrait_panel_position_center">Posisi: Tengah</string>
+    <string name="settings_portrait_panel_position_center">Posisi: Pas dengan video</string>
     <string name="settings_portrait_panel_position_higher_percent">Posisi: %1$d%% lebih tinggi</string>
     <string name="settings_portrait_panel_position_lower_percent">Posisi: %1$d%% lebih rendah</string>
     <string name="settings_color_ice_white">Putih es</string>
