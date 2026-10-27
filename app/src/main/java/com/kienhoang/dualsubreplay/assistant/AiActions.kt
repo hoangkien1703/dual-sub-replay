@@ -724,7 +724,9 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.TEXT_SIZE -> "a percentage from 80 to 200"
         AiSetting.PLAYBACK_SPEED -> "a speed from 0.25 to 2 (1 is normal)"
         AiSetting.PRONUNCIATION_VOLUME -> "a percentage from 25 to 200 in steps of 25 (100 follows the phone's media volume)"
-        AiSetting.PORTRAIT_PANEL_POSITION -> "a percentage from -20 (higher, a taller panel over the bottom of the video) to 20 (lower, a shorter panel), 0 fits the panel right under the video"
+        AiSetting.PORTRAIT_PANEL_POSITION ->
+            "a percentage from -20 (higher: a taller panel over the bottom of the video) to 20 (lower: a shorter panel); " +
+                "0 fits the panel right under the video"
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> "auto, or the code of a language the open video has captions in"
         AiSetting.APP_LANGUAGE -> choiceList(setting.choices) + " (device follows the phone)"
         AiSetting.DAILY_GOAL -> choiceList(setting.choices) + " (minutes a day)"
