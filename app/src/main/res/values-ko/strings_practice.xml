@@ -91,7 +91,7 @@
     <string name="practice_translate">번역</string>
     <string name="practice_all_actions">모든 작업</string>
     <string name="practice_clear_selection">선택 해제</string>
-    <string name="practice_tap_another_word">다른 단어를 탭하면 구문을 선택할 수 있어요</string>
+    <string name="practice_drag_handles">양쪽 끝의 핸들을 끌어 더 많은 단어를 선택하세요</string>
     <string name="practice_translation_unavailable">번역을 사용할 수 없음</string>
     <string name="practice_translating">번역 중…</string>
     <string name="practice_preparing_pronunciation">발음을 준비하는 중…</string>

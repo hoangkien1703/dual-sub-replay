@@ -1,6 +1,13 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
@@ -11,10 +18,12 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -83,20 +92,53 @@ class PhraseSelectionUiTest {
         word: String,
     ) = tapCharacter(text, text.indexOf(word) + 1)
 
+    private fun layoutOf(text: String): TextLayoutResult {
+        val layouts = mutableListOf<TextLayoutResult>()
+        compose
+            .onNodeWithText(text, useUnmergedTree = true)
+            .fetchSemanticsNode()
+            .config[SemanticsActions.GetTextLayoutResult]
+            .action!!
+            .invoke(layouts)
+        return layouts.first()
+    }
+
+    /**
+     * Drags the end handle from the end of [from] onto the middle of [to] in [text], in one move:
+     * the handle's popup jumps to each new word, and the test moves its finger relative to it.
+     */
+    private fun dragEndHandle(
+        text: String,
+        from: String,
+        to: String,
+    ) {
+        val layout = layoutOf(text)
+        val end = layout.getBoundingBox(text.indexOf(from) + from.length - 1)
+        val target = layout.getBoundingBox(text.indexOf(to) + to.length / 2).center
+        compose.onNodeWithTag("phrase_handle_end").performTouchInput {
+            down(Offset(width / 2f, height / 3f))
+            moveBy(target - Offset(end.right, end.center.y))
+            up()
+        }
+        compose.waitForIdle()
+    }
+
     @Test
-    fun tappingTwoWordsSelectsThePhraseAndTranslateSendsIt() {
+    fun draggingTheEndHandleSelectsThePhraseAndTranslateSendsIt() {
         showCard()
         tapWord(original, "looking")
         compose.onNodeWithTag("phrase_action_bar").assertIsDisplayed()
-        compose.onNodeWithText("Tap another word to select a phrase").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_handle_start").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_handle_end").assertIsDisplayed()
+        compose.onNodeWithText("Drag the handles to select more words").assertIsDisplayed()
         // One word shows its meaning in the bar at once.
         compose.onNodeWithTag("phrase_quick_translation").assertIsDisplayed()
         compose.onNodeWithText("nghĩa của looking").assertIsDisplayed()
         saveUiEvidence("phrase-action-bar-word")
-        tapWord(original, " to ")
+        dragEndHandle(original, from = "looking", to = "to ")
         saveUiEvidence("phrase-action-bar")
-        compose.onNodeWithText("Tap another word to select a phrase").assertDoesNotExist()
-        // A phrase shows its meaning in the bar at once too.
+        compose.onNodeWithText("Drag the handles to select more words").assertDoesNotExist()
+        // A phrase shows its meaning in the bar too, once the finger lets go.
         compose.onNodeWithTag("phrase_quick_translation").assertIsDisplayed()
         compose.onNodeWithText("nghĩa của looking forward to").assertIsDisplayed()
         compose.runOnIdle {
@@ -114,24 +156,90 @@ class PhraseSelectionUiTest {
             assertEquals(false, taps.single().translated)
         }
         compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_handle_end").assertDoesNotExist()
     }
 
     @Test
-    fun copyAndPronounceKeepTheSelectionWithoutOpeningTheCard() {
+    fun holdingAWordAndDraggingSelectsEveryWordPassed() {
+        showCard()
+        val layout = layoutOf(original)
+        val really = layout.getBoundingBox(original.indexOf("really") + 2).center
+        val forward = layout.getBoundingBox(original.indexOf("forward") + 3).center
+        compose.onNodeWithText(original, useUnmergedTree = true).performTouchInput {
+            down(really)
+            advanceEventTime(viewConfiguration.longPressTimeoutMillis + 200)
+            moveTo(Offset((really.x + forward.x) / 2, really.y))
+            moveTo(forward)
+            up()
+        }
+        compose.waitForIdle()
+
+        compose.onNodeWithText("nghĩa của really looking forward").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_pronounce").performClick()
+        compose.runOnIdle {
+            assertEquals(listOf("really looking forward" to false), spoken)
+            assertEquals(1, pauses)
+            assertEquals(0, replays)
+        }
+    }
+
+    @Test
+    fun tappingAnotherWordMovesTheSelectionAndCopyKeepsIt() {
         showCard()
         tapWord(original, "seeing")
         tapWord(original, "really")
+        compose.onNodeWithText("nghĩa của really").assertIsDisplayed()
 
         compose.onNodeWithTag("phrase_copy").performClick()
         compose.onNodeWithContentDescription("Copied").assertIsDisplayed()
         compose.onNodeWithTag("phrase_pronounce").performClick()
         compose.runOnIdle {
-            assertEquals(listOf("really looking forward to seeing" to false), spoken)
+            assertEquals(listOf("really" to false), spoken)
             assertTrue(taps.isEmpty())
         }
 
         compose.onNodeWithTag("phrase_close").performClick()
         compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
+    }
+
+    @Test
+    fun tappingOutsideTheSubtitlesClearsTheSelection() {
+        val controller = PhraseSelectionController()
+        compose.setContent {
+            DualSubTheme {
+                CompositionLocalProvider(LocalPhraseSelection provides controller) {
+                    Column(Modifier.clearPhraseSelectionOnTapElsewhere(controller)) {
+                        CompactSubtitleCard(
+                            segment = SubtitleSegment(1, 1_000, 3_000, original, translated),
+                            active = true,
+                            fontScale = 1.4f,
+                            onReplay = { replays++ },
+                            wordLearningEnabled = true,
+                            tapToLearnEnabled = true,
+                            resolvedSourceLanguage = "en",
+                            targetLanguage = "vi",
+                            onWordClick = { taps += it },
+                        )
+                        Box(Modifier.fillMaxWidth().height(120.dp).testTag("elsewhere"))
+                    }
+                }
+            }
+        }
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_action_bar").assertIsDisplayed()
+        // A tap on a word of the other line moves the selection there and keeps it.
+        tapWord(translated, "mong")
+        compose.onNodeWithTag("phrase_action_bar").assertIsDisplayed()
+
+        compose.onNodeWithTag("elsewhere").performTouchInput { click(center) }
+        compose.waitForIdle()
+
+        compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_handle_start").assertDoesNotExist()
+        compose.runOnIdle {
+            assertNull(controller.selection)
+            assertEquals(0, replays)
+        }
     }
 
     @Test
@@ -159,7 +267,7 @@ class PhraseSelectionUiTest {
     fun translatedLineSelectsItsOwnWords() {
         showCard()
         tapWord(translated, "mong")
-        tapWord(translated, "gặp")
+        dragEndHandle(translated, from = "mong", to = "gặp")
         compose.onNodeWithTag("phrase_translate").performClick()
 
         compose.runOnIdle {

@@ -91,7 +91,7 @@
     <string name="practice_translate">Dịch</string>
     <string name="practice_all_actions">Tất cả thao tác</string>
     <string name="practice_clear_selection">Bỏ chọn</string>
-    <string name="practice_tap_another_word">Chạm vào từ khác để chọn cụm từ</string>
+    <string name="practice_drag_handles">Kéo hai chốt ở hai đầu để chọn thêm từ</string>
     <string name="practice_translation_unavailable">Không có bản dịch</string>
     <string name="practice_translating">Đang dịch…</string>
     <string name="practice_preparing_pronunciation">Đang chuẩn bị phát âm…</string>
