@@ -1,4 +1,4 @@
-# Translate the current minute while paused
+# Translate the current minute while paused, and the fullscreen menu shift
 
 ## Status
 
@@ -76,14 +76,39 @@ until Retry (`translationAttempt`).
   seek.
 - With the on-device engine, a paused video spends a moment of CPU translating its window once.
 
+## Part 2: YouTube's settings menu in fullscreen
+
+### Problem
+
+In fullscreen, tapping YouTube's gear showed the video pushed up: only its bottom ~40% (with the
+controls and the menu) stayed on screen and the rest was black. Kien checked that it does not
+happen when the phone is already sideways before tapping Fullscreen, so it comes from the turn to
+landscape added on 2026-10-26 ([spec](2026-10-26-fullscreen-free-drag-and-rotation.md)). The
+shift in his screenshot is about half the difference between the portrait and landscape screen
+heights, which is what keeping the middle of the old portrait screen in view would leave as a
+scroll offset on the page behind the fullscreen video.
+
+### Fix (to be confirmed on the phone)
+
+`FullscreenVideoRotation` runs `FULLSCREEN_SCROLL_RESET_SCRIPT` 0.3 s and 1 s after the
+orientation changes during fullscreen, and again whenever YouTube opens or closes a menu
+(`youtubeNativeDialogVisible`). The script acts only while `document.fullscreenElement` is set and
+scrolls the page to the top; WebView restores the page's own scroll position when fullscreen ends
+(`AwContents.restoreScrollAfterTransition`), so the watch page comes back where it was.
+
+The cause could not be reproduced in the cloud (YouTube blocks cloud browsers with a bot check,
+and there is no emulator). Desktop Chromium confirmed only that the script resets a fullscreen
+page's scroll and leaves a normal page alone. If the preview still shows the shift, the next step
+is live debugging on Kien's laptop emulator with WebView DevTools (planned for 2026-10-28).
+
 ## Release intent
 
 `release:patch` (default for app behavior fixes).
 
 ## Implementation result
 
-As planned.
+Part 1 as planned. Part 2 as described above.
 
 ## Validation result
 
-Unit tests listed above passed in the cloud container. Phone check pending on the preview build.
+Unit tests listed above and `FullscreenRotationTest` passed in the cloud container. Phone checks for both parts pending on the preview build.

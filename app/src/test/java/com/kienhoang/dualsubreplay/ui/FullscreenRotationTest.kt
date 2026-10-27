@@ -37,4 +37,12 @@ class FullscreenRotationTest {
         assertFalse(rotationKeepsActivity(0))
         assertFalse(rotationKeepsActivity(ActivityInfo.CONFIG_ORIENTATION))
     }
+
+    @Test
+    fun scrollResetOnlyTouchesAFullscreenPage() {
+        // The page under a normal (not fullscreen) player keeps the place the user scrolled to.
+        assertTrue(FULLSCREEN_SCROLL_RESET_SCRIPT.contains("if(!document.fullscreenElement)return''"))
+        assertTrue(FULLSCREEN_SCROLL_RESET_SCRIPT.contains("window.scrollTo(0,0)"))
+        assertTrue(FULLSCREEN_SCROLL_RESET_DELAYS_MS.sum() <= 1_000L)
+    }
 }
