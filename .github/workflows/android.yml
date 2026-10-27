@@ -66,6 +66,10 @@ jobs:
             -PpreviewApplicationIdSuffix=".preview" \
             --stacktrace
 
+      - name: List failed unit tests
+        if: failure()
+        run: python3 tools/report_failed_tests.py app/build/test-results/ --title "Failed unit tests"
+
       - name: Verify preview package id
         run: |
           badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging app/build/outputs/apk/debug/app-debug.apk | head -n 1)"
@@ -160,6 +164,12 @@ jobs:
             app/build/outputs/androidTest-results/managedDevice/ 2>/dev/null | sort -u || true)
           echo "${lines:-No PageCpuUseTest results found.}"
           { echo "### Page CPU use (ms of CPU per second)"; echo '```'; echo "${lines:-No results found.}"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: List failed device tests
+        if: failure()
+        run: >-
+          python3 tools/report_failed_tests.py app/build/outputs/androidTest-results/managedDevice/
+          --title "Failed device tests"
 
       - name: Upload managed-device reports
         if: always()
