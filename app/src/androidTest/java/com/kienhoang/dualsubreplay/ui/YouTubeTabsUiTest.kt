@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -128,6 +129,27 @@ class YouTubeTabsUiTest {
         saveUiEvidence("tabs-other-account")
         compose.onNodeWithTag("new_tab_account_3").performClick()
         compose.runOnIdle { assertEquals(listOf(3), requested) }
+    }
+
+    // Phone test of build 544: the picture stayed on the first video after the tab moved on.
+    @Test fun theTabPictureFollowsTheTabsPage() {
+        TabThumbnails.put(browserTabThumbnailUrl(video)!!, ImageBitmap(16, 9))
+        var tabs by mutableStateOf(BrowserTabs().opened(video)!!)
+        compose.setContent {
+            DualSubTheme {
+                AppNavigation(onPractice = {}, onSettings = {}, tabs = tabs) { menu -> menu() }
+            }
+        }
+        compose.onNodeWithTag("navigation_menu_button").performClick()
+        compose.onNodeWithTag("open_tabs").performClick()
+        val picture = compose.onNodeWithTag("browser_tab_thumbnail", useUnmergedTree = true)
+        picture.assertIsDisplayed()
+
+        compose.runOnIdle { tabs = tabs.withActiveUrl(search) }
+        picture.assertDoesNotExist()
+
+        compose.runOnIdle { tabs = tabs.withActiveUrl(video) }
+        picture.assertIsDisplayed()
     }
 
     @Test fun aFullListSaysSoInsteadOfOfferingANewTab() {

@@ -9,6 +9,7 @@ import android.util.LruCache
 import android.view.MotionEvent
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
+import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -284,6 +285,8 @@ internal fun browserTabName(tab: BrowserTab): String =
 private fun TabPicture(url: String) {
     val thumbnailUrl = browserTabThumbnailUrl(url)
     val picture by produceState(TabThumbnails.cached(thumbnailUrl), thumbnailUrl) {
+        // The tab moved to another page: drop the old page's picture before loading the new one.
+        value = TabThumbnails.cached(thumbnailUrl)
         if (value == null && thumbnailUrl != null) value = TabThumbnails.load(thumbnailUrl)
     }
     Box(
@@ -295,7 +298,12 @@ private fun TabPicture(url: String) {
     ) {
         val image = picture
         if (image != null) {
-            Image(image, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            Image(
+                image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().testTag("browser_tab_thumbnail"),
+            )
         } else {
             val icon =
                 when (browserTabKind(url)) {
@@ -310,7 +318,7 @@ private fun TabPicture(url: String) {
 }
 
 /** YouTube's small video pictures for the Tabs list, kept in memory only. */
-private object TabThumbnails {
+internal object TabThumbnails {
     private val cache = LruCache<String, ImageBitmap>(THUMBNAIL_CACHE_SIZE)
     private val client by lazy {
         OkHttpClient
@@ -321,6 +329,14 @@ private object TabThumbnails {
     }
 
     fun cached(url: String?): ImageBitmap? = url?.let { cache.get(it) }
+
+    @VisibleForTesting
+    fun put(
+        url: String,
+        picture: ImageBitmap,
+    ) {
+        cache.put(url, picture)
+    }
 
     suspend fun load(url: String): ImageBitmap? =
         withContext(Dispatchers.IO) {
