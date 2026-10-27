@@ -80,7 +80,7 @@ img {
 
 .hero {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 40px;
   align-items: center;
   padding: 32px 0 56px;
@@ -140,6 +140,26 @@ img {
   border: 6px solid #051013;
   box-shadow: 0 30px 80px rgb(0 197 229 / 0.18);
   overflow: hidden;
+}
+
+.phones {
+  justify-self: center;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: min(460px, 100%);
+}
+
+.phones .phone {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  border-width: 5px;
+  border-radius: 24px;
+}
+
+.phones .phone + .phone {
+  margin-top: 48px;
 }
 
 section {
@@ -258,6 +278,14 @@ footer p {
 
   .phone {
     width: min(260px, 100%);
+  }
+
+  .phones .phone {
+    border-radius: 18px;
+  }
+
+  .phones .phone + .phone {
+    margin-top: 32px;
   }
 }
 
