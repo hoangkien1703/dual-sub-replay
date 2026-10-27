@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">Below original</string>
     <string name="settings_translation_position_above">Above original</string>
     <string name="settings_portrait_panel_position">Portrait panel position</string>
-    <string name="settings_portrait_panel_position_hint">Move the portrait transcript panel up or down. Moving it lower shows fewer subtitle rows.</string>
+    <string name="settings_portrait_panel_position_hint">The portrait transcript panel starts right under the video. Higher makes it taller and covers the bottom of the video; lower makes it shorter.</string>
     <string name="settings_portrait_panel_higher">Higher</string>
     <string name="settings_portrait_panel_default">Default</string>
     <string name="settings_portrait_panel_lower">Lower</string>
     <string name="settings_portrait_panel_reset">Reset position</string>
-    <string name="settings_portrait_panel_position_center">Position: Center</string>
+    <string name="settings_portrait_panel_position_center">Position: Fits the video</string>
     <string name="settings_portrait_panel_position_higher_percent">Position: %1$d%% higher</string>
     <string name="settings_portrait_panel_position_lower_percent">Position: %1$d%% lower</string>
     <string name="settings_color_ice_white">Ice white</string>

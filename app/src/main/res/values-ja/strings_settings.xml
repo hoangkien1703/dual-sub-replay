@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">原文の下</string>
     <string name="settings_translation_position_above">原文の上</string>
     <string name="settings_portrait_panel_position">縦向きパネルの位置</string>
-    <string name="settings_portrait_panel_position_hint">縦向きのトランスクリプトパネルを上下に移動します。下げるほど表示される字幕の行数が減ります。</string>
+    <string name="settings_portrait_panel_position_hint">縦向きのトランスクリプトパネルは動画のすぐ下から始まります。上げるとパネルが長くなり動画の下部に重なります。下げると短くなります。</string>
     <string name="settings_portrait_panel_higher">上へ</string>
     <string name="settings_portrait_panel_default">標準</string>
     <string name="settings_portrait_panel_lower">下へ</string>
     <string name="settings_portrait_panel_reset">位置をリセット</string>
-    <string name="settings_portrait_panel_position_center">位置: 中央</string>
+    <string name="settings_portrait_panel_position_center">位置: 動画にぴったり</string>
     <string name="settings_portrait_panel_position_higher_percent">位置: %1$d%% 上</string>
     <string name="settings_portrait_panel_position_lower_percent">位置: %1$d%% 下</string>
     <string name="settings_color_ice_white">アイスホワイト</string>

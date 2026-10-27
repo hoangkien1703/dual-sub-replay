@@ -88,7 +88,7 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithText("Position: 20% lower").performScrollTo().assertIsDisplayed()
         composeRule.runOnIdle { assertEquals(0.2f, portraitPanelPosition.floatValue, 0f) }
         composeRule.onNodeWithTag("reset_portrait_panel_position").performScrollTo().performClick()
-        composeRule.onNodeWithText("Position: 1% lower").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Position: Fits the video").performScrollTo().assertIsDisplayed()
         composeRule.runOnIdle {
             assertEquals(
                 DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,

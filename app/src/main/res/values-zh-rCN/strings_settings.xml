@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">原文下方</string>
     <string name="settings_translation_position_above">原文上方</string>
     <string name="settings_portrait_panel_position">竖屏面板位置</string>
-    <string name="settings_portrait_panel_position_hint">上下移动竖屏的字幕文稿面板。位置越低，显示的字幕行越少。</string>
+    <string name="settings_portrait_panel_position_hint">竖屏字幕文稿面板紧贴在视频下方。调高会让面板变长并盖住视频底部；调低会让面板变短。</string>
     <string name="settings_portrait_panel_higher">更高</string>
     <string name="settings_portrait_panel_default">默认</string>
     <string name="settings_portrait_panel_lower">更低</string>
     <string name="settings_portrait_panel_reset">重置位置</string>
-    <string name="settings_portrait_panel_position_center">位置：居中</string>
+    <string name="settings_portrait_panel_position_center">位置：贴合视频</string>
     <string name="settings_portrait_panel_position_higher_percent">位置：上移 %1$d%%</string>
     <string name="settings_portrait_panel_position_lower_percent">位置：下移 %1$d%%</string>
     <string name="settings_color_ice_white">冰白</string>

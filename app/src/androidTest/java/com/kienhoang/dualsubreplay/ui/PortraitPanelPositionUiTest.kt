@@ -33,14 +33,14 @@ class PortraitPanelPositionUiTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    @Test fun panelMovesAndResizesWithinMeasuredPortraitContent() {
+    @Test fun panelGrowsAndShrinksWithItsBottomKeptInPlace() {
         val offset = mutableFloatStateOf(DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION)
         composeRule.setContent {
             MaterialTheme {
                 Box(Modifier.fillMaxSize().background(Color(0xFF90CAF9))) {
                     Text("Video remains visible above the transcript", color = Color.Black)
                     PortraitSubtitlePanelLayout(
-                        baselineHeightFraction = 0.60f,
+                        playerFrame = null,
                         offsetFraction = offset.floatValue,
                     ) { modifier ->
                         Column(modifier.background(Color(0xFF061719)).testTag("measured_portrait_panel")) {
@@ -75,7 +75,7 @@ class PortraitPanelPositionUiTest {
 
         assertTrue(higherBounds.top < defaultBounds.top)
         assertTrue(higherBounds.height > defaultBounds.height)
-        assertTrue(higherBounds.bottom < defaultBounds.bottom)
+        assertEquals(defaultBounds.bottom, higherBounds.bottom, 1f)
         assertTrue(lowerBounds.top > defaultBounds.top)
         assertTrue(lowerBounds.height < defaultBounds.height)
         assertEquals(defaultBounds.bottom, lowerBounds.bottom, 1f)
@@ -87,7 +87,7 @@ class PortraitPanelPositionUiTest {
             MaterialTheme {
                 Box(Modifier.requiredSize(width = 300.dp, height = 600.dp)) {
                     PortraitSubtitlePanelLayout(
-                        baselineHeightFraction = 0.60f,
+                        playerFrame = null,
                         offsetFraction = 0.20f,
                     ) { modifier ->
                         Column(modifier.testTag("lowest_portrait_panel")) {
