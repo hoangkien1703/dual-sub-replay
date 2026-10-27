@@ -131,6 +131,9 @@ internal enum class AiSetting(
     SKIP_SPONSORS("skip_sponsors"),
     ALWAYS_SKIP_SPONSORS("always_skip_sponsors"),
 
+    /** Settings → YouTube tabs (2026-10-27). */
+    DIFFERENT_TAB_ACCOUNTS("different_tab_accounts"),
+
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
     APP_AUTO_UPDATE("auto_update", asks = true),
 
@@ -762,6 +765,10 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (with skip_sponsors on, a seek, a tapped line or a replay that lands in a sponsor part also jumps to its " +
                 "end, so sponsor parts never play; off by default)"
+        AiSetting.DIFFERENT_TAB_ACCOUNTS ->
+            choiceList(setting.choices) +
+                " (Use different Google accounts: adds New tab with another account under Tabs in the menu, where a tab " +
+                "can use Account 2 or 3 with its own Google sign-in; off by default, then every tab uses Account 1)"
         AiSetting.APP_AUTO_UPDATE ->
             choiceList(setting.choices) +
                 " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +

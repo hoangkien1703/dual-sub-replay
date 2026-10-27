@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">YouTube 标签页</string>
+    <string name="settings_section_tabs_summary">标签页和 Google 账号</string>
+    <string name="tabs_menu_title">标签页 (%1$d)</string>
+    <string name="tabs_list_shown">标签页列表已展开</string>
+    <string name="tabs_list_hidden">标签页列表已收起</string>
+    <string name="tabs_new_tab">新标签页</string>
+    <string name="tabs_new_tab_other_account">用其他账号打开新标签页</string>
+    <string name="tabs_account_main">账号 1（主账号）</string>
+    <string name="tabs_account">账号 %1$d</string>
+    <string name="tabs_full">最多可以打开 %1$d 个标签页。请先关闭一个再打开新的。</string>
+    <string name="tabs_close">关闭标签页“%1$s”</string>
+    <string name="tabs_name_video">YouTube 视频</string>
+    <string name="tabs_name_home">YouTube 首页</string>
+    <string name="tabs_name_search">YouTube 搜索</string>
+    <string name="tabs_name_page">YouTube 页面</string>
+    <string name="tabs_empty_title">没有打开的 YouTube 标签页</string>
+    <string name="tabs_empty_message">你已关闭所有标签页。打开一个新的 YouTube 标签页，继续用双语字幕观看。</string>
+    <string name="tabs_open_new_youtube_tab">打开新的 YouTube 标签页</string>
+    <string name="tabs_open_in_new_tab">在新标签页中打开</string>
+    <string name="tabs_open_here">在此打开</string>
+    <string name="tabs_opened_in_new_tab">已在新标签页中打开</string>
+    <string name="tabs_show">显示</string>
+    <string name="tabs_settings_note">在菜单的“标签页”中打开和切换标签页。只有当前标签页会播放，视频会从你上次停下的地方继续。在 YouTube 上长按视频即可在新标签页中打开。</string>
+    <string name="tabs_different_accounts_title">使用不同的 Google 账号</string>
+    <string name="tabs_different_accounts_description">在“标签页”下添加“用其他账号打开新标签页”。账号 2 和 3 各自保留自己的 Google 登录；账号 1 是你平常用的账号。关闭时：所有标签页都使用账号 1。</string>
+    <string name="tabs_different_accounts_unsupported">使用不同的 Google 账号需要较新的 Android System WebView。请在 Google Play 中更新后使用。</string>
+</resources>

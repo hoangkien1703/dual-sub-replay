@@ -143,6 +143,7 @@ internal data class AiStoredSettings(
     val study: StudySettings = StudySettings(),
     val autoUpdate: Boolean = false,
     val adSkip: AdSkipSettings = AdSkipSettings(),
+    val differentTabAccounts: Boolean = false,
 )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -161,6 +162,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         study = readStudySettings(preferences),
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
         adSkip = readAdSkipSettings(preferences),
+        differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
     )
 }
 
@@ -195,6 +197,7 @@ private fun aiStoredSettingValue(
         AiSetting.SKIP_ADS -> onOff(stored.adSkip.skipAds)
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
         AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
+        AiSetting.DIFFERENT_TAB_ACCOUNTS -> onOff(stored.differentTabAccounts)
         else -> aiStudySettingValue(stored.study, setting)
     }
 
@@ -635,6 +638,7 @@ internal class AppAiActions(
             AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
             AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
             AiSetting.ALWAYS_SKIP_SPONSORS -> editor.putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, on)
+            AiSetting.DIFFERENT_TAB_ACCOUNTS -> editor.putBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -814,6 +818,7 @@ internal class AppAiActions(
             AiSetting.SKIP_ADS -> switch(R.string.ads_skip_ads_title, value)
             AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
             AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
+            AiSetting.DIFFERENT_TAB_ACCOUNTS -> switch(R.string.tabs_different_accounts_title, value)
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

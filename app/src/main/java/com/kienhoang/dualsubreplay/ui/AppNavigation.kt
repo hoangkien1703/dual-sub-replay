@@ -30,6 +30,9 @@ internal fun AppNavigation(
     onSettings: () -> Unit,
     onProgress: () -> Unit = {},
     onVisibilityChange: (Boolean) -> Unit = {},
+    tabs: BrowserTabs? = null,
+    differentTabAccounts: Boolean = false,
+    tabActions: BrowserTabActions = BrowserTabActions(),
     content: @Composable (menuButton: @Composable () -> Unit) -> Unit,
 ) {
     val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -52,6 +55,9 @@ internal fun AppNavigation(
                         Column {
                             DrawerHeader(onClose = { scope.launch { drawer.close() } })
                             Spacer(Modifier.height(8.dp))
+                            if (tabs != null) {
+                                DrawerTabsSection(tabs, differentTabAccounts, tabActions, closeDrawer = { scope.launch { drawer.close() } })
+                            }
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Default.School, contentDescription = null) },
                                 label = { Text(stringResource(R.string.navigation_practice)) }, selected = false,

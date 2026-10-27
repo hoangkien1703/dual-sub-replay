@@ -198,9 +198,9 @@ internal fun shouldAutoReturnAfterSignIn(
     sessionCookiesPresent: Boolean,
 ): Boolean = !startedWithSessionCookies && sessionCookiesPresent
 
-private fun hasStoredYouTubeSessionCookie(): Boolean =
+private fun CookieManager.hasStoredYouTubeSessionCookie(): Boolean =
     sequenceOf("https://www.youtube.com", "https://m.youtube.com").any { url ->
-        hasAuthenticatedYouTubeCookie(CookieManager.getInstance().getCookie(url))
+        hasAuthenticatedYouTubeCookie(getCookie(url))
     }
 
 internal val youtubePlayerControlsVisible = MutableStateFlow(false)
@@ -312,8 +312,13 @@ internal fun SingleYouTubePage(
     captionTrackTarget: CaptionTrackTarget? = null,
     fullscreenOverlay: (@Composable BoxScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    account: Int = MAIN_TAB_ACCOUNT,
+    tabActions: BrowserTabActions? = null,
 ) {
     val context = LocalContext.current
+    // The tab's Google account: its own cookies, so its own sign-in (YouTubeTabAccounts.kt).
+    val cookies = remember { tabCookieManager(account) }
+    var longPressedLink by remember { mutableStateOf<LongPressedVideoLink?>(null) }
     val resources = LocalResources.current
     val requestInterceptor = LocalYouTubeRequestInterceptor.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -351,7 +356,7 @@ internal fun SingleYouTubePage(
             signInEmbedUntilYouTubeLands = false
             signInStartedWithCookies = false
             signInReturnUrl = null
-            CookieManager.getInstance().flush()
+            cookies.flush()
         }
     }
 
@@ -366,6 +371,7 @@ internal fun SingleYouTubePage(
 
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         OffScreenPlaybackWebView(context) { WebVideoBridge.playback.value.isPlaying() }.apply {
+            useTabAccount(account)
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -392,6 +398,14 @@ internal fun SingleYouTubePage(
                     youtubeFullscreenActive.value = true
                 }
 
+                override fun onReceivedTitle(
+                    view: WebView,
+                    title: String?,
+                ) {
+                    val url = view.url.orEmpty()
+                    if (isYouTubeWebUrl(url)) tabActions?.pageTitle?.invoke(url, title)
+                }
+
                 override fun onHideCustomView() {
                     youtubeFullscreenActive.value = false
                     val session = fullscreenSession ?: return
@@ -400,8 +414,9 @@ internal fun SingleYouTubePage(
                     runCatching { session.callback.onCustomViewHidden() }
                 }
             }
-            CookieManager.getInstance().setAcceptCookie(true)
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+            cookies.setAcceptCookie(true)
+            cookies.setAcceptThirdPartyCookies(this, true)
+            if (tabActions != null) listenForVideoLongPress { longPressedLink = it }
             if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
                 WebViewCompat.addDocumentStartJavaScript(
                     this,
@@ -428,7 +443,7 @@ internal fun SingleYouTubePage(
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress && !isSignOutNavigation(url)) {
                             signInReturnUrl = lastKnownUrl
-                            signInStartedWithCookies = hasStoredYouTubeSessionCookie()
+                            signInStartedWithCookies = cookies.hasStoredYouTubeSessionCookie()
                             googleSignInInProgress = true
                         }
                         return false
@@ -486,7 +501,7 @@ internal fun SingleYouTubePage(
                     webViewUnavailable = false
                     reportNavigation(view, url)
                     if (url?.let(::isYouTubeWebUrl) == true) {
-                        CookieManager.getInstance().flush()
+                        cookies.flush()
                         view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
                         view.evaluateJavascript(WEB_HIDE_OPEN_APP_SCRIPT, null)
                         view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
@@ -661,9 +676,8 @@ internal fun SingleYouTubePage(
 
     LaunchedEffect(webView, lifecycleStarted, googleSignInInProgress) {
         if (!lifecycleStarted || !googleSignInInProgress) return@LaunchedEffect
-        val cookieManager = CookieManager.getInstance()
         while (isActive && googleSignInInProgress) {
-            val signedIn = hasStoredYouTubeSessionCookie()
+            val signedIn = cookies.hasStoredYouTubeSessionCookie()
             if (!signedIn) {
                 signInStartedWithCookies = false
             } else if (shouldAutoReturnAfterSignIn(signInStartedWithCookies, signedIn)) {
@@ -672,7 +686,7 @@ internal fun SingleYouTubePage(
                 signInStartedWithCookies = false
                 signInReturnUrl = null
                 signInEmbedUntilYouTubeLands = true
-                cookieManager.flush()
+                cookies.flush()
                 webView.loadUrl(returnUrl)
                 return@LaunchedEffect
             }
@@ -801,6 +815,12 @@ internal fun SingleYouTubePage(
                 modifier = Modifier.align(Alignment.Center),
             )
         }
+        OpenInNewTabMenu(
+            link = longPressedLink,
+            onOpenInNewTab = { url -> tabActions?.openInNew?.invoke(url) },
+            onOpenHere = { url -> if (isYouTubeWebUrl(url)) webView.loadUrl(url) },
+            onDismiss = { longPressedLink = null },
+        )
     }
 
     FullscreenVideoRotation(fullscreen = fullscreenSession != null, webView = webView)

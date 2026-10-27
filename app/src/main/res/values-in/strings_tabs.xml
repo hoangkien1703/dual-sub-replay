@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">Tab YouTube</string>
+    <string name="settings_section_tabs_summary">Tab dan akun Google</string>
+    <string name="tabs_menu_title">Tab (%1$d)</string>
+    <string name="tabs_list_shown">Daftar tab ditampilkan</string>
+    <string name="tabs_list_hidden">Daftar tab disembunyikan</string>
+    <string name="tabs_new_tab">Tab baru</string>
+    <string name="tabs_new_tab_other_account">Tab baru dengan akun lain</string>
+    <string name="tabs_account_main">Akun 1 (utama)</string>
+    <string name="tabs_account">Akun %1$d</string>
+    <string name="tabs_full">Maksimal %1$d tab bisa dibuka. Tutup satu untuk membuka yang lain.</string>
+    <string name="tabs_close">Tutup tab %1$s</string>
+    <string name="tabs_name_video">Video YouTube</string>
+    <string name="tabs_name_home">Beranda YouTube</string>
+    <string name="tabs_name_search">Pencarian YouTube</string>
+    <string name="tabs_name_page">Halaman YouTube</string>
+    <string name="tabs_empty_title">Tidak ada tab YouTube yang terbuka</string>
+    <string name="tabs_empty_message">Anda menutup semua tab. Buka tab YouTube baru untuk lanjut menonton dengan subtitle ganda.</string>
+    <string name="tabs_open_new_youtube_tab">Buka tab YouTube baru</string>
+    <string name="tabs_open_in_new_tab">Buka di tab baru</string>
+    <string name="tabs_open_here">Buka di sini</string>
+    <string name="tabs_opened_in_new_tab">Dibuka di tab baru</string>
+    <string name="tabs_show">Tampilkan</string>
+    <string name="tabs_settings_note">Buka dan pindah tab dari Tab di menu. Hanya tab yang terbuka yang diputar, dan video dibuka lagi di posisi terakhir. Tekan lama video di YouTube untuk membukanya di tab baru.</string>
+    <string name="tabs_different_accounts_title">Gunakan akun Google yang berbeda</string>
+    <string name="tabs_different_accounts_description">Menambahkan “Tab baru dengan akun lain” di bawah Tab. Akun 2 dan 3 masing-masing menyimpan login Google sendiri; Akun 1 adalah akun Anda yang biasa. Nonaktif: semua tab memakai Akun 1.</string>
+    <string name="tabs_different_accounts_unsupported">Akun Google yang berbeda memerlukan Android System WebView yang lebih baru. Perbarui dari Google Play untuk menggunakannya.</string>
+</resources>

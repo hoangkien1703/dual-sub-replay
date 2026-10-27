@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">Thẻ YouTube</string>
+    <string name="settings_section_tabs_summary">Thẻ và tài khoản Google</string>
+    <string name="tabs_menu_title">Thẻ (%1$d)</string>
+    <string name="tabs_list_shown">Đang hiện danh sách thẻ</string>
+    <string name="tabs_list_hidden">Đang ẩn danh sách thẻ</string>
+    <string name="tabs_new_tab">Thẻ mới</string>
+    <string name="tabs_new_tab_other_account">Thẻ mới với tài khoản khác</string>
+    <string name="tabs_account_main">Tài khoản 1 (chính)</string>
+    <string name="tabs_account">Tài khoản %1$d</string>
+    <string name="tabs_full">Chỉ mở được tối đa %1$d thẻ. Hãy đóng một thẻ để mở thẻ khác.</string>
+    <string name="tabs_close">Đóng thẻ %1$s</string>
+    <string name="tabs_name_video">Video YouTube</string>
+    <string name="tabs_name_home">Trang chủ YouTube</string>
+    <string name="tabs_name_search">Tìm kiếm YouTube</string>
+    <string name="tabs_name_page">Trang YouTube</string>
+    <string name="tabs_empty_title">Chưa mở thẻ YouTube nào</string>
+    <string name="tabs_empty_message">Bạn đã đóng mọi thẻ. Hãy mở một thẻ YouTube mới để tiếp tục xem với phụ đề song ngữ.</string>
+    <string name="tabs_open_new_youtube_tab">Mở thẻ YouTube mới</string>
+    <string name="tabs_open_in_new_tab">Mở trong thẻ mới</string>
+    <string name="tabs_open_here">Mở tại đây</string>
+    <string name="tabs_opened_in_new_tab">Đã mở trong thẻ mới</string>
+    <string name="tabs_show">Xem</string>
+    <string name="tabs_settings_note">Mở và chuyển thẻ trong mục Thẻ ở menu. Chỉ thẻ đang mở mới phát, và video sẽ mở lại đúng chỗ bạn đã dừng. Nhấn giữ một video trên YouTube để mở nó trong thẻ mới.</string>
+    <string name="tabs_different_accounts_title">Dùng các tài khoản Google khác nhau</string>
+    <string name="tabs_different_accounts_description">Thêm “Thẻ mới với tài khoản khác” trong mục Thẻ. Tài khoản 2 và 3 mỗi tài khoản giữ đăng nhập Google riêng; Tài khoản 1 là tài khoản bạn vẫn dùng. Tắt: mọi thẻ dùng Tài khoản 1.</string>
+    <string name="tabs_different_accounts_unsupported">Dùng nhiều tài khoản Google cần Android System WebView mới hơn. Hãy cập nhật nó trên Google Play để dùng.</string>
+</resources>

@@ -49,12 +49,15 @@ import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.WordTap
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -92,6 +95,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Composable
+@Suppress("LongMethod")
 fun DualSubApp(
     viewModel: AppViewModel,
     playerMode: PlayerExperienceMode = PlayerExperienceMode.TRANSCRIPT_PANEL,
@@ -174,6 +178,7 @@ fun DualSubApp(
                 onTapToLearnChange = viewModel::setTapToLearnEnabled,
                 onWordClick = viewModel::selectLearningWord,
                 onResetSettings = viewModel::resetAllSettings,
+                tabActions = remember(viewModel) { browserTabActions(viewModel) },
             )
         }
         state.selectedLearningWord?.let { selection ->
@@ -285,6 +290,7 @@ private fun DualSubExperience(
     onTapToLearnChange: (Boolean) -> Unit = {},
     onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
+    tabActions: BrowserTabActions = BrowserTabActions(),
 ) {
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)
@@ -338,11 +344,20 @@ private fun DualSubExperience(
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showQuickSettings = true
     }
+    val differentTabAccounts by rememberDifferentTabAccounts()
+    val snackbars = remember { SnackbarHostState() }
+    val pageTabActions = rememberPageTabActions(tabActions, state.browserTabs, snackbars)
 
-    AppNavigation(onPractice = onVocabulary, onProgress = onProgress, onSettings = {
-        showSettings = true
-    }, onVisibilityChange = onNavigationVisibilityChange) { menuButton ->
-        Scaffold(contentWindowInsets = contentInsets, topBar = {
+    AppNavigation(
+        onPractice = onVocabulary,
+        onProgress = onProgress,
+        onSettings = { showSettings = true },
+        onVisibilityChange = onNavigationVisibilityChange,
+        tabs = state.browserTabs,
+        differentTabAccounts = differentTabAccounts,
+        tabActions = tabActions,
+    ) { menuButton ->
+        Scaffold(contentWindowInsets = contentInsets, snackbarHost = { SnackbarHost(snackbars) }, topBar = {
             Surface {
                 Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                     menuButton()
@@ -362,28 +377,42 @@ private fun DualSubExperience(
             ) {
                 // Single call site on purpose: branching around SingleYouTubePage would
                 // leave composition and destroy the persistent WebView on every rotation.
+                // Only closing every tab, or opening a tab of another Google account, replaces it.
                 Row(
                     Modifier
                         .fillMaxSize()
                         .onSizeChanged { splitContainerWidthPx = it.width.toFloat() },
                 ) {
-                    SingleYouTubePage(
-                        initialUrl = state.browserUrl,
-                        navigationRequestId = state.browserNavigationRequestId,
-                        controller = webController,
-                        onPageChanged = onPageChanged,
-                        onPlaybackSecond = onPlaybackSecond,
-                        onPlaybackPaused = onPlaybackPaused,
-                        liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
-                        suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
-                        captionTrackTarget = captionTrackTarget(state),
-                        fullscreenOverlay = fullscreenLearningOverlay,
-                        modifier =
-                            Modifier
-                                .weight(if (sideBySide) landscapeVideoFraction else 1f)
-                                .fillMaxHeight()
-                                .testTag("youtube_web_app"),
-                    )
+                    val activeTab = state.browserTabs.active
+                    val account = effectiveTabAccount(activeTab, differentTabAccounts)
+                    if (activeTab == null) {
+                        EmptyTabsPage(
+                            onOpenNewTab = { tabActions.openNew(MAIN_TAB_ACCOUNT) },
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                        )
+                    } else {
+                        key(account) {
+                            SingleYouTubePage(
+                                initialUrl = state.browserUrl,
+                                navigationRequestId = state.browserNavigationRequestId,
+                                controller = webController,
+                                onPageChanged = onPageChanged,
+                                onPlaybackSecond = onPlaybackSecond,
+                                onPlaybackPaused = onPlaybackPaused,
+                                liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
+                                suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
+                                captionTrackTarget = captionTrackTarget(state),
+                                fullscreenOverlay = fullscreenLearningOverlay,
+                                modifier =
+                                    Modifier
+                                        .weight(if (sideBySide) landscapeVideoFraction else 1f)
+                                        .fillMaxHeight()
+                                        .testTag("youtube_web_app"),
+                                account = account,
+                                tabActions = pageTabActions,
+                            )
+                        }
+                    }
 
                     if (sideBySide) {
                         LandscapeSplitDivider(
