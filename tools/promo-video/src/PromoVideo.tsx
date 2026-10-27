@@ -211,8 +211,15 @@ export const SocialCard: React.FC<PromoProps> = () => (
       <div style={{fontSize: 39, lineHeight: 1.18, fontWeight: 700, marginTop: 28}}>Dual subtitles.<br />Tap any sentence to replay.</div>
       <div style={{fontSize: 24, color: colors.muted, marginTop: 34}}>Free, open-source Android language learning</div>
     </div>
-    <div style={{position: 'absolute', right: 80, top: 25, width: 250, height: 550, borderRadius: 34, padding: 7, background: '#020708', border: `2px solid ${colors.surfaceVariant}`, boxShadow: '0 20px 70px #000D, 0 0 60px #13C6D744', overflow: 'hidden', transform: 'rotate(3deg)'}}>
-      <Img src={staticFile('source/poster-source.jpg')} style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: 27}} />
-    </div>
+    <SocialPhone src="source/social-japanese-english.webp" right={300} top={38} rotate={-4} />
+    <SocialPhone src="source/social-english-vietnamese.webp" right={62} top={82} rotate={4} />
   </AbsoluteFill>
+);
+
+// The owner's 2026-10-28 screenshots (Japanese -> English, English -> Vietnamese), the same
+// pair the website hero shows.
+const SocialPhone: React.FC<{src: string; right: number; top: number; rotate: number}> = ({src, right, top, rotate}) => (
+  <div style={{position: 'absolute', right, top, width: 236, height: 504, borderRadius: 32, padding: 6, background: '#020708', border: `2px solid ${colors.surfaceVariant}`, boxShadow: '0 20px 70px #000D, 0 0 60px #13C6D744', overflow: 'hidden', transform: `rotate(${rotate}deg)`}}>
+    <Img src={staticFile(src)} style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', borderRadius: 26}} />
+  </div>
 );

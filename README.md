@@ -58,15 +58,17 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
 If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
 
 <p align="center">
+  <img src="docs/images/dualsub-replay-japanese-english.webp" alt="DualSub Replay with a Japanese YouTube video, Japanese subtitles and English translations, the playing line's words colored by part of speech" width="280">
+  &nbsp;
+  <img src="docs/images/dualsub-replay-english-vietnamese.webp" alt="DualSub Replay with an English YouTube video, English subtitles and Vietnamese translations, the playing line's words colored by part of speech" width="280">
+</p>
+
+<p align="center">
   <img src="docs/images/dualsub-replay-full-hd.jpg" alt="DualSub Replay showing bilingual English and Vietnamese subtitles over a landscape interview video" width="900">
 </p>
 
 <p align="center">
   <img src="docs/images/dualsub-replay-landscape.png" alt="DualSub Replay in landscape with the YouTube video on the left and replayable Japanese and English subtitles on the right" width="900">
-</p>
-
-<p align="center">
-  <img src="docs/images/dualsub-replay-preview.webp" alt="DualSub Replay showing YouTube with original and translated subtitles in a replayable bottom panel" width="280">
 </p>
 
 ## Features

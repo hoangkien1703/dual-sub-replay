@@ -37,7 +37,8 @@ jobs:
           set -euo pipefail
           cp -R site _site
           mkdir -p _site/images
-          cp docs/images/dualsub-replay-preview.webp \
+          cp docs/images/dualsub-replay-japanese-english.webp \
+             docs/images/dualsub-replay-english-vietnamese.webp \
              docs/images/dualsub-replay-japanese-word-card.webp \
              docs/images/dualsub-replay-full-hd.jpg \
              docs/images/dualsub-replay-landscape.png \
