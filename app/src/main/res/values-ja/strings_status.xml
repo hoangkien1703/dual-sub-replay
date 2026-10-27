@@ -11,7 +11,6 @@
     <string name="status_downloading_translation_model">翻訳モデルをダウンロードしています…</string>
     <string name="status_subtitles_load_failed">字幕を読み込めませんでした。再試行して続けてください。</string>
     <string name="status_original_captions_only">元の字幕のみ · 翻訳は利用できません</string>
-    <string name="status_paused_translation_resumes">一時停止中 · 再生すると翻訳を再開します</string>
     <string name="status_subtitles_ready">再生位置付近の字幕の準備ができました</string>
     <string name="status_preparing_translation">%1$s への翻訳を準備しています…</string>
     <string name="status_translation_unavailable_retry">現在翻訳を利用できません。接続を確認してから再試行してください。</string>

@@ -11,7 +11,6 @@
     <string name="status_downloading_translation_model">Baixando modelo de tradução…</string>
     <string name="status_subtitles_load_failed">Não foi possível carregar as legendas. Tente novamente para continuar.</string>
     <string name="status_original_captions_only">Somente legendas originais · tradução indisponível</string>
-    <string name="status_paused_translation_resumes">Pausado · a tradução continua ao reproduzir</string>
     <string name="status_subtitles_ready">Legendas prontas perto da reprodução</string>
     <string name="status_preparing_translation">Preparando a tradução para %1$s…</string>
     <string name="status_translation_unavailable_retry">A tradução está indisponível no momento. Verifique sua conexão e tente novamente.</string>

@@ -11,7 +11,6 @@
     <string name="status_downloading_translation_model">正在下载翻译模型…</string>
     <string name="status_subtitles_load_failed">无法加载字幕。请重试以继续。</string>
     <string name="status_original_captions_only">仅原文字幕 · 翻译不可用</string>
-    <string name="status_paused_translation_resumes">已暂停 · 播放时继续翻译</string>
     <string name="status_subtitles_ready">播放位置附近的字幕已就绪</string>
     <string name="status_preparing_translation">正在准备%1$s翻译…</string>
     <string name="status_translation_unavailable_retry">暂时无法翻译。请检查网络连接，然后重试。</string>

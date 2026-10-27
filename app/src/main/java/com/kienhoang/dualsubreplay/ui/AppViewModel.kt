@@ -1998,7 +1998,6 @@ class AppViewModel internal constructor(
                     text(
                         when {
                             current.translationError != null -> R.string.status_original_captions_only
-                            current.playbackPaused -> R.string.status_paused_translation_resumes
                             preparing -> R.string.status_preparing_nearby_translations
                             else -> R.string.status_subtitles_ready
                         },
