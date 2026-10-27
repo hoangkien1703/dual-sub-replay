@@ -41,4 +41,23 @@ class CaptionVisibilityTest {
         assertFalse(snapshot.paused)
         assertFalse(CaptionVisibility.PAUSED.visible(snapshot.paused))
     }
+
+    @Test fun snapshotCarriesTheWatchPlayerFrame() {
+        val snapshot =
+            parseWebPlaybackSnapshot(
+                org.json.JSONObject.quote(
+                    "{\"url\":\"https://m.youtube.com/watch?v=abcdefghijk\",\"currentSecond\":1," +
+                        "\"playerFrame\":{\"bottom\":0.32,\"aspect\":0.45}}",
+                ),
+            )!!
+        assertEquals(PagePlayerFrame(bottomFraction = 0.32f, viewportAspect = 0.45f), snapshot.playerFrame)
+
+        val broken =
+            parseWebPlaybackSnapshot(
+                org.json.JSONObject.quote(
+                    "{\"url\":\"https://m.youtube.com\",\"currentSecond\":1,\"playerFrame\":{\"bottom\":1.5,\"aspect\":0.45}}",
+                ),
+            )!!
+        assertNull(broken.playerFrame)
+    }
 }

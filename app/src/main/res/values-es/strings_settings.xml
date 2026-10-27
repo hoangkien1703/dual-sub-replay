@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">Debajo del original</string>
     <string name="settings_translation_position_above">Encima del original</string>
     <string name="settings_portrait_panel_position">Posición del panel en vertical</string>
-    <string name="settings_portrait_panel_position_hint">Mueve el panel de transcripción vertical hacia arriba o abajo. Cuanto más abajo, menos filas de subtítulos se muestran.</string>
+    <string name="settings_portrait_panel_position_hint">El panel de transcripción vertical empieza justo debajo del vídeo. Más arriba lo hace más alto y tapa la parte inferior del vídeo; más abajo lo hace más corto.</string>
     <string name="settings_portrait_panel_higher">Más arriba</string>
     <string name="settings_portrait_panel_default">Predeterminado</string>
     <string name="settings_portrait_panel_lower">Más abajo</string>
     <string name="settings_portrait_panel_reset">Restablecer posición</string>
-    <string name="settings_portrait_panel_position_center">Posición: centro</string>
+    <string name="settings_portrait_panel_position_center">Posición: ajustada al vídeo</string>
     <string name="settings_portrait_panel_position_higher_percent">Posición: %1$d%% más arriba</string>
     <string name="settings_portrait_panel_position_lower_percent">Posición: %1$d%% más abajo</string>
     <string name="settings_color_ice_white">Blanco hielo</string>

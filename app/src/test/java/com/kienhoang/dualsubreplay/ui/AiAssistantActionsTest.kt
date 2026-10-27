@@ -106,7 +106,7 @@ class AiAssistantActionsTest {
         assertEquals("0.75", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 0.75f, none, AiSetting.PLAYBACK_SPEED))
         assertEquals("off", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.DAILY_GOAL))
         assertEquals("125", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, stored, AiSetting.PRONUNCIATION_VOLUME))
-        assertEquals("1", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.PORTRAIT_PANEL_POSITION))
+        assertEquals("0", aiSettingCurrentValue(state, PlayerExperienceMode.TRANSCRIPT_PANEL, 1f, none, AiSetting.PORTRAIT_PANEL_POSITION))
     }
 
     @Test

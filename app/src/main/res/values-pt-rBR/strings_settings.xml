@@ -13,12 +13,12 @@
     <string name="settings_translation_position_below">Abaixo do original</string>
     <string name="settings_translation_position_above">Acima do original</string>
     <string name="settings_portrait_panel_position">Posição do painel no modo retrato</string>
-    <string name="settings_portrait_panel_position_hint">Mova o painel de transcrição no modo retrato para cima ou para baixo. Quanto mais baixo, menos linhas de legenda aparecem.</string>
+    <string name="settings_portrait_panel_position_hint">O painel de transcrição no modo retrato começa logo abaixo do vídeo. Mais alto deixa o painel maior e cobre a parte de baixo do vídeo; mais baixo deixa o painel menor.</string>
     <string name="settings_portrait_panel_higher">Mais alto</string>
     <string name="settings_portrait_panel_default">Padrão</string>
     <string name="settings_portrait_panel_lower">Mais baixo</string>
     <string name="settings_portrait_panel_reset">Redefinir posição</string>
-    <string name="settings_portrait_panel_position_center">Posição: centro</string>
+    <string name="settings_portrait_panel_position_center">Posição: ajustada ao vídeo</string>
     <string name="settings_portrait_panel_position_higher_percent">Posição: %1$d%% mais alto</string>
     <string name="settings_portrait_panel_position_lower_percent">Posição: %1$d%% mais baixo</string>
     <string name="settings_color_ice_white">Branco gelo</string>
