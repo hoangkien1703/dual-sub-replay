@@ -544,7 +544,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         LocalAiAssistant provides aiAssistant,
         LocalStudyTools provides studyTools,
     ) {
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().clearPhraseSelectionOnTapElsewhere(phraseSelection)) {
             DualSubApp(
                 viewModel = viewModel,
                 playerMode = mode,

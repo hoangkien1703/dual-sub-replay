@@ -91,7 +91,7 @@
     <string name="practice_translate">Terjemahkan</string>
     <string name="practice_all_actions">Semua tindakan</string>
     <string name="practice_clear_selection">Hapus pilihan</string>
-    <string name="practice_tap_another_word">Ketuk kata lain untuk memilih frasa</string>
+    <string name="practice_drag_handles">Seret pegangan di kedua ujung untuk memilih lebih banyak kata</string>
     <string name="practice_translation_unavailable">Terjemahan tidak tersedia</string>
     <string name="practice_translating">Menerjemahkan…</string>
     <string name="practice_preparing_pronunciation">Menyiapkan pengucapan…</string>

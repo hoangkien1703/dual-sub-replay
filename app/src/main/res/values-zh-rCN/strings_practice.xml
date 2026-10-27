@@ -91,7 +91,7 @@
     <string name="practice_translate">翻译</string>
     <string name="practice_all_actions">全部操作</string>
     <string name="practice_clear_selection">清除选择</string>
-    <string name="practice_tap_another_word">点按另一个单词即可选择短语</string>
+    <string name="practice_drag_handles">拖动两端的手柄即可选择更多词语</string>
     <string name="practice_translation_unavailable">翻译不可用</string>
     <string name="practice_translating">正在翻译…</string>
     <string name="practice_preparing_pronunciation">正在准备发音…</string>

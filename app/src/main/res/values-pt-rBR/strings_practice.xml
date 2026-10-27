@@ -91,7 +91,7 @@
     <string name="practice_translate">Traduzir</string>
     <string name="practice_all_actions">Todas as ações</string>
     <string name="practice_clear_selection">Limpar seleção</string>
-    <string name="practice_tap_another_word">Toque em outra palavra para selecionar uma frase</string>
+    <string name="practice_drag_handles">Arraste as alças das pontas para selecionar mais palavras</string>
     <string name="practice_translation_unavailable">Tradução indisponível</string>
     <string name="practice_translating">Traduzindo…</string>
     <string name="practice_preparing_pronunciation">Preparando a pronúncia…</string>

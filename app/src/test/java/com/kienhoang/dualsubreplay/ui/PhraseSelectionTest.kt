@@ -32,14 +32,41 @@ class PhraseSelectionTest {
     private val segment = SubtitleSegment(1, 1_000, 3_000, sentence, "Mình rất mong được gặp bạn.")
 
     @Test
-    fun tapsSelectExtendAndClearAWordRange() {
+    fun tapsSelectMoveAndClearAWordAsAndroidDoes() {
         assertEquals(3..3, nextPhraseRange(null, 3))
-        // A later word extends forward, an earlier one extends backward.
-        assertEquals(3..5, nextPhraseRange(3..3, 5))
-        assertEquals(1..5, nextPhraseRange(3..5, 1))
+        // Another word moves the selection there instead of growing it: the handles grow it.
+        assertEquals(5..5, nextPhraseRange(3..3, 5))
+        assertEquals(1..1, nextPhraseRange(3..5, 1))
         // Tapping inside the selection clears it.
         assertNull(nextPhraseRange(3..3, 3))
         assertNull(nextPhraseRange(1..5, 4))
+    }
+
+    @Test
+    fun draggingSpansFromTheFixedWordEitherWay() {
+        assertEquals(3..6, spanBetween(fixed = 3, moving = 6))
+        // A handle dragged past the other end swaps the ends, as on Android.
+        assertEquals(1..3, spanBetween(fixed = 3, moving = 1))
+        assertEquals(4..4, spanBetween(fixed = 4, moving = 4))
+    }
+
+    @Test
+    fun aDragBetweenOrPastWordsStillPicksTheClosestWord() {
+        val tokens = subtitleWordTokens(sentence, "en")
+        val really = tokens.indexOfFirst { it.text == "really" }
+        val looking = tokens.indexOfFirst { it.text == "looking" }
+        val reallyStart = tokens[really].startIndex
+
+        assertEquals(really, wordAt(tokens, reallyStart + 2))
+        assertEquals(really, nearestWord(tokens, reallyStart + 2))
+        // The space after "really" is no word for a tap, and the earlier word for a drag.
+        val space = tokens[really].endIndex
+        assertEquals(-1, wordAt(tokens, space))
+        assertEquals(really, nearestWord(tokens, space))
+        assertEquals(looking, nearestWord(tokens, space + 1))
+        // Past the end of the line: the last word.
+        assertEquals(tokens.lastIndex, nearestWord(tokens, sentence.length + 5))
+        assertEquals(-1, nearestWord(emptyList(), 0))
     }
 
     @Test
@@ -136,6 +163,20 @@ class PhraseSelectionTest {
             IntOffset(200, 140 + 10),
             phraseBarPosition(nearTop, popupWidth = 200, popupHeight = 80, windowWidth = 1_000, minTop = 60, gap = 10, margin = 16),
         )
+        // Below, it leaves room for the handles that hang under the words.
+        assertEquals(
+            IntOffset(200, 140 + 50),
+            phraseBarPosition(
+                nearTop,
+                popupWidth = 200,
+                popupHeight = 80,
+                windowWidth = 1_000,
+                minTop = 60,
+                gap = 10,
+                margin = 16,
+                belowGap = 50,
+            ),
+        )
     }
 
     @Test
@@ -164,9 +205,15 @@ class PhraseSelectionTest {
         val line = Any()
 
         controller.tap(line, 2)
-        controller.tap(line, 4)
+        assertTrue(controller.select(line, 2..4))
+        assertFalse(controller.select(line, 2..4))
         assertEquals(PhraseSelection(line, 2..4), controller.selection)
         assertEquals(1, pauses)
+        // Another line's selection pauses again, in case the video played in between.
+        val otherLine = Any()
+        controller.tap(otherLine, 1)
+        assertEquals(PhraseSelection(otherLine, 1..1), controller.selection)
+        assertEquals(2, pauses)
 
         controller.clearAll()
         assertNull(controller.selection)
