@@ -30,7 +30,16 @@ class BrowserTabsTest {
     fun savedTabsComeBackAfterARestart() {
         val saved = tabs(video, search).withActive { it.copy(title = "Search", account = 2) }
         assertEquals(saved, decodeBrowserTabs(encodeBrowserTabs(saved)))
-        assertEquals(saved, initialBrowserTabs(encodeBrowserTabs(saved), lastUrl = video))
+        assertEquals(saved, initialBrowserTabs(encodeBrowserTabs(saved), lastUrl = search))
+    }
+
+    @Test
+    fun theOpenTabTakesTheLatestPageAddress() {
+        val saved = tabs(video, search)
+        val later = "https://m.youtube.com/results?search_query=korean"
+        val restored = initialBrowserTabs(encodeBrowserTabs(saved), lastUrl = later)
+        assertEquals(listOf(video, later), restored.tabs.map { it.url })
+        assertEquals(saved, initialBrowserTabs(encodeBrowserTabs(saved), lastUrl = "https://example.com/"))
     }
 
     @Test

@@ -117,11 +117,12 @@ class YouTubeTabsUiTest {
         compose.onNodeWithTag("navigation_menu_button").performClick()
         compose.onNodeWithTag("open_tabs").performClick()
         compose.onNodeWithTag("new_tab").assertIsDisplayed()
-        compose.onNodeWithTag("browser_tab_account_2").assertDoesNotExist()
+        // The account name is a Text inside the clickable tab row, so it is in the unmerged tree.
+        compose.onNodeWithTag("browser_tab_account_2", useUnmergedTree = true).assertDoesNotExist()
         compose.onNodeWithTag("new_tab_other_account").assertDoesNotExist()
 
         accountsOn = true
-        compose.onNodeWithTag("browser_tab_account_2").assertIsDisplayed()
+        compose.onNodeWithTag("browser_tab_account_2", useUnmergedTree = true).assertIsDisplayed()
         compose.onNodeWithText("Account 2").assertIsDisplayed()
         compose.onNodeWithTag("new_tab_other_account").performScrollTo().performClick()
         saveUiEvidence("tabs-other-account")

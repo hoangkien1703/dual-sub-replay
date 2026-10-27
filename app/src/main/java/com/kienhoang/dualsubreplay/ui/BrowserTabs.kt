@@ -175,14 +175,19 @@ internal fun decodeBrowserTabs(stored: String?): BrowserTabs? {
 
 /**
  * The tabs to start with. Before tabs existed the app kept one page ([lastUrl]); that page becomes
- * the first tab, and a brand-new user starts with YouTube's home page open, as before.
+ * the first tab, and a brand-new user starts with YouTube's home page open, as before. The app
+ * writes [lastUrl] whenever the open tab's page changes, so it is the open tab's latest address.
  */
 internal fun initialBrowserTabs(
     stored: String?,
     lastUrl: String?,
-): BrowserTabs =
-    decodeBrowserTabs(stored)
-        ?: BrowserTabs(listOf(BrowserTab(id = 1, url = trustedEmbeddedUrlOrHome(lastUrl ?: YOUTUBE_HOME_URL))), activeId = 1)
+): BrowserTabs {
+    val saved =
+        decodeBrowserTabs(stored)
+            ?: return BrowserTabs(listOf(BrowserTab(id = 1, url = trustedEmbeddedUrlOrHome(lastUrl ?: YOUTUBE_HOME_URL))), activeId = 1)
+    val latest = lastUrl?.takeIf(::isYouTubeWebUrl) ?: return saved
+    return if (saved.active == null) saved else saved.withActiveUrl(latest)
+}
 
 /** Keeps the tabs in preferences, so they are there again after the app restarts. */
 internal class BrowserTabStore(
