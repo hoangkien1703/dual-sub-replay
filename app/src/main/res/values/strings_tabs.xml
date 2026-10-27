@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">YouTube tabs</string>
+    <string name="settings_section_tabs_summary">Tabs and Google accounts</string>
+    <string name="tabs_menu_title">Tabs (%1$d)</string>
+    <string name="tabs_list_shown">Tab list shown</string>
+    <string name="tabs_list_hidden">Tab list hidden</string>
+    <string name="tabs_new_tab">New tab</string>
+    <string name="tabs_new_tab_other_account">New tab with another account</string>
+    <string name="tabs_account_main">Account 1 (main)</string>
+    <string name="tabs_account">Account %1$d</string>
+    <string name="tabs_full">Up to %1$d tabs can be open. Close one to open another.</string>
+    <string name="tabs_close">Close tab %1$s</string>
+    <string name="tabs_name_video">YouTube video</string>
+    <string name="tabs_name_home">YouTube home</string>
+    <string name="tabs_name_search">YouTube search</string>
+    <string name="tabs_name_page">YouTube page</string>
+    <string name="tabs_empty_title">No YouTube tabs open</string>
+    <string name="tabs_empty_message">You closed every tab. Open a new YouTube tab to keep watching with dual subtitles.</string>
+    <string name="tabs_open_new_youtube_tab">Open new YouTube tab</string>
+    <string name="tabs_open_in_new_tab">Open in new tab</string>
+    <string name="tabs_open_here">Open here</string>
+    <string name="tabs_opened_in_new_tab">Opened in a new tab</string>
+    <string name="tabs_show">Show</string>
+    <string name="tabs_settings_note">Open and switch tabs from Tabs in the menu. Only the open tab plays, and a video opens again where you left it. Long-press a video on YouTube to open it in a new tab.</string>
+    <string name="tabs_different_accounts_title">Use different Google accounts</string>
+    <string name="tabs_different_accounts_description">Adds “New tab with another account” under Tabs. Accounts 2 and 3 each keep their own Google sign-in; Account 1 is your usual one. Off: every tab uses Account 1.</string>
+    <string name="tabs_different_accounts_unsupported">Different Google accounts need a newer Android System WebView. Update it from Google Play to use them.</string>
+</resources>

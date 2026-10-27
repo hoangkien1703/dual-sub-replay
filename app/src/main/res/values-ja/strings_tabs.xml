@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">YouTube タブ</string>
+    <string name="settings_section_tabs_summary">タブと Google アカウント</string>
+    <string name="tabs_menu_title">タブ (%1$d)</string>
+    <string name="tabs_list_shown">タブ一覧を表示中</string>
+    <string name="tabs_list_hidden">タブ一覧を非表示</string>
+    <string name="tabs_new_tab">新しいタブ</string>
+    <string name="tabs_new_tab_other_account">別のアカウントで新しいタブ</string>
+    <string name="tabs_account_main">アカウント 1（メイン）</string>
+    <string name="tabs_account">アカウント %1$d</string>
+    <string name="tabs_full">開けるタブは %1$d 個までです。別のタブを開くには 1 つ閉じてください。</string>
+    <string name="tabs_close">タブ「%1$s」を閉じる</string>
+    <string name="tabs_name_video">YouTube の動画</string>
+    <string name="tabs_name_home">YouTube ホーム</string>
+    <string name="tabs_name_search">YouTube 検索</string>
+    <string name="tabs_name_page">YouTube のページ</string>
+    <string name="tabs_empty_title">開いている YouTube タブはありません</string>
+    <string name="tabs_empty_message">すべてのタブを閉じました。新しい YouTube タブを開くと、二言語字幕で続きを見られます。</string>
+    <string name="tabs_open_new_youtube_tab">新しい YouTube タブを開く</string>
+    <string name="tabs_open_in_new_tab">新しいタブで開く</string>
+    <string name="tabs_open_here">ここで開く</string>
+    <string name="tabs_opened_in_new_tab">新しいタブで開きました</string>
+    <string name="tabs_show">表示</string>
+    <string name="tabs_settings_note">メニューの「タブ」からタブを開いたり切り替えたりできます。再生されるのは開いているタブだけで、動画は前に止めた所から再開します。YouTube で動画を長押しすると新しいタブで開けます。</string>
+    <string name="tabs_different_accounts_title">別々の Google アカウントを使う</string>
+    <string name="tabs_different_accounts_description">「タブ」に「別のアカウントで新しいタブ」を追加します。アカウント 2 と 3 はそれぞれ別の Google ログインを保持し、アカウント 1 はいつものアカウントです。オフ: すべてのタブがアカウント 1 を使います。</string>
+    <string name="tabs_different_accounts_unsupported">別々の Google アカウントを使うには、新しい Android System WebView が必要です。Google Play で更新してください。</string>
+</resources>

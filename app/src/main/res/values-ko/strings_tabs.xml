@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">YouTube 탭</string>
+    <string name="settings_section_tabs_summary">탭과 Google 계정</string>
+    <string name="tabs_menu_title">탭 (%1$d)</string>
+    <string name="tabs_list_shown">탭 목록 표시됨</string>
+    <string name="tabs_list_hidden">탭 목록 숨겨짐</string>
+    <string name="tabs_new_tab">새 탭</string>
+    <string name="tabs_new_tab_other_account">다른 계정으로 새 탭</string>
+    <string name="tabs_account_main">계정 1(기본)</string>
+    <string name="tabs_account">계정 %1$d</string>
+    <string name="tabs_full">탭은 최대 %1$d개까지 열 수 있습니다. 다른 탭을 열려면 하나를 닫으세요.</string>
+    <string name="tabs_close">%1$s 탭 닫기</string>
+    <string name="tabs_name_video">YouTube 동영상</string>
+    <string name="tabs_name_home">YouTube 홈</string>
+    <string name="tabs_name_search">YouTube 검색</string>
+    <string name="tabs_name_page">YouTube 페이지</string>
+    <string name="tabs_empty_title">열린 YouTube 탭이 없습니다</string>
+    <string name="tabs_empty_message">모든 탭을 닫았습니다. 새 YouTube 탭을 열어 이중 자막으로 계속 시청하세요.</string>
+    <string name="tabs_open_new_youtube_tab">새 YouTube 탭 열기</string>
+    <string name="tabs_open_in_new_tab">새 탭에서 열기</string>
+    <string name="tabs_open_here">여기서 열기</string>
+    <string name="tabs_opened_in_new_tab">새 탭에서 열었습니다</string>
+    <string name="tabs_show">보기</string>
+    <string name="tabs_settings_note">메뉴의 탭에서 탭을 열고 전환하세요. 열려 있는 탭만 재생되며, 동영상은 멈춘 곳에서 다시 열립니다. YouTube에서 동영상을 길게 누르면 새 탭에서 열 수 있습니다.</string>
+    <string name="tabs_different_accounts_title">다른 Google 계정 사용</string>
+    <string name="tabs_different_accounts_description">탭 아래에 \"다른 계정으로 새 탭\"을 추가합니다. 계정 2와 3은 각각 자체 Google 로그인을 유지하고, 계정 1은 평소 쓰는 계정입니다. 끄면 모든 탭이 계정 1을 사용합니다.</string>
+    <string name="tabs_different_accounts_unsupported">다른 Google 계정을 쓰려면 최신 Android System WebView가 필요합니다. Google Play에서 업데이트하세요.</string>
+</resources>

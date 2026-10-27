@@ -37,6 +37,7 @@ import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.translation.DEFAULT_TRANSLATION_ENGINE
@@ -96,6 +97,8 @@ data class DualSubUiState(
     val fullTranscriptProblem: String? = null,
     val browserUrl: String = YOUTUBE_HOME_URL,
     val browserNavigationRequestId: Long = 0L,
+    /** The menu's YouTube tabs; the open one is shown in the one YouTube page, none shows an empty page. */
+    val browserTabs: BrowserTabs = BrowserTabs(),
     val activeVideoId: String? = null,
     val subtitlePanelVisible: Boolean = true,
     val sourcePreference: String = "auto",
@@ -249,6 +252,7 @@ internal fun activeWordIndex(
         ?: -1
 
 internal const val YOUTUBE_HOME_URL = "https://m.youtube.com/"
+private const val LEFT_TAB_REPORT_MS = 5_000L
 
 /** The language chosen as "learning" at onboarding; see [storedLearningLanguage]. */
 private const val LEARNING_LANGUAGE_PREFERENCE = "learning_language"
@@ -456,14 +460,15 @@ class AppViewModel internal constructor(
     private var liveTranslationJob: Job? = null
     private var rejectedLiveRevision: Long? = null
 
+    private var leftTabUrl: String? = null
+    private var leftTabUrlUntil = 0L
+    private val tabStore = BrowserTabStore(preferences, preferences.getString("last_browser_url", null))
+
     private val _state =
         MutableStateFlow(
             DualSubUiState(
-                browserUrl =
-                    preferences
-                        .getString("last_browser_url", YOUTUBE_HOME_URL)
-                        ?.let(::trustedEmbeddedUrlOrHome)
-                        ?: YOUTUBE_HOME_URL,
+                browserUrl = tabStore.value.active?.url ?: YOUTUBE_HOME_URL,
+                browserTabs = tabStore.value,
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
                 studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
@@ -689,6 +694,7 @@ class AppViewModel internal constructor(
     fun acceptSharedText(text: String) {
         val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
         val watchUrl = mobileWatchUrl(videoId)
+        ensureOpenTab(watchUrl)
         preferences.edit().putString("last_browser_url", watchUrl).apply()
         _state.update {
             it.copy(
@@ -701,6 +707,9 @@ class AppViewModel internal constructor(
 
     fun onYouTubePageChanged(url: String) {
         if (classifyMainFrameUrl(url) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
+        if (_state.value.browserTabs.active == null) return
+        if (isLeftTabReport(url)) return
+        changeTabs { it.withActiveUrl(url) }
         if (url != _state.value.browserUrl) {
             preferences.edit().putString("last_browser_url", url).apply()
             _state.update { it.copy(browserUrl = url) }
@@ -1084,6 +1093,7 @@ class AppViewModel internal constructor(
     /** Opens a YouTube page in the app's one YouTube view, for example a search the assistant offered. */
     fun openYouTubePage(url: String) {
         if (!isYouTubeWebUrl(url)) return
+        ensureOpenTab(url)
         preferences.edit().putString("last_browser_url", url).apply()
         _state.update { it.copy(browserUrl = url, browserNavigationRequestId = it.browserNavigationRequestId + 1) }
     }
@@ -1359,6 +1369,83 @@ class AppViewModel internal constructor(
             return
         }
         loadVideo(videoId, showPanel = true)
+    }
+
+    /** The page's title, shown as the open tab's name in the menu. */
+    fun onYouTubePageTitle(
+        url: String,
+        title: String?,
+    ) {
+        if (isLeftTabReport(url)) return
+        val name = browserTabTitle(title)
+        changeTabs { it.withActiveTitle(name) }
+    }
+
+    /** Menu → Tabs → + New tab: YouTube's home page in a new tab, signed in with [account]. */
+    fun openNewTab(account: Int = MAIN_TAB_ACCOUNT): Boolean {
+        val opened = rememberActiveTabPosition().opened(YOUTUBE_HOME_URL, account) ?: return false
+        changeTabs { opened }
+        showActiveTab()
+        return true
+    }
+
+    /** Long-press a video → Open in new tab: the tab waits in the menu; the open page stays. */
+    fun openInNewTab(url: String): Boolean {
+        if (!isYouTubeWebUrl(url)) return false
+        val current = _state.value.browserTabs
+        val opened = current.opened(url, current.active?.account ?: MAIN_TAB_ACCOUNT, activate = false) ?: return false
+        changeTabs { opened }
+        return true
+    }
+
+    fun switchTab(id: Long) {
+        if (id == _state.value.browserTabs.activeId) return
+        changeTabs { rememberActiveTabPosition().switchedTo(id) }
+        showActiveTab()
+    }
+
+    fun closeTab(id: Long) {
+        val wasActive = id == _state.value.browserTabs.activeId
+        changeTabs { it.closed(id) }
+        if (wasActive) showActiveTab()
+    }
+
+    /** Just after a tab switch the page may still report the tab it is leaving. */
+    private fun isLeftTabReport(url: String): Boolean = url == leftTabUrl && SystemClock.elapsedRealtime() < leftTabUrlUntil
+
+    private fun changeTabs(change: (BrowserTabs) -> BrowserTabs) {
+        tabStore.update(change)
+        if (_state.value.browserTabs != tabStore.value) _state.update { it.copy(browserTabs = tabStore.value) }
+    }
+
+    /** The open tab's video starts where it was left when the tab is opened again. */
+    private fun rememberActiveTabPosition(): BrowserTabs {
+        val tabs = _state.value.browserTabs
+        val active = tabs.active ?: return tabs
+        val playback = WebVideoBridge.playback.value
+        val videoId = YouTubeUrlParser.extractVideoId(active.url)
+        if (playback == null || videoId == null || playback.videoId != videoId) return tabs
+        return tabs.withActiveUrl(watchUrlAt(active.url, playback.positionMs))
+    }
+
+    /** Loads the open tab in the YouTube page, or, with every tab closed, stops the video's subtitles. */
+    private fun showActiveTab() {
+        val tab = _state.value.browserTabs.active
+        if (tab == null) {
+            clearActiveVideo()
+            return
+        }
+        leftTabUrl = _state.value.browserUrl.takeIf { it != tab.url }
+        leftTabUrlUntil = SystemClock.elapsedRealtime() + LEFT_TAB_REPORT_MS
+        preferences.edit().putString("last_browser_url", tab.url).apply()
+        _state.update { it.copy(browserUrl = tab.url, browserNavigationRequestId = it.browserNavigationRequestId + 1) }
+        val videoId = YouTubeUrlParser.extractVideoId(tab.url)
+        if (videoId == null) clearActiveVideo() else openVideo(videoId)
+    }
+
+    /** A page opened from outside the menu (a shared link, the assistant) needs a tab when all were closed. */
+    private fun ensureOpenTab(url: String) {
+        if (_state.value.browserTabs.active == null) changeTabs { it.opened(url) ?: it }
     }
 
     fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }

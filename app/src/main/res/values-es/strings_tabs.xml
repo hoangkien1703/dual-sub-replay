@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">Pestañas de YouTube</string>
+    <string name="settings_section_tabs_summary">Pestañas y cuentas de Google</string>
+    <string name="tabs_menu_title">Pestañas (%1$d)</string>
+    <string name="tabs_list_shown">Lista de pestañas visible</string>
+    <string name="tabs_list_hidden">Lista de pestañas oculta</string>
+    <string name="tabs_new_tab">Nueva pestaña</string>
+    <string name="tabs_new_tab_other_account">Nueva pestaña con otra cuenta</string>
+    <string name="tabs_account_main">Cuenta 1 (principal)</string>
+    <string name="tabs_account">Cuenta %1$d</string>
+    <string name="tabs_full">Puedes tener hasta %1$d pestañas abiertas. Cierra una para abrir otra.</string>
+    <string name="tabs_close">Cerrar la pestaña %1$s</string>
+    <string name="tabs_name_video">Vídeo de YouTube</string>
+    <string name="tabs_name_home">Inicio de YouTube</string>
+    <string name="tabs_name_search">Búsqueda de YouTube</string>
+    <string name="tabs_name_page">Página de YouTube</string>
+    <string name="tabs_empty_title">No hay pestañas de YouTube abiertas</string>
+    <string name="tabs_empty_message">Cerraste todas las pestañas. Abre una nueva pestaña de YouTube para seguir viendo con subtítulos dobles.</string>
+    <string name="tabs_open_new_youtube_tab">Abrir nueva pestaña de YouTube</string>
+    <string name="tabs_open_in_new_tab">Abrir en una pestaña nueva</string>
+    <string name="tabs_open_here">Abrir aquí</string>
+    <string name="tabs_opened_in_new_tab">Abierto en una pestaña nueva</string>
+    <string name="tabs_show">Mostrar</string>
+    <string name="tabs_settings_note">Abre y cambia de pestaña desde Pestañas en el menú. Solo se reproduce la pestaña abierta, y un vídeo vuelve a abrirse donde lo dejaste. Mantén pulsado un vídeo en YouTube para abrirlo en una pestaña nueva.</string>
+    <string name="tabs_different_accounts_title">Usar distintas cuentas de Google</string>
+    <string name="tabs_different_accounts_description">Añade «Nueva pestaña con otra cuenta» en Pestañas. Las cuentas 2 y 3 guardan cada una su propio inicio de sesión de Google; la cuenta 1 es la de siempre. Desactivado: todas las pestañas usan la cuenta 1.</string>
+    <string name="tabs_different_accounts_unsupported">Para usar distintas cuentas de Google hace falta un Android System WebView más reciente. Actualízalo desde Google Play.</string>
+</resources>

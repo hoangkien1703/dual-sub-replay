@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewDay
@@ -103,6 +104,7 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_translation_title,
         R.string.settings_section_translation_summary,
     ),
+    TABS("tabs", R.string.settings_section_tabs_title, R.string.settings_section_tabs_summary),
     ADS("ads", R.string.settings_section_ads_title, R.string.settings_section_ads_summary),
     UPDATES("updates", R.string.settings_section_updates_title, R.string.settings_section_updates_summary),
 
@@ -574,6 +576,10 @@ internal fun SubtitleSettingsDialog(
                             SettingsSectionDivider()
                             LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
                         }
+                    }
+
+                    Section(MoreSettingsSection.TABS, Icons.Default.Tab) {
+                        YouTubeTabsSettingsSection()
                     }
 
                     Section(MoreSettingsSection.ADS, Icons.Default.FastForward) {

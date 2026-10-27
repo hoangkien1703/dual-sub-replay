@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">Abas do YouTube</string>
+    <string name="settings_section_tabs_summary">Abas e contas do Google</string>
+    <string name="tabs_menu_title">Abas (%1$d)</string>
+    <string name="tabs_list_shown">Lista de abas aberta</string>
+    <string name="tabs_list_hidden">Lista de abas fechada</string>
+    <string name="tabs_new_tab">Nova aba</string>
+    <string name="tabs_new_tab_other_account">Nova aba com outra conta</string>
+    <string name="tabs_account_main">Conta 1 (principal)</string>
+    <string name="tabs_account">Conta %1$d</string>
+    <string name="tabs_full">Você pode ter até %1$d abas abertas. Feche uma para abrir outra.</string>
+    <string name="tabs_close">Fechar a aba %1$s</string>
+    <string name="tabs_name_video">Vídeo do YouTube</string>
+    <string name="tabs_name_home">Início do YouTube</string>
+    <string name="tabs_name_search">Pesquisa do YouTube</string>
+    <string name="tabs_name_page">Página do YouTube</string>
+    <string name="tabs_empty_title">Nenhuma aba do YouTube aberta</string>
+    <string name="tabs_empty_message">Você fechou todas as abas. Abra uma nova aba do YouTube para continuar assistindo com legendas duplas.</string>
+    <string name="tabs_open_new_youtube_tab">Abrir nova aba do YouTube</string>
+    <string name="tabs_open_in_new_tab">Abrir em nova aba</string>
+    <string name="tabs_open_here">Abrir aqui</string>
+    <string name="tabs_opened_in_new_tab">Aberto em uma nova aba</string>
+    <string name="tabs_show">Mostrar</string>
+    <string name="tabs_settings_note">Abra e troque de aba em Abas no menu. Só a aba aberta toca, e um vídeo volta de onde você parou. Toque e segure um vídeo no YouTube para abri-lo em uma nova aba.</string>
+    <string name="tabs_different_accounts_title">Usar contas do Google diferentes</string>
+    <string name="tabs_different_accounts_description">Adiciona “Nova aba com outra conta” em Abas. As contas 2 e 3 guardam cada uma o próprio login do Google; a conta 1 é a de sempre. Desativado: todas as abas usam a conta 1.</string>
+    <string name="tabs_different_accounts_unsupported">Contas do Google diferentes precisam de um Android System WebView mais novo. Atualize-o pelo Google Play para usar.</string>
+</resources>
