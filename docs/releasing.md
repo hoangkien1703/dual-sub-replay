@@ -7,7 +7,7 @@ follow [Preparing PRs for owner merge](../AGENTS.md#preparing-prs-for-owner-merg
 
 ## Continuous integration
 
-Pull requests use the committed wrapper to run formatting and complexity checks, unit tests, lint, debug and Android-test APK assembly, and an optimized release build. A second job executes the offline fixture suite on the API 36 managed device at the same time. Both jobs must pass before merging into `main`. The same checks also run after every push to `main`, so the Gradle cache that pull requests restore stays current. Same-repository pull requests also publish a numbered test APK to the rolling preview release and remove it automatically when the PR is closed.
+Pull requests use the committed wrapper to run formatting and complexity checks, unit tests, lint, debug and Android-test APK assembly, and an optimized release build. A second job executes the offline fixture suite on the API 36 managed device at the same time. Both jobs must pass before merging into `main`. The same checks also run after every push to `main`, so the Gradle cache that pull requests restore stays current. Pull requests, including ones from forks, also publish a numbered test APK to the rolling preview release and remove it automatically when the PR is closed.
 
 ## Automatic official releases
 
