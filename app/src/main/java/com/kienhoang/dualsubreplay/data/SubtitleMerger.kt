@@ -33,24 +33,29 @@ object SubtitleMerger {
 
         fun flush() {
             if (text.isNotBlank()) {
-                val formattedText = if (enhancedNaturalFlow) {
-                    text.trim().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                } else {
-                    text.trim()
-                }
-                output += SubtitleSegment(
-                    id = output.size.toLong(),
-                    startMs = start,
-                    endMs = end,
-                    originalText = formattedText,
-                    words = timedOrEstimatedWords(
-                        segmentText = formattedText,
+                val continuesSentence =
+                    output.isNotEmpty() && !sentenceEnding.containsMatchIn(output.last().originalText) && startsWithSentenceTail(text)
+                val formattedText =
+                    if (enhancedNaturalFlow && !continuesSentence) {
+                        text.trim().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                    } else {
+                        text.trim()
+                    }
+                output +=
+                    SubtitleSegment(
+                        id = output.size.toLong(),
                         startMs = start,
                         endMs = end,
-                        speechEndMs = speechEnd,
-                        collectedWords = pendingWords,
-                    ),
-                )
+                        originalText = formattedText,
+                        words =
+                            timedOrEstimatedWords(
+                                segmentText = formattedText,
+                                startMs = start,
+                                endMs = end,
+                                speechEndMs = speechEnd,
+                                collectedWords = pendingWords,
+                            ),
+                    )
             }
             pendingWords = emptyList()
         }
@@ -84,6 +89,16 @@ object SubtitleMerger {
         }
         flush()
         return output
+    }
+
+    /**
+     * A merged line can stop mid-sentence ("…misleading in"), so the next one starts with that
+     * sentence's end ("a way. The reality…"). That end keeps its lowercase start, which tells the
+     * translation units it belongs to the sentence before it.
+     */
+    private fun startsWithSentenceTail(text: String): Boolean {
+        val first = text.trim().split(sentenceBreak, limit = 2)
+        return first.size == 2 && first[0].length <= SENTENCE_TAIL_MAX_CHARACTERS && sentenceEnding.containsMatchIn(first[0])
     }
 
     fun formatNaturalTranslation(text: String): String {
@@ -508,6 +523,9 @@ object SubtitleMerger {
 }
 
 internal const val SPLIT_SENTENCE_MAX_CHARACTERS = 48
+
+/** Matches `MAX_SENTENCE_TAIL_CHARACTERS` in the translation units: the longest sentence end that joins the sentence before it. */
+private const val SENTENCE_TAIL_MAX_CHARACTERS = 32
 
 /** Japanese and Chinese rows hold half as many characters as [SPLIT_SENTENCE_MAX_CHARACTERS], never fewer than 12. */
 internal fun cjkMaxCharacters(maxCharacters: Int): Int = (maxCharacters / 2).coerceAtLeast(12)

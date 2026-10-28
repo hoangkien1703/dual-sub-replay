@@ -14,6 +14,12 @@ internal data class CaptionTranslationUnit(
 internal const val MAX_UNIT_CHARACTERS = 120
 internal const val MAX_UNIT_DURATION_MS = 8_000L
 
+/**
+ * A lowercase piece this short that ends a sentence ("a way.") finishes the sentence before it, even
+ * past the limits above: translated alone it loses its meaning ("A way." became "Xa.", "far").
+ */
+internal const val MAX_SENTENCE_TAIL_CHARACTERS = 32
+
 /** Display splitting must not remove the sentence context passed to ML Kit. */
 internal fun sentenceCaptionUnits(
     display: List<SubtitleSegment>,
@@ -32,12 +38,15 @@ internal fun sentenceCaptionUnits(
     ordered.forEach { next ->
         val previous = coherent.lastOrNull()
         // Auto-caption lines overlap in time (a negative gap), which means continuous speech.
-        val join =
+        val continues =
             previous != null && !sentenceEnd.containsMatchIn(previous.text.trim()) &&
                 next.indices.first() == previous.indices.last() + 1 &&
-                display[next.indices.first()].startMs - display[previous.indices.last()].endMs <= 1200 &&
+                display[next.indices.first()].startMs - display[previous.indices.last()].endMs <= 1200
+        val fits =
+            previous != null &&
                 display[next.indices.last()].endMs - display[previous.indices.first()].startMs <= MAX_UNIT_DURATION_MS &&
                 previous.text.length + next.text.length <= MAX_UNIT_CHARACTERS
+        val join = continues && (fits || isSentenceTail(next.text, sentenceEnd))
         if (join) {
             val left = checkNotNull(previous).text
             val separator = if (left.lastOrNull()?.code in 0x3000..0x9FFF && next.text.firstOrNull()?.code in 0x3000..0x9FFF) "" else " "
@@ -47,6 +56,17 @@ internal fun sentenceCaptionUnits(
         }
     }
     return coherent
+}
+
+/** A short piece that starts in lowercase and ends a sentence: the end of the sentence before it. */
+private fun isSentenceTail(
+    text: String,
+    sentenceEnd: Regex,
+): Boolean {
+    val trimmed = text.trim()
+    return trimmed.length <= MAX_SENTENCE_TAIL_CHARACTERS &&
+        sentenceEnd.containsMatchIn(trimmed) &&
+        trimmed.firstOrNull(Char::isLetter)?.isLowerCase() == true
 }
 
 /**

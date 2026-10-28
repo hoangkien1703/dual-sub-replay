@@ -1071,7 +1071,17 @@ private fun OnlineTranslationSettingsRows(
         },
         testTag = "google_translate_switch",
     )
-    if (google) GoogleWaitSettings(settings.googleWait, actions.selectGoogleWait)
+    if (google) {
+        GoogleWaitSettings(settings.googleWait, actions.selectGoogleWait)
+        SettingsSwitchRow(
+            title = stringResource(R.string.settings_ai_translation_title),
+            description = stringResource(R.string.settings_ai_translation_description),
+            checked = settings.aiTranslation,
+            onCheckedChange = actions.selectAiTranslation,
+            testTag = "ai_translation_switch",
+        )
+        if (settings.aiTranslation) AiTranslationModelSettings(settings.aiTranslationModel, actions.selectAiTranslationModel)
+    }
 }
 
 @Composable

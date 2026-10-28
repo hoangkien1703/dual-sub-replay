@@ -1,5 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.RawCaptionCue
+import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
 import com.kienhoang.dualsubreplay.data.SubtitleWord
@@ -102,4 +104,26 @@ class CaptionFormatTest {
                 directory.deleteRecursively()
             }
         }
+
+    /** Auto captions at 0:37 of a real video, where "a way." once became its own row and was translated alone. */
+    @Test fun sentenceEndAfterALongLineJoinsTheSentenceBeforeIt() {
+        val cues =
+            listOf(
+                RawCaptionCue(26_000, 30_000, "bit bad about how I'm starting this"),
+                RawCaptionCue(30_000, 34_500, "video because it's almost misleading in"),
+                RawCaptionCue(34_500, 36_500, "a way. The reality is that two different"),
+                RawCaptionCue(36_500, 38_500, "things are happening at once right now."),
+            )
+        val merged = SubtitleMerger.merge(cues, enhancedNaturalFlow = true)
+        assertEquals("a way. The reality is that two different things are happening at once right now.", merged.last().originalText)
+        val rows = captionDisplaySegments(merged, CaptionFormat.SHORT_PHRASES, true)
+        assertTrue(rows.none { it.originalText.equals("a way.", ignoreCase = true) })
+        val tail = rows.first { it.originalText.endsWith("a way.") }
+        assertEquals(
+            "Bit bad about how I'm starting this video because it's almost misleading in a way.",
+            tail.sentence?.text,
+        )
+        val next = rows.first { it.originalText.startsWith("The reality") }
+        assertEquals("The reality is that two different things are happening at once right now.", next.sentence?.text ?: next.originalText)
+    }
 }
