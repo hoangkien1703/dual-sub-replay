@@ -25,16 +25,25 @@ class AiSubtitleTranslatorTest {
         )
 
     private class FakeModel(
-        private val answer: (String) -> String,
+        private val pieces: (String) -> List<String> = { emptyList() },
+        private val answer: (String) -> String = { user -> pieces(user).joinToString("") },
     ) : AiTranslationModel {
         override val scope = "fake/model"
         val requests = mutableListOf<String>()
 
+        /** Called after each streamed piece, with what was handed over so far. */
+        var afterPiece: (Int) -> Unit = {}
+
         override suspend fun ask(
             system: String,
             user: String,
+            onText: (String) -> Unit,
         ): String {
             requests += user
+            pieces(user).forEachIndexed { index, piece ->
+                onText(piece)
+                afterPiece(index)
+            }
             return answer(user)
         }
     }
@@ -205,6 +214,55 @@ class AiSubtitleTranslatorTest {
             // The next minute is already translated: nothing is sent and the look-ahead is not even read.
             translator.translateAll(model, "en", "vi", listOf("Later sentence 3."), ahead = { error("not needed") })
             assertEquals(1, model.requests.size)
+        }
+
+    @Test fun theReaderHandsOverEachSentenceAsSoonAsItCloses() {
+        val sentences = aiSentences(translationTexts(rows))
+        val reader = AiReplyReader(sentences)
+        assertTrue(reader.add("```json\n{\"sentences\":[{\"id\":1,\"rows\":[\"Thực tế {là} có").isEmpty())
+        val first = reader.add(" hai chuyện\",\"đang diễn ra \\\"}\\\" ngay.\"]},{\"id\":2,")
+        assertEquals(listOf(0 to listOf("Thực tế {là} có hai chuyện", "đang diễn ra \"}\" ngay.")), first)
+        assertEquals(listOf(1 to listOf("Ở một phía.")), reader.add("\"rows\":[\"Ở một phía.\"]}]}\n```"))
+    }
+
+    @Test fun aSentenceShowsWhileTheRestOfTheReplyIsStillComing() =
+        runBlocking {
+            val model =
+                FakeModel(pieces = {
+                    listOf(
+                        "{\"sentences\":[{\"id\":1,\"rows\":[\"Thực tế là có hai chuyện khác nhau\",\"đang diễn ra.\"]},",
+                        "{\"id\":2,\"rows\":[\"Ở một phía, ta có các CVE.\"]}]}",
+                    )
+                })
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            model.afterPiece = { index ->
+                if (index == 0) {
+                    val whole = translator.shownTranslation(model, "en", "vi", sentence)
+                    assertEquals("Thực tế là có hai chuyện khác nhau đang diễn ra.", whole)
+                    assertNull(translator.shownTranslation(model, "en", "vi", rows[2].originalText))
+                    assertEquals(1L, translator.updates.value)
+                }
+            }
+            translator.translateAll(model, "en", "vi", translationTexts(rows))
+            assertEquals("Ở một phía, ta có các CVE.", translator.shownTranslation(model, "en", "vi", rows[2].originalText))
+            assertEquals(2L, translator.updates.value)
+        }
+
+    @Test fun sentencesThatArrivedBeforeAFailureStay() =
+        runBlocking {
+            val model =
+                FakeModel(
+                    pieces = { listOf("{\"sentences\":[{\"id\":2,\"rows\":[\"Ở một phía, ta có các CVE.\"]},") },
+                    answer = { throw IOException("connection reset") },
+                )
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            try {
+                translator.translateAll(model, "en", "vi", translationTexts(rows))
+                fail("expected a failure")
+            } catch (_: IOException) {
+            }
+            assertEquals("Ở một phía, ta có các CVE.", translator.cachedTranslation(model, "en", "vi", rows[2].originalText))
+            assertNull(translator.cachedTranslation(model, "en", "vi", sentence))
         }
 
     @Test fun aRowNeverStartsWithALeftoverComma() {

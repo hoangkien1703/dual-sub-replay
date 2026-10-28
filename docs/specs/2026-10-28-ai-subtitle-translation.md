@@ -54,9 +54,10 @@ line. This change does the same with the AI service the user already set up for 
   answers 429 or "quota" rests 1 minute, doubling up to 30 minutes while it keeps refusing (Google
   translates meanwhile), a rejected key rests 6 hours, and a 16 MB cache so watching again sends
   nothing.
-- Google stays the fallback, so subtitles never stop: a sentence the model left out, an
-  unreadable reply, a refused key, no key, or a model slower than 6 s for the playing window
-  all translate with Google as before.
+- Google translates first and stays the fallback, so subtitles never wait for the AI: the
+  playing window shows Google's lines at once, and each sentence switches to the AI's as soon
+  as the model has written it (streamed). A sentence the model left out, an unreadable reply, a
+  refused key or no key keeps Google's lines.
 
 ## Non-goals
 
@@ -96,8 +97,9 @@ nothing. Reset all settings turns it off.
 4. `assistant/AiTranslationAccess.kt`: the chosen service and model with each saved key in turn
    (a rejected, out-of-credit or rate-limited key hands over to the next), and the assistant's
    busy retries.
-5. `AppViewModel.followGoogleTranslation`: AI first for the window (6 s wait, the request runs
-   on and fills the cache) and for the background steps, Google for the rest.
+5. `AppViewModel.followGoogleTranslation`: the window's AI request starts without waiting while
+   Google translates the window; the background steps ask the AI, Google when it fails.
+   (Was: AI first with a 6 s wait; changed by the streaming follow-up below.)
 6. Setting row, `ai_subtitle_translation` preference, Reset all settings, strings in all 8 languages.
 7. `AiKeyPacer` (`assistant/AiTranslationAccess.kt`): turns, intervals and rests per key, kept for
    the app run; the model chips and `ai_translation_model` preference (empty = default).
@@ -159,6 +161,41 @@ captions may come from speech recognition (read the sentences as one speech, tra
 as a piece of the whole, translate what was most likely said), fills in omitted subjects from
 context, and forbids a row starting with a comma; `cleanAiRow` also strips one. Cached lines carry
 `AI_PROMPT_VERSION`, so lines translated with the old prompt are translated again.
+
+## Follow-up: show Google first, then stream the AI (2026-10-28)
+
+Kien found that AI lines could take up to 30 s to appear: the window waited for one JSON reply
+of up to 60 sentences, and a free key is asked at most every 6 s. He picked two of the offered
+options: **show Google's translation at once and replace each line with the AI's when it
+arrives**, and **stream the AI's answer** so lines show as soon as the model writes them.
+
+- `AiChatTransport.stream`: `AiHttpTransport` sends `"stream": true` and reads server-sent events
+  (`choices[0].delta.content` for Gemini, OpenAI, OpenRouter, OpenCode and other OpenAI-style
+  services; `text_delta` for Claude). A service that answers in one piece is read whole; an
+  error event part way is a failure. The assistant's chat does not use it.
+- `AiReplyReader`: reads the JSON while it streams and hands over each `{"id":…,"rows":[…]}` as
+  soon as its closing brace arrives (braces inside strings are skipped). Each one is cached at
+  once and raises `AiSubtitleTranslator.updates`; at the end the whole reply is read again for
+  anything the reader missed. Sentences that arrived before a failure stay; the rest are asked
+  again after the 30 s rest. A request that already streamed text is never sent again with
+  another key or a busy retry, so no sentence is handed over twice.
+- The playing window no longer waits for the AI: its request runs beside Google, and
+  `translatePlaybackWindow` takes `TranslationUpgrades` (the update counter and a memory-only
+  lookup). When the counter changes, also while paused, `withUpgrades` puts the AI's translation
+  on every sentence of the window that has one, cut by the AI's own rows; a sentence already
+  showing it is left as it is. Sentences a request is waiting for are not asked for again by
+  the next row (`asking`).
+- Cost is unchanged: the same requests are sent, only read earlier. Google is asked for the
+  playing minute as it was before the AI setting existed.
+
+Acceptance (unit): `AiStreamingTest` (events read piece by piece for OpenAI-style services and
+Claude, a non-streamed reply read whole, a refusal keeps its kind, an error event fails),
+`AiSubtitleTranslatorTest.theReaderHandsOverEachSentenceAsSoonAsItCloses`,
+`aSentenceShowsWhileTheRestOfTheReplyIsStillComing`, `sentencesThatArrivedBeforeAFailureStay`,
+`AiTranslationAccessTest.theAnswerIsHandedOverWhileItStreams`,
+`aFailureAfterPartOfTheAnswerIsNotAskedAgainWithAnotherKey`, and `TranslationUpgradesTest`.
+Phone check: with the switch on, Google's lines show at once and turn into the AI's within a
+few seconds, starting with the playing line.
 
 ## Release intent
 

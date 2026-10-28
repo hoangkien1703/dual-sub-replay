@@ -1,6 +1,10 @@
 package com.kienhoang.dualsubreplay.translation
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -10,14 +14,17 @@ import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 /*
  * Settings → Translation → Translate with AI (off by default, owner request 2026-10-28): the AI service
  * and key from the AI assistant's settings translate subtitles, as 4You's own server does. A request
  * carries a window of sentences, each split into the rows the screen shows, plus the sentences before
  * them as context only; the model answers with one translation per row. Rows then get exactly the
- * words meant for them instead of a character-count cut of one Google sentence. Google stays the
- * fallback: whatever the model leaves out or fails on is translated by Google as before.
+ * words meant for them instead of a character-count cut of one Google sentence. Google translates
+ * first and stays the fallback (owner request 2026-10-28, "show Google first, then stream"): the
+ * playing minute shows Google's lines at once, and each sentence switches to the AI's as soon as the
+ * model has written it ([AiReplyReader]), so nobody waits for the whole request.
  */
 
 /**
@@ -43,10 +50,14 @@ internal const val AI_CONTEXT_SENTENCES = 4
 internal interface AiTranslationModel {
     val scope: String
 
-    /** Sends one request and returns the reply text, or throws an [IOException]. */
+    /**
+     * Sends one request and returns the reply text, or throws an [IOException]. [onText] receives the
+     * reply piece by piece while the service writes it (all at once where it cannot stream).
+     */
     suspend fun ask(
         system: String,
         user: String,
+        onText: (String) -> Unit = {},
     ): String
 }
 
@@ -141,14 +152,73 @@ internal fun parseAiTranslationReply(
         } catch (error: JSONException) {
             throw AiTranslationException("The AI reply is not the JSON asked for: ${error.message}")
         }
-    val byId = HashMap<Int, List<String>>()
+    val byId = HashMap<Int, JSONObject>()
     for (index in 0 until items.length()) {
         val item = items.optJSONObject(index) ?: continue
-        val rows = item.optJSONArray("rows") ?: continue
-        byId[item.optInt("id", -1)] = (0 until rows.length()).map { cleanAiRow(rows.optString(it)) }
+        byId[item.optInt("id", -1)] = item
     }
-    return sentences.mapIndexed { index, sentence ->
-        byId[index + 1]?.takeIf { rows -> rows.any(String::isNotEmpty) }?.let { rows -> fitRows(rows, sentence.rows.size) }
+    return sentences.mapIndexed { index, sentence -> byId[index + 1]?.let { aiRows(it, sentence) } }
+}
+
+/** The rows of one `{"id":…,"rows":[…]}` answer, or null when it has none. */
+private fun aiRows(
+    item: JSONObject,
+    sentence: AiSentence,
+): List<String>? {
+    val rows = item.optJSONArray("rows") ?: return null
+    val cleaned = (0 until rows.length()).map { cleanAiRow(rows.optString(it)) }
+    return cleaned.takeIf { it.any(String::isNotEmpty) }?.let { fitRows(it, sentence.rows.size) }
+}
+
+/**
+ * Reads a reply while it streams in: each sentence's `{"id":…,"rows":[…]}` is handed over as soon as
+ * its closing brace arrives, so its rows show while the model still writes the rest. Braces inside
+ * strings are skipped; the object around the list has no id and is ignored.
+ */
+internal class AiReplyReader(
+    private val sentences: List<AiSentence>,
+) {
+    private val text = StringBuilder()
+    private val starts = ArrayDeque<Int>()
+    private val done = HashSet<Int>()
+    private var inString = false
+    private var escaped = false
+
+    /** Adds [piece] of the reply; returns the sentences it completed, by position, with their rows. */
+    fun add(piece: String): List<Pair<Int, List<String>>> {
+        val found = mutableListOf<Pair<Int, List<String>>>()
+        val from = text.length
+        text.append(piece)
+        for (position in from until text.length) {
+            val char = text[position]
+            when {
+                escaped -> escaped = false
+                inString && char == '\\' -> escaped = true
+                inString -> inString = char != '"'
+                char == '"' -> inString = true
+                char == '{' -> starts.addLast(position)
+                char == '}' -> starts.removeLastOrNull()?.let { start -> sentenceAt(start, position)?.let(found::add) }
+            }
+        }
+        return found
+    }
+
+    private fun sentenceAt(
+        start: Int,
+        end: Int,
+    ): Pair<Int, List<String>>? {
+        val item =
+            try {
+                JSONObject(text.substring(start, end + 1))
+            } catch (_: JSONException) {
+                return null
+            }
+        val index = item.optInt("id", -1) - 1
+        val sentence = sentences.getOrNull(index) ?: return null
+        if (index in done) return null
+        val rows = aiRows(item, sentence) ?: return null
+        done += index
+        return index to rows
     }
 }
 
@@ -231,6 +301,10 @@ internal class AiSubtitleTranslator(
     private val diskCache = cacheDirectory?.let { TranslationDiskCache(it, maxEntries = 20_000, maxBytes = 16L * 1024 * 1024) }
     private val requests = Mutex()
 
+    /** Raised each time translations arrive, so rows already showing Google's lines take the AI's. */
+    private val arrivals = MutableStateFlow(0L)
+    val updates: StateFlow<Long> = arrivals.asStateFlow()
+
     /** The last sentences sent for each language pair and model, the next request's context. */
     private val recent = HashMap<String, List<String>>()
 
@@ -238,11 +312,23 @@ internal class AiSubtitleTranslator(
      * Sentences already sent and answered: one the model left out is never asked again, so each row
      * that follows does not send a new request for it (Google translates it).
      */
-    private val attempted: MutableSet<String> =
-        java.util.concurrent.ConcurrentHashMap
-            .newKeySet()
+    private val attempted: MutableSet<String> = ConcurrentHashMap.newKeySet()
+
+    /** Sentences of a request that is waiting or running: another call does not ask for them again. */
+    private val asking: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     @Volatile private var restUntil = Long.MIN_VALUE
+
+    /** What the AI has translated [text] to in this app run, without reading the disk; null when nothing yet. */
+    fun shownTranslation(
+        model: AiTranslationModel,
+        sourceLanguageCode: String,
+        targetLanguageCode: String,
+        text: String,
+    ): String? {
+        val (source, target) = pair(model, sourceLanguageCode, targetLanguageCode)
+        return cache.get(source, target, text)
+    }
 
     suspend fun cachedTranslation(
         model: AiTranslationModel,
@@ -304,8 +390,8 @@ internal class AiSubtitleTranslator(
         if (TranslationLanguages.normalize(source) == TranslationLanguages.normalize(target) || now() < restUntil) return emptyList()
         val (scopedSource, scopedTarget) = pair(model, source, target)
         return aiSentences(texts).filter { sentence ->
-            attemptKey(scopedSource, scopedTarget, sentence.text) !in attempted &&
-                cachedTranslation(model, source, target, sentence.text) == null
+            val key = attemptKey(scopedSource, scopedTarget, sentence.text)
+            key !in attempted && key !in asking && cachedTranslation(model, source, target, sentence.text) == null
         }
     }
 
@@ -314,34 +400,78 @@ internal class AiSubtitleTranslator(
         sourceLanguageCode: String,
         targetLanguageCode: String,
         batch: List<AiSentence>,
-    ) = requests.withLock {
+    ) {
         val (source, target) = pair(model, sourceLanguageCode, targetLanguageCode)
+        val keys = batch.map { attemptKey(source, target, it.text) }
+        asking += keys
+        try {
+            requests.withLock { translateNow(model, sourceLanguageCode to targetLanguageCode, source to target, batch) }
+        } finally {
+            asking -= keys.toSet()
+        }
+    }
+
+    /** Sends one request; each sentence is cached as soon as the model has written it. */
+    private suspend fun translateNow(
+        model: AiTranslationModel,
+        languages: Pair<String, String>,
+        scoped: Pair<String, String>,
+        batch: List<AiSentence>,
+    ) {
+        val (source, target) = scoped
         val pending = batch.filter { cache.get(source, target, it.text) == null && attemptKey(source, target, it.text) !in attempted }
-        if (pending.isEmpty() || now() < restUntil) return@withLock
+        if (pending.isEmpty() || now() < restUntil) return
         val contextKey = "$source>$target"
+        val found = ConcurrentHashMap<String, String>()
+        val translated = ConcurrentHashMap.newKeySet<Int>()
+
+        fun keep(
+            index: Int,
+            rows: List<String>,
+        ) {
+            if (!translated.add(index)) return
+            val entries = aiTranslationEntries(pending[index], rows)
+            entries.forEach { (text, translation) -> cache.put(source, target, text, translation) }
+            found += entries
+            arrivals.update { it + 1 }
+        }
+        val reader = AiReplyReader(pending)
         val reply =
             try {
                 model.ask(
                     aiTranslationSystemPrompt(
-                        TranslationLanguages.normalize(sourceLanguageCode),
-                        TranslationLanguages.normalize(targetLanguageCode),
+                        TranslationLanguages.normalize(languages.first),
+                        TranslationLanguages.normalize(languages.second),
                     ),
                     aiTranslationRequest(recent[contextKey].orEmpty(), pending),
-                )
+                ) { piece -> reader.add(piece).forEach { (index, rows) -> keep(index, rows) } }
             } catch (error: IOException) {
                 restUntil = now() + AI_FAILURE_REST_MS
+                // Sentences that arrived before the failure stay; the others are asked again after the rest.
+                translated.forEach { attempted += attemptKey(source, target, pending[it].text) }
+                save(scoped, found)
                 throw error
             }
         pending.forEach { attempted += attemptKey(source, target, it.text) }
-        val found =
-            pending
-                .zip(parseAiTranslationReply(reply, pending))
-                .mapNotNull { (sentence, rows) -> rows?.let { aiTranslationEntries(sentence, it) } }
-                .fold(emptyMap<String, String>()) { all, entries -> all + entries }
+        // A reply that did not stream, or a sentence the reader could not place, is read whole.
+        val whole =
+            try {
+                parseAiTranslationReply(reply, pending)
+            } catch (error: AiTranslationException) {
+                if (found.isEmpty()) throw error
+                emptyList()
+            }
+        whole.forEachIndexed { index, rows -> if (rows != null) keep(index, rows) }
         if (found.isEmpty()) throw AiTranslationException("The AI reply translated none of the ${pending.size} sentences.")
         recent[contextKey] = pending.takeLast(AI_CONTEXT_SENTENCES).map { it.text }
-        found.forEach { (text, translation) -> cache.put(source, target, text, translation) }
-        withContext(Dispatchers.IO) { found.forEach { (text, translation) -> diskCache?.put(source, target, text, translation) } }
+        save(scoped, found)
+    }
+
+    private suspend fun save(
+        scoped: Pair<String, String>,
+        found: Map<String, String>,
+    ) = withContext(Dispatchers.IO) {
+        found.forEach { (text, translation) -> diskCache?.put(scoped.first, scoped.second, text, translation) }
     }
 
     private fun attemptKey(

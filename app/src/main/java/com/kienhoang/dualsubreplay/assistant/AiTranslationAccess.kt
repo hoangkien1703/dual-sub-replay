@@ -173,8 +173,10 @@ private class KeyedAiTranslationModel(
     override suspend fun ask(
         system: String,
         user: String,
+        onText: (String) -> Unit,
     ): String {
         val messages = listOf(AiWireMessage(AiRole.SYSTEM, system), AiWireMessage(AiRole.USER, user))
+        val text = StreamedText(onText)
         var failure = AiChatException(AiErrorKind.RATE_LIMITED, "Every key is resting after its limit.")
         repeat(keyIds.size) {
             val paced = pacer.take(pacedIds) ?: throw failure
@@ -182,10 +184,12 @@ private class KeyedAiTranslationModel(
             try {
                 val key = withContext(Dispatchers.IO) { keyStore.load(provider, id) }
                 if (key !is StoredAiKey.Found) throw AiChatException(AiErrorKind.KEY_UNREADABLE)
-                val reply = completeWhenBusy(key.key, messages)
+                val reply = completeWhenBusy(key.key, messages, text)
                 pacer.answered(paced)
                 return reply.text
             } catch (error: AiChatException) {
+                // Part of the answer already arrived: asking again would hand it over twice.
+                if (text.started) throw error
                 when (error.kind) {
                     in REST_PROBLEMS -> pacer.limited(paced)
                     in BAD_KEY_PROBLEMS -> pacer.rejected(paced)
@@ -201,14 +205,16 @@ private class KeyedAiTranslationModel(
     private suspend fun completeWhenBusy(
         apiKey: String,
         messages: List<AiWireMessage>,
+        text: StreamedText,
     ): AiReply {
         val waits = AI_BUSY_RETRY_DELAYS_MS.iterator()
         while (true) {
             val request = AiChatRequest(baseUrl, model, apiKey, messages, AI_TRANSLATION_TIMEOUT_MS, effort, format = provider.format)
             try {
-                return withContext(Dispatchers.IO) { send(request) }
+                return withContext(Dispatchers.IO) { send(request, text) }
             } catch (error: AiChatException) {
                 when {
+                    text.started -> throw error
                     effort != null && error.kind in setOf(AiErrorKind.UNSUPPORTED_THINKING, AiErrorKind.BAD_REQUEST) -> effort = null
                     error.kind == AiErrorKind.SERVER && waits.hasNext() -> delay(waits.next())
                     else -> throw error
@@ -217,12 +223,29 @@ private class KeyedAiTranslationModel(
         }
     }
 
-    private suspend fun send(request: AiChatRequest): AiReply =
+    private suspend fun send(
+        request: AiChatRequest,
+        text: StreamedText,
+    ): AiReply =
         try {
-            transport.complete(request)
+            transport.stream(request, text)
         } catch (error: AiChatException) {
             throw error
         } catch (error: IOException) {
             throw aiConnectionFailure(error)
         }
+}
+
+/** Hands the reply's pieces on and remembers that some arrived, after which a request is not sent again. */
+private class StreamedText(
+    private val onText: (String) -> Unit,
+) : (String) -> Unit {
+    @Volatile var started = false
+        private set
+
+    override fun invoke(piece: String) {
+        if (piece.isEmpty()) return
+        started = true
+        onText(piece)
+    }
 }

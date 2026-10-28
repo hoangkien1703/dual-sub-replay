@@ -90,6 +90,57 @@ class AiTranslationAccessTest {
             assertEquals(listOf("none", null), efforts)
         }
 
+    @Test fun theAnswerIsHandedOverWhileItStreams() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaOnlyKey0000000000000000000000000000")
+            val transport =
+                object : AiChatTransport {
+                    override suspend fun complete(request: AiChatRequest): AiReply = error("must stream")
+
+                    override suspend fun stream(
+                        request: AiChatRequest,
+                        onText: (String) -> Unit,
+                    ): AiReply {
+                        onText("{\"sentences\":[")
+                        onText("{\"id\":1}]}")
+                        return AiReply("{\"sentences\":[{\"id\":1}]}")
+                    }
+                }
+            val pieces = mutableListOf<String>()
+            val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
+            model.ask("system", "user") { pieces += it }
+            assertEquals(listOf("{\"sentences\":[", "{\"id\":1}]}"), pieces)
+        }
+
+    @Test fun aFailureAfterPartOfTheAnswerIsNotAskedAgainWithAnotherKey() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaFirstKey000000000000000000000000000")
+            store.add(AiProvider.GEMINI, "AIzaSecondKey00000000000000000000000000")
+            var calls = 0
+            val transport =
+                object : AiChatTransport {
+                    override suspend fun complete(request: AiChatRequest): AiReply = error("must stream")
+
+                    override suspend fun stream(
+                        request: AiChatRequest,
+                        onText: (String) -> Unit,
+                    ): AiReply {
+                        calls++
+                        onText("{\"sentences\":[")
+                        throw AiChatException(AiErrorKind.RATE_LIMITED)
+                    }
+                }
+            val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
+            try {
+                model.ask("system", "user")
+                fail("expected a failure")
+            } catch (_: AiChatException) {
+            }
+            assertEquals(1, calls)
+        }
+
     @Test fun noKeyMeansNoModel() {
         assertNull(aiTranslationModel(gemini, null, AiKeyStore(MapStorage(), FakeCipher()), { error("unused") }))
     }

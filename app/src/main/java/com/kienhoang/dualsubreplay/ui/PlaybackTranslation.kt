@@ -9,6 +9,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
@@ -39,6 +40,62 @@ internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
     state.translationError != null && state.errorMessage == null && !state.liveFallback && state.segments.isNotEmpty()
 
 /**
+ * Better translations that arrive after rows already show one (Translate with AI: the AI's lines
+ * replace Google's, owner request 2026-10-28). [version] changes whenever some arrive; [lookup]
+ * returns the one for a text, or null.
+ */
+internal class TranslationUpgrades(
+    val version: StateFlow<Long>,
+    val lookup: (String) -> String?,
+)
+
+/**
+ * [rows] with every sentence (or lone row) that [lookup] has a translation for showing it, cut into
+ * its rows as [translateRow] does: by the row prefixes' translations when all are there. A sentence
+ * already showing that translation keeps its rows as they are.
+ */
+internal fun withUpgrades(
+    rows: List<SubtitleSegment>,
+    lookup: (String) -> String?,
+): List<SubtitleSegment> {
+    val sentences = HashSet<List<String>>()
+    return rows.indices.fold(rows) { current, index ->
+        val row = current[index]
+        val texts = rowTranslationTexts(row)
+        if (row.sentence != null && !sentences.add(texts)) return@fold current
+        val translated = lookup(texts.first())?.trim() ?: return@fold current
+        if (alreadyShows(current, row, translated)) return@fold current
+        val prefixes =
+            row.sentence?.let {
+                texts
+                    .drop(1)
+                    .map(lookup)
+                    .takeIf { found -> found.all { it != null } }
+                    ?.filterNotNull()
+            }
+        withTranslation(current, index, translated, prefixes)
+    }
+}
+
+/** Whether every row of [row]'s sentence in [rows] is translated and together they read as part of [translated]. */
+private fun alreadyShows(
+    rows: List<SubtitleSegment>,
+    row: SubtitleSegment,
+    translated: String,
+): Boolean {
+    val sentence = row.sentence
+    val parts =
+        if (sentence == null) {
+            listOf(row)
+        } else {
+            rows.filter { other -> other.sentence.let { it != null && it.text == sentence.text && it.cuts == sentence.cuts } }
+        }
+    if (parts.any { it.translatedText == null }) return false
+    val shown = parts.joinToString("") { it.translatedText.orEmpty() }.filterNot(Char::isWhitespace)
+    return shown.isNotEmpty() && shown in translated.filterNot(Char::isWhitespace)
+}
+
+/**
  * Event driven: sleeps when the window is ready or the app is backgrounded. A paused video still
  * gets its window translated (the current row, then the next minute), so lines show before play.
  *
@@ -48,6 +105,7 @@ internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
  *
  * [prefetch], when given, receives the texts of the next row and of the next minute's sentences first,
  * so an online engine can translate them in one request and [translate] then finds them cached.
+ * [upgrades], when given, replace shown translations as they arrive, also while paused.
  */
 internal suspend fun translatePlaybackWindow(
     store: SubtitleStore,
@@ -55,11 +113,13 @@ internal suspend fun translatePlaybackWindow(
     translate: suspend (String) -> String,
     onTranslationFailure: (Exception) -> Unit = {},
     prefetch: (suspend (List<String>) -> Unit)? = null,
+    upgrades: TranslationUpgrades? = null,
     onWindow: (List<SubtitleSegment>, Boolean) -> Unit,
 ) {
     var indices = IntRange.EMPTY
     var rows = emptyList<SubtitleSegment>()
     var failedAttempt: Long? = null
+    var upgradedAt: Long? = null
     while (true) {
         currentCoroutineContext().ensureActive()
         val request = requests.value
@@ -75,13 +135,22 @@ internal suspend fun translatePlaybackWindow(
                     row.copy(translatedText = previous[row.id]?.translatedText)
                 }
             indices = nextIndices
+            upgradedAt = null
         }
         // Reading disk can suspend across a seek. Never show the old position afterwards.
         if (requests.value != request) continue
+        if (upgrades != null && upgrades.version.value != upgradedAt) {
+            upgradedAt = upgrades.version.value
+            rows = withUpgrades(rows, upgrades.lookup)
+        }
         val next = nextWindowTranslation(rows, request).takeIf { failedAttempt != request.translationAttempt }
         onWindow(rows, next != null)
         if (next == null) {
-            requests.first { it != request }
+            if (upgrades == null) {
+                requests.first { it != request }
+            } else {
+                combine(requests, upgrades.version) { now, version -> now != request || version != upgradedAt }.first { it }
+            }
             continue
         }
         rows =
