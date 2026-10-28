@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.ClipData
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -26,6 +27,7 @@ import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
@@ -68,6 +70,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -234,6 +237,8 @@ internal class PhraseActions(
     val stopSpeech: () -> Unit = {},
     val speechMessage: () -> String? = { null },
     val translate: (suspend (text: String, translated: Boolean) -> String)? = null,
+    /** Sends the selected text to the Google Translate app. */
+    val openGoogleTranslate: (text: String) -> Unit = {},
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -326,6 +331,7 @@ internal fun BindPhraseActions(
         if (!state.playbackPaused) controller.clearAll()
     }
     val autoPronounce = state.autoPronounce
+    val context = LocalContext.current
     SideEffect {
         controller.actions =
             PhraseActions(
@@ -346,6 +352,15 @@ internal fun BindPhraseActions(
                 stopSpeech = pronouncer::stop,
                 speechMessage = { pronouncer.message },
                 translate = translate,
+                openGoogleTranslate = { text ->
+                    when (sendToGoogleTranslate(context, text)) {
+                        TranslateSendResult.SENT -> Unit
+                        TranslateSendResult.NOT_INSTALLED ->
+                            Toast.makeText(context, R.string.practice_google_translate_unavailable, Toast.LENGTH_LONG).show()
+                        TranslateSendResult.CANNOT_RECEIVE ->
+                            Toast.makeText(context, R.string.practice_google_translate_cannot_open, Toast.LENGTH_LONG).show()
+                    }
+                },
             )
     }
 }
@@ -449,6 +464,9 @@ internal fun SelectableSubtitleText(
                         onWordClick(tap)
                     },
                     onPronounce = { spoken?.let { controller.actions.pronounce(it, translated) } },
+                    onOpenGoogleTranslate = {
+                        controller.actions.openGoogleTranslate(text.substring(start, end))
+                    },
                     onClose = { controller.clear(owner) },
                 )
             }
@@ -721,6 +739,7 @@ private fun PhraseActionBar(
     quickTranslate: (suspend () -> String)?,
     onTranslate: () -> Unit,
     onPronounce: () -> Unit,
+    onOpenGoogleTranslate: () -> Unit,
     onClose: () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -760,11 +779,19 @@ private fun PhraseActionBar(
                             scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
                             copied = true
                         },
-                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onTranslate),
-                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onPronounce),
+                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onClick = onTranslate),
+                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onClick = onPronounce),
+                        // Only in the ▾ list, so the bar keeps its few everyday icons.
+                        PhraseAction(
+                            Icons.AutoMirrored.Filled.OpenInNew,
+                            R.string.practice_open_google_translate,
+                            "google_translate",
+                            inBar = false,
+                            onClick = onOpenGoogleTranslate,
+                        ),
                     )
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    actions.forEach { action ->
+                    actions.filter { it.inBar }.forEach { action ->
                         IconButton(onClick = action.onClick, modifier = Modifier.testTag("phrase_${action.tag}")) {
                             Icon(action.icon, contentDescription = stringResource(action.label), tint = MaterialTheme.colorScheme.primary)
                         }
@@ -797,11 +824,12 @@ private fun PhraseActionBar(
     }
 }
 
-/** One action of the phrase bar: an icon in the bar, and the icon with its name in the ▾ list. */
+/** One action of the phrase bar: an icon in the bar when [inBar], and always the icon with its name in the ▾ list. */
 private class PhraseAction(
     val icon: ImageVector,
     @StringRes val label: Int,
     val tag: String,
+    val inBar: Boolean = true,
     val onClick: () -> Unit,
 )
 

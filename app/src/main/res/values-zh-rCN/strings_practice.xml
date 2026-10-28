@@ -17,6 +17,9 @@
     <string name="practice_empty_hint">点按字幕中的单词,选择“翻译”,再选择“保存到生词本”,开始积累你的生词。</string>
     <string name="practice_next_review">下次复习:%1$s</string>
     <string name="practice_pronounce">发音</string>
+    <string name="practice_open_google_translate">在 Google 翻译中打开</string>
+    <string name="practice_google_translate_unavailable">未安装 Google 翻译</string>
+    <string name="practice_google_translate_cannot_open">Google 翻译无法接收该文本</string>
     <string name="practice_pronounce_item">朗读 %1$s</string>
     <string name="practice_speech_settings">语音设置</string>
     <string name="practice_show_meaning">显示释义</string>
