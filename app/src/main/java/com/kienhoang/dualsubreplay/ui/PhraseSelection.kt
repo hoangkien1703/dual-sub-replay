@@ -779,22 +779,20 @@ private fun PhraseActionBar(
                             scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
                             copied = true
                         },
-                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onTranslate),
-                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onPronounce),
+                        PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onClick = onTranslate),
+                        PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onClick = onPronounce),
+                        // Only in the ▾ list, so the bar keeps its few everyday icons.
                         PhraseAction(
                             Icons.AutoMirrored.Filled.OpenInNew,
                             R.string.practice_open_google_translate,
                             "google_translate",
-                            onOpenGoogleTranslate,
+                            inBar = false,
+                            onClick = onOpenGoogleTranslate,
                         ),
                     )
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    actions.forEach { action ->
-                        // 40dp keeps five buttons plus close inside a 320dp screen.
-                        IconButton(
-                            onClick = action.onClick,
-                            modifier = Modifier.size(40.dp).testTag("phrase_${action.tag}"),
-                        ) {
+                    actions.filter { it.inBar }.forEach { action ->
+                        IconButton(onClick = action.onClick, modifier = Modifier.testTag("phrase_${action.tag}")) {
                             Icon(action.icon, contentDescription = stringResource(action.label), tint = MaterialTheme.colorScheme.primary)
                         }
                     }
@@ -826,11 +824,12 @@ private fun PhraseActionBar(
     }
 }
 
-/** One action of the phrase bar: an icon in the bar, and the icon with its name in the ▾ list. */
+/** One action of the phrase bar: an icon in the bar when [inBar], and always the icon with its name in the ▾ list. */
 private class PhraseAction(
     val icon: ImageVector,
     @StringRes val label: Int,
     val tag: String,
+    val inBar: Boolean = true,
     val onClick: () -> Unit,
 )
 

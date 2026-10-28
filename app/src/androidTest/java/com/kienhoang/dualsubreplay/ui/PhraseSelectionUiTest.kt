@@ -266,11 +266,14 @@ class PhraseSelectionUiTest {
     }
 
     @Test
-    fun googleTranslateButtonSendsTheSelectedWordAndKeepsTheOtherActions() {
+    fun googleTranslateInTheMenuSendsTheSelectedWordAndKeepsTheOtherActions() {
         showCard()
         tapWord(original, "really")
 
-        compose.onNodeWithTag("phrase_google_translate").performClick()
+        // Only the ▾ list offers it; the bar keeps its everyday icons.
+        compose.onNodeWithTag("phrase_google_translate").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_google_translate").performClick()
         compose.onNodeWithTag("phrase_pronounce").performClick()
         compose.waitForIdle()
 
