@@ -35,12 +35,17 @@ internal class TranslationEngineActions(
     val select: (TranslationEngine) -> Unit,
     val tryGoogleAgain: () -> Unit = {},
     val selectGoogleWait: (GoogleWait) -> Unit = {},
+    val selectAiTranslation: (Boolean) -> Unit = {},
+    val selectAiTranslationModel: (String) -> Unit = {},
 )
 
 /** What Settings → Translation shows about the online engine. */
 internal data class OnlineTranslationSettings(
     val engine: TranslationEngine = TranslationEngine.ON_DEVICE,
     val googleWait: GoogleWait = GoogleWait.AUTO,
+    val aiTranslation: Boolean = false,
+    /** Empty uses the AI service's fast default model. */
+    val aiTranslationModel: String = "",
 )
 
 internal val LocalTranslationEngineActions = staticCompositionLocalOf<TranslationEngineActions?> { null }

@@ -147,6 +147,10 @@
     <string name="language_downloads_back">Atrás</string>
     <string name="settings_google_translate_title">Google Traductor (en línea)</string>
     <string name="settings_google_translate_description">Activado de forma predeterminada. Traducciones mejores, sobre todo del japonés. Envía el texto de los subtítulos a Google. No es un servicio oficial de Google, así que puede dejar de funcionar; entonces la app traduce en tu dispositivo hasta que Google vuelva a funcionar. Desactívalo para traducir siempre en tu dispositivo.</string>
+    <string name="settings_ai_translation_title">Traducir con IA (beta)</string>
+    <string name="settings_ai_translation_description">Desactivado de forma predeterminada. El servicio y la clave de IA de Más ajustes → Asistente de IA traducen frases completas con las líneas de alrededor y dan a cada fila su parte. Envía el texto de los subtítulos a ese servicio y usa los límites de tu clave. Google traduce lo que la IA omite o cuando falla. Una clave gratuita de Google Gemini funciona mejor; otros servicios también sirven, pero pueden costar dinero o responder con menos fiabilidad.</string>
+    <string name="settings_ai_translation_model_title">Modelo de IA para traducir</string>
+    <string name="settings_ai_translation_model_description">Modelos del servicio de IA elegido en Más ajustes → Asistente de IA. El primero es rápido y tiene los límites gratuitos más amplios; con una clave gratuita de Gemini alcanza para muchos vídeos al día. Añade más claves allí para repartir la carga.</string>
     <string name="settings_google_wait_title">Esperar a Google</string>
     <string name="settings_google_wait_description">Cuánto espera una línea a Google Traductor antes de mostrar una traducción de YouTube o de tu dispositivo. Google se sigue intentando en segundo plano y su traducción sustituye a la línea cuando llega. Automático espera 2 segundos con datos móviles y 4 con Wi-Fi.</string>
     <string name="settings_google_wait_auto">Automático</string>

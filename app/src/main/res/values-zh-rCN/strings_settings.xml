@@ -147,6 +147,10 @@
     <string name="language_downloads_back">返回</string>
     <string name="settings_google_translate_title">Google 翻译（在线）</string>
     <string name="settings_google_translate_description">默认开启。翻译质量更好，尤其是日语。会将字幕文本发送给 Google。这不是 Google 的官方服务，可能会停止工作；届时应用会在设备上翻译，直到 Google 恢复。关闭后将始终在设备上翻译。</string>
+    <string name="settings_ai_translation_title">用 AI 翻译（测试版）</string>
+    <string name="settings_ai_translation_description">默认关闭。使用更多设置 → AI 助手中的 AI 服务和密钥，结合前后几行翻译整句，再把每部分分配到对应的行。会将字幕文本发送给该服务，并占用你的密钥额度。AI 遗漏的内容或出错时由 Google 翻译。免费的 Google Gemini 密钥效果最好；其他服务也能用，但可能收费或回复不够稳定。</string>
+    <string name="settings_ai_translation_model_title">用于翻译的 AI 模型</string>
+    <string name="settings_ai_translation_model_description">更多设置 → AI 助手中所选 AI 服务的模型。第一个速度快、免费额度最大，用免费的 Gemini 密钥每天也能看很多视频。在那里添加更多密钥可以分摊用量。</string>
     <string name="settings_google_wait_title">等待 Google</string>
     <string name="settings_google_wait_description">每行在显示 YouTube 或设备翻译之前等待 Google 翻译的时间。Google 会在后台继续尝试，译文到达后会替换该行。自动：移动数据等待 2 秒，Wi-Fi 等待 4 秒。</string>
     <string name="settings_google_wait_auto">自动</string>

@@ -147,6 +147,10 @@
     <string name="language_downloads_back">뒤로</string>
     <string name="settings_google_translate_title">Google 번역(온라인)</string>
     <string name="settings_google_translate_description">기본으로 켜져 있습니다. 특히 일본어 번역 품질이 더 좋습니다. 자막 텍스트를 Google로 보냅니다. Google 공식 서비스가 아니므로 작동이 멈출 수 있으며, 그때는 Google이 다시 작동할 때까지 기기에서 번역합니다. 끄면 항상 기기에서 번역합니다.</string>
+    <string name="settings_ai_translation_title">AI로 번역 (베타)</string>
+    <string name="settings_ai_translation_description">기본으로 꺼져 있습니다. 추가 설정 → AI 도우미의 AI 서비스와 키가 주변 줄까지 읽고 문장 전체를 번역한 뒤 각 줄에 해당하는 부분을 나눠 줍니다. 자막 텍스트를 그 서비스로 보내며 키의 사용 한도를 씁니다. AI가 빠뜨린 부분이나 실패했을 때는 Google이 번역합니다. 무료 Google Gemini 키가 가장 잘 맞습니다. 다른 서비스도 쓸 수 있지만 비용이 들거나 응답이 덜 안정적일 수 있습니다.</string>
+    <string name="settings_ai_translation_model_title">번역에 쓸 AI 모델</string>
+    <string name="settings_ai_translation_model_description">추가 설정 → AI 도우미에서 고른 AI 서비스의 모델입니다. 첫 번째 모델은 빠르고 무료 한도가 가장 넉넉해서 무료 Gemini 키로도 하루에 많은 동영상을 볼 수 있습니다. 그곳에서 키를 더 추가하면 부담을 나눕니다.</string>
     <string name="settings_google_wait_title">Google 대기 시간</string>
     <string name="settings_google_wait_description">YouTube 또는 기기의 번역을 표시하기 전에 각 줄이 Google 번역을 기다리는 시간입니다. Google은 백그라운드에서 계속 시도하며, 번역이 도착하면 그 줄을 바꿉니다. 자동은 모바일 데이터에서 2초, Wi-Fi에서 4초 기다립니다.</string>
     <string name="settings_google_wait_auto">자동</string>

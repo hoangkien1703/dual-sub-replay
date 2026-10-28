@@ -119,6 +119,15 @@ internal data class AiChatRequest(
 /** Sends one chat request and returns the reply, or throws [AiChatException]. */
 internal fun interface AiChatTransport {
     suspend fun complete(request: AiChatRequest): AiReply
+
+    /**
+     * Like [complete], handing [onText] the answer piece by piece while the service writes it; a
+     * transport that cannot stream hands it over whole at the end.
+     */
+    suspend fun stream(
+        request: AiChatRequest,
+        onText: (String) -> Unit,
+    ): AiReply = complete(request).also { onText(it.text) }
 }
 
 /** A model a service offers; [free] and [pictures] are only known when the service says so. */
@@ -294,6 +303,23 @@ internal fun parseAiReply(body: String): AiReply {
         throw AiChatException(AiErrorKind.NOT_A_CHAT_MODEL, "A safety checker answered instead of a chat model.")
     }
     return AiReply(text, calls, model, sources = urlCitations(message))
+}
+
+/**
+ * The answer text one streamed event adds: OpenAI's `choices[0].delta.content` (also Gemini's,
+ * OpenRouter's and the other OpenAI-style services') or Claude's `text_delta`. Thinking and other
+ * events add nothing.
+ */
+internal fun streamedTextPiece(event: JSONObject): String {
+    val delta =
+        event.optJSONArray("choices")?.optJSONObject(0)?.optJSONObject("delta")
+            ?: event.optJSONObject("delta")?.takeIf { it.optString("type") == "text_delta" }
+            ?: return ""
+    return when (val content = delta.opt("content") ?: delta.opt("text")) {
+        is String -> content
+        is JSONArray -> (0 until content.length()).joinToString("") { content.optJSONObject(it)?.optString("text").orEmpty() }
+        else -> ""
+    }
 }
 
 /** A safety checker's whole answer, for example "User Safety: safe" and "Response Safety: unsafe". */
@@ -475,6 +501,84 @@ internal class AiHttpTransport(
         return if (anthropic) parseAnthropicReply(reply) else parseAiReply(reply)
     }
 
+    /**
+     * Asks with `"stream": true` and reads the server-sent events as they come, so subtitle lines
+     * show while the model still writes the rest. A service that answers in one piece anyway is read
+     * whole. Used without actions or web search (subtitle translation).
+     */
+    override suspend fun stream(
+        request: AiChatRequest,
+        onText: (String) -> Unit,
+    ): AiReply {
+        val anthropic = request.format == AiWireFormat.ANTHROPIC_MESSAGES
+        val url =
+            (if (anthropic) anthropicMessagesUrl(request.baseUrl) else chatCompletionsUrl(request.baseUrl))
+                ?: throw AiChatException(AiErrorKind.BAD_ADDRESS)
+        val body =
+            if (anthropic) {
+                anthropicRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
+            } else {
+                chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
+            }
+        val json = JSONObject(body).put("stream", true).toString()
+        val httpRequest =
+            authorized(request.apiKey, request.format) {
+                url(url).header("Accept", "text/event-stream").post(json.toRequestBody(JSON_MEDIA_TYPE))
+            }
+        return call(httpRequest, request.timeoutMs) { response ->
+            val events = response.body?.contentType()?.subtype == "event-stream"
+            if (response.code in 200..299 && events) return@call readEvents(response, request.apiKey, onText)
+            val (code, reply) = readReply(response, MAX_AI_RESPONSE_BYTES)
+            val status = aiReplyStatus(code, reply)
+            if (status !in 200..299) {
+                throw statusFailure(status, reply, request.apiKey, request.reasoningEffort != null, sentAttachments = false)
+            }
+            (if (anthropic) parseAnthropicReply(reply) else parseAiReply(reply)).also { onText(it.text) }
+        }
+    }
+
+    /** Reads `data: {…}` events until `[DONE]` or the end, handing each piece of text to [onText]. */
+    private fun readEvents(
+        response: Response,
+        apiKey: String,
+        onText: (String) -> Unit,
+    ): AiReply {
+        val source = checkNotNull(response.body).source()
+        val text = StringBuilder()
+        var model = ""
+        while (true) {
+            val line = source.readUtf8Line() ?: break
+            if (!line.startsWith("data:")) continue
+            val data = line.removePrefix("data:").trim()
+            if (data == "[DONE]") break
+            val event =
+                try {
+                    JSONObject(data)
+                } catch (_: JSONException) {
+                    continue
+                }
+            // OpenRouter and Claude report a failure after the start as an event of its own.
+            val status = aiReplyStatus(200, data)
+            if (status !in 200..299 || event.optString("type") == "error") {
+                throw statusFailure(status.takeIf { it !in 200..299 } ?: 502, data, apiKey, sentThinking = false, sentAttachments = false)
+            }
+            model = event.optString("model").ifEmpty { event.optJSONObject("message")?.optString("model").orEmpty() }.ifEmpty { model }
+            val piece = streamedTextPiece(event)
+            if (piece.isEmpty()) continue
+            text.append(piece)
+            if (text.length > MAX_AI_RESPONSE_BYTES) {
+                throw AiChatException(AiErrorKind.BAD_REPLY, "The reply was larger than ${MAX_AI_RESPONSE_BYTES / (1024 * 1024)} MiB.")
+            }
+            onText(piece)
+        }
+        val reply = text.toString().trim()
+        if (reply.isEmpty()) throw AiChatException(AiErrorKind.BAD_REPLY, "The reply had no text.")
+        if (aiSafetyCheckerAnswered(model, reply)) {
+            throw AiChatException(AiErrorKind.NOT_A_CHAT_MODEL, "A safety checker answered instead of a chat model.")
+        }
+        return AiReply(reply, model = model)
+    }
+
     /** A search request (YouTube, Tavily, OpenAI's search model): the status and body, whatever the status. */
     override suspend fun post(request: AiHttpPost): Pair<Int, String> {
         val httpRequest =
@@ -556,7 +660,14 @@ internal class AiHttpTransport(
         request: Request,
         timeoutMs: Long,
         maxBytes: Int,
-    ): Pair<Int, String> =
+    ): Pair<Int, String> = call(request, timeoutMs) { readReply(it, maxBytes) }
+
+    /** Sends [request] and reads its response with [read] on OkHttp's thread; cancelling the caller cancels the call. */
+    private suspend fun <T> call(
+        request: Request,
+        timeoutMs: Long,
+        read: (Response) -> T,
+    ): T =
         suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
             call.timeout().timeout(timeoutMs, TimeUnit.MILLISECONDS)
@@ -577,7 +688,7 @@ internal class AiHttpTransport(
                         response: Response,
                     ) {
                         // Reading the body can still time out or lose the connection.
-                        val result = runCatching { response.use { readReply(it, maxBytes) } }
+                        val result = runCatching { response.use(read) }
                         if (continuation.isActive) {
                             result.fold(
                                 { continuation.resume(it) },

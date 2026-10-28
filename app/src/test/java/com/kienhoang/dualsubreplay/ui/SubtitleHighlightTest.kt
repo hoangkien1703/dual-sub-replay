@@ -21,17 +21,19 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun mapsWordTimingsOntoCharacterRanges() {
-        val segment = SubtitleSegment(
-            id = 1,
-            startMs = 0,
-            endMs = 2_000,
-            originalText = "Hello brave world",
-            words = listOf(
-                SubtitleWord("Hello", 0, 600),
-                SubtitleWord("brave", 600, 1_200),
-                SubtitleWord("world", 1_200, 2_000),
-            ),
-        )
+        val segment =
+            SubtitleSegment(
+                id = 1,
+                startMs = 0,
+                endMs = 2_000,
+                originalText = "Hello brave world",
+                words =
+                    listOf(
+                        SubtitleWord("Hello", 0, 600),
+                        SubtitleWord("brave", 600, 1_200),
+                        SubtitleWord("world", 1_200, 2_000),
+                    ),
+            )
 
         val spans = subtitleWordSpans(segment.originalText, segment.words)
 
@@ -51,12 +53,13 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun malformedAutoCaptionChunkDoesNotDisableLaterHighlights() {
-        val words = listOf(
-            SubtitleWord("stale overlapping text", 0, 300),
-            SubtitleWord("changes", 300, 600),
-            SubtitleWord("being", 600, 900),
-            SubtitleWord("applied", 900, 1_200),
-        )
+        val words =
+            listOf(
+                SubtitleWord("stale overlapping text", 0, 300),
+                SubtitleWord("changes", 300, 600),
+                SubtitleWord("being", 600, 900),
+                SubtitleWord("applied", 900, 1_200),
+            )
 
         val spans = subtitleWordSpans("changes being applied on web", words)
 
@@ -65,23 +68,26 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun spokenWordUsesColorAndUnderlineWithoutBold() {
-        val segment = SubtitleSegment(
-            id = 1,
-            startMs = 0,
-            endMs = 1_000,
-            originalText = "really useful",
-            words = listOf(
-                SubtitleWord("really", 0, 500),
-                SubtitleWord("useful", 500, 1_000),
-            ),
-        )
+        val segment =
+            SubtitleSegment(
+                id = 1,
+                startMs = 0,
+                endMs = 1_000,
+                originalText = "really useful",
+                words =
+                    listOf(
+                        SubtitleWord("really", 0, 500),
+                        SubtitleWord("useful", 500, 1_000),
+                    ),
+            )
 
-        val annotated = annotatedSpokenText(
-            segment = segment,
-            activeWordIndex = 0,
-            baseColor = Color.White,
-            highlightColor = Color.Yellow,
-        )
+        val annotated =
+            annotatedSpokenText(
+                segment = segment,
+                activeWordIndex = 0,
+                baseColor = Color.White,
+                highlightColor = Color.Yellow,
+            )
         val style = annotated.spanStyles.single().item
 
         assertEquals(Color.Yellow, style.color)
@@ -90,25 +96,28 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun wordLearningSpokenWordUsesUnderlineOnlyWithoutBoldOrBackground() {
-        val segment = SubtitleSegment(
-            id = 1,
-            startMs = 0,
-            endMs = 1_000,
-            originalText = "really useful",
-            words = listOf(
-                SubtitleWord("really", 0, 500),
-                SubtitleWord("useful", 500, 1_000),
-            ),
-        )
+        val segment =
+            SubtitleSegment(
+                id = 1,
+                startMs = 0,
+                endMs = 1_000,
+                originalText = "really useful",
+                words =
+                    listOf(
+                        SubtitleWord("really", 0, 500),
+                        SubtitleWord("useful", 500, 1_000),
+                    ),
+            )
 
-        val annotated = annotatedSubtitleText(
-            text = segment.originalText,
-            words = segment.words,
-            activeWordIndex = 0,
-            baseColor = Color.White,
-            highlightColor = Color.Yellow,
-            wordLearningEnabled = true,
-        )
+        val annotated =
+            annotatedSubtitleText(
+                text = segment.originalText,
+                words = segment.words,
+                activeWordIndex = 0,
+                baseColor = Color.White,
+                highlightColor = Color.Yellow,
+                wordLearningEnabled = true,
+            )
 
         val activeStyles = annotated.spanStyles.filter { it.start == 0 && it.item.textDecoration == TextDecoration.Underline }
         assertTrue("Should have active karaoke underline style", activeStyles.isNotEmpty())
@@ -129,11 +138,12 @@ class SubtitleWordHighlightTest {
     }
 
     @Test fun customColorTogglesFallBackToDefaults() {
-        val state = DualSubUiState(
-            originalColorKey = "amber",
-            translatedColorKey = "rose",
-            highlightColorKey = "lavender",
-        )
+        val state =
+            DualSubUiState(
+                originalColorKey = "amber",
+                translatedColorKey = "rose",
+                highlightColorKey = "lavender",
+            )
         assertEquals(subtitleColor("amber"), effectiveOriginalColor(state))
         assertEquals(subtitleColor("rose"), effectiveTranslatedColor(state))
 
@@ -203,6 +213,8 @@ class SubtitleWordHighlightTest {
                 com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
                 com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
                 com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE,
+                com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE,
+                com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE,
                 "auto_pronounce",
                 PRONUNCIATION_VOLUME_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,
@@ -245,16 +257,17 @@ class SubtitleWordHighlightTest {
         val origTokens = LanguageAwareTokenizer.tokenize("Both Cursor and OpenAI", "en")
         val translation = "Cả con trỏ và Openai được"
 
-        val annotated = annotatedSubtitleText(
-            text = translation,
-            words = emptyList(),
-            activeWordIndex = -1,
-            baseColor = Color.White,
-            highlightColor = Color.Yellow,
-            wordLearningEnabled = true,
-            languageCode = "vi",
-            alignedOriginalTokens = origTokens,
-        )
+        val annotated =
+            annotatedSubtitleText(
+                text = translation,
+                words = emptyList(),
+                activeWordIndex = -1,
+                baseColor = Color.White,
+                highlightColor = Color.Yellow,
+                wordLearningEnabled = true,
+                languageCode = "vi",
+                alignedOriginalTokens = origTokens,
+            )
 
         // Find style applied to "được"
         val duocStart = translation.indexOf("được")
@@ -268,27 +281,29 @@ class SubtitleWordHighlightTest {
         val words = emptyList<SubtitleWord>()
 
         // Inactive sentence with wordLearningActiveOnly = true -> should NOT have POS styles
-        val inactiveAnnotated = annotatedSubtitleText(
-            text = text,
-            words = words,
-            activeWordIndex = -1,
-            baseColor = Color.White,
-            highlightColor = Color.Yellow,
-            wordLearningEnabled = false, // When inactive and active-only is ON
-            languageCode = "en",
-        )
+        val inactiveAnnotated =
+            annotatedSubtitleText(
+                text = text,
+                words = words,
+                activeWordIndex = -1,
+                baseColor = Color.White,
+                highlightColor = Color.Yellow,
+                wordLearningEnabled = false, // When inactive and active-only is ON
+                languageCode = "en",
+            )
         assertTrue("Inactive sentence should have no POS spans", inactiveAnnotated.spanStyles.isEmpty())
 
         // Active sentence with wordLearningActiveOnly = true -> should have POS styles
-        val activeAnnotated = annotatedSubtitleText(
-            text = text,
-            words = words,
-            activeWordIndex = -1,
-            baseColor = Color.White,
-            highlightColor = Color.Yellow,
-            wordLearningEnabled = true, // When active
-            languageCode = "en",
-        )
+        val activeAnnotated =
+            annotatedSubtitleText(
+                text = text,
+                words = words,
+                activeWordIndex = -1,
+                baseColor = Color.White,
+                highlightColor = Color.Yellow,
+                wordLearningEnabled = true, // When active
+                languageCode = "en",
+            )
         assertTrue("Active sentence should have POS spans", activeAnnotated.spanStyles.isNotEmpty())
     }
 }

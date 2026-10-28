@@ -147,6 +147,10 @@
     <string name="language_downloads_back">Back</string>
     <string name="settings_google_translate_title">Google Translate (online)</string>
     <string name="settings_google_translate_description">On by default. Better translations, especially for Japanese. Sends subtitle text to Google. This is not an official Google service, so it can stop working; the app then translates on your device until Google works again. Turn off to always translate on your device.</string>
+    <string name="settings_ai_translation_title">Translate with AI (beta)</string>
+    <string name="settings_ai_translation_description">Off by default. The AI service and key from More settings → AI assistant translate whole sentences with the lines around them, and give each row its own part. Sends subtitle text to that service and uses your key’s limits. Google translates whatever the AI leaves out or when it fails. A free Google Gemini key works best; other services work too, but may cost money or answer less reliably.</string>
+    <string name="settings_ai_translation_model_title">AI model for translation</string>
+    <string name="settings_ai_translation_model_description">Models of the AI service chosen in More settings → AI assistant. The first is fast and has the largest free limits; with a free Gemini key it covers many videos a day. Add more keys there to share the load.</string>
     <string name="settings_google_wait_title">Wait for Google</string>
     <string name="settings_google_wait_description">How long a line waits for Google Translate before it shows a translation from YouTube or your device. Google keeps trying in the background, and its translation replaces the line when it arrives. Automatic waits 2 seconds on mobile data and 4 on Wi-Fi.</string>
     <string name="settings_google_wait_auto">Automatic</string>

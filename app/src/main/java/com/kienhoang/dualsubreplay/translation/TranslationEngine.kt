@@ -2,6 +2,9 @@ package com.kienhoang.dualsubreplay.translation
 
 internal const val TRANSLATION_ENGINE_PREFERENCE = "translation_engine"
 
+/** Settings → Translation → Translate with AI; off by default (owner request 2026-10-28). */
+internal const val AI_TRANSLATION_PREFERENCE = "ai_subtitle_translation"
+
 /** Which engine translates subtitles. Google online is the default. */
 enum class TranslationEngine(
     val storageValue: String,
