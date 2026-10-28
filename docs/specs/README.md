@@ -67,16 +67,14 @@ each significant change owns its plan and results in its feature spec. Existing
 
 Record one intent and its reason before implementation where possible, and resolve it
 before opening the PR. Follow explicit owner instructions; otherwise preserve the
-existing patch default, including workflow work. Recommend alternatives when
+existing patch default for changes that reach the APK. Recommend alternatives when
 appropriate, but do not silently change the owner's release policy.
 
-Standing owner decision (2026-10-04): a PR whose changed files are all documentation
-or promo media (`*.md`, `docs/**`, `site/**`, `tools/promo-video/**`,
-`.github/ISSUE_TEMPLATE/**`, `.github/pull_request_template.md`) gets `release:skip`
-without asking, because the APK does not change. On 2026-10-17 the owner extended this
-to website-only PRs that also change `tools/tests/test_site.py` or
-`.github/workflows/pages.yml`. Any other changed file, including other workflows and
-release tools, keeps the patch default.
+Standing owner decision (2026-10-28, widening the 2026-10-04 docs-only and 2026-10-17
+website rules): a PR gets `release:skip` without asking when the shipped APK cannot
+change, that is, no changed file is in `app/src/main/**`, `app/build.gradle.kts`, `app/proguard-rules.pro`, `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties` or `gradle/**` (version catalog, wrapper).
+Docs, site, promo media, workflows, release tools, `tools/**`, tests, `benchmark/**` and
+lint/quality config all qualify. A change to any of those APK files keeps the patch default.
 
 | Intent in spec | Actual PR metadata |
 | --- | --- |

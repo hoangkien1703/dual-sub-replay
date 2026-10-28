@@ -31,4 +31,11 @@ the fork PR will have apk file too, the same way as us do".
 
 ## Release intent
 
-Patch (workflow change, default).
+`release:skip`: only CI, docs and repo rules change, so the APK is the same (owner 2026-10-28).
+
+## Release rule change (same PR)
+
+Owner 2026-10-28: "you can change the rule to allow skip the app release when apk app doesn't
+change". AGENTS.md, `docs/specs/README.md` and the PR template now say: apply `release:skip`
+without asking when no changed file can reach the shipped APK (`app/src/main/**`, app/root
+Gradle files, `gradle.properties`, `gradle/**`, `app/proguard-rules.pro`).
