@@ -85,21 +85,44 @@ controls and the menu) stayed on screen and the rest was black. Kien checked tha
 happen when the phone is already sideways before tapping Fullscreen, so it comes from the turn to
 landscape added on 2026-10-26 ([spec](2026-10-26-fullscreen-free-drag-and-rotation.md)). The
 shift in his screenshot is about half the difference between the portrait and landscape screen
-heights, which is what keeping the middle of the old portrait screen in view would leave as a
-scroll offset on the page behind the fullscreen video.
+heights. A first guess (2026-10-27) took that for a leftover page scroll and reset it with
+`window.scrollTo(0,0)`; it did not help, and the 2026-10-28 debugging showed the page never
+scrolls (`scrollY` stays 0), so that script is removed.
 
-### Fix (to be confirmed on the phone)
+### Cause (found 2026-10-28 on the laptop emulator with WebView DevTools)
 
-`FullscreenVideoRotation` runs `FULLSCREEN_SCROLL_RESET_SCRIPT` 0.3 s and 1 s after the
-orientation changes during fullscreen, and again whenever YouTube opens or closes a menu
-(`youtubeNativeDialogVisible`). The script acts only while `document.fullscreenElement` is set and
-scrolls the page to the top; WebView restores the page's own scroll position when fullscreen ends
-(`AwContents.restoreScrollAfterTransition`), so the watch page comes back where it was.
+It depends on the WebView version, not on ColorOS: an Android 16 emulator with WebView 133 never
+showed it, an Android 17 emulator with WebView 149 did every time (Kien's OnePlus Ace 5 has
+WebView 156). Numbers from the page (CSS px, Pixel 7 size, 2.625 px per CSS px):
 
-The cause could not be reproduced in the cloud (YouTube blocks cloud browsers with a bot check,
-and there is no emulator). Desktop Chromium confirmed only that the script resets a fullscreen
-page's scroll and leaves a normal page alone. If the preview still shows the shift, the next step
-is live debugging on Kien's laptop emulator with WebView DevTools (planned for 2026-10-28).
+| Moment | `innerWidth`×`innerHeight` | `visualViewport` width×height | `visualViewport.offsetTop` |
+| --- | --- | --- | --- |
+| Upright, Fullscreen tapped | 411×914 | 411×914 | 0 |
+| After the app turns the screen | 914×411 | **914×0** | 0 |
+| After tapping the gear | 914×411 | 914×0 | **234** (614 device px) |
+| Already sideways, Fullscreen, gear | 914×411 | 914×411 | 0 |
+
+The Android side was correct throughout: the Dialog window and the fullscreen view were
+2400×1080 at (0,0) and the IME inset was 0. Since M139, WebView shrinks the visual viewport by
+the part of the fullscreen view that hangs below the window
+([WebView insets doc](https://chromium.googlesource.com/chromium/src/+/main/android_webview/docs/insets.md);
+`AwDisplayCutoutController.recalculateBottomImeInset`: `viewBottom − (windowHeight − ime)`), but
+it recalculates only when insets reach the page's own WebView (in the activity window) or the
+fullscreen view moves. Turning the screen gives the activity its landscape insets while the
+Dialog still has the portrait size, so the view counts as 2400 px tall in a 1080 px window: the
+inset is 1320 px (503 CSS px, more than the 411 px height) and the visible height becomes 0. The
+view then gets its landscape size without moving, so nothing recalculates. YouTube's menu focuses
+its first item and Chromium scrolls the 0-high visual viewport down to it, which draws the video
+pushed up with black below. Re-laying out the Dialog, re-applying the Dialog's insets, a real
+1 px resize and re-attaching the view all left the height at 0; asking the page's WebView for
+insets again restored 914×411.
+
+### Fix
+
+`RemeasureFullscreenInsets` (`ui/FullscreenRotation.kt`) listens to layout passes of the
+fullscreen view and calls `webView.requestApplyInsets()` whenever its size changes
+(`fullscreenViewResized`), so WebView measures it again with the new size. On the emulator the
+visible height came back 29 ms after the turn, and the gear menu opened over the whole video.
 
 ## Release intent
 
@@ -107,8 +130,12 @@ is live debugging on Kien's laptop emulator with WebView DevTools (planned for 2
 
 ## Implementation result
 
-Part 1 as planned. Part 2 as described above.
+Part 1 as planned. Part 2: the scroll reset was replaced by the insets fix above.
 
 ## Validation result
 
-Unit tests listed above and `FullscreenRotationTest` passed in the cloud container. Phone checks for both parts pending on the preview build.
+Unit tests listed above and `FullscreenRotationTest` passed in the cloud container.
+Part 2 on the Android 17 / WebView 149 emulator (2026-10-28): upright → Fullscreen → gear opens
+the menu over the full video (`visualViewport` 914×411, offset 0); already sideways → Fullscreen
+→ gear unchanged; leaving fullscreen from either orientation restores the watch page. Phone
+check (WebView 156) pending on the preview build.

@@ -53,7 +53,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
@@ -824,8 +823,7 @@ internal fun SingleYouTubePage(
         )
     }
 
-    val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
-    FullscreenVideoRotation(fullscreen = fullscreenSession != null, webView = webView, nativeDialogVisible = nativeDialogVisible)
+    FullscreenVideoRotation(fullscreen = fullscreenSession != null, webView = webView)
 
     fullscreenSession?.let { session ->
         Dialog(
@@ -835,6 +833,7 @@ internal fun SingleYouTubePage(
                 decorFitsSystemWindows = false,
             ),
         ) {
+            RemeasureFullscreenInsets(fullscreenView = session.view, webView = webView)
             Box(Modifier.fillMaxSize().background(Color.Black)) {
                 AndroidView(
                     factory = {

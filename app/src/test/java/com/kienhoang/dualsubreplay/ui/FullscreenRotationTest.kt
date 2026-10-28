@@ -39,10 +39,12 @@ class FullscreenRotationTest {
     }
 
     @Test
-    fun scrollResetOnlyTouchesAFullscreenPage() {
-        // The page under a normal (not fullscreen) player keeps the place the user scrolled to.
-        assertTrue(FULLSCREEN_SCROLL_RESET_SCRIPT.contains("if(!document.fullscreenElement)return''"))
-        assertTrue(FULLSCREEN_SCROLL_RESET_SCRIPT.contains("window.scrollTo(0,0)"))
-        assertTrue(FULLSCREEN_SCROLL_RESET_DELAYS_MS.sum() <= 1_000L)
+    fun fullscreenInsetsAreMeasuredAgainOnlyWhenTheVideoChangesSize() {
+        // Turning the screen: the Dialog goes from portrait to landscape size.
+        assertTrue(fullscreenViewResized(2400, 1080, 1080, 2400))
+        // First layout after the Dialog opens.
+        assertTrue(fullscreenViewResized(2400, 1080, 0, 0))
+        // Ordinary layout passes (YouTube's menu, the subtitle box) keep the size.
+        assertFalse(fullscreenViewResized(2400, 1080, 2400, 1080))
     }
 }

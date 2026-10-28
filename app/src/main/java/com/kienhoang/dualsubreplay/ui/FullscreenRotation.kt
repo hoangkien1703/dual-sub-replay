@@ -4,33 +4,17 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.view.OrientationEventListener
+import android.view.View
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.delay
 
 /** Size of the playing video as "width x height", or "" before the page has one. */
 internal const val FULLSCREEN_VIDEO_SIZE_SCRIPT =
     "(function(){var v=document.querySelector('#movie_player video')||document.querySelector('video');" +
         "return v&&v.videoWidth&&v.videoHeight?v.videoWidth+'x'+v.videoHeight:'';})()"
-
-/**
- * Turning the screen while a page is fullscreen leaves the page behind the fullscreen video
- * scrolled by about half the height the screen lost, as if keeping the middle of the old screen in
- * view. The video hides that until YouTube opens its settings menu, which then shows the video
- * pushed up with black below it (owner report 2026-10-27). WebView puts the page's own scroll
- * position back when fullscreen ends, so resetting it here loses nothing.
- */
-internal const val FULLSCREEN_SCROLL_RESET_SCRIPT =
-    "(function(){if(!document.fullscreenElement)return'';var x=window.scrollX,y=window.scrollY;" +
-        "if(x||y)window.scrollTo(0,0);return x+','+y;})()"
-
-/** When the scroll is reset after the screen turned or YouTube opened a menu: once laid out, then once settled. */
-internal val FULLSCREEN_SCROLL_RESET_DELAYS_MS = listOf(300L, 700L)
 
 /** Upright videos (Shorts, phone recordings) stay upright in fullscreen, like the YouTube app. */
 internal fun fullscreenVideoIsTall(scriptResult: String?): Boolean {
@@ -127,7 +111,6 @@ internal class FullscreenRotation(
 internal fun FullscreenVideoRotation(
     fullscreen: Boolean,
     webView: WebView,
-    nativeDialogVisible: Boolean = false,
 ) {
     val activity = LocalContext.current.findActivity()?.takeIf { it.keepsRunningWhenRotated() } ?: return
     val rotation = remember(activity) { FullscreenRotation(activity) }
@@ -145,12 +128,38 @@ internal fun FullscreenVideoRotation(
             rotation.giveBack()
         }
     }
-    val orientation = LocalConfiguration.current.orientation
-    LaunchedEffect(fullscreen, orientation, nativeDialogVisible) {
-        if (!fullscreen) return@LaunchedEffect
-        FULLSCREEN_SCROLL_RESET_DELAYS_MS.forEach { waitMs ->
-            delay(waitMs)
-            webView.evaluateJavascript(FULLSCREEN_SCROLL_RESET_SCRIPT, null)
-        }
+}
+
+/** True when a layout pass gave the fullscreen video a new size, as turning the screen does. */
+internal fun fullscreenViewResized(
+    width: Int,
+    height: Int,
+    oldWidth: Int,
+    oldHeight: Int,
+): Boolean = width != oldWidth || height != oldHeight
+
+/**
+ * WebView (since M139) shrinks the page's visible area by the part of the fullscreen video that
+ * hangs below the window, but it measures that only when insets reach the page's own WebView or the
+ * video moves. Turning the screen sends the activity its new insets while the fullscreen Dialog
+ * still has the portrait size, so the video looks 2400 px tall in a 1080 px window and the visible
+ * area stays 0 px high. YouTube's settings menu then scrolls that area to its first item, pushing
+ * the video up (owner report 2026-10-27). Asking for insets again once the video has its new size
+ * makes WebView measure it again.
+ */
+@Composable
+internal fun RemeasureFullscreenInsets(
+    fullscreenView: View,
+    webView: WebView,
+) {
+    DisposableEffect(fullscreenView, webView) {
+        val listener =
+            View.OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+                if (fullscreenViewResized(right - left, bottom - top, oldRight - oldLeft, oldBottom - oldTop)) {
+                    webView.requestApplyInsets()
+                }
+            }
+        fullscreenView.addOnLayoutChangeListener(listener)
+        onDispose { fullscreenView.removeOnLayoutChangeListener(listener) }
     }
 }
