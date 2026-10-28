@@ -39,7 +39,8 @@ internal fun onlyTranslationFailed(state: DualSubUiState): Boolean =
     state.translationError != null && state.errorMessage == null && !state.liveFallback && state.segments.isNotEmpty()
 
 /**
- * Event driven: sleeps when the window is ready, paused, or the app is backgrounded.
+ * Event driven: sleeps when the window is ready or the app is backgrounded. A paused video still
+ * gets its window translated (the current row, then the next minute), so lines show before play.
  *
  * Original rows keep following playback when translation fails: [onTranslationFailure] reports the
  * error once, and no further row is translated until [CaptionPlaybackRequest.translationAttempt]
@@ -232,11 +233,16 @@ internal fun withTranslation(
     }
 }
 
+/**
+ * The next row of the window to translate, also while paused (owner request 2026-10-27): the first
+ * request carries the next minute, so a paused video gets that minute at once. Only the background
+ * look-ahead of minutes 2 to 5 waits for playback.
+ */
 internal fun nextWindowTranslation(
     rows: List<SubtitleSegment>,
     request: CaptionPlaybackRequest,
 ): Int? {
-    if (!request.enabled || request.paused || rows.isEmpty()) return null
+    if (!request.enabled || rows.isEmpty()) return null
     val current = nearestSegmentIndex(rows, request.timeMs)
     val ahead = request.timeMs + com.kienhoang.dualsubreplay.data.SUBTITLE_LOOK_AHEAD_MS
     val behind = request.timeMs - com.kienhoang.dualsubreplay.data.SUBTITLE_LOOK_BEHIND_MS

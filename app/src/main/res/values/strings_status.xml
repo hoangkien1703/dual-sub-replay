@@ -11,7 +11,6 @@
     <string name="status_downloading_translation_model">Downloading translation model…</string>
     <string name="status_subtitles_load_failed">The subtitles could not be loaded. Retry to continue.</string>
     <string name="status_original_captions_only">Original captions only · translation unavailable</string>
-    <string name="status_paused_translation_resumes">Paused · translation resumes on play</string>
     <string name="status_subtitles_ready">Subtitles ready near playback</string>
     <string name="status_preparing_translation">Preparing %1$s translation…</string>
     <string name="status_translation_unavailable_retry">Translation is unavailable right now. Check your connection, then retry.</string>

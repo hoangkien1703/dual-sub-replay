@@ -37,4 +37,14 @@ class FullscreenRotationTest {
         assertFalse(rotationKeepsActivity(0))
         assertFalse(rotationKeepsActivity(ActivityInfo.CONFIG_ORIENTATION))
     }
+
+    @Test
+    fun fullscreenInsetsAreMeasuredAgainOnlyWhenTheVideoChangesSize() {
+        // Turning the screen: the Dialog goes from portrait to landscape size.
+        assertTrue(fullscreenViewResized(2400, 1080, 1080, 2400))
+        // First layout after the Dialog opens.
+        assertTrue(fullscreenViewResized(2400, 1080, 0, 0))
+        // Ordinary layout passes (YouTube's menu, the subtitle box) keep the size.
+        assertFalse(fullscreenViewResized(2400, 1080, 2400, 1080))
+    }
 }

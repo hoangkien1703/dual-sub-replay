@@ -95,7 +95,7 @@ Paths below are relative to
   unofficial web endpoints with its own caches, sending upcoming sentences in one batch request
   (`translatePlaybackWindow`'s `prefetch`) and retrying short outages; `AppViewModel.translateText` routes every
   translation through the chosen engine. `prefetchInBackground` translates minutes 2 to 5 one request
-  at a time. A line Google leaves blank is asked again alone and, if still blank, translated on the
+  at a time while the video plays; the window itself (the next minute) is translated also while paused. A line Google leaves blank is asked again alone and, if still blank, translated on the
   device by itself. A failure moves that video off Google (`DualSubUiState.onDeviceFallback`): the
   page fetches YouTube's own translation of the caption track (`data/PageTranslationSource.kt`,
   `webPageTranslationScript`, matched to rows by `ui/YouTubeTranslation.kt`; see the

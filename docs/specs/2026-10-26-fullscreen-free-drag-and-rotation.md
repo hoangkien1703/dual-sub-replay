@@ -64,3 +64,9 @@ stay with the owner.
   shows the buttons on a tap.
 - Phone (owner): fullscreen turns to landscape for a normal video, stays upright for a Short,
   returns upright on exit; the subtitle box follows a diagonal drag.
+
+## Follow-up
+
+2026-10-27: turning the screen after fullscreen started left WebView (M139+) with a 0 px high
+visible area, which showed when YouTube's settings menu opened; see
+[the follow-up spec](2026-10-27-translate-while-paused-and-fullscreen-menu.md).

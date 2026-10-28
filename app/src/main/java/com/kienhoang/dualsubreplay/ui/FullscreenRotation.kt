@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.view.OrientationEventListener
+import android.view.View
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -126,5 +127,39 @@ internal fun FullscreenVideoRotation(
             active = false
             rotation.giveBack()
         }
+    }
+}
+
+/** True when a layout pass gave the fullscreen video a new size, as turning the screen does. */
+internal fun fullscreenViewResized(
+    width: Int,
+    height: Int,
+    oldWidth: Int,
+    oldHeight: Int,
+): Boolean = width != oldWidth || height != oldHeight
+
+/**
+ * WebView (since M139) shrinks the page's visible area by the part of the fullscreen video that
+ * hangs below the window, but it measures that only when insets reach the page's own WebView or the
+ * video moves. Turning the screen sends the activity its new insets while the fullscreen Dialog
+ * still has the portrait size, so the video looks 2400 px tall in a 1080 px window and the visible
+ * area stays 0 px high. YouTube's settings menu then scrolls that area to its first item, pushing
+ * the video up (owner report 2026-10-27). Asking for insets again once the video has its new size
+ * makes WebView measure it again.
+ */
+@Composable
+internal fun RemeasureFullscreenInsets(
+    fullscreenView: View,
+    webView: WebView,
+) {
+    DisposableEffect(fullscreenView, webView) {
+        val listener =
+            View.OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+                if (fullscreenViewResized(right - left, bottom - top, oldRight - oldLeft, oldBottom - oldTop)) {
+                    webView.requestApplyInsets()
+                }
+            }
+        fullscreenView.addOnLayoutChangeListener(listener)
+        onDispose { fullscreenView.removeOnLayoutChangeListener(listener) }
     }
 }

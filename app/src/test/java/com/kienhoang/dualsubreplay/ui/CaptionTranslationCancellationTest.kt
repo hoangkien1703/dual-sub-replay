@@ -90,38 +90,30 @@ class CaptionTranslationCancellationTest {
         }
 
     @Test
-    fun pauseFinishesOnlyTheInFlightEntryAndResumeContinues() =
+    fun pausedVideoTranslatesTheNextMinuteAndThenSleeps() =
         runBlocking {
             withStore { store ->
-                val requests = MutableStateFlow(CaptionPlaybackRequest(0, paused = false, enabled = true))
-                val started = CompletableDeferred<Unit>()
-                val release = CompletableDeferred<Unit>()
-                val paused = CompletableDeferred<Unit>()
-                val resumed = CompletableDeferred<Unit>()
-                var count = 0
+                val position = 60 * 60 * 1000L
+                val requests = MutableStateFlow(CaptionPlaybackRequest(position, paused = true, enabled = true))
+                val inputs = mutableListOf<String>()
+                val ready = CompletableDeferred<List<SubtitleSegment>>()
                 val job =
                     launch {
-                        translatePlaybackWindow(store, requests, {
-                            count++
-                            if (count == 1) {
-                                started.complete(Unit)
-                                release.await()
-                            }
-                            it
-                        }) { _, preparing ->
-                            if (!preparing && requests.value.paused) paused.complete(Unit)
-                            if (!preparing && !requests.value.paused) resumed.complete(Unit)
-                        }
+                        translatePlaybackWindow(store, requests, { text ->
+                            inputs.add(text)
+                            "translated: $text"
+                        }) { snapshot, preparing -> if (!preparing) ready.complete(snapshot) }
                     }
                 try {
-                    withTimeout(5000) { started.await() }
-                    requests.value = requests.value.copy(paused = true)
-                    release.complete(Unit)
-                    withTimeout(5000) { paused.await() }
-                    check(count == 1)
-                    requests.value = requests.value.copy(paused = false)
-                    withTimeout(5000) { resumed.await() }
-                    check(count > 1)
+                    val output = withTimeout(5000) { ready.await() }
+                    check(inputs.first() == "Caption ${position / 3400}")
+                    // Every row starting within the next minute is translated before play.
+                    check(output.filter { it.startMs in position..position + 60_000 }.all { it.translatedText != null })
+                    check(output.last().startMs <= position + 60_000)
+                    val sent = inputs.size
+                    kotlinx.coroutines.yield()
+                    check(inputs.size == sent) // Sleeps until the position changes.
+                    check(job.isActive)
                 } finally {
                     job.cancelAndJoin()
                 }
@@ -153,7 +145,7 @@ class CaptionTranslationCancellationTest {
         }
 
     @Test
-    fun unknownPlaybackAndBackgroundDoNotStartWork() =
+    fun unknownPlaybackDoesNotStartWorkButAPausedVideoDoes() =
         runBlocking {
             withStore { store ->
                 val requests = MutableStateFlow(CaptionPlaybackRequest())
@@ -173,7 +165,7 @@ class CaptionTranslationCancellationTest {
                     check(count == 0)
                     requests.value = CaptionPlaybackRequest(0, paused = true, enabled = true)
                     withTimeout(5000) { ready.await() }
-                    check(count == 0)
+                    check(count > 0)
                 } finally {
                     job.cancelAndJoin()
                 }
@@ -226,6 +218,8 @@ class CaptionTranslationCancellationTest {
         val later = listOf(SubtitleSegment(0, 100_000, 101_000, "Later"))
         check(nextWindowTranslation(later, CaptionPlaybackRequest(0, paused = false, enabled = true)) == null)
         check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = false, enabled = true)) == 0)
+        check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = true, enabled = true)) == 0)
+        check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = true, enabled = false)) == null)
     }
 
     @Test

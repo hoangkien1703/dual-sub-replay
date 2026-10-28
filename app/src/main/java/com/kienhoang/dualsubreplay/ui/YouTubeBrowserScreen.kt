@@ -833,6 +833,7 @@ internal fun SingleYouTubePage(
                 decorFitsSystemWindows = false,
             ),
         ) {
+            RemeasureFullscreenInsets(fullscreenView = session.view, webView = webView)
             Box(Modifier.fillMaxSize().background(Color.Black)) {
                 AndroidView(
                     factory = {
