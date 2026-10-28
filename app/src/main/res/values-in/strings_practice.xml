@@ -17,6 +17,9 @@
     <string name="practice_empty_hint">Ketuk kata di subtitel, pilih Terjemahkan, lalu Simpan ke kosakata untuk memulai koleksi Anda.</string>
     <string name="practice_next_review">Ulasan berikutnya: %1$s</string>
     <string name="practice_pronounce">Ucapkan</string>
+    <string name="practice_open_google_translate">Buka di Google Terjemahan</string>
+    <string name="practice_google_translate_unavailable">Google Terjemahan belum terpasang</string>
+    <string name="practice_google_translate_cannot_open">Google Terjemahan tidak dapat menerima teks</string>
     <string name="practice_pronounce_item">Ucapkan %1$s</string>
     <string name="practice_speech_settings">Setelan ucapan</string>
     <string name="practice_show_meaning">Tampilkan arti</string>

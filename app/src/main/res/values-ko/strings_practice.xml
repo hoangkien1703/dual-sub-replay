@@ -17,6 +17,9 @@
     <string name="practice_empty_hint">자막의 단어를 탭하고 번역을 선택한 다음 단어장에 저장을 눌러 나만의 단어 모음을 시작하세요.</string>
     <string name="practice_next_review">다음 복습: %1$s</string>
     <string name="practice_pronounce">발음</string>
+    <string name="practice_open_google_translate">Google 번역에서 열기</string>
+    <string name="practice_google_translate_unavailable">Google 번역이 설치되어 있지 않습니다</string>
+    <string name="practice_google_translate_cannot_open">Google 번역이 텍스트를 받을 수 없습니다</string>
     <string name="practice_pronounce_item">%1$s 발음</string>
     <string name="practice_speech_settings">음성 설정</string>
     <string name="practice_show_meaning">뜻 보기</string>
