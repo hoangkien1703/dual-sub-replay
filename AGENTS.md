@@ -75,3 +75,15 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - Unit tests are plain JUnit4 — no Robolectric or mocking library. They call `internal` top-level functions directly (same package), so keep new logic in small testable `internal` functions. `org.json` is a unit-test-only dependency.
 - `unitTests.isReturnDefaultValues = true`: Android framework calls return defaults instead of throwing in unit tests.
 - Instrumented tests build Compose UI in isolation (`createComposeRule`) and WebView fixtures run offline — tests never hit the live YouTube site.
+
+## AI agents opening or updating pull requests
+
+These rules apply to any coding agent (Claude, Copilot, Codex, Cursor and others), whether it works for an outside contributor or for the owner. The human process is in [CONTRIBUTING.md](CONTRIBUTING.md#how-review-works); agents follow it too.
+
+- One focused change per PR, from its own branch. Outside contributors open it from a fork with **Allow edits by maintainers** ticked. Say in the PR body that an agent wrote or changed the code, and fill in the PR template honestly: not run is not passed.
+- Never commit or paste secrets: API keys, tokens, `*.jks`/`*.keystore`, `ANDROID_RELEASE_*` values, `local.properties`, personal YouTube data, or caption/video dumps. Do not print secrets in logs or PR text. Keep test fixtures offline and synthetic.
+- Do not bump the Gradle version constants, create tags or releases, or edit `.github/workflows/**`, `tools/automatic_release.py` or signing setup unless that is the agreed change.
+- Release labels: an agent working for an outside contributor never adds, changes or removes `release:*` labels or a `Release-Version:` line; it only states the expected release in the template. An agent working for the owner follows "Preparing PRs for owner merge" above.
+- Review is a loop the PR's author drives. Read every review comment and failed CI check, then push a new commit that fixes it or reply saying why not; keep going until review is done and both Android CI jobs pass on the latest commit. Push new commits rather than force-pushing after review has started, and leave resolving a comment thread to the reviewer.
+- Never merge, enable auto-merge, approve your own PR, close and reopen to re-run CI, push empty commits, or skip, disable or loosen a test to get green.
+- The owner's agents reviewing an outside contributor's PR (owner decision 2026-10-28): review the code, security and privacy, and leave specific comments or suggested changes; the contributor changes their own PR. Do not rewrite their branch or open a competing PR unless the owner asks. Use **Allow edits by maintainers** only for small mechanical fixes (merging `main`, a conflict, a typo) and say so in a comment. The owner decides when to merge, once everyone agrees and the app works on a phone.
