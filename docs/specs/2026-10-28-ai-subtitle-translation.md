@@ -209,3 +209,24 @@ As planned.
 
 New and related unit tests passed locally on 2026-10-28; full results are in the PR. Phone check
 pending on the preview build.
+
+## Follow-up: one "Translate subtitles with" choice (2026-10-28)
+
+Owner request after #166 merged: put AI above Google so people find it, offer "Google while waiting"
+and "AI only", and let translation use a different model from the assistant, by default the same
+one. Owner picked the single-choice layout so the section is not a row of switches that depend on
+each other.
+
+- Settings → Translation starts with **Translate subtitles with**: Google Translate (default), AI
+  with Google while waiting (beta), AI only (beta), On this device only. Each has one short line.
+  It is saved as the existing engine and AI preferences plus `ai_subtitle_translation_only`, so
+  older installs keep their choice.
+- Only the chosen translator's settings show: the AI model and a note with a link to the AI
+  assistant settings for AI choices; Wait for Google for the two choices that show Google's lines.
+- AI model for translation: the first chip is "Same as AI assistant (model)" (saved as empty, the
+  default); the others are the service's suggested models. Thinking is still turned off for
+  translation, and a refused thinking setting is dropped.
+- AI only: a row waits while the running AI request may still bring its sentence (asking once more
+  if that request was for another place), then Google translates it, then the device.
+- The assistant's translation status names the AI choice.
+

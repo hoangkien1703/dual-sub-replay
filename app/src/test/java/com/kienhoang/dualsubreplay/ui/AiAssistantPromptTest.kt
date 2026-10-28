@@ -94,6 +94,8 @@ class AiAssistantPromptTest {
         assertEquals("Google Translate (online)", aiTranslationStatus(google))
         assertTrue("Google Translate failed" in aiTranslationStatus(google.copy(onDeviceFallback = true)))
         assertTrue("timed out" in aiTranslationStatus(google.copy(translationError = "timed out")))
+        assertTrue("while waiting" in aiTranslationStatus(google.copy(aiTranslation = true)))
+        assertTrue("AI only" in aiTranslationStatus(google.copy(aiTranslation = true, aiTranslationOnly = true)))
     }
 
     @Test

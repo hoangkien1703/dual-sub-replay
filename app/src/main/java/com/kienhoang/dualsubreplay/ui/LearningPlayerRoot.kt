@@ -553,7 +553,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 viewModel::setTranslationEngine,
                 viewModel::tryGoogleTranslationAgain,
                 viewModel::setGoogleWait,
-                viewModel::setAiTranslation,
+                viewModel::setSubtitleTranslator,
                 viewModel::setAiTranslationModel,
             )
         }

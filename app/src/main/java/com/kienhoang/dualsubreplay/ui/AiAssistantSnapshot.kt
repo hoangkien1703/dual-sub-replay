@@ -34,6 +34,10 @@ internal fun aiTranslationStatus(state: DualSubUiState): String =
             "YouTube's own translated captions (lines YouTube left out on the device), because Google Translate failed; " +
                 "Google is checked again every 2 minutes"
         state.onDeviceFallback -> "on the device, because Google Translate failed; Google is checked again every 2 minutes"
+        state.translationEngine == TranslationEngine.GOOGLE_WEB && state.aiTranslationOnly && state.aiTranslation ->
+            "AI only (the AI assistant's service; Google translates what it fails to)"
+        state.translationEngine == TranslationEngine.GOOGLE_WEB && state.aiTranslation ->
+            "AI, with Google Translate's lines shown while waiting"
         state.translationEngine == TranslationEngine.GOOGLE_WEB -> "Google Translate (online)"
         else -> "on the device"
     }

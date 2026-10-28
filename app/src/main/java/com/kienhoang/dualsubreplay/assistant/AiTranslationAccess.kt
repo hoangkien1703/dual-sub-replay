@@ -32,22 +32,19 @@ private val REST_PROBLEMS = setOf(AiErrorKind.RATE_LIMITED, AiErrorKind.NO_CREDI
 private val BAD_KEY_PROBLEMS = setOf(AiErrorKind.NO_KEY, AiErrorKind.KEY_UNREADABLE, AiErrorKind.INVALID_KEY)
 
 /**
- * The model subtitles are translated with when none is chosen: the service's first suggested model,
- * a fast and cheap one (Gemini Flash-Lite, the most generous free tier), not the assistant's model,
- * which may be a slow thinking one. A service without suggestions uses the assistant's model.
+ * The model subtitles are translated with when none is chosen: the AI assistant's own model (owner
+ * request 2026-10-28; Gemini's default is already the fast Flash-Lite). Thinking is turned off for
+ * translation, so a thinking model still answers quickly.
  */
-internal fun aiTranslationDefaultModel(
-    settings: AiAssistantSettings,
-    provider: AiProvider = settings.provider,
-): String = provider.suggestedModels.firstOrNull() ?: settings.modelFor(provider)
+internal fun aiTranslationDefaultModel(settings: AiAssistantSettings): String = settings.modelFor(settings.provider)
 
-/** The models offered for translation: the default, the service's other suggestions and the assistant's model. */
+/** The models offered besides "Same as AI assistant": the service's suggestions. */
 internal fun aiTranslationModelChoices(settings: AiAssistantSettings): List<String> =
-    (listOf(aiTranslationDefaultModel(settings)) + settings.provider.suggestedModels + settings.modelFor(settings.provider))
+    settings.provider.suggestedModels
         .filter(String::isNotBlank)
         .distinct()
 
-/** The chosen model when it is still offered by the current service, else the default. */
+/** The chosen model when it is still offered by the current service, else the assistant's. */
 internal fun aiTranslationModelName(
     settings: AiAssistantSettings,
     chosen: String?,
@@ -92,9 +89,11 @@ internal fun Context.aiTranslationModel(
         transport,
     )
 
-/** The translation models offered for the AI assistant's current service. */
-internal fun Context.aiTranslationModelChoices(): List<String> =
-    aiTranslationModelChoices(readAiAssistantSettings(getSharedPreferences(AI_SETTINGS_PREFERENCES, 0)))
+/** The AI assistant's model, then the other translation models its current service offers. */
+internal fun Context.aiTranslationModelChoices(): Pair<String, List<String>> {
+    val settings = readAiAssistantSettings(getSharedPreferences(AI_SETTINGS_PREFERENCES, 0))
+    return aiTranslationDefaultModel(settings) to aiTranslationModelChoices(settings)
+}
 
 /**
  * When each key was last asked and how long it rests, kept for the whole app run so a new video does

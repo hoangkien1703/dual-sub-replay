@@ -3,8 +3,6 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
-import androidx.compose.ui.test.assertIsOff
-import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.kienhoang.dualsubreplay.translation.GoogleWait
+import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
@@ -49,33 +48,41 @@ class OnlineTranslationUiTest {
     }
 
     @Test
-    fun googleSwitchIsOnForTheDefaultEngineAndTurnsOffToOnDevice() {
-        val chosen = mutableListOf<TranslationEngine>()
+    fun translatorChoiceShowsGoogleByDefaultAndPicksAiOnly() {
+        val chosen = mutableListOf<SubtitleTranslator>()
         showTranslationSettings(
             OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB),
-            TranslationEngineActions(select = { chosen += it }),
+            TranslationEngineActions(select = {}, selectTranslator = { chosen += it }),
         )
-        composeRule
-            .onNodeWithTag("google_translate_switch")
-            .performScrollTo()
-            .assertIsOn()
-            .performClick()
-        assertEquals(listOf(TranslationEngine.ON_DEVICE), chosen)
+        composeRule.onNodeWithTag("translator_google").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_translation_model_same").assertDoesNotExist()
+        composeRule.onNodeWithTag("translator_ai_only").performScrollTo().performClick()
+        assertEquals(listOf(SubtitleTranslator.AI_ONLY), chosen)
     }
 
     @Test
-    fun googleSwitchTurnsOnToChooseGoogle() {
-        val chosen = mutableListOf<TranslationEngine>()
+    fun aiChoiceShowsTheModelPickerWithTheAssistantsModelFirst() {
+        val picked = mutableListOf<String>()
         showTranslationSettings(
-            OnlineTranslationSettings(engine = TranslationEngine.ON_DEVICE),
-            TranslationEngineActions(select = { chosen += it }),
+            OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB, aiTranslation = true),
+            TranslationEngineActions(select = {}, selectAiTranslationModel = { picked += it }),
         )
         composeRule
-            .onNodeWithTag("google_translate_switch")
+            .onNodeWithTag("ai_translation_model_same")
             .performScrollTo()
-            .assertIsOff()
-            .performClick()
-        assertEquals(listOf(TranslationEngine.GOOGLE_WEB), chosen)
+            .assertIsSelected()
+        saveUiEvidence("settings-translate-subtitles-with-ai")
+        composeRule.onNodeWithTag("google_wait_auto").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_translation_model_gemini-flash-lite-latest").performScrollTo().performClick()
+        assertEquals(listOf("gemini-flash-lite-latest"), picked)
+    }
+
+    @Test
+    fun aiOnlyHidesWaitForGoogle() {
+        val aiOnly = OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB, aiTranslation = true, aiTranslationOnly = true)
+        showTranslationSettings(aiOnly)
+        composeRule.onNodeWithTag("ai_translation_model_same").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("google_wait_auto").assertDoesNotExist()
     }
 
     @Test

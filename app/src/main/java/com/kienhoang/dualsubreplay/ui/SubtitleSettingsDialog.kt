@@ -79,7 +79,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
-import com.kienhoang.dualsubreplay.translation.TranslationEngine
+import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -549,7 +549,11 @@ internal fun SubtitleSettingsDialog(
 
                     Section(MoreSettingsSection.TRANSLATION, Icons.Default.Translate) {
                         if (translationEngineActions != null) {
-                            OnlineTranslationSettingsRows(onlineTranslation, translationEngineActions)
+                            OnlineTranslationSettingsRows(
+                                onlineTranslation,
+                                translationEngineActions,
+                                onOpenAiSettings = aiAssistant?.let { { openSection = MoreSettingsSection.AI_ASSISTANT } },
+                            )
                         }
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_natural_flow_title),
@@ -1055,32 +1059,59 @@ private fun SubtitleColorSwatchRow(
     }
 }
 
+/**
+ * Settings → Translation → Translate subtitles with, first in the section so AI is easy to find
+ * (owner request 2026-10-28). Only the settings of the chosen translator show below it.
+ */
 @Composable
 private fun OnlineTranslationSettingsRows(
     settings: OnlineTranslationSettings,
     actions: TranslationEngineActions,
+    onOpenAiSettings: (() -> Unit)?,
 ) {
-    val google = settings.engine == TranslationEngine.GOOGLE_WEB
-    SettingsSwitchRow(
-        title = stringResource(R.string.settings_google_translate_title),
-        description = stringResource(R.string.settings_google_translate_description),
-        checked = google,
-        onCheckedChange = { enabled ->
-            val engine = if (enabled) TranslationEngine.GOOGLE_WEB else TranslationEngine.ON_DEVICE
-            actions.select(engine)
-        },
-        testTag = "google_translate_switch",
+    val translator = settings.translator
+    Text(
+        stringResource(R.string.settings_translator_title),
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(top = 6.dp),
     )
-    if (google) {
+    SubtitleTranslator.entries.forEach { option ->
+        TranslatorOptionRow(option, translator, actions.selectTranslator)
+    }
+    if (translator.usesAi) {
+        AiTranslationModelSettings(settings.aiTranslationModel, actions.selectAiTranslationModel)
+        AiTranslationServiceNote(onOpenAiSettings)
+    }
+    if (translator == SubtitleTranslator.GOOGLE || translator == SubtitleTranslator.AI_WITH_GOOGLE) {
         GoogleWaitSettings(settings.googleWait, actions.selectGoogleWait)
-        SettingsSwitchRow(
-            title = stringResource(R.string.settings_ai_translation_title),
-            description = stringResource(R.string.settings_ai_translation_description),
-            checked = settings.aiTranslation,
-            onCheckedChange = actions.selectAiTranslation,
-            testTag = "ai_translation_switch",
-        )
-        if (settings.aiTranslation) AiTranslationModelSettings(settings.aiTranslationModel, actions.selectAiTranslationModel)
+    }
+}
+
+@Composable
+private fun TranslatorOptionRow(
+    option: SubtitleTranslator,
+    selected: SubtitleTranslator,
+    onSelect: (SubtitleTranslator) -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onSelect(option) }
+                .padding(vertical = 4.dp)
+                .testTag("translator_${option.storageValue}"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected == option, onClick = { onSelect(option) })
+        Spacer(Modifier.size(8.dp))
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(option.titleRes))
+            Text(
+                stringResource(option.descriptionRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

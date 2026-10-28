@@ -10,20 +10,21 @@ import org.junit.Test
 class AiTranslationAccessTest {
     private val gemini = AiAssistantSettings(provider = AiProvider.GEMINI, models = mapOf(AiProvider.GEMINI to "gemini-pro-latest"))
 
-    @Test fun translationDefaultsToTheFastModelNotTheAssistantsModel() {
-        assertEquals("gemini-flash-lite-latest", aiTranslationModelName(gemini, null))
-        assertEquals("gemini-flash-lite-latest", aiTranslationModelName(gemini, ""))
-        assertEquals(listOf("gemini-flash-lite-latest", "gemini-flash-latest", "gemini-pro-latest"), aiTranslationModelChoices(gemini))
+    @Test fun translationDefaultsToTheAssistantsModel() {
+        assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, null))
+        assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, ""))
+        assertEquals(listOf("gemini-flash-lite-latest", "gemini-flash-latest"), aiTranslationModelChoices(gemini))
     }
 
     @Test fun aChosenModelIsUsedOnlyWhileTheServiceOffersIt() {
-        assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, "gemini-pro-latest"))
-        assertEquals("gemini-flash-lite-latest", aiTranslationModelName(gemini, "gpt-5-mini"))
+        assertEquals("gemini-flash-lite-latest", aiTranslationModelName(gemini, "gemini-flash-lite-latest"))
+        assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, "gpt-5-mini"))
     }
 
     @Test fun aServiceWithoutSuggestionsUsesTheAssistantsModel() {
         val custom = AiAssistantSettings(provider = AiProvider.CUSTOM, models = mapOf(AiProvider.CUSTOM to "my-model"))
         assertEquals("my-model", aiTranslationModelName(custom, null))
+        assertEquals(emptyList<String>(), aiTranslationModelChoices(custom))
     }
 
     @Test fun thinkingIsTurnedOffWhereTheServiceAllowsIt() {
@@ -71,7 +72,7 @@ class AiTranslationAccessTest {
             val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
             assertEquals("{\"sentences\":[]}", model.ask("system", "user"))
             assertEquals(2, keys.size)
-            assertEquals("gemini/gemini-flash-lite-latest", model.scope)
+            assertEquals("gemini/gemini-pro-latest", model.scope)
         }
 
     @Test fun aRefusedThinkingSettingIsDroppedAndAskedAgain() =
