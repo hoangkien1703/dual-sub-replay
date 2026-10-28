@@ -151,6 +151,15 @@ use on a free Gemini Flash-Lite key (500 requests a day): about 10 to 15 request
 video, so 35 to 50 such videos a day. Free limits are per Google project, so extra keys add
 capacity only when they come from different projects.
 
+Then a Japanese auto-caption video (2026-10-28) showed three weaknesses: the misheard 声の塔
+("tower of voices", for 声のトーン "tone of voice") translated literally, an unpunctuated
+sentence cut across rows translated as two unrelated sentences ("so let's have a little laugh" /
+", and the tower…"), and a guessed "he" where the speaker meant herself. The prompt now says
+captions may come from speech recognition (read the sentences as one speech, translate a piece
+as a piece of the whole, translate what was most likely said), fills in omitted subjects from
+context, and forbids a row starting with a comma; `cleanAiRow` also strips one. Cached lines carry
+`AI_PROMPT_VERSION`, so lines translated with the old prompt are translated again.
+
 ## Release intent
 
 `release:patch` (default; no owner instruction to change it).

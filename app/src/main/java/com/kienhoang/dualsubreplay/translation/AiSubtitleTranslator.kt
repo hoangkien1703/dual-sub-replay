@@ -33,6 +33,9 @@ internal const val AI_FAILURE_REST_MS = 30_000L
 /** Markup some models add (`<i>sự</i>`); subtitles show plain text. */
 private val MARKUP = Regex("</?[A-Za-z][^<>]*>")
 
+/** Raised when the prompt changes, so lines cached with the old one are translated again. */
+internal const val AI_PROMPT_VERSION = 2
+
 /** Sentences of the previous request sent again as context, so pronouns and tone carry over. */
 internal const val AI_CONTEXT_SENTENCES = 4
 
@@ -91,16 +94,19 @@ internal fun aiSentences(texts: List<String>): List<AiSentence> {
 internal fun aiTranslationSystemPrompt(
     source: String,
     target: String,
-): String =
-    """
-    You translate video subtitles from ${languageName(
-        source,
-    )} ($source) to ${languageName(target)} ($target) for someone learning ${languageName(source)} who reads ${languageName(target)}.
-    The input is JSON: "context" holds earlier sentences of the same video, for meaning only; "sentences" holds the sentences to translate, each split into the rows the screen shows.
-    For every sentence, translate the whole sentence naturally, as a native speaker would say it in this situation, keeping the speaker's tone, slang and jokes. Keep names, brands, code and numbers as they are.
-    Then split your translation into exactly as many rows as the source sentence has, in the same order. Each row holds the part of your translation that says what its source row says, as far as natural word order allows. Do not leave a row empty unless its source row is only a filler word.
-    Answer with JSON only, no comments and no code fences: {"sentences":[{"id":<id>,"rows":["…", …]}, …]} with every id from the input.
-    """.trimIndent()
+): String {
+    val from = languageName(source)
+    val to = languageName(target)
+    return """
+        You translate video subtitles from $from ($source) to $to ($target) for someone learning $from who reads $to.
+        The input is JSON: "context" holds earlier sentences of the same video, for meaning only; "sentences" holds the sentences to translate, in the order they are spoken, each split into the rows the screen shows.
+        Captions are often made by automatic speech recognition: punctuation may be missing, so one spoken sentence can be cut across several input sentences, and some words are misheard. Read the sentences as one continuous speech. When a sentence is only a piece of a longer one, translate it as that piece so that reading the translations in order gives the whole sentence naturally. When a word makes no sense in context, translate what the speaker most likely said (a word that sounds similar), not the misheard word.
+        Fill in subjects the source leaves out (common in Japanese, Korean, Chinese and Vietnamese) from context; when someone talks about their own life, it is usually "I".
+        Translate naturally, as a native speaker would say it in this situation, keeping the speaker's tone, slang and jokes. Keep names, brands, code and numbers as they are.
+        Split each sentence's translation into exactly as many rows as the source sentence has, in the same order. Each row holds the part of the translation that says what its source row says, as far as natural word order allows. Do not leave a row empty unless its source row is only a filler word, and do not start a row with a comma.
+        Answer with JSON only, no comments and no code fences: {"sentences":[{"id":<id>,"rows":["…", …]}, …]} with every id from the input.
+        """.trimIndent()
+}
 
 /** The user message: the context sentences and the numbered sentences to translate. */
 internal fun aiTranslationRequest(
@@ -139,12 +145,20 @@ internal fun parseAiTranslationReply(
     for (index in 0 until items.length()) {
         val item = items.optJSONObject(index) ?: continue
         val rows = item.optJSONArray("rows") ?: continue
-        byId[item.optInt("id", -1)] = (0 until rows.length()).map { rows.optString(it).replace(MARKUP, "").trim() }
+        byId[item.optInt("id", -1)] = (0 until rows.length()).map { cleanAiRow(rows.optString(it)) }
     }
     return sentences.mapIndexed { index, sentence ->
         byId[index + 1]?.takeIf { rows -> rows.any(String::isNotEmpty) }?.let { rows -> fitRows(rows, sentence.rows.size) }
     }
 }
+
+/** Plain text without markup and without a comma or semicolon left over at the start ("…, and the tone…"). */
+internal fun cleanAiRow(row: String): String =
+    row
+        .replace(MARKUP, "")
+        .trim()
+        .trimStart(',', ';', '，', '、', '；')
+        .trim()
 
 /** Rows the model merged or split are joined into the expected count; the player then cuts them itself. */
 private fun fitRows(
@@ -341,5 +355,6 @@ internal class AiSubtitleTranslator(
         model: AiTranslationModel,
         source: String,
         target: String,
-    ): Pair<String, String> = "${model.scope}:${TranslationLanguages.normalize(source)}" to TranslationLanguages.normalize(target)
+    ): Pair<String, String> =
+        "${model.scope}:p$AI_PROMPT_VERSION:${TranslationLanguages.normalize(source)}" to TranslationLanguages.normalize(target)
 }

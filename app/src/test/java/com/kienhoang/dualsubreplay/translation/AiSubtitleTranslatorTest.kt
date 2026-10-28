@@ -206,4 +206,16 @@ class AiSubtitleTranslatorTest {
             translator.translateAll(model, "en", "vi", listOf("Later sentence 3."), ahead = { error("not needed") })
             assertEquals(1, model.requests.size)
         }
+
+    @Test fun aRowNeverStartsWithALeftoverComma() {
+        assertEquals("and my voice gets higher too.", cleanAiRow(", and my voice gets higher too."))
+        assertEquals("「そうです」", cleanAiRow("、「そうです」"))
+    }
+
+    @Test fun thePromptExplainsSpeechRecognitionCaptions() {
+        val prompt = aiTranslationSystemPrompt("ja", "en")
+        assertTrue(prompt.contains("Japanese (ja) to English (en)"))
+        assertTrue(prompt.contains("misheard"))
+        assertTrue(prompt.contains("subjects"))
+    }
 }
