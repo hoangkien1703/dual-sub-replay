@@ -17,6 +17,9 @@
     <string name="practice_empty_hint">Tap subtitle words, choose Translate, then Save to vocabulary to start your collection.</string>
     <string name="practice_next_review">Next review: %1$s</string>
     <string name="practice_pronounce">Pronounce</string>
+    <string name="practice_open_google_translate">Open in Google Translate</string>
+    <string name="practice_google_translate_unavailable">Google Translate is not installed</string>
+    <string name="practice_google_translate_cannot_open">Google Translate could not accept the text</string>
     <string name="practice_pronounce_item">Pronounce %1$s</string>
     <string name="practice_speech_settings">Speech settings</string>
     <string name="practice_show_meaning">Show meaning</string>

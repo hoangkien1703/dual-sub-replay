@@ -36,6 +36,7 @@ class PhraseSelectionUiTest {
     private val translated = "Mình rất mong được gặp bạn."
     private val taps = mutableListOf<WordTap>()
     private val spoken = mutableListOf<Pair<String, Boolean>>()
+    private val googleOpened = mutableListOf<String>()
     private var pauses = 0
     private var replays = 0
     private val translatedTexts = mutableListOf<Pair<String, Boolean>>()
@@ -46,6 +47,7 @@ class PhraseSelectionUiTest {
             PhraseActions(
                 pause = { pauses++ },
                 pronounce = { text, isTranslated -> spoken += text to isTranslated },
+                openGoogleTranslate = { text -> googleOpened += text },
                 translate = { text, isTranslated ->
                     translatedTexts += text to isTranslated
                     "nghĩa của $text"
@@ -260,6 +262,22 @@ class PhraseSelectionUiTest {
         compose.runOnIdle {
             assertEquals(listOf("really" to false), spoken)
             assertTrue(taps.isEmpty())
+        }
+    }
+
+    @Test
+    fun googleTranslateButtonSendsTheSelectedWordAndKeepsTheOtherActions() {
+        showCard()
+        tapWord(original, "really")
+
+        compose.onNodeWithTag("phrase_google_translate").performClick()
+        compose.onNodeWithTag("phrase_pronounce").performClick()
+        compose.waitForIdle()
+
+        compose.onNodeWithTag("phrase_action_bar").assertIsDisplayed()
+        compose.runOnIdle {
+            assertEquals(listOf("really"), googleOpened)
+            assertEquals(listOf("really" to false), spoken)
         }
     }
 

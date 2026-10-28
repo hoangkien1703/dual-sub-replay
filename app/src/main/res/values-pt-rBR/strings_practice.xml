@@ -17,6 +17,9 @@
     <string name="practice_empty_hint">Toque em palavras das legendas, escolha Traduzir e depois Salvar no vocabulário para começar sua coleção.</string>
     <string name="practice_next_review">Próxima revisão: %1$s</string>
     <string name="practice_pronounce">Pronunciar</string>
+    <string name="practice_open_google_translate">Abrir no Google Tradutor</string>
+    <string name="practice_google_translate_unavailable">O Google Tradutor não está instalado</string>
+    <string name="practice_google_translate_cannot_open">O Google Tradutor não conseguiu receber o texto</string>
     <string name="practice_pronounce_item">Pronunciar %1$s</string>
     <string name="practice_speech_settings">Configurações de voz</string>
     <string name="practice_show_meaning">Mostrar significado</string>
