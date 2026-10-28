@@ -207,8 +207,8 @@ Choose evidence appropriate to the change in its [spec](../specs/README.md).
 
 [Android CI](../../.github/workflows/android.yml) runs formatting/complexity checks,
 unit tests, lint, APK builds, optimized-build checks, and managed-device tests.
-[PR previews](../../.github/workflows/pr-preview-auto.yml) publish successful trusted
-same-repository PR artifacts and clean up closed-PR previews.
+[PR previews](../../.github/workflows/pr-preview-auto.yml) publish successful PR artifacts,
+including fork PRs, and clean up closed-PR previews.
 
 After an owner merge, [release-on-main.yml](../../.github/workflows/release-on-main.yml)
 and [automatic_release.py](../../tools/automatic_release.py) verify final-head PR CI,
