@@ -27,6 +27,12 @@ import java.util.Locale
 internal const val MAX_AI_BATCH_SENTENCES = 60
 internal const val MAX_AI_BATCH_CHARS = 6_000
 
+/** After a failed request (network, limit, refusal) the AI is not asked for this long; Google translates meanwhile. */
+internal const val AI_FAILURE_REST_MS = 30_000L
+
+/** Markup some models add (`<i>sự</i>`); subtitles show plain text. */
+private val MARKUP = Regex("</?[A-Za-z][^<>]*>")
+
 /** Sentences of the previous request sent again as context, so pronouns and tone carry over. */
 internal const val AI_CONTEXT_SENTENCES = 4
 
@@ -133,7 +139,7 @@ internal fun parseAiTranslationReply(
     for (index in 0 until items.length()) {
         val item = items.optJSONObject(index) ?: continue
         val rows = item.optJSONArray("rows") ?: continue
-        byId[item.optInt("id", -1)] = (0 until rows.length()).map { rows.optString(it).trim() }
+        byId[item.optInt("id", -1)] = (0 until rows.length()).map { rows.optString(it).replace(MARKUP, "").trim() }
     }
     return sentences.mapIndexed { index, sentence ->
         byId[index + 1]?.takeIf { rows -> rows.any(String::isNotEmpty) }?.let { rows -> fitRows(rows, sentence.rows.size) }
@@ -203,6 +209,7 @@ internal fun aiBatches(sentences: List<AiSentence>): List<List<AiSentence>> {
  */
 internal class AiSubtitleTranslator(
     cacheDirectory: File?,
+    private val now: () -> Long = System::currentTimeMillis,
 ) {
     private val cache = TranslationCache(maxEntries = 2_048, maxCharacters = 512_000)
 
@@ -212,6 +219,16 @@ internal class AiSubtitleTranslator(
 
     /** The last sentences sent for each language pair and model, the next request's context. */
     private val recent = HashMap<String, List<String>>()
+
+    /**
+     * Sentences already sent and answered: one the model left out is never asked again, so each row
+     * that follows does not send a new request for it (Google translates it).
+     */
+    private val attempted: MutableSet<String> =
+        java.util.concurrent.ConcurrentHashMap
+            .newKeySet()
+
+    @Volatile private var restUntil = Long.MIN_VALUE
 
     suspend fun cachedTranslation(
         model: AiTranslationModel,
@@ -255,8 +272,12 @@ internal class AiSubtitleTranslator(
         target: String,
         texts: List<String>,
     ): List<AiSentence> {
-        if (TranslationLanguages.normalize(source) == TranslationLanguages.normalize(target)) return emptyList()
-        return aiSentences(texts).filter { sentence -> cachedTranslation(model, source, target, sentence.text) == null }
+        if (TranslationLanguages.normalize(source) == TranslationLanguages.normalize(target) || now() < restUntil) return emptyList()
+        val (scopedSource, scopedTarget) = pair(model, source, target)
+        return aiSentences(texts).filter { sentence ->
+            attemptKey(scopedSource, scopedTarget, sentence.text) !in attempted &&
+                cachedTranslation(model, source, target, sentence.text) == null
+        }
     }
 
     private suspend fun translate(
@@ -266,17 +287,23 @@ internal class AiSubtitleTranslator(
         batch: List<AiSentence>,
     ) = requests.withLock {
         val (source, target) = pair(model, sourceLanguageCode, targetLanguageCode)
-        val pending = batch.filter { cache.get(source, target, it.text) == null }
-        if (pending.isEmpty()) return@withLock
+        val pending = batch.filter { cache.get(source, target, it.text) == null && attemptKey(source, target, it.text) !in attempted }
+        if (pending.isEmpty() || now() < restUntil) return@withLock
         val contextKey = "$source>$target"
         val reply =
-            model.ask(
-                aiTranslationSystemPrompt(
-                    TranslationLanguages.normalize(sourceLanguageCode),
-                    TranslationLanguages.normalize(targetLanguageCode),
-                ),
-                aiTranslationRequest(recent[contextKey].orEmpty(), pending),
-            )
+            try {
+                model.ask(
+                    aiTranslationSystemPrompt(
+                        TranslationLanguages.normalize(sourceLanguageCode),
+                        TranslationLanguages.normalize(targetLanguageCode),
+                    ),
+                    aiTranslationRequest(recent[contextKey].orEmpty(), pending),
+                )
+            } catch (error: IOException) {
+                restUntil = now() + AI_FAILURE_REST_MS
+                throw error
+            }
+        pending.forEach { attempted += attemptKey(source, target, it.text) }
         val found =
             pending
                 .zip(parseAiTranslationReply(reply, pending))
@@ -287,6 +314,12 @@ internal class AiSubtitleTranslator(
         found.forEach { (text, translation) -> cache.put(source, target, text, translation) }
         withContext(Dispatchers.IO) { found.forEach { (text, translation) -> diskCache?.put(source, target, text, translation) } }
     }
+
+    private fun attemptKey(
+        source: String,
+        target: String,
+        text: String,
+    ) = "$source>$target:$text"
 
     /** Cache keys: the service and model are part of the source, so another model translates again. */
     private fun pair(

@@ -148,7 +148,7 @@
     <string name="settings_google_translate_title">Google 翻訳（オンライン）</string>
     <string name="settings_google_translate_description">初期設定でオンです。特に日本語の翻訳がより自然になります。字幕のテキストを Google に送信します。Google の公式サービスではないため、使えなくなることがあります。その場合は Google が使えるようになるまで端末上で翻訳します。オフにすると常に端末上で翻訳します。</string>
     <string name="settings_ai_translation_title">AI で翻訳（ベータ）</string>
-    <string name="settings_ai_translation_description">初期設定でオフです。その他の設定 → AI アシスタントで選んだ AI サービスとキーが、前後の行も読んで文全体を翻訳し、各行にその行の部分を割り当てます。字幕のテキストをそのサービスに送信し、キーの利用枠を使います。AI が訳さなかった部分や失敗したときは Google が翻訳します。</string>
+    <string name="settings_ai_translation_description">初期設定でオフです。その他の設定 → AI アシスタントで選んだ AI サービスとキーが、前後の行も読んで文全体を翻訳し、各行にその行の部分を割り当てます。字幕のテキストをそのサービスに送信し、キーの利用枠を使います。AI が訳さなかった部分や失敗したときは Google が翻訳します。無料の Google Gemini キーが最適です。ほかのサービスも使えますが、料金がかかったり応答が不安定だったりすることがあります。</string>
     <string name="settings_ai_translation_model_title">翻訳に使う AI モデル</string>
     <string name="settings_ai_translation_model_description">その他の設定 → AI アシスタントで選んだ AI サービスのモデルです。最初のモデルは速く、無料枠が最も大きいので、無料の Gemini キーでも 1 日に多くの動画を見られます。キーをそこで追加すると負荷を分け合えます。</string>
     <string name="settings_google_wait_title">Google を待つ時間</string>

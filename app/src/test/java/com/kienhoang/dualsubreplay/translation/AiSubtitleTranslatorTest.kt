@@ -150,4 +150,41 @@ class AiSubtitleTranslatorTest {
         assertTrue(batches.all { it.size <= MAX_AI_BATCH_SENTENCES })
         assertEquals(sentences, batches.flatten())
     }
+
+    @Test fun aSentenceTheModelLeftOutIsNotAskedForAgain() =
+        runBlocking {
+            val model = FakeModel { """{"sentences":[{"id":2,"rows":["Ở một phía, ta có các CVE."]}]}""" }
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            repeat(3) { translator.translateAll(model, "en", "vi", translationTexts(rows)) }
+            assertEquals(1, model.requests.size)
+        }
+
+    @Test fun afterAFailureTheAiRestsAndThenIsAskedAgain() =
+        runBlocking {
+            var now = 0L
+            var failing = true
+            val model =
+                FakeModel {
+                    if (failing) throw IOException("HTTP 503")
+                    """{"sentences":[{"id":1,"rows":["Một."]}]}"""
+                }
+            val translator = AiSubtitleTranslator(cacheDirectory = null, now = { now })
+            try {
+                translator.translateAll(model, "en", "vi", listOf("One."))
+                fail("expected a failure")
+            } catch (_: IOException) {
+            }
+            failing = false
+            translator.translateAll(model, "en", "vi", listOf("One."))
+            assertEquals(1, model.requests.size)
+            now = AI_FAILURE_REST_MS
+            translator.translateAll(model, "en", "vi", listOf("One."))
+            assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
+        }
+
+    @Test fun markupTheModelAddsIsRemoved() {
+        val sentences = listOf(AiSentence("Saying it out loud matters.", listOf("Saying it out loud matters.")))
+        val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["Việc thực <i>sự</i> nói ra là quan trọng."]}]}""", sentences)
+        assertEquals(listOf("Việc thực sự nói ra là quan trọng."), parsed[0])
+    }
 }

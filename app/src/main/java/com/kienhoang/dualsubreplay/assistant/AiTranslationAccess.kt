@@ -17,9 +17,9 @@ internal const val AI_TRANSLATION_MODEL_PREFERENCE = "ai_translation_model"
 
 /**
  * Free keys allow about 15 requests a minute each (Gemini's free tier), so one key is asked at most
- * this often. With several keys the requests take turns, so each key is asked less.
+ * this often (10 a minute, well under the limit). With several keys the requests take turns, so each key is asked less.
  */
-internal const val AI_TRANSLATION_KEY_INTERVAL_MS = 4_500L
+internal const val AI_TRANSLATION_KEY_INTERVAL_MS = 6_000L
 
 /** A key that answered "too many requests" or "quota" rests this long, doubling while it keeps refusing. */
 internal const val AI_TRANSLATION_KEY_REST_MS = 60_000L

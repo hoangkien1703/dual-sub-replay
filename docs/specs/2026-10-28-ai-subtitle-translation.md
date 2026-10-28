@@ -50,7 +50,7 @@ line. This change does the same with the AI service the user already set up for 
 - Free keys last: thinking off where the service allows it (`reasoning_effort` `none` for Gemini,
   `minimal` for OpenAI, dropped if refused), up to 60 sentences / 6,000 characters per request
   (about 8 requests for 30 minutes of speech), requests take turns over the saved keys with at
-  most one request per key every 4.5 s (Gemini's free tier allows about 15 a minute), a key that
+  most one request per key every 6 s (10 a minute; Gemini's free tier allows 15), a key that
   answers 429 or "quota" rests 1 minute, doubling up to 30 minutes while it keeps refusing (Google
   translates meanwhile), a rejected key rests 6 hours, and a 16 MB cache so watching again sends
   nothing.
@@ -132,6 +132,17 @@ nothing. Reset all settings turns it off.
 - Free keys have rate limits; a 429 moves to the next key, then Google.
 - A model that ignores the row count still gives a whole-sentence translation, which is cut as
   before.
+
+## Follow-up from the first phone test (2026-10-28)
+
+Kien's AI Studio page showed 12 of 15 requests a minute, and one Japanese → Vietnamese row read
+"thực <i>sự</i>". Fixes: a sentence that was sent and answered (even if the model left it out)
+is never sent again, so each following row no longer asks for it; after a failed request the AI
+rests 30 s (`AI_FAILURE_REST_MS`) while Google translates; a key is asked at most every 6 s;
+markup tags are removed from the model's rows. The setting text now says a free Gemini key works
+best and that other services may cost money or answer less reliably
+(`AiSubtitleTranslatorTest.aSentenceTheModelLeftOutIsNotAskedForAgain`,
+`afterAFailureTheAiRestsAndThenIsAskedAgain`, `markupTheModelAddsIsRemoved`).
 
 ## Release intent
 
