@@ -40,6 +40,19 @@ active example exact-version directive. Do not manually bump Gradle version cons
 See AGENTS.md for handoff and docs/releasing.md for release recovery.
 -->
 
+## Checklist
+
+<!-- Tick what is true; leave the rest unticked and explain in Notes. See CONTRIBUTING.md "How review works". -->
+
+- [ ] One focused change; unrelated fixes are in their own PR.
+- [ ] Screenshots or a recording above for visible changes (or "No UI change").
+- [ ] Tried on a real phone (name it in Verification), or said why not.
+- [ ] Android CI is green on the latest commit (`verify-build`, `managed-device-tests`).
+- [ ] No keys, signing files, personal data or copied caption/video dumps; no manual version bump.
+- [ ] From a fork: **Allow edits by maintainers** is ticked.
+- [ ] I (or my agent) will answer every review comment with a fix or a reason, and keep pushing to this branch until it is good.
+- [ ] AI-written changes are marked as such, and the agent followed AGENTS.md.
+
 ## Notes for reviewers
 
 <!-- Risks, unresolved validation, and plan deviations. Owner reviews preview/green

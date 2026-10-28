@@ -27,12 +27,26 @@ Managed-device tests additionally require the API 36 AOSP x86_64 system image:
 
 ## Pull requests
 
-- Keep each pull request focused, explain the user-facing impact, and link its spec (or state why a spec is not required). Record actual implementation and validation results against acceptance criteria. Update lasting project decisions in the relevant documentation in the same PR.
+- Keep each pull request to one focused change, explain the user-facing impact, and link its spec (or state why a spec is not required). Record actual implementation and validation results against acceptance criteria. Update lasting project decisions in the relevant documentation in the same PR.
+- When you open a pull request from a fork, tick **Allow edits by maintainers** (GitHub shows it beside the Create pull request button, and in the PR sidebar afterwards). The maintainer rarely uses it, but it lets them merge `main` into your branch or fix a typo instead of waiting a day for a one-line change.
 - Add or update tests for changed behavior.
 - Preserve the single-WebView playback architecture and the origin checks around JavaScript playback bridges.
-- Do not manually bump `appVersionName` / `appVersionCode` in normal PRs. Follow the [release-intent mapping](docs/specs/README.md#release-intent-is-a-decision-not-automation): apply and verify the actual GitHub label or exact-version directive before handoff. A label mentioned only in prose has no effect; report missing metadata explicitly.
-- Include screenshots or a short recording for visible UI changes.
+- Do not manually bump `appVersionName` / `appVersionCode` in normal PRs. Say in the PR template which release you expect (see the [release-intent mapping](docs/specs/README.md#release-intent-is-a-decision-not-automation)); the owner applies the actual GitHub label or exact-version directive, so do not add, change or remove release labels yourself. A label mentioned only in prose has no effect.
+- Include screenshots or a short recording for visible UI changes, and say whether you tried it on a real phone (and which one).
 - Complete the PR template with relevant commands/scenarios and honest results; distinguish not run from passed. Documentation-only edits need appropriate link/consistency checks, not claims of runtime testing. Existing PR CI still applies.
-- The owner reviews the preview and successful final-head CI before manually merging. Do not merge, enable auto-merge, or publish without an explicit owner request; existing automation handles releases after eligible merges.
+- If an AI agent wrote or changed the code, say so in the PR and point it at [AGENTS.md](AGENTS.md#ai-agents-opening-or-updating-pull-requests).
+
+## How review works
+
+The maintainer's job is to review: check the code, security and privacy, try the build on a phone, and decide. Fixing the code is the contributor's job.
+
+1. **CI runs first.** On your first pull request the owner has to approve the workflow before CI starts, so a short wait is normal. Both Android CI jobs (`verify-build`, `managed-device-tests`) must pass. If one fails, the job summary lists the failed tests; please fix them yourself. Pull requests from forks get the debug APK as the `DualSub-Replay-preview` artifact of the CI run; only branches in this repository also get a build on the [`preview` release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview).
+2. **The maintainer reviews and suggests.** Expect comments that explain what to change and why, sometimes with a suggested change you can apply in one click. The maintainer does not usually rewrite your pull request or open a competing one.
+3. **You update your pull request.** Push new commits to the same branch (please avoid force-pushing once review has started, so the reviewer can see what changed). Answer every comment, either with a fix or with a reply explaining why not; disagreement is welcome when you give a reason. Let the reviewer resolve their own comments.
+4. **Repeat until everything is good.** When review is done, CI is green on the latest commit and the app works on a phone, the owner merges. Merging is always the owner's decision; nobody else merges, enables auto-merge or publishes releases.
+
+The maintainer may push to your branch only for small mechanical things (merging `main`, resolving a conflict, a typo), and will say so in a comment.
+
+Security problems go through a [private report](SECURITY.md), not a pull request or a public issue.
 
 By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
