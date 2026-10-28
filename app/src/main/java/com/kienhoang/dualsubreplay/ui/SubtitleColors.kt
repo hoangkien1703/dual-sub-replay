@@ -194,5 +194,8 @@ val RESETTABLE_SETTING_KEYS =
         WORD_LEARNING_ACTIVE_ONLY_PREFERENCE,
         com.kienhoang.dualsubreplay.translation.TRANSLATION_ENGINE_PREFERENCE,
         com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE,
+        com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE,
+        com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE,
+        com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE,
         com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE,
     ) + STUDY_SETTING_KEYS + WORD_CARD_SECTION_KEYS + AD_SKIP_SETTING_KEYS + YOUTUBE_TABS_SETTING_KEYS

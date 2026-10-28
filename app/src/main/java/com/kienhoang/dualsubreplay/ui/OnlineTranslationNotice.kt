@@ -28,20 +28,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.translation.GoogleWait
+import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
+import com.kienhoang.dualsubreplay.translation.subtitleTranslator
 
 /** Chooses the translation engine from Settings → Translation, or tries Google again from the top-right icon. */
 internal class TranslationEngineActions(
     val select: (TranslationEngine) -> Unit,
     val tryGoogleAgain: () -> Unit = {},
     val selectGoogleWait: (GoogleWait) -> Unit = {},
+    val selectTranslator: (SubtitleTranslator) -> Unit = {},
+    val selectAiTranslationModel: (String) -> Unit = {},
 )
 
 /** What Settings → Translation shows about the online engine. */
 internal data class OnlineTranslationSettings(
     val engine: TranslationEngine = TranslationEngine.ON_DEVICE,
     val googleWait: GoogleWait = GoogleWait.AUTO,
-)
+    val aiTranslation: Boolean = false,
+    val aiTranslationOnly: Boolean = false,
+    /** Empty uses the AI assistant's model. */
+    val aiTranslationModel: String = "",
+) {
+    val translator: SubtitleTranslator
+        get() = subtitleTranslator(engine, aiTranslation, aiTranslationOnly)
+}
 
 internal val LocalTranslationEngineActions = staticCompositionLocalOf<TranslationEngineActions?> { null }
 

@@ -24,6 +24,12 @@ internal fun translationSlices(
     val boundaries = mutableListOf<Int>()
     cuts.forEachIndexed { index, cut ->
         val previous = boundaries.lastOrNull() ?: 0
+        // The prefix came out word for word as the start of the whole translation (the AI's rows): cut exactly there.
+        val exact = exactBoundary(text, prefixTranslations?.getOrNull(index))
+        if (exact != null && exact > previous) {
+            boundaries += exact
+            return@forEachIndexed
+        }
         val ideal = idealBoundary(text, weak, sourceLength, cut, prefixTranslations?.getOrNull(index))
         val remaining = cuts.size - index - 1
         // Prefer leaving one break for every later row, so later rows are not left empty.
@@ -52,6 +58,18 @@ private fun idealBoundary(
     if (text.none(Char::isWhitespace)) return prefix.length.coerceAtMost(text.length)
     val words = prefix.split(Regex("\\s+")).size
     return weak.getOrNull(words - 1) ?: text.length
+}
+
+/** Where [prefix] ends when [text] starts with it and a new word follows, else null. */
+private fun exactBoundary(
+    text: String,
+    prefix: String?,
+): Int? {
+    val trimmed = prefix?.trim()?.takeIf { it.isNotEmpty() && it.length < text.length } ?: return null
+    if (!text.startsWith(trimmed)) return null
+    val end = skipSpaces(text, trimmed.length)
+    val wordEdge = end > trimmed.length || text.none(Char::isWhitespace)
+    return end.takeIf { wordEdge && it < text.length }
 }
 
 /** Positions right after clause or sentence punctuation (skipping following spaces). */
