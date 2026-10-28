@@ -242,14 +242,29 @@ internal class AiSubtitleTranslator(
             ?: withContext(Dispatchers.IO) { diskCache?.get(source, target, text) }?.also { cache.put(source, target, text, it) }
     }
 
-    /** Translates the sentences of [texts] not translated yet, in as few requests as needed. */
+    /**
+     * Translates the sentences of [texts] not translated yet, in as few requests as needed. The last
+     * request is filled up to [MAX_AI_BATCH_SENTENCES] with sentences from [ahead] (read only when a
+     * request is needed), so a window of one minute does not cost a request of its own and later
+     * minutes need fewer requests: free keys count requests, not their size.
+     */
     suspend fun translateAll(
         model: AiTranslationModel,
         sourceLanguageCode: String,
         targetLanguageCode: String,
         texts: List<String>,
+        ahead: (suspend () -> List<String>)? = null,
     ) {
-        aiBatches(missing(model, sourceLanguageCode, targetLanguageCode, texts)).forEach { batch ->
+        val needed = missing(model, sourceLanguageCode, targetLanguageCode, texts)
+        if (needed.isEmpty()) return
+        val neededTexts = needed.mapTo(HashSet()) { it.text }
+        val extra =
+            ahead
+                ?.invoke()
+                ?.let { missing(model, sourceLanguageCode, targetLanguageCode, it) }
+                .orEmpty()
+                .filter { it.text !in neededTexts }
+        aiBatches(needed + extra).takeWhile { batch -> batch.any { it.text in neededTexts } }.forEach { batch ->
             translate(model, sourceLanguageCode, targetLanguageCode, batch)
         }
     }

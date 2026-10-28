@@ -144,6 +144,13 @@ best and that other services may cost money or answer less reliably
 (`AiSubtitleTranslatorTest.aSentenceTheModelLeftOutIsNotAskedForAgain`,
 `afterAFailureTheAiRestsAndThenIsAskedAgain`, `markupTheModelAddsIsRemoved`).
 
+Then (owner request, same day): the playing window's AI request is filled up to 60 sentences with
+the sentences of minutes 2 to 5 ahead, so opening or seeking costs one request instead of a small
+one plus background ones (`theWindowRequestIsFilledWithSentencesAheadInOneRequest`). Estimated
+use on a free Gemini Flash-Lite key (500 requests a day): about 10 to 15 requests per 30-minute
+video, so 35 to 50 such videos a day. Free limits are per Google project, so extra keys add
+capacity only when they come from different projects.
+
 ## Release intent
 
 `release:patch` (default; no owner instruction to change it).

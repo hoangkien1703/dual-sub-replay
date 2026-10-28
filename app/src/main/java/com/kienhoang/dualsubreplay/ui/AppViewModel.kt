@@ -353,6 +353,9 @@ private const val YOUTUBE_TRANSLATION_WAIT_MS = 1_000L
 
 /** With Translate with AI, the playing window waits this long for the AI before Google translates it. */
 private const val AI_TRANSLATION_WAIT_MS = 6_000L
+
+/** Rows read to fill an AI request; 60 sentences need far fewer. */
+private const val AI_FILL_MAX_ROWS = 240
 internal const val NATURAL_SUBTITLES_PREFERENCE = "enhanced_natural_subtitles"
 internal const val HIDE_SOUND_CUES_PREFERENCE = "hide_sound_cues"
 internal const val WORD_LEARNING_ENABLED_PREFERENCE = "word_learning_mode_enabled"
@@ -1836,7 +1839,7 @@ class AppViewModel internal constructor(
         warmModelOnWifi(source, target)
         val waitMs = currentGoogleWaitMs()
         follow({ texts ->
-            val rest = ai?.let { model -> translateWithAi(model, languages, texts, googleRequests) } ?: texts
+            val rest = ai?.let { model -> translateWithAi(model, languages, texts, googleRequests) { aiFillTexts(store) } } ?: texts
             if (rest.isNotEmpty()) awaitWithin(googleRequests, waitMs) { googleTranslator.translateAll(source, target, rest) }
         }) { text ->
             // A line Google leaves blank on every address is translated on the device; the rest stays on Google.
@@ -1856,14 +1859,22 @@ class AppViewModel internal constructor(
         languages: Pair<String, String>,
         texts: List<String>,
         requests: CoroutineScope,
+        ahead: suspend () -> List<String>,
     ): List<String> {
         val (source, target) = languages
         try {
-            awaitWithin(requests, AI_TRANSLATION_WAIT_MS) { aiTranslator.translateAll(model, source, target, texts) }
+            awaitWithin(requests, AI_TRANSLATION_WAIT_MS) { aiTranslator.translateAll(model, source, target, texts, ahead) }
         } catch (_: IOException) {
             // Slow, refused or unreadable: Google translates these rows.
         }
         return texts.filter { aiTranslator.cachedTranslation(model, source, target, it) == null }
+    }
+
+    /** The sentences of minutes 2 to 5 ahead, which fill the playing window's AI request. */
+    private suspend fun aiFillTexts(store: SubtitleStore): List<String> {
+        val timeMs = playbackRequests.value.timeMs
+        val indices = store.indicesBetween(timeMs + PREFETCH_AHEAD_MS, timeMs + BACKGROUND_PREFETCH_AHEAD_MS, AI_FILL_MAX_ROWS)
+        return translationTexts(withContext(Dispatchers.IO) { store.read(indices) })
     }
 
     /** One background step with the AI; when it fails, Google takes the step as before. */

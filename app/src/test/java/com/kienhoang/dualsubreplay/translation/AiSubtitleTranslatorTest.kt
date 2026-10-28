@@ -187,4 +187,23 @@ class AiSubtitleTranslatorTest {
         val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["Việc thực <i>sự</i> nói ra là quan trọng."]}]}""", sentences)
         assertEquals(listOf("Việc thực sự nói ra là quan trọng."), parsed[0])
     }
+
+    @Test fun theWindowRequestIsFilledWithSentencesAheadInOneRequest() =
+        runBlocking {
+            val model =
+                FakeModel { user ->
+                    val count = JSONObject(user).getJSONArray("sentences").length()
+                    val items = (1..count).joinToString(",") { """{"id":$it,"rows":["Câu $it."]}""" }
+                    """{"sentences":[$items]}"""
+                }
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            val ahead = List(30) { "Later sentence $it." }
+            translator.translateAll(model, "en", "vi", listOf("Now."), ahead = { ahead })
+            assertEquals(1, model.requests.size)
+            assertEquals(31, JSONObject(model.requests.single()).getJSONArray("sentences").length())
+            assertEquals("Câu 31.", translator.cachedTranslation(model, "en", "vi", "Later sentence 29."))
+            // The next minute is already translated: nothing is sent and the look-ahead is not even read.
+            translator.translateAll(model, "en", "vi", listOf("Later sentence 3."), ahead = { error("not needed") })
+            assertEquals(1, model.requests.size)
+        }
 }
