@@ -230,3 +230,8 @@ each other.
   if that request was for another place), then Google translates it, then the device.
 - The assistant's translation status names the AI choice.
 
+Owner phone check on preview build565 (2026-10-28): works. Kien asked to drop "beta" and reword the
+AI explanations. Now: "AI translation (best quality)" (uses AI to translate, and Google Translate
+while the AI is loading) and "AI only" (waits for the AI instead of showing Google first). The model
+chips no longer repeat the assistant's model next to "Same as AI assistant".
+

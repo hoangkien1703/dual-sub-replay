@@ -73,8 +73,10 @@ class OnlineTranslationUiTest {
             .assertIsSelected()
         saveUiEvidence("settings-translate-subtitles-with-ai")
         composeRule.onNodeWithTag("google_wait_auto").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("ai_translation_model_gemini-flash-lite-latest").performScrollTo().performClick()
-        assertEquals(listOf("gemini-flash-lite-latest"), picked)
+        // The assistant's model (Gemini's default) is not offered twice.
+        composeRule.onNodeWithTag("ai_translation_model_gemini-flash-lite-latest").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_translation_model_gemini-flash-latest").performScrollTo().performClick()
+        assertEquals(listOf("gemini-flash-latest"), picked)
     }
 
     @Test

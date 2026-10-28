@@ -89,10 +89,11 @@ internal fun Context.aiTranslationModel(
         transport,
     )
 
-/** The AI assistant's model, then the other translation models its current service offers. */
+/** The AI assistant's model, then the other translation models its current service offers (without it again). */
 internal fun Context.aiTranslationModelChoices(): Pair<String, List<String>> {
     val settings = readAiAssistantSettings(getSharedPreferences(AI_SETTINGS_PREFERENCES, 0))
-    return aiTranslationDefaultModel(settings) to aiTranslationModelChoices(settings)
+    val assistant = aiTranslationDefaultModel(settings)
+    return assistant to aiTranslationModelChoices(settings).filter { it != assistant }
 }
 
 /**
