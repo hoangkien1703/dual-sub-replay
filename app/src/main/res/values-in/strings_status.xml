@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">Memakai terjemahan YouTube</string>
     <string name="translation_issue_youtube_message">Google Terjemahan sedang tidak berfungsi, jadi video ini memakai teks terjemahan dari YouTube sendiri; baris yang tidak diterjemahkan YouTube diterjemahkan di perangkat Anda. Aplikasi mencoba Google lagi setiap 2 menit dan di video berikutnya.</string>
     <string name="translation_issue_try_google">Coba Google lagi</string>
+    <string name="translation_issue_ai_title">Terjemahan AI dijeda</string>
+    <string name="translation_issue_ai_message">Terjemahan AI gagal, jadi baris Google Terjemahan ditampilkan. Aplikasi bertanya lagi ke AI setelah 30 detik. Periksa kunci AI dan batas hariannya di Setelan lainnya → Asisten AI.</string>
+    <string name="translation_issue_try_ai">Coba AI lagi</string>
+    <string name="problem_detail_show_more">Lihat selengkapnya</string>
+    <string name="problem_detail_show_less">Ciutkan</string>
 </resources>

@@ -12,6 +12,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import java.io.IOException
+import java.nio.file.Files
 
 class AiSubtitleTranslatorTest {
     private val sentence = "The reality is that two different things are happening at once right now."
@@ -191,6 +192,32 @@ class AiSubtitleTranslatorTest {
             assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
         }
 
+    @Test fun aFailureIsReportedUntilARequestSucceeds() =
+        runBlocking {
+            var failing = true
+            val model =
+                FakeModel {
+                    if (failing) throw IOException("HTTP 429: quota exceeded")
+                    """{"sentences":[{"id":1,"rows":["Một."]}]}"""
+                }
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            assertNull(translator.problem.value)
+            try {
+                translator.translateAll(model, "en", "vi", listOf("One."))
+                fail("expected a failure")
+            } catch (_: IOException) {
+            }
+            assertEquals("HTTP 429: quota exceeded", translator.problem.value)
+            // "Try AI again" ends the rest at once, so the next row asks without waiting 30 s.
+            failing = false
+            translator.tryAgain()
+            assertNull(translator.problem.value)
+            translator.translateAll(model, "en", "vi", listOf("One."))
+            assertEquals(2, model.requests.size)
+            assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
+            assertNull(translator.problem.value)
+        }
+
     @Test fun markupTheModelAddsIsRemoved() {
         val sentences = listOf(AiSentence("Saying it out loud matters.", listOf("Saying it out loud matters.")))
         val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["Việc thực <i>sự</i> nói ra là quan trọng."]}]}""", sentences)
@@ -269,6 +296,45 @@ class AiSubtitleTranslatorTest {
         assertEquals("and my voice gets higher too.", cleanAiRow(", and my voice gets higher too."))
         assertEquals("「そうです」", cleanAiRow("、「そうです」"))
     }
+
+    private val japanese = "っていうスキルは、本当に、家庭でも職場でも大事だと思うんですよね"
+    private val english = "I think that skill is really important both at home and in the workplace."
+
+    @Test fun aCopyOfTheSourceBeforeTheTranslationIsRemoved() {
+        val sentences = aiSentences(listOf(japanese))
+        // Owner report 2026-10-29: the row showed the Japanese line, then its translation.
+        val inOneRow = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese $english"]}]}""", sentences)
+        assertEquals(listOf(english), inOneRow[0])
+        val inAnExtraRow = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese","$english"]}]}""", sentences)
+        assertEquals(listOf(english), inAnExtraRow[0])
+        assertEquals(english, withoutSourceEcho("$japanese - $english", listOf(japanese)))
+    }
+
+    @Test fun aReplyThatOnlyCopiesTheSourceStaysForGoogle() {
+        val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese"]}]}""", aiSentences(listOf(japanese)))
+        assertNull(parsed[0])
+    }
+
+    @Test fun aTranslationStartingWithAKeptNameStaysWhole() {
+        assertEquals("Netflix là nền tảng lớn nhất.", withoutSourceEcho("Netflix là nền tảng lớn nhất.", listOf("Netflix")))
+        assertEquals("東京は大きい", withoutSourceEcho("東京は大きい", listOf("東京")))
+    }
+
+    @Test fun aLineCachedWithTheSourceCopyIsCleanedWhenRead() =
+        runBlocking {
+            val cache = Files.createTempDirectory("ai-echo").toFile()
+            try {
+                // A reply cached by an older version, before copies of the source were removed.
+                val model = FakeModel()
+                val translator = AiSubtitleTranslator(cache)
+                val disk = TranslationDiskCache(cache, maxEntries = 20_000, maxBytes = 16L * 1024 * 1024)
+                disk.put("${model.scope}:p$AI_PROMPT_VERSION:ja", "en", japanese, "$japanese $english")
+                assertEquals(english, translator.cachedTranslation(model, "ja", "en", japanese))
+                assertEquals(english, translator.shownTranslation(model, "ja", "en", japanese))
+            } finally {
+                cache.deleteRecursively()
+            }
+        }
 
     @Test fun thePromptExplainsSpeechRecognitionCaptions() {
         val prompt = aiTranslationSystemPrompt("ja", "en")

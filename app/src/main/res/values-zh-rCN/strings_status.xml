@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">正在使用 YouTube 翻译</string>
     <string name="translation_issue_youtube_message">Google 翻译目前无法使用，因此此视频使用 YouTube 自己的翻译字幕；YouTube 没有翻译的行会在设备上翻译。应用每 2 分钟以及在下一个视频时会再次尝试 Google。</string>
     <string name="translation_issue_try_google">再次尝试 Google</string>
+    <string name="translation_issue_ai_title">AI 翻译已暂停</string>
+    <string name="translation_issue_ai_message">AI 翻译失败，因此暂时显示 Google 翻译的译文。应用会在 30 秒后再次请求 AI。请在“更多设置 → AI 助手”中检查 AI 密钥和每日额度。</string>
+    <string name="translation_issue_try_ai">重试 AI</string>
+    <string name="problem_detail_show_more">显示更多</string>
+    <string name="problem_detail_show_less">收起</string>
 </resources>

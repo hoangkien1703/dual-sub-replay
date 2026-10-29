@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">Đang dùng bản dịch của YouTube</string>
     <string name="translation_issue_youtube_message">Google Dịch hiện không hoạt động, nên video này dùng phụ đề do chính YouTube dịch; những dòng YouTube không dịch sẽ được dịch trên thiết bị của bạn. Ứng dụng thử lại Google mỗi 2 phút và ở video tiếp theo.</string>
     <string name="translation_issue_try_google">Thử lại Google</string>
+    <string name="translation_issue_ai_title">Tạm dừng dịch bằng AI</string>
+    <string name="translation_issue_ai_message">Dịch bằng AI bị lỗi, nên tạm hiện bản dịch của Google Dịch. Ứng dụng sẽ hỏi lại AI sau 30 giây. Hãy kiểm tra khóa AI và giới hạn trong ngày ở Cài đặt khác → Trợ lý AI.</string>
+    <string name="translation_issue_try_ai">Thử lại AI</string>
+    <string name="problem_detail_show_more">Xem thêm</string>
+    <string name="problem_detail_show_less">Thu gọn</string>
 </resources>

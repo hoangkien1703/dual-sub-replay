@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">YouTube 번역 사용 중</string>
     <string name="translation_issue_youtube_message">지금은 Google 번역이 작동하지 않아 이 동영상은 YouTube 자체 번역 자막을 사용합니다. YouTube가 번역하지 않은 줄은 기기에서 번역합니다. 앱은 2분마다, 그리고 다음 동영상에서 Google을 다시 시도합니다.</string>
     <string name="translation_issue_try_google">Google 다시 시도</string>
+    <string name="translation_issue_ai_title">AI 번역 일시 중지</string>
+    <string name="translation_issue_ai_message">AI 번역이 실패하여 Google 번역 결과를 대신 표시합니다. 30초 후 AI에 다시 요청합니다. 추가 설정 → AI 도우미에서 AI 키와 일일 한도를 확인하세요.</string>
+    <string name="translation_issue_try_ai">AI 다시 시도</string>
+    <string name="problem_detail_show_more">더 보기</string>
+    <string name="problem_detail_show_less">접기</string>
 </resources>
