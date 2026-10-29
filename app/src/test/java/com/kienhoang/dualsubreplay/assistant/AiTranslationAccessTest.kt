@@ -28,9 +28,10 @@ class AiTranslationAccessTest {
     }
 
     @Test fun thinkingIsTurnedOffWhereTheServiceAllowsIt() {
-        assertEquals("none", aiTranslationEffort(AiProvider.GEMINI))
-        assertEquals("minimal", aiTranslationEffort(AiProvider.OPENAI))
-        assertNull(aiTranslationEffort(AiProvider.CLAUDE))
+        assertEquals("none", aiTranslationEffort(AiProvider.GEMINI, "gemini-flash-lite-latest"))
+        assertEquals("none", aiTranslationEffort(AiProvider.OPENAI, "gpt-6-luna"))
+        assertEquals("minimal", aiTranslationEffort(AiProvider.OPENAI, "gpt-5-mini"))
+        assertNull(aiTranslationEffort(AiProvider.CLAUDE, "claude-haiku-5-5"))
     }
 
     @Test fun requestsTakeTurnsOverTheKeys() =

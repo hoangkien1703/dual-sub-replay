@@ -755,7 +755,8 @@ internal class AiAssistantController(
         val searches = poster?.let { Searches(settings, route, it) }
         val run =
             AiAnswerRun(appActions, history, tools, memories, newId, settings.fullAccess, searches, webSearch) { messages, offered ->
-                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered, webSearch = this.webSearch)
+                val effort = aiAssistantEffort(settings, withTools = offered.isNotEmpty())
+                request(settings, messages, AI_CHAT_TIMEOUT_MS, effort, offered, webSearch = this.webSearch)
             }
         _state.update { it.copy(sending = true, failure = null, stopped = false) }
         sendJob =
