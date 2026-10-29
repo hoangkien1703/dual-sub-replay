@@ -102,6 +102,13 @@ def published_images():
     return set(re.findall(r"docs/images/([\w.-]+)", workflow))
 
 
+def published_release_files():
+    """Release assets that pages.yml downloads into the site root."""
+    workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
+    downloads = re.findall(r"gh release download (.*) --dir _site\n", workflow)
+    return {name for line in downloads for name in re.findall(r"--pattern '([\w.-]+)'", line)}
+
+
 class SiteTest(unittest.TestCase):
     def test_pages_have_search_metadata(self):
         for path, url in PAGES.items():
@@ -150,6 +157,7 @@ class SiteTest(unittest.TestCase):
 
     def test_local_links_resolve_in_published_site(self):
         images = published_images()
+        release_files = published_release_files()
         for path, url in PAGES.items():
             with self.subTest(path=path):
                 for ref in parse(path).refs:
@@ -161,6 +169,8 @@ class SiteTest(unittest.TestCase):
                         name = relative.removeprefix("images/")
                         self.assertIn(name, images, ref)
                         self.assertTrue((ROOT / "docs/images" / name).is_file(), ref)
+                    elif relative in release_files:
+                        continue
                     else:
                         file = SITE / (relative or "index.html")
                         if relative.endswith("/") or not relative:

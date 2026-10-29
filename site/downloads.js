@@ -37,3 +37,36 @@
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ total: total, at: Date.now() })); } catch (e) {}
   }).catch(function () {});
 })();
+
+// When the GitHub app is installed, Chrome hands the github.com APK link to it and the app's
+// in-app browser never finishes the download. Once a visitor has tapped a download link and
+// comes back to the page, show the [data-download-backup] links to the site's own APK copy.
+(function () {
+  var backups = document.querySelectorAll('[data-download-backup]');
+  if (!backups.length) return;
+
+  var STATE_KEY = 'dualsub-download-tapped';
+  var tapped = false;
+
+  function reveal() {
+    backups.forEach(function (el) { el.hidden = false; });
+  }
+
+  try {
+    if (sessionStorage.getItem(STATE_KEY)) reveal();
+  } catch (e) {}
+
+  document.addEventListener('click', function (event) {
+    var link = event.target.closest && event.target.closest('a[href$="/releases/latest/download/DualSub-Replay.apk"]');
+    if (!link) return;
+    tapped = true;
+    try { sessionStorage.setItem(STATE_KEY, '1'); } catch (e) {}
+  });
+
+  function onReturn() {
+    if (tapped && document.visibilityState === 'visible') reveal();
+  }
+  document.addEventListener('visibilitychange', onReturn);
+  window.addEventListener('pageshow', onReturn);
+  window.addEventListener('focus', onReturn);
+})();
