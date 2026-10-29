@@ -1,6 +1,5 @@
 [![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/hoangkien1703/dual-sub-replay/total?label=downloads&color=brightgreen)](https://github.com/hoangkien1703/dual-sub-replay/releases)
-[![GitHub stars](https://img.shields.io/github/stars/hoangkien1703/dual-sub-replay?style=flat&logo=github&color=yellow)](https://github.com/hoangkien1703/dual-sub-replay/stargazers)
 [![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
 [![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
 [![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
