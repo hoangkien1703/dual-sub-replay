@@ -7,6 +7,10 @@ on:
       - "site/**"
       - "docs/images/**"
       - ".github/workflows/pages.yml"
+  # Refresh the site's copy of the APK after each release.
+  workflow_run:
+    workflows: ["Release merged PR"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -18,7 +22,9 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository == 'hoangkien1703/dual-sub-replay' && github.ref == 'refs/heads/main'
+    if: >-
+      github.repository == 'hoangkien1703/dual-sub-replay' && github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -52,6 +58,17 @@ jobs:
             sed -i "s|<meta name=\"theme-color\"|<meta name=\"google-site-verification\" content=\"$GOOGLE_SITE_VERIFICATION\">\n  <meta name=\"theme-color\"|" _site/index.html
           fi
           find _site -type f | sort
+
+      # Chrome hands github.com links to the GitHub app when it is installed, and the app's
+      # in-app browser never finishes the APK download, so the site also serves its own copy.
+      - name: Copy the latest release APK into the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh release download --pattern 'DualSub-Replay.apk' --pattern 'DualSub-Replay.apk.sha256' --dir _site
+          (cd _site && sha256sum --check DualSub-Replay.apk.sha256)
 
       - name: Upload site
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
