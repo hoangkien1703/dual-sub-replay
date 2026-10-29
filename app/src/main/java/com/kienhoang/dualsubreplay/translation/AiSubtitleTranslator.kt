@@ -362,6 +362,21 @@ internal class AiSubtitleTranslator(
 
     @Volatile private var restUntil = Long.MIN_VALUE
 
+    private val failure = MutableStateFlow<String?>(null)
+
+    /**
+     * Why the last request failed (the service's own words), or null once one succeeds. Google's lines
+     * show meanwhile, so without this an AI that stopped working looks like plain Google (owner report
+     * 2026-10-29); the top-right icon shows it.
+     */
+    val problem: StateFlow<String?> = failure.asStateFlow()
+
+    /** Ends the rest after a failure, so the next row asks the AI at once. */
+    fun tryAgain() {
+        restUntil = Long.MIN_VALUE
+        failure.value = null
+    }
+
     /** What the AI has translated [text] to in this app run, without reading the disk; null when nothing yet. */
     fun shownTranslation(
         model: AiTranslationModel,
@@ -452,6 +467,9 @@ internal class AiSubtitleTranslator(
         asking += keys
         try {
             requests.withLock { translateNow(model, sourceLanguageCode to targetLanguageCode, source to target, batch) }
+        } catch (error: IOException) {
+            failure.value = error.message?.takeIf(String::isNotBlank) ?: error.javaClass.simpleName
+            throw error
         } finally {
             asking -= keys.toSet()
         }
@@ -510,6 +528,7 @@ internal class AiSubtitleTranslator(
         whole.forEachIndexed { index, rows -> if (rows != null) keep(index, rows) }
         if (found.isEmpty()) throw AiTranslationException("The AI reply translated none of the ${pending.size} sentences.")
         recent[contextKey] = pending.takeLast(AI_CONTEXT_SENTENCES).map { it.text }
+        failure.value = null
         save(scoped, found)
     }
 

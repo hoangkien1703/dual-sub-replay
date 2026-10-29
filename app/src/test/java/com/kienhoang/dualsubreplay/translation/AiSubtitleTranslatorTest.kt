@@ -192,6 +192,32 @@ class AiSubtitleTranslatorTest {
             assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
         }
 
+    @Test fun aFailureIsReportedUntilARequestSucceeds() =
+        runBlocking {
+            var failing = true
+            val model =
+                FakeModel {
+                    if (failing) throw IOException("HTTP 429: quota exceeded")
+                    """{"sentences":[{"id":1,"rows":["Một."]}]}"""
+                }
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            assertNull(translator.problem.value)
+            try {
+                translator.translateAll(model, "en", "vi", listOf("One."))
+                fail("expected a failure")
+            } catch (_: IOException) {
+            }
+            assertEquals("HTTP 429: quota exceeded", translator.problem.value)
+            // "Try AI again" ends the rest at once, so the next row asks without waiting 30 s.
+            failing = false
+            translator.tryAgain()
+            assertNull(translator.problem.value)
+            translator.translateAll(model, "en", "vi", listOf("One."))
+            assertEquals(2, model.requests.size)
+            assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
+            assertNull(translator.problem.value)
+        }
+
     @Test fun markupTheModelAddsIsRemoved() {
         val sentences = listOf(AiSentence("Saying it out loud matters.", listOf("Saying it out loud matters.")))
         val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["Việc thực <i>sự</i> nói ra là quan trọng."]}]}""", sentences)

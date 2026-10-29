@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.translation.GoogleWait
@@ -69,6 +71,11 @@ internal sealed interface TranslationIssue {
         val youTube: Boolean = false,
     ) : TranslationIssue
 
+    /** The AI translator failed, so Google's lines show; the AI is asked again after a short rest. */
+    data class AiPaused(
+        override val detail: String,
+    ) : TranslationIssue
+
     /** Translation stopped; the original captions keep playing. */
     data class Unavailable(
         override val detail: String,
@@ -81,6 +88,7 @@ internal fun DualSubUiState.translationIssue(): TranslationIssue? =
         activeVideoId == null -> null
         translationError != null -> TranslationIssue.Unavailable(translationError)
         onDeviceFallback -> TranslationIssue.OnDeviceFallback(onlineTranslationFailureDetail, youTube = youTubeTranslationFallback)
+        aiTranslation && translatesWithGoogle() && aiTranslationProblem != null -> TranslationIssue.AiPaused(aiTranslationProblem)
         else -> null
     }
 
@@ -98,7 +106,8 @@ internal fun TranslationIssueButton(
 ) {
     if (issue == null) return
     var expanded by remember { mutableStateOf(false) }
-    val fallback = issue is TranslationIssue.OnDeviceFallback
+    // Translation still works (on the device, or with Google instead of the AI): the mild icon, and "try again".
+    val fallback = issue !is TranslationIssue.Unavailable
     Box {
         IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("translation_issue_button")) {
             Icon(
@@ -131,7 +140,8 @@ internal fun TranslationIssueDetails(
     issue: TranslationIssue,
     onAction: () -> Unit,
 ) {
-    val fallback = issue is TranslationIssue.OnDeviceFallback
+    val fallback = issue !is TranslationIssue.Unavailable
+    val ai = issue is TranslationIssue.AiPaused
     val youTube = (issue as? TranslationIssue.OnDeviceFallback)?.youTube == true
     Column(
         Modifier.widthIn(max = 300.dp).padding(start = 16.dp, end = 8.dp, top = 8.dp).testTag("translation_issue_details"),
@@ -140,6 +150,7 @@ internal fun TranslationIssueDetails(
         Text(
             stringResource(
                 when {
+                    ai -> R.string.translation_issue_ai_title
                     youTube -> R.string.translation_issue_youtube_title
                     fallback -> R.string.translation_issue_on_device_title
                     else -> R.string.player_translation_unavailable
@@ -149,21 +160,60 @@ internal fun TranslationIssueDetails(
         )
         if (fallback) {
             Text(
-                stringResource(if (youTube) R.string.translation_issue_youtube_message else R.string.translation_issue_on_device_message),
+                stringResource(
+                    when {
+                        ai -> R.string.translation_issue_ai_message
+                        youTube -> R.string.translation_issue_youtube_message
+                        else -> R.string.translation_issue_on_device_message
+                    },
+                ),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
         // Diagnostic text (for example the HTTP status) so a report says why it failed.
-        issue.detail?.let {
+        issue.detail?.let { ProblemDetailText(it, Modifier.testTag("translation_issue_detail")) }
+        TextButton(onClick = onAction, modifier = Modifier.align(Alignment.End).testTag("translation_issue_action")) {
             Text(
-                it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.testTag("translation_issue_detail"),
+                stringResource(
+                    when {
+                        ai -> R.string.translation_issue_try_ai
+                        fallback -> R.string.translation_issue_try_google
+                        else -> R.string.player_retry_translation
+                    },
+                ),
             )
         }
-        TextButton(onClick = onAction, modifier = Modifier.align(Alignment.End).testTag("translation_issue_action")) {
-            Text(stringResource(if (fallback) R.string.translation_issue_try_google else R.string.player_retry_translation))
-        }
+    }
+}
+
+/** Lines of a problem's diagnostic text shown before "Show more". */
+private const val PROBLEM_DETAIL_LINES = 3
+
+/**
+ * A problem's diagnostic text, cut to [PROBLEM_DETAIL_LINES] lines: a service's error can run to a
+ * paragraph (owner request 2026-10-29). Tapping it shows all of it, and tapping again cuts it.
+ */
+@Composable
+internal fun ProblemDetailText(
+    detail: String,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember(detail) { mutableStateOf(false) }
+    var cut by remember(detail) { mutableStateOf(false) }
+    val toggle = stringResource(if (expanded) R.string.problem_detail_show_less else R.string.problem_detail_show_more)
+    val tappable = cut || expanded
+    Column(
+        modifier.then(if (tappable) Modifier.clickable(onClickLabel = toggle) { expanded = !expanded } else Modifier),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            detail,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline,
+            maxLines = if (expanded) Int.MAX_VALUE else PROBLEM_DETAIL_LINES,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { layout -> if (!expanded) cut = layout.hasVisualOverflow },
+        )
+        if (tappable) Text(toggle, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
     }
 }

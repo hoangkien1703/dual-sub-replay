@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">YouTube の翻訳を使用中</string>
     <string name="translation_issue_youtube_message">現在 Google 翻訳が使えないため、この動画では YouTube 自身の翻訳字幕を使っています。YouTube が翻訳しない行は端末で翻訳します。アプリは 2 分ごとと次の動画で Google をもう一度試します。</string>
     <string name="translation_issue_try_google">Google をもう一度試す</string>
+    <string name="translation_issue_ai_title">AI翻訳を一時停止中</string>
+    <string name="translation_issue_ai_message">AI翻訳が失敗したため、Google翻訳の訳を表示しています。30秒後にもう一度AIに問い合わせます。その他の設定 → AI アシスタントで、AIキーと1日の上限を確認してください。</string>
+    <string name="translation_issue_try_ai">AIをもう一度試す</string>
+    <string name="problem_detail_show_more">もっと見る</string>
+    <string name="problem_detail_show_less">閉じる</string>
 </resources>

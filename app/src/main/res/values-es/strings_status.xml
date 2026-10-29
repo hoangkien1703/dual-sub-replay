@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">Usando la traducción de YouTube</string>
     <string name="translation_issue_youtube_message">Google Traductor no funciona ahora mismo, así que este video usa los subtítulos traducidos del propio YouTube; las líneas que YouTube no traduce se traducen en tu dispositivo. La app vuelve a probar Google cada 2 minutos y en el siguiente video.</string>
     <string name="translation_issue_try_google">Volver a probar Google</string>
+    <string name="translation_issue_ai_title">Traducción con IA en pausa</string>
+    <string name="translation_issue_ai_message">La traducción con IA falló, así que se muestran las líneas de Google Translate. La app vuelve a preguntar a la IA en 30 segundos. Revisa tu clave de IA y su límite diario en Más ajustes → Asistente de IA.</string>
+    <string name="translation_issue_try_ai">Reintentar IA</string>
+    <string name="problem_detail_show_more">Ver más</string>
+    <string name="problem_detail_show_less">Ver menos</string>
 </resources>

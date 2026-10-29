@@ -32,6 +32,14 @@ class TranslationIssueTest {
         assertEquals(TranslationIssue.Unavailable("The translation model download took too long."), stopped.translationIssue())
     }
 
+    @Test fun aFailingAiShowsWhyWhileGoogleLinesShow() {
+        val ai = google.copy(aiTranslation = true, aiTranslationProblem = "HTTP 429: quota exceeded")
+        assertEquals(TranslationIssue.AiPaused("HTTP 429: quota exceeded"), ai.translationIssue())
+        // With AI translation turned off, an old AI problem is not shown; a Google fallback outranks it.
+        assertNull(ai.copy(aiTranslation = false).translationIssue())
+        assertEquals(TranslationIssue.OnDeviceFallback(null), ai.copy(onDeviceFallback = true).translationIssue())
+    }
+
     @Test fun googleTranslatesOnlyWhenChosenAndNotFallenBack() {
         assertTrue(google.translatesWithGoogle())
         assertFalse(google.copy(translationEngine = TranslationEngine.ON_DEVICE).translatesWithGoogle())

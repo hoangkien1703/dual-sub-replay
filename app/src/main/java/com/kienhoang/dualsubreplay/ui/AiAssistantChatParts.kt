@@ -81,9 +81,7 @@ internal fun AppProblemCard(
                 Text(problem.title, style = MaterialTheme.typography.titleSmall)
             }
             problem.message?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-            problem.detail?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-            }
+            problem.detail?.let { ProblemDetailText(it) }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 if (canAsk) {
                     TextButton(onClick = onAsk, modifier = Modifier.testTag("ai_problem_ask")) {

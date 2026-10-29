@@ -158,6 +158,29 @@ class OnlineTranslationUiTest {
     }
 
     @Test
+    fun aFailingAiShowsALongReasonCutAndTriesTheAiAgain() {
+        var triedAgain = 0
+        val reason = "HTTP 429: You exceeded your current quota. " + "Please check your plan and billing details. ".repeat(12)
+        composeRule.setContent {
+            DualSubTheme {
+                TranslationIssueButton(
+                    TranslationIssue.AiPaused(reason.trim()),
+                    onTryGoogleAgain = { triedAgain++ },
+                    onRetryTranslation = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag("translation_issue_button").performClick()
+        composeRule.onNodeWithText("AI translation paused").assertIsDisplayed()
+        // The long reason starts cut to three lines; tapping it shows all of it.
+        composeRule.onNodeWithText("Show more").assertIsDisplayed()
+        composeRule.onNodeWithTag("translation_issue_detail").performClick()
+        composeRule.onNodeWithText("Show less").assertIsDisplayed()
+        composeRule.onNodeWithText("Try AI again").performClick()
+        assertEquals(1, triedAgain)
+    }
+
+    @Test
     fun noIconWhileTranslationWorks() {
         composeRule.setContent {
             DualSubTheme {

@@ -86,6 +86,17 @@ internal fun appProblems(
                     action = onTryGoogleAgain,
                     mild = true,
                 )
+        is TranslationIssue.AiPaused ->
+            problems +=
+                AppProblem(
+                    key = "translation_ai_paused",
+                    title = stringResource(R.string.translation_issue_ai_title),
+                    message = stringResource(R.string.translation_issue_ai_message),
+                    detail = issue.detail,
+                    actionLabel = stringResource(R.string.translation_issue_try_ai),
+                    action = onTryGoogleAgain,
+                    mild = true,
+                )
         is TranslationIssue.Unavailable ->
             problems +=
                 AppProblem(

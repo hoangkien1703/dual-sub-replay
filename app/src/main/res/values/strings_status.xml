@@ -30,4 +30,9 @@
     <string name="translation_issue_youtube_title">Using YouTube\'s translation</string>
     <string name="translation_issue_youtube_message">Google Translate isn\'t working right now, so this video uses YouTube\'s own translated captions; lines YouTube leaves out are translated on your device. The app checks Google again every 2 minutes and on the next video.</string>
     <string name="translation_issue_try_google">Try Google again</string>
+    <string name="translation_issue_ai_title">AI translation paused</string>
+    <string name="translation_issue_ai_message">The AI translation failed, so Google Translate\'s lines show instead. The app asks the AI again after 30 seconds. Check your AI key and its daily limit in More settings → AI assistant.</string>
+    <string name="translation_issue_try_ai">Try AI again</string>
+    <string name="problem_detail_show_more">Show more</string>
+    <string name="problem_detail_show_less">Show less</string>
 </resources>
