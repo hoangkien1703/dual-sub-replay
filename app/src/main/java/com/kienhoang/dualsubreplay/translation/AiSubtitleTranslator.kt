@@ -114,6 +114,7 @@ internal fun aiTranslationSystemPrompt(
         Captions are often made by automatic speech recognition: punctuation may be missing, so one spoken sentence can be cut across several input sentences, and some words are misheard. Read the sentences as one continuous speech. When a sentence is only a piece of a longer one, translate it as that piece so that reading the translations in order gives the whole sentence naturally. When a word makes no sense in context, translate what the speaker most likely said (a word that sounds similar), not the misheard word.
         Fill in subjects the source leaves out (common in Japanese, Korean, Chinese and Vietnamese) from context; when someone talks about their own life, it is usually "I".
         Translate naturally, as a native speaker would say it in this situation, keeping the speaker's tone, slang and jokes. Keep names, brands, code and numbers as they are.
+        Write only the translation in each row, never a copy of the source text.
         Split each sentence's translation into exactly as many rows as the source sentence has, in the same order. Each row holds the part of the translation that says what its source row says, as far as natural word order allows. Do not leave a row empty unless its source row is only a filler word, and do not start a row with a comma.
         Answer with JSON only, no comments and no code fences: {"sentences":[{"id":<id>,"rows":["…", …]}, …]} with every id from the input.
         """.trimIndent()
@@ -166,9 +167,51 @@ private fun aiRows(
     sentence: AiSentence,
 ): List<String>? {
     val rows = item.optJSONArray("rows") ?: return null
-    val cleaned = (0 until rows.length()).map { cleanAiRow(rows.optString(it)) }
-    return cleaned.takeIf { it.any(String::isNotEmpty) }?.let { fitRows(it, sentence.rows.size) }
+    val sources = sentence.rows + sentence.text
+    val cleaned =
+        (0 until rows.length())
+            .map { withoutSourceEcho(cleanAiRow(rows.optString(it)), sources) }
+            // A row that only copies the source, written next to its translation, is dropped.
+            .let { all -> if (all.size > sentence.rows.size) all.filterNot { isSourceEcho(it, sources) } else all }
+    return cleaned
+        .takeIf { it.any { row -> row.isNotEmpty() && !isSourceEcho(row, sources) } }
+        ?.let { fitRows(it, sentence.rows.size) }
 }
+
+/** Separators a model puts between a copied source and its translation ("…よね - I think…"). */
+private const val ECHO_SEPARATORS = "-–—:：=→|/"
+
+/**
+ * [row] without a copy of one of [sources] written before its translation ("っていうスキルは…よね I think that
+ * skill…", owner report 2026-10-29); the model sometimes repeats the source row. Only a copy long enough not to
+ * be a kept name counts (see [canBeSourceEcho]), so "Netflix là…" stays whole.
+ */
+internal fun withoutSourceEcho(
+    row: String,
+    sources: List<String>,
+): String {
+    val trimmed = row.trim()
+    val echoes = sources.map(String::trim).filter(::canBeSourceEcho).sortedByDescending { it.length }
+    for (source in echoes) {
+        if (trimmed.length <= source.length || !trimmed.startsWith(source)) continue
+        val rest = trimmed.substring(source.length).trimStart { it.isWhitespace() || it in ECHO_SEPARATORS }
+        if (rest.isNotEmpty()) return rest
+    }
+    return trimmed
+}
+
+/** Whether [row] is nothing but a copy of one of [sources]. */
+private fun isSourceEcho(
+    row: String,
+    sources: List<String>,
+): Boolean = canBeSourceEcho(row) && sources.any { it.trim() == row }
+
+/** Three words or more, or four characters of a script written without spaces: too long to be a name kept as is. */
+private fun canBeSourceEcho(text: String): Boolean =
+    text.split(SPACES).count(String::isNotEmpty) >= 3 ||
+        (text.length >= 4 && text.none(Char::isWhitespace) && writtenWithoutSpaces(text.first()))
+
+private val SPACES = Regex("\\s+")
 
 /**
  * Reads a reply while it streams in: each sentence's `{"id":…,"rows":[…]}` is handed over as soon as
@@ -327,7 +370,7 @@ internal class AiSubtitleTranslator(
         text: String,
     ): String? {
         val (source, target) = pair(model, sourceLanguageCode, targetLanguageCode)
-        return cache.get(source, target, text)
+        return cache.get(source, target, text)?.let { withoutSourceEcho(it, listOf(text)) }
     }
 
     suspend fun cachedTranslation(
@@ -338,8 +381,11 @@ internal class AiSubtitleTranslator(
     ): String? {
         val (source, target) = pair(model, sourceLanguageCode, targetLanguageCode)
         if (text.isBlank()) return text
-        return cache.get(source, target, text)
-            ?: withContext(Dispatchers.IO) { diskCache?.get(source, target, text) }?.also { cache.put(source, target, text, it) }
+        // Lines cached before echoes were removed (v1.8.6 and older) are cleaned as they are read.
+        val translation =
+            cache.get(source, target, text)
+                ?: withContext(Dispatchers.IO) { diskCache?.get(source, target, text) }?.also { cache.put(source, target, text, it) }
+        return translation?.let { withoutSourceEcho(it, listOf(text)) }
     }
 
     /**

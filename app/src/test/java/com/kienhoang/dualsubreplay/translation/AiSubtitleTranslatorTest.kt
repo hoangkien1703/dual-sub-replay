@@ -12,6 +12,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import java.io.IOException
+import java.nio.file.Files
 
 class AiSubtitleTranslatorTest {
     private val sentence = "The reality is that two different things are happening at once right now."
@@ -269,6 +270,45 @@ class AiSubtitleTranslatorTest {
         assertEquals("and my voice gets higher too.", cleanAiRow(", and my voice gets higher too."))
         assertEquals("「そうです」", cleanAiRow("、「そうです」"))
     }
+
+    private val japanese = "っていうスキルは、本当に、家庭でも職場でも大事だと思うんですよね"
+    private val english = "I think that skill is really important both at home and in the workplace."
+
+    @Test fun aCopyOfTheSourceBeforeTheTranslationIsRemoved() {
+        val sentences = aiSentences(listOf(japanese))
+        // Owner report 2026-10-29: the row showed the Japanese line, then its translation.
+        val inOneRow = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese $english"]}]}""", sentences)
+        assertEquals(listOf(english), inOneRow[0])
+        val inAnExtraRow = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese","$english"]}]}""", sentences)
+        assertEquals(listOf(english), inAnExtraRow[0])
+        assertEquals(english, withoutSourceEcho("$japanese - $english", listOf(japanese)))
+    }
+
+    @Test fun aReplyThatOnlyCopiesTheSourceStaysForGoogle() {
+        val parsed = parseAiTranslationReply("""{"sentences":[{"id":1,"rows":["$japanese"]}]}""", aiSentences(listOf(japanese)))
+        assertNull(parsed[0])
+    }
+
+    @Test fun aTranslationStartingWithAKeptNameStaysWhole() {
+        assertEquals("Netflix là nền tảng lớn nhất.", withoutSourceEcho("Netflix là nền tảng lớn nhất.", listOf("Netflix")))
+        assertEquals("東京は大きい", withoutSourceEcho("東京は大きい", listOf("東京")))
+    }
+
+    @Test fun aLineCachedWithTheSourceCopyIsCleanedWhenRead() =
+        runBlocking {
+            val cache = Files.createTempDirectory("ai-echo").toFile()
+            try {
+                // A reply cached by an older version, before copies of the source were removed.
+                val model = FakeModel()
+                val translator = AiSubtitleTranslator(cache)
+                val disk = TranslationDiskCache(cache, maxEntries = 20_000, maxBytes = 16L * 1024 * 1024)
+                disk.put("${model.scope}:p$AI_PROMPT_VERSION:ja", "en", japanese, "$japanese $english")
+                assertEquals(english, translator.cachedTranslation(model, "ja", "en", japanese))
+                assertEquals(english, translator.shownTranslation(model, "ja", "en", japanese))
+            } finally {
+                cache.deleteRecursively()
+            }
+        }
 
     @Test fun thePromptExplainsSpeechRecognitionCaptions() {
         val prompt = aiTranslationSystemPrompt("ja", "en")
