@@ -161,21 +161,6 @@ No account or API key is required, and the app has no analytics or advertising S
 - YouTube's official Data API does not let ordinary viewers download captions from arbitrary public videos, so DualSub Replay reads them through YouTube's undocumented internal interfaces. They can change without notice, and their use may be restricted by YouTube's terms. That code is isolated in `YouTubeCaptionProvider` so it can be replaced.
 - Videos play in YouTube's own mobile webpage player; the app does not download video. Spoken-word highlighting depends on YouTube's page and may be unavailable or less precise on some videos and phones, in which case it falls back to sentence timing.
 
-## Community
-
-> "Thank you for creating and sharing DualSub Replay. It's a great open-source app!"
->
-> — [mrAlishah](https://github.com/hoangkien1703/dual-sub-replay/discussions/81#discussioncomment-19228373), who built [Triple Sub Replay](https://github.com/mrAlishah/triple-sub-replay), a fork that adds a third subtitle line for learning German with English and Persian, and became this project's first code contributor
-
-Ideas and questions are welcome in [Discussions](https://github.com/hoangkien1703/dual-sub-replay/discussions). Bug reports and feature requests go to [Issues](https://github.com/hoangkien1703/dual-sub-replay/issues).
-
-<a href="https://star-history.com/#hoangkien1703/dual-sub-replay&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangkien1703/dual-sub-replay&type=Date&theme=dark">
-    <img src="https://api.star-history.com/svg?repos=hoangkien1703/dual-sub-replay&type=Date" alt="Star history of DualSub Replay on GitHub" width="600">
-  </picture>
-</a>
-
 ## For developers
 
 ### Build
