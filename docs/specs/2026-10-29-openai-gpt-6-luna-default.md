@@ -32,6 +32,8 @@ owner picked "Yes, switch to GPT-6 Luna". This does not authorize merging or pub
   models, "none" for every other OpenAI model (`openAiNoThinkingEffort`).
 - With Auto thinking and actions offered, an OpenAI model outside the first GPT-5 models gets
   `reasoning_effort: "none"` (`aiAssistantEffort`). Low, Medium and High are still sent as chosen.
+  If the service refuses that "none" as a thinking level, the round is asked again without a
+  thinking level, as Auto always was (owner merged without a live test, so this keeps Auto working).
 - A 400 about `reasoning_effort` on a request with tools and a thinking level is a thinking-level
   problem (`UNSUPPORTED_THINKING`: "Choose Auto under the chat box"), not a refusal of actions.
 
@@ -43,7 +45,7 @@ owner picked "Yes, switch to GPT-6 Luna". This does not authorize merging or pub
 ## Validation
 
 - Unit tests: default and quick list (`AiSettingsTest`), effort per model and Auto with tools
-  (`AiSettingsTest`), translation effort (`AiTranslationAccessTest`), the tools + reasoning_effort
+  (`AiSettingsTest`), Auto's retry (`AiAssistantControllerTest`), translation effort (`AiTranslationAccessTest`), the tools + reasoning_effort
   400 (`AiChatClientTest`).
 - Result 2026-10-29 in a cloud container: `formatCheck`, `complexityCheck`, `lintDebug` and all 1,006
   `testDebugUnitTest` tests passed.
