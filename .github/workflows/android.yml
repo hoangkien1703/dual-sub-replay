@@ -2,7 +2,8 @@ name: Android build and releases
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    # No ready_for_review: drafts already run CI, so marking one ready would only repeat it on the same commit.
+    types: [opened, synchronize, reopened]
   # setup-gradle only saves caches from the default branch, so main runs keep PR caches fresh.
   push:
     branches: [main]
