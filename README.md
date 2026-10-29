@@ -1,5 +1,6 @@
 [![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/hoangkien1703/dual-sub-replay/total?label=downloads&color=brightgreen)](https://github.com/hoangkien1703/dual-sub-replay/releases)
+[![GitHub stars](https://img.shields.io/github/stars/hoangkien1703/dual-sub-replay?style=flat&logo=github&color=yellow)](https://github.com/hoangkien1703/dual-sub-replay/stargazers)
 [![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
 [![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
 [![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
@@ -30,6 +31,8 @@ Android may show a warning because the app comes from GitHub instead of Google P
 
 **Obtainium:** if you use [Obtainium](https://obtainium.imranr.dev/), [add DualSub Replay to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/hoangkien1703/dual-sub-replay) to get updates straight from GitHub releases.
 
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/hoangkien1703/dual-sub-replay"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54"></a>
+
 > **About preview builds:** they install as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
 
 ## See it in action
@@ -55,6 +58,17 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
 - **Learn the words you hear.** Tap a word for its meaning, part of speech, pronunciation and, for English, Japanese and Chinese, the grammar around it.
 - **Remember them.** Save words with their original sentence and review them with spaced repetition.
 - **Stay private.** There is no account, no tracking, and no ads. Translation uses Google Translate by default, or turn it off and your phone translates on its own.
+
+### How it compares
+
+| App | On Android | Cost | Best at |
+| --- | --- | --- | --- |
+| **DualSub Replay** | App with YouTube inside | Free, open source, no ads | Tap-to-replay, word lookup, grammar help, saved-word practice |
+| Trancy | App and browser extension | Free plan; Premium from about $3.49 a month | Bilingual subtitles; AI tools need Premium, free plan saves up to 100 words |
+| LingoTube | App on Google Play | Free, with ads | Dual captions with A-B repeat |
+| Language Reactor | No Android app (desktop Chrome only) | Free, paid Pro plan | Studying YouTube and Netflix on a computer |
+
+Facts checked in October 2026. See the [full comparison](https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/) for Migaku, Dualsub and more.
 
 If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
 
@@ -147,6 +161,21 @@ No account or API key is required, and the app has no analytics or advertising S
 
 - YouTube's official Data API does not let ordinary viewers download captions from arbitrary public videos, so DualSub Replay reads them through YouTube's undocumented internal interfaces. They can change without notice, and their use may be restricted by YouTube's terms. That code is isolated in `YouTubeCaptionProvider` so it can be replaced.
 - Videos play in YouTube's own mobile webpage player; the app does not download video. Spoken-word highlighting depends on YouTube's page and may be unavailable or less precise on some videos and phones, in which case it falls back to sentence timing.
+
+## Community
+
+> "Thank you for creating and sharing DualSub Replay. It's a great open-source app!"
+>
+> — [mrAlishah](https://github.com/hoangkien1703/dual-sub-replay/discussions/81#discussioncomment-19228373), who built [Triple Sub Replay](https://github.com/mrAlishah/triple-sub-replay), a fork that adds a third subtitle line for learning German with English and Persian, and became this project's first code contributor
+
+Ideas and questions are welcome in [Discussions](https://github.com/hoangkien1703/dual-sub-replay/discussions). Bug reports and feature requests go to [Issues](https://github.com/hoangkien1703/dual-sub-replay/issues).
+
+<a href="https://star-history.com/#hoangkien1703/dual-sub-replay&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangkien1703/dual-sub-replay&type=Date&theme=dark">
+    <img src="https://api.star-history.com/svg?repos=hoangkien1703/dual-sub-replay&type=Date" alt="Star history of DualSub Replay on GitHub" width="600">
+  </picture>
+</a>
 
 ## For developers
 
