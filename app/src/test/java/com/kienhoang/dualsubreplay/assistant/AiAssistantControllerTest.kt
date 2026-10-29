@@ -726,6 +726,21 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun autoAsksLaterGptsWithoutThinkingAndAgainAsBeforeWhenThatIsRefused() {
+        settings.value = AiAssistantSettings(provider = AiProvider.OPENAI)
+        keyStore.save(AiProvider.OPENAI, openAiKey)
+        keyStore.markChecked(AiProvider.OPENAI, aiCheckedSetup(settings.value, AiProvider.OPENAI))
+        val controller = controller().also { it.appActions = RecordingApp() }
+        controller.send("Why?", "guide")
+        assertEquals("gpt-6-luna", transport.requests.last().model)
+        assertEquals("none", transport.requests.last().reasoningEffort)
+        transport.failOnce += AiChatException(AiErrorKind.UNSUPPORTED_THINKING)
+        controller.send("And this?", "guide")
+        assertEquals(listOf("none", null), transport.requests.takeLast(2).map { it.reasoningEffort })
+        assertNull(controller.state.value.failure)
+    }
+
+    @Test
     fun theModelListComesFromTheServiceWithoutModelsThatCannotChat() {
         checkedGeminiKey()
         val controller = controller()

@@ -51,10 +51,13 @@ internal fun aiTranslationModelName(
 ): String = chosen?.takeIf { it in aiTranslationModelChoices(settings) } ?: aiTranslationDefaultModel(settings)
 
 /** Turns thinking off where the service allows it: translation needs speed, and free limits count thinking tokens. */
-internal fun aiTranslationEffort(provider: AiProvider): String? =
+internal fun aiTranslationEffort(
+    provider: AiProvider,
+    model: String,
+): String? =
     when (provider) {
         AiProvider.GEMINI -> "none"
-        AiProvider.OPENAI -> "minimal"
+        AiProvider.OPENAI -> openAiNoThinkingEffort(model)
         else -> null
     }
 
@@ -168,7 +171,7 @@ private class KeyedAiTranslationModel(
     private val pacedIds = keyIds.map { "${provider.key}/$it" }
 
     /** Cleared once the model refuses the thinking setting, so later requests do not fail first. */
-    @Volatile private var effort = aiTranslationEffort(provider)
+    @Volatile private var effort = aiTranslationEffort(provider, model)
 
     override suspend fun ask(
         system: String,

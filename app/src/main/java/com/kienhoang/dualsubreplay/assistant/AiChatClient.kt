@@ -382,6 +382,20 @@ internal fun redactApiKey(
     return if (redacted.length > MAX_AI_ERROR_DETAIL_CHARS) redacted.take(MAX_AI_ERROR_DETAIL_CHARS) + "…" else redacted
 }
 
+/**
+ * Later GPTs answer 400 "Function tools with reasoning_effort are not supported": the thinking level is
+ * the problem, so the actions are not dropped.
+ */
+private fun thinkingRefusedWithTools(
+    code: Int,
+    lower: String,
+    sentThinking: Boolean,
+    sentTools: Boolean,
+): AiErrorKind? =
+    AiErrorKind.UNSUPPORTED_THINKING.takeIf {
+        sentThinking && sentTools && code == 400 && ("reasoning_effort" in lower || "reasoning effort" in lower)
+    }
+
 /** A refusal of what came with the question (web search, actions, pictures and files, or a thinking level), or null. */
 private fun unsupportedExtra(
     code: Int,
@@ -415,7 +429,10 @@ internal fun aiErrorKindForStatus(
     sentWebSearch: Boolean = false,
 ): AiErrorKind {
     val lower = message.orEmpty().lowercase()
-    unsupportedExtra(code, lower, sentThinking, sentAttachments, sentTools, sentWebSearch)?.let { return it }
+    (
+        thinkingRefusedWithTools(code, lower, sentThinking, sentTools)
+            ?: unsupportedExtra(code, lower, sentThinking, sentAttachments, sentTools, sentWebSearch)
+    )?.let { return it }
     return when {
         code == 401 -> AiErrorKind.INVALID_KEY
         // OpenRouter also answers 403 for a model it keeps for coding apps; only a key problem names the key.

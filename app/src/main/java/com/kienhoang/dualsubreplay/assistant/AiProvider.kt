@@ -70,12 +70,14 @@ internal enum class AiProvider(
         labelRes = R.string.ai_provider_openai,
         noteRes = R.string.ai_provider_openai_note,
         baseUrl = "https://api.openai.com/v1",
-        defaultModel = "gpt-5-mini",
+        // The cheapest current GPT (owner pick 2026-10-29): $0.10 / $0.50 per million tokens in / out,
+        // against gpt-5-mini's $0.25 / $2.00.
+        defaultModel = "gpt-6-luna",
         keyPageUrl = "https://platform.openai.com/api-keys",
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_openai,
         createKeyStepRes = R.string.ai_setup_step_create_openai,
-        suggestedModels = listOf("gpt-5-mini", "gpt-5-nano", "gpt-5"),
+        suggestedModels = listOf("gpt-6-luna", "gpt-6.1-sol", "gpt-5-mini"),
     ),
 
     /** Anthropic's Claude, through its own Messages API. Keys start with `sk-ant-`. */

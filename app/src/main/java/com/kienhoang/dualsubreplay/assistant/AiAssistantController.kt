@@ -755,7 +755,7 @@ internal class AiAssistantController(
         val searches = poster?.let { Searches(settings, route, it) }
         val run =
             AiAnswerRun(appActions, history, tools, memories, newId, settings.fullAccess, searches, webSearch) { messages, offered ->
-                request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, offered, webSearch = this.webSearch)
+                answer(settings, messages, offered, webSearch = this.webSearch)
             }
         _state.update { it.copy(sending = true, failure = null, stopped = false) }
         sendJob =
@@ -858,6 +858,25 @@ internal class AiAssistantController(
                 }
             }
         current.copy(chat = chat.copy(messages = messages))
+    }
+
+    /**
+     * Asks one round of an answer. When the service refuses the thinking level the app chose for Auto
+     * ([aiAssistantEffort]), it is asked again without one, as Auto always was.
+     */
+    private suspend fun answer(
+        settings: AiAssistantSettings,
+        messages: List<AiWireMessage>,
+        tools: List<AiTool>,
+        webSearch: Boolean,
+    ): AiReply {
+        val effort = aiAssistantEffort(settings, withTools = tools.isNotEmpty())
+        return try {
+            request(settings, messages, AI_CHAT_TIMEOUT_MS, effort, tools, webSearch = webSearch)
+        } catch (error: AiChatException) {
+            if (error.kind != AiErrorKind.UNSUPPORTED_THINKING || effort == settings.thinking.effort) throw error
+            request(settings, messages, AI_CHAT_TIMEOUT_MS, settings.thinking.effort, tools, webSearch = webSearch)
+        }
     }
 
     /**

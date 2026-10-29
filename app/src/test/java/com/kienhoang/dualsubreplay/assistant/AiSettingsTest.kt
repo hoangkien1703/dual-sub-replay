@@ -115,6 +115,32 @@ class AiSettingsTest {
     }
 
     @Test
+    fun newOpenAiKeysStartOnGpt6Luna() {
+        assertEquals("gpt-6-luna", AiAssistantSettings().modelFor(AiProvider.OPENAI))
+        assertEquals(listOf("gpt-6-luna", "gpt-6.1-sol", "gpt-5-mini"), AiProvider.OPENAI.suggestedModels)
+    }
+
+    @Test
+    fun onlyTheFirstGpt5ModelsTurnThinkingOffWithMinimal() {
+        listOf("gpt-5", "gpt-5-mini", "gpt-5-nano", " GPT-5-mini-2025-08-07 ").forEach {
+            assertEquals(it, "minimal", openAiNoThinkingEffort(it))
+        }
+        listOf("gpt-6-luna", "gpt-6.1-sol", "gpt-5.6-luna", "gpt-5-search-api").forEach {
+            assertEquals(it, "none", openAiNoThinkingEffort(it))
+        }
+    }
+
+    @Test
+    fun autoThinkingIsTurnedOffForLaterGptsOnlyWhenActionsAreOffered() {
+        val openAi = AiAssistantSettings(provider = AiProvider.OPENAI)
+        assertEquals("none", aiAssistantEffort(openAi, withTools = true))
+        assertNull(aiAssistantEffort(openAi, withTools = false))
+        assertEquals("high", aiAssistantEffort(openAi.copy(thinking = AiThinking.HIGH), withTools = true))
+        assertNull(aiAssistantEffort(openAi.copy(models = mapOf(AiProvider.OPENAI to "gpt-5-mini")), withTools = true))
+        assertNull(aiAssistantEffort(AiAssistantSettings(provider = AiProvider.GEMINI), withTools = true))
+    }
+
+    @Test
     fun aKeyCheckedWithAnOldDefaultKeepsThatModelUntilAnotherIsChosen() {
         val gemini = AiProvider.GEMINI.baseUrl
         val oldDefault = mapOf(AiProvider.GEMINI to "$gemini\ngemini-flash-latest")

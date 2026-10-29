@@ -66,6 +66,25 @@ internal enum class AiThinking(
     HIGH("high", R.string.ai_effort_high, R.string.ai_effort_high_note, "high"),
 }
 
+/** The first GPT-5 models, which call no thinking "minimal"; later GPTs call it "none" and refuse "minimal". */
+private val FIRST_GPT5_MODEL = Regex("""gpt-5(-mini|-nano)?(-\d{4}-\d{2}-\d{2})?""")
+
+/** The `reasoning_effort` that turns OpenAI's thinking off for [model]. */
+internal fun openAiNoThinkingEffort(model: String): String = if (FIRST_GPT5_MODEL.matches(model.trim().lowercase())) "minimal" else "none"
+
+/**
+ * The `reasoning_effort` an assistant request carries. Later GPTs such as gpt-6-luna answer with actions
+ * in Chat Completions only without thinking, so Auto turns it off when actions are offered.
+ */
+internal fun aiAssistantEffort(
+    settings: AiAssistantSettings,
+    withTools: Boolean,
+): String? {
+    val effort = settings.thinking.effort
+    if (effort != null || !withTools || settings.provider != AiProvider.OPENAI) return effort
+    return openAiNoThinkingEffort(settings.modelFor(AiProvider.OPENAI)).takeIf { it == "none" }
+}
+
 internal fun storedAiThinking(raw: String?): AiThinking = AiThinking.entries.firstOrNull { it.key == raw } ?: AiThinking.AUTO
 
 internal fun storedChatHistoryRetention(raw: String?): ChatHistoryRetention =

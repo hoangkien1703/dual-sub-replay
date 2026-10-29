@@ -134,6 +134,10 @@ class AiChatClientTest {
             aiErrorKindForStatus(400, "Unsupported parameter: 'reasoning_effort' is not supported with this model.", sentThinking = true),
         )
         assertEquals(AiErrorKind.BAD_REQUEST, aiErrorKindForStatus(400, "Thinking is not enabled.", sentThinking = false))
+        // Later GPTs refuse a thinking level together with actions; the actions stay.
+        val toolsAndThinking = "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions."
+        assertEquals(AiErrorKind.UNSUPPORTED_THINKING, aiErrorKindForStatus(400, toolsAndThinking, sentThinking = true, sentTools = true))
+        assertEquals(AiErrorKind.UNSUPPORTED_TOOLS, aiErrorKindForStatus(400, toolsAndThinking, sentThinking = false, sentTools = true))
     }
 
     @Test
