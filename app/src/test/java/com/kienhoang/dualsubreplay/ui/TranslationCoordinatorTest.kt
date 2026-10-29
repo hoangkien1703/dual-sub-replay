@@ -25,6 +25,33 @@ class TranslationCoordinatorTest {
         assertEquals(listOf(0L, 1000L), rows.map { it.startMs })
     }
 
+    @Test fun anUnfinishedJapanesePieceJoinsTheNextAfterAPause() {
+        // Owner report 2026-10-29: the speaker paused after "とても" and "梅田で", so each went to Google alone.
+        val rows =
+            listOf(
+                SubtitleSegment(0, 0, 800, "はい。"),
+                SubtitleSegment(1, 900, 1500, "とても"),
+                SubtitleSegment(2, 3500, 5000, "楽しい場所です。"),
+                SubtitleSegment(3, 6000, 7500, "私の前のアパートから"),
+                SubtitleSegment(4, 9500, 10200, "梅田で"),
+                SubtitleSegment(5, 12000, 13500, "自転車で10分ぐらいです。"),
+            )
+        assertEquals(
+            listOf("はい。", "とても楽しい場所です。", "私の前のアパートから梅田で自転車で10分ぐらいです。"),
+            sentenceCaptionUnits(rows, rows, true).map { it.text },
+        )
+    }
+
+    @Test fun japaneseWithoutSentenceMarksKeepsTheShortPause() {
+        val rows = listOf(SubtitleSegment(0, 0, 1000, "とても"), SubtitleSegment(1, 3000, 4000, "楽しい場所です"))
+        assertEquals(listOf("とても", "楽しい場所です"), sentenceCaptionUnits(rows, rows, true).map { it.text })
+    }
+
+    @Test fun aPauseLongerThanThreeSecondsStillEndsTheUnit() {
+        val rows = listOf(SubtitleSegment(0, 0, 1000, "とても"), SubtitleSegment(1, 4500, 5500, "楽しい場所です。"))
+        assertEquals(listOf("とても", "楽しい場所です。"), sentenceCaptionUnits(rows, rows, true).map { it.text })
+    }
+
     private val sentence = SubtitleSegment(0, 0, 2000, "I gave up because it was raining.")
     private val display =
         listOf(

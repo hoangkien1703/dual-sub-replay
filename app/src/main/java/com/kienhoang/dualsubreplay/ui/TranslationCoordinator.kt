@@ -20,6 +20,16 @@ internal const val MAX_UNIT_DURATION_MS = 8_000L
  */
 internal const val MAX_SENTENCE_TAIL_CHARACTERS = 32
 
+/** Auto-caption pieces this close in time are one stretch of speech, so an unfinished one joins the next. */
+internal const val MAX_JOIN_PAUSE_MS = 1_200L
+
+/**
+ * In Japanese or Chinese captions that end sentences with 。, a piece without one is unfinished even
+ * after a longer pause ("とても" … "楽しい場所です。", owner report 2026-10-29): translated alone it
+ * lost its sentence ("very", "It's a fun place.").
+ */
+internal const val MAX_UNFINISHED_PAUSE_MS = 3_000L
+
 /** Display splitting must not remove the sentence context passed to ML Kit. */
 internal fun sentenceCaptionUnits(
     display: List<SubtitleSegment>,
@@ -35,13 +45,15 @@ internal fun sentenceCaptionUnits(
         }
     val coherent = mutableListOf<CaptionTranslationUnit>()
     val sentenceEnd = Regex("[.!?。！？…][\\\"'’”)]*$")
+    val marksEnds = marksCjkSentenceEnds(display)
     ordered.forEach { next ->
         val previous = coherent.lastOrNull()
+        val pauseLimit = if (marksEnds && isCjk(previous?.text?.trim()?.lastOrNull())) MAX_UNFINISHED_PAUSE_MS else MAX_JOIN_PAUSE_MS
         // Auto-caption lines overlap in time (a negative gap), which means continuous speech.
         val continues =
             previous != null && !sentenceEnd.containsMatchIn(previous.text.trim()) &&
                 next.indices.first() == previous.indices.last() + 1 &&
-                display[next.indices.first()].startMs - display[previous.indices.last()].endMs <= 1200
+                display[next.indices.first()].startMs - display[previous.indices.last()].endMs <= pauseLimit
         val fits =
             previous != null &&
                 display[next.indices.last()].endMs - display[previous.indices.first()].startMs <= MAX_UNIT_DURATION_MS &&
@@ -49,7 +61,7 @@ internal fun sentenceCaptionUnits(
         val join = continues && (fits || isSentenceTail(next.text, sentenceEnd))
         if (join) {
             val left = checkNotNull(previous).text
-            val separator = if (left.lastOrNull()?.code in 0x3000..0x9FFF && next.text.firstOrNull()?.code in 0x3000..0x9FFF) "" else " "
+            val separator = if (isCjk(left.lastOrNull()) && isCjk(next.text.firstOrNull())) "" else " "
             coherent[coherent.lastIndex] = CaptionTranslationUnit(left + separator + next.text, previous.indices + next.indices)
         } else {
             coherent.add(next)
@@ -57,6 +69,15 @@ internal fun sentenceCaptionUnits(
     }
     return coherent
 }
+
+/** Kana, kanji and CJK punctuation: text written without spaces. */
+private fun isCjk(char: Char?): Boolean = char?.code in 0x3000..0x9FFF
+
+/** At least one piece in five ends with 。, ！ or ？: the captions mark where sentences end. */
+private fun marksCjkSentenceEnds(pieces: List<SubtitleSegment>): Boolean =
+    pieces.isNotEmpty() && pieces.count { piece -> CJK_SENTENCE_ENDS.any(piece.originalText.trim()::endsWith) } * 5 >= pieces.size
+
+private val CJK_SENTENCE_ENDS = listOf("。", "！", "？")
 
 /** A short piece that starts in lowercase and ends a sentence: the end of the sentence before it. */
 private fun isSentenceTail(
