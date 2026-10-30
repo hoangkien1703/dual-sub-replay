@@ -31,7 +31,8 @@ A review of what would break at a million users found no server to overload (the
   - Once a day when the app opens it reads one small file from the latest GitHub release
     (`update-info.json`, served from GitHub's download hosts, not the rate-limited API).
   - A new version shows a small banner, at most once a week whichever version it names, so daily
-    releases never bring a daily banner (owner question 2026-10-30); **Skip this version** hides
+    releases never bring a daily banner, and none in the week after the app was installed or updated
+    however that happened (Android's `lastUpdateTime`; owner questions 2026-10-30); **Skip this version** hides
     that version for good, and a newer one still waits for the week.
   - A **security update** (a release whose PR had the `security:critical` label) shows a dialog at
     once; after Not now it returns daily for that fix's first 3 days, then weekly, and only a newer
@@ -111,8 +112,8 @@ A review of what would break at a million users found no server to overload (the
 
 ## Acceptance criteria
 
-- [ ] Reminder rules (unit tests): the first banner shows at once, later ones at most once in 7
-      days even when a newer version came out meanwhile; Skip hides that version; below the
+- [ ] Reminder rules (unit tests): a banner shows at most once in 7 days, even when a newer
+      version came out meanwhile, and not within 7 days of the app's own install or update; Skip hides that version; below the
       minimum safe version a security dialog shows, again after 1 day during the fix's first 3
       days, then weekly, and at once for a newer fix; nothing shows while a video plays; a clock moved back does not block.
 - [ ] `update-info.json` parsing ignores files with another schema, missing fields or bad SHA-256.

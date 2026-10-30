@@ -25,11 +25,14 @@ internal data class ReminderMemory(
     val skippedVersion: String? = null,
     val securityFixCode: Long = 0,
     val securitySinceMs: Long = 0,
+    /** When this app was installed or last updated (Android's `lastUpdateTime`); 0 when unknown. */
+    val installedAtMs: Long = 0,
 )
 
 /**
  * The banner shows at most once a week, whichever version it names, so daily releases do not bring a
- * daily banner; Skip this version hides that version for good. A security update (the installed app is
+ * daily banner, and not in the week after the app was installed or updated, however that happened
+ * (owner question 2026-10-30); Skip this version hides that version for good. A security update (the installed app is
  * older than the latest security fix) cannot be skipped: a new fix shows at once, then once a day for
  * its first 3 days and once a week after that, however many versions come out meanwhile. A clock set
  * back never hides a reminder for long.
@@ -49,7 +52,9 @@ internal fun updateReminder(
         return if (due) UpdateReminder.SECURITY else UpdateReminder.NONE
     }
     if (memory.skippedVersion == update.versionName) return UpdateReminder.NONE
-    val due = memory.shownAtMs <= 0 || elapsed >= UPDATE_REMINDER_AGAIN_MS || elapsed < 0
+    val quietSince = maxOf(memory.shownAtMs, memory.installedAtMs)
+    val quiet = nowMs - quietSince
+    val due = quietSince <= 0 || quiet >= UPDATE_REMINDER_AGAIN_MS || quiet < 0
     return if (due) UpdateReminder.BANNER else UpdateReminder.NONE
 }
 

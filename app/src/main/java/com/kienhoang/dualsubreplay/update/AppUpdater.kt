@@ -239,7 +239,7 @@ internal object AppUpdater {
                 val available = state.value as? UpdateState.Available ?: return@launch
                 // Update automatically installs an ordinary update itself; a security update is still shown.
                 if (reminders && (!auto || available.update.critical)) {
-                    mutableReminder.value = updateReminder(available.update, reminderMemory(preferences), System.currentTimeMillis())
+                    mutableReminder.value = updateReminder(available.update, reminderMemory(app, preferences), System.currentTimeMillis())
                 }
                 // About 34 MB: only on Wi-Fi or another unmetered network.
                 if (auto && unmetered(app)) downloadNow(app, available.update)
@@ -256,13 +256,17 @@ internal object AppUpdater {
             else -> null
         }
 
-    private fun reminderMemory(preferences: android.content.SharedPreferences): ReminderMemory =
+    private fun reminderMemory(
+        context: Context,
+        preferences: android.content.SharedPreferences,
+    ): ReminderMemory =
         ReminderMemory(
             shownVersion = preferences.getString(REMINDER_VERSION_PREFERENCE, null),
             shownAtMs = preferences.getLong(REMINDER_SHOWN_AT_PREFERENCE, 0),
             skippedVersion = preferences.getString(REMINDER_SKIPPED_PREFERENCE, null),
             securityFixCode = preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0),
             securitySinceMs = preferences.getLong(REMINDER_SECURITY_SINCE_PREFERENCE, 0),
+            installedAtMs = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime }.getOrDefault(0L),
         )
 
     /**

@@ -77,6 +77,18 @@ class UpdateRemindersTest {
     }
 
     @Test
+    fun noBannerInTheWeekAfterTheAppWasUpdatedHoweverItWas() {
+        // Updated by hand (or installed) yesterday, no banner for 30 days: the next version waits.
+        val updated = ReminderMemory(shownVersion = "1.8.0", shownAtMs = now - 30 * day, installedAtMs = now - day)
+        assertEquals(UpdateReminder.NONE, updateReminder(update(), updated, now))
+        assertEquals(UpdateReminder.BANNER, updateReminder(update(), updated, now + 6 * day))
+        // Never shown a banner, installed a week ago.
+        assertEquals(UpdateReminder.BANNER, updateReminder(update(), ReminderMemory(installedAtMs = now - 7 * day), now))
+        // A security update does not wait.
+        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), updated, now))
+    }
+
+    @Test
     fun skipHidesOnlyThatVersionAndNeverASecurityUpdate() {
         val skipped = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now, skippedVersion = "1.9.0")
         assertEquals(UpdateReminder.NONE, updateReminder(update(), skipped, now + 30 * day))
