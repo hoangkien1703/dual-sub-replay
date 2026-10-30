@@ -57,9 +57,14 @@ internal fun TvLayer(
                     actions.tabActions.switchTo(id)
                     leave()
                 },
-                // YouTube's home page in a tab of its own, so the open video stays in Continue watching.
+                // YouTube's pages in a tab of their own, so the open video stays in Continue watching.
                 openYouTubePage = {
-                    if (state.browserTabs.active == null || state.activeVideoId != null) actions.tabActions.openNew(MAIN_TAB_ACCOUNT)
+                    val tab = tvYouTubePageTab(state.browserTabs, videoOpen = state.activeVideoId != null)
+                    when (tab) {
+                        null -> actions.tabActions.openNew(MAIN_TAB_ACCOUNT)
+                        state.browserTabs.activeId -> Unit
+                        else -> actions.tabActions.switchTo(tab)
+                    }
                     leave()
                 },
                 backToVideo = leave,

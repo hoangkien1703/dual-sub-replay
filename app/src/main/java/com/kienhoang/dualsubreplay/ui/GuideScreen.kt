@@ -71,7 +71,7 @@ fun GuideScreen(onFinish: () -> Unit) {
             ) {
                 TextButton(
                     onClick = onFinish,
-                    modifier = Modifier.testTag("guide_skip"),
+                    modifier = Modifier.tvButtonFocusRing().testTag("guide_skip"),
                 ) {
                     Text(stringResource(R.string.onboarding_skip), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -107,6 +107,8 @@ fun GuideScreen(onFinish: () -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .tvStartFocus()
+                    .tvButtonFocusRing()
                     .testTag(if (isLastPage) "guide_done" else "guide_next"),
             ) {
                 Text(stringResource(if (isLastPage) R.string.onboarding_guide_get_started else R.string.onboarding_guide_next))

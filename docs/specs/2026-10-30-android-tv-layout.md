@@ -98,7 +98,7 @@ The owner has no Android TV, so checks run on the Android TV emulator.
 
 | Category | Command/scenario and expected result | Environment / applicability |
 | --- | --- | --- |
-| Unit tests | `testDebugUnitTest` incl. `TvLayoutTest`, `TvRemoteTest` | Cloud container |
+| Unit tests | `testDebugUnitTest` incl. `TvLayoutTest` | Cloud container |
 | Android lint/build | `formatCheck complexityCheck lintDebug assembleDebug` | Cloud container, PR CI |
 | Managed-device/emulator | PR CI phone emulator suites unchanged | PR CI |
 | Android TV emulator | Install the debug APK, walk the scenario above with D-pad keys | Owner's laptop (Remote Control) |
@@ -119,8 +119,33 @@ patch; the owner picks before merge.
 
 ## Implementation result
 
-Filled in after implementation.
+- Detection and setting: `ui/TvLayout.kt` (`isTelevisionDevice`, `readTvLayout`, `LocalTvLayout`,
+  More settings → Android TV (beta)); assistant setting `tv_layout`; reset all settings covers it.
+- Launcher: `LEANBACK_LAUNCHER`, `drawable-xhdpi/tv_banner.png`, touchscreen and leanback not required.
+- Remote: `MainActivity.dispatchKeyEvent` → `TvRemoteKeys` (`ui/TvRemote.kt`), actions run in
+  `ui/TvExperience.kt`. ▼ to the panel pauses the video and focus follows the playing line.
+- TV home: `ui/TvHome.kt` over the one WebView (never replacing it), search through
+  `data/YouTubeVideoSearch.kt`; its state survives watching a video.
+- Line words: `ui/TvLineWords.kt`. Page focus, unmute and mobile user agent: `ui/TvPageScripts.kt`
+  (`mediaPlaybackRequiresUserGesture` is off only in the TV layout).
+- Remote fixes from the emulator walkthrough: the side menu button is hidden in the TV layout (the
+  remote could open the drawer but not leave it), sliders and text fields let ▲/▼ leave
+  (`tvArrowsLeave`), language pickers start on the list, stronger focus shading (`tvFocusShading`),
+  and the guide's picture shrinks to fit a TV screen. Setup screens start with their main button
+  focused and ringed; text size moves 5% a press on a TV; Continue watching lists only videos and
+  "YouTube page" reuses a tab already on YouTube's pages.
+- Known gap: with the side menu hidden, Check for updates and the interface-language button are not
+  reachable in the TV layout; turning the TV layout off brings them back.
 
 ## Validation result
 
-Filled in after validation.
+- Cloud container: `formatReport` + format ratchet, `complexityCheck`, `testDebugUnitTest`
+  (incl. `TvLayoutTest`), `lintDebug` pass. PR CI green.
+- Android TV emulator (owner's laptop, android-34 TV image, remote keys only, 2026-10-30): banner in
+  the Apps row, TV home search and results kept after a video, ▼ pauses and focuses the playing line,
+  OK opens the line words, word card, ◀/▶/▲ line jumps, media keys, sound on start, sliders and
+  language pickers leave with ▲/▼, setting toggle. No crashes or ANRs (`logcat -b crash` empty).
+- Not fixed: arrow focus on YouTube's own pages follows a nearest-element guess and can jump (for
+  example ▶ from a list item to the filter chips); the video shows no focus marker while it holds
+  the remote (it is the normal watching state). No test on a real TV yet.
+- Screenshots: `docs/images/android-tv/` (debug build, so the launcher label says "Preview").

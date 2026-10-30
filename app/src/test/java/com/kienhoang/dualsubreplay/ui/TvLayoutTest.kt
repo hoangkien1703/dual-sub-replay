@@ -118,6 +118,26 @@ class TvLayoutTest {
     }
 
     @Test
+    fun continueWatchingShowsOnlyVideosAndYouTubePageReusesAPageTab() {
+        val home = BrowserTab(id = 1, url = "https://m.youtube.com/")
+        val video = BrowserTab(id = 2, url = "https://m.youtube.com/watch?v=dQw4w9WgXcQ")
+        val tabs = BrowserTabs(listOf(home, video), activeId = 2)
+        assertEquals(listOf(video), tvContinueTabs(tabs))
+        assertEquals(1L, tvYouTubePageTab(tabs, videoOpen = true))
+        assertEquals(2L, tvYouTubePageTab(tabs, videoOpen = false))
+        assertNull(tvYouTubePageTab(BrowserTabs(listOf(video), activeId = 2), videoOpen = true))
+        assertNull(tvYouTubePageTab(BrowserTabs(), videoOpen = false))
+    }
+
+    @Test
+    fun textSizeMovesFivePercentAPressOnlyOnATv() {
+        val steps = fontScaleSteps(tvLayout = true)
+        val step = (MAX_FONT_SCALE - MIN_FONT_SCALE) / (steps + 1)
+        assertEquals(0.05f, step, 0.0001f)
+        assertEquals(0, fontScaleSteps(tvLayout = false))
+    }
+
+    @Test
     fun onAVideoTheScriptUnmutesOnceAndDrawsNoOutline() {
         val script = webTvFocusScript(true)
         assertTrue(script.contains("html:not(.dualsub-tv-watch) *:focus"))

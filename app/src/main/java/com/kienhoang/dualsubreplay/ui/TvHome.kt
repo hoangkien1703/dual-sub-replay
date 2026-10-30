@@ -104,6 +104,18 @@ internal fun parseRecentSearches(stored: String?): List<String> =
         .filter(String::isNotEmpty)
         .take(MAX_RECENT_SEARCHES)
 
+/** Continue watching: the tabs on a video. YouTube's own pages are reached with "YouTube page". */
+internal fun tvContinueTabs(tabs: BrowserTabs): List<BrowserTab> = tabs.tabs.filter { browserTabThumbnailUrl(it.url) != null }
+
+/**
+ * The tab "YouTube page" shows: the open tab unless it holds the open video, else a tab already off
+ * any video, so pressing it again does not pile up tabs. Null opens a new tab.
+ */
+internal fun tvYouTubePageTab(
+    tabs: BrowserTabs,
+    videoOpen: Boolean,
+): Long? = tabs.active?.takeUnless { videoOpen }?.id ?: tabs.tabs.firstOrNull { browserTabThumbnailUrl(it.url) == null }?.id
+
 /** "Channel · 12:34 · 1.2M views": the parts YouTube gave. */
 internal fun tvVideoDetails(video: YouTubeVideoResult): String =
     listOf(video.channel, video.length, video.views).filter(String::isNotBlank).joinToString(" · ")
@@ -231,9 +243,10 @@ internal fun TvHome(
                     focus = if (videoOpen) null else firstFocus,
                 )
             }
-            if (tabs.tabs.isNotEmpty()) {
+            val continueTabs = tvContinueTabs(tabs)
+            if (continueTabs.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    TvContinueRow(tabs, actions.openTab)
+                    TvContinueRow(continueTabs, actions.openTab)
                 }
             }
             tvSearchResults(home.search, actions.openVideo) { home.searchRun += 1 }
@@ -366,13 +379,13 @@ private fun TvSearchBar(
 
 @Composable
 private fun TvContinueRow(
-    tabs: BrowserTabs,
+    tabs: List<BrowserTab>,
     onOpen: (Long) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         TvSectionTitle(stringResource(R.string.tv_home_continue))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(tabs.tabs, key = { it.id }) { tab ->
+            items(tabs, key = { it.id }) { tab ->
                 TvVideoCard(
                     thumbnailUrl = browserTabThumbnailUrl(tab.url),
                     title = browserTabName(tab),

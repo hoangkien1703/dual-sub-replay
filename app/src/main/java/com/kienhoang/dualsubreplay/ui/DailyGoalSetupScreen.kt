@@ -38,7 +38,7 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
     ) {
         Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 28.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = { onFinish(null) }, modifier = Modifier.testTag("daily_goal_skip")) {
+                TextButton(onClick = { onFinish(null) }, modifier = Modifier.tvButtonFocusRing().testTag("daily_goal_skip")) {
                     Text(stringResource(R.string.onboarding_skip), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -64,7 +64,15 @@ fun DailyGoalSetupScreen(onFinish: (Int?) -> Unit) {
                 DailyGoalPicker(selected = selected, includeOff = false, onSelect = { selected = it }, centered = true)
             }
             Spacer(Modifier.height(20.dp))
-            Button(onClick = { onFinish(selected) }, modifier = Modifier.fillMaxWidth().testTag("daily_goal_confirm")) {
+            Button(
+                onClick = { onFinish(selected) },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .tvStartFocus()
+                        .tvButtonFocusRing()
+                        .testTag("daily_goal_confirm"),
+            ) {
                 Text(stringResource(R.string.onboarding_goal_set))
             }
         }

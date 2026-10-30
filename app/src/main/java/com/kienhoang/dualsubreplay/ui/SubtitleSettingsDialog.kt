@@ -438,6 +438,7 @@ internal fun SubtitleSettingsDialog(
                             onValueChange = onFontScaleChange,
                             modifier = Modifier.tvArrowsLeave(),
                             valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE,
+                            steps = fontScaleSteps(LocalTvLayout.current),
                         )
                         CaptionVisibilitySettings()
                         TranslationPositionSettings(translationPosition, onTranslationPositionChange)

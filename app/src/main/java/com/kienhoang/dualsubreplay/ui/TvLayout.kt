@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
@@ -24,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -37,6 +40,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import kotlin.math.roundToInt
 
 // Settings → Android TV (beta) (owner request 2026-10-29/30, spec 2026-10-30-android-tv-layout.md):
 // on a TV the TV layout is on unless turned off; on phones and tablets it can never turn on.
@@ -138,6 +142,24 @@ internal fun Modifier.tvFocusRing(shape: Shape = RoundedCornerShape(10.dp)): Mod
         val color = if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent
         Modifier.onFocusChanged { focused = it.hasFocus }.border(3.dp, color, shape)
     }
+
+/** A filled button's focus ring in the TV layout: its own shading barely changes on focus. */
+internal fun Modifier.tvButtonFocusRing(): Modifier = tvFocusRing(RoundedCornerShape(percent = 50))
+
+/** In the TV layout the remote starts on this item, so the screen opens with something focused. */
+internal fun Modifier.tvStartFocus(): Modifier =
+    composed {
+        if (!LocalTvLayout.current) return@composed Modifier
+        val focus = remember { FocusRequester() }
+        LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+        Modifier.focusRequester(focus)
+    }
+
+/** Text size moves 5% a press on a TV remote, so it can land on 100% again; 0 (smooth) elsewhere. */
+internal fun fontScaleSteps(tvLayout: Boolean): Int =
+    if (tvLayout) ((MAX_FONT_SCALE - MIN_FONT_SCALE) / TV_FONT_SCALE_STEP).roundToInt() - 1 else 0
+
+private const val TV_FONT_SCALE_STEP = 0.05f
 
 /**
  * ▲ and ▼ leave a slider or a text field in the TV layout, instead of changing the value or moving
