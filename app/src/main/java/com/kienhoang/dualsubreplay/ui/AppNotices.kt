@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -156,19 +157,34 @@ private fun NoticeCard(
     }
 }
 
-/** A security update: shown at once, and again the next day after Not now; it can always be declined. */
+/**
+ * A security update: shown at once, then daily for its first days and weekly after; it can always be
+ * declined. What was fixed opens the release page (owner request 2026-10-30), so people can check the
+ * warning themselves; the dialog stays for when they come back.
+ */
 @Composable
 private fun SecurityUpdateDialog(update: AppUpdate) {
     val context = LocalContext.current
+    var noBrowser by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = { AppUpdater.dismissReminder() },
         icon = { Icon(Icons.Default.Security, contentDescription = null) },
         title = { Text(stringResource(R.string.updates_security_title)) },
         text = {
-            Text(
-                stringResource(R.string.updates_security_message, update.versionName, BuildConfig.VERSION_NAME),
-                modifier = Modifier.testTag("security_update_message"),
-            )
+            Column {
+                Text(
+                    stringResource(R.string.updates_security_message, update.versionName, BuildConfig.VERSION_NAME),
+                    modifier = Modifier.testTag("security_update_message"),
+                )
+                TextButton(
+                    onClick = { noBrowser = !openExternalPage(context, update.pageUrl) },
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier.testTag("security_update_details"),
+                ) {
+                    Text(stringResource(R.string.updates_security_details), style = MaterialTheme.typography.labelLarge)
+                }
+                if (noBrowser) Text(stringResource(R.string.navigation_no_browser), style = MaterialTheme.typography.bodySmall)
+            }
         },
         confirmButton = {
             TextButton(onClick = { AppUpdater.updateFromReminder(context) }, modifier = Modifier.testTag("security_update_update")) {

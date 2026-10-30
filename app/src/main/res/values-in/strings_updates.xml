@@ -38,4 +38,5 @@
     <string name="updates_security_title">Pembaruan keamanan</string>
     <string name="updates_security_message">Versi %1$s memperbaiki masalah keamanan pada versi yang Anda miliki (%2$s). Perbarui sekarang? Kata tersimpan dan setelan Anda tetap ada.</string>
     <string name="updates_reminders_off_hint">Selama nonaktif, Anda tidak akan diberi tahu tentang versi baru atau pembaruan keamanan.</string>
+    <string name="updates_security_details">Apa yang diperbaiki</string>
 </resources>

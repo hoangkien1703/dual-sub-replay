@@ -38,4 +38,5 @@
     <string name="updates_security_title">Actualización de seguridad</string>
     <string name="updates_security_message">La versión %1$s corrige un problema de seguridad de la versión que tienes (%2$s). ¿Actualizar ahora? Tus palabras guardadas y tus ajustes se conservan.</string>
     <string name="updates_reminders_off_hint">Mientras esté desactivado, no sabrás de versiones nuevas ni de actualizaciones de seguridad.</string>
+    <string name="updates_security_details">Qué se corrigió</string>
 </resources>

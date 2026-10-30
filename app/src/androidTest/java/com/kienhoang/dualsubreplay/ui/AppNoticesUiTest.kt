@@ -86,6 +86,7 @@ class AppNoticesUiTest {
         composeRule.setContent { DualSubTheme { AppNoticesHost() } }
         composeRule.onNodeWithText("Security update").assertIsDisplayed()
         composeRule.onNodeWithTag("security_update_update").assertIsDisplayed()
+        composeRule.onNodeWithTag("security_update_details").assertIsDisplayed()
         saveUiEvidence("security-update-dialog")
         composeRule.onNodeWithTag("security_update_not_now").performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("security_update_message")).fetchSemanticsNodes().isEmpty() }

@@ -288,6 +288,8 @@ class ReleaseTests(unittest.TestCase):
         self.assertTrue(security["security"])
         self.assertEqual(security["minimum_safe_version_code"], 37)
         self.assertIn('"security": true', self.api.releases[-1]["body"])
+        self.assertTrue(self.api.releases[-1]["body"].startswith(release.SECURITY_NOTE))
+        self.assertNotIn("security problem", self.api.releases[-2]["body"])
         # A later ordinary release keeps telling older apps about the security fix.
         self.api.releases[-1]["draft"] = False
         self.pr.update(number=74, merge_commit_sha="merge74", head={"sha": "head74"}, labels=[])

@@ -38,4 +38,5 @@
     <string name="updates_security_title">安全更新</string>
     <string name="updates_security_message">版本 %1$s 修复了你当前版本（%2$s）中的一个安全问题。现在更新吗？你保存的单词和设置都会保留。</string>
     <string name="updates_reminders_off_hint">关闭期间，你不会收到新版本或安全更新的通知。</string>
+    <string name="updates_security_details">查看修复内容</string>
 </resources>

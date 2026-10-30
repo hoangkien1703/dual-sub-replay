@@ -36,7 +36,8 @@ A review of what would break at a million users found no server to overload (the
   - A **security update** (a release whose PR had the `security:critical` label) shows a dialog at
     once; after Not now it returns daily for that fix's first 3 days, then weekly, and only a newer
     security fix starts again (owner decision 2026-10-30: no permanent skip, but no daily nagging
-    forever). It is based on a *minimum safe version*: someone
+    forever). A small **What was fixed** link opens the release page, whose notes the release
+    automation starts with a security note (owner request 2026-10-30). It is based on a *minimum safe version*: someone
     two releases behind the security fix still gets it after a later ordinary release. People
     can always decline.
   - Never shown over a playing video: a reminder found while a video plays waits for pause.
