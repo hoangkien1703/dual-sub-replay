@@ -106,17 +106,17 @@ internal fun AppUpdateDialogHost(channel: UpdateChannel = AppUpdater.channel(Loc
     if (channel == UpdateChannel.None) {
         AlertDialog(
             onDismissRequest = close,
-            title = { Text(stringResource(R.string.updates_check)) },
+            title = { DialogTitle(stringResource(R.string.updates_check), onClose = close) },
             text = { UpdateMessage(stringResource(R.string.updates_unsupported), noBrowser) },
             confirmButton = { UpdateButton(R.string.updates_open_github, "update_open_github") { open(UPDATE_RELEASES_PAGE_URL) } },
-            dismissButton = { UpdateButton(R.string.updates_close, "update_close", close) },
         )
         return
     }
     val current = state
     AlertDialog(
         onDismissRequest = close,
-        title = { Text(stringResource(R.string.updates_check)) },
+        // The X hides the dialog like Not now; a download or a ready update carries on.
+        title = { DialogTitle(stringResource(R.string.updates_check), onClose = close) },
         text = { UpdateDialogText(current, noBrowser) },
         confirmButton = { UpdateConfirmButton(current, close) },
         dismissButton = {
@@ -188,7 +188,8 @@ private fun UpdateConfirmButton(
                     else -> AppUpdater.check(context)
                 }
             }
-        UpdateState.UpToDate -> UpdateButton(R.string.updates_close, "update_close", close)
+        // Up to date: only What's new is left beside the X.
+        UpdateState.UpToDate -> Unit
         // Hiding keeps a download or an install going.
         else -> UpdateButton(R.string.updates_hide, "update_hide", close)
     }

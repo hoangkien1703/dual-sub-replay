@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_close">Đóng</string>
+    <string name="dialog_discard_title">Bỏ các thay đổi của bạn?</string>
+    <string name="dialog_discard">Bỏ</string>
+    <string name="dialog_keep_editing">Tiếp tục sửa</string>
+</resources>

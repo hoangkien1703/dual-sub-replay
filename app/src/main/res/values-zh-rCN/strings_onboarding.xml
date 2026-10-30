@@ -29,7 +29,6 @@
     <string name="onboarding_goal_save">保存</string>
     <string name="onboarding_goal_cancel">取消</string>
     <string name="onboarding_progress_title">进度</string>
-    <string name="onboarding_progress_close">关闭</string>
     <string name="onboarding_progress_load_error">无法加载你的进度。请检查存储空间，然后重新打开此页面重试。</string>
     <string name="onboarding_progress_empty">观看带字幕的视频即可开始记录你的时长。</string>
     <string name="onboarding_progress_today">今天</string>

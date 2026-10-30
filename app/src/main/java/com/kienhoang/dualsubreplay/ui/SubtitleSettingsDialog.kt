@@ -276,7 +276,7 @@ internal fun QuickLanguageSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.Language, contentDescription = null) },
-        title = { Text(stringResource(R.string.settings_subtitle_languages)) },
+        title = { DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss, centered = true) },
         text = {
             Column(Modifier.testTag("quick_language_settings")) {
                 LanguagePickerButtons(

@@ -43,7 +43,6 @@
     <string name="study_comprehension_known">你认识这个视频中 %1$d%% 的词。</string>
     <string name="study_mark_all_known">把所有新词标记为认识</string>
     <string name="study_mark_all_known_confirm">标记为认识</string>
-    <string name="study_close">关闭</string>
     <string name="study_known_word_toggle">我认识这个词</string>
     <string name="study_send_to_anki">发送到 %1$s</string>
     <string name="study_sending_to_anki">正在发送…</string>

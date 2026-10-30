@@ -29,7 +29,6 @@
     <string name="onboarding_goal_save">Simpan</string>
     <string name="onboarding_goal_cancel">Batal</string>
     <string name="onboarding_progress_title">Kemajuan</string>
-    <string name="onboarding_progress_close">Tutup</string>
     <string name="onboarding_progress_load_error">Tidak dapat memuat kemajuan Anda. Periksa penyimpanan, lalu buka kembali layar ini untuk mencoba lagi.</string>
     <string name="onboarding_progress_empty">Tonton video bersubtitel untuk mulai mencatat waktu Anda.</string>
     <string name="onboarding_progress_today">Hari ini</string>

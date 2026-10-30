@@ -167,16 +167,22 @@ private fun AiMemoryList(
 }
 
 @Composable
-private fun AiMemoryEditDialog(
+internal fun AiMemoryEditDialog(
     memory: AiMemory,
     onDismiss: () -> Unit,
     onSave: (String) -> Boolean,
 ) {
     var text by remember(memory.id) { mutableStateOf(memory.text) }
     val valid = aiMemoryText(text) != null
+    var askDiscard by remember { mutableStateOf(false) }
+    // Typed text is never dropped silently (owner request 2026-10-30): the X, Cancel or a tap outside ask first.
+    val leave = { if (text == memory.text) onDismiss() else askDiscard = true }
+    if (askDiscard) {
+        DiscardChangesDialog(onDiscard = onDismiss, onKeepEditing = { askDiscard = false })
+    }
     AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.ai_memory_edit)) },
+        onDismissRequest = leave,
+        title = { DialogTitle(stringResource(R.string.ai_memory_edit), onClose = leave, closeTag = "ai_memory_edit_close") },
         text = {
             OutlinedTextField(
                 value = text,
@@ -192,7 +198,27 @@ private fun AiMemoryEditDialog(
                 Text(stringResource(R.string.ai_memory_save))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ai_action_cancel)) } },
+        dismissButton = { TextButton(onClick = leave) { Text(stringResource(R.string.ai_action_cancel)) } },
+    )
+}
+
+/** Asked before a dialog with changed text closes; no X, since it is the question itself. */
+@Composable
+internal fun DiscardChangesDialog(
+    onDiscard: () -> Unit,
+    onKeepEditing: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onKeepEditing,
+        title = { Text(stringResource(R.string.dialog_discard_title)) },
+        confirmButton = {
+            TextButton(onClick = onDiscard, modifier = Modifier.testTag("dialog_discard")) { Text(stringResource(R.string.dialog_discard)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onKeepEditing, modifier = Modifier.testTag("dialog_keep_editing")) {
+                Text(stringResource(R.string.dialog_keep_editing))
+            }
+        },
     )
 }
 

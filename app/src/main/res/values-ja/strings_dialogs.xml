@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_close">閉じる</string>
+    <string name="dialog_discard_title">変更を破棄しますか？</string>
+    <string name="dialog_discard">破棄</string>
+    <string name="dialog_keep_editing">編集を続ける</string>
+</resources>

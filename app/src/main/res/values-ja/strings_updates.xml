@@ -18,7 +18,6 @@
     <string name="updates_install">インストール</string>
     <string name="updates_installing">インストールしています… 更新中はアプリが閉じます。</string>
     <string name="updates_try_again">再試行</string>
-    <string name="updates_close">閉じる</string>
     <string name="updates_open_github">GitHub を開く</string>
     <string name="updates_unsupported">このアプリはパソコンでビルドされたため、自動で更新できません。最新バージョンは GitHub から入手してください。</string>
     <string name="updates_problem_offline">GitHub に接続できません。接続を確認して、もう一度お試しください。</string>

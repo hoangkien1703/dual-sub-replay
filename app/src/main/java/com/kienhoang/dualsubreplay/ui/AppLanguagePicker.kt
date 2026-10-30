@@ -83,7 +83,7 @@ private fun AppLanguageDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.navigation_app_language)) },
+        title = { DialogTitle(stringResource(R.string.navigation_app_language), onClose = onDismiss) },
         text = {
             Column(
                 Modifier
@@ -107,9 +107,7 @@ private fun AppLanguageDialog(
                 }
             }
         },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.navigation_cancel)) }
-        },
+        confirmButton = {},
     )
 }
 

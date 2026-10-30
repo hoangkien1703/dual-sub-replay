@@ -43,7 +43,6 @@
     <string name="study_comprehension_known">Anda mengenal %1$d%% kata di video ini.</string>
     <string name="study_mark_all_known">Tandai semua kata baru sebagai dikenal</string>
     <string name="study_mark_all_known_confirm">Tandai sebagai dikenal</string>
-    <string name="study_close">Tutup</string>
     <string name="study_known_word_toggle">Saya tahu kata ini</string>
     <string name="study_send_to_anki">Kirim ke %1$s</string>
     <string name="study_sending_to_anki">Mengirim…</string>

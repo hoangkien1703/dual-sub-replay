@@ -282,7 +282,7 @@ private fun ComprehensionDialog(
     val newCount = comprehension.newWords.size
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.study_comprehension_title)) },
+        title = { DialogTitle(stringResource(R.string.study_comprehension_title), onClose = onDismiss) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.study_comprehension_known, comprehension.percent))
@@ -305,10 +305,9 @@ private fun ComprehensionDialog(
                 }
             }
         },
+        // While asking to mark every new word known, Cancel steps back; otherwise the X closes.
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(if (confirming) R.string.settings_cancel else R.string.study_close))
-            }
+            if (confirming) TextButton(onClick = { confirming = false }) { Text(stringResource(R.string.settings_cancel)) }
         },
     )
 }
@@ -388,7 +387,7 @@ private fun KnownWordsOfferDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.study_known_words_offer_title)) },
+        title = { DialogTitle(stringResource(R.string.study_known_words_offer_title), onClose = onDismiss) },
         text = { Text(stringResource(R.string.study_known_words_offer_message)) },
         confirmButton = {
             TextButton(onClick = onTurnOn, modifier = Modifier.testTag("turn_on_known_words")) {
