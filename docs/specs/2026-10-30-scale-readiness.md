@@ -181,6 +181,10 @@ it is the owner's call and not applied without asking.
 - Problem log: `data/ProblemLog.kt`, initialised in `MainActivity`; records Google failures (and
   answers that came only after a 403/429), caption failures (page step and exception class name
   only), update failures and switch-download failures. Menu → Report a problem in `DrawerFooter`.
+- Owner phone test 2026-10-30: with GitHub's app installed, Open GitHub showed the app's empty
+  template list (the app ignores the address's form fields). Open GitHub now opens the phone's
+  browser (`openInBrowser`: a browser selector, falling back to any app) and also copies the report,
+  with a note to paste it under Screenshots or logs if the form is empty.
 - Split: `DualSubUiState`, `LoadStage` and the pure helper functions moved unchanged from
   `AppViewModel.kt` (2,243 → 1,958 lines) to `ui/DualSubUiState.kt`; only `withGoogleAgain`
   became `internal` because the view model still uses it. The view model's own methods were not
