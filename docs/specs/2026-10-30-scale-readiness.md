@@ -185,6 +185,10 @@ it is the owner's call and not applied without asking.
   template list (the app ignores the address's form fields). Open GitHub now opens the phone's
   browser (`openInBrowser`: a browser selector, falling back to any app) and also copies the report,
   with a note to paste it under Screenshots or logs if the form is empty.
+- Owner phone test (build 620): the default browser opened, asking to sign in to GitHub. Owner
+  choice: an in-app tab (`androidx.browser` 1.10.0, Custom Tabs) of Chrome first, then of the default
+  browser, so a GitHub sign-in made in Chrome is already there; the manifest may now see browsers
+  that offer in-app tabs. Owner choice too: a Send by email button (address pending).
 - Split: `DualSubUiState`, `LoadStage` and the pure helper functions moved unchanged from
   `AppViewModel.kt` (2,243 → 1,958 lines) to `ui/DualSubUiState.kt`; only `withGoogleAgain`
   became `internal` because the view model still uses it. The view model's own methods were not

@@ -5,6 +5,8 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -283,15 +285,32 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
     )
 }
 
+/** Chrome first for the in-app tab, so a GitHub sign-in made in Chrome is already there (owner choice 2026-10-30). */
+private const val CHROME_PACKAGE = "com.android.chrome"
+
 /**
- * Opens [url] in the phone's browser rather than an app that claims GitHub links: GitHub's own app opens
- * a new issue without the details the address fills in. With no browser it opens like any link; false
- * when nothing can open it.
+ * Opens [url] in a browser rather than an app that claims GitHub links: GitHub's own app opens a new
+ * issue without the details the address fills in. It prefers an in-app tab of Chrome, then of the
+ * default browser (a tab shares that browser's sign-ins), then the default browser itself, then any app;
+ * false when nothing can open it.
  */
 internal fun openInBrowser(
     context: Context,
     url: String,
 ): Boolean {
+    val tabBrowser =
+        CustomTabsClient.getPackageName(context, listOf(CHROME_PACKAGE), true)
+            ?: CustomTabsClient.getPackageName(context, emptyList(), false)
+    if (tabBrowser != null) {
+        try {
+            val tab = CustomTabsIntent.Builder().setShowTitle(true).build()
+            tab.intent.setPackage(tabBrowser)
+            tab.launchUrl(context, url.toUri())
+            return true
+        } catch (_: ActivityNotFoundException) {
+            // Falls through to a plain browser.
+        }
+    }
     val view = Intent(Intent.ACTION_VIEW, url.toUri()).addCategory(Intent.CATEGORY_BROWSABLE)
     val browser = Intent(view).apply { selector = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_BROWSER) }
     return try {

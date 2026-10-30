@@ -24,6 +24,8 @@
         <provider android:authorities="com.ichi2.anki.flashcards" />
         <!-- Send to → AnkiConnect offers to open AnkiConnect Android when its server does not answer. -->
         <package android:name="com.kamwithk.ankiconnectandroid" />
+        <!-- Report a problem opens GitHub in a browser's in-app tab; Android 11+ needs to see which browsers offer one. -->
+        <intent><action android:name="android.support.customtabs.action.CustomTabsService" /></intent>
     </queries>
 
     <application

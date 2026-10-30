@@ -285,6 +285,8 @@ dependencies {
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.webkit:webkit:1.14.0")
+    // Report a problem opens GitHub in an in-app browser tab (owner request 2026-10-30).
+    implementation("androidx.browser:browser:1.10.0")
     // Media session and media notification only (earphone buttons); the video stays in the WebView.
     implementation("androidx.media:media:1.8.0")
     implementation("androidx.activity:activity-compose:1.11.0")
