@@ -32,4 +32,6 @@ npm run validate:links
 
 Remotion downloads its own headless Chrome on first use. To use an installed one instead (for example on a container without internet access to Google's CDN), append `-- --browser-executable=/path/to/headless_shell` to each `render:*` script.
 
+`package.json` overrides `zod` to 4.6.7 because Remotion 4.0.536 pins 4.5.4, which has a memory-exhaustion advisory (GHSA-mrhx-c7xc-m3w5). Remove the override once Remotion depends on a fixed `zod` itself.
+
 Generated caches, `node_modules`, and QA output stay outside version control.
