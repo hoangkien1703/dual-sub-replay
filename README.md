@@ -128,6 +128,16 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - **Progress** in the menu shows today's watch time against a daily goal, your streak, totals for the week, month, year and all time, and the time spent in each language.
 - Time counts only while a captioned video plays, and it is stored only on your device.
 
+### Watch on Android TV (beta)
+
+- The same APK installs on Android TV and Google TV and shows on the TV home screen. On a TV it opens on **TV home**: search YouTube with the remote, continue a tab, or open the YouTube page.
+- On a video, OK plays or pauses, ◀ ▶ jump to the previous or next line, ▲ replays the line, and ▼ moves to the subtitles. OK on a subtitle line shows its words as big buttons; pick one for its word card.
+- **Settings → Android TV (beta)** turns the TV layout off. Phones and tablets never use it.
+
+<p align="center">
+  <img src="docs/images/dualsub-replay-android-tv.webp" alt="DualSub Replay on Android TV: a Japanese YouTube video with the subtitle panel beside it, Japanese lines colored by part of speech with English translations" width="900">
+</p>
+
 ### Use the app in your language
 
 The interface is available in English, Tiếng Việt, Español, Português (Brasil), 日本語, 한국어, 简体中文 and Bahasa Indonesia. It follows your phone's language; the globe button at the bottom of the menu picks another.
@@ -148,7 +158,9 @@ The interface is available in English, Tiếng Việt, Español, Português (Bra
 
 **Is there a Language Reactor-style tool for Android?** Browser extensions such as Language Reactor run in desktop Chrome, not in the Android YouTube app. DualSub Replay is a separate, unaffiliated Android app with a similar two-language view, plus tap-to-replay, word lookup, and saved-word practice.
 
-**Can I sign in to YouTube?** Experimentally. The Google sign-in flow stays inside the app and returns to your video afterwards, but Google does not officially support signing in from embedded WebViews and may reject it with a "browser or app may not be secure" message. The app never spoofs its user agent or copies cookies.
+**Can I sign in to YouTube?** Experimentally. The Google sign-in flow stays inside the app and returns to your video afterwards, but Google does not officially support signing in from embedded WebViews and may reject it with a "browser or app may not be secure" message. The app never pretends to be another browser or copies cookies. (On Android TV it only adds "Mobile" to the WebView's own user agent when it is missing, so YouTube sends its phone site.)
+
+**Does it work on Android TV?** Yes, in beta. Sideload the same APK (for example with the Downloader app) and the app shows on the TV home screen with a remote-friendly layout. See [Watch on Android TV](#watch-on-android-tv-beta).
 
 **Is it on Google Play?** Not yet. Install the official APK from [GitHub releases](https://github.com/hoangkien1703/dual-sub-replay/releases/latest).
 
