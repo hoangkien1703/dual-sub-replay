@@ -31,4 +31,12 @@
     <string name="updates_auto_title">Update automatically</string>
     <string name="updates_auto_description">Once a day when you open the app, checks GitHub for a new version, downloads it on Wi-Fi and installs it when you leave the app, never while a video plays.</string>
     <string name="updates_auto_unavailable">This copy of the app can\'t update itself.</string>
+    <string name="updates_reminders_title">Tell me about new versions</string>
+    <string name="updates_reminders_description">Once a day when you open the app, reads a small file on GitHub to learn about new versions and temporary fixes for YouTube or Google changes. Nothing about you or your videos is sent. When off, the app asks GitHub only when you tap Check for updates.</string>
+    <string name="updates_banner">Version %1$s is available.</string>
+    <string name="updates_skip_version">Skip this version</string>
+    <string name="updates_security_title">Security update</string>
+    <string name="updates_security_message">Version %1$s fixes a security problem in the version you have (%2$s). Update now? Your saved words and settings stay.</string>
+    <string name="updates_reminders_off_hint">While this is off, you won\'t hear about new versions or security updates.</string>
+    <string name="updates_security_details">What was fixed</string>
 </resources>

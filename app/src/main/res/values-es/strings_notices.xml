@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">YouTube cambió algo y es posible que los subtítulos no carguen. Ya hay un arreglo en camino.</string>
+    <string name="notice_google_translate_limited">Google Traductor está limitando las solicitudes ahora, así que algunas líneas pueden traducirse en el dispositivo.</string>
+    <string name="notice_update_recommended">Una versión más reciente corrige problemas de esta. Abre el menú y toca Buscar actualizaciones.</string>
+    <string name="notice_close">Cerrar</string>
+    <string name="report_problem_title">Informar de un problema</string>
+    <string name="report_problem_intro">No se envía nada a menos que tú lo decidas. Enviar por correo o Abrir GitHub inicia un informe con los datos de abajo, que puedes cambiar antes de enviarlo. Solo indica qué pasos fallaron hace poco, nunca tus videos, subtítulos ni tu cuenta.</string>
+    <string name="report_problem_open">Abrir GitHub</string>
+    <string name="report_problem_copy">Copiar</string>
+    <string name="report_problem_copied">Copiado</string>
+    <string name="report_problem_also_copied">También se copió. Si GitHub muestra un formulario vacío, elige Bug report y pégalo en Screenshots or logs.</string>
+    <string name="report_problem_email">Enviar por correo</string>
+    <string name="report_problem_no_email">No hay ninguna app de correo configurada en este teléfono. Toca Copiar y envía el informe de otra forma.</string>
+</resources>

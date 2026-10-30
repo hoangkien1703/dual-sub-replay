@@ -14,14 +14,22 @@ import androidx.core.content.pm.PackageInfoCompat
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.data.AppUpdate
 import com.kienhoang.dualsubreplay.data.MAX_UPDATE_BYTES
+import com.kienhoang.dualsubreplay.data.ProblemArea
+import com.kienhoang.dualsubreplay.data.ProblemLog
+import com.kienhoang.dualsubreplay.data.ReminderMemory
+import com.kienhoang.dualsubreplay.data.UPDATE_INFO_URL
 import com.kienhoang.dualsubreplay.data.UPDATE_LATEST_RELEASE_URL
 import com.kienhoang.dualsubreplay.data.UPDATE_PREVIEW_RELEASE_URL
 import com.kienhoang.dualsubreplay.data.UpdateChannel
+import com.kienhoang.dualsubreplay.data.UpdateReminder
 import com.kienhoang.dualsubreplay.data.isAllowedUpdateHost
 import com.kienhoang.dualsubreplay.data.parseOfficialRelease
 import com.kienhoang.dualsubreplay.data.parsePreviewRelease
 import com.kienhoang.dualsubreplay.data.parseSha256File
+import com.kienhoang.dualsubreplay.data.parseUpdateInfo
 import com.kienhoang.dualsubreplay.data.updateChannelFor
+import com.kienhoang.dualsubreplay.data.updateFromInfo
+import com.kienhoang.dualsubreplay.data.updateReminder
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.playback.isPlaying
 import kotlinx.coroutines.CoroutineScope
@@ -43,11 +51,25 @@ import java.util.concurrent.TimeUnit
 /** Settings → App updates → Update automatically, off by default (owner request 2026-10-20). */
 internal const val APP_AUTO_UPDATE_PREFERENCE = "app_auto_update"
 
-/** When Update automatically last asked GitHub; not a setting, so Reset all settings keeps it. */
+/**
+ * Settings → App updates → Tell me about new versions, on by default (owner request 2026-10-30): once a
+ * day the app reads the latest release's `update-info.json` (and the remote switches) and shows a
+ * reminder for a newer version. Off, it asks GitHub only when Check for updates is tapped.
+ */
+internal const val UPDATE_REMINDERS_PREFERENCE = "update_reminders"
+
+/** When the daily check last asked GitHub; not a setting, so Reset all settings keeps it. */
 private const val APP_UPDATE_LAST_CHECK_PREFERENCE = "app_update_last_check"
 private const val DAY_MS = 24L * 60 * 60 * 1000
 
-/** Update automatically asks GitHub at most once a day. */
+/** The reminder last shown, when, and the version Skip this version hid (kept by Reset all settings). */
+private const val REMINDER_VERSION_PREFERENCE = "update_reminder_version"
+private const val REMINDER_SHOWN_AT_PREFERENCE = "update_reminder_shown_at"
+private const val REMINDER_SKIPPED_PREFERENCE = "update_reminder_skipped"
+private const val REMINDER_SECURITY_FIX_PREFERENCE = "update_reminder_security_fix"
+private const val REMINDER_SECURITY_SINCE_PREFERENCE = "update_reminder_security_since"
+
+/** The daily check asks GitHub at most once a day. */
 internal fun isAutoUpdateCheckDue(
     lastCheckMs: Long,
     nowMs: Long,
@@ -109,6 +131,11 @@ internal object AppUpdater {
 
     /** The update dialog; the drawer opens it, and an automatic update waiting for a tap opens it too. */
     val dialogVisible: StateFlow<Boolean> = mutableDialogVisible.asStateFlow()
+
+    private val mutableReminder = MutableStateFlow(UpdateReminder.NONE)
+
+    /** The banner or security dialog the daily check found; the screen shows it once no video plays. */
+    val reminder: StateFlow<UpdateReminder> = mutableReminder.asStateFlow()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var job: Job? = null
@@ -188,26 +215,115 @@ internal object AppUpdater {
         scope.launch { installNow(app, update, file) }
     }
 
-    /** The app came to the screen: an automatic check once a day, and a waiting update shows. */
+    /**
+     * The app came to the screen: once a day it checks for a newer version (with reminders or Update
+     * automatically on), and a waiting update shows.
+     */
     fun onAppStarted(context: Context) {
         foreground = true
         val app = context.applicationContext
         if (pendingConfirmation != null || (automatic && state.value is UpdateState.Ready)) {
             mutableDialogVisible.value = true
         }
-        if (!autoUpdateEnabled(app) || channel(app) == UpdateChannel.None || busy()) return
+        val reminders = remindersEnabled(app)
+        val auto = autoUpdateEnabled(app)
+        if ((!reminders && !auto) || channel(app) == UpdateChannel.None || busy()) return
         val preferences = preferences(app)
         val now = System.currentTimeMillis()
         if (!isAutoUpdateCheckDue(preferences.getLong(APP_UPDATE_LAST_CHECK_PREFERENCE, 0), now)) return
         preferences.edit().putLong(APP_UPDATE_LAST_CHECK_PREFERENCE, now).apply()
-        automatic = true
+        automatic = auto
         job =
             scope.launch {
                 checkNow(app)
                 val available = state.value as? UpdateState.Available ?: return@launch
+                // Update automatically installs an ordinary update itself; a security update is still shown.
+                if (reminders && (!auto || available.update.critical)) {
+                    mutableReminder.value = updateReminder(available.update, reminderMemory(app, preferences), System.currentTimeMillis())
+                }
                 // About 34 MB: only on Wi-Fi or another unmetered network.
-                if (unmetered(app)) downloadNow(app, available.update)
+                if (auto && unmetered(app)) downloadNow(app, available.update)
             }
+    }
+
+    /** The update the reminder is about, while one is known. */
+    private fun knownUpdate(): AppUpdate? =
+        when (val current = state.value) {
+            is UpdateState.Available -> current.update
+            is UpdateState.Downloading -> current.update
+            is UpdateState.Ready -> current.update
+            is UpdateState.Failed -> current.update
+            else -> null
+        }
+
+    private fun reminderMemory(
+        context: Context,
+        preferences: android.content.SharedPreferences,
+    ): ReminderMemory =
+        ReminderMemory(
+            shownVersion = preferences.getString(REMINDER_VERSION_PREFERENCE, null),
+            shownAtMs = preferences.getLong(REMINDER_SHOWN_AT_PREFERENCE, 0),
+            skippedVersion = preferences.getString(REMINDER_SKIPPED_PREFERENCE, null),
+            securityFixCode = preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0),
+            securitySinceMs = preferences.getLong(REMINDER_SECURITY_SINCE_PREFERENCE, 0),
+            // Preview builds are installed for each test, so the week after an update would hide the banner there.
+            installedAtMs =
+                if (channel(context) is UpdateChannel.Preview) {
+                    0L
+                } else {
+                    runCatching { context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime }.getOrDefault(0L)
+                },
+        )
+
+    /**
+     * The reminder appeared on screen: the wait before it shows again starts now, and a security fix seen
+     * for the first time starts its daily days (see `updateReminder`).
+     */
+    fun onReminderShown(context: Context) {
+        val update = knownUpdate() ?: return
+        val preferences = preferences(context.applicationContext)
+        val now = System.currentTimeMillis()
+        val editor =
+            preferences
+                .edit()
+                .putString(REMINDER_VERSION_PREFERENCE, update.versionName)
+                .putLong(REMINDER_SHOWN_AT_PREFERENCE, now)
+        if (update.critical && preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0) != update.securityFixCode) {
+            editor.putLong(REMINDER_SECURITY_FIX_PREFERENCE, update.securityFixCode).putLong(REMINDER_SECURITY_SINCE_PREFERENCE, now)
+        }
+        editor.apply()
+    }
+
+    /** Not now, or the reminder led to the update dialog. */
+    fun dismissReminder() {
+        mutableReminder.value = UpdateReminder.NONE
+    }
+
+    /** Skip this version: never a banner for it; a newer one still waits for the week (a security update cannot be skipped). */
+    fun skipReminderVersion(context: Context) {
+        val update = knownUpdate()
+        if (update != null && !update.critical) {
+            preferences(context.applicationContext).edit().putString(REMINDER_SKIPPED_PREFERENCE, update.versionName).apply()
+        }
+        dismissReminder()
+    }
+
+    /** Update from a reminder: the dialog shows the version, and a security update starts downloading at once. */
+    fun updateFromReminder(context: Context) {
+        val update = knownUpdate()
+        dismissReminder()
+        showDialog()
+        if (update != null && update.critical && state.value is UpdateState.Available) download(context, update)
+    }
+
+    /** Device tests show a reminder without asking GitHub. */
+    @VisibleForTesting
+    fun showReminderForTest(
+        update: AppUpdate,
+        shown: UpdateReminder,
+    ) {
+        mutableState.value = UpdateState.Available(update)
+        mutableReminder.value = shown
     }
 
     /** The app left the screen: an automatic update installs now, unless a video is playing. */
@@ -229,18 +345,48 @@ internal object AppUpdater {
             try {
                 val update =
                     when (val channel = channel(context)) {
-                        UpdateChannel.Official -> parseOfficialRelease(fetchText(UPDATE_LATEST_RELEASE_URL), BuildConfig.VERSION_NAME)
+                        UpdateChannel.Official -> officialUpdate()
                         is UpdateChannel.Preview -> parsePreviewRelease(fetchText(UPDATE_PREVIEW_RELEASE_URL), channel)
                         UpdateChannel.None -> null
                     }
                 if (update == null) UpdateState.UpToDate else UpdateState.Available(update)
             } catch (error: UpdateException) {
-                UpdateState.Failed(error.problem, null)
+                failed(error.problem, null)
             } catch (_: IOException) {
-                UpdateState.Failed(UpdateProblem.OFFLINE, null)
+                failed(UpdateProblem.OFFLINE, null)
             } catch (_: org.json.JSONException) {
-                UpdateState.Failed(UpdateProblem.GITHUB_ERROR, null)
+                failed(UpdateProblem.GITHUB_ERROR, null)
             }
+    }
+
+    /**
+     * The latest release's `update-info.json` first: GitHub's download hosts carry no per-address limit,
+     * and the file says whether the installed version misses a security fix. A release from before that
+     * file (or a missing one) falls back to GitHub's API.
+     */
+    private fun officialUpdate(): AppUpdate? {
+        val info =
+            try {
+                parseUpdateInfo(fetchText(UPDATE_INFO_URL))
+            } catch (error: UpdateException) {
+                if (error.problem != UpdateProblem.GITHUB_ERROR) throw error
+                null
+            }
+        return if (info != null) {
+            updateFromInfo(info, BuildConfig.VERSION_CODE.toLong())
+        } else {
+            parseOfficialRelease(fetchText(UPDATE_LATEST_RELEASE_URL), BuildConfig.VERSION_NAME)
+        }
+    }
+
+    /** A failed step, also kept in the problem log that Report a problem shows. */
+    private fun failed(
+        problem: UpdateProblem,
+        update: AppUpdate?,
+        file: File? = null,
+    ): UpdateState.Failed {
+        ProblemLog.record(ProblemArea.APP_UPDATE, problem.name)
+        return UpdateState.Failed(problem, update, file)
     }
 
     private suspend fun downloadNow(
@@ -264,10 +410,10 @@ internal object AppUpdater {
                 UpdateState.Ready(update, apk)
             } catch (error: UpdateException) {
                 part.delete()
-                UpdateState.Failed(error.problem, update)
+                failed(error.problem, update)
             } catch (_: IOException) {
                 part.delete()
-                UpdateState.Failed(UpdateProblem.OFFLINE, update)
+                failed(UpdateProblem.OFFLINE, update)
             }
     }
 
@@ -358,9 +504,9 @@ internal object AppUpdater {
                 session.commit(status.intentSender)
             }
         } catch (_: IOException) {
-            mutableState.value = UpdateState.Failed(UpdateProblem.INSTALL_FAILED, update, file)
+            mutableState.value = failed(UpdateProblem.INSTALL_FAILED, update, file)
         } catch (_: SecurityException) {
-            mutableState.value = UpdateState.Failed(UpdateProblem.INSTALL_FAILED, update, file)
+            mutableState.value = failed(UpdateProblem.INSTALL_FAILED, update, file)
         }
     }
 
@@ -374,7 +520,7 @@ internal object AppUpdater {
     ) {
         val (update, file) = lastInstall ?: return
         if (confirmation == null) {
-            mutableState.value = UpdateState.Failed(UpdateProblem.INSTALL_FAILED, update, file)
+            mutableState.value = failed(UpdateProblem.INSTALL_FAILED, update, file)
             return
         }
         if (foreground) {
@@ -392,7 +538,7 @@ internal object AppUpdater {
                 // The new version replaces this process; nothing is left to show.
                 PackageInstaller.STATUS_SUCCESS -> UpdateState.Idle
                 PackageInstaller.STATUS_FAILURE_ABORTED -> UpdateState.Failed(UpdateProblem.CANCELLED, update, file)
-                else -> UpdateState.Failed(UpdateProblem.INSTALL_FAILED, update, file)
+                else -> failed(UpdateProblem.INSTALL_FAILED, update, file)
             }
     }
 
@@ -446,6 +592,8 @@ internal object AppUpdater {
     private fun preferences(context: Context) = context.getSharedPreferences("dual_sub_preferences", 0)
 
     fun autoUpdateEnabled(context: Context): Boolean = preferences(context).getBoolean(APP_AUTO_UPDATE_PREFERENCE, false)
+
+    fun remindersEnabled(context: Context): Boolean = preferences(context).getBoolean(UPDATE_REMINDERS_PREFERENCE, true)
 }
 
 /** Android's answer to an install session [AppUpdater] committed. */

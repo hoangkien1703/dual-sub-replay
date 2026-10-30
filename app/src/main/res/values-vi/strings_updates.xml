@@ -31,4 +31,12 @@
     <string name="updates_auto_title">Tự động cập nhật</string>
     <string name="updates_auto_description">Mỗi ngày một lần khi bạn mở ứng dụng, kiểm tra phiên bản mới trên GitHub, tải về khi có Wi-Fi và cài khi bạn rời ứng dụng, không bao giờ cài khi video đang phát.</string>
     <string name="updates_auto_unavailable">Bản ứng dụng này không tự cập nhật được.</string>
+    <string name="updates_reminders_title">Báo cho tôi khi có phiên bản mới</string>
+    <string name="updates_reminders_description">Mỗi ngày một lần khi bạn mở ứng dụng, ứng dụng đọc một tệp nhỏ trên GitHub để biết có phiên bản mới và các bản sửa tạm thời khi YouTube hoặc Google thay đổi. Không gửi gì về bạn hay video của bạn. Khi tắt, ứng dụng chỉ hỏi GitHub khi bạn nhấn Kiểm tra cập nhật.</string>
+    <string name="updates_banner">Đã có phiên bản %1$s.</string>
+    <string name="updates_skip_version">Bỏ qua phiên bản này</string>
+    <string name="updates_security_title">Bản cập nhật bảo mật</string>
+    <string name="updates_security_message">Phiên bản %1$s sửa một lỗi bảo mật trong phiên bản bạn đang dùng (%2$s). Cập nhật ngay? Từ đã lưu và cài đặt của bạn vẫn được giữ.</string>
+    <string name="updates_reminders_off_hint">Khi tắt, bạn sẽ không được báo về phiên bản mới hay bản cập nhật bảo mật.</string>
+    <string name="updates_security_details">Đã sửa những gì</string>
 </resources>

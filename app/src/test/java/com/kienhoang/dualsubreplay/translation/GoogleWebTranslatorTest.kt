@@ -195,6 +195,48 @@ class GoogleWebTranslatorTest {
             assertEquals(GoogleEndpoint.entries.size, calls)
         }
 
+    @Test fun aRemoteSwitchChoosesTheAddressesAndTheirOrder() =
+        runBlocking {
+            val seen = mutableListOf<GoogleEndpoint>()
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = emptyList(),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            seen += endpoint
+                            if (endpoint == GoogleEndpoint.WEB_BATCH) UNREACHABLE to "" else 200 to batchReply(texts.map { "ok" })
+                        },
+                    addressNames = { listOf("WEB_BATCH", "EXTENSION_BATCH") },
+                )
+            assertEquals("ok", translator.translate("ja", "en", "テスト"))
+            assertEquals(listOf(GoogleEndpoint.WEB_BATCH, GoogleEndpoint.EXTENSION_BATCH), seen)
+            // Unknown names never add an address; nothing known keeps the app's own order.
+            assertEquals(listOf(GoogleEndpoint.BATCH), googleEndpointsFor(listOf("https://evil.example", "BATCH")))
+            assertEquals(GoogleEndpoint.entries, googleEndpointsFor(listOf("nope")))
+            assertEquals(GoogleEndpoint.entries, googleEndpointsFor(null))
+        }
+
+    @Test fun refusalsAnywhereSlowTheBackgroundUntilAClearAnswer() =
+        runBlocking {
+            var refuseFirst = true
+            val translator =
+                GoogleWebTranslator(
+                    retryDelaysMs = emptyList(),
+                    client =
+                        fakeGoogle { endpoint, texts ->
+                            if (refuseFirst && endpoint == GoogleEndpoint.BATCH) 429 to "" else 200 to batchReply(texts.map { "ok" })
+                        },
+                    addressNames = { listOf("BATCH", "EXTENSION_BATCH") },
+                )
+            translator.translateAll("ja", "en", listOf("a"))
+            assertEquals(1, translator.refusalStreak)
+            refuseFirst = false
+            translator.translateAll("ja", "en", listOf("b"))
+            assertEquals(0, translator.refusalStreak)
+            assertEquals(3, nextRefusalStreak(2, refused = true, reached = true))
+            assertEquals(2, nextRefusalStreak(2, refused = false, reached = false))
+        }
+
     @Test fun anUnreachableAddressHandsOverToTheNext() =
         runBlocking {
             val seen = mutableListOf<GoogleEndpoint>()

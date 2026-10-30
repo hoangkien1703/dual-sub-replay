@@ -311,7 +311,8 @@ class PageTranscriptSource(
         val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
         request.languages = availableLanguages(tracks)
         request.trackId = captionTrackId(track)
-        val mode = pageTokenMode
+        // A remote switch can turn page tokens off for everyone while YouTube's token changes break them.
+        val mode = if (RemoteSwitchState.switches.value.pageTokenOff) PageTokenMode.OFF else pageTokenMode
         val pageToken = mode != PageTokenMode.OFF && baseUrl.isNotEmpty()
         request.target =
             PageCaptionTarget(

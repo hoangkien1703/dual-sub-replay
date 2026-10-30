@@ -139,6 +139,7 @@ class AiActionsTest {
                 AiSetting.ORIGINAL_CAPTION_LANGUAGE,
                 AiSetting.APP_LANGUAGE,
                 AiSetting.PAGE_TOKEN_CAPTIONS,
+                AiSetting.UPDATE_REMINDERS,
                 AiSetting.APP_AUTO_UPDATE,
                 AiSetting.TV_LAYOUT,
             )
@@ -148,7 +149,7 @@ class AiActionsTest {
         val description = AI_TOOLS.first { it.name == AI_SETTING_TOOL }.description
         assertTrue(
             "natural_subtitle_flow, hide_sound_descriptions, preload_translation_models, original_caption_language, app_language, " +
-                "page_token_captions, auto_update, tv_layout " +
+                "page_token_captions, update_reminders, auto_update, tv_layout " +
                 "show an Apply button" in
                 description,
         )

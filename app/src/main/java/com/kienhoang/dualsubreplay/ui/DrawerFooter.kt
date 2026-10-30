@@ -30,15 +30,28 @@ private fun FooterLinkText(text: String) {
     Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
-/** The bottom of the drawer: Check for updates, then the open-source licences and the GitHub link in small text. */
+/** The bottom of the drawer: Check for updates, Report a problem, then the open-source licences and the GitHub link in small text. */
 @Composable
 internal fun DrawerFooter(beforeOpen: suspend () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showLicense by remember { mutableStateOf(false) }
+    var showReport by remember { mutableStateOf(false) }
     val loadingLicense = stringResource(R.string.navigation_loading_license)
     val uriHandler = LocalUriHandler.current
     CheckForUpdatesRow(onOpen = { scope.launch { beforeOpen() } })
+    TextButton(
+        onClick = {
+            scope.launch {
+                beforeOpen()
+                showReport = true
+            }
+        },
+        modifier = Modifier.padding(start = 4.dp).testTag("report_problem"),
+    ) {
+        FooterLinkText(stringResource(R.string.report_problem_title))
+    }
+    if (showReport) ReportProblemDialog(onDismiss = { showReport = false })
     Row(Modifier.padding(start = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         TextButton(
             onClick = {

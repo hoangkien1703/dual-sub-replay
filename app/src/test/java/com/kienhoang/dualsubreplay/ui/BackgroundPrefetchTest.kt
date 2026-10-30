@@ -27,7 +27,7 @@ class BackgroundPrefetchTest {
                 val batches = Collections.synchronizedList(mutableListOf<List<String>>())
                 val job =
                     launch {
-                        prefetchInBackground(store, requests, pauseMs = 1, restMs = 1) { texts ->
+                        prefetchInBackground(store, requests, pauseMs = { 1 }, restMs = 1) { texts ->
                             texts.take(10).also { if (it.isNotEmpty()) batches += it }
                         }
                     }
@@ -65,7 +65,7 @@ class BackgroundPrefetchTest {
                 var calls = 0
                 val job =
                     launch {
-                        prefetchInBackground(store, requests, pauseMs = 1, restMs = 1) { texts ->
+                        prefetchInBackground(store, requests, pauseMs = { 1 }, restMs = 1) { texts ->
                             if (++calls == 1) throw IllegalStateException("Google Translate returned HTTP 503.")
                             texts.also { sent += it }
                         }

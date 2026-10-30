@@ -7,11 +7,13 @@ import android.view.View
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.RemoteSwitchState
 import com.kienhoang.dualsubreplay.data.SponsorSegment
 import com.kienhoang.dualsubreplay.data.SponsorSegmentSource
 import kotlinx.coroutines.CompletableDeferred
@@ -420,7 +422,9 @@ internal fun AdSkipPageScripts(
     /** The view the page shows in: the full-screen view while the video is full screen. */
     pageView: () -> View = { webView },
 ) {
-    val settings by rememberAdSkipSettings()
+    val stored by rememberAdSkipSettings()
+    val remote by RemoteSwitchState.switches.collectAsState()
+    val settings = stored.withRemote(remote)
     val note = stringResource(R.string.ads_skipped_sponsor_note)
     val source = remember { SponsorSegmentSource() }
     val currentPageView by rememberUpdatedState(pageView)

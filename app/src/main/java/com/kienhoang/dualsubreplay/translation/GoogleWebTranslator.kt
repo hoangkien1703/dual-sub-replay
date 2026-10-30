@@ -1,5 +1,8 @@
 package com.kienhoang.dualsubreplay.translation
 
+import com.kienhoang.dualsubreplay.data.ProblemArea
+import com.kienhoang.dualsubreplay.data.ProblemLog
+import com.kienhoang.dualsubreplay.data.RemoteSwitchState
 import com.kienhoang.dualsubreplay.data.ResponseLimitExceededException
 import com.kienhoang.dualsubreplay.data.readUtf8WithLimit
 import kotlinx.coroutines.Dispatchers
@@ -143,6 +146,30 @@ internal fun googleLanguageCode(appCode: String): String =
 /** Google answers a refused client with 403 or 429 ("automated queries"); another endpoint may still work. */
 internal fun isBlockedGoogleStatus(code: Int): Boolean = code == 403 || code == 429
 
+/** The addresses in a remote switch's order (only names the app knows), or every address in the app's order. */
+internal fun googleEndpointsFor(names: List<String>?): List<GoogleEndpoint> =
+    names
+        ?.mapNotNull { name -> GoogleEndpoint.entries.firstOrNull { it.name == name } }
+        ?.distinct()
+        ?.takeIf { it.isNotEmpty() }
+        ?: GoogleEndpoint.entries
+
+/**
+ * How many requests in a row met a refusal (HTTP 403/429) at some address, even when another address
+ * then worked: Google is limiting this network, so background requests slow down. A request that no
+ * address refused starts over at 0; one that could not reach Google leaves it as it was.
+ */
+internal fun nextRefusalStreak(
+    streak: Int,
+    refused: Boolean,
+    reached: Boolean,
+): Int =
+    when {
+        refused -> streak + 1
+        reached -> 0
+        else -> streak
+    }
+
 /** Endpoint indices to try, starting with the one that last worked. */
 internal fun googleClientOrder(
     preferred: Int,
@@ -241,7 +268,11 @@ class GoogleWebTranslator(
             .build(),
     /** Keeps the address that last worked across restarts; null keeps it only while this translator lives. */
     private val addressMemory: GoogleAddressMemory? = null,
+    /** The address names to try, in order (see [googleEndpointsFor]): a remote switch may reorder them or leave some out. */
+    private val addressNames: () -> List<String>? = { RemoteSwitchState.switches.value.googleTranslateAddresses },
 ) {
+    private fun addresses(): List<GoogleEndpoint> = googleEndpointsFor(addressNames())
+
     // Separate from the on-device caches, so switching engines never shows the other engine's result.
     private val diskCache = cacheDirectory?.let { TranslationDiskCache(it) }
 
@@ -251,6 +282,10 @@ class GoogleWebTranslator(
     @Volatile private var preferredEndpoint = rememberedAddress(addressMemory, GoogleEndpoint.entries)
 
     private val failures = MutableStateFlow<String?>(null)
+
+    /** See [nextRefusalStreak]; the background translation waits longer while it is above 0. */
+    @Volatile var refusalStreak = 0
+        private set
 
     /**
      * What the addresses tried by the latest request did so far (see [googleFailureList]); null while
@@ -321,8 +356,8 @@ class GoogleWebTranslator(
         target: String,
         text: String,
     ): String? {
-        val endpoints = GoogleEndpoint.entries
-        for (index in googleClientOrder(preferredEndpoint, endpoints.size).drop(1)) {
+        val endpoints = addresses()
+        for (index in googleClientOrder(startIndex(endpoints), endpoints.size).drop(1)) {
             val translated =
                 try {
                     sendAll(endpoints[index], googleLanguageCode(source), googleLanguageCode(target), listOf(text)).single()
@@ -410,9 +445,9 @@ class GoogleWebTranslator(
         texts: List<String>,
     ): List<String?> {
         val refusals = mutableListOf<Pair<GoogleEndpoint, GoogleTranslateException>>()
-        val endpoints = GoogleEndpoint.entries
+        val endpoints = addresses()
         failures.value = null
-        for (index in googleClientOrder(preferredEndpoint, endpoints.size)) {
+        for (index in googleClientOrder(startIndex(endpoints), endpoints.size)) {
             val translated =
                 try {
                     sendAll(endpoints[index], source, target, texts)
@@ -422,12 +457,18 @@ class GoogleWebTranslator(
                     failures.value = googleFailureList(refusals)
                     continue
                 }
-            if (index != preferredEndpoint) {
-                preferredEndpoint = index
+            if (endpoints[index].ordinal != preferredEndpoint) {
+                preferredEndpoint = endpoints[index].ordinal
                 addressMemory?.write(endpoints[index].name)
+            }
+            noteRefusals(refusals, reached = true)
+            if (refusals.any { (_, error) -> error.status != null }) {
+                ProblemLog.record(ProblemArea.GOOGLE_TRANSLATE, "worked after " + googleFailureList(refusals))
             }
             return translated
         }
+        noteRefusals(refusals, reached = refusals.any { (_, error) -> !error.unreachable })
+        ProblemLog.record(ProblemArea.GOOGLE_TRANSLATE, googleFailureList(refusals))
         // An address that could not be reached is worth retrying after a pause; refusals are not.
         throw if (refusals.any { (_, error) ->
                 error.unreachable
@@ -437,6 +478,18 @@ class GoogleWebTranslator(
         } else {
             googleRefusedEverywhere(refusals)
         }
+    }
+
+    /** Where in [endpoints] to start: the address that last worked, when it is still in the list. */
+    private fun startIndex(endpoints: List<GoogleEndpoint>): Int =
+        endpoints.indexOf(GoogleEndpoint.entries[preferredEndpoint]).coerceAtLeast(0)
+
+    private fun noteRefusals(
+        refusals: List<Pair<GoogleEndpoint, GoogleTranslateException>>,
+        reached: Boolean,
+    ) {
+        refusalStreak =
+            nextRefusalStreak(refusalStreak, refusals.any { (_, error) -> error.status?.let(::isBlockedGoogleStatus) == true }, reached)
     }
 
     /** One request for a batch endpoint, one per text for the other. Errors name the address. */

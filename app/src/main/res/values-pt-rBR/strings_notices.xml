@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">O YouTube mudou algo, então as legendas podem não carregar. Uma correção está a caminho.</string>
+    <string name="notice_google_translate_limited">O Google Tradutor está limitando as solicitações agora, então algumas linhas podem ser traduzidas no dispositivo.</string>
+    <string name="notice_update_recommended">Uma versão mais recente corrige problemas desta. Abra o menu e toque em Verificar atualizações.</string>
+    <string name="notice_close">Fechar</string>
+    <string name="report_problem_title">Relatar um problema</string>
+    <string name="report_problem_intro">Nada é enviado a menos que você queira. Enviar por e-mail ou Abrir GitHub inicia um relatório com os detalhes abaixo, que você pode alterar antes de enviar. Ele lista só as etapas que falharam recentemente, nunca seus vídeos, legendas ou conta.</string>
+    <string name="report_problem_open">Abrir GitHub</string>
+    <string name="report_problem_copy">Copiar</string>
+    <string name="report_problem_copied">Copiado</string>
+    <string name="report_problem_also_copied">Também foi copiado. Se o GitHub mostrar um formulário vazio, escolha Bug report e cole em Screenshots or logs.</string>
+    <string name="report_problem_email">Enviar por e-mail</string>
+    <string name="report_problem_no_email">Nenhum app de e-mail está configurado neste telefone. Toque em Copiar e envie o relatório de outra forma.</string>
+</resources>

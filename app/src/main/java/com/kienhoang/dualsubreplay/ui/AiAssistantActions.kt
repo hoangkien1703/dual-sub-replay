@@ -29,6 +29,7 @@ import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.translation.storedGoogleWait
 import com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE
+import com.kienhoang.dualsubreplay.update.UPDATE_REMINDERS_PREFERENCE
 import kotlinx.coroutines.CancellationException
 import java.net.URLEncoder
 import java.text.NumberFormat
@@ -141,6 +142,7 @@ internal data class AiStoredSettings(
     /** An `APP_LANGUAGES` tag, or "device". */
     val appLanguage: String = "device",
     val study: StudySettings = StudySettings(),
+    val updateReminders: Boolean = true,
     val autoUpdate: Boolean = false,
     val adSkip: AdSkipSettings = AdSkipSettings(),
     val differentTabAccounts: Boolean = false,
@@ -161,6 +163,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         rememberDraggedPosition = preferences.getBoolean(REMEMBER_OVERLAY_POSITION_PREFERENCE, true),
         appLanguage = AppLanguageSettings.selected(context)?.tag ?: "device",
         study = readStudySettings(preferences),
+        updateReminders = preferences.getBoolean(UPDATE_REMINDERS_PREFERENCE, true),
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
         adSkip = readAdSkipSettings(preferences),
         differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
@@ -195,6 +198,7 @@ private fun aiStoredSettingValue(
         AiSetting.AVOID_VIDEO_CONTROLS -> onOff(stored.avoidVideoControls)
         AiSetting.REMEMBER_DRAGGED_POSITION -> onOff(stored.rememberDraggedPosition)
         AiSetting.APP_LANGUAGE -> stored.appLanguage
+        AiSetting.UPDATE_REMINDERS -> onOff(stored.updateReminders)
         AiSetting.APP_AUTO_UPDATE -> onOff(stored.autoUpdate)
         AiSetting.SKIP_ADS -> onOff(stored.adSkip.skipAds)
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
@@ -637,6 +641,7 @@ internal class AppAiActions(
                 // Like the settings page: turning it off forgets the dragged positions.
                 if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             }
+            AiSetting.UPDATE_REMINDERS -> editor.putBoolean(UPDATE_REMINDERS_PREFERENCE, on)
             AiSetting.APP_AUTO_UPDATE -> editor.putBoolean(APP_AUTO_UPDATE_PREFERENCE, on)
             AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
             AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
@@ -818,6 +823,7 @@ internal class AppAiActions(
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
             AiSetting.KANJI_DETAILS -> switch(R.string.study_kanji_details_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
+            AiSetting.UPDATE_REMINDERS -> switch(R.string.updates_reminders_title, value)
             AiSetting.APP_AUTO_UPDATE -> switch(R.string.updates_auto_title, value)
             AiSetting.SKIP_ADS -> switch(R.string.ads_skip_ads_title, value)
             AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)

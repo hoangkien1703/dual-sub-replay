@@ -41,6 +41,7 @@ import com.kienhoang.dualsubreplay.data.UPDATE_RELEASES_PAGE_URL
 import com.kienhoang.dualsubreplay.data.UpdateChannel
 import com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE
 import com.kienhoang.dualsubreplay.update.AppUpdater
+import com.kienhoang.dualsubreplay.update.UPDATE_REMINDERS_PREFERENCE
 import com.kienhoang.dualsubreplay.update.UpdateProblem
 import com.kienhoang.dualsubreplay.update.UpdateState
 
@@ -246,8 +247,21 @@ private fun Busy(
 internal fun AppUpdateSettingsSection() {
     val context = LocalContext.current
     val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
+    var reminders by remember { mutableStateOf(preferences.getBoolean(UPDATE_REMINDERS_PREFERENCE, true)) }
     var auto by remember { mutableStateOf(preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false)) }
     val channel = remember(context) { AppUpdater.channel(context) }
+    SettingsSwitchRow(
+        title = stringResource(R.string.updates_reminders_title),
+        description = stringResource(R.string.updates_reminders_description),
+        checked = reminders,
+        onCheckedChange = {
+            reminders = it
+            preferences.edit().putBoolean(UPDATE_REMINDERS_PREFERENCE, it).apply()
+            if (!it) AppUpdater.dismissReminder()
+        },
+        testTag = "update_reminders_switch",
+    )
+    if (!reminders) SettingsHint(stringResource(R.string.updates_reminders_off_hint))
     SettingsSwitchRow(
         title = stringResource(R.string.updates_auto_title),
         description = stringResource(R.string.updates_auto_description),

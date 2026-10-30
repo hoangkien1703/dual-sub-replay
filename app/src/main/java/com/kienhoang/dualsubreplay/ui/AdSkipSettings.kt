@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.RemoteSwitches
 
 // Settings → Ads & sponsors (owner request 2026-10-25): both switches are on by default.
 
@@ -35,6 +36,10 @@ internal fun readAdSkipSettings(preferences: SharedPreferences): AdSkipSettings 
         skipSponsors = preferences.getBoolean(SKIP_SPONSORS_PREFERENCE, true),
         alwaysSkipSponsors = preferences.getBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, false),
     )
+
+/** What the page does: the user's switches, unless a remote switch turned skipping off for now. */
+internal fun AdSkipSettings.withRemote(switches: RemoteSwitches): AdSkipSettings =
+    copy(skipAds = skipAds && !switches.skipAdsOff, skipSponsors = skipSponsors && !switches.skipSponsorsOff)
 
 /** The Ads and sponsors settings, following every change (from the settings page or the assistant). */
 @Composable

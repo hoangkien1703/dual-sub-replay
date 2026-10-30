@@ -110,6 +110,7 @@ internal fun AppNavigation(
                 )
             }
         }
+        AppNoticesHost()
     }
 }
 
