@@ -165,4 +165,5 @@
     <string name="settings_google_wait_2">2초</string>
     <string name="settings_google_wait_4">4초</string>
     <string name="settings_google_wait_8">8초</string>
+    <string name="settings_source_language_auto_short">자동</string>
 </resources>

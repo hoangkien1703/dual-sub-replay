@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,12 +45,16 @@ import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.ViewDay
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -278,7 +281,8 @@ private fun CompactLanguageRow(
         Text(label, modifier = Modifier.weight(1f).padding(end = 8.dp), style = MaterialTheme.typography.bodyLarge)
         OutlinedButton(
             onClick = onClick,
-            modifier = Modifier.widthIn(min = 120.dp, max = 180.dp).testTag(tag),
+            // The same width for both, so their edges line up.
+            modifier = Modifier.width(150.dp).testTag(tag),
             contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
         ) {
             Text(value, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
@@ -291,6 +295,7 @@ private fun CompactLanguageRow(
  * The subtitle panel's gear opens this small popup with only the languages, over the video.
  * "Dual-subtitle settings" leads to the full settings page.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun QuickLanguageSettingsDialog(
     sourcePreference: String,
@@ -304,6 +309,7 @@ internal fun QuickLanguageSettingsDialog(
 ) {
     val languagePicker = remember { LanguagePickerState() }
     val autoLabel = stringResource(R.string.settings_source_language_auto)
+    val shortAutoLabel = stringResource(R.string.settings_source_language_auto_short)
     val interfaceLocale = currentInterfaceLocale()
     val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
     val pickerOpen =
@@ -317,14 +323,22 @@ internal fun QuickLanguageSettingsDialog(
             onTargetChange = onTargetChange,
         )
     if (pickerOpen) return
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        // Owner request 2026-10-30: no icon, the title on the left beside the X, and no Done (changes apply at once).
-        title = { DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss) },
-        text = {
-            Column(Modifier.testTag("quick_language_settings")) {
+    // Owner requests 2026-10-30: no icon, the title on the left beside the X, no Done (changes apply at
+    // once), and no empty button row, so this is a plain dialog card rather than an AlertDialog.
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+        ) {
+            Column(Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 12.dp).testTag("quick_language_settings")) {
+                ProvideTextStyle(MaterialTheme.typography.headlineSmall) {
+                    DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss)
+                }
+                Spacer(Modifier.height(12.dp))
                 CompactLanguageRows(
-                    sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, interfaceLocale),
+                    // "Auto" alone fits beside its label; the picker's list still says "Auto (recommended)".
+                    sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, shortAutoLabel, interfaceLocale),
                     targetLanguage = targetLanguage,
                     onPick = languagePicker::open,
                 )
@@ -347,14 +361,18 @@ internal fun QuickLanguageSettingsDialog(
                     Text(
                         stringResource(R.string.settings_dual_subtitle_settings),
                         style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f),
                     )
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
-        },
-        confirmButton = {},
-    )
+        }
+    }
 }
 
 @Composable

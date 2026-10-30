@@ -165,4 +165,5 @@
     <string name="settings_google_wait_2">2 dtk</string>
     <string name="settings_google_wait_4">4 dtk</string>
     <string name="settings_google_wait_8">8 dtk</string>
+    <string name="settings_source_language_auto_short">Otomatis</string>
 </resources>
