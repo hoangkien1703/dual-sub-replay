@@ -27,6 +27,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+/** A dialog window fades in after Compose is idle; the screenshot waits for it to finish. */
+private const val DIALOG_FADE_IN_MS = 700L
+
 /** The update reminder, the security dialog, a remote notice and Report a problem (owner request 2026-10-30). */
 class AppNoticesUiTest {
     @get:Rule
@@ -87,6 +90,7 @@ class AppNoticesUiTest {
         composeRule.onNodeWithText("Security update").assertIsDisplayed()
         composeRule.onNodeWithTag("security_update_update").assertIsDisplayed()
         composeRule.onNodeWithTag("security_update_details").assertIsDisplayed()
+        Thread.sleep(DIALOG_FADE_IN_MS)
         saveUiEvidence("security-update-dialog")
         composeRule.onNodeWithTag("security_update_not_now").performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("security_update_message")).fetchSemanticsNodes().isEmpty() }
@@ -116,6 +120,7 @@ class AppNoticesUiTest {
             ).assertIsDisplayed()
         composeRule.onNodeWithTag("report_problem_open").assertIsDisplayed()
         composeRule.onNodeWithTag("report_problem_copy").assertIsDisplayed()
+        Thread.sleep(DIALOG_FADE_IN_MS)
         saveUiEvidence("report-a-problem")
     }
 
