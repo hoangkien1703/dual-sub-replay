@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">YouTube 側の変更により、字幕が読み込めないことがあります。修正を準備中です。</string>
+    <string name="notice_google_translate_limited">現在 Google 翻訳がリクエストを制限しているため、一部の行は端末上で翻訳されることがあります。</string>
+    <string name="notice_update_recommended">新しいバージョンでこのバージョンの問題が修正されています。メニューを開いて「アップデートを確認」をタップしてください。</string>
+    <string name="notice_close">閉じる</string>
+    <string name="report_problem_title">問題を報告</string>
+    <string name="report_problem_intro">あなたが選ばない限り何も送信されません。「GitHub を開く」で下の内容を入れたバグ報告が作成され、送信前に編集できます。内容は最近失敗した手順だけで、動画・字幕・アカウントは含まれません。</string>
+    <string name="report_problem_open">GitHub を開く</string>
+    <string name="report_problem_copy">コピー</string>
+    <string name="report_problem_copied">コピーしました</string>
+</resources>

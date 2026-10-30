@@ -26,7 +26,9 @@ GitHub.", so people visit GitHub and download every release by hand.
 ## Non-goals
 
 - Google Play, F-Droid, Obtainium or any other store or updater.
-- A project server, or any request to GitHub that the user did not start or turn on.
+- A project server, or any request to GitHub that the user did not start or turn on. (Superseded
+  on 2026-10-30 by the owner's decision to turn update reminders on by default; see
+  [scale readiness](2026-10-30-scale-readiness.md).)
 - Updating a locally built debug app (its signing key differs from releases): the button opens
   the releases page instead.
 

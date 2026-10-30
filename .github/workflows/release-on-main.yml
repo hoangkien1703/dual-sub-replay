@@ -35,6 +35,7 @@ jobs:
       source_sha: ${{ steps.plan.outputs.source_sha }}
       version: ${{ steps.plan.outputs.version }}
       version_code: ${{ steps.plan.outputs.version_code }}
+      minimum_safe_version_code: ${{ steps.plan.outputs.minimum_safe_version_code }}
     steps:
       - name: Check out trusted main workflow source and release history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -55,6 +56,10 @@ jobs:
               gh label create "$label" --color 1D76DB --description "Release automation: $mode"
             fi
           done
+          if ! grep -Fxq "security:critical" <<< "$labels"; then
+            gh label create "security:critical" --color B60205 \
+              --description "Release fixes a security problem: older apps are asked to update at once"
+          fi
 
       - name: Verify merge and CI, then reserve or resume the release
         id: plan
@@ -146,6 +151,7 @@ jobs:
         env:
           EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
           EXPECTED_CODE: ${{ needs.prepare.outputs.version_code }}
+          MINIMUM_SAFE_CODE: ${{ needs.prepare.outputs.minimum_safe_version_code }}
         run: |
           set -euo pipefail
           mkdir -p release
@@ -166,6 +172,11 @@ jobs:
             exit 1
           fi
           sha256sum "$release_apk" | sed 's#  release/#  #' > release/DualSub-Replay.apk.sha256
+          # What the app reads once a day from the latest release (owner decision 2026-10-30).
+          python3 tools/automatic_release.py update-info --version "$EXPECTED_VERSION" \
+            --version-code "$EXPECTED_CODE" --minimum-safe-version-code "${MINIMUM_SAFE_CODE:-0}" \
+            --apk "$release_apk" --output release/update-info.json
+          cat release/update-info.json
 
       - name: Upload verified APK and checksum to the reserved draft
         if: steps.resume.outputs.build == 'true'
@@ -175,7 +186,7 @@ jobs:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         run: >-
           gh release upload "v${RELEASE_VERSION}"
-          release/DualSub-Replay.apk release/DualSub-Replay.apk.sha256 --clobber
+          release/DualSub-Replay.apk release/DualSub-Replay.apk.sha256 release/update-info.json --clobber
 
       - name: Publish the complete official release
         if: steps.resume.outputs.build == 'true'

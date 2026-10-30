@@ -31,4 +31,10 @@
     <string name="updates_auto_title">自动更新</string>
     <string name="updates_auto_description">每天打开应用时检查一次 GitHub 上的新版本，在 Wi-Fi 下下载，并在你离开应用时安装；视频播放时不会安装。</string>
     <string name="updates_auto_unavailable">这个应用无法自行更新。</string>
+    <string name="updates_reminders_title">有新版本时通知我</string>
+    <string name="updates_reminders_description">每天打开应用时读取一次 GitHub 上的一个小文件，了解新版本以及针对 YouTube 或 Google 变化的临时修复。不会发送任何关于你或你所看视频的信息。关闭后，只有点按“检查更新”时才会访问 GitHub。</string>
+    <string name="updates_banner">版本 %1$s 已推出。</string>
+    <string name="updates_skip_version">跳过此版本</string>
+    <string name="updates_security_title">安全更新</string>
+    <string name="updates_security_message">版本 %1$s 修复了你当前版本（%2$s）中的一个安全问题。现在更新吗？你保存的单词和设置都会保留。</string>
 </resources>

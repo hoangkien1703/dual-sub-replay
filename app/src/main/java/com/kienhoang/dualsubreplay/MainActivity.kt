@@ -15,11 +15,13 @@ import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.ui.AppLanguageSettings
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
 import com.kienhoang.dualsubreplay.ui.TvRemoteKeys
 import com.kienhoang.dualsubreplay.update.AppUpdater
+import com.kienhoang.dualsubreplay.update.RemoteSwitchFetcher
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ProblemLog.init(cacheDir)
         enableEdgeToEdge()
         allowContentInDisplayCutout()
         updateImmersiveMode(resources.configuration)
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         AppUpdater.onAppStarted(this)
+        RemoteSwitchFetcher.onAppStarted(this)
     }
 
     override fun onStop() {

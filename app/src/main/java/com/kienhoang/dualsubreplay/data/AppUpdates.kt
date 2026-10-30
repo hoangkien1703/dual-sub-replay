@@ -9,6 +9,12 @@ internal const val UPDATE_LATEST_RELEASE_URL = "https://api.github.com/repos/$UP
 internal const val UPDATE_PREVIEW_RELEASE_URL = "https://api.github.com/repos/$UPDATE_REPOSITORY/releases/tags/preview"
 internal const val UPDATE_RELEASES_PAGE_URL = "https://github.com/$UPDATE_REPOSITORY/releases"
 internal const val UPDATE_PREVIEW_PAGE_URL = "$UPDATE_RELEASES_PAGE_URL/tag/preview"
+
+/**
+ * The latest release's small description of itself (owner decision 2026-10-30). GitHub serves it from
+ * its download hosts, which, unlike the API, have no 60-an-hour limit per shared mobile address.
+ */
+internal const val UPDATE_INFO_URL = "$UPDATE_RELEASES_PAGE_URL/latest/download/update-info.json"
 internal const val OFFICIAL_APK_NAME = "DualSub-Replay.apk"
 internal const val OFFICIAL_APK_CHECKSUM_NAME = "$OFFICIAL_APK_NAME.sha256"
 internal const val OFFICIAL_APPLICATION_ID = "com.kienhoang.dualsubreplay"
@@ -69,7 +75,54 @@ internal data class AppUpdate(
     val sizeBytes: Long,
     /** The release page, with what changed. */
     val pageUrl: String,
+    /** The installed version is older than the latest security fix (a `security:critical` release). */
+    val critical: Boolean = false,
 )
+
+/** The latest release as its `update-info.json` describes it. */
+internal data class UpdateInfo(
+    val versionName: String,
+    val versionCode: Long,
+    /** The newest security release's version code; any older app should update at once. 0 when none. */
+    val minimumSafeVersionCode: Long,
+    val sha256: String,
+    val sizeBytes: Long,
+)
+
+private val STABLE_VERSION = Regex("""^\d{1,4}\.\d{1,4}\.\d{1,4}$""")
+
+/** The file's description, or null when it is another schema or anything is missing or malformed. */
+internal fun parseUpdateInfo(json: String): UpdateInfo? {
+    val info = runCatching { JSONObject(json) }.getOrNull() ?: return null
+    if (info.optInt("schema") != 1 || info.optString("apk") != OFFICIAL_APK_NAME) return null
+    val version = info.optString("version").takeIf(STABLE_VERSION::matches) ?: return null
+    val code = info.optLong("version_code").takeIf { it > 0 } ?: return null
+    val sha256 = info.optString("sha256").lowercase().takeIf(SHA256_HEX::matches) ?: return null
+    return UpdateInfo(
+        versionName = version,
+        versionCode = code,
+        minimumSafeVersionCode = info.optLong("minimum_safe_version_code").coerceAtLeast(0),
+        sha256 = sha256,
+        sizeBytes = info.optLong("size").coerceAtLeast(0),
+    )
+}
+
+/** The update [info] offers to an app with [installedVersionCode]; null when it is not newer. */
+internal fun updateFromInfo(
+    info: UpdateInfo,
+    installedVersionCode: Long,
+): AppUpdate? {
+    if (info.versionCode <= installedVersionCode) return null
+    return AppUpdate(
+        versionName = info.versionName,
+        downloadUrl = "$UPDATE_RELEASES_PAGE_URL/download/v${info.versionName}/$OFFICIAL_APK_NAME",
+        sha256 = info.sha256,
+        checksumUrl = null,
+        sizeBytes = info.sizeBytes,
+        pageUrl = "$UPDATE_RELEASES_PAGE_URL/tag/v${info.versionName}",
+        critical = installedVersionCode < info.minimumSafeVersionCode,
+    )
+}
 
 /** Compares the numbers of two versions like `v1.7.1` or `1.7.2-pr3-build9`; the rest is ignored. */
 internal fun compareVersions(

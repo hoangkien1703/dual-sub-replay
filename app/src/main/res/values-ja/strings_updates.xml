@@ -31,4 +31,10 @@
     <string name="updates_auto_title">自動で更新</string>
     <string name="updates_auto_description">1 日 1 回、アプリを開いたときに GitHub で新しいバージョンを確認し、Wi-Fi でダウンロードして、アプリを離れたときにインストールします。動画の再生中にはインストールしません。</string>
     <string name="updates_auto_unavailable">このアプリは自動で更新できません。</string>
+    <string name="updates_reminders_title">新しいバージョンを知らせる</string>
+    <string name="updates_reminders_description">1 日に 1 回、アプリを開いたときに GitHub 上の小さなファイルを読み、新しいバージョンや YouTube・Google の変更への一時的な修正を確認します。あなたや動画についての情報は送信しません。オフにすると、「アップデートを確認」をタップしたときだけ GitHub に問い合わせます。</string>
+    <string name="updates_banner">バージョン %1$s が利用できます。</string>
+    <string name="updates_skip_version">このバージョンをスキップ</string>
+    <string name="updates_security_title">セキュリティアップデート</string>
+    <string name="updates_security_message">バージョン %1$s は、お使いのバージョン（%2$s）のセキュリティ上の問題を修正します。今すぐアップデートしますか？保存した単語と設定はそのまま残ります。</string>
 </resources>

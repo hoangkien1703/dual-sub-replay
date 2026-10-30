@@ -134,6 +134,9 @@ internal enum class AiSetting(
     /** Settings → YouTube tabs (2026-10-27). */
     DIFFERENT_TAB_ACCOUNTS("different_tab_accounts"),
 
+    /** Settings → App updates (2026-10-30): reads GitHub once a day, so it waits for a tap. */
+    UPDATE_REMINDERS("update_reminders", asks = true),
+
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
     APP_AUTO_UPDATE("auto_update", asks = true),
 
@@ -772,6 +775,11 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (Use different Google accounts: adds New tab with another account under Tabs in the menu, where a tab " +
                 "can use Account 2 or 3 with its own Google sign-in; off by default, then every tab uses Account 1)"
+        AiSetting.UPDATE_REMINDERS ->
+            choiceList(setting.choices) +
+                " (Tell me about new versions: once a day when the app opens it reads a small file on GitHub, shows a " +
+                "banner for a new version at most once a week and a security update at once, and applies temporary " +
+                "fixes for YouTube or Google changes; on by default; off, only the menu's Check for updates asks GitHub)"
         AiSetting.APP_AUTO_UPDATE ->
             choiceList(setting.choices) +
                 " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +

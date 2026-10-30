@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">YouTube 做了一些更改，字幕可能无法加载。修复正在准备中。</string>
+    <string name="notice_google_translate_limited">Google 翻译目前正在限制请求，因此部分字幕可能会在设备上翻译。</string>
+    <string name="notice_update_recommended">新版本修复了此版本中的问题。请打开菜单并点按“检查更新”。</string>
+    <string name="notice_close">关闭</string>
+    <string name="report_problem_title">报告问题</string>
+    <string name="report_problem_intro">除非你选择发送，否则不会发送任何内容。“打开 GitHub”会用下面的信息创建一个错误报告，你可以在发送前修改。报告只列出最近失败的步骤，绝不包含你的视频、字幕或账号。</string>
+    <string name="report_problem_open">打开 GitHub</string>
+    <string name="report_problem_copy">复制</string>
+    <string name="report_problem_copied">已复制</string>
+</resources>

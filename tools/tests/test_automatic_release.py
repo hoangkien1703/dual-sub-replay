@@ -27,7 +27,7 @@ class FakeGitHub:
                       "status": "completed", "conclusion": "success"}]
         self.jobs = [{"name": name, "conclusion": "success"} for name in release.REQUIRED_JOBS]
         self.assets = [{"name": name, "size": 100} for name in
-                       ("DualSub-Replay.apk", "DualSub-Replay.apk.sha256")]
+                       ("DualSub-Replay.apk", "DualSub-Replay.apk.sha256", "update-info.json")]
         self.writes = []
         self.associated_prs = [PR]
 
@@ -246,7 +246,7 @@ class ReleaseTests(unittest.TestCase):
     def test_publish_requires_all_assets_and_the_reserved_source(self):
         plan = release.prepare(self.api, self.pr)
         self.api.assets.pop()
-        with self.assertRaisesRegex(ValueError, "Both verified"):
+        with self.assertRaisesRegex(ValueError, "update-info.json must be uploaded"):
             release.publish(self.api, plan["release_id"])
         self.assertTrue(self.api.releases[-1]["draft"])
         self.api.assets = FakeGitHub().assets
@@ -268,6 +268,52 @@ class ReleaseTests(unittest.TestCase):
         self.api.releases.append(dict(self.api.releases[0], id=3, tag_name="v1.0.6"))
         release.publish(self.api, plan["release_id"])
         self.assertEqual(self.api.releases[1]["make_latest"], "false")
+
+    def test_publish_requires_update_info(self):
+        plan = release.prepare(self.api, self.pr)
+        self.api.assets = [asset for asset in self.api.assets if asset["name"] != "update-info.json"]
+        with self.assertRaisesRegex(ValueError, "update-info.json"):
+            release.publish(self.api, plan["release_id"])
+        self.assertTrue(self.api.releases[-1]["draft"])
+
+    def test_security_label_sets_the_minimum_safe_version(self):
+        plan = release.prepare(self.api, self.pr)
+        self.assertFalse(plan["security"])
+        self.assertEqual(plan["minimum_safe_version_code"], 0)
+        self.api.releases[-1]["draft"] = False
+        self.pr.update(number=73, merge_commit_sha="merge73", head={"sha": "head73"},
+                       labels=[{"name": "security:critical"}, {"name": "release:minor"}])
+        self.api.runs[0].update(head_sha="head73")
+        security = release.prepare(self.api, self.pr)
+        self.assertTrue(security["security"])
+        self.assertEqual(security["minimum_safe_version_code"], 37)
+        self.assertIn('"security": true', self.api.releases[-1]["body"])
+        # A later ordinary release keeps telling older apps about the security fix.
+        self.api.releases[-1]["draft"] = False
+        self.pr.update(number=74, merge_commit_sha="merge74", head={"sha": "head74"}, labels=[])
+        self.api.runs[0].update(head_sha="head74")
+        later = release.prepare(self.api, self.pr)
+        self.assertEqual((later["version_code"], later["minimum_safe_version_code"]), (38, 37))
+
+    def test_unpublished_security_draft_does_not_raise_the_minimum(self):
+        meta = {"pr": 1, "merge_sha": "m", "release_sha": "r", "version": "1.0.5", "version_code": 40, "security": True}
+        draft = {"draft": True, "body": "<!-- automatic-release-v1 " + json.dumps(meta) + " -->"}
+        old = dict(meta, version_code=30)
+        published = {"draft": False, "body": "<!-- automatic-release-v1 " + json.dumps(old) + " -->"}
+        legacy = {"draft": False, "body": "Legacy notes"}
+        self.assertEqual(release.minimum_safe_version_code([draft, published, legacy], {"version_code": 41}), 30)
+        self.assertEqual(release.minimum_safe_version_code([], {"version_code": 41, "security": True}), 41)
+
+    def test_update_info_describes_the_apk(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            apk = Path(folder) / "DualSub-Replay.apk"
+            apk.write_bytes(b"apk bytes")
+            info = release.update_info("1.0.5", 36, 30, apk)
+        self.assertEqual(info, {"schema": 1, "version": "1.0.5", "version_code": 36,
+                                "minimum_safe_version_code": 30, "apk": "DualSub-Replay.apk",
+                                "sha256": release.hashlib.sha256(b"apk bytes").hexdigest(),
+                                "size": 9})
 
     def test_tampered_reservation_is_rejected(self):
         release.prepare(self.api, self.pr)

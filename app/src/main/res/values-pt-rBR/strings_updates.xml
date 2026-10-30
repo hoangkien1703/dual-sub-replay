@@ -31,4 +31,10 @@
     <string name="updates_auto_title">Atualizar automaticamente</string>
     <string name="updates_auto_description">Uma vez por dia, ao abrir o app, procura uma versão nova no GitHub, baixa pelo Wi-Fi e instala quando você sai do app, nunca enquanto um vídeo está tocando.</string>
     <string name="updates_auto_unavailable">Esta cópia do app não pode se atualizar sozinha.</string>
+    <string name="updates_reminders_title">Avisar sobre novas versões</string>
+    <string name="updates_reminders_description">Uma vez por dia, ao abrir o app, ele lê um pequeno arquivo no GitHub para saber de novas versões e correções temporárias para mudanças do YouTube ou do Google. Nada sobre você ou seus vídeos é enviado. Desativado, o app só consulta o GitHub quando você toca em Verificar atualizações.</string>
+    <string name="updates_banner">A versão %1$s está disponível.</string>
+    <string name="updates_skip_version">Pular esta versão</string>
+    <string name="updates_security_title">Atualização de segurança</string>
+    <string name="updates_security_message">A versão %1$s corrige um problema de segurança na versão que você tem (%2$s). Atualizar agora? Suas palavras salvas e configurações continuam.</string>
 </resources>

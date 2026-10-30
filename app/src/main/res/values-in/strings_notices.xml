@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">YouTube mengubah sesuatu, jadi teks mungkin tidak dimuat. Perbaikan sedang disiapkan.</string>
+    <string name="notice_google_translate_limited">Google Terjemahan sedang membatasi permintaan, jadi beberapa baris mungkin diterjemahkan di perangkat.</string>
+    <string name="notice_update_recommended">Versi yang lebih baru memperbaiki masalah pada versi ini. Buka menu dan ketuk Periksa pembaruan.</string>
+    <string name="notice_close">Tutup</string>
+    <string name="report_problem_title">Laporkan masalah</string>
+    <string name="report_problem_intro">Tidak ada yang dikirim kecuali Anda memilihnya. Buka GitHub memulai laporan bug dengan detail di bawah, yang dapat Anda ubah sebelum dikirim. Laporan hanya mencantumkan langkah yang gagal baru-baru ini, tidak pernah video, teks, atau akun Anda.</string>
+    <string name="report_problem_open">Buka GitHub</string>
+    <string name="report_problem_copy">Salin</string>
+    <string name="report_problem_copied">Disalin</string>
+</resources>

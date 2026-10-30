@@ -2,6 +2,7 @@
 """Plan/resume and publish releases. Mutations run only in the serialized main workflow."""
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,11 @@ VERSION = re.compile(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 MARKER = re.compile(r"<!-- automatic-release-v1 (\{[^\n]+\}) -->")
 # Every job in .github/workflows/android.yml; a test keeps this list in sync with the workflow.
 REQUIRED_JOBS = {"verify-build", "managed-device-tests"}
+# A release that fixes a security problem (owner decision 2026-10-30): apps older than it are
+# told at once, and this stays true after later ordinary releases. Separate from release:* labels.
+SECURITY_LABEL = "security:critical"
+APK_NAME = "DualSub-Replay.apk"
+UPDATE_INFO_NAME = "update-info.json"
 
 
 def command(*args, input_text=None):
@@ -66,6 +72,27 @@ def release_request(pr):
         version_tuple(requested)
         return requested
     return next(iter(modes), "release:patch").split(":")[1]
+
+
+def security_fix(pr):
+    return SECURITY_LABEL in {label["name"] for label in pr.get("labels", [])}
+
+
+def minimum_safe_version_code(releases, meta):
+    """The highest version code of a published security release, or of [meta] when it is one; 0 when none."""
+    codes = [metadata(item)["version_code"] for item in releases
+             if not item["draft"] and metadata(item) and metadata(item).get("security")]
+    if meta.get("security"):
+        codes.append(meta["version_code"])
+    return max(codes, default=0)
+
+
+def update_info(version, code, minimum_safe, apk):
+    """What the app reads from the latest release to learn about it (`update-info.json`)."""
+    data = Path(apk).read_bytes()
+    return {"schema": 1, "version": version, "version_code": code,
+            "minimum_safe_version_code": minimum_safe, "apk": APK_NAME,
+            "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
 
 
 def next_version(previous, request):
@@ -178,7 +205,8 @@ def prepare(api, pr):
         meta = metadata(release)
         if release["tag_name"] != "v" + meta["version"] or release["target_commitish"] != meta["release_sha"]:
             raise ValueError("The reserved draft has been edited; refusing to change its identity")
-        return dict(meta, eligible=True, release_needed=True, release_id=release["id"], source_sha=meta["release_sha"])
+        return dict(meta, eligible=True, release_needed=True, release_id=release["id"], source_sha=meta["release_sha"],
+                    minimum_safe_version_code=minimum_safe_version_code(releases, meta))
     request = release_request(pr)
     if request == "skip":
         return {"eligible": True, "release_needed": False, "source_sha": merge}
@@ -216,7 +244,7 @@ def prepare(api, pr):
     commit = api.api("git/commits", {"message": f"Release v{version} from PR #{pr['number']}",
                                      "tree": tree["sha"], "parents": [merge]})
     meta = {"pr": pr["number"], "merge_sha": merge, "release_sha": commit["sha"],
-            "version": version, "version_code": code, "ci_run": ci_run}
+            "version": version, "version_code": code, "ci_run": ci_run, "security": security_fix(pr)}
     previous = [release["tag_name"] for release in releases
                 if not release["draft"] and not release["prerelease"] and stable_tag(release["tag_name"])]
     notes_request = {"tag_name": "v" + version, "target_commitish": commit["sha"]}
@@ -231,7 +259,8 @@ def prepare(api, pr):
     release = api.api("releases", {"tag_name": "v" + version, "target_commitish": commit["sha"],
                                    "name": f"DualSub Replay v{version}", "body": body,
                                    "draft": True, "prerelease": False})
-    return dict(meta, eligible=True, release_needed=True, release_id=release["id"], source_sha=commit["sha"])
+    return dict(meta, eligible=True, release_needed=True, release_id=release["id"], source_sha=commit["sha"],
+                minimum_safe_version_code=minimum_safe_version_code(releases, meta))
 
 
 def publish(api, release_id):
@@ -246,9 +275,9 @@ def publish(api, release_id):
     if command("git", "rev-parse", "HEAD").strip() != meta["release_sha"]:
         raise ValueError("The checked-out source does not match the reserved release")
     assets = api.pages(f"releases/{release_id}/assets")
-    required = {"DualSub-Replay.apk", "DualSub-Replay.apk.sha256"}
+    required = {APK_NAME, APK_NAME + ".sha256", UPDATE_INFO_NAME}
     if not required <= {asset["name"] for asset in assets if asset["size"] > 0}:
-        raise ValueError("Both verified release assets must be uploaded before publication")
+        raise ValueError("The verified APK, its checksum and update-info.json must be uploaded before publication")
     releases = api.pages("releases")
     newer = any(not item["draft"] and not item["prerelease"] and stable_tag(item["tag_name"])
                 and version_tuple(item["tag_name"][1:]) > version_tuple(meta["version"]) for item in releases)
@@ -258,9 +287,19 @@ def publish(api, release_id):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["prepare", "publish"])
+    parser.add_argument("action", choices=["prepare", "publish", "update-info"])
     parser.add_argument("--release-id", type=int)
+    parser.add_argument("--version")
+    parser.add_argument("--version-code", type=int)
+    parser.add_argument("--minimum-safe-version-code", type=int, default=0)
+    parser.add_argument("--apk")
+    parser.add_argument("--output")
     args = parser.parse_args()
+    if args.action == "update-info":
+        version_tuple(args.version)
+        info = update_info(args.version, args.version_code, args.minimum_safe_version_code, args.apk)
+        Path(args.output).write_text(json.dumps(info, sort_keys=True) + "\n")
+        return
     if os.environ["GITHUB_REF"] != "refs/heads/main":
         raise ValueError("Release automation must run from main")
     api = GitHub(os.environ["GITHUB_REPOSITORY"])

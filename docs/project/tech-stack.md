@@ -82,6 +82,23 @@ Paths below are relative to
   `releases/latest`, preview builds newer builds of the same PR on `preview`
   (`data/AppUpdates.kt`). Each APK must match GitHub's SHA-256 digest, be this package and be
   newer before `PackageInstaller` gets it (`REQUEST_INSTALL_PACKAGES`); Android checks the signature.
+  Since 2026-10-30 ([spec](../specs/2026-10-30-scale-readiness.md)) Settings → App updates → Tell
+  me about new versions (on by default) makes the same daily check read the latest release's
+  `update-info.json` from GitHub's download hosts (not the API's 60-an-hour limit), falling back to
+  the API, and shows a banner (once per version, then weekly; Skip this version) or, below the
+  newest `security:critical` release, a Security update dialog (daily after Not now), never over a
+  playing video (`data/UpdateReminders.kt`, `ui/AppNotices.kt`).
+- Remote switches (owner decision 2026-10-30, switches only): `update/RemoteSwitchFetcher.kt` reads
+  `remote-config/switches.json` from `raw.githubusercontent.com` with the daily check (64 KiB cap,
+  saved 30 days). `data/RemoteSwitches.kt` can only reorder or drop built-in Google Translate
+  addresses, slow background translation (3–60 s), turn Skip ads, Skip sponsors or page-token
+  captions off, and show one of the notices in `strings_notices.xml`; it never carries code,
+  scripts, selectors or addresses. See [remote-config/README.md](../../remote-config/README.md).
+- Problem log (owner decision 2026-10-30, no server): `data/ProblemLog.kt` keeps the last 50 failed
+  steps (Google statuses and addresses, caption step names, update problems; never video IDs,
+  titles or text) in the cache folder. Menu → Report a problem shows them and opens a prefilled
+  GitHub bug report the person sends themselves. Background translation pauses double while Google
+  refuses (3 s to 60 s) and failed background steps rest 2 to 16 minutes (`PlaybackTranslation.kt`).
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve
   bounded loading and cancellation when changing long-video behavior.

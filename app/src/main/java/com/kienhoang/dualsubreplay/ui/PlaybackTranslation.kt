@@ -228,6 +228,27 @@ internal const val BACKGROUND_PREFETCH_PAUSE_MS = 3_000L
 /** Once everything ahead is translated, the background waits for this much playback (or a seek) before looking again. */
 internal const val BACKGROUND_PREFETCH_STEP_MS = 30_000L
 
+/** While Google keeps refusing, the background pause doubles up to this (owner request 2026-10-30). */
+internal const val MAX_BACKGROUND_PREFETCH_PAUSE_MS = 60_000L
+
+/** A background step that keeps failing rests twice as long each time, up to this. */
+internal const val MAX_BACKGROUND_REST_MS = 16 * 60_000L
+
+/**
+ * The pause before a background request: [baseMs] (3 s, or a remote switch's slower pace), doubled
+ * for each request in a row Google refused somewhere, so a busy shared address is not pressed harder.
+ */
+internal fun backgroundPrefetchPauseMs(
+    baseMs: Long,
+    refusalStreak: Int,
+): Long = (baseMs shl refusalStreak.coerceIn(0, 10)).coerceAtMost(maxOf(MAX_BACKGROUND_PREFETCH_PAUSE_MS, baseMs))
+
+/** The rest after the [failures]th failed background step in a row: [restMs], then 2, 4 and 8 times it. */
+internal fun backgroundRestMs(
+    restMs: Long,
+    failures: Int,
+): Long = (restMs shl (failures - 1).coerceIn(0, 10)).coerceAtMost(maxOf(MAX_BACKGROUND_REST_MS, restMs))
+
 /** Five minutes of speech is far fewer rows; this only bounds one read. */
 private const val MAX_BACKGROUND_PREFETCH_ROWS = 400
 
@@ -235,19 +256,21 @@ private const val MAX_BACKGROUND_PREFETCH_ROWS = 400
  * While the video plays, hands the sentences starting 1 to 5 minutes ahead to [fetch], one step at a
  * time with [pauseMs] before each. [fetch] sends one request for the texts not translated yet and
  * returns the texts it sent (none when all were translated); a text is handed over at most once, so a
- * line Google leaves blank is not asked again here. A failed step waits [restMs]: the playing minute,
- * not this prefetch, decides when Google has stopped working.
+ * line Google leaves blank is not asked again here. A failed step waits [restMs], doubling for each
+ * failure in a row (see [backgroundRestMs]): the playing minute, not this prefetch, decides when
+ * Google has stopped working. [pauseMs] is asked before each step, so it follows Google's refusals.
  */
 internal suspend fun prefetchInBackground(
     store: SubtitleStore,
     requests: StateFlow<CaptionPlaybackRequest>,
-    pauseMs: Long = BACKGROUND_PREFETCH_PAUSE_MS,
+    pauseMs: () -> Long = { BACKGROUND_PREFETCH_PAUSE_MS },
     restMs: Long = GOOGLE_RECHECK_INTERVAL_MS,
     fetch: suspend (List<String>) -> List<String>,
 ) {
     val sent = HashSet<String>()
+    var failures = 0
     while (true) {
-        delay(pauseMs)
+        delay(pauseMs())
         val request = requests.value
         if (!request.enabled || request.paused) {
             requests.first { it.enabled && !it.paused }
@@ -266,9 +289,10 @@ internal suspend fun prefetchInBackground(
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {
-                delay(restMs)
+                delay(backgroundRestMs(restMs, ++failures))
                 continue
             }
+        failures = 0
         sent += fetched
         if (fetched.isEmpty()) {
             requests.first {
