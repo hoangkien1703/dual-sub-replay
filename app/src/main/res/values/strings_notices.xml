@@ -9,4 +9,5 @@
     <string name="report_problem_open">Open GitHub</string>
     <string name="report_problem_copy">Copy</string>
     <string name="report_problem_copied">Copied</string>
+    <string name="report_problem_also_copied">Also copied. If GitHub shows an empty form, choose Bug report and paste it under Screenshots or logs.</string>
 </resources>

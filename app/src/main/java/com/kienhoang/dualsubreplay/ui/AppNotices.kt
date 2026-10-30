@@ -1,6 +1,9 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +50,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AppUpdate
@@ -213,7 +217,14 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
     val android = "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})"
     val report = remember(entries) { problemReport(BuildConfig.VERSION_NAME, android, device, entries) }
     var copied by remember { mutableStateOf(false) }
+    var opened by remember { mutableStateOf(false) }
     var noBrowser by remember { mutableStateOf(false) }
+    val copy = {
+        scope.launch {
+            clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("DualSub Replay", report)))
+            copied = true
+        }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.report_problem_title)) },
@@ -233,6 +244,14 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
                         modifier = Modifier.padding(8.dp).testTag("problem_report_text"),
                     )
                 }
+                if (opened) {
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        stringResource(R.string.report_problem_also_copied),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.testTag("report_problem_also_copied"),
+                    )
+                }
                 if (noBrowser) {
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.navigation_no_browser), style = MaterialTheme.typography.bodySmall)
@@ -241,19 +260,19 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
         },
         confirmButton = {
             TextButton(
-                onClick = { noBrowser = !openExternalPage(context, problemIssueUrl(report, BuildConfig.VERSION_NAME, device)) },
+                onClick = {
+                    // Copied too: an app that takes GitHub links (such as GitHub's own) shows an empty form.
+                    copy()
+                    opened = true
+                    noBrowser = !openInBrowser(context, problemIssueUrl(report, BuildConfig.VERSION_NAME, device))
+                },
                 modifier = Modifier.testTag("report_problem_open"),
             ) { Text(stringResource(R.string.report_problem_open)) }
         },
         dismissButton = {
             Row {
                 TextButton(
-                    onClick = {
-                        scope.launch {
-                            clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("DualSub Replay", report)))
-                            copied = true
-                        }
-                    },
+                    onClick = { copy() },
                     modifier = Modifier.testTag("report_problem_copy"),
                 ) { Text(stringResource(if (copied) R.string.report_problem_copied else R.string.report_problem_copy)) }
                 TextButton(onClick = onDismiss, modifier = Modifier.testTag("report_problem_close")) {
@@ -262,4 +281,23 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
             }
         },
     )
+}
+
+/**
+ * Opens [url] in the phone's browser rather than an app that claims GitHub links: GitHub's own app opens
+ * a new issue without the details the address fills in. With no browser it opens like any link; false
+ * when nothing can open it.
+ */
+internal fun openInBrowser(
+    context: Context,
+    url: String,
+): Boolean {
+    val view = Intent(Intent.ACTION_VIEW, url.toUri()).addCategory(Intent.CATEGORY_BROWSABLE)
+    val browser = Intent(view).apply { selector = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_BROWSER) }
+    return try {
+        context.startActivity(browser)
+        true
+    } catch (_: ActivityNotFoundException) {
+        openExternalPage(context, url)
+    }
 }

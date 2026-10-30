@@ -9,4 +9,5 @@
     <string name="report_problem_open">Buka GitHub</string>
     <string name="report_problem_copy">Salin</string>
     <string name="report_problem_copied">Disalin</string>
+    <string name="report_problem_also_copied">Juga sudah disalin. Jika GitHub menampilkan formulir kosong, pilih Bug report dan tempel di Screenshots or logs.</string>
 </resources>

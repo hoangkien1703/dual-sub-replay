@@ -9,4 +9,5 @@
     <string name="report_problem_open">打开 GitHub</string>
     <string name="report_problem_copy">复制</string>
     <string name="report_problem_copied">已复制</string>
+    <string name="report_problem_also_copied">也已复制。如果 GitHub 显示空白表单，请选择 Bug report 并粘贴到 Screenshots or logs 中。</string>
 </resources>

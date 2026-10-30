@@ -9,4 +9,5 @@
     <string name="report_problem_open">GitHub 열기</string>
     <string name="report_problem_copy">복사</string>
     <string name="report_problem_copied">복사됨</string>
+    <string name="report_problem_also_copied">복사도 했습니다. GitHub에 빈 양식이 보이면 Bug report를 선택하고 Screenshots or logs에 붙여 넣으세요.</string>
 </resources>

@@ -9,4 +9,5 @@
     <string name="report_problem_open">Mở GitHub</string>
     <string name="report_problem_copy">Sao chép</string>
     <string name="report_problem_copied">Đã sao chép</string>
+    <string name="report_problem_also_copied">Đã sao chép luôn. Nếu GitHub hiện biểu mẫu trống, hãy chọn Bug report và dán vào ô Screenshots or logs.</string>
 </resources>

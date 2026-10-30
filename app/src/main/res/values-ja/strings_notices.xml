@@ -9,4 +9,5 @@
     <string name="report_problem_open">GitHub を開く</string>
     <string name="report_problem_copy">コピー</string>
     <string name="report_problem_copied">コピーしました</string>
+    <string name="report_problem_also_copied">コピーもしました。GitHub に空のフォームが表示されたら、Bug report を選んで Screenshots or logs に貼り付けてください。</string>
 </resources>
