@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV（ベータ）</string>
+    <string name="settings_section_tv_summary">リモコン向けのTVレイアウト</string>
+    <string name="tv_layout_title">TVレイアウト（ベータ）</string>
+    <string name="tv_layout_description">YouTube検索のあるスタートページ、動画でのリモコン操作、一覧から選ぶ単語。オフにすると、このTVでもスマホと同じレイアウトになります。</string>
+    <string name="tv_layout_note">動画では：OKで再生／一時停止、◀ ▶で前／次の行、▲で行をもう一度再生、▼で字幕へ、戻るでTVホームを開きます。字幕の行でOKを押すと、その行の単語が表示されます。</string>
+    <string name="tv_layout_needs_tv">Android TV専用です。このアプリをAndroid TVまたはGoogle TVにインストールしてお試しください。</string>
+    <string name="tv_replay_line">行をもう一度再生</string>
+    <string name="tv_close">閉じる</string>
+    <string name="tv_pick_a_word">単語を選ぶ</string>
+    <string name="tv_home_back_to_video">動画に戻る</string>
+    <string name="tv_home_youtube_page">YouTubeページ</string>
+    <string name="tv_home_search">YouTubeを検索</string>
+    <string name="tv_home_search_label">検索する言葉</string>
+    <string name="tv_home_search_button">検索</string>
+    <string name="tv_home_subtitles_only">字幕あり（CC）</string>
+    <string name="tv_home_recent">最近：</string>
+    <string name="tv_home_continue">続きを見る</string>
+    <string name="tv_home_results">「%1$s」の動画</string>
+    <string name="tv_home_searching">YouTubeを検索中…</string>
+    <string name="tv_home_no_results">動画が見つかりません。別の言葉でお試しください。</string>
+    <string name="tv_home_search_failed">YouTubeを検索できませんでした。接続を確認して、もう一度お試しください。</string>
+    <string name="tv_home_try_again">もう一度試す</string>
+    <string name="tv_home_start_hint">学習中の言語の動画を検索するか、YouTubeページを開いてください。動画では◀ ▶で行を移動し、▼で字幕へ移ります。</string>
+</resources>

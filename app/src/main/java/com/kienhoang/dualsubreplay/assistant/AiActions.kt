@@ -137,6 +137,9 @@ internal enum class AiSetting(
     /** Settings → App updates: downloads and installs a new version, so it waits for a tap. */
     APP_AUTO_UPDATE("auto_update", asks = true),
 
+    /** Settings → Android TV (beta, 2026-10-30): changes the whole screen, so it waits for a tap; only a TV uses it. */
+    TV_LAYOUT("tv_layout", asks = true),
+
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
     ;
@@ -773,6 +776,10 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (Update automatically: once a day when the app opens it checks GitHub for a new version, downloads it on " +
                 "Wi-Fi and installs it when the user leaves the app; off by default, then only the menu's Check for updates asks)"
+        AiSetting.TV_LAYOUT ->
+            choiceList(setting.choices) +
+                " (TV layout, beta: on an Android TV, TV home with YouTube search, remote buttons on the video and words " +
+                "picked from a list; on by default on a TV; phones and tablets never use it)"
         else -> choiceList(setting.choices)
     }
 

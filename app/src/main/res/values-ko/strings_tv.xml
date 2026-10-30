@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (베타)</string>
+    <string name="settings_section_tv_summary">리모컨용 TV 레이아웃</string>
+    <string name="tv_layout_title">TV 레이아웃 (베타)</string>
+    <string name="tv_layout_description">YouTube 검색이 있는 시작 페이지, 영상에서 쓰는 리모컨 버튼, 목록에서 고르는 단어. 끄면 이 TV에서 휴대전화 레이아웃이 표시됩니다.</string>
+    <string name="tv_layout_note">영상에서: OK는 재생 또는 일시정지, ◀ ▶는 이전 또는 다음 줄, ▲는 줄 다시 재생, ▼는 자막으로 이동, 뒤로는 TV 홈을 엽니다. 자막 줄에서 OK를 누르면 그 줄의 단어가 표시됩니다.</string>
+    <string name="tv_layout_needs_tv">Android TV 전용입니다. 이 앱을 Android TV나 Google TV에 설치해서 사용해 보세요.</string>
+    <string name="tv_replay_line">줄 다시 재생</string>
+    <string name="tv_close">닫기</string>
+    <string name="tv_pick_a_word">단어 고르기</string>
+    <string name="tv_home_back_to_video">영상으로 돌아가기</string>
+    <string name="tv_home_youtube_page">YouTube 페이지</string>
+    <string name="tv_home_search">YouTube 검색</string>
+    <string name="tv_home_search_label">검색할 단어</string>
+    <string name="tv_home_search_button">검색</string>
+    <string name="tv_home_subtitles_only">자막 있음 (CC)</string>
+    <string name="tv_home_recent">최근:</string>
+    <string name="tv_home_continue">이어서 보기</string>
+    <string name="tv_home_results">“%1$s” 영상</string>
+    <string name="tv_home_searching">YouTube 검색 중…</string>
+    <string name="tv_home_no_results">영상을 찾지 못했습니다. 다른 단어로 해 보세요.</string>
+    <string name="tv_home_search_failed">YouTube를 검색할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="tv_home_try_again">다시 시도</string>
+    <string name="tv_home_start_hint">배우는 언어로 된 영상을 검색하거나 YouTube 페이지를 여세요. 영상에서 ◀ ▶로 줄을 이동하고 ▼로 자막으로 갑니다.</string>
+</resources>

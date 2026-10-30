@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">Layout de TV para controle remoto</string>
+    <string name="tv_layout_title">Layout de TV (beta)</string>
+    <string name="tv_layout_description">Uma página inicial com busca do YouTube, botões do controle remoto no vídeo e palavras escolhidas em uma lista. Desligado: esta TV mostra o layout do celular.</string>
+    <string name="tv_layout_note">Em um vídeo: OK reproduz ou pausa, ◀ ▶ vão para a linha anterior ou a próxima, ▲ repete a linha, ▼ vai para as legendas e Voltar abre o início da TV. OK em uma linha de legenda mostra as palavras dela.</string>
+    <string name="tv_layout_needs_tv">Só no Android TV. Instale este mesmo app em uma Android TV ou Google TV para testar.</string>
+    <string name="tv_replay_line">Repetir linha</string>
+    <string name="tv_close">Fechar</string>
+    <string name="tv_pick_a_word">Escolha uma palavra</string>
+    <string name="tv_home_back_to_video">Voltar ao vídeo</string>
+    <string name="tv_home_youtube_page">Página do YouTube</string>
+    <string name="tv_home_search">Pesquisar no YouTube</string>
+    <string name="tv_home_search_label">Palavras para pesquisar</string>
+    <string name="tv_home_search_button">Pesquisar</string>
+    <string name="tv_home_subtitles_only">Com legendas (CC)</string>
+    <string name="tv_home_recent">Recentes:</string>
+    <string name="tv_home_continue">Continuar assistindo</string>
+    <string name="tv_home_results">Vídeos de “%1$s”</string>
+    <string name="tv_home_searching">Pesquisando no YouTube…</string>
+    <string name="tv_home_no_results">Nenhum vídeo encontrado. Tente outras palavras.</string>
+    <string name="tv_home_search_failed">Não foi possível pesquisar no YouTube. Verifique a conexão e tente de novo.</string>
+    <string name="tv_home_try_again">Tentar de novo</string>
+    <string name="tv_home_start_hint">Pesquise um vídeo no idioma que você está aprendendo ou abra a página do YouTube. Em um vídeo, ◀ ▶ mudam de linha e ▼ vai para as legendas.</string>
+</resources>

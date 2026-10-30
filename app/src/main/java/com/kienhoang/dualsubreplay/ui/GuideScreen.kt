@@ -71,7 +71,7 @@ fun GuideScreen(onFinish: () -> Unit) {
             ) {
                 TextButton(
                     onClick = onFinish,
-                    modifier = Modifier.testTag("guide_skip"),
+                    modifier = Modifier.tvButtonFocusRing().testTag("guide_skip"),
                 ) {
                     Text(stringResource(R.string.onboarding_skip), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -107,6 +107,8 @@ fun GuideScreen(onFinish: () -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .tvStartFocus()
+                    .tvButtonFocusRing()
                     .testTag(if (isLastPage) "guide_done" else "guide_next"),
             ) {
                 Text(stringResource(if (isLastPage) R.string.onboarding_guide_get_started else R.string.onboarding_guide_next))
@@ -130,10 +132,15 @@ private fun GuidePageContent(page: GuidePage, modifier: Modifier = Modifier) {
                 contentDescription = page.imageContentDescriptionRes?.let { stringResource(it) },
                 contentScale = ContentScale.Crop,
                 alignment = if (page.imageCropFromTop) Alignment.TopCenter else Alignment.Center,
+                // A TV screen is short: the picture shrinks to the space left, so the buttons stay on screen.
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(aspectRatio)
-                    .clip(RoundedCornerShape(20.dp))
+                    .then(
+                        if (LocalTvLayout.current) {
+                            Modifier.weight(1f, fill = false).aspectRatio(aspectRatio, matchHeightConstraintsFirst = true)
+                        } else {
+                            Modifier.fillMaxWidth().aspectRatio(aspectRatio)
+                        },
+                    ).clip(RoundedCornerShape(20.dp))
                     .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
             )
             Spacer(Modifier.height(28.dp))

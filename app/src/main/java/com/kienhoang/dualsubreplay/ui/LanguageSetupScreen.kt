@@ -147,6 +147,7 @@ fun LanguageSetupScreen(
                 enabled = nativeLanguage != null && learningLanguage != null,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .tvButtonFocusRing()
                     .testTag("onboarding_continue"),
             ) {
                 Text(stringResource(R.string.onboarding_language_continue))

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">Tata letak TV untuk remote</string>
+    <string name="tv_layout_title">Tata letak TV (beta)</string>
+    <string name="tv_layout_description">Halaman awal dengan pencarian YouTube, tombol remote pada video, dan kata yang dipilih dari daftar. Mati: TV ini memakai tata letak ponsel.</string>
+    <string name="tv_layout_note">Pada video: OK memutar atau menjeda, ◀ ▶ ke baris sebelumnya atau berikutnya, ▲ memutar ulang baris, ▼ ke subtitle, dan Kembali membuka beranda TV. OK pada baris subtitle menampilkan kata-katanya.</string>
+    <string name="tv_layout_needs_tv">Hanya di Android TV. Pasang aplikasi yang sama ini di Android TV atau Google TV untuk mencobanya.</string>
+    <string name="tv_replay_line">Putar ulang baris</string>
+    <string name="tv_close">Tutup</string>
+    <string name="tv_pick_a_word">Pilih kata</string>
+    <string name="tv_home_back_to_video">Kembali ke video</string>
+    <string name="tv_home_youtube_page">Halaman YouTube</string>
+    <string name="tv_home_search">Cari di YouTube</string>
+    <string name="tv_home_search_label">Kata yang dicari</string>
+    <string name="tv_home_search_button">Cari</string>
+    <string name="tv_home_subtitles_only">Dengan subtitle (CC)</string>
+    <string name="tv_home_recent">Terbaru:</string>
+    <string name="tv_home_continue">Lanjutkan menonton</string>
+    <string name="tv_home_results">Video untuk “%1$s”</string>
+    <string name="tv_home_searching">Mencari di YouTube…</string>
+    <string name="tv_home_no_results">Video tidak ditemukan. Coba kata lain.</string>
+    <string name="tv_home_search_failed">Tidak bisa mencari di YouTube. Periksa koneksi lalu coba lagi.</string>
+    <string name="tv_home_try_again">Coba lagi</string>
+    <string name="tv_home_start_hint">Cari video dalam bahasa yang sedang kamu pelajari, atau buka halaman YouTube. Pada video, ◀ ▶ berpindah baris dan ▼ ke subtitle.</string>
+</resources>

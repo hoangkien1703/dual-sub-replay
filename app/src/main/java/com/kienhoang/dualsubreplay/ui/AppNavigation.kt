@@ -93,7 +93,10 @@ internal fun AppNavigation(
         },
     ) {
         AppUpdateDialogHost()
+        // TV home holds the menu's places; a remote that reached the menu could not leave it.
+        val tvLayout = LocalTvLayout.current
         content {
+            if (tvLayout) return@content
             Box(
                 modifier = Modifier.size(width = 72.dp, height = 48.dp)
                     .testTag("navigation_menu_button")

@@ -1,10 +1,12 @@
 package com.kienhoang.dualsubreplay
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +18,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.kienhoang.dualsubreplay.ui.AppLanguageSettings
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
+import com.kienhoang.dualsubreplay.ui.TvRemoteKeys
 import com.kienhoang.dualsubreplay.update.AppUpdater
 
 class MainActivity : ComponentActivity() {
@@ -49,6 +52,11 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         handleIntent(intent)
     }
+
+    // The TV layout's remote keys come first; elsewhere TvRemoteKeys takes nothing. androidx.core marks
+    // its ComponentActivity override restricted, but overriding Activity.dispatchKeyEvent is public API.
+    @SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean = TvRemoteKeys.dispatch(event, currentFocus) || super.dispatchKeyEvent(event)
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
