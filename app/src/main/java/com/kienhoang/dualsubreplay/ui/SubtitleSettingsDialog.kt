@@ -278,11 +278,12 @@ private fun CompactLanguageRow(
     onClick: () -> Unit,
 ) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, modifier = Modifier.weight(1f).padding(end = 8.dp), style = MaterialTheme.typography.bodyLarge)
+        Text(label, modifier = Modifier.weight(1f).padding(end = 8.dp), style = MaterialTheme.typography.bodyMedium)
         OutlinedButton(
             onClick = onClick,
-            // The same width for both, so their edges line up.
-            modifier = Modifier.width(150.dp).testTag(tag),
+            // The same width for both, so their edges line up; narrow enough that "Original language" fits
+            // on one line beside it even on a small phone.
+            modifier = Modifier.width(130.dp).testTag(tag),
             contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
         ) {
             Text(value, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
