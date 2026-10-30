@@ -29,7 +29,6 @@
     <string name="onboarding_goal_save">保存</string>
     <string name="onboarding_goal_cancel">キャンセル</string>
     <string name="onboarding_progress_title">進捗</string>
-    <string name="onboarding_progress_close">閉じる</string>
     <string name="onboarding_progress_load_error">進捗を読み込めませんでした。ストレージを確認し、この画面を開き直して再試行してください。</string>
     <string name="onboarding_progress_empty">字幕付きの動画を見ると、視聴時間の記録が始まります。</string>
     <string name="onboarding_progress_today">今日</string>

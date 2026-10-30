@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_close">Close</string>
+    <string name="dialog_discard_title">Discard your changes?</string>
+    <string name="dialog_discard">Discard</string>
+    <string name="dialog_keep_editing">Keep editing</string>
+</resources>

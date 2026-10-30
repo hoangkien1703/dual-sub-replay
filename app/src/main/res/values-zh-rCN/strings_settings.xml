@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">语言模型仅在需要时下载。</string>
     <string name="settings_subtitle_languages">字幕语言</string>
     <string name="settings_dual_subtitle_settings">双语字幕设置</string>
-    <string name="settings_dual_subtitle_settings_summary">文字大小、视图、颜色、悬浮层等</string>
     <string name="settings_done">完成</string>
     <string name="settings_close_settings">关闭设置</string>
     <string name="settings_group_languages">语言</string>
@@ -166,4 +165,5 @@
     <string name="settings_google_wait_2">2 秒</string>
     <string name="settings_google_wait_4">4 秒</string>
     <string name="settings_google_wait_8">8 秒</string>
+    <string name="settings_source_language_auto_short">自动</string>
 </resources>

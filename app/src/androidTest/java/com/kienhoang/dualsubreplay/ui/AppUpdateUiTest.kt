@@ -90,7 +90,7 @@ class AppUpdateUiTest {
         AppUpdater.showForTest(UpdateState.Idle)
         composeRule.setContent { DualSubTheme { AppUpdateDialogHost(channel = UpdateChannel.None) } }
         composeRule.onNodeWithTag("update_open_github").assertIsDisplayed()
-        composeRule.onNodeWithTag("update_close").performClick()
+        composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("update_message")).fetchSemanticsNodes().isEmpty() }
     }
 }

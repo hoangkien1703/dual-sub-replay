@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_close">Tutup</string>
+    <string name="dialog_discard_title">Buang perubahan Anda?</string>
+    <string name="dialog_discard">Buang</string>
+    <string name="dialog_keep_editing">Lanjut mengedit</string>
+</resources>

@@ -131,7 +131,7 @@ internal fun ProgressContent(
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.onboarding_progress_title), style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.onboarding_progress_close)) }
+            CloseIconButton(onDismiss, tag = "progress_close")
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         TodayCard(
@@ -410,7 +410,7 @@ private fun DailyGoalDialog(
     var selected by remember { mutableIntStateOf(goalMinutes) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.onboarding_goal_dialog_title)) },
+        title = { DialogTitle(stringResource(R.string.onboarding_goal_dialog_title), onClose = onDismiss, closeTag = "daily_goal_close") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.onboarding_goal_dialog_body))

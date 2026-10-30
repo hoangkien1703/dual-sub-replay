@@ -92,14 +92,14 @@ internal fun DrawerFooter(beforeOpen: suspend () -> Unit = {}) {
         }
         AlertDialog(
             onDismissRequest = { showLicense = false },
-            title = { Text(stringResource(R.string.navigation_licenses)) },
+            title = { DialogTitle(stringResource(R.string.navigation_licenses), onClose = { showLicense = false }) },
             text = {
                 Text(
                     stringResource(R.string.navigation_license_summary) + "\n\n" + license,
                     modifier = Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()),
                 )
             },
-            confirmButton = { TextButton(onClick = { showLicense = false }) { Text(stringResource(R.string.navigation_close)) } },
+            confirmButton = {},
         )
     }
 }

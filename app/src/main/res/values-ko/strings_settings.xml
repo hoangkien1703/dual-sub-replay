@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">언어 모델은 필요할 때만 다운로드돼요.</string>
     <string name="settings_subtitle_languages">자막 언어</string>
     <string name="settings_dual_subtitle_settings">이중 자막 설정</string>
-    <string name="settings_dual_subtitle_settings_summary">글자 크기, 보기, 색상, 오버레이 등</string>
     <string name="settings_done">완료</string>
     <string name="settings_close_settings">설정 닫기</string>
     <string name="settings_group_languages">언어</string>
@@ -166,4 +165,5 @@
     <string name="settings_google_wait_2">2초</string>
     <string name="settings_google_wait_4">4초</string>
     <string name="settings_google_wait_8">8초</string>
+    <string name="settings_source_language_auto_short">자동</string>
 </resources>

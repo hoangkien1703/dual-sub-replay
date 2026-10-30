@@ -29,7 +29,6 @@
     <string name="onboarding_goal_save">Salvar</string>
     <string name="onboarding_goal_cancel">Cancelar</string>
     <string name="onboarding_progress_title">Progresso</string>
-    <string name="onboarding_progress_close">Fechar</string>
     <string name="onboarding_progress_load_error">Não foi possível carregar seu progresso. Verifique o armazenamento e abra esta tela de novo para tentar novamente.</string>
     <string name="onboarding_progress_empty">Assista a um vídeo com legendas para começar a acompanhar seu tempo.</string>
     <string name="onboarding_progress_today">Hoje</string>

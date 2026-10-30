@@ -18,7 +18,6 @@
     <string name="updates_install">Pasang</string>
     <string name="updates_installing">Memasang… Aplikasi tertutup selama pembaruan.</string>
     <string name="updates_try_again">Coba lagi</string>
-    <string name="updates_close">Tutup</string>
     <string name="updates_open_github">Buka GitHub</string>
     <string name="updates_unsupported">Salinan aplikasi ini dibuat di komputer, jadi tidak bisa memperbarui dirinya sendiri. Dapatkan versi terbaru di GitHub.</string>
     <string name="updates_problem_offline">Tidak dapat menghubungi GitHub. Periksa koneksi Anda, lalu coba lagi.</string>

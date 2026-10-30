@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">O modelo de idioma só é baixado quando necessário.</string>
     <string name="settings_subtitle_languages">Idiomas das legendas</string>
     <string name="settings_dual_subtitle_settings">Configurações de legendas duplas</string>
-    <string name="settings_dual_subtitle_settings_summary">Tamanho do texto, visualização, cores, sobreposição e mais</string>
     <string name="settings_done">Concluído</string>
     <string name="settings_close_settings">Fechar configurações</string>
     <string name="settings_group_languages">Idiomas</string>
@@ -166,4 +165,5 @@
     <string name="settings_google_wait_2">2 s</string>
     <string name="settings_google_wait_4">4 s</string>
     <string name="settings_google_wait_8">8 s</string>
+    <string name="settings_source_language_auto_short">Automático</string>
 </resources>

@@ -18,7 +18,6 @@
     <string name="updates_install">安装</string>
     <string name="updates_installing">正在安装… 更新时应用会关闭。</string>
     <string name="updates_try_again">重试</string>
-    <string name="updates_close">关闭</string>
     <string name="updates_open_github">打开 GitHub</string>
     <string name="updates_unsupported">这个应用是在电脑上构建的，无法自行更新。请在 GitHub 获取最新版本。</string>
     <string name="updates_problem_offline">无法连接 GitHub。请检查网络后重试。</string>

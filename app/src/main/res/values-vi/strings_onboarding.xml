@@ -29,7 +29,6 @@
     <string name="onboarding_goal_save">Lưu</string>
     <string name="onboarding_goal_cancel">Hủy</string>
     <string name="onboarding_progress_title">Tiến độ</string>
-    <string name="onboarding_progress_close">Đóng</string>
     <string name="onboarding_progress_load_error">Không thể tải tiến độ của bạn. Hãy kiểm tra bộ nhớ rồi mở lại màn hình này để thử lại.</string>
     <string name="onboarding_progress_empty">Xem một video có phụ đề để bắt đầu theo dõi thời gian của bạn.</string>
     <string name="onboarding_progress_today">Hôm nay</string>

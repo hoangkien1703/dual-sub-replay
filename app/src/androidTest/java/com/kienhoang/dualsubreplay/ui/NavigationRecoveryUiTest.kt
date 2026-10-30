@@ -46,7 +46,7 @@ class NavigationRecoveryUiTest {
         compose.onNodeWithText("Check for updates").assertIsDisplayed()
         saveUiEvidence("navigation-drawer")
         compose.onNodeWithText("Open-source licenses").performClick()
-        compose.onNodeWithText("Close").assertIsDisplayed().performClick()
+        compose.onNodeWithTag(DIALOG_CLOSE_TAG).assertIsDisplayed().performClick()
         compose.onNodeWithText("Practice").assertIsNotDisplayed()
         compose.onNodeWithContentDescription("Open navigation menu").performClick()
         closeSystemDialogs()

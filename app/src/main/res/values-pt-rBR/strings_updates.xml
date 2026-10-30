@@ -18,7 +18,6 @@
     <string name="updates_install">Instalar</string>
     <string name="updates_installing">Instalando… O app fecha enquanto atualiza.</string>
     <string name="updates_try_again">Tentar de novo</string>
-    <string name="updates_close">Fechar</string>
     <string name="updates_open_github">Abrir o GitHub</string>
     <string name="updates_unsupported">Esta cópia do app foi compilada em um computador, então não pode se atualizar sozinha. Baixe a versão mais recente no GitHub.</string>
     <string name="updates_problem_offline">Não foi possível acessar o GitHub. Verifique sua conexão e tente de novo.</string>
