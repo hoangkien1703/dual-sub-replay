@@ -32,7 +32,8 @@ A review of what would break at a million users found no server to overload (the
     (`update-info.json`, served from GitHub's download hosts, not the rate-limited API).
   - A new version shows a small banner, at most once a week whichever version it names, so daily
     releases never bring a daily banner, and none in the week after the app was installed or updated
-    however that happened (Android's `lastUpdateTime`; owner questions 2026-10-30); **Skip this version** hides
+    however that happened (Android's `lastUpdateTime`; owner questions 2026-10-30; not for PR preview builds,
+    which are installed for every test); **Skip this version** hides
     that version for good, and a newer one still waits for the week.
   - A **security update** (a release whose PR had the `security:critical` label) shows a dialog at
     once; after Not now it returns daily for that fix's first 3 days, then weekly, and only a newer

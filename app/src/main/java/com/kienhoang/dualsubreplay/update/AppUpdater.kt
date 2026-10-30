@@ -266,7 +266,13 @@ internal object AppUpdater {
             skippedVersion = preferences.getString(REMINDER_SKIPPED_PREFERENCE, null),
             securityFixCode = preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0),
             securitySinceMs = preferences.getLong(REMINDER_SECURITY_SINCE_PREFERENCE, 0),
-            installedAtMs = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime }.getOrDefault(0L),
+            // Preview builds are installed for each test, so the week after an update would hide the banner there.
+            installedAtMs =
+                if (channel(context) is UpdateChannel.Preview) {
+                    0L
+                } else {
+                    runCatching { context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime }.getOrDefault(0L)
+                },
         )
 
     /**
