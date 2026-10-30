@@ -602,7 +602,7 @@ internal fun SingleYouTubePage(
     AdSkipPageScripts(webView, active = lifecycleStarted, pageView = { fullscreenSession?.view ?: webView })
     TvPageScripts(webView, tvLayout = LocalTvLayout.current, active = lifecycleStarted)
     DisposableEffect(webView) {
-        val focusPage = { webView.requestFocus(); Unit }
+        val focusPage: () -> Unit = { webView.requestFocus() }
         TvRemoteKeys.focusPage = focusPage
         onDispose { if (TvRemoteKeys.focusPage === focusPage) TvRemoteKeys.focusPage = null }
     }

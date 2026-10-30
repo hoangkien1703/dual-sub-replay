@@ -38,6 +38,21 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
+import com.kienhoang.dualsubreplay.playback.WebVideoCommand
+
+/** The line dialog for [segment], pausing the video while it is open. */
+@Composable
+internal fun TvLineWords(
+    segment: SubtitleSegment,
+    languageCode: String?,
+    onReplay: (SubtitleSegment) -> Unit,
+    onWord: (WordTap) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    LaunchedEffect(segment) { WebVideoBridge.send(WebVideoCommand.Pause) }
+    TvLineWordsDialog(segment, languageCode, onReplay = { onReplay(segment) }, onWord = onWord, onDismiss = onDismiss)
+}
 
 /** The words of a line that get a button: punctuation and symbols are left out. */
 internal fun tvLineWords(tokens: List<AnalyzedToken>): List<AnalyzedToken> =

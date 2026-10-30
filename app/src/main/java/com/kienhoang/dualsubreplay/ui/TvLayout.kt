@@ -68,6 +68,12 @@ internal fun readTvLayout(
     television: Boolean,
 ): Boolean = tvLayoutOn(television, preferences.getBoolean(TV_LAYOUT_PREFERENCE, true))
 
+/** The TV layout always keeps the subtitle panel beside the video; elsewhere Landscape split view decides. */
+internal fun landscapeSplitWanted(
+    setting: Boolean,
+    tvLayout: Boolean,
+): Boolean = setting || tvLayout
+
 /** Whether the TV layout is on, following every change (from the settings page or the assistant). */
 @Composable
 internal fun rememberTvLayout(): State<Boolean> {

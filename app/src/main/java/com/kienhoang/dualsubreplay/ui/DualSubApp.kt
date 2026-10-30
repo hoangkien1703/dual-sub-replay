@@ -89,8 +89,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
-import com.kienhoang.dualsubreplay.playback.WebVideoBridge
-import com.kienhoang.dualsubreplay.playback.WebVideoCommand
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import java.util.Locale
@@ -339,7 +337,7 @@ private fun DualSubExperience(
     val sideBySide =
         tracksVisible && !nativeDialogVisible &&
             shouldUseLandscapeSplit(
-                splitEnabled = state.landscapeSplitEnabled || tvLayout,
+                splitEnabled = landscapeSplitWanted(state.landscapeSplitEnabled, tvLayout),
                 subtitlePanelVisible = state.subtitlePanelVisible,
                 hasActiveVideo = state.activeVideoId != null,
                 orientation = configuration.orientation,
@@ -494,15 +492,13 @@ private fun DualSubExperience(
             }
         }
     }
-    if (tvLayout) {
-        TvLayer(
-            state = state,
-            webController = webController,
-            homeShown = tvHomeShown,
-            onHomeShownChange = { tvHomeShown = it },
-            actions = TvLayerActions(onOpenVideo, tabActions, onShowSubtitles, onVocabulary, onProgress) { showSettings = true },
-        )
-    }
+    TvLayer(
+        state = state,
+        webController = webController,
+        homeShown = tvHomeShown,
+        onHomeShownChange = { tvHomeShown = it },
+        actions = TvLayerActions(onOpenVideo, tabActions, onShowSubtitles, onVocabulary, onProgress) { showSettings = true },
+    )
     if (showQuickSettings) {
         QuickLanguageSettingsDialog(
             sourcePreference = sourceChoiceSelection(state),
@@ -1001,16 +997,7 @@ internal fun SubtitleTimeline(
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
-    tvLine?.let { segment ->
-        LaunchedEffect(segment) { WebVideoBridge.send(WebVideoCommand.Pause) }
-        TvLineWordsDialog(
-            segment = segment,
-            languageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
-            onReplay = { onReplay(segment) },
-            onWord = onWordClick,
-            onDismiss = { tvLine = null },
-        )
-    }
+    tvLine?.let { TvLineWords(it, state.resolvedSourceLanguage ?: state.sourcePreference, onReplay, onWordClick) { tvLine = null } }
 }
 
 /** Lets the remote's ▼ on the video move focus to the playing line while the panel is shown. */

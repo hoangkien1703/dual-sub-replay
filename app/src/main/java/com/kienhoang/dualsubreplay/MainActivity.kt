@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -52,7 +53,9 @@ class MainActivity : ComponentActivity() {
         handleIntent(intent)
     }
 
-    // The TV layout's remote keys come first; elsewhere TvRemoteKeys takes nothing.
+    // The TV layout's remote keys come first; elsewhere TvRemoteKeys takes nothing. androidx.core marks
+    // its ComponentActivity override restricted, but overriding Activity.dispatchKeyEvent is public API.
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean = TvRemoteKeys.dispatch(event, currentFocus) || super.dispatchKeyEvent(event)
 
     override fun onConfigurationChanged(newConfig: Configuration) {

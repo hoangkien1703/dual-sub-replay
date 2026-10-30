@@ -28,6 +28,13 @@ class TvLayoutTest {
     }
 
     @Test
+    fun theTvLayoutKeepsThePanelBesideTheVideo() {
+        assertTrue(landscapeSplitWanted(setting = false, tvLayout = true))
+        assertTrue(landscapeSplitWanted(setting = true, tvLayout = false))
+        assertFalse(landscapeSplitWanted(setting = false, tvLayout = false))
+    }
+
+    @Test
     fun resetAllSettingsBringsTheTvLayoutBack() {
         assertEquals(listOf("tv_layout"), TV_LAYOUT_SETTING_KEYS)
         assertTrue(RESETTABLE_SETTING_KEYS.containsAll(TV_LAYOUT_SETTING_KEYS))

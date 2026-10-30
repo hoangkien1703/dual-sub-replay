@@ -34,6 +34,7 @@ internal fun TvLayer(
     onHomeShownChange: (Boolean) -> Unit,
     actions: TvLayerActions,
 ) {
+    if (!LocalTvLayout.current) return
     BindTvRemote(state, webController, homeShown) { onHomeShownChange(true) }
     // Leaving TV home hands the remote to the page, so OK and the arrows work on the video at once.
     LaunchedEffect(homeShown) {

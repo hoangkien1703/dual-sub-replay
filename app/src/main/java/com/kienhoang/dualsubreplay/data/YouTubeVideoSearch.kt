@@ -1,7 +1,5 @@
 package com.kienhoang.dualsubreplay.data
 
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -13,6 +11,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 /*
  * YouTube's own web search, the request youtube.com sends when someone searches. It needs no key
