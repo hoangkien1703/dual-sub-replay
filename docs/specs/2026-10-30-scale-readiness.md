@@ -185,4 +185,13 @@ it is the owner's call and not applied without asking.
 
 ## Validation result
 
-To be filled after validation.
+| Check | Result |
+| --- | --- |
+| CI parity command (`formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest`) | Passed locally (Linux, JDK 21) |
+| New unit tests: `UpdateRemindersTest` (8), `RemoteSwitchesTest` (7), `ProblemLogTest` (5), `BackgroundBackoffTest` (3); extended `GoogleWebTranslatorTest`, `AiActionsTest`, `BackgroundPrefetchTest` | Passed |
+| `python3 -m unittest discover -s tools/tests -p 'test_*.py'` (42, incl. new release-tool tests) | Passed |
+| Workflow YAML parse, `remote-config/switches.json` parse | Passed |
+| PR CI on the first head (`verify-build`, `managed-device-tests`, incl. `AppNoticesUiTest`) | Passed on [PR 181](https://github.com/hoangkien1703/dual-sub-replay/pull/181); see the PR for the final head |
+| Release workflow writing `update-info.json` | Not run: it runs on the first release after merge (logic covered by the Python tests) |
+| Owner's phone: banner for a newer build of this PR, Report a problem opens GitHub | Not run yet (owner) |
+| Live YouTube | Not applicable |
