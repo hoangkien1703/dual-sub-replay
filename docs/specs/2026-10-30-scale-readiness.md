@@ -30,8 +30,9 @@ A review of what would break at a million users found no server to overload (the
 - **Update reminders, on by default** (Settings → App updates → Tell me about new versions):
   - Once a day when the app opens it reads one small file from the latest GitHub release
     (`update-info.json`, served from GitHub's download hosts, not the rate-limited API).
-  - A new version shows a small banner at once; after **Not now** it comes back at most once a
-    week; **Skip this version** hides it until a newer one.
+  - A new version shows a small banner, at most once a week whichever version it names, so daily
+    releases never bring a daily banner (owner question 2026-10-30); **Skip this version** hides
+    that version for good, and a newer one still waits for the week.
   - A **security update** (a release whose PR had the `security:critical` label) shows a dialog at
     once, and again once a day after Not now. It is based on a *minimum safe version*: someone
     two releases behind the security fix still gets it after a later ordinary release. People
@@ -106,8 +107,8 @@ A review of what would break at a million users found no server to overload (the
 
 ## Acceptance criteria
 
-- [ ] Reminder rules (unit tests): a new version shows at once; Not now hides it 7 days; Skip
-      hides it until a newer version; below the minimum safe version a security dialog shows,
+- [ ] Reminder rules (unit tests): the first banner shows at once, later ones at most once in 7
+      days even when a newer version came out meanwhile; Skip hides that version; below the minimum safe version a security dialog shows,
       and again after 1 day; nothing shows while a video plays; a clock moved back does not block.
 - [ ] `update-info.json` parsing ignores files with another schema, missing fields or bad SHA-256.
 - [ ] Release tool (Python tests): `security:critical` sets `security`; the minimum safe code is

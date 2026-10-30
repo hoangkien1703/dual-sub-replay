@@ -58,14 +58,16 @@ class UpdateRemindersTest {
     }
 
     @Test
-    fun aNewVersionShowsAtOnceThenAtMostWeekly() {
+    fun theBannerShowsAtMostOnceAWeekWhateverTheVersion() {
         assertEquals(UpdateReminder.BANNER, updateReminder(update(), ReminderMemory(), now))
         val shown = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now)
         assertEquals(UpdateReminder.NONE, updateReminder(update(), shown, now + day))
         assertEquals(UpdateReminder.NONE, updateReminder(update(), shown, now + 7 * day - 1))
         assertEquals(UpdateReminder.BANNER, updateReminder(update(), shown, now + 7 * day))
-        // A newer version than the one shown is new again.
-        assertEquals(UpdateReminder.BANNER, updateReminder(update(), shown.copy(shownVersion = "1.8.0"), now + day))
+        // A release every day still brings at most one banner a week (owner request 2026-10-30).
+        val yesterday = shown.copy(shownVersion = "1.8.9")
+        assertEquals(UpdateReminder.NONE, updateReminder(update(), yesterday, now + day))
+        assertEquals(UpdateReminder.BANNER, updateReminder(update(), yesterday, now + 7 * day))
         assertEquals(UpdateReminder.NONE, updateReminder(null, ReminderMemory(), now))
     }
 
@@ -80,6 +82,9 @@ class UpdateRemindersTest {
     @Test
     fun aSecurityUpdateShowsAtOnceAndAgainTheNextDay() {
         assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), ReminderMemory(), now))
+        // A banner shown today does not hold back a security update.
+        val banner = ReminderMemory(shownVersion = "1.8.9", shownAtMs = now)
+        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), banner, now + 1))
         val shown = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now)
         assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true), shown, now + day - 1))
         assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), shown, now + day))

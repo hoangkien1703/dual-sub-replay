@@ -85,7 +85,7 @@ Paths below are relative to
   Since 2026-10-30 ([spec](../specs/2026-10-30-scale-readiness.md)) Settings → App updates → Tell
   me about new versions (on by default) makes the same daily check read the latest release's
   `update-info.json` from GitHub's download hosts (not the API's 60-an-hour limit), falling back to
-  the API, and shows a banner (once per version, then weekly; Skip this version) or, below the
+  the API, and shows a banner (at most once a week whatever the version; Skip this version) or, below the
   newest `security:critical` release, a Security update dialog (daily after Not now), never over a
   playing video (`data/UpdateReminders.kt`, `ui/AppNotices.kt`).
 - Remote switches (owner decision 2026-10-30, switches only): `update/RemoteSwitchFetcher.kt` reads

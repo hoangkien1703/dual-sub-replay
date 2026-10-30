@@ -1,6 +1,9 @@
 package com.kienhoang.dualsubreplay.data
 
-/** After Not now, a new version is shown again a week later (owner request 2026-10-30). */
+/**
+ * The banner shows at most once in this long, however many versions come out meanwhile (owner request
+ * 2026-10-30: releases can come daily, and the banner must not appear every day).
+ */
 internal const val UPDATE_REMINDER_AGAIN_MS = 7L * 24 * 60 * 60 * 1000
 
 /** After Not now, a security update is shown again the next day. */
@@ -17,9 +20,10 @@ internal data class ReminderMemory(
 )
 
 /**
- * A new version shows at once, then at most once a week until Skip this version; a security update
- * (the installed app is older than the latest security fix) cannot be skipped and shows once a day.
- * A clock set back never hides a reminder for long.
+ * The banner shows at most once a week, whichever version it names, so daily releases do not bring a
+ * daily banner; Skip this version hides that version for good. A security update (the installed app is
+ * older than the latest security fix) cannot be skipped: it shows at once, then once a day. A clock set
+ * back never hides a reminder for long.
  */
 internal fun updateReminder(
     update: AppUpdate?,
@@ -27,12 +31,14 @@ internal fun updateReminder(
     nowMs: Long,
 ): UpdateReminder {
     if (update == null) return UpdateReminder.NONE
-    val shown = if (update.critical) UpdateReminder.SECURITY else UpdateReminder.BANNER
-    if (!update.critical && memory.skippedVersion == update.versionName) return UpdateReminder.NONE
-    if (memory.shownVersion != update.versionName) return shown
     val elapsed = nowMs - memory.shownAtMs
-    val again = if (update.critical) SECURITY_REMINDER_AGAIN_MS else UPDATE_REMINDER_AGAIN_MS
-    return if (elapsed >= again || elapsed < 0) shown else UpdateReminder.NONE
+    if (update.critical) {
+        val due = memory.shownVersion != update.versionName || elapsed >= SECURITY_REMINDER_AGAIN_MS || elapsed < 0
+        return if (due) UpdateReminder.SECURITY else UpdateReminder.NONE
+    }
+    if (memory.skippedVersion == update.versionName) return UpdateReminder.NONE
+    val due = memory.shownAtMs <= 0 || elapsed >= UPDATE_REMINDER_AGAIN_MS || elapsed < 0
+    return if (due) UpdateReminder.BANNER else UpdateReminder.NONE
 }
 
 /** A reminder never covers a playing video; it waits until the video is paused. */

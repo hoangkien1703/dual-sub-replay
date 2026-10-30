@@ -276,7 +276,7 @@ internal object AppUpdater {
         mutableReminder.value = UpdateReminder.NONE
     }
 
-    /** Skip this version: no reminder until a newer one (a security update cannot be skipped). */
+    /** Skip this version: never a banner for it; a newer one still waits for the week (a security update cannot be skipped). */
     fun skipReminderVersion(context: Context) {
         val update = knownUpdate()
         if (update != null && !update.critical) {
