@@ -5,9 +5,11 @@
     <string name="notice_update_recommended">Phiên bản mới hơn đã sửa các lỗi trong phiên bản này. Mở menu và nhấn Kiểm tra cập nhật.</string>
     <string name="notice_close">Đóng</string>
     <string name="report_problem_title">Báo lỗi</string>
-    <string name="report_problem_intro">Không có gì được gửi nếu bạn không chọn gửi. Mở GitHub sẽ tạo một báo cáo lỗi với thông tin bên dưới, bạn có thể sửa trước khi gửi. Báo cáo chỉ liệt kê các bước bị lỗi gần đây, không bao giờ có video, phụ đề hay tài khoản của bạn.</string>
+    <string name="report_problem_intro">Không có gì được gửi nếu bạn không chọn gửi. Gửi qua email hoặc Mở GitHub sẽ tạo một báo cáo với thông tin bên dưới, bạn có thể sửa trước khi gửi. Báo cáo chỉ liệt kê các bước bị lỗi gần đây, không bao giờ có video, phụ đề hay tài khoản của bạn.</string>
     <string name="report_problem_open">Mở GitHub</string>
     <string name="report_problem_copy">Sao chép</string>
     <string name="report_problem_copied">Đã sao chép</string>
     <string name="report_problem_also_copied">Đã sao chép luôn. Nếu GitHub hiện biểu mẫu trống, hãy chọn Bug report và dán vào ô Screenshots or logs.</string>
+    <string name="report_problem_email">Gửi qua email</string>
+    <string name="report_problem_no_email">Điện thoại chưa có ứng dụng email. Hãy nhấn Sao chép và gửi báo cáo theo cách khác.</string>
 </resources>

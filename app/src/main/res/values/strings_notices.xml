@@ -5,9 +5,11 @@
     <string name="notice_update_recommended">A newer version fixes problems in this one. Open the menu and tap Check for updates.</string>
     <string name="notice_close">Close</string>
     <string name="report_problem_title">Report a problem</string>
-    <string name="report_problem_intro">Nothing is sent unless you choose to. Open GitHub starts a bug report with the details below, which you can change before sending. It lists which steps failed recently, never your videos, subtitles or account.</string>
+    <string name="report_problem_intro">Nothing is sent unless you choose to. Send by email or Open GitHub starts a report with the details below, which you can change before sending. It lists which steps failed recently, never your videos, subtitles or account.</string>
     <string name="report_problem_open">Open GitHub</string>
     <string name="report_problem_copy">Copy</string>
     <string name="report_problem_copied">Copied</string>
     <string name="report_problem_also_copied">Also copied. If GitHub shows an empty form, choose Bug report and paste it under Screenshots or logs.</string>
+    <string name="report_problem_email">Send by email</string>
+    <string name="report_problem_no_email">No email app is set up on this phone. Tap Copy and send the report another way.</string>
 </resources>

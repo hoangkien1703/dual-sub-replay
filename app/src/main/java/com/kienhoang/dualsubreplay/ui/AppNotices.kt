@@ -56,10 +56,13 @@ import androidx.core.net.toUri
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AppUpdate
+import com.kienhoang.dualsubreplay.data.PROBLEM_REPORT_EMAIL
 import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.data.RemoteNotice
 import com.kienhoang.dualsubreplay.data.RemoteSwitchState
 import com.kienhoang.dualsubreplay.data.UpdateReminder
+import com.kienhoang.dualsubreplay.data.problemEmailSubject
+import com.kienhoang.dualsubreplay.data.problemEmailUri
 import com.kienhoang.dualsubreplay.data.problemIssueUrl
 import com.kienhoang.dualsubreplay.data.problemReport
 import com.kienhoang.dualsubreplay.data.reminderVisible
@@ -67,6 +70,8 @@ import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.playback.isPlaying
 import com.kienhoang.dualsubreplay.update.AppUpdater
 import com.kienhoang.dualsubreplay.update.UpdateState
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /** The remote notice last closed, as `id:key`, so it stays closed until a different one arrives. */
@@ -90,11 +95,13 @@ internal fun AppNoticesHost() {
     val context = LocalContext.current
     val reminder by AppUpdater.reminder.collectAsState()
     val state by AppUpdater.state.collectAsState()
-    val playback by WebVideoBridge.playback.collectAsState()
+    // Only whether a video plays: the playback position changes several times a second. Until the first
+    // value arrives a video counts as playing, so nothing can flash over one.
+    val playing by remember { WebVideoBridge.playback.map { it.isPlaying() }.distinctUntilChanged() }
+        .collectAsState(initial = true)
     val switches by RemoteSwitchState.switches.collectAsState()
     val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
     var closedNotice by remember { mutableStateOf(preferences.getString(REMOTE_NOTICE_CLOSED_PREFERENCE, null)) }
-    val playing = playback.isPlaying()
     val update = (state as? UpdateState.Available)?.update
     val showReminder = update != null && reminderVisible(reminder, playing)
     LaunchedEffect(showReminder, update?.versionName) {
@@ -221,6 +228,7 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
     var copied by remember { mutableStateOf(false) }
     var opened by remember { mutableStateOf(false) }
     var noBrowser by remember { mutableStateOf(false) }
+    var noEmailApp by remember { mutableStateOf(false) }
     val copy = {
         scope.launch {
             clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("DualSub Replay", report)))
@@ -258,9 +266,17 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.navigation_no_browser), style = MaterialTheme.typography.bodySmall)
                 }
+                if (noEmailApp) {
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.report_problem_no_email), style = MaterialTheme.typography.bodySmall)
+                }
             }
         },
         confirmButton = {
+            TextButton(
+                onClick = { noEmailApp = !sendProblemEmail(context, report) },
+                modifier = Modifier.testTag("report_problem_email"),
+            ) { Text(stringResource(R.string.report_problem_email)) }
             TextButton(
                 onClick = {
                     // Copied too: an app that takes GitHub links (such as GitHub's own) shows an empty form.
@@ -318,5 +334,26 @@ internal fun openInBrowser(
         true
     } catch (_: ActivityNotFoundException) {
         openExternalPage(context, url)
+    }
+}
+
+/**
+ * Send by email: the phone's mail app with the project's address, subject and report filled in; the
+ * person reads and sends it. False when no mail app is set up.
+ */
+private fun sendProblemEmail(
+    context: Context,
+    report: String,
+): Boolean {
+    val email =
+        Intent(Intent.ACTION_SENDTO, problemEmailUri(report, BuildConfig.VERSION_NAME).toUri())
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf(PROBLEM_REPORT_EMAIL))
+            .putExtra(Intent.EXTRA_SUBJECT, problemEmailSubject(BuildConfig.VERSION_NAME))
+            .putExtra(Intent.EXTRA_TEXT, report)
+    return try {
+        context.startActivity(email)
+        true
+    } catch (_: ActivityNotFoundException) {
+        false
     }
 }

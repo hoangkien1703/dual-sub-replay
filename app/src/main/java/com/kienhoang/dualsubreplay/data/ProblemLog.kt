@@ -106,6 +106,21 @@ internal fun problemReport(
         }
     }.trimEnd()
 
+/**
+ * Report a problem → Send by email goes here (owner decision 2026-10-30: most people have no GitHub
+ * account). The project's own inbox for app reports, not a personal one; it is in every APK, so keep it.
+ */
+internal const val PROBLEM_REPORT_EMAIL = "dualsubreplay.help@gmail.com"
+
+/** A `mailto:` address with the report as subject and body, for mail apps that ignore the intent's extras. */
+internal fun problemEmailUri(
+    report: String,
+    appVersion: String,
+): String = "mailto:$PROBLEM_REPORT_EMAIL?subject=${urlEncoded(problemEmailSubject(appVersion))}&body=${urlEncoded(report)}"
+
+/** English, like the report: it is for the project, not the person sending it. */
+internal fun problemEmailSubject(appVersion: String): String = "DualSub Replay problem report ($appVersion)"
+
 private fun urlEncoded(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
 
 /**

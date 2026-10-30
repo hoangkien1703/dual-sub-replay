@@ -5,9 +5,11 @@
     <string name="notice_update_recommended">Versi yang lebih baru memperbaiki masalah pada versi ini. Buka menu dan ketuk Periksa pembaruan.</string>
     <string name="notice_close">Tutup</string>
     <string name="report_problem_title">Laporkan masalah</string>
-    <string name="report_problem_intro">Tidak ada yang dikirim kecuali Anda memilihnya. Buka GitHub memulai laporan bug dengan detail di bawah, yang dapat Anda ubah sebelum dikirim. Laporan hanya mencantumkan langkah yang gagal baru-baru ini, tidak pernah video, teks, atau akun Anda.</string>
+    <string name="report_problem_intro">Tidak ada yang dikirim kecuali Anda memilihnya. Kirim lewat email atau Buka GitHub memulai laporan dengan detail di bawah, yang dapat Anda ubah sebelum dikirim. Laporan hanya mencantumkan langkah yang gagal baru-baru ini, tidak pernah video, teks, atau akun Anda.</string>
     <string name="report_problem_open">Buka GitHub</string>
     <string name="report_problem_copy">Salin</string>
     <string name="report_problem_copied">Disalin</string>
     <string name="report_problem_also_copied">Juga sudah disalin. Jika GitHub menampilkan formulir kosong, pilih Bug report dan tempel di Screenshots or logs.</string>
+    <string name="report_problem_email">Kirim lewat email</string>
+    <string name="report_problem_no_email">Belum ada aplikasi email di ponsel ini. Ketuk Salin dan kirim laporan dengan cara lain.</string>
 </resources>

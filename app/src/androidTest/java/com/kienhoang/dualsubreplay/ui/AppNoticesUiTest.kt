@@ -120,6 +120,7 @@ class AppNoticesUiTest {
             ).assertIsDisplayed()
         composeRule.onNodeWithTag("report_problem_open").assertIsDisplayed()
         composeRule.onNodeWithTag("report_problem_copy").assertIsDisplayed()
+        composeRule.onNodeWithTag("report_problem_email").assertIsDisplayed()
         Thread.sleep(DIALOG_FADE_IN_MS)
         saveUiEvidence("report-a-problem")
     }

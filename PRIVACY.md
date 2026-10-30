@@ -31,7 +31,7 @@ DualSub Replay is designed without an application account, analytics SDK, advert
 - It does not require an API key or DualSub Replay account. Only the optional AI assistant needs a key, which you get from the AI service yourself; everything else works without one.
 - It does not send subtitle text or translation requests to a server operated by this project. Subtitle text goes to Google only while Google Translate (online) is on, which is the default, and to the AI service you chose only when you ask the AI assistant about it.
 - It does not download video or audio from YouTube.
-- It does not intentionally collect analytics, advertising identifiers, or crash telemetry. Menu → Report a problem shows the recent problems the app noted on the phone (which step failed, Google's answer code and address; never your videos, subtitles or account) and only opens a GitHub bug report with them; you read, change and send it yourself.
+- It does not intentionally collect analytics, advertising identifiers, or crash telemetry. Menu → Report a problem shows the recent problems the app noted on the phone (which step failed, Google's answer code and address; never your videos, subtitles or account) and only opens an email to the project's report address (`dualsubreplay.help@gmail.com`) or a GitHub bug report with them; you read, change and send it yourself.
 
 Deleting the app clears its local app data under Android's normal uninstall behavior. You can also clear the app's storage from Android Settings.
 

@@ -53,6 +53,14 @@ class ProblemLogTest {
     }
 
     @Test
+    fun theEmailGoesToTheProjectInboxWithTheReport() {
+        val uri = problemEmailUri("App: 1.9.0\nPhone: Pixel & co", "1.9.0")
+        assertTrue(uri.startsWith("mailto:dualsubreplay.help@gmail.com?subject=DualSub%20Replay%20problem%20report%20%281.9.0%29&body="))
+        assertEquals("App: 1.9.0\nPhone: Pixel & co", URLDecoder.decode(uri.substringAfter("&body="), "UTF-8"))
+        assertFalse(uri.substringAfter("&body=").contains("&"))
+    }
+
+    @Test
     fun theIssueAddressFitsAndFillsTheBugReportForm() {
         val many = (1..50).map { ProblemEntry(time + it, ProblemArea.CAPTIONS, "number $it " + " x".repeat(70)) }
         val url = problemIssueUrl(problemReport("1.9.0", "16", "Pixel", many), "1.9.0", "Pixel 8")
