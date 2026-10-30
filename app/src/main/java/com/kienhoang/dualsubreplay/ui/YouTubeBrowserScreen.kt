@@ -600,6 +600,12 @@ internal fun SingleYouTubePage(
     PageTranslationReader(webView, active = lifecycleStarted)
     StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
     AdSkipPageScripts(webView, active = lifecycleStarted, pageView = { fullscreenSession?.view ?: webView })
+    TvPageScripts(webView, tvLayout = LocalTvLayout.current, active = lifecycleStarted)
+    DisposableEffect(webView) {
+        val focusPage = { webView.requestFocus(); Unit }
+        TvRemoteKeys.focusPage = focusPage
+        onDispose { if (TvRemoteKeys.focusPage === focusPage) TvRemoteKeys.focusPage = null }
+    }
 
     val pollNow = remember(webView) { Channel<Unit>(Channel.CONFLATED) }
     LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {

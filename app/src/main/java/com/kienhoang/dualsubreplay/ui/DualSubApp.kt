@@ -63,11 +63,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -85,6 +89,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
+import com.kienhoang.dualsubreplay.playback.WebVideoCommand
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import java.util.Locale
@@ -179,6 +185,7 @@ fun DualSubApp(
                 onWordClick = viewModel::selectLearningWord,
                 onResetSettings = viewModel::resetAllSettings,
                 tabActions = remember(viewModel) { browserTabActions(viewModel) },
+                onOpenVideo = { videoId -> viewModel.acceptSharedText("https://m.youtube.com/watch?v=$videoId") },
             )
         }
         state.selectedLearningWord?.let { selection ->
@@ -291,6 +298,7 @@ private fun DualSubExperience(
     onWordClick: (WordTap) -> Unit = {},
     onResetSettings: () -> Unit,
     tabActions: BrowserTabActions = BrowserTabActions(),
+    onOpenVideo: (videoId: String) -> Unit = {},
 ) {
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)
@@ -325,10 +333,13 @@ private fun DualSubExperience(
     val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
     val playerFrame by youtubePlayerFrame.collectAsStateWithLifecycle()
     val tracksVisible = state.showOriginal() || state.showTranslation()
+    // The TV layout opens on TV home and always keeps the panel beside the video.
+    val tvLayout = LocalTvLayout.current
+    var tvHomeShown by rememberSaveable { mutableStateOf(true) }
     val sideBySide =
         tracksVisible && !nativeDialogVisible &&
             shouldUseLandscapeSplit(
-                splitEnabled = state.landscapeSplitEnabled,
+                splitEnabled = state.landscapeSplitEnabled || tvLayout,
                 subtitlePanelVisible = state.subtitlePanelVisible,
                 hasActiveVideo = state.activeVideoId != null,
                 orientation = configuration.orientation,
@@ -482,6 +493,15 @@ private fun DualSubExperience(
                 }
             }
         }
+    }
+    if (tvLayout) {
+        TvLayer(
+            state = state,
+            webController = webController,
+            homeShown = tvHomeShown,
+            onHomeShownChange = { tvHomeShown = it },
+            actions = TvLayerActions(onOpenVideo, tabActions, onShowSubtitles, onVocabulary, onProgress) { showSettings = true },
+        )
     }
     if (showQuickSettings) {
         QuickLanguageSettingsDialog(
@@ -928,11 +948,17 @@ internal fun SubtitleTimeline(
     val showOriginal = state.showOriginal()
     val showTranslation = state.showTranslation()
     val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
+    // TV layout: OK on a line opens its words (no touch to select them), and text is larger.
+    val tvLayout = LocalTvLayout.current
+    var tvLine by remember { mutableStateOf<SubtitleSegment?>(null) }
+    val activeRowFocus = remember { FocusRequester() }
+    val fontScale = if (tvLayout) state.fontScale * TV_TEXT_SCALE else state.fontScale
+    BindTvPanelFocus(tvLayout, activeRowFocus)
     val onLight = appThemeIsLight()
     val originalColor = effectiveOriginalColor(state, onLight)
     val translatedColor = effectiveTranslatedColor(state, onLight)
     val highlightColor = effectiveHighlightColor(state, onLight)
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().onFocusChanged { if (tvLayout) TvRemoteKeys.panelFocused = it.hasFocus }) {
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
@@ -947,8 +973,9 @@ internal fun SubtitleTimeline(
                     showTranslation = showTranslation,
                     translationPosition = state.translationPosition,
                     active = active,
-                    fontScale = state.fontScale,
-                    onReplay = { onReplay(segment) },
+                    fontScale = fontScale,
+                    onReplay = { if (tvLayout) tvLine = segment else onReplay(segment) },
+                    focusModifier = if (active) Modifier.focusRequester(activeRowFocus) else Modifier,
                     // Only the active row draws the spoken word. Giving the others a constant lets them
                     // skip recomposition each time the highlighted word moves.
                     activeWordIndex = if (active) activeWordIndex else -1,
@@ -973,6 +1000,33 @@ internal fun SubtitleTimeline(
             startMs = state.segments.getOrNull(state.currentIndex)?.startMs,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+    }
+    tvLine?.let { segment ->
+        LaunchedEffect(segment) { WebVideoBridge.send(WebVideoCommand.Pause) }
+        TvLineWordsDialog(
+            segment = segment,
+            languageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
+            onReplay = { onReplay(segment) },
+            onWord = onWordClick,
+            onDismiss = { tvLine = null },
+        )
+    }
+}
+
+/** Lets the remote's ▼ on the video move focus to the playing line while the panel is shown. */
+@Composable
+private fun BindTvPanelFocus(
+    tvLayout: Boolean,
+    activeRowFocus: FocusRequester,
+) {
+    if (!tvLayout) return
+    DisposableEffect(activeRowFocus) {
+        val focus = { runCatching { activeRowFocus.requestFocus() }.isSuccess }
+        TvRemoteKeys.focusPanel = focus
+        onDispose {
+            if (TvRemoteKeys.focusPanel === focus) TvRemoteKeys.focusPanel = null
+            TvRemoteKeys.panelFocused = false
+        }
     }
 }
 

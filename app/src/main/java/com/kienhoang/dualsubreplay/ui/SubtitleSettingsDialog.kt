@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
@@ -107,6 +108,7 @@ internal enum class MoreSettingsSection(
     TABS("tabs", R.string.settings_section_tabs_title, R.string.settings_section_tabs_summary),
     ADS("ads", R.string.settings_section_ads_title, R.string.settings_section_ads_summary),
     UPDATES("updates", R.string.settings_section_updates_title, R.string.settings_section_updates_summary),
+    TV("tv", R.string.settings_section_tv_title, R.string.settings_section_tv_summary),
 
     /** Only in builds with the assistant ([LocalAiAssistant] is set). */
     AI_ASSISTANT("ai_assistant", R.string.settings_section_ai_title, R.string.settings_section_ai_summary),
@@ -592,6 +594,10 @@ internal fun SubtitleSettingsDialog(
 
                     Section(MoreSettingsSection.UPDATES, Icons.Default.SystemUpdate) {
                         AppUpdateSettingsSection()
+                    }
+
+                    Section(MoreSettingsSection.TV, Icons.Default.Tv) {
+                        TvLayoutSettingsSection()
                     }
 
                     if (aiAssistant != null) {
@@ -1122,13 +1128,14 @@ internal fun SettingsSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     testTag: String,
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
-            Text(title)
+            Text(title, color = if (enabled) Color.Unspecified else MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
                 description,
                 style = MaterialTheme.typography.bodySmall,
@@ -1139,6 +1146,7 @@ internal fun SettingsSwitchRow(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = Modifier.testTag(testTag),
+            enabled = enabled,
         )
     }
 }

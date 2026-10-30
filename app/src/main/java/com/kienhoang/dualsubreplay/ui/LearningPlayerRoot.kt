@@ -430,18 +430,21 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             .apply()
     }
 
+    // A remote cannot reach the floating subtitle box: the TV layout always uses the panel.
+    val tvLayout by rememberTvLayout()
     val automaticLandscapeOverlay =
-        shouldUseAutomaticLandscapeOverlay(
-            mode = mode,
-            autoLandscape = autoOverlayLandscape,
-            orientation = configuration.orientation,
-        )
+        !tvLayout &&
+            shouldUseAutomaticLandscapeOverlay(
+                mode = mode,
+                autoLandscape = autoOverlayLandscape,
+                orientation = configuration.orientation,
+            )
     val automaticFullscreenOverlay =
         mode == PlayerExperienceMode.TRANSCRIPT_PANEL && autoOverlayFullscreen && youtubeFullscreen
     val automaticPresentationOverlay = automaticLandscapeOverlay || automaticFullscreenOverlay
     val effectiveMode =
         if (
-            mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY || automaticPresentationOverlay
+            (mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY && !tvLayout) || automaticPresentationOverlay
         ) {
             PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
         } else {
@@ -567,6 +570,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         LocalTranslationEngineActions provides translationEngineActions,
         LocalAiAssistant provides aiAssistant,
         LocalStudyTools provides studyTools,
+        LocalTvLayout provides tvLayout,
     ) {
         Box(Modifier.fillMaxSize().clearPhraseSelectionOnTapElsewhere(phraseSelection)) {
             DualSubApp(

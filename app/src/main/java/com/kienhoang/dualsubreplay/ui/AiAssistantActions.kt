@@ -144,6 +144,7 @@ internal data class AiStoredSettings(
     val autoUpdate: Boolean = false,
     val adSkip: AdSkipSettings = AdSkipSettings(),
     val differentTabAccounts: Boolean = false,
+    val tvLayout: Boolean = false,
 )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -163,6 +164,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
         adSkip = readAdSkipSettings(preferences),
         differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
+        tvLayout = readTvLayout(preferences, isTelevisionDevice(context)),
     )
 }
 
@@ -198,6 +200,7 @@ private fun aiStoredSettingValue(
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
         AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
         AiSetting.DIFFERENT_TAB_ACCOUNTS -> onOff(stored.differentTabAccounts)
+        AiSetting.TV_LAYOUT -> onOff(stored.tvLayout)
         else -> aiStudySettingValue(stored.study, setting)
     }
 
@@ -639,6 +642,7 @@ internal class AppAiActions(
             AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
             AiSetting.ALWAYS_SKIP_SPONSORS -> editor.putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, on)
             AiSetting.DIFFERENT_TAB_ACCOUNTS -> editor.putBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, on)
+            AiSetting.TV_LAYOUT -> editor.putBoolean(TV_LAYOUT_PREFERENCE, on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -819,6 +823,7 @@ internal class AppAiActions(
             AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
             AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
             AiSetting.DIFFERENT_TAB_ACCOUNTS -> switch(R.string.tabs_different_accounts_title, value)
+            AiSetting.TV_LAYOUT -> switch(R.string.tv_layout_title, value)
             // settingLabel and otherSettingLabel name the others.
             else -> value
         }

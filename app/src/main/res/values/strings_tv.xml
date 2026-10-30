@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">TV layout for a remote control</string>
+    <string name="tv_layout_title">TV layout (beta)</string>
+    <string name="tv_layout_description">A start page with YouTube search, remote buttons on the video, and words picked from a list. Off: this TV shows the phone layout.</string>
+    <string name="tv_layout_note">On a video: OK plays or pauses, ◀ ▶ go to the previous or next line, ▲ replays the line, ▼ goes to the subtitles, and Back opens TV home. OK on a subtitle line shows its words.</string>
+    <string name="tv_layout_needs_tv">Only on Android TV. Install this same app on an Android TV or Google TV to try it.</string>
+    <string name="tv_replay_line">Replay line</string>
+    <string name="tv_close">Close</string>
+    <string name="tv_pick_a_word">Pick a word</string>
+    <string name="tv_home_back_to_video">Back to video</string>
+    <string name="tv_home_youtube_page">YouTube page</string>
+    <string name="tv_home_search">Search YouTube</string>
+    <string name="tv_home_search_label">Words to search for</string>
+    <string name="tv_home_search_button">Search</string>
+    <string name="tv_home_subtitles_only">With subtitles (CC)</string>
+    <string name="tv_home_recent">Recent:</string>
+    <string name="tv_home_continue">Continue watching</string>
+    <string name="tv_home_results">Videos for “%1$s”</string>
+    <string name="tv_home_searching">Searching YouTube…</string>
+    <string name="tv_home_no_results">No videos found. Try other words.</string>
+    <string name="tv_home_search_failed">Could not search YouTube. Check the connection and try again.</string>
+    <string name="tv_home_try_again">Try again</string>
+    <string name="tv_home_start_hint">Search for a video in the language you are learning, or open the YouTube page. On a video, ◀ ▶ move between lines and ▼ goes to the subtitles.</string>
+    <string name="tv_home_cc" translatable="false">CC</string>
+</resources>

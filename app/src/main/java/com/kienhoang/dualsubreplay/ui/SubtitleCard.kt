@@ -71,6 +71,8 @@ internal fun CompactSubtitleCard(
     showOriginal: Boolean = true,
     showTranslation: Boolean = true,
     translationPosition: TranslationPosition = TranslationPosition.BELOW,
+    /** Goes before the row's click, for a focus requester (TV layout). */
+    focusModifier: Modifier = Modifier,
 ) {
     if (!showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -79,6 +81,8 @@ internal fun CompactSubtitleCard(
             Modifier
                 .fillMaxWidth()
                 .semantics { stateDescription = rowState }
+                .then(focusModifier)
+                .tvFocusRing()
                 .clickable(enabled = replayEnabled, onClick = onReplay),
         border =
             BorderStroke(

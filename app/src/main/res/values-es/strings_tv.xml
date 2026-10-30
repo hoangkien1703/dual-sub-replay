@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">Diseño de TV para control remoto</string>
+    <string name="tv_layout_title">Diseño de TV (beta)</string>
+    <string name="tv_layout_description">Una página de inicio con búsqueda de YouTube, botones del control remoto en el video y palabras elegidas de una lista. Desactivado: esta TV muestra el diseño del teléfono.</string>
+    <string name="tv_layout_note">En un video: OK reproduce o pausa, ◀ ▶ van a la línea anterior o siguiente, ▲ repite la línea, ▼ va a los subtítulos y Atrás abre el inicio de TV. OK en una línea de subtítulos muestra sus palabras.</string>
+    <string name="tv_layout_needs_tv">Solo en Android TV. Instala esta misma app en un Android TV o Google TV para probarlo.</string>
+    <string name="tv_replay_line">Repetir línea</string>
+    <string name="tv_close">Cerrar</string>
+    <string name="tv_pick_a_word">Elige una palabra</string>
+    <string name="tv_home_back_to_video">Volver al video</string>
+    <string name="tv_home_youtube_page">Página de YouTube</string>
+    <string name="tv_home_search">Buscar en YouTube</string>
+    <string name="tv_home_search_label">Palabras para buscar</string>
+    <string name="tv_home_search_button">Buscar</string>
+    <string name="tv_home_subtitles_only">Con subtítulos (CC)</string>
+    <string name="tv_home_recent">Recientes:</string>
+    <string name="tv_home_continue">Seguir viendo</string>
+    <string name="tv_home_results">Videos de “%1$s”</string>
+    <string name="tv_home_searching">Buscando en YouTube…</string>
+    <string name="tv_home_no_results">No se encontraron videos. Prueba con otras palabras.</string>
+    <string name="tv_home_search_failed">No se pudo buscar en YouTube. Revisa la conexión e inténtalo de nuevo.</string>
+    <string name="tv_home_try_again">Reintentar</string>
+    <string name="tv_home_start_hint">Busca un video en el idioma que estás aprendiendo o abre la página de YouTube. En un video, ◀ ▶ cambian de línea y ▼ va a los subtítulos.</string>
+</resources>

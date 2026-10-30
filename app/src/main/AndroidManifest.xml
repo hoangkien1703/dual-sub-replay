@@ -13,6 +13,9 @@
     <!-- Check for updates (drawer) and Update automatically: the app installs its own newer
          GitHub release. Android still asks once to allow installs from this app. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Android TV (spec 2026-10-30-android-tv-layout.md): the same APK runs on a TV with a remote. -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
         <!-- Open in Google Translate shares the selected text to this app; see GoogleTranslateLink.kt. -->
@@ -28,6 +31,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -51,6 +55,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
 
             <intent-filter>

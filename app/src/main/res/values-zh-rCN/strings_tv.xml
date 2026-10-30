@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV（测试版）</string>
+    <string name="settings_section_tv_summary">适合遥控器的电视布局</string>
+    <string name="tv_layout_title">电视布局（测试版）</string>
+    <string name="tv_layout_description">带 YouTube 搜索的起始页、视频上的遥控器按键，以及从列表中选词。关闭后，这台电视使用手机布局。</string>
+    <string name="tv_layout_note">在视频上：OK 播放或暂停，◀ ▶ 切换到上一句或下一句，▲ 重播这一句，▼ 进入字幕，返回键打开电视主页。在字幕行上按 OK 会显示这一行的词。</string>
+    <string name="tv_layout_needs_tv">仅限 Android TV。在 Android TV 或 Google TV 上安装这个应用即可试用。</string>
+    <string name="tv_replay_line">重播这一句</string>
+    <string name="tv_close">关闭</string>
+    <string name="tv_pick_a_word">选择一个词</string>
+    <string name="tv_home_back_to_video">返回视频</string>
+    <string name="tv_home_youtube_page">YouTube 页面</string>
+    <string name="tv_home_search">搜索 YouTube</string>
+    <string name="tv_home_search_label">要搜索的词</string>
+    <string name="tv_home_search_button">搜索</string>
+    <string name="tv_home_subtitles_only">带字幕（CC）</string>
+    <string name="tv_home_recent">最近：</string>
+    <string name="tv_home_continue">继续观看</string>
+    <string name="tv_home_results">“%1$s”的视频</string>
+    <string name="tv_home_searching">正在搜索 YouTube…</string>
+    <string name="tv_home_no_results">没有找到视频。请换个词试试。</string>
+    <string name="tv_home_search_failed">无法搜索 YouTube。请检查网络连接后重试。</string>
+    <string name="tv_home_try_again">重试</string>
+    <string name="tv_home_start_hint">搜索你正在学习的语言的视频，或打开 YouTube 页面。在视频上，◀ ▶ 在句子之间切换，▼ 进入字幕。</string>
+</resources>

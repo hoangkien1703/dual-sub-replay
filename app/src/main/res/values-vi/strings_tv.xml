@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">Giao diện TV cho điều khiển từ xa</string>
+    <string name="tv_layout_title">Giao diện TV (beta)</string>
+    <string name="tv_layout_description">Trang bắt đầu có tìm kiếm YouTube, nút điều khiển trên video và chọn từ trong danh sách. Tắt: TV này dùng giao diện điện thoại.</string>
+    <string name="tv_layout_note">Trên video: OK để phát hoặc tạm dừng, ◀ ▶ sang câu trước hoặc câu sau, ▲ phát lại câu, ▼ xuống phụ đề, Back mở trang chủ TV. OK trên một dòng phụ đề sẽ hiện các từ của dòng đó.</string>
+    <string name="tv_layout_needs_tv">Chỉ dùng trên Android TV. Cài chính ứng dụng này lên Android TV hoặc Google TV để dùng thử.</string>
+    <string name="tv_replay_line">Phát lại câu</string>
+    <string name="tv_close">Đóng</string>
+    <string name="tv_pick_a_word">Chọn một từ</string>
+    <string name="tv_home_back_to_video">Quay lại video</string>
+    <string name="tv_home_youtube_page">Trang YouTube</string>
+    <string name="tv_home_search">Tìm trên YouTube</string>
+    <string name="tv_home_search_label">Từ khóa cần tìm</string>
+    <string name="tv_home_search_button">Tìm</string>
+    <string name="tv_home_subtitles_only">Có phụ đề (CC)</string>
+    <string name="tv_home_recent">Gần đây:</string>
+    <string name="tv_home_continue">Xem tiếp</string>
+    <string name="tv_home_results">Video cho “%1$s”</string>
+    <string name="tv_home_searching">Đang tìm trên YouTube…</string>
+    <string name="tv_home_no_results">Không tìm thấy video. Hãy thử từ khác.</string>
+    <string name="tv_home_search_failed">Không tìm được trên YouTube. Hãy kiểm tra kết nối rồi thử lại.</string>
+    <string name="tv_home_try_again">Thử lại</string>
+    <string name="tv_home_start_hint">Tìm một video bằng ngôn ngữ bạn đang học, hoặc mở trang YouTube. Trên video, ◀ ▶ chuyển giữa các câu và ▼ xuống phụ đề.</string>
+</resources>
