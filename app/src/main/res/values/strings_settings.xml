@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">A language model downloads only when it is needed.</string>
     <string name="settings_subtitle_languages">Subtitle languages</string>
     <string name="settings_dual_subtitle_settings">Dual-subtitle settings</string>
-    <string name="settings_dual_subtitle_settings_summary">Text size, view, colors, overlay and more</string>
     <string name="settings_done">Done</string>
     <string name="settings_close_settings">Close settings</string>
     <string name="settings_group_languages">Languages</string>

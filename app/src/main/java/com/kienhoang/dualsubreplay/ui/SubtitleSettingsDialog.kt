@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -244,6 +246,48 @@ private fun LanguagePickerButtons(
 }
 
 /**
+ * The quick panel's languages, each label beside its button on one line (owner request 2026-10-30:
+ * less empty space). The model-download hint stays on the full settings page.
+ */
+@Composable
+private fun CompactLanguageRows(
+    sourceLabel: String,
+    targetLanguage: String,
+    onPick: (LanguagePickerMode) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        CompactLanguageRow(stringResource(R.string.settings_original_language), sourceLabel, "source_language_picker") {
+            onPick(LanguagePickerMode.SOURCE)
+        }
+        CompactLanguageRow(
+            stringResource(R.string.settings_translate_to),
+            languageDisplayName(targetLanguage, currentInterfaceLocale()),
+            "target_language_picker",
+        ) { onPick(LanguagePickerMode.TARGET) }
+    }
+}
+
+@Composable
+private fun CompactLanguageRow(
+    label: String,
+    value: String,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f).padding(end = 8.dp), style = MaterialTheme.typography.bodyLarge)
+        OutlinedButton(
+            onClick = onClick,
+            modifier = Modifier.widthIn(min = 120.dp, max = 180.dp).testTag(tag),
+            contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
+        ) {
+            Text(value, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+            Icon(Icons.Default.ExpandMore, contentDescription = null, modifier = Modifier.padding(start = 4.dp).size(18.dp))
+        }
+    }
+}
+
+/**
  * The subtitle panel's gear opens this small popup with only the languages, over the video.
  * "Dual-subtitle settings" leads to the full settings page.
  */
@@ -279,7 +323,7 @@ internal fun QuickLanguageSettingsDialog(
         title = { DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss) },
         text = {
             Column(Modifier.testTag("quick_language_settings")) {
-                LanguagePickerButtons(
+                CompactLanguageRows(
                     sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, interfaceLocale),
                     targetLanguage = targetLanguage,
                     onPick = languagePicker::open,
@@ -300,14 +344,11 @@ internal fun QuickLanguageSettingsDialog(
                 ) {
                     Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.settings_dual_subtitle_settings), style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            stringResource(R.string.settings_dual_subtitle_settings_summary),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    Text(
+                        stringResource(R.string.settings_dual_subtitle_settings),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f),
+                    )
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
                 }
             }

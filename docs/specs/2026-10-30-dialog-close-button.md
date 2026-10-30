@@ -42,7 +42,7 @@ the top right.
 | AnkiConnect deck, App language, Export words | Cancel only | X |
 | Caption language picker | Back | X |
 | Daily goal, Import words, Known words offer, Comprehension, Check for updates | Their buttons | X plus their buttons (a lone Close that only closed goes) |
-| Subtitle languages (the subtitle panel's gear) | Globe icon, centered two-line title, Done | Owner request 2026-10-30: no icon, the title on the left beside the X, no Done (choices apply at once) |
+| Subtitle languages (the subtitle panel's gear) | Globe icon, centered two-line title, labels above full-width buttons, model hint, a two-line settings link, Done | Owner requests 2026-10-30: no icon, the title on the left beside the X, each label beside its button on one line, no model hint (it stays on the full settings page), a one-line settings link, no Done (choices apply at once); no swap button (most videos have captions in one language only) |
 | Edit memory | Save, Cancel | X, Save, Cancel; X, Cancel or an outside tap ask before dropping changed text |
 | Practice, Progress (full screen) | "Close" text | X icon |
 
