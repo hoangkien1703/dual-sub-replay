@@ -6,23 +6,32 @@ package com.kienhoang.dualsubreplay.data
  */
 internal const val UPDATE_REMINDER_AGAIN_MS = 7L * 24 * 60 * 60 * 1000
 
-/** After Not now, a security update is shown again the next day. */
+/** After Not now, a security update is shown again the next day during its first days... */
 internal const val SECURITY_REMINDER_AGAIN_MS = 24L * 60 * 60 * 1000
+
+/** ...which last this long from its first showing; after that it shows once a week (owner request 2026-10-30). */
+internal const val SECURITY_DAILY_PERIOD_MS = 3L * 24 * 60 * 60 * 1000
 
 /** What the app shows about a newer version: nothing, a small banner, or the security dialog. */
 internal enum class UpdateReminder { NONE, BANNER, SECURITY }
 
-/** Which version was last shown and when, and the version Skip this version hid. */
+/**
+ * Which version was last shown and when, and the version Skip this version hid; for a security update,
+ * which fix (its [AppUpdate.securityFixCode]) was first shown and when.
+ */
 internal data class ReminderMemory(
     val shownVersion: String? = null,
     val shownAtMs: Long = 0,
     val skippedVersion: String? = null,
+    val securityFixCode: Long = 0,
+    val securitySinceMs: Long = 0,
 )
 
 /**
  * The banner shows at most once a week, whichever version it names, so daily releases do not bring a
  * daily banner; Skip this version hides that version for good. A security update (the installed app is
- * older than the latest security fix) cannot be skipped: it shows at once, then once a day. A clock set
+ * older than the latest security fix) cannot be skipped: a new fix shows at once, then once a day for
+ * its first 3 days and once a week after that, however many versions come out meanwhile. A clock set
  * back never hides a reminder for long.
  */
 internal fun updateReminder(
@@ -33,7 +42,10 @@ internal fun updateReminder(
     if (update == null) return UpdateReminder.NONE
     val elapsed = nowMs - memory.shownAtMs
     if (update.critical) {
-        val due = memory.shownVersion != update.versionName || elapsed >= SECURITY_REMINDER_AGAIN_MS || elapsed < 0
+        if (memory.securityFixCode != update.securityFixCode || memory.securitySinceMs <= 0) return UpdateReminder.SECURITY
+        val age = nowMs - memory.securitySinceMs
+        val again = if (age in 0 until SECURITY_DAILY_PERIOD_MS) SECURITY_REMINDER_AGAIN_MS else UPDATE_REMINDER_AGAIN_MS
+        val due = elapsed >= again || elapsed < 0
         return if (due) UpdateReminder.SECURITY else UpdateReminder.NONE
     }
     if (memory.skippedVersion == update.versionName) return UpdateReminder.NONE

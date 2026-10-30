@@ -77,6 +77,8 @@ internal data class AppUpdate(
     val pageUrl: String,
     /** The installed version is older than the latest security fix (a `security:critical` release). */
     val critical: Boolean = false,
+    /** That security fix's version code while [critical]; a newer fix is announced afresh. */
+    val securityFixCode: Long = 0,
 )
 
 /** The latest release as its `update-info.json` describes it. */
@@ -121,6 +123,7 @@ internal fun updateFromInfo(
         sizeBytes = info.sizeBytes,
         pageUrl = "$UPDATE_RELEASES_PAGE_URL/tag/v${info.versionName}",
         critical = installedVersionCode < info.minimumSafeVersionCode,
+        securityFixCode = if (installedVersionCode < info.minimumSafeVersionCode) info.minimumSafeVersionCode else 0,
     )
 }
 

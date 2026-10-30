@@ -37,4 +37,5 @@
     <string name="updates_skip_version">Bỏ qua phiên bản này</string>
     <string name="updates_security_title">Bản cập nhật bảo mật</string>
     <string name="updates_security_message">Phiên bản %1$s sửa một lỗi bảo mật trong phiên bản bạn đang dùng (%2$s). Cập nhật ngay? Từ đã lưu và cài đặt của bạn vẫn được giữ.</string>
+    <string name="updates_reminders_off_hint">Khi tắt, bạn sẽ không được báo về phiên bản mới hay bản cập nhật bảo mật.</string>
 </resources>

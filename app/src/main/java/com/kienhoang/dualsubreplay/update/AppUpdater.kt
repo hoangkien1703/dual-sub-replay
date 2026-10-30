@@ -66,6 +66,8 @@ private const val DAY_MS = 24L * 60 * 60 * 1000
 private const val REMINDER_VERSION_PREFERENCE = "update_reminder_version"
 private const val REMINDER_SHOWN_AT_PREFERENCE = "update_reminder_shown_at"
 private const val REMINDER_SKIPPED_PREFERENCE = "update_reminder_skipped"
+private const val REMINDER_SECURITY_FIX_PREFERENCE = "update_reminder_security_fix"
+private const val REMINDER_SECURITY_SINCE_PREFERENCE = "update_reminder_security_since"
 
 /** The daily check asks GitHub at most once a day. */
 internal fun isAutoUpdateCheckDue(
@@ -259,16 +261,27 @@ internal object AppUpdater {
             shownVersion = preferences.getString(REMINDER_VERSION_PREFERENCE, null),
             shownAtMs = preferences.getLong(REMINDER_SHOWN_AT_PREFERENCE, 0),
             skippedVersion = preferences.getString(REMINDER_SKIPPED_PREFERENCE, null),
+            securityFixCode = preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0),
+            securitySinceMs = preferences.getLong(REMINDER_SECURITY_SINCE_PREFERENCE, 0),
         )
 
-    /** The reminder appeared on screen: the week (a day for a security update) before it shows again starts now. */
+    /**
+     * The reminder appeared on screen: the wait before it shows again starts now, and a security fix seen
+     * for the first time starts its daily days (see `updateReminder`).
+     */
     fun onReminderShown(context: Context) {
         val update = knownUpdate() ?: return
-        preferences(context.applicationContext)
-            .edit()
-            .putString(REMINDER_VERSION_PREFERENCE, update.versionName)
-            .putLong(REMINDER_SHOWN_AT_PREFERENCE, System.currentTimeMillis())
-            .apply()
+        val preferences = preferences(context.applicationContext)
+        val now = System.currentTimeMillis()
+        val editor =
+            preferences
+                .edit()
+                .putString(REMINDER_VERSION_PREFERENCE, update.versionName)
+                .putLong(REMINDER_SHOWN_AT_PREFERENCE, now)
+        if (update.critical && preferences.getLong(REMINDER_SECURITY_FIX_PREFERENCE, 0) != update.securityFixCode) {
+            editor.putLong(REMINDER_SECURITY_FIX_PREFERENCE, update.securityFixCode).putLong(REMINDER_SECURITY_SINCE_PREFERENCE, now)
+        }
+        editor.apply()
     }
 
     /** Not now, or the reminder led to the update dialog. */

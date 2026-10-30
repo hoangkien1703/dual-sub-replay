@@ -37,4 +37,5 @@
     <string name="updates_skip_version">Pular esta versão</string>
     <string name="updates_security_title">Atualização de segurança</string>
     <string name="updates_security_message">A versão %1$s corrige um problema de segurança na versão que você tem (%2$s). Atualizar agora? Suas palavras salvas e configurações continuam.</string>
+    <string name="updates_reminders_off_hint">Enquanto estiver desativado, você não será avisado sobre novas versões nem atualizações de segurança.</string>
 </resources>

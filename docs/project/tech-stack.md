@@ -86,7 +86,8 @@ Paths below are relative to
   me about new versions (on by default) makes the same daily check read the latest release's
   `update-info.json` from GitHub's download hosts (not the API's 60-an-hour limit), falling back to
   the API, and shows a banner (at most once a week whatever the version; Skip this version) or, below the
-  newest `security:critical` release, a Security update dialog (daily after Not now), never over a
+  newest `security:critical` release, a Security update dialog (daily for the fix's first 3 days,
+  then weekly; a newer fix starts again), never over a
   playing video (`data/UpdateReminders.kt`, `ui/AppNotices.kt`).
 - Remote switches (owner decision 2026-10-30, switches only): `update/RemoteSwitchFetcher.kt` reads
   `remote-config/switches.json` from `raw.githubusercontent.com` with the daily check (64 KiB cap,

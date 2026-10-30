@@ -34,7 +34,9 @@ A review of what would break at a million users found no server to overload (the
     releases never bring a daily banner (owner question 2026-10-30); **Skip this version** hides
     that version for good, and a newer one still waits for the week.
   - A **security update** (a release whose PR had the `security:critical` label) shows a dialog at
-    once, and again once a day after Not now. It is based on a *minimum safe version*: someone
+    once; after Not now it returns daily for that fix's first 3 days, then weekly, and only a newer
+    security fix starts again (owner decision 2026-10-30: no permanent skip, but no daily nagging
+    forever). It is based on a *minimum safe version*: someone
     two releases behind the security fix still gets it after a later ordinary release. People
     can always decline.
   - Never shown over a playing video: a reminder found while a video plays waits for pause.
@@ -63,7 +65,8 @@ A review of what would break at a million users found no server to overload (the
 
 - Settings → App updates gets **Tell me about new versions** (on by default) above Update
   automatically. Off: the app reads nothing from GitHub unless Check for updates is tapped (and
-  so gets no remote switches either).
+  so gets no remote switches either); a note under the switch says security updates go
+  unannounced too. The app never checks behind the user's back when it is off.
 - Banner (bottom of the screen, app theme): "Version X is available" — Update, Not now, Skip
   this version. Update opens the existing update dialog.
 - Security dialog: "Security update" — "Version X fixes a security problem in the version you
@@ -108,8 +111,9 @@ A review of what would break at a million users found no server to overload (the
 ## Acceptance criteria
 
 - [ ] Reminder rules (unit tests): the first banner shows at once, later ones at most once in 7
-      days even when a newer version came out meanwhile; Skip hides that version; below the minimum safe version a security dialog shows,
-      and again after 1 day; nothing shows while a video plays; a clock moved back does not block.
+      days even when a newer version came out meanwhile; Skip hides that version; below the
+      minimum safe version a security dialog shows, again after 1 day during the fix's first 3
+      days, then weekly, and at once for a newer fix; nothing shows while a video plays; a clock moved back does not block.
 - [ ] `update-info.json` parsing ignores files with another schema, missing fields or bad SHA-256.
 - [ ] Release tool (Python tests): `security:critical` sets `security`; the minimum safe code is
       the highest security version code including the new release; publish refuses a release

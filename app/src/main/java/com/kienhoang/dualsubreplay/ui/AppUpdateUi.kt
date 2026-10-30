@@ -261,6 +261,7 @@ internal fun AppUpdateSettingsSection() {
         },
         testTag = "update_reminders_switch",
     )
+    if (!reminders) SettingsHint(stringResource(R.string.updates_reminders_off_hint))
     SettingsSwitchRow(
         title = stringResource(R.string.updates_auto_title),
         description = stringResource(R.string.updates_auto_description),

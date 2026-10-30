@@ -55,6 +55,8 @@ class AppNoticesUiTest {
             .remove("update_reminder_version")
             .remove("update_reminder_shown_at")
             .remove("update_reminder_skipped")
+            .remove("update_reminder_security_fix")
+            .remove("update_reminder_security_since")
             .commit()
         AppUpdater.dismissReminder()
         // Leaves no found update behind for the menu's Check for updates row in other tests.
@@ -142,6 +144,7 @@ class AppNoticesUiTest {
             .assertIsDisplayed()
             .performClick()
         composeRule.runOnIdle { assertFalse(preferences.getBoolean(UPDATE_REMINDERS_PREFERENCE, true)) }
+        composeRule.onNodeWithText("security updates", substring = true).performScrollTo().assertIsDisplayed()
         saveUiEvidence("app-updates-settings-reminders")
     }
 }

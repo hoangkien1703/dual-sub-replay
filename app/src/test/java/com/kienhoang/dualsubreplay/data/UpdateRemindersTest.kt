@@ -21,8 +21,11 @@ class UpdateRemindersTest {
         |"apk":"DualSub-Replay.apk","sha256":"$sha256","size":34251919}
         """.trimMargin()
 
-    private fun update(critical: Boolean = false) =
-        AppUpdate("1.9.0", "https://github.com/x.apk", digest, null, 1, "https://github.com/x", critical)
+    private fun update(
+        critical: Boolean = false,
+        version: String = "1.9.0",
+        fix: Long = 55,
+    ) = AppUpdate(version, "https://github.com/x.apk", digest, null, 1, "https://github.com/x", critical, if (critical) fix else 0)
 
     @Test
     fun updateInfoNamesTheApkTheChecksumAndTheReleasePage() {
@@ -39,6 +42,8 @@ class UpdateRemindersTest {
     fun anAppOlderThanTheLatestSecurityFixIsCritical() {
         val parsed = parseUpdateInfo(info(minimumSafe = 55))!!
         assertTrue(updateFromInfo(parsed, installedVersionCode = 54)!!.critical)
+        assertEquals(55L, updateFromInfo(parsed, installedVersionCode = 54)!!.securityFixCode)
+        assertEquals(0L, updateFromInfo(parsed, installedVersionCode = 57)!!.securityFixCode)
         // The latest release is ordinary, but this app also misses the earlier security release.
         assertTrue(updateFromInfo(parseUpdateInfo(info(code = 70, minimumSafe = 55))!!, 50)!!.critical)
         assertNull(updateFromInfo(parsed, installedVersionCode = 60))
@@ -80,14 +85,28 @@ class UpdateRemindersTest {
     }
 
     @Test
-    fun aSecurityUpdateShowsAtOnceAndAgainTheNextDay() {
+    fun aSecurityUpdateShowsAtOnceThenDailyForThreeDaysThenWeekly() {
         assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), ReminderMemory(), now))
         // A banner shown today does not hold back a security update.
         val banner = ReminderMemory(shownVersion = "1.8.9", shownAtMs = now)
         assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), banner, now + 1))
-        val shown = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now)
-        assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true), shown, now + day - 1))
-        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), shown, now + day))
+        val first = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now, securityFixCode = 55, securitySinceMs = now)
+        assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true), first, now + day - 1))
+        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), first, now + day))
+        // Shown again on day 2; from day 3 the next one waits a week.
+        val dayTwo = first.copy(shownAtMs = now + 2 * day)
+        assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true), dayTwo, now + 3 * day))
+        assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true), dayTwo, now + 9 * day - 1))
+        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true), dayTwo, now + 9 * day))
+    }
+
+    @Test
+    fun dailyReleasesDoNotRestartASecurityReminderButANewFixDoes() {
+        val weekly = ReminderMemory(shownVersion = "1.9.0", shownAtMs = now + 5 * day, securityFixCode = 55, securitySinceMs = now)
+        // 1.9.1, released the next day, carries the same fix: still weekly.
+        assertEquals(UpdateReminder.NONE, updateReminder(update(critical = true, version = "1.9.1"), weekly, now + 6 * day))
+        // A newer security fix is announced at once.
+        assertEquals(UpdateReminder.SECURITY, updateReminder(update(critical = true, version = "1.9.2", fix = 58), weekly, now + 6 * day))
     }
 
     @Test

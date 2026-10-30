@@ -778,7 +778,8 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.UPDATE_REMINDERS ->
             choiceList(setting.choices) +
                 " (Tell me about new versions: once a day when the app opens it reads a small file on GitHub, shows a " +
-                "banner for a new version at most once a week and a security update at once, and applies temporary " +
+                "banner for a new version at most once a week and a security update at once (then daily for 3 days, then " +
+                "weekly), and applies temporary " +
                 "fixes for YouTube or Google changes; on by default; off, only the menu's Check for updates asks GitHub)"
         AiSetting.APP_AUTO_UPDATE ->
             choiceList(setting.choices) +
