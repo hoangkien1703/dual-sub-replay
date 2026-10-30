@@ -275,8 +275,8 @@ internal fun QuickLanguageSettingsDialog(
     if (pickerOpen) return
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Default.Language, contentDescription = null) },
-        title = { DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss, centered = true) },
+        // Owner request 2026-10-30: no icon, the title on the left beside the X, and no Done (changes apply at once).
+        title = { DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss) },
         text = {
             Column(Modifier.testTag("quick_language_settings")) {
                 LanguagePickerButtons(
@@ -312,7 +312,7 @@ internal fun QuickLanguageSettingsDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_done)) } },
+        confirmButton = {},
     )
 }
 
