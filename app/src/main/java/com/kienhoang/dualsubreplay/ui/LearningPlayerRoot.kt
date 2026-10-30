@@ -571,6 +571,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         LocalAiAssistant provides aiAssistant,
         LocalStudyTools provides studyTools,
         LocalTvLayout provides tvLayout,
+        tvFocusShading(tvLayout),
     ) {
         Box(Modifier.fillMaxSize().clearPhraseSelectionOnTapElsewhere(phraseSelection)) {
             DualSubApp(

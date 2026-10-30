@@ -28,7 +28,9 @@ internal fun webTvFocusScript(enabled: Boolean): String =
       const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
       if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
       const old = window.__dualSubTvFocus;
+      const page = document.documentElement;
       if (!$enabled) {
+        page.classList.remove('dualsub-tv-watch');
         if (old) {
           document.removeEventListener('keydown', old.listener, true);
           if (old.style && old.style.parentNode) old.style.parentNode.removeChild(old.style);
@@ -36,10 +38,23 @@ internal fun webTvFocusScript(enabled: Boolean): String =
         }
         return true;
       }
+      // On a video the app has the remote, so no outline lands on the player's own buttons. A video
+      // opened from TV home starts without a tap, so YouTube starts it muted: unmute it once.
+      const watch = window.location.pathname === '/watch';
+      page.classList.toggle('dualsub-tv-watch', watch);
+      const id = watch ? new URLSearchParams(window.location.search).get('v') : null;
+      const video = id ? document.querySelector('video') : null;
+      if (video && window.__dualSubTvUnmuted !== id) {
+        const unmute = document.querySelector('.ytp-unmute, .ytm-unmute-button, button[class*="unmute"]');
+        if (video.muted && unmute) unmute.click();
+        if (video.muted) video.muted = false;
+        if (!video.muted) window.__dualSubTvUnmuted = id;
+      }
       if (old && old.style && old.style.isConnected) return true;
       if (old) document.removeEventListener('keydown', old.listener, true);
       const style = document.createElement('style');
-      style.textContent = '*:focus{outline:4px solid #00C5E5 !important;outline-offset:2px !important;}';
+      style.textContent = 'html:not(.dualsub-tv-watch) *:focus{outline:4px solid #00C5E5 !important;' +
+        'outline-offset:2px !important;}';
       (document.head || document.documentElement).appendChild(style);
       const selector = 'a[href],button,input,textarea,select,[role="button"],[role="link"],[role="tab"],' +
         '[tabindex]:not([tabindex="-1"])';
@@ -109,6 +124,8 @@ internal fun TvPageScripts(
         val default = WebSettings.getDefaultUserAgent(webView.context)
         val wanted = if (tvLayout) tvUserAgent(default) else default
         if (webView.settings.userAgentString != wanted) webView.settings.userAgentString = wanted
+        // A video opened from TV home has no tap behind it; phones keep needing one.
+        webView.settings.mediaPlaybackRequiresUserGesture = !tvLayout
     }
     var installed by remember(webView) { mutableStateOf(false) }
     LaunchedEffect(webView, tvLayout, active) {

@@ -118,6 +118,14 @@ class TvLayoutTest {
     }
 
     @Test
+    fun onAVideoTheScriptUnmutesOnceAndDrawsNoOutline() {
+        val script = webTvFocusScript(true)
+        assertTrue(script.contains("html:not(.dualsub-tv-watch) *:focus"))
+        assertTrue(script.contains("window.__dualSubTvUnmuted !== id"))
+        assertTrue(webTvFocusScript(false).contains("page.classList.remove('dualsub-tv-watch')"))
+    }
+
+    @Test
     fun aTvWebViewIsMarkedMobileOnlyWhenItIsNot() {
         val webKit = "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0"
         val phone = "Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) $webKit Chrome/139.0 Mobile Safari/537.36"

@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +50,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -133,8 +136,30 @@ internal class TvHomeActions(
     val settings: () -> Unit,
 )
 
+/**
+ * TV home's search, kept while a video plays so the results are still there on the way back.
+ * [searchRun] counts searches asked for; [searched] is the run and filter last answered.
+ */
+@Stable
+internal class TvHomeState(
+    recent: List<String>,
+) {
+    var recent by mutableStateOf(recent)
+    var subtitlesOnly by mutableStateOf(false)
+    var search by mutableStateOf<TvSearchState>(TvSearchState.Idle)
+    var searchRun by mutableIntStateOf(0)
+    var searched by mutableStateOf<Pair<Int, Boolean>?>(null)
+}
+
+@Composable
+internal fun rememberTvHomeState(): TvHomeState {
+    val context = LocalContext.current
+    return remember { TvHomeState(parseRecentSearches(studyPreferences(context).getString(TV_RECENT_SEARCHES_PREFERENCE, null))) }
+}
+
 @Composable
 internal fun TvHome(
+    home: TvHomeState,
     tabs: BrowserTabs,
     videoOpen: Boolean,
     actions: TvHomeActions,
@@ -142,39 +167,38 @@ internal fun TvHome(
 ) {
     val context = LocalContext.current
     val preferences = remember(context) { studyPreferences(context) }
-    var recent by remember { mutableStateOf(parseRecentSearches(preferences.getString(TV_RECENT_SEARCHES_PREFERENCE, null))) }
-    var subtitlesOnly by rememberSaveable { mutableStateOf(false) }
-    var search by remember { mutableStateOf<TvSearchState>(TvSearchState.Idle) }
-    var searchRun by remember { mutableIntStateOf(0) }
     var askQuery by remember { mutableStateOf(false) }
     val firstFocus = remember { FocusRequester() }
 
     fun runSearch(query: String) {
         val clean = query.trim()
         if (clean.isEmpty()) return
-        recent = withRecentSearch(recent, clean)
-        preferences.edit().putString(TV_RECENT_SEARCHES_PREFERENCE, recent.joinToString("\n")).apply()
-        search = TvSearchState.Searching(clean)
-        searchRun += 1
+        home.recent = withRecentSearch(home.recent, clean)
+        preferences.edit().putString(TV_RECENT_SEARCHES_PREFERENCE, home.recent.joinToString("\n")).apply()
+        home.search = TvSearchState.Searching(clean)
+        home.searchRun += 1
     }
 
-    LaunchedEffect(searchRun, subtitlesOnly) {
+    LaunchedEffect(home.searchRun, home.subtitlesOnly) {
+        val asked = home.searchRun to home.subtitlesOnly
+        if (home.searched == asked) return@LaunchedEffect
         val query =
-            when (val current = search) {
+            when (val current = home.search) {
                 is TvSearchState.Searching -> current.query
                 is TvSearchState.Found -> current.query
                 is TvSearchState.Failed -> current.query
                 TvSearchState.Idle -> return@LaunchedEffect
             }
-        search = TvSearchState.Searching(query)
-        search =
+        home.search = TvSearchState.Searching(query)
+        home.search =
             try {
-                TvSearchState.Found(query, YouTubeVideoSearch.search(query, subtitlesOnly, Locale.getDefault().country))
+                TvSearchState.Found(query, YouTubeVideoSearch.search(query, home.subtitlesOnly, Locale.getDefault().country))
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (_: IOException) {
                 TvSearchState.Failed(query)
             }
+        home.searched = asked
     }
     LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
     BackHandler {
@@ -196,12 +220,13 @@ internal fun TvHome(
                 TvHomeHeader(videoOpen, actions, firstFocus)
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
+                val search = home.search
                 TvSearchBar(
                     query = (search as? TvSearchState.Found)?.query ?: (search as? TvSearchState.Searching)?.query,
-                    subtitlesOnly = subtitlesOnly,
+                    subtitlesOnly = home.subtitlesOnly,
                     onSearch = { askQuery = true },
-                    onSubtitlesOnlyChange = { subtitlesOnly = it },
-                    recent = recent,
+                    onSubtitlesOnlyChange = { home.subtitlesOnly = it },
+                    recent = home.recent,
                     onRecent = ::runSearch,
                     focus = if (videoOpen) null else firstFocus,
                 )
@@ -211,12 +236,12 @@ internal fun TvHome(
                     TvContinueRow(tabs, actions.openTab)
                 }
             }
-            tvSearchResults(search, actions.openVideo) { searchRun += 1 }
+            tvSearchResults(home.search, actions.openVideo) { home.searchRun += 1 }
         }
     }
     if (askQuery) {
         TvSearchDialog(
-            initial = (search as? TvSearchState.Found)?.query.orEmpty(),
+            initial = (home.search as? TvSearchState.Found)?.query.orEmpty(),
             onSearch = { query ->
                 askQuery = false
                 runSearch(query)
@@ -226,42 +251,47 @@ internal fun TvHome(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TvHomeHeader(
     videoOpen: Boolean,
     actions: TvHomeActions,
     firstFocus: FocusRequester,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Icon(
-            Icons.Default.ClosedCaption,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(32.dp),
-        )
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
-        if (videoOpen) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(
+                Icons.Default.ClosedCaption,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp),
+            )
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall, maxLines = 1)
+        }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (videoOpen) {
+                TvHomeButton(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    stringResource(R.string.tv_home_back_to_video),
+                    actions.backToVideo,
+                    Modifier.focusRequester(firstFocus).testTag("tv_back_to_video"),
+                )
+            }
             TvHomeButton(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(R.string.tv_home_back_to_video),
-                actions.backToVideo,
-                Modifier.focusRequester(firstFocus).testTag("tv_back_to_video"),
+                Icons.Default.OndemandVideo,
+                stringResource(R.string.tv_home_youtube_page),
+                actions.openYouTubePage,
+                Modifier.testTag("tv_youtube_page"),
+            )
+            TvHomeButton(Icons.Default.School, stringResource(R.string.navigation_practice), actions.practice)
+            TvHomeButton(Icons.Default.Insights, stringResource(R.string.navigation_progress), actions.progress)
+            TvHomeButton(
+                Icons.Default.Settings,
+                stringResource(R.string.navigation_settings),
+                actions.settings,
+                Modifier.testTag("tv_settings"),
             )
         }
-        TvHomeButton(
-            Icons.Default.OndemandVideo,
-            stringResource(R.string.tv_home_youtube_page),
-            actions.openYouTubePage,
-            Modifier.testTag("tv_youtube_page"),
-        )
-        TvHomeButton(Icons.Default.School, stringResource(R.string.navigation_practice), actions.practice)
-        TvHomeButton(Icons.Default.Insights, stringResource(R.string.navigation_progress), actions.progress)
-        TvHomeButton(
-            Icons.Default.Settings,
-            stringResource(R.string.navigation_settings),
-            actions.settings,
-            Modifier.testTag("tv_settings"),
-        )
     }
 }
 
@@ -499,7 +529,12 @@ private fun TvSearchDialog(
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                modifier = Modifier.fillMaxWidth().focusRequester(field).testTag("tv_search_field"),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .focusRequester(field)
+                        .tvArrowsLeave()
+                        .testTag("tv_search_field"),
                 label = { Text(stringResource(R.string.tv_home_search_label)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),

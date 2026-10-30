@@ -433,7 +433,12 @@ internal fun SubtitleSettingsDialog(
 
                     SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {
                         Text(stringResource(R.string.settings_text_size, (fontScale * 100).toInt()))
-                        Slider(value = fontScale, onValueChange = onFontScaleChange, valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE)
+                        Slider(
+                            value = fontScale,
+                            onValueChange = onFontScaleChange,
+                            modifier = Modifier.tvArrowsLeave(),
+                            valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE,
+                        )
                         CaptionVisibilitySettings()
                         TranslationPositionSettings(translationPosition, onTranslationPositionChange)
                         SettingsSwitchRow(
@@ -868,7 +873,7 @@ private fun PronunciationVolumeSetting() {
             onValueChangeFinished = { preferences.edit().putFloat(PRONUNCIATION_VOLUME_PREFERENCE, volume).apply() },
             valueRange = MIN_PRONUNCIATION_VOLUME..MAX_PRONUNCIATION_VOLUME,
             steps = PRONUNCIATION_VOLUME_STEPS,
-            modifier = Modifier.testTag("pronunciation_volume_slider"),
+            modifier = Modifier.tvArrowsLeave().testTag("pronunciation_volume_slider"),
         )
     }
 }

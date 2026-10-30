@@ -187,6 +187,7 @@ internal fun PortraitPanelPositionSettings(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .tvArrowsLeave()
                 .semantics { contentDescription = positionTitle }
                 .testTag("portrait_panel_position_slider"),
     )

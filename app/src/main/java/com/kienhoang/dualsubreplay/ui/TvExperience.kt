@@ -35,7 +35,8 @@ internal fun TvLayer(
     actions: TvLayerActions,
 ) {
     if (!LocalTvLayout.current) return
-    BindTvRemote(state, webController, homeShown) { onHomeShownChange(true) }
+    BindTvRemote(state, webController, homeShown, actions.showPanel) { onHomeShownChange(true) }
+    val home = rememberTvHomeState()
     // Leaving TV home hands the remote to the page, so OK and the arrows work on the video at once.
     LaunchedEffect(homeShown) {
         if (homeShown) webController.pause() else TvRemoteKeys.focusPage?.invoke()
@@ -43,6 +44,7 @@ internal fun TvLayer(
     if (!homeShown) return
     val leave = { onHomeShownChange(false) }
     TvHome(
+        home = home,
         tabs = state.browserTabs,
         videoOpen = state.activeVideoId != null,
         actions =
@@ -55,8 +57,9 @@ internal fun TvLayer(
                     actions.tabActions.switchTo(id)
                     leave()
                 },
+                // YouTube's home page in a tab of its own, so the open video stays in Continue watching.
                 openYouTubePage = {
-                    if (state.browserTabs.active == null) actions.tabActions.openNew(MAIN_TAB_ACCOUNT)
+                    if (state.browserTabs.active == null || state.activeVideoId != null) actions.tabActions.openNew(MAIN_TAB_ACCOUNT)
                     leave()
                 },
                 backToVideo = leave,
@@ -75,9 +78,11 @@ private fun BindTvRemote(
     state: DualSubUiState,
     webController: YouTubeWebController,
     homeShown: Boolean,
+    showPanel: () -> Unit,
     showHome: () -> Unit,
 ) {
     val currentState by rememberUpdatedState(state)
+    val currentShowPanel by rememberUpdatedState(showPanel)
     val currentHomeShown by rememberUpdatedState(homeShown)
     val currentShowHome by rememberUpdatedState(showHome)
     DisposableEffect(webController) {
@@ -93,7 +98,7 @@ private fun BindTvRemote(
                 )
             val action = tvRemoteAction(keyCode, place)
             if (action != null && (!repeat || repeatsWhileHeld(action))) {
-                runTvRemoteAction(action, currentState, webController, currentShowHome)
+                runTvRemoteAction(action, currentState, webController, currentShowPanel, currentShowHome)
             }
             action != null
         }
@@ -106,6 +111,7 @@ private fun runTvRemoteAction(
     action: TvRemoteAction,
     state: DualSubUiState,
     webController: YouTubeWebController,
+    showPanel: () -> Unit,
     showHome: () -> Unit,
 ) {
     val playback = WebVideoBridge.playback.value
@@ -121,7 +127,12 @@ private fun runTvRemoteAction(
         TvRemoteAction.PREVIOUS_LINE, TvRemoteAction.NEXT_LINE, TvRemoteAction.REPLAY_LINE ->
             tvLineStartMs(state.segments.map { it.startMs }, state.currentIndex, playback?.positionMs, action)
                 ?.let { webController.replayFrom(it / 1_000f) }
-        TvRemoteAction.FOCUS_PANEL -> TvRemoteKeys.focusPanel?.invoke()
+        // Picking a line happens paused: a playing panel scrolls the focused line away.
+        TvRemoteAction.FOCUS_PANEL -> {
+            webController.pause()
+            if (!state.subtitlePanelVisible) showPanel()
+            TvRemoteKeys.focusPanel?.invoke()
+        }
         TvRemoteAction.FOCUS_VIDEO -> TvRemoteKeys.focusPage?.invoke()
         TvRemoteAction.SHOW_HOME -> showHome()
     }

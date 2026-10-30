@@ -7,9 +7,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -18,10 +23,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
@@ -122,6 +134,50 @@ internal fun Modifier.tvFocusRing(shape: Shape = RoundedCornerShape(10.dp)): Mod
     composed {
         if (!LocalTvLayout.current) return@composed Modifier
         var focused by remember { mutableStateOf(false) }
-        val color = if (focused) MaterialTheme.colorScheme.primary else Color.Transparent
+        // Not the accent: the playing subtitle line already has an accent border.
+        val color = if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent
         Modifier.onFocusChanged { focused = it.hasFocus }.border(3.dp, color, shape)
     }
+
+/**
+ * ▲ and ▼ leave a slider or a text field in the TV layout, instead of changing the value or moving
+ * the cursor, so the remote can reach what is above and below it.
+ */
+internal fun Modifier.tvArrowsLeave(): Modifier =
+    composed {
+        if (!LocalTvLayout.current) return@composed Modifier
+        val focusManager = LocalFocusManager.current
+        Modifier.onPreviewKeyEvent { event ->
+            val direction =
+                when (event.key) {
+                    Key.DirectionUp -> FocusDirection.Up
+                    Key.DirectionDown -> FocusDirection.Down
+                    else -> return@onPreviewKeyEvent false
+                }
+            if (event.type == KeyEventType.KeyDown) focusManager.moveFocus(direction)
+            true
+        }
+    }
+
+/**
+ * Material's focus shading, strong enough to see across a room in the TV layout. It is always
+ * provided, so turning the layout on or off keeps the screen's state.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun tvFocusShading(tvLayout: Boolean): ProvidedValue<RippleConfiguration?> =
+    LocalRippleConfiguration provides if (tvLayout) tvRippleConfiguration() else LocalRippleConfiguration.current
+
+@OptIn(ExperimentalMaterial3Api::class)
+private fun tvRippleConfiguration(): RippleConfiguration =
+    RippleConfiguration(
+        rippleAlpha =
+            RippleAlpha(
+                draggedAlpha = TV_STATE_ALPHA,
+                focusedAlpha = TV_STATE_ALPHA,
+                hoveredAlpha = TV_STATE_ALPHA,
+                pressedAlpha = TV_STATE_ALPHA,
+            ),
+    )
+
+private const val TV_STATE_ALPHA = 0.32f

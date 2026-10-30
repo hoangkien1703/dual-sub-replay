@@ -130,10 +130,15 @@ private fun GuidePageContent(page: GuidePage, modifier: Modifier = Modifier) {
                 contentDescription = page.imageContentDescriptionRes?.let { stringResource(it) },
                 contentScale = ContentScale.Crop,
                 alignment = if (page.imageCropFromTop) Alignment.TopCenter else Alignment.Center,
+                // A TV screen is short: the picture shrinks to the space left, so the buttons stay on screen.
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(aspectRatio)
-                    .clip(RoundedCornerShape(20.dp))
+                    .then(
+                        if (LocalTvLayout.current) {
+                            Modifier.weight(1f, fill = false).aspectRatio(aspectRatio, matchHeightConstraintsFirst = true)
+                        } else {
+                            Modifier.fillMaxWidth().aspectRatio(aspectRatio)
+                        },
+                    ).clip(RoundedCornerShape(20.dp))
                     .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
             )
             Spacer(Modifier.height(28.dp))

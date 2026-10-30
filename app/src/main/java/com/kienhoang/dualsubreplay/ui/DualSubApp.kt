@@ -949,7 +949,7 @@ internal fun SubtitleTimeline(
     var tvLine by remember { mutableStateOf<SubtitleSegment?>(null) }
     val activeRowFocus = remember { FocusRequester() }
     val fontScale = if (tvLayout) state.fontScale * TV_TEXT_SCALE else state.fontScale
-    BindTvPanelFocus(tvLayout, activeRowFocus)
+    BindTvPanelFocus(tvLayout, activeRowFocus, state.currentIndex)
     val onLight = appThemeIsLight()
     val originalColor = effectiveOriginalColor(state, onLight)
     val translatedColor = effectiveTranslatedColor(state, onLight)
@@ -1000,11 +1000,16 @@ internal fun SubtitleTimeline(
     tvLine?.let { TvLineWords(it, state.resolvedSourceLanguage ?: state.sourcePreference, onReplay, onWordClick) { tvLine = null } }
 }
 
-/** Lets the remote's ▼ on the video move focus to the playing line while the panel is shown. */
+/**
+ * Lets the remote's ▼ on the video move focus to the playing line while the panel is shown. While
+ * the video plays with focus in the panel, focus follows the playing line, so the panel's scrolling
+ * never drops it.
+ */
 @Composable
 private fun BindTvPanelFocus(
     tvLayout: Boolean,
     activeRowFocus: FocusRequester,
+    currentIndex: Int,
 ) {
     if (!tvLayout) return
     DisposableEffect(activeRowFocus) {
@@ -1014,6 +1019,9 @@ private fun BindTvPanelFocus(
             if (TvRemoteKeys.focusPanel === focus) TvRemoteKeys.focusPanel = null
             TvRemoteKeys.panelFocused = false
         }
+    }
+    LaunchedEffect(currentIndex) {
+        if (TvRemoteKeys.panelFocused) runCatching { activeRowFocus.requestFocus() }
     }
 }
 
@@ -1209,16 +1217,23 @@ internal fun LanguagePickerDialog(
             emptyList()
         }
     val selectedLabel = stringResource(R.string.player_language_selected)
+    // On a TV the remote starts on the list: a focused search field would open the keyboard at once.
+    val tvLayout = LocalTvLayout.current
+    val firstRowFocus = remember { FocusRequester() }
+    if (tvLayout) LaunchedEffect(Unit) { runCatching { firstRowFocus.requestFocus() } }
 
     @Composable
     fun ChoiceRow(
         choice: LanguageChoice,
         shown: String,
         tag: String,
+        first: Boolean = false,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(if (tvLayout && first) Modifier.focusRequester(firstRowFocus) else Modifier)
+                .tvFocusRing()
                 .clickable { onChoice(choice) }
                 .testTag(tag)
                 .padding(horizontal = 8.dp, vertical = 12.dp),
@@ -1249,7 +1264,7 @@ internal fun LanguagePickerDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
-                    modifier = Modifier.fillMaxWidth().testTag("language_search"),
+                    modifier = Modifier.fillMaxWidth().tvArrowsLeave().testTag("language_search"),
                     label = { Text(stringResource(R.string.player_search_languages)) },
                     singleLine = true,
                 )
@@ -1258,13 +1273,13 @@ internal fun LanguagePickerDialog(
                 LazyColumn(Modifier.fillMaxWidth().heightIn(max = listMaxHeight)) {
                     if (recentChoices.isNotEmpty()) {
                         item(key = "recent_heading") { GroupHeading(stringResource(R.string.player_recent_languages)) }
-                        items(recentChoices, key = { "recent_${it.first.code}" }) { (choice, shown) ->
-                            ChoiceRow(choice, shown, "language_recent_${testTagPrefix}_${choice.code}")
+                        itemsIndexed(recentChoices, key = { _, item -> "recent_${item.first.code}" }) { index, (choice, shown) ->
+                            ChoiceRow(choice, shown, "language_recent_${testTagPrefix}_${choice.code}", first = index == 0)
                         }
                         item(key = "all_heading") { GroupHeading(stringResource(R.string.player_all_languages)) }
                     }
-                    itemsIndexed(filteredChoices, key = { _, item -> item.first.code }) { _, (choice, shown) ->
-                        ChoiceRow(choice, shown, "language_option_${testTagPrefix}_${choice.code}")
+                    itemsIndexed(filteredChoices, key = { _, item -> item.first.code }) { index, (choice, shown) ->
+                        ChoiceRow(choice, shown, "language_option_${testTagPrefix}_${choice.code}", first = index == 0 && recentChoices.isEmpty())
                     }
                 }
             }
