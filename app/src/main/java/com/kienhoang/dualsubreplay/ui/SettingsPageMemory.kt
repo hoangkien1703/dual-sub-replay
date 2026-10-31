@@ -51,9 +51,6 @@ internal const val SETTINGS_PEEK_TAP_MILLIS = 300L
 /** How quickly the page fades out and back in. */
 internal const val SETTINGS_PEEK_FADE_MILLIS = 150
 
-/** How much of the page still shows while a slider that changes the subtitles is dragged. */
-internal const val SETTINGS_SLIDER_PEEK_ALPHA = 0.3f
-
 /**
  * Whether the page stays see-through after the peek button's click. [pressedAtMillis] is null
  * when the click came without a touch (TalkBack, a TV remote's key), which counts as a tap.
@@ -69,13 +66,11 @@ internal fun settingsPeekLockedAfterClick(
         else -> nowMillis - pressedAtMillis < SETTINGS_PEEK_TAP_MILLIS
     }
 
-/** Page opacity: hidden while peeking, faint while a subtitle slider is dragged. */
+/**
+ * Page opacity: hidden while peeking or while a subtitle slider is held. A half-faded page mixed its
+ * text with the subtitles behind it (owner feedback 2026-10-31), so it is all or nothing.
+ */
 internal fun settingsPageAlpha(
     peeking: Boolean,
-    sliderDragged: Boolean,
-): Float =
-    when {
-        peeking -> 0f
-        sliderDragged -> SETTINGS_SLIDER_PEEK_ALPHA
-        else -> 1f
-    }
+    sliderHeld: Boolean,
+): Float = if (peeking || sliderHeld) 0f else 1f

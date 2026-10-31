@@ -93,6 +93,18 @@ class SettingsPageMemoryUiTest {
     }
 
     @Test
+    fun holdingTheTextSizeSliderShowsOnlyThatSliderOnACard() {
+        showSettings(SettingsPageMemory())
+
+        composeRule.onNodeWithTag("font_scale_slider").performScrollTo().performTouchInput { down(center) }
+        composeRule.onNodeWithTag("held_slider_card").assertIsDisplayed()
+        saveUiEvidence("settings-held-slider")
+
+        composeRule.onNodeWithTag("font_scale_slider").performTouchInput { up() }
+        composeRule.onNodeWithTag("held_slider_card").assertDoesNotExist()
+    }
+
+    @Test
     fun theSubtitlePanelGearOpensLanguagesOnTapAndLayoutOnLongPress() {
         var taps = 0
         var longPresses = 0

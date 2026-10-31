@@ -522,14 +522,21 @@ internal fun SubtitleSettingsDialog(
                     }
 
                     SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {
-                        Text(stringResource(R.string.settings_text_size, (fontScale * 100).toInt()))
+                        val fontScaleLabel = stringResource(R.string.settings_text_size, (fontScale * 100).toInt())
+                        val fontScaleSteps = fontScaleSteps(LocalTvLayout.current)
+                        val fontScaleRange = MIN_FONT_SCALE..MAX_FONT_SCALE
+                        Text(fontScaleLabel)
                         Slider(
                             value = fontScale,
                             onValueChange = onFontScaleChange,
-                            modifier = Modifier.tvArrowsLeave().testTag("font_scale_slider"),
-                            interactionSource = peek.fontScaleSlider,
-                            valueRange = MIN_FONT_SCALE..MAX_FONT_SCALE,
-                            steps = fontScaleSteps(LocalTvLayout.current),
+                            modifier =
+                                Modifier
+                                    .tvArrowsLeave()
+                                    .peekWhileHeld(peek.fontScaleSlider, fontScaleLabel, fontScale, fontScaleRange, fontScaleSteps)
+                                    .testTag("font_scale_slider"),
+                            interactionSource = peek.fontScaleSlider.interaction,
+                            valueRange = fontScaleRange,
+                            steps = fontScaleSteps,
                         )
                         CaptionVisibilitySettings()
                         TranslationPositionSettings(translationPosition, onTranslationPositionChange)
@@ -572,7 +579,7 @@ internal fun SubtitleSettingsDialog(
                             offsetFraction = portraitPanelOffsetFraction,
                             onOffsetFractionChange = onPortraitPanelOffsetFractionChange,
                             onReset = onResetPortraitPanelPosition,
-                            sliderInteraction = peek.panelPositionSlider,
+                            peekSlider = peek.panelPositionSlider,
                         )
                         SettingsSectionDivider()
                         CaptionFormatSettings(captionFormat, onCaptionFormatChange)
@@ -714,6 +721,7 @@ internal fun SubtitleSettingsDialog(
                 }
             }
         }
+        peek.heldSlider?.let { HeldSliderCard(it) }
         if (peek.locked) SettingsPeekBackOverlay(onBack = { peek.locked = false })
 
         if (showLanguageDownloads && languageDownloads != null) {

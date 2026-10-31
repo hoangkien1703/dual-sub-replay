@@ -58,9 +58,9 @@ class SettingsPageMemoryTest {
     }
 
     @Test
-    fun peekingHidesThePageAndDraggingASliderFadesIt() {
-        assertEquals(1f, settingsPageAlpha(peeking = false, sliderDragged = false))
-        assertEquals(SETTINGS_SLIDER_PEEK_ALPHA, settingsPageAlpha(peeking = false, sliderDragged = true))
-        assertEquals(0f, settingsPageAlpha(peeking = true, sliderDragged = true))
+    fun peekingOrHoldingASliderHidesTheWholePage() {
+        assertEquals(1f, settingsPageAlpha(peeking = false, sliderHeld = false))
+        assertEquals(0f, settingsPageAlpha(peeking = false, sliderHeld = true))
+        assertEquals(0f, settingsPageAlpha(peeking = true, sliderHeld = false))
     }
 }

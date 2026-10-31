@@ -171,26 +171,30 @@ internal fun PortraitPanelPositionSettings(
     offsetFraction: Float,
     onOffsetFractionChange: (Float) -> Unit,
     onReset: () -> Unit,
-    sliderInteraction: MutableInteractionSource = remember { MutableInteractionSource() },
+    peekSlider: PeekSlider? = null,
 ) {
     val normalizedOffset = normalizePortraitPanelOffsetFraction(offsetFraction)
+    val ownInteraction = remember { MutableInteractionSource() }
+    val positionLabel = portraitPanelPositionLabel(normalizedOffset)
+    val positionRange = MIN_PORTRAIT_PANEL_OFFSET_FRACTION..MAX_PORTRAIT_PANEL_OFFSET_FRACTION
     val positionTitle = stringResource(R.string.settings_portrait_panel_position)
     Text(positionTitle, fontWeight = FontWeight.SemiBold)
     Text(stringResource(R.string.settings_portrait_panel_position_hint))
     Text(
-        text = portraitPanelPositionLabel(normalizedOffset),
+        text = positionLabel,
         modifier = Modifier.testTag("portrait_panel_position_value"),
         fontWeight = FontWeight.Medium,
     )
     Slider(
         value = normalizedOffset,
         onValueChange = { onOffsetFractionChange(normalizePortraitPanelOffsetFraction(it)) },
-        valueRange = MIN_PORTRAIT_PANEL_OFFSET_FRACTION..MAX_PORTRAIT_PANEL_OFFSET_FRACTION,
+        valueRange = positionRange,
         steps = PORTRAIT_PANEL_OFFSET_STEPS,
-        interactionSource = sliderInteraction,
+        interactionSource = peekSlider?.interaction ?: ownInteraction,
         modifier =
             Modifier
                 .fillMaxWidth()
+                .peekWhileHeld(peekSlider, positionLabel, normalizedOffset, positionRange, PORTRAIT_PANEL_OFFSET_STEPS)
                 .tvArrowsLeave()
                 .semantics { contentDescription = positionTitle }
                 .testTag("portrait_panel_position_slider"),

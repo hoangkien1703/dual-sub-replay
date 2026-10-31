@@ -9,22 +9,29 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,15 +41,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.kienhoang.dualsubreplay.R
+import kotlin.math.roundToInt
 
 /**
  * The settings page's see-through state. Holding the eye button hides the page until it is let
@@ -51,15 +65,17 @@ import com.kienhoang.dualsubreplay.R
 internal class SettingsPeekState {
     var locked by mutableStateOf(false)
     var buttonHeld by mutableStateOf(false)
-    var sliderDragged by mutableStateOf(false)
     val buttonInteraction = MutableInteractionSource()
 
-    /** The sliders that change how the subtitles look: dragging one fades the page. */
-    val fontScaleSlider = MutableInteractionSource()
-    val panelPositionSlider = MutableInteractionSource()
+    /** The sliders that change how the subtitles look: holding one hides the page but that slider. */
+    val fontScaleSlider = PeekSlider(this)
+    val panelPositionSlider = PeekSlider(this)
+
+    /** The slider being held, shown alone on [HeldSliderCard] while the page is hidden. */
+    var heldSlider by mutableStateOf<HeldSlider?>(null)
     private var pressedAtMillis: Long? = null
 
-    val pageAlpha: Float get() = settingsPageAlpha(peeking = locked || buttonHeld, sliderDragged = sliderDragged)
+    val pageAlpha: Float get() = settingsPageAlpha(peeking = locked || buttonHeld, sliderHeld = heldSlider != null)
 
     fun onButtonPress(nowMillis: Long) {
         pressedAtMillis = nowMillis
@@ -85,9 +101,89 @@ internal fun rememberSettingsPeekState(): SettingsPeekState {
             }
         }
     }
-    val sliderHeld = state.fontScaleSlider.isHeld() || state.panelPositionSlider.isHeld()
-    LaunchedEffect(sliderHeld) { state.sliderDragged = sliderHeld }
     return state
+}
+
+/** A settings slider that hides the page while it is held or dragged. */
+internal class PeekSlider(
+    private val peek: SettingsPeekState,
+) {
+    val interaction = MutableInteractionSource()
+    var boundsInRoot = Rect.Zero
+
+    fun report(held: HeldSlider?) {
+        if (held != null) {
+            peek.heldSlider = held
+        } else if (peek.heldSlider?.slider === this) {
+            peek.heldSlider = null
+        }
+    }
+}
+
+/** What [HeldSliderCard] draws in place of the hidden page: the held slider, its label and value. */
+internal data class HeldSlider(
+    val slider: PeekSlider,
+    val label: String,
+    val value: Float,
+    val valueRange: ClosedFloatingPointRange<Float>,
+    val steps: Int,
+    val boundsInRoot: Rect,
+)
+
+/**
+ * Put on a settings [androidx.compose.material3.Slider] that also takes [PeekSlider.interaction]:
+ * while it is held, the page hides and [HeldSliderCard] shows [label] and the slider in its place.
+ */
+@Composable
+internal fun Modifier.peekWhileHeld(
+    slider: PeekSlider?,
+    label: String,
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+): Modifier {
+    if (slider == null) return this
+    val held = slider.interaction.isHeld()
+    SideEffect { slider.report(if (held) HeldSlider(slider, label, value, valueRange, steps, slider.boundsInRoot) else null) }
+    return onGloballyPositioned { slider.boundsInRoot = it.boundsInRoot() }
+}
+
+/**
+ * The held slider alone on a solid card over the video, where the slider sits on the hidden page,
+ * like Android's brightness slider. It only shows the value: the hidden slider keeps the touch.
+ */
+@Composable
+internal fun HeldSliderCard(held: HeldSlider) {
+    val density = LocalDensity.current
+    val padding = 12.dp
+    val labelHeight = 24.dp
+    Box(Modifier.fillMaxSize()) {
+        Surface(
+            modifier =
+                Modifier
+                    .offset {
+                        IntOffset(
+                            (held.boundsInRoot.left - padding.toPx()).roundToInt(),
+                            (held.boundsInRoot.top - padding.toPx() - labelHeight.toPx()).roundToInt(),
+                        )
+                    }.width(with(density) { held.boundsInRoot.width.toDp() } + padding * 2)
+                    .testTag("held_slider_card"),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shadowElevation = 6.dp,
+        ) {
+            Column(Modifier.padding(start = padding, end = padding, top = padding)) {
+                Text(held.label, modifier = Modifier.height(labelHeight), fontWeight = FontWeight.Medium, maxLines = 1)
+                Slider(
+                    value = held.value,
+                    onValueChange = {},
+                    valueRange = held.valueRange,
+                    steps = held.steps,
+                    modifier = Modifier.height(with(density) { held.boundsInRoot.height.toDp() }),
+                )
+            }
+        }
+    }
 }
 
 @Composable
