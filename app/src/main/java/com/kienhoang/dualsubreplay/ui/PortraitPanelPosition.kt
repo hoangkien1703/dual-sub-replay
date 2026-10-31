@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,6 +13,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -169,6 +171,7 @@ internal fun PortraitPanelPositionSettings(
     offsetFraction: Float,
     onOffsetFractionChange: (Float) -> Unit,
     onReset: () -> Unit,
+    sliderInteraction: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val normalizedOffset = normalizePortraitPanelOffsetFraction(offsetFraction)
     val positionTitle = stringResource(R.string.settings_portrait_panel_position)
@@ -184,6 +187,7 @@ internal fun PortraitPanelPositionSettings(
         onValueChange = { onOffsetFractionChange(normalizePortraitPanelOffsetFraction(it)) },
         valueRange = MIN_PORTRAIT_PANEL_OFFSET_FRACTION..MAX_PORTRAIT_PANEL_OFFSET_FRACTION,
         steps = PORTRAIT_PANEL_OFFSET_STEPS,
+        interactionSource = sliderInteraction,
         modifier =
             Modifier
                 .fillMaxWidth()

@@ -67,6 +67,8 @@
     <string name="settings_dual_subtitle_settings_summary">Cỡ chữ, chế độ xem, màu sắc, lớp phủ và hơn nữa</string>
     <string name="settings_done">Xong</string>
     <string name="settings_close_settings">Đóng cài đặt</string>
+    <string name="settings_peek">Xem video. Giữ để xem nhanh, hoặc chạm để video hiện cho đến khi quay lại</string>
+    <string name="settings_peek_back">Quay lại cài đặt</string>
     <string name="settings_group_languages">Ngôn ngữ</string>
     <string name="settings_group_reading">Đọc</string>
     <string name="settings_text_size">Cỡ chữ: %1$d%%</string>

@@ -48,6 +48,7 @@ Where settings are (menu at the top left, then Settings):
 - Languages: original caption language (Auto recommended) and the language to translate to.
 - Reading: text size (80% to 200%), when original and translated captions show (Always, Only when paused, Never), Translation position (Below original or Above original), Highlight spoken words.
 - Default view: Transcript panel or Scroll-friendly overlay.
+- The settings page reopens at the section and scroll position the user left, unless it stayed closed for more than 3 minutes or the app restarted. The eye icon next to Done shows the video behind the page: hold it to peek, or tap it to keep the video visible until "Back to settings". Dragging Text size or Portrait panel position fades the page so the change shows live. A long press on the subtitle panel's gear opens the settings page at Layout & format (a tap opens the languages popup).
 - More settings, Layout & format: portrait panel position, caption format (Short paired phrases or Whole sentence), Landscape split view.
 - More settings, Colors & theme: custom subtitle colors (original, translated, spoken-word highlight), overlay background, and App theme: App colors (Deep teal, Black, Navy, Slate, Plum, Forest, or Light) and Accent color.
 - More settings, Word learning: Pronounce tapped words, Pronunciation volume (25% to 200%), Word learning mode (colors words by part of speech) and which lines get colors, Tap word for definition, Highlight active sentence only.

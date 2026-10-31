@@ -39,7 +39,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -301,6 +300,13 @@ private fun DualSubExperience(
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)
     var showSettings by remember { mutableStateOf(false) }
+    // Kept while the app runs, so the settings page reopens where it was (owner request 2026-10-31).
+    val settingsPageMemory = remember { SettingsPageMemory() }
+    var settingsJumpSection by remember { mutableStateOf<MoreSettingsSection?>(null) }
+    val openLayoutSettings = {
+        settingsJumpSection = MoreSettingsSection.LAYOUT
+        showSettings = true
+    }
     // Gear icons on the player open a small languages popup; the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
@@ -445,6 +451,7 @@ private fun DualSubExperience(
                                     .testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
                             onSettings = { showQuickSettings = true },
+                            onLongPressSettings = openLayoutSettings,
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -461,6 +468,7 @@ private fun DualSubExperience(
                             modifier = panelModifier.testTag("subtitle_timeline"),
                             onHide = onHideSubtitles,
                             onSettings = { showQuickSettings = true },
+                            onLongPressSettings = openLayoutSettings,
                             onRetry = onRetry,
                             onWordClick = onWordClick,
                             onReplay = { segment ->
@@ -566,9 +574,15 @@ private fun DualSubExperience(
             onCaptionFormatChange = onCaptionFormatChange,
             onResetSettings = {
                 showSettings = false
+                settingsJumpSection = null
                 onResetSettings()
             },
-            onDismiss = { showSettings = false },
+            pageMemory = settingsPageMemory,
+            jumpToSection = settingsJumpSection,
+            onDismiss = {
+                showSettings = false
+                settingsJumpSection = null
+            },
         )
     }
 }
@@ -582,6 +596,7 @@ private fun SubtitlePanel(
     onRetry: () -> Unit,
     onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
+    onLongPressSettings: () -> Unit = onSettings,
 ) {
     var panelOffsetY by remember { mutableFloatStateOf(0f) }
     var panelHeightPx by remember { mutableFloatStateOf(0f) }
@@ -670,13 +685,7 @@ private fun SubtitlePanel(
                         )
                     }
                     ComprehensionChip()
-                    IconButton(onClick = onSettings) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.player_subtitle_settings),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
+                    PanelSettingsButton(onClick = onSettings, onLongClick = onLongPressSettings, size = 48.dp, iconSize = 24.dp)
                     IconButton(onClick = onHide) {
                         Icon(
                             Icons.Default.Close,
@@ -784,6 +793,7 @@ private fun SideSubtitlePanel(
     onRetry: () -> Unit,
     onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
+    onLongPressSettings: () -> Unit = onSettings,
 ) {
     var panelOffsetX by remember { mutableFloatStateOf(0f) }
     var panelWidthPx by remember { mutableFloatStateOf(0f) }
@@ -854,14 +864,7 @@ private fun SideSubtitlePanel(
                         )
                     }
                     ComprehensionChip()
-                    IconButton(onClick = onSettings, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.player_subtitle_settings),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
+                    PanelSettingsButton(onClick = onSettings, onLongClick = onLongPressSettings, size = 36.dp, iconSize = 20.dp)
                     IconButton(onClick = onHide, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Default.Close,
