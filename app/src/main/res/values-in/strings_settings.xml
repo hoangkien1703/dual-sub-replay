@@ -66,6 +66,8 @@
     <string name="settings_dual_subtitle_settings">Setelan subtitel ganda</string>
     <string name="settings_done">Selesai</string>
     <string name="settings_close_settings">Tutup setelan</string>
+    <string name="settings_peek">Lihat video. Tahan untuk mengintip, atau ketuk agar tetap terlihat</string>
+    <string name="settings_peek_back">Kembali ke setelan</string>
     <string name="settings_group_languages">Bahasa</string>
     <string name="settings_group_reading">Membaca</string>
     <string name="settings_text_size">Ukuran teks: %1$d%%</string>

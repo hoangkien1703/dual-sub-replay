@@ -66,6 +66,8 @@
     <string name="settings_dual_subtitle_settings">2言語字幕の設定</string>
     <string name="settings_done">完了</string>
     <string name="settings_close_settings">設定を閉じる</string>
+    <string name="settings_peek">動画を見る。長押しで一時的に表示、タップで表示したままにします</string>
+    <string name="settings_peek_back">設定に戻る</string>
     <string name="settings_group_languages">言語</string>
     <string name="settings_group_reading">読みやすさ</string>
     <string name="settings_text_size">文字サイズ: %1$d%%</string>

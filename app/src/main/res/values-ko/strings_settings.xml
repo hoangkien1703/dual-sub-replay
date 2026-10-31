@@ -66,6 +66,8 @@
     <string name="settings_dual_subtitle_settings">이중 자막 설정</string>
     <string name="settings_done">완료</string>
     <string name="settings_close_settings">설정 닫기</string>
+    <string name="settings_peek">영상 보기. 길게 누르면 잠시 보이고, 탭하면 계속 보입니다</string>
+    <string name="settings_peek_back">설정으로 돌아가기</string>
     <string name="settings_group_languages">언어</string>
     <string name="settings_group_reading">읽기</string>
     <string name="settings_text_size">글자 크기: %1$d%%</string>

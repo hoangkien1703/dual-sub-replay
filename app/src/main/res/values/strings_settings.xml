@@ -66,6 +66,8 @@
     <string name="settings_dual_subtitle_settings">Dual-subtitle settings</string>
     <string name="settings_done">Done</string>
     <string name="settings_close_settings">Close settings</string>
+    <string name="settings_peek">See the video. Hold to peek, or tap to keep it visible</string>
+    <string name="settings_peek_back">Back to settings</string>
     <string name="settings_group_languages">Languages</string>
     <string name="settings_group_reading">Reading</string>
     <string name="settings_text_size">Text size: %1$d%%</string>

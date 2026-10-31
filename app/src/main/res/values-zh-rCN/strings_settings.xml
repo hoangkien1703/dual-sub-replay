@@ -66,6 +66,8 @@
     <string name="settings_dual_subtitle_settings">双语字幕设置</string>
     <string name="settings_done">完成</string>
     <string name="settings_close_settings">关闭设置</string>
+    <string name="settings_peek">查看视频。按住可临时查看，轻点可保持显示</string>
+    <string name="settings_peek_back">返回设置</string>
     <string name="settings_group_languages">语言</string>
     <string name="settings_group_reading">阅读</string>
     <string name="settings_text_size">文字大小：%1$d%%</string>
