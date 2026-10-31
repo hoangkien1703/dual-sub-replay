@@ -16,6 +16,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -99,7 +100,9 @@ class SettingsPageMemoryUiTest {
         composeRule.onNodeWithTag("font_scale_slider").performScrollTo().performTouchInput { down(center) }
         composeRule.waitForIdle()
         saveUiEvidence("settings-held-slider")
-        composeRule.onNodeWithTag("held_slider_card").assertIsDisplayed()
+        val slider = composeRule.onNodeWithTag("font_scale_slider").fetchSemanticsNode().boundsInRoot
+        val card = composeRule.onNodeWithTag("held_slider_card").fetchSemanticsNode().boundsInRoot
+        assertTrue("The card $card should cover the held slider $slider", card.height > 0f && card.overlaps(slider))
 
         composeRule.onNodeWithTag("font_scale_slider").performTouchInput { up() }
         composeRule.onNodeWithTag("held_slider_card").assertDoesNotExist()
