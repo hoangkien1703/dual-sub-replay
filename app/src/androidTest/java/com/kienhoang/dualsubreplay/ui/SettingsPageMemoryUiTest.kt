@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
@@ -94,10 +95,14 @@ class SettingsPageMemoryUiTest {
     }
 
     @Test
-    fun holdingTheTextSizeSliderShowsOnlyThatSliderOnACard() {
+    fun draggingTheTextSizeSliderShowsOnlyThatSliderOnACard() {
         showSettings(SettingsPageMemory())
 
-        composeRule.onNodeWithTag("font_scale_slider").performScrollTo().performTouchInput { down(center) }
+        // Drag, as people do: a finger resting on a slider without moving is not a drag.
+        composeRule.onNodeWithTag("font_scale_slider").performScrollTo().performTouchInput {
+            down(center)
+            moveBy(Offset(width * 0.2f, 0f))
+        }
         composeRule.waitForIdle()
         saveUiEvidence("settings-held-slider")
         val slider = composeRule.onNodeWithTag("font_scale_slider").fetchSemanticsNode().boundsInRoot
