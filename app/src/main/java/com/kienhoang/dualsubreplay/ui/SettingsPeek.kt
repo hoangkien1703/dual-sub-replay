@@ -43,8 +43,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.DialogWindowProvider
 import com.kienhoang.dualsubreplay.R
 import kotlin.math.roundToInt
@@ -109,7 +110,9 @@ internal class PeekSlider(
     private val peek: SettingsPeekState,
 ) {
     val interaction = MutableInteractionSource()
-    var boundsInRoot = Rect.Zero
+
+    /** Where the slider sits on the page, unclipped, so [HeldSliderCard] can cover the same spot. */
+    var boundsInRoot by mutableStateOf(Rect.Zero)
 
     fun report(held: HeldSlider?) {
         if (held != null) {
@@ -127,7 +130,6 @@ internal data class HeldSlider(
     val value: Float,
     val valueRange: ClosedFloatingPointRange<Float>,
     val steps: Int,
-    val boundsInRoot: Rect,
 )
 
 /**
@@ -144,8 +146,8 @@ internal fun Modifier.peekWhileHeld(
 ): Modifier {
     if (slider == null) return this
     val held = slider.interaction.isHeld()
-    SideEffect { slider.report(if (held) HeldSlider(slider, label, value, valueRange, steps, slider.boundsInRoot) else null) }
-    return onGloballyPositioned { slider.boundsInRoot = it.boundsInRoot() }
+    SideEffect { slider.report(if (held) HeldSlider(slider, label, value, valueRange, steps) else null) }
+    return onGloballyPositioned { slider.boundsInRoot = Rect(it.positionInRoot(), it.size.toSize()) }
 }
 
 /**
@@ -157,16 +159,17 @@ internal fun HeldSliderCard(held: HeldSlider) {
     val density = LocalDensity.current
     val padding = 12.dp
     val labelHeight = 24.dp
+    val bounds = held.slider.boundsInRoot
     Box(Modifier.fillMaxSize()) {
         Surface(
             modifier =
                 Modifier
                     .offset {
                         IntOffset(
-                            (held.boundsInRoot.left - padding.toPx()).roundToInt(),
-                            (held.boundsInRoot.top - padding.toPx() - labelHeight.toPx()).roundToInt(),
+                            (bounds.left - padding.toPx()).roundToInt(),
+                            (bounds.top - padding.toPx() - labelHeight.toPx()).roundToInt(),
                         )
-                    }.width(with(density) { held.boundsInRoot.width.toDp() } + padding * 2)
+                    }.width(with(density) { bounds.width.toDp() } + padding * 2)
                     .testTag("held_slider_card"),
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -179,7 +182,7 @@ internal fun HeldSliderCard(held: HeldSlider) {
                     onValueChange = {},
                     valueRange = held.valueRange,
                     steps = held.steps,
-                    modifier = Modifier.height(with(density) { held.boundsInRoot.height.toDp() }),
+                    modifier = Modifier.height(with(density) { bounds.height.toDp() }),
                 )
             }
         }
