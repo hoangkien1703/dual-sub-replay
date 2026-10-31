@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">Mô hình ngôn ngữ chỉ được tải xuống khi cần.</string>
     <string name="settings_subtitle_languages">Ngôn ngữ phụ đề</string>
     <string name="settings_dual_subtitle_settings">Cài đặt phụ đề kép</string>
-    <string name="settings_dual_subtitle_settings_summary">Cỡ chữ, chế độ xem, màu sắc, lớp phủ và hơn nữa</string>
     <string name="settings_done">Xong</string>
     <string name="settings_close_settings">Đóng cài đặt</string>
     <string name="settings_peek">Xem video. Giữ để xem nhanh, hoặc chạm để video hiện cho đến khi quay lại</string>
@@ -168,4 +167,5 @@
     <string name="settings_google_wait_2">2 giây</string>
     <string name="settings_google_wait_4">4 giây</string>
     <string name="settings_google_wait_8">8 giây</string>
+    <string name="settings_source_language_auto_short">Tự động</string>
 </resources>

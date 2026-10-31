@@ -1259,9 +1259,10 @@ internal fun LanguagePickerDialog(
         )
     }
 
+    // A TV remote reaches the Back button more easily than a corner X.
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = { if (tvLayout) Text(title) else DialogTitle(title, onClose = onDismiss) },
         text = {
             Column {
                 OutlinedTextField(
@@ -1287,7 +1288,7 @@ internal fun LanguagePickerDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.player_back)) } },
+        confirmButton = { if (tvLayout) TextButton(onClick = onDismiss) { Text(stringResource(R.string.player_back)) } },
     )
 }
 

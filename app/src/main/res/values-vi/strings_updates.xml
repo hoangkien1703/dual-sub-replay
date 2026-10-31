@@ -18,7 +18,6 @@
     <string name="updates_install">Cài đặt</string>
     <string name="updates_installing">Đang cài… Ứng dụng sẽ đóng trong lúc cập nhật.</string>
     <string name="updates_try_again">Thử lại</string>
-    <string name="updates_close">Đóng</string>
     <string name="updates_open_github">Mở GitHub</string>
     <string name="updates_unsupported">Bản ứng dụng này được tạo trên máy tính nên không tự cập nhật được. Hãy tải phiên bản mới nhất trên GitHub.</string>
     <string name="updates_problem_offline">Không kết nối được GitHub. Hãy kiểm tra mạng rồi thử lại.</string>

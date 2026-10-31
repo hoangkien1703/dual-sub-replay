@@ -8,11 +8,9 @@
     <string name="navigation_tagline">Aprenda idiomas com o YouTube</string>
     <string name="navigation_app_language">Idioma do app</string>
     <string name="navigation_device_language">Idioma do dispositivo</string>
-    <string name="navigation_cancel">Cancelar</string>
     <string name="navigation_no_browser">Nenhum navegador disponível para abrir o GitHub.</string>
     <string name="navigation_licenses">Licenças de código aberto</string>
     <string name="navigation_github_repository">Ver o repositório no GitHub</string>
     <string name="navigation_loading_license">Carregando licença…</string>
     <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. O aplicativo é software livre sob a Licença MIT e é fornecido sem garantia. As licenças das bibliotecas incluídas aparecem abaixo; a lista completa está em THIRD_PARTY_NOTICES.md, no repositório do GitHub.</string>
-    <string name="navigation_close">Fechar</string>
 </resources>

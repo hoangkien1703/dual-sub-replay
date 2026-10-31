@@ -178,7 +178,7 @@ private fun ImportPracticeDialog(
         onDismissRequest = controller::cancel,
         title = {
             val title = if (preview == null) R.string.practice_import_review_title else R.string.practice_import_preview_title
-            Text(stringResource(title))
+            DialogTitle(stringResource(title), onClose = controller::cancel)
         },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -284,7 +284,7 @@ private fun ExportPracticeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.practice_export_title)) },
+        title = { DialogTitle(stringResource(R.string.practice_export_title), onClose = onDismiss) },
         text = {
             Column {
                 Text(stringResource(R.string.practice_export_description))
@@ -294,6 +294,5 @@ private fun ExportPracticeDialog(
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.practice_cancel)) } },
     )
 }

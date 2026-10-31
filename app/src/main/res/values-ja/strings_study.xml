@@ -43,7 +43,6 @@
     <string name="study_comprehension_known">この動画の単語の %1$d%% を知っています。</string>
     <string name="study_mark_all_known">新しい単語をすべて既知にする</string>
     <string name="study_mark_all_known_confirm">既知にする</string>
-    <string name="study_close">閉じる</string>
     <string name="study_known_word_toggle">この単語を知っている</string>
     <string name="study_send_to_anki">%1$s に送る</string>
     <string name="study_sending_to_anki">送信中…</string>

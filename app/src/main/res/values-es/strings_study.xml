@@ -43,7 +43,6 @@
     <string name="study_comprehension_known">Conoces el %1$d%% de las palabras de este video.</string>
     <string name="study_mark_all_known">Marcar todas las palabras nuevas como conocidas</string>
     <string name="study_mark_all_known_confirm">Marcar como conocidas</string>
-    <string name="study_close">Cerrar</string>
     <string name="study_known_word_toggle">Conozco esta palabra</string>
     <string name="study_send_to_anki">Enviar a %1$s</string>
     <string name="study_sending_to_anki">Enviando…</string>

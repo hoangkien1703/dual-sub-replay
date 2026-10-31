@@ -53,7 +53,6 @@
     <string name="study_comprehension_known">You know %1$d%% of the words in this video.</string>
     <string name="study_mark_all_known">Mark all new words as known</string>
     <string name="study_mark_all_known_confirm">Mark as known</string>
-    <string name="study_close">Close</string>
     <string name="study_known_word_toggle">I know this word</string>
     <string name="study_send_to_anki">Send to %1$s</string>
     <string name="study_send_to_choose">Choose where to send</string>

@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">言語モデルは必要なときだけダウンロードされます。</string>
     <string name="settings_subtitle_languages">字幕の言語</string>
     <string name="settings_dual_subtitle_settings">2言語字幕の設定</string>
-    <string name="settings_dual_subtitle_settings_summary">文字サイズ、表示、色、オーバーレイなど</string>
     <string name="settings_done">完了</string>
     <string name="settings_close_settings">設定を閉じる</string>
     <string name="settings_peek">動画を見る。長押しで一時的に表示、タップで表示したままにします</string>
@@ -168,4 +167,5 @@
     <string name="settings_google_wait_2">2 秒</string>
     <string name="settings_google_wait_4">4 秒</string>
     <string name="settings_google_wait_8">8 秒</string>
+    <string name="settings_source_language_auto_short">自動</string>
 </resources>

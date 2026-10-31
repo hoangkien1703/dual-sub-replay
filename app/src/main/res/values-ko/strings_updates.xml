@@ -18,7 +18,6 @@
     <string name="updates_install">설치</string>
     <string name="updates_installing">설치 중… 업데이트하는 동안 앱이 닫힙니다.</string>
     <string name="updates_try_again">다시 시도</string>
-    <string name="updates_close">닫기</string>
     <string name="updates_open_github">GitHub 열기</string>
     <string name="updates_unsupported">이 앱은 컴퓨터에서 빌드되어 스스로 업데이트할 수 없습니다. GitHub에서 최신 버전을 받으세요.</string>
     <string name="updates_problem_offline">GitHub에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>

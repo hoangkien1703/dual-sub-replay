@@ -43,7 +43,6 @@
     <string name="study_comprehension_known">Bạn biết %1$d%% số từ trong video này.</string>
     <string name="study_mark_all_known">Đánh dấu mọi từ mới là đã biết</string>
     <string name="study_mark_all_known_confirm">Đánh dấu đã biết</string>
-    <string name="study_close">Đóng</string>
     <string name="study_known_word_toggle">Tôi biết từ này</string>
     <string name="study_send_to_anki">Gửi sang %1$s</string>
     <string name="study_sending_to_anki">Đang gửi…</string>

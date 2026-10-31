@@ -124,9 +124,9 @@ internal fun SavedWordsScreen(
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.9f), shape = MaterialTheme.shapes.large) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.practice_title), style = MaterialTheme.typography.titleLarge)
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.practice_close)) }
+                    CloseIconButton(onDismiss, tag = "practice_close")
                 }
                 error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
                 if (malformed > 0) {

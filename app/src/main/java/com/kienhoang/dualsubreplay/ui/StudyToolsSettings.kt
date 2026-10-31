@@ -339,7 +339,7 @@ private fun AnkiConnectDeckDialog(
     val decks by produceState<Result<List<String>>?>(null) { value = runCatching { ankiConnect.deckNames() } }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.study_ankiconnect_deck_title)) },
+        title = { DialogTitle(stringResource(R.string.study_ankiconnect_deck_title), onClose = onDismiss) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 val loaded = decks
@@ -364,7 +364,6 @@ private fun AnkiConnectDeckDialog(
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_cancel)) } },
     )
 }
 

@@ -237,7 +237,7 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.report_problem_title)) },
+        title = { DialogTitle(stringResource(R.string.report_problem_title), onClose = onDismiss) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(stringResource(R.string.report_problem_intro), style = MaterialTheme.typography.bodyMedium)
@@ -288,15 +288,10 @@ internal fun ReportProblemDialog(onDismiss: () -> Unit) {
             ) { Text(stringResource(R.string.report_problem_open)) }
         },
         dismissButton = {
-            Row {
-                TextButton(
-                    onClick = { copy() },
-                    modifier = Modifier.testTag("report_problem_copy"),
-                ) { Text(stringResource(if (copied) R.string.report_problem_copied else R.string.report_problem_copy)) }
-                TextButton(onClick = onDismiss, modifier = Modifier.testTag("report_problem_close")) {
-                    Text(stringResource(R.string.notice_close))
-                }
-            }
+            TextButton(
+                onClick = { copy() },
+                modifier = Modifier.testTag("report_problem_copy"),
+            ) { Text(stringResource(if (copied) R.string.report_problem_copied else R.string.report_problem_copy)) }
         },
     )
 }

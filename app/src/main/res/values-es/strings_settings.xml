@@ -64,7 +64,6 @@
     <string name="settings_model_download_hint">El modelo de idioma solo se descarga cuando hace falta.</string>
     <string name="settings_subtitle_languages">Idiomas de los subtítulos</string>
     <string name="settings_dual_subtitle_settings">Ajustes de subtítulos dobles</string>
-    <string name="settings_dual_subtitle_settings_summary">Tamaño del texto, vista, colores, superposición y más</string>
     <string name="settings_done">Listo</string>
     <string name="settings_close_settings">Cerrar ajustes</string>
     <string name="settings_peek">Ver el vídeo. Mantén pulsado para echar un vistazo o toca para dejarlo a la vista</string>
@@ -168,4 +167,5 @@
     <string name="settings_google_wait_2">2 s</string>
     <string name="settings_google_wait_4">4 s</string>
     <string name="settings_google_wait_8">8 s</string>
+    <string name="settings_source_language_auto_short">Automático</string>
 </resources>

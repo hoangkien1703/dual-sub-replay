@@ -90,6 +90,8 @@ class AppNoticesUiTest {
         composeRule.onNodeWithText("Security update").assertIsDisplayed()
         composeRule.onNodeWithTag("security_update_update").assertIsDisplayed()
         composeRule.onNodeWithTag("security_update_details").assertIsDisplayed()
+        // A security update must be answered: no X (owner decision 2026-10-30).
+        composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).assertDoesNotExist()
         Thread.sleep(DIALOG_FADE_IN_MS)
         saveUiEvidence("security-update-dialog")
         composeRule.onNodeWithTag("security_update_not_now").performClick()
@@ -112,7 +114,8 @@ class AppNoticesUiTest {
     @Test
     fun reportAProblemShowsWhatWouldBeSent() {
         ProblemLog.record(ProblemArea.GOOGLE_TRANSLATE, "translate.googleapis.com/translate_a/t: HTTP 429")
-        composeRule.setContent { DualSubTheme { ReportProblemDialog(onDismiss = {}) } }
+        var closed = false
+        composeRule.setContent { DualSubTheme { ReportProblemDialog(onDismiss = { closed = true }) } }
         composeRule
             .onNodeWithText(
                 "Google Translate: translate.googleapis.com/translate_a/t: HTTP 429",
@@ -123,6 +126,8 @@ class AppNoticesUiTest {
         composeRule.onNodeWithTag("report_problem_email").assertIsDisplayed()
         Thread.sleep(DIALOG_FADE_IN_MS)
         saveUiEvidence("report-a-problem")
+        composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).performClick()
+        composeRule.runOnIdle { assertTrue(closed) }
     }
 
     @Test
