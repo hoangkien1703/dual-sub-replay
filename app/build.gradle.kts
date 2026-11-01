@@ -284,7 +284,7 @@ dependencies {
 
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.core:core-ktx:1.19.1")
-    implementation("androidx.webkit:webkit:1.14.0")
+    implementation("androidx.webkit:webkit:1.18.0")
     // Report a problem opens GitHub in an in-app browser tab (owner request 2026-10-30).
     implementation("androidx.browser:browser:1.10.0")
     // Media session and media notification only (earphone buttons); the video stays in the WebView.
@@ -301,7 +301,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.mlkit:translate:17.0.3")
-    implementation("com.squareup.okhttp3:okhttp:5.5.0")
+    implementation("com.squareup.okhttp3:okhttp:5.5.1")
     // Japanese morphological analysis (MeCab IPADIC dictionary), Apache-2.0, pure Java.
     // The APK keeps only its code; the dictionary files are excluded from packaging below.
     implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
