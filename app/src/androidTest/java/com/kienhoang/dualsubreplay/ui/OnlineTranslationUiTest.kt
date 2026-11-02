@@ -80,6 +80,30 @@ class OnlineTranslationUiTest {
     }
 
     @Test
+    fun aiChoiceShowsThinkingOffByDefaultAndPicksALevel() {
+        val picked = mutableListOf<com.kienhoang.dualsubreplay.assistant.AiTranslationThinking>()
+        showTranslationSettings(
+            OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB, aiTranslation = true),
+            TranslationEngineActions(select = {}, selectAiTranslationThinking = { picked += it }),
+        )
+        // Gemini, the assistant's default service, offers Off, Low and Medium; High is left out.
+        composeRule
+            .onNodeWithTag("ai_translation_thinking_off")
+            .performScrollTo()
+            .assertIsSelected()
+        composeRule.onNodeWithTag("ai_translation_thinking_high").assertDoesNotExist()
+        saveUiEvidence("settings-ai-translation-thinking")
+        composeRule.onNodeWithTag("ai_translation_thinking_medium").performScrollTo().performClick()
+        assertEquals(listOf(com.kienhoang.dualsubreplay.assistant.AiTranslationThinking.MEDIUM), picked)
+    }
+
+    @Test
+    fun googleOnlyHidesTheThinkingLevel() {
+        showTranslationSettings(OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB))
+        composeRule.onNodeWithTag("ai_translation_thinking_off").assertDoesNotExist()
+    }
+
+    @Test
     fun aiOnlyHidesWaitForGoogle() {
         val aiOnly = OnlineTranslationSettings(engine = TranslationEngine.GOOGLE_WEB, aiTranslation = true, aiTranslationOnly = true)
         showTranslationSettings(aiOnly)

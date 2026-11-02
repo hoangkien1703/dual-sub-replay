@@ -558,6 +558,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 viewModel::setGoogleWait,
                 viewModel::setSubtitleTranslator,
                 viewModel::setAiTranslationModel,
+                viewModel::setAiTranslationThinking,
             )
         }
     val aiViewModel: AiAssistantViewModel = viewModel()

@@ -157,6 +157,9 @@
     <string name="settings_translator_on_device_description">Funciona offline e não envia nada online. Menos preciso.</string>
     <string name="settings_ai_translation_model_same">Igual ao Assistente de IA (%1$s)</string>
     <string name="settings_ai_translation_model_description">Modelos rápidos respondem antes e têm os maiores limites gratuitos.</string>
+    <string name="settings_ai_translation_thinking_title">Raciocínio da IA ao traduzir</string>
+    <string name="settings_ai_translation_thinking_description">Desligado é o mais rápido. Baixo e Médio podem ajudar com gírias, piadas e falas que dependem das anteriores, mas cada resposta demora mais e gasta mais do limite gratuito. Um novo nível traduz o vídeo de novo.</string>
+    <string name="settings_ai_translation_thinking_off">Desligado</string>
     <string name="settings_ai_translation_service_description">As opções de IA usam o serviço e a chave das configurações do Assistente de IA e enviam o texto das legendas para lá. Uma chave gratuita do Google Gemini funciona melhor.</string>
     <string name="settings_ai_translation_service_open">Abrir configurações do Assistente de IA</string>
     <string name="settings_google_wait_description">Quanto tempo uma linha espera pelo Google antes de mostrar a tradução do YouTube ou do seu dispositivo. Automático: 2 s nos dados móveis, 4 s no Wi-Fi.</string>

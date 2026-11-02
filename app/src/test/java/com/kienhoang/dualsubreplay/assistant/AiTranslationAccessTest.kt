@@ -34,6 +34,50 @@ class AiTranslationAccessTest {
         assertNull(aiTranslationEffort(AiProvider.CLAUDE, "claude-haiku-5-5"))
     }
 
+    @Test fun aChosenThinkingLevelIsSentOnlyWhereTheServiceTakesIt() {
+        assertEquals("low", aiTranslationEffort(AiProvider.GEMINI, "gemini-flash-lite-latest", AiTranslationThinking.LOW))
+        assertEquals("medium", aiTranslationEffort(AiProvider.OPENAI, "gpt-5-mini", AiTranslationThinking.MEDIUM))
+        assertEquals("minimal", aiTranslationEffort(AiProvider.OPENAI, "gpt-5-mini", AiTranslationThinking.OFF))
+        assertNull(aiTranslationEffort(AiProvider.CLAUDE, "claude-haiku-5-5", AiTranslationThinking.MEDIUM))
+        assertNull(aiTranslationEffort(AiProvider.OPENROUTER, "openrouter/free", AiTranslationThinking.LOW))
+    }
+
+    @Test fun onlyGeminiAndOpenAiOfferThinkingLevels() {
+        assertEquals(AiTranslationThinking.entries, aiTranslationThinkingLevels(AiProvider.GEMINI))
+        assertEquals(AiTranslationThinking.entries, aiTranslationThinkingLevels(AiProvider.OPENAI))
+        listOf(AiProvider.CLAUDE, AiProvider.OPENROUTER, AiProvider.OPENCODE_ZEN, AiProvider.OPENCODE_GO, AiProvider.CUSTOM)
+            .forEach { assertEquals(it.key, emptyList<AiTranslationThinking>(), aiTranslationThinkingLevels(it)) }
+    }
+
+    @Test fun offKeepsTheOldCacheAndEachLevelTranslatesApart() {
+        assertEquals("gemini/m", aiTranslationScope(AiProvider.GEMINI, "m", AiTranslationThinking.OFF))
+        assertEquals("gemini/m+thinking-low", aiTranslationScope(AiProvider.GEMINI, "m", AiTranslationThinking.LOW))
+        assertEquals("claude/m", aiTranslationScope(AiProvider.CLAUDE, "m", AiTranslationThinking.MEDIUM))
+    }
+
+    @Test fun storedThinkingDefaultsToOff() {
+        assertEquals(AiTranslationThinking.OFF, storedAiTranslationThinking(null))
+        assertEquals(AiTranslationThinking.OFF, storedAiTranslationThinking("high"))
+        assertEquals(AiTranslationThinking.MEDIUM, storedAiTranslationThinking("medium"))
+    }
+
+    @Test fun theChosenLevelGoesWithEveryRequest() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaOnlyKey0000000000000000000000000000")
+            val efforts = mutableListOf<String?>()
+            val transport =
+                AiChatTransport { request ->
+                    efforts += request.reasoningEffort
+                    AiReply("ok")
+                }
+            val model =
+                aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0), AiTranslationThinking.MEDIUM)!!
+            model.ask("system", "user")
+            assertEquals(listOf<String?>("medium"), efforts)
+            assertEquals("gemini/gemini-pro-latest+thinking-medium", model.scope)
+        }
+
     @Test fun requestsTakeTurnsOverTheKeys() =
         runBlocking {
             val pacer = AiKeyPacer(intervalMs = 0)
