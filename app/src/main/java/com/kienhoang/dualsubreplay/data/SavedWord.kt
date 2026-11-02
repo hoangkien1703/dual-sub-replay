@@ -63,6 +63,10 @@ data class SavedWord(
     val intervalMs: Long = 0,
     /** The deck the learner put the word in; null keeps it in its language's automatic deck. */
     val deck: String? = null,
+    /** The video's title when the word was saved (shown and filtered in Practice); null for older words. Never part of the id. */
+    val sourceTitle: String? = null,
+    /** The learner's own notes, typed in Practice; never filled in automatically. */
+    val notes: String = "",
 )
 
 enum class ReviewRating { AGAIN, HARD, GOOD, EASY }
@@ -97,7 +101,42 @@ internal fun savedWordId(
         .joinToString("") { "%02x".format(it) }
 }
 
-internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, online: Boolean): SavedWord {
+/** The longest video title kept with a word; YouTube's own limit is 100 characters. */
+internal const val MAX_SOURCE_TITLE_LENGTH = 200
+
+/** The longest notes kept with one word. */
+internal const val MAX_WORD_NOTES_LENGTH = 5_000
+
+/** A title on one line, trimmed and cut to [MAX_SOURCE_TITLE_LENGTH]; null when blank. */
+internal fun cleanSourceTitle(title: String?): String? =
+    title
+        ?.replace(Regex("\\s+"), " ")
+        ?.trim()
+        ?.take(MAX_SOURCE_TITLE_LENGTH)
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+
+/**
+ * Saving a word again (same word, same line) keeps its review schedule, and the notes and video title it
+ * already has when the new copy has none.
+ */
+internal fun mergeResaved(
+    old: SavedWord,
+    new: SavedWord,
+): SavedWord =
+    new.copy(
+        dueAt = old.dueAt,
+        intervalMs = old.intervalMs,
+        sourceTitle = new.sourceTitle ?: old.sourceTitle,
+        notes = new.notes.ifBlank { old.notes },
+    )
+
+internal fun savedWordFrom(
+    selection: LearningWordSelection,
+    meaning: String,
+    online: Boolean,
+    sourceTitle: String? = null,
+): SavedWord {
     val segment = selection.segment
     val word = selection.token.text.trim()
     val id = savedWordId(word, selection.wordLanguage, selection.meaningLanguage, selection.videoId, segment)
@@ -105,5 +144,5 @@ internal fun savedWordFrom(selection: LearningWordSelection, meaning: String, on
     return SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
         meaning.trim(), segment?.originalText.orEmpty(), segment?.translatedText, selection.videoId,
         segment?.startMs ?: 0, segment?.endMs ?: 0, selection.translated,
-        online = online && hasClip)
+        online = online && hasClip, sourceTitle = cleanSourceTitle(sourceTitle))
 }

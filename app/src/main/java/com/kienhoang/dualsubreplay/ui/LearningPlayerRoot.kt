@@ -701,7 +701,7 @@ internal fun LearningSubtitleOverlay(
     onRetryTranscript: (() -> Unit)? = null,
     onClose: () -> Unit,
 ) {
-    if (content.originalText == null && content.translatedText == null && content.statusText == null) {
+    if (content.originalText == null && content.translatedText == null && content.statusText == null && content.thirdText == null) {
         Box(modifier) { TextButton(onClick = onSettings) { Text(stringResource(R.string.player_subtitle_settings)) } }
         return
     }
@@ -922,6 +922,11 @@ internal fun LearningSubtitleOverlay(
                 subtitleLineOrder(originalLine, translationLine, translationPosition).forEachIndexed { index, line ->
                     if (index > 0) Spacer(Modifier.size(2.dp))
                     line()
+                }
+                content.thirdText?.let { third ->
+                    Spacer(Modifier.size(2.dp))
+                    val align = if (isFullscreen) TextAlign.Center else TextAlign.Unspecified
+                    ThirdLineText(third, fontScale, translatedColor, textAlign = align)
                 }
                 onRetryTranscript?.let { retry ->
                     // The overlay stays dark on every app theme, so the button takes a light subtitle color.

@@ -15,6 +15,8 @@ internal data class LearningOverlayContent(
     val activeWordIndex: Int = -1,
     val segment: SubtitleSegment? = null,
     val words: List<SubtitleWord> = segment?.words.orEmpty(),
+    /** Settings → Languages → Third line, under the translation; null while off or not translated yet. */
+    val thirdText: String? = null,
 )
 
 /** Looks up the app's own texts, so plain JVM tests can pass a stub instead of Android resources. */
@@ -47,6 +49,7 @@ internal fun learningOverlayContent(
     return content.copy(
         originalText = content.originalText.takeIf { state.showOriginal() },
         translatedText = content.translatedText.takeIf { state.showTranslation() },
+        thirdText = content.thirdText.takeIf { state.showTranslation() },
         statusText = content.statusText.takeIf { state.showOriginal() || state.showTranslation() },
     )
 }
@@ -73,6 +76,7 @@ private fun unfilteredLearningOverlayContent(
             statusText = null,
             activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
             segment = active,
+            thirdText = state.thirdLineFor(active),
         )
     }
     val status =

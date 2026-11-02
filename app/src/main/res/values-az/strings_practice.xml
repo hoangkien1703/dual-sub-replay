@@ -157,4 +157,10 @@
         <item quantity="one">Tam ehtiyat nüsxə: %1$d oxunan söz. Təkrar tarixçəsi daxildir.</item>
         <item quantity="other">Tam ehtiyat nüsxə: %1$d oxunan söz. Təkrar tarixçəsi daxildir.</item>
     </plurals>
+    <string name="practice_video_filter">Video: %1$s</string>
+    <string name="practice_video_filter_all">Bütün videolar</string>
+    <string name="practice_video_filter_choose">Video seçin</string>
+    <string name="practice_from_video">Mənbə: %1$s</string>
+    <string name="practice_notes_label">Qeydlər</string>
+    <string name="practice_save_notes">Qeydləri yadda saxla</string>
 </resources>

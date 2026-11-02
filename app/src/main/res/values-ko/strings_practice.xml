@@ -147,4 +147,10 @@
     <plurals name="practice_import_backup_summary">
         <item quantity="other">전체 백업: 읽을 수 있는 단어 %1$d개. 복습 기록이 포함돼요.</item>
     </plurals>
+    <string name="practice_video_filter">동영상: %1$s</string>
+    <string name="practice_video_filter_all">모든 동영상</string>
+    <string name="practice_video_filter_choose">동영상 선택</string>
+    <string name="practice_from_video">출처: %1$s</string>
+    <string name="practice_notes_label">메모</string>
+    <string name="practice_save_notes">메모 저장</string>
 </resources>

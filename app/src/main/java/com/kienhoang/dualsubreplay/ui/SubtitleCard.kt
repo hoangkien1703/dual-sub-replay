@@ -34,12 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kienhoang.dualsubreplay.R
@@ -73,6 +75,8 @@ internal fun CompactSubtitleCard(
     translationPosition: TranslationPosition = TranslationPosition.BELOW,
     /** Goes before the row's click, for a focus requester (TV layout). */
     focusModifier: Modifier = Modifier,
+    /** Settings → Languages → Third line: plain text under the other lines; null shows nothing. */
+    thirdText: String? = null,
 ) {
     if (!showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -166,10 +170,44 @@ internal fun CompactSubtitleCard(
                         )
                     }
                 }
+                thirdText?.let { ThirdLineText(it, fontScale, translatedColor, Modifier.padding(top = 2.dp)) }
             }
         }
     }
 }
+
+/** The third line: plain text (no word taps) in the translation's color, a little smaller; right to left by its own script. */
+@Composable
+internal fun ThirdLineText(
+    text: String,
+    fontScale: Float,
+    color: Color,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Unspecified,
+) {
+    val annotated = AnnotatedString(text)
+    Text(
+        text = annotated,
+        modifier =
+            (
+                if (textAlign ==
+                    TextAlign.Unspecified
+                ) {
+                    modifier.lineSide(annotated, LocalLayoutDirection.current)
+                } else {
+                    modifier
+                }
+            ).testTag("third_line"),
+        style = LocalTextStyle.current.inLineDirection(),
+        textAlign = textAlign,
+        fontSize = (13 * fontScale).sp,
+        lineHeight = (17 * fontScale).sp,
+        color = color.copy(alpha = color.alpha * THIRD_LINE_ALPHA),
+    )
+}
+
+/** The third line is a touch lighter than the translation, so the eye still reads the first two first. */
+private const val THIRD_LINE_ALPHA = 0.85f
 
 @Composable
 private fun OriginalCardText(

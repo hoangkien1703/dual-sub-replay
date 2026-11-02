@@ -137,7 +137,7 @@ internal fun toggleMoreSettingsSection(
     tapped: MoreSettingsSection,
 ): MoreSettingsSection? = if (open == tapped) null else tapped
 
-internal enum class LanguagePickerMode { SOURCE, TARGET }
+internal enum class LanguagePickerMode { SOURCE, TARGET, THIRD }
 
 /** Which language list is open, shared by the full settings page and the quick languages popup. */
 internal class LanguagePickerState {
@@ -205,39 +205,65 @@ private fun showLanguagePickerIfOpen(
     sourceChoices: List<LanguageChoice>,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
+    thirdLanguage: String?,
+    onThirdLanguageChange: (String?) -> Unit,
 ): Boolean {
     val mode = picker.mode ?: return false
-    val source = mode == LanguagePickerMode.SOURCE
     val interfaceLocale = currentInterfaceLocale()
+    val translationChoices = TranslationLanguages.all.map { LanguageChoice(it.code, languageDisplayName(it.code, interfaceLocale)) }
     LanguagePickerDialog(
         title =
             stringResource(
-                if (source) R.string.settings_original_caption_language else R.string.settings_translate_to,
+                when (mode) {
+                    LanguagePickerMode.SOURCE -> R.string.settings_original_caption_language
+                    LanguagePickerMode.TARGET -> R.string.settings_translate_to
+                    LanguagePickerMode.THIRD -> R.string.settings_third_line
+                },
             ),
         choices =
-            if (source) {
-                sourceChoices
-            } else {
-                TranslationLanguages.all.map { LanguageChoice(it.code, languageDisplayName(it.code, interfaceLocale)) }
+            when (mode) {
+                LanguagePickerMode.SOURCE -> sourceChoices
+                LanguagePickerMode.TARGET -> translationChoices
+                LanguagePickerMode.THIRD ->
+                    listOf(LanguageChoice(THIRD_LINE_OFF, stringResource(R.string.settings_third_line_off))) +
+                        translationChoices
             },
-        selectedCode = if (source) sourcePreference else targetLanguage,
+        selectedCode =
+            when (mode) {
+                LanguagePickerMode.SOURCE -> sourcePreference
+                LanguagePickerMode.TARGET -> targetLanguage
+                LanguagePickerMode.THIRD -> thirdLanguage ?: THIRD_LINE_OFF
+            },
         searchQuery = picker.query,
         onSearchQueryChange = { picker.query = it },
         onChoice = { choice ->
-            if (source) onSourceChange(choice.code) else onTargetChange(choice.code)
+            when (mode) {
+                LanguagePickerMode.SOURCE -> onSourceChange(choice.code)
+                LanguagePickerMode.TARGET -> onTargetChange(choice.code)
+                LanguagePickerMode.THIRD -> onThirdLanguageChange(choice.code.takeUnless { it == THIRD_LINE_OFF })
+            }
             picker.close()
         },
         onDismiss = picker::close,
         testTagPrefix = mode.name.lowercase(),
-        recentCodes = if (source) emptyList() else recentLanguagesToShow(recentTargetLanguages, targetLanguage),
+        recentCodes = if (mode == LanguagePickerMode.TARGET) recentLanguagesToShow(recentTargetLanguages, targetLanguage) else emptyList(),
     )
     return true
 }
+
+/** The third line's "Off" entry in its language list. */
+private const val THIRD_LINE_OFF = "off"
+
+/** The third line's button text: its language, or "Off". */
+@Composable
+private fun thirdLineLabel(thirdLanguage: String?): String =
+    thirdLanguage?.let { languageDisplayName(it, currentInterfaceLocale()) } ?: stringResource(R.string.settings_third_line_off)
 
 @Composable
 private fun LanguagePickerButtons(
     sourceLabel: String,
     targetLanguage: String,
+    thirdLanguage: String?,
     onPick: (LanguagePickerMode) -> Unit,
 ) {
     Text(stringResource(R.string.settings_original_language))
@@ -258,6 +284,16 @@ private fun LanguagePickerButtons(
         Text(languageDisplayName(targetLanguage, currentInterfaceLocale()))
     }
     SettingsHint(stringResource(R.string.settings_model_download_hint))
+    Spacer(Modifier.height(12.dp))
+    Text(stringResource(R.string.settings_third_line))
+    Spacer(Modifier.height(6.dp))
+    OutlinedButton(
+        onClick = { onPick(LanguagePickerMode.THIRD) },
+        modifier = Modifier.fillMaxWidth().testTag("third_language_picker"),
+    ) {
+        Text(thirdLineLabel(thirdLanguage))
+    }
+    SettingsHint(stringResource(R.string.settings_third_line_hint))
 }
 
 /**
@@ -268,6 +304,7 @@ private fun LanguagePickerButtons(
 private fun CompactLanguageRows(
     sourceLabel: String,
     targetLanguage: String,
+    thirdLanguage: String?,
     onPick: (LanguagePickerMode) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -279,6 +316,9 @@ private fun CompactLanguageRows(
             languageDisplayName(targetLanguage, currentInterfaceLocale()),
             "target_language_picker",
         ) { onPick(LanguagePickerMode.TARGET) }
+        CompactLanguageRow(stringResource(R.string.settings_third_line), thirdLineLabel(thirdLanguage), "third_language_picker") {
+            onPick(LanguagePickerMode.THIRD)
+        }
     }
 }
 
@@ -318,6 +358,8 @@ internal fun QuickLanguageSettingsDialog(
     onTargetChange: (String) -> Unit,
     onOpenAllSettings: () -> Unit,
     recentTargetLanguages: List<String> = emptyList(),
+    thirdLanguage: String? = null,
+    onThirdLanguageChange: (String?) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
@@ -334,6 +376,8 @@ internal fun QuickLanguageSettingsDialog(
             sourceChoices = sourceChoices,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLanguage = thirdLanguage,
+            onThirdLanguageChange = onThirdLanguageChange,
         )
     if (pickerOpen) return
     // Owner requests 2026-10-30: no icon, the title on the left beside the X, no Done (changes apply at
@@ -353,6 +397,7 @@ internal fun QuickLanguageSettingsDialog(
                     // "Auto" alone fits beside its label; the picker's list still says "Auto (recommended)".
                     sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, shortAutoLabel, interfaceLocale),
                     targetLanguage = targetLanguage,
+                    thirdLanguage = thirdLanguage,
                     onPick = languagePicker::open,
                 )
                 HorizontalDivider(
@@ -428,6 +473,8 @@ internal fun SubtitleSettingsDialog(
     onTapToLearnChange: (Boolean) -> Unit = {},
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
+    thirdLanguage: String? = null,
+    onThirdLanguageChange: (String?) -> Unit = {},
     onFontScaleChange: (Float) -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
@@ -475,6 +522,8 @@ internal fun SubtitleSettingsDialog(
             sourceChoices = sourceChoices,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLanguage = thirdLanguage,
+            onThirdLanguageChange = onThirdLanguageChange,
         )
     if (pickerOpen) return
     val sourceLabel =
@@ -518,7 +567,7 @@ internal fun SubtitleSettingsDialog(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SettingsGroupCard(title = stringResource(R.string.settings_group_languages), icon = Icons.Default.Language) {
-                        LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
+                        LanguagePickerButtons(sourceLabel, targetLanguage, thirdLanguage, languagePicker::open)
                     }
 
                     SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {

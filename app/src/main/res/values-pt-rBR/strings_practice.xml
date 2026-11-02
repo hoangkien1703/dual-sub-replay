@@ -167,4 +167,10 @@
         <item quantity="many">Backup completo: %1$d palavras legíveis. Inclui o histórico de revisões.</item>
         <item quantity="other">Backup completo: %1$d palavras legíveis. Inclui o histórico de revisões.</item>
     </plurals>
+    <string name="practice_video_filter">Vídeo: %1$s</string>
+    <string name="practice_video_filter_all">Todos os vídeos</string>
+    <string name="practice_video_filter_choose">Escolher um vídeo</string>
+    <string name="practice_from_video">De: %1$s</string>
+    <string name="practice_notes_label">Notas</string>
+    <string name="practice_save_notes">Salvar notas</string>
 </resources>

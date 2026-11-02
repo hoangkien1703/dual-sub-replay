@@ -157,4 +157,10 @@
         <item quantity="one">Full backup: %1$d readable word. Review history is included.</item>
         <item quantity="other">Full backup: %1$d readable words. Review history is included.</item>
     </plurals>
+    <string name="practice_video_filter">Video: %1$s</string>
+    <string name="practice_video_filter_all">All videos</string>
+    <string name="practice_video_filter_choose">Choose a video</string>
+    <string name="practice_from_video">From: %1$s</string>
+    <string name="practice_notes_label">Notes</string>
+    <string name="practice_save_notes">Save notes</string>
 </resources>

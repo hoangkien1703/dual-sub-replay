@@ -21,6 +21,7 @@ import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.data.SavedWord
+import com.kienhoang.dualsubreplay.data.cleanSourceTitle
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
@@ -845,7 +846,10 @@ internal class AppAiActions(
         // The assistant saves into the deck last picked for that language on the word card.
         val word =
             aiSavedWord(action.word, action.reading, action.meaning, state).let { word ->
-                word.copy(deck = rememberedDeck(context, word.wordLanguage)?.takeIf { deck -> saved.any { it.deck == deck } })
+                word.copy(
+                    deck = rememberedDeck(context, word.wordLanguage)?.takeIf { deck -> saved.any { it.deck == deck } },
+                    sourceTitle = cleanSourceTitle(viewModel.videoTitle(word.videoId)),
+                )
             }
         if (viewModel.vocabulary.words.value
                 .any { it.id == word.id }

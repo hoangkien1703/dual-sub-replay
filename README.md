@@ -93,6 +93,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Captions load automatically, manual or auto-generated, in any language the video offers.
 - Translations go into any of 101 languages. The 59 that Google ML Kit supports can also translate offline: download their models ahead of time in **Settings → Translation → Languages on this device**. The rest, such as Azerbaijani, Kazakh, Uzbek, Armenian and Burmese, translate online with Google Translate or AI.
 - Short caption fragments are merged into readable sentences, and the current one is highlighted. On eligible auto-generated captions, the spoken word is highlighted too.
+- Want a third language? **Settings → Languages → Third line** adds one more translation under each subtitle (off by default).
 
 ### Replay any sentence
 
@@ -112,6 +113,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 ### Practice saved words
 
 - Open **Saved words** to search, edit, or practice your cards. Each card keeps its original sentence and can replay it in the video.
+- Each card remembers which video it came from, so **Video: All videos** shows and practices the words of one video. Add your own **Notes** to any card; search finds them too.
 - Reviews use spaced repetition: **Again** (10 minutes), **Hard** (1 day), **Good** (3 days), or **Easy** (7 days), with intervals growing on later reviews.
 - Export a full backup or Anki text, and import it on another phone. See [Practice transfer](docs/practice-transfer.md).
 
@@ -177,7 +179,7 @@ No account or API key is required, and the app has no analytics or advertising S
 
 > "Thank you for creating and sharing DualSub Replay. It's a great open-source app!"
 >
-> — [mrAlishah](https://github.com/hoangkien1703/dual-sub-replay/discussions/81#discussioncomment-19228373), who built [Triple Sub Replay](https://github.com/mrAlishah/triple-sub-replay), a fork that adds a third subtitle line for learning German with English and Persian, and became this project's first code contributor
+> — [mrAlishah](https://github.com/hoangkien1703/dual-sub-replay/discussions/81#discussioncomment-19228373), who built [Triple Sub Replay](https://github.com/mrAlishah/triple-sub-replay), a fork that adds a third subtitle line for learning German with English and Persian, and became this project's first code contributor. The third line, video titles and notes on saved words came from Triple Sub Replay
 
 Ideas and questions are welcome in [Discussions](https://github.com/hoangkien1703/dual-sub-replay/discussions). Bug reports and feature requests go to [Issues](https://github.com/hoangkien1703/dual-sub-replay/issues).
 

@@ -147,4 +147,10 @@
     <plurals name="practice_import_backup_summary">
         <item quantity="other">完整备份:%1$d 个可读取的单词。包含复习记录。</item>
     </plurals>
+    <string name="practice_video_filter">视频：%1$s</string>
+    <string name="practice_video_filter_all">所有视频</string>
+    <string name="practice_video_filter_choose">选择视频</string>
+    <string name="practice_from_video">来自：%1$s</string>
+    <string name="practice_notes_label">笔记</string>
+    <string name="practice_save_notes">保存笔记</string>
 </resources>

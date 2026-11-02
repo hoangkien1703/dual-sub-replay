@@ -62,6 +62,9 @@
     <string name="settings_translate_to">Terjemahkan ke</string>
     <string name="settings_original_language">Bahasa asli</string>
     <string name="settings_model_download_hint">Model bahasa hanya diunduh saat dibutuhkan.</string>
+    <string name="settings_third_line">Baris ketiga</string>
+    <string name="settings_third_line_off">Mati</string>
+    <string name="settings_third_line_hint">Satu terjemahan lagi di bawah setiap subtitle, dalam bahasa lain. Mati secara default; memakai sedikit lebih banyak data.</string>
     <string name="settings_subtitle_languages">Bahasa subtitel</string>
     <string name="settings_dual_subtitle_settings">Setelan subtitel ganda</string>
     <string name="settings_done">Selesai</string>

@@ -212,6 +212,7 @@ class AppViewModel internal constructor(
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
                 studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
+                thirdLanguage = storedThirdLanguage(preferences.getString(THIRD_LANGUAGE_PREFERENCE, null)),
                 fontScale = normalizeFontScale(preferences.getFloat("font_scale", 1f)),
                 portraitPanelOffsetFraction =
                     normalizePortraitPanelOffsetFraction(
@@ -319,6 +320,9 @@ class AppViewModel internal constructor(
             ),
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
+
+    private val thirdLineTranslation =
+        ThirdLineTranslation(_state, playbackRequests, googleTranslator, translator, ::currentGoogleWaitMs, ::isCurrentLoad)
 
     private val visibilityListener =
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -686,6 +690,13 @@ class AppViewModel internal constructor(
         _state.update { it.copy(targetLanguage = normalized, recentTargetLanguages = recent, liveTranslated = null) }
     }
 
+    /** Settings → Languages → Third line; null turns it off. The open video's third lines follow at once. */
+    fun setThirdLanguage(language: String?) {
+        val normalized = language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
+        preferences.edit().putString(THIRD_LANGUAGE_PREFERENCE, normalized.orEmpty()).apply()
+        _state.update { it.copy(thirdLanguage = normalized) }
+    }
+
     fun completeOnboarding(
         nativeLanguage: String,
         learningLanguage: String,
@@ -941,7 +952,14 @@ class AppViewModel internal constructor(
         meaning: String,
         online: Boolean,
         deck: String? = null,
-    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online).copy(deck = deck))
+    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online, videoTitle(selection.videoId)).copy(deck = deck))
+
+    /** The title of [videoId] while the page plays it (the page reports title and address together); null otherwise. */
+    internal fun videoTitle(videoId: String?): String? =
+        WebVideoBridge.playback.value
+            ?.takeIf { videoId != null && it.videoId == videoId }
+            ?.title
+            ?.ifBlank { null }
 
     suspend fun translateWord(word: String): String {
         val current = _state.value
@@ -1135,6 +1153,7 @@ class AppViewModel internal constructor(
                 sourcePreference = "auto",
                 targetLanguage = "vi",
                 recentTargetLanguages = emptyList(),
+                thirdLanguage = null,
                 fontScale = 1f,
                 portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
                 landscapeSplitEnabled = true,
@@ -1516,24 +1535,16 @@ class AppViewModel internal constructor(
                     )
             }
             val store = checkNotNull(displayStore)
-            try {
-                if (_state.value.translatesWithGoogle()) {
-                    followGoogleTranslation(
-                        store,
-                        videoId,
-                        generation,
-                        sourceLanguage to targetLanguage,
-                        googleRequests,
-                    ) { prefetch, upgrades, translate ->
+            coroutineScope {
+                // The third line runs beside the second; it never delays or stops it.
+                val thirdLine = launch { thirdLineTranslation.follow(store, videoId, generation, sourceLanguage, googleRequests) }
+                try {
+                    followTranslation(store, videoId, generation, source, targetLanguage, googleRequests, { prefetch, upgrades, translate ->
                         follow(prefetch, upgrades, translate)
-                    }
-                } else {
-                    followOnDevice(store, videoId, generation, source, targetLanguage) { translate -> follow(translate = translate) }
+                    }) { following }
+                } finally {
+                    thirdLine.cancel()
                 }
-            } catch (error: Exception) {
-                if (error is CancellationException || following) throw error
-                // The pair cannot be translated at all (an unsupported language): still show the captions.
-                follow { throw error }
             }
         } catch (error: CancellationException) {
             throw error
@@ -1552,6 +1563,43 @@ class AppViewModel internal constructor(
             }
         } finally {
             withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
+        }
+    }
+
+    /** Google (with AI when chosen) or the device for the second line; an untranslatable pair still shows the captions. */
+    private suspend fun followTranslation(
+        store: SubtitleStore,
+        videoId: String,
+        generation: Long,
+        source: Pair<String, Boolean>,
+        targetLanguage: String,
+        googleRequests: CoroutineScope,
+        follow: suspend (
+            prefetch: (suspend (List<String>) -> Unit)?,
+            upgrades: TranslationUpgrades?,
+            translate: suspend (String) -> String,
+        ) -> Unit,
+        following: () -> Boolean,
+    ) {
+        val sourceLanguage = source.first
+        try {
+            if (_state.value.translatesWithGoogle()) {
+                followGoogleTranslation(
+                    store,
+                    videoId,
+                    generation,
+                    sourceLanguage to targetLanguage,
+                    googleRequests,
+                ) { prefetch, upgrades, translate ->
+                    follow(prefetch, upgrades, translate)
+                }
+            } else {
+                followOnDevice(store, videoId, generation, source, targetLanguage) { translate -> follow(null, null, translate) }
+            }
+        } catch (error: Exception) {
+            if (error is CancellationException || following()) throw error
+            // The pair cannot be translated at all (an unsupported language): still show the captions.
+            follow(null, null) { throw error }
         }
     }
 

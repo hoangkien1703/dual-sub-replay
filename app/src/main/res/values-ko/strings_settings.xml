@@ -62,6 +62,9 @@
     <string name="settings_translate_to">번역할 언어</string>
     <string name="settings_original_language">원본 언어</string>
     <string name="settings_model_download_hint">언어 모델은 필요할 때만 다운로드돼요.</string>
+    <string name="settings_third_line">세 번째 줄</string>
+    <string name="settings_third_line_off">끄기</string>
+    <string name="settings_third_line_hint">각 자막 아래에 다른 언어로 번역을 한 줄 더 표시합니다. 기본값은 꺼짐이며 데이터를 조금 더 사용합니다.</string>
     <string name="settings_subtitle_languages">자막 언어</string>
     <string name="settings_dual_subtitle_settings">이중 자막 설정</string>
     <string name="settings_done">완료</string>

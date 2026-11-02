@@ -147,4 +147,10 @@
     <plurals name="practice_import_backup_summary">
         <item quantity="other">Bản sao lưu đầy đủ: %1$d từ đọc được. Có kèm lịch sử ôn tập.</item>
     </plurals>
+    <string name="practice_video_filter">Video: %1$s</string>
+    <string name="practice_video_filter_all">Tất cả video</string>
+    <string name="practice_video_filter_choose">Chọn video</string>
+    <string name="practice_from_video">Từ: %1$s</string>
+    <string name="practice_notes_label">Ghi chú</string>
+    <string name="practice_save_notes">Lưu ghi chú</string>
 </resources>

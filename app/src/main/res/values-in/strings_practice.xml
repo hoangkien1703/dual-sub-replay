@@ -147,4 +147,10 @@
     <plurals name="practice_import_backup_summary">
         <item quantity="other">Cadangan lengkap: %1$d kata yang dapat dibaca. Riwayat ulasan disertakan.</item>
     </plurals>
+    <string name="practice_video_filter">Video: %1$s</string>
+    <string name="practice_video_filter_all">Semua video</string>
+    <string name="practice_video_filter_choose">Pilih video</string>
+    <string name="practice_from_video">Dari: %1$s</string>
+    <string name="practice_notes_label">Catatan</string>
+    <string name="practice_save_notes">Simpan catatan</string>
 </resources>

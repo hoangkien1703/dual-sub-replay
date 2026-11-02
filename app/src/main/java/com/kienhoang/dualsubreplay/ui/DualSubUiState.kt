@@ -28,6 +28,10 @@ data class DualSubUiState(
     val subtitlePanelVisible: Boolean = true,
     val sourcePreference: String = "auto",
     val targetLanguage: String = "vi",
+    /** Settings → Languages → Third line: one more translation under each subtitle; null (off) by default. */
+    val thirdLanguage: String? = null,
+    /** The third line's texts near playback; see [thirdLineFor]. */
+    val thirdLines: ThirdLines = ThirdLines(),
     /** Recent "Translate to" picks, newest first; see [recentLanguagesToShow]. */
     val recentTargetLanguages: List<String> = emptyList(),
     val onboardingCompleted: Boolean = false,
