@@ -33,8 +33,8 @@ private val BAD_KEY_PROBLEMS = setOf(AiErrorKind.NO_KEY, AiErrorKind.KEY_UNREADA
 
 /**
  * The model subtitles are translated with when none is chosen: the AI assistant's own model (owner
- * request 2026-10-28; Gemini's default is already the fast Flash-Lite). Thinking is turned off for
- * translation, so a thinking model still answers quickly.
+ * request 2026-10-28; Gemini's default is already the fast Flash-Lite). Thinking is off for
+ * translation unless [AiTranslationThinking] says otherwise, so a thinking model still answers quickly.
  */
 internal fun aiTranslationDefaultModel(settings: AiAssistantSettings): String = settings.modelFor(settings.provider)
 
@@ -50,16 +50,67 @@ internal fun aiTranslationModelName(
     chosen: String?,
 ): String = chosen?.takeIf { it in aiTranslationModelChoices(settings) } ?: aiTranslationDefaultModel(settings)
 
-/** Turns thinking off where the service allows it: translation needs speed, and free limits count thinking tokens. */
+/** Settings → Translation → AI thinking for translation; missing means [AiTranslationThinking.OFF]. */
+internal const val AI_TRANSLATION_THINKING_PREFERENCE = "ai_translation_thinking"
+
+/**
+ * How long the model thinks before it translates subtitles (owner request 2026-11-02). [OFF] is the
+ * default: subtitles need speed and free limits count thinking tokens. High is left out on purpose:
+ * a window of up to 60 sentences could then run past [AI_TRANSLATION_TIMEOUT_MS], and Google would
+ * translate instead.
+ */
+enum class AiTranslationThinking(
+    val key: String,
+) {
+    OFF("off"),
+    LOW("low"),
+    MEDIUM("medium"),
+}
+
+internal fun storedAiTranslationThinking(raw: String?): AiTranslationThinking =
+    AiTranslationThinking.entries.firstOrNull { it.key == raw } ?: AiTranslationThinking.OFF
+
+/**
+ * The thinking levels [provider] lets the app choose for translation; empty hides the setting. Only
+ * Gemini and OpenAI both turn thinking off and take low and medium through `reasoning_effort`.
+ * Claude's effort is not thinking (no effort already means its full effort), and the other services
+ * pick their own, so their models translate as they come.
+ */
+internal fun aiTranslationThinkingLevels(provider: AiProvider): List<AiTranslationThinking> =
+    when (provider) {
+        AiProvider.GEMINI, AiProvider.OPENAI -> AiTranslationThinking.entries
+        else -> emptyList()
+    }
+
+/**
+ * The `reasoning_effort` a translation request carries. Off turns thinking off where the service
+ * allows it; the other levels are sent as they are.
+ */
 internal fun aiTranslationEffort(
     provider: AiProvider,
     model: String,
+    thinking: AiTranslationThinking = AiTranslationThinking.OFF,
 ): String? =
-    when (provider) {
-        AiProvider.GEMINI -> "none"
-        AiProvider.OPENAI -> openAiNoThinkingEffort(model)
-        else -> null
+    when {
+        thinking !in aiTranslationThinkingLevels(provider) -> null
+        thinking != AiTranslationThinking.OFF -> thinking.key
+        provider == AiProvider.GEMINI -> "none"
+        else -> openAiNoThinkingEffort(model)
     }
+
+/**
+ * The translation cache's name for [model]: the service and model, plus the thinking level when one
+ * is on, so a new level translates again and Off keeps the translations saved before levels existed.
+ */
+internal fun aiTranslationScope(
+    provider: AiProvider,
+    model: String,
+    thinking: AiTranslationThinking,
+): String {
+    val base = "${provider.key}/$model"
+    val level = thinking.takeIf { it != AiTranslationThinking.OFF && it in aiTranslationThinkingLevels(provider) }
+    return if (level == null) base else "$base+thinking-${level.key}"
+}
 
 /**
  * The model subtitles are translated with: the service and keys chosen in More settings → AI
@@ -72,17 +123,19 @@ internal fun aiTranslationModel(
     keyStore: AiKeyStore,
     transport: AiChatTransport,
     pacer: AiKeyPacer = AiKeyPacer.Shared,
+    thinking: AiTranslationThinking = AiTranslationThinking.OFF,
 ): AiTranslationModel? {
     val provider = settings.provider
     val ids = keyStore.keys(provider).map { it.id }
     val model = aiTranslationModelName(settings, chosenModel)
     if (ids.isEmpty() || model.isBlank()) return null
-    return KeyedAiTranslationModel(provider, model, settings.baseUrlFor(provider), ids, keyStore, transport, pacer)
+    return KeyedAiTranslationModel(provider, model, thinking, settings.baseUrlFor(provider), ids, keyStore, transport, pacer)
 }
 
 /** Reads the AI assistant's settings and keys from the app's own storage. */
 internal fun Context.aiTranslationModel(
     chosenModel: String?,
+    thinking: AiTranslationThinking,
     transport: AiChatTransport,
 ): AiTranslationModel? =
     aiTranslationModel(
@@ -90,7 +143,12 @@ internal fun Context.aiTranslationModel(
         chosenModel,
         AiKeyStore(SharedPreferencesSecretStorage(getSharedPreferences(AI_KEYS_PREFERENCES, 0)), KeystoreSecretCipher()),
         transport,
+        thinking = thinking,
     )
+
+/** The thinking levels the AI assistant's current service offers for translation. */
+internal fun Context.aiTranslationThinkingLevels(): List<AiTranslationThinking> =
+    aiTranslationThinkingLevels(readAiAssistantSettings(getSharedPreferences(AI_SETTINGS_PREFERENCES, 0)).provider)
 
 /** The AI assistant's model, then the other translation models its current service offers (without it again). */
 internal fun Context.aiTranslationModelChoices(): Pair<String, List<String>> {
@@ -160,18 +218,19 @@ internal class AiKeyPacer(
 private class KeyedAiTranslationModel(
     private val provider: AiProvider,
     private val model: String,
+    thinking: AiTranslationThinking,
     private val baseUrl: String,
     private val keyIds: List<String>,
     private val keyStore: AiKeyStore,
     private val transport: AiChatTransport,
     private val pacer: AiKeyPacer,
 ) : AiTranslationModel {
-    override val scope: String = "${provider.key}/$model"
+    override val scope: String = aiTranslationScope(provider, model, thinking)
 
     private val pacedIds = keyIds.map { "${provider.key}/$it" }
 
     /** Cleared once the model refuses the thinking setting, so later requests do not fail first. */
-    @Volatile private var effort = aiTranslationEffort(provider, model)
+    @Volatile private var effort = aiTranslationEffort(provider, model, thinking)
 
     override suspend fun ask(
         system: String,

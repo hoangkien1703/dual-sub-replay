@@ -219,6 +219,7 @@ class SubtitleWordHighlightTest {
                 com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE,
                 com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE,
                 com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE,
+                com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE,
                 "auto_pronounce",
                 PRONUNCIATION_VOLUME_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,

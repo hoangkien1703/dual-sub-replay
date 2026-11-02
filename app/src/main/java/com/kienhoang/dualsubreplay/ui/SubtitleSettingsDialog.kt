@@ -1281,6 +1281,7 @@ private fun OnlineTranslationSettingsRows(
     }
     if (translator.usesAi) {
         AiTranslationModelSettings(settings.aiTranslationModel, actions.selectAiTranslationModel)
+        AiTranslationThinkingSettings(settings.aiTranslationThinking, actions.selectAiTranslationThinking)
         AiTranslationServiceNote(onOpenAiSettings)
     }
     if (translator == SubtitleTranslator.GOOGLE || translator == SubtitleTranslator.AI_WITH_GOOGLE) {

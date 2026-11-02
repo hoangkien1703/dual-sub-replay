@@ -20,6 +20,7 @@ import com.kienhoang.dualsubreplay.assistant.AiMemoryKeeper
 import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
+import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.cleanSourceTitle
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
@@ -266,6 +267,7 @@ private fun aiLearningSettingValue(
         AiSetting.TAP_WORD_FOR_DEFINITION -> onOff(state.tapToLearnEnabled)
         AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY -> onOff(state.wordLearningActiveOnly)
         AiSetting.GOOGLE_WAIT -> state.googleWait.storageValue
+        AiSetting.AI_TRANSLATION_THINKING -> state.aiTranslationThinking.key
         AiSetting.NATURAL_SUBTITLE_FLOW -> onOff(state.naturalSubtitlesEnabled)
         AiSetting.HIDE_SOUND_DESCRIPTIONS -> onOff(state.hideSoundCues)
         AiSetting.PRELOAD_TRANSLATION_MODELS -> onOff(state.preloadModelsEnabled)
@@ -578,6 +580,7 @@ internal class AppAiActions(
             AiSetting.LOCK_OVERLAY_TO_VIDEO -> viewModel.setLockOverlayToVideo(on)
             AiSetting.PLAYBACK_SPEED -> player.setSpeed(value.toFloat(), state.activeVideoId)
             AiSetting.GOOGLE_WAIT -> viewModel.setGoogleWait(storedGoogleWait(value))
+            AiSetting.AI_TRANSLATION_THINKING -> viewModel.setAiTranslationThinking(storedAiTranslationThinking(value))
             AiSetting.NATURAL_SUBTITLE_FLOW -> viewModel.setNaturalSubtitlesEnabled(on)
             AiSetting.HIDE_SOUND_DESCRIPTIONS -> viewModel.setHideSoundCues(on)
             AiSetting.PRELOAD_TRANSLATION_MODELS -> viewModel.setPreloadModelsEnabled(on)
@@ -748,6 +751,8 @@ internal class AppAiActions(
             AiSetting.TAP_WORD_FOR_DEFINITION -> switch(R.string.settings_tap_definition_title, value)
             AiSetting.LOCK_OVERLAY_TO_VIDEO -> switch(R.string.settings_lock_overlay_title, value)
             AiSetting.GOOGLE_WAIT -> named(R.string.settings_google_wait_title, string(storedGoogleWait(value).labelRes))
+            AiSetting.AI_TRANSLATION_THINKING ->
+                named(R.string.settings_ai_translation_thinking_title, string(storedAiTranslationThinking(value).labelRes))
             AiSetting.PLAYBACK_SPEED ->
                 named(
                     R.string.ai_action_speed_title,

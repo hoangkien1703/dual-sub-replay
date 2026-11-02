@@ -162,6 +162,9 @@
     <string name="settings_translator_on_device_description">Works offline and sends nothing online. Less accurate.</string>
     <string name="settings_ai_translation_model_same">Same as AI assistant (%1$s)</string>
     <string name="settings_ai_translation_model_description">Fast models answer sooner and have the largest free limits.</string>
+    <string name="settings_ai_translation_thinking_title">AI thinking for translation</string>
+    <string name="settings_ai_translation_thinking_description">Off is fastest. Low and Medium can help with slang, jokes and lines that depend on earlier ones, but each answer comes more slowly and uses more of the free limit. A new level translates the video again.</string>
+    <string name="settings_ai_translation_thinking_off">Off</string>
     <string name="settings_ai_translation_service_description">AI choices use the service and key from the AI assistant settings and send subtitle text there. A free Google Gemini key works best.</string>
     <string name="settings_ai_translation_service_open">Open AI assistant settings</string>
     <string name="settings_google_wait_description">How long a line waits for Google before showing YouTube’s or your device’s translation. Automatic: 2 s on mobile data, 4 s on Wi-Fi.</string>

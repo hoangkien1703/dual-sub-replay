@@ -162,6 +162,9 @@
     <string name="settings_translator_on_device_description">İnternetsiz işləyir və heç nəyi onlayn göndərmir. Daha az dəqiqdir.</string>
     <string name="settings_ai_translation_model_same">Sİ köməkçisindəki kimi (%1$s)</string>
     <string name="settings_ai_translation_model_description">Sürətli modellər daha tez cavab verir və ən böyük pulsuz limitlərə malikdir.</string>
+    <string name="settings_ai_translation_thinking_title">Tərcümə üçün Sİ düşünməsi</string>
+    <string name="settings_ai_translation_thinking_description">Söndürülüb ən sürətlisidir. Aşağı və Orta jarqon, zarafat və əvvəlki sətirlərdən asılı olan sətirlərdə kömək edə bilər, lakin hər cavab daha gec gəlir və pulsuz limitdən daha çox istifadə edir. Yeni səviyyə videonu yenidən tərcümə edir.</string>
+    <string name="settings_ai_translation_thinking_off">Söndürülüb</string>
     <string name="settings_ai_translation_service_description">Sİ seçimləri Sİ köməkçisi ayarlarındakı xidmət və açardan istifadə edir və altyazı mətnini ora göndərir. Pulsuz Google Gemini açarı ən yaxşı işləyir.</string>
     <string name="settings_ai_translation_service_open">Sİ köməkçisi ayarlarını aç</string>
     <string name="settings_google_wait_description">YouTube-un və ya cihazınızın tərcüməsini göstərməzdən əvvəl sətrin Google-u nə qədər gözlədiyi. Avtomatik: mobil internetdə 2 san, Wi-Fi-da 4 san.</string>

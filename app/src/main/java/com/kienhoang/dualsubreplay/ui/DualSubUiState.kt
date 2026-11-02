@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
@@ -93,6 +94,8 @@ data class DualSubUiState(
     val aiTranslationOnly: Boolean = false,
     /** Settings → Translation → AI model for translation; empty uses the AI assistant's model. */
     val aiTranslationModel: String = "",
+    /** Settings → Translation → AI thinking for translation; off by default. */
+    val aiTranslationThinking: AiTranslationThinking = AiTranslationThinking.OFF,
     /**
      * Google failed, so this video translates on the device. The saved engine is unchanged: Google is
      * checked again every [GOOGLE_RECHECK_INTERVAL_MS] and tried again on the next load.
@@ -120,7 +123,7 @@ internal fun withGoogleAgain(state: DualSubUiState): DualSubUiState =
 internal fun DualSubUiState.translatesWithGoogle(): Boolean = translationEngine == TranslationEngine.GOOGLE_WEB && !onDeviceFallback
 
 internal fun DualSubUiState.onlineTranslationSettings() =
-    OnlineTranslationSettings(translationEngine, googleWait, aiTranslation, aiTranslationOnly, aiTranslationModel)
+    OnlineTranslationSettings(translationEngine, googleWait, aiTranslation, aiTranslationOnly, aiTranslationModel, aiTranslationThinking)
 
 /**
  * A source-language choice is only rejected when the video's track list is
