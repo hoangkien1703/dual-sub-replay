@@ -3,6 +3,7 @@
     <string name="status_waiting_for_captions">Aguardando as legendas do YouTube e o idioma delas. Reproduza o vídeo com as legendas ativadas.</string>
     <string name="status_translating_live_captions">Traduzindo legendas ao vivo…</string>
     <string name="status_live_translation_not_supported">A tradução ao vivo não é compatível com %1$s.</string>
+    <string name="status_translation_needs_online">%1$s não tem tradução no dispositivo. Em Configurações, defina “Traduzir legendas com” como Google ou IA.</string>
     <string name="status_current_captions_only">Somente legendas atuais; não é possível repetir por parágrafo.</string>
     <string name="status_live_translation_unavailable">Tradução ao vivo indisponível. Verifique a conexão para baixar o modelo de idioma.</string>
     <string name="status_preparing_nearby_translations">Preparando traduções próximas…</string>

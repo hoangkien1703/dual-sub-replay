@@ -62,6 +62,11 @@
     <string name="settings_translate_to">翻译为</string>
     <string name="settings_original_language">原文语言</string>
     <string name="settings_model_download_hint">语言模型仅在需要时下载。</string>
+    <string name="settings_third_line">第三行</string>
+    <string name="settings_third_line_off">关闭</string>
+    <string name="settings_third_line_hint">在每条字幕下再显示一行另一种语言的翻译。会多用一点流量。</string>
+    <string name="settings_third_line_title">第三行字幕</string>
+    <string name="settings_third_line_choose">选择语言</string>
     <string name="settings_subtitle_languages">字幕语言</string>
     <string name="settings_dual_subtitle_settings">双语字幕设置</string>
     <string name="settings_done">完成</string>

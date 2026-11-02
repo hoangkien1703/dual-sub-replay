@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tv_title">Android TV (beta)</string>
+    <string name="settings_section_tv_summary">Pult üçün TV görünüşü</string>
+    <string name="tv_layout_title">TV görünüşü (beta)</string>
+    <string name="tv_layout_description">YouTube axtarışı olan başlanğıc səhifə, videoda pult düymələri və siyahıdan seçilən sözlər. Söndürüləndə: bu TV telefon görünüşünü göstərir.</string>
+    <string name="tv_layout_note">Videoda: OK oynadır və ya dayandırır, ◀ ▶ əvvəlki və ya növbəti sətrə keçir, ▲ sətri təkrarlayır, ▼ altyazılara keçir, Geri isə TV əsas səhifəsini açır. Altyazı sətrində OK onun sözlərini göstərir.</string>
+    <string name="tv_layout_needs_tv">Yalnız Android TV-də. Sınamaq üçün eyni tətbiqi Android TV və ya Google TV-yə quraşdırın.</string>
+    <string name="tv_replay_line">Sətri təkrarla</string>
+    <string name="tv_close">Bağla</string>
+    <string name="tv_pick_a_word">Söz seçin</string>
+    <string name="tv_home_back_to_video">Videoya qayıt</string>
+    <string name="tv_home_youtube_page">YouTube səhifəsi</string>
+    <string name="tv_home_search">YouTube-da axtar</string>
+    <string name="tv_home_search_label">Axtarılacaq sözlər</string>
+    <string name="tv_home_search_button">Axtar</string>
+    <string name="tv_home_subtitles_only">Altyazılı (CC)</string>
+    <string name="tv_home_recent">Son axtarışlar:</string>
+    <string name="tv_home_continue">İzləməyə davam et</string>
+    <string name="tv_home_results">“%1$s” üçün videolar</string>
+    <string name="tv_home_searching">YouTube-da axtarılır…</string>
+    <string name="tv_home_no_results">Video tapılmadı. Başqa sözlər yoxlayın.</string>
+    <string name="tv_home_search_failed">YouTube-da axtarmaq mümkün olmadı. Bağlantını yoxlayın və yenidən cəhd edin.</string>
+    <string name="tv_home_try_again">Yenidən cəhd et</string>
+    <string name="tv_home_start_hint">Öyrəndiyiniz dildə video axtarın və ya YouTube səhifəsini açın. Videoda ◀ ▶ sətirlər arasında keçir, ▼ isə altyazılara keçir.</string>
+</resources>

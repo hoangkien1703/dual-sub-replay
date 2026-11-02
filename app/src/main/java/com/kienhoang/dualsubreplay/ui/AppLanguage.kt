@@ -33,6 +33,7 @@ internal val APP_LANGUAGES =
         AppLanguageOption("ko", "한국어"),
         AppLanguageOption("zh-CN", "简体中文"),
         AppLanguageOption("id", "Bahasa Indonesia"),
+        AppLanguageOption("az", "Azərbaycan dili"),
     )
 
 internal const val APP_LANGUAGE_PREFERENCE = "app_language"

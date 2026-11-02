@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kanji_section_title">Kanci</string>
+    <string name="kanji_back">Geri: %1$s</string>
+    <string name="kanji_grade_school">%1$d. sinif</string>
+    <string name="kanji_grade_secondary">Orta məktəb</string>
+    <string name="kanji_grade_names">Adlarda işlənir</string>
+    <string name="kanji_radical">radikal %1$s</string>
+    <string name="kanji_on">On</string>
+    <string name="kanji_kun">Kun</string>
+    <string name="kanji_how_to_write">Necə yazılır</string>
+    <string name="kanji_play">Oynat</string>
+    <string name="kanji_stroke_order_description">%1$s işarəsinin cizgi ardıcıllığı, %2$s</string>
+    <string name="kanji_parts">Hissələr</string>
+    <string name="kanji_part_radical">radikal</string>
+    <string name="kanji_part_sound">səs %1$s</string>
+    <string name="kanji_part_sound_plain">səs</string>
+    <string name="kanji_how_to_remember">Necə yadda saxlamalı</string>
+    <string name="kanji_memory_story">Yadda saxlama hekayəsi</string>
+    <string name="kanji_my_story">Mənim hekayəm</string>
+    <string name="kanji_my_story_hint">Öz hekayənizi yazın (bu telefonda saxlanılır)</string>
+    <string name="kanji_ai_story_button">Sİ ilə başqa hekayə</string>
+    <string name="kanji_ai_story_question">Kanci %1$s üçün onun hissələrindən qurulmuş başqa qısa yadda saxlama hekayəsi və oxunuşlarını asan xatırlamaq yolu ver.</string>
+    <string name="practice_meaning_edit">Mənanı redaktə et</string>
+    <string name="practice_meaning_done">Hazır</string>
+    <string name="study_kanji_details_title">Heroqlif təfərrüatları</string>
+    <string name="study_kanji_details_description">Yapon və Çin sözlərində hər heroqlif cizgi ardıcıllığı, hissələri və yadda saxlama hekayəsi ilə göstərilir.</string>
+    <plurals name="kanji_strokes">
+        <item quantity="one">%1$d cizgi</item>
+        <item quantity="other">%1$d cizgi</item>
+    </plurals>
+</resources>

@@ -62,6 +62,11 @@
     <string name="settings_translate_to">Traducir a</string>
     <string name="settings_original_language">Idioma original</string>
     <string name="settings_model_download_hint">El modelo de idioma solo se descarga cuando hace falta.</string>
+    <string name="settings_third_line">Tercera línea</string>
+    <string name="settings_third_line_off">Desactivada</string>
+    <string name="settings_third_line_hint">Una traducción más bajo cada subtítulo, en otro idioma. Usa un poco más de datos.</string>
+    <string name="settings_third_line_title">Tercera línea de subtítulos</string>
+    <string name="settings_third_line_choose">Elegir un idioma</string>
     <string name="settings_subtitle_languages">Idiomas de los subtítulos</string>
     <string name="settings_dual_subtitle_settings">Ajustes de subtítulos dobles</string>
     <string name="settings_done">Listo</string>

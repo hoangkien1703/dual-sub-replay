@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hanzi_section_title">Heroqliflər</string>
+    <string name="hanzi_traditional">ənənəvi %1$s</string>
+    <string name="hanzi_simplified">sadələşdirilmiş %1$s</string>
+    <string name="hanzi_part_meaning">məna</string>
+    <string name="hanzi_words">Sözlər</string>
+    <string name="hanzi_story_of_simplified">Yadda saxlama hekayəsi (sadələşdirilmiş forma %1$s üçün)</string>
+    <string name="hanzi_ai_story_question">Çin heroqlifi %1$s üçün onun hissələrindən qurulmuş başqa qısa yadda saxlama hekayəsi və pinyin ilə tonunu asan xatırlamaq yolu ver.</string>
+</resources>

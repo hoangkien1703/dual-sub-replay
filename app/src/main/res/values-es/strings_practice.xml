@@ -167,4 +167,10 @@
         <item quantity="many">Copia de seguridad completa: %1$d palabras legibles. Incluye el historial de repasos.</item>
         <item quantity="other">Copia de seguridad completa: %1$d palabras legibles. Incluye el historial de repasos.</item>
     </plurals>
+    <string name="practice_video_filter">Video: %1$s</string>
+    <string name="practice_video_filter_all">Todos los videos</string>
+    <string name="practice_video_filter_choose">Elegir un video</string>
+    <string name="practice_from_video">De: %1$s</string>
+    <string name="practice_notes_label">Notas</string>
+    <string name="practice_save_notes">Guardar notas</string>
 </resources>

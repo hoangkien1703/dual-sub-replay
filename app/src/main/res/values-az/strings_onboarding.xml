@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Keç</string>
+    <string name="onboarding_guide_next">Növbəti</string>
+    <string name="onboarding_guide_get_started">Başlayaq</string>
+    <string name="onboarding_guide_dual_subtitles_title">İzləyərkən ikidilli altyazılar</string>
+    <string name="onboarding_guide_dual_subtitles_body">İstənilən YouTube videosunu açın və orijinal altyazıları, altında isə canlı tərcüməsini görün.</string>
+    <string name="onboarding_guide_dual_subtitles_image">Üzərində orijinal və tərcümə altyazıları olan oynayan video</string>
+    <string name="onboarding_guide_replay_title">İstənilən sətri dərhal təkrarlayın</string>
+    <string name="onboarding_guide_replay_body">Deyilən hər sətir tərcüməsi ilə birlikdə siyahıda göstərilir. Videonu həmin ana qaytarmaq üçün sətirdəki oynatma düyməsinə toxunun, dilləri və ya mətn ölçüsünü dəyişmək üçün dişli çarxdan istifadə edin.</string>
+    <string name="onboarding_guide_replay_image">Təkrar oynatma düymələri olan altyazı sətirləri paneli</string>
+    <string name="onboarding_guide_open_video_title">İstənilən videonu açın</string>
+    <string name="onboarding_guide_open_video_body">YouTube linkini yapışdırın, videonu birbaşa YouTube tətbiqindən paylaşın və ya sadəcə DualSub Replay daxilində gəzin.</string>
+    <string name="onboarding_language_welcome">DualSub Replay-ə xoş gəlmisiniz</string>
+    <string name="onboarding_language_intro">Dillərinizi bir dəfə seçin. Sonra onları altyazı ayarlarında dəyişə bilərsiniz.</string>
+    <string name="onboarding_language_native_title">Ana diliniz</string>
+    <string name="onboarding_language_native_helper">Kiçik tərcümə altyazısı kimi göstərilir.</string>
+    <string name="onboarding_language_learning_title">Öyrənmək istədiyiniz dil</string>
+    <string name="onboarding_language_learning_helper">Üstünlük verilən altyazı treki; böyük altyazı videoya uyğun gəlir.</string>
+    <string name="onboarding_language_select">Dil seçin</string>
+    <string name="onboarding_language_continue">Davam et</string>
+    <string name="onboarding_language_skip_for_now">Hələlik keç</string>
+    <string name="onboarding_goal_setup_title">Gündəlik hədəf qoyun</string>
+    <string name="onboarding_goal_setup_body">Hər gün yeni dilinizdə neçə dəqiqə izləmək istəyirsiniz? Vaxtınızı və ardıcıl günlərinizi menyudakı İrəliləyiş bölməsində izləyin və hədəfi orada istənilən vaxt dəyişin.</string>
+    <string name="onboarding_goal_set">Hədəf qoy</string>
+    <string name="onboarding_goal_off">Söndürülüb</string>
+    <string name="onboarding_goal_dialog_title">Gündəlik hədəf</string>
+    <string name="onboarding_goal_dialog_body">Hər gün nə qədər izləmək istəyirsiniz?</string>
+    <string name="onboarding_goal_save">Yadda saxla</string>
+    <string name="onboarding_goal_cancel">Ləğv et</string>
+    <string name="onboarding_progress_title">İrəliləyiş</string>
+    <string name="onboarding_progress_load_error">İrəliləyişiniz yüklənmədi. Yaddaşı yoxlayın və yenidən cəhd etmək üçün bu ekranı yenidən açın.</string>
+    <string name="onboarding_progress_empty">Vaxtınızı izləməyə başlamaq üçün altyazılı video izləyin.</string>
+    <string name="onboarding_progress_today">Bu gün</string>
+    <string name="onboarding_progress_goal">Gündəlik hədəf: %1$d dəq</string>
+    <string name="onboarding_progress_goal_reached">%1$d dəqiqəlik gündəlik hədəfə çatdınız</string>
+    <string name="onboarding_progress_no_goal">Gündəlik hədəf yoxdur</string>
+    <string name="onboarding_progress_streak_start">Ardıcıllığa bu gün başlayın</string>
+    <string name="onboarding_progress_change_goal">Hədəfi dəyiş</string>
+    <string name="onboarding_progress_this_week">Bu həftə</string>
+    <string name="onboarding_progress_this_month">Bu ay</string>
+    <string name="onboarding_progress_this_year">Bu il</string>
+    <string name="onboarding_progress_total">Cəmi</string>
+    <string name="onboarding_progress_period_week">Həftə</string>
+    <string name="onboarding_progress_period_month">Ay</string>
+    <string name="onboarding_progress_period_year">İl</string>
+    <string name="onboarding_progress_period_all">Hamısı</string>
+    <string name="onboarding_progress_bar_description">%1$s: %2$s</string>
+    <string name="onboarding_progress_languages">Dillər</string>
+    <string name="onboarding_progress_no_time_in_period">Bu dövrdə hələ vaxt yoxdur.</string>
+    <string name="onboarding_progress_language_counts">%1$s · %2$s</string>
+    <string name="onboarding_progress_footnote">Vaxt video tətbiqdə oynayarkən, altyazılarının dili üçün hesablanır. O, yalnız bu cihazda saxlanılır.</string>
+    <string name="onboarding_duration_under_minute">&lt;1 dəq</string>
+    <string name="onboarding_duration_minutes">%1$d dəq</string>
+    <string name="onboarding_duration_hours">%1$d saat</string>
+    <string name="onboarding_duration_hours_minutes">%1$d saat %2$d dəq</string>
+    <plurals name="onboarding_progress_streak_days">
+        <item quantity="one">%1$d gün ardıcıl</item>
+        <item quantity="other">%1$d gün ardıcıl</item>
+    </plurals>
+    <plurals name="onboarding_progress_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="onboarding_progress_saved_words">
+        <item quantity="one">%1$d saxlanmış söz</item>
+        <item quantity="other">%1$d saxlanmış söz</item>
+    </plurals>
+</resources>

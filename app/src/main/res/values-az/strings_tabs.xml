@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_tabs_title">YouTube vərəqləri</string>
+    <string name="settings_section_tabs_summary">Vərəqlər və Google hesabları</string>
+    <string name="tabs_menu_title">Vərəqlər (%1$d)</string>
+    <string name="tabs_list_shown">Vərəq siyahısı göstərilir</string>
+    <string name="tabs_list_hidden">Vərəq siyahısı gizlədilib</string>
+    <string name="tabs_new_tab">Yeni vərəq</string>
+    <string name="tabs_new_tab_other_account">Başqa hesabla yeni vərəq</string>
+    <string name="tabs_account_main">Hesab 1 (əsas)</string>
+    <string name="tabs_account">Hesab %1$d</string>
+    <string name="tabs_full">Ən çox %1$d vərəq açıq ola bilər. Başqasını açmaq üçün birini bağlayın.</string>
+    <string name="tabs_close">%1$s vərəqini bağla</string>
+    <string name="tabs_name_video">YouTube videosu</string>
+    <string name="tabs_name_home">YouTube əsas səhifəsi</string>
+    <string name="tabs_name_search">YouTube axtarışı</string>
+    <string name="tabs_name_page">YouTube səhifəsi</string>
+    <string name="tabs_empty_title">Açıq YouTube vərəqi yoxdur</string>
+    <string name="tabs_empty_message">Bütün vərəqləri bağladınız. İkidilli altyazılarla izləməyə davam etmək üçün yeni YouTube vərəqi açın.</string>
+    <string name="tabs_open_new_youtube_tab">Yeni YouTube vərəqi aç</string>
+    <string name="tabs_open_in_new_tab">Yeni vərəqdə aç</string>
+    <string name="tabs_open_here">Burada aç</string>
+    <string name="tabs_opened_in_new_tab">Yeni vərəqdə açıldı</string>
+    <string name="tabs_show">Göstər</string>
+    <string name="tabs_settings_note">Vərəqləri menyudakı Vərəqlər bölməsindən açın və dəyişin. Yalnız açıq vərəq oynayır, video isə dayandığınız yerdən yenidən açılır. Videonu yeni vərəqdə açmaq üçün YouTube-da onu basıb saxlayın.</string>
+    <string name="tabs_different_accounts_title">Fərqli Google hesablarından istifadə et</string>
+    <string name="tabs_different_accounts_description">Vərəqlər bölməsinə “Başqa hesabla yeni vərəq” əlavə edir. Hesab 2 və 3-ün hər birinin öz Google girişi olur; Hesab 1 adi hesabınızdır. Söndürüləndə: bütün vərəqlər Hesab 1-dən istifadə edir.</string>
+    <string name="tabs_different_accounts_unsupported">Fərqli Google hesabları üçün Android System WebView-un daha yeni versiyası lazımdır. Onlardan istifadə etmək üçün onu Google Play-dən yeniləyin.</string>
+</resources>

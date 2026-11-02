@@ -74,6 +74,8 @@ internal fun SavedWordsScreen(
     val selected = words.firstOrNull { it.id == if (practice) queue.firstOrNull() else selectedId }
     var revealed by remember(selected?.id, practice) { mutableStateOf(false) }
     var editedMeaning by remember(selected?.id, selected?.meaning) { mutableStateOf(selected?.meaning.orEmpty()) }
+    var editedNotes by remember(selected?.id, selected?.notes) { mutableStateOf(selected?.notes.orEmpty()) }
+    var videoFilter by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     var openDeck by remember { mutableStateOf<PracticeDeck?>(null) }
     var renamingDeck by remember { mutableStateOf<String?>(null) }
@@ -82,7 +84,11 @@ internal fun SavedWordsScreen(
     val named = namedDecks(words)
     val currentDeck = openDeck?.takeIf { deck -> decks.any { it.deck == deck } }
     val showDeckList = currentDeck == null && decks.size > 1
-    val shown = currentDeck?.let { deck -> words.filter { deckOf(it) == deck } } ?: words
+    val videos = practiceVideos(words)
+    val shownVideo = videoFilter?.takeIf { id -> videos.any { it.videoId == id } }
+    val shown =
+        (currentDeck?.let { deck -> words.filter { deckOf(it) == deck } } ?: words)
+            .filter { shownVideo == null || it.videoId == shownVideo }
     val due = shown.filter { it.dueAt <= now }.sortedBy { it.dueAt }
     val locale = currentInterfaceLocale()
     val searchLabel = stringResource(R.string.practice_search_label)
@@ -113,6 +119,13 @@ internal fun SavedWordsScreen(
         }
     }
     fun returnFromVideo() { onPause(); onlinePreview = false }
+
+    // Leaving a word keeps notes typed but not saved yet.
+    fun saveNotesIfChanged() {
+        val word = selected ?: return
+        val notes = editedNotes.trim().take(MAX_WORD_NOTES_LENGTH)
+        if (notes != word.notes) action { repository.update(word.id) { it.copy(notes = notes) } }
+    }
 
     if (onlinePreview) {
         BackHandler { returnFromVideo() }
@@ -173,16 +186,17 @@ internal fun SavedWordsScreen(
                             queue = due.map { it.id }; practice = true
                         }) { Text(stringResource(R.string.practice_due_words_button)) }
                         OutlinedTextField(search, { search = it }, label = { Text(searchLabel) }, modifier = Modifier.fillMaxWidth())
+                        if (videos.isNotEmpty()) VideoFilterChip(videos, shownVideo) { videoFilter = it }
                         if (words.isEmpty()) Text(stringResource(R.string.practice_empty_hint))
                         else if (due.isEmpty()) shown.minOfOrNull { it.dueAt }?.let {
                             val next = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale).format(Date(it))
                             Text(stringResource(R.string.practice_next_review, next), style = MaterialTheme.typography.bodySmall)
                         }
-                        if (showDeckList && search.isBlank()) {
+                        if (showDeckList && search.isBlank() && shownVideo == null) {
                             DeckList(decks, { openDeck = it }, Modifier.weight(1f))
                         } else {
                             LazyColumn(Modifier.weight(1f)) {
-                                items(shown.filter { it.word.contains(search, true) || it.meaning.contains(search, true) }, key = { it.id }) { word ->
+                                items(shown.filter { matchesPracticeSearch(it, search) }, key = { it.id }) { word ->
                                     ListItem(headlineContent = { Text(word.word) }, supportingContent = { Text(word.meaning) },
                                         modifier = Modifier.clickable { selectedId = word.id }.testTag("saved_word_${word.id}"))
                                     HorizontalDivider()
@@ -226,6 +240,33 @@ internal fun SavedWordsScreen(
                             Text(selected.sentence)
                             selected.translatedSentence?.let { Text(it) }
                             if (selected.translated) Text(originalSentenceNote, style = MaterialTheme.typography.bodySmall)
+                            selected.sourceTitle?.let { title ->
+                                Text(
+                                    stringResource(R.string.practice_from_video, title),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.testTag("word_source_title"),
+                                )
+                            }
+                            if (practice) {
+                                if (selected.notes.isNotBlank()) {
+                                    Text(stringResource(R.string.practice_notes_label), style = MaterialTheme.typography.labelMedium)
+                                    Text(selected.notes, modifier = Modifier.testTag("review_notes"))
+                                }
+                            } else {
+                                OutlinedTextField(
+                                    editedNotes,
+                                    { editedNotes = it.take(MAX_WORD_NOTES_LENGTH) },
+                                    label = { Text(stringResource(R.string.practice_notes_label)) },
+                                    minLines = 2,
+                                    modifier = Modifier.fillMaxWidth().testTag("word_notes"),
+                                )
+                                TextButton(
+                                    enabled = !busy && editedNotes.trim() != selected.notes,
+                                    onClick = { saveNotesIfChanged() },
+                                    modifier = Modifier.testTag("save_notes"),
+                                ) { Text(stringResource(R.string.practice_save_notes)) }
+                            }
                             if (selected.online) TextButton(onClick = {
                                 pronouncer.stop(); onlinePreview = true; onOnline(selected)
                             }, modifier = Modifier.testTag("play_online_clip")) { Text(playOnlineLabel) }
@@ -244,7 +285,10 @@ internal fun SavedWordsScreen(
                         }
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        TextButton(onClick = { selectedId = null; practice = false; pronouncer.stop() }) { Text(backLabel) }
+                        TextButton(onClick = {
+                            if (!practice) saveNotesIfChanged()
+                            selectedId = null; practice = false; pronouncer.stop()
+                        }) { Text(backLabel) }
                         if (!practice) TextButton(enabled = !busy, onClick = { confirmDelete = selected }) { Text(deleteWordLabel) }
                     }
                 }

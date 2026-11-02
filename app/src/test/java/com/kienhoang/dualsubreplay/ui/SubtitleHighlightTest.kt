@@ -178,6 +178,8 @@ class SubtitleWordHighlightTest {
                 PORTRAIT_PANEL_OFFSET_PREFERENCE,
                 "preferred_caption_language",
                 "target_language",
+                THIRD_LANGUAGE_PREFERENCE,
+                THIRD_LINE_ENABLED_PREFERENCE,
                 "landscape_split_enabled",
                 PLAYER_EXPERIENCE_MODE_PREFERENCE,
                 AUTO_OVERLAY_FULLSCREEN_PREFERENCE,

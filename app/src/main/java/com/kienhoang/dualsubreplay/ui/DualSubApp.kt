@@ -153,6 +153,7 @@ fun DualSubApp(
                 onRetry = viewModel::retryCaptions,
                 onSourceChange = viewModel::setSourcePreference,
                 onTargetChange = viewModel::setTargetLanguage,
+                onThirdLineChange = viewModel::setThirdLine,
                 onFontScaleChange = viewModel::setFontScale,
                 onPortraitPanelOffsetFractionChange = viewModel::setPortraitPanelOffsetFraction,
                 onResetPortraitPanelPosition = viewModel::resetPortraitPanelPosition,
@@ -280,6 +281,7 @@ private fun DualSubExperience(
     onRetry: () -> Unit,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
+    onThirdLineChange: (ThirdLineChoice) -> Unit = {},
     onFontScaleChange: (Float) -> Unit,
     onPortraitPanelOffsetFractionChange: (Float) -> Unit,
     onResetPortraitPanelPosition: () -> Unit,
@@ -529,6 +531,8 @@ private fun DualSubExperience(
             availableSourceLanguages = state.availableSourceLanguages,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLine = state.thirdLine,
+            onThirdLineChange = onThirdLineChange,
             onOpenAllSettings = {
                 showQuickSettings = false
                 showSettings = true
@@ -577,6 +581,8 @@ private fun DualSubExperience(
             onTapToLearnChange = onTapToLearnChange,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLine = state.thirdLine,
+            onThirdLineChange = onThirdLineChange,
             onFontScaleChange = onFontScaleChange,
             onLandscapeSplitChange = onLandscapeSplitChange,
             onPlayerModeChange = onPlayerModeChange,
@@ -1004,6 +1010,7 @@ internal fun SubtitleTimeline(
                     isDownloadingTranslationModel = state.isDownloadingTranslationModel,
                     translationUnavailable = state.translationError != null,
                     onWordClick = onWordClick,
+                    thirdText = if (showTranslation) state.thirdLineFor(segment) else null,
                 )
             }
         }

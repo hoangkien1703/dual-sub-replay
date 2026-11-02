@@ -47,7 +47,7 @@ internal val AI_APP_COLORS = listOf("deep_teal", "black", "navy", "slate", "plum
 internal val AI_ACCENT_COLORS = listOf("cyan", "blue", "mint", "amber", "rose", "lavender")
 
 /** "device" follows the phone; the rest are the tags of `APP_LANGUAGES`, which a test keeps equal. */
-internal val AI_APP_LANGUAGES = listOf("device", "en", "vi", "es", "pt-BR", "ja", "ko", "zh-CN", "id")
+internal val AI_APP_LANGUAGES = listOf("device", "en", "vi", "es", "pt-BR", "ja", "ko", "zh-CN", "id", "az")
 
 /** "off" or the minutes of `DAILY_GOAL_CHOICES`, which a test keeps equal. */
 internal val AI_DAILY_GOALS = listOf("off", "5", "10", "15", "20", "30", "45", "60")

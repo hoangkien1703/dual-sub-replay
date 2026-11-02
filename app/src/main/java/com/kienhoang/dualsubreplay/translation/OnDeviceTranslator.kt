@@ -112,6 +112,14 @@ class OnDeviceTranslator(
         }
     }
 
+    /** Both languages have an ML Kit model, so this pair can translate on the device. */
+    fun supports(
+        sourceLanguageCode: String,
+        targetLanguageCode: String,
+    ): Boolean =
+        TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(sourceLanguageCode)) != null &&
+            TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(targetLanguageCode)) != null
+
     /** The app languages whose model this build can download. English is built in, so it is not listed. */
     suspend fun downloadableLanguages(): List<String> =
         TranslationLanguages.all

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_practice">Məşq</string>
+    <string name="navigation_progress">İrəliləyiş</string>
+    <string name="navigation_settings">Ayarlar</string>
+    <string name="navigation_open_menu">Naviqasiya menyusunu aç</string>
+    <string name="navigation_close_menu">Naviqasiya menyusunu bağla</string>
+    <string name="navigation_tagline">YouTube ilə dil öyrənin</string>
+    <string name="navigation_app_language">Tətbiqin dili</string>
+    <string name="navigation_device_language">Cihazın dili</string>
+    <string name="navigation_no_browser">GitHub-ı açmaq üçün brauzer yoxdur.</string>
+    <string name="navigation_licenses">Açıq mənbə lisenziyaları</string>
+    <string name="navigation_github_repository">GitHub reposuna baxın</string>
+    <string name="navigation_loading_license">Lisenziya yüklənir…</string>
+    <string name="navigation_license_summary">DualSub Replay © 2026 Hoang Trung Kien. Tətbiq MIT Lisenziyası ilə yayılan pulsuz proqramdır və heç bir zəmanət vermir. Daxil etdiyi kitabxanaların lisenziyaları aşağıdadır; tam siyahı GitHub reposundakı THIRD_PARTY_NOTICES.md faylındadır.</string>
+</resources>

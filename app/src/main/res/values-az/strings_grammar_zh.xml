@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="grammar_zh_budebu">不得不: başqa yolu yoxdur, məcburdur</string>
+    <string name="grammar_zh_budan">不但 / 不仅…而且…: təkcə… deyil, həm də…</string>
+    <string name="grammar_zh_wulun">无论 / 不管…都…: … olursa olsun, (həmişə)…</string>
+    <string name="grammar_zh_buru">A 不如 B: A B qədər yaxşı deyil; … etmək daha yaxşı olardı</string>
+    <string name="grammar_zh_buyong">不用: … etməyə ehtiyac yoxdur</string>
+    <string name="grammar_zh_bie">别 / 不要 + fel: etmə (bunu)</string>
+    <string name="grammar_zh_danshi">但是 / 可是 / 不过: amma, lakin</string>
+    <string name="grammar_zh_suiran">虽然…但是 / 可是…: baxmayaraq ki…, (yenə də)…</string>
+    <string name="grammar_zh_yinwei_suoyi">因为…所以…: çünki… (buna görə)…: əvvəl səbəb, sonra nəticə</string>
+    <string name="grammar_zh_ruguo">如果 / 要是…(的话)…就…: əgər…, onda…</string>
+    <string name="grammar_zh_zhiyao">只要…就…: yalnız … olsa, (onda)…</string>
+    <string name="grammar_zh_zhiyou">只有…才…: yalnız … olanda, (ancaq onda)…</string>
+    <string name="grammar_zh_jiran">既然…就…: madam ki…, onda…</string>
+    <string name="grammar_zh_jishi">即使 / 就算…也…: hətta … olsa da, yenə…</string>
+    <string name="grammar_zh_lian">连…都 / 也…: hətta…</string>
+    <string name="grammar_zh_chule">除了…(以外): … başqa; … əlavə olaraq</string>
+    <string name="grammar_zh_dui_laishuo">对(于)…来说: (kiminsə) üçün, onun baxışından</string>
+    <string name="grammar_zh_ershi">不是 A 而是 B: A yox, B</string>
+    <string name="grammar_zh_kanqilai">看起来 / 听起来: görünür, səslənir, deyəsən</string>
+    <string name="grammar_zh_youdianr">有点儿 + sifət: bir az (adətən arzuolunmaz bir şey)</string>
+    <string name="grammar_zh_yidianr">一点儿: bir az (sifət + 一点儿 = bir az daha…)</string>
+    <string name="grammar_zh_yuelaiyue">越来越 + sifət: getdikcə daha…</string>
+    <string name="grammar_zh_yue_yue">越 A 越 B: nə qədər A, o qədər B</string>
+    <string name="grammar_zh_yibian">一边 A 一边 B: A və B-ni eyni vaxtda etmək</string>
+    <string name="grammar_zh_kuaiyao">快要 / 就要…了: az qalıb, tezliklə olacaq</string>
+    <string name="grammar_zh_zai_progressive">在 / 正在 + fel: məhz indi edir (davam edir)</string>
+    <string name="grammar_zh_yixia">Fel + 一下: qısaca etmək (bir baxmaq, bir az gözləmək)</string>
+    <string name="grammar_zh_direction">Fel + 来 / 去 (…): hərəkətin istiqaməti (来 danışana doğru, 去 ondan uzağa)</string>
+    <string name="grammar_zh_potential">Fel + 得 / 不 + nəticə: bacarır / bacarmır (听不懂 = başa düşə bilmir)</string>
+    <string name="grammar_zh_result">Fel + nəticə: hərəkətin necə bitdiyini göstərir (做完 = bitirmək, 听懂 = başa düşmək, 找到 = tapmaq)</string>
+    <string name="grammar_zh_rang">让 / 叫 + kimsə + fel: kiməsə nəyisə etməyə icazə vermək və ya etdirmək</string>
+    <string name="grammar_zh_yi_wei">以 A 为 B: A-nı B kimi qəbul etmək (rəsmi)</string>
+    <string name="grammar_zh_ma">吗: cümləni hə/yox sualına çevirir</string>
+    <string name="grammar_zh_ne">呢: bəs…?; sualı yumşaldır; və ya hələ davam edən hərəkət</string>
+    <string name="grammar_zh_shi">是: -dır (iki ismi bağlayır: 我是学生)</string>
+    <string name="grammar_zh_you">有: var, sahib olmaq</string>
+    <string name="grammar_zh_zai">在: -da, -də (yer); və ya bir yerdə olmaq</string>
+    <string name="grammar_zh_hen">很: çox (çox vaxt sadəcə mübtədanı sifətlə bağlayır)</string>
+    <string name="grammar_zh_tai">太 (…了): həddən artıq…; və ya çox… (了 hiss əlavə edir)</string>
+    <string name="grammar_zh_dou">都: hamısı, hər ikisi (feldən əvvəl gəlir)</string>
+    <string name="grammar_zh_ye">也: də, həm də (feldən əvvəl gəlir)</string>
+    <string name="grammar_zh_he">和: və (cümlələri yox, isimləri bağlayır); ilə</string>
+    <string name="grammar_zh_question_word">Sual sözü: nə, kim, harada, necə, neçə, niyə (cavabın olacağı yerdə durur)</string>
+    <string name="grammar_zh_de_shihou">…的时候: … olanda, … vaxtı</string>
+    <string name="grammar_zh_location">İsimdən sonra yer sözü: 桌子上 = stolun üstündə, 房间里 = otağın içində</string>
+    <string name="grammar_zh_qing">请 + fel: zəhmət olmasa (edin)</string>
+    <string name="grammar_zh_hui">会: bacarır (öyrənilmiş bacarıq); yəqin ki, edəcək</string>
+    <string name="grammar_zh_neng">能: bacarır (imkanı və ya icazəsi var)</string>
+    <string name="grammar_zh_xiang">想 + fel: istəmək, arzulamaq</string>
+    <string name="grammar_zh_de">的: təsvir sözünü və ya sahibi isimlə bağlayır (我的书 = mənim kitabım)</string>
+    <string name="grammar_zh_le_completed">Fel + 了: hərəkət tamamlanıb</string>
+    <string name="grammar_zh_guo">Fel + 过: bunu əvvəllər edib (təcrübə)</string>
+    <string name="grammar_zh_zhe">Fel + 着: davam edən vəziyyət və ya hərəkət (穿着 = geyinib)</string>
+    <string name="grammar_zh_de_degree">Fel + 得 + təsvir: nə qədər (yaxşı) edildiyi (跑得很快)</string>
+    <string name="grammar_zh_bi">A 比 B + sifət: A B-dən daha…</string>
+    <string name="grammar_zh_zui">最: ən</string>
+    <string name="grammar_zh_jiu">就: onda; dərhal; məhz; yalnız (tez və ya asan olduğunu vurğulayır)</string>
+    <string name="grammar_zh_yijing">已经 (…了): artıq</string>
+    <string name="grammar_zh_gei">给: vermək; üçün, -ya (给他打电话 = ona zəng etmək)</string>
+    <string name="grammar_zh_dui">对: -ya, -ya qarşı, haqqında (对…感兴趣); və ya düzdür</string>
+    <string name="grammar_zh_cong">从: -dan (yer və ya zaman); 从…到…: …-dan …-ya qədər</string>
+    <string name="grammar_zh_li">离: məsafə (A 离 B 很远 = A B-dən uzaqdır)</string>
+    <string name="grammar_zh_wang">往: tərəfə (istiqamət)</string>
+    <string name="grammar_zh_yiqi">一起: birlikdə (跟…一起 = … ilə birlikdə)</string>
+    <string name="grammar_zh_hai">还: hələ; həm də; daha da (还有 = bir də var)</string>
+    <string name="grammar_zh_zai_again">再: yenə (gələcəkdə); sonra (先…再…)</string>
+    <string name="grammar_zh_degree">非常 / 特别 / 真 / 挺: çox, həqiqətən (sifətin nə qədər güclü olduğu)</string>
+    <string name="grammar_zh_keyi">可以: olar, bilər (icazə və ya imkan)</string>
+    <string name="grammar_zh_yao">要: istəmək; lazımdır; edəcək (tezliklə)</string>
+    <string name="grammar_zh_ba_particle">吧: təklif (gəlin…) və ya yoxlama (…elə deyilmi?)</string>
+    <string name="grammar_zh_frequency">常常 / 经常 / 总是: nə qədər tez-tez (tez-tez, adətən, həmişə)</string>
+    <string name="grammar_zh_before_after">…以前 / …以后: …-dan əvvəl / …-dan sonra (hadisədən sonra gəlir)</string>
+    <string name="grammar_zh_ordinal">第 + rəqəm: sıra sayı (第一 = birinci)</string>
+    <string name="grammar_zh_mei_every">每 (+ ölçü sözü): hər (çox vaxt 都 ilə)</string>
+    <string name="grammar_zh_le_change">Sonda 了: nəsə dəyişib və ya indi yenidir</string>
+    <string name="grammar_zh_v_not_v">Fel 不 fel: hə/yox sualı (去不去 = gedirsən, ya yox?)</string>
+    <string name="grammar_zh_reduplication">Təkrarlanan fel (看看, 试一试): bir az etmək, sınamaq</string>
+    <string name="grammar_zh_ba">把 + tamamlıq + fel + nəticə: tamamlığa nəsə edir (tamamlıq feldən əvvəl gəlir)</string>
+    <string name="grammar_zh_bei">被: məchul, mübtəda hərəkəti qəbul edir (çox vaxt arzuolunmaz şey)</string>
+    <string name="grammar_zh_de_adverbial">Təsvir + 地 + fel: hərəkətin necə edildiyi (慢慢地走)</string>
+    <string name="grammar_zh_geng">更: daha da</string>
+    <string name="grammar_zh_xian">先 (…再 / 然后…): əvvəlcə (…, sonra…)</string>
+    <string name="grammar_zh_ranhou">然后: sonra, bundan sonra</string>
+    <string name="grammar_zh_haishi">还是: yoxsa (suallarda); hələ də; yaxşı olar ki</string>
+    <string name="grammar_zh_huozhe">或者: və ya (təsdiq cümlələrində)</string>
+    <string name="grammar_zh_cai">才: yalnız onda, ancaq (gözləniləndən gec və ya çətin)</string>
+    <string name="grammar_zh_you_again">又: yenə (artıq yenə baş verib); 又 A 又 B: həm A, həm B</string>
+    <string name="grammar_zh_bijiao">比较: kifayət qədər, nisbətən; müqayisə etmək</string>
+    <string name="grammar_zh_zhi">只: yalnız (feldən əvvəl)</string>
+    <string name="grammar_zh_yiding">一定: mütləq, şübhəsiz; gərək</string>
+    <string name="grammar_zh_zhongyu">终于: nəhayət (gözləmə və ya səydən sonra)</string>
+    <string name="grammar_zh_mashang">马上: dərhal, elə indi</string>
+    <string name="grammar_zh_yizhi">一直: hər zaman, fasiləsiz; düz irəli</string>
+    <string name="grammar_zh_qishi">其实: əslində, həqiqətdə</string>
+    <string name="grammar_zh_gang">刚 / 刚刚: indicə (bir an əvvəl); 刚才: bir az əvvəl</string>
+    <string name="grammar_zh_yinggai">应该: gərək, lazımdır</string>
+    <string name="grammar_zh_bixu">必须: mütləq, məcburdur</string>
+    <string name="grammar_zh_xuyao">需要: ehtiyac var, lazımdır</string>
+    <string name="grammar_zh_yuanyi">愿意: razı olmaq, istəmək</string>
+    <string name="grammar_zh_weile">为了: … üçün, … naminə</string>
+    <string name="grammar_zh_guanyu">关于: haqqında, mövzusunda</string>
+    <string name="grammar_zh_gen">跟: ilə, və (跟…一起 = … ilə birlikdə)</string>
+    <string name="grammar_zh_yiyang">A 跟 / 和 B 一样: A B ilə eynidir</string>
+    <string name="grammar_zh_haoxiang">好像: deyəsən, sanki</string>
+    <string name="grammar_zh_zheme">这么 / 那么 (+ sifət): bu qədər…, belə / elə</string>
+    <string name="grammar_zh_a_particle">啊 / 呀 / 啦: hiss əlavə edir (təəccüb, həyəcan, yumşaq ton)</string>
+    <string name="grammar_zh_shi_de">是…的: nəyinsə nə vaxt, harada və ya necə baş verdiyini vurğulayır</string>
+    <string name="grammar_zh_yi_jiu">一 A 就 B: A olan kimi, (dərhal) B</string>
+    <string name="grammar_zh_yushi">于是: beləliklə, sonra (bundan sonra nə oldu)</string>
+    <string name="grammar_zh_duome">多么 + sifət!: necə də…! (güclü hiss)</string>
+    <string name="grammar_zh_yuanlai">原来: əvvəlcə; demə (indicə başa düşdünüz)</string>
+    <string name="grammar_zh_daodi">到底: axı, görəsən (suallarda); nəticədə</string>
+    <string name="grammar_zh_shenzhi">甚至: hətta (gözləniləndən də irəli)</string>
+    <string name="grammar_zh_fouze">否则 / 不然: yoxsa, əks halda</string>
+    <string name="grammar_zh_jingran">竟然 / 居然: gözlənilmədən, təəccüb ki</string>
+    <string name="grammar_zh_nandao">难道…?: məgər…? (yox cavabı gözləyən sual)</string>
+    <string name="grammar_zh_jinguan">尽管: baxmayaraq ki; çəkinmədən edin</string>
+    <string name="grammar_zh_suizhe">随着: … ilə birlikdə, … dəyişdikcə</string>
+    <string name="grammar_zh_fanzheng">反正: hər halda, necə olursa olsun</string>
+    <string name="grammar_zh_bijing">毕竟: axı, nəticə etibarilə</string>
+    <string name="grammar_zh_weibi">未必: mütləq deyil</string>
+    <string name="grammar_zh_jianzhi">简直: sadəcə, az qala (güclü hiss)</string>
+    <string name="grammar_zh_wanyi">万一: birdən, əgər təsadüfən (pis bir şey)</string>
+    <string name="grammar_zh_zongzhi">总之: qısası, hər halda</string>
+    <string name="grammar_zh_zhiyu">至于: …-a gəlincə</string>
+    <string name="grammar_zh_yuqi">与其 A 不如 B: A etməkdənsə, B etmək daha yaxşıdır</string>
+    <string name="grammar_zh_ningke">宁可: daha yaxşı olar ki (bahasına olsa da)</string>
+    <string name="grammar_zh_hebi">何必…?: nəyə lazım…? (ehtiyac yoxdur)</string>
+    <string name="grammar_zh_yimian">以免: … olmasın deyə</string>
+    <string name="grammar_zh_yibian_so">以便: … üçün, … asanlaşsın deyə</string>
+    <string name="grammar_zh_conger">从而: beləliklə, bununla da</string>
+    <string name="grammar_zh_guran">固然: düzdür ki… (amma)</string>
+    <string name="grammar_zh_kuangqie">况且 / 何况: üstəlik; o ki qaldı</string>
+    <string name="grammar_zh_men">们: insanlar üçün sözü cəm edir (朋友们 = dostlar)</string>
+    <string name="grammar_zh_yong">用 + əşya + fel: onunla və ya ondan istifadə edərək nəsə etmək</string>
+    <string name="grammar_zh_wei_for">为 + kimsə: kiminsə üçün, adından (为你高兴 = sənin üçün sevinirəm)</string>
+    <string name="grammar_zh_xiang_toward">向 / 朝: tərəfə, üzü … tərəfə (向我走来 = mənə tərəf gəlmək)</string>
+    <string name="grammar_zh_yiwei_thought">以为: elə bilirdi (adətən səhvən), güman edirdi</string>
+    <string name="grammar_zh_er">而: və, amma, halbuki (iki fikri bağlayır, daha rəsmi)</string>
+    <string name="grammar_zh_bing">并: və həm də; 并不 / 并没有: heç də, əslində yox</string>
+    <string name="grammar_zh_you_by">由: tərəfindən (kim edir); -dan (由我负责 = cavabdeh mənəm)</string>
+    <string name="grammar_zh_suo">所 + fel: … olan şey (rəsmi; 我所知道的 = bildiyim şey)</string>
+    <string name="grammar_zh_zhishi">只是: sadəcə, yalnız; amma (但是-dən yumşaq)</string>
+    <string name="grammar_zh_youyu">由于: … səbəbindən, … görə (rəsmi)</string>
+    <string name="grammar_zh_genju">根据: … əsasən; 通过: … vasitəsilə; 按照: … uyğun olaraq (qaydalara)</string>
+    <string name="grammar_zh_yu_at">于: -da, -ya, -dan (rəsmi yazılı Çin dili)</string>
+    <string name="grammar_zh_yi_by">以: ilə, vasitəsilə, kimi (rəsmi)</string>
+    <string name="grammar_zh_zhi_of">之: 的-nin rəsmi forması (三分之一 = üçdə bir)</string>
+    <string name="grammar_zh_measure">Ölçü sözü: rəqəm və ya bu / o + ölçü sözü + isim (一本书, 这个人)</string>
+    <string name="grammar_zh_bu">不: yox, deyil (indi, gələcək, vərdişlər və sifətlərlə)</string>
+    <string name="grammar_zh_mei">没 / 没有: etmədi, etməyib (keçmiş hərəkətlər); 没有 + isim: yoxdur</string>
+    <string name="grammar_zh_zhiyi">A 之一: A-dan biri (最好的电影之一 = ən yaxşı filmlərdən biri)</string>
+    <string name="grammar_zh_duiyu">对于: … gəlincə, … barədə (对于这个问题 = bu məsələ barədə)</string>
+    <string name="grammar_zh_yinci">因此: buna görə, ona görə də (indicə deyilənin nəticəsi)</string>
+    <string name="grammar_zh_raner">然而: lakin (但是-dən daha rəsmi)</string>
+    <string name="grammar_zh_chufei">除非: əgər … olmasa; yalnız … olsa (除非…才 / 否则…)</string>
+    <string name="grammar_zh_yaome">要么 A 要么 B: ya A, ya da B (birini seçin)</string>
+    <string name="grammar_zh_ji_you">既 A 又 / 也 B: həm A, həm də B</string>
+    <string name="grammar_zh_tongshi">同时: eyni vaxtda; həmçinin</string>
+    <string name="grammar_zh_shide">(像)…似的: sanki, kimi (他像孩子似的 = o, uşaq kimidir)</string>
+    <string name="grammar_zh_zicong">自从 / 自: …-dan bəri (keçmişdəki vaxtdan indiyə qədər)</string>
+    <string name="grammar_zh_yiji">以及: və, həmçinin (rəsmi; siyahının son üzvünü bağlayır)</string>
+    <string name="grammar_zh_ti">替: əvəzinə, adından (替我谢谢他 = mənim adımdan ona təşəkkür et)</string>
+</resources>

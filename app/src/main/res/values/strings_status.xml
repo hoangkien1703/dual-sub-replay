@@ -3,6 +3,7 @@
     <string name="status_waiting_for_captions">Waiting for YouTube captions and their language. Play the video with captions enabled.</string>
     <string name="status_translating_live_captions">Translating live captions…</string>
     <string name="status_live_translation_not_supported">Live translation is not supported for %1$s.</string>
+    <string name="status_translation_needs_online">%1$s has no on-device translation. In Settings, set “Translate subtitles with” to Google or AI.</string>
     <string name="status_current_captions_only">Current captions only; paragraph replay is unavailable.</string>
     <string name="status_live_translation_unavailable">Live translation unavailable. Check the connection for the language model download.</string>
     <string name="status_preparing_nearby_translations">Preparing nearby translations…</string>

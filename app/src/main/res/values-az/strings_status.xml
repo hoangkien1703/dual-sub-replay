@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_waiting_for_captions">YouTube altyazıları və onların dili gözlənilir. Videonu altyazılar açıq halda oynadın.</string>
+    <string name="status_translating_live_captions">Canlı altyazılar tərcümə olunur…</string>
+    <string name="status_live_translation_not_supported">%1$s üçün canlı tərcümə dəstəklənmir.</string>
+    <string name="status_translation_needs_online">%1$s cihazda tərcümə oluna bilmir. Ayarlarda “Altyazı tərcüməçisi” seçimini Google və ya Sİ edin.</string>
+    <string name="status_current_captions_only">Yalnız cari altyazılar; abzası təkrar oynatmaq mümkün deyil.</string>
+    <string name="status_live_translation_unavailable">Canlı tərcümə mümkün deyil. Dil modelini endirmək üçün bağlantını yoxlayın.</string>
+    <string name="status_preparing_nearby_translations">Yaxındakı tərcümələr hazırlanır…</string>
+    <string name="status_finding_caption_track">Ən yaxşı altyazı treki axtarılır…</string>
+    <string name="status_preparing_subtitles">Oynatma yerinin yaxınlığındakı altyazılar hazırlanır…</string>
+    <string name="status_downloading_translation_model">Tərcümə modeli endirilir…</string>
+    <string name="status_subtitles_load_failed">Altyazılar yüklənmədi. Davam etmək üçün yenidən cəhd edin.</string>
+    <string name="status_original_captions_only">Yalnız orijinal altyazılar · tərcümə mümkün deyil</string>
+    <string name="status_subtitles_ready">Oynatma yerinin yaxınlığındakı altyazılar hazırdır</string>
+    <string name="status_preparing_translation">Tərcümə hazırlanır: %1$s…</string>
+    <string name="status_translation_unavailable_retry">Tərcümə hazırda mümkün deyil. Bağlantınızı yoxlayın, sonra yenidən cəhd edin.</string>
+    <string name="status_live_subtitles_title">Canlı altyazılar</string>
+    <string name="status_retrying_full_transcript">Tam mətn yenidən cəhd edilir…</string>
+    <string name="status_retry_full_transcript">Tam mətni yenidən cəhd et</string>
+    <string name="status_transcript_page_no_answer">Tam mətn: YouTube səhifəsi bu video üçün hələ cavab verməyib. Tətbiq yoxlamağa davam edir.</string>
+    <string name="status_transcript_page_no_tracks">Tam mətn: YouTube bu video üçün heç bir altyazı göstərmir.</string>
+    <string name="status_transcript_page_no_player">Tam mətn: YouTube pleyeri hələ hazır deyil. Tətbiq yoxlamağa davam edir.</string>
+    <string name="status_transcript_page_waiting">Tam mətn: YouTube altyazıları hələ yükləməyib. Onlar yüklənən kimi, adətən video oynamağa başlayandan sonra, özü görünəcək.</string>
+    <string name="status_transcript_page_unreadable">Tam mətn: YouTube-un göndərdiyi altyazıları oxumaq mümkün olmadı.</string>
+    <string name="status_transcript_download_failed">Tətbiqin endirməsi: %1$s</string>
+    <string name="status_transcript_page_detail">Səhifə yoxlaması: %1$s</string>
+    <string name="translation_issue_button">Tərcümə problemi</string>
+    <string name="translation_issue_on_device_title">Cihazda tərcümədən istifadə olunur</string>
+    <string name="translation_issue_on_device_message">Google Tərcümə hazırda işləmir, ona görə bu video cihazınızda tərcümə olunur. Tətbiq Google-u hər 2 dəqiqədən bir və növbəti videoda yenidən yoxlayır.</string>
+    <string name="translation_issue_youtube_title">YouTube-un tərcüməsindən istifadə olunur</string>
+    <string name="translation_issue_youtube_message">Google Tərcümə hazırda işləmir, ona görə bu video YouTube-un öz tərcümə altyazılarından istifadə edir; YouTube-un buraxdığı sətirlər cihazınızda tərcümə olunur. Tətbiq Google-u hər 2 dəqiqədən bir və növbəti videoda yenidən yoxlayır.</string>
+    <string name="translation_issue_try_google">Google-u yenidən yoxla</string>
+    <string name="translation_issue_ai_title">Sİ tərcüməsi dayandırılıb</string>
+    <string name="translation_issue_ai_message">Sİ tərcüməsi alınmadı, ona görə əvəzində Google Tərcümənin sətirləri göstərilir. Tətbiq 30 saniyədən sonra Sİ-yə yenidən müraciət edir. Sİ açarınızı və onun gündəlik limitini Əlavə ayarlar → Sİ köməkçisi bölməsində yoxlayın.</string>
+    <string name="translation_issue_try_ai">Sİ-ni yenidən yoxla</string>
+    <string name="problem_detail_show_more">Daha çox göstər</string>
+    <string name="problem_detail_show_less">Daha az göstər</string>
+</resources>

@@ -137,7 +137,7 @@ internal fun toggleMoreSettingsSection(
     tapped: MoreSettingsSection,
 ): MoreSettingsSection? = if (open == tapped) null else tapped
 
-internal enum class LanguagePickerMode { SOURCE, TARGET }
+internal enum class LanguagePickerMode { SOURCE, TARGET, THIRD }
 
 /** Which language list is open, shared by the full settings page and the quick languages popup. */
 internal class LanguagePickerState {
@@ -205,33 +205,93 @@ private fun showLanguagePickerIfOpen(
     sourceChoices: List<LanguageChoice>,
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
+    thirdLine: ThirdLineChoice,
+    onThirdLineChange: (ThirdLineChoice) -> Unit,
 ): Boolean {
     val mode = picker.mode ?: return false
-    val source = mode == LanguagePickerMode.SOURCE
     val interfaceLocale = currentInterfaceLocale()
+    val translationChoices = TranslationLanguages.all.map { LanguageChoice(it.code, languageDisplayName(it.code, interfaceLocale)) }
     LanguagePickerDialog(
         title =
             stringResource(
-                if (source) R.string.settings_original_caption_language else R.string.settings_translate_to,
+                when (mode) {
+                    LanguagePickerMode.SOURCE -> R.string.settings_original_caption_language
+                    LanguagePickerMode.TARGET -> R.string.settings_translate_to
+                    LanguagePickerMode.THIRD -> R.string.settings_third_line
+                },
             ),
         choices =
-            if (source) {
-                sourceChoices
-            } else {
-                TranslationLanguages.all.map { LanguageChoice(it.code, languageDisplayName(it.code, interfaceLocale)) }
+            when (mode) {
+                LanguagePickerMode.SOURCE -> sourceChoices
+                LanguagePickerMode.TARGET -> translationChoices
+                LanguagePickerMode.THIRD ->
+                    listOf(LanguageChoice(THIRD_LINE_OFF, stringResource(R.string.settings_third_line_off))) +
+                        translationChoices
             },
-        selectedCode = if (source) sourcePreference else targetLanguage,
+        selectedCode =
+            when (mode) {
+                LanguagePickerMode.SOURCE -> sourcePreference
+                LanguagePickerMode.TARGET -> targetLanguage
+                LanguagePickerMode.THIRD -> thirdLine.shownLanguage ?: THIRD_LINE_OFF
+            },
         searchQuery = picker.query,
         onSearchQueryChange = { picker.query = it },
         onChoice = { choice ->
-            if (source) onSourceChange(choice.code) else onTargetChange(choice.code)
+            when (mode) {
+                LanguagePickerMode.SOURCE -> onSourceChange(choice.code)
+                LanguagePickerMode.TARGET -> onTargetChange(choice.code)
+                LanguagePickerMode.THIRD ->
+                    onThirdLineChange(
+                        if (choice.code == THIRD_LINE_OFF) thirdLine.copy(enabled = false) else ThirdLineChoice(true, choice.code),
+                    )
+            }
             picker.close()
         },
         onDismiss = picker::close,
         testTagPrefix = mode.name.lowercase(),
-        recentCodes = if (source) emptyList() else recentLanguagesToShow(recentTargetLanguages, targetLanguage),
+        recentCodes = if (mode == LanguagePickerMode.TARGET) recentLanguagesToShow(recentTargetLanguages, targetLanguage) else emptyList(),
     )
     return true
+}
+
+/** The third line's "Off" entry in its language list. */
+private const val THIRD_LINE_OFF = "off"
+
+/** The third line's button text: its language, or "Choose a language" while none is picked. */
+@Composable
+private fun thirdLineLabel(thirdLanguage: String?): String =
+    thirdLanguage?.let { languageDisplayName(it, currentInterfaceLocale()) } ?: stringResource(R.string.settings_third_line_choose)
+
+/**
+ * Settings → Layout & format → Third subtitle line (owner request 2026-11-02: off by default, and its
+ * language row shows here and in the language popup only while it is on). Turning it on with no
+ * language picked yet opens the language list.
+ */
+@Composable
+private fun ThirdLineSettings(
+    thirdLine: ThirdLineChoice,
+    onThirdLineChange: (ThirdLineChoice) -> Unit,
+    onPick: (LanguagePickerMode) -> Unit,
+) {
+    SettingsSwitchRow(
+        title = stringResource(R.string.settings_third_line_title),
+        description = stringResource(R.string.settings_third_line_hint),
+        checked = thirdLine.enabled,
+        onCheckedChange = { on ->
+            onThirdLineChange(thirdLine.copy(enabled = on))
+            if (on && thirdLine.language == null) onPick(LanguagePickerMode.THIRD)
+        },
+        testTag = "third_line_switch",
+    )
+    if (thirdLine.enabled) {
+        Spacer(Modifier.height(6.dp))
+        OutlinedButton(
+            onClick = { onPick(LanguagePickerMode.THIRD) },
+            modifier = Modifier.fillMaxWidth().testTag("third_language_picker"),
+        ) {
+            Text(thirdLineLabel(thirdLine.language))
+        }
+    }
 }
 
 @Composable
@@ -268,6 +328,7 @@ private fun LanguagePickerButtons(
 private fun CompactLanguageRows(
     sourceLabel: String,
     targetLanguage: String,
+    thirdLine: ThirdLineChoice,
     onPick: (LanguagePickerMode) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -279,6 +340,12 @@ private fun CompactLanguageRows(
             languageDisplayName(targetLanguage, currentInterfaceLocale()),
             "target_language_picker",
         ) { onPick(LanguagePickerMode.TARGET) }
+        // Only while Layout & format → Third subtitle line is on; "Off" in its list turns it off again.
+        if (thirdLine.enabled) {
+            CompactLanguageRow(stringResource(R.string.settings_third_line), thirdLineLabel(thirdLine.language), "third_language_picker") {
+                onPick(LanguagePickerMode.THIRD)
+            }
+        }
     }
 }
 
@@ -318,6 +385,8 @@ internal fun QuickLanguageSettingsDialog(
     onTargetChange: (String) -> Unit,
     onOpenAllSettings: () -> Unit,
     recentTargetLanguages: List<String> = emptyList(),
+    thirdLine: ThirdLineChoice = ThirdLineChoice(),
+    onThirdLineChange: (ThirdLineChoice) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
@@ -334,6 +403,8 @@ internal fun QuickLanguageSettingsDialog(
             sourceChoices = sourceChoices,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLine = thirdLine,
+            onThirdLineChange = onThirdLineChange,
         )
     if (pickerOpen) return
     // Owner requests 2026-10-30: no icon, the title on the left beside the X, no Done (changes apply at
@@ -353,6 +424,7 @@ internal fun QuickLanguageSettingsDialog(
                     // "Auto" alone fits beside its label; the picker's list still says "Auto (recommended)".
                     sourceLabel = sourceLanguageLabel(sourcePreference, sourceChoices, shortAutoLabel, interfaceLocale),
                     targetLanguage = targetLanguage,
+                    thirdLine = thirdLine,
                     onPick = languagePicker::open,
                 )
                 HorizontalDivider(
@@ -428,6 +500,8 @@ internal fun SubtitleSettingsDialog(
     onTapToLearnChange: (Boolean) -> Unit = {},
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
+    thirdLine: ThirdLineChoice = ThirdLineChoice(),
+    onThirdLineChange: (ThirdLineChoice) -> Unit = {},
     onFontScaleChange: (Float) -> Unit,
     onLandscapeSplitChange: (Boolean) -> Unit,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
@@ -475,6 +549,8 @@ internal fun SubtitleSettingsDialog(
             sourceChoices = sourceChoices,
             onSourceChange = onSourceChange,
             onTargetChange = onTargetChange,
+            thirdLine = thirdLine,
+            onThirdLineChange = onThirdLineChange,
         )
     if (pickerOpen) return
     val sourceLabel =
@@ -583,6 +659,8 @@ internal fun SubtitleSettingsDialog(
                         )
                         SettingsSectionDivider()
                         CaptionFormatSettings(captionFormat, onCaptionFormatChange)
+                        SettingsSectionDivider()
+                        ThirdLineSettings(thirdLine, onThirdLineChange, languagePicker::open)
                         SettingsSectionDivider()
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_landscape_split_title),

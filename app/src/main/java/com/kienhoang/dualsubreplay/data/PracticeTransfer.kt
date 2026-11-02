@@ -21,6 +21,8 @@ internal val transferColumns =
         "startMs",
         "endMs",
         "deck",
+        "sourceTitle",
+        "notes",
     )
 
 internal data class TransferDocument(
@@ -189,6 +191,8 @@ internal fun exportAnkiTsv(words: List<SavedWord>): String {
                 word.startMs.toString(),
                 word.endMs.toString(),
                 word.deck.orEmpty(),
+                word.sourceTitle.orEmpty(),
+                word.notes,
             ).joinToString("\t", transform = ::quote)
         }
 }
@@ -248,6 +252,8 @@ internal fun previewImport(
                         false,
                         validClipRange(videoId, start, end),
                         deck = cleanDeckName(field("deck")),
+                        sourceTitle = cleanSourceTitle(field("sourceTitle")),
+                        notes = field("notes").trim().take(MAX_WORD_NOTES_LENGTH),
                     )
                 validateTransferWord(word)
                 val id =
@@ -286,4 +292,6 @@ internal fun validateTransferWord(word: SavedWord) {
     require(word.videoId == null || word.videoId.matches(Regex("[A-Za-z0-9_-]{11}")))
     require(!word.online || validClipRange(word.videoId, word.startMs, word.endMs))
     require(word.deck == null || word.deck == cleanDeckName(word.deck))
+    require(word.sourceTitle == null || word.sourceTitle == cleanSourceTitle(word.sourceTitle))
+    require(word.notes.length <= MAX_WORD_NOTES_LENGTH)
 }

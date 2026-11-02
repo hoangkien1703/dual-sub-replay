@@ -147,4 +147,10 @@
     <plurals name="practice_import_backup_summary">
         <item quantity="other">完全バックアップ: 読み取れる単語 %1$d 語。復習履歴も含まれます。</item>
     </plurals>
+    <string name="practice_video_filter">動画: %1$s</string>
+    <string name="practice_video_filter_all">すべての動画</string>
+    <string name="practice_video_filter_choose">動画を選択</string>
+    <string name="practice_from_video">出典: %1$s</string>
+    <string name="practice_notes_label">メモ</string>
+    <string name="practice_save_notes">メモを保存</string>
 </resources>

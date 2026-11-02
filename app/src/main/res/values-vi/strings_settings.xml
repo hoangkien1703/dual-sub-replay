@@ -62,6 +62,11 @@
     <string name="settings_translate_to">Dịch sang</string>
     <string name="settings_original_language">Ngôn ngữ gốc</string>
     <string name="settings_model_download_hint">Mô hình ngôn ngữ chỉ được tải xuống khi cần.</string>
+    <string name="settings_third_line">Dòng thứ ba</string>
+    <string name="settings_third_line_off">Tắt</string>
+    <string name="settings_third_line_hint">Thêm một bản dịch nữa dưới mỗi phụ đề, bằng một ngôn ngữ khác. Tốn thêm một chút dữ liệu mạng.</string>
+    <string name="settings_third_line_title">Dòng phụ đề thứ ba</string>
+    <string name="settings_third_line_choose">Chọn ngôn ngữ</string>
     <string name="settings_subtitle_languages">Ngôn ngữ phụ đề</string>
     <string name="settings_dual_subtitle_settings">Cài đặt phụ đề kép</string>
     <string name="settings_done">Xong</string>

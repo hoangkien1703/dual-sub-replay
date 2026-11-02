@@ -215,6 +215,8 @@ class AppViewModel internal constructor(
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
                 studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
+                thirdLineEnabled = preferences.getBoolean(THIRD_LINE_ENABLED_PREFERENCE, false),
+                thirdLanguage = storedThirdLanguage(preferences.getString(THIRD_LANGUAGE_PREFERENCE, null)),
                 fontScale = normalizeFontScale(preferences.getFloat("font_scale", 1f)),
                 portraitPanelOffsetFraction =
                     normalizePortraitPanelOffsetFraction(
@@ -323,6 +325,9 @@ class AppViewModel internal constructor(
             ),
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
+
+    private val thirdLineTranslation =
+        ThirdLineTranslation(_state, playbackRequests, googleTranslator, translator, ::currentGoogleWaitMs, ::isCurrentLoad)
 
     private val visibilityListener =
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -690,6 +695,17 @@ class AppViewModel internal constructor(
         _state.update { it.copy(targetLanguage = normalized, recentTargetLanguages = recent, liveTranslated = null) }
     }
 
+    /** Layout & format → Third subtitle line, and its language; the open video's third lines follow at once. */
+    fun setThirdLine(choice: ThirdLineChoice) {
+        val language = choice.language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
+        preferences
+            .edit()
+            .putBoolean(THIRD_LINE_ENABLED_PREFERENCE, choice.enabled)
+            .putString(THIRD_LANGUAGE_PREFERENCE, language.orEmpty())
+            .apply()
+        _state.update { it.copy(thirdLineEnabled = choice.enabled, thirdLanguage = language) }
+    }
+
     fun completeOnboarding(
         nativeLanguage: String,
         learningLanguage: String,
@@ -945,7 +961,14 @@ class AppViewModel internal constructor(
         meaning: String,
         online: Boolean,
         deck: String? = null,
-    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online).copy(deck = deck))
+    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online, videoTitle(selection.videoId)).copy(deck = deck))
+
+    /** The title of [videoId] while the page plays it (the page reports title and address together); null otherwise. */
+    internal fun videoTitle(videoId: String?): String? =
+        WebVideoBridge.playback.value
+            ?.takeIf { videoId != null && it.videoId == videoId }
+            ?.title
+            ?.ifBlank { null }
 
     suspend fun translateWord(word: String): String {
         val current = _state.value
@@ -959,7 +982,13 @@ class AppViewModel internal constructor(
         target: String,
         text: String,
     ): String {
-        if (!_state.value.translatesWithGoogle()) return translator.translateSingle(source, target, text)
+        val onDevice = translator.supports(source, target)
+        // A language without an on-device model stays with Google, even after Google failed once.
+        val online = _state.value.translatesWithGoogle() || (!onDevice && _state.value.translationEngine == TranslationEngine.GOOGLE_WEB)
+        if (!online) {
+            requireOnDeviceModel(source, target)
+            return translator.translateSingle(source, target, text)
+        }
         val translated =
             try {
                 googleTranslator.translate(source, target, text)
@@ -967,10 +996,27 @@ class AppViewModel internal constructor(
                 throw error
             } catch (error: Exception) {
                 fallBackToOnDevice(error)
+                if (!onDevice) throw error
                 null
             }
         // A text Google leaves blank is translated on the device; only a failure moves the video off Google.
-        return translated ?: translator.translateSingle(source, target, text)
+        return translated ?: if (onDevice) translator.translateSingle(source, target, text) else ""
+    }
+
+    /** "On this device only" with a language ML Kit has no model for: say which translator can do it. */
+    private fun requireOnDeviceModel(
+        source: String,
+        target: String,
+    ) {
+        if (!translator.supports(source, target)) throw onlineOnlyError(source, target)
+    }
+
+    private fun onlineOnlyError(
+        source: String,
+        target: String,
+    ): IllegalArgumentException {
+        val missing = if (translator.supports(source, source)) target else source
+        return IllegalArgumentException(text(R.string.status_translation_needs_online, languageName(missing)))
     }
 
     /** Settings → Translation → Google Translate (online). Reloads the current video's translations. */
@@ -1127,6 +1173,8 @@ class AppViewModel internal constructor(
                 sourcePreference = "auto",
                 targetLanguage = "vi",
                 recentTargetLanguages = emptyList(),
+                thirdLineEnabled = false,
+                thirdLanguage = null,
                 fontScale = 1f,
                 portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,
                 landscapeSplitEnabled = true,
@@ -1509,24 +1557,16 @@ class AppViewModel internal constructor(
                     )
             }
             val store = checkNotNull(displayStore)
-            try {
-                if (_state.value.translatesWithGoogle()) {
-                    followGoogleTranslation(
-                        store,
-                        videoId,
-                        generation,
-                        sourceLanguage to targetLanguage,
-                        googleRequests,
-                    ) { prefetch, upgrades, translate ->
+            coroutineScope {
+                // The third line runs beside the second; it never delays or stops it.
+                val thirdLine = launch { thirdLineTranslation.follow(store, videoId, generation, sourceLanguage, googleRequests) }
+                try {
+                    followTranslation(store, videoId, generation, source, targetLanguage, googleRequests, { prefetch, upgrades, translate ->
                         follow(prefetch, upgrades, translate)
-                    }
-                } else {
-                    followOnDevice(store, videoId, generation, source, targetLanguage) { translate -> follow(translate = translate) }
+                    }) { following }
+                } finally {
+                    thirdLine.cancel()
                 }
-            } catch (error: Exception) {
-                if (error is CancellationException || following) throw error
-                // The pair cannot be translated at all (an unsupported language): still show the captions.
-                follow { throw error }
             }
         } catch (error: CancellationException) {
             throw error
@@ -1545,6 +1585,43 @@ class AppViewModel internal constructor(
             }
         } finally {
             withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
+        }
+    }
+
+    /** Google (with AI when chosen) or the device for the second line; an untranslatable pair still shows the captions. */
+    private suspend fun followTranslation(
+        store: SubtitleStore,
+        videoId: String,
+        generation: Long,
+        source: Pair<String, Boolean>,
+        targetLanguage: String,
+        googleRequests: CoroutineScope,
+        follow: suspend (
+            prefetch: (suspend (List<String>) -> Unit)?,
+            upgrades: TranslationUpgrades?,
+            translate: suspend (String) -> String,
+        ) -> Unit,
+        following: () -> Boolean,
+    ) {
+        val sourceLanguage = source.first
+        try {
+            if (_state.value.translatesWithGoogle()) {
+                followGoogleTranslation(
+                    store,
+                    videoId,
+                    generation,
+                    sourceLanguage to targetLanguage,
+                    googleRequests,
+                ) { prefetch, upgrades, translate ->
+                    follow(prefetch, upgrades, translate)
+                }
+            } else {
+                followOnDevice(store, videoId, generation, source, targetLanguage) { translate -> follow(null, null, translate) }
+            }
+        } catch (error: Exception) {
+            if (error is CancellationException || following()) throw error
+            // The pair cannot be translated at all (an unsupported language): still show the captions.
+            follow(null, null) { throw error }
         }
     }
 
@@ -1695,6 +1772,17 @@ class AppViewModel internal constructor(
         if (fallback) launch { recheckGoogle(sourceLanguage, targetLanguage, soon) }
         val fromYouTube = if (fallback) async { youTubeTranslations(store, videoId, generation, source, targetLanguage) } else null
         val youTubeInTime = fromYouTube?.let { answer -> async { withTimeoutOrNull(YOUTUBE_TRANSLATION_WAIT_MS) { answer.await() } } }
+        if (!translator.supports(sourceLanguage, targetLanguage)) {
+            // No on-device model (Azerbaijani, Kazakh...): after a Google failure rows take YouTube's own
+            // translation, else ask Google again; "On this device only" cannot translate them at all.
+            if (fromYouTube == null || youTubeInTime == null) throw onlineOnlyError(sourceLanguage, targetLanguage)
+            follow { text ->
+                googleTranslator.cachedTranslation(sourceLanguage, targetLanguage, text)
+                    ?: (if (fromYouTube.isCompleted) fromYouTube.await() else youTubeInTime.await())?.get(text)
+                    ?: googleTranslator.translate(sourceLanguage, targetLanguage, text).orEmpty()
+            }
+            return@coroutineScope
+        }
         translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
             showTranslationModelDownload(videoId, generation, downloading)
         }) { translate ->
@@ -1728,6 +1816,8 @@ class AppViewModel internal constructor(
         target: String,
         text: String,
     ): String {
+        // Without an on-device model the line Google left blank stays blank.
+        if (!translator.supports(source, target)) return ""
         val onDownloadingChange = { downloading: Boolean -> showTranslationModelDownload(videoId, generation, downloading) }
         return translator.withSession(source, target, onDownloadingChange) { translate -> translate(text) }
     }

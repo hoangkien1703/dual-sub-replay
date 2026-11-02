@@ -100,10 +100,7 @@ internal class VocabularyRepository internal constructor(
                     if (old == null) {
                         word
                     } else {
-                        word.copy(
-                            dueAt = old.dueAt,
-                            intervalMs = old.intervalMs,
-                        )
+                        mergeResaved(old, word)
                     }
                 if (old == null) {
                     val rowId =
@@ -216,11 +213,18 @@ internal class VocabularyRepository internal constructor(
                             )
                             changed++
                         } else if (replace) {
+                            // A file without notes or a video title (an older backup, a TSV without those
+                            // columns) never erases the ones already saved.
+                            val kept =
+                                word.copy(
+                                    sourceTitle = word.sourceTitle ?: existing.sourceTitle,
+                                    notes = word.notes.ifBlank { existing.notes },
+                                )
                             val replacement =
                                 if (preserveReviewHistory) {
-                                    word.copy(dueAt = existing.dueAt, intervalMs = existing.intervalMs)
+                                    kept.copy(dueAt = existing.dueAt, intervalMs = existing.intervalMs)
                                 } else {
-                                    word
+                                    kept
                                 }
                             check(
                                 db.update(
@@ -287,6 +291,8 @@ internal fun encodeWord(w: SavedWord): JSONObject =
         put("dueAt", w.dueAt)
         put("intervalMs", w.intervalMs)
         put("deck", w.deck)
+        put("sourceTitle", w.sourceTitle)
+        if (w.notes.isNotEmpty()) put("notes", w.notes)
     }
 
 internal fun decodeWord(j: JSONObject): SavedWord =
@@ -307,4 +313,7 @@ internal fun decodeWord(j: JSONObject): SavedWord =
         dueAt = j.optLong("dueAt"),
         intervalMs = j.optLong("intervalMs"),
         deck = if (j.isNull("deck")) null else cleanDeckName(j.getString("deck")),
+        sourceTitle = cleanSourceTitle(j.optString("sourceTitle")),
+        // "personalNotes" is the name in Triple Sub Replay's backups (mrAlishah's fork), so they import here too.
+        notes = j.optString("notes").ifEmpty { j.optString("personalNotes") }.take(MAX_WORD_NOTES_LENGTH),
     )

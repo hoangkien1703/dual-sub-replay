@@ -88,7 +88,7 @@ private fun AppLanguageDialog(
             Column(
                 Modifier
                     .selectableGroup()
-                    .heightIn(max = 420.dp)
+                    .heightIn(max = 520.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
                 AppLanguageRow(
