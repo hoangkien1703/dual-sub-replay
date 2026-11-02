@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.translation.GoogleWait
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
@@ -41,6 +42,7 @@ internal class TranslationEngineActions(
     val selectGoogleWait: (GoogleWait) -> Unit = {},
     val selectTranslator: (SubtitleTranslator) -> Unit = {},
     val selectAiTranslationModel: (String) -> Unit = {},
+    val selectAiTranslationThinking: (AiTranslationThinking) -> Unit = {},
 )
 
 /** What Settings → Translation shows about the online engine. */
@@ -51,6 +53,7 @@ internal data class OnlineTranslationSettings(
     val aiTranslationOnly: Boolean = false,
     /** Empty uses the AI assistant's model. */
     val aiTranslationModel: String = "",
+    val aiTranslationThinking: AiTranslationThinking = AiTranslationThinking.OFF,
 ) {
     val translator: SubtitleTranslator
         get() = subtitleTranslator(engine, aiTranslation, aiTranslationOnly)

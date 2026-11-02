@@ -8,8 +8,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
+import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
+import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.AiHttpTransport
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
+import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionTrackResult
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -316,6 +319,7 @@ class AppViewModel internal constructor(
                 aiTranslation = preferences.getBoolean(AI_TRANSLATION_PREFERENCE, false),
                 aiTranslationOnly = preferences.getBoolean(AI_TRANSLATION_ONLY_PREFERENCE, false),
                 aiTranslationModel = preferences.getString(AI_TRANSLATION_MODEL_PREFERENCE, null).orEmpty(),
+                aiTranslationThinking = storedAiTranslationThinking(preferences.getString(AI_TRANSLATION_THINKING_PREFERENCE, null)),
             ),
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
@@ -1023,6 +1027,17 @@ class AppViewModel internal constructor(
         }
     }
 
+    /** Settings → Translation → AI thinking for translation. Reloads the current video's translations. */
+    fun setAiTranslationThinking(thinking: AiTranslationThinking) {
+        preferences.edit().putString(AI_TRANSLATION_THINKING_PREFERENCE, thinking.key).apply()
+        val changed = _state.value.aiTranslationThinking != thinking
+        _state.update { it.copy(aiTranslationThinking = thinking) }
+        val videoId = _state.value.activeVideoId
+        if (changed && videoId != null && _state.value.aiTranslation && _state.value.translatesWithGoogle()) {
+            loadVideo(videoId = videoId, showPanel = _state.value.subtitlePanelVisible)
+        }
+    }
+
     private fun onWifiNow(): Boolean = getApplication<Application>().onWifi()
 
     /** How long a row waits for Google on the current network. */
@@ -1139,6 +1154,7 @@ class AppViewModel internal constructor(
                 aiTranslation = false,
                 aiTranslationOnly = false,
                 aiTranslationModel = "",
+                aiTranslationThinking = AiTranslationThinking.OFF,
                 onDeviceFallback = false,
                 youTubeTranslationFallback = false,
                 onlineTranslationFailureDetail = null,
@@ -1577,7 +1593,7 @@ class AppViewModel internal constructor(
             if (_state.value.aiTranslation) {
                 withContext(
                     Dispatchers.IO,
-                ) { getApplication<Application>().aiTranslationModel(_state.value.aiTranslationModel, aiTransport) }
+                ) { getApplication<Application>().aiTranslationModel(_state.value.aiTranslationModel, _state.value.aiTranslationThinking, aiTransport) }
             } else {
                 null
             }

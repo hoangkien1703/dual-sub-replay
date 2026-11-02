@@ -107,6 +107,9 @@ internal enum class AiSetting(
     LOCK_OVERLAY_TO_VIDEO("lock_overlay_to_video"),
     AVOID_VIDEO_CONTROLS("avoid_video_controls"),
     REMEMBER_DRAGGED_POSITION("remember_dragged_position"),
+
+    /** Settings → Translation → AI thinking for translation (2026-11-02): translates the video again, so it waits for a tap. */
+    AI_TRANSLATION_THINKING("ai_translation_thinking", listOf("off", "low", "medium"), asks = true),
     GOOGLE_WAIT("google_wait", listOf("auto", "2", "4", "8")),
     NATURAL_SUBTITLE_FLOW("natural_subtitle_flow", asks = true),
     HIDE_SOUND_DESCRIPTIONS("hide_sound_descriptions", asks = true),
@@ -602,6 +605,8 @@ private val SETTING_CHOICE_ALIASES by lazy {
                 "new_words" to "new_word_lines",
                 "one_new_word" to "new_word_lines",
             ),
+        AiSetting.AI_TRANSLATION_THINKING to
+            mapOf("none" to "off", "no" to "off", "false" to "off", "disabled" to "off", "minimal" to "low", "mid" to "medium"),
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
         AiSetting.SEND_TO_APP to mapOf("anki" to "ankidroid", "anki_droid" to "ankidroid", "anki_connect" to "ankiconnect"),
         AiSetting.KNOWN_WORDS to
@@ -739,6 +744,12 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> "auto, or the code of a language the open video has captions in"
         AiSetting.APP_LANGUAGE -> choiceList(setting.choices) + " (device follows the phone)"
         AiSetting.DAILY_GOAL -> choiceList(setting.choices) + " (minutes a day)"
+        AiSetting.AI_TRANSLATION_THINKING ->
+            choiceList(setting.choices) +
+                " (how long the AI thinks before it translates subtitles, when Translate subtitles with is an AI choice and " +
+                "the assistant's service is Gemini or OpenAI; off is the default and fastest; low and medium can help with " +
+                "slang, jokes and lines that depend on earlier ones but answer more slowly, use more of the free limit and " +
+                "translate the open video again; there is no high level because long windows would time out)"
         AiSetting.GOOGLE_WAIT ->
             choiceList(setting.choices) +
                 " (seconds a subtitle line waits for Google Translate before YouTube's or the device's translation shows; " +

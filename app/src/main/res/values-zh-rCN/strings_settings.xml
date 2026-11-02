@@ -157,6 +157,9 @@
     <string name="settings_translator_on_device_description">离线可用，不会在线发送任何内容。准确度较低。</string>
     <string name="settings_ai_translation_model_same">与 AI 助手相同（%1$s）</string>
     <string name="settings_ai_translation_model_description">快速模型回复更快，免费额度也最大。</string>
+    <string name="settings_ai_translation_thinking_title">翻译时的 AI 思考</string>
+    <string name="settings_ai_translation_thinking_description">关闭最快。低和中可能让俚语、笑话以及依赖前文的句子译得更好，但每次回复更慢，也会用掉更多免费额度。更换级别会重新翻译视频。</string>
+    <string name="settings_ai_translation_thinking_off">关闭</string>
     <string name="settings_ai_translation_service_description">AI 选项使用 AI 助手设置中的服务和密钥，并将字幕文本发送到该服务。免费的 Google Gemini 密钥效果最好。</string>
     <string name="settings_ai_translation_service_open">打开 AI 助手设置</string>
     <string name="settings_google_wait_description">每行在显示 YouTube 或设备译文之前等待 Google 的时间。自动：移动数据 2 秒，Wi-Fi 4 秒。</string>

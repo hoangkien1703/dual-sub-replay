@@ -19,7 +19,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModelChoices
+import com.kienhoang.dualsubreplay.assistant.aiTranslationThinkingLevels
 import com.kienhoang.dualsubreplay.translation.GoogleWait
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 
@@ -118,6 +120,49 @@ internal fun AiTranslationModelSettings(
                     onClick = { onChange(model) },
                     label = { Text(model) },
                     modifier = Modifier.testTag("ai_translation_model_$model"),
+                )
+            }
+        }
+    }
+}
+
+/** The chip text of each AI thinking for translation choice. */
+@get:StringRes
+internal val AiTranslationThinking.labelRes: Int
+    get() =
+        when (this) {
+            AiTranslationThinking.OFF -> R.string.settings_ai_translation_thinking_off
+            AiTranslationThinking.LOW -> R.string.ai_effort_low
+            AiTranslationThinking.MEDIUM -> R.string.ai_effort_medium
+        }
+
+/**
+ * Settings → Translation → AI thinking for translation (owner request 2026-11-02), shown with an AI
+ * translator when the assistant's service lets the app choose (Gemini and OpenAI). Off is the default.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun AiTranslationThinkingSettings(
+    thinking: AiTranslationThinking,
+    onChange: (AiTranslationThinking) -> Unit,
+) {
+    val context = LocalContext.current
+    val levels = remember(context) { context.aiTranslationThinkingLevels() }
+    if (levels.isEmpty()) return
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Text(stringResource(R.string.settings_ai_translation_thinking_title))
+        Text(
+            stringResource(R.string.settings_ai_translation_thinking_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            levels.forEach { option ->
+                FilterChip(
+                    selected = thinking == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("ai_translation_thinking_${option.key}"),
                 )
             }
         }

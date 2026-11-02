@@ -68,6 +68,9 @@ class AiActionsTest {
         assertEquals("4", setting("google_wait", "4 seconds"))
         assertEquals("8", setting("google_wait", "8s"))
         assertEquals(null, setting("google_wait", "3"))
+        assertEquals("off", setting("ai_translation_thinking", "none"))
+        assertEquals("medium", setting("ai_translation_thinking", "Medium"))
+        assertEquals(null, setting("ai_translation_thinking", "high"))
         assertEquals("below", setting("translation_position", "under"))
         assertEquals("-10", setting("portrait_panel_position", "-10%"))
         assertEquals("0", setting("portrait_panel_position", "0"))
@@ -133,6 +136,7 @@ class AiActionsTest {
     fun settingsThatReloadDownloadOrRebuildAlwaysAsk() {
         val asking =
             listOf(
+                AiSetting.AI_TRANSLATION_THINKING,
                 AiSetting.NATURAL_SUBTITLE_FLOW,
                 AiSetting.HIDE_SOUND_DESCRIPTIONS,
                 AiSetting.PRELOAD_TRANSLATION_MODELS,
