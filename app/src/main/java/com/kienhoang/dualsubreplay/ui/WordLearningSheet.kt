@@ -45,6 +45,9 @@ internal fun WordLearningDialog(
     existingWord: com.kienhoang.dualsubreplay.data.SavedWord? = null,
     onSpeechSettings: (() -> Unit)? = null,
     onSpeakPart: (AnalyzedToken) -> Unit = {},
+    deck: String? = null,
+    namedDecks: List<String> = emptyList(),
+    onDeckChange: ((String?) -> Unit)? = null,
 ) {
     var meaning by remember(selection) { mutableStateOf(existingWord?.meaning.orEmpty()) }
     var loading by remember(selection) { mutableStateOf(true) }
@@ -115,6 +118,9 @@ internal fun WordLearningDialog(
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                    }
+                    onDeckChange?.let { change ->
+                        DeckChip(deck, selection.wordLanguage, namedDecks, { change(it).also { saved = false } }, enabled = !saving)
                     }
                     SaveWordButton(saving = saving, saved = saved, enabled = !saving && !loading && !saved) {
                         saving = true

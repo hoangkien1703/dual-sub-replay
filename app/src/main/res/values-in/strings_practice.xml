@@ -103,6 +103,20 @@
     <string name="practice_speech_playback_failed">Tidak dapat memutar pengucapan. Periksa volume media dan koneksi Anda, atau pilih suara di Setelan ucapan.</string>
     <string name="practice_speech_invalid_language">Pilih bahasa subtitel sebelum mengucapkan kata ini.</string>
     <string name="practice_speech_settings_manual">Buka Setelan Android dan cari Output text-to-speech untuk menginstal atau memilih suara.</string>
+    <string name="practice_deck_label">Dek: %1$s</string>
+    <string name="practice_deck_choose">Pilih dek</string>
+    <string name="practice_deck_new">Dek baru…</string>
+    <string name="practice_deck_new_title">Dek baru</string>
+    <string name="practice_deck_name_label">Nama dek</string>
+    <string name="practice_deck_create">Buat</string>
+    <string name="practice_deck_all">Semua dek</string>
+    <string name="practice_deck_menu">Opsi dek</string>
+    <string name="practice_deck_rename">Ganti nama dek</string>
+    <string name="practice_deck_rename_confirm">Ganti nama</string>
+    <string name="practice_deck_delete">Hapus dek</string>
+    <string name="practice_deck_delete_title">Hapus dek %1$s?</string>
+    <string name="practice_deck_delete_body">Kata-katanya kembali ke dek bahasanya masing-masing. Tidak ada kata atau riwayat ulasan yang dihapus.</string>
+    <string name="practice_deck_hint">Kata dikelompokkan menurut bahasa. Gunakan Dek pada sebuah kata untuk membuat dek sendiri.</string>
     <plurals name="practice_word_count">
         <item quantity="other">%1$d kata</item>
     </plurals>

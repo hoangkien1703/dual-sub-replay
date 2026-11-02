@@ -61,6 +61,8 @@ data class SavedWord(
     val online: Boolean = true,
     val dueAt: Long = 0,
     val intervalMs: Long = 0,
+    /** The deck the learner put the word in; null keeps it in its language's automatic deck. */
+    val deck: String? = null,
 )
 
 enum class ReviewRating { AGAIN, HARD, GOOD, EASY }

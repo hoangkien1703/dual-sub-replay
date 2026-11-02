@@ -103,6 +103,20 @@
     <string name="practice_speech_playback_failed">Không thể phát âm. Hãy kiểm tra âm lượng phương tiện và kết nối mạng, hoặc chọn giọng đọc trong Cài đặt giọng nói.</string>
     <string name="practice_speech_invalid_language">Hãy chọn ngôn ngữ phụ đề trước khi phát âm từ này.</string>
     <string name="practice_speech_settings_manual">Mở Cài đặt Android và tìm \"Chuyển văn bản thành giọng nói\" để cài đặt hoặc chọn giọng đọc.</string>
+    <string name="practice_deck_label">Bộ thẻ: %1$s</string>
+    <string name="practice_deck_choose">Chọn bộ thẻ</string>
+    <string name="practice_deck_new">Bộ thẻ mới…</string>
+    <string name="practice_deck_new_title">Bộ thẻ mới</string>
+    <string name="practice_deck_name_label">Tên bộ thẻ</string>
+    <string name="practice_deck_create">Tạo</string>
+    <string name="practice_deck_all">Tất cả bộ thẻ</string>
+    <string name="practice_deck_menu">Tùy chọn bộ thẻ</string>
+    <string name="practice_deck_rename">Đổi tên bộ thẻ</string>
+    <string name="practice_deck_rename_confirm">Đổi tên</string>
+    <string name="practice_deck_delete">Xóa bộ thẻ</string>
+    <string name="practice_deck_delete_title">Xóa bộ thẻ %1$s?</string>
+    <string name="practice_deck_delete_body">Các từ trong bộ thẻ sẽ trở về bộ thẻ theo ngôn ngữ của chúng. Không từ nào và không lịch sử ôn tập nào bị xóa.</string>
+    <string name="practice_deck_hint">Các từ được xếp theo ngôn ngữ. Dùng nút Bộ thẻ trên một từ để tạo bộ thẻ của riêng bạn.</string>
     <plurals name="practice_word_count">
         <item quantity="other">%1$d từ</item>
     </plurals>

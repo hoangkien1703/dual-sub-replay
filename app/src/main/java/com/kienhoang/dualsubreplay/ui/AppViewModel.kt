@@ -940,7 +940,8 @@ class AppViewModel internal constructor(
         selection: LearningWordSelection,
         meaning: String,
         online: Boolean,
-    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online))
+        deck: String? = null,
+    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online).copy(deck = deck))
 
     suspend fun translateWord(word: String): String {
         val current = _state.value

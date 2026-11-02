@@ -841,7 +841,12 @@ internal class AppAiActions(
         ).joinToString(" · ")
 
     private suspend fun saveWord(action: AiAction.SaveWord): AiActionOutcome {
-        val word = aiSavedWord(action.word, action.reading, action.meaning, state)
+        val saved = viewModel.vocabulary.words.value
+        // The assistant saves into the deck last picked for that language on the word card.
+        val word =
+            aiSavedWord(action.word, action.reading, action.meaning, state).let { word ->
+                word.copy(deck = rememberedDeck(context, word.wordLanguage)?.takeIf { deck -> saved.any { it.deck == deck } })
+            }
         if (viewModel.vocabulary.words.value
                 .any { it.id == word.id }
         ) {
