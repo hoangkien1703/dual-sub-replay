@@ -64,7 +64,9 @@
     <string name="settings_model_download_hint">言語モデルは必要なときだけダウンロードされます。</string>
     <string name="settings_third_line">3行目</string>
     <string name="settings_third_line_off">オフ</string>
-    <string name="settings_third_line_hint">各字幕の下に、別の言語の翻訳をもう1行表示します。初期設定はオフで、通信量が少し増えます。</string>
+    <string name="settings_third_line_hint">各字幕の下に、別の言語の翻訳をもう1行表示します。通信量が少し増えます。</string>
+    <string name="settings_third_line_title">3行目の字幕</string>
+    <string name="settings_third_line_choose">言語を選択</string>
     <string name="settings_subtitle_languages">字幕の言語</string>
     <string name="settings_dual_subtitle_settings">2言語字幕の設定</string>
     <string name="settings_done">完了</string>

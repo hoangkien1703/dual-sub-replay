@@ -212,6 +212,7 @@ class AppViewModel internal constructor(
                 originalVisibility = storedCaptionVisibility(preferences.getString(ORIGINAL_VISIBILITY, null)),
                 translatedVisibility = storedCaptionVisibility(preferences.getString(TRANSLATED_VISIBILITY, null)),
                 studyPlayMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
+                thirdLineEnabled = preferences.getBoolean(THIRD_LINE_ENABLED_PREFERENCE, false),
                 thirdLanguage = storedThirdLanguage(preferences.getString(THIRD_LANGUAGE_PREFERENCE, null)),
                 fontScale = normalizeFontScale(preferences.getFloat("font_scale", 1f)),
                 portraitPanelOffsetFraction =
@@ -690,11 +691,15 @@ class AppViewModel internal constructor(
         _state.update { it.copy(targetLanguage = normalized, recentTargetLanguages = recent, liveTranslated = null) }
     }
 
-    /** Settings → Languages → Third line; null turns it off. The open video's third lines follow at once. */
-    fun setThirdLanguage(language: String?) {
-        val normalized = language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
-        preferences.edit().putString(THIRD_LANGUAGE_PREFERENCE, normalized.orEmpty()).apply()
-        _state.update { it.copy(thirdLanguage = normalized) }
+    /** Layout & format → Third subtitle line, and its language; the open video's third lines follow at once. */
+    fun setThirdLine(choice: ThirdLineChoice) {
+        val language = choice.language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
+        preferences
+            .edit()
+            .putBoolean(THIRD_LINE_ENABLED_PREFERENCE, choice.enabled)
+            .putString(THIRD_LANGUAGE_PREFERENCE, language.orEmpty())
+            .apply()
+        _state.update { it.copy(thirdLineEnabled = choice.enabled, thirdLanguage = language) }
     }
 
     fun completeOnboarding(
@@ -1153,6 +1158,7 @@ class AppViewModel internal constructor(
                 sourcePreference = "auto",
                 targetLanguage = "vi",
                 recentTargetLanguages = emptyList(),
+                thirdLineEnabled = false,
                 thirdLanguage = null,
                 fontScale = 1f,
                 portraitPanelOffsetFraction = DEFAULT_PORTRAIT_PANEL_OFFSET_FRACTION,

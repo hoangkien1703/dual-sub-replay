@@ -39,8 +39,12 @@ with nothing for Android apps yet. The fork reuses the Codex CLI's login instead
 - Practice → list: **Video: All videos ▾** appears once a word has a title; picking a video
   shows its words, and **Practice due words** practises only those. Search also matches
   titles and notes.
-- Settings → Languages (and the subtitle panel's language popup): **Third line: Off**. Picking
-  a language shows its translation under each subtitle, in the overlay too, in the
+- Settings → Layout & format: **Third subtitle line**, a switch that is off by default (owner
+  request 2026-11-02, after first trying it in the Languages card). Turning it on shows its
+  language button under the switch, and opens the language list when none is picked yet.
+  While it is on, the subtitle panel's language popup also shows a **Third line** row; picking
+  "Off" there turns the switch off. The language is remembered while the line is off.
+  The line shows its translation under each subtitle, in the overlay too, in the
   translation's color and a bit smaller. It follows the translation line's visibility
   (paused only, hidden, Listen first). A language that equals the original or the translation
   shows nothing, and live subtitles (no full transcript) have no third line.
@@ -63,7 +67,8 @@ with nothing for Android apps yet. The fork reuses the Codex CLI's login instead
   first with one batched request for upcoming lines, falling back to ML Kit when it has a
   model; with "On this device only" it uses ML Kit only. Its failures are silent and never
   touch the other two lines.
-- Third line preference: `third_subtitle_language` (blank = off); reset with all settings.
+- Third line preferences: `third_subtitle_line_enabled` (default false) and
+  `third_subtitle_language` (blank = none picked); both reset with all settings.
 
 ## Tests
 

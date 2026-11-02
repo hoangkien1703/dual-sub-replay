@@ -93,7 +93,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Captions load automatically, manual or auto-generated, in any language the video offers.
 - Translations go into any of 101 languages. The 59 that Google ML Kit supports can also translate offline: download their models ahead of time in **Settings → Translation → Languages on this device**. The rest, such as Azerbaijani, Kazakh, Uzbek, Armenian and Burmese, translate online with Google Translate or AI.
 - Short caption fragments are merged into readable sentences, and the current one is highlighted. On eligible auto-generated captions, the spoken word is highlighted too.
-- Want a third language? **Settings → Languages → Third line** adds one more translation under each subtitle (off by default).
+- Want a third language? Turn on **Settings → Layout & format → Third subtitle line** (off by default) to add one more translation under each subtitle.
 
 ### Replay any sentence
 

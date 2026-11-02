@@ -64,7 +64,9 @@
     <string name="settings_model_download_hint">Dil modeli yalnız lazım olanda endirilir.</string>
     <string name="settings_third_line">Üçüncü sətir</string>
     <string name="settings_third_line_off">Söndürülüb</string>
-    <string name="settings_third_line_hint">Hər altyazının altında başqa dildə daha bir tərcümə. Standart olaraq söndürülüb; bir az daha çox internet trafiki işlədir.</string>
+    <string name="settings_third_line_hint">Hər altyazının altında başqa dildə daha bir tərcümə. Bir az daha çox internet trafiki işlədir.</string>
+    <string name="settings_third_line_title">Üçüncü altyazı sətri</string>
+    <string name="settings_third_line_choose">Dil seçin</string>
     <string name="settings_subtitle_languages">Altyazı dilləri</string>
     <string name="settings_dual_subtitle_settings">İkidilli altyazı ayarları</string>
     <string name="settings_done">Hazır</string>

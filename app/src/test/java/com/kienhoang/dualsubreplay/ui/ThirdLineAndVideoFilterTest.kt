@@ -31,16 +31,24 @@ class ThirdLineAndVideoFilterTest {
                 activeVideoId = "video",
                 resolvedSourceLanguage = "de",
                 targetLanguage = "en",
+                thirdLineEnabled = true,
                 thirdLanguage = "fa",
                 thirdLines = ThirdLines("video", "fa", mapOf(4L to "سلام")),
             )
 
         assertEquals("سلام", state.thirdLineFor(row))
+        assertNull(state.copy(thirdLineEnabled = false).thirdLineFor(row))
         assertNull(state.copy(thirdLanguage = null).thirdLineFor(row))
         assertNull(state.copy(thirdLanguage = "ja").thirdLineFor(row))
         assertNull(state.copy(activeVideoId = "other").thirdLineFor(row))
         assertNull(state.copy(liveFallback = true).thirdLineFor(row))
         assertNull(state.thirdLineFor(row.copy(id = 5)))
+    }
+
+    @Test fun thirdLineIsOffByDefaultAndRemembersItsLanguage() {
+        assertEquals(ThirdLineChoice(false, null), DualSubUiState().thirdLine)
+        assertNull(ThirdLineChoice(enabled = false, language = "fa").shownLanguage)
+        assertEquals("fa", ThirdLineChoice(enabled = true, language = "fa").shownLanguage)
     }
 
     private fun saved(

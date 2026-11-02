@@ -22,6 +22,20 @@ import java.io.IOException
 
 internal const val THIRD_LANGUAGE_PREFERENCE = "third_subtitle_language"
 
+/** Settings → Layout & format → Third subtitle line; off by default (owner request 2026-11-02). */
+internal const val THIRD_LINE_ENABLED_PREFERENCE = "third_subtitle_line_enabled"
+
+/** The switch and the language it remembers; the language is kept while the switch is off. */
+data class ThirdLineChoice(
+    val enabled: Boolean = false,
+    val language: String? = null,
+) {
+    /** The language the line shows in, or null while it is off or no language is picked. */
+    val shownLanguage: String? get() = language.takeIf { enabled }
+}
+
+internal val DualSubUiState.thirdLine: ThirdLineChoice get() = ThirdLineChoice(thirdLineEnabled, thirdLanguage)
+
 /** The saved third language, or null (off, the default) when nothing valid is saved. */
 internal fun storedThirdLanguage(raw: String?): String? =
     raw
@@ -50,7 +64,7 @@ internal fun thirdLineLanguage(
 /** Row [segment]'s third line, only for the open video and the language chosen now; null until it arrives. */
 internal fun DualSubUiState.thirdLineFor(segment: SubtitleSegment?): String? {
     if (segment == null || liveFallback) return null
-    val language = thirdLineLanguage(thirdLanguage, resolvedSourceLanguage, targetLanguage) ?: return null
+    val language = thirdLineLanguage(thirdLine.shownLanguage, resolvedSourceLanguage, targetLanguage) ?: return null
     return thirdLines
         .takeIf { it.videoId == activeVideoId && it.language == language }
         ?.lines
@@ -80,7 +94,7 @@ internal class ThirdLineTranslation(
         googleRequests: CoroutineScope,
     ) {
         state
-            .map { thirdLineLanguage(it.thirdLanguage, source, it.targetLanguage) to it.translationEngine }
+            .map { thirdLineLanguage(it.thirdLine.shownLanguage, source, it.targetLanguage) to it.translationEngine }
             .distinctUntilChanged()
             .collectLatest { (third, engine) ->
                 publish(videoId, generation, ThirdLines(videoId, third))
