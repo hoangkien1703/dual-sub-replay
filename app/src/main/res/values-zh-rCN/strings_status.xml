@@ -3,6 +3,7 @@
     <string name="status_waiting_for_captions">正在等待 YouTube 字幕及其语言。请在开启字幕的情况下播放视频。</string>
     <string name="status_translating_live_captions">正在翻译实时字幕…</string>
     <string name="status_live_translation_not_supported">不支持%1$s的实时翻译。</string>
+    <string name="status_translation_needs_online">%1$s 无法在设备上翻译。请在设置中将“字幕翻译方式”改为 Google 或 AI。</string>
     <string name="status_current_captions_only">仅显示当前字幕；无法按段落重播。</string>
     <string name="status_live_translation_unavailable">实时翻译不可用。请检查网络连接以下载语言模型。</string>
     <string name="status_preparing_nearby_translations">正在准备附近的翻译…</string>

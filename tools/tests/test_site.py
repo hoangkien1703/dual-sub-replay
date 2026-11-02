@@ -185,7 +185,7 @@ class SiteTest(unittest.TestCase):
 
     def test_language_list_matches_app(self):
         source = LANGUAGES_SOURCE.read_text(encoding="utf-8")
-        app_languages = re.findall(r'TranslationLanguageOption\("[^"]+", "([^"]+)"\)', source)
+        app_languages = re.findall(r'TranslationLanguageOption\("[^"]+", "([^"]+)"', source)
         page = parse("index.html")
         self.assertEqual(app_languages, page.language_items)
         self.assertIn(f"these {len(app_languages)} languages", (SITE / "index.html").read_text(encoding="utf-8"))

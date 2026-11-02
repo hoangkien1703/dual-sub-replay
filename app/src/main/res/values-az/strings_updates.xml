@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_updates_title">Tətbiq yeniləmələri</string>
+    <string name="settings_section_updates_summary">Avtomatik yenilə</string>
+    <string name="updates_check">Yeniləmələri yoxla</string>
+    <string name="updates_version">Versiya %1$s</string>
+    <string name="updates_available_short">Versiya %1$s mövcuddur</string>
+    <string name="updates_checking">Yeniləmələr yoxlanılır…</string>
+    <string name="updates_up_to_date">Sizdə ən son versiya var (%1$s).</string>
+    <string name="updates_available">Versiya %1$s mövcuddur. Sizdəki: %2$s.</string>
+    <string name="updates_first_time_note">İlk dəfə Android sizdən DualSub Replay-dən tətbiq quraşdırmağa icazə istəyəcək. Saxlanmış sözləriniz və ayarlarınız qalır.</string>
+    <string name="updates_whats_new">Nə yenidir</string>
+    <string name="updates_update">Yenilə</string>
+    <string name="updates_not_now">İndi yox</string>
+    <string name="updates_downloading">Versiya %1$s endirilir…</string>
+    <string name="updates_hide">Gizlət</string>
+    <string name="updates_ready">Versiya %1$s quraşdırmağa hazırdır.</string>
+    <string name="updates_install">Quraşdır</string>
+    <string name="updates_installing">Quraşdırılır… Yenilənərkən tətbiq bağlanır.</string>
+    <string name="updates_try_again">Yenidən cəhd et</string>
+    <string name="updates_open_github">GitHub-ı aç</string>
+    <string name="updates_unsupported">Tətbiqin bu nüsxəsi kompüterdə yığılıb, ona görə özünü yeniləyə bilmir. Ən son versiyanı GitHub-dan əldə edin.</string>
+    <string name="updates_problem_offline">GitHub ilə əlaqə qurulmadı. Bağlantınızı yoxlayın və yenidən cəhd edin.</string>
+    <string name="updates_problem_busy">GitHub hazırda məşğuldur. Bir neçə dəqiqədən sonra yenidən cəhd edin.</string>
+    <string name="updates_problem_github">GitHub gözlənilməz cavab göndərdi. Sonra yenidən cəhd edin.</string>
+    <string name="updates_problem_checksum">Endirilən fayl GitHub-ın yoxlama cəminə uyğun gəlmədi, ona görə silindi.</string>
+    <string name="updates_problem_wrong_app">Endirilən fayl bu tətbiqin daha yeni versiyası deyil, ona görə quraşdırılmadı.</string>
+    <string name="updates_problem_install">Android yeniləməni quraşdıra bilmədi.</string>
+    <string name="updates_problem_cancelled">Yeniləmə ləğv edildi.</string>
+    <string name="updates_auto_title">Avtomatik yenilə</string>
+    <string name="updates_auto_description">Gündə bir dəfə tətbiqi açanda GitHub-da yeni versiyanı yoxlayır, onu Wi-Fi ilə endirir və tətbiqdən çıxanda quraşdırır, video oynayarkən heç vaxt.</string>
+    <string name="updates_auto_unavailable">Tətbiqin bu nüsxəsi özünü yeniləyə bilmir.</string>
+    <string name="updates_reminders_title">Yeni versiyalar barədə xəbər ver</string>
+    <string name="updates_reminders_description">Gündə bir dəfə tətbiqi açanda yeni versiyalar və YouTube ya da Google dəyişiklikləri üçün müvəqqəti düzəlişlər barədə öyrənmək üçün GitHub-dakı kiçik faylı oxuyur. Siz və ya videolarınız barədə heç nə göndərilmir. Söndürüləndə tətbiq GitHub-a yalnız Yeniləmələri yoxla düyməsinə toxunanda müraciət edir.</string>
+    <string name="updates_banner">Versiya %1$s mövcuddur.</string>
+    <string name="updates_skip_version">Bu versiyanı ötür</string>
+    <string name="updates_security_title">Təhlükəsizlik yeniləməsi</string>
+    <string name="updates_security_message">Versiya %1$s sizdəki versiyada (%2$s) olan təhlükəsizlik problemini düzəldir. İndi yeniləyək? Saxlanmış sözləriniz və ayarlarınız qalır.</string>
+    <string name="updates_reminders_off_hint">Bu söndürülü olduqca yeni versiyalar və təhlükəsizlik yeniləmələri barədə xəbər almayacaqsınız.</string>
+    <string name="updates_security_details">Nə düzəldildi</string>
+</resources>

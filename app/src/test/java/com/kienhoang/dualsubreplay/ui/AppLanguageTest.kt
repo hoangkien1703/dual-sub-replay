@@ -21,6 +21,7 @@ class AppLanguageTest {
             "ko" to "values-ko",
             "zh-CN" to "values-zh-rCN",
             "id" to "values-in",
+            "az" to "values-az",
         )
 
     @Test
@@ -30,6 +31,7 @@ class AppLanguageTest {
         assertEquals("vi", appLanguageOptionFor("vi-VN")?.tag)
         assertEquals("id", appLanguageOptionFor("in")?.tag)
         assertEquals("id", appLanguageOptionFor("id-ID")?.tag)
+        assertEquals("az", appLanguageOptionFor("az-Latn-AZ")?.tag)
         assertEquals("pt-BR", appLanguageOptionFor("pt-PT")?.tag)
         assertEquals("zh-CN", appLanguageOptionFor("zh-Hans-CN")?.tag)
         assertEquals("zh-CN", appLanguageOptionFor("zh-SG")?.tag)

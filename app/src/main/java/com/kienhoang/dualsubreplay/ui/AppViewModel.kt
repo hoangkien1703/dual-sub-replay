@@ -955,7 +955,13 @@ class AppViewModel internal constructor(
         target: String,
         text: String,
     ): String {
-        if (!_state.value.translatesWithGoogle()) return translator.translateSingle(source, target, text)
+        val onDevice = translator.supports(source, target)
+        // A language without an on-device model stays with Google, even after Google failed once.
+        val online = _state.value.translatesWithGoogle() || (!onDevice && _state.value.translationEngine == TranslationEngine.GOOGLE_WEB)
+        if (!online) {
+            requireOnDeviceModel(source, target)
+            return translator.translateSingle(source, target, text)
+        }
         val translated =
             try {
                 googleTranslator.translate(source, target, text)
@@ -963,10 +969,27 @@ class AppViewModel internal constructor(
                 throw error
             } catch (error: Exception) {
                 fallBackToOnDevice(error)
+                if (!onDevice) throw error
                 null
             }
         // A text Google leaves blank is translated on the device; only a failure moves the video off Google.
-        return translated ?: translator.translateSingle(source, target, text)
+        return translated ?: if (onDevice) translator.translateSingle(source, target, text) else ""
+    }
+
+    /** "On this device only" with a language ML Kit has no model for: say which translator can do it. */
+    private fun requireOnDeviceModel(
+        source: String,
+        target: String,
+    ) {
+        if (!translator.supports(source, target)) throw onlineOnlyError(source, target)
+    }
+
+    private fun onlineOnlyError(
+        source: String,
+        target: String,
+    ): IllegalArgumentException {
+        val missing = if (translator.supports(source, source)) target else source
+        return IllegalArgumentException(text(R.string.status_translation_needs_online, languageName(missing)))
     }
 
     /** Settings → Translation → Google Translate (online). Reloads the current video's translations. */
@@ -1679,6 +1702,17 @@ class AppViewModel internal constructor(
         if (fallback) launch { recheckGoogle(sourceLanguage, targetLanguage, soon) }
         val fromYouTube = if (fallback) async { youTubeTranslations(store, videoId, generation, source, targetLanguage) } else null
         val youTubeInTime = fromYouTube?.let { answer -> async { withTimeoutOrNull(YOUTUBE_TRANSLATION_WAIT_MS) { answer.await() } } }
+        if (!translator.supports(sourceLanguage, targetLanguage)) {
+            // No on-device model (Azerbaijani, Kazakh...): after a Google failure rows take YouTube's own
+            // translation, else ask Google again; "On this device only" cannot translate them at all.
+            if (fromYouTube == null || youTubeInTime == null) throw onlineOnlyError(sourceLanguage, targetLanguage)
+            follow { text ->
+                googleTranslator.cachedTranslation(sourceLanguage, targetLanguage, text)
+                    ?: (if (fromYouTube.isCompleted) fromYouTube.await() else youTubeInTime.await())?.get(text)
+                    ?: googleTranslator.translate(sourceLanguage, targetLanguage, text).orEmpty()
+            }
+            return@coroutineScope
+        }
         translator.withSession(sourceLanguage, targetLanguage, onDownloadingChange = { downloading ->
             showTranslationModelDownload(videoId, generation, downloading)
         }) { translate ->
@@ -1712,6 +1746,8 @@ class AppViewModel internal constructor(
         target: String,
         text: String,
     ): String {
+        // Without an on-device model the line Google left blank stays blank.
+        if (!translator.supports(source, target)) return ""
         val onDownloadingChange = { downloading: Boolean -> showTranslationModelDownload(videoId, generation, downloading) }
         return translator.withSession(source, target, onDownloadingChange) { translate -> translate(text) }
     }

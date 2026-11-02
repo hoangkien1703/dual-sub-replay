@@ -3,6 +3,7 @@
     <string name="status_waiting_for_captions">Esperando los subtítulos de YouTube y su idioma. Reproduce el video con los subtítulos activados.</string>
     <string name="status_translating_live_captions">Traduciendo subtítulos en directo…</string>
     <string name="status_live_translation_not_supported">La traducción en directo no es compatible con %1$s.</string>
+    <string name="status_translation_needs_online">%1$s no se puede traducir en el dispositivo. En Ajustes, pon “Traducir subtítulos con” en Google o IA.</string>
     <string name="status_current_captions_only">Solo subtítulos actuales; no se puede repetir por párrafos.</string>
     <string name="status_live_translation_unavailable">Traducción en directo no disponible. Revisa la conexión para descargar el modelo de idioma.</string>
     <string name="status_preparing_nearby_translations">Preparando traducciones cercanas…</string>

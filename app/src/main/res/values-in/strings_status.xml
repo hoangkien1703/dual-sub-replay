@@ -3,6 +3,7 @@
     <string name="status_waiting_for_captions">Menunggu subtitel YouTube dan bahasanya. Putar video dengan subtitel diaktifkan.</string>
     <string name="status_translating_live_captions">Menerjemahkan subtitel langsung…</string>
     <string name="status_live_translation_not_supported">Terjemahan langsung tidak didukung untuk %1$s.</string>
+    <string name="status_translation_needs_online">%1$s tidak bisa diterjemahkan di perangkat. Di Setelan, ubah “Terjemahkan subtitle dengan” ke Google atau AI.</string>
     <string name="status_current_captions_only">Hanya subtitel saat ini; putar ulang per paragraf tidak tersedia.</string>
     <string name="status_live_translation_unavailable">Terjemahan langsung tidak tersedia. Periksa koneksi untuk mengunduh model bahasa.</string>
     <string name="status_preparing_nearby_translations">Menyiapkan terjemahan di sekitar posisi putar…</string>

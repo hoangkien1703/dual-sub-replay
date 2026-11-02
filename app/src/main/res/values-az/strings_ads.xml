@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_ads_title">Reklamlar və sponsorlar</string>
+    <string name="settings_section_ads_summary">Video reklamlarını və sponsor hissələrini ötür</string>
+    <string name="ads_skip_ads_title">Reklamları ötür</string>
+    <string name="ads_skip_ads_description">YouTube video reklamlarının səsini söndürür, onları sürətlə oynadır və Ötür düyməsi görünən kimi ona basır. Videonun üzərindəki banner reklamlar bağlanır.</string>
+    <string name="ads_skip_sponsors_title">Sponsorları ötür</string>
+    <string name="ads_skip_sponsors_description">Video sponsor hissəsinə çatanda, SponsorBlock icmasının siyahısına əsasən həmin hissəni ötürür. Özünüzün keçdiyiniz hissə yenə oynayır. sponsor.ajay.app ünvanına yalnız video ID-sindən yaradılan qısa kod göndərilir.</string>
+    <string name="ads_always_skip_sponsors_title">Sponsorları həmişə ötür</string>
+    <string name="ads_always_skip_sponsors_description">Sponsor hissəsinə özünüz keçəndə, onun sətirlərindən birinə toxunanda və ya orada sözü təkrar oynadanda da həmin hissəni ötürür, beləliklə sponsor hissələri heç vaxt oynamır.</string>
+    <string name="ads_note">Reklamlar yenə başlayır, çünki onların nə vaxt oynayacağına YouTube qərar verir. YouTube reklam bloklayıcıları barədə xəbərdarlıq etsə, Reklamları ötür seçimini söndürün.</string>
+    <string name="ads_skipped_sponsor_note">Sponsor hissəsi ötürüldü</string>
+    <string name="ads_last_ad_check">Son reklam: %1$s</string>
+    <string name="ads_sponsor_parts_check">Son videodakı sponsor hissələri: %1$d</string>
+</resources>

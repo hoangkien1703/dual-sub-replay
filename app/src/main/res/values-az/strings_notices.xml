@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_youtube_changed">YouTube nəyisə dəyişdi, buna görə altyazılar yüklənməyə bilər. Düzəliş hazırlanır.</string>
+    <string name="notice_google_translate_limited">Google Tərcümə hazırda sorğuları məhdudlaşdırır, buna görə bəzi sətirlər cihazda tərcümə oluna bilər.</string>
+    <string name="notice_update_recommended">Yeni versiya bu versiyadakı problemləri düzəldir. Menyunu açıb Yeniləmələri yoxla düyməsinə toxunun.</string>
+    <string name="notice_close">Bağla</string>
+    <string name="report_problem_title">Problem bildir</string>
+    <string name="report_problem_intro">Siz seçməsəniz, heç nə göndərilmir. E-poçtla göndər və ya GitHub-ı aç aşağıdakı məlumatlarla hesabat başladır, göndərməzdən əvvəl onları dəyişə bilərsiniz. Hesabatda yalnız son vaxtlar hansı addımların uğursuz olduğu göstərilir, videolarınız, altyazılarınız və ya hesabınız yox.</string>
+    <string name="report_problem_open">GitHub-ı aç</string>
+    <string name="report_problem_copy">Kopyala</string>
+    <string name="report_problem_copied">Kopyalandı</string>
+    <string name="report_problem_also_copied">Həmçinin kopyalandı. GitHub boş forma göstərsə, Bug report seçin və mətni Screenshots or logs bölməsinə yapışdırın.</string>
+    <string name="report_problem_email">E-poçtla göndər</string>
+    <string name="report_problem_no_email">Bu telefonda e-poçt tətbiqi qurulmayıb. Kopyala düyməsinə toxunun və hesabatı başqa yolla göndərin.</string>
+</resources>
