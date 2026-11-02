@@ -223,12 +223,26 @@ private fun SelectedWordDialog(
         androidx.compose.runtime.DisposableEffect(selection) {
             onDispose { pronouncer.stop() }
         }
+        val context = LocalContext.current
+        val existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false).id }
+        val namedDecks = remember(savedWords) { com.kienhoang.dualsubreplay.data.namedDecks(savedWords) }
+        var deck by remember(selection) {
+            mutableStateOf(
+                if (existingWord != null) existingWord.deck else rememberedDeck(context, selection.wordLanguage)?.takeIf { it in namedDecks },
+            )
+        }
         WordLearningDialog(
             selection = selection,
-            existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false).id },
+            existingWord = existingWord,
+            deck = deck,
+            namedDecks = namedDecks,
+            onDeckChange = { deck = it },
             autoPronounce = state.autoPronounce,
             onTranslateWord = { viewModel.translateSelection(selection) },
-            onSave = { meaning, online -> viewModel.saveWord(selection, meaning, online); Unit },
+            onSave = { meaning, online ->
+                viewModel.saveWord(selection, meaning, online, deck)
+                rememberDeck(context, selection.wordLanguage, deck)
+            },
             onSpeak = {
                 webController.pause()
                 pronouncer.speak(spokenText(selection.token.text, selection.token.startIndex, selection.parts), selection.wordLanguage)

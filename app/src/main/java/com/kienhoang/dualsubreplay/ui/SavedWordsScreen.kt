@@ -74,7 +74,16 @@ internal fun SavedWordsScreen(
     val selected = words.firstOrNull { it.id == if (practice) queue.firstOrNull() else selectedId }
     var revealed by remember(selected?.id, practice) { mutableStateOf(false) }
     var editedMeaning by remember(selected?.id, selected?.meaning) { mutableStateOf(selected?.meaning.orEmpty()) }
-    val due = words.filter { it.dueAt <= now }.sortedBy { it.dueAt }
+    val context = LocalContext.current
+    var openDeck by remember { mutableStateOf<PracticeDeck?>(null) }
+    var renamingDeck by remember { mutableStateOf<String?>(null) }
+    var deletingDeck by remember { mutableStateOf<String?>(null) }
+    val decks = deckSummaries(words, now)
+    val named = namedDecks(words)
+    val currentDeck = openDeck?.takeIf { deck -> decks.any { it.deck == deck } }
+    val showDeckList = currentDeck == null && decks.size > 1
+    val shown = currentDeck?.let { deck -> words.filter { deckOf(it) == deck } } ?: words
+    val due = shown.filter { it.dueAt <= now }.sortedBy { it.dueAt }
     val locale = currentInterfaceLocale()
     val searchLabel = stringResource(R.string.practice_search_label)
     val pronounceLabel = stringResource(R.string.practice_pronounce)
@@ -123,6 +132,7 @@ internal fun SavedWordsScreen(
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.9f), shape = MaterialTheme.shapes.large) {
+            BackHandler(enabled = currentDeck != null && selected == null && !practice) { openDeck = null }
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.practice_title), style = MaterialTheme.typography.titleLarge)
@@ -142,11 +152,20 @@ internal fun SavedWordsScreen(
                         Text(stringResource(R.string.practice_session_complete_body))
                         TextButton(onClick = { practice = false }) { Text(backLabel) }
                     } else {
-                        PracticeTransferControls(repository, words)
+                        if (currentDeck == null) {
+                            PracticeTransferControls(repository, words)
+                        } else {
+                            DeckHeader(
+                                currentDeck,
+                                onBack = { openDeck = null },
+                                onRename = { renamingDeck = currentDeck.name },
+                                onDelete = { deletingDeck = currentDeck.name },
+                            )
+                        }
                         Text(
                             stringResource(
                                 R.string.practice_word_summary,
-                                pluralStringResource(R.plurals.practice_word_count, words.size, words.size),
+                                pluralStringResource(R.plurals.practice_word_count, shown.size, shown.size),
                                 pluralStringResource(R.plurals.practice_due_count, due.size, due.size),
                             ),
                         )
@@ -155,15 +174,19 @@ internal fun SavedWordsScreen(
                         }) { Text(stringResource(R.string.practice_due_words_button)) }
                         OutlinedTextField(search, { search = it }, label = { Text(searchLabel) }, modifier = Modifier.fillMaxWidth())
                         if (words.isEmpty()) Text(stringResource(R.string.practice_empty_hint))
-                        else if (due.isEmpty()) words.minOfOrNull { it.dueAt }?.let {
+                        else if (due.isEmpty()) shown.minOfOrNull { it.dueAt }?.let {
                             val next = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale).format(Date(it))
                             Text(stringResource(R.string.practice_next_review, next), style = MaterialTheme.typography.bodySmall)
                         }
-                        LazyColumn(Modifier.weight(1f)) {
-                            items(words.filter { it.word.contains(search, true) || it.meaning.contains(search, true) }, key = { it.id }) { word ->
-                                ListItem(headlineContent = { Text(word.word) }, supportingContent = { Text(word.meaning) },
-                                    modifier = Modifier.clickable { selectedId = word.id }.testTag("saved_word_${word.id}"))
-                                HorizontalDivider()
+                        if (showDeckList && search.isBlank()) {
+                            DeckList(decks, { openDeck = it }, Modifier.weight(1f))
+                        } else {
+                            LazyColumn(Modifier.weight(1f)) {
+                                items(shown.filter { it.word.contains(search, true) || it.meaning.contains(search, true) }, key = { it.id }) { word ->
+                                    ListItem(headlineContent = { Text(word.word) }, supportingContent = { Text(word.meaning) },
+                                        modifier = Modifier.clickable { selectedId = word.id }.testTag("saved_word_${word.id}"))
+                                    HorizontalDivider()
+                                }
                             }
                         }
                     }
@@ -195,6 +218,11 @@ internal fun SavedWordsScreen(
                                     repository.update(selected.id) { it.copy(meaning = editedMeaning.trim()) }
                                 } }) { Text(stringResource(R.string.practice_save_meaning)) }
                             }
+                            if (!practice) {
+                                DeckChip(selected.deck, selected.wordLanguage, named, { deck ->
+                                    action { repository.update(selected.id) { it.copy(deck = deck) } }
+                                }, enabled = !busy, tag = "word_deck")
+                            }
                             Text(selected.sentence)
                             selected.translatedSentence?.let { Text(it) }
                             if (selected.translated) Text(originalSentenceNote, style = MaterialTheme.typography.bodySmall)
@@ -222,6 +250,34 @@ internal fun SavedWordsScreen(
                 }
             }
         }
+    }
+    renamingDeck?.let { old ->
+        DeckNameDialog(
+            title = stringResource(R.string.practice_deck_rename),
+            initial = old,
+            confirmLabel = stringResource(R.string.practice_deck_rename_confirm),
+            onConfirm = { typed ->
+                renamingDeck = null
+                resolveDeckName(typed, named - old)?.let { new ->
+                    action {
+                        repository.updateWhere({ it.deck == old }) { it.copy(deck = new) }
+                        replaceRememberedDeck(context, old, new)
+                        openDeck = PracticeDeck(name = new)
+                    }
+                }
+            },
+            onDismiss = { renamingDeck = null },
+        )
+    }
+    deletingDeck?.let { name ->
+        DeleteDeckDialog(name, onDelete = {
+            deletingDeck = null
+            action {
+                repository.updateWhere({ it.deck == name }) { it.copy(deck = null) }
+                replaceRememberedDeck(context, name, null)
+                openDeck = null
+            }
+        }, onKeep = { deletingDeck = null })
     }
     confirmDelete?.let { word ->
         val deleteTitle = stringResource(R.string.practice_delete_word_title, word.word)

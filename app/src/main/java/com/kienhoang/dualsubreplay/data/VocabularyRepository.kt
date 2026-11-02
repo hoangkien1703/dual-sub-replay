@@ -156,6 +156,31 @@ internal class VocabularyRepository internal constructor(
             }
         }
 
+    /** Changes every word [matches] picks in one transaction (moving words between decks), publishing once. */
+    suspend fun updateWhere(
+        matches: (SavedWord) -> Boolean,
+        change: (SavedWord) -> SavedWord,
+    ): Int =
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                val db = database.writableDatabase
+                var changed = 0
+                db.beginTransaction()
+                try {
+                    readAll().filter(matches).forEach { old ->
+                        val values = ContentValues().apply { put("payload", encodeWord(change(old)).toString()) }
+                        check(db.update("words", values, "id = ?", arrayOf(old.id)) == 1) { "Could not update word" }
+                        changed++
+                    }
+                    db.setTransactionSuccessful()
+                } finally {
+                    db.endTransaction()
+                }
+                publish()
+                changed
+            }
+        }
+
     suspend fun remove(id: String) =
         withContext(Dispatchers.IO) {
             mutex.withLock {
@@ -261,6 +286,7 @@ internal fun encodeWord(w: SavedWord): JSONObject =
         put("online", w.online)
         put("dueAt", w.dueAt)
         put("intervalMs", w.intervalMs)
+        put("deck", w.deck)
     }
 
 internal fun decodeWord(j: JSONObject): SavedWord =
@@ -280,4 +306,5 @@ internal fun decodeWord(j: JSONObject): SavedWord =
         online = j.optBoolean("online", false),
         dueAt = j.optLong("dueAt"),
         intervalMs = j.optLong("intervalMs"),
+        deck = if (j.isNull("deck")) null else cleanDeckName(j.getString("deck")),
     )

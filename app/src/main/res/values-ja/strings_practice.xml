@@ -103,6 +103,20 @@
     <string name="practice_speech_playback_failed">発音を再生できませんでした。メディアの音量と接続を確認するか、音声設定で音声を選んでください。</string>
     <string name="practice_speech_invalid_language">この単語を発音する前に、字幕の言語を選んでください。</string>
     <string name="practice_speech_settings_manual">Android の設定を開いて「テキスト読み上げ」を検索し、音声をインストールまたは選択してください。</string>
+    <string name="practice_deck_label">デッキ: %1$s</string>
+    <string name="practice_deck_choose">デッキを選択</string>
+    <string name="practice_deck_new">新しいデッキ…</string>
+    <string name="practice_deck_new_title">新しいデッキ</string>
+    <string name="practice_deck_name_label">デッキ名</string>
+    <string name="practice_deck_create">作成</string>
+    <string name="practice_deck_all">すべてのデッキ</string>
+    <string name="practice_deck_menu">デッキのオプション</string>
+    <string name="practice_deck_rename">デッキ名を変更</string>
+    <string name="practice_deck_rename_confirm">名前を変更</string>
+    <string name="practice_deck_delete">デッキを削除</string>
+    <string name="practice_deck_delete_title">デッキ「%1$s」を削除しますか？</string>
+    <string name="practice_deck_delete_body">このデッキの単語は各言語のデッキに戻ります。単語や復習履歴は削除されません。</string>
+    <string name="practice_deck_hint">単語は言語ごとにまとめられます。単語の「デッキ」から自分のデッキを作成できます。</string>
     <plurals name="practice_word_count">
         <item quantity="other">%1$d 語</item>
     </plurals>

@@ -103,6 +103,20 @@
     <string name="practice_speech_playback_failed">无法播放发音。请检查媒体音量和网络连接,或在语音设置中选择一种语音。</string>
     <string name="practice_speech_invalid_language">请先选择字幕语言,再朗读此单词。</string>
     <string name="practice_speech_settings_manual">请打开 Android 设置并搜索“文字转语音”,以安装或选择语音。</string>
+    <string name="practice_deck_label">卡组：%1$s</string>
+    <string name="practice_deck_choose">选择卡组</string>
+    <string name="practice_deck_new">新建卡组…</string>
+    <string name="practice_deck_new_title">新建卡组</string>
+    <string name="practice_deck_name_label">卡组名称</string>
+    <string name="practice_deck_create">创建</string>
+    <string name="practice_deck_all">所有卡组</string>
+    <string name="practice_deck_menu">卡组选项</string>
+    <string name="practice_deck_rename">重命名卡组</string>
+    <string name="practice_deck_rename_confirm">重命名</string>
+    <string name="practice_deck_delete">删除卡组</string>
+    <string name="practice_deck_delete_title">删除卡组“%1$s”？</string>
+    <string name="practice_deck_delete_body">其中的单词会回到各自语言的卡组。不会删除任何单词或复习记录。</string>
+    <string name="practice_deck_hint">单词按语言分组。在单词上使用“卡组”即可创建自己的卡组。</string>
     <plurals name="practice_word_count">
         <item quantity="other">%1$d 个单词</item>
     </plurals>

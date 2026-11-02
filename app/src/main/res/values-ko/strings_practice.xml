@@ -103,6 +103,20 @@
     <string name="practice_speech_playback_failed">발음을 재생하지 못했어요. 미디어 볼륨과 연결 상태를 확인하거나 음성 설정에서 음성을 선택하세요.</string>
     <string name="practice_speech_invalid_language">이 단어를 발음하기 전에 자막 언어를 선택하세요.</string>
     <string name="practice_speech_settings_manual">Android 설정을 열고 텍스트 음성 변환을 검색해 음성을 설치하거나 선택하세요.</string>
+    <string name="practice_deck_label">덱: %1$s</string>
+    <string name="practice_deck_choose">덱 선택</string>
+    <string name="practice_deck_new">새 덱…</string>
+    <string name="practice_deck_new_title">새 덱</string>
+    <string name="practice_deck_name_label">덱 이름</string>
+    <string name="practice_deck_create">만들기</string>
+    <string name="practice_deck_all">모든 덱</string>
+    <string name="practice_deck_menu">덱 옵션</string>
+    <string name="practice_deck_rename">덱 이름 바꾸기</string>
+    <string name="practice_deck_rename_confirm">이름 바꾸기</string>
+    <string name="practice_deck_delete">덱 삭제</string>
+    <string name="practice_deck_delete_title">%1$s 덱을 삭제할까요?</string>
+    <string name="practice_deck_delete_body">이 덱의 단어는 각 언어 덱으로 돌아갑니다. 단어와 복습 기록은 삭제되지 않습니다.</string>
+    <string name="practice_deck_hint">단어는 언어별로 묶입니다. 단어의 덱 버튼으로 나만의 덱을 만들 수 있습니다.</string>
     <plurals name="practice_word_count">
         <item quantity="other">단어 %1$d개</item>
     </plurals>
