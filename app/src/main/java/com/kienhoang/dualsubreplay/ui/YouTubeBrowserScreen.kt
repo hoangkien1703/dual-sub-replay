@@ -17,6 +17,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -842,9 +843,17 @@ internal fun SingleYouTubePage(
             RemeasureFullscreenInsets(fullscreenView = session.view, webView = webView)
             Box(Modifier.fillMaxSize().background(Color.Black)) {
                 AndroidView(
-                    factory = {
+                    factory = { frameContext ->
                         (session.view.parent as? ViewGroup)?.removeView(session.view)
-                        session.view
+                        OffScreenPlaybackFrame(frameContext) { WebVideoBridge.playback.value.isPlaying() }.apply {
+                            addView(
+                                session.view,
+                                FrameLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                ),
+                            )
+                        }
                     },
                     modifier = Modifier.fillMaxSize(),
                 )
