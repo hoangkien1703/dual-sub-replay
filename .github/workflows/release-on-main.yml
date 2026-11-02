@@ -74,6 +74,10 @@ jobs:
     if: needs.prepare.outputs.eligible == 'true' && needs.prepare.outputs.release_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # The ANDROID_RELEASE_* signing secrets live only in the `release` environment, which
+    # accepts jobs from `main` alone (owner decision 2026-11-02). A workflow pushed on any other
+    # branch therefore can never read the production signing key.
+    environment: release
     permissions:
       contents: write
     steps:

@@ -43,7 +43,7 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - Draft release metadata reserves version/name/code/source before building. Retry failed runs (or dispatch with a merged PR number) to resume that reservation. Never delete reservations or edit their hidden marker to retry. Published merges are a no-op.
 - Production signature, package, and version are verified before upload; the draft is published only with both APK and checksum present. Release notes are generated automatically. Queued runs cannot allocate the same version, and older retries cannot replace a newer Latest release.
 - Merges into `main` publish no preview APK (owner decision 2026-10-18); the `preview` release holds only open PRs' `DualSub-Replay-PR<N>-build<run>-preview.apk` builds. The PR CI artifact stays `DualSub-Replay-preview`, the name `pr-preview-auto.yml` downloads.
-- Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true`. Never commit signing material (`*.jks`/`*.keystore` are gitignored).
+- Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true`. Never commit signing material (`*.jks`/`*.keystore` are gitignored). The signing secrets are `release` environment secrets, not repository secrets: that environment only runs jobs from `main` (owner decision 2026-11-02), and only `publish-main` may name it. Never add `environment: release` to another job, and never widen the environment's branch rule.
 - Test workflow changes with `python3 -m unittest discover -s tools/tests -p 'test_*.py' -v` and validate workflow YAML/shell. These tests also run in Android PR CI.
 
 ## Architecture invariants (enforced by tests)
