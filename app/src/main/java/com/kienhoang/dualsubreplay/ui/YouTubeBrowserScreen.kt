@@ -388,9 +388,6 @@ internal fun SingleYouTubePage(
             settings.useWideViewPort = false
             settings.loadWithOverviewMode = false
             settings.textZoom = 100
-            // The page process decodes the sound; keep it important while the screen is off too,
-            // so Android does not slow it down at the moment the app leaves the screen.
-            setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
             webChromeClient = object : WebChromeClient() {
                 override fun onShowCustomView(
                     view: View,
