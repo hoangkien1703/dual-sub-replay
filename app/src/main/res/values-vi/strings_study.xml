@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">Nghe trước</string>
     <string name="study_play_mode_listen_first_description">Ẩn phụ đề khi video đang phát, rồi dừng sau mỗi dòng và hiện phụ đề.</string>
     <string name="study_play_mode_repeat">Lặp lại mỗi dòng</string>
-    <string name="study_play_mode_repeat_description">Phát mỗi dòng vài lần rồi mới sang dòng tiếp theo.</string>
+    <string name="study_play_mode_repeat_description">Phát mỗi dòng vài lần rồi mới sang dòng tiếp theo. Mãi mãi lặp lại dòng đó cho đến khi bạn chạm vào dòng khác hoặc tua.</string>
+    <string name="study_repeat_forever">Mãi mãi</string>
     <string name="study_play_mode_new_word">Dừng ở dòng có một từ mới</string>
     <string name="study_play_mode_new_word_description">Chỉ dừng sau những dòng có đúng một từ bạn chưa biết. Cần bật Từ đã biết.</string>
     <string name="study_play_mode_needs_known_words">Bật Từ đã biết bên dưới để dùng chế độ này.</string>

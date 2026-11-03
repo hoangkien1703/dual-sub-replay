@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Posisi terjemahan</string>
     <string name="settings_translation_position_below">Di bawah teks asli</string>
     <string name="settings_translation_position_above">Di atas teks asli</string>
+    <string name="settings_transcript_follow_title">Baris yang diputar di transkrip</string>
+    <string name="settings_transcript_follow_description">Di tengah menjaga baris yang sedang diucapkan tetap di tengah dan menggulir transkrip ke atas setiap kali baris selesai, seperti lirik lagu.</string>
+    <string name="settings_transcript_follow_page">Bergerak ke bawah</string>
+    <string name="settings_transcript_follow_center">Di tengah</string>
     <string name="settings_portrait_panel_position">Posisi panel potret</string>
     <string name="settings_portrait_panel_position_hint">Panel transkrip potret dimulai tepat di bawah video. Lebih tinggi membuatnya lebih panjang dan menutupi bagian bawah video; lebih rendah membuatnya lebih pendek.</string>
     <string name="settings_portrait_panel_higher">Lebih tinggi</string>

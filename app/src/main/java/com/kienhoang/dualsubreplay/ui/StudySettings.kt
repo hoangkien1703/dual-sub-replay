@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 
@@ -124,8 +125,11 @@ internal fun storedKnownWordsMode(value: String?): KnownWordsMode =
 
 internal fun storedKnownWordsAfter(value: Int): Int = value.takeIf { it in KNOWN_WORDS_AFTER_CHOICES } ?: DEFAULT_KNOWN_WORDS_AFTER
 
-/** How many times Repeat each line plays a line. */
-internal val STUDY_REPEAT_COUNTS = listOf(2, 3, 5)
+/** Repeat each line's count that plays a line until the learner taps another line or seeks (2026-11-03). */
+internal const val STUDY_REPEAT_FOREVER = 0
+
+/** How many times Repeat each line plays a line; [STUDY_REPEAT_FOREVER] has no limit. */
+internal val STUDY_REPEAT_COUNTS = listOf(2, 3, 5, STUDY_REPEAT_FOREVER)
 
 internal const val DEFAULT_STUDY_REPEAT_COUNT = 2
 
@@ -158,6 +162,14 @@ internal fun storedSkipSilence(value: String?): SkipSilence =
     SkipSilence.entries.firstOrNull { it.storageValue == value } ?: SkipSilence.OFF
 
 internal fun storedStudyRepeatCount(value: Int): Int = value.takeIf { it in STUDY_REPEAT_COUNTS } ?: DEFAULT_STUDY_REPEAT_COUNT
+
+/** The AI assistant's study_repeat_count ("2", "3", "5" or "forever") as a stored count. */
+internal fun aiStudyRepeatCount(value: String): Int =
+    if (value == AI_REPEAT_FOREVER) {
+        STUDY_REPEAT_FOREVER
+    } else {
+        storedStudyRepeatCount(value.toIntOrNull() ?: DEFAULT_STUDY_REPEAT_COUNT)
+    }
 
 internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
     StudySettings(

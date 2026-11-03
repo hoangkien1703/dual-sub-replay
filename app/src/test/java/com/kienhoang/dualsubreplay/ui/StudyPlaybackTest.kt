@@ -88,6 +88,120 @@ class StudyPlaybackTest {
     }
 
     @Test
+    fun foreverLoopsALineUntilTheLearnerMovesOn() {
+        val driver = StudyPlaybackDriver()
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = STUDY_REPEAT_FOREVER)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), play(driver, settings, 900, 3_000).map { it.second })
+        // Far past any count: each of the driver's own seeks plays the line once more.
+        repeat(8) { round ->
+            val session = "loop$round"
+            assertEquals(listOf(StudyAction.PlayFrom(1_000)), play(driver, settings, 1_000, 3_000, session = session).map { it.second })
+        }
+        // A tap on another line (a seek the driver did not ask for) loops that line instead.
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), play(driver, settings, 3_500, 5_000, session = "tap").map { it.second })
+    }
+
+    @Test
+    fun tappingTheNextLineNeverTakesTheVideoBackToTheOldOne() {
+        // Back-to-back lines, as YouTube's auto captions often are.
+        val joined = listOf(SubtitleSegment(1, 1_000, 3_000, "first"), SubtitleSegment(2, 3_000, 5_000, "second"))
+        for (count in listOf(2, STUDY_REPEAT_FOREVER)) {
+            val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = count)
+            val driver = StudyPlaybackDriver()
+
+            fun at(
+                timeMs: Long,
+                session: String,
+            ) = driver.tick(StudyTick("abcdefghijk", timeMs, session, false, joined, settings))
+            var time = 900L
+            while (time <= 2_500) {
+                assertNull(at(time, "s1"))
+                time += 33
+            }
+            driver.learnerSeek(3_000)
+            // A tick from before the seek, then the page reporting the new time before its seek event.
+            assertNull(at(2_533, "s1"))
+            assertNull("count $count", at(3_000, "s1"))
+            assertNull(at(3_033, "s2"))
+            // The tapped line is the one that repeats.
+            val asked = mutableListOf<StudyAction>()
+            time = 3_066
+            while (time <= 5_000) {
+                at(time, "s2")?.let { asked += it }
+                time += 33
+            }
+            assertEquals("count $count", listOf(StudyAction.PlayFrom(3_000)), asked)
+        }
+    }
+
+    @Test
+    fun aCountedRepeatMovesOnWhenTheSeekLandsTwiceOrEarly() {
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 2)
+        val driver = StudyPlaybackDriver()
+        // Line two ends: it plays once more.
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), play(driver, settings, 3_400, 5_000).map { it.second })
+        // The seek lands 200 ms early, in the gap after line one, and the page reports it as two sessions.
+        assertNull(tick(driver, settings, 3_300, session = "s2"))
+        assertNull(tick(driver, settings, 3_333, session = "s3"))
+        // Line two plays its second time, then the video goes on to line three: no third play.
+        assertEquals(emptyList<StudyAction>(), play(driver, settings, 3_366, 9_500, session = "s3").map { it.second })
+    }
+
+    @Test
+    fun aSeekLandingEarlyInTheLineBeforeDoesNotRepeatThatLine() {
+        val joined = listOf(SubtitleSegment(1, 1_000, 3_000, "first"), SubtitleSegment(2, 3_000, 5_000, "second"))
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 3)
+        val driver = StudyPlaybackDriver()
+        // Line one plays; the learner taps line two.
+        assertNull(driver.tick(StudyTick("abcdefghijk", 1_500, "s1", false, joined, settings)))
+        driver.learnerSeek(3_000)
+        val asked = mutableListOf<StudyAction>()
+        // The tapped line's seek lands 250 ms early, inside line one.
+        var time = 2_750L
+        while (time <= 5_000) {
+            driver.tick(StudyTick("abcdefghijk", time, "s2", false, joined, settings))?.let { asked += it }
+            time += 33
+        }
+        assertEquals(listOf(StudyAction.PlayFrom(3_000)), asked)
+    }
+
+    @Test
+    fun aSlidingTranscriptWindowNeitherLoopsACountNorGoesBackALine() {
+        // The segments are a window that slides with playback, also back after a repeat: the same
+        // line has another index from one tick to the next (seen on a real video, 2026-11-04).
+        val joined =
+            listOf(
+                SubtitleSegment(1, 1_000, 3_000, "first"),
+                SubtitleSegment(2, 3_000, 5_000, "second"),
+                SubtitleSegment(3, 5_000, 7_000, "third"),
+            )
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 2)
+        val driver = StudyPlaybackDriver()
+        var slid = false
+
+        fun from(
+            fromMs: Long,
+            toMs: Long,
+            session: String,
+        ): List<StudyAction> {
+            val asked = mutableListOf<StudyAction>()
+            var time = fromMs
+            while (time <= toMs) {
+                slid = !slid
+                val window = if (slid) joined.drop(1) else joined
+                driver.tick(StudyTick("abcdefghijk", time, session, false, window, settings))?.let { asked += it }
+                time += 33
+            }
+            return asked
+        }
+        driver.learnerSeek(3_000)
+        assertEquals(listOf(StudyAction.PlayFrom(3_000)), from(3_000, 5_000, "s2"))
+        // The second play goes on to the next line, which gets its own two plays.
+        assertEquals(listOf(StudyAction.PlayFrom(5_000)), from(3_000, 7_000, "s3"))
+        assertEquals(emptyList<StudyAction>(), from(5_000, 7_500, "s4"))
+    }
+
+    @Test
     fun readFirstStopsAtTheStartOfEachLine() {
         val driver = StudyPlaybackDriver()
         val settings = StudySettings(playMode = StudyPlayMode.READ_FIRST)
@@ -181,6 +295,10 @@ class StudyPlaybackTest {
         assertEquals(SkipSilence.OFF, storedSkipSilence("8x"))
         assertEquals(5, storedStudyRepeatCount(5))
         assertEquals(DEFAULT_STUDY_REPEAT_COUNT, storedStudyRepeatCount(4))
+        assertEquals(STUDY_REPEAT_FOREVER, storedStudyRepeatCount(STUDY_REPEAT_FOREVER))
+        assertEquals(STUDY_REPEAT_FOREVER, aiStudyRepeatCount("forever"))
+        assertEquals(5, aiStudyRepeatCount("5"))
+        assertEquals("Unknown text keeps the default, not Forever", DEFAULT_STUDY_REPEAT_COUNT, aiStudyRepeatCount("lots"))
         val defaults = StudySettings()
         assertEquals(PageTokenMode.AUTO, defaults.pageTokenCaptions)
         assertEquals(false, defaults.blurBox)

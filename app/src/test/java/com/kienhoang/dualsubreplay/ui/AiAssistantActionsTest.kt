@@ -8,6 +8,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_AFTER
 import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_OVERLAY_BACKGROUNDS
 import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
+import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.assistant.AI_SEND_TO_APPS
 import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_PLAY_MODES
@@ -56,7 +57,11 @@ class AiAssistantActionsTest {
         assertEquals(GoogleWait.entries.map { it.storageValue }, AiSetting.GOOGLE_WAIT.choices)
         assertEquals(StudyPlayMode.entries.map { it.storageValue }, AI_STUDY_PLAY_MODES)
         assertEquals(SkipSilence.entries.map { it.storageValue }, AI_SKIP_SILENCE)
-        assertEquals(STUDY_REPEAT_COUNTS.map { it.toString() }, AI_STUDY_REPEAT_COUNTS)
+        assertEquals(
+            STUDY_REPEAT_COUNTS.map { if (it == STUDY_REPEAT_FOREVER) AI_REPEAT_FOREVER else it.toString() },
+            AI_STUDY_REPEAT_COUNTS,
+        )
+        assertEquals(TranscriptFollow.entries.map { it.storageValue }, AiSetting.TRANSCRIPT_FOLLOW.choices)
         assertEquals(PageTokenMode.entries.map { it.storageValue }, AI_PAGE_TOKEN_MODES)
         assertEquals(KnownWordsMode.entries.map { it.storageValue }, AI_KNOWN_WORDS_MODES)
         assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)

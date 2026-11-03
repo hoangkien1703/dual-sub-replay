@@ -75,6 +75,17 @@ class StudyToolsUiTest {
     }
 
     @Test
+    fun repeatEachLineOffersForever() {
+        showSettings()
+        composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo().performClick()
+        composeRule.onNodeWithTag("study_repeat_$STUDY_REPEAT_FOREVER").performScrollTo().performClick()
+        composeRule.runOnIdle { assertEquals(STUDY_REPEAT_FOREVER, preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, -1)) }
+        composeRule.onNodeWithText("Forever").assertIsDisplayed()
+        composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
+        saveUiEvidence("study-repeat-forever")
+    }
+
+    @Test
     fun theStudyToolsSectionTurnsEachToolOnAndOff() {
         showSettings()
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo().performClick()

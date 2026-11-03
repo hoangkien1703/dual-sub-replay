@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.assistant.AiAction
 import com.kienhoang.dualsubreplay.assistant.AiActionOutcome
 import com.kienhoang.dualsubreplay.assistant.AiActionText
@@ -218,7 +219,7 @@ private fun aiStudySettingValue(
 ): String? =
     when (setting) {
         AiSetting.STUDY_PLAY_MODE -> study.playMode.storageValue
-        AiSetting.STUDY_REPEAT_COUNT -> study.repeatCount.toString()
+        AiSetting.STUDY_REPEAT_COUNT -> if (study.repeatCount == STUDY_REPEAT_FOREVER) AI_REPEAT_FOREVER else study.repeatCount.toString()
         AiSetting.SKIP_SILENCE -> study.skipSilence.storageValue
         AiSetting.KNOWN_WORDS -> study.knownWordsMode.storageValue
         AiSetting.KNOWN_WORDS_AFTER -> study.knownWordsAfter.toString()
@@ -242,6 +243,7 @@ private fun aiReadingSettingValue(
         AiSetting.ORIGINAL_CAPTIONS -> state.originalVisibility.name.lowercase(Locale.ROOT)
         AiSetting.TRANSLATED_CAPTIONS -> state.translatedVisibility.name.lowercase(Locale.ROOT)
         AiSetting.TRANSLATION_POSITION -> state.translationPosition.storageValue
+        AiSetting.TRANSCRIPT_FOLLOW -> state.transcriptFollow.storageValue
         AiSetting.HIGHLIGHT_SPOKEN_WORDS -> onOff(state.wordHighlightEnabled)
         AiSetting.DEFAULT_VIEW -> if (playerMode == PlayerExperienceMode.TRANSCRIPT_PANEL) "transcript_panel" else "overlay"
         AiSetting.PORTRAIT_PANEL_POSITION -> Math.round(state.portraitPanelOffsetFraction * PERCENT).toString()
@@ -611,6 +613,7 @@ internal class AppAiActions(
                 )
             AiSetting.CAPTION_FORMAT -> viewModel.setCaptionFormat(captionFormat(value))
             AiSetting.TRANSLATION_POSITION -> viewModel.setTranslationPosition(storedTranslationPosition(value))
+            AiSetting.TRANSCRIPT_FOLLOW -> viewModel.setTranscriptFollow(storedTranscriptFollow(value))
             AiSetting.LANDSCAPE_SPLIT_VIEW -> viewModel.setLandscapeSplitEnabled(on)
             AiSetting.PORTRAIT_PANEL_POSITION -> viewModel.setPortraitPanelOffsetFraction(value.toFloat() / PERCENT)
             AiSetting.CUSTOM_SUBTITLE_COLORS -> viewModel.setCustomColorsEnabled(on)
@@ -668,7 +671,7 @@ internal class AppAiActions(
         val on = value == "on"
         when (setting) {
             AiSetting.STUDY_PLAY_MODE -> editor.putString(STUDY_PLAY_MODE_PREFERENCE, storedStudyPlayMode(value).storageValue)
-            AiSetting.STUDY_REPEAT_COUNT -> editor.putInt(STUDY_REPEAT_COUNT_PREFERENCE, storedStudyRepeatCount(value.toIntOrNull() ?: 0))
+            AiSetting.STUDY_REPEAT_COUNT -> editor.putInt(STUDY_REPEAT_COUNT_PREFERENCE, aiStudyRepeatCount(value))
             AiSetting.SKIP_SILENCE -> editor.putString(SKIP_SILENCE_PREFERENCE, storedSkipSilence(value).storageValue)
             AiSetting.KNOWN_WORDS -> editor.putString(KNOWN_WORDS_PREFERENCE, storedKnownWordsMode(value).storageValue)
             AiSetting.KNOWN_WORDS_AFTER -> editor.putInt(KNOWN_WORDS_AFTER_PREFERENCE, storedKnownWordsAfter(value.toIntOrNull() ?: 0))
@@ -773,6 +776,8 @@ internal class AppAiActions(
         SETTING_SWITCH_TITLES[setting]?.let { switch(it, value) } ?: when (setting) {
             AiSetting.TRANSLATION_POSITION ->
                 named(R.string.settings_translation_position_title, string(storedTranslationPosition(value).labelRes))
+            AiSetting.TRANSCRIPT_FOLLOW ->
+                named(R.string.settings_transcript_follow_title, string(storedTranscriptFollow(value).labelRes))
             AiSetting.PORTRAIT_PANEL_POSITION -> {
                 val position = portraitPanelPositionText(value.toFloat() / PERCENT)
                 named(R.string.settings_portrait_panel_position, string(position.textRes, position.percentage))
@@ -812,8 +817,15 @@ internal class AppAiActions(
         when (setting) {
             AiSetting.STUDY_PLAY_MODE -> named(R.string.study_play_mode_title, string(storedStudyPlayMode(value).titleRes))
             AiSetting.STUDY_REPEAT_COUNT -> {
-                val count = storedStudyRepeatCount(value.toIntOrNull() ?: 0)
-                named(R.string.study_play_mode_repeat, context.resources.getQuantityString(R.plurals.study_repeat_count, count, count))
+                val count = aiStudyRepeatCount(value)
+                named(
+                    R.string.study_play_mode_repeat,
+                    if (count == STUDY_REPEAT_FOREVER) {
+                        string(R.string.study_repeat_forever)
+                    } else {
+                        context.resources.getQuantityString(R.plurals.study_repeat_count, count, count)
+                    },
+                )
             }
             AiSetting.SKIP_SILENCE -> named(R.string.study_skip_silence_title, string(storedSkipSilence(value).labelRes))
             AiSetting.KNOWN_WORDS -> named(R.string.study_known_words_title, string(storedKnownWordsMode(value).labelRes))

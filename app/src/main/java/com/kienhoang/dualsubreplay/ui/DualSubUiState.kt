@@ -69,6 +69,7 @@ data class DualSubUiState(
     val customColorsEnabled: Boolean = true,
     val captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     val translationPosition: TranslationPosition = TranslationPosition.BELOW,
+    val transcriptFollow: TranscriptFollow = TranscriptFollow.PAGE,
     val isDownloadingTranslationModel: Boolean = false,
     val lockOverlayToVideo: Boolean = false,
     val preloadModelsEnabled: Boolean = true,

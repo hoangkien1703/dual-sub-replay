@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">翻訳の位置</string>
     <string name="settings_translation_position_below">原文の下</string>
     <string name="settings_translation_position_above">原文の上</string>
+    <string name="settings_transcript_follow_title">トランスクリプトの再生中の行</string>
+    <string name="settings_transcript_follow_description">「中央」では、話されている行を中央に保ち、各行が終わるたびに歌詞のようにトランスクリプトを上へスクロールします。</string>
+    <string name="settings_transcript_follow_page">下へ移動</string>
+    <string name="settings_transcript_follow_center">中央</string>
     <string name="settings_portrait_panel_position">縦向きパネルの位置</string>
     <string name="settings_portrait_panel_position_hint">縦向きのトランスクリプトパネルは動画のすぐ下から始まります。上げるとパネルが長くなり動画の下部に重なります。下げると短くなります。</string>
     <string name="settings_portrait_panel_higher">上へ</string>

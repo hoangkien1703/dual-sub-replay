@@ -481,6 +481,8 @@ internal fun SubtitleSettingsDialog(
     captionFormat: CaptionFormat = CaptionFormat.SHORT_PHRASES,
     translationPosition: TranslationPosition = TranslationPosition.BELOW,
     onTranslationPositionChange: (TranslationPosition) -> Unit = {},
+    transcriptFollow: TranscriptFollow = TranscriptFollow.PAGE,
+    onTranscriptFollowChange: (TranscriptFollow) -> Unit = {},
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -616,6 +618,7 @@ internal fun SubtitleSettingsDialog(
                         )
                         CaptionVisibilitySettings()
                         TranslationPositionSettings(translationPosition, onTranslationPositionChange)
+                        TranscriptFollowSettings(transcriptFollow, onTranscriptFollowChange)
                         SettingsSwitchRow(
                             title = stringResource(R.string.settings_highlight_spoken_words_title),
                             description = stringResource(R.string.settings_highlight_spoken_words_description),

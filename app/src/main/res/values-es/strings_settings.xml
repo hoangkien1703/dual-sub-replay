@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Posición de la traducción</string>
     <string name="settings_translation_position_below">Debajo del original</string>
     <string name="settings_translation_position_above">Encima del original</string>
+    <string name="settings_transcript_follow_title">Línea en reproducción en la transcripción</string>
+    <string name="settings_transcript_follow_description">En el centro mantiene la línea que se está diciendo en el medio y desplaza la transcripción hacia arriba al terminar cada línea, como la letra de una canción.</string>
+    <string name="settings_transcript_follow_page">Baja por la página</string>
+    <string name="settings_transcript_follow_center">En el centro</string>
     <string name="settings_portrait_panel_position">Posición del panel en vertical</string>
     <string name="settings_portrait_panel_position_hint">El panel de transcripción vertical empieza justo debajo del vídeo. Más arriba lo hace más alto y tapa la parte inferior del vídeo; más abajo lo hace más corto.</string>
     <string name="settings_portrait_panel_higher">Más arriba</string>

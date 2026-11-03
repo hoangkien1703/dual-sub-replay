@@ -65,7 +65,12 @@ internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
 internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
 
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
-internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5")
+internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", AI_REPEAT_FOREVER)
+
+/** Repeat each line's count with no limit (`STUDY_REPEAT_FOREVER`). */
+internal const val AI_REPEAT_FOREVER = "forever"
+
+private val AI_REPEAT_FOREVER_WORDS = setOf("forever", "infinite", "infinity", "unlimited", "endless", "loop", "always", "until_i_move_on")
 
 /**
  * A setting the assistant may change, in the order the settings page shows them. [choices] lists
@@ -83,6 +88,7 @@ internal enum class AiSetting(
     ORIGINAL_CAPTIONS("original_captions", AiChoices.captionVisibility),
     TRANSLATED_CAPTIONS("translated_captions", AiChoices.captionVisibility),
     TRANSLATION_POSITION("translation_position", listOf("below", "above")),
+    TRANSCRIPT_FOLLOW("transcript_follow", listOf("page", "center")),
     HIGHLIGHT_SPOKEN_WORDS("highlight_spoken_words"),
     DEFAULT_VIEW("default_view", listOf("transcript_panel", "overlay")),
     PORTRAIT_PANEL_POSITION("portrait_panel_position", emptyList(), -20f..20f),
@@ -608,6 +614,8 @@ private val SETTING_CHOICE_ALIASES by lazy {
         AiSetting.AI_TRANSLATION_THINKING to
             mapOf("none" to "off", "no" to "off", "false" to "off", "disabled" to "off", "minimal" to "low", "mid" to "medium"),
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
+        AiSetting.TRANSCRIPT_FOLLOW to
+            mapOf("centre" to "center", "middle" to "center", "in_the_middle" to "center", "lyrics" to "center", "down" to "page"),
         AiSetting.SEND_TO_APP to mapOf("anki" to "ankidroid", "anki_droid" to "ankidroid", "anki_connect" to "ankiconnect"),
         AiSetting.KNOWN_WORDS to
             mapOf("automatic" to "auto", "on" to "auto", "true" to "auto", "enabled" to "auto", "false" to "off", "disabled" to "off"),
@@ -640,6 +648,7 @@ internal fun aiSettingValue(
             .lowercase(Locale.ROOT)
             .replace(' ', '_')
             .replace('-', '_')
+    if (setting == AiSetting.STUDY_REPEAT_COUNT && key in AI_REPEAT_FOREVER_WORDS) return AI_REPEAT_FOREVER
     return when (setting) {
         AiSetting.ORIGINAL_CAPTION_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "auto" else aiLanguageCode(raw)
         AiSetting.APP_LANGUAGE -> if (key in DEVICE_LANGUAGE_WORDS) "device" else aiAppLanguage(raw)
@@ -759,7 +768,9 @@ internal fun aiSettingValues(setting: AiSetting): String =
                 " (pause_after_line pauses after each line, read_first stops at each line's start, listen_first hides subtitles " +
                 "until each line ends, repeat_line plays each line study_repeat_count times, new_word_lines pauses after lines " +
                 "with exactly one new word and needs known_words on; all need the full transcript)"
-        AiSetting.STUDY_REPEAT_COUNT -> choiceList(setting.choices) + " (plays of each line in repeat_line)"
+        AiSetting.STUDY_REPEAT_COUNT ->
+            choiceList(setting.choices) +
+                " (plays of each line in repeat_line; forever loops each line until the user taps another line or seeks)"
         AiSetting.KNOWN_WORDS ->
             choiceList(setting.choices) +
                 " (auto also counts a word as known after it played in known_words_after lines, each line once per video; " +

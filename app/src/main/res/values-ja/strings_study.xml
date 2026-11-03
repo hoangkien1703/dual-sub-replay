@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">先に聞く</string>
     <string name="study_play_mode_listen_first_description">再生中は字幕を隠し、各行の後で一時停止して字幕を表示します。</string>
     <string name="study_play_mode_repeat">各行を繰り返す</string>
-    <string name="study_play_mode_repeat_description">各行を何回か再生してから次に進みます。</string>
+    <string name="study_play_mode_repeat_description">各行を何回か再生してから次に進みます。「無制限」では、別の行をタップするかシークするまで同じ行を繰り返します。</string>
+    <string name="study_repeat_forever">無制限</string>
     <string name="study_play_mode_new_word">新しい単語が1つの行で一時停止</string>
     <string name="study_play_mode_new_word_description">まだ知らない単語がちょうど1つある行の後だけ一時停止します。既知の単語が必要です。</string>
     <string name="study_play_mode_needs_known_words">このモードを使うには、下の既知の単語をオンにしてください。</string>

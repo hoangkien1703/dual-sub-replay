@@ -146,6 +146,14 @@ private fun StudyPlayModeSettings(
     }
 }
 
+@Composable
+private fun studyRepeatCountLabel(count: Int): String =
+    if (count == STUDY_REPEAT_FOREVER) {
+        stringResource(R.string.study_repeat_forever)
+    } else {
+        pluralStringResource(R.plurals.study_repeat_count, count, count)
+    }
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun StudyRepeatCountSettings(
@@ -157,7 +165,7 @@ private fun StudyRepeatCountSettings(
             FilterChip(
                 selected = count == option,
                 onClick = { onChange(option) },
-                label = { Text(pluralStringResource(R.plurals.study_repeat_count, option, option)) },
+                label = { Text(studyRepeatCountLabel(option)) },
                 modifier = Modifier.testTag("study_repeat_$option"),
             )
         }

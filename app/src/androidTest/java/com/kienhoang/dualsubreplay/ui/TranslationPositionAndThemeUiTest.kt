@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.test.captureToImage
@@ -118,6 +121,34 @@ class TranslationPositionAndThemeUiTest {
         composeRule.waitUntil(5_000) { background < 0.1f }
         composeRule.waitForIdle()
         saveUiEvidence("settings-navy-theme")
+    }
+
+    @Test
+    fun theReadingCardSwitchesTheTranscriptToInTheMiddle() {
+        var follow by mutableStateOf(TranscriptFollow.PAGE)
+        composeRule.setContent {
+            DualSubTheme {
+                SubtitleSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    availableSourceLanguages = emptyList(),
+                    fontScale = 1f,
+                    landscapeSplitEnabled = true,
+                    transcriptFollow = follow,
+                    onTranscriptFollowChange = { follow = it },
+                    onSourceChange = {},
+                    onTargetChange = {},
+                    onFontScaleChange = {},
+                    onLandscapeSplitChange = {},
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("transcript_follow_center").performScrollTo().performClick()
+        composeRule.runOnIdle { assertEquals(TranscriptFollow.CENTER, follow) }
+        composeRule.onNodeWithTag("translation_position_below").performScrollTo()
+        saveUiEvidence("settings-transcript-follow")
     }
 
     @Test
