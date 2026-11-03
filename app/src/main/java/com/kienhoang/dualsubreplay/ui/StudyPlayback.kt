@@ -160,7 +160,8 @@ internal class StudyPlaybackDriver {
         tick: StudyTick,
         line: Int,
     ): StudyAction? {
-        if (repeats >= tick.settings.repeatCount - 1) return null
+        val count = tick.settings.repeatCount
+        if (count != STUDY_REPEAT_FOREVER && repeats >= count - 1) return null
         repeats++
         val start = tick.segments[line].startMs
         ownSeek = OwnSeek(start, replayLine = line)

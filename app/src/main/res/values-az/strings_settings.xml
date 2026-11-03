@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Tərcümənin yeri</string>
     <string name="settings_translation_position_below">Orijinalın altında</string>
     <string name="settings_translation_position_above">Orijinalın üstündə</string>
+    <string name="settings_transcript_follow_title">Mətndə oynayan sətir</string>
+    <string name="settings_transcript_follow_description">Ortada seçimi deyilən sətri mərkəzdə saxlayır və hər sətir bitəndə mətni mahnı sözləri kimi yuxarı sürüşdürür.</string>
+    <string name="settings_transcript_follow_page">Aşağı gedir</string>
+    <string name="settings_transcript_follow_center">Ortada</string>
     <string name="settings_portrait_panel_position">Şaquli paneldəki yer</string>
     <string name="settings_portrait_panel_position_hint">Şaquli rejimdə mətn paneli videonun düz altından başlayır. Yuxarı onu hündür edir və videonun aşağısını örtür; aşağı onu qısaldır.</string>
     <string name="settings_portrait_panel_higher">Yuxarı</string>

@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">번역 위치</string>
     <string name="settings_translation_position_below">원문 아래</string>
     <string name="settings_translation_position_above">원문 위</string>
+    <string name="settings_transcript_follow_title">스크립트에서 재생 중인 줄</string>
+    <string name="settings_transcript_follow_description">가운데를 고르면 말하는 줄을 가운데에 두고, 각 줄이 끝날 때마다 노래 가사처럼 스크립트를 위로 스크롤합니다.</string>
+    <string name="settings_transcript_follow_page">아래로 이동</string>
+    <string name="settings_transcript_follow_center">가운데</string>
     <string name="settings_portrait_panel_position">세로 패널 위치</string>
     <string name="settings_portrait_panel_position_hint">세로 화면의 스크립트 패널은 영상 바로 아래에서 시작해요. 위로 올리면 패널이 길어지고 영상 아래쪽을 가려요. 아래로 내리면 짧아져요.</string>
     <string name="settings_portrait_panel_higher">위로</string>

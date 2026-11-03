@@ -88,6 +88,20 @@ class StudyPlaybackTest {
     }
 
     @Test
+    fun foreverLoopsALineUntilTheLearnerMovesOn() {
+        val driver = StudyPlaybackDriver()
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = STUDY_REPEAT_FOREVER)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), play(driver, settings, 900, 3_000).map { it.second })
+        // Far past any count: each of the driver's own seeks plays the line once more.
+        repeat(8) { round ->
+            val session = "loop$round"
+            assertEquals(listOf(StudyAction.PlayFrom(1_000)), play(driver, settings, 1_000, 3_000, session = session).map { it.second })
+        }
+        // A tap on another line (a seek the driver did not ask for) loops that line instead.
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), play(driver, settings, 3_500, 5_000, session = "tap").map { it.second })
+    }
+
+    @Test
     fun readFirstStopsAtTheStartOfEachLine() {
         val driver = StudyPlaybackDriver()
         val settings = StudySettings(playMode = StudyPlayMode.READ_FIRST)
@@ -181,6 +195,10 @@ class StudyPlaybackTest {
         assertEquals(SkipSilence.OFF, storedSkipSilence("8x"))
         assertEquals(5, storedStudyRepeatCount(5))
         assertEquals(DEFAULT_STUDY_REPEAT_COUNT, storedStudyRepeatCount(4))
+        assertEquals(STUDY_REPEAT_FOREVER, storedStudyRepeatCount(STUDY_REPEAT_FOREVER))
+        assertEquals(STUDY_REPEAT_FOREVER, aiStudyRepeatCount("forever"))
+        assertEquals(5, aiStudyRepeatCount("5"))
+        assertEquals("Unknown text keeps the default, not Forever", DEFAULT_STUDY_REPEAT_COUNT, aiStudyRepeatCount("lots"))
         val defaults = StudySettings()
         assertEquals(PageTokenMode.AUTO, defaults.pageTokenCaptions)
         assertEquals(false, defaults.blurBox)

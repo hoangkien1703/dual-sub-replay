@@ -285,6 +285,7 @@ class AppViewModel internal constructor(
                         preferences.getBoolean(SPLIT_LONG_SENTENCES_PREFERENCE, true),
                     ),
                 translationPosition = storedTranslationPosition(preferences.getString(TRANSLATION_POSITION_PREFERENCE, null)),
+                transcriptFollow = storedTranscriptFollow(preferences.getString(TRANSCRIPT_FOLLOW_PREFERENCE, null)),
                 lockOverlayToVideo =
                     storedFeatureEnabled(
                         preferences.getBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, false),
@@ -843,6 +844,11 @@ class AppViewModel internal constructor(
         _state.update { it.copy(translationPosition = position) }
     }
 
+    fun setTranscriptFollow(follow: TranscriptFollow) {
+        preferences.edit().putString(TRANSCRIPT_FOLLOW_PREFERENCE, follow.storageValue).apply()
+        _state.update { it.copy(transcriptFollow = follow) }
+    }
+
     fun setLockOverlayToVideo(locked: Boolean) {
         preferences.edit().putBoolean(LOCK_OVERLAY_TO_VIDEO_PREFERENCE, locked).apply()
         _state.update { it.copy(lockOverlayToVideo = locked) }
@@ -1193,6 +1199,7 @@ class AppViewModel internal constructor(
                 studyPlayMode = StudyPlayMode.NORMAL,
                 captionFormat = CaptionFormat.SHORT_PHRASES,
                 translationPosition = TranslationPosition.BELOW,
+                transcriptFollow = TranscriptFollow.PAGE,
                 lockOverlayToVideo = false,
                 preloadModelsEnabled = true,
                 naturalSubtitlesEnabled = true,

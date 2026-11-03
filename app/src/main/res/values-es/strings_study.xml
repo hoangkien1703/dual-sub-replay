@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">Escuchar primero</string>
     <string name="study_play_mode_listen_first_description">Oculta los subtítulos mientras el video se reproduce y luego pausa después de cada línea y los muestra.</string>
     <string name="study_play_mode_repeat">Repetir cada línea</string>
-    <string name="study_play_mode_repeat_description">Reproduce cada línea varias veces antes de seguir.</string>
+    <string name="study_play_mode_repeat_description">Reproduce cada línea varias veces antes de seguir. Siempre la repite hasta que tocas otra línea o adelantas o retrocedes el video.</string>
+    <string name="study_repeat_forever">Siempre</string>
     <string name="study_play_mode_new_word">Pausar en líneas con una palabra nueva</string>
     <string name="study_play_mode_new_word_description">Solo pausa después de las líneas con exactamente una palabra que aún no conoces. Necesita Palabras conocidas.</string>
     <string name="study_play_mode_needs_known_words">Activa Palabras conocidas abajo para usar este modo.</string>

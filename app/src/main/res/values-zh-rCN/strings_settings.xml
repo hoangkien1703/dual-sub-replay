@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">译文位置</string>
     <string name="settings_translation_position_below">原文下方</string>
     <string name="settings_translation_position_above">原文上方</string>
+    <string name="settings_transcript_follow_title">文稿中正在播放的行</string>
+    <string name="settings_transcript_follow_description">“居中”会让正在说的那一行保持在中间，每行结束时文稿向上滚动，就像歌词一样。</string>
+    <string name="settings_transcript_follow_page">向下移动</string>
+    <string name="settings_transcript_follow_center">居中</string>
     <string name="settings_portrait_panel_position">竖屏面板位置</string>
     <string name="settings_portrait_panel_position_hint">竖屏字幕文稿面板紧贴在视频下方。调高会让面板变长并盖住视频底部；调低会让面板变短。</string>
     <string name="settings_portrait_panel_higher">更高</string>

@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">Listen first</string>
     <string name="study_play_mode_listen_first_description">Hides subtitles while the video plays, then pauses after each line and shows them.</string>
     <string name="study_play_mode_repeat">Repeat each line</string>
-    <string name="study_play_mode_repeat_description">Plays each line several times before going on.</string>
+    <string name="study_play_mode_repeat_description">Plays each line several times before going on. Forever loops it until you tap another line or seek.</string>
+    <string name="study_repeat_forever">Forever</string>
     <string name="study_play_mode_new_word">Pause on lines with one new word</string>
     <string name="study_play_mode_new_word_description">Pauses only after lines with exactly one word you do not know yet. Needs Known words.</string>
     <string name="study_play_mode_needs_known_words">Turn on Known words below to use this mode.</string>

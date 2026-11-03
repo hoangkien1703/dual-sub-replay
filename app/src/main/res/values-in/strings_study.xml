@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">Dengar dulu</string>
     <string name="study_play_mode_listen_first_description">Menyembunyikan subtitle saat video diputar, lalu berhenti setelah setiap baris dan menampilkannya.</string>
     <string name="study_play_mode_repeat">Ulangi setiap baris</string>
-    <string name="study_play_mode_repeat_description">Memutar setiap baris beberapa kali sebelum lanjut.</string>
+    <string name="study_play_mode_repeat_description">Memutar setiap baris beberapa kali sebelum lanjut. Terus-menerus mengulang baris itu sampai kamu mengetuk baris lain atau menggeser video.</string>
+    <string name="study_repeat_forever">Terus-menerus</string>
     <string name="study_play_mode_new_word">Jeda di baris dengan satu kata baru</string>
     <string name="study_play_mode_new_word_description">Hanya berhenti setelah baris yang berisi tepat satu kata yang belum Anda kenal. Perlu Kata yang dikenal.</string>
     <string name="study_play_mode_needs_known_words">Aktifkan Kata yang dikenal di bawah untuk memakai mode ini.</string>

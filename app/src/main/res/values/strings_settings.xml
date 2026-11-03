@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Translation position</string>
     <string name="settings_translation_position_below">Below original</string>
     <string name="settings_translation_position_above">Above original</string>
+    <string name="settings_transcript_follow_title">Playing line in the transcript</string>
+    <string name="settings_transcript_follow_description">In the middle keeps the line being spoken in the center and scrolls the transcript up as each line ends, like song lyrics.</string>
+    <string name="settings_transcript_follow_page">Moves down</string>
+    <string name="settings_transcript_follow_center">In the middle</string>
     <string name="settings_portrait_panel_position">Portrait panel position</string>
     <string name="settings_portrait_panel_position_hint">The portrait transcript panel starts right under the video. Higher makes it taller and covers the bottom of the video; lower makes it shorter.</string>
     <string name="settings_portrait_panel_higher">Higher</string>

@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Posição da tradução</string>
     <string name="settings_translation_position_below">Abaixo do original</string>
     <string name="settings_translation_position_above">Acima do original</string>
+    <string name="settings_transcript_follow_title">Linha tocando na transcrição</string>
+    <string name="settings_transcript_follow_description">No meio mantém a linha falada no centro e rola a transcrição para cima quando cada linha termina, como a letra de uma música.</string>
+    <string name="settings_transcript_follow_page">Desce pela página</string>
+    <string name="settings_transcript_follow_center">No meio</string>
     <string name="settings_portrait_panel_position">Posição do painel no modo retrato</string>
     <string name="settings_portrait_panel_position_hint">O painel de transcrição no modo retrato começa logo abaixo do vídeo. Mais alto deixa o painel maior e cobre a parte de baixo do vídeo; mais baixo deixa o painel menor.</string>
     <string name="settings_portrait_panel_higher">Mais alto</string>

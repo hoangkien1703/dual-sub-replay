@@ -55,6 +55,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
@@ -165,6 +166,7 @@ fun DualSubApp(
                 onCustomColorsChange = viewModel::setCustomColorsEnabled,
                 onCaptionFormatChange = viewModel::setCaptionFormat,
                 onTranslationPositionChange = viewModel::setTranslationPosition,
+                onTranscriptFollowChange = viewModel::setTranscriptFollow,
                 lockOverlayToVideo = state.lockOverlayToVideo,
                 onLockOverlayToVideoChange = viewModel::setLockOverlayToVideo,
                 preloadModelsEnabled = state.preloadModelsEnabled,
@@ -293,6 +295,7 @@ private fun DualSubExperience(
     onCustomColorsChange: (Boolean) -> Unit,
     onCaptionFormatChange: (CaptionFormat) -> Unit,
     onTranslationPositionChange: (TranslationPosition) -> Unit = {},
+    onTranscriptFollowChange: (TranscriptFollow) -> Unit = {},
     lockOverlayToVideo: Boolean = false,
     onLockOverlayToVideoChange: (Boolean) -> Unit = {},
     preloadModelsEnabled: Boolean = true,
@@ -562,6 +565,8 @@ private fun DualSubExperience(
             captionFormat = state.captionFormat,
             translationPosition = state.translationPosition,
             onTranslationPositionChange = onTranslationPositionChange,
+            transcriptFollow = state.transcriptFollow,
+            onTranscriptFollowChange = onTranscriptFollowChange,
             lockOverlayToVideo = state.lockOverlayToVideo,
             onLockOverlayToVideoChange = onLockOverlayToVideoChange,
             preloadModelsEnabled = state.preloadModelsEnabled,
@@ -920,41 +925,9 @@ internal fun SubtitleTimeline(
         .coerceAtLeast(0)
         .coerceAtMost(state.segments.lastIndex.coerceAtLeast(0))
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialItemIndex)
-    val previousIndex = remember { mutableIntStateOf(-1) }
-    LaunchedEffect(state.currentIndex, state.segments.firstOrNull()?.id) {
-        val target = state.currentIndex
-        if (target < 0) return@LaunchedEffect
-        // IDs remain global when the local window shifts or jumps hours ahead.
-        val globalIndex = state.segments.getOrNull(target)?.id?.toInt() ?: return@LaunchedEffect
-        val lastIndex = previousIndex.intValue
-        previousIndex.intValue = globalIndex
-        if (listState.isScrollInProgress) {
-            snapshotFlow { listState.isScrollInProgress }.first { !it }
-        }
-        if (listState.isScrollInProgress) return@LaunchedEffect
-        val visibleItemIndices = snapshotFlow {
-            listState.layoutInfo.visibleItemsInfo.map { it.index }
-        }.first { it.isNotEmpty() }
-
-        when {
-            // First placement after opening/reopening should always be an instant
-            // jump. Animating from row 0 is expensive and looks like a full-list
-            // scroll on long videos.
-            lastIndex < 0 -> {
-                listState.scrollToItem(target)
-            }
-            shouldFollowPlaybackSeek(lastIndex, globalIndex) -> {
-                if (abs(globalIndex - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
-                    listState.scrollToItem(target)
-                } else {
-                    listState.animateScrollToItem(target)
-                }
-            }
-            shouldPromoteActiveSubtitle(target, visibleItemIndices) -> {
-                listState.animateScrollToItem(target)
-            }
-        }
-    }
+    val browsing = rememberLearnerBrowsing(listState)
+    val centre = state.transcriptFollow == TranscriptFollow.CENTER
+    FollowPlayingRow(listState, state, browsing, centre)
 
     KeepActiveRowOnScreen(listState, state.currentIndex)
     PrepareUpcomingTokens(
@@ -1019,9 +992,66 @@ internal fun SubtitleTimeline(
             target = state.currentIndex,
             startMs = state.segments.getOrNull(state.currentIndex)?.startMs,
             modifier = Modifier.align(Alignment.BottomCenter),
+            browsing = browsing,
+            centre = centre,
         )
     }
     tvLine?.let { TvLineWords(it, state.resolvedSourceLanguage ?: state.sourcePreference, onReplay, onWordClick) { tvLine = null } }
+}
+
+/**
+ * Scrolls the transcript with playback: in the middle ([TranscriptFollow.CENTER]) every line
+ * change, or (the default) only after a seek or once the playing row reaches the bottom.
+ */
+@Composable
+private fun FollowPlayingRow(
+    listState: LazyListState,
+    state: DualSubUiState,
+    browsing: State<Boolean>,
+    centre: Boolean,
+) {
+    val previousIndex = remember { mutableIntStateOf(-1) }
+    LaunchedEffect(state.currentIndex, state.segments.firstOrNull()?.id, centre) {
+        val target = state.currentIndex
+        if (target < 0) return@LaunchedEffect
+        // IDs remain global when the local window shifts or jumps hours ahead.
+        val globalIndex = state.segments.getOrNull(target)?.id?.toInt() ?: return@LaunchedEffect
+        val lastIndex = previousIndex.intValue
+        previousIndex.intValue = globalIndex
+        if (listState.isScrollInProgress) {
+            snapshotFlow { listState.isScrollInProgress }.first { !it }
+        }
+        if (listState.isScrollInProgress) return@LaunchedEffect
+        val visibleItemIndices = snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo.map { it.index }
+        }.first { it.isNotEmpty() }
+
+        when {
+            // First placement after opening/reopening should always be an instant
+            // jump. Animating from row 0 is expensive and looks like a full-list
+            // scroll on long videos.
+            lastIndex < 0 && centre -> listState.centreRow(target, animate = false)
+            lastIndex < 0 -> {
+                listState.scrollToItem(target)
+            }
+            // Lyrics style: the playing line stays in the middle, except while the learner browses.
+            centre -> {
+                if (!browsing.value) {
+                    listState.centreRow(target, animate = abs(globalIndex - lastIndex) <= SUBTITLE_INSTANT_SCROLL_DISTANCE)
+                }
+            }
+            shouldFollowPlaybackSeek(lastIndex, globalIndex) -> {
+                if (abs(globalIndex - lastIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
+                    listState.scrollToItem(target)
+                } else {
+                    listState.animateScrollToItem(target)
+                }
+            }
+            shouldPromoteActiveSubtitle(target, visibleItemIndices) -> {
+                listState.animateScrollToItem(target)
+            }
+        }
+    }
 }
 
 /**

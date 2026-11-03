@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">先听</string>
     <string name="study_play_mode_listen_first_description">播放时隐藏字幕，每行之后暂停并显示字幕。</string>
     <string name="study_play_mode_repeat">每行重复</string>
-    <string name="study_play_mode_repeat_description">每行播放几遍后再继续。</string>
+    <string name="study_play_mode_repeat_description">每行播放几遍后再继续。“无限”会一直重复这一行，直到你点按另一行或拖动进度。</string>
+    <string name="study_repeat_forever">无限</string>
     <string name="study_play_mode_new_word">只在有一个新词的行暂停</string>
     <string name="study_play_mode_new_word_description">只在恰好有一个你还不认识的词的行之后暂停。需要已认识的词。</string>
     <string name="study_play_mode_needs_known_words">打开下面的已认识的词才能使用此模式。</string>

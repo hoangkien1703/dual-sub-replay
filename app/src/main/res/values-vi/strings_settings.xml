@@ -12,6 +12,10 @@
     <string name="settings_translation_position_title">Vị trí bản dịch</string>
     <string name="settings_translation_position_below">Dưới bản gốc</string>
     <string name="settings_translation_position_above">Trên bản gốc</string>
+    <string name="settings_transcript_follow_title">Dòng đang phát trong bảng chép lời</string>
+    <string name="settings_transcript_follow_description">Ở giữa giữ dòng đang nói ở chính giữa và cuộn bảng chép lời lên khi mỗi dòng kết thúc, giống lời bài hát.</string>
+    <string name="settings_transcript_follow_page">Di chuyển xuống</string>
+    <string name="settings_transcript_follow_center">Ở giữa</string>
     <string name="settings_portrait_panel_position">Vị trí bảng ở chế độ dọc</string>
     <string name="settings_portrait_panel_position_hint">Bảng chép lời ở chế độ dọc bắt đầu ngay dưới video. Đặt cao hơn thì bảng dài ra và che phần dưới video; đặt thấp hơn thì bảng ngắn lại.</string>
     <string name="settings_portrait_panel_higher">Cao hơn</string>

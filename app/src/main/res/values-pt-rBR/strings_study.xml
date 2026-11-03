@@ -13,7 +13,8 @@
     <string name="study_play_mode_listen_first">Ouvir primeiro</string>
     <string name="study_play_mode_listen_first_description">Esconde as legendas enquanto o vídeo toca e depois pausa após cada linha e as mostra.</string>
     <string name="study_play_mode_repeat">Repetir cada linha</string>
-    <string name="study_play_mode_repeat_description">Toca cada linha algumas vezes antes de seguir.</string>
+    <string name="study_play_mode_repeat_description">Toca cada linha algumas vezes antes de seguir. Sempre repete a linha até você tocar em outra linha ou avançar/voltar o vídeo.</string>
+    <string name="study_repeat_forever">Sempre</string>
     <string name="study_play_mode_new_word">Pausar em linhas com uma palavra nova</string>
     <string name="study_play_mode_new_word_description">Só pausa depois das linhas com exatamente uma palavra que você ainda não conhece. Precisa de Palavras conhecidas.</string>
     <string name="study_play_mode_needs_known_words">Ative Palavras conhecidas abaixo para usar este modo.</string>

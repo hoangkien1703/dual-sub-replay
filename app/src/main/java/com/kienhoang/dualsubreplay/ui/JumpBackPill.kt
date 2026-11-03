@@ -106,7 +106,7 @@ private fun LazyListState.placementOf(target: Int): ActiveRowPlacement {
  * stops moving. Scrolls the app makes itself (following playback) do not count.
  */
 @Composable
-private fun rememberLearnerBrowsing(listState: LazyListState): MutableState<Boolean> {
+internal fun rememberLearnerBrowsing(listState: LazyListState): MutableState<Boolean> {
     val browsing = remember(listState) { mutableStateOf(false) }
     LaunchedEffect(listState) {
         listState.interactionSource.interactions.collect { interaction ->
@@ -135,8 +135,9 @@ internal fun JumpBackPill(
     target: Int,
     startMs: Long?,
     modifier: Modifier = Modifier,
+    browsing: MutableState<Boolean> = rememberLearnerBrowsing(listState),
+    centre: Boolean = false,
 ) {
-    val browsing = rememberLearnerBrowsing(listState)
     val placement by remember(listState, target) { derivedStateOf { listState.placementOf(target) } }
     val scope = rememberCoroutineScope()
     AnimatedVisibility(
@@ -150,7 +151,13 @@ internal fun JumpBackPill(
             onClick = {
                 browsing.value = false
                 scope.launch {
-                    if (abs(target - listState.firstVisibleItemIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
+                    if (centre) {
+                        listState.centreRow(
+                            target,
+                            animate =
+                                abs(target - listState.firstVisibleItemIndex) <= SUBTITLE_INSTANT_SCROLL_DISTANCE,
+                        )
+                    } else if (abs(target - listState.firstVisibleItemIndex) > SUBTITLE_INSTANT_SCROLL_DISTANCE) {
                         listState.scrollToItem(target)
                     } else {
                         listState.animateScrollToItem(target)
