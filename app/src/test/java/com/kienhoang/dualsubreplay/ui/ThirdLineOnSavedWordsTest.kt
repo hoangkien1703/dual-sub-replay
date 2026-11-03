@@ -123,4 +123,12 @@ class ThirdLineOnSavedWordsTest {
         assertThrows(IllegalArgumentException::class.java) { validateTransferWord(word(third = null, language = "fa")) }
         assertThrows(IllegalArgumentException::class.java) { validateTransferWord(word(third = " padded ")) }
     }
+
+    @Test fun practiceHighlightsTheSavedWordInItsLine() {
+        val line = withWordHighlighted("We've done Tons of testing", "tons", androidx.compose.ui.graphics.Color.Red)
+
+        assertEquals("We've done Tons of testing", line.text)
+        assertEquals(11 until 15, line.spanStyles.single().let { it.start until it.end })
+        assertEquals(emptyList<Any>(), withWordHighlighted("no match here", "tons", androidx.compose.ui.graphics.Color.Red).spanStyles)
+    }
 }

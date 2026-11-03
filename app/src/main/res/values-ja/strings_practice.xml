@@ -24,7 +24,6 @@
     <string name="practice_speech_settings">音声設定</string>
     <string name="practice_show_meaning">意味を表示</string>
     <string name="practice_meaning_label">意味(%1$s)</string>
-    <string name="practice_save_meaning">意味を保存</string>
     <string name="practice_video_uses_original_sentence">例の動画では元の文が再生されます。</string>
     <string name="practice_play_online_example">オンラインの例を再生</string>
     <string name="practice_online_example">オンラインの例</string>

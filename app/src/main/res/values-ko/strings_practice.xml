@@ -24,7 +24,6 @@
     <string name="practice_speech_settings">음성 설정</string>
     <string name="practice_show_meaning">뜻 보기</string>
     <string name="practice_meaning_label">뜻(%1$s)</string>
-    <string name="practice_save_meaning">뜻 저장</string>
     <string name="practice_video_uses_original_sentence">예시 동영상은 원래 문장을 사용해요.</string>
     <string name="practice_play_online_example">온라인 예시 재생</string>
     <string name="practice_online_example">온라인 예시</string>
