@@ -49,6 +49,11 @@ with nothing for Android apps yet. The fork reuses the Codex CLI's login instead
   (paused only, hidden, Listen first). A language that equals the original or the translation
   shows nothing, and live subtitles (no full transcript) have no third line.
 - Words saved before this change have no title until saved again.
+- Saved words keep the third line too (follow-up after mrAlishah tested v1.8.16, 2026-11-03): a
+  word saved while the line is on keeps that line's text and language. Practice shows it under
+  the translation (a Persian, Arabic or Hebrew line in Practice now reads from the right, like the
+  subtitles); backups and Export keep it; AnkiDroid and AnkiConnect cards get it in the
+  **Translation** field, on a new line under the translation.
 
 ## Technical notes
 
@@ -67,6 +72,12 @@ with nothing for Android apps yet. The fork reuses the Codex CLI's login instead
   first with one batched request for upcoming lines, falling back to ML Kit when it has a
   model; with "On this device only" it uses ML Kit only. Its failures are silent and never
   touch the other two lines.
+- `SavedWord.thirdSentence` and `SavedWord.thirdLanguage`: optional JSON fields, filled from
+  `DualSubUiState.withThirdLineOnScreen` when a word is tapped and again when it is saved (the line
+  may arrive in between). Saving again with the line off keeps the old one (`withThirdLineOf`).
+  TSV export adds `thirdSentence` and `thirdLanguage` columns at the end. Anki gets no new field:
+  AnkiDroid's provider cannot add a field to the "DualSub Replay" note type people already have,
+  and a second note type with the same name would split their cards.
 - Third line preferences: `third_subtitle_line_enabled` (default false) and
   `third_subtitle_language` (blank = none picked); both reset with all settings.
 
@@ -74,5 +85,7 @@ with nothing for Android apps yet. The fork reuses the Codex CLI's login instead
 
 - `SavedWordNotesAndSourceTest`: storage, backup and TSV round trips, older words, fork
   backups, re-saving, import validation.
+- `ThirdLineOnSavedWordsTest`: saving with the line on, off or for another video, storage,
+  backup, TSV and Anki fields.
 - `ThirdLineAndVideoFilterTest`: stored language, no repeated language, rows only for the open
   video and chosen language, video list, search.

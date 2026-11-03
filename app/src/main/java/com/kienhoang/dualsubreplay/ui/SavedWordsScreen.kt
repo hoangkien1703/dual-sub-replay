@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -237,8 +238,9 @@ internal fun SavedWordsScreen(
                                     action { repository.update(selected.id) { it.copy(deck = deck) } }
                                 }, enabled = !busy, tag = "word_deck")
                             }
-                            Text(selected.sentence)
-                            selected.translatedSentence?.let { Text(it) }
+                            PracticeSentence(selected.sentence)
+                            selected.translatedSentence?.let { PracticeSentence(it) }
+                            selected.thirdSentence?.let { PracticeSentence(it, Modifier.testTag("word_third_sentence")) }
                             if (selected.translated) Text(originalSentenceNote, style = MaterialTheme.typography.bodySmall)
                             selected.sourceTitle?.let { title ->
                                 Text(
@@ -334,4 +336,13 @@ internal fun SavedWordsScreen(
                 action { repository.remove(word.id); selectedId = null }
             }) { Text(deleteLabel) } }, dismissButton = { TextButton(onClick = { confirmDelete = null }) { Text(keepLabel) } })
     }
+}
+
+/** A subtitle line in Practice: a Persian, Arabic or Hebrew line reads right to left from its own side (issue #152). */
+@Composable
+private fun PracticeSentence(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(text, modifier.lineSide(text, LocalLayoutDirection.current), style = LocalTextStyle.current.inLineDirection())
 }

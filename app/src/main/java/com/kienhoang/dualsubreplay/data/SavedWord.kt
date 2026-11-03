@@ -19,6 +19,9 @@ data class LearningWordSelection(
     val segment: SubtitleSegment?,
     val translated: Boolean,
     val parts: List<AnalyzedToken> = listOf(token),
+    /** The line's third subtitle line (Settings → Layout & format) and its language; null while that line is off or not translated yet. */
+    val thirdText: String? = null,
+    val thirdLanguage: String? = null,
 ) {
     val isPhrase: Boolean get() = parts.size > 1
 }
@@ -67,6 +70,13 @@ data class SavedWord(
     val sourceTitle: String? = null,
     /** The learner's own notes, typed in Practice; never filled in automatically. */
     val notes: String = "",
+    /**
+     * The line's third subtitle line when the word was saved, and its language; null when that line was off
+     * (or for older words). Shown in Practice, kept in backups and Export, and sent to Anki with the translation.
+     * Never part of the id.
+     */
+    val thirdSentence: String? = null,
+    val thirdLanguage: String? = null,
 )
 
 enum class ReviewRating { AGAIN, HARD, GOOD, EASY }
@@ -124,12 +134,23 @@ internal fun mergeResaved(
     old: SavedWord,
     new: SavedWord,
 ): SavedWord =
-    new.copy(
+    new.withThirdLineOf(old).copy(
         dueAt = old.dueAt,
         intervalMs = old.intervalMs,
         sourceTitle = new.sourceTitle ?: old.sourceTitle,
         notes = new.notes.ifBlank { old.notes },
     )
+
+/** [this] with [old]'s third line when it has none of its own (an older file, or the line off while saving again). */
+internal fun SavedWord.withThirdLineOf(old: SavedWord): SavedWord =
+    if (thirdSentence != null) this else copy(thirdSentence = old.thirdSentence, thirdLanguage = old.thirdLanguage)
+
+/** A third line's text, or null when blank. */
+internal fun cleanThirdSentence(text: String?): String? = text?.trim()?.takeIf { it.isNotEmpty() }
+
+/** A third line's language when it looks like a language code, else null. */
+internal fun cleanThirdLanguage(language: String?): String? =
+    language?.trim()?.takeIf { it.matches(Regex("[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*")) }
 
 internal fun savedWordFrom(
     selection: LearningWordSelection,
@@ -141,8 +162,18 @@ internal fun savedWordFrom(
     val word = selection.token.text.trim()
     val id = savedWordId(word, selection.wordLanguage, selection.meaningLanguage, selection.videoId, segment)
     val hasClip = validClipRange(selection.videoId, segment?.startMs ?: -1, segment?.endMs ?: -1)
-    return SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
+    val saved = SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
         meaning.trim(), segment?.originalText.orEmpty(), segment?.translatedText, selection.videoId,
         segment?.startMs ?: 0, segment?.endMs ?: 0, selection.translated,
         online = online && hasClip, sourceTitle = cleanSourceTitle(sourceTitle))
+    return saved.withThirdLine(selection.thirdText, selection.thirdLanguage)
+}
+
+/** [this] with a third line, or with none when [text] is blank. */
+internal fun SavedWord.withThirdLine(
+    text: String?,
+    language: String?,
+): SavedWord {
+    val third = cleanThirdSentence(text)
+    return copy(thirdSentence = third, thirdLanguage = third?.let { cleanThirdLanguage(language) })
 }

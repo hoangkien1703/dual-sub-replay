@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
 import com.kienhoang.dualsubreplay.translation.GoogleWebTranslator
@@ -70,6 +71,13 @@ internal fun DualSubUiState.thirdLineFor(segment: SubtitleSegment?): String? {
         ?.lines
         ?.get(segment.id)
         ?.takeIf(String::isNotBlank)
+}
+
+/** [selection] with its line's third subtitle line, when it has none yet and that line is on screen for its video. */
+internal fun DualSubUiState.withThirdLineOnScreen(selection: LearningWordSelection): LearningWordSelection {
+    if (selection.thirdText != null || selection.videoId == null || selection.videoId != activeVideoId) return selection
+    val text = thirdLineFor(selection.segment) ?: return selection
+    return selection.copy(thirdText = text, thirdLanguage = thirdLines.language)
 }
 
 /**

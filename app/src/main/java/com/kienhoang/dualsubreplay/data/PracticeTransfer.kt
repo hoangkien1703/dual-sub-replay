@@ -23,6 +23,8 @@ internal val transferColumns =
         "deck",
         "sourceTitle",
         "notes",
+        "thirdSentence",
+        "thirdLanguage",
     )
 
 internal data class TransferDocument(
@@ -193,6 +195,8 @@ internal fun exportAnkiTsv(words: List<SavedWord>): String {
                 word.deck.orEmpty(),
                 word.sourceTitle.orEmpty(),
                 word.notes,
+                word.thirdSentence.orEmpty(),
+                word.thirdLanguage.orEmpty(),
             ).joinToString("\t", transform = ::quote)
         }
 }
@@ -254,7 +258,7 @@ internal fun previewImport(
                         deck = cleanDeckName(field("deck")),
                         sourceTitle = cleanSourceTitle(field("sourceTitle")),
                         notes = field("notes").trim().take(MAX_WORD_NOTES_LENGTH),
-                    )
+                    ).withThirdLine(field("thirdSentence"), field("thirdLanguage"))
                 validateTransferWord(word)
                 val id =
                     MessageDigest
@@ -294,4 +298,6 @@ internal fun validateTransferWord(word: SavedWord) {
     require(word.deck == null || word.deck == cleanDeckName(word.deck))
     require(word.sourceTitle == null || word.sourceTitle == cleanSourceTitle(word.sourceTitle))
     require(word.notes.length <= MAX_WORD_NOTES_LENGTH)
+    require(word.thirdSentence == cleanThirdSentence(word.thirdSentence))
+    require(word.thirdLanguage == null || (word.thirdSentence != null && word.thirdLanguage == cleanThirdLanguage(word.thirdLanguage)))
 }

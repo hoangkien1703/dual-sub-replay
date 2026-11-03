@@ -68,6 +68,16 @@ internal fun ankiSourceLink(
     return "<a href=\"https://www.youtube.com/watch?v=$videoId&amp;t=${seconds}s\">YouTube $label</a>"
 }
 
+/**
+ * The Translation field: the translation, then the third subtitle line under it. The third line shares
+ * this field so the "DualSub Replay" note type keeps its fields: AnkiDroid's API cannot add a field to a
+ * note type people already have.
+ */
+internal fun ankiTranslationHtml(word: SavedWord): String =
+    listOfNotNull(word.translatedSentence, word.thirdSentence)
+        .filter { it.isNotBlank() }
+        .joinToString("<br>", transform = ::ankiHtml)
+
 /** The fields of [word]'s note, in [ANKI_FIELDS] order. */
 internal fun ankiNoteFields(word: SavedWord): List<String> =
     listOf(
@@ -75,7 +85,7 @@ internal fun ankiNoteFields(word: SavedWord): List<String> =
         ankiHtml(word.meaning),
         ankiHtml(word.reading.orEmpty()),
         ankiSentenceHtml(word.sentence, word.word),
-        ankiHtml(word.translatedSentence.orEmpty()),
+        ankiTranslationHtml(word),
         ankiSourceLink(word.videoId, word.startMs),
     )
 
