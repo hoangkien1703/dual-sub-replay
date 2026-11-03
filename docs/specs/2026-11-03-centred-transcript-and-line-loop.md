@@ -97,32 +97,34 @@ Before this change:
 
 ## Repeat each line fixes (owner's preview test, 2026-11-03)
 
-On the preview (build 655), Kien found two problems with Repeat each line. Both happen on `main`
-too, because the play-mode driver is unchanged there:
+On the preview, Kien found two problems with Repeat each line. Both are on `main` too: a tap on
+another line jumped back to the line before it, and 2 / 3 / 5 times looped forever. Normal mode
+was fine.
 
-1. **Tapping another line jumped back to the line before it.** The page can report a seek's new
-   time before its `seeking` event, so before the new playback session starts. A tick that already
-   showed the next line under the old session counted as the old line ending, and the driver
-   played the old line again. A seek can also land a little early, inside the line before.
-2. **2 / 3 / 5 times looped forever.** The count started again whenever a line was entered again,
-   or a seek arrived as a second session, so a seek landing early or reported twice reset it.
+**Root cause** (reproduced on Kien's laptop, emulator Pixel 7 API 37, a TED video, ×2, with a
+tick-by-tick debug log): `state.segments` isn't the whole transcript. It's a window of about 40
+lines that `AppViewModel.publishSubtitleWindow` slides with playback, and it also slides back
+after every repeat seek, often between two ticks 35 ms apart. `StudyPlaybackDriver` kept
+`entered`, `handled`, `repeatedLine`, `readStartHandled` and `jumpedGap` as list positions, so
+after a slide the same number named another line. The count started again (a line, or two lines
+in turn, repeated forever), a stale `entered` named the line before (its end was handled and the
+video went back to it), and a stale `handled` sometimes matched the next line, which then never
+repeated. Seek sessions, tick timing and seek landing were all fine: one session change per seek,
+ticks every 35 ms, seeks landing 50–120 ms after the target, and no seeks by YouTube itself.
 
-Fix (`StudyPlaybackDriver`, `YouTubeWebController.replayFrom`):
+**Fix:** the driver keeps lines by `SubtitleSegment.id` (the store index, which is the same in
+every window). The same change fixes Read first's next-line stop and Skip silence's Jump, which
+used indices too. Earlier, more defensive changes stay (taps tell the driver through
+`learnerSeek`, the count belongs to the line, a seek's target is kept until playback passes it):
+they cover the seek races, and their tests still pass.
 
-- Taps, the AI assistant and the TV remote tell the driver about their seek
-  (`learnerSeek`, through `learnerSeekListener`). The old line is forgotten at once, and ticks
-  are ignored until playback reaches the tapped line (or the new session starts).
-- The repeat count belongs to the line (`repeatedLine`), not to entering it.
-- The driver's own seek stays known until playback is 1.5 s past it, so a second session for the
-  same seek is not taken for the learner's.
-- Until a seek has landed and playback has reached its target, lines starting before it are not
-  entered (`seekFloor`), so a seek landing early can't repeat the line before.
+Verified on the emulator: about 4 minutes of ×2, 54 lines entered and each repeated exactly once,
+in order, none skipped or looped. 4 taps on other lines (above and below) while a line repeated
+each went to the tapped line, played it twice and moved on. The unit test
+`aSlidingTranscriptWindowNeitherLoopsACountNorGoesBackALine` fails on the index-based driver.
 
-Unit tests reproduce all three cases and fail on the previous driver:
-`tappingTheNextLineNeverTakesTheVideoBackToTheOldOne`,
-`aSeekLandingEarlyInTheLineBeforeDoesNotRepeatThatLine` and
-`aCountedRepeatMovesOnWhenTheSeekLandsTwiceOrEarly`. Whether these were the exact causes on Kien's
-phone still needs his check on the next preview.
+Not changed: Pause on lines with one new word still matches the window index against
+`oneNewWordLines`, which comes from the same window.
 
 ## Risks / edge cases
 

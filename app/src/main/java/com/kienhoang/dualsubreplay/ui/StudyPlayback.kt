@@ -85,22 +85,25 @@ internal data class StudyTick(
 internal class StudyPlaybackDriver {
     private class OwnSeek(
         val targetMs: Long,
-        /** The line whose end handling starts again when the seek lands (a repeat). */
-        val replayLine: Int = -1,
+        /** True for a repeat: the line's end is handled again when the seek lands. */
+        val replay: Boolean = false,
     ) {
         var landed = false
     }
 
     private var videoId: String? = null
     private var session: String? = null
-    private var entered = -1
-    private var handled = -1
-    private var readStartHandled = -1
+
+    // Lines are kept by [SubtitleSegment.id], not by index: the segments are a window that slides
+    // with playback (also back, after a repeat), so an index can name another line a tick later.
+    private var entered: Long? = null
+    private var handled: Long? = null
+    private var readStartHandled: Long? = null
 
     /** The line Repeat each line is counting, and how many times it has played again. */
-    private var repeatedLine = -1
+    private var repeatedLine: Long? = null
     private var repeats = 0
-    private var jumpedGap = -1
+    private var jumpedGap: Long? = null
     private var gapRate: Float? = null
     private var ownSeek: OwnSeek? = null
 
@@ -183,12 +186,12 @@ internal class StudyPlaybackDriver {
     }
 
     private fun forgetLines() {
-        entered = -1
-        handled = -1
-        readStartHandled = -1
-        repeatedLine = -1
+        entered = null
+        handled = null
+        readStartHandled = null
+        repeatedLine = null
         repeats = 0
-        jumpedGap = -1
+        jumpedGap = null
     }
 
     private fun landSeek(timeMs: Long) {
@@ -200,7 +203,7 @@ internal class StudyPlaybackDriver {
         } else {
             own.landed = true
             floorLanded = true
-            if (own.replayLine >= 0) handled = -1
+            if (own.replay) handled = null
         }
     }
 
@@ -210,12 +213,14 @@ internal class StudyPlaybackDriver {
         mode: StudyPlayMode,
         index: Int,
     ): StudyAction? {
-        val line = entered
-        if (mode == StudyPlayMode.NORMAL || line !in tick.segments.indices || handled == line) return null
+        val id = entered
+        if (mode == StudyPlayMode.NORMAL || id == null || handled == id) return null
+        val line = tick.segments.indexOfFirst { it.id == id }
+        if (line < 0) return null
         val end = lineBoundary(tick.segments, line)
         if (tick.timeMs < end - STUDY_PAUSE_LEAD_MS) return null
         if (index != line && tick.timeMs >= end + STUDY_CATCH_UP_MS) return null
-        handled = line
+        handled = id
         return when (mode) {
             StudyPlayMode.PAUSE_AFTER_LINE, StudyPlayMode.LISTEN_FIRST -> StudyAction.Pause
             StudyPlayMode.NEW_WORD_LINES -> StudyAction.Pause.takeIf { line in tick.newWordLines }
@@ -229,15 +234,16 @@ internal class StudyPlaybackDriver {
         tick: StudyTick,
         line: Int,
     ): StudyAction? {
-        if (line != repeatedLine) {
-            repeatedLine = line
+        val segment = tick.segments[line]
+        if (segment.id != repeatedLine) {
+            repeatedLine = segment.id
             repeats = 0
         }
         val count = tick.settings.repeatCount
         if (count != STUDY_REPEAT_FOREVER && repeats >= count - 1) return null
         repeats++
-        val start = tick.segments[line].startMs
-        ownSeek = OwnSeek(start, replayLine = line)
+        val start = segment.startMs
+        ownSeek = OwnSeek(start, replay = true)
         seekFloor = start
         floorLanded = false
         return StudyAction.PlayFrom(start)
@@ -248,7 +254,7 @@ internal class StudyPlaybackDriver {
         next: Int,
     ): StudyAction? {
         val segment = segments.getOrNull(next) ?: return null
-        readStartHandled = next
+        readStartHandled = segment.id
         val target = segment.startMs + STUDY_READ_OFFSET_MS
         ownSeek = OwnSeek(target)
         return StudyAction.PauseAt(target)
@@ -264,7 +270,7 @@ internal class StudyPlaybackDriver {
         val next = index + 1
         val segment = tick.segments.getOrNull(next) ?: return null
         val inGap = index < 0 || tick.timeMs >= tick.segments[index].endMs
-        if (!inGap || readStartHandled == next || segment.startMs - tick.timeMs > STUDY_PAUSE_LEAD_MS) return null
+        if (!inGap || readStartHandled == segment.id || segment.startMs - tick.timeMs > STUDY_PAUSE_LEAD_MS) return null
         return readNext(tick.segments, next)
     }
 
@@ -272,10 +278,11 @@ internal class StudyPlaybackDriver {
         tick: StudyTick,
         index: Int,
     ): StudyAction? {
-        if (index < 0 || index == entered) return null
-        if (seekFloor?.let { tick.segments[index].startMs + LEARNER_SEEK_EARLY_MS < it } == true) return null
+        val segment = tick.segments.getOrNull(index) ?: return null
+        if (segment.id == entered) return null
+        if (seekFloor?.let { segment.startMs + LEARNER_SEEK_EARLY_MS < it } == true) return null
         if (tick.timeMs >= lineBoundary(tick.segments, index) - STUDY_PAUSE_LEAD_MS) return null
-        entered = index
+        entered = segment.id
         return null
     }
 
@@ -290,8 +297,8 @@ internal class StudyPlaybackDriver {
         val remaining = next.startMs - tick.timeMs
         val rate = skip.rate
         return when {
-            skip == SkipSilence.JUMP && remaining > SKIP_SILENCE_MIN_GAP_MS && jumpedGap != index + 1 -> {
-                jumpedGap = index + 1
+            skip == SkipSilence.JUMP && remaining > SKIP_SILENCE_MIN_GAP_MS && jumpedGap != next.id -> {
+                jumpedGap = next.id
                 val target = next.startMs - SKIP_SILENCE_JUMP_LEAD_MS
                 ownSeek = OwnSeek(target)
                 StudyAction.PlayFrom(target)

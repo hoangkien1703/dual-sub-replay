@@ -166,6 +166,42 @@ class StudyPlaybackTest {
     }
 
     @Test
+    fun aSlidingTranscriptWindowNeitherLoopsACountNorGoesBackALine() {
+        // The segments are a window that slides with playback, also back after a repeat: the same
+        // line has another index from one tick to the next (seen on a real video, 2026-11-04).
+        val joined =
+            listOf(
+                SubtitleSegment(1, 1_000, 3_000, "first"),
+                SubtitleSegment(2, 3_000, 5_000, "second"),
+                SubtitleSegment(3, 5_000, 7_000, "third"),
+            )
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 2)
+        val driver = StudyPlaybackDriver()
+        var slid = false
+
+        fun from(
+            fromMs: Long,
+            toMs: Long,
+            session: String,
+        ): List<StudyAction> {
+            val asked = mutableListOf<StudyAction>()
+            var time = fromMs
+            while (time <= toMs) {
+                slid = !slid
+                val window = if (slid) joined.drop(1) else joined
+                driver.tick(StudyTick("abcdefghijk", time, session, false, window, settings))?.let { asked += it }
+                time += 33
+            }
+            return asked
+        }
+        driver.learnerSeek(3_000)
+        assertEquals(listOf(StudyAction.PlayFrom(3_000)), from(3_000, 5_000, "s2"))
+        // The second play goes on to the next line, which gets its own two plays.
+        assertEquals(listOf(StudyAction.PlayFrom(5_000)), from(3_000, 7_000, "s3"))
+        assertEquals(emptyList<StudyAction>(), from(5_000, 7_500, "s4"))
+    }
+
+    @Test
     fun readFirstStopsAtTheStartOfEachLine() {
         val driver = StudyPlaybackDriver()
         val settings = StudySettings(playMode = StudyPlayMode.READ_FIRST)
