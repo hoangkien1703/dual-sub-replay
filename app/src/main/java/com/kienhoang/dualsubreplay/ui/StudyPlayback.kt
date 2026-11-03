@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,6 +28,12 @@ private const val SKIP_SILENCE_RESTORE_REAL_MS = 250L
 
 /** A seek landing this close to the one the driver asked for is the driver's own. */
 private const val OWN_SEEK_TOLERANCE_MS = 1_500L
+
+/**
+ * A tick this far before a tapped line's start already counts as there. Earlier ticks still show
+ * where the video was: the page can report the new time before its seek event (and new session).
+ */
+private const val LEARNER_SEEK_EARLY_MS = 50L
 
 /** What [StudyPlaybackDriver] asks the page video to do. */
 internal sealed interface StudyAction {
@@ -80,17 +87,49 @@ internal class StudyPlaybackDriver {
         val targetMs: Long,
         /** The line whose end handling starts again when the seek lands (a repeat). */
         val replayLine: Int = -1,
-    )
+    ) {
+        var landed = false
+    }
 
     private var videoId: String? = null
     private var session: String? = null
     private var entered = -1
     private var handled = -1
     private var readStartHandled = -1
+
+    /** The line Repeat each line is counting, and how many times it has played again. */
+    private var repeatedLine = -1
     private var repeats = 0
     private var jumpedGap = -1
     private var gapRate: Float? = null
     private var ownSeek: OwnSeek? = null
+
+    /** Where a line the learner tapped starts, until playback lands there. */
+    private var learnerTarget: Long? = null
+
+    /**
+     * Where the last seek (a repeat or a tapped line) went, until playback reaches it. A seek can
+     * land a little early, in the line before; that line is not entered, or its end would take the
+     * video back to it.
+     */
+    private var seekFloor: Long? = null
+
+    /** True once the seek behind [seekFloor] has landed; ticks before that still show the old place. */
+    private var floorLanded = false
+
+    /**
+     * The learner tapped a line (or the AI or the remote asked for one): the line playing before is
+     * done with, and no tick counts until playback reaches [targetMs]. Without this, a tick that
+     * already shows the next line under the old session ended the old line, and Repeat each line
+     * took the video back to it.
+     */
+    fun learnerSeek(targetMs: Long) {
+        ownSeek = null
+        forgetLines()
+        learnerTarget = targetMs
+        seekFloor = targetMs
+        floorLanded = false
+    }
 
     fun tick(tick: StudyTick): StudyAction? {
         if (tick.videoId != videoId) {
@@ -102,6 +141,8 @@ internal class StudyPlaybackDriver {
         val seek = session != null && tick.sessionId != session
         session = tick.sessionId
         if (seek) landSeek(tick.timeMs)
+        if (!landedOnLearnerTarget(seek, tick.timeMs)) return if (gapRate != null) normalSpeed() else null
+        passSeekTargets(tick.timeMs)
         val mode = if (tick.active) tick.settings.effectivePlayMode else StudyPlayMode.NORMAL
         val skip = if (tick.active) tick.settings.skipSilence else SkipSilence.OFF
         if (gapRate != null && (tick.paused || skip.rate == null)) return normalSpeed()
@@ -115,23 +156,51 @@ internal class StudyPlaybackDriver {
         forgetLines()
         gapRate = null
         ownSeek = null
+        learnerTarget = null
+        seekFloor = null
+    }
+
+    /**
+     * A seek of the driver's own stays known until playback is well past it, because the page can
+     * report one seek as two sessions; the second must not start the line's count again.
+     */
+    private fun passSeekTargets(timeMs: Long) {
+        ownSeek?.let { if (it.landed && timeMs > it.targetMs + OWN_SEEK_TOLERANCE_MS) ownSeek = null }
+        seekFloor?.let { if (floorLanded && timeMs >= it) seekFloor = null }
+    }
+
+    /** False while a tapped line's seek has not landed yet; the tick that lands starts afresh. */
+    private fun landedOnLearnerTarget(
+        seek: Boolean,
+        timeMs: Long,
+    ): Boolean {
+        val target = learnerTarget ?: return true
+        if (!seek && timeMs !in (target - LEARNER_SEEK_EARLY_MS)..(target + OWN_SEEK_TOLERANCE_MS)) return false
+        learnerTarget = null
+        floorLanded = true
+        forgetLines()
+        return true
     }
 
     private fun forgetLines() {
         entered = -1
         handled = -1
         readStartHandled = -1
+        repeatedLine = -1
         repeats = 0
         jumpedGap = -1
     }
 
     private fun landSeek(timeMs: Long) {
         val own = ownSeek?.takeIf { abs(timeMs - it.targetMs) <= OWN_SEEK_TOLERANCE_MS }
-        ownSeek = null
         if (own == null) {
+            ownSeek = null
+            if (seekFloor?.let { abs(timeMs - it) > OWN_SEEK_TOLERANCE_MS } == true) seekFloor = null
             forgetLines()
-        } else if (own.replayLine >= 0) {
-            handled = -1
+        } else {
+            own.landed = true
+            floorLanded = true
+            if (own.replayLine >= 0) handled = -1
         }
     }
 
@@ -160,11 +229,17 @@ internal class StudyPlaybackDriver {
         tick: StudyTick,
         line: Int,
     ): StudyAction? {
+        if (line != repeatedLine) {
+            repeatedLine = line
+            repeats = 0
+        }
         val count = tick.settings.repeatCount
         if (count != STUDY_REPEAT_FOREVER && repeats >= count - 1) return null
         repeats++
         val start = tick.segments[line].startMs
         ownSeek = OwnSeek(start, replayLine = line)
+        seekFloor = start
+        floorLanded = false
         return StudyAction.PlayFrom(start)
     }
 
@@ -198,9 +273,9 @@ internal class StudyPlaybackDriver {
         index: Int,
     ): StudyAction? {
         if (index < 0 || index == entered) return null
+        if (seekFloor?.let { tick.segments[index].startMs + LEARNER_SEEK_EARLY_MS < it } == true) return null
         if (tick.timeMs >= lineBoundary(tick.segments, index) - STUDY_PAUSE_LEAD_MS) return null
         entered = index
-        repeats = 0
         return null
     }
 
@@ -283,6 +358,11 @@ internal class StudyPlaybackRunner(
 
     @Volatile var newWordLines: Set<Int> = emptySet()
 
+    /** A line the learner tapped: see [StudyPlaybackDriver.learnerSeek]. */
+    fun onLearnerSeek(second: Float) {
+        driver.learnerSeek((second * MS_PER_SECOND).toLong())
+    }
+
     fun onPaused(paused: Boolean) {
         this.paused = paused
     }
@@ -321,7 +401,7 @@ internal class StudyPlaybackRunner(
             )
         when (val action = driver.tick(tick)) {
             StudyAction.Pause -> controller.pause()
-            is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND)
+            is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND, byPlayMode = true)
             is StudyAction.PauseAt -> controller.seekPaused(action.ms / MS_PER_SECOND)
             is StudyAction.GapSpeed -> controller.setGapSpeed(action.rate, action.safetyMs)
             StudyAction.NormalSpeed -> controller.setGapSpeed(null, 0L)
@@ -339,6 +419,11 @@ internal fun rememberStudyPlaybackRunner(
     state: DualSubUiState,
 ): StudyPlaybackRunner {
     val runner = remember(controller) { StudyPlaybackRunner(controller) }
+    DisposableEffect(controller, runner) {
+        val listener: (Float) -> Unit = runner::onLearnerSeek
+        controller.learnerSeekListener = listener
+        onDispose { if (controller.learnerSeekListener === listener) controller.learnerSeekListener = null }
+    }
     val settings by rememberStudySettings()
     val comprehension = LocalStudyTools.current?.comprehension
     val newWordLines = comprehension?.oneNewWordLines.orEmpty()

@@ -95,6 +95,35 @@ Before this change:
 | Live YouTube | Not run in the container | Owner's phone |
 | Performance | `PageCpuUseTest` stays within budget in PR CI | PR CI |
 
+## Repeat each line fixes (owner's preview test, 2026-11-03)
+
+On the preview (build 655), Kien found two problems with Repeat each line. Both happen on `main`
+too, because the play-mode driver is unchanged there:
+
+1. **Tapping another line jumped back to the line before it.** The page can report a seek's new
+   time before its `seeking` event, so before the new playback session starts. A tick that already
+   showed the next line under the old session counted as the old line ending, and the driver
+   played the old line again. A seek can also land a little early, inside the line before.
+2. **2 / 3 / 5 times looped forever.** The count started again whenever a line was entered again,
+   or a seek arrived as a second session, so a seek landing early or reported twice reset it.
+
+Fix (`StudyPlaybackDriver`, `YouTubeWebController.replayFrom`):
+
+- Taps, the AI assistant and the TV remote tell the driver about their seek
+  (`learnerSeek`, through `learnerSeekListener`). The old line is forgotten at once, and ticks
+  are ignored until playback reaches the tapped line (or the new session starts).
+- The repeat count belongs to the line (`repeatedLine`), not to entering it.
+- The driver's own seek stays known until playback is 1.5 s past it, so a second session for the
+  same seek is not taken for the learner's.
+- Until a seek has landed and playback has reached its target, lines starting before it are not
+  entered (`seekFloor`), so a seek landing early can't repeat the line before.
+
+Unit tests reproduce all three cases and fail on the previous driver:
+`tappingTheNextLineNeverTakesTheVideoBackToTheOldOne`,
+`aSeekLandingEarlyInTheLineBeforeDoesNotRepeatThatLine` and
+`aCountedRepeatMovesOnWhenTheSeekLandsTwiceOrEarly`. Whether these were the exact causes on Kien's
+phone still needs his check on the next preview.
+
 ## Risks / edge cases
 
 - A row taller than the panel cannot be centred; its top is aligned instead.

@@ -102,6 +102,70 @@ class StudyPlaybackTest {
     }
 
     @Test
+    fun tappingTheNextLineNeverTakesTheVideoBackToTheOldOne() {
+        // Back-to-back lines, as YouTube's auto captions often are.
+        val joined = listOf(SubtitleSegment(1, 1_000, 3_000, "first"), SubtitleSegment(2, 3_000, 5_000, "second"))
+        for (count in listOf(2, STUDY_REPEAT_FOREVER)) {
+            val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = count)
+            val driver = StudyPlaybackDriver()
+
+            fun at(
+                timeMs: Long,
+                session: String,
+            ) = driver.tick(StudyTick("abcdefghijk", timeMs, session, false, joined, settings))
+            var time = 900L
+            while (time <= 2_500) {
+                assertNull(at(time, "s1"))
+                time += 33
+            }
+            driver.learnerSeek(3_000)
+            // A tick from before the seek, then the page reporting the new time before its seek event.
+            assertNull(at(2_533, "s1"))
+            assertNull("count $count", at(3_000, "s1"))
+            assertNull(at(3_033, "s2"))
+            // The tapped line is the one that repeats.
+            val asked = mutableListOf<StudyAction>()
+            time = 3_066
+            while (time <= 5_000) {
+                at(time, "s2")?.let { asked += it }
+                time += 33
+            }
+            assertEquals("count $count", listOf(StudyAction.PlayFrom(3_000)), asked)
+        }
+    }
+
+    @Test
+    fun aCountedRepeatMovesOnWhenTheSeekLandsTwiceOrEarly() {
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 2)
+        val driver = StudyPlaybackDriver()
+        // Line two ends: it plays once more.
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), play(driver, settings, 3_400, 5_000).map { it.second })
+        // The seek lands 200 ms early, in the gap after line one, and the page reports it as two sessions.
+        assertNull(tick(driver, settings, 3_300, session = "s2"))
+        assertNull(tick(driver, settings, 3_333, session = "s3"))
+        // Line two plays its second time, then the video goes on to line three: no third play.
+        assertEquals(emptyList<StudyAction>(), play(driver, settings, 3_366, 9_500, session = "s3").map { it.second })
+    }
+
+    @Test
+    fun aSeekLandingEarlyInTheLineBeforeDoesNotRepeatThatLine() {
+        val joined = listOf(SubtitleSegment(1, 1_000, 3_000, "first"), SubtitleSegment(2, 3_000, 5_000, "second"))
+        val settings = StudySettings(playMode = StudyPlayMode.REPEAT_LINE, repeatCount = 3)
+        val driver = StudyPlaybackDriver()
+        // Line one plays; the learner taps line two.
+        assertNull(driver.tick(StudyTick("abcdefghijk", 1_500, "s1", false, joined, settings)))
+        driver.learnerSeek(3_000)
+        val asked = mutableListOf<StudyAction>()
+        // The tapped line's seek lands 250 ms early, inside line one.
+        var time = 2_750L
+        while (time <= 5_000) {
+            driver.tick(StudyTick("abcdefghijk", time, "s2", false, joined, settings))?.let { asked += it }
+            time += 33
+        }
+        assertEquals(listOf(StudyAction.PlayFrom(3_000)), asked)
+    }
+
+    @Test
     fun readFirstStopsAtTheStartOfEachLine() {
         val driver = StudyPlaybackDriver()
         val settings = StudySettings(playMode = StudyPlayMode.READ_FIRST)
