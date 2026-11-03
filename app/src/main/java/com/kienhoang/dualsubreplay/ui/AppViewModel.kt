@@ -921,11 +921,13 @@ class AppViewModel internal constructor(
             it.copy(
                 selectedLearningWord =
                     tap?.let { selected ->
-                        com.kienhoang.dualsubreplay.data.learningSelection(
-                            if (current.liveFallback) selected.copy(segment = null) else selected,
-                            source,
-                            current.targetLanguage,
-                            current.activeVideoId.takeUnless { current.liveFallback },
+                        current.withThirdLineOnScreen(
+                            com.kienhoang.dualsubreplay.data.learningSelection(
+                                if (current.liveFallback) selected.copy(segment = null) else selected,
+                                source,
+                                current.targetLanguage,
+                                current.activeVideoId.takeUnless { current.liveFallback },
+                            ),
                         )
                     },
             )
@@ -961,7 +963,10 @@ class AppViewModel internal constructor(
         meaning: String,
         online: Boolean,
         deck: String? = null,
-    ): SavedWord = vocabulary.save(savedWordFrom(selection, meaning, online, videoTitle(selection.videoId)).copy(deck = deck))
+    ): SavedWord =
+        vocabulary.save(
+            savedWordFrom(_state.value.withThirdLineOnScreen(selection), meaning, online, videoTitle(selection.videoId)).copy(deck = deck),
+        )
 
     /** The title of [videoId] while the page plays it (the page reports title and address together); null otherwise. */
     internal fun videoTitle(videoId: String?): String? =

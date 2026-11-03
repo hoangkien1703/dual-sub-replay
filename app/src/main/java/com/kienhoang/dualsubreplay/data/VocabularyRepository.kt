@@ -219,7 +219,7 @@ internal class VocabularyRepository internal constructor(
                                 word.copy(
                                     sourceTitle = word.sourceTitle ?: existing.sourceTitle,
                                     notes = word.notes.ifBlank { existing.notes },
-                                )
+                                ).withThirdLineOf(existing)
                             val replacement =
                                 if (preserveReviewHistory) {
                                     kept.copy(dueAt = existing.dueAt, intervalMs = existing.intervalMs)
@@ -293,6 +293,8 @@ internal fun encodeWord(w: SavedWord): JSONObject =
         put("deck", w.deck)
         put("sourceTitle", w.sourceTitle)
         if (w.notes.isNotEmpty()) put("notes", w.notes)
+        w.thirdSentence?.let { put("thirdSentence", it) }
+        w.thirdLanguage?.let { put("thirdLanguage", it) }
     }
 
 internal fun decodeWord(j: JSONObject): SavedWord =
@@ -316,4 +318,4 @@ internal fun decodeWord(j: JSONObject): SavedWord =
         sourceTitle = cleanSourceTitle(j.optString("sourceTitle")),
         // "personalNotes" is the name in Triple Sub Replay's backups (mrAlishah's fork), so they import here too.
         notes = j.optString("notes").ifEmpty { j.optString("personalNotes") }.take(MAX_WORD_NOTES_LENGTH),
-    )
+    ).withThirdLine(j.optString("thirdSentence"), j.optString("thirdLanguage"))

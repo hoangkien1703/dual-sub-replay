@@ -150,15 +150,19 @@ internal fun WordLearningDialog(
 /**
  * The meaning, the answer the learner opened the card for: a tinted panel with an accent bar and
  * large bold text right under the word (owner request 2026-10-24). The pencil turns it into a
- * text field to correct the meaning before saving.
+ * text field to correct the meaning before saving. Practice shows saved words with the same panel:
+ * read-only in a review ([editable] false), and [onDone] saves a corrected meaning.
  */
 @Composable
-private fun MeaningPanel(
+internal fun MeaningPanel(
     meaning: String,
     language: String,
     loading: Boolean,
     enabled: Boolean,
     onChange: (String) -> Unit,
+    editable: Boolean = true,
+    onDone: () -> Unit = {},
+    textTag: String = "word_meaning_text",
 ) {
     var editing by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
@@ -191,16 +195,21 @@ private fun MeaningPanel(
                             meaning.ifBlank { "…" },
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 2.dp).testTag("word_meaning_text"),
+                            modifier = Modifier.padding(top = 2.dp).testTag(textTag),
                         )
                 }
             }
-            IconButton(onClick = { editing = !editing }, enabled = enabled, modifier = Modifier.testTag("edit_meaning")) {
-                Icon(
-                    if (editing) Icons.Default.Check else Icons.Default.Edit,
-                    contentDescription = stringResource(if (editing) R.string.practice_meaning_done else R.string.practice_meaning_edit),
-                    tint = colors.primary,
-                )
+            if (editable) {
+                IconButton(onClick = {
+                    if (editing) onDone()
+                    editing = !editing
+                }, enabled = enabled, modifier = Modifier.testTag("edit_meaning")) {
+                    Icon(
+                        if (editing) Icons.Default.Check else Icons.Default.Edit,
+                        contentDescription = stringResource(if (editing) R.string.practice_meaning_done else R.string.practice_meaning_edit),
+                        tint = colors.primary,
+                    )
+                }
             }
         }
     }

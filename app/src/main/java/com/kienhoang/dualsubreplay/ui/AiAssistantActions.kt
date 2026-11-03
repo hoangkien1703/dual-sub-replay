@@ -27,6 +27,7 @@ import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.validClipRange
+import com.kienhoang.dualsubreplay.data.withThirdLine
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.translation.storedGoogleWait
@@ -387,7 +388,7 @@ internal fun aiSavedWord(
         endMs = segment?.endMs ?: 0,
         translated = false,
         online = validClipRange(clipVideo, segment?.startMs ?: -1, segment?.endMs ?: -1),
-    )
+    ).withThirdLine(clipVideo?.let { state.thirdLineFor(segment) }, state.thirdLines.language)
 }
 
 /** Runs the assistant's actions with the same setters the settings page and player use. */

@@ -12,7 +12,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -120,11 +129,14 @@ internal fun SavedWordsScreen(
     }
     fun returnFromVideo() { onPause(); onlinePreview = false }
 
-    // Leaving a word keeps notes typed but not saved yet.
+    // Leaving a word keeps notes and a meaning typed but not saved yet.
     fun saveNotesIfChanged() {
         val word = selected ?: return
         val notes = editedNotes.trim().take(MAX_WORD_NOTES_LENGTH)
-        if (notes != word.notes) action { repository.update(word.id) { it.copy(notes = notes) } }
+        val meaning = editedMeaning.trim().ifEmpty { word.meaning }
+        if (notes != word.notes || meaning != word.meaning) {
+            action { repository.update(word.id) { it.copy(notes = notes, meaning = meaning) } }
+        }
     }
 
     if (onlinePreview) {
@@ -222,32 +234,32 @@ internal fun SavedWordsScreen(
                             }
                         }
                         if (practice && !revealed) {
+                            // The front of the card, as on the Anki card: the word's own line as a hint, translations hidden.
+                            PracticeExample(selected, revealed = false)
                             Button(onClick = { revealed = true }, modifier = Modifier.testTag("reveal_meaning")) { Text(showMeaningLabel) }
                         } else {
-                            if (practice) Text(selected.meaning, modifier = Modifier.testTag("review_meaning"))
-                            else {
-                                val meaningLabel = stringResource(R.string.practice_meaning_label, selected.meaningLanguage)
-                                OutlinedTextField(editedMeaning, { editedMeaning = it }, label = { Text(meaningLabel) })
-                                TextButton(enabled = !busy && editedMeaning != selected.meaning, onClick = { action {
-                                    repository.update(selected.id) { it.copy(meaning = editedMeaning.trim()) }
-                                } }) { Text(stringResource(R.string.practice_save_meaning)) }
-                            }
+                            MeaningPanel(
+                                meaning = if (practice) selected.meaning else editedMeaning,
+                                language = selected.meaningLanguage,
+                                loading = false,
+                                enabled = !busy,
+                                onChange = { editedMeaning = it },
+                                editable = !practice,
+                                onDone = {
+                                    val meaning = editedMeaning.trim()
+                                    if (meaning.isNotEmpty() && meaning != selected.meaning) {
+                                        action { repository.update(selected.id) { it.copy(meaning = meaning) } }
+                                    }
+                                },
+                                textTag = if (practice) "review_meaning" else "word_meaning_text",
+                            )
                             if (!practice) {
                                 DeckChip(selected.deck, selected.wordLanguage, named, { deck ->
                                     action { repository.update(selected.id) { it.copy(deck = deck) } }
                                 }, enabled = !busy, tag = "word_deck")
                             }
-                            Text(selected.sentence)
-                            selected.translatedSentence?.let { Text(it) }
+                            PracticeExample(selected, revealed = true)
                             if (selected.translated) Text(originalSentenceNote, style = MaterialTheme.typography.bodySmall)
-                            selected.sourceTitle?.let { title ->
-                                Text(
-                                    stringResource(R.string.practice_from_video, title),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.testTag("word_source_title"),
-                                )
-                            }
                             if (practice) {
                                 if (selected.notes.isNotBlank()) {
                                     Text(stringResource(R.string.practice_notes_label), style = MaterialTheme.typography.labelMedium)
@@ -271,13 +283,23 @@ internal fun SavedWordsScreen(
                                 pronouncer.stop(); onlinePreview = true; onOnline(selected)
                             }, modifier = Modifier.testTag("play_online_clip")) { Text(playOnlineLabel) }
                             if (practice) {
-                                ReviewRating.entries.forEach { rating ->
-                                    OutlinedButton(enabled = !busy, modifier = Modifier.fillMaxWidth().testTag("review_${rating.name.lowercase()}"), onClick = {
-                                        action {
-                                            repository.update(selected.id) { reviewWord(it, rating, System.currentTimeMillis()) }
-                                            queue = queue.drop(1); pronouncer.stop()
+                                // Two rows of two, so all four answers fit on a phone without scrolling.
+                                ReviewRating.entries.chunked(2).forEach { pair ->
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        pair.forEach { rating ->
+                                            OutlinedButton(
+                                                enabled = !busy,
+                                                modifier = Modifier.weight(1f).testTag("review_${rating.name.lowercase()}"),
+                                                onClick = {
+                                                    action {
+                                                        repository.update(selected.id) { reviewWord(it, rating, System.currentTimeMillis()) }
+                                                        queue = queue.drop(1)
+                                                        pronouncer.stop()
+                                                    }
+                                                },
+                                            ) { Text(ratingText(rating, reviewInterval(selected.intervalMs, rating)), textAlign = TextAlign.Center) }
                                         }
-                                    }) { Text(ratingText(rating, reviewInterval(selected.intervalMs, rating))) }
+                                    }
                                 }
                             } else if (validClipRange(selected.videoId, selected.startMs, selected.endMs)) {
                                 ClipChoice(onlineExampleLabel, selected.online, { enabled -> action { repository.update(selected.id) { it.copy(online = enabled) } } }, "saved_online_choice")
@@ -334,4 +356,71 @@ internal fun SavedWordsScreen(
                 action { repository.remove(word.id); selectedId = null }
             }) { Text(deleteLabel) } }, dismissButton = { TextButton(onClick = { confirmDelete = null }) { Text(keepLabel) } })
     }
+}
+
+/**
+ * The word's example in a tinted box: its own line first, with the word in bold accent color as in the
+ * word card, then the other lines smaller and dimmer, and the video it came from. Before "Show meaning"
+ * ([revealed] false) only the word's own line shows.
+ */
+@Composable
+private fun PracticeExample(
+    word: SavedWord,
+    revealed: Boolean,
+) {
+    val colors = MaterialTheme.colorScheme
+    val own = if (word.translated) word.translatedSentence ?: word.sentence else word.sentence
+    val lines = if (revealed) listOfNotNull(word.sentence, word.translatedSentence, word.thirdSentence) else listOf(own)
+    if (lines.all { it.isBlank() } && (!revealed || word.sourceTitle == null)) return
+    Surface(
+        color = colors.surfaceVariant.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().testTag("word_example"),
+    ) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            lines.filter { it.isNotBlank() }.forEach { line ->
+                val main = line == own
+                PracticeSentence(
+                    text = withWordHighlighted(line, word.word, colors.primary),
+                    style = if (main) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium,
+                    color = if (main) colors.onSurface else colors.onSurfaceVariant,
+                    modifier = if (line == word.thirdSentence && revealed) Modifier.testTag("word_third_sentence") else Modifier,
+                )
+            }
+            if (revealed) {
+                word.sourceTitle?.let { title ->
+                    Text(
+                        stringResource(R.string.practice_from_video, title),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
+                        modifier = Modifier.testTag("word_source_title"),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** [text] with the first appearance of [word] in bold [color], like the Anki card's sentence. */
+internal fun withWordHighlighted(
+    text: String,
+    word: String,
+    color: Color,
+): AnnotatedString {
+    val at = if (word.isBlank()) -1 else text.indexOf(word, ignoreCase = true)
+    return buildAnnotatedString {
+        append(text)
+        if (at >= 0) addStyle(SpanStyle(color = color, fontWeight = FontWeight.Bold), at, at + word.length)
+    }
+}
+
+/** A subtitle line in Practice: a Persian, Arabic or Hebrew line reads right to left from its own side (issue #152). */
+@Composable
+private fun PracticeSentence(
+    text: AnnotatedString,
+    style: TextStyle,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Text(text, modifier.lineSide(text, LocalLayoutDirection.current), color = color, style = style.inLineDirection())
 }

@@ -44,4 +44,37 @@ class SavedWordsScreenTest {
             repository.close(); context.deleteDatabase(name)
         }
     }
+
+    @Test fun practiceShowsTheThirdSubtitleLineAfterTheMeaning() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val name = "vocabulary-ui-${UUID.randomUUID()}.db"
+        val repository = VocabularyRepository(context, name)
+        val visible = androidx.compose.runtime.mutableStateOf(true)
+        val selection =
+            LearningWordSelection(
+                AnalyzedToken("Hund", 4, 8, PartOfSpeech.NOUN),
+                "de",
+                "en",
+                "dQw4w9WgXcQ",
+                SubtitleSegment(1, 1000, 3000, "Der Hund schläft.", "The dog sleeps."),
+                false,
+                thirdText = "سگ می‌خوابد.",
+                thirdLanguage = "fa",
+            )
+        runBlocking { repository.save(savedWordFrom(selection, "dog", false)) }
+        try {
+            compose.setContent { DualSubTheme { if (visible.value) SavedWordsScreen(repository, {}, {}, {}) } }
+            compose.waitForIdle()
+            compose.onNodeWithTag("practice_words").performClick()
+            compose.onNodeWithTag("word_third_sentence").assertDoesNotExist()
+            compose.onNodeWithTag("reveal_meaning").performClick()
+            compose.onNodeWithTag("word_third_sentence").performScrollTo().assertTextEquals("سگ می‌خوابد.")
+            saveUiEvidence("word-practice-third-line")
+        } finally {
+            compose.runOnIdle { visible.value = false }
+            compose.waitForIdle()
+            repository.close()
+            context.deleteDatabase(name)
+        }
+    }
 }
