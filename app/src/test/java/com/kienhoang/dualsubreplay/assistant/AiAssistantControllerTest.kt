@@ -585,6 +585,27 @@ class AiAssistantControllerTest {
     }
 
     @Test
+    fun aTappedKeyIsAskedFirstAndStaysChosenAfterARestart() {
+        checkedGeminiKey()
+        val second = keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        val controller = controller()
+        controller.useKey(AiProvider.GEMINI, second)
+        assertEquals(second, controller.state.value.keyInUse(AiProvider.GEMINI))
+        controller.send("Hi", "guide")
+        assertEquals(listOf(secondGeminiKey), transport.requests.map { it.apiKey })
+        assertEquals(second, controller().state.value.keyInUse(AiProvider.GEMINI))
+    }
+
+    @Test
+    fun theKeyThatTookOverAfterALimitIsStillInUseAfterARestart() {
+        checkedGeminiKey()
+        val second = keyStore.save(AiProvider.GEMINI, secondGeminiKey)
+        transport.failForKey[geminiKey] = AiChatException(AiErrorKind.RATE_LIMITED, "Quota exceeded.")
+        controller().send("Hi", "guide")
+        assertEquals(second, controller().state.value.keyInUse(AiProvider.GEMINI))
+    }
+
+    @Test
     fun aRejectedKeyLosesItsCheckWhileAnotherKeyKeepsTheChatOpen() {
         checkedGeminiKey()
         keyStore.save(AiProvider.GEMINI, secondGeminiKey)

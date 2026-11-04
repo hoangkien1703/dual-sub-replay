@@ -223,12 +223,24 @@ internal class AiKeyStore(
         storage.remove(listOf(name(CHECKED_PREFIX, provider, id)))
     }
 
+    /** The key the assistant asks first, chosen with a tap or the last one that answered; null before either. */
+    fun inUse(provider: AiProvider): String? = storage.get(IN_USE_PREFIX + provider.key)?.takeIf { it in ids(provider) }
+
+    /** Remembers [id] as the key the assistant asks first, so it stays the same after the app restarts. */
+    fun setInUse(
+        provider: AiProvider,
+        id: String,
+    ) {
+        if (id in ids(provider)) storage.put(mapOf(IN_USE_PREFIX + provider.key to id))
+    }
+
     fun remove(
         provider: AiProvider,
         id: String,
     ) {
         val rest = ids(provider).filter { it != id }
         storage.remove(listOf(name(KEY_PREFIX, provider, id), name(HINT_PREFIX, provider, id), name(CHECKED_PREFIX, provider, id)))
+        if (storage.get(IN_USE_PREFIX + provider.key) == id) storage.remove(listOf(IN_USE_PREFIX + provider.key))
         if (rest.isEmpty()) {
             storage.remove(listOf(ORDER_PREFIX + provider.key))
         } else {
@@ -252,6 +264,7 @@ internal class AiKeyStore(
         /** The first key of a service, stored under the names one key per service used. */
         const val LEGACY_KEY_ID = "0"
         const val ORDER_PREFIX = "keys_"
+        const val IN_USE_PREFIX = "key_in_use_"
         const val ORDER_SEPARATOR = ","
         const val ID_LENGTH = 8
     }

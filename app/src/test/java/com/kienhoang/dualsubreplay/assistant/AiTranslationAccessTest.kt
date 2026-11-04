@@ -102,6 +102,37 @@ class AiTranslationAccessTest {
             assertEquals("a", pacer.take(listOf("a")))
         }
 
+    @Test fun tryAgainWakesEveryRestingKey() =
+        runBlocking {
+            val pacer = AiKeyPacer(intervalMs = 0)
+            pacer.limited("a")
+            pacer.rejected("b")
+            assertNull(pacer.take(listOf("a", "b")))
+            pacer.wakeAll()
+            assertEquals("a", pacer.take(listOf("a", "b")))
+            assertEquals("b", pacer.take(listOf("a", "b")))
+        }
+
+    @Test fun aKeyAddedWhileEveryKeyRestsIsAskedAtOnce() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaFirstKey000000000000000000000000000")
+            val keys = mutableListOf<String>()
+            val transport =
+                AiChatTransport { request ->
+                    keys += request.apiKey
+                    if (request.apiKey.startsWith("AIzaFirst")) throw AiChatException(AiErrorKind.RATE_LIMITED)
+                    AiReply("{\"sentences\":[]}")
+                }
+            val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
+            val failure = runCatching { model.ask("system", "user") }.exceptionOrNull() as AiChatException
+            assertEquals(AiErrorKind.RATE_LIMITED, failure.kind)
+            // The same model, made when the video opened, finds the key added afterwards.
+            store.add(AiProvider.GEMINI, "AIzaSecondKey00000000000000000000000000")
+            assertEquals("{\"sentences\":[]}", model.ask("system", "user"))
+            assertEquals(listOf("AIzaFirst", "AIzaSecond"), keys.map { it.take(it.indexOf("Key")) })
+        }
+
     @Test fun aRateLimitedKeyHandsTheRequestToTheNextKey() =
         runBlocking {
             val store = AiKeyStore(MapStorage(), FakeCipher())

@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">Chọn dịch vụ AI</string>
     <string name="ai_settings_test_all">Kiểm tra tất cả khóa</string>
     <string name="ai_settings_keys_fallback">Khi một khóa bị từ chối, hết tín dụng hoặc chạm giới hạn, trợ lý sẽ tự chuyển sang khóa tiếp theo.</string>
+    <string name="ai_settings_keys_several">Chạm vào một khóa để trợ lý dùng khóa đó. Nếu khóa bị từ chối, hết tín dụng hoặc chạm giới hạn, trợ lý sẽ tự chuyển sang khóa tiếp theo. Dịch phụ đề dùng lần lượt tất cả các khóa.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini tính giới hạn miễn phí theo dự án Google Cloud, không theo khóa. Thêm khóa chỉ tăng số yêu cầu khi các khóa thuộc dự án hoặc tài khoản khác nhau.</string>
     <string name="ai_settings_keys_full">Bạn đã lưu số khóa tối đa cho dịch vụ này (%1$d). Hãy xóa một khóa để thêm khóa khác.</string>
     <string name="ai_settings_add_key">Thêm khóa khác</string>
-    <string name="ai_settings_key_in_use">Hoạt động · đang dùng</string>
+    <string name="ai_settings_key_in_use">%1$s · trợ lý đang dùng</string>
     <string name="ai_settings_key_works">Hoạt động</string>
     <string name="ai_settings_key_ending">Khóa kết thúc bằng %1$s</string>
     <string name="ai_settings_thinking_title">Mức suy nghĩ</string>

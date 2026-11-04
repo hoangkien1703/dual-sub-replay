@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">选择 AI 服务</string>
     <string name="ai_settings_test_all">测试所有密钥</string>
     <string name="ai_settings_keys_fallback">当某个密钥被拒绝、额度用完或达到上限时，助手会自动换用下一个密钥。</string>
+    <string name="ai_settings_keys_several">点按某个密钥即可让助手使用它。如果该密钥被拒绝、额度用完或达到上限，助手会自动换用下一个。字幕翻译会轮流使用你的所有密钥。</string>
+    <string name="ai_settings_gemini_keys_note">Gemini 的免费额度按 Google Cloud 项目计算，而不是按密钥。只有来自不同项目或账号的密钥才能增加可用请求次数。</string>
     <string name="ai_settings_keys_full">此服务已保存的密钥数量已达上限（%1$d 个）。请先删除一个再添加。</string>
     <string name="ai_settings_add_key">添加另一个密钥</string>
-    <string name="ai_settings_key_in_use">可用 · 正在使用</string>
+    <string name="ai_settings_key_in_use">%1$s · 助手正在使用</string>
     <string name="ai_settings_key_works">可用</string>
     <string name="ai_settings_key_ending">以 %1$s 结尾的密钥</string>
     <string name="ai_settings_thinking_title">思考</string>

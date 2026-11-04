@@ -126,10 +126,9 @@ internal fun aiTranslationModel(
     thinking: AiTranslationThinking = AiTranslationThinking.OFF,
 ): AiTranslationModel? {
     val provider = settings.provider
-    val ids = keyStore.keys(provider).map { it.id }
     val model = aiTranslationModelName(settings, chosenModel)
-    if (ids.isEmpty() || model.isBlank()) return null
-    return KeyedAiTranslationModel(provider, model, thinking, settings.baseUrlFor(provider), ids, keyStore, transport, pacer)
+    if (keyStore.keys(provider).isEmpty() || model.isBlank()) return null
+    return KeyedAiTranslationModel(provider, model, thinking, settings.baseUrlFor(provider), keyStore, transport, pacer)
 }
 
 /** Reads the AI assistant's settings and keys from the app's own storage. */
@@ -208,6 +207,18 @@ internal class AiKeyPacer(
     /** The service rejected the key. */
     suspend fun rejected(id: String) = lock.withLock { state(id).restUntil = now() + AI_TRANSLATION_BAD_KEY_REST_MS }
 
+    /**
+     * "Try AI again": every resting key may be asked at once. Without this the button only cleared the
+     * translator's own pause, and with every key still resting (up to 30 minutes) it failed again at once.
+     */
+    suspend fun wakeAll() =
+        lock.withLock {
+            keys.values.forEach { state ->
+                state.restUntil = Long.MIN_VALUE / 2
+                state.nextRestMs = AI_TRANSLATION_KEY_REST_MS
+            }
+        }
+
     private fun state(id: String) = keys.getOrPut(id) { KeyState() }
 
     companion object {
@@ -220,14 +231,11 @@ private class KeyedAiTranslationModel(
     private val model: String,
     thinking: AiTranslationThinking,
     private val baseUrl: String,
-    private val keyIds: List<String>,
     private val keyStore: AiKeyStore,
     private val transport: AiChatTransport,
     private val pacer: AiKeyPacer,
 ) : AiTranslationModel {
     override val scope: String = aiTranslationScope(provider, model, thinking)
-
-    private val pacedIds = keyIds.map { "${provider.key}/$it" }
 
     /** Cleared once the model refuses the thinking setting, so later requests do not fail first. */
     @Volatile private var effort = aiTranslationEffort(provider, model, thinking)
@@ -240,6 +248,11 @@ private class KeyedAiTranslationModel(
         val messages = listOf(AiWireMessage(AiRole.SYSTEM, system), AiWireMessage(AiRole.USER, user))
         val text = StreamedText(onText)
         var failure = AiChatException(AiErrorKind.RATE_LIMITED, "Every key is resting after its limit.")
+        // Read for every request, so a key added while a video plays is used at once (2026-11-04: a new
+        // key was left out until the video was opened again, and translation kept saying every key rests).
+        val keyIds = withContext(Dispatchers.IO) { keyStore.keys(provider).map { it.id } }
+        if (keyIds.isEmpty()) throw AiChatException(AiErrorKind.NO_KEY)
+        val pacedIds = keyIds.map { "${provider.key}/$it" }
         repeat(keyIds.size) {
             val paced = pacer.take(pacedIds) ?: throw failure
             val id = keyIds[pacedIds.indexOf(paced)]

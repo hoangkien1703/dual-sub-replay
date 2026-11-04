@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">Elegir un servicio de IA</string>
     <string name="ai_settings_test_all">Probar todas las claves</string>
     <string name="ai_settings_keys_fallback">Si una clave se rechaza, se queda sin crédito o alcanza su límite, el asistente pasa solo a la siguiente clave.</string>
+    <string name="ai_settings_keys_several">Toca una clave para que el asistente la use. Si se rechaza, se queda sin crédito o alcanza su límite, el asistente pasa solo a la siguiente. La traducción de subtítulos usa todas tus claves por turnos.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini cuenta los límites gratuitos por proyecto de Google Cloud, no por clave. Más claves solo dan más solicitudes si vienen de proyectos o cuentas distintos.</string>
     <string name="ai_settings_keys_full">Ya guardaste el máximo de claves para este servicio (%1$d). Quita una para añadir otra.</string>
     <string name="ai_settings_add_key">Añadir otra clave</string>
-    <string name="ai_settings_key_in_use">Funciona · en uso</string>
+    <string name="ai_settings_key_in_use">%1$s · la usa el asistente</string>
     <string name="ai_settings_key_works">Funciona</string>
     <string name="ai_settings_key_ending">Clave que termina en %1$s</string>
     <string name="ai_settings_thinking_title">Razonamiento</string>

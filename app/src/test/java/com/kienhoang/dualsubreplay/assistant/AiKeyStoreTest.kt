@@ -55,6 +55,25 @@ class AiKeyStoreTest {
     }
 
     @Test
+    fun theKeyInUseIsRememberedUntilItIsRemoved() {
+        var next = 0
+        val store = AiKeyStore(MapStorage(), FakeCipher()) { "id${++next}" }
+        val first = store.addId(AiProvider.GEMINI, key)
+        val second = store.addId(AiProvider.GEMINI, secondKey)
+        assertNull(store.inUse(AiProvider.GEMINI))
+        store.setInUse(AiProvider.GEMINI, second)
+        assertEquals(second, store.inUse(AiProvider.GEMINI))
+        assertNull(store.inUse(AiProvider.OPENAI))
+        // A key that is not saved is never chosen.
+        store.setInUse(AiProvider.GEMINI, "gone")
+        assertEquals(second, store.inUse(AiProvider.GEMINI))
+        store.remove(AiProvider.GEMINI, first)
+        assertEquals(second, store.inUse(AiProvider.GEMINI))
+        store.remove(AiProvider.GEMINI, second)
+        assertNull(store.inUse(AiProvider.GEMINI))
+    }
+
+    @Test
     fun aServiceKeepsSeveralKeysInTheOrderTheyWereAdded() {
         var next = 0
         val store = AiKeyStore(MapStorage(), FakeCipher()) { "id${++next}" }

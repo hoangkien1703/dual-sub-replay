@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">Sİ xidməti seçin</string>
     <string name="ai_settings_test_all">Bütün açarları yoxla</string>
     <string name="ai_settings_keys_fallback">Açar rədd ediləndə, balansı bitəndə və ya limitə çatanda köməkçi özü növbəti açara keçir.</string>
+    <string name="ai_settings_keys_several">Köməkçinin istifadə etməsi üçün açara toxunun. Açar rədd ediləndə, balansı bitəndə və ya limitə çatanda köməkçi özü növbəti açara keçir. Altyazı tərcüməsi bütün açarlarınızı növbə ilə işlədir.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini pulsuz limitləri açara görə yox, Google Cloud layihəsinə görə sayır. Əlavə açarlar yalnız fərqli layihə və ya hesablardan olanda daha çox sorğu verir.</string>
     <string name="ai_settings_keys_full">Bu xidmət üçün ən çox açarı saxlamısınız (%1$d). Başqasını əlavə etmək üçün birini silin.</string>
     <string name="ai_settings_add_key">Başqa açar əlavə et</string>
-    <string name="ai_settings_key_in_use">İşləyir · indi istifadədədir</string>
+    <string name="ai_settings_key_in_use">%1$s · köməkçi istifadə edir</string>
     <string name="ai_settings_key_works">İşləyir</string>
     <string name="ai_settings_key_ending">Sonu %1$s olan açar</string>
     <string name="ai_settings_thinking_title">Düşünmə</string>
