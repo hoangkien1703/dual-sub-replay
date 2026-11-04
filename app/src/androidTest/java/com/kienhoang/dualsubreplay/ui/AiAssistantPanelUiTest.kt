@@ -7,8 +7,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
@@ -663,6 +665,14 @@ class AiAssistantPanelUiTest {
             composeRule.onNodeWithText("Key ending in wxyz").assertIsDisplayed()
             composeRule.onNodeWithTag("ai_test_connection").performScrollTo().assertTextEquals("Test all keys")
             saveUiEvidence("ai_settings_keys")
+
+            // A tap makes a key the assistant's key.
+            composeRule.onNodeWithText("Key ending in wxyz").performScrollTo().performClick()
+            composeRule.waitForIdle()
+            composeRule.onAllNodesWithTag("ai_test_result", useUnmergedTree = true).assertAny(hasText("Works · the assistant uses it"))
+            composeRule.onAllNodesWithTag("ai_key_row")[1].assertIsSelected()
+            composeRule.onAllNodesWithTag("ai_key_row")[0].assertIsNotSelected()
+            saveUiEvidence("ai_settings_keys_tapped")
 
             composeRule.onNodeWithTag("ai_section_permissions").performScrollTo().performClick()
             composeRule

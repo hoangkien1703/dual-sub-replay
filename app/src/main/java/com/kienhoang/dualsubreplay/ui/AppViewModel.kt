@@ -11,6 +11,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.AiHttpTransport
+import com.kienhoang.dualsubreplay.assistant.AiKeyPacer
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.CaptionProvider
@@ -1140,6 +1141,7 @@ class AppViewModel internal constructor(
     fun tryGoogleTranslationAgain() {
         googleFailedOnMobile = false
         aiTranslator.tryAgain()
+        viewModelScope.launch { AiKeyPacer.Shared.wakeAll() }
         _state.update(::withGoogleAgain)
     }
 

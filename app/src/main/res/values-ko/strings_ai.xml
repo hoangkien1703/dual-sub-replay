@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">AI 서비스 선택</string>
     <string name="ai_settings_test_all">모든 키 테스트</string>
     <string name="ai_settings_keys_fallback">키가 거부되거나 크레딧이 떨어지거나 한도에 도달하면 도우미가 자동으로 다음 키로 전환합니다.</string>
+    <string name="ai_settings_keys_several">키를 탭하면 도우미가 그 키를 사용합니다. 키가 거부되거나 크레딧이 떨어지거나 한도에 도달하면 자동으로 다음 키로 전환합니다. 자막 번역은 모든 키를 번갈아 사용합니다.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini 무료 한도는 키가 아니라 Google Cloud 프로젝트별로 계산됩니다. 다른 프로젝트나 계정의 키를 추가해야 요청 수가 늘어납니다.</string>
     <string name="ai_settings_keys_full">이 서비스에 저장할 수 있는 최대 키 수(%1$d개)에 도달했습니다. 다른 키를 추가하려면 하나를 삭제하세요.</string>
     <string name="ai_settings_add_key">다른 키 추가</string>
-    <string name="ai_settings_key_in_use">작동함 · 사용 중</string>
+    <string name="ai_settings_key_in_use">%1$s · 도우미가 사용 중</string>
     <string name="ai_settings_key_works">작동함</string>
     <string name="ai_settings_key_ending">%1$s(으)로 끝나는 키</string>
     <string name="ai_settings_thinking_title">생각</string>

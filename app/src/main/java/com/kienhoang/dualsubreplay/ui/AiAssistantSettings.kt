@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Key
@@ -450,14 +451,24 @@ private fun AiKeySettings(
 ) {
     val provider = aiState.settings.provider
     val keys = aiState.currentKeys
-    keys.forEach { key -> AiKeyRow(aiState, key, onRemove = { controller.removeKey(provider, key.id) }) }
+    Column(Modifier.selectableGroup()) {
+        keys.forEach { key ->
+            AiKeyRow(
+                aiState,
+                key,
+                onUse = { controller.useKey(provider, key.id) },
+                onRemove = { controller.removeKey(provider, key.id) },
+            )
+        }
+    }
     if (keys.isNotEmpty()) {
         OutlinedButton(
             onClick = controller::testConnection,
             enabled = aiState.connectionTest != AiConnectionTest.Testing,
             modifier = Modifier.padding(top = 4.dp).testTag("ai_test_connection"),
         ) { Text(stringResource(if (keys.size > 1) R.string.ai_settings_test_all else R.string.ai_settings_test)) }
-        SettingsHint(stringResource(R.string.ai_settings_keys_fallback))
+        SettingsHint(stringResource(if (keys.size > 1) R.string.ai_settings_keys_several else R.string.ai_settings_keys_fallback))
+        if (provider == AiProvider.GEMINI && keys.size > 1) SettingsHint(stringResource(R.string.ai_settings_gemini_keys_note))
         SettingsSectionDivider()
     }
     when {
@@ -476,37 +487,52 @@ private fun AiKeySettings(
     if (provider == AiProvider.GEMINI) SettingsHint(stringResource(R.string.ai_settings_gemini_note))
 }
 
-/** "•••• fpzA", what its last check said, and Remove. */
+/** "•••• fpzA", what its last check said, and Remove; with several keys, a tap makes it the assistant's key. */
 @Composable
 private fun AiKeyRow(
     aiState: AiAssistantUiState,
     key: AiSavedKey,
+    onUse: () -> Unit,
     onRemove: () -> Unit,
 ) {
     val test = aiState.keyTests[key.id]
     val failure = (test as? AiConnectionTest.Failed)?.failure
     val checked = key.checkedSetup == aiCheckedSetup(aiState.settings, aiState.settings.provider)
-    val inUse = aiState.keyInUse(aiState.settings.provider) == key.id
-    val status =
+    val several = aiState.currentKeys.size > 1
+    val inUse = several && aiState.keyInUse(aiState.settings.provider) == key.id
+    val result =
         when {
             test == AiConnectionTest.Testing -> stringResource(R.string.ai_checking)
             failure != null -> stringResource(failure.kind.messageRes())
-            checked && inUse && aiState.currentKeys.size > 1 -> stringResource(R.string.ai_settings_key_in_use)
-            checked && aiState.currentKeys.size > 1 -> stringResource(R.string.ai_settings_key_works)
+            checked && several -> stringResource(R.string.ai_settings_key_works)
             checked -> stringResource(R.string.ai_settings_test_passed)
             else -> stringResource(R.string.ai_settings_not_checked)
         }
+    val status = if (inUse) stringResource(R.string.ai_settings_key_in_use, result) else result
     val color =
         when {
             failure != null -> MaterialTheme.colorScheme.error
             test == AiConnectionTest.Testing || checked -> MaterialTheme.colorScheme.primary
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
-    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("ai_key_row"), verticalAlignment = Alignment.CenterVertically) {
+    val choose =
+        if (several) {
+            Modifier.selectable(selected = inUse, role = Role.RadioButton, onClick = onUse)
+        } else {
+            Modifier
+        }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .then(choose)
+            .padding(vertical = 4.dp)
+            .testTag("ai_key_row"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Icon(
-            Icons.Default.Key,
+            if (inUse) Icons.Default.CheckCircle else Icons.Default.Key,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = if (inUse) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
         Spacer(Modifier.width(10.dp))

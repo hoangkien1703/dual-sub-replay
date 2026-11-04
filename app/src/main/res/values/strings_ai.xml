@@ -208,9 +208,11 @@
     <string name="ai_settings_service_choose">Choose an AI service</string>
     <string name="ai_settings_test_all">Test all keys</string>
     <string name="ai_settings_keys_fallback">When a key is rejected, runs out of credit or hits its limit, the assistant switches to the next key on its own.</string>
+    <string name="ai_settings_keys_several">Tap a key to make the assistant use it. If that key is rejected, runs out of credit or hits its limit, the assistant moves to the next one on its own. Subtitle translation takes turns with all your keys.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini counts free limits per Google Cloud project, not per key. Extra keys only add more requests when they come from different projects or accounts.</string>
     <string name="ai_settings_keys_full">You\'ve saved the most keys for this service (%1$d). Remove one to add another.</string>
     <string name="ai_settings_add_key">Add another key</string>
-    <string name="ai_settings_key_in_use">Works · in use now</string>
+    <string name="ai_settings_key_in_use">%1$s · the assistant uses it</string>
     <string name="ai_settings_key_works">Works</string>
     <string name="ai_settings_key_ending">Key ending in %1$s</string>
     <string name="ai_settings_thinking_title">Thinking</string>

@@ -202,9 +202,11 @@
     <string name="ai_settings_service_choose">Pilih layanan AI</string>
     <string name="ai_settings_test_all">Uji semua kunci</string>
     <string name="ai_settings_keys_fallback">Jika kunci ditolak, kehabisan kredit, atau mencapai batasnya, asisten otomatis beralih ke kunci berikutnya.</string>
+    <string name="ai_settings_keys_several">Ketuk kunci agar asisten memakainya. Jika kunci itu ditolak, kehabisan kredit, atau mencapai batasnya, asisten otomatis beralih ke kunci berikutnya. Terjemahan subtitle memakai semua kunci Anda secara bergiliran.</string>
+    <string name="ai_settings_gemini_keys_note">Gemini menghitung batas gratis per proyek Google Cloud, bukan per kunci. Kunci tambahan hanya menambah permintaan jika berasal dari proyek atau akun yang berbeda.</string>
     <string name="ai_settings_keys_full">Anda sudah menyimpan kunci maksimum untuk layanan ini (%1$d). Hapus satu untuk menambah yang lain.</string>
     <string name="ai_settings_add_key">Tambah kunci lain</string>
-    <string name="ai_settings_key_in_use">Berfungsi · sedang dipakai</string>
+    <string name="ai_settings_key_in_use">%1$s · dipakai asisten</string>
     <string name="ai_settings_key_works">Berfungsi</string>
     <string name="ai_settings_key_ending">Kunci berakhiran %1$s</string>
     <string name="ai_settings_thinking_title">Berpikir</string>

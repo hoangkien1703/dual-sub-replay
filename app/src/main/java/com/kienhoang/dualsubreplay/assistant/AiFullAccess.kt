@@ -290,4 +290,8 @@ internal fun aiFullAccessPrompt(state: AiAssistantUiState): String =
             append("\n- ").append(provider.key).append(": ")
             append(keys.joinToString(", ") { it.hint + if (it.id == inUse) " (in use)" else "" })
         }
+        if (state.keys.values.any { it.size > 1 }) {
+            append("\n(The assistant asks the key in use first and moves on when one is rejected or limited; ")
+            append("the user taps a key in AI settings to choose it. Subtitle translation takes turns with all keys.)")
+        }
     }
