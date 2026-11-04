@@ -78,7 +78,8 @@
     <string name="settings_peek">Xem video. Giữ để xem nhanh, hoặc chạm để video hiện cho đến khi quay lại</string>
     <string name="settings_peek_back">Quay lại cài đặt</string>
     <string name="settings_group_languages">Ngôn ngữ</string>
-    <string name="settings_group_reading">Đọc</string>
+    <string name="settings_section_reading_title">Đọc &amp; chế độ xem</string>
+    <string name="settings_section_reading_summary">Cỡ chữ, phụ đề, bảng chép lời, chế độ xem mặc định</string>
     <string name="settings_text_size">Cỡ chữ: %1$d%%</string>
     <string name="settings_highlight_spoken_words_title">Tô sáng từ đang nói</string>
     <string name="settings_highlight_spoken_words_description">Tô màu từ đang được nói để bạn dễ theo dõi.</string>

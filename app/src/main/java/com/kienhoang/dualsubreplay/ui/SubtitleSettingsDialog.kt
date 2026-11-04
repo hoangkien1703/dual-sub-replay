@@ -32,7 +32,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FastForward
@@ -108,6 +107,8 @@ internal enum class MoreSettingsSection(
     @StringRes val titleRes: Int,
     @StringRes val summaryRes: Int,
 ) {
+    /** The old always-open Reading and Default view cards, merged and closed until tapped (owner request 2026-11-04). */
+    READING("reading", R.string.settings_section_reading_title, R.string.settings_section_reading_summary),
     LAYOUT("layout", R.string.settings_section_layout_title, R.string.settings_section_layout_summary),
     COLORS("colors", R.string.settings_section_colors_title, R.string.settings_section_colors_summary),
     WORD_LEARNING(
@@ -599,7 +600,14 @@ internal fun SubtitleSettingsDialog(
                         LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
                     }
 
-                    SettingsGroupCard(title = stringResource(R.string.settings_group_reading), icon = Icons.Default.TextFields) {
+                    Text(
+                        stringResource(R.string.settings_more_settings),
+                        modifier = Modifier.padding(start = 4.dp, top = 8.dp),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    Section(MoreSettingsSection.READING, Icons.Default.TextFields) {
                         val fontScaleLabel = stringResource(R.string.settings_text_size, (fontScale * 100).toInt())
                         val fontScaleSteps = fontScaleSteps(LocalTvLayout.current)
                         val fontScaleRange = MIN_FONT_SCALE..MAX_FONT_SCALE
@@ -626,9 +634,12 @@ internal fun SubtitleSettingsDialog(
                             onCheckedChange = onWordHighlightChange,
                             testTag = "word_highlight_switch",
                         )
-                    }
-
-                    SettingsGroupCard(title = stringResource(R.string.settings_group_default_view), icon = Icons.Default.Dashboard) {
+                        SettingsSectionDivider()
+                        Text(
+                            stringResource(R.string.settings_group_default_view),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                        )
                         PlayerModeSettingsOption(
                             mode = PlayerExperienceMode.TRANSCRIPT_PANEL,
                             selectedMode = playerMode,
@@ -645,13 +656,6 @@ internal fun SubtitleSettingsDialog(
                             onModeChange = onPlayerModeChange,
                         )
                     }
-
-                    Text(
-                        stringResource(R.string.settings_more_settings),
-                        modifier = Modifier.padding(start = 4.dp, top = 8.dp),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
 
                     Section(MoreSettingsSection.LAYOUT, Icons.Default.ViewDay) {
                         PortraitPanelPositionSettings(

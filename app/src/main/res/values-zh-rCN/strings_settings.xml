@@ -78,7 +78,8 @@
     <string name="settings_peek">查看视频。按住可临时查看，轻点可保持显示</string>
     <string name="settings_peek_back">返回设置</string>
     <string name="settings_group_languages">语言</string>
-    <string name="settings_group_reading">阅读</string>
+    <string name="settings_section_reading_title">阅读与视图</string>
+    <string name="settings_section_reading_summary">文字大小、字幕、字幕文稿、默认视图</string>
     <string name="settings_text_size">文字大小：%1$d%%</string>
     <string name="settings_highlight_spoken_words_title">高亮当前说出的词</string>
     <string name="settings_highlight_spoken_words_description">为正在说出的词着色，方便跟读。</string>

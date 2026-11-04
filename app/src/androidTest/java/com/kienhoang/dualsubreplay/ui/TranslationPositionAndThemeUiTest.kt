@@ -105,6 +105,7 @@ class TranslationPositionAndThemeUiTest {
             }
         }
 
+        composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
         composeRule.onNodeWithTag("translation_position_above").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals(TranslationPosition.ABOVE, position) }
         assertTrue(background < 0.1f)
@@ -124,7 +125,7 @@ class TranslationPositionAndThemeUiTest {
     }
 
     @Test
-    fun theReadingCardSwitchesTheTranscriptToInTheMiddle() {
+    fun theReadingSectionSwitchesTheTranscriptToInTheMiddle() {
         var follow by mutableStateOf(TranscriptFollow.PAGE)
         composeRule.setContent {
             DualSubTheme {
@@ -145,6 +146,7 @@ class TranslationPositionAndThemeUiTest {
             }
         }
 
+        composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
         composeRule.onNodeWithTag("transcript_follow_center").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals(TranscriptFollow.CENTER, follow) }
         composeRule.onNodeWithTag("translation_position_below").performScrollTo()
