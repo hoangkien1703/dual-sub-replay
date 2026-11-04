@@ -60,6 +60,8 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
 - **Remember them.** Save words with their original sentence and review them with spaced repetition.
 - **Stay private.** There is no account, no tracking, and no ads. Translation uses Google Translate by default, or turn it off and your phone translates on its own.
 
+I built DualSub Replay because I wanted a really good app for learning languages from YouTube, one that anyone can use for free. I also hope it raises the bar for other apps in this field: if a free, open-source app can do this, paid apps should do at least as well.
+
 ### How it compares
 
 | App | On Android | Cost | Best at |
@@ -226,6 +228,10 @@ The landing page in `site/` (English and Vietnamese) deploys to GitHub Pages whe
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md), and the compact [roadmap](ROADMAP.md) before opening a pull request. Humans and coding agents share the [project context](docs/project/mission.md), [technical context](docs/project/tech-stack.md), and [lightweight spec workflow](docs/specs/README.md); [AGENTS.md](AGENTS.md) gives operational instructions.
 
-## License
+## License, reuse and the name
 
-Source contributed to this repository is released under the [MIT license](LICENSE). See [third-party notices and build/source information](THIRD_PARTY_NOTICES.md). This project is independently implemented and is not affiliated with 1Letters, YouTube, or Google.
+The code is released under the [MIT license](LICENSE). You may copy it, change it and use it for anything, including building your own app and selling it. Please keep the copyright and license notice, and follow the terms of the few data files listed in [third-party notices and build/source information](THIRD_PARTY_NOTICES.md) (for example, the kanji data is CC BY-SA).
+
+The MIT license covers the code, not the name. Please don't call your app "DualSub Replay", use its logo, or present your app as made, approved or supported by this project without written permission. A fork should use its own name, icon and Android package name (not `com.kienhoang.dualsubreplay`). Saying "based on DualSub Replay" with a link here is welcome.
+
+This project is independently implemented and is not affiliated with 1Letters, YouTube, or Google.
