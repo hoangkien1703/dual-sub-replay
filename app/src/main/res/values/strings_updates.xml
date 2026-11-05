@@ -53,4 +53,8 @@
     <string name="sound_test_no_scripts_description" translatable="false">Stage 3, and none of the app\'s repeating page scripts run (subtitles, captions, ad skipping, study tools). Subtitles stop moving.</string>
     <string name="sound_test_plain_page" translatable="false">5. Plain page</string>
     <string name="sound_test_plain_page_description" translatable="false">Stage 4, and the page is loaded again without anything the app adds to it, as close to YouTube in Chrome as the app can get.</string>
+    <string name="sound_test_log_title" translatable="false">Log (newest first)</string>
+    <string name="sound_test_log_description" translatable="false">When you hear a glitch, note the time, open this page and send a screenshot of the log. Lines with "page:" are what the video did; "app:" lines are what the app asked for.</string>
+    <string name="sound_test_log_clear" translatable="false">Clear log</string>
+    <string name="sound_test_log_empty" translatable="false">Nothing yet. Play a video.</string>
 </resources>

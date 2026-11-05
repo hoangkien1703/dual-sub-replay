@@ -107,7 +107,10 @@ internal fun SoundTestSettings() {
         SoundTestStage.entries.forEach { option ->
             FilterChip(
                 selected = stage == option,
-                onClick = { preferences.edit().putString(SOUND_TEST_PREFERENCE, option.storageValue).apply() },
+                onClick = {
+                    SoundTestLog.app("sound test stage ${option.storageValue}")
+                    preferences.edit().putString(SOUND_TEST_PREFERENCE, option.storageValue).apply()
+                },
                 label = { Text(stringResource(option.labelRes)) },
                 modifier = Modifier.testTag("sound_test_${option.storageValue}"),
             )
@@ -117,5 +120,6 @@ internal fun SoundTestSettings() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        SoundTestLogList()
     }
 }

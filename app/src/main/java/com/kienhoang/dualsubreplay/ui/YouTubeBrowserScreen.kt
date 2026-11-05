@@ -232,11 +232,13 @@ internal class YouTubeWebController {
 
     fun bindScripts(action: (String) -> Unit) { scriptAction = action }
     fun pause() {
+        SoundTestLog.app("pause")
         pendingClip = null
         playingClipVideo = null
         scriptAction?.invoke(webPauseScript())
     }
     fun replayClip(word: com.kienhoang.dualsubreplay.data.SavedWord) {
+        SoundTestLog.app("play saved word clip")
         pause()
         pendingClip = word
     }
@@ -275,11 +277,13 @@ internal class YouTubeWebController {
     ) {
         pause()
         val target = second.takeIf { it.isFinite() }?.coerceAtLeast(0f) ?: 0f
+        SoundTestLog.app("play from $target" + if (byPlayMode) " (play mode)" else "")
         if (!byPlayMode) learnerSeekListener?.invoke(target)
         replayAction?.invoke(target)
     }
 
     fun setPlaybackSpeed(rate: Float) {
+        SoundTestLog.app("speed $rate")
         scriptAction?.invoke(webPlaybackSpeedScript(rate))
     }
 
@@ -288,6 +292,7 @@ internal class YouTubeWebController {
 
     /** Pauses the video with it at [second] (Read first). */
     fun seekPaused(second: Float) {
+        SoundTestLog.app("pause at $second")
         scriptAction?.invoke(webSeekPausedScript(second))
     }
 
@@ -296,6 +301,7 @@ internal class YouTubeWebController {
         rate: Float?,
         safetyMs: Long,
     ) {
+        SoundTestLog.app("skip silence speed $rate")
         scriptAction?.invoke(webGapSpeedScript(rate, safetyMs))
     }
 }
@@ -407,6 +413,7 @@ internal fun SingleYouTubePage(
                     fullscreenSession?.callback?.onCustomViewHidden()
                     (view.parent as? ViewGroup)?.removeView(view)
                     fullscreenSession = WebFullscreenSession(view, callback)
+                    SoundTestLog.app("full screen on")
                     youtubeFullscreenActive.value = true
                 }
 
@@ -419,6 +426,7 @@ internal fun SingleYouTubePage(
                 }
 
                 override fun onHideCustomView() {
+                    if (fullscreenSession != null) SoundTestLog.app("full screen off")
                     youtubeFullscreenActive.value = false
                     val session = fullscreenSession ?: return
                     fullscreenSession = null
@@ -597,6 +605,7 @@ internal fun SingleYouTubePage(
 
     LaunchedEffect(webView, captionTrackTarget) {
         if (soundTest.noScripts) return@LaunchedEffect
+        SoundTestLog.app("caption track sync")
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(webCaptionTrackSyncScript(captionTrackTarget), null)
         }
@@ -612,6 +621,7 @@ internal fun SingleYouTubePage(
     }
 
     val pageScriptsActive = lifecycleStarted && !soundTest.noScripts
+    SoundTestPageLog(webView, enabled = !soundTest.plainPage)
     PageTranscriptReader(webView, active = pageScriptsActive)
     PageTranslationReader(webView, active = pageScriptsActive)
     StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = pageScriptsActive)
@@ -756,6 +766,7 @@ internal fun SingleYouTubePage(
     // WebView pauses a hidden page's video and resumes it once the page is shown again. Off
     // screen, tell WebView (and the full-screen view, which has its own window) it is visible.
     fun keepPageShownOffScreen() {
+        SoundTestLog.app("keep page shown off screen")
         webView.onResume()
         webView.dispatchWindowVisibilityChanged(View.VISIBLE)
         fullscreenSession?.view?.dispatchWindowVisibilityChanged(View.VISIBLE)
@@ -763,6 +774,7 @@ internal fun SingleYouTubePage(
 
     DisposableEffect(webView) {
         fun runCommand(command: WebVideoCommand) {
+            SoundTestLog.app("earphones or notification: $command")
             if (command == WebVideoCommand.Pause) controller.pause()
             if (command == WebVideoCommand.Play && !lifecycleStarted) keepPageShownOffScreen()
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
@@ -776,6 +788,7 @@ internal fun SingleYouTubePage(
     DisposableEffect(lifecycleOwner, webView) {
         val observer = LifecycleEventObserver { _, _ ->
             lifecycleStarted = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+            SoundTestLog.app("app ${lifecycleOwner.lifecycle.currentState.name.lowercase()}")
             when {
                 lifecycleStarted -> webView.onResume()
                 // A playing video keeps playing with the screen off. Android may hide the window

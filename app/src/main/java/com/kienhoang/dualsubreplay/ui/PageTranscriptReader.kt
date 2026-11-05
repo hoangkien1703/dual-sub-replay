@@ -46,6 +46,8 @@ internal fun PageTranscriptReader(
             val started = now
             runningSince = started
             val script = target?.let(::webPageTranscriptScript) ?: WEB_PAGE_CAPTION_TRACKS_SCRIPT
+            val late = if (request.late) " (late)" else ""
+            SoundTestLog.app((if (target == null) "page caption track list" else "page transcript read") + late)
             // Installs the page's token maker first (once per page; later runs return at once).
             if (target?.pageToken == true) webView.evaluateJavascript(WEB_PAGE_TOKEN_SCRIPT, null)
             webView.evaluateJavascript(script) { rawValue ->
@@ -82,6 +84,7 @@ internal fun PageTranslationReader(
             if (!isYouTubeWebUrl(url)) continue
             val request = source.pending(browseVideoSelection(url)?.videoId) ?: continue
             runningSince = now
+            SoundTestLog.app("page translation read")
             webView.evaluateJavascript(webPageTranslationScript(request.target)) { rawValue ->
                 if (runningSince == now) runningSince = 0L
                 source.offer(request, parsePageTranslationReply(rawValue))
