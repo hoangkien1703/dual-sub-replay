@@ -62,11 +62,17 @@ class LearningPlayerUiTest {
         }
 
         composeRule.onNodeWithText("Dual-subtitle settings").assertIsDisplayed()
+        // Reading and Default view are one More settings section, closed until tapped.
+        composeRule.onNodeWithTag("word_highlight_switch").assertDoesNotExist()
+        saveUiEvidence("settings-reading-closed")
+        composeRule.onNodeWithTag("settings_section_colors").performScrollTo()
+        saveUiEvidence("settings-section-order")
+        composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
+        composeRule.waitForIdle()
+        saveUiEvidence("settings-reading-open")
         composeRule.onNodeWithText("Default view").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Transcript panel").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
-
-        // Spoken-word highlighting stays in the always-visible Reading group.
         composeRule.onNodeWithTag("word_highlight_switch").performScrollTo().assertIsDisplayed()
 
         composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay")

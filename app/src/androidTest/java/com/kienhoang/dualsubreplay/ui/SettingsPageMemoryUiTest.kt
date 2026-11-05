@@ -97,6 +97,7 @@ class SettingsPageMemoryUiTest {
     @Test
     fun draggingTheTextSizeSliderShowsOnlyThatSliderOnACard() {
         showSettings(SettingsPageMemory())
+        composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
 
         // Drag, as people do: a finger resting on a slider without moving is not a drag.
         composeRule.onNodeWithTag("font_scale_slider").performScrollTo().performTouchInput {

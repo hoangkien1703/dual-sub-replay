@@ -78,7 +78,8 @@
     <string name="settings_peek">動画を見る。長押しで一時的に表示、タップで表示したままにします</string>
     <string name="settings_peek_back">設定に戻る</string>
     <string name="settings_group_languages">言語</string>
-    <string name="settings_group_reading">読みやすさ</string>
+    <string name="settings_section_reading_title">読みやすさと表示</string>
+    <string name="settings_section_reading_summary">文字サイズ、字幕、トランスクリプト、デフォルトの表示</string>
     <string name="settings_text_size">文字サイズ: %1$d%%</string>
     <string name="settings_highlight_spoken_words_title">発話中の単語をハイライト</string>
     <string name="settings_highlight_spoken_words_description">話されている単語に色を付けて、聞きながら追えるようにします。</string>

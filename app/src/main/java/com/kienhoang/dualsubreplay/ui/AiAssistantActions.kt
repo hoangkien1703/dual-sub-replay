@@ -232,7 +232,7 @@ private fun aiStudySettingValue(
         else -> null
     }
 
-/** The Reading, Default view, Layout and Colors settings that the view model holds. */
+/** The Reading & view, Layout and Colors settings that the view model holds. */
 private fun aiReadingSettingValue(
     state: DualSubUiState,
     playerMode: PlayerExperienceMode,
