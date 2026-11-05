@@ -38,4 +38,19 @@
     <string name="updates_security_message">Version %1$s fixes a security problem in the version you have (%2$s). Update now? Your saved words and settings stay.</string>
     <string name="updates_reminders_off_hint">While this is off, you won\'t hear about new versions or security updates.</string>
     <string name="updates_security_details">What was fixed</string>
+    <!-- TEMPORARY sound test (test build only, owner request 2026-11-05): English only, remove with ui/SoundTest.kt. -->
+    <string name="sound_test_title" translatable="false">Sound test (temporary)</string>
+    <string name="sound_test_description" translatable="false">For finding why Bluetooth sound distorts, drops out or repeats. Each stage keeps the ones above it. Play a video for about 10 minutes on a stage, then try the next one. Subtitles may lag or stop from stage 3 on.</string>
+    <string name="sound_test_normal" translatable="false">Normal</string>
+    <string name="sound_test_normal_description" translatable="false">The app works as usual.</string>
+    <string name="sound_test_old_full_screen" translatable="false">1. Old full screen</string>
+    <string name="sound_test_old_full_screen_description" translatable="false">Full screen works as before the screen-off fix of v1.8.15. The sound may stop briefly when the screen turns off in full screen.</string>
+    <string name="sound_test_no_notification" translatable="false">2. No media notification</string>
+    <string name="sound_test_no_notification_description" translatable="false">Stage 1, and no media notification and nothing sent to the earphones about the video. Earphone buttons and screen-off playing stop working; test with the screen on.</string>
+    <string name="sound_test_slow_reading" translatable="false">3. Slow page reading</string>
+    <string name="sound_test_slow_reading_description" translatable="false">Stage 2, and the page is read once a second instead of 10 times a second. Subtitles move in jumps.</string>
+    <string name="sound_test_no_scripts" translatable="false">4. No page scripts</string>
+    <string name="sound_test_no_scripts_description" translatable="false">Stage 3, and none of the app\'s repeating page scripts run (subtitles, captions, ad skipping, study tools). Subtitles stop moving.</string>
+    <string name="sound_test_plain_page" translatable="false">5. Plain page</string>
+    <string name="sound_test_plain_page_description" translatable="false">Stage 4, and the page is loaded again without anything the app adds to it, as close to YouTube in Chrome as the app can get.</string>
 </resources>

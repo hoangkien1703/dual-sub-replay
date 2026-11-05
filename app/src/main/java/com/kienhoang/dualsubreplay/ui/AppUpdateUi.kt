@@ -274,4 +274,7 @@ internal fun AppUpdateSettingsSection() {
         testTag = "auto_update_switch",
     )
     if (channel == UpdateChannel.None) SettingsHint(stringResource(R.string.updates_auto_unavailable))
+    // TEMPORARY, test build only (SoundTest.kt).
+    SettingsSectionDivider()
+    SoundTestSettings()
 }

@@ -337,6 +337,9 @@ internal fun SingleYouTubePage(
     val currentLiveCaptionCaptureEnabled by rememberUpdatedState(liveCaptionCaptureEnabled)
     val currentSuppressPageCaptions by rememberUpdatedState(suppressPageCaptions)
     val currentCaptionTrackTarget by rememberUpdatedState(captionTrackTarget)
+    // TEMPORARY sound test (SoundTest.kt): each stage turns off more of the app's own page work.
+    val soundTest by rememberSoundTestStage()
+    val currentSoundTest by rememberUpdatedState(soundTest)
     var canGoBack by remember { mutableStateOf(false) }
     var lifecycleStarted by remember {
         mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
@@ -369,7 +372,7 @@ internal fun SingleYouTubePage(
         }
     }
 
-    val webView = remember(webViewGeneration) {
+    val webView = remember(webViewGeneration, soundTest.plainPage) {
         if (BuildConfig.DEBUG) {
             val packageInfo = WebView.getCurrentWebViewPackage()
             Log.d(
@@ -426,7 +429,7 @@ internal fun SingleYouTubePage(
             cookies.setAcceptCookie(true)
             cookies.setAcceptThirdPartyCookies(this, true)
             if (tabActions != null) listenForVideoLongPress { longPressedLink = it }
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            if (!soundTest.plainPage && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
                 WebViewCompat.addDocumentStartJavaScript(
                     this,
                     WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
@@ -511,6 +514,7 @@ internal fun SingleYouTubePage(
                     reportNavigation(view, url)
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         cookies.flush()
+                        if (currentSoundTest.plainPage) return
                         view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
                         view.evaluateJavascript(WEB_HIDE_OPEN_APP_SCRIPT, null)
                         view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
@@ -585,31 +589,34 @@ internal fun SingleYouTubePage(
     }
 
     LaunchedEffect(webView, suppressPageCaptions) {
+        if (soundTest.noScripts) return@LaunchedEffect
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
         }
     }
 
     LaunchedEffect(webView, captionTrackTarget) {
+        if (soundTest.noScripts) return@LaunchedEffect
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(webCaptionTrackSyncScript(captionTrackTarget), null)
         }
     }
 
-    LaunchedEffect(webView, liveCaptionCaptureEnabled, lifecycleStarted) {
+    LaunchedEffect(webView, liveCaptionCaptureEnabled, lifecycleStarted, soundTest.noScripts) {
         if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
             webView.evaluateJavascript(
-                webLiveCaptionConfigurationScript(liveCaptionCaptureEnabled && lifecycleStarted),
+                webLiveCaptionConfigurationScript(liveCaptionCaptureEnabled && lifecycleStarted && !soundTest.noScripts),
                 null,
             )
         }
     }
 
-    PageTranscriptReader(webView, active = lifecycleStarted)
-    PageTranslationReader(webView, active = lifecycleStarted)
-    StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
-    AdSkipPageScripts(webView, active = lifecycleStarted, pageView = { fullscreenSession?.view ?: webView })
-    TvPageScripts(webView, tvLayout = LocalTvLayout.current, active = lifecycleStarted)
+    val pageScriptsActive = lifecycleStarted && !soundTest.noScripts
+    PageTranscriptReader(webView, active = pageScriptsActive)
+    PageTranslationReader(webView, active = pageScriptsActive)
+    StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = pageScriptsActive)
+    AdSkipPageScripts(webView, active = pageScriptsActive, pageView = { fullscreenSession?.view ?: webView })
+    TvPageScripts(webView, tvLayout = LocalTvLayout.current, active = pageScriptsActive)
     DisposableEffect(webView) {
         val focusPage: () -> Unit = { webView.requestFocus() }
         TvRemoteKeys.focusPage = focusPage
@@ -617,8 +624,8 @@ internal fun SingleYouTubePage(
     }
 
     val pollNow = remember(webView) { Channel<Unit>(Channel.CONFLATED) }
-    LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
-        if (!lifecycleStarted) return@LaunchedEffect
+    LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl, soundTest) {
+        if (!lifecycleStarted || soundTest.noScripts) return@LaunchedEffect
         val gate = PlaybackSnapshotGate()
         val clock = CaptionPlaybackClock()
         var pending = false
@@ -649,9 +656,8 @@ internal fun SingleYouTubePage(
             while (isActive) {
                 val now = android.os.SystemClock.elapsedRealtime()
                 val url = webView.url.orEmpty()
-                val due =
-                    woken || url != lastUrl ||
-                        now - lastRequest >= playbackPollIntervalMs(browseVideoSelection(url) != null, latest)
+                val interval = playbackPollIntervalMs(browseVideoSelection(url) != null, latest)
+                val due = woken || url != lastUrl || now - lastRequest >= soundTestPollIntervalMs(interval, soundTest)
                 if (due && isYouTubeWebUrl(url) && (!pending || now - lastRequest > 500)) {
                     lastUrl = url
                     pending = true
@@ -726,7 +732,7 @@ internal fun SingleYouTubePage(
     fun refreshMediaState() {
         // Only a watch page's video is published, so other pages need no script run.
         val url = webView.url.orEmpty()
-        if (!isYouTubeWebUrl(url) || browseVideoSelection(url) == null) {
+        if (currentSoundTest.noNotification || !isYouTubeWebUrl(url) || browseVideoSelection(url) == null) {
             WebVideoBridge.publish(null)
             return
         }
@@ -853,14 +859,18 @@ internal fun SingleYouTubePage(
                 AndroidView(
                     factory = { frameContext ->
                         (session.view.parent as? ViewGroup)?.removeView(session.view)
-                        OffScreenPlaybackFrame(frameContext) { WebVideoBridge.playback.value.isPlaying() }.apply {
-                            addView(
-                                session.view,
-                                FrameLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                ),
-                            )
+                        if (soundTest.oldFullScreen) {
+                            session.view
+                        } else {
+                            OffScreenPlaybackFrame(frameContext) { WebVideoBridge.playback.value.isPlaying() }.apply {
+                                addView(
+                                    session.view,
+                                    FrameLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ),
+                                )
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxSize(),
