@@ -65,6 +65,8 @@ class LearningPlayerUiTest {
         // Reading and Default view are one More settings section, closed until tapped.
         composeRule.onNodeWithTag("word_highlight_switch").assertDoesNotExist()
         saveUiEvidence("settings-reading-closed")
+        composeRule.onNodeWithTag("settings_section_colors").performScrollTo()
+        saveUiEvidence("settings-section-order")
         composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
         composeRule.waitForIdle()
         saveUiEvidence("settings-reading-open")

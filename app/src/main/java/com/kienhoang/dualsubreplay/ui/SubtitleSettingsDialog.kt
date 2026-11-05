@@ -110,7 +110,11 @@ internal enum class MoreSettingsSection(
     /** The old always-open Reading and Default view cards, merged and closed until tapped (owner request 2026-11-04). */
     READING("reading", R.string.settings_section_reading_title, R.string.settings_section_reading_summary),
     LAYOUT("layout", R.string.settings_section_layout_title, R.string.settings_section_layout_summary),
-    COLORS("colors", R.string.settings_section_colors_title, R.string.settings_section_colors_summary),
+    TRANSLATION(
+        "translation",
+        R.string.settings_section_translation_title,
+        R.string.settings_section_translation_summary,
+    ),
     WORD_LEARNING(
         "word_learning",
         R.string.settings_section_word_learning_title,
@@ -118,11 +122,7 @@ internal enum class MoreSettingsSection(
     ),
     STUDY("study", R.string.settings_section_study_title, R.string.settings_section_study_summary),
     OVERLAY("overlay", R.string.settings_section_overlay_title, R.string.settings_section_overlay_summary),
-    TRANSLATION(
-        "translation",
-        R.string.settings_section_translation_title,
-        R.string.settings_section_translation_summary,
-    ),
+    COLORS("colors", R.string.settings_section_colors_title, R.string.settings_section_colors_summary),
     TABS("tabs", R.string.settings_section_tabs_title, R.string.settings_section_tabs_summary),
     ADS("ads", R.string.settings_section_ads_title, R.string.settings_section_ads_summary),
     UPDATES("updates", R.string.settings_section_updates_title, R.string.settings_section_updates_summary),
@@ -681,64 +681,6 @@ internal fun SubtitleSettingsDialog(
                         )
                     }
 
-                    Section(MoreSettingsSection.COLORS, Icons.Default.Palette) {
-                        SettingsSwitchRow(
-                            title = stringResource(R.string.settings_custom_colors_title),
-                            description = stringResource(R.string.settings_custom_colors_description),
-                            checked = customColorsEnabled,
-                            onCheckedChange = onCustomColorsChange,
-                            testTag = "custom_colors_switch",
-                        )
-                        if (customColorsEnabled) {
-                            SubtitleColorSwatchRow(
-                                title = stringResource(R.string.settings_original_color_title),
-                                selectedKey = originalColorKey,
-                                enabled = true,
-                                onColorChange = onOriginalColorChange,
-                                testTagPrefix = "original_color",
-                            )
-                            SubtitleColorSwatchRow(
-                                title = stringResource(R.string.settings_translated_color_title),
-                                selectedKey = translatedColorKey,
-                                enabled = true,
-                                onColorChange = onTranslatedColorChange,
-                                testTagPrefix = "translated_color",
-                            )
-                            SubtitleColorSwatchRow(
-                                title = stringResource(R.string.settings_highlight_color_title),
-                                selectedKey = highlightColorKey,
-                                enabled = wordHighlightEnabled,
-                                onColorChange = onHighlightColorChange,
-                                testTagPrefix = "highlight_color",
-                            )
-                        }
-                        SettingsSectionDivider()
-                        AdvancedAppearanceSettings()
-                    }
-
-                    Section(MoreSettingsSection.WORD_LEARNING, Icons.Default.School) {
-                        WordLearningSettings(
-                            autoPronounce = autoPronounce,
-                            onAutoPronounceChange = onAutoPronounceChange,
-                            wordLearningEnabled = wordLearningEnabled,
-                            onWordLearningChange = onWordLearningChange,
-                            wordLearningTarget = wordLearningTarget,
-                            onWordLearningTargetChange = onWordLearningTargetChange,
-                            tapToLearnEnabled = tapToLearnEnabled,
-                            onTapToLearnChange = onTapToLearnChange,
-                            wordLearningActiveOnly = wordLearningActiveOnly,
-                            onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
-                        )
-                    }
-
-                    Section(MoreSettingsSection.STUDY, Icons.Default.AutoStories) {
-                        StudyToolsSettingsSection()
-                    }
-
-                    Section(MoreSettingsSection.OVERLAY, Icons.Default.Fullscreen) {
-                        OverlaySettings(lockOverlayToVideo, onLockOverlayToVideoChange)
-                    }
-
                     Section(MoreSettingsSection.TRANSLATION, Icons.Default.Translate) {
                         if (translationEngineActions != null) {
                             OnlineTranslationSettingsRows(
@@ -772,6 +714,64 @@ internal fun SubtitleSettingsDialog(
                             SettingsSectionDivider()
                             LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
                         }
+                    }
+
+                    Section(MoreSettingsSection.WORD_LEARNING, Icons.Default.School) {
+                        WordLearningSettings(
+                            autoPronounce = autoPronounce,
+                            onAutoPronounceChange = onAutoPronounceChange,
+                            wordLearningEnabled = wordLearningEnabled,
+                            onWordLearningChange = onWordLearningChange,
+                            wordLearningTarget = wordLearningTarget,
+                            onWordLearningTargetChange = onWordLearningTargetChange,
+                            tapToLearnEnabled = tapToLearnEnabled,
+                            onTapToLearnChange = onTapToLearnChange,
+                            wordLearningActiveOnly = wordLearningActiveOnly,
+                            onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
+                        )
+                    }
+
+                    Section(MoreSettingsSection.STUDY, Icons.Default.AutoStories) {
+                        StudyToolsSettingsSection()
+                    }
+
+                    Section(MoreSettingsSection.OVERLAY, Icons.Default.Fullscreen) {
+                        OverlaySettings(lockOverlayToVideo, onLockOverlayToVideoChange)
+                    }
+
+                    Section(MoreSettingsSection.COLORS, Icons.Default.Palette) {
+                        SettingsSwitchRow(
+                            title = stringResource(R.string.settings_custom_colors_title),
+                            description = stringResource(R.string.settings_custom_colors_description),
+                            checked = customColorsEnabled,
+                            onCheckedChange = onCustomColorsChange,
+                            testTag = "custom_colors_switch",
+                        )
+                        if (customColorsEnabled) {
+                            SubtitleColorSwatchRow(
+                                title = stringResource(R.string.settings_original_color_title),
+                                selectedKey = originalColorKey,
+                                enabled = true,
+                                onColorChange = onOriginalColorChange,
+                                testTagPrefix = "original_color",
+                            )
+                            SubtitleColorSwatchRow(
+                                title = stringResource(R.string.settings_translated_color_title),
+                                selectedKey = translatedColorKey,
+                                enabled = true,
+                                onColorChange = onTranslatedColorChange,
+                                testTagPrefix = "translated_color",
+                            )
+                            SubtitleColorSwatchRow(
+                                title = stringResource(R.string.settings_highlight_color_title),
+                                selectedKey = highlightColorKey,
+                                enabled = wordHighlightEnabled,
+                                onColorChange = onHighlightColorChange,
+                                testTagPrefix = "highlight_color",
+                            )
+                        }
+                        SettingsSectionDivider()
+                        AdvancedAppearanceSettings()
                     }
 
                     Section(MoreSettingsSection.TABS, Icons.Default.Tab) {
