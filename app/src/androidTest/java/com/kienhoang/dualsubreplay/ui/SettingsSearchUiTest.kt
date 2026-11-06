@@ -73,7 +73,9 @@ class SettingsSearchUiTest {
         // Mid-glow: the setting the search landed on is highlighted for a moment.
         saveUiEvidence("settings-search-jump")
         composeRule.mainClock.autoAdvance = true
-        composeRule.onNodeWithTag("settings_search").assertIsDisplayed()
+        // The page stays scrolled to the setting once the glow is gone.
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("loop_button_switch").assertIsDisplayed()
     }
 
     @Test
@@ -82,7 +84,7 @@ class SettingsSearchUiTest {
         composeRule.onNodeWithTag("settings_search").performTextInput("zzzz")
         composeRule.onNodeWithTag("settings_search_no_results").assertIsDisplayed()
         composeRule.onNodeWithTag("settings_search_clear").performClick()
-        composeRule.onNodeWithTag("settings_section_study").assertIsDisplayed()
+        composeRule.onNodeWithTag("settings_section_study").performScrollTo().assertIsDisplayed()
     }
 
     @Test
