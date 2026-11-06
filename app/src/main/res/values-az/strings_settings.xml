@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Orijinal altyazının dili</string>
     <string name="settings_translate_to">Tərcümə dili</string>
     <string name="settings_original_language">Orijinal dil</string>
-    <string name="settings_model_download_hint">Dil modeli yalnız lazım olanda endirilir.</string>
     <string name="settings_third_line">Üçüncü sətir</string>
     <string name="settings_third_line_off">Söndürülüb</string>
     <string name="settings_third_line_hint">Hər altyazının altında başqa dildə daha bir tərcümə. Bir az daha çox internet trafiki işlədir.</string>
@@ -185,6 +184,7 @@
     <string name="settings_search_clear">Axtarışı təmizlə</string>
     <string name="settings_search_no_results">Ayar tapılmadı</string>
     <string name="settings_often_changed">Tez-tez dəyişdirilən</string>
+    <string name="settings_often_changed_empty">Bir həftədə iki dəfə dəyişdiyiniz ayarlar burada görünür.</string>
     <string name="settings_text_size_name">Mətn ölçüsü</string>
     <string name="settings_pronunciation_volume_name">Tələffüz səsi</string>
     <string name="settings_original_captions_name">Orijinal altyazılar</string>

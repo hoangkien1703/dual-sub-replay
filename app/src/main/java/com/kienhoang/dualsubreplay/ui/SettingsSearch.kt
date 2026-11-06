@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -64,18 +65,23 @@ import java.util.Locale
 
 /**
  * A setting that Search settings finds and Often changed lists (owner request 2026-11-06): its
- * name, the More settings section it is in (null: the Languages card), the tag of the place on the
+ * name, the More settings section it is in, the tag of the place on the
  * page to scroll to ([settingAnchor]; [SettingsSwitchRow] uses its test tag), and the preference
  * keys a change of it writes.
  */
 internal enum class SearchableSetting(
     @StringRes val titleRes: Int,
-    val section: MoreSettingsSection?,
+    val section: MoreSettingsSection,
     val anchor: String?,
     val keys: Set<String>,
 ) {
-    ORIGINAL_LANGUAGE(R.string.settings_original_language, null, "source_language_picker", setOf("preferred_caption_language")),
-    TRANSLATE_TO(R.string.settings_translate_to, null, "target_language_picker", setOf("target_language")),
+    ORIGINAL_LANGUAGE(
+        R.string.settings_original_language,
+        MoreSettingsSection.LANGUAGES,
+        "source_language_picker",
+        setOf("preferred_caption_language"),
+    ),
+    TRANSLATE_TO(R.string.settings_translate_to, MoreSettingsSection.LANGUAGES, "target_language_picker", setOf("target_language")),
     TEXT_SIZE(R.string.settings_text_size_name, MoreSettingsSection.READING, "font_scale", setOf("font_scale")),
     ORIGINAL_CAPTIONS(
         R.string.settings_original_captions_name,
@@ -379,8 +385,8 @@ internal data class SettingChange(
 /** Often changed looks at the last 7 days. */
 internal const val SETTING_HISTORY_MS = 7L * 24 * 60 * 60 * 1000
 
-/** Changes of one setting this close together (a slider drag, a quick on and off) count once. */
-internal const val SETTING_CHANGE_MERGE_MS = 30_000L
+/** Changes of one setting each this close to the one before (a slider drag) count once. */
+internal const val SETTING_CHANGE_MERGE_MS = 3_000L
 
 /** Often changed lists settings changed at least this often, at most [OFTEN_CHANGED_MAX] of them. */
 internal const val OFTEN_CHANGED_MIN_CHANGES = 2
@@ -397,8 +403,11 @@ internal fun recordSettingChange(
     nowMs: Long,
 ): List<SettingChange> {
     val recent = history.filter { it.isRecent(nowMs) }
-    val last = recent.lastOrNull { it.setting == setting }
-    if (last != null && nowMs - last.atMs < SETTING_CHANGE_MERGE_MS) return recent
+    val last = recent.indexOfLast { it.setting == setting }
+    if (last >= 0 && nowMs - recent[last].atMs < SETTING_CHANGE_MERGE_MS) {
+        // Still the same drag: it counts once, and the next step is measured from this one.
+        return recent.toMutableList().apply { this[last] = SettingChange(setting, nowMs) }
+    }
     return (recent + SettingChange(setting, nowMs)).takeLast(SETTING_HISTORY_MAX_CHANGES)
 }
 
@@ -526,13 +535,14 @@ private val SETTINGS_GLOW_CORNER = 12.dp
 @Composable
 internal fun SettingsSearchField(
     query: String,
+    onFocusChange: (Boolean) -> Unit = {},
     onQueryChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = Modifier.fillMaxWidth().testTag("settings_search"),
+        modifier = Modifier.fillMaxWidth().onFocusChanged { onFocusChange(it.isFocused) }.testTag("settings_search"),
         placeholder = { Text(stringResource(R.string.settings_search_hint)) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
         trailingIcon = {
@@ -572,13 +582,24 @@ internal fun SettingsSearchResults(
     }
 }
 
-/** Often changed: up to 3 settings, each a link to its place on the page; nothing while empty. */
+/**
+ * Often changed, under Search settings while it is tapped: up to 3 settings, each a link to its
+ * place on the page, or a line saying what will show here.
+ */
 @Composable
 internal fun OftenChangedSettings(
     entries: List<SettingsSearchEntry>,
     onPick: (SettingsSearchEntry) -> Unit,
 ) {
-    if (entries.isEmpty()) return
+    if (entries.isEmpty()) {
+        Text(
+            stringResource(R.string.settings_often_changed_empty),
+            modifier = Modifier.padding(horizontal = 4.dp).testTag("often_changed_empty"),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        return
+    }
     SettingsLinkCard(Modifier.testTag("often_changed_settings")) {
         Row(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 2.dp),

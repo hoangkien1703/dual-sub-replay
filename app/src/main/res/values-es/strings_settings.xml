@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Idioma de los subtítulos originales</string>
     <string name="settings_translate_to">Traducir a</string>
     <string name="settings_original_language">Idioma original</string>
-    <string name="settings_model_download_hint">El modelo de idioma solo se descarga cuando hace falta.</string>
     <string name="settings_third_line">Tercera línea</string>
     <string name="settings_third_line_off">Desactivada</string>
     <string name="settings_third_line_hint">Una traducción más bajo cada subtítulo, en otro idioma. Usa un poco más de datos.</string>
@@ -185,6 +184,7 @@
     <string name="settings_search_clear">Borrar búsqueda</string>
     <string name="settings_search_no_results">No se encontraron ajustes</string>
     <string name="settings_often_changed">Cambiados a menudo</string>
+    <string name="settings_often_changed_empty">Aquí aparecen los ajustes que cambias dos veces en una semana.</string>
     <string name="settings_text_size_name">Tamaño del texto</string>
     <string name="settings_pronunciation_volume_name">Volumen de pronunciación</string>
     <string name="settings_original_captions_name">Subtítulos originales</string>

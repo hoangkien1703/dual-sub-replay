@@ -16,6 +16,7 @@ class SettingsSearchTest {
             SettingsSearchEntry("Play mode", "Study tools", SearchableSetting.PLAY_MODE),
             SettingsSearchEntry("Cỡ chữ", "Đọc & xem", SearchableSetting.TEXT_SIZE),
             SettingsSearchEntry("Study tools", "More settings", section = MoreSettingsSection.STUDY),
+            SettingsSearchEntry("Translate to", "Languages", SearchableSetting.TRANSLATE_TO),
         )
 
     @Test
@@ -49,11 +50,13 @@ class SettingsSearchTest {
     }
 
     @Test
-    fun aSecondChangeSoonAfterCountsOnce() {
+    fun aDragCountsOnceHoweverLongItLasts() {
         var history = recordSettingChange(emptyList(), "TEXT_SIZE", now)
-        history = recordSettingChange(history, "TEXT_SIZE", now + SETTING_CHANGE_MERGE_MS - 1)
-        assertEquals(1, history.size)
-        history = recordSettingChange(history, "TEXT_SIZE", now + SETTING_CHANGE_MERGE_MS)
+        // Slider steps keep coming, each soon after the one before.
+        for (step in 1..10) history = recordSettingChange(history, "TEXT_SIZE", now + step * (SETTING_CHANGE_MERGE_MS - 1))
+        assertEquals(listOf(SettingChange("TEXT_SIZE", now + 10 * (SETTING_CHANGE_MERGE_MS - 1))), history)
+        // A change after a pause counts again, even a few seconds later.
+        history = recordSettingChange(history, "TEXT_SIZE", now + 11 * (SETTING_CHANGE_MERGE_MS - 1) + SETTING_CHANGE_MERGE_MS)
         assertEquals(2, history.size)
     }
 

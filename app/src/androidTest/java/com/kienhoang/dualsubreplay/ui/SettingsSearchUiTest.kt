@@ -105,6 +105,9 @@ class SettingsSearchUiTest {
             )
         usage.edit().putString("changes", encodeSettingHistory(history)).commit()
         showSettings()
+        // Often changed shows under Search settings only while it is tapped (owner request 2026-11-06).
+        assertTrue(composeRule.onAllNodesWithTag("often_changed_settings").fetchSemanticsNodes().isEmpty())
+        composeRule.onNodeWithTag("settings_search").performClick()
         composeRule.onNodeWithTag("often_changed_settings").assertIsDisplayed()
         composeRule.onNodeWithTag("often_changed_LOOP_BUTTON").assertIsDisplayed()
         composeRule.onNodeWithTag("often_changed_TEXT_SIZE").assertIsDisplayed()
@@ -124,7 +127,20 @@ class SettingsSearchUiTest {
             assertTrue(preferences.getBoolean(LOOP_BUTTON_PREFERENCE, false))
             assertEquals(listOf("LOOP_BUTTON"), decodeSettingHistory(usage.getString("changes", null)).map { it.setting })
         }
+        // One change is not enough yet: the search field says what will show there.
+        composeRule.onNodeWithTag("settings_search").performScrollTo().performClick()
+        composeRule.onNodeWithTag("often_changed_empty").assertIsDisplayed()
         assertTrue(composeRule.onAllNodes(hasTestTag("often_changed_settings")).fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
+    fun languagesIsASectionAndSearchOpensIt() {
+        showSettings()
+        assertTrue(composeRule.onAllNodesWithTag("target_language_picker").fetchSemanticsNodes().isEmpty())
+        composeRule.onNodeWithTag("settings_search").performTextInput("translate to")
+        composeRule.onNodeWithTag("settings_search_result_TRANSLATE_TO").performClick()
+        composeRule.onNodeWithTag("target_language_picker").assertIsDisplayed()
+        saveUiEvidence("settings-languages-section")
     }
 
     @Test

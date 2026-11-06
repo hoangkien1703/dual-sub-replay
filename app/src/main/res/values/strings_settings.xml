@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Original caption language</string>
     <string name="settings_translate_to">Translate to</string>
     <string name="settings_original_language">Original language</string>
-    <string name="settings_model_download_hint">A language model downloads only when it is needed.</string>
     <string name="settings_third_line">Third line</string>
     <string name="settings_third_line_off">Off</string>
     <string name="settings_third_line_hint">One more translation under each subtitle, in another language. It uses a little more internet data.</string>
@@ -185,6 +184,7 @@
     <string name="settings_search_clear">Clear search</string>
     <string name="settings_search_no_results">No settings found</string>
     <string name="settings_often_changed">Often changed</string>
+    <string name="settings_often_changed_empty">Settings you change twice in a week show up here.</string>
     <string name="settings_text_size_name">Text size</string>
     <string name="settings_pronunciation_volume_name">Pronunciation volume</string>
     <string name="settings_original_captions_name">Original captions</string>

@@ -112,8 +112,12 @@ import kotlin.math.roundToInt
 internal enum class MoreSettingsSection(
     val key: String,
     @StringRes val titleRes: Int,
-    @StringRes val summaryRes: Int,
+    /** Null: the page writes the summary itself. */
+    @StringRes val summaryRes: Int?,
 ) {
+    /** Was an always-open card above More settings; closed until tapped like the others (owner request 2026-11-06). */
+    LANGUAGES("languages", R.string.settings_group_languages, null),
+
     /** The old always-open Reading and Default view cards, merged and closed until tapped (owner request 2026-11-04). */
     READING("reading", R.string.settings_section_reading_title, R.string.settings_section_reading_summary),
     LAYOUT("layout", R.string.settings_section_layout_title, R.string.settings_section_layout_summary),
@@ -188,12 +192,11 @@ private fun SettingsJumpEffect(
 /** Every setting and section Search settings can find, named in the app's language. */
 @Composable
 private fun settingsSearchEntries(withAiAssistant: Boolean): List<SettingsSearchEntry> {
-    val languages = stringResource(R.string.settings_group_languages)
     val moreSettings = stringResource(R.string.settings_more_settings)
     val sectionTitles = MoreSettingsSection.entries.associateWith { stringResource(it.titleRes) }
     val settings =
         SearchableSetting.entries.map { setting ->
-            SettingsSearchEntry(stringResource(setting.titleRes), setting.section?.let(sectionTitles::getValue) ?: languages, setting)
+            SettingsSearchEntry(stringResource(setting.titleRes), sectionTitles.getValue(setting.section), setting)
         }
     val sections =
         MoreSettingsSection.entries
@@ -388,7 +391,6 @@ private fun LanguagePickerButtons(
     ) {
         Text(languageDisplayName(targetLanguage, currentInterfaceLocale()))
     }
-    SettingsHint(stringResource(R.string.settings_model_download_hint))
 }
 
 /**
@@ -461,6 +463,9 @@ internal fun QuickLanguageSettingsDialog(
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
+    // A language picked here counts for Often changed too.
+    val context = LocalContext.current
+    RecordSettingChanges(remember(context) { studyPreferences(context) }, remember(context) { SettingsUsage(context) })
     val autoLabel = stringResource(R.string.settings_source_language_auto)
     val shortAutoLabel = stringResource(R.string.settings_source_language_auto_short)
     val interfaceLocale = currentInterfaceLocale()
@@ -603,9 +608,11 @@ internal fun SubtitleSettingsDialog(
     val anchors = remember { SettingsAnchors() }
     val usage = remember(context) { SettingsUsage(context) }
     RecordSettingChanges(remember(context) { studyPreferences(context) }, usage)
-    // Read once on opening, so the list does not move while the user changes things.
-    val oftenChanged = remember(usage) { usage.oftenChanged() }
     var searchQuery by remember { mutableStateOf("") }
+    // Often changed shows under Search settings while it is tapped and empty (owner request 2026-11-06),
+    // read afresh each time, so the list does not move while the user changes things.
+    var searchFocused by remember { mutableStateOf(false) }
+    val oftenChanged = remember(usage, searchFocused) { if (searchFocused) usage.oftenChanged() else emptyList() }
     var jump by remember { mutableStateOf<SettingsSearchEntry?>(null) }
     // The scrolling page's top on the screen, where a jumped-to setting lines up.
     val viewportTop = remember { FloatArray(1) }
@@ -652,12 +659,14 @@ internal fun SubtitleSettingsDialog(
     fun Section(
         section: MoreSettingsSection,
         icon: ImageVector,
+        summary: String? = null,
         content: @Composable ColumnScope.() -> Unit,
     ) {
         Box(Modifier.fillMaxWidth().onPlaced { sectionTops[section] = it.positionInParent().y.roundToInt() }) {
             ExpandableSettingsSection(
                 section = section,
                 icon = icon,
+                summary = summary,
                 expanded = openSection == section,
                 onToggle = { openSection = toggleMoreSettingsSection(openSection, section) },
                 content = content,
@@ -666,7 +675,13 @@ internal fun SubtitleSettingsDialog(
     }
 
     Dialog(
-        onDismissRequest = { if (peek.locked) peek.locked = false else onDismiss() },
+        onDismissRequest = {
+            when {
+                peek.locked -> peek.locked = false
+                searchFocused -> focusManager.clearFocus()
+                else -> onDismiss()
+            }
+        },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         SeeThroughDialogWindow()
@@ -687,27 +702,30 @@ internal fun SubtitleSettingsDialog(
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            SettingsSearchField(searchQuery) { searchQuery = it }
+                            SettingsSearchField(searchQuery, onFocusChange = { searchFocused = it }) { searchQuery = it }
                             if (searchQuery.isNotBlank()) {
                                 SettingsSearchResults(searchSettings(searchEntries, searchQuery), pickSetting)
                             } else {
-                                OftenChangedSettings(
-                                    oftenChanged.mapNotNull { setting -> searchEntries.firstOrNull { it.setting == setting } },
-                                    pickSetting,
-                                )
-                                SettingsGroupCard(
-                                    title = stringResource(R.string.settings_group_languages),
-                                    icon = Icons.Default.Language,
-                                ) {
-                                    LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
+                                if (searchFocused) {
+                                    OftenChangedSettings(
+                                        oftenChanged.mapNotNull { setting -> searchEntries.firstOrNull { it.setting == setting } },
+                                        pickSetting,
+                                    )
                                 }
-
                                 Text(
                                     stringResource(R.string.settings_more_settings),
                                     modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
+
+                                Section(
+                                    MoreSettingsSection.LANGUAGES,
+                                    Icons.Default.Language,
+                                    summary = "$sourceLabel → ${languageDisplayName(targetLanguage, currentInterfaceLocale())}",
+                                ) {
+                                    LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
+                                }
 
                                 Section(MoreSettingsSection.READING, Icons.Default.TextFields) {
                                     val fontScaleLabel = stringResource(R.string.settings_text_size, (fontScale * 100).toInt())
@@ -1019,13 +1037,14 @@ private fun SettingsGroupCard(
 private fun ExpandableSettingsSection(
     section: MoreSettingsSection,
     icon: ImageVector,
+    summary: String?,
     expanded: Boolean,
     onToggle: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     SettingsExpandableCard(
         title = stringResource(section.titleRes),
-        summary = stringResource(section.summaryRes),
+        summary = summary ?: section.summaryRes?.let { stringResource(it) }.orEmpty(),
         icon = icon,
         expanded = expanded,
         onToggle = onToggle,

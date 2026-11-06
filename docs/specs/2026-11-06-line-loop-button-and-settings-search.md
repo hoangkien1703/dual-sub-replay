@@ -16,13 +16,17 @@ the very top and a short list of the settings the user changes most.
 
 - Settings → Study tools → **Loop button on the playing line** (off by default). While it is on, the
   playing (highlighted) row of the transcript panel shows a small loop icon at its right edge. Tap
-  it and that line plays again and again; tap it again, tap another line, or seek elsewhere to stop.
+  it and that line plays again and again. The loop stays on until the icon is tapped again: tapping
+  another line, or seeking elsewhere, loops that line instead (owner feedback on the preview).
 - A **Search settings** field at the very top of the settings page. Typing shows matching settings
   (name and section, in the app's language, accents ignored); tapping one opens its section,
   scrolls to it and briefly highlights it.
-- **Often changed**: below the search field, up to 3 settings the user changed at least twice in
-  the last 7 days, most changed first; hidden when none qualify. Tapping one jumps to it like a
-  search result.
+- **Often changed**: shown under the search field while it is tapped and empty (owner feedback on
+  the preview): up to 3 settings the user changed at least twice in the last 7 days, most changed
+  first, or a line saying settings changed twice in a week show there. Tapping one jumps to it
+  like a search result.
+- **Languages** becomes a closed section, the first under More settings, its summary showing the
+  two languages; the "A language model downloads only when it is needed." hint is gone.
 
 ## Non-goals
 
@@ -34,10 +38,12 @@ the very top and a short list of the settings the user changes most.
 ## User-visible behavior
 
 - Loop: the icon is a repeat-one icon; while looping it sits on a filled accent circle. The loop
-  only follows the line it was turned on for, overrides the play mode and skip silence while on,
-  and ends when the video changes or the option is turned off.
-- Often changed counts the user's own changes on the settings page only (not the AI assistant,
-  not Reset all settings); a slider drag or quick on/off within 30 seconds counts once. Reset all
+  overrides the play mode and skip silence while on, moves to the line the learner taps or seeks
+  into (or the next line after a gap), and ends when the icon is tapped, the video changes or the
+  option is turned off.
+- Often changed counts the user's own changes on the settings page and in the gear's languages
+  popup (not the AI assistant, not Reset all settings); a slider drag counts once (changes of one
+  setting less than 3 seconds after the one before merge). Reset all
   settings also clears this history.
 
 ## Technical constraints / invariants
@@ -60,11 +66,12 @@ the very top and a short list of the settings the user changes most.
 ## Acceptance criteria
 
 - With the option off (default) the transcript rows look exactly as before.
-- With it on, only the playing row shows the icon; tapping it repeats that line until tapped
-  again, another line is tapped, or the user seeks elsewhere.
+- With it on, only the playing row shows the icon; tapping it repeats that line until it is tapped
+  again; tapping another line loops that line instead.
 - Typing "loop" in Search settings shows "Loop button on the playing line · Study tools"; tapping
   it opens Study tools at that switch, highlighted.
-- Changing Text size on two visits within 7 days shows it under Often changed; one change does not.
+- Changing Text size twice (a few seconds apart) within 7 days shows it under Often changed when
+  the search field is tapped; one change does not.
 
 ## Validation plan
 

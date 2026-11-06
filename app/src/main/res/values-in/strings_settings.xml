@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Bahasa subtitel asli</string>
     <string name="settings_translate_to">Terjemahkan ke</string>
     <string name="settings_original_language">Bahasa asli</string>
-    <string name="settings_model_download_hint">Model bahasa hanya diunduh saat dibutuhkan.</string>
     <string name="settings_third_line">Baris ketiga</string>
     <string name="settings_third_line_off">Mati</string>
     <string name="settings_third_line_hint">Satu terjemahan lagi di bawah setiap subtitle, dalam bahasa lain. Memakai sedikit lebih banyak data.</string>
@@ -185,6 +184,7 @@
     <string name="settings_search_clear">Hapus pencarian</string>
     <string name="settings_search_no_results">Setelan tidak ditemukan</string>
     <string name="settings_often_changed">Sering diubah</string>
+    <string name="settings_often_changed_empty">Pengaturan yang Anda ubah dua kali dalam seminggu muncul di sini.</string>
     <string name="settings_text_size_name">Ukuran teks</string>
     <string name="settings_pronunciation_volume_name">Volume pengucapan</string>
     <string name="settings_original_captions_name">Subtitel asli</string>

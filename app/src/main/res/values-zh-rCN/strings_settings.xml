@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">原文字幕语言</string>
     <string name="settings_translate_to">翻译为</string>
     <string name="settings_original_language">原文语言</string>
-    <string name="settings_model_download_hint">语言模型仅在需要时下载。</string>
     <string name="settings_third_line">第三行</string>
     <string name="settings_third_line_off">关闭</string>
     <string name="settings_third_line_hint">在每条字幕下再显示一行另一种语言的翻译。会多用一点流量。</string>
@@ -185,6 +184,7 @@
     <string name="settings_search_clear">清除搜索</string>
     <string name="settings_search_no_results">没有找到设置</string>
     <string name="settings_often_changed">常改设置</string>
+    <string name="settings_often_changed_empty">一周内更改过两次的设置会显示在这里。</string>
     <string name="settings_text_size_name">文字大小</string>
     <string name="settings_pronunciation_volume_name">发音音量</string>
     <string name="settings_original_captions_name">原文字幕</string>
