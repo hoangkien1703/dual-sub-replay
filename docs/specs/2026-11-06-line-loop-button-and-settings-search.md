@@ -83,5 +83,10 @@ the very top and a short list of the settings the user changes most.
 ## Risks / edge cases
 
 - A seek landing early, in the line before, must not end the loop (own seeks are recognised).
+- The transcript lines are a window that slides with playback: after a long seek the loop waits
+  until the window reaches the new place instead of ending (found on the emulator, build 674).
+- An ad plays on the page with its own clock: the play modes and the loop ignore ticks while
+  YouTube's player shows an ad (`adShowing` in the playback snapshot); otherwise the loop kept
+  restarting the ad. After the ad, the loop follows the video to where it is.
 - Settings that show only under another choice (for example Google wait) have no anchor while
   hidden; the jump then stops at the section's top.

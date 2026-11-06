@@ -95,5 +95,5 @@
     <string name="study_ankiconnect_failed_detail">AnkiConnect 没有接收这张卡片:%1$s</string>
     <string name="study_ankiconnect_open">打开 AnkiConnect Android</string>
     <string name="study_loop_button_title">正在播放的行显示循环按钮</string>
-    <string name="study_loop_button_description">在字幕列表中正在播放的行上显示一个小循环图标。点按即可循环播放这一行，再次点按、点按其他行或拖动视频后停止。</string>
+    <string name="study_loop_button_description">在字幕列表中正在播放的行上显示一个小循环图标。点按即可循环播放这一行，再次点按后停止。点按其他行或拖动视频会改为循环那一行。</string>
 </resources>

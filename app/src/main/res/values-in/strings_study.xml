@@ -95,5 +95,5 @@
     <string name="study_ankiconnect_failed_detail">AnkiConnect tidak menerima kartu: %1$s</string>
     <string name="study_ankiconnect_open">Buka AnkiConnect Android</string>
     <string name="study_loop_button_title">Tombol ulang di baris yang diputar</string>
-    <string name="study_loop_button_description">Menampilkan ikon ulang kecil di baris yang sedang diputar di transkrip. Ketuk untuk mengulang baris itu sampai Anda mengetuknya lagi, mengetuk baris lain, atau menggeser video.</string>
+    <string name="study_loop_button_description">Menampilkan ikon ulang kecil di baris yang sedang diputar di transkrip. Ketuk untuk mengulang baris itu sampai Anda mengetuknya lagi. Mengetuk baris lain atau menggeser video akan mengulang baris itu.</string>
 </resources>

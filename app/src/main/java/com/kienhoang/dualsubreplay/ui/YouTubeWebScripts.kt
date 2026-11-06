@@ -25,6 +25,8 @@ internal data class WebPlaybackSnapshot(
     val playbackRate: Double = 1.0,
     val seeking: Boolean = false,
     val buffering: Boolean = false,
+    /** YouTube plays an ad: the time is the ad's, not the video's. */
+    val adShowing: Boolean = false,
     val sessionId: String = "",
     val playerFrame: PagePlayerFrame? = null,
 )
@@ -114,6 +116,7 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
         buffering: !video || video.readyState < 3 || !!(clock.state && clock.state.waiting),
         sessionId: video && clock.state ? clock.state.id : '',
         paused: !!video && video.paused === true,
+        adShowing: !!player && (player.classList.contains('ad-showing') || player.classList.contains('ad-interrupting')),
         controlsVisible: controlsVisible,
         nativeDialogVisible: nativeDialogVisible,
         playerFrame: playerFrame,
@@ -635,6 +638,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
             sessionId = json.optString("sessionId", ""),
             controlsVisible = json.optBoolean("controlsVisible", false),
             nativeDialogVisible = json.optBoolean("nativeDialogVisible", false),
+            adShowing = json.optBoolean("adShowing", false),
             liveCaption = liveCaption,
             playerFrame =
                 json.optJSONObject("playerFrame")?.let { frame ->

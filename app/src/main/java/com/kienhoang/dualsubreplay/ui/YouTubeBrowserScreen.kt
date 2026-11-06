@@ -283,6 +283,9 @@ internal class YouTubeWebController {
         scriptAction?.invoke(webPlaybackSpeedScript(rate))
     }
 
+    /** True while YouTube plays an ad (the page's last playback snapshot); the play modes leave it alone. */
+    var adShowing = false
+
     /** True while a saved word's clip is about to play or plays; the play modes leave it alone. */
     val clipPlaying: Boolean get() = pendingClip != null || playingClipVideo != null
 
@@ -634,6 +637,7 @@ internal fun SingleYouTubePage(
                     val position = clock.position(now)
                     val selection = snapshot?.url?.takeIf { it == webView.url }?.let(::browseVideoSelection)
                     if (selection != null && position != null) {
+                        controller.adShowing = snapshot.adShowing
                         currentOnPlaybackPaused(selection.videoId, snapshot.paused)
                         currentOnPlaybackSecond(
                             selection.videoId,
