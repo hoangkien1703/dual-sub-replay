@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -70,8 +73,9 @@ class SettingsSearchUiTest {
         composeRule.onNodeWithTag("settings_search_result_LOOP_BUTTON").performClick()
         composeRule.mainClock.advanceTimeBy(1_500)
         composeRule.onNodeWithTag("loop_button_switch").assertIsDisplayed()
-        // Mid-glow: the setting the search landed on is highlighted for a moment.
-        saveUiEvidence("settings-search-jump")
+        // Mid-glow: the setting the search landed on is highlighted for a moment. The settings page is a
+        // dialog, the last root; a device screenshot would lag behind the paused test clock.
+        saveUiEvidence("settings-search-jump", composeRule.onAllNodes(isRoot()).onLast().captureToImage())
         composeRule.mainClock.autoAdvance = true
         // The page stays scrolled to the setting once the glow is gone.
         composeRule.waitForIdle()
