@@ -76,6 +76,11 @@ Android app (`:app`, package `com.kienhoang.dualsubreplay`) with a separate test
 - Unit tests are plain JUnit4 — no Robolectric or mocking library. They call `internal` top-level functions directly (same package), so keep new logic in small testable `internal` functions. `org.json` is a unit-test-only dependency.
 - `unitTests.isReturnDefaultValues = true`: Android framework calls return defaults instead of throwing in unit tests.
 - Instrumented tests build Compose UI in isolation (`createComposeRule`) and WebView fixtures run offline — tests never hit the live YouTube site.
+- The CI emulator sometimes shows "System UI isn't responding", which holds window focus. Call `closeSystemDialogs()` (`ui/SystemDialogs.kt` in `androidTest`) just before Espresso's `pressBack` or `closeSoftKeyboard` in a new test.
+- Compose merges a `Text` inside a clickable `Row` into the row's node, so a test that looks for that text needs `useUnmergedTree = true`.
+- When a check fails, the CI job summary lists the failed tests (`tools/report_failed_tests.py`). For device tests, the full JUnit XML is in the `pixel2-api36-test-reports` artifact; the managed-device log no longer prints failing test names.
+- The transcript the player holds is a window of lines around the playing time, not the whole video. Code that keeps a line across seeks (loops, repeats) must handle that line leaving the window. Check long seeks and ads on an emulator with a real video; unit tests alone missed both cases in PR #201.
+- `formatNewCode -PformatFiles=...` reformats each whole file, including code you did not touch. Revert unrelated hunks so the PR stays focused; `formatCheck` only ratchets per-file counts.
 
 ## AI agents opening or updating pull requests
 
