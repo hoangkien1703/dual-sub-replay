@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Ngôn ngữ phụ đề gốc</string>
     <string name="settings_translate_to">Dịch sang</string>
     <string name="settings_original_language">Ngôn ngữ gốc</string>
-    <string name="settings_model_download_hint">Mô hình ngôn ngữ chỉ được tải xuống khi cần.</string>
     <string name="settings_third_line">Dòng thứ ba</string>
     <string name="settings_third_line_off">Tắt</string>
     <string name="settings_third_line_hint">Thêm một bản dịch nữa dưới mỗi phụ đề, bằng một ngôn ngữ khác. Tốn thêm một chút dữ liệu mạng.</string>
@@ -181,4 +180,13 @@
     <string name="settings_google_wait_4">4 giây</string>
     <string name="settings_google_wait_8">8 giây</string>
     <string name="settings_source_language_auto_short">Tự động</string>
+    <string name="settings_search_hint">Tìm cài đặt</string>
+    <string name="settings_search_clear">Xoá tìm kiếm</string>
+    <string name="settings_search_no_results">Không tìm thấy cài đặt nào</string>
+    <string name="settings_often_changed">Hay thay đổi</string>
+    <string name="settings_often_changed_empty">Các cài đặt bạn đổi từ 2 lần trong một tuần sẽ hiện ở đây.</string>
+    <string name="settings_text_size_name">Cỡ chữ</string>
+    <string name="settings_pronunciation_volume_name">Âm lượng phát âm</string>
+    <string name="settings_original_captions_name">Phụ đề gốc</string>
+    <string name="settings_translated_captions_name">Phụ đề dịch</string>
 </resources>

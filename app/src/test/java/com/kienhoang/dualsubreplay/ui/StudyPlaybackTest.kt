@@ -321,4 +321,147 @@ class StudyPlaybackTest {
         actual: Long,
         tolerance: Double,
     ) = org.junit.Assert.assertEquals(expected.toDouble(), actual.toDouble(), tolerance)
+
+    /** Like [play], with the loop button on: [loop] is the transcript panel's, following the driver's moves. */
+    private fun playLooping(
+        driver: StudyPlaybackDriver,
+        fromMs: Long,
+        toMs: Long,
+        session: String,
+        settings: StudySettings = StudySettings(loopButton = true),
+        loop: LineLoop = LineLoop().apply { lineId = 1 },
+        segments: List<SubtitleSegment> = lines,
+        active: Boolean = true,
+    ): List<Pair<Long, StudyAction>> {
+        val asked = mutableListOf<Pair<Long, StudyAction>>()
+        var time = fromMs
+        while (time <= toMs) {
+            driver
+                .tick(StudyTick("abcdefghijk", time, session, false, segments, settings, active = active, loopLineId = loop.lineId))
+                ?.let { asked += time to it }
+            driver.takeLoopMove()?.let(loop::follow)
+            time += 33
+        }
+        return asked
+    }
+
+    @Test
+    fun loopButtonPlaysTheLineAgainAndAgain() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        repeat(3) { round ->
+            val asked = playLooping(driver, if (round == 0) 900 else 1_000, 3_100, session = "s$round", loop = loop)
+            assertEquals(listOf(StudyAction.PlayFrom(1_000)), asked.map { it.second })
+            assertEquals(3_000 - STUDY_PAUSE_LEAD_MS, asked.single().first, 33.0)
+        }
+        assertEquals(1L, loop.lineId)
+    }
+
+    @Test
+    fun loopButtonWinsOverThePlayMode() {
+        val driver = StudyPlaybackDriver()
+        val settings = StudySettings(playMode = StudyPlayMode.PAUSE_AFTER_LINE, loopButton = true)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), playLooping(driver, 900, 3_100, "s1", settings).map { it.second })
+    }
+
+    @Test
+    fun aSeekElsewhereTakesTheLoopAlong() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        playLooping(driver, 900, 2_000, "s1", loop = loop)
+        // The learner drags YouTube's bar into the third line: that line loops now.
+        assertEquals(
+            listOf(StudyAction.PlayFrom(9_000)),
+            playLooping(driver, 9_100, 10_000, "s2", loop = loop).map { it.second },
+        )
+        assertEquals(3L, loop.lineId)
+        // Dragged into the gap before the third line: the third line is the next to loop.
+        playLooping(driver, 6_000, 6_100, "s3", loop = loop)
+        assertEquals(3L, loop.lineId)
+    }
+
+    @Test
+    fun aLongSeekWaitsForTheLinesToCatchUp() {
+        // The lines are a window that slides with playback: right after a long seek it still holds the old place.
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        val oldWindow = lines.take(2)
+        playLooping(driver, 900, 2_000, "s1", loop = loop, segments = oldWindow)
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 9_100, 9_300, "s2", loop = loop, segments = oldWindow))
+        assertEquals(1L, loop.lineId)
+        assertEquals(
+            listOf(StudyAction.PlayFrom(9_000)),
+            playLooping(driver, 9_333, 10_000, "s2", loop = loop, segments = lines.drop(1)).map { it.second },
+        )
+        assertEquals(3L, loop.lineId)
+    }
+
+    @Test
+    fun aSeekPastTheLastLineKeepsTheLoopWaiting() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        playLooping(driver, 900, 2_000, "s1", loop = loop)
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 12_000, 13_000, "s2", loop = loop))
+        assertEquals(1L, loop.lineId)
+        // Tapping a line from there loops that line.
+        driver.learnerSeek(3_500)
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), playLooping(driver, 3_500, 5_100, "s3", loop = loop).map { it.second })
+        assertEquals(2L, loop.lineId)
+    }
+
+    @Test
+    fun anAdLeavesTheLoopAloneAndTheLoopFollowsTheVideoAfterIt() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        playLooping(driver, 900, 2_000, "s1", loop = loop)
+        // The ad plays from 0 s on the page's clock, past the first line's end: nothing is asked of it.
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 0, 5_000, "ad", loop = loop, active = false))
+        assertEquals(1L, loop.lineId)
+        // The video comes back where the learner had sought to: the third line loops.
+        assertEquals(listOf(StudyAction.PlayFrom(9_000)), playLooping(driver, 9_100, 10_000, "s2", loop = loop).map { it.second })
+        assertEquals(3L, loop.lineId)
+    }
+
+    @Test
+    fun tappingAnotherLineLoopsThatLine() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        playLooping(driver, 900, 2_000, "s1", loop = loop)
+        driver.learnerSeek(1_000)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), playLooping(driver, 1_000, 3_100, "s2", loop = loop).map { it.second })
+        assertEquals(1L, loop.lineId)
+
+        driver.learnerSeek(3_500)
+        assertEquals(listOf(StudyAction.PlayFrom(3_500)), playLooping(driver, 3_500, 5_100, "s3", loop = loop).map { it.second })
+        assertEquals(2L, loop.lineId)
+    }
+
+    @Test
+    fun tappingTheLoopButtonAgainEndsTheLoop() {
+        val driver = StudyPlaybackDriver()
+        val loop = LineLoop().apply { lineId = 1 }
+        playLooping(driver, 900, 2_000, "s1", loop = loop)
+        loop.toggle(1)
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 2_033, 3_400, "s1", loop = loop))
+        assertNull(loop.lineId)
+    }
+
+    @Test
+    fun anotherVideoEndsTheLoop() {
+        val driver = StudyPlaybackDriver()
+        playLooping(driver, 900, 2_000, "s1")
+        driver.tick(StudyTick("lmnopqrstuv", 500, "s1", false, lines, StudySettings(loopButton = true), loopLineId = 1))
+        assertEquals(LoopMove(1, null), driver.takeLoopMove())
+        assertNull(driver.takeLoopMove())
+    }
+
+    @Test
+    fun theLoopFindsTheLineAtATime() {
+        assertEquals(1L, loopLineAt(lines, 960)?.id)
+        assertEquals(1L, loopLineAt(lines, 2_999)?.id)
+        assertEquals(2L, loopLineAt(lines, 3_200)?.id)
+        assertEquals(3L, loopLineAt(lines, 6_000)?.id)
+        assertNull(loopLineAt(lines, 10_000))
+        assertEquals(1L, loopLineAt(lines, 0)?.id)
+    }
 }

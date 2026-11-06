@@ -104,4 +104,6 @@
     <string name="study_ankiconnect_failed">AnkiConnect no aceptó la tarjeta.</string>
     <string name="study_ankiconnect_failed_detail">AnkiConnect no aceptó la tarjeta: %1$s</string>
     <string name="study_ankiconnect_open">Abrir AnkiConnect Android</string>
+    <string name="study_loop_button_title">Botón de bucle en la línea que suena</string>
+    <string name="study_loop_button_description">Muestra un pequeño icono de bucle en la línea que se está reproduciendo en la transcripción. Tócalo para repetir esa línea hasta que lo vuelvas a tocar. Si tocas otra línea o mueves el video, se repite esa línea.</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
@@ -59,7 +60,7 @@ internal fun CaptionVisibilitySettings() {
         ).forEach { (key, labelRes) ->
             var selected by remember { mutableStateOf(storedCaptionVisibility(preferences.getString(key, null))) }
             var expanded by remember { mutableStateOf(false) }
-            Column {
+            Column(Modifier.settingAnchor(key)) {
                 TextButton(onClick = { expanded = true }) { Text(stringResource(labelRes, stringResource(selected.labelRes))) }
                 DropdownMenu(expanded, { expanded = false }) {
                     CaptionVisibility.entries.forEach { mode ->

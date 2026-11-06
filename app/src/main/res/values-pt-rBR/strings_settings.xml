@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">Idioma das legendas originais</string>
     <string name="settings_translate_to">Traduzir para</string>
     <string name="settings_original_language">Idioma original</string>
-    <string name="settings_model_download_hint">O modelo de idioma só é baixado quando necessário.</string>
     <string name="settings_third_line">Terceira linha</string>
     <string name="settings_third_line_off">Desligada</string>
     <string name="settings_third_line_hint">Mais uma tradução sob cada legenda, em outro idioma. Usa um pouco mais de dados.</string>
@@ -181,4 +180,13 @@
     <string name="settings_google_wait_4">4 s</string>
     <string name="settings_google_wait_8">8 s</string>
     <string name="settings_source_language_auto_short">Automático</string>
+    <string name="settings_search_hint">Pesquisar configurações</string>
+    <string name="settings_search_clear">Limpar pesquisa</string>
+    <string name="settings_search_no_results">Nenhuma configuração encontrada</string>
+    <string name="settings_often_changed">Alteradas com frequência</string>
+    <string name="settings_often_changed_empty">As configurações que você muda duas vezes em uma semana aparecem aqui.</string>
+    <string name="settings_text_size_name">Tamanho do texto</string>
+    <string name="settings_pronunciation_volume_name">Volume da pronúncia</string>
+    <string name="settings_original_captions_name">Legendas originais</string>
+    <string name="settings_translated_captions_name">Legendas traduzidas</string>
 </resources>

@@ -227,6 +227,7 @@ private fun aiStudySettingValue(
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
         AiSetting.SEND_TO_APP -> study.sendTo.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
+        AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
         AiSetting.KANJI_DETAILS -> onOff(study.kanjiDetails)
         AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
         else -> null
@@ -679,6 +680,7 @@ internal class AppAiActions(
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
             AiSetting.SEND_TO_APP -> editor.putString(SEND_TO_APP_PREFERENCE, storedFlashcardApp(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
+            AiSetting.LOOP_BUTTON -> editor.putBoolean(LOOP_BUTTON_PREFERENCE, on)
             AiSetting.KANJI_DETAILS -> editor.putBoolean(KANJI_DETAILS_PREFERENCE, on)
             AiSetting.PAGE_TOKEN_CAPTIONS ->
                 editor
@@ -840,6 +842,7 @@ internal class AppAiActions(
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
+            AiSetting.LOOP_BUTTON -> switch(R.string.study_loop_button_title, value)
             AiSetting.KANJI_DETAILS -> switch(R.string.study_kanji_details_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))
             AiSetting.UPDATE_REMINDERS -> switch(R.string.updates_reminders_title, value)

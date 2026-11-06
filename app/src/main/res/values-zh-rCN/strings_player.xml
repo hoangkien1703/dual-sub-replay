@@ -37,4 +37,6 @@
     <string name="playback_notification_channel_description">通过耳机、锁定屏幕和此通知播放或暂停视频。</string>
     <string name="playback_play">播放</string>
     <string name="playback_pause">暂停</string>
+    <string name="player_loop_line">循环播放这一行</string>
+    <string name="player_stop_loop_line">停止循环这一行</string>
 </resources>

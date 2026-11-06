@@ -43,7 +43,7 @@ internal fun GoogleWaitSettings(
     wait: GoogleWait,
     onChange: (GoogleWait) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("google_wait").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.settings_google_wait_title))
         Text(
             stringResource(R.string.settings_google_wait_description),
@@ -98,7 +98,7 @@ internal fun AiTranslationModelSettings(
     val context = LocalContext.current
     val (assistantModel, choices) = remember(context) { context.aiTranslationModelChoices() }
     val selected = chosen.takeIf { it in choices }.orEmpty()
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("ai_translation_model").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.settings_ai_translation_model_title))
         if (choices.isNotEmpty()) {
             Text(
@@ -149,7 +149,7 @@ internal fun AiTranslationThinkingSettings(
     val context = LocalContext.current
     val levels = remember(context) { context.aiTranslationThinkingLevels() }
     if (levels.isEmpty()) return
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("ai_translation_thinking").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.settings_ai_translation_thinking_title))
         Text(
             stringResource(R.string.settings_ai_translation_thinking_description),

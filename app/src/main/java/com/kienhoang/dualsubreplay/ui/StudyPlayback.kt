@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import kotlin.math.abs
 
@@ -34,6 +37,9 @@ private const val OWN_SEEK_TOLERANCE_MS = 1_500L
  * where the video was: the page can report the new time before its seek event (and new session).
  */
 private const val LEARNER_SEEK_EARLY_MS = 50L
+
+/** The video this far from the looped line, with no seek the driver knows of, means it moved elsewhere. */
+private const val LOOP_DRIFT_MS = 2_000L
 
 /** What [StudyPlaybackDriver] asks the page video to do. */
 internal sealed interface StudyAction {
@@ -74,7 +80,37 @@ internal data class StudyTick(
     val newWordLines: Set<Int> = emptySet(),
     /** False in live fallback, while a saved word's clip plays, or for another video. */
     val active: Boolean = true,
+    /** The line the loop button repeats ([LineLoop]), or null. */
+    val loopLineId: Long? = null,
 )
+
+/**
+ * The line the loop button on the playing line repeats (Settings → Study tools → Loop button on the
+ * playing line, owner request 2026-11-06), or null. The transcript panel and the playback ticks share it.
+ */
+internal class LineLoop {
+    var lineId by mutableStateOf<Long?>(null)
+
+    fun toggle(id: Long) {
+        lineId = if (lineId == id) null else id
+    }
+
+    /**
+     * The loop moved to another line (the learner tapped one or sought there) or ended ([LoopMove.to]
+     * null). Only the loop it moved from changes, so a loop just turned on for another line stays.
+     */
+    fun follow(move: LoopMove) {
+        if (lineId == move.from) lineId = move.to
+    }
+}
+
+/** The loop button's loop went from line [from] to line [to], or ended when [to] is null. */
+internal data class LoopMove(
+    val from: Long,
+    val to: Long?,
+)
+
+internal val LocalLineLoop = staticCompositionLocalOf<LineLoop?> { null }
 
 /**
  * Play modes and skip silence (Settings → Study tools), as decisions on playback ticks. It never
@@ -120,6 +156,37 @@ internal class StudyPlaybackDriver {
     /** True once the seek behind [seekFloor] has landed; ticks before that still show the old place. */
     private var floorLanded = false
 
+    /** The looped line the last tick saw. */
+    private var loopLine: Long? = null
+
+    /** The loop's last move: until the transcript panel follows it, a tick asking for [LoopMove.from] means [LoopMove.to]. */
+    private var loopMoved: LoopMove? = null
+
+    /** [loopMoved], until [takeLoopMove] passes it on. */
+    private var loopMoveToReport: LoopMove? = null
+
+    /**
+     * Where the learner moved the video (a tapped line, YouTube's bar), until a tick whose lines
+     * reach that far moves the loop there. The lines can be a window that has not caught up yet.
+     */
+    private var learnerMoveToCheck: Long? = null
+
+    /** True while the loop waits for the lines to reach where the learner moved the video: it does nothing then. */
+    private var loopWaiting = false
+
+    /** Where the loop went since the last call (another line, or ended by another video), if anywhere. */
+    fun takeLoopMove(): LoopMove? = loopMoveToReport.also { loopMoveToReport = null }
+
+    private fun moveLoop(to: Long?) {
+        val from = loopLine ?: return
+        if (to == from) return
+        LoopMove(from, to).let {
+            loopMoved = it
+            loopMoveToReport = it
+        }
+        loopLine = to
+    }
+
     /**
      * The learner tapped a line (or the AI or the remote asked for one): the line playing before is
      * done with, and no tick counts until playback reaches [targetMs]. Without this, a tick that
@@ -132,11 +199,13 @@ internal class StudyPlaybackDriver {
         learnerTarget = targetMs
         seekFloor = targetMs
         floorLanded = false
+        learnerMoveToCheck = targetMs
     }
 
     fun tick(tick: StudyTick): StudyAction? {
         if (tick.videoId != videoId) {
             val fast = gapRate != null
+            if (videoId != null) moveLoop(null)
             reset()
             videoId = tick.videoId
             if (fast) return StudyAction.NormalSpeed
@@ -144,14 +213,83 @@ internal class StudyPlaybackDriver {
         val seek = session != null && tick.sessionId != session
         session = tick.sessionId
         if (seek) landSeek(tick.timeMs)
+        val loopId = checkLoop(tick)
         if (!landedOnLearnerTarget(seek, tick.timeMs)) return if (gapRate != null) normalSpeed() else null
         passSeekTargets(tick.timeMs)
+        if (loopId != null) {
+            if (gapRate != null) return normalSpeed()
+            return if (tick.paused) null else loop(tick, loopId)
+        }
         val mode = if (tick.active) tick.settings.effectivePlayMode else StudyPlayMode.NORMAL
         val skip = if (tick.active) tick.settings.skipSilence else SkipSilence.OFF
         if (gapRate != null && (tick.paused || skip.rate == null)) return normalSpeed()
         if (tick.paused || tick.segments.isEmpty() || (mode == StudyPlayMode.NORMAL && skip == SkipSilence.OFF)) return null
         val index = lineAtOrBefore(tick.segments, tick.timeMs)
         return lineEnd(tick, mode, index) ?: readFirstStart(tick, mode, index) ?: enter(tick, index) ?: silence(tick, skip, index)
+    }
+
+    /**
+     * The line the loop button repeats on this tick, or null. The loop stays on until the learner
+     * taps its button again (owner request 2026-11-06): tapping another line, or seeking with
+     * YouTube's bar, moves it to the line the video went to.
+     */
+    private fun checkLoop(tick: StudyTick): Long? {
+        var asked = tick.loopLineId?.takeIf { tick.active }
+        val moved = loopMoved
+        if (moved != null && asked == moved.from) asked = moved.to else loopMoved = null
+        if (asked != loopLine) {
+            // A loop just turned on starts on its own line, whatever the learner did before.
+            loopLine = asked
+            learnerMoveToCheck = null
+        }
+        loopWaiting = false
+        if (asked == null) return null
+        var target = learnerMoveToCheck ?: driftedTo(tick, asked) ?: return asked
+        val settled = learnerTarget == null
+        if (!linesReach(tick.segments, target) && settled && linesReach(tick.segments, tick.timeMs)) target = tick.timeMs
+        if (!linesReach(tick.segments, target)) {
+            learnerMoveToCheck = target
+            loopWaiting = true
+            return asked
+        }
+        learnerMoveToCheck = null
+        moveLoop(loopLineAt(tick.segments, target)?.id)
+        return loopLine
+    }
+
+    /**
+     * Where the video is when it is well away from the looped line without the driver knowing why
+     * (a seek it did not see, the end of an ad), so the loop follows it there instead of going back.
+     */
+    private fun driftedTo(
+        tick: StudyTick,
+        id: Long,
+    ): Long? {
+        val line = tick.segments.indexOfFirst { it.id == id }
+        // The lines are a window that slides with playback: remember where the looped line is for when it slides out.
+        if (line >= 0) loopSpan = id to (tick.segments[line].startMs..lineBoundary(tick.segments, line))
+        if (learnerTarget != null || ownSeek?.landed == false) return null
+        val span = loopSpan?.takeIf { it.first == id }?.second ?: return null
+        val away = tick.timeMs < span.first - LOOP_DRIFT_MS || tick.timeMs > span.last + LOOP_DRIFT_MS
+        return tick.timeMs.takeIf { away }
+    }
+
+    /** The looped line's start and end, as last seen in the lines. */
+    private var loopSpan: Pair<Long, LongRange>? = null
+
+    /** The looped line's end takes the video back to its start, for as long as the loop is on. */
+    private fun loop(
+        tick: StudyTick,
+        id: Long,
+    ): StudyAction? {
+        val line = tick.segments.indexOfFirst { it.id == id }
+        if (loopWaiting || line < 0 || ownSeek?.landed == false) return null
+        val segment = tick.segments[line]
+        if (tick.timeMs < lineBoundary(tick.segments, line) - STUDY_PAUSE_LEAD_MS) return null
+        ownSeek = OwnSeek(segment.startMs, replay = true)
+        seekFloor = segment.startMs
+        floorLanded = false
+        return StudyAction.PlayFrom(segment.startMs)
     }
 
     private fun reset() {
@@ -197,6 +335,8 @@ internal class StudyPlaybackDriver {
     private fun landSeek(timeMs: Long) {
         val own = ownSeek?.takeIf { abs(timeMs - it.targetMs) <= OWN_SEEK_TOLERANCE_MS }
         if (own == null) {
+            // A seek of the learner's own (YouTube's bar, double tap) takes the loop along; a tapped line does so on its own.
+            if (learnerTarget == null) learnerMoveToCheck = timeMs
             ownSeek = null
             if (seekFloor?.let { abs(timeMs - it) > OWN_SEEK_TOLERANCE_MS } == true) seekFloor = null
             forgetLines()
@@ -359,6 +499,9 @@ internal class StudyPlaybackRunner(
     private val driver = StudyPlaybackDriver()
     private var paused = false
 
+    /** The loop button's line, shared with the transcript panel. */
+    val lineLoop = LineLoop()
+
     @Volatile var state: DualSubUiState? = null
 
     @Volatile var settings = StudySettings()
@@ -394,7 +537,8 @@ internal class StudyPlaybackRunner(
         sessionId: String,
     ) {
         val current = state ?: return
-        val active = !current.liveFallback && current.activeVideoId == videoId && !controller.clipPlaying
+        // An ad plays on the same page with its own clock: the play modes and the loop leave it alone.
+        val active = !current.liveFallback && current.activeVideoId == videoId && !controller.clipPlaying && !controller.adShowing
         val tick =
             StudyTick(
                 videoId = videoId,
@@ -405,8 +549,11 @@ internal class StudyPlaybackRunner(
                 settings = settings,
                 newWordLines = newWordLines,
                 active = active,
+                loopLineId = if (settings.loopButton) lineLoop.lineId else null,
             )
-        when (val action = driver.tick(tick)) {
+        val action = driver.tick(tick)
+        driver.takeLoopMove()?.let(lineLoop::follow)
+        when (action) {
             StudyAction.Pause -> controller.pause()
             is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND, byPlayMode = true)
             is StudyAction.PauseAt -> controller.seekPaused(action.ms / MS_PER_SECOND)
@@ -435,9 +582,25 @@ internal fun rememberStudyPlaybackRunner(
     val comprehension = LocalStudyTools.current?.comprehension
     val newWordLines = comprehension?.oneNewWordLines.orEmpty()
     SideEffect {
+        if (!settings.loopButton) runner.lineLoop.lineId = null
         runner.state = state
         runner.settings = settings
         runner.newWordLines = newWordLines
     }
     return runner
 }
+
+/** The line the video is in at [timeMs] (a tapped line's start counts as in it), or else the next one. */
+internal fun loopLineAt(
+    segments: List<SubtitleSegment>,
+    timeMs: Long,
+): SubtitleSegment? {
+    val index = segments.indexOfLast { it.startMs - LEARNER_SEEK_EARLY_MS <= timeMs }
+    return segments.getOrNull(index)?.takeIf { timeMs < it.endMs.coerceAtLeast(it.startMs + 1) } ?: segments.getOrNull(index + 1)
+}
+
+/** True when [segments] reach [timeMs]: from a little before the first line to the end of the last. */
+private fun linesReach(
+    segments: List<SubtitleSegment>,
+    timeMs: Long,
+): Boolean = segments.isNotEmpty() && timeMs in (segments.first().startMs - LOOP_DRIFT_MS)..segments.last().endMs

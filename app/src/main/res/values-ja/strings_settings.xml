@@ -65,7 +65,6 @@
     <string name="settings_original_caption_language">元の字幕の言語</string>
     <string name="settings_translate_to">翻訳先</string>
     <string name="settings_original_language">元の言語</string>
-    <string name="settings_model_download_hint">言語モデルは必要なときだけダウンロードされます。</string>
     <string name="settings_third_line">3行目</string>
     <string name="settings_third_line_off">オフ</string>
     <string name="settings_third_line_hint">各字幕の下に、別の言語の翻訳をもう1行表示します。通信量が少し増えます。</string>
@@ -181,4 +180,13 @@
     <string name="settings_google_wait_4">4 秒</string>
     <string name="settings_google_wait_8">8 秒</string>
     <string name="settings_source_language_auto_short">自動</string>
+    <string name="settings_search_hint">設定を検索</string>
+    <string name="settings_search_clear">検索をクリア</string>
+    <string name="settings_search_no_results">該当する設定がありません</string>
+    <string name="settings_often_changed">よく変更する設定</string>
+    <string name="settings_often_changed_empty">1週間に2回変更した設定がここに表示されます。</string>
+    <string name="settings_text_size_name">文字サイズ</string>
+    <string name="settings_pronunciation_volume_name">発音の音量</string>
+    <string name="settings_original_captions_name">元の字幕</string>
+    <string name="settings_translated_captions_name">翻訳字幕</string>
 </resources>
