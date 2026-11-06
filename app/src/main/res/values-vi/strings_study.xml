@@ -94,4 +94,6 @@
     <string name="study_ankiconnect_failed">AnkiConnect không nhận thẻ.</string>
     <string name="study_ankiconnect_failed_detail">AnkiConnect không nhận thẻ: %1$s</string>
     <string name="study_ankiconnect_open">Mở AnkiConnect Android</string>
+    <string name="study_loop_button_title">Nút lặp trên dòng đang phát</string>
+    <string name="study_loop_button_description">Hiện một biểu tượng lặp nhỏ trên dòng đang phát trong bản chép lời. Chạm vào để lặp lại dòng đó cho đến khi bạn chạm lại, chạm vào dòng khác hoặc tua video.</string>
 </resources>

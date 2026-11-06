@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 giây</string>
     <string name="settings_google_wait_8">8 giây</string>
     <string name="settings_source_language_auto_short">Tự động</string>
+    <string name="settings_search_hint">Tìm cài đặt</string>
+    <string name="settings_search_clear">Xoá tìm kiếm</string>
+    <string name="settings_search_no_results">Không tìm thấy cài đặt nào</string>
+    <string name="settings_often_changed">Hay thay đổi</string>
+    <string name="settings_text_size_name">Cỡ chữ</string>
+    <string name="settings_pronunciation_volume_name">Âm lượng phát âm</string>
+    <string name="settings_original_captions_name">Phụ đề gốc</string>
+    <string name="settings_translated_captions_name">Phụ đề dịch</string>
 </resources>

@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 san</string>
     <string name="settings_google_wait_8">8 san</string>
     <string name="settings_source_language_auto_short">Avtomatik</string>
+    <string name="settings_search_hint">Ayarlarda axtar</string>
+    <string name="settings_search_clear">Axtarışı təmizlə</string>
+    <string name="settings_search_no_results">Ayar tapılmadı</string>
+    <string name="settings_often_changed">Tez-tez dəyişdirilən</string>
+    <string name="settings_text_size_name">Mətn ölçüsü</string>
+    <string name="settings_pronunciation_volume_name">Tələffüz səsi</string>
+    <string name="settings_original_captions_name">Orijinal altyazılar</string>
+    <string name="settings_translated_captions_name">Tərcümə altyazıları</string>
 </resources>

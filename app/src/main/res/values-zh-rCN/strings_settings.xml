@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 秒</string>
     <string name="settings_google_wait_8">8 秒</string>
     <string name="settings_source_language_auto_short">自动</string>
+    <string name="settings_search_hint">搜索设置</string>
+    <string name="settings_search_clear">清除搜索</string>
+    <string name="settings_search_no_results">没有找到设置</string>
+    <string name="settings_often_changed">常改设置</string>
+    <string name="settings_text_size_name">文字大小</string>
+    <string name="settings_pronunciation_volume_name">发音音量</string>
+    <string name="settings_original_captions_name">原文字幕</string>
+    <string name="settings_translated_captions_name">翻译字幕</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -136,13 +137,15 @@ private fun ColorChoiceSetting(
     testTagPrefix: String,
     onColorChange: (String) -> Unit,
 ) {
-    Text(title)
-    Text(
-        hint,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    SettingsColorSwatchRow(selectedKey, options, onColorChange, testTagPrefix)
+    Column(Modifier.fillMaxWidth().settingAnchor(testTagPrefix)) {
+        Text(title)
+        Text(
+            hint,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        SettingsColorSwatchRow(selectedKey, options, onColorChange, testTagPrefix)
+    }
 }
 
 @Composable

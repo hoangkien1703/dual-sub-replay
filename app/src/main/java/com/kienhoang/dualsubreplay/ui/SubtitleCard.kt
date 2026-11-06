@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,9 +20,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -77,6 +80,8 @@ internal fun CompactSubtitleCard(
     focusModifier: Modifier = Modifier,
     /** Settings → Languages → Third line: plain text under the other lines; null shows nothing. */
     thirdText: String? = null,
+    /** The loop button at the row's end (Study tools → Loop button on the playing line), or null for none. */
+    loop: LineLoopButton? = null,
 ) {
     if (!showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -172,6 +177,41 @@ internal fun CompactSubtitleCard(
                 }
                 thirdText?.let { ThirdLineText(it, fontScale, translatedColor, Modifier.padding(top = 2.dp)) }
             }
+            loop?.let { LineLoopIconButton(it) }
+        }
+    }
+}
+
+/** The loop button of one transcript row: whether its line loops, and what a tap does. */
+internal data class LineLoopButton(
+    val looping: Boolean,
+    val onToggle: () -> Unit,
+)
+
+/** A small repeat-one icon; on a filled accent circle while the line loops. */
+@Composable
+private fun LineLoopIconButton(button: LineLoopButton) {
+    val description = stringResource(if (button.looping) R.string.player_stop_loop_line else R.string.player_loop_line)
+    IconButton(
+        onClick = button.onToggle,
+        modifier = Modifier.padding(start = 4.dp).size(40.dp).testTag("line_loop_button"),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .size(32.dp)
+                    .background(
+                        if (button.looping) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        CircleShape,
+                    ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Default.RepeatOne,
+                contentDescription = description,
+                modifier = Modifier.size(20.dp),
+                tint = if (button.looping) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

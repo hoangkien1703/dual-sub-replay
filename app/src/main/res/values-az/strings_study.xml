@@ -98,4 +98,6 @@
     <string name="study_known_words_offer_message">Bundan sonra altyazı paneli hər videonun nə qədərini artıq bildiyinizi göstərir, tez-tez gördüyünüz sözlər isə özü bilinən sayılır. Bunu sonra Ayarlar → Öyrənmə alətləri bölməsində dəyişə bilərsiniz.</string>
     <string name="study_known_words_offer_confirm">Yandır</string>
     <string name="study_known_words_offer_dismiss">İndi yox</string>
+    <string name="study_loop_button_title">Oynayan sətirdə dövr düyməsi</string>
+    <string name="study_loop_button_description">Transkriptdə oynayan sətirdə kiçik dövr işarəsi göstərir. Həmin sətri təkrarlamaq üçün ona toxunun; yenidən toxunana, başqa sətrə toxunana və ya videonu irəli-geri çəkənə qədər təkrarlanır.</string>
 </resources>

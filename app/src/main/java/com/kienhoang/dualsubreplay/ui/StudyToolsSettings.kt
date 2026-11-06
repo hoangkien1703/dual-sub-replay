@@ -55,6 +55,13 @@ internal fun StudyToolsSettingsSection() {
         SettingsHint(stringResource(R.string.study_play_mode_needs_known_words))
     }
     SettingsHint(stringResource(R.string.study_play_mode_note))
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_loop_button_title),
+        description = stringResource(R.string.study_loop_button_description),
+        checked = settings.loopButton,
+        onCheckedChange = { preferences.edit().putBoolean(LOOP_BUTTON_PREFERENCE, it).apply() },
+        testTag = "loop_button_switch",
+    )
     SettingsSectionDivider()
     SkipSilenceSettings(settings.skipSilence) { skip -> preferences.edit().putString(SKIP_SILENCE_PREFERENCE, skip.storageValue).apply() }
     SettingsSectionDivider()
@@ -121,26 +128,28 @@ private fun StudyPlayModeSettings(
     settings: StudySettings,
     onChange: (StudyPlayMode) -> Unit,
 ) {
-    SettingsSubheading(stringResource(R.string.study_play_mode_title))
-    StudyPlayMode.entries.forEach { mode ->
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clickable { onChange(mode) }
-                    .padding(vertical = 4.dp)
-                    .testTag("study_play_mode_${mode.storageValue}"),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            RadioButton(selected = settings.playMode == mode, onClick = { onChange(mode) })
-            Spacer(Modifier.size(8.dp))
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(mode.titleRes))
-                Text(
-                    stringResource(mode.descriptionRes),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+    Column(Modifier.fillMaxWidth().settingAnchor("study_play_mode")) {
+        SettingsSubheading(stringResource(R.string.study_play_mode_title))
+        StudyPlayMode.entries.forEach { mode ->
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onChange(mode) }
+                        .padding(vertical = 4.dp)
+                        .testTag("study_play_mode_${mode.storageValue}"),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = settings.playMode == mode, onClick = { onChange(mode) })
+                Spacer(Modifier.size(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(mode.titleRes))
+                    Text(
+                        stringResource(mode.descriptionRes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -178,7 +187,7 @@ private fun SkipSilenceSettings(
     skip: SkipSilence,
     onChange: (SkipSilence) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("skip_silence").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.study_skip_silence_title))
         Text(
             stringResource(R.string.study_skip_silence_description),
@@ -205,7 +214,7 @@ private fun KnownWordsSettings(
     onModeChange: (KnownWordsMode) -> Unit,
     onAfterChange: (Int) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("known_words").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.study_known_words_title))
         Text(
             stringResource(R.string.study_known_words_description),
@@ -249,7 +258,7 @@ private fun PageTokenSettings(
     mode: PageTokenMode,
     onChange: (PageTokenMode) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    Column(Modifier.fillMaxWidth().settingAnchor("page_token").padding(vertical = 6.dp)) {
         Text(stringResource(R.string.study_page_token_title))
         Text(
             stringResource(R.string.study_page_token_description),

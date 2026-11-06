@@ -321,4 +321,73 @@ class StudyPlaybackTest {
         actual: Long,
         tolerance: Double,
     ) = org.junit.Assert.assertEquals(expected.toDouble(), actual.toDouble(), tolerance)
+
+    /** Like [play], with the loop button on for line [loopLineId]. */
+    private fun playLooping(
+        driver: StudyPlaybackDriver,
+        fromMs: Long,
+        toMs: Long,
+        session: String,
+        settings: StudySettings = StudySettings(loopButton = true),
+        loopLineId: Long = 1,
+    ): List<Pair<Long, StudyAction>> {
+        val asked = mutableListOf<Pair<Long, StudyAction>>()
+        var time = fromMs
+        while (time <= toMs) {
+            driver
+                .tick(StudyTick("abcdefghijk", time, session, false, lines, settings, loopLineId = loopLineId))
+                ?.let { asked += time to it }
+            time += 33
+        }
+        return asked
+    }
+
+    @Test
+    fun loopButtonPlaysTheLineAgainAndAgain() {
+        val driver = StudyPlaybackDriver()
+        repeat(3) { round ->
+            val asked = playLooping(driver, if (round == 0) 900 else 1_000, 3_100, session = "s$round")
+            assertEquals(listOf(StudyAction.PlayFrom(1_000)), asked.map { it.second })
+            assertEquals(3_000 - STUDY_PAUSE_LEAD_MS, asked.single().first, 33.0)
+        }
+        assertNull(driver.takeEndedLoop())
+    }
+
+    @Test
+    fun loopButtonWinsOverThePlayMode() {
+        val driver = StudyPlaybackDriver()
+        val settings = StudySettings(playMode = StudyPlayMode.PAUSE_AFTER_LINE, loopButton = true)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), playLooping(driver, 900, 3_100, "s1", settings).map { it.second })
+    }
+
+    @Test
+    fun aSeekElsewhereEndsTheLoop() {
+        val driver = StudyPlaybackDriver()
+        playLooping(driver, 900, 2_000, "s1")
+        // The learner drags YouTube's bar to the third line: the loop ends and that line plays on.
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 9_100, 10_500, "s2"))
+        assertEquals(1L, driver.takeEndedLoop())
+        assertNull(driver.takeEndedLoop())
+    }
+
+    @Test
+    fun tappingAnotherLineEndsTheLoopButTappingTheLoopedLineKeepsIt() {
+        val driver = StudyPlaybackDriver()
+        playLooping(driver, 900, 2_000, "s1")
+        driver.learnerSeek(1_000)
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), playLooping(driver, 1_000, 3_100, "s2").map { it.second })
+        assertNull(driver.takeEndedLoop())
+
+        driver.learnerSeek(3_500)
+        assertEquals(emptyList<Pair<Long, StudyAction>>(), playLooping(driver, 3_500, 5_500, "s3"))
+        assertEquals(1L, driver.takeEndedLoop())
+    }
+
+    @Test
+    fun anotherVideoEndsTheLoop() {
+        val driver = StudyPlaybackDriver()
+        playLooping(driver, 900, 2_000, "s1")
+        driver.tick(StudyTick("lmnopqrstuv", 500, "s1", false, lines, StudySettings(loopButton = true), loopLineId = 1))
+        assertEquals(1L, driver.takeEndedLoop())
+    }
 }

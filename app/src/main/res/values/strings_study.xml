@@ -101,4 +101,6 @@
     <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and words you see often count as known by themselves. You can change this later in Settings → Study tools.</string>
     <string name="study_known_words_offer_confirm">Turn on</string>
     <string name="study_known_words_offer_dismiss">Not now</string>
+    <string name="study_loop_button_title">Loop button on the playing line</string>
+    <string name="study_loop_button_description">Shows a small loop icon on the line that is playing in the transcript. Tap it to repeat that line until you tap it again, tap another line or move the video.</string>
 </resources>

@@ -132,6 +132,7 @@ internal enum class AiSetting(
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
     BLUR_BOX("blur_box"),
+    LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 

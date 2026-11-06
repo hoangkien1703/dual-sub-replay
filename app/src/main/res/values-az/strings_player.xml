@@ -37,4 +37,6 @@
     <string name="playback_notification_channel_description">Videonu qulaqlıqdan, kilid ekranından və bu bildirişdən oynadın və dayandırın.</string>
     <string name="playback_play">Oynat</string>
     <string name="playback_pause">Fasilə</string>
+    <string name="player_loop_line">Bu sətri dövrə sal</string>
+    <string name="player_stop_loop_line">Bu sətrin dövrünü dayandır</string>
 </resources>

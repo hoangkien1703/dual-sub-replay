@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 s</string>
     <string name="settings_google_wait_8">8 s</string>
     <string name="settings_source_language_auto_short">Auto</string>
+    <string name="settings_search_hint">Search settings</string>
+    <string name="settings_search_clear">Clear search</string>
+    <string name="settings_search_no_results">No settings found</string>
+    <string name="settings_often_changed">Often changed</string>
+    <string name="settings_text_size_name">Text size</string>
+    <string name="settings_pronunciation_volume_name">Pronunciation volume</string>
+    <string name="settings_original_captions_name">Original captions</string>
+    <string name="settings_translated_captions_name">Translated captions</string>
 </resources>

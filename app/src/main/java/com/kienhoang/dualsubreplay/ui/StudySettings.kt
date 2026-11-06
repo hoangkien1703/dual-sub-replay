@@ -36,6 +36,9 @@ internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
 /** Automatic page tokens: YouTube wanted a token, so later videos ask with it first. */
 internal const val PAGE_TOKEN_NEEDED_PREFERENCE = "page_token_needed"
 
+/** Study tools → Loop button on the playing line (owner request 2026-11-06), off by default. */
+internal const val LOOP_BUTTON_PREFERENCE = "line_loop_button"
+
 /** The word card offered to turn Known words on once, after the first "I know this word". */
 internal const val KNOWN_WORDS_OFFERED_PREFERENCE = "known_words_offered"
 
@@ -52,6 +55,7 @@ internal val STUDY_SETTING_KEYS =
         SEND_TO_APP_PREFERENCE,
         ANKICONNECT_DECK_PREFERENCE,
         BLUR_BOX_PREFERENCE,
+        LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
@@ -136,6 +140,7 @@ internal const val DEFAULT_STUDY_REPEAT_COUNT = 2
 internal data class StudySettings(
     val playMode: StudyPlayMode = StudyPlayMode.NORMAL,
     val repeatCount: Int = DEFAULT_STUDY_REPEAT_COUNT,
+    val loopButton: Boolean = false,
     val skipSilence: SkipSilence = SkipSilence.OFF,
     val knownWordsMode: KnownWordsMode = KnownWordsMode.OFF,
     val knownWordsAfter: Int = DEFAULT_KNOWN_WORDS_AFTER,
@@ -175,6 +180,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
     StudySettings(
         playMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
         repeatCount = storedStudyRepeatCount(preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, DEFAULT_STUDY_REPEAT_COUNT)),
+        loopButton = preferences.getBoolean(LOOP_BUTTON_PREFERENCE, false),
         skipSilence = storedSkipSilence(preferences.getString(SKIP_SILENCE_PREFERENCE, null)),
         knownWordsMode = storedKnownWordsMode(preferences.getString(KNOWN_WORDS_PREFERENCE, null)),
         knownWordsAfter = storedKnownWordsAfter(preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, DEFAULT_KNOWN_WORDS_AFTER)),

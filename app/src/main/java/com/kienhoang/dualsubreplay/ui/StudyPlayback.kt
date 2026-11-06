@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import kotlin.math.abs
 
@@ -74,7 +77,28 @@ internal data class StudyTick(
     val newWordLines: Set<Int> = emptySet(),
     /** False in live fallback, while a saved word's clip plays, or for another video. */
     val active: Boolean = true,
+    /** The line the loop button repeats ([LineLoop]), or null. */
+    val loopLineId: Long? = null,
 )
+
+/**
+ * The line the loop button on the playing line repeats (Settings → Study tools → Loop button on the
+ * playing line, owner request 2026-11-06), or null. The transcript panel and the playback ticks share it.
+ */
+internal class LineLoop {
+    var lineId by mutableStateOf<Long?>(null)
+
+    fun toggle(id: Long) {
+        lineId = if (lineId == id) null else id
+    }
+
+    /** Ends the loop of [id] only, so a loop just turned on for another line stays. */
+    fun end(id: Long) {
+        if (lineId == id) lineId = null
+    }
+}
+
+internal val LocalLineLoop = staticCompositionLocalOf<LineLoop?> { null }
 
 /**
  * Play modes and skip silence (Settings → Study tools), as decisions on playback ticks. It never
@@ -120,6 +144,29 @@ internal class StudyPlaybackDriver {
     /** True once the seek behind [seekFloor] has landed; ticks before that still show the old place. */
     private var floorLanded = false
 
+    /** The looped line the last tick saw. */
+    private var loopLine: Long? = null
+
+    /** The loop a seek elsewhere ended: ignored until the transcript panel lets go of it too. */
+    private var endedLoop: Long? = null
+
+    /** [endedLoop], until [takeEndedLoop] passes it on. */
+    private var endedLoopToReport: Long? = null
+
+    /** Where a tapped line starts, until the next tick checks whether it is the looped line. */
+    private var learnerSeekToCheck: Long? = null
+
+    /** The looped line a seek elsewhere (or another video) ended since the last call, if any. */
+    fun takeEndedLoop(): Long? = endedLoopToReport.also { endedLoopToReport = null }
+
+    private fun endLoop() {
+        loopLine?.let {
+            endedLoop = it
+            endedLoopToReport = it
+        }
+        loopLine = null
+    }
+
     /**
      * The learner tapped a line (or the AI or the remote asked for one): the line playing before is
      * done with, and no tick counts until playback reaches [targetMs]. Without this, a tick that
@@ -132,11 +179,13 @@ internal class StudyPlaybackDriver {
         learnerTarget = targetMs
         seekFloor = targetMs
         floorLanded = false
+        learnerSeekToCheck = targetMs
     }
 
     fun tick(tick: StudyTick): StudyAction? {
         if (tick.videoId != videoId) {
             val fast = gapRate != null
+            if (videoId != null) endLoop()
             reset()
             videoId = tick.videoId
             if (fast) return StudyAction.NormalSpeed
@@ -144,14 +193,57 @@ internal class StudyPlaybackDriver {
         val seek = session != null && tick.sessionId != session
         session = tick.sessionId
         if (seek) landSeek(tick.timeMs)
+        val loopId = checkLoop(tick)
         if (!landedOnLearnerTarget(seek, tick.timeMs)) return if (gapRate != null) normalSpeed() else null
         passSeekTargets(tick.timeMs)
+        if (loopId != null) {
+            if (gapRate != null) return normalSpeed()
+            return if (tick.paused) null else loop(tick, loopId)
+        }
         val mode = if (tick.active) tick.settings.effectivePlayMode else StudyPlayMode.NORMAL
         val skip = if (tick.active) tick.settings.skipSilence else SkipSilence.OFF
         if (gapRate != null && (tick.paused || skip.rate == null)) return normalSpeed()
         if (tick.paused || tick.segments.isEmpty() || (mode == StudyPlayMode.NORMAL && skip == SkipSilence.OFF)) return null
         val index = lineAtOrBefore(tick.segments, tick.timeMs)
         return lineEnd(tick, mode, index) ?: readFirstStart(tick, mode, index) ?: enter(tick, index) ?: silence(tick, skip, index)
+    }
+
+    /**
+     * The line the loop button repeats on this tick, or null. Tapping another line ends the loop;
+     * tapping the looped line itself only plays it again.
+     */
+    private fun checkLoop(tick: StudyTick): Long? {
+        val asked = tick.loopLineId?.takeIf { tick.active }
+        if (asked != endedLoop) endedLoop = null
+        val id = asked?.takeIf { it != endedLoop }
+        if (id != loopLine) {
+            loopLine = id
+            learnerSeekToCheck = null
+        }
+        val target = learnerSeekToCheck ?: return id
+        learnerSeekToCheck = null
+        if (id == null) return null
+        val segment = tick.segments.firstOrNull { it.id == id }
+        val onLoopedLine =
+            segment != null && target in (segment.startMs - LEARNER_SEEK_EARLY_MS) until segment.endMs.coerceAtLeast(segment.startMs + 1)
+        if (onLoopedLine) return id
+        endLoop()
+        return null
+    }
+
+    /** The looped line's end takes the video back to its start, for as long as the loop is on. */
+    private fun loop(
+        tick: StudyTick,
+        id: Long,
+    ): StudyAction? {
+        val line = tick.segments.indexOfFirst { it.id == id }
+        if (line < 0 || ownSeek?.landed == false) return null
+        val segment = tick.segments[line]
+        if (tick.timeMs < lineBoundary(tick.segments, line) - STUDY_PAUSE_LEAD_MS) return null
+        ownSeek = OwnSeek(segment.startMs, replay = true)
+        seekFloor = segment.startMs
+        floorLanded = false
+        return StudyAction.PlayFrom(segment.startMs)
     }
 
     private fun reset() {
@@ -197,6 +289,8 @@ internal class StudyPlaybackDriver {
     private fun landSeek(timeMs: Long) {
         val own = ownSeek?.takeIf { abs(timeMs - it.targetMs) <= OWN_SEEK_TOLERANCE_MS }
         if (own == null) {
+            // A seek of the learner's own (YouTube's bar, double tap) leaves the looped line; a tapped line is checked on its own.
+            if (learnerTarget == null) endLoop()
             ownSeek = null
             if (seekFloor?.let { abs(timeMs - it) > OWN_SEEK_TOLERANCE_MS } == true) seekFloor = null
             forgetLines()
@@ -359,6 +453,9 @@ internal class StudyPlaybackRunner(
     private val driver = StudyPlaybackDriver()
     private var paused = false
 
+    /** The loop button's line, shared with the transcript panel. */
+    val lineLoop = LineLoop()
+
     @Volatile var state: DualSubUiState? = null
 
     @Volatile var settings = StudySettings()
@@ -405,8 +502,11 @@ internal class StudyPlaybackRunner(
                 settings = settings,
                 newWordLines = newWordLines,
                 active = active,
+                loopLineId = if (settings.loopButton) lineLoop.lineId else null,
             )
-        when (val action = driver.tick(tick)) {
+        val action = driver.tick(tick)
+        driver.takeEndedLoop()?.let(lineLoop::end)
+        when (action) {
             StudyAction.Pause -> controller.pause()
             is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND, byPlayMode = true)
             is StudyAction.PauseAt -> controller.seekPaused(action.ms / MS_PER_SECOND)
@@ -435,6 +535,7 @@ internal fun rememberStudyPlaybackRunner(
     val comprehension = LocalStudyTools.current?.comprehension
     val newWordLines = comprehension?.oneNewWordLines.orEmpty()
     SideEffect {
+        if (!settings.loopButton) runner.lineLoop.lineId = null
         runner.state = state
         runner.settings = settings
         runner.newWordLines = newWordLines

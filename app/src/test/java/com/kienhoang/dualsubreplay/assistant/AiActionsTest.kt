@@ -110,6 +110,7 @@ class AiActionsTest {
         assertEquals("jump", setting("skip_silence", "skip"))
         assertEquals("off", setting("skip_silence", "Off"))
         assertEquals("on", setting("blur_box", "true"))
+        assertEquals("on", setting("loop_button", "on"))
         assertEquals("off", setting("skip_ads", "off"))
         assertEquals("on", setting("skip_sponsors", "on"))
         assertEquals("on", setting("always_skip_sponsors", "true"))

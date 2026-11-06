@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 秒</string>
     <string name="settings_google_wait_8">8 秒</string>
     <string name="settings_source_language_auto_short">自動</string>
+    <string name="settings_search_hint">設定を検索</string>
+    <string name="settings_search_clear">検索をクリア</string>
+    <string name="settings_search_no_results">該当する設定がありません</string>
+    <string name="settings_often_changed">よく変更する設定</string>
+    <string name="settings_text_size_name">文字サイズ</string>
+    <string name="settings_pronunciation_volume_name">発音の音量</string>
+    <string name="settings_original_captions_name">元の字幕</string>
+    <string name="settings_translated_captions_name">翻訳字幕</string>
 </resources>

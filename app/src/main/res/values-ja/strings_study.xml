@@ -94,4 +94,6 @@
     <string name="study_ankiconnect_failed">AnkiConnect がカードを受け付けませんでした。</string>
     <string name="study_ankiconnect_failed_detail">AnkiConnect がカードを受け付けませんでした: %1$s</string>
     <string name="study_ankiconnect_open">AnkiConnect Android を開く</string>
+    <string name="study_loop_button_title">再生中の行にループボタン</string>
+    <string name="study_loop_button_description">字幕一覧で再生中の行に小さなループアイコンを表示します。タップするとその行を繰り返し、もう一度タップするか、別の行をタップするか、動画を移動すると止まります。</string>
 </resources>

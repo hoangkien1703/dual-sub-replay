@@ -37,4 +37,6 @@
     <string name="playback_notification_channel_description">Reproduza e pause o vídeo pelos fones de ouvido, pela tela de bloqueio e por esta notificação.</string>
     <string name="playback_play">Reproduzir</string>
     <string name="playback_pause">Pausar</string>
+    <string name="player_loop_line">Repetir esta linha sem parar</string>
+    <string name="player_stop_loop_line">Parar de repetir esta linha</string>
 </resources>

@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4 dtk</string>
     <string name="settings_google_wait_8">8 dtk</string>
     <string name="settings_source_language_auto_short">Otomatis</string>
+    <string name="settings_search_hint">Cari setelan</string>
+    <string name="settings_search_clear">Hapus pencarian</string>
+    <string name="settings_search_no_results">Setelan tidak ditemukan</string>
+    <string name="settings_often_changed">Sering diubah</string>
+    <string name="settings_text_size_name">Ukuran teks</string>
+    <string name="settings_pronunciation_volume_name">Volume pengucapan</string>
+    <string name="settings_original_captions_name">Subtitel asli</string>
+    <string name="settings_translated_captions_name">Subtitel terjemahan</string>
 </resources>

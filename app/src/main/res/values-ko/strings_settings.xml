@@ -181,4 +181,12 @@
     <string name="settings_google_wait_4">4초</string>
     <string name="settings_google_wait_8">8초</string>
     <string name="settings_source_language_auto_short">자동</string>
+    <string name="settings_search_hint">설정 검색</string>
+    <string name="settings_search_clear">검색어 지우기</string>
+    <string name="settings_search_no_results">일치하는 설정이 없습니다</string>
+    <string name="settings_often_changed">자주 바꾸는 설정</string>
+    <string name="settings_text_size_name">글자 크기</string>
+    <string name="settings_pronunciation_volume_name">발음 음량</string>
+    <string name="settings_original_captions_name">원본 자막</string>
+    <string name="settings_translated_captions_name">번역 자막</string>
 </resources>
