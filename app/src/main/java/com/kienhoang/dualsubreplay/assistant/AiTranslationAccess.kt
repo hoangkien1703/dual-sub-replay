@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.assistant
 
 import android.content.Context
 import com.kienhoang.dualsubreplay.translation.AiTranslationModel
+import com.kienhoang.dualsubreplay.translation.aiTranslationJsonSchema
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
@@ -29,6 +30,9 @@ internal const val AI_TRANSLATION_KEY_MAX_REST_MS = 30 * 60_000L
 internal const val AI_TRANSLATION_BAD_KEY_REST_MS = 6 * 60 * 60_000L
 
 private val REST_PROBLEMS = setOf(AiErrorKind.RATE_LIMITED, AiErrorKind.NO_CREDIT)
+
+/** How a service answers a `response_format` it does not take: 400, sometimes naming the model. */
+private val FORMAT_REFUSALS = setOf(AiErrorKind.BAD_REQUEST, AiErrorKind.UNKNOWN_MODEL)
 private val BAD_KEY_PROBLEMS = setOf(AiErrorKind.NO_KEY, AiErrorKind.KEY_UNREADABLE, AiErrorKind.INVALID_KEY)
 
 /**
@@ -96,6 +100,17 @@ internal fun aiTranslationEffort(
         thinking != AiTranslationThinking.OFF -> thinking.key
         provider == AiProvider.GEMINI -> "none"
         else -> openAiNoThinkingEffort(model)
+    }
+
+/**
+ * The `response_format` a translation request carries: Gemini and OpenAI both take a JSON schema
+ * on the chat endpoint, so their replies always parse. Other services get none, since not every
+ * model behind OpenRouter or a custom address takes it.
+ */
+internal fun aiTranslationResponseFormat(provider: AiProvider): String? =
+    when (provider) {
+        AiProvider.GEMINI, AiProvider.OPENAI -> aiTranslationJsonSchema()
+        else -> null
     }
 
 /**
@@ -240,6 +255,9 @@ private class KeyedAiTranslationModel(
     /** Cleared once the model refuses the thinking setting, so later requests do not fail first. */
     @Volatile private var effort = aiTranslationEffort(provider, model, thinking)
 
+    /** Cleared once the model refuses the JSON schema, so later requests do not fail first. */
+    @Volatile private var responseFormat = aiTranslationResponseFormat(provider)
+
     override suspend fun ask(
         system: String,
         user: String,
@@ -276,7 +294,10 @@ private class KeyedAiTranslationModel(
         throw failure
     }
 
-    /** A busy model is asked again after the assistant's waits; a refused thinking setting is dropped. */
+    /**
+     * A busy model is asked again after the assistant's waits; a refused JSON schema, then a refused
+     * thinking setting, is dropped.
+     */
     private suspend fun completeWhenBusy(
         apiKey: String,
         messages: List<AiWireMessage>,
@@ -284,12 +305,23 @@ private class KeyedAiTranslationModel(
     ): AiReply {
         val waits = AI_BUSY_RETRY_DELAYS_MS.iterator()
         while (true) {
-            val request = AiChatRequest(baseUrl, model, apiKey, messages, AI_TRANSLATION_TIMEOUT_MS, effort, format = provider.format)
+            val request =
+                AiChatRequest(
+                    baseUrl,
+                    model,
+                    apiKey,
+                    messages,
+                    AI_TRANSLATION_TIMEOUT_MS,
+                    effort,
+                    format = provider.format,
+                    responseFormat = responseFormat,
+                )
             try {
                 return withContext(Dispatchers.IO) { send(request, text) }
             } catch (error: AiChatException) {
                 when {
                     text.started -> throw error
+                    responseFormat != null && error.kind in FORMAT_REFUSALS -> responseFormat = null
                     effort != null && error.kind in setOf(AiErrorKind.UNSUPPORTED_THINKING, AiErrorKind.BAD_REQUEST) -> effort = null
                     error.kind == AiErrorKind.SERVER && waits.hasNext() -> delay(waits.next())
                     else -> throw error

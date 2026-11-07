@@ -114,6 +114,8 @@ internal data class AiChatRequest(
     val format: AiWireFormat = AiWireFormat.OPENAI_CHAT,
     /** The service's own web search goes with the request: Claude's `web_search` or OpenRouter's server tool. */
     val webSearch: Boolean = false,
+    /** The `response_format` JSON the reply must follow (OpenAI chat format only); null sends none. */
+    val responseFormat: String? = null,
 )
 
 /** Sends one chat request and returns the reply, or throws [AiChatException]. */
@@ -161,12 +163,14 @@ internal fun chatRequestBody(
     reasoningEffort: String? = null,
     tools: List<AiTool> = emptyList(),
     webSearch: Boolean = false,
+    responseFormat: String? = null,
 ): String =
     JSONObject()
         .put("model", model)
         .put("messages", JSONArray().apply { messages.forEach { put(wireMessage(it)) } })
         .apply {
             if (reasoningEffort != null) put("reasoning_effort", reasoningEffort)
+            if (responseFormat != null) put("response_format", JSONObject(responseFormat))
             if (tools.isNotEmpty() || webSearch) {
                 put(
                     "tools",
@@ -498,7 +502,14 @@ internal class AiHttpTransport(
             if (anthropic) {
                 anthropicRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
             } else {
-                chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
+                chatRequestBody(
+                    request.model,
+                    request.messages,
+                    request.reasoningEffort,
+                    request.tools,
+                    request.webSearch,
+                    request.responseFormat,
+                )
             }
         val httpRequest = authorized(request.apiKey, request.format) { url(url).post(json.toRequestBody(JSON_MEDIA_TYPE)) }
         val (code, reply) = execute(httpRequest, request.timeoutMs, MAX_AI_RESPONSE_BYTES)
@@ -535,7 +546,14 @@ internal class AiHttpTransport(
             if (anthropic) {
                 anthropicRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
             } else {
-                chatRequestBody(request.model, request.messages, request.reasoningEffort, request.tools, request.webSearch)
+                chatRequestBody(
+                    request.model,
+                    request.messages,
+                    request.reasoningEffort,
+                    request.tools,
+                    request.webSearch,
+                    request.responseFormat,
+                )
             }
         val json = JSONObject(body).put("stream", true).toString()
         val httpRequest =

@@ -34,6 +34,17 @@ import java.util.concurrent.ConcurrentHashMap
 internal const val MAX_AI_BATCH_SENTENCES = 60
 internal const val MAX_AI_BATCH_CHARS = 6_000
 
+/**
+ * The background look-ahead (minutes 2 to 5) asks the AI only once it can fill most of a request:
+ * this many sentences, or [MIN_AI_BACKGROUND_CHARS] characters. Before, every 3 s step sent the one
+ * or two sentences that had just crossed the five-minute mark, about 120 requests in 25 minutes of
+ * playback instead of about 10, and free Gemini keys ran out (owner report 2026-11-07). Sentences
+ * that never fill a request come in the playing window's request, which takes up to
+ * [MAX_AI_BATCH_SENTENCES] from the minutes ahead.
+ */
+internal const val MIN_AI_BACKGROUND_SENTENCES = 40
+internal const val MIN_AI_BACKGROUND_CHARS = 4_000
+
 /** After a failed request (network, limit, refusal) the AI is not asked for this long; Google translates meanwhile. */
 internal const val AI_FAILURE_REST_MS = 30_000L
 
@@ -120,6 +131,32 @@ internal fun aiTranslationSystemPrompt(
         """.trimIndent()
 }
 
+/**
+ * The `response_format` that makes Gemini and OpenAI answer in valid JSON of the shape the prompt asks
+ * for. Without it a model sometimes left a quote in a row unescaped (`[""Green" means…`), and the
+ * whole request of up to 60 sentences was lost (owner screenshot 2026-11-07). Strict schemas need
+ * every property required and no others, which this shape already is.
+ */
+internal fun aiTranslationJsonSchema(): String {
+    val rows = JSONObject().put("type", "array").put("items", JSONObject().put("type", "string"))
+    val sentence =
+        JSONObject()
+            .put("type", "object")
+            .put("properties", JSONObject().put("id", JSONObject().put("type", "integer")).put("rows", rows))
+            .put("required", JSONArray(listOf("id", "rows")))
+            .put("additionalProperties", false)
+    val schema =
+        JSONObject()
+            .put("type", "object")
+            .put("properties", JSONObject().put("sentences", JSONObject().put("type", "array").put("items", sentence)))
+            .put("required", JSONArray(listOf("sentences")))
+            .put("additionalProperties", false)
+    return JSONObject()
+        .put("type", "json_schema")
+        .put("json_schema", JSONObject().put("name", "subtitle_translations").put("strict", true).put("schema", schema))
+        .toString()
+}
+
 /** The user message: the context sentences and the numbered sentences to translate. */
 internal fun aiTranslationRequest(
     context: List<String>,
@@ -147,11 +184,17 @@ internal fun parseAiTranslationReply(
     val start = reply.indexOf('{')
     val end = reply.lastIndexOf('}')
     if (start < 0 || end <= start) throw AiTranslationException("The AI reply has no JSON.")
+    val json = reply.substring(start, end + 1)
     val items =
         try {
-            JSONObject(reply.substring(start, end + 1)).getJSONArray("sentences")
+            JSONObject(json).getJSONArray("sentences")
         } catch (error: JSONException) {
-            throw AiTranslationException("The AI reply is not the JSON asked for: ${error.message}")
+            // A quote the model left unescaped inside a row is read as part of the row.
+            try {
+                JSONObject(withStrayQuotesEscaped(json)).getJSONArray("sentences")
+            } catch (_: JSONException) {
+                throw AiTranslationException("The AI reply is not the JSON asked for: ${error.message}")
+            }
         }
     val byId = HashMap<Int, JSONObject>()
     for (index in 0 until items.length()) {
@@ -159,6 +202,34 @@ internal fun parseAiTranslationReply(
         byId[item.optInt("id", -1)] = item
     }
     return sentences.mapIndexed { index, sentence -> byId[index + 1]?.let { aiRows(it, sentence) } }
+}
+
+/**
+ * [json] with each quote inside a string escaped when it cannot end the string, that is when the next
+ * character that is not a space is not one of `, : ] }`: `[""Green" means…"]` becomes
+ * `["\"Green\" means…"]`. Valid JSON comes back unchanged.
+ */
+internal fun withStrayQuotesEscaped(json: String): String {
+    val out = StringBuilder(json.length + 8)
+    var inString = false
+    var escaped = false
+    json.forEachIndexed { index, char ->
+        when {
+            escaped -> escaped = false
+            inString && char == '\\' -> escaped = true
+            inString && char == '"' -> {
+                val next = (index + 1 until json.length).firstOrNull { !json[it].isWhitespace() }?.let(json::get)
+                if (next == null || next in ",:]}") {
+                    inString = false
+                } else {
+                    out.append('\\')
+                }
+            }
+            char == '"' -> inString = true
+        }
+        out.append(char)
+    }
+    return out.toString()
 }
 
 /** The rows of one `{"id":…,"rows":[…]}` answer, or null when it has none. */
@@ -312,6 +383,10 @@ private fun writtenWithoutSpaces(char: Char?): Boolean =
 private fun languageName(code: String): String =
     Locale.forLanguageTag(code).getDisplayName(Locale.ENGLISH).takeIf { it.isNotBlank() && it != code } ?: code
 
+/** Whether [batch] is worth a background request of its own. */
+internal fun fillsBackgroundRequest(batch: List<AiSentence>): Boolean =
+    batch.size >= MIN_AI_BACKGROUND_SENTENCES || batch.sumOf { it.text.length } >= MIN_AI_BACKGROUND_CHARS
+
 /** Splits [sentences] into requests of at most [MAX_AI_BATCH_SENTENCES] sentences and [MAX_AI_BATCH_CHARS] characters. */
 internal fun aiBatches(sentences: List<AiSentence>): List<List<AiSentence>> {
     val batches = mutableListOf<MutableList<AiSentence>>()
@@ -430,7 +505,11 @@ internal class AiSubtitleTranslator(
         }
     }
 
-    /** Sends one request at most, for the first sentences of [texts] not translated yet; returns the texts it covered. */
+    /**
+     * The background step: sends one request at most, for the first sentences of [texts] not
+     * translated yet, and only when they fill most of a request (see [MIN_AI_BACKGROUND_SENTENCES]);
+     * returns the texts it covered, none when it waited.
+     */
     suspend fun translateNextBatch(
         model: AiTranslationModel,
         sourceLanguageCode: String,
@@ -438,6 +517,7 @@ internal class AiSubtitleTranslator(
         texts: List<String>,
     ): List<String> {
         val batch = aiBatches(missing(model, sourceLanguageCode, targetLanguageCode, texts)).firstOrNull() ?: return emptyList()
+        if (!fillsBackgroundRequest(batch)) return emptyList()
         translate(model, sourceLanguageCode, targetLanguageCode, batch)
         return batch.flatMap { listOf(it.text) + it.prefixes }
     }

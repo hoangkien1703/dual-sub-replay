@@ -140,6 +140,14 @@ class AiChatClientTest {
         assertEquals(AiErrorKind.UNSUPPORTED_TOOLS, aiErrorKindForStatus(400, toolsAndThinking, sentThinking = false, sentTools = true))
     }
 
+    @Test fun aResponseFormatGoesWithTheRequestOnlyWhenGiven() {
+        val format = """{"type":"json_schema","json_schema":{"name":"x","schema":{"type":"object"}}}"""
+        val body =
+            JSONObject(chatRequestBody("gemini-flash-lite-latest", listOf(AiWireMessage(AiRole.USER, "Hi")), responseFormat = format))
+        assertEquals("json_schema", body.getJSONObject("response_format").getString("type"))
+        assertFalse(JSONObject(chatRequestBody("m", listOf(AiWireMessage(AiRole.USER, "Hi")))).has("response_format"))
+    }
+
     @Test
     fun modelListsAreReadSortedWithFreeAndPictureModelsMarked() {
         val body =

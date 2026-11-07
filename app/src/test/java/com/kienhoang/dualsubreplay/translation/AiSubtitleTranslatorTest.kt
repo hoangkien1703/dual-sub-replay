@@ -153,6 +153,58 @@ class AiSubtitleTranslatorTest {
             assertTrue(model.requests.isEmpty())
         }
 
+    @Test fun aQuoteTheModelLeftUnescapedIsStillRead() {
+        // Owner screenshot 2026-11-07: "Unterminated array at character 33".
+        val sentences = listOf(AiSentence("\"Green\" means go.", listOf("\"Green\" means go.")), AiSentence("Stop.", listOf("Stop.")))
+        val reply = """{"sentences":[{"id":1,"rows":[""Green" means v\u00e0o."]},{"id":2,"rows":["Dừng."]}]}"""
+        assertEquals(listOf(listOf("\"Green\" means vào."), listOf("Dừng.")), parseAiTranslationReply(reply, sentences))
+    }
+
+    @Test fun validJsonIsLeftAsItIs() {
+        val json = """{"sentences":[{"id":1,"rows":["He said \"hi\", then: [left] {ok}", " x "]}]}"""
+        assertEquals(json, withStrayQuotesEscaped(json))
+    }
+
+    @Test fun theRequestShapeNeedsEveryIdAndRows() {
+        val format = JSONObject(aiTranslationJsonSchema())
+        assertEquals("json_schema", format.getString("type"))
+        val schema = format.getJSONObject("json_schema").getJSONObject("schema")
+        val item = schema.getJSONObject("properties").getJSONObject("sentences").getJSONObject("items")
+        assertEquals("[\"id\",\"rows\"]", item.getJSONArray("required").toString())
+        assertEquals(false, item.getBoolean("additionalProperties"))
+    }
+
+    @Test fun theBackgroundWaitsUntilItCanFillARequest() =
+        runBlocking {
+            val model = FakeModel { user -> answerAll(user) }
+            val translator = AiSubtitleTranslator(cacheDirectory = null)
+            val few = List(MIN_AI_BACKGROUND_SENTENCES - 1) { "Sentence number $it is here." }
+            assertTrue(translator.translateNextBatch(model, "en", "vi", few).isEmpty())
+            assertTrue(model.requests.isEmpty())
+            val enough = few + "One more sentence is here."
+            assertEquals(enough, translator.translateNextBatch(model, "en", "vi", enough))
+            assertEquals(1, model.requests.size)
+        }
+
+    @Test fun aFewLongSentencesAlsoFillABackgroundRequest() {
+        val long = "word ".repeat(MIN_AI_BACKGROUND_CHARS / 50)
+        assertTrue(fillsBackgroundRequest(List(10) { AiSentence("$long$it", listOf("$long$it")) }))
+        assertTrue(!fillsBackgroundRequest(List(10) { AiSentence("Short $it.", listOf("Short $it.")) }))
+    }
+
+    /** A reply translating every sentence of [user]'s request. */
+    private fun answerAll(user: String): String {
+        val sentences = JSONObject(user).getJSONArray("sentences")
+        val answers =
+            org.json.JSONArray().apply {
+                for (index in 0 until sentences.length()) {
+                    val id = sentences.getJSONObject(index).getInt("id")
+                    put(JSONObject().put("id", id).put("rows", org.json.JSONArray(listOf("Câu $id."))))
+                }
+            }
+        return JSONObject().put("sentences", answers).toString()
+    }
+
     @Test fun longWindowsSplitIntoSeveralRequests() {
         val sentences = List(100) { AiSentence("Sentence number $it.", listOf("Sentence number $it.")) }
         val batches = aiBatches(sentences)
