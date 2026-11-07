@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock
@@ -24,6 +25,7 @@ import com.kienhoang.dualsubreplay.MainActivity
 import com.kienhoang.dualsubreplay.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -51,6 +53,10 @@ class WebVideoPlaybackService : Service() {
     private var sessionUpdatedAtMs = 0L
     private var shownNotificationKey: Any? = null
     private var following = false
+    private var detailsVideoId: String? = null
+    private var artwork: Bitmap? = null
+    private var fetchedChannel = ""
+    private var detailsJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -123,12 +129,13 @@ class WebVideoPlaybackService : Service() {
             stopEverything()
             return
         }
+        if (playback.videoId != detailsVideoId) loadVideoDetails(playback.videoId)
         if (sessionNeedsUpdate(sessionPlayback, sessionUpdatedAtMs, playback, now)) {
             updateSession(playback, now)
         }
         val wantForeground = startedAsForeground || shouldStayInForeground(playback, pausedSinceMs, now)
         // The position moves every poll; the notification only changes with these.
-        val notificationKey = listOf(playback.videoId, playback.title, playback.paused, wantForeground)
+        val notificationKey = listOf(playback.videoId, playback.title, playback.channel, playback.paused, wantForeground)
         if (!startedAsForeground && notificationKey == shownNotificationKey) return
         shownNotificationKey = notificationKey
         val notification = buildNotification(playback)
@@ -139,6 +146,41 @@ class WebVideoPlaybackService : Service() {
             inForeground = false
             postNotification(notification)
         }
+    }
+
+    /**
+     * Shows the new video's picture and channel once each downloads; until then (or when one
+     * can't load) the notification goes without it, so the last video's never stays on the next.
+     */
+    private fun loadVideoDetails(videoId: String) {
+        detailsJob?.cancel()
+        detailsVideoId = videoId
+        artwork = null
+        fetchedChannel = ""
+        detailsJob =
+            scope.launch {
+                launch {
+                    val picture = VideoArtwork.load(videoId) ?: return@launch
+                    if (detailsVideoId == videoId) {
+                        artwork = picture
+                        refreshVideoDetails(videoId)
+                    }
+                }
+                launch {
+                    val channel = VideoArtwork.loadChannel(videoId).ifBlank { return@launch }
+                    if (detailsVideoId == videoId) {
+                        fetchedChannel = channel
+                        refreshVideoDetails(videoId)
+                    }
+                }
+            }
+    }
+
+    /** Sends a new session state and notification for the same playback. */
+    private fun refreshVideoDetails(videoId: String) {
+        sessionPlayback = null
+        shownNotificationKey = null
+        lastPlayback?.takeIf { it.videoId == videoId }?.let { show(it) }
     }
 
     private fun startInForeground(notification: Notification) {
@@ -176,6 +218,10 @@ class WebVideoPlaybackService : Service() {
         notificationManager().cancel(NOTIFICATION_ID)
         shownNotificationKey = null
         sessionPlayback = null
+        detailsJob?.cancel()
+        detailsVideoId = null
+        artwork = null
+        fetchedChannel = ""
         session.setPlaybackState(PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 1f).build())
         stopSelf()
     }
@@ -202,13 +248,17 @@ class WebVideoPlaybackService : Service() {
                 .Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, playback.videoId)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, displayTitle(playback))
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, getString(R.string.app_name))
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, displayArtist(playback))
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, playback.durationMs ?: -1L)
+                .apply { artwork?.let { putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, it) } }
                 .build(),
         )
     }
 
     private fun displayTitle(playback: WebVideoPlayback): String = playback.title.ifBlank { getString(R.string.app_name) }
+
+    private fun displayArtist(playback: WebVideoPlayback): String =
+        playback.channel.ifBlank { fetchedChannel }.ifBlank { getString(R.string.app_name) }
 
     private fun buildNotification(playback: WebVideoPlayback): Notification {
         val toggleAction =
@@ -219,7 +269,8 @@ class WebVideoPlaybackService : Service() {
             }
         return baseNotification()
             .setContentTitle(displayTitle(playback))
-            .setContentText(getString(R.string.app_name))
+            .setContentText(displayArtist(playback))
+            .setLargeIcon(artwork)
             .setOngoing(!playback.paused)
             .addAction(toggleAction)
             .setStyle(MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0))

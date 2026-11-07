@@ -20,6 +20,8 @@ internal data class WebVideoPlayback(
     val positionMs: Long,
     val durationMs: Long?,
     val playbackRate: Float,
+    /** The YouTube channel's name, shown under the title; blank when the page does not show it yet. */
+    val channel: String = "",
 )
 
 internal sealed interface WebVideoCommand {
@@ -134,6 +136,13 @@ internal fun cleanVideoTitle(pageTitle: String?): String =
         .takeUnless { it == "YouTube" }
         .orEmpty()
 
+internal fun cleanChannelName(name: String?): String =
+    name
+        .orEmpty()
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .take(MAX_CHANNEL_LENGTH)
+
 /** Reads the page video's state from [WEB_VIDEO_STATE_SCRIPT]; null when no watch-page video exists. */
 internal fun parseWebVideoPlayback(rawValue: String?): WebVideoPlayback? {
     if (rawValue.isNullOrBlank() || rawValue == "null") return null
@@ -153,11 +162,21 @@ internal fun parseWebVideoPlayback(rawValue: String?): WebVideoPlayback? {
             positionMs = (positionSecond * 1000).toLong(),
             durationMs = durationSecond?.let { (it * 1000).toLong() },
             playbackRate = rate.toFloat(),
+            channel = cleanChannelName(json.optString("channel")),
         )
     }.getOrNull()
 }
 
 private const val MAX_TITLE_LENGTH = 200
+private const val MAX_CHANNEL_LENGTH = 100
+
+/**
+ * The channel under the video when the page's media session is empty: the mobile site's bold
+ * "@handle" (2026-11 layout), its older channel name, then the desktop site's.
+ */
+private const val CHANNEL_NAME_SELECTORS =
+    ".ytVideoSubtitleViewModelBoldSubstring, .slim-owner-channel-name, " +
+        "ytd-watch-metadata ytd-channel-name a"
 
 private const val YOUTUBE_ORIGIN_CHECK =
     """
@@ -171,14 +190,27 @@ private const val YOUTUBE_ORIGIN_CHECK =
       if (!video) return null;
     """
 
-/** The page video's state for the media session, polled once a second. */
+/**
+ * The page video's state for the media session, polled once a second. The channel comes from the
+ * page's own media session (YouTube's player fills it for Chrome's notification; checked on
+ * m.youtube.com 2026-11-07) while it names the open video, otherwise from the name under the video.
+ */
 internal val WEB_VIDEO_STATE_SCRIPT: String =
     """
     (function() {
       $YOUTUBE_ORIGIN_CHECK
+      const channel = (function() {
+        try {
+          const meta = navigator.mediaSession && navigator.mediaSession.metadata;
+          if (meta && meta.artist && meta.title && document.title.indexOf(meta.title) !== -1) return meta.artist;
+        } catch (error) {}
+        const owner = document.querySelector('$CHANNEL_NAME_SELECTORS');
+        return owner ? owner.textContent : '';
+      })();
       return JSON.stringify({
         url: window.location.href,
         title: document.title,
+        channel: channel,
         paused: video.paused || video.ended,
         currentSecond: video.currentTime,
         durationSecond: isFinite(video.duration) ? video.duration : null,
