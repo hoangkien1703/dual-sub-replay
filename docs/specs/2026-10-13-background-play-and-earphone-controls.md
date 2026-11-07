@@ -41,7 +41,8 @@ owner chose "Everyone" on 2026-10-13. This does not authorize merging or publish
 ## User-visible behavior
 
 - After a video starts playing, a "DualSub Replay" media notification appears with the video
-  title, play/pause and a seek bar. Tapping it opens the app.
+  title, play/pause and a seek bar. Tapping it opens the app. Since 2026-11-07 it also shows the
+  video's picture and, under the title, the channel name (see the follow-up below).
 - Touching the earphones pauses a playing video and resumes a paused one; the notification button
   does the same.
 - Screen off, Home or Back while a video plays: the video keeps playing, with or without Premium
@@ -130,6 +131,22 @@ video itself when its window is hidden; WebView keeps background media suspensio
 (`windowVisibilityForPage`, `OffScreenPlaybackWebViewTest`). On leaving the screen while playing,
 and before an off-screen Play command, the page and the full-screen video view (which has its own
 window) are told again that they are visible, which also resumes a video WebView paused while hidden.
+
+Follow-up (owner request 2026-11-07, from a lock-screen screenshot showing a blank music note and
+"DualSub Replay Preview" under the title): the notification and lock screen show the video's
+picture and its channel.
+
+- Picture: YouTube's `https://i.ytimg.com/vi/<id>/hqdefault.jpg` (`playback/VideoArtwork.kt`), the
+  one picture every video has, downloaded once per video (no redirects, 512 KiB cap, memory only)
+  and given to the media session (`METADATA_KEY_ALBUM_ART`) and the notification's large icon. Its
+  black bars above and below a 16:9 frame are cut (`letterboxBarRows`); a 4:3 video or a picture
+  without dark bands is kept whole. The old picture is dropped as soon as the video changes, so a
+  new video shows none until its own loads; when it cannot load, the notification looks as before.
+- Channel: `WEB_VIDEO_STATE_SCRIPT` reads the page's own `navigator.mediaSession.metadata.artist`
+  (YouTube's player fills it for Chrome's notification; seen on m.youtube.com 2026-11-07) while
+  its title is in the page title, otherwise the channel name under the video. The app's name shows
+  when neither is there.
+- The title that seems cut off in the screenshot is ColorOS scrolling a long title; nothing changed.
 
 ## Validation result
 
