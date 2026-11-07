@@ -42,6 +42,23 @@ class WebVideoPlaybackTest {
     }
 
     @Test
+    fun readsTheChannelNameForTheNotification() {
+        val raw =
+            scriptResult(
+                JSONObject()
+                    .put("url", "https://m.youtube.com/watch?v=dQw4w9WgXcQ")
+                    .put("title", "Learn Japanese - YouTube")
+                    .put("channel", "  Japanese\n  with Kien "),
+            )
+
+        assertEquals("Japanese with Kien", parseWebVideoPlayback(raw)!!.channel)
+        val noChannel = scriptResult(JSONObject().put("url", "https://m.youtube.com/watch?v=dQw4w9WgXcQ"))
+        assertEquals("", parseWebVideoPlayback(noChannel)!!.channel)
+        // The page's media session names the channel only while it describes the open video.
+        assertTrue(WEB_VIDEO_STATE_SCRIPT.contains("document.title.indexOf(meta.title) !== -1) return meta.artist;"))
+    }
+
+    @Test
     fun ignoresPagesWithoutAVideoAndOtherSites() {
         assertNull(parseWebVideoPlayback("null"))
         assertNull(parseWebVideoPlayback(null))
@@ -113,6 +130,7 @@ class WebVideoPlaybackTest {
         assertTrue(sessionNeedsUpdate(playing, 0, playing.copy(positionMs = 40_000), 1_000))
         assertTrue(sessionNeedsUpdate(playing, 0, paused.copy(positionMs = 11_000), 1_000))
         assertTrue(sessionNeedsUpdate(playing, 0, playing.copy(title = "Next", positionMs = 11_000), 1_000))
+        assertTrue(sessionNeedsUpdate(playing, 0, playing.copy(channel = "Channel", positionMs = 11_000), 1_000))
     }
 
     @Test
