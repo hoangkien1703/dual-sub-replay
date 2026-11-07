@@ -53,9 +53,10 @@ class WebVideoPlaybackService : Service() {
     private var sessionUpdatedAtMs = 0L
     private var shownNotificationKey: Any? = null
     private var following = false
-    private var artworkVideoId: String? = null
+    private var detailsVideoId: String? = null
     private var artwork: Bitmap? = null
-    private var artworkJob: Job? = null
+    private var fetchedChannel = ""
+    private var detailsJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -128,7 +129,7 @@ class WebVideoPlaybackService : Service() {
             stopEverything()
             return
         }
-        if (playback.videoId != artworkVideoId) loadArtwork(playback.videoId)
+        if (playback.videoId != detailsVideoId) loadVideoDetails(playback.videoId)
         if (sessionNeedsUpdate(sessionPlayback, sessionUpdatedAtMs, playback, now)) {
             updateSession(playback, now)
         }
@@ -148,23 +149,38 @@ class WebVideoPlaybackService : Service() {
     }
 
     /**
-     * Shows the new video's picture once it downloads; until then (or when it can't load) the
-     * notification has none, so the last video's picture never stays on the next one.
+     * Shows the new video's picture and channel once each downloads; until then (or when one
+     * can't load) the notification goes without it, so the last video's never stays on the next.
      */
-    private fun loadArtwork(videoId: String) {
-        artworkJob?.cancel()
-        artworkVideoId = videoId
+    private fun loadVideoDetails(videoId: String) {
+        detailsJob?.cancel()
+        detailsVideoId = videoId
         artwork = null
-        artworkJob =
+        fetchedChannel = ""
+        detailsJob =
             scope.launch {
-                val picture = VideoArtwork.load(videoId) ?: return@launch
-                if (artworkVideoId != videoId) return@launch
-                artwork = picture
-                // Force a new session state and notification for the same playback.
-                sessionPlayback = null
-                shownNotificationKey = null
-                lastPlayback?.takeIf { it.videoId == videoId }?.let { show(it) }
+                launch {
+                    val picture = VideoArtwork.load(videoId) ?: return@launch
+                    if (detailsVideoId == videoId) {
+                        artwork = picture
+                        refreshVideoDetails(videoId)
+                    }
+                }
+                launch {
+                    val channel = VideoArtwork.loadChannel(videoId).ifBlank { return@launch }
+                    if (detailsVideoId == videoId) {
+                        fetchedChannel = channel
+                        refreshVideoDetails(videoId)
+                    }
+                }
             }
+    }
+
+    /** Sends a new session state and notification for the same playback. */
+    private fun refreshVideoDetails(videoId: String) {
+        sessionPlayback = null
+        shownNotificationKey = null
+        lastPlayback?.takeIf { it.videoId == videoId }?.let { show(it) }
     }
 
     private fun startInForeground(notification: Notification) {
@@ -202,9 +218,10 @@ class WebVideoPlaybackService : Service() {
         notificationManager().cancel(NOTIFICATION_ID)
         shownNotificationKey = null
         sessionPlayback = null
-        artworkJob?.cancel()
-        artworkVideoId = null
+        detailsJob?.cancel()
+        detailsVideoId = null
         artwork = null
+        fetchedChannel = ""
         session.setPlaybackState(PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 1f).build())
         stopSelf()
     }
@@ -240,7 +257,8 @@ class WebVideoPlaybackService : Service() {
 
     private fun displayTitle(playback: WebVideoPlayback): String = playback.title.ifBlank { getString(R.string.app_name) }
 
-    private fun displayArtist(playback: WebVideoPlayback): String = playback.channel.ifBlank { getString(R.string.app_name) }
+    private fun displayArtist(playback: WebVideoPlayback): String =
+        playback.channel.ifBlank { fetchedChannel }.ifBlank { getString(R.string.app_name) }
 
     private fun buildNotification(playback: WebVideoPlayback): Notification {
         val toggleAction =

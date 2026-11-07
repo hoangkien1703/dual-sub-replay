@@ -243,4 +243,30 @@ class AiTranslationAccessTest {
             assertEquals(1, calls)
             assertTrue(store.keys(AiProvider.GEMINI).isNotEmpty())
         }
+
+    @Test fun geminiAndOpenAiAskForTheJsonShapeOthersDoNot() {
+        assertTrue(aiTranslationResponseFormat(AiProvider.GEMINI).orEmpty().contains("\"json_schema\""))
+        assertTrue(aiTranslationResponseFormat(AiProvider.OPENAI).orEmpty().contains("\"json_schema\""))
+        listOf(AiProvider.CLAUDE, AiProvider.OPENROUTER, AiProvider.OPENCODE_ZEN, AiProvider.OPENCODE_GO, AiProvider.CUSTOM)
+            .forEach { assertNull(it.key, aiTranslationResponseFormat(it)) }
+    }
+
+    @Test fun aRefusedJsonShapeIsDroppedOnceAndForAll() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaOnlyKey0000000000000000000000000000")
+            val formats = mutableListOf<String?>()
+            val transport =
+                AiChatTransport { request ->
+                    formats += request.responseFormat
+                    if (request.responseFormat != null) throw AiChatException(AiErrorKind.BAD_REQUEST, "Unknown name \"response_format\"")
+                    AiReply("{\"sentences\":[]}")
+                }
+            val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
+            model.ask("system", "user")
+            model.ask("system", "user")
+            assertEquals(3, formats.size)
+            assertTrue(formats[0] != null)
+            assertEquals(listOf<String?>(null, null), formats.drop(1))
+        }
 }

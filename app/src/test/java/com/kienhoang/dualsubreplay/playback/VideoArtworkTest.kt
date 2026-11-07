@@ -48,4 +48,17 @@ class VideoArtworkTest {
         assertEquals(0, letterboxBarRows(480, 360, IntArray(10)))
         assertEquals(0, letterboxBarRows(0, 0, IntArray(0)))
     }
+
+    @Test
+    fun channelComesFromYouTubesOEmbedReply() {
+        assertEquals(
+            "https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format=json",
+            videoChannelUrl("dQw4w9WgXcQ"),
+        )
+        assertNull(videoChannelUrl("x&url=evil"))
+        assertEquals("Rick Astley", parseOEmbedChannel("""{"title":"Never Gonna Give You Up","author_name":" Rick  Astley "}"""))
+        assertEquals("", parseOEmbedChannel("""{"title":"No author"}"""))
+        assertEquals("", parseOEmbedChannel("Not Found"))
+        assertEquals("", parseOEmbedChannel(null))
+    }
 }
