@@ -147,6 +147,12 @@ picture and its channel.
   its title is in the page title, otherwise the channel name under the video. The app's name shows
   when neither is there.
 - The title that seems cut off in the screenshot is ColorOS scrolling a long title; nothing changed.
+- Owner's phone test of PR #204 (2026-11-07, build679): the picture works on the lock screen and
+  media player and changes with the video, but the channel line still said "DualSub Replay
+  Preview": the app's WebView page gave neither source (Chrome's page has both). Follow-up: the
+  service also asks YouTube's public oEmbed address once per video
+  (`https://www.youtube.com/oembed?url=<watch address>&format=json`, `author_name`, 32 KiB cap,
+  memory only), used when the page gives no channel.
 
 ## Validation result
 

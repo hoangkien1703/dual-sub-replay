@@ -6,11 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONObject
+import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
 private val VIDEO_ID_PATTERN = Regex("[A-Za-z0-9_-]{11}")
 private const val ARTWORK_TIMEOUT_MS = 10_000L
 private const val ARTWORK_MAX_BYTES = 512L * 1024
+private const val CHANNEL_REPLY_MAX_BYTES = 32L * 1024
 private const val DARK_CHANNEL_MAX = 40
 private const val BAR_SAMPLE_STEP = 8
 private const val BAR_EDGE_ROWS = 3
@@ -21,6 +24,21 @@ private const val BAR_EDGE_ROWS = 3
  */
 internal fun videoArtworkUrl(videoId: String): String? =
     videoId.takeIf { VIDEO_ID_PATTERN.matches(it) }?.let { "https://i.ytimg.com/vi/$it/hqdefault.jpg" }
+
+/**
+ * YouTube's public oEmbed description of the video, which names its channel (`author_name`). The
+ * app's WebView page gives no channel (seen on the owner's phone 2026-11-07, although Chrome's
+ * page has one), so the notification asks YouTube directly, once per video.
+ */
+internal fun videoChannelUrl(videoId: String): String? =
+    videoId.takeIf { VIDEO_ID_PATTERN.matches(it) }?.let {
+        val watchUrl = URLEncoder.encode("https://www.youtube.com/watch?v=$it", "UTF-8")
+        "https://www.youtube.com/oembed?url=$watchUrl&format=json"
+    }
+
+/** The channel name in an oEmbed reply; blank when the reply has none. */
+internal fun parseOEmbedChannel(reply: String?): String =
+    runCatching { cleanChannelName(JSONObject(reply.orEmpty()).optString("author_name")) }.getOrDefault("")
 
 /**
  * How many rows of black bar to cut from the top and from the bottom of a 4:3 picture holding a
@@ -48,7 +66,7 @@ internal fun letterboxBarRows(
     return if (dark) bar else 0
 }
 
-/** Downloads the picture the media notification and lock screen show for the playing video. */
+/** Downloads the picture and channel the media notification and lock screen show for the video. */
 internal object VideoArtwork {
     private val client by lazy {
         OkHttpClient
@@ -59,22 +77,35 @@ internal object VideoArtwork {
     }
 
     /** The video's picture without its black bars, or null when it cannot be loaded. */
-    suspend fun load(videoId: String): Bitmap? =
-        withContext(Dispatchers.IO) {
-            val url = videoArtworkUrl(videoId) ?: return@withContext null
+    suspend fun load(videoId: String): Bitmap? {
+        val data = download(videoArtworkUrl(videoId), ARTWORK_MAX_BYTES) ?: return null
+        // A JPEG has no transparency; half the memory keeps the notification small.
+        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.RGB_565 }
+        return withContext(Dispatchers.Default) {
+            runCatching { BitmapFactory.decodeByteArray(data, 0, data.size, options)?.let(::withoutLetterbox) }.getOrNull()
+        }
+    }
+
+    /** The video's channel name, or blank when YouTube does not say. */
+    suspend fun loadChannel(videoId: String): String =
+        parseOEmbedChannel(download(videoChannelUrl(videoId), CHANNEL_REPLY_MAX_BYTES)?.decodeToString())
+
+    private suspend fun download(
+        url: String?,
+        maxBytes: Long,
+    ): ByteArray? {
+        if (url == null) return null
+        return withContext(Dispatchers.IO) {
             runCatching {
                 client.newCall(Request.Builder().url(url).build()).execute().use { response ->
                     val body = response.body
-                    if (!response.isSuccessful || body.contentLength() > ARTWORK_MAX_BYTES) return@use null
-                    val buffer = body.source().apply { request(ARTWORK_MAX_BYTES + 1) }.buffer
-                    if (buffer.size > ARTWORK_MAX_BYTES) return@use null
-                    val data = buffer.readByteArray()
-                    // A JPEG has no transparency; half the memory keeps the notification small.
-                    val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.RGB_565 }
-                    BitmapFactory.decodeByteArray(data, 0, data.size, options)?.let(::withoutLetterbox)
+                    if (!response.isSuccessful || body.contentLength() > maxBytes) return@use null
+                    val buffer = body.source().apply { request(maxBytes + 1) }.buffer
+                    if (buffer.size > maxBytes) null else buffer.readByteArray()
                 }
             }.getOrNull()
         }
+    }
 
     private fun withoutLetterbox(picture: Bitmap): Bitmap {
         val pixels = IntArray(picture.width * picture.height)
