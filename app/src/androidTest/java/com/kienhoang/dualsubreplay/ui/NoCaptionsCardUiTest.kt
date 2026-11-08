@@ -1,10 +1,13 @@
 package com.kienhoang.dualsubreplay.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
@@ -39,12 +42,26 @@ class NoCaptionsCardUiTest {
                     "App download: This video does not provide a public caption track.",
         )
 
+    /** Draws [content] the way the app's subtitle panel does: on its Surface, so text gets the panel's colour. */
+    @Composable
+    private fun AppPanel(content: @Composable () -> Unit) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+            color = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+        ) {
+            Box(Modifier.padding(16.dp)) { content() }
+        }
+    }
+
     private fun showPanel(state: DualSubUiState) {
         composeRule.setContent {
             DualSubTheme {
                 CompositionLocalProvider(LocalAiSubtitleActions provides actions) {
-                    Box(Modifier.fillMaxWidth().height(420.dp).background(MaterialTheme.colorScheme.surface)) {
-                        LiveSubtitlePanel(state, onRetry = {}, onWordClick = {})
+                    AppPanel {
+                        Box(Modifier.fillMaxWidth().height(420.dp)) {
+                            LiveSubtitlePanel(state, onRetry = {}, onWordClick = {})
+                        }
                     }
                 }
             }
@@ -57,9 +74,7 @@ class NoCaptionsCardUiTest {
     ) {
         composeRule.setContent {
             DualSubTheme {
-                Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)) {
-                    NoCaptionsCard(status, geminiReady, actions)
-                }
+                AppPanel { NoCaptionsCard(status, geminiReady, actions) }
             }
         }
     }
