@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_subtitles_no_captions_title">No subtitles on YouTube</string>
+    <string name="ai_subtitles_no_captions_body">This video has no captions, not even automatic ones. AI can listen to it and write them.</string>
+    <string name="ai_subtitles_make">Make subtitles with AI</string>
+    <string name="ai_subtitles_try_again">Try again</string>
+    <string name="ai_subtitles_note">Uses your free Gemini key. Gemini listens to the video on Google\'s servers.</string>
+    <string name="ai_subtitles_add_key">Add a free Gemini key</string>
+    <string name="ai_subtitles_needs_key">AI subtitles use a free Gemini key from More settings → AI assistant. Add one, then come back to this video.</string>
+    <string name="ai_subtitles_starting">Making subtitles with AI…</string>
+    <string name="ai_subtitles_progress">Making subtitles with AI… %1$s of %2$s</string>
+    <string name="ai_subtitles_progress_unknown_length">Making subtitles with AI… %1$s done</string>
+    <string name="ai_subtitles_track_label">%1$s (AI subtitles)</string>
+    <string name="ai_subtitles_problem_key">Gemini didn\'t accept your key. Check it in More settings → AI assistant.</string>
+    <string name="ai_subtitles_problem_video">Gemini can\'t open this video. It may be private, age-restricted or unavailable.</string>
+    <string name="ai_subtitles_problem_limit">Your Gemini key\'s free limit is used up for now. Try again later.</string>
+    <string name="ai_subtitles_problem_busy">Gemini is busy right now. Try again in a minute.</string>
+    <string name="ai_subtitles_problem_network">Couldn\'t reach Gemini. Check your connection and try again.</string>
+    <string name="ai_subtitles_problem_refused">Gemini wouldn\'t write subtitles for this video. It does this for some songs.</string>
+    <string name="ai_subtitles_problem_no_speech">Gemini heard no speech in this video.</string>
+    <string name="ai_subtitles_problem_failed">Gemini\'s answer couldn\'t be read. Try again.</string>
+</resources>

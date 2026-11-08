@@ -652,7 +652,7 @@ class YouTubeCaptionProvider(
         }
 
         if (!sawNonTrackFailure && failures.isNotEmpty()) {
-            throw CaptionUnavailableException("This video does not provide a public caption track.", lastError)
+            throw NoPublicCaptionsException("This video does not provide a public caption track.", lastError)
         }
 
         val detail =

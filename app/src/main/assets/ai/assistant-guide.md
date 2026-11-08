@@ -43,6 +43,7 @@ Translation:
 - The on-device engine needs a downloaded language model (about 30-60 MB each). Settings, More settings, Captions & translation, Languages on this device downloads or removes them.
 - If translation stops completely, the original captions keep playing; "Retry translation" tries again.
 - If subtitles cannot load, the video may have no captions, YouTube may have changed, or the connection failed. "Retry" loads them again.
+- If YouTube has no captions at all for a video, the subtitle panel says "No subtitles on YouTube" and offers "Make subtitles with AI": Gemini listens to the video and writes subtitles in about 10 seconds per 5 minutes of video, starting with the part that is playing. It needs a free Gemini key in More settings → AI assistant ("Add a free Gemini key" opens it). The video must be public; private or age-restricted videos and some songs cannot be done. Made subtitles are kept, so the video opens with them next time; the source label then says "(AI subtitles)".
 
 Where settings are (menu at the top left, then Settings):
 - More settings, Languages: original caption language (Auto recommended) and the language to translate to.

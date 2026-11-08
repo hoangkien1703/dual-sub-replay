@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_subtitles_no_captions_title">Sin subtítulos en YouTube</string>
+    <string name="ai_subtitles_no_captions_body">Este video no tiene subtítulos, ni siquiera automáticos. La IA puede escucharlo y escribirlos.</string>
+    <string name="ai_subtitles_make">Crear subtítulos con IA</string>
+    <string name="ai_subtitles_try_again">Reintentar</string>
+    <string name="ai_subtitles_note">Usa tu clave gratuita de Gemini. Gemini escucha el video en los servidores de Google.</string>
+    <string name="ai_subtitles_add_key">Añadir una clave gratuita de Gemini</string>
+    <string name="ai_subtitles_needs_key">Los subtítulos con IA usan una clave gratuita de Gemini de Más ajustes → Asistente de IA. Añade una y vuelve a este video.</string>
+    <string name="ai_subtitles_starting">Creando subtítulos con IA…</string>
+    <string name="ai_subtitles_progress">Creando subtítulos con IA… %1$s de %2$s</string>
+    <string name="ai_subtitles_progress_unknown_length">Creando subtítulos con IA… %1$s listos</string>
+    <string name="ai_subtitles_track_label">%1$s (subtítulos con IA)</string>
+    <string name="ai_subtitles_problem_key">Gemini no aceptó tu clave. Revísala en Más ajustes → Asistente de IA.</string>
+    <string name="ai_subtitles_problem_video">Gemini no puede abrir este video. Puede ser privado, tener restricción de edad o no estar disponible.</string>
+    <string name="ai_subtitles_problem_limit">El límite gratuito de tu clave de Gemini se agotó por ahora. Inténtalo más tarde.</string>
+    <string name="ai_subtitles_problem_busy">Gemini está ocupado ahora. Inténtalo en un minuto.</string>
+    <string name="ai_subtitles_problem_network">No se pudo conectar con Gemini. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="ai_subtitles_problem_refused">Gemini no quiso escribir subtítulos para este video. Lo hace con algunas canciones.</string>
+    <string name="ai_subtitles_problem_no_speech">Gemini no oyó ninguna voz en este video.</string>
+    <string name="ai_subtitles_problem_failed">No se pudo leer la respuesta de Gemini. Inténtalo de nuevo.</string>
+</resources>

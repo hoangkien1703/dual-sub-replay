@@ -86,6 +86,15 @@ internal fun LiveSubtitlePanel(
     onWordClick: (WordTap) -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(12.dp)) {
+        if (state.noCaptions) {
+            // No captions to wait for: say so and offer AI subtitles; the diagnostic lines stay below for reports.
+            NoCaptionsSection(state)
+            state.fullTranscriptProblem?.let { problem ->
+                Spacer(Modifier.height(12.dp))
+                Text(problem, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            return@Column
+        }
         Text(stringResource(R.string.status_live_subtitles_title), style = MaterialTheme.typography.labelMedium)
         Text(
             state.statusMessage ?: stringResource(R.string.status_current_captions_only),
