@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.Context
+import android.text.format.Formatter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.AppUpdate
 import com.kienhoang.dualsubreplay.data.UpdateChannel
+import com.kienhoang.dualsubreplay.data.UpdatePatch
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE
 import com.kienhoang.dualsubreplay.update.AppUpdater
@@ -103,5 +105,29 @@ class AppUpdateUiTest {
         composeRule.onNodeWithTag("update_open_github").assertIsDisplayed()
         composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("update_message")).fetchSemanticsNodes().isEmpty() }
+    }
+
+    @Test
+    fun aPatchShowsItsOwnSize() {
+        val patch =
+            UpdatePatch(
+                "https://github.com/hoangkien1703/dual-sub-replay/releases/download/v1.7.2/update-from-v1.7.1.patch",
+                "a".repeat(64),
+                2_600_000,
+            )
+        AppUpdater.showForTest(UpdateState.Available(update.copy(patch = patch)))
+        composeRule.setContent { DualSubTheme { AppUpdateDialogHost(channel = UpdateChannel.Official) } }
+        composeRule.onNodeWithText("Version 1.7.2 is available", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(Formatter.formatShortFileSize(context, 2_600_000), substring = true).assertIsDisplayed()
+        saveUiEvidence("app-update-patch-size")
+    }
+
+    @Test
+    fun aDeviceWithoutArmKeepsItsVersion() {
+        AppUpdater.showForTest(UpdateState.Idle)
+        composeRule.setContent { DualSubTheme { AppUpdateDialogHost(channel = UpdateChannel.UnsupportedDevice) } }
+        composeRule.onNodeWithText("made for phones with ARM processors", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag("update_open_github").assertIsDisplayed()
+        saveUiEvidence("app-update-unsupported-device")
     }
 }

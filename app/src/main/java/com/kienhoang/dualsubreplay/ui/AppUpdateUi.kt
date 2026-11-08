@@ -44,6 +44,7 @@ import com.kienhoang.dualsubreplay.update.AppUpdater
 import com.kienhoang.dualsubreplay.update.UPDATE_REMINDERS_PREFERENCE
 import com.kienhoang.dualsubreplay.update.UpdateProblem
 import com.kienhoang.dualsubreplay.update.UpdateState
+import com.kienhoang.dualsubreplay.update.canUpdateItself
 
 /** The drawer's Check for updates row: it asks GitHub only when tapped. */
 @Composable
@@ -103,11 +104,12 @@ internal fun AppUpdateDialogHost(channel: UpdateChannel = AppUpdater.channel(Loc
     var noBrowser by remember { mutableStateOf(false) }
     val close = { AppUpdater.hideDialog() }
     val open = { url: String -> noBrowser = !openExternalPage(context, url) }
-    if (channel == UpdateChannel.None) {
+    if (!canUpdateItself(channel)) {
+        val why = if (channel == UpdateChannel.UnsupportedDevice) R.string.updates_unsupported_device else R.string.updates_unsupported
         AlertDialog(
             onDismissRequest = close,
             title = { DialogTitle(stringResource(R.string.updates_check), onClose = close) },
-            text = { UpdateMessage(stringResource(R.string.updates_unsupported), noBrowser) },
+            text = { UpdateMessage(stringResource(why), noBrowser) },
             confirmButton = { UpdateButton(R.string.updates_open_github, "update_open_github") { open(UPDATE_RELEASES_PAGE_URL) } },
         )
         return
@@ -158,7 +160,7 @@ private fun UpdateDialogText(
         is UpdateState.Available ->
             UpdateMessage(
                 stringResource(R.string.updates_available, current.update.versionName, BuildConfig.VERSION_NAME) +
-                    sizeLine(context, current.update.sizeBytes) + "\n\n" + stringResource(R.string.updates_first_time_note),
+                    sizeLine(context, current.update.downloadBytes) + "\n\n" + stringResource(R.string.updates_first_time_note),
                 noBrowser,
             )
         is UpdateState.Downloading ->
@@ -275,5 +277,5 @@ internal fun AppUpdateSettingsSection() {
         },
         testTag = "auto_update_switch",
     )
-    if (channel == UpdateChannel.None) SettingsHint(stringResource(R.string.updates_auto_unavailable))
+    if (!canUpdateItself(channel)) SettingsHint(stringResource(R.string.updates_auto_unavailable))
 }

@@ -81,10 +81,22 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
 
+      # main's own patch tool, never the PR's code.
+      - name: Check out the patch tool from main
+        if: steps.pr.outputs.publish == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: main-tools
+          sparse-checkout: tools
+          persist-credentials: false
+
       - name: Package the versioned PR preview APK
         if: steps.pr.outputs.publish == 'true'
         id: package
         env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           BUILD_NUMBER: ${{ github.event.workflow_run.run_number }}
         run: |
@@ -95,6 +107,23 @@ jobs:
           sha256sum "release/$asset_name"
           echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
 
+          # A phone with the build this one replaces downloads a small patch (owner pick 2026-11-08,
+          # docs/specs/2026-11-08-smaller-app-updates.md). Best effort: without it, the whole APK.
+          previous="$( (gh release view preview --json assets --jq '.assets[].name' || true) |
+            sed -nE "s/^DualSub-Replay-PR${PR_NUMBER}-build([0-9]+)-preview\.apk$/\1/p" |
+            awk -v build="$BUILD_NUMBER" '$1 < build' | sort -n | tail -n 1)"
+          if [[ -n "$previous" ]] &&
+             gh release download preview --pattern "DualSub-Replay-PR${PR_NUMBER}-build${previous}-preview.apk" --dir previous; then
+            patch_name="DualSub-Replay-PR${PR_NUMBER}-build${BUILD_NUMBER}-from-build${previous}.patch"
+            if python3 -I main-tools/tools/apk_patch.py make "previous/DualSub-Replay-PR${PR_NUMBER}-build${previous}-preview.apk" \
+                 "release/$asset_name" "release/$patch_name"; then
+              ls -l "release/$patch_name"
+              echo "patch_name=$patch_name" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning::No patch from build ${previous}."
+            fi
+          fi
+
       - name: Upload newest PR preview to rolling preview release
         if: steps.pr.outputs.publish == 'true'
         env:
@@ -102,12 +131,18 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           ASSET_NAME: ${{ steps.package.outputs.asset_name }}
+          PATCH_NAME: ${{ steps.package.outputs.patch_name }}
         run: |
           set -euo pipefail
+          # The patch goes up first, so a phone that sees the new APK finds its patch too.
+          if [[ -n "$PATCH_NAME" ]]; then
+            gh release upload preview "release/$PATCH_NAME" --clobber
+          fi
           assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
           while IFS= read -r asset; do
             [[ -z "$asset" ]] && continue
-            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-(build[0-9]+-)?preview\.apk$ ]] && [[ "$asset" != "$ASSET_NAME" ]]; then
+            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-((build[0-9]+-)?preview\.apk|build[0-9]+-from-build[0-9]+\.patch)$ ]] &&
+               [[ "$asset" != "$ASSET_NAME" ]] && [[ "$asset" != "$PATCH_NAME" ]]; then
               gh release delete-asset preview "$asset" --yes
               echo "Removed older PR #$PR_NUMBER preview: $asset"
             fi
@@ -137,7 +172,7 @@ jobs:
           removed=false
           while IFS= read -r asset; do
             [[ -z "$asset" ]] && continue
-            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-(build[0-9]+-)?preview\.apk$ ]]; then
+            if [[ "$asset" =~ ^DualSub-Replay-PR${PR_NUMBER}-((build[0-9]+-)?preview\.apk|build[0-9]+-from-build[0-9]+\.patch)$ ]]; then
               gh release delete-asset preview "$asset" --yes
               echo "Deleted $asset from the preview release."
               removed=true

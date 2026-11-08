@@ -20,6 +20,7 @@
     <string name="updates_try_again">Coba lagi</string>
     <string name="updates_open_github">Buka GitHub</string>
     <string name="updates_unsupported">Salinan aplikasi ini dibuat di komputer, jadi tidak bisa memperbarui dirinya sendiri. Dapatkan versi terbaru di GitHub.</string>
+    <string name="updates_unsupported_device">Versi baru dibuat untuk ponsel dengan prosesor ARM, dan perangkat ini tidak bisa menjalankannya. Versi yang Anda miliki tetap berfungsi, dan GitHub menyimpan semua versi.</string>
     <string name="updates_problem_offline">Tidak dapat menghubungi GitHub. Periksa koneksi Anda, lalu coba lagi.</string>
     <string name="updates_problem_interrupted">Unduhan berhenti sebelum selesai. Coba lagi untuk melanjutkan dari bagian yang terhenti.</string>
     <string name="updates_problem_busy">GitHub sedang sibuk. Coba lagi dalam beberapa menit.</string>

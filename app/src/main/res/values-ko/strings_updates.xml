@@ -20,6 +20,7 @@
     <string name="updates_try_again">다시 시도</string>
     <string name="updates_open_github">GitHub 열기</string>
     <string name="updates_unsupported">이 앱은 컴퓨터에서 빌드되어 스스로 업데이트할 수 없습니다. GitHub에서 최신 버전을 받으세요.</string>
+    <string name="updates_unsupported_device">새 버전은 ARM 프로세서 휴대폰용이라 이 기기에서는 실행할 수 없습니다. 지금 버전은 계속 쓸 수 있으며, 모든 버전은 GitHub에 있습니다.</string>
     <string name="updates_problem_offline">GitHub에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
     <string name="updates_problem_interrupted">다운로드가 끝나기 전에 멈췄습니다. 다시 시도하면 멈춘 곳부터 이어서 받습니다.</string>
     <string name="updates_problem_busy">지금 GitHub가 바쁩니다. 몇 분 후에 다시 시도하세요.</string>

@@ -20,6 +20,7 @@
     <string name="updates_try_again">Thử lại</string>
     <string name="updates_open_github">Mở GitHub</string>
     <string name="updates_unsupported">Bản ứng dụng này được tạo trên máy tính nên không tự cập nhật được. Hãy tải phiên bản mới nhất trên GitHub.</string>
+    <string name="updates_unsupported_device">Các phiên bản mới được làm cho điện thoại dùng chip ARM, và thiết bị này không chạy được. Phiên bản bạn đang dùng vẫn hoạt động bình thường, và GitHub có đủ mọi phiên bản.</string>
     <string name="updates_problem_offline">Không kết nối được GitHub. Hãy kiểm tra mạng rồi thử lại.</string>
     <string name="updates_problem_interrupted">Tải xuống bị dừng giữa chừng. Bấm Thử lại để tải tiếp từ chỗ đã dừng.</string>
     <string name="updates_problem_busy">GitHub đang bận. Hãy thử lại sau vài phút.</string>
