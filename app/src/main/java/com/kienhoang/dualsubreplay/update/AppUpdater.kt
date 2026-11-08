@@ -209,13 +209,36 @@ internal object AppUpdater {
         val app = context.applicationContext
         if (busy()) return
         automatic = false
+        job = scope.launch { downloadAndInstall(app, update) }
+    }
+
+    /**
+     * Try again after a download stopped: GitHub is asked first, so a version released meanwhile
+     * replaces the half download instead of being offered right after it; the same version carries on.
+     */
+    fun retryDownload(context: Context) {
+        val app = context.applicationContext
+        if (busy()) return
+        automatic = false
         job =
             scope.launch {
-                downloadNow(app, update, asked = true)
-                // The user tapped Update: install as soon as the download is verified.
-                val ready = state.value as? UpdateState.Ready ?: return@launch
-                installNow(app, ready.update, ready.file)
+                checkNow(app)
+                when (val found = state.value) {
+                    is UpdateState.Available -> downloadAndInstall(app, found.update)
+                    is UpdateState.Ready -> installNow(app, found.update, found.file)
+                    else -> Unit
+                }
             }
+    }
+
+    /** The user tapped Update: install as soon as the download is verified. */
+    private suspend fun downloadAndInstall(
+        context: Context,
+        update: AppUpdate,
+    ) {
+        downloadNow(context, update, asked = true)
+        val ready = state.value as? UpdateState.Ready ?: return
+        installNow(context, ready.update, ready.file)
     }
 
     fun install(

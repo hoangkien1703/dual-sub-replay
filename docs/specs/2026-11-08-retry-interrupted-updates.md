@@ -33,7 +33,7 @@ Related: [Check for updates](2026-10-20-check-for-updates.md).
 ## User-visible behavior
 
 - Home on Android's install screen, then back to the app: the dialog shows "Version X is ready to install." with Install. Install opens Android's screen again (the same session while Android still holds it, otherwise a new one).
-- The connection drops mid-download: the app tries twice more by itself (after 2 s and 5 s) when bytes were arriving. If it still fails, the dialog says "The download stopped before it finished. Try again to carry on from where it stopped." Try again asks GitHub for the rest only.
+- The connection drops mid-download: the app tries twice more by itself (after 2 s and 5 s) when bytes were arriving. If it still fails, the dialog says "The download stopped before it finished. Try again to carry on from where it stopped." Try again first asks GitHub which version is newest (owner question 2026-11-08): the same version asks GitHub for the rest only; a version released meanwhile replaces the half download, so the person updates once, to the newest. A finished download already in the cache installs at once.
 - The app is closed after the person tapped Update: on the next start the dialog shows once more, with Install for a finished download or Try again for a half one. A download Update automatically made waits silently as before and still installs when the app leaves the screen.
 - Check for updates with a finished download of the same version in the cache: Ready with Install, no new download.
 - After the update, the new version deletes the APK on its first start. Up to date also clears the folder, and a half download older than 3 days is deleted.
@@ -88,5 +88,5 @@ As planned above. Deviation: none.
 ## Validation result
 
 - Passed locally (cloud container, no emulator): `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` and `python3 -m unittest discover -s tools/tests -p 'test_*.py'`.
-- Device test `AppUpdateUiTest.aBrokenDownloadOffersTryAgain`: PR CI only.
+- PR CI on f156815: `verify-build` and `managed-device-tests` passed, including `AppUpdateUiTest.aBrokenDownloadOffersTryAgain` (screenshot `app-update-interrupted` matches the other update dialogs).
 - Not verified yet: the four phone scenarios in the validation plan, on the owner's phone with the PR preview build.
