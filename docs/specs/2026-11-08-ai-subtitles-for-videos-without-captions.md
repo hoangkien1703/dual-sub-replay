@@ -57,7 +57,7 @@ Research in the project thread (2026-11-08):
 
 ## Acceptance criteria
 
-- [x] A video whose lookup ends in "no public caption track" sets `noCaptions`; other failures do not.
+- [x] A video whose lookup ends in "no public caption track", or whose fully loaded page player lists no track, sets `noCaptions`; other failures do not.
 - [x] Reply parsing turns `00:21.464`, `1:02:03.5`, `06:00:237` and `12.5` into the right milliseconds, shifts part-relative times, and drops empty or impossible lines.
 - [x] Parts start at the playing position's part and wrap around; a known length stops them at the end.
 - [x] A rate-limited key hands the part to the next key; a 404 or busy model hands it to the next model; 403 "caller does not have permission" is reported as an unavailable video, not a bad key.
@@ -83,4 +83,5 @@ Patch (default for an APK change). The owner may pick minor for a new feature.
 - Implemented as planned. Deviation: the progress shows only before anything shows; after the first part loads, later parts come in quietly (a part that fails for a passing reason — limit, busy, connection — is asked again after 30 s, 60 s and 120 s; reopening the video carries on after that).
 - Live run of the app's own Kotlin request and parser (cloud container, owner's key, 2026-11-08, test not committed): `yjsAuMiLc_A` 0–5:00 gave 72 Spanish lines in 10.1 s; `rqiOwOmYO80` 5:00–10:00 gave 33 lines in 9.6 s with video times; `yjsAuMiLc_A` from 5:00 answered past the end in 0.4 s; `aaaaaaaaaaa` gave "video unavailable".
 - Local checks: `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` passed (1,175 unit tests including 22 new, 0 failures).
+- Owner phone test 1 (preview build691, music video `UTOZWO1rGzE`): the card did not show. The page player listed 0 tracks, but the app's own download failed with "Web: Player returned UNPLAYABLE: Video unavailable" instead of "no public caption track". Fix: `meansNoCaptionsAtAll` also counts the page's `NO_TRACKS` (set only after the page player finished loading and listed nothing for 8 s). Gemini answered the same video's 0–5:00 part with 29 Chinese lines in 9.4 s.
 - Not run here: device tests (no /dev/kvm in the cloud container; PR CI runs `NoCaptionsCardUiTest`), the owner's phone test.

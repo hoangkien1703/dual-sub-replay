@@ -217,4 +217,17 @@ class AiSubtitlesTest {
         assertEquals(track, decodeAiSubtitleTrack(encodeAiSubtitleTrack(track)))
         assertNull(decodeAiSubtitleTrack("""{"version":99}"""))
     }
+
+    @Test
+    fun aVideoIsCaptionlessWhenTheDownloadOrThePagePlayerFindsNoTrack() {
+        val none = NoPublicCaptionsException("This video does not provide a public caption track.")
+        // A music video the page plays while the app's download answers UNPLAYABLE (owner's phone, 2026-11-08).
+        val unplayable = CaptionUnavailableException("Last failure: Web: Player returned UNPLAYABLE: Video unavailable")
+        assertTrue(meansNoCaptionsAtAll(none, null))
+        assertTrue(meansNoCaptionsAtAll(CaptionUnavailableException("wrapped", none), PageTranscriptProblem.NO_ANSWER))
+        assertTrue(meansNoCaptionsAtAll(unplayable, PageTranscriptProblem.NO_TRACKS))
+        assertFalse(meansNoCaptionsAtAll(unplayable, PageTranscriptProblem.WAITING_FOR_CAPTIONS))
+        assertFalse(meansNoCaptionsAtAll(unplayable, PageTranscriptProblem.NO_PLAYER))
+        assertFalse(meansNoCaptionsAtAll(unplayable, null))
+    }
 }

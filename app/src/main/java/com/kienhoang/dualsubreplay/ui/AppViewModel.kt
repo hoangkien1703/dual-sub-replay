@@ -51,7 +51,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
-import com.kienhoang.dualsubreplay.data.meansNoPublicCaptions
+import com.kienhoang.dualsubreplay.data.meansNoCaptionsAtAll
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
@@ -1517,7 +1517,7 @@ class AppViewModel internal constructor(
                             liveFallback = true,
                             retryingTranscript = false,
                             fullTranscriptProblem = fullTranscriptProblem(videoId, error),
-                            noCaptions = error.meansNoPublicCaptions(),
+                            noCaptions = meansNoCaptionsAtAll(error, pageTranscripts.problem(videoId)),
                             statusMessage =
                                 if (current.liveOriginal !=
                                     null

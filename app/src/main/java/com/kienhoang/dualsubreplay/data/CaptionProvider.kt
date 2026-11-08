@@ -31,3 +31,13 @@ internal fun Throwable.meansNoPublicCaptions(): Boolean =
     generateSequence(this) {
         it.cause
     }.take(8).any { it is NoPublicCaptionsException }
+
+/**
+ * True when the video has no caption track at all: the app's download found none, or the page's own
+ * player, fully loaded, listed none. The download can fail for another reason on such a video, such as
+ * "UNPLAYABLE" for a music video that plays fine on the page (owner's phone test, 2026-11-08).
+ */
+internal fun meansNoCaptionsAtAll(
+    downloadError: Throwable,
+    pageProblem: PageTranscriptProblem?,
+): Boolean = pageProblem == PageTranscriptProblem.NO_TRACKS || downloadError.meansNoPublicCaptions()
