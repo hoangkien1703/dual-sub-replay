@@ -21,6 +21,7 @@
     <string name="updates_open_github">Abrir o GitHub</string>
     <string name="updates_unsupported">Esta cópia do app foi compilada em um computador, então não pode se atualizar sozinha. Baixe a versão mais recente no GitHub.</string>
     <string name="updates_problem_offline">Não foi possível acessar o GitHub. Verifique sua conexão e tente de novo.</string>
+    <string name="updates_problem_interrupted">O download parou antes de terminar. Tente de novo para continuar de onde parou.</string>
     <string name="updates_problem_busy">O GitHub está ocupado agora. Tente de novo em alguns minutos.</string>
     <string name="updates_problem_github">O GitHub enviou uma resposta inesperada. Tente mais tarde.</string>
     <string name="updates_problem_checksum">O download não correspondeu à soma de verificação do GitHub, então foi excluído.</string>

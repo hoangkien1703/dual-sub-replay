@@ -21,6 +21,7 @@
     <string name="updates_open_github">GitHub-ı aç</string>
     <string name="updates_unsupported">Tətbiqin bu nüsxəsi kompüterdə yığılıb, ona görə özünü yeniləyə bilmir. Ən son versiyanı GitHub-dan əldə edin.</string>
     <string name="updates_problem_offline">GitHub ilə əlaqə qurulmadı. Bağlantınızı yoxlayın və yenidən cəhd edin.</string>
+    <string name="updates_problem_interrupted">Endirmə bitmədən dayandı. Qaldığı yerdən davam etmək üçün yenidən cəhd edin.</string>
     <string name="updates_problem_busy">GitHub hazırda məşğuldur. Bir neçə dəqiqədən sonra yenidən cəhd edin.</string>
     <string name="updates_problem_github">GitHub gözlənilməz cavab göndərdi. Sonra yenidən cəhd edin.</string>
     <string name="updates_problem_checksum">Endirilən fayl GitHub-ın yoxlama cəminə uyğun gəlmədi, ona görə silindi.</string>

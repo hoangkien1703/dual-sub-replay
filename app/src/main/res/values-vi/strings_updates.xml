@@ -21,6 +21,7 @@
     <string name="updates_open_github">Mở GitHub</string>
     <string name="updates_unsupported">Bản ứng dụng này được tạo trên máy tính nên không tự cập nhật được. Hãy tải phiên bản mới nhất trên GitHub.</string>
     <string name="updates_problem_offline">Không kết nối được GitHub. Hãy kiểm tra mạng rồi thử lại.</string>
+    <string name="updates_problem_interrupted">Tải xuống bị dừng giữa chừng. Bấm Thử lại để tải tiếp từ chỗ đã dừng.</string>
     <string name="updates_problem_busy">GitHub đang bận. Hãy thử lại sau vài phút.</string>
     <string name="updates_problem_github">GitHub trả lời không như mong đợi. Hãy thử lại sau.</string>
     <string name="updates_problem_checksum">Tệp tải về không khớp mã kiểm tra của GitHub nên đã bị xóa.</string>

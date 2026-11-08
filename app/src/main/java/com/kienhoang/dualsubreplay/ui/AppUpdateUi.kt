@@ -184,7 +184,8 @@ private fun UpdateConfirmButton(
             UpdateButton(R.string.updates_try_again, "update_try_again") {
                 when {
                     current.file != null && current.update != null -> AppUpdater.install(context, current.update, current.file)
-                    current.update != null -> AppUpdater.download(context, current.update)
+                    // GitHub first: a newer version replaces a half download of an older one.
+                    current.update != null -> AppUpdater.retryDownload(context)
                     else -> AppUpdater.check(context)
                 }
             }
@@ -204,6 +205,7 @@ private val UpdateProblem.messageRes: Int
     get() =
         when (this) {
             UpdateProblem.OFFLINE -> R.string.updates_problem_offline
+            UpdateProblem.INTERRUPTED -> R.string.updates_problem_interrupted
             UpdateProblem.GITHUB_BUSY -> R.string.updates_problem_busy
             UpdateProblem.GITHUB_ERROR -> R.string.updates_problem_github
             UpdateProblem.CHECKSUM -> R.string.updates_problem_checksum

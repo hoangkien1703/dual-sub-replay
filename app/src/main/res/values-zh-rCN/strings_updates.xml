@@ -21,6 +21,7 @@
     <string name="updates_open_github">打开 GitHub</string>
     <string name="updates_unsupported">这个应用是在电脑上构建的，无法自行更新。请在 GitHub 获取最新版本。</string>
     <string name="updates_problem_offline">无法连接 GitHub。请检查网络后重试。</string>
+    <string name="updates_problem_interrupted">下载在完成前中断了。重试即可从中断处继续下载。</string>
     <string name="updates_problem_busy">GitHub 现在很忙。请过几分钟再试。</string>
     <string name="updates_problem_github">GitHub 返回了意外的结果。请稍后再试。</string>
     <string name="updates_problem_checksum">下载的文件与 GitHub 的校验和不一致，已删除。</string>
