@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_subtitles_no_captions_title">YouTube에 자막이 없습니다</string>
+    <string name="ai_subtitles_no_captions_body">이 동영상에는 자동 자막을 포함해 자막이 없습니다. AI가 듣고 자막을 만들 수 있습니다.</string>
+    <string name="ai_subtitles_make">AI로 자막 만들기</string>
+    <string name="ai_subtitles_try_again">다시 시도</string>
+    <string name="ai_subtitles_note">무료 Gemini 키를 사용합니다. Gemini가 Google 서버에서 동영상을 듣습니다.</string>
+    <string name="ai_subtitles_add_key">무료 Gemini 키 추가</string>
+    <string name="ai_subtitles_needs_key">AI 자막은 추가 설정 → AI 도우미의 무료 Gemini 키를 사용합니다. 키를 추가한 뒤 이 동영상으로 돌아오세요.</string>
+    <string name="ai_subtitles_starting">AI로 자막을 만드는 중…</string>
+    <string name="ai_subtitles_progress">AI로 자막을 만드는 중… %1$s / %2$s</string>
+    <string name="ai_subtitles_progress_unknown_length">AI로 자막을 만드는 중… %1$s 완료</string>
+    <string name="ai_subtitles_track_label">%1$s (AI 자막)</string>
+    <string name="ai_subtitles_problem_key">Gemini가 키를 받아들이지 않았습니다. 추가 설정 → AI 도우미에서 확인하세요.</string>
+    <string name="ai_subtitles_problem_video">Gemini가 이 동영상을 열 수 없습니다. 비공개, 연령 제한 또는 볼 수 없는 동영상일 수 있습니다.</string>
+    <string name="ai_subtitles_problem_limit">Gemini 키의 무료 한도를 지금은 모두 사용했습니다. 나중에 다시 시도하세요.</string>
+    <string name="ai_subtitles_problem_busy">Gemini가 지금 바쁩니다. 1분 후에 다시 시도하세요.</string>
+    <string name="ai_subtitles_problem_network">Gemini에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="ai_subtitles_problem_refused">Gemini가 이 동영상의 자막을 만들지 않았습니다. 일부 노래에서 이런 일이 있습니다.</string>
+    <string name="ai_subtitles_problem_no_speech">이 동영상에서 말소리를 듣지 못했습니다.</string>
+    <string name="ai_subtitles_problem_failed">Gemini의 응답을 읽을 수 없습니다. 다시 시도하세요.</string>
+</resources>

@@ -21,6 +21,10 @@ data class DualSubUiState(
     val retryingTranscript: Boolean = false,
     /** Why the full transcript is missing while live subtitles stand in, or null. */
     val fullTranscriptProblem: String? = null,
+    /** YouTube has no caption track at all for the open video, so the panel offers AI subtitles. */
+    val noCaptions: Boolean = false,
+    /** AI subtitles being made for a video, or why they could not be; null when nothing is going on. */
+    val aiSubtitles: AiSubtitleStatus? = null,
     val browserUrl: String = YOUTUBE_HOME_URL,
     val browserNavigationRequestId: Long = 0L,
     /** The menu's YouTube tabs; the open one is shown in the one YouTube page, none shows an empty page. */

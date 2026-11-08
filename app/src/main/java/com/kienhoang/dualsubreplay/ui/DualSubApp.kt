@@ -46,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.WordTap
+import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -61,6 +62,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -122,6 +124,9 @@ fun DualSubApp(
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
     var showVocabulary by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
+    // The no-captions card's "Add a free Gemini key" opens More settings → AI assistant.
+    var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
+    val aiSubtitleActions = remember(viewModel) { AiSubtitleActions(viewModel::makeAiSubtitles) { aiSettingsRequestId++ } }
 
     DualSubTheme {
         if (!state.onboardingCompleted) {
@@ -131,7 +136,7 @@ fun DualSubApp(
         } else if (!state.dailyGoalPromptCompleted) {
             DailyGoalSetupScreen(onFinish = viewModel::completeDailyGoalPrompt)
         } else {
-            CompositionLocalProvider(LocalLineLoop provides studyRunner.lineLoop) {
+            CompositionLocalProvider(LocalLineLoop provides studyRunner.lineLoop, LocalAiSubtitleActions provides aiSubtitleActions) {
                 DualSubExperience(
                     state = state,
                     webController = webController,
@@ -146,6 +151,7 @@ fun DualSubApp(
                     effectivePlayerMode = effectivePlayerMode,
                     onPlayerModeChange = onPlayerModeChange,
                     externalSettingsRequestId = externalSettingsRequestId,
+                    aiSettingsRequestId = aiSettingsRequestId,
                     fullscreenLearningOverlay = fullscreenLearningOverlay,
                     onNavigationVisibilityChange = onNavigationVisibilityChange,
                     onPageChanged = viewModel::onYouTubePageChanged,
@@ -276,6 +282,7 @@ private fun DualSubExperience(
     effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
     externalSettingsRequestId: Long,
+    aiSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
     onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
@@ -380,6 +387,10 @@ private fun DualSubExperience(
 
     LaunchedEffect(externalSettingsRequestId) {
         if (externalSettingsRequestId > 0L) showQuickSettings = true
+    }
+    OnSettingsRequest(aiSettingsRequestId) {
+        settingsJumpSection = MoreSettingsSection.AI_ASSISTANT
+        showSettings = true
     }
     val differentTabAccounts by rememberDifferentTabAccounts()
     val snackbars = remember { SnackbarHostState() }
@@ -612,6 +623,17 @@ private fun DualSubExperience(
                 settingsJumpSection = null
             },
         )
+    }
+}
+
+/** Runs [open] for each new [requestId] above 0, such as the no-captions card's "Add a free Gemini key". */
+@Composable
+private fun OnSettingsRequest(
+    requestId: Long,
+    open: () -> Unit,
+) {
+    LaunchedEffect(requestId) {
+        if (requestId > 0L) open()
     }
 }
 
@@ -1377,6 +1399,9 @@ private fun sourceDescription(state: DualSubUiState): String {
     val resources = LocalResources.current
     val interfaceLocale = currentInterfaceLocale()
     val source = state.resolvedSourceLanguage?.let { resolved ->
+        if (state.loadedTrackId == AI_SUBTITLE_TRACK_ID) {
+            return@let stringResource(R.string.ai_subtitles_track_label, languageDisplayName(resolved, interfaceLocale))
+        }
         // YouTube's own name of the loaded track already says when it is auto-generated.
         state.availableSourceLanguages.firstOrNull { state.loadedTrackId.isNotBlank() && it.trackId == state.loadedTrackId }?.name
             ?: run {

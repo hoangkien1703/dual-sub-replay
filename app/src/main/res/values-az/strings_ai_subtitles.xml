@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_subtitles_no_captions_title">YouTube-da altyazı yoxdur</string>
+    <string name="ai_subtitles_no_captions_body">Bu videonun heç bir altyazısı yoxdur, avtomatik altyazı da. Sİ videonu dinləyib altyazı yaza bilər.</string>
+    <string name="ai_subtitles_make">Sİ ilə altyazı yarat</string>
+    <string name="ai_subtitles_try_again">Yenidən cəhd et</string>
+    <string name="ai_subtitles_note">Pulsuz Gemini açarınızdan istifadə edir. Gemini videonu Google serverlərində dinləyir.</string>
+    <string name="ai_subtitles_add_key">Pulsuz Gemini açarı əlavə et</string>
+    <string name="ai_subtitles_needs_key">Sİ altyazıları Əlavə ayarlar → Sİ köməkçisi bölməsindəki pulsuz Gemini açarından istifadə edir. Açar əlavə edin, sonra bu videoya qayıdın.</string>
+    <string name="ai_subtitles_starting">Sİ ilə altyazı yaradılır…</string>
+    <string name="ai_subtitles_progress">Sİ ilə altyazı yaradılır… %1$s / %2$s</string>
+    <string name="ai_subtitles_progress_unknown_length">Sİ ilə altyazı yaradılır… %1$s hazırdır</string>
+    <string name="ai_subtitles_track_label">%1$s (Sİ altyazıları)</string>
+    <string name="ai_subtitles_problem_key">Gemini açarınızı qəbul etmədi. Onu Əlavə ayarlar → Sİ köməkçisi bölməsində yoxlayın.</string>
+    <string name="ai_subtitles_problem_video">Gemini bu videonu aça bilmir. Video şəxsi, yaş məhdudiyyətli və ya əlçatmaz ola bilər.</string>
+    <string name="ai_subtitles_problem_limit">Gemini açarınızın pulsuz limiti hələlik bitib. Sonra yenidən cəhd edin.</string>
+    <string name="ai_subtitles_problem_busy">Gemini hazırda məşğuldur. Bir dəqiqədən sonra yenidən cəhd edin.</string>
+    <string name="ai_subtitles_problem_network">Gemini ilə əlaqə qurmaq olmadı. Bağlantınızı yoxlayıb yenidən cəhd edin.</string>
+    <string name="ai_subtitles_problem_refused">Gemini bu video üçün altyazı yazmadı. Bəzi mahnılarda belə olur.</string>
+    <string name="ai_subtitles_problem_no_speech">Gemini bu videoda danışıq eşitmədi.</string>
+    <string name="ai_subtitles_problem_failed">Gemini-nin cavabını oxumaq olmadı. Yenidən cəhd edin.</string>
+</resources>

@@ -214,6 +214,10 @@ Paths below are relative to
   It changes the app only through its fixed tool list, with Undo or a tap to confirm; its own
   settings, keys and saved words need the off-by-default Full access option. Each service may keep
   several keys, and a failing key hands the request to the next one.
+- AI subtitles for videos without captions (owner pick 2026-11-08, [spec](../specs/2026-11-08-ai-subtitles-for-videos-without-captions.md))
+  reuse the assistant's Gemini keys: only after a tap on the no-captions card, the app sends the
+  video's YouTube address (no audio or text) to Gemini in 5-minute parts and keeps the result in
+  `cacheDir/ai-subtitles/`. No on-device speech model, no audio capture.
 - Preserve guide migration: a missing `guide_completed` inherits prior onboarding
   completion for existing users; new users still see the guide. Preserve vocabulary,
   review scheduling, backup/import compatibility, and retained legacy clip files.

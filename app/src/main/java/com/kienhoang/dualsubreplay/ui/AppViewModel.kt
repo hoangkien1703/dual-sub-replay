@@ -7,13 +7,21 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AI_KEYS_PREFERENCES
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
-import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.AiHttpTransport
 import com.kienhoang.dualsubreplay.assistant.AiKeyPacer
+import com.kienhoang.dualsubreplay.assistant.AiKeyStore
+import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
+import com.kienhoang.dualsubreplay.assistant.AiVideoSubtitleMaker
+import com.kienhoang.dualsubreplay.assistant.KeystoreSecretCipher
+import com.kienhoang.dualsubreplay.assistant.SharedPreferencesSecretStorage
+import com.kienhoang.dualsubreplay.assistant.StoredGeminiKeys
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
+import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
+import com.kienhoang.dualsubreplay.data.AiSubtitleStore
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionTrackResult
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -43,6 +51,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
+import com.kienhoang.dualsubreplay.data.meansNoPublicCaptions
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
@@ -138,6 +147,33 @@ class AppViewModel internal constructor(
         )
     private val aiTranslator = AiSubtitleTranslator(File(application.cacheDir, "ai-translations"))
     private val aiTransport by lazy { AiHttpTransport() }
+
+    /** Subtitles Gemini made for videos without captions (owner pick 2026-11-08). */
+    private val aiSubtitleStore = AiSubtitleStore(File(application.cacheDir, "ai-subtitles"))
+    private val geminiSubtitles by lazy {
+        AiVideoSubtitleMaker(
+            StoredGeminiKeys(
+                AiKeyStore(
+                    SharedPreferencesSecretStorage(application.getSharedPreferences(AI_KEYS_PREFERENCES, 0)),
+                    KeystoreSecretCipher(),
+                ),
+            ),
+            aiTransport,
+        )
+    }
+    private val aiSubtitles =
+        AiSubtitleRunner(
+            scope = viewModelScope,
+            store = aiSubtitleStore,
+            askPart = { videoId, startMs, endMs -> geminiSubtitles.part(videoId, startMs, endMs) },
+            durationOf = { videoId ->
+                WebVideoBridge.playback.value
+                    ?.takeIf { it.videoId == videoId }
+                    ?.durationMs
+            },
+            onStatus = { status -> _state.update { it.copy(aiSubtitles = status) } },
+            onReady = { videoId -> if (_state.value.activeVideoId == videoId) loadVideo(videoId, showPanel = true) },
+        )
 
     /** Google failed or was too slow on mobile data and has not answered since. */
     @Volatile private var googleFailedOnMobile = false
@@ -353,6 +389,7 @@ class AppViewModel internal constructor(
     override fun onCleared() {
         flushImmersion()
         loadingJob?.cancel()
+        aiSubtitles.stop()
         preferences.unregisterOnSharedPreferenceChangeListener(visibilityListener)
         super.onCleared()
     }
@@ -669,13 +706,28 @@ class AppViewModel internal constructor(
     }
 
     /** Fetches [videoId]'s captions in the picked track or chosen original language, or Auto's pick when none is chosen. */
-    private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult =
-        captionProvider.fetch(
+    private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult {
+        // Subtitles Gemini made for this video earlier: YouTube had none for it.
+        aiSubtitleStore.read(videoId)?.takeIf { it.cues().isNotEmpty() }?.let { return it.asCaptionTrack(aiSubtitleLanguage(it.language)) }
+        return captionProvider.fetch(
             videoId,
             preferredCaptionLanguages(_state.value.sourcePreference),
             learningLanguage(),
             _state.value.pickedTrack,
         )
+    }
+
+    /** The language Gemini named, or the learning language when it named none the app knows. */
+    private fun aiSubtitleLanguage(named: String): String =
+        TranslationLanguages.normalize(named).takeIf { named.isNotBlank() && TranslationLanguages.isSupported(it) }
+            ?: learningLanguage()
+            ?: "en"
+
+    /** The no-captions card's button: Gemini makes subtitles for the open video, starting with the playing part. */
+    fun makeAiSubtitles() {
+        val videoId = _state.value.activeVideoId ?: return
+        aiSubtitles.start(videoId, latestPlaybackSecondMs)
+    }
 
     private fun learningLanguage(): String? =
         storedLearningLanguage(
@@ -1366,20 +1418,9 @@ class AppViewModel internal constructor(
         }
     }
 
-    private fun loadVideo(
-        videoId: String,
-        showPanel: Boolean,
-    ) {
-        val generation = ++loadGeneration
-        loadingJob?.cancel()
-        liveCaptionTracker.reset()
-        liveCaptionProgress = null
-        val preserveLive = _state.value.liveFallback && _state.value.activeVideoId == videoId
-        if (!preserveLive) {
-            rejectedLiveRevision = null
-            liveTranslationGate.reset()
-            liveTranslationJob?.cancel()
-        }
+    /** Before [videoId] loads: another video's AI subtitles stop, and its playback position is forgotten. */
+    private fun leaveOtherVideo(videoId: String) {
+        if (aiSubtitles.videoId != null && aiSubtitles.videoId != videoId) aiSubtitles.stop()
         // Reloading the same video (language change, retry) keeps tracking the
         // current position so subtitles resume exactly where playback is.
         if (shouldResetPlaybackClock(_state.value.activeVideoId, videoId)) {
@@ -1387,6 +1428,23 @@ class AppViewModel internal constructor(
             playbackKnown = false
             playbackSessionId = null
             captionHighlightResolver.reset()
+        }
+    }
+
+    private fun loadVideo(
+        videoId: String,
+        showPanel: Boolean,
+    ) {
+        val generation = ++loadGeneration
+        loadingJob?.cancel()
+        leaveOtherVideo(videoId)
+        liveCaptionTracker.reset()
+        liveCaptionProgress = null
+        val preserveLive = _state.value.liveFallback && _state.value.activeVideoId == videoId
+        if (!preserveLive) {
+            rejectedLiveRevision = null
+            liveTranslationGate.reset()
+            liveTranslationJob?.cancel()
         }
         playbackRequests.value = CaptionPlaybackRequest()
         _state.update {
@@ -1396,6 +1454,7 @@ class AppViewModel internal constructor(
                 liveTranslated = if (preserveLive) it.liveTranslated else null,
                 retryingTranscript = preserveLive,
                 fullTranscriptProblem = if (preserveLive) it.fullTranscriptProblem else null,
+                noCaptions = preserveLive && it.noCaptions,
                 activeVideoId = videoId,
                 playbackPaused = if (playbackKnown) it.playbackPaused else true,
                 subtitlePanelVisible = showPanel,
@@ -1431,6 +1490,7 @@ class AppViewModel internal constructor(
                             liveTranslated = null,
                             retryingTranscript = false,
                             fullTranscriptProblem = null,
+                            noCaptions = false,
                             resolvedSourceLanguage = track.languageCode,
                             sourcePreference =
                                 resolvedSourcePreference(
@@ -1446,6 +1506,7 @@ class AppViewModel internal constructor(
                         )
                     }
 
+                    if (track.trackId == AI_SUBTITLE_TRACK_ID) aiSubtitles.resumeIfUnfinished(videoId, latestPlaybackSecondMs)
                     followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, track.isGenerated, natural)
                 } catch (error: Exception) {
                     if (error is CancellationException) throw error
@@ -1456,6 +1517,7 @@ class AppViewModel internal constructor(
                             liveFallback = true,
                             retryingTranscript = false,
                             fullTranscriptProblem = fullTranscriptProblem(videoId, error),
+                            noCaptions = error.meansNoPublicCaptions(),
                             statusMessage =
                                 if (current.liveOriginal !=
                                     null
