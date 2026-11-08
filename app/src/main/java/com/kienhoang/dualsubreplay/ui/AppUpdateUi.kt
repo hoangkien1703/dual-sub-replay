@@ -204,6 +204,7 @@ private val UpdateProblem.messageRes: Int
     get() =
         when (this) {
             UpdateProblem.OFFLINE -> R.string.updates_problem_offline
+            UpdateProblem.INTERRUPTED -> R.string.updates_problem_interrupted
             UpdateProblem.GITHUB_BUSY -> R.string.updates_problem_busy
             UpdateProblem.GITHUB_ERROR -> R.string.updates_problem_github
             UpdateProblem.CHECKSUM -> R.string.updates_problem_checksum

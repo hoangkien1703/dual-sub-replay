@@ -21,6 +21,7 @@
     <string name="updates_open_github">GitHub 열기</string>
     <string name="updates_unsupported">이 앱은 컴퓨터에서 빌드되어 스스로 업데이트할 수 없습니다. GitHub에서 최신 버전을 받으세요.</string>
     <string name="updates_problem_offline">GitHub에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="updates_problem_interrupted">다운로드가 끝나기 전에 멈췄습니다. 다시 시도하면 멈춘 곳부터 이어서 받습니다.</string>
     <string name="updates_problem_busy">지금 GitHub가 바쁩니다. 몇 분 후에 다시 시도하세요.</string>
     <string name="updates_problem_github">GitHub에서 예상치 못한 응답이 왔습니다. 나중에 다시 시도하세요.</string>
     <string name="updates_problem_checksum">다운로드한 파일이 GitHub의 체크섬과 일치하지 않아 삭제했습니다.</string>

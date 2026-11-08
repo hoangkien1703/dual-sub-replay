@@ -14,6 +14,7 @@ import com.kienhoang.dualsubreplay.data.UpdateChannel
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE
 import com.kienhoang.dualsubreplay.update.AppUpdater
+import com.kienhoang.dualsubreplay.update.UpdateProblem
 import com.kienhoang.dualsubreplay.update.UpdateState
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -83,6 +84,16 @@ class AppUpdateUiTest {
         saveUiEvidence("app-update-available")
         composeRule.onNodeWithTag("update_not_now").performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("update_message")).fetchSemanticsNodes().isEmpty() }
+    }
+
+    @Test
+    fun aBrokenDownloadOffersTryAgain() {
+        AppUpdater.showForTest(UpdateState.Failed(UpdateProblem.INTERRUPTED, update))
+        composeRule.setContent { DualSubTheme { AppUpdateDialogHost(channel = UpdateChannel.Official) } }
+        composeRule.onNodeWithText("carry on from where it stopped", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag("update_try_again").assertIsDisplayed()
+        composeRule.onNodeWithTag("update_not_now").assertIsDisplayed()
+        saveUiEvidence("app-update-interrupted")
     }
 
     @Test
