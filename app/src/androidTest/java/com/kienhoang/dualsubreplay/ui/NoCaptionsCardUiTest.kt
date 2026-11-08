@@ -10,7 +10,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -42,11 +44,14 @@ class NoCaptionsCardUiTest {
                     "App download: This video does not provide a public caption track.",
         )
 
+    /** Saves the panel as drawn; a whole-screen capture can run before the frame is on screen and come out blank. */
+    private fun saveEvidence(name: String) = saveUiEvidence(name, composeRule.onNodeWithTag(PANEL).captureToImage())
+
     /** Draws [content] the way the app's subtitle panel does: on its Surface, so text gets the panel's colour. */
     @Composable
     private fun AppPanel(content: @Composable () -> Unit) {
         Surface(
-            modifier = Modifier.fillMaxWidth().systemBarsPadding(),
+            modifier = Modifier.fillMaxWidth().systemBarsPadding().testTag(PANEL),
             color = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
@@ -85,7 +90,7 @@ class NoCaptionsCardUiTest {
         composeRule.onNodeWithText("No subtitles on YouTube").assertIsDisplayed()
         composeRule.onNodeWithText("not even automatic ones", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("Waiting for YouTube captions", substring = true).assertDoesNotExist()
-        saveUiEvidence("no-captions-add-key")
+        saveEvidence("no-captions-add-key")
         composeRule.onNodeWithTag("ai_subtitles_add_key").performClick()
         assertEquals(1, settingsOpened)
         assertEquals(0, made)
@@ -95,7 +100,7 @@ class NoCaptionsCardUiTest {
     fun withAGeminiKeyTheButtonMakesSubtitles() {
         showCard(status = null, geminiReady = true)
         composeRule.onNodeWithText("Make subtitles with AI").assertIsDisplayed()
-        saveUiEvidence("no-captions-make")
+        saveEvidence("no-captions-make")
         composeRule.onNodeWithTag("ai_subtitles_make").performClick()
         assertEquals(1, made)
     }
@@ -106,7 +111,7 @@ class NoCaptionsCardUiTest {
         composeRule.onNodeWithText("Making subtitles with AI… 5:00 of 9:24").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_subtitles_progress").assertIsDisplayed()
         composeRule.onNodeWithTag("ai_subtitles_make").assertDoesNotExist()
-        saveUiEvidence("no-captions-making")
+        saveEvidence("no-captions-making")
     }
 
     @Test
@@ -114,12 +119,16 @@ class NoCaptionsCardUiTest {
         showCard(AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.LIMIT), geminiReady = true)
         composeRule.onNodeWithTag("ai_subtitles_problem").assertIsDisplayed()
         composeRule.onNodeWithText("Try again").assertIsDisplayed()
-        saveUiEvidence("no-captions-problem")
+        saveEvidence("no-captions-problem")
     }
 
     @Test
     fun otherFailuresStillShowLiveSubtitles() {
         showPanel(noCaptions.copy(noCaptions = false))
         composeRule.onNodeWithTag("no_captions_card").assertDoesNotExist()
+    }
+
+    private companion object {
+        const val PANEL = "no_captions_test_panel"
     }
 }
