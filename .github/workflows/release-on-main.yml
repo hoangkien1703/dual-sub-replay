@@ -151,7 +151,6 @@ jobs:
         env:
           EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
           EXPECTED_CODE: ${{ needs.prepare.outputs.version_code }}
-          MINIMUM_SAFE_CODE: ${{ needs.prepare.outputs.minimum_safe_version_code }}
         run: |
           set -euo pipefail
           mkdir -p release
@@ -172,10 +171,54 @@ jobs:
             exit 1
           fi
           sha256sum "$release_apk" | sed 's#  release/#  #' > release/DualSub-Replay.apk.sha256
+
+      - name: Make small update patches from recent releases
+        if: steps.resume.outputs.build == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          # Phones on one of the last 15 versions download a ~3 MB patch instead of the whole APK
+          # (owner pick 2026-11-08, docs/specs/2026-11-08-smaller-app-updates.md). Best effort:
+          # without patches the app downloads the whole APK as before.
+          mkdir -p old-releases release/patches
+          echo '[]' > release/patches.json
+          gh api "repos/${GH_REPO}/releases?per_page=40" --jq \
+            '[.[] | select(.draft == false and .prerelease == false and (.tag_name | test("^v[0-9]+[.][0-9]+[.][0-9]+$")))] | .[:15] | .[].tag_name' \
+            > old-releases/tags.txt || true
+          while IFS= read -r tag; do
+            [[ -z "$tag" || "$tag" == "v${EXPECTED_VERSION}" ]] && continue
+            folder="old-releases/${tag#v}"
+            mkdir -p "$folder"
+            gh release download "$tag" --pattern DualSub-Replay.apk --pattern update-info.json --dir "$folder" ||
+              echo "::warning::Could not download $tag; no patch from it."
+          done < old-releases/tags.txt
+          python3 tools/apk_patch.py release --apk release/DualSub-Replay.apk --old-releases old-releases \
+            --output-dir release/patches --entries release/patches.json ||
+            { echo "::warning::No update patches this time; phones download the whole APK."; rm -f release/patches/*; echo '[]' > release/patches.json; }
+          ls -l release/patches
+
+      - name: Write update-info.json
+        if: steps.resume.outputs.build == 'true'
+        env:
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_CODE: ${{ needs.prepare.outputs.version_code }}
+          MINIMUM_SAFE_CODE: ${{ needs.prepare.outputs.minimum_safe_version_code }}
+        run: |
+          set -euo pipefail
           # What the app reads once a day from the latest release (owner decision 2026-10-30).
+          # A retried reservation from before patches has an older release tool without --patches.
+          patches=()
+          if grep -q -- '"--patches"' tools/automatic_release.py; then
+            patches=(--patches release/patches.json)
+          else
+            rm -f release/patches/*
+          fi
           python3 tools/automatic_release.py update-info --version "$EXPECTED_VERSION" \
             --version-code "$EXPECTED_CODE" --minimum-safe-version-code "${MINIMUM_SAFE_CODE:-0}" \
-            --apk "$release_apk" --output release/update-info.json
+            --apk release/DualSub-Replay.apk "${patches[@]}" --output release/update-info.json
           cat release/update-info.json
 
       - name: Upload verified APK and checksum to the reserved draft
@@ -184,9 +227,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
-        run: >-
-          gh release upload "v${RELEASE_VERSION}"
-          release/DualSub-Replay.apk release/DualSub-Replay.apk.sha256 release/update-info.json --clobber
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          gh release upload "v${RELEASE_VERSION}" \
+            release/DualSub-Replay.apk release/DualSub-Replay.apk.sha256 release/patches/*.patch release/update-info.json --clobber
 
       - name: Publish the complete official release
         if: steps.resume.outputs.build == 'true'

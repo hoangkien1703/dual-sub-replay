@@ -90,12 +90,19 @@ def minimum_safe_version_code(releases, meta):
     return max(codes, default=0)
 
 
-def update_info(version, code, minimum_safe, apk):
-    """What the app reads from the latest release to learn about it (`update-info.json`)."""
+def update_info(version, code, minimum_safe, apk, patches=None):
+    """What the app reads from the latest release to learn about it (`update-info.json`).
+
+    [patches] are `tools/apk_patch.py release` entries: small downloads that turn an earlier
+    release's APK into this one (owner pick 2026-11-08). Older apps ignore them.
+    """
     data = Path(apk).read_bytes()
-    return {"schema": 1, "version": version, "version_code": code,
+    info = {"schema": 1, "version": version, "version_code": code,
             "minimum_safe_version_code": minimum_safe, "apk": APK_NAME,
             "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
+    if patches:
+        info["patches"] = patches
+    return info
 
 
 def next_version(previous, request):
@@ -297,11 +304,13 @@ def main():
     parser.add_argument("--version-code", type=int)
     parser.add_argument("--minimum-safe-version-code", type=int, default=0)
     parser.add_argument("--apk")
+    parser.add_argument("--patches", help="JSON list from tools/apk_patch.py release")
     parser.add_argument("--output")
     args = parser.parse_args()
     if args.action == "update-info":
         version_tuple(args.version)
-        info = update_info(args.version, args.version_code, args.minimum_safe_version_code, args.apk)
+        patches = json.loads(Path(args.patches).read_text()) if args.patches else None
+        info = update_info(args.version, args.version_code, args.minimum_safe_version_code, args.apk, patches)
         Path(args.output).write_text(json.dumps(info, sort_keys=True) + "\n")
         return
     if os.environ["GITHUB_REF"] != "refs/heads/main":

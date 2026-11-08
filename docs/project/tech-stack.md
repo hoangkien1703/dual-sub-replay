@@ -90,6 +90,10 @@ Paths below are relative to
   newest `security:critical` release, a Security update dialog (daily for the fix's first 3 days,
   then weekly; a newer fix starts again), never over a
   playing video (`data/UpdateReminders.kt`, `ui/AppNotices.kt`).
+  Since 2026-11-08 ([spec](../specs/2026-11-08-smaller-app-updates.md)) an update from one of the
+  last 15 releases (or the previous preview build) downloads a ~3 MB patch and rebuilds the APK
+  from the installed one (`tools/apk_patch.py`, `data/UpdatePatches.kt`), falling back to the
+  whole APK; the release APK carries ARM libraries only (about 25 MB).
 - Remote switches (owner decision 2026-10-30, switches only): `update/RemoteSwitchFetcher.kt` reads
   `remote-config/switches.json` from `raw.githubusercontent.com` with the daily check (64 KiB cap,
   saved 30 days). `data/RemoteSwitches.kt` can only reorder or drop built-in Google Translate

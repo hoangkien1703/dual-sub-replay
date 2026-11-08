@@ -47,7 +47,16 @@ internal sealed interface UpdateChannel {
 
     /** A locally built copy, signed with another key: it cannot update itself. */
     data object None : UpdateChannel
+
+    /**
+     * A device that cannot run ARM apps (owner pick 2026-11-08): release APKs carry ARM libraries
+     * only, so it keeps the version it has instead of downloading one that would not install.
+     */
+    data object UnsupportedDevice : UpdateChannel
 }
+
+/** Release APKs carry ARM libraries only; Intel Chromebooks and emulators run them through ARM translation and list ARM too. */
+internal fun canRunReleaseApk(supportedAbis: List<String>): Boolean = supportedAbis.any { it.startsWith("arm") }
 
 private val PREVIEW_VERSION = Regex("""-pr(\d+)-build(\d+)$""")
 
@@ -55,8 +64,11 @@ internal fun updateChannelFor(
     applicationId: String,
     debuggable: Boolean,
     versionName: String,
+    supportedAbis: List<String> = listOf("arm64-v8a"),
 ): UpdateChannel {
-    if (applicationId == OFFICIAL_APPLICATION_ID && !debuggable) return UpdateChannel.Official
+    if (applicationId == OFFICIAL_APPLICATION_ID && !debuggable) {
+        return if (canRunReleaseApk(supportedAbis)) UpdateChannel.Official else UpdateChannel.UnsupportedDevice
+    }
     val preview = PREVIEW_VERSION.find(versionName)
     if (applicationId == "$OFFICIAL_APPLICATION_ID.preview" && preview != null) {
         return UpdateChannel.Preview(preview.groupValues[1].toInt(), preview.groupValues[2].toInt())
@@ -79,7 +91,12 @@ internal data class AppUpdate(
     val critical: Boolean = false,
     /** That security fix's version code while [critical]; a newer fix is announced afresh. */
     val securityFixCode: Long = 0,
-)
+    /** A small download that turns the installed APK into this version; null downloads the whole APK. */
+    val patch: UpdatePatch? = null,
+) {
+    /** What Update downloads when the patch works. */
+    val downloadBytes: Long get() = patch?.sizeBytes ?: sizeBytes
+}
 
 /** The latest release as its `update-info.json` describes it. */
 internal data class UpdateInfo(
@@ -89,6 +106,8 @@ internal data class UpdateInfo(
     val minimumSafeVersionCode: Long,
     val sha256: String,
     val sizeBytes: Long,
+    /** Patches from earlier releases (owner pick 2026-11-08). */
+    val patches: List<UpdateInfoPatch> = emptyList(),
 )
 
 private val STABLE_VERSION = Regex("""^\d{1,4}\.\d{1,4}\.\d{1,4}$""")
@@ -106,6 +125,7 @@ internal fun parseUpdateInfo(json: String): UpdateInfo? {
         minimumSafeVersionCode = info.optLong("minimum_safe_version_code").coerceAtLeast(0),
         sha256 = sha256,
         sizeBytes = info.optLong("size").coerceAtLeast(0),
+        patches = parseUpdateInfoPatches(info.optJSONArray("patches")),
     )
 }
 
@@ -124,6 +144,7 @@ internal fun updateFromInfo(
         pageUrl = "$UPDATE_RELEASES_PAGE_URL/tag/v${info.versionName}",
         critical = installedVersionCode < info.minimumSafeVersionCode,
         securityFixCode = if (installedVersionCode < info.minimumSafeVersionCode) info.minimumSafeVersionCode else 0,
+        patch = officialPatchFor(info.versionName, info.patches, installedVersionCode),
     )
 }
 
@@ -179,10 +200,9 @@ internal fun parsePreviewRelease(
     channel: UpdateChannel.Preview,
 ): AppUpdate? {
     val release = JSONObject(json)
+    val assets = release.getJSONArray("assets").objects()
     val newest =
-        release
-            .getJSONArray("assets")
-            .objects()
+        assets
             .mapNotNull { asset ->
                 val match = PREVIEW_ASSET.find(asset.optString("name")) ?: return@mapNotNull null
                 if (match.groupValues[1].toInt() != channel.pullRequest) return@mapNotNull null
@@ -197,6 +217,7 @@ internal fun parsePreviewRelease(
         checksumUrl = null,
         sizeBytes = asset.optLong("size"),
         pageUrl = release.optString("html_url").ifBlank { UPDATE_PREVIEW_PAGE_URL },
+        patch = previewPatchFor(assets, channel.pullRequest, fromBuild = channel.build, toBuild = newest.first),
     )
 }
 

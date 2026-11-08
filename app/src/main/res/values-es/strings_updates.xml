@@ -20,6 +20,7 @@
     <string name="updates_try_again">Reintentar</string>
     <string name="updates_open_github">Abrir GitHub</string>
     <string name="updates_unsupported">Esta copia de la app se compiló en un ordenador, así que no puede actualizarse sola. Descarga la versión más reciente en GitHub.</string>
+    <string name="updates_unsupported_device">Las nuevas versiones están hechas para teléfonos con procesador ARM, y este dispositivo no puede ejecutarlas. La versión que tienes sigue funcionando, y GitHub tiene todas las versiones.</string>
     <string name="updates_problem_offline">No se pudo conectar con GitHub. Revisa tu conexión e inténtalo de nuevo.</string>
     <string name="updates_problem_interrupted">La descarga se detuvo antes de terminar. Inténtalo de nuevo para seguir desde donde se quedó.</string>
     <string name="updates_problem_busy">GitHub está ocupado ahora mismo. Inténtalo de nuevo en unos minutos.</string>

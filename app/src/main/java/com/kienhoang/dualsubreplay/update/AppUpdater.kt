@@ -23,7 +23,9 @@ import com.kienhoang.dualsubreplay.data.UPDATE_LATEST_RELEASE_URL
 import com.kienhoang.dualsubreplay.data.UPDATE_PREVIEW_RELEASE_URL
 import com.kienhoang.dualsubreplay.data.UpdateChannel
 import com.kienhoang.dualsubreplay.data.UpdateDownloadRecord
+import com.kienhoang.dualsubreplay.data.UpdatePatch
 import com.kienhoang.dualsubreplay.data.UpdateReminder
+import com.kienhoang.dualsubreplay.data.applyUpdatePatch
 import com.kienhoang.dualsubreplay.data.contentRangeStart
 import com.kienhoang.dualsubreplay.data.isAllowedUpdateHost
 import com.kienhoang.dualsubreplay.data.isSameUpdateDownload
@@ -77,6 +79,10 @@ private const val UPDATE_FOLDER = "app-update"
 private const val UPDATE_APK = "update.apk"
 private const val UPDATE_PART = "update.apk.part"
 private const val UPDATE_RECORD = "update.json"
+
+/** A small patch (owner pick 2026-11-08) and the APK it rebuilds from the installed one, until checked. */
+private const val UPDATE_PATCH = "update.patch"
+private const val UPDATE_PATCHED = "update.apk.patched"
 
 /** A connection that drops mid-download is tried again after these waits, carrying on where it stopped. */
 private val DOWNLOAD_RETRY_DELAYS_MS = longArrayOf(2_000, 5_000)
@@ -172,7 +178,8 @@ internal object AppUpdater {
             .build()
     }
 
-    fun channel(context: Context): UpdateChannel = updateChannelFor(context.packageName, BuildConfig.DEBUG, BuildConfig.VERSION_NAME)
+    fun channel(context: Context): UpdateChannel =
+        updateChannelFor(context.packageName, BuildConfig.DEBUG, BuildConfig.VERSION_NAME, Build.SUPPORTED_ABIS.orEmpty().toList())
 
     /** Device tests show a dialog state without asking GitHub. */
     @VisibleForTesting
@@ -276,7 +283,7 @@ internal object AppUpdater {
         restored = true
         val reminders = remindersEnabled(app)
         val auto = autoUpdateEnabled(app)
-        val dailyCheck = (reminders || auto) && channel(app) != UpdateChannel.None && dailyCheckDue(app)
+        val dailyCheck = (reminders || auto) && canUpdateItself(channel(app)) && dailyCheckDue(app)
         if (!restore && !dailyCheck) return
         job =
             scope.launch {
@@ -290,7 +297,7 @@ internal object AppUpdater {
                     mutableReminder.value =
                         updateReminder(available.update, reminderMemory(app, preferences(app)), System.currentTimeMillis())
                 }
-                // About 34 MB: only on Wi-Fi or another unmetered network.
+                // Up to 25 MB when no patch fits: only on Wi-Fi or another unmetered network.
                 if (auto && unmetered(app)) downloadNow(app, available.update, asked = false)
             }
     }
@@ -468,7 +475,7 @@ internal object AppUpdater {
                     when (val channel = channel(context)) {
                         UpdateChannel.Official -> officialUpdate()
                         is UpdateChannel.Preview -> parsePreviewRelease(fetchText(UPDATE_PREVIEW_RELEASE_URL), channel)
-                        UpdateChannel.None -> null
+                        UpdateChannel.None, UpdateChannel.UnsupportedDevice -> null
                     }
                 when {
                     update == null -> {
@@ -563,6 +570,8 @@ internal object AppUpdater {
             apk.delete()
         }
         val part = File(folder, UPDATE_PART)
+        // A small patch first, unless a whole download was already under way.
+        if (part.length() == 0L) update.patch?.let { patch -> patchedApk(context, update, patch, expected, folder)?.let { return it } }
         if (downloadWithRetries(update, part) != expected) {
             throw UpdateException(UpdateProblem.CHECKSUM, "The download's SHA-256 does not match GitHub's")
         }
@@ -571,16 +580,55 @@ internal object AppUpdater {
         return apk
     }
 
+    /**
+     * The new APK rebuilt from the installed one with [patch], checked like a whole download; null when
+     * the patch cannot be used, so the whole APK is downloaded instead. Both files go either way.
+     */
+    private suspend fun patchedApk(
+        context: Context,
+        update: AppUpdate,
+        patch: UpdatePatch,
+        expected: String,
+        folder: File,
+    ): File? {
+        val patchFile = File(folder, UPDATE_PATCH)
+        val patched = File(folder, UPDATE_PATCHED)
+        return try {
+            val installed = context.applicationInfo
+            // An app installed in parts has no single APK to start from.
+            if (!installed.splitSourceDirs.isNullOrEmpty()) return null
+            if (downloadWithRetries(update, patchFile, patch.downloadUrl, patch.sizeBytes) != patch.sha256) {
+                throw IOException("The patch's SHA-256 does not match")
+            }
+            if (applyUpdatePatch(File(installed.sourceDir), patchFile, patched) != expected) {
+                throw IOException("The patched APK's SHA-256 does not match the release")
+            }
+            verifyArchive(context, patched)
+            val apk = File(folder, UPDATE_APK)
+            if (!patched.renameTo(apk)) throw IOException("Could not keep the patched APK")
+            apk
+        } catch (_: IOException) {
+            // Kept in the problem log; the whole download follows.
+            ProblemLog.record(ProblemArea.APP_UPDATE, "PATCH_FAILED")
+            null
+        } finally {
+            patchFile.delete()
+            patched.delete()
+        }
+    }
+
     /** A connection that drops after some bytes arrived is tried again; one that never connects is not. */
     private suspend fun downloadWithRetries(
         update: AppUpdate,
         part: File,
+        url: String = update.downloadUrl,
+        sizeBytes: Long = update.sizeBytes,
     ): String {
         var attempt = 0
         while (true) {
             val before = part.length()
             try {
-                return downloadTo(update, part)
+                return downloadTo(update, part, url, sizeBytes)
             } catch (error: IOException) {
                 val retry = error !is UpdateException && part.length() > before && attempt < DOWNLOAD_RETRY_DELAYS_MS.size
                 if (!retry) throw error
@@ -609,13 +657,15 @@ internal object AppUpdater {
     private fun downloadTo(
         update: AppUpdate,
         file: File,
+        url: String,
+        sizeBytes: Long,
     ): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        val have = keptBytes(update, file)
+        val have = keptBytes(sizeBytes, file)
         if (have > 0) digest.updateFrom(file)
         // Killed after the last byte, before the check: nothing is left to download.
-        if (have > 0 && have == update.sizeBytes) return digest.hex()
-        open(update.downloadUrl, from = have).use { response ->
+        if (have > 0 && have == sizeBytes) return digest.hex()
+        open(url, from = have).use { response ->
             val body = response.body ?: throw UpdateException(UpdateProblem.GITHUB_ERROR, "GitHub sent no file")
             val resumed = have > 0 && response.code == 206 && contentRangeStart(response.header("Content-Range")) == have
             if (response.code == 206 && !resumed) {
@@ -625,7 +675,7 @@ internal object AppUpdater {
             // GitHub sent the whole file again: start over.
             val start = if (resumed) have else 0L
             if (!resumed) digest.reset()
-            val total = body.contentLength().takeIf { it > 0 }?.plus(start) ?: update.sizeBytes.takeIf { it > 0 }
+            val total = body.contentLength().takeIf { it > 0 }?.plus(start) ?: sizeBytes.takeIf { it > 0 }
             if (total != null && total > MAX_UPDATE_BYTES) throw UpdateException(UpdateProblem.WRONG_APP, "The download is too big")
             body.byteStream().use { input ->
                 FileOutputStream(file, resumed).use { output -> copyWithProgress(input, output, digest, update, start, total) }
@@ -636,11 +686,11 @@ internal object AppUpdater {
 
     /** The bytes of an earlier try that can carry on; a part bigger than the APK can be is deleted. */
     private fun keptBytes(
-        update: AppUpdate,
+        sizeBytes: Long,
         file: File,
     ): Long {
         val have = file.length()
-        if (have <= MAX_UPDATE_BYTES && (update.sizeBytes <= 0 || have <= update.sizeBytes)) return have
+        if (have <= MAX_UPDATE_BYTES && (sizeBytes <= 0 || have <= sizeBytes)) return have
         file.delete()
         return 0
     }
@@ -876,6 +926,9 @@ internal object AppUpdater {
 
     fun remindersEnabled(context: Context): Boolean = preferences(context).getBoolean(UPDATE_REMINDERS_PREFERENCE, true)
 }
+
+/** Official and preview builds find newer versions of themselves; the others only open GitHub. */
+internal fun canUpdateItself(channel: UpdateChannel): Boolean = channel is UpdateChannel.Official || channel is UpdateChannel.Preview
 
 /** Android's answer to an install session [AppUpdater] committed. */
 class AppUpdateReceiver : BroadcastReceiver() {
