@@ -75,7 +75,8 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("word_highlight_switch").performScrollTo().assertIsDisplayed()
 
-        composeRule.onNodeWithTag("player_mode_scroll_friendly_overlay")
+        composeRule
+            .onNodeWithTag("player_mode_scroll_friendly_overlay")
             .performScrollTo()
             .performClick()
         composeRule.runOnIdle {
@@ -87,7 +88,8 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
         composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
         composeRule.onNodeWithText("Portrait panel position").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("portrait_panel_position_slider")
+        composeRule
+            .onNodeWithTag("portrait_panel_position_slider")
             .performSemanticsAction(SemanticsActions.SetProgress) { setProgress ->
                 setProgress(0.2f)
             }
@@ -111,25 +113,31 @@ class LearningPlayerUiTest {
         composeRule.onNodeWithTag("settings_section_colors").performScrollTo().performClick()
         composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
         composeRule.onNodeWithTag("custom_colors_switch").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("color_option_box_background_deep_teal")
+        composeRule
+            .onNodeWithTag("color_option_box_background_deep_teal")
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag("color_option_theme_accent_cyan")
+        composeRule
+            .onNodeWithTag("color_option_theme_accent_cyan")
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag("settings_section_word_learning").performScrollTo().performClick()
         composeRule.onNodeWithTag("word_learning_mode_switch").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("settings_section_overlay").performScrollTo().performClick()
-        composeRule.onNodeWithTag("auto_overlay_fullscreen_switch")
+        composeRule
+            .onNodeWithTag("auto_overlay_fullscreen_switch")
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag("auto_overlay_landscape_switch")
+        composeRule
+            .onNodeWithTag("auto_overlay_landscape_switch")
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag("auto_avoid_player_controls_switch")
+        composeRule
+            .onNodeWithTag("auto_avoid_player_controls_switch")
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag("remember_overlay_position_switch")
+        composeRule
+            .onNodeWithTag("remember_overlay_position_switch")
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag("reset_overlay_position").performScrollTo().assertIsDisplayed()
@@ -150,7 +158,11 @@ class LearningPlayerUiTest {
     fun pronunciationVolumeIsSavedFromWordLearningSettings() {
         val preferences =
             InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", 0)
-        preferences.edit().remove(PRONUNCIATION_VOLUME_PREFERENCE).commit()
+        preferences
+            .edit()
+            .remove(PRONUNCIATION_VOLUME_PREFERENCE)
+            .remove(PHONE_VOICE_PREFERENCE)
+            .commit()
         try {
             composeRule.setContent {
                 DualSubTheme {
@@ -180,9 +192,16 @@ class LearningPlayerUiTest {
             composeRule.runOnIdle {
                 assertEquals(1.5f, preferences.getFloat(PRONUNCIATION_VOLUME_PREFERENCE, 0f), 0f)
             }
+            // lion737 (#81) wanted a male voice: the phone's own voice replaces Google's online one.
+            composeRule.onNodeWithTag("phone_voice_switch").performScrollTo().performClick()
+            composeRule.runOnIdle { assertTrue(preferences.getBoolean(PHONE_VOICE_PREFERENCE, false)) }
             saveUiEvidence("pronunciation-volume-setting")
         } finally {
-            preferences.edit().remove(PRONUNCIATION_VOLUME_PREFERENCE).commit()
+            preferences
+                .edit()
+                .remove(PRONUNCIATION_VOLUME_PREFERENCE)
+                .remove(PHONE_VOICE_PREFERENCE)
+                .commit()
         }
     }
 
@@ -191,11 +210,12 @@ class LearningPlayerUiTest {
         composeRule.setContent {
             DualSubTheme {
                 LearningSubtitleOverlay(
-                    content = LearningOverlayContent(
-                        originalText = "What will we discuss?",
-                        translatedText = "Chúng ta sẽ thảo luận gì?",
-                        statusText = null,
-                    ),
+                    content =
+                        LearningOverlayContent(
+                            originalText = "What will we discuss?",
+                            translatedText = "Chúng ta sẽ thảo luận gì?",
+                            statusText = null,
+                        ),
                     fontScale = 1f,
                     onSettings = {},
                     onClose = {},

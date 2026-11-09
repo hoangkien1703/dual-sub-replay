@@ -190,6 +190,12 @@ internal enum class SearchableSetting(
         "pronunciation_volume",
         setOf(PRONUNCIATION_VOLUME_PREFERENCE),
     ),
+    PHONE_VOICE(
+        R.string.settings_phone_voice_title,
+        MoreSettingsSection.WORD_LEARNING,
+        "phone_voice_switch",
+        setOf(PHONE_VOICE_PREFERENCE),
+    ),
     WORD_LEARNING_MODE(
         R.string.settings_word_learning_mode_title,
         MoreSettingsSection.WORD_LEARNING,

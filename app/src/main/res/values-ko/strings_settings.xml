@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">자막에서 단어를 탭하거나 뜻을 열면 그 단어를 읽어 줘요.</string>
     <string name="settings_pronunciation_volume_title">발음 음량: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%%는 휴대폰의 미디어 음량을 따라요. 더 높이면 단어를 그보다 크게 읽어 줘요.</string>
+    <string name="settings_phone_voice_title">휴대폰 음성 사용</string>
+    <string name="settings_phone_voice_description">단어 읽기와 Anki 단어 음성에 Google 온라인 음성 대신 Android 텍스트 음성 변환 설정에서 고른 음성(남성 또는 여성)을 사용합니다.</string>
     <string name="settings_word_learning_mode_title">단어 학습 모드(품사별 색상)</string>
     <string name="settings_word_learning_mode_description">문법 역할(명사, 동사, 형용사, 조사)에 따라 단어에 색을 입혀 문장 구조를 보여 줘요.</string>
     <string name="settings_colored_lines_title">색상을 입힐 자막 줄</string>

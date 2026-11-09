@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Speak a word when you tap it in the subtitles or open its definition.</string>
     <string name="settings_pronunciation_volume_title">Pronunciation volume: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% follows your phone’s media volume. Higher plays words louder than that.</string>
+    <string name="settings_phone_voice_title">Use the phone\'s voice</string>
+    <string name="settings_phone_voice_description">Speak words, and record Anki word audio, in the voice picked in Android\'s text-to-speech settings (male or female) instead of Google\'s online voice.</string>
     <string name="settings_word_learning_mode_title">Word learning mode (POS colors)</string>
     <string name="settings_word_learning_mode_description">Color words by grammatical role (nouns, verbs, adjectives, particles) to see sentence structure.</string>
     <string name="settings_colored_lines_title">Colored subtitle lines</string>

@@ -27,7 +27,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 
-internal class WordPronouncer(context: Context) {
+internal class WordPronouncer(
+    context: Context,
+) {
     private val application = context.applicationContext
 
     // The activity's resources show the chosen interface language; the application's may not before Android 13.
@@ -43,23 +45,27 @@ internal class WordPronouncer(context: Context) {
     var showSpeechSettings by mutableStateOf(false)
         private set
 
-    fun speak(word: String, language: String) {
+    fun speak(
+        word: String,
+        language: String,
+    ) {
         if (disposed || word.isBlank()) return
         stop()
         if (cache.lookup(word, language) == null) message = resources.getString(R.string.practice_preparing_pronunciation)
-        speech = scope.launch {
-            val result = pronounce(word, language)
-            lastResult = result
-            showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
-            message =
-                when (result) {
-                    PronunciationResult.SPOKEN -> null
-                    PronunciationResult.NO_VOICE -> resources.getString(R.string.practice_speech_no_voice)
-                    PronunciationResult.UNAVAILABLE -> resources.getString(R.string.practice_speech_unavailable)
-                    PronunciationResult.PLAYBACK_FAILED -> resources.getString(R.string.practice_speech_playback_failed)
-                    PronunciationResult.INVALID_LANGUAGE -> resources.getString(R.string.practice_speech_invalid_language)
-                }
-        }
+        speech =
+            scope.launch {
+                val result = pronounce(word, language)
+                lastResult = result
+                showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
+                message =
+                    when (result) {
+                        PronunciationResult.SPOKEN -> null
+                        PronunciationResult.NO_VOICE -> resources.getString(R.string.practice_speech_no_voice)
+                        PronunciationResult.UNAVAILABLE -> resources.getString(R.string.practice_speech_unavailable)
+                        PronunciationResult.PLAYBACK_FAILED -> resources.getString(R.string.practice_speech_playback_failed)
+                        PronunciationResult.INVALID_LANGUAGE -> resources.getString(R.string.practice_speech_invalid_language)
+                    }
+            }
     }
 
     /**
@@ -78,7 +84,8 @@ internal class WordPronouncer(context: Context) {
      * Replays the recorded speech when [word] was the last word pronounced. Otherwise records it to
      * a file, keeps that file for the next replay and plays it; engines that cannot record speak it
      * directly instead. While Google translates subtitles, every language is first fetched from
-     * Google's online voice; the phone's voices are the fallback.
+     * Google's online voice, unless the learner picked the phone's voice; the phone's voices are the
+     * fallback.
      */
     private suspend fun pronounce(
         word: String,
@@ -88,7 +95,7 @@ internal class WordPronouncer(context: Context) {
         cache.lookup(word, language)?.let { audio ->
             if (withTimeoutOrNull(15_000) { playSpeechFile(audio, volume) } == true) return PronunciationResult.SPOKEN
         }
-        if (speaksWithGoogle(word, language, translationEngine())) {
+        if (!readPhoneVoice(application) && speaksWithGoogle(word, language, translationEngine())) {
             val online = cache.prepare(word, language, extension = "mp3")
             if (googleSpeech.record(word, language, online)) {
                 cache.markReady()

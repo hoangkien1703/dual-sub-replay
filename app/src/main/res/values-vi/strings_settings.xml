@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Đọc to một từ khi bạn chạm vào nó trong phụ đề hoặc mở phần định nghĩa.</string>
     <string name="settings_pronunciation_volume_title">Âm lượng phát âm: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% theo âm lượng phương tiện của điện thoại. Cao hơn sẽ đọc từ to hơn mức đó.</string>
+    <string name="settings_phone_voice_title">Dùng giọng của điện thoại</string>
+    <string name="settings_phone_voice_description">Đọc từ và ghi âm thanh từ cho thẻ Anki bằng giọng đã chọn trong cài đặt chuyển văn bản thành giọng nói của Android (nam hoặc nữ), thay vì giọng trực tuyến của Google.</string>
     <string name="settings_word_learning_mode_title">Chế độ học từ (màu theo từ loại)</string>
     <string name="settings_word_learning_mode_description">Tô màu từ theo vai trò ngữ pháp (danh từ, động từ, tính từ, trợ từ) để thấy cấu trúc câu.</string>
     <string name="settings_colored_lines_title">Dòng phụ đề được tô màu</string>

@@ -96,3 +96,7 @@ Implementation notes:
 lion737 reported (discussion #81, 2026-11-09) cards whose Sentence audio stayed empty. The app's WebView keeps `mediaPlaybackRequiresUserGesture` on, so the recorder's audio context stays suspended until a tap inside the YouTube page; taps on the app's own controls and subtitle list don't count, and the 60 s pause rest made it worse. `LineAudioWebViewTest` had turned the rule off, so CI missed it.
 
 Fix: `ensure` also reports whether the video plays. When the context is suspended while the video plays, `LineAudioPageScripts` lifts the rule for about half a second, runs `ensure` again (which resumes the context) and puts the rule back (`wakeLineAudio`, at most every 10 s). The video already plays, so nothing else can start in that moment. New device test: the recorder under the tap rule is asleep, wakes, and then records a line.
+
+## Follow-up: the phone's voice for words
+
+lion737 also asked to switch the word voice to a male one. While Google translates subtitles, the word card and Anki word audio used Google's online voice (female), so the voice picked in Android's text-to-speech settings was ignored. Owner pick 2026-11-09: a setting, not an in-app voice list. Settings → Word learning → **Use the phone's voice** (off by default, `phone_voice`): words are spoken and recorded for Anki with the phone's own voice. It sits next to Pronunciation volume because it changes the word card too. The AI assistant can switch it, Settings search finds it, and Reset all settings clears it. All 9 interface languages.

@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Ucapkan kata saat Anda mengetuknya di subtitel atau membuka definisinya.</string>
     <string name="settings_pronunciation_volume_title">Volume pengucapan: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% mengikuti volume media ponsel. Lebih tinggi membuat kata terdengar lebih keras dari itu.</string>
+    <string name="settings_phone_voice_title">Gunakan suara ponsel</string>
+    <string name="settings_phone_voice_description">Ucapkan kata, dan rekam audio kata Anki, dengan suara yang dipilih di setelan teks ke ucapan Android (pria atau wanita), bukan suara online Google.</string>
     <string name="settings_word_learning_mode_title">Mode belajar kata (warna kelas kata)</string>
     <string name="settings_word_learning_mode_description">Warnai kata menurut peran tata bahasanya (kata benda, kata kerja, kata sifat, partikel) untuk melihat struktur kalimat.</string>
     <string name="settings_colored_lines_title">Baris subtitel berwarna</string>

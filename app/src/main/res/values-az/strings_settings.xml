@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Altyazılarda sözə toxunanda və ya onun izahını açanda sözü səsləndirir.</string>
     <string name="settings_pronunciation_volume_title">Tələffüz səsi: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% telefonunuzun media səsinə uyğundur. Daha yüksək dəyər sözləri ondan ucadan oxudur.</string>
+    <string name="settings_phone_voice_title">Telefonun səsindən istifadə et</string>
+    <string name="settings_phone_voice_description">Sözləri və Anki söz səsini Google-un onlayn səsi əvəzinə Android-in mətndən nitqə ayarlarında seçilmiş səslə (kişi və ya qadın) oxu.</string>
     <string name="settings_word_learning_mode_title">Söz öyrənmə rejimi (nitq hissəsi rəngləri)</string>
     <string name="settings_word_learning_mode_description">Cümlə quruluşunu görmək üçün sözləri qrammatik roluna görə (isimlər, fellər, sifətlər, ədatlar) rəngləyir.</string>
     <string name="settings_colored_lines_title">Rəngli altyazı sətirləri</string>

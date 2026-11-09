@@ -1149,6 +1149,7 @@ private fun WordLearningSettings(
         testTag = "auto_pronounce_switch",
     )
     PronunciationVolumeSetting()
+    PhoneVoiceSetting()
     SettingsSwitchRow(
         title = stringResource(R.string.settings_word_learning_mode_title),
         description = stringResource(R.string.settings_word_learning_mode_description),
@@ -1228,6 +1229,33 @@ private fun PronunciationVolumeSetting() {
             modifier = Modifier.tvArrowsLeave().testTag("pronunciation_volume_slider"),
         )
     }
+}
+
+/** Google's online voice or the phone's own voice for spoken words and Anki word audio. */
+@Composable
+private fun PhoneVoiceSetting() {
+    val context = LocalContext.current
+    val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
+    var phoneVoice by remember { mutableStateOf(readPhoneVoice(context)) }
+    DisposableEffect(preferences) {
+        // "Reset all settings" and the AI assistant change the key while this section is open.
+        val listener =
+            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == PHONE_VOICE_PREFERENCE || key == null) phoneVoice = readPhoneVoice(context)
+            }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+    SettingsSwitchRow(
+        title = stringResource(R.string.settings_phone_voice_title),
+        description = stringResource(R.string.settings_phone_voice_description),
+        checked = phoneVoice,
+        onCheckedChange = {
+            phoneVoice = it
+            preferences.edit().putBoolean(PHONE_VOICE_PREFERENCE, it).apply()
+        },
+        testTag = "phone_voice_switch",
+    )
 }
 
 @Composable
