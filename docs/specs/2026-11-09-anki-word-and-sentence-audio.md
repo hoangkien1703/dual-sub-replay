@@ -93,9 +93,7 @@ Implementation notes:
 
 ## Follow-up: empty Sentence audio in v1.8.29
 
-lion737 reported (discussion #81, 2026-11-09) cards whose Sentence audio stayed empty. The app's WebView keeps `mediaPlaybackRequiresUserGesture` on, so the recorder's audio context stays suspended until a tap inside the YouTube page; taps on the app's own controls and subtitle list don't count, and the 60 s pause rest made it worse. `LineAudioWebViewTest` had turned the rule off, so CI missed it.
-
-Fix: `ensure` also reports whether the video plays. When the context is suspended while the video plays, `LineAudioPageScripts` lifts the rule for about half a second, runs `ensure` again (which resumes the context) and puts the rule back (`wakeLineAudio`, at most every 10 s). The video already plays, so nothing else can start in that moment. New device test: the recorder under the tap rule is asleep, wakes, and then records a line.
+lion737 reported (discussion #81, 2026-11-09) a card whose Sentence audio stayed empty. First guess: the WebView's `mediaPlaybackRequiresUserGesture` keeps the recorder's audio context suspended. CI disproved it: under that rule the context runs in the main frame (Chromium applies the tap rule to Web Audio only in cross-origin frames). The wake code was removed again; `LineAudioWebViewTest` now keeps the rule on, as the app does, so this stays checked. Cause still open: next step is a real YouTube video in the emulator's WebView and a phone test.
 
 ## Follow-up: the phone's voice for words
 

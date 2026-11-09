@@ -38,9 +38,8 @@ internal fun webLineAudioScript(
  * a Web Audio script node copies the last [LINE_AUDIO_KEPT_MS] of played sound into memory,
  * stamped with the video's time, and writes silence. Paused, seeking, buffering and ad time is
  * skipped. It never changes the video, its volume, its speed or any request. Under WebView's
- * "user gesture" rule the audio context stays suspended until a tap inside the page (taps on the
- * app's own controls don't count), so it also starts on the page's next touch, and
- * [LineAudioPageScripts] wakes it while the video plays (see [lineAudioRecorderAsleep]).
+ * "user gesture" rule an audio context may wait for a tap in the page, so the recorder also
+ * starts on the page's next touch.
  */
 private val WEB_LINE_AUDIO_RECORDER =
     """
@@ -117,7 +116,7 @@ private val WEB_LINE_AUDIO_RECORDER =
           state.pausedAt = 0;
           resume();
         }
-        return JSON.stringify({ state: state.context.state, playing: !!(video && !video.paused && !video.ended), rate: state.context.sampleRate, track: !!state.track, seconds: state.samples / state.context.sampleRate });
+        return JSON.stringify({ state: state.context.state, rate: state.context.sampleRate, track: !!state.track, seconds: state.samples / state.context.sampleRate });
       },
       clip: function(videoId, startSecond, endSecond, lineEnd) {
         if (videoId !== state.videoId || !state.context || !(endSecond > startSecond)) return null;

@@ -76,18 +76,6 @@ class LineAudioTest {
     }
 
     @Test
-    fun aRecorderIsAsleepOnlyWhenItsContextIsSuspendedWhileTheVideoPlays() {
-        fun reply(json: String) = JSONObject.quote(json)
-        assertTrue(lineAudioRecorderAsleep(reply("""{"state":"suspended","playing":true,"rate":24000}""")))
-        assertFalse(lineAudioRecorderAsleep(reply("""{"state":"running","playing":true}""")))
-        // A paused video lets the recorder rest on purpose.
-        assertFalse(lineAudioRecorderAsleep(reply("""{"state":"suspended","playing":false}""")))
-        assertFalse(lineAudioRecorderAsleep(JSONObject.quote("off")))
-        assertFalse(lineAudioRecorderAsleep("null"))
-        assertFalse(lineAudioRecorderAsleep(null))
-    }
-
-    @Test
     fun waitingCardsSurviveAsTextAndOldOnesGo() {
         val line = audioLine("abcdefghijk", 1_000, 2_000)!!
         val first = PendingCardAudio(PENDING_ANKIDROID, 7, line, ANKI_SENTENCE_AUDIO_FIELD, "", 100)

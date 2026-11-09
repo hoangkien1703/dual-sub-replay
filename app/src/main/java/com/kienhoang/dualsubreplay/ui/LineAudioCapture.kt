@@ -21,13 +21,11 @@ import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.audioLineOf
 import com.kienhoang.dualsubreplay.data.lineAudioReady
-import com.kienhoang.dualsubreplay.data.lineAudioRecorderAsleep
 import com.kienhoang.dualsubreplay.data.parseLinePcm
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -45,12 +43,6 @@ private const val LINE_AUDIO_RETRY_MS = 5_000L
 private const val PENDING_AUDIO_RETRY_MS = 60_000L
 
 private const val LINE_AUDIO_PRUNE_MS = 60 * 60 * 1000L
-
-/** How long a changed WebView setting takes to reach the page. */
-private const val LINE_AUDIO_WAKE_SETTLE_MS = 300L
-
-/** A recorder that stays asleep after a wake isn't woken again sooner than this. */
-private const val LINE_AUDIO_WAKE_RETRY_MS = 10_000L
 
 /**
  * Connects the page recorder (which needs the one WebView) to Send to (which needs a clip now):
@@ -156,20 +148,13 @@ internal fun LineAudioPageScripts(
         val vocabulary = VocabularyRepository.get(context)
         val tried = HashMap<AudioLine, Long>()
         var lastPrune = 0L
-        var lastWake = 0L
         val capture: suspend (AudioLine) -> File? = { line -> captureLine(webView, clips, line) }
         val token = LineAudioBridge.bind(capture)
         try {
             while (isActive) {
                 val url = webView.url.orEmpty()
                 val videoId = browseVideoSelection(url)?.videoId?.takeIf { isYouTubeWebUrl(url) }
-                if (videoId != null && lineAudioRecorderAsleep(evaluate(webView, webLineAudioScript(on = true, videoId = videoId)))) {
-                    val now = SystemClock.elapsedRealtime()
-                    if (now - lastWake > LINE_AUDIO_WAKE_RETRY_MS) {
-                        lastWake = now
-                        wakeLineAudio(webView, videoId)
-                    }
-                }
+                if (videoId != null) webView.evaluateJavascript(webLineAudioScript(on = true, videoId = videoId), null)
                 val playback = WebVideoBridge.playback.value?.takeIf { it.videoId == videoId }
                 val waiting = withContext(Dispatchers.IO) { pending.all() }
                 if (playback != null) {
@@ -207,39 +192,6 @@ internal fun lineAudioWanted(
     ankiDroidInstalled: Boolean,
 ): Boolean = settings.ankiDroid && settings.cardAudio && (ankiDroidInstalled || settings.sendTo == FlashcardApp.ANKICONNECT)
 
-/**
- * Wakes a recorder that WebView's tap rule keeps asleep (v1.8.29 cards came without their sentence
- * sound when the learner only used the app's own controls). The video already plays, so nothing
- * else can start: the rule is lifted for a moment, the recorder resumes its audio context, and the
- * rule is put back.
- */
-internal suspend fun wakeLineAudio(
-    webView: WebView,
-    videoId: String,
-) = withContext(Dispatchers.Main) {
-    val settings = webView.settings
-    if (!settings.mediaPlaybackRequiresUserGesture) return@withContext
-    settings.mediaPlaybackRequiresUserGesture = false
-    try {
-        // The setting reaches the page on its own, a little after it is set.
-        delay(LINE_AUDIO_WAKE_SETTLE_MS)
-        evaluate(webView, webLineAudioScript(on = true, videoId = videoId))
-        delay(LINE_AUDIO_WAKE_SETTLE_MS)
-    } finally {
-        settings.mediaPlaybackRequiresUserGesture = true
-    }
-}
-
-private suspend fun evaluate(
-    webView: WebView,
-    script: String,
-): String? =
-    withContext(Dispatchers.Main) {
-        suspendCancellableCoroutine { continuation ->
-            webView.evaluateJavascript(script) { value -> if (continuation.isActive) continuation.resume(value) }
-        }
-    }
-
 /** Cuts [line] from the page's recorded sound and keeps it as a clip; null when the page doesn't hold all of it. */
 private suspend fun captureLine(
     webView: WebView,
@@ -251,7 +203,9 @@ private suspend fun captureLine(
         withContext(Dispatchers.Main) {
             val url = webView.url.orEmpty()
             if (!isYouTubeWebUrl(url) || browseVideoSelection(url)?.videoId != line.videoId) return@withContext null
-            evaluate(webView, webLineAudioClipScript(line))
+            suspendCancellableCoroutine<String?> { continuation ->
+                webView.evaluateJavascript(webLineAudioClipScript(line)) { value -> if (continuation.isActive) continuation.resume(value) }
+            }
         } ?: return null
     val pcm = withContext(Dispatchers.Default) { parseLinePcm(raw) } ?: return null
     return withContext(Dispatchers.IO) { if (clips.save(line, pcm)) clips.file(line) else null }

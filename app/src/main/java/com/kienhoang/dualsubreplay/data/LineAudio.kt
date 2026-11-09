@@ -104,21 +104,6 @@ internal fun parseLinePcm(rawValue: String?): LinePcm? {
     }
 }
 
-/**
- * True when the page recorder's answer to `ensure` says its audio context is suspended while the
- * page video plays: WebView's tap rule held it back, so nothing is being recorded.
- */
-internal fun lineAudioRecorderAsleep(rawValue: String?): Boolean {
-    if (rawValue.isNullOrBlank()) return false
-    return try {
-        val text = JSONTokener(rawValue).nextValue() as? String ?: return false
-        val reply = JSONObject(text)
-        reply.optString("state") == "suspended" && reply.optBoolean("playing")
-    } catch (_: JSONException) {
-        false
-    }
-}
-
 /** Writes [pcm] as AAC in an MPEG-4 file ([out], usually `.m4a`), which AnkiDroid, Anki and AnkiMobile all play. */
 internal fun encodeM4a(
     pcm: LinePcm,
