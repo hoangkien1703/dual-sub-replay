@@ -94,7 +94,7 @@ class DictationUiTest {
         showPanel(withFirstLineRevealed())
         composeRule.onNodeWithText("It was the first snowfall of the year.").assertIsDisplayed()
         composeRule.onNodeWithText("We begin to make a snowman.").assertDoesNotExist()
-        assertEquals(3, composeRule.onAllNodesWithTag("dictation_hidden_line").fetchSemanticsNodes().size)
+        assertEquals(3, composeRule.onAllNodesWithTag("dictation_hidden_line", useUnmergedTree = true).fetchSemanticsNodes().size)
         composeRule.onNodeWithTag("dictation_check").assertIsNotEnabled()
 
         composeRule.onNodeWithTag("dictation_answer").performTextInput("we begin make snowman")
@@ -105,7 +105,7 @@ class DictationUiTest {
         composeRule.onNodeWithText("4 of 6 right").assertIsDisplayed()
         composeRule.onNodeWithText("We begin to make a snowman.").assertIsDisplayed()
         composeRule.onNodeWithText("Chúng tôi bắt đầu đắp người tuyết.").assertIsDisplayed()
-        assertEquals(2, composeRule.onAllNodesWithTag("dictation_hidden_line").fetchSemanticsNodes().size)
+        assertEquals(2, composeRule.onAllNodesWithTag("dictation_hidden_line", useUnmergedTree = true).fetchSemanticsNodes().size)
         saveEvidence("dictation-checked")
 
         composeRule.onNodeWithTag("dictation_replay").performClick()
