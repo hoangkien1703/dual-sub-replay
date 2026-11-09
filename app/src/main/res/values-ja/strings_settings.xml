@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">色とテーマ</string>
     <string name="settings_section_colors_summary">字幕の色、オーバーレイの背景、アプリの色とアクセント</string>
     <string name="settings_section_word_learning_title">単語学習</string>
-    <string name="settings_section_word_learning_summary">単語の色分け、タップで意味表示、発音</string>
+    <string name="settings_section_word_learning_summary">単語の色分け、タップで意味表示、発音、既知の単語</string>
     <string name="settings_section_overlay_title">オーバーレイと全画面</string>
     <string name="settings_section_overlay_summary">自動オーバーレイ、ドラッグ、保存した位置</string>
     <string name="settings_section_translation_title">字幕と翻訳</string>

@@ -54,7 +54,7 @@ class StudyToolsUiTest {
             .commit()
     }
 
-    private fun showSettings() {
+    private fun showSettings(section: String = "settings_section_study") {
         composeRule.setContent {
             DualSubTheme {
                 SubtitleSettingsDialog(
@@ -71,7 +71,7 @@ class StudyToolsUiTest {
                 )
             }
         }
-        composeRule.onNodeWithTag("settings_section_study").performScrollTo().performClick()
+        composeRule.onNodeWithTag(section).performScrollTo().performClick()
     }
 
     @Test
@@ -92,29 +92,48 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("study_repeat_3").performScrollTo().performClick()
         composeRule.onNodeWithTag("skip_silence_2x").performScrollTo().performClick()
         composeRule.onNodeWithTag("blur_box_switch").performScrollTo().performClick()
-        composeRule.onNodeWithTag("kanji_details_switch").performScrollTo().performClick()
         composeRule.runOnIdle {
             assertEquals("repeat_line", preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null))
             assertEquals(3, preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, 0))
             assertEquals("2x", preferences.getString(SKIP_SILENCE_PREFERENCE, null))
             assertTrue(preferences.getBoolean(BLUR_BOX_PREFERENCE, false))
-            assertFalse("Kanji details is on until turned off", preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true))
         }
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
         saveUiEvidence("study-tools-settings")
+        // Page tokens: Automatic by default, then On.
+        composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
+        composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
+        saveUiEvidence("study-tools-settings-lower")
+        // Send to and card audio moved to their own section (owner pick 2026-11-09).
+        assertTrue(composeRule.onAllNodes(hasTestTag("ankidroid_switch")).fetchSemanticsNodes().isEmpty())
+        assertTrue(composeRule.onAllNodes(hasTestTag("known_words_off")).fetchSemanticsNodes().isEmpty())
+    }
 
+    @Test
+    fun wordLearningHoldsKnownWordsAndCharacterDetails() {
+        showSettings("settings_section_word_learning")
+        composeRule.onNodeWithTag("kanji_details_switch").performScrollTo().performClick()
+        composeRule.runOnIdle {
+            assertFalse("Kanji details is on until turned off", preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true))
+        }
         // Known words is off at first; Automatic shows its count, and Mark new words goes with Known words.
         assertTrue(composeRule.onAllNodes(hasTestTag("mark_new_words_switch")).fetchSemanticsNodes().isEmpty())
         composeRule.onNodeWithTag("known_words_auto").performScrollTo().performClick()
         composeRule.onNodeWithTag("known_words_after_10").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("known_words_after_20").performScrollTo().performClick()
         composeRule.onNodeWithTag("mark_new_words_switch").performScrollTo().assertIsDisplayed()
+        saveUiEvidence("word-learning-known-words")
         composeRule.onNodeWithTag("known_words_off").performScrollTo().performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag("mark_new_words_switch")).fetchSemanticsNodes().isEmpty() }
         composeRule.runOnIdle {
             assertEquals("off", preferences.getString(KNOWN_WORDS_PREFERENCE, null))
             assertEquals(20, preferences.getInt(KNOWN_WORDS_AFTER_PREFERENCE, 0))
         }
+    }
+
+    @Test
+    fun flashcardsAndAnkiHoldsSendToAndCardAudio() {
+        showSettings("settings_section_flashcards")
         // Send to: AnkiDroid by default; AnkiConnect adds its deck choice.
         composeRule.onNodeWithTag("send_to_app_ankiconnect").performScrollTo().performClick()
         composeRule.onNodeWithTag("ankiconnect_choose_deck").performScrollTo().assertIsDisplayed()
@@ -124,10 +143,6 @@ class StudyToolsUiTest {
         saveUiEvidence("study-tools-send-to-settings")
         composeRule.onNodeWithTag("card_audio_switch").performClick()
         composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_AUDIO_PREFERENCE, true)) }
-        // Page tokens: Automatic by default, then On.
-        composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
-        composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
-        saveUiEvidence("study-tools-settings-lower")
     }
 
     @Test

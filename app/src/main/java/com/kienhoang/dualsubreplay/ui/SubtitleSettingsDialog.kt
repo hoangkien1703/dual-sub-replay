@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.TextFields
@@ -132,6 +133,9 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_word_learning_summary,
     ),
     STUDY("study", R.string.settings_section_study_title, R.string.settings_section_study_summary),
+
+    /** Send to and card audio, out of Study tools (owner pick 2026-11-09). */
+    FLASHCARDS("flashcards", R.string.settings_section_flashcards_title, R.string.settings_section_flashcards_summary),
     OVERLAY("overlay", R.string.settings_section_overlay_title, R.string.settings_section_overlay_summary),
     COLORS("colors", R.string.settings_section_colors_title, R.string.settings_section_colors_summary),
     TABS("tabs", R.string.settings_section_tabs_title, R.string.settings_section_tabs_summary),
@@ -873,10 +877,15 @@ internal fun SubtitleSettingsDialog(
                                         wordLearningActiveOnly = wordLearningActiveOnly,
                                         onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
                                     )
+                                    KnownWordsAndCharacterSettings()
                                 }
 
                                 Section(MoreSettingsSection.STUDY, Icons.Default.AutoStories) {
                                     StudyToolsSettingsSection()
+                                }
+
+                                Section(MoreSettingsSection.FLASHCARDS, Icons.Default.Style) {
+                                    FlashcardSettingsSection()
                                 }
 
                                 Section(MoreSettingsSection.OVERLAY, Icons.Default.Fullscreen) {

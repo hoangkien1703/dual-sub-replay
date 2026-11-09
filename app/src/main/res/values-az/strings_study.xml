@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_study_title">Öyrənmə alətləri</string>
-    <string name="settings_section_study_summary">Oynatma rejimləri, sükutu ötürmə, bildiyim sözlər, Göndər, bulanıq qutu</string>
+    <string name="settings_section_study_summary">Oynatma rejimləri, sükutu ötürmə, təkrar düyməsi, bulanıq qutu</string>
+    <string name="settings_section_flashcards_title">Fləşkartlar və Anki</string>
+    <string name="settings_section_flashcards_summary">AnkiDroid və ya AnkiConnect-ə göndər, kart səsi</string>
     <string name="study_play_mode_title">Oynatma rejimi</string>
     <string name="study_play_mode_normal">Adi</string>
     <string name="study_play_mode_normal_description">Video həmişəki kimi oynayır.</string>
@@ -99,7 +101,7 @@
     <string name="study_known_words_after_title">Sözü bu qədər gördükdən sonra bilinən say</string>
     <string name="study_word_seen">%2$d dəfədən %1$d dəfə görülüb</string>
     <string name="study_known_words_offer_title">Bildiyim sözlər yandırılsın?</string>
-    <string name="study_known_words_offer_message">Bundan sonra altyazı paneli hər videonun nə qədərini artıq bildiyinizi göstərir, tez-tez gördüyünüz sözlər isə özü bilinən sayılır. Bunu sonra Ayarlar → Öyrənmə alətləri bölməsində dəyişə bilərsiniz.</string>
+    <string name="study_known_words_offer_message">Bundan sonra altyazı paneli hər videonun nə qədərini artıq bildiyinizi göstərir, tez-tez gördüyünüz sözlər isə özü bilinən sayılır. Bunu sonra Ayarlar → Söz öyrənmə bölməsində dəyişə bilərsiniz.</string>
     <string name="study_known_words_offer_confirm">Yandır</string>
     <string name="study_known_words_offer_dismiss">İndi yox</string>
     <string name="study_loop_button_title">Oynayan sətirdə dövr düyməsi</string>

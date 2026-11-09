@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Cores e tema</string>
     <string name="settings_section_colors_summary">Cores das legendas, fundo da sobreposição, cores e destaque do app</string>
     <string name="settings_section_word_learning_title">Aprendizado de palavras</string>
-    <string name="settings_section_word_learning_summary">Cores das palavras, toque para ver o significado, pronúncia</string>
+    <string name="settings_section_word_learning_summary">Cores das palavras, toque para ver o significado, pronúncia, palavras conhecidas</string>
     <string name="settings_section_overlay_title">Sobreposição e tela cheia</string>
     <string name="settings_section_overlay_summary">Sobreposição automática, arrastar, posições salvas</string>
     <string name="settings_section_translation_title">Legendas e tradução</string>

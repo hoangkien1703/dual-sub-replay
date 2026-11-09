@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">颜色与主题</string>
     <string name="settings_section_colors_summary">字幕颜色、悬浮层背景、应用颜色和强调色</string>
     <string name="settings_section_word_learning_title">单词学习</string>
-    <string name="settings_section_word_learning_summary">单词着色、点按查看释义、发音</string>
+    <string name="settings_section_word_learning_summary">单词着色、点按查看释义、发音、已认识的词</string>
     <string name="settings_section_overlay_title">悬浮层与全屏</string>
     <string name="settings_section_overlay_summary">自动悬浮层、拖动、已保存的位置</string>
     <string name="settings_section_translation_title">字幕与翻译</string>

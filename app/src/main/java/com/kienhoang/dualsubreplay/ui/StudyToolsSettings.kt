@@ -41,7 +41,7 @@ import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import kotlinx.coroutines.launch
 
-/** More settings → Study tools: play modes, skip silence, known words, Send to, blur box and page tokens. */
+/** More settings → Study tools: play modes, loop button, skip silence, blur box and page tokens. */
 @Composable
 internal fun StudyToolsSettingsSection() {
     val context = LocalContext.current
@@ -65,6 +65,30 @@ internal fun StudyToolsSettingsSection() {
     SettingsSectionDivider()
     SkipSilenceSettings(settings.skipSilence) { skip -> preferences.edit().putString(SKIP_SILENCE_PREFERENCE, skip.storageValue).apply() }
     SettingsSectionDivider()
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_blur_box_title),
+        description = stringResource(R.string.study_blur_box_description),
+        checked = settings.blurBox,
+        onCheckedChange = { preferences.edit().putBoolean(BLUR_BOX_PREFERENCE, it).apply() },
+        testTag = "blur_box_switch",
+    )
+    PageTokenSettings(settings.pageTokenCaptions) { mode ->
+        // A new choice starts over: Automatic learns again whether YouTube wants a token.
+        preferences
+            .edit()
+            .putString(PAGE_TOKEN_CAPTIONS_PREFERENCE, mode.storageValue)
+            .remove(PAGE_TOKEN_NEEDED_PREFERENCE)
+            .apply()
+    }
+}
+
+/** More settings → Word learning, after the word settings: known words and character details (owner pick 2026-11-09). */
+@Composable
+internal fun KnownWordsAndCharacterSettings() {
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
+    val settings by rememberStudySettings()
+    SettingsSectionDivider()
     KnownWordsSettings(
         settings = settings,
         onModeChange = { mode -> preferences.edit().putString(KNOWN_WORDS_PREFERENCE, mode.storageValue).apply() },
@@ -80,7 +104,21 @@ internal fun StudyToolsSettingsSection() {
         )
     }
     KnownWordsCountRow()
-    SettingsSectionDivider()
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_kanji_details_title),
+        description = stringResource(R.string.study_kanji_details_description),
+        checked = settings.kanjiDetails,
+        onCheckedChange = { preferences.edit().putBoolean(KANJI_DETAILS_PREFERENCE, it).apply() },
+        testTag = "kanji_details_switch",
+    )
+}
+
+/** More settings → Flashcards & Anki: Send to and card audio (owner pick 2026-11-09). */
+@Composable
+internal fun FlashcardSettingsSection() {
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
+    val settings by rememberStudySettings()
     SettingsSwitchRow(
         title = stringResource(R.string.study_anki_title),
         description = stringResource(R.string.study_anki_description),
@@ -110,28 +148,6 @@ internal fun StudyToolsSettingsSection() {
         if (settings.cardAudio && recorder.isNotEmpty()) {
             Text(recorder, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }
-    SettingsSwitchRow(
-        title = stringResource(R.string.study_blur_box_title),
-        description = stringResource(R.string.study_blur_box_description),
-        checked = settings.blurBox,
-        onCheckedChange = { preferences.edit().putBoolean(BLUR_BOX_PREFERENCE, it).apply() },
-        testTag = "blur_box_switch",
-    )
-    SettingsSwitchRow(
-        title = stringResource(R.string.study_kanji_details_title),
-        description = stringResource(R.string.study_kanji_details_description),
-        checked = settings.kanjiDetails,
-        onCheckedChange = { preferences.edit().putBoolean(KANJI_DETAILS_PREFERENCE, it).apply() },
-        testTag = "kanji_details_switch",
-    )
-    PageTokenSettings(settings.pageTokenCaptions) { mode ->
-        // A new choice starts over: Automatic learns again whether YouTube wants a token.
-        preferences
-            .edit()
-            .putString(PAGE_TOKEN_CAPTIONS_PREFERENCE, mode.storageValue)
-            .remove(PAGE_TOKEN_NEEDED_PREFERENCE)
-            .apply()
     }
 }
 

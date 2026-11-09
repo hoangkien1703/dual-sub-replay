@@ -2,7 +2,9 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">学習ツール</string>
-    <string name="settings_section_study_summary">再生モード、無音スキップ、既知の単語、送信先、ぼかしボックス</string>
+    <string name="settings_section_study_summary">再生モード、無音スキップ、ループボタン、ぼかしボックス</string>
+    <string name="settings_section_flashcards_title">単語カードと Anki</string>
+    <string name="settings_section_flashcards_summary">AnkiDroid・AnkiConnect への送信、カードの音声</string>
     <string name="study_play_mode_title">再生モード</string>
     <string name="study_play_mode_normal">通常</string>
     <string name="study_play_mode_normal_description">動画をいつも通り再生します。</string>
@@ -82,7 +84,7 @@
     <string name="study_known_words_after_title">既知とするまでに見る回数</string>
     <string name="study_word_seen">%2$d回中%1$d回見ました</string>
     <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
-    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 学習ツールで変更できます。</string>
+    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 単語学習で変更できます。</string>
     <string name="study_known_words_offer_confirm">オンにする</string>
     <string name="study_known_words_offer_dismiss">今はしない</string>
     <string name="study_send_to_app_title">単語の送信先</string>

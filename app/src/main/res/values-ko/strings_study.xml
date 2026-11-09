@@ -2,7 +2,9 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">학습 도구</string>
-    <string name="settings_section_study_summary">재생 모드, 무음 건너뛰기, 아는 단어, 보내기, 흐림 상자</string>
+    <string name="settings_section_study_summary">재생 모드, 무음 건너뛰기, 반복 버튼, 흐림 상자</string>
+    <string name="settings_section_flashcards_title">플래시카드 및 Anki</string>
+    <string name="settings_section_flashcards_summary">AnkiDroid 또는 AnkiConnect로 보내기, 카드 음성</string>
     <string name="study_play_mode_title">재생 모드</string>
     <string name="study_play_mode_normal">보통</string>
     <string name="study_play_mode_normal_description">동영상을 평소처럼 재생합니다.</string>
@@ -82,7 +84,7 @@
     <string name="study_known_words_after_title">아는 단어로 세기까지 볼 횟수</string>
     <string name="study_word_seen">%2$d번 중 %1$d번 봤어요</string>
     <string name="study_known_words_offer_title">아는 단어를 켤까요?</string>
-    <string name="study_known_words_offer_message">자막 패널에 각 동영상에서 이미 아는 비율이 표시되고, 자주 보는 단어는 저절로 아는 단어로 셉니다. 나중에 설정 → 학습 도구에서 바꿀 수 있습니다.</string>
+    <string name="study_known_words_offer_message">자막 패널에 각 동영상에서 이미 아는 비율이 표시되고, 자주 보는 단어는 저절로 아는 단어로 셉니다. 나중에 설정 → 단어 학습에서 바꿀 수 있습니다.</string>
     <string name="study_known_words_offer_confirm">켜기</string>
     <string name="study_known_words_offer_dismiss">나중에</string>
     <string name="study_send_to_app_title">단어를 보낼 곳</string>

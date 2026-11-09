@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Màu sắc &amp; giao diện</string>
     <string name="settings_section_colors_summary">Màu phụ đề, nền lớp phủ, màu và màu nhấn ứng dụng</string>
     <string name="settings_section_word_learning_title">Học từ</string>
-    <string name="settings_section_word_learning_summary">Tô màu từ, chạm để xem nghĩa, phát âm</string>
+    <string name="settings_section_word_learning_summary">Tô màu từ, chạm để xem nghĩa, phát âm, từ đã biết</string>
     <string name="settings_section_overlay_title">Lớp phủ &amp; toàn màn hình</string>
     <string name="settings_section_overlay_summary">Lớp phủ tự động, kéo thả, vị trí đã lưu</string>
     <string name="settings_section_translation_title">Phụ đề &amp; bản dịch</string>

@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Warna dan tema</string>
     <string name="settings_section_colors_summary">Warna subtitel, latar overlay, warna dan aksen aplikasi</string>
     <string name="settings_section_word_learning_title">Belajar kata</string>
-    <string name="settings_section_word_learning_summary">Warna kata, ketuk untuk arti, pengucapan</string>
+    <string name="settings_section_word_learning_summary">Warna kata, ketuk untuk arti, pengucapan, kata yang dikenal</string>
     <string name="settings_section_overlay_title">Overlay dan layar penuh</string>
     <string name="settings_section_overlay_summary">Overlay otomatis, seret, posisi tersimpan</string>
     <string name="settings_section_translation_title">Subtitel dan terjemahan</string>

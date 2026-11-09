@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Rənglər və mövzu</string>
     <string name="settings_section_colors_summary">Altyazı rəngləri, qatın fonu, tətbiq rəngləri və vurğu</string>
     <string name="settings_section_word_learning_title">Söz öyrənmə</string>
-    <string name="settings_section_word_learning_summary">Söz rəngləri, məna üçün toxunma, tələffüz</string>
+    <string name="settings_section_word_learning_summary">Söz rəngləri, məna üçün toxunma, tələffüz, bildiyim sözlər</string>
     <string name="settings_section_overlay_title">Qat və tam ekran</string>
     <string name="settings_section_overlay_summary">Avtomatik qat, sürüşdürmə, yadda saxlanmış yerlər</string>
     <string name="settings_section_translation_title">Altyazılar və tərcümə</string>

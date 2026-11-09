@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Colores y tema</string>
     <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, colores y acento de la app</string>
     <string name="settings_section_word_learning_title">Aprendizaje de palabras</string>
-    <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación</string>
+    <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación, palabras conocidas</string>
     <string name="settings_section_overlay_title">Superposición y pantalla completa</string>
     <string name="settings_section_overlay_summary">Superposición automática, arrastre, posiciones guardadas</string>
     <string name="settings_section_translation_title">Subtítulos y traducción</string>
