@@ -231,6 +231,7 @@ class SubtitleWordHighlightTest {
                 ANKIDROID_PREFERENCE,
                 SEND_TO_APP_PREFERENCE,
                 ANKICONNECT_DECK_PREFERENCE,
+                CARD_AUDIO_PREFERENCE,
                 BLUR_BOX_PREFERENCE,
                 LOOP_BUTTON_PREFERENCE,
                 KANJI_DETAILS_PREFERENCE,

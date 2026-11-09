@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">Hapus</string>
     <string name="study_anki_title">Kirim ke aplikasi kartu hafalan</string>
     <string name="study_anki_description">Menampilkan tombol Kirim ke di kartu kata dan di Latihan → Ekspor. Tombol ini mengirim ke AnkiDroid kecuali Anda memilih aplikasi lain dengan ▾ di tombol atau di bawah; tombol lalu menampilkan aplikasi itu.</string>
+    <string name="study_card_audio_title">Tambahkan audio ke kartu</string>
+    <string name="study_card_audio_description">Kartu mendapat kata dengan suara yang dipakai kartu kata, dan suara asli kalimat dari video. Kalimat direkam saat diputar, jadi kartu yang dikirim sebelum kalimat selesai mendapat suaranya setelah kalimat selesai.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>

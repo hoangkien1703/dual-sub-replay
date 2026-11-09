@@ -241,6 +241,7 @@ internal enum class SearchableSetting(
         "ankidroid_switch",
         setOf(ANKIDROID_PREFERENCE, SEND_TO_APP_PREFERENCE, ANKICONNECT_DECK_PREFERENCE),
     ),
+    CARD_AUDIO(R.string.study_card_audio_title, MoreSettingsSection.STUDY, "card_audio_switch", setOf(CARD_AUDIO_PREFERENCE)),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(
         R.string.study_kanji_details_title,

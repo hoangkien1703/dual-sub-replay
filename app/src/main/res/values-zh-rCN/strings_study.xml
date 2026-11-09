@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">清除</string>
     <string name="study_anki_title">发送到抽认卡应用</string>
     <string name="study_anki_description">在单词卡片和“练习”→“导出”中显示“发送到”按钮。除非你用按钮上的 ▾ 或下方的设置选择其他应用,否则会发送到 AnkiDroid;之后按钮会显示所选应用。</string>
+    <string name="study_card_audio_title">为卡片添加音频</string>
+    <string name="study_card_audio_description">卡片会带上用单词卡同款声音朗读的单词，以及视频中这句台词的原声。台词在播放时录下，所以在台词结束前发送的卡片，会在台词播完后补上音频。</string>
     <string name="study_blur_box_title">模糊框</string>
     <string name="study_blur_box_description">在视频上放一个模糊框，遮住画面里自带的字幕。拖动可移动，拖动角可调整大小。</string>
     <string name="study_page_token_title">用页面令牌加载字幕（测试版）</string>

@@ -98,6 +98,13 @@ internal fun StudyToolsSettingsSection() {
                 editor.apply()
             },
         )
+        SettingsSwitchRow(
+            title = stringResource(R.string.study_card_audio_title),
+            description = stringResource(R.string.study_card_audio_description),
+            checked = settings.cardAudio,
+            onCheckedChange = { preferences.edit().putBoolean(CARD_AUDIO_PREFERENCE, it).apply() },
+            testTag = "card_audio_switch",
+        )
     }
     SettingsSwitchRow(
         title = stringResource(R.string.study_blur_box_title),

@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">Limpar</string>
     <string name="study_anki_title">Enviar para apps de flashcards</string>
     <string name="study_anki_description">Mostra um botão Enviar para no cartão da palavra e em Prática → Exportar. Ele envia para o AnkiDroid, a menos que você escolha outro app com ▾ no botão ou aqui embaixo; então o botão mostra esse app.</string>
+    <string name="study_card_audio_title">Adicionar áudio aos cartões</string>
+    <string name="study_card_audio_description">Os cartões recebem a palavra na voz usada pelo cartão de palavra e o som real da frase do vídeo. A frase é gravada enquanto toca, então um cartão enviado antes de a frase terminar recebe o som quando ela termina.</string>
     <string name="study_blur_box_title">Caixa desfocada</string>
     <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
     <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>

@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">Xóa</string>
     <string name="study_anki_title">Gửi sang ứng dụng thẻ ghi nhớ</string>
     <string name="study_anki_description">Hiện nút Gửi sang trên thẻ từ và trong Luyện tập → Xuất. Nút gửi sang AnkiDroid, trừ khi bạn chọn ứng dụng khác bằng ▾ trên nút hoặc ở bên dưới; khi đó nút sẽ hiện ứng dụng đó.</string>
+    <string name="study_card_audio_title">Thêm âm thanh vào thẻ</string>
+    <string name="study_card_audio_description">Thẻ có từ được đọc bằng giọng của thẻ từ, và âm thanh thật của câu trong video. Câu được ghi lại khi đang phát, nên thẻ gửi trước khi câu kết thúc sẽ có âm thanh khi câu phát xong.</string>
     <string name="study_blur_box_title">Ô làm mờ</string>
     <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
     <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>

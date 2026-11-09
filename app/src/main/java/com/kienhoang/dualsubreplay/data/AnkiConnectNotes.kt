@@ -12,6 +12,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
@@ -100,19 +101,35 @@ internal fun ankiConnectFallbackNoteType(names: List<String>): String? =
 
 /**
  * [word]'s note for a note type with [fieldNames]: the DualSub Replay fields one by one, or, in
- * any other note type, the word and sentence on the front (first field) and the rest on the back.
+ * any other note type, the word and sentence (and the word's sound) on the front (first field) and
+ * the rest (with the sentence's sound) on the back.
  */
 internal fun ankiConnectFields(
     fieldNames: List<String>,
     word: SavedWord,
+    sounds: CardSounds = CardSounds(),
 ): Map<String, String> {
-    val values = ankiNoteFields(word)
+    val values = ankiNoteFields(word, sounds)
     if (fieldNames == ANKI_FIELDS) return ANKI_FIELDS.zip(values).toMap()
     if (fieldNames.isEmpty()) return emptyMap()
-    val front = listOf(values[0], values[3]).filter { it.isNotBlank() }.joinToString("<br><br>")
-    val back = listOf(values[2], values[1], values[4], values[5]).filter { it.isNotBlank() }.joinToString("<br>")
+    val front = listOf(values[0], values[3], values[6]).filter { it.isNotBlank() }.joinToString("<br><br>")
+    val back = listOf(values[2], values[1], values[4], values[7], values[5]).filter { it.isNotBlank() }.joinToString("<br>")
     if (fieldNames.size == 1) return mapOf(fieldNames[0] to listOf(front, back).filter { it.isNotBlank() }.joinToString("<hr>"))
     return mapOf(fieldNames[0] to front, fieldNames[1] to back)
+}
+
+/**
+ * Where a card sent without its sentence clip gets it later: the Sentence audio field of the
+ * DualSub Replay audio type, else the back (or only) field, after the text it was sent with.
+ */
+internal fun ankiConnectSentenceTarget(
+    fieldNames: List<String>,
+    fields: Map<String, String>,
+): Pair<String, String>? {
+    if (fieldNames == ANKI_FIELDS) return ANKI_SENTENCE_AUDIO_FIELD to ""
+    val field = fieldNames.getOrNull(1) ?: fieldNames.firstOrNull() ?: return null
+    val base = fields[field].orEmpty()
+    return field to if (base.isBlank()) "" else "$base<br>"
 }
 
 /** The DualSub Replay note type, made where AnkiConnect can make one (desktop Anki). */
@@ -175,6 +192,7 @@ internal class AnkiConnectNotes(
     suspend fun send(
         words: List<SavedWord>,
         chosenDeck: String?,
+        audio: AnkiCardAudio? = null,
     ): AnkiSendResult {
         val unsent = unsentAnkiWords(words, ::wasSent)
         var skipped = words.distinctBy { it.id }.size - unsent.size
@@ -185,7 +203,21 @@ internal class AnkiConnectNotes(
             val (noteType, fields) = noteType() ?: return AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
             for (word in unsent) {
                 try {
-                    call("addNote", JSONObject().put("note", note(deck, noteType, ankiConnectFields(fields, word))))
+                    val files = audio?.files(word) ?: AnkiAudioFiles()
+                    val sounds =
+                        CardSounds(
+                            word = files.word?.let { storeMedia(it) }.orEmpty(),
+                            sentence = files.sentence?.let { storeMedia(it) }.orEmpty(),
+                        )
+                    val values = ankiConnectFields(fields, word, sounds)
+                    val noteId = (call("addNote", JSONObject().put("note", note(deck, noteType, values))) as? Number)?.toLong()
+                    val line = audioLineOf(word)
+                    val target = ankiConnectSentenceTarget(fields, values)
+                    if (audio != null && sounds.sentence.isEmpty() && noteId != null && line != null && target != null) {
+                        audio.awaitSentence(
+                            PendingCardAudio(PENDING_ANKICONNECT, noteId, line, target.first, target.second, System.currentTimeMillis()),
+                        )
+                    }
                     sent++
                 } catch (error: AnkiConnectError) {
                     // Anki already has this note (sent from another phone, or before a reinstall).
@@ -205,6 +237,58 @@ internal class AnkiConnectNotes(
             AnkiSendResult(sent, skipped, AnkiProblem.FAILED)
         }
     }
+
+    /**
+     * Stores [file] in Anki's media and returns the field text that plays it, or empty text when
+     * AnkiConnect refused it (the card then goes without that sound). AnkiConnect Android may add
+     * a number to the name, so the name it answers is used.
+     */
+    private suspend fun storeMedia(file: File): String {
+        val data = withContext(Dispatchers.IO) { runCatching { file.readBytes() }.getOrNull() } ?: return ""
+        val params =
+            JSONObject()
+                .put("filename", "dualsub_${file.name}")
+                .put(
+                    "data",
+                    java.util.Base64
+                        .getEncoder()
+                        .encodeToString(data),
+                )
+        return try {
+            ankiSound(call("storeMediaFile", params) as? String)
+        } catch (_: AnkiConnectError) {
+            ""
+        } catch (_: JSONException) {
+            ""
+        }
+    }
+
+    /**
+     * Adds a waiting card's sentence clip to [item]'s field. False when AnkiConnect didn't answer
+     * (try again later); true also when it refused, so the card stops waiting.
+     */
+    suspend fun addSentenceAudio(
+        item: PendingCardAudio,
+        clip: File,
+    ): Boolean =
+        try {
+            val sound = storeMedia(clip)
+            if (sound.isEmpty()) {
+                false
+            } else {
+                val note = JSONObject().put("id", item.noteId).put("fields", JSONObject().put(item.field, item.base + sound))
+                call("updateNoteFields", JSONObject().put("note", note))
+                true
+            }
+        } catch (cancel: CancellationException) {
+            throw cancel
+        } catch (_: IOException) {
+            false
+        } catch (_: AnkiConnectError) {
+            true
+        } catch (_: JSONException) {
+            true
+        }
 
     private suspend fun deck(chosen: String?): String? {
         val decks = ankiConnectNames(call("deckNames"))

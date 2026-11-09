@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.assistant.AI_CHATS_DIRECTORY
 import com.kienhoang.dualsubreplay.assistant.AI_KEYS_PREFERENCES
 import com.kienhoang.dualsubreplay.assistant.AI_MEMORY_DIRECTORY
+import com.kienhoang.dualsubreplay.data.LINE_AUDIO_DIRECTORY
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,13 +21,16 @@ class BackupRulesTest {
         setOf("sharedpref:$AI_KEYS_PREFERENCES.xml", "file:$AI_CHATS_DIRECTORY/", "file:$AI_MEMORY_DIRECTORY/")
     private val excluded = regenerable.map { "file:$it" }.toSet() + "root:app_webview/" + aiPrivate
 
+    /** The sentence clips for Anki cards stay out of cloud backups (size); a phone-to-phone transfer keeps them. */
+    private val clips = "file:$LINE_AUDIO_DIRECTORY/"
+
     @Test
     fun everyBackupPathLeavesOutTheDownloadsTheWebViewProfileAndAiData() {
-        assertEquals(excluded, excludedPaths(rules("backup_rules.xml")))
+        assertEquals(excluded + clips, excludedPaths(rules("backup_rules.xml")))
         val extraction = rules("data_extraction_rules.xml")
-        for (section in listOf("cloud-backup", "device-transfer")) {
+        for ((section, expected) in listOf("cloud-backup" to excluded + clips, "device-transfer" to excluded)) {
             val element = extraction.getElementsByTagName(section).item(0) as Element
-            assertEquals(section, excluded, excludedPaths(element))
+            assertEquals(section, expected, excludedPaths(element))
         }
     }
 

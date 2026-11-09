@@ -119,7 +119,11 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("send_to_app_ankiconnect").performScrollTo().performClick()
         composeRule.onNodeWithTag("ankiconnect_choose_deck").performScrollTo().assertIsDisplayed()
         composeRule.runOnIdle { assertEquals("ankiconnect", preferences.getString(SEND_TO_APP_PREFERENCE, null)) }
+        // Add audio to cards is on until turned off.
+        composeRule.onNodeWithTag("card_audio_switch").performScrollTo().assertIsDisplayed()
         saveUiEvidence("study-tools-send-to-settings")
+        composeRule.onNodeWithTag("card_audio_switch").performClick()
+        composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_AUDIO_PREFERENCE, true)) }
         // Page tokens: Automatic by default, then On.
         composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }

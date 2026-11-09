@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">Clear</string>
     <string name="study_anki_title">Send to flashcard apps</string>
     <string name="study_anki_description">Shows a Send to button on the word card and in Practice → Export. It sends to AnkiDroid unless you pick another app with ▾ on the button or below; the button then shows that app.</string>
+    <string name="study_card_audio_title">Add audio to cards</string>
+    <string name="study_card_audio_description">Cards get the word in the voice the word card uses, and the line\'s real sound from the video. The line is recorded while it plays, so a card sent before the line ends gets its sound when it does.</string>
     <string name="study_send_to_app_title">Send words to</string>
     <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
     <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>

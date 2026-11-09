@@ -132,6 +132,7 @@ internal enum class AiSetting(
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
+    CARD_AUDIO("anki_card_audio"),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),

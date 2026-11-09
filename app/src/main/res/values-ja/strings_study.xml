@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">消去</string>
     <string name="study_anki_title">単語カードアプリに送る</string>
     <string name="study_anki_description">単語カードと「練習」→「エクスポート」に「送る」ボタンを表示します。ボタンの ▾ または下の設定で別のアプリを選ばない限り AnkiDroid に送ります。選んだアプリはボタンに表示されます。</string>
+    <string name="study_card_audio_title">カードに音声を追加</string>
+    <string name="study_card_audio_description">単語カードと同じ声で読んだ単語と、動画から取った実際のセリフの音声をカードに付けます。セリフは再生中に録音されるため、セリフが終わる前に送ったカードには、終わった時点で音声が追加されます。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>

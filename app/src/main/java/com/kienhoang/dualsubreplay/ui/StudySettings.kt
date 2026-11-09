@@ -29,6 +29,9 @@ internal const val SEND_TO_APP_PREFERENCE = "send_to_app"
 internal const val ANKICONNECT_DECK_PREFERENCE = "ankiconnect_deck"
 internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
 
+/** Study tools → Send to → Add audio to cards (owner pick 2026-11-09), on by default. */
+internal const val CARD_AUDIO_PREFERENCE = "anki_card_audio"
+
 /** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
 internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
 internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
@@ -54,6 +57,7 @@ internal val STUDY_SETTING_KEYS =
         ANKIDROID_PREFERENCE,
         SEND_TO_APP_PREFERENCE,
         ANKICONNECT_DECK_PREFERENCE,
+        CARD_AUDIO_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
@@ -151,6 +155,8 @@ internal data class StudySettings(
     val ankiDroid: Boolean = true,
     val sendTo: FlashcardApp = FlashcardApp.ANKIDROID,
     val ankiConnectDeck: String? = null,
+    /** Cards carry the word's voice and the line's real sound from the video. */
+    val cardAudio: Boolean = true,
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
@@ -191,6 +197,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         ankiDroid = preferences.getBoolean(ANKIDROID_PREFERENCE, true),
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
+        cardAudio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),

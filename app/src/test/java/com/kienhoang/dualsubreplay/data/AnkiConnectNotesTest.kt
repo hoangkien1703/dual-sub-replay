@@ -50,6 +50,8 @@ class AnkiConnectNotesTest {
         val models = models.toMutableMap()
         val notes = mutableListOf<JSONObject>()
         val duplicates = mutableSetOf<String>()
+        val media = mutableMapOf<String, ByteArray>()
+        val updates = mutableListOf<JSONObject>()
 
         fun answer(body: String): String {
             val request = JSONObject(body)
@@ -82,6 +84,15 @@ class AnkiConnectNotesTest {
                         notes += note
                         notes.size.toLong()
                     }
+                    // AnkiConnect Android adds a number to the name, as its source says.
+                    "storeMediaFile" ->
+                        params!!.getString("filename").replace(".", "_7.").also {
+                            media[it] =
+                                java.util.Base64
+                                    .getDecoder()
+                                    .decode(params.getString("data"))
+                        }
+                    "updateNoteFields" -> JSONObject.NULL.also { updates += params!!.getJSONObject("note") }
                     else -> return JSONObject().put("result", JSONObject.NULL).put("error", "unsupported action").toString()
                 }
             return JSONObject().put("result", result).put("error", JSONObject.NULL).toString()
@@ -200,4 +211,83 @@ class AnkiConnectNotesTest {
             assertEquals("collection is not available", result.detail)
             assertFalse(refusing.wasSent("1"))
         }
+
+    /** Sounds from files on disk: [wordSound] always, [sentenceSound] when given; waiting cards are kept. */
+    private class FakeCardAudio(
+        private val wordSound: java.io.File,
+        private val sentenceSound: java.io.File? = null,
+    ) : AnkiCardAudio {
+        val waiting = mutableListOf<PendingCardAudio>()
+
+        override suspend fun files(word: SavedWord) = AnkiAudioFiles(wordSound, sentenceSound)
+
+        override fun awaitSentence(item: PendingCardAudio) {
+            waiting += item
+        }
+    }
+
+    private fun soundFile(name: String): java.io.File =
+        java.io
+            .File(
+                kotlin.io.path
+                    .createTempDirectory("card-audio")
+                    .toFile(),
+                name,
+            ).apply { writeBytes(byteArrayOf(1, 2, 3)) }
+
+    @Test
+    fun basicCardsGetTheWordSoundOnTheFrontAndWaitForTheSentence() =
+        runBlocking {
+            val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = false)
+            val audio = FakeCardAudio(soundFile("word-1.mp3"))
+            assertEquals(
+                AnkiSendResult(sent = 1),
+                AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio),
+            )
+            assertEquals(byteArrayOf(1, 2, 3).toList(), anki.media.getValue("dualsub_word-1_7.mp3").toList())
+            val fields = anki.notes.single().getJSONObject("fields")
+            assertTrue(fields.getString("Front").endsWith("<br><br>[sound:dualsub_word-1_7.mp3]"))
+            // The sentence's clip wasn't ready: the card waits for it, after its back text.
+            val waiting = audio.waiting.single()
+            assertEquals(PENDING_ANKICONNECT, waiting.app)
+            assertEquals(1L, waiting.noteId)
+            assertEquals(AudioLine("abcdefghijk", 83_400, 85_000), waiting.line)
+            assertEquals("Back", waiting.field)
+            assertEquals(fields.getString("Back") + "<br>", waiting.base)
+        }
+
+    @Test
+    fun theAudioNoteTypeGetsBothSoundsInTheirFields() =
+        runBlocking {
+            val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
+            val audio = FakeCardAudio(soundFile("word-1.mp3"), soundFile("abcdefghijk-83400-85000.m4a"))
+            AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio)
+            val fields = anki.notes.single().getJSONObject("fields")
+            assertEquals("[sound:dualsub_word-1_7.mp3]", fields.getString(ANKI_WORD_AUDIO_FIELD))
+            assertEquals("[sound:dualsub_abcdefghijk-83400-85000_7.m4a]", fields.getString(ANKI_SENTENCE_AUDIO_FIELD))
+            assertTrue(audio.waiting.isEmpty())
+        }
+
+    @Test
+    fun aWaitingCardGetsItsClipLater() =
+        runBlocking {
+            val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = false)
+            val notes = AnkiConnectNotes(MemorySentWords(), { anki.answer(it) })
+            val item = PendingCardAudio(PENDING_ANKICONNECT, 42, AudioLine("abcdefghijk", 1_000, 2_000), "Back", "meaning<br>", 0)
+            assertTrue(notes.addSentenceAudio(item, soundFile("abcdefghijk-1000-2000.m4a")))
+            val update = anki.updates.single()
+            assertEquals(42L, update.getLong("id"))
+            assertEquals("meaning<br>[sound:dualsub_abcdefghijk-1000-2000_7.m4a]", update.getJSONObject("fields").getString("Back"))
+            // Nothing answering: try again later.
+            val silent = AnkiConnectNotes(MemorySentWords(), { throw IOException("Connection refused") })
+            assertFalse(silent.addSentenceAudio(item, soundFile("abcdefghijk-1000-2000.m4a")))
+        }
+
+    @Test
+    fun theSentenceTargetIsItsOwnFieldOrTheBack() {
+        assertEquals(ANKI_SENTENCE_AUDIO_FIELD to "", ankiConnectSentenceTarget(ANKI_FIELDS, emptyMap()))
+        assertEquals("Back" to "x<br>", ankiConnectSentenceTarget(listOf("Front", "Back"), mapOf("Back" to "x")))
+        assertEquals("Text" to "", ankiConnectSentenceTarget(listOf("Text"), mapOf("Text" to "")))
+        assertNull(ankiConnectSentenceTarget(emptyList(), emptyMap()))
+    }
 }
