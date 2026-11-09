@@ -33,6 +33,9 @@ internal fun DualSubUiState.showOriginal() = studyCaptionVisibility(originalVisi
 
 internal fun DualSubUiState.showTranslation() = studyCaptionVisibility(translatedVisibility, studyPlayMode).visible(playbackPaused)
 
+/** The subtitle panel has something to show; Dictation keeps it while the video plays, as its rows and box hide the lines. */
+internal fun DualSubUiState.tracksVisible() = showOriginal() || showTranslation() || dictationInPanel()
+
 /** Hiding the transcript for an overlay must not disconnect its live timing source. */
 internal fun shouldCaptureCaptionsForPresentation(
     state: DualSubUiState,
@@ -83,4 +86,4 @@ internal fun shouldSuppressNativeCaptions(
 ): Boolean =
     liveCapture || mode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY ||
         state.originalVisibility != CaptionVisibility.ALWAYS || state.translatedVisibility != CaptionVisibility.ALWAYS ||
-        state.studyPlayMode == StudyPlayMode.LISTEN_FIRST
+        state.studyPlayMode.hidesWhilePlaying

@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">Para no início de cada linha para você lê-la antes de ouvi-la.</string>
     <string name="study_play_mode_listen_first">Ouvir primeiro</string>
     <string name="study_play_mode_listen_first_description">Esconde as legendas enquanto o vídeo toca e depois pausa após cada linha e as mostra.</string>
+    <string name="study_play_mode_dictation">Ditado</string>
+    <string name="study_play_mode_dictation_description">Esconde cada linha até você digitar o que ouviu. O vídeo pausa após cada linha; toque em Verificar para ver o que você perdeu. Funciona melhor com legendas feitas por pessoas: as automáticas podem ter erros.</string>
     <string name="study_play_mode_repeat">Repetir cada linha</string>
     <string name="study_play_mode_repeat_description">Toca cada linha algumas vezes antes de seguir. Sempre repete a linha até você tocar em outra linha ou avançar/voltar o vídeo.</string>
     <string name="study_repeat_forever">Sempre</string>
@@ -106,4 +108,12 @@
     <string name="study_ankiconnect_open">Abrir AnkiConnect Android</string>
     <string name="study_loop_button_title">Botão de repetição na linha atual</string>
     <string name="study_loop_button_description">Mostra um pequeno ícone de repetição na linha que está tocando na transcrição. Toque nele para repetir essa linha até tocar de novo. Tocar em outra linha ou mover o vídeo repete essa linha.</string>
+    <string name="dictation_type_what_you_heard">Digite o que você ouviu</string>
+    <string name="dictation_replay">Ouvir de novo</string>
+    <string name="dictation_show">Mostrar</string>
+    <string name="dictation_check">Verificar</string>
+    <string name="dictation_next">Próxima</string>
+    <string name="dictation_perfect">Perfeito!</string>
+    <string name="dictation_score">%1$d de %2$d certas</string>
+    <string name="dictation_hidden_line">Linha escondida</string>
 </resources>

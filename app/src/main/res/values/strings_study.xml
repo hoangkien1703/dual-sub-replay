@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">Stops at the start of each line so you can read it before you hear it.</string>
     <string name="study_play_mode_listen_first">Listen first</string>
     <string name="study_play_mode_listen_first_description">Hides subtitles while the video plays, then pauses after each line and shows them.</string>
+    <string name="study_play_mode_dictation">Dictation</string>
+    <string name="study_play_mode_dictation_description">Hides each line until you type what you heard. The video pauses after each line; tap Check to see what you missed. Works best with subtitles made by people: automatic ones can contain mistakes.</string>
     <string name="study_play_mode_repeat">Repeat each line</string>
     <string name="study_play_mode_repeat_description">Plays each line several times before going on. Forever loops it until you tap another line or seek.</string>
     <string name="study_repeat_forever">Forever</string>
@@ -103,4 +105,12 @@
     <string name="study_known_words_offer_dismiss">Not now</string>
     <string name="study_loop_button_title">Loop button on the playing line</string>
     <string name="study_loop_button_description">Shows a small loop icon on the line that is playing in the transcript. Tap it to repeat that line until you tap it again. Tapping another line or moving the video loops that line instead.</string>
+    <string name="dictation_type_what_you_heard">Type what you heard</string>
+    <string name="dictation_replay">Replay</string>
+    <string name="dictation_show">Show</string>
+    <string name="dictation_check">Check</string>
+    <string name="dictation_next">Next</string>
+    <string name="dictation_perfect">Perfect!</string>
+    <string name="dictation_score">%1$d of %2$d right</string>
+    <string name="dictation_hidden_line">Hidden line</string>
 </resources>

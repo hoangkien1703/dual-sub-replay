@@ -11,6 +11,8 @@
     <string name="study_play_mode_read_first_description">Hər sətrin əvvəlində dayanır ki, onu eşitməzdən əvvəl oxuya biləsiniz.</string>
     <string name="study_play_mode_listen_first">Əvvəl dinlə</string>
     <string name="study_play_mode_listen_first_description">Video oynayarkən altyazıları gizlədir, sonra hər sətirdən sonra dayanıb onları göstərir.</string>
+    <string name="study_play_mode_dictation">Diktə</string>
+    <string name="study_play_mode_dictation_description">Eşitdiyinizi yazana qədər hər sətri gizlədir. Hər sətirdən sonra video dayanır; nəyi qaçırdığınızı görmək üçün Yoxla düyməsinə toxunun. İnsanların hazırladığı altyazılarla daha yaxşı işləyir: avtomatik altyazılarda səhvlər ola bilər.</string>
     <string name="study_play_mode_repeat">Hər sətri təkrarla</string>
     <string name="study_play_mode_repeat_description">Davam etməzdən əvvəl hər sətri bir neçə dəfə oynadır. Sonsuz seçimi başqa sətrə toxunana və ya videonu irəli-geri çəkənə qədər sətri təkrarlayır.</string>
     <string name="study_repeat_forever">Sonsuz</string>
@@ -100,4 +102,12 @@
     <string name="study_known_words_offer_dismiss">İndi yox</string>
     <string name="study_loop_button_title">Oynayan sətirdə dövr düyməsi</string>
     <string name="study_loop_button_description">Transkriptdə oynayan sətirdə kiçik dövr işarəsi göstərir. Həmin sətri təkrarlamaq üçün ona toxunun; yenidən toxunana qədər təkrarlanır. Başqa sətrə toxunsanız və ya videonu irəli-geri çəksəniz, həmin sətir təkrarlanır.</string>
+    <string name="dictation_type_what_you_heard">Eşitdiyinizi yazın</string>
+    <string name="dictation_replay">Yenidən dinlə</string>
+    <string name="dictation_show">Göstər</string>
+    <string name="dictation_check">Yoxla</string>
+    <string name="dictation_next">Növbəti</string>
+    <string name="dictation_perfect">Mükəmməl!</string>
+    <string name="dictation_score">Düz: %1$d / %2$d</string>
+    <string name="dictation_hidden_line">Gizli sətir</string>
 </resources>

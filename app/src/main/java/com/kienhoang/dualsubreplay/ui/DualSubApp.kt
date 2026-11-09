@@ -92,6 +92,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.DictationCheck
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import java.util.Locale
@@ -136,7 +137,11 @@ fun DualSubApp(
         } else if (!state.dailyGoalPromptCompleted) {
             DailyGoalSetupScreen(onFinish = viewModel::completeDailyGoalPrompt)
         } else {
-            CompositionLocalProvider(LocalLineLoop provides studyRunner.lineLoop, LocalAiSubtitleActions provides aiSubtitleActions) {
+            CompositionLocalProvider(
+                LocalLineLoop provides studyRunner.lineLoop,
+                LocalDictation provides studyRunner.dictation,
+                LocalAiSubtitleActions provides aiSubtitleActions,
+            ) {
                 DualSubExperience(
                     state = state,
                     webController = webController,
@@ -365,7 +370,7 @@ private fun DualSubExperience(
         }
     val nativeDialogVisible by youtubeNativeDialogVisible.collectAsStateWithLifecycle()
     val playerFrame by youtubePlayerFrame.collectAsStateWithLifecycle()
-    val tracksVisible = state.showOriginal() || state.showTranslation()
+    val tracksVisible = state.tracksVisible()
     // The TV layout opens on TV home and always keeps the panel beside the video.
     val tvLayout = LocalTvLayout.current
     var tvHomeShown by rememberSaveable { mutableStateOf(true) }
@@ -942,6 +947,7 @@ internal fun SubtitleTimeline(
     state: DualSubUiState,
     onWordClick: (WordTap) -> Unit = {},
     onReplay: (SubtitleSegment) -> Unit,
+    dictation: DictationState? = null,
 ) {
     // When the panel is recreated after being closed, start the lazy list at the
     // current transcript row instead of item 0. This prevents long videos from
@@ -962,11 +968,14 @@ internal fun SubtitleTimeline(
         enabled = state.wordLearningEnabled,
     )
 
-    val showOriginal = state.showOriginal()
-    val showTranslation = state.showTranslation()
-    val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
     // TV layout: OK on a line opens its words (no touch to select them), and text is larger.
     val tvLayout = LocalTvLayout.current
+    // Dictation hides each line until it is revealed; on TV (no box to type in) it acts like Listen first.
+    val hiding = dictation?.takeIf { !tvLayout && state.dictationInPanel() }
+    val showOriginal = if (hiding != null) state.originalVisibility != CaptionVisibility.NEVER else state.showOriginal()
+    val showTranslation = if (hiding != null) state.translatedVisibility != CaptionVisibility.NEVER else state.showTranslation()
+    val sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference
+    val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
     var tvLine by remember { mutableStateOf<SubtitleSegment?>(null) }
     // Study tools → Loop button on the playing line (off by default); not on TV, where OK opens a line's words.
     val lineLoop = LocalLineLoop.current?.takeIf { !tvLayout && rememberStudySettings().value.loopButton }
@@ -986,7 +995,9 @@ internal fun SubtitleTimeline(
         ) {
             itemsIndexed(state.segments, key = { _, segment -> segment.id }) { index, segment ->
                 val active = index == state.currentIndex
+                val hidden = hiding != null && !hiding.isRevealed(DictationKey(state.activeVideoId, segment.id))
                 CompactSubtitleCard(
+                    hiddenHint = if (hidden) DictationCheck.hiddenDots(segment.originalText, sourceLanguage) else null,
                     segment = segment,
                     showOriginal = showOriginal,
                     showTranslation = showTranslation,
@@ -1005,7 +1016,7 @@ internal fun SubtitleTimeline(
                     wordLearningTarget = state.wordLearningTarget,
                     wordLearningActiveOnly = state.wordLearningActiveOnly,
                     tapToLearnEnabled = state.tapToLearnEnabled,
-                    resolvedSourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference,
+                    resolvedSourceLanguage = sourceLanguage,
                     targetLanguage = state.targetLanguage,
                     isDownloadingTranslationModel = state.isDownloadingTranslationModel,
                     translationUnavailable = state.translationError != null,
@@ -1255,7 +1266,26 @@ internal fun TranslatedSubtitleTimeline(
     onWordClick: (WordTap) -> Unit,
     onReplay: (SubtitleSegment) -> Unit,
 ) {
-    SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+    val dictation = (LocalDictation.current ?: remember { DictationState() }).takeIf { state.dictationInPanel() && !LocalTvLayout.current }
+    if (dictation == null) {
+        SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay)
+        return
+    }
+    Column(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxWidth().weight(1f)) {
+            SubtitleTimeline(state, onWordClick = onWordClick, onReplay = onReplay, dictation = dictation)
+        }
+        val line = rememberDictationLine(state)
+        val next = line?.let { current -> state.segments.getOrNull(state.segments.indexOfFirst { it.id == current.id } + 1) }
+        DictationBox(
+            dictation = dictation,
+            videoId = state.activeVideoId,
+            line = line,
+            nextLine = next,
+            languageCode = state.resolvedSourceLanguage ?: state.sourcePreference,
+            onPlayLine = onReplay,
+        )
+    }
 }
 
 @Composable

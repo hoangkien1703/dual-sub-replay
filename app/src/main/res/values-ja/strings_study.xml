@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">各行の始めで止まるので、聞く前に読めます。</string>
     <string name="study_play_mode_listen_first">先に聞く</string>
     <string name="study_play_mode_listen_first_description">再生中は字幕を隠し、各行の後で一時停止して字幕を表示します。</string>
+    <string name="study_play_mode_dictation">ディクテーション</string>
+    <string name="study_play_mode_dictation_description">聞き取った内容を入力するまで各行を隠します。各行の後で動画が一時停止し、「確認」をタップすると聞き逃した部分がわかります。人が作った字幕がおすすめです（自動字幕には誤りがあることがあります）。</string>
     <string name="study_play_mode_repeat">各行を繰り返す</string>
     <string name="study_play_mode_repeat_description">各行を何回か再生してから次に進みます。「無制限」では、別の行をタップするかシークするまで同じ行を繰り返します。</string>
     <string name="study_repeat_forever">無制限</string>
@@ -96,4 +98,12 @@
     <string name="study_ankiconnect_open">AnkiConnect Android を開く</string>
     <string name="study_loop_button_title">再生中の行にループボタン</string>
     <string name="study_loop_button_description">字幕一覧で再生中の行に小さなループアイコンを表示します。タップするとその行を繰り返し、もう一度タップすると止まります。別の行をタップしたり動画を移動したりすると、その行を繰り返します。</string>
+    <string name="dictation_type_what_you_heard">聞こえたとおりに入力</string>
+    <string name="dictation_replay">もう一度</string>
+    <string name="dictation_show">表示</string>
+    <string name="dictation_check">確認</string>
+    <string name="dictation_next">次へ</string>
+    <string name="dictation_perfect">完璧！</string>
+    <string name="dictation_score">%2$d 個中 %1$d 個正解</string>
+    <string name="dictation_hidden_line">非表示の行</string>
 </resources>

@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">Se detiene al inicio de cada línea para que la leas antes de oírla.</string>
     <string name="study_play_mode_listen_first">Escuchar primero</string>
     <string name="study_play_mode_listen_first_description">Oculta los subtítulos mientras el video se reproduce y luego pausa después de cada línea y los muestra.</string>
+    <string name="study_play_mode_dictation">Dictado</string>
+    <string name="study_play_mode_dictation_description">Oculta cada línea hasta que escribas lo que oíste. El video se pausa después de cada línea; toca Comprobar para ver lo que se te escapó. Funciona mejor con subtítulos hechos por personas: los automáticos pueden tener errores.</string>
     <string name="study_play_mode_repeat">Repetir cada línea</string>
     <string name="study_play_mode_repeat_description">Reproduce cada línea varias veces antes de seguir. Siempre la repite hasta que tocas otra línea o adelantas o retrocedes el video.</string>
     <string name="study_repeat_forever">Siempre</string>
@@ -106,4 +108,12 @@
     <string name="study_ankiconnect_open">Abrir AnkiConnect Android</string>
     <string name="study_loop_button_title">Botón de bucle en la línea que suena</string>
     <string name="study_loop_button_description">Muestra un pequeño icono de bucle en la línea que se está reproduciendo en la transcripción. Tócalo para repetir esa línea hasta que lo vuelvas a tocar. Si tocas otra línea o mueves el video, se repite esa línea.</string>
+    <string name="dictation_type_what_you_heard">Escribe lo que oíste</string>
+    <string name="dictation_replay">Repetir</string>
+    <string name="dictation_show">Mostrar</string>
+    <string name="dictation_check">Comprobar</string>
+    <string name="dictation_next">Siguiente</string>
+    <string name="dictation_perfect">¡Perfecto!</string>
+    <string name="dictation_score">%1$d de %2$d bien</string>
+    <string name="dictation_hidden_line">Línea oculta</string>
 </resources>

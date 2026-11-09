@@ -53,7 +53,8 @@ internal val AI_APP_LANGUAGES = listOf("device", "en", "vi", "es", "pt-BR", "ja"
 internal val AI_DAILY_GOALS = listOf("off", "5", "10", "15", "20", "30", "45", "60")
 
 /** The keys of `StudyPlayMode`; a test keeps them equal. */
-internal val AI_STUDY_PLAY_MODES = listOf("normal", "pause_after_line", "read_first", "listen_first", "repeat_line", "new_word_lines")
+internal val AI_STUDY_PLAY_MODES =
+    listOf("normal", "pause_after_line", "read_first", "listen_first", "dictation", "repeat_line", "new_word_lines")
 
 /** The keys of `SkipSilence`; a test keeps them equal. */
 internal val AI_SKIP_SILENCE = listOf("off", "2x", "4x", "jump")
@@ -611,6 +612,8 @@ private val SETTING_CHOICE_ALIASES by lazy {
                 "repeat_each_line" to "repeat_line",
                 "new_words" to "new_word_lines",
                 "one_new_word" to "new_word_lines",
+                "dictation_mode" to "dictation",
+                "type_what_you_hear" to "dictation",
             ),
         AiSetting.AI_TRANSLATION_THINKING to
             mapOf("none" to "off", "no" to "off", "false" to "off", "disabled" to "off", "minimal" to "low", "mid" to "medium"),
@@ -767,7 +770,8 @@ internal fun aiSettingValues(setting: AiSetting): String =
         AiSetting.STUDY_PLAY_MODE ->
             choiceList(setting.choices) +
                 " (pause_after_line pauses after each line, read_first stops at each line's start, listen_first hides subtitles " +
-                "until each line ends, repeat_line plays each line study_repeat_count times, new_word_lines pauses after lines " +
+                "until each line ends, dictation hides each line until the user types what they heard and checks it in the " +
+                "subtitle panel, repeat_line plays each line study_repeat_count times, new_word_lines pauses after lines " +
                 "with exactly one new word and needs known_words on; all need the full transcript)"
         AiSetting.STUDY_REPEAT_COUNT ->
             choiceList(setting.choices) +

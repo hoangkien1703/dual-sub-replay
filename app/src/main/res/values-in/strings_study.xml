@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">Berhenti di awal setiap baris agar Anda bisa membacanya sebelum mendengarnya.</string>
     <string name="study_play_mode_listen_first">Dengar dulu</string>
     <string name="study_play_mode_listen_first_description">Menyembunyikan subtitle saat video diputar, lalu berhenti setelah setiap baris dan menampilkannya.</string>
+    <string name="study_play_mode_dictation">Dikte</string>
+    <string name="study_play_mode_dictation_description">Menyembunyikan setiap baris sampai kamu mengetik apa yang kamu dengar. Video berhenti setelah setiap baris; ketuk Periksa untuk melihat yang terlewat. Paling baik dengan subtitle buatan manusia: subtitle otomatis bisa berisi kesalahan.</string>
     <string name="study_play_mode_repeat">Ulangi setiap baris</string>
     <string name="study_play_mode_repeat_description">Memutar setiap baris beberapa kali sebelum lanjut. Terus-menerus mengulang baris itu sampai kamu mengetuk baris lain atau menggeser video.</string>
     <string name="study_repeat_forever">Terus-menerus</string>
@@ -96,4 +98,12 @@
     <string name="study_ankiconnect_open">Buka AnkiConnect Android</string>
     <string name="study_loop_button_title">Tombol ulang di baris yang diputar</string>
     <string name="study_loop_button_description">Menampilkan ikon ulang kecil di baris yang sedang diputar di transkrip. Ketuk untuk mengulang baris itu sampai Anda mengetuknya lagi. Mengetuk baris lain atau menggeser video akan mengulang baris itu.</string>
+    <string name="dictation_type_what_you_heard">Ketik apa yang kamu dengar</string>
+    <string name="dictation_replay">Putar ulang</string>
+    <string name="dictation_show">Tampilkan</string>
+    <string name="dictation_check">Periksa</string>
+    <string name="dictation_next">Berikutnya</string>
+    <string name="dictation_perfect">Sempurna!</string>
+    <string name="dictation_score">%1$d dari %2$d benar</string>
+    <string name="dictation_hidden_line">Baris tersembunyi</string>
 </resources>

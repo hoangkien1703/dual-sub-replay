@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">在每行开头停下，让你先读再听。</string>
     <string name="study_play_mode_listen_first">先听</string>
     <string name="study_play_mode_listen_first_description">播放时隐藏字幕，每行之后暂停并显示字幕。</string>
+    <string name="study_play_mode_dictation">听写</string>
+    <string name="study_play_mode_dictation_description">在你输入听到的内容之前隐藏每一行。每行之后视频会暂停，点“检查”查看漏听的部分。人工制作的字幕效果最好，自动字幕可能有错误。</string>
     <string name="study_play_mode_repeat">每行重复</string>
     <string name="study_play_mode_repeat_description">每行播放几遍后再继续。“无限”会一直重复这一行，直到你点按另一行或拖动进度。</string>
     <string name="study_repeat_forever">无限</string>
@@ -96,4 +98,12 @@
     <string name="study_ankiconnect_open">打开 AnkiConnect Android</string>
     <string name="study_loop_button_title">正在播放的行显示循环按钮</string>
     <string name="study_loop_button_description">在字幕列表中正在播放的行上显示一个小循环图标。点按即可循环播放这一行，再次点按后停止。点按其他行或拖动视频会改为循环那一行。</string>
+    <string name="dictation_type_what_you_heard">输入你听到的内容</string>
+    <string name="dictation_replay">重听</string>
+    <string name="dictation_show">显示</string>
+    <string name="dictation_check">检查</string>
+    <string name="dictation_next">下一句</string>
+    <string name="dictation_perfect">完全正确！</string>
+    <string name="dictation_score">共 %2$d 个，对了 %1$d 个</string>
+    <string name="dictation_hidden_line">隐藏的行</string>
 </resources>
