@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the cards' sounds: the sentence clips and the words' voices while a card is sent. -->
+<paths>
+    <files-path name="line-audio" path="line-audio/" />
+    <cache-path name="card-audio" path="card-audio/" />
+</paths>

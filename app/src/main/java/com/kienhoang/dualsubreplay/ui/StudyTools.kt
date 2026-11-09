@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.ANKIDROID_PERMISSION
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
+import com.kienhoang.dualsubreplay.data.AnkiCardAudio
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.AnkiProblem
@@ -90,6 +91,8 @@ internal class StudyTools(
     internal val anki: AnkiDroidNotes,
     internal val ankiConnect: AnkiConnectNotes,
     private val scope: CoroutineScope,
+    /** The cards' sounds (Settings → Study tools → Add audio to cards); null where nothing records them. */
+    private val cardAudio: AnkiCardAudio? = null,
 ) {
     var settings by mutableStateOf(StudySettings())
         internal set
@@ -139,8 +142,8 @@ internal class StudyTools(
         words: List<SavedWord>,
     ): AnkiSendResult =
         when (app) {
-            FlashcardApp.ANKIDROID -> anki.send(words)
-            FlashcardApp.ANKICONNECT -> ankiConnect.send(words, settings.ankiConnectDeck)
+            FlashcardApp.ANKIDROID -> anki.send(words, cardAudio.takeIf { settings.cardAudio })
+            FlashcardApp.ANKICONNECT -> ankiConnect.send(words, settings.ankiConnectDeck, cardAudio.takeIf { settings.cardAudio })
         }
 
     /** AnkiDroid asks for its permission before the first card; AnkiConnect asks for none. */
@@ -184,7 +187,13 @@ internal fun rememberStudyTools(
     val scope = rememberCoroutineScope()
     val tools =
         remember(context) {
-            StudyTools(KnownWordsRepository.get(context), AnkiDroidNotes(context), AnkiConnectNotes.create(context), scope)
+            StudyTools(
+                KnownWordsRepository.get(context),
+                AnkiDroidNotes(context),
+                AnkiConnectNotes.create(context),
+                scope,
+                CardAudioSource(context),
+            )
         }
     val settings by rememberStudySettings()
     val sourceCode = state.resolvedSourceLanguage

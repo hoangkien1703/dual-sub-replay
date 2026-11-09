@@ -36,6 +36,8 @@
     <string name="study_known_words_clear_confirm">Təmizlə</string>
     <string name="study_anki_title">Fləşkart tətbiqlərinə göndər</string>
     <string name="study_anki_description">Söz kartında və Məşq → İxrac bölməsində Göndər düyməsini göstərir. Düymədəki və ya aşağıdakı ▾ ilə başqa tətbiq seçməsəniz, AnkiDroid-ə göndərir; sonra düymə həmin tətbiqi göstərir.</string>
+    <string name="study_card_audio_title">Kartlara səs əlavə et</string>
+    <string name="study_card_audio_description">Kartlara söz kartının istifadə etdiyi səslə oxunan söz və videodakı cümlənin əsl səsi əlavə olunur. Cümlə oynayarkən yazılır, buna görə cümlə bitməmiş göndərilən kart səsi cümlə bitəndə alır.</string>
     <string name="study_send_to_app_title">Sözləri göndər</string>
     <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
     <string name="study_ankiconnect_description">Bu telefondakı AnkiConnect-ə (127.0.0.1:8765) göndərir, ondan AnkiConnect Android tətbiqi, Yomitan və asbplayer istifadə edir. Serverinin işləməsi üçün AnkiConnect Android-i bir dəfə açın. AnkiConnect DualSub Replay qeyd növü yarada bilmədikdə kartlar Anki-nin Basic qeyd növündən istifadə edir.</string>

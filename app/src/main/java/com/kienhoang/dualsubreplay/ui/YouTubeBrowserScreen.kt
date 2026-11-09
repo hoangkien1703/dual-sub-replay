@@ -611,6 +611,7 @@ internal fun SingleYouTubePage(
     PageTranscriptReader(webView, active = lifecycleStarted)
     PageTranslationReader(webView, active = lifecycleStarted)
     StudyPageScripts(webView, enabled = rememberStudySettings().value.blurBox, active = lifecycleStarted)
+    LineAudioPageScripts(webView, active = lifecycleStarted)
     AdSkipPageScripts(webView, active = lifecycleStarted, pageView = { fullscreenSession?.view ?: webView })
     TvPageScripts(webView, tvLayout = LocalTvLayout.current, active = lifecycleStarted)
     DisposableEffect(webView) {

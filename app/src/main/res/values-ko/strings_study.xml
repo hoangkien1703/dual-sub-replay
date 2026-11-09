@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">지우기</string>
     <string name="study_anki_title">플래시카드 앱으로 보내기</string>
     <string name="study_anki_description">단어 카드와 연습 → 내보내기에 보내기 버튼을 표시합니다. 버튼의 ▾ 또는 아래에서 다른 앱을 고르지 않으면 AnkiDroid로 보냅니다. 고른 앱은 버튼에 표시됩니다.</string>
+    <string name="study_card_audio_title">카드에 오디오 추가</string>
+    <string name="study_card_audio_description">단어 카드와 같은 목소리로 읽은 단어와, 동영상에서 가져온 문장의 실제 소리를 카드에 넣습니다. 문장은 재생되는 동안 녹음되므로, 문장이 끝나기 전에 보낸 카드는 문장이 끝나면 소리가 추가됩니다.</string>
     <string name="study_blur_box_title">흐림 상자</string>
     <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
     <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>

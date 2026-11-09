@@ -37,6 +37,8 @@
     <string name="study_known_words_clear_confirm">Borrar</string>
     <string name="study_anki_title">Enviar a apps de tarjetas</string>
     <string name="study_anki_description">Muestra un botón Enviar a en la tarjeta de palabra y en Práctica → Exportar. Envía a AnkiDroid salvo que elijas otra app con ▾ en el botón o aquí abajo; entonces el botón muestra esa app.</string>
+    <string name="study_card_audio_title">Añadir audio a las tarjetas</string>
+    <string name="study_card_audio_description">Las tarjetas llevan la palabra con la voz que usa la tarjeta de palabra y el sonido real de la frase del vídeo. La frase se graba mientras suena, así que una tarjeta enviada antes de que termine recibe el sonido cuando termina.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>

@@ -2,8 +2,9 @@
 <!--
     Android 11 and lower. Leaves out downloads the app can fetch again, so backups stay small:
     the Japanese dictionary (13 MB). Also leaves out the WebView profile (app_webview/), whose
-    cookies hold the YouTube/Google sign-in, and the AI assistant's encrypted keys (useless
-    without this phone's Keystore), saved chats, and memories and instructions. Keep these paths
+    cookies hold the YouTube/Google sign-in, the AI assistant's encrypted keys (useless
+    without this phone's Keystore), saved chats, and memories and instructions, and the sentence
+    clips recorded for Anki cards (line-audio/, about 25 KB each). Keep these paths
     in sync with data_extraction_rules.xml and the directories AppViewModel and
     AiAssistantViewModel create.
 -->
@@ -13,4 +14,5 @@
     <exclude domain="sharedpref" path="ai_assistant_keys.xml" />
     <exclude domain="file" path="ai-chats/" />
     <exclude domain="file" path="ai-memory/" />
+    <exclude domain="file" path="line-audio/" />
 </full-backup-content>
