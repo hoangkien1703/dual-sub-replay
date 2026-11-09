@@ -90,3 +90,9 @@ Implementation notes:
 
 - A clip's tail may be missing when the video is paused right at the line's end (Pause after each line), so the line is cut then without waiting for the tail.
 - Word sounds are recorded one by one when sending, so Practice → Export → Send all with many words takes longer (one Google voice request per word).
+
+## Follow-up: empty Sentence audio in v1.8.29
+
+lion737 reported (discussion #81, 2026-11-09) cards whose Sentence audio stayed empty. The app's WebView keeps `mediaPlaybackRequiresUserGesture` on, so the recorder's audio context stays suspended until a tap inside the YouTube page; taps on the app's own controls and subtitle list don't count, and the 60 s pause rest made it worse. `LineAudioWebViewTest` had turned the rule off, so CI missed it.
+
+Fix: `ensure` also reports whether the video plays. When the context is suspended while the video plays, `LineAudioPageScripts` lifts the rule for about half a second, runs `ensure` again (which resumes the context) and puts the rule back (`wakeLineAudio`, at most every 10 s). The video already plays, so nothing else can start in that moment. New device test: the recorder under the tap rule is asleep, wakes, and then records a line.

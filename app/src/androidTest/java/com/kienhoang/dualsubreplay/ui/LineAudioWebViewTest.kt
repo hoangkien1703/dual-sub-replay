@@ -8,8 +8,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.LinePcm
 import com.kienhoang.dualsubreplay.data.audioLine
 import com.kienhoang.dualsubreplay.data.encodeM4a
+import com.kienhoang.dualsubreplay.data.lineAudioRecorderAsleep
 import com.kienhoang.dualsubreplay.data.parseLinePcm
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -94,6 +97,67 @@ class LineAudioWebViewTest {
         } finally {
             instrumentation.runOnMainSync { web?.destroy() }
         }
+    }
+
+    @Test
+    fun aRecorderHeldBackByWebViewsTapRuleIsWokenWhileTheVideoPlays() {
+        val loaded = CountDownLatch(1)
+        var web: WebView? = null
+        try {
+            instrumentation.runOnMainSync {
+                web =
+                    WebView(instrumentation.targetContext).apply {
+                        settings.javaScriptEnabled = true
+                        // The learner's tap started the video; the app keeps the tap rule on after that.
+                        settings.mediaPlaybackRequiresUserGesture = false
+                        webViewClient =
+                            object : WebViewClient() {
+                                override fun onPageFinished(
+                                    view: WebView,
+                                    url: String,
+                                ) = loaded.countDown()
+                            }
+                        loadDataWithBaseURL("https://www.youtube.com/watch?v=abcdefghijk", FIXTURE, "text/html", "UTF-8", null)
+                    }
+            }
+            assertTrue(loaded.await(20, TimeUnit.SECONDS))
+            assumeTrue("the fixture video did not play", waitForVideo(web!!, 0.5))
+            instrumentation.runOnMainSync { web!!.settings.mediaPlaybackRequiresUserGesture = true }
+            Thread.sleep(500)
+            val before = evaluate(web!!, webLineAudioScript(on = true, videoId = "abcdefghijk"))
+            Thread.sleep(300)
+            val asleep = lineAudioRecorderAsleep(evaluate(web!!, webLineAudioScript(on = true, videoId = "abcdefghijk")))
+            runBlocking { wakeLineAudio(web!!, "abcdefghijk") }
+            val awake = evaluate(web!!, webLineAudioScript(on = true, videoId = "abcdefghijk"))
+            var rule = false
+            instrumentation.runOnMainSync { rule = web!!.settings.mediaPlaybackRequiresUserGesture }
+            assertTrue("the tap rule was not put back", rule)
+            assertFalse("the recorder is still asleep: $awake (before the wake: $before)", lineAudioRecorderAsleep(awake))
+            val from = (evaluate(web!!, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0) + 0.5
+            assumeTrue("the fixture ended too soon", from < 7.5)
+            assumeTrue("the fixture stopped playing", waitForVideo(web!!, from + 1.8))
+            val startMs = (from * 1000).toLong()
+            val pcm = parseLinePcm(evaluate(web!!, webLineAudioClipScript(audioLine("abcdefghijk", startMs, startMs + 1_000)!!)))
+            assertNotNull("no clip after the wake: $awake (before the wake: $before)", pcm)
+            assertTrue("the clip is silent", pcm!!.samples.maxOf { abs(it.toInt()) } > 1_000)
+            // The reason v1.8.29 cards had no sentence sound: the rule kept the recorder asleep.
+            assertTrue("the tap rule did not hold the recorder back: $before", asleep)
+        } finally {
+            instrumentation.runOnMainSync { web?.destroy() }
+        }
+    }
+
+    private fun waitForVideo(
+        web: WebView,
+        second: Double,
+    ): Boolean {
+        val deadline = System.currentTimeMillis() + 20_000
+        while (System.currentTimeMillis() < deadline) {
+            val at = evaluate(web, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
+            if (at >= second) return true
+            Thread.sleep(200)
+        }
+        return false
     }
 
     private fun evaluate(
