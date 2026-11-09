@@ -196,7 +196,12 @@ private fun settingsSearchEntries(withAiAssistant: Boolean): List<SettingsSearch
     val sectionTitles = MoreSettingsSection.entries.associateWith { stringResource(it.titleRes) }
     val settings =
         SearchableSetting.entries.map { setting ->
-            SettingsSearchEntry(stringResource(setting.titleRes), sectionTitles.getValue(setting.section), setting)
+            SettingsSearchEntry(
+                stringResource(setting.titleRes),
+                sectionTitles.getValue(setting.section),
+                setting,
+                choices = setting.alsoFinds.map { stringResource(it) },
+            )
         }
     val sections =
         MoreSettingsSection.entries

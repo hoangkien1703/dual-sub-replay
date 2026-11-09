@@ -225,6 +225,23 @@ class StudyPlaybackTest {
     }
 
     @Test
+    fun dictationPausesAfterEachLineAndHidesSubtitlesOutsideThePanelWhilePlaying() {
+        val settings = StudySettings(playMode = StudyPlayMode.DICTATION)
+        assertEquals(StudyAction.Pause, play(StudyPlaybackDriver(), settings, 900, 3_000).single().second)
+        assertEquals(CaptionVisibility.PAUSED, studyCaptionVisibility(CaptionVisibility.ALWAYS, StudyPlayMode.DICTATION))
+        assertEquals(StudyPlayMode.DICTATION, storedStudyPlayMode("dictation"))
+        // The panel stays while the video plays: its rows and box hide each line themselves.
+        val playing = DualSubUiState(studyPlayMode = StudyPlayMode.DICTATION, playbackPaused = false)
+        assertFalse(playing.showOriginal())
+        assertTrue(playing.dictationInPanel())
+        assertFalse("Live subtitles have no lines to hide", playing.copy(liveFallback = true).dictationInPanel())
+        assertFalse(
+            "Both lines set to never: nothing to dictate",
+            playing.copy(originalVisibility = CaptionVisibility.NEVER, translatedVisibility = CaptionVisibility.NEVER).dictationInPanel(),
+        )
+    }
+
+    @Test
     fun newWordLinesPausesOnlyOnLinesWithOneNewWord() {
         val settings = StudySettings(playMode = StudyPlayMode.NEW_WORD_LINES, knownWordsMode = KnownWordsMode.MANUAL)
         val asked = play(StudyPlaybackDriver(), settings, 900, 11_000, newWordLines = setOf(1))

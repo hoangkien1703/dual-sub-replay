@@ -101,6 +101,7 @@ class AiActionsTest {
     @Test
     fun theStudySettingsTakeTheirDocumentedValues() {
         assertEquals("listen_first", setting("study_play_mode", "Listen first"))
+        assertEquals("dictation", setting("study_play_mode", "Dictation"))
         assertEquals("pause_after_line", setting("study_play_mode", "pause after each line"))
         assertEquals("normal", setting("study_play_mode", "off"))
         assertEquals(null, setting("study_play_mode", "shadowing"))

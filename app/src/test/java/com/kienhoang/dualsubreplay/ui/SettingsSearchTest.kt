@@ -13,7 +13,12 @@ class SettingsSearchTest {
         listOf(
             SettingsSearchEntry("Text size", "Reading & view", SearchableSetting.TEXT_SIZE),
             SettingsSearchEntry("Loop button on the playing line", "Study tools", SearchableSetting.LOOP_BUTTON),
-            SettingsSearchEntry("Play mode", "Study tools", SearchableSetting.PLAY_MODE),
+            SettingsSearchEntry(
+                "Play mode",
+                "Study tools",
+                SearchableSetting.PLAY_MODE,
+                choices = listOf("Normal", "Pause after each line", "Listen first", "Dictation"),
+            ),
             SettingsSearchEntry("Cỡ chữ", "Đọc & xem", SearchableSetting.TEXT_SIZE),
             SettingsSearchEntry("Study tools", "More settings", section = MoreSettingsSection.STUDY),
             SettingsSearchEntry("Translate to", "Languages", SearchableSetting.TRANSLATE_TO),
@@ -26,6 +31,16 @@ class SettingsSearchTest {
         assertEquals(listOf("Cỡ chữ"), searchSettings(entries, "đọc").map { it.title })
         assertEquals(emptyList<SettingsSearchEntry>(), searchSettings(entries, "   "))
         assertEquals(emptyList<SettingsSearchEntry>(), searchSettings(entries, "volume"))
+    }
+
+    @Test
+    fun aSettingIsFoundByTheNamesOfItsChoices() {
+        assertEquals(listOf("Play mode"), searchSettings(entries, "pause").map { it.title })
+        assertEquals(listOf("Play mode"), searchSettings(entries, "dictation").map { it.title })
+        assertEquals(listOf("Play mode"), searchSettings(entries, "after each").map { it.title })
+        // All the words must be in one choice.
+        assertEquals(emptyList<SettingsSearchEntry>(), searchSettings(entries, "pause dictation"))
+        assertTrue(SearchableSetting.PLAY_MODE.alsoFinds.containsAll(StudyPlayMode.entries.map { it.titleRes }))
     }
 
     @Test

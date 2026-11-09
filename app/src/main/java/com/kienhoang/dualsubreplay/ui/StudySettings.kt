@@ -72,6 +72,9 @@ enum class StudyPlayMode(
     PAUSE_AFTER_LINE("pause_after_line", R.string.study_play_mode_pause_after, R.string.study_play_mode_pause_after_description),
     READ_FIRST("read_first", R.string.study_play_mode_read_first, R.string.study_play_mode_read_first_description),
     LISTEN_FIRST("listen_first", R.string.study_play_mode_listen_first, R.string.study_play_mode_listen_first_description),
+
+    /** Lines stay hidden until the learner checks what they typed (owner pick 2026-11-09); see `Dictation.kt`. */
+    DICTATION("dictation", R.string.study_play_mode_dictation, R.string.study_play_mode_dictation_description),
     REPEAT_LINE("repeat_line", R.string.study_play_mode_repeat, R.string.study_play_mode_repeat_description),
     NEW_WORD_LINES("new_word_lines", R.string.study_play_mode_new_word, R.string.study_play_mode_new_word_description),
 }
@@ -197,12 +200,17 @@ internal fun studyPreferences(context: Context): SharedPreferences = context.get
 
 /**
  * Listen first hides subtitles while the video plays: a line set to show always shows only while
- * paused. Never stays never.
+ * paused. Never stays never. Dictation does the same outside the subtitle panel (full screen, the
+ * overlay); the panel hides each line until it is revealed.
  */
 internal fun studyCaptionVisibility(
     stored: CaptionVisibility,
     mode: StudyPlayMode,
-): CaptionVisibility = if (mode == StudyPlayMode.LISTEN_FIRST && stored == CaptionVisibility.ALWAYS) CaptionVisibility.PAUSED else stored
+): CaptionVisibility = if (mode.hidesWhilePlaying && stored == CaptionVisibility.ALWAYS) CaptionVisibility.PAUSED else stored
+
+/** Listen first and Dictation keep subtitles (and YouTube's own captions) hidden while the video plays. */
+internal val StudyPlayMode.hidesWhilePlaying: Boolean
+    get() = this == StudyPlayMode.LISTEN_FIRST || this == StudyPlayMode.DICTATION
 
 /** The Study tools settings, following every change to them (from the settings page or the assistant). */
 @Composable

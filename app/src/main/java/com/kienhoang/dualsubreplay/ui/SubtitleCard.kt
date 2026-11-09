@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
@@ -82,8 +83,10 @@ internal fun CompactSubtitleCard(
     thirdText: String? = null,
     /** The loop button at the row's end (Study tools → Loop button on the playing line), or null for none. */
     loop: LineLoopButton? = null,
+    /** Dictation: the line is hidden until revealed, and this (one dot per word) shows instead. */
+    hiddenHint: String? = null,
 ) {
-    if (!showOriginal && !showTranslation) return
+    if (hiddenHint == null && !showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
     OutlinedCard(
         modifier =
@@ -110,76 +113,101 @@ internal fun CompactSubtitleCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (replayEnabled) {
-                Card(
-                    modifier = Modifier.size(34.dp),
-                    shape = CircleShape,
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Icon(
-                            Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.player_replay_paragraph),
-                            modifier = Modifier.size(22.dp),
-                            tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-            }
+            if (replayEnabled) ReplayCircle(active)
             if (replayEnabled) Spacer(Modifier.size(9.dp))
-            Column(Modifier.weight(1f)) {
-                val isSentenceEligibleForPos = !wordLearningActiveOnly || active
-                // true marks the translation line.
-                val lines = subtitleLineOrder(false.takeIf { showOriginal }, true.takeIf { showTranslation }, translationPosition)
-                lines.forEach { translated ->
-                    if (translated) {
-                        TranslatedCardText(
-                            segment,
-                            active,
-                            activeWordIndex,
-                            fontScale,
-                            originalColor,
-                            translatedColor,
-                            highlightColor,
-                            wordLearningEnabled,
-                            wordLearningTarget,
-                            isSentenceEligibleForPos,
-                            tapToLearnEnabled,
-                            resolvedSourceLanguage,
-                            targetLanguage,
-                            stringResource(pendingTranslationTextRes(isDownloadingTranslationModel, translationUnavailable)),
-                            onWordClick,
-                            onReplay,
-                        )
-                    } else {
-                        OriginalCardText(
-                            segment,
-                            active,
-                            activeWordIndex,
-                            fontScale,
-                            originalColor,
-                            translatedColor,
-                            highlightColor,
-                            wordLearningEnabled,
-                            wordLearningTarget,
-                            isSentenceEligibleForPos,
-                            tapToLearnEnabled,
-                            resolvedSourceLanguage,
-                            targetLanguage,
-                            isDownloadingTranslationModel,
-                            onWordClick,
-                            onReplay,
-                        )
+            if (hiddenHint != null) {
+                HiddenLineText(hiddenHint, fontScale, Modifier.weight(1f))
+            } else {
+                Column(Modifier.weight(1f)) {
+                    val isSentenceEligibleForPos = !wordLearningActiveOnly || active
+                    // true marks the translation line.
+                    val lines = subtitleLineOrder(false.takeIf { showOriginal }, true.takeIf { showTranslation }, translationPosition)
+                    lines.forEach { translated ->
+                        if (translated) {
+                            TranslatedCardText(
+                                segment,
+                                active,
+                                activeWordIndex,
+                                fontScale,
+                                originalColor,
+                                translatedColor,
+                                highlightColor,
+                                wordLearningEnabled,
+                                wordLearningTarget,
+                                isSentenceEligibleForPos,
+                                tapToLearnEnabled,
+                                resolvedSourceLanguage,
+                                targetLanguage,
+                                stringResource(pendingTranslationTextRes(isDownloadingTranslationModel, translationUnavailable)),
+                                onWordClick,
+                                onReplay,
+                            )
+                        } else {
+                            OriginalCardText(
+                                segment,
+                                active,
+                                activeWordIndex,
+                                fontScale,
+                                originalColor,
+                                translatedColor,
+                                highlightColor,
+                                wordLearningEnabled,
+                                wordLearningTarget,
+                                isSentenceEligibleForPos,
+                                tapToLearnEnabled,
+                                resolvedSourceLanguage,
+                                targetLanguage,
+                                isDownloadingTranslationModel,
+                                onWordClick,
+                                onReplay,
+                            )
+                        }
                     }
+                    thirdText?.let { ThirdLineText(it, fontScale, translatedColor, Modifier.padding(top = 2.dp)) }
                 }
-                thirdText?.let { ThirdLineText(it, fontScale, translatedColor, Modifier.padding(top = 2.dp)) }
             }
             loop?.let { LineLoopIconButton(it) }
         }
     }
+}
+
+/** The round play icon at a row's start: filled with the accent colour on the playing row. */
+@Composable
+private fun ReplayCircle(active: Boolean) {
+    Card(
+        modifier = Modifier.size(34.dp),
+        shape = CircleShape,
+        colors =
+            CardDefaults.cardColors(
+                containerColor = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            ),
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(
+                Icons.Default.PlayArrow,
+                contentDescription = stringResource(R.string.player_replay_paragraph),
+                modifier = Modifier.size(22.dp),
+                tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+}
+
+/** A line Dictation hides: dots in place of its words, read out as "Hidden line". */
+@Composable
+private fun HiddenLineText(
+    dots: String,
+    fontScale: Float,
+    modifier: Modifier,
+) {
+    val description = stringResource(R.string.dictation_hidden_line)
+    Text(
+        text = dots,
+        modifier = modifier.semantics { contentDescription = description }.testTag("dictation_hidden_line"),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontSize = (16 * fontScale).sp,
+        letterSpacing = 1.sp,
+    )
 }
 
 /** The loop button of one transcript row: whether its line loops, and what a tap does. */

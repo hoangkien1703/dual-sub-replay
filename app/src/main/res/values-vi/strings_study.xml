@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">Dừng ở đầu mỗi dòng để bạn đọc trước khi nghe.</string>
     <string name="study_play_mode_listen_first">Nghe trước</string>
     <string name="study_play_mode_listen_first_description">Ẩn phụ đề khi video đang phát, rồi dừng sau mỗi dòng và hiện phụ đề.</string>
+    <string name="study_play_mode_dictation">Nghe chép</string>
+    <string name="study_play_mode_dictation_description">Ẩn từng dòng cho đến khi bạn gõ lại những gì nghe được. Video dừng sau mỗi dòng; nhấn Kiểm tra để xem chỗ bạn nghe sót. Phụ đề do người làm cho kết quả tốt nhất: phụ đề tự động có thể có lỗi.</string>
     <string name="study_play_mode_repeat">Lặp lại mỗi dòng</string>
     <string name="study_play_mode_repeat_description">Phát mỗi dòng vài lần rồi mới sang dòng tiếp theo. Mãi mãi lặp lại dòng đó cho đến khi bạn chạm vào dòng khác hoặc tua.</string>
     <string name="study_repeat_forever">Mãi mãi</string>
@@ -96,4 +98,12 @@
     <string name="study_ankiconnect_open">Mở AnkiConnect Android</string>
     <string name="study_loop_button_title">Nút lặp trên dòng đang phát</string>
     <string name="study_loop_button_description">Hiện một biểu tượng lặp nhỏ trên dòng đang phát trong bản chép lời. Chạm vào để lặp lại dòng đó cho đến khi bạn chạm lại. Chạm vào dòng khác hoặc tua video thì sẽ lặp dòng đó.</string>
+    <string name="dictation_type_what_you_heard">Gõ những gì bạn nghe được</string>
+    <string name="dictation_replay">Nghe lại</string>
+    <string name="dictation_show">Hiện</string>
+    <string name="dictation_check">Kiểm tra</string>
+    <string name="dictation_next">Tiếp</string>
+    <string name="dictation_perfect">Hoàn hảo!</string>
+    <string name="dictation_score">Đúng %1$d/%2$d</string>
+    <string name="dictation_hidden_line">Dòng đang ẩn</string>
 </resources>

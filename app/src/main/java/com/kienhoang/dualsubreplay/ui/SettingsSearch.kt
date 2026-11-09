@@ -74,6 +74,8 @@ internal enum class SearchableSetting(
     val section: MoreSettingsSection,
     val anchor: String?,
     val keys: Set<String>,
+    /** Names of the setting's choices, so "pause" or "dictation" finds Play mode (2026-11-09). */
+    val alsoFinds: List<Int> = emptyList(),
 ) {
     ORIGINAL_LANGUAGE(
         R.string.settings_original_language,
@@ -217,6 +219,7 @@ internal enum class SearchableSetting(
         MoreSettingsSection.STUDY,
         "study_play_mode",
         setOf(STUDY_PLAY_MODE_PREFERENCE, STUDY_REPEAT_COUNT_PREFERENCE),
+        StudyPlayMode.entries.map { it.titleRes },
     ),
     LOOP_BUTTON(R.string.study_loop_button_title, MoreSettingsSection.STUDY, "loop_button_switch", setOf(LOOP_BUTTON_PREFERENCE)),
     SKIP_SILENCE(R.string.study_skip_silence_title, MoreSettingsSection.STUDY, "skip_silence", setOf(SKIP_SILENCE_PREFERENCE)),
@@ -339,6 +342,8 @@ internal data class SettingsSearchEntry(
     val sectionTitle: String,
     val setting: SearchableSetting? = null,
     val section: MoreSettingsSection? = setting?.section,
+    /** The names of the setting's choices ([SearchableSetting.alsoFinds]), matched like its name. */
+    val choices: List<String> = emptyList(),
 )
 
 /** Lower case without accents, so "tieng viet" finds "Tiếng Việt" and "cafe" finds "café". */
@@ -366,9 +371,10 @@ internal fun searchSettings(
         .mapNotNull { entry ->
             val title = normalizedForSearch(entry.title)
             val withSection = "$title ${normalizedForSearch(entry.sectionTitle)}"
+            val choices = entry.choices.map(::normalizedForSearch)
             when {
                 title.startsWith(normalizedQuery) -> 0
-                words.all { it in title } -> 1
+                words.all { it in title } || choices.any { choice -> words.all { it in choice } } -> 1
                 words.all { it in withSection } -> 2
                 else -> null
             }?.let { rank -> rank to entry }

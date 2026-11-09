@@ -12,6 +12,8 @@
     <string name="study_play_mode_read_first_description">각 줄의 시작에서 멈춰 듣기 전에 읽을 수 있습니다.</string>
     <string name="study_play_mode_listen_first">먼저 듣기</string>
     <string name="study_play_mode_listen_first_description">재생 중에는 자막을 숨기고, 각 줄 뒤에 일시정지하며 자막을 보여 줍니다.</string>
+    <string name="study_play_mode_dictation">받아쓰기</string>
+    <string name="study_play_mode_dictation_description">들은 내용을 입력할 때까지 각 줄을 숨깁니다. 각 줄 뒤에 동영상이 일시정지되고, 확인을 누르면 놓친 부분을 볼 수 있습니다. 사람이 만든 자막에서 가장 잘 작동합니다. 자동 자막에는 오류가 있을 수 있습니다.</string>
     <string name="study_play_mode_repeat">각 줄 반복</string>
     <string name="study_play_mode_repeat_description">각 줄을 여러 번 재생한 뒤 다음으로 넘어갑니다. 계속을 고르면 다른 줄을 탭하거나 탐색할 때까지 그 줄을 반복합니다.</string>
     <string name="study_repeat_forever">계속</string>
@@ -96,4 +98,12 @@
     <string name="study_ankiconnect_open">AnkiConnect Android 열기</string>
     <string name="study_loop_button_title">재생 중인 줄에 반복 버튼</string>
     <string name="study_loop_button_description">자막 목록에서 재생 중인 줄에 작은 반복 아이콘을 표시합니다. 탭하면 그 줄을 반복하고, 다시 탭하면 멈춥니다. 다른 줄을 탭하거나 영상을 이동하면 그 줄을 반복합니다.</string>
+    <string name="dictation_type_what_you_heard">들은 내용을 입력하세요</string>
+    <string name="dictation_replay">다시 듣기</string>
+    <string name="dictation_show">보기</string>
+    <string name="dictation_check">확인</string>
+    <string name="dictation_next">다음</string>
+    <string name="dictation_perfect">완벽해요!</string>
+    <string name="dictation_score">%2$d개 중 %1$d개 맞음</string>
+    <string name="dictation_hidden_line">숨겨진 줄</string>
 </resources>

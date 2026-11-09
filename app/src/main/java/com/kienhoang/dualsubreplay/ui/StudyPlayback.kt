@@ -362,7 +362,7 @@ internal class StudyPlaybackDriver {
         if (index != line && tick.timeMs >= end + STUDY_CATCH_UP_MS) return null
         handled = id
         return when (mode) {
-            StudyPlayMode.PAUSE_AFTER_LINE, StudyPlayMode.LISTEN_FIRST -> StudyAction.Pause
+            StudyPlayMode.PAUSE_AFTER_LINE, StudyPlayMode.LISTEN_FIRST, StudyPlayMode.DICTATION -> StudyAction.Pause
             StudyPlayMode.NEW_WORD_LINES -> StudyAction.Pause.takeIf { line in tick.newWordLines }
             StudyPlayMode.READ_FIRST -> readNext(tick.segments, line + 1) ?: StudyAction.Pause
             StudyPlayMode.REPEAT_LINE -> repeat(tick, line)
@@ -501,6 +501,9 @@ internal class StudyPlaybackRunner(
 
     /** The loop button's line, shared with the transcript panel. */
     val lineLoop = LineLoop()
+
+    /** Dictation's revealed lines and answers, kept while the panel closes or the phone turns. */
+    val dictation = DictationState()
 
     @Volatile var state: DualSubUiState? = null
 
