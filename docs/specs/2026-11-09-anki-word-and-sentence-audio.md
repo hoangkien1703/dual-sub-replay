@@ -93,7 +93,7 @@ Implementation notes:
 
 ## Follow-up: empty Sentence audio in v1.8.29
 
-lion737 reported (discussion #81, 2026-11-09) a card whose Sentence audio stayed empty. First guess: the WebView's `mediaPlaybackRequiresUserGesture` keeps the recorder's audio context suspended. CI disproved it: under that rule the context runs in the main frame (Chromium applies the tap rule to Web Audio only in cross-origin frames). The wake code was removed again; `LineAudioWebViewTest` now keeps the rule on, as the app does, so this stays checked. Cause still open: next step is a real YouTube video in the emulator's WebView and a phone test.
+lion737 reported (discussion #81, 2026-11-09) a card whose Sentence audio stayed empty. First guess: the WebView's `mediaPlaybackRequiresUserGesture` keeps the recorder's audio context suspended. CI disproved it: under that rule the context runs in the main frame (Chromium applies the tap rule to Web Audio only in cross-origin frames). The wake code was removed again; `LineAudioWebViewTest` now keeps the rule on, as the app does, so this stays checked. A probe with a real YouTube video in the emulator was inconclusive (a WebView with no window never loaded the video). Cause still open: next step is a phone test.
 
 ## Follow-up: the phone's voice for words
 

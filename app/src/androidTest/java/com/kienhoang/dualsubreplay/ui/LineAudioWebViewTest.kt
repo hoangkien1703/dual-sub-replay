@@ -99,69 +99,6 @@ class LineAudioWebViewTest {
         }
     }
 
-    /**
-     * Temporary probe (removed before merge): does the recorder hear a real YouTube video in the
-     * emulator's WebView? lion737's v1.8.29 card came without its sentence sound.
-     */
-    @Test
-    fun probeTheRecorderOnARealYouTubeVideo() {
-        val loaded = CountDownLatch(1)
-        var web: WebView? = null
-        val notes = StringBuilder()
-        try {
-            instrumentation.runOnMainSync {
-                web =
-                    WebView(instrumentation.targetContext).apply {
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.mediaPlaybackRequiresUserGesture = false
-                        webViewClient =
-                            object : WebViewClient() {
-                                override fun onPageFinished(
-                                    view: WebView,
-                                    url: String,
-                                ) = loaded.countDown()
-                            }
-                        loadUrl("https://m.youtube.com/watch?v=jNQXAC9IVRw")
-                    }
-            }
-            loaded.await(40, TimeUnit.SECONDS)
-            val probe =
-                "JSON.stringify((function(){const v=document.querySelector('video');" +
-                    "return v?{t:v.currentTime,p:v.paused,m:v.muted,vol:v.volume,rs:v.readyState,src:(v.src||'').slice(0,12)," +
-                    "cls:v.className,ad:!!document.querySelector('.ad-showing, .ad-interrupting'),url:location.href," +
-                    "cs:typeof v.captureStream}:{none:true,url:location.href,title:document.title}})())"
-            val deadline = System.currentTimeMillis() + 60_000
-            var second = 0.0
-            while (System.currentTimeMillis() < deadline && second < 9.0) {
-                evaluate(
-                    web!!,
-                    "(function(){const v=document.querySelector('video'); if (v && v.paused) { v.muted=false; v.play().catch(function(){}); } })()",
-                )
-                instrumentation.runOnMainSync { web!!.settings.mediaPlaybackRequiresUserGesture = true }
-                val state = evaluate(web!!, webLineAudioScript(on = true, videoId = "jNQXAC9IVRw"))
-                val video = evaluate(web!!, probe)
-                notes
-                    .append("\n")
-                    .append(state)
-                    .append(" ")
-                    .append(video)
-                second = Regex("\\\\\"t\\\\\":([0-9.]+)")
-                    .find(video.orEmpty())
-                    ?.groupValues
-                    ?.get(1)
-                    ?.toDoubleOrNull() ?: 0.0
-                Thread.sleep(1_000)
-            }
-            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(audioLine("jNQXAC9IVRw", 5_000, 7_000)!!)))
-            val peak = clip?.samples?.maxOf { abs(it.toInt()) }
-            android.util.Log.i("LineAudioProbe", "peak=$peak notes=$notes")
-            assertTrue("real YouTube: clip=${clip?.samples?.size} peak=$peak$notes", peak != null && peak > 1_000)
-        } finally {
-            instrumentation.runOnMainSync { web?.destroy() }
-        }
-    }
-
     private fun waitForVideo(
         web: WebView,
         second: Double,
