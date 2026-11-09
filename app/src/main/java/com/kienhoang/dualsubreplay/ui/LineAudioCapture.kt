@@ -26,6 +26,7 @@ import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -51,6 +52,12 @@ private const val LINE_AUDIO_PRUNE_MS = 60 * 60 * 1000L
 internal object LineAudioBridge {
     @Volatile
     private var capturer: (suspend (AudioLine) -> File?)? = null
+
+    /** TEMPORARY (preview only): the page recorder's state and the last clip result, shown in Settings. */
+    val status = MutableStateFlow("")
+
+    @Volatile
+    var lastClip = ""
 
     /** Wakes the recorder's loop early, for example when a card starts waiting for its clip. */
     val wake = Channel<Unit>(Channel.CONFLATED)
@@ -156,6 +163,11 @@ internal fun LineAudioPageScripts(
                 val videoId = browseVideoSelection(url)?.videoId?.takeIf { isYouTubeWebUrl(url) }
                 if (videoId != null) webView.evaluateJavascript(webLineAudioScript(on = true, videoId = videoId), null)
                 val playback = WebVideoBridge.playback.value?.takeIf { it.videoId == videoId }
+                val debug = runCatching { org.json.JSONTokener(evaluate(webView, webLineAudioDebugScript()) ?: "").nextValue() }.getOrNull()
+                LineAudioBridge.status.value =
+                    "video=$videoId playback=${WebVideoBridge.playback.value?.let {
+                        "${it.videoId}@${it.positionMs}"
+                    }}\n$debug\n${LineAudioBridge.lastClip}"
                 val waiting = withContext(Dispatchers.IO) { pending.all() }
                 if (playback != null) {
                     val now = SystemClock.elapsedRealtime()
@@ -192,6 +204,16 @@ internal fun lineAudioWanted(
     ankiDroidInstalled: Boolean,
 ): Boolean = settings.ankiDroid && settings.cardAudio && (ankiDroidInstalled || settings.sendTo == FlashcardApp.ANKICONNECT)
 
+private suspend fun evaluate(
+    webView: WebView,
+    script: String,
+): String? =
+    withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine { continuation ->
+            webView.evaluateJavascript(script) { value -> if (continuation.isActive) continuation.resume(value) }
+        }
+    }
+
 /** Cuts [line] from the page's recorded sound and keeps it as a clip; null when the page doesn't hold all of it. */
 private suspend fun captureLine(
     webView: WebView,
@@ -207,6 +229,10 @@ private suspend fun captureLine(
                 webView.evaluateJavascript(webLineAudioClipScript(line)) { value -> if (continuation.isActive) continuation.resume(value) }
             }
         } ?: return null
-    val pcm = withContext(Dispatchers.Default) { parseLinePcm(raw) } ?: return null
+    val pcm = withContext(Dispatchers.Default) { parseLinePcm(raw) }
+    LineAudioBridge.lastClip =
+        "clip ${line.startMs}-${line.endMs}: " +
+        if (pcm == null) "none (${raw.take(40)})" else "${pcm.samples.size / pcm.sampleRate.toFloat()} s"
+    if (pcm == null) return null
     return withContext(Dispatchers.IO) { if (clips.save(line, pcm)) clips.file(line) else null }
 }

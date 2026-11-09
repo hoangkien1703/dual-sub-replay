@@ -59,6 +59,7 @@ private val WEB_LINE_AUDIO_RECORDER =
       if (state.context && state.context.state === 'suspended') state.context.resume().catch(function() {});
     };
     const listen = function(event) {
+      state.calls = (state.calls || 0) + 1;
       const video = state.video;
       if (!video || video.paused || video.seeking || video.ended || video.readyState < 3 || adShowing() || pageVideoId() !== state.videoId) {
         state.last = null;
@@ -151,6 +152,19 @@ private val WEB_LINE_AUDIO_RECORDER =
         for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
         return JSON.stringify({ rate: state.context.sampleRate, pcm: btoa(binary) });
       },
+      debug: function() {
+        // TEMPORARY (preview only): what the recorder holds, to find the empty Sentence audio.
+        const video = pageVideo();
+        const blocks = state.blocks;
+        return JSON.stringify({
+          ctx: state.context ? state.context.state : 'none', rate: state.context ? state.context.sampleRate : 0,
+          track: state.track ? state.track.readyState : 'none', same: video === state.video,
+          id: state.videoId, page: pageVideoId(), t: video ? Math.round(video.currentTime * 10) / 10 : -1,
+          paused: video ? video.paused : null, rs: video ? video.readyState : -1, muted: video ? video.muted : null,
+          ad: adShowing(), n: blocks.length, from: blocks.length ? Math.round(blocks[0].start * 10) / 10 : null,
+          to: blocks.length ? Math.round(blocks[blocks.length - 1].end * 10) / 10 : null, calls: state.calls || 0,
+        });
+      },
       stop: function() {
         document.removeEventListener('pointerdown', resume, true);
         document.removeEventListener('touchend', resume, true);
@@ -164,6 +178,10 @@ private val WEB_LINE_AUDIO_RECORDER =
     };
     window.__dualSubLineAudio = recorder;
     """.trimIndent()
+
+/** TEMPORARY (preview only): the recorder's state as JSON, or null without a recorder. */
+internal fun webLineAudioDebugScript(): String =
+    "(function(){const r=window.__dualSubLineAudio;return r?r.debug():JSON.stringify({recorder:false,url:location.href});})()"
 
 /**
  * Asks the page recorder for [line]'s sound with its lead and tail (or up to the line's end, when the
