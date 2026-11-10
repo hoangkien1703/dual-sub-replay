@@ -3,8 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -103,26 +103,27 @@ internal fun CaptionVisibilitySettings() {
     }
 }
 
-/** One row in the gear popup for the setting people flip most: original or translated lines only when paused. */
-@OptIn(ExperimentalLayoutApi::class)
+/**
+ * One line in the gear popup for the setting people flip most: translated lines only when paused.
+ * Original stays on the settings page, so the popup can't hide both lines and leave the video blank.
+ */
 @Composable
 internal fun HideWhilePlayingRow(
-    original: CaptionVisibility,
     translated: CaptionVisibility,
     onChange: (original: Boolean, visibility: CaptionVisibility) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().testTag("hide_while_playing")) {
+    Row(
+        Modifier.fillMaxWidth().testTag("hide_while_playing"),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             stringResource(R.string.settings_hide_while_playing),
             style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
         )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HideWhilePlayingChip(R.string.settings_colored_lines_original, original, "hide_original_while_playing") {
-                onChange(true, original.toggledHideWhilePlaying())
-            }
-            HideWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "hide_translation_while_playing") {
-                onChange(false, translated.toggledHideWhilePlaying())
-            }
+        HideWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "hide_translation_while_playing") {
+            onChange(false, translated.toggledHideWhilePlaying())
         }
     }
 }
