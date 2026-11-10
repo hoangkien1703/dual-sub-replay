@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">Hər altyazının altında başqa dildə daha bir tərcümə. Bir az daha çox internet trafiki işlədir.</string>
     <string name="settings_third_line_title">Üçüncü altyazı sətri</string>
     <string name="settings_third_line_choose">Dil seçin</string>
-    <string name="settings_subtitle_languages">Altyazı dilləri</string>
+    <string name="settings_quick_subtitles">Altyazılar</string>
+    <string name="settings_hide_while_playing">Oynayarkən gizlət</string>
     <string name="settings_dual_subtitle_settings">İkidilli altyazı ayarları</string>
     <string name="settings_done">Hazır</string>
     <string name="settings_close_settings">Ayarları bağla</string>
@@ -115,6 +116,9 @@
     <string name="settings_phone_voice_description">Sözləri və Anki söz səsini Google-un onlayn səsi əvəzinə Android-in mətndən nitqə ayarlarında seçilmiş səslə (kişi və ya qadın) oxu.</string>
     <string name="settings_meaning_in_context_title">Bu cümlədəki mənası (Sİ)</string>
     <string name="settings_meaning_in_context_description">Sözə toxunanda Əlavə ayarlar → Sİ köməkçisi bölməsindəki Sİ onun bu cümlədəki mənasını lüğət mənasının üstündə göstərir. Toxunduğunuz hər söz öz cümləsini həmin xidmətə göndərir və açarınızdan istifadə edir.</string>
+    <string name="settings_meaning_order_title">Əvvəlcə göstər</string>
+    <string name="settings_meaning_order_sentence">Bu cümlədəki mənası</string>
+    <string name="settings_meaning_order_dictionary">Lüğət mənası</string>
     <string name="settings_word_learning_mode_title">Söz öyrənmə rejimi (nitq hissəsi rəngləri)</string>
     <string name="settings_word_learning_mode_description">Cümlə quruluşunu görmək üçün sözləri qrammatik roluna görə (isimlər, fellər, sifətlər, ədatlar) rəngləyir.</string>
     <string name="settings_colored_lines_title">Rəngli altyazı sətirləri</string>

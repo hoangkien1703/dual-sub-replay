@@ -145,6 +145,26 @@ internal fun nearestWord(
         }
     } ?: -1
 
+/**
+ * What Copy puts on the clipboard for [words] of [tokens]: the text from the first to the last
+ * word, plus the line's opening or closing punctuation ("¿", "?", "." and the like) when the
+ * selection reaches that end of the line (lion737, discussion #81, 2026-11-10).
+ */
+internal fun copiedPhrase(
+    text: String,
+    tokens: List<AnalyzedToken>,
+    words: IntRange,
+): String {
+    var start = tokens[words.first].startIndex
+    var end = tokens[words.last].endIndex
+    if (words.first == 0) while (start > 0 && text[start - 1] in OPENING_PUNCTUATION) start--
+    if (words.last == tokens.lastIndex) while (end < text.length && text[end] in CLOSING_PUNCTUATION) end++
+    return text.substring(start, end)
+}
+
+private const val OPENING_PUNCTUATION = "¿¡\"“„«‹'‘(（[「『"
+private const val CLOSING_PUNCTUATION = ".?!…,;:\"”»›'’)）]」』。？！、"
+
 /** The words tap-to-learn recognizes in a subtitle line, in text order. */
 internal fun subtitleWordTokens(
     text: String,
@@ -451,6 +471,7 @@ internal fun SelectableSubtitleText(
                 PhraseActionBar(
                     selection = textLayout.getPathForRange(start, end).getBounds(),
                     phrase = text.substring(start, end),
+                    copyText = copiedPhrase(text, tokens, words),
                     singleWord = words.first == words.last,
                     speechMessage = controller.actions.speechMessage(),
                     dictionaryNote =
@@ -733,6 +754,7 @@ private fun TextStyle.centeredIf(centered: Boolean): TextStyle = if (centered) c
 private fun PhraseActionBar(
     selection: Rect,
     phrase: String,
+    copyText: String,
     singleWord: Boolean,
     speechMessage: String?,
     @StringRes dictionaryNote: Int?,
@@ -776,7 +798,7 @@ private fun PhraseActionBar(
                             label = if (copied) R.string.practice_copied else R.string.practice_copy,
                             tag = "copy",
                         ) {
-                            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, phrase))) }
+                            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(clipLabel, copyText))) }
                             copied = true
                         },
                         PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onClick = onTranslate),

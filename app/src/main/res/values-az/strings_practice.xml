@@ -26,6 +26,7 @@
     <string name="practice_meaning_label">Məna (%1$s)</string>
     <string name="practice_meaning_in_sentence_label">Bu cümlədə (%1$s)</string>
     <string name="practice_meaning_dictionary">Lüğət: %1$s</string>
+    <string name="practice_meaning_in_sentence_under">Bu cümlədə: %1$s</string>
     <string name="practice_meaning_in_sentence_loading">Bu cümlədəki mənası Sİ-dən soruşulur…</string>
     <string name="practice_meaning_in_sentence_no_key">Bu cümlədəki məna üçün Sİ açarı lazımdır: Əlavə ayarlar → Sİ köməkçisi.</string>
     <string name="practice_video_uses_original_sentence">Video nümunəsi orijinal cümlədən istifadə edir.</string>

@@ -78,6 +78,9 @@
     <string name="study_send_to_choose">Choose where to send</string>
     <string name="study_sending_to_anki">Sending…</string>
     <string name="study_sent_to_anki">Sent to %1$s</string>
+    <string name="study_send_again_title">Send this card again?</string>
+    <string name="study_send_again_text">%1$s already has a card for this word. Another one is added, and you can delete the old one there.</string>
+    <string name="study_send_again">Send again</string>
     <string name="study_anki_not_installed">AnkiDroid is not installed on this phone.</string>
     <string name="study_anki_permission_denied">AnkiDroid\'s permission was not given, so no card was added.</string>
     <string name="study_anki_failed">AnkiDroid did not accept the card. Open AnkiDroid, leave it running in the background, then come back and try again.</string>

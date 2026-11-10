@@ -141,6 +141,7 @@ internal data class AiStoredSettings(
     val pronunciationVolume: Float = DEFAULT_PRONUNCIATION_VOLUME,
     val phoneVoice: Boolean = false,
     val meaningInContext: Boolean = false,
+    val meaningOrder: String = MEANING_ORDER_SENTENCE_FIRST,
     val overlayInFullscreen: Boolean = true,
     val overlayWhenRotated: Boolean = true,
     val movableControls: Boolean = true,
@@ -165,6 +166,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         pronunciationVolume = readPronunciationVolume(context),
         phoneVoice = preferences.getBoolean(PHONE_VOICE_PREFERENCE, false),
         meaningInContext = preferences.getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false),
+        meaningOrder = storedMeaningOrder(preferences.getString(MEANING_ORDER_PREFERENCE, null)),
         overlayInFullscreen = preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true),
         overlayWhenRotated = preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true),
         movableControls = preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true),
@@ -203,6 +205,7 @@ private fun aiStoredSettingValue(
         AiSetting.PRONUNCIATION_VOLUME -> Math.round(stored.pronunciationVolume * PERCENT).toString()
         AiSetting.PHONE_VOICE -> onOff(stored.phoneVoice)
         AiSetting.MEANING_IN_CONTEXT -> onOff(stored.meaningInContext)
+        AiSetting.MEANING_ORDER -> stored.meaningOrder
         AiSetting.OVERLAY_IN_FULLSCREEN -> onOff(stored.overlayInFullscreen)
         AiSetting.OVERLAY_WHEN_ROTATED -> onOff(stored.overlayWhenRotated)
         AiSetting.MOVABLE_SUBTITLE_CONTROLS -> onOff(stored.movableControls)
@@ -653,6 +656,7 @@ internal class AppAiActions(
             AiSetting.PRONUNCIATION_VOLUME -> editor.putFloat(PRONUNCIATION_VOLUME_PREFERENCE, value.toFloat() / PERCENT)
             AiSetting.PHONE_VOICE -> editor.putBoolean(PHONE_VOICE_PREFERENCE, on)
             AiSetting.MEANING_IN_CONTEXT -> editor.putBoolean(MEANING_IN_CONTEXT_PREFERENCE, on)
+            AiSetting.MEANING_ORDER -> editor.putString(MEANING_ORDER_PREFERENCE, storedMeaningOrder(value))
             AiSetting.OVERLAY_IN_FULLSCREEN -> editor.putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, on)
             AiSetting.OVERLAY_WHEN_ROTATED -> editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, on)
             AiSetting.MOVABLE_SUBTITLE_CONTROLS -> editor.putBoolean(MOVABLE_OVERLAY_PREFERENCE, on)
@@ -795,6 +799,17 @@ internal class AppAiActions(
                 named(R.string.settings_translation_position_title, string(storedTranslationPosition(value).labelRes))
             AiSetting.TRANSCRIPT_FOLLOW ->
                 named(R.string.settings_transcript_follow_title, string(storedTranscriptFollow(value).labelRes))
+            AiSetting.MEANING_ORDER ->
+                named(
+                    R.string.settings_meaning_order_title,
+                    string(
+                        if (storedMeaningOrder(value) == MEANING_ORDER_SENTENCE_FIRST) {
+                            R.string.settings_meaning_order_sentence
+                        } else {
+                            R.string.settings_meaning_order_dictionary
+                        },
+                    ),
+                )
             AiSetting.PORTRAIT_PANEL_POSITION -> {
                 val position = portraitPanelPositionText(value.toFloat() / PERCENT)
                 named(R.string.settings_portrait_panel_position, string(position.textRes, position.percentage))

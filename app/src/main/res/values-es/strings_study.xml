@@ -67,6 +67,9 @@
     <string name="study_send_to_anki">Enviar a %1$s</string>
     <string name="study_sending_to_anki">Enviando…</string>
     <string name="study_sent_to_anki">Enviada a %1$s</string>
+    <string name="study_send_again_title">¿Enviar esta tarjeta otra vez?</string>
+    <string name="study_send_again_text">%1$s ya tiene una tarjeta de esta palabra. Se añade otra y puedes borrar la antigua allí.</string>
+    <string name="study_send_again">Enviar otra vez</string>
     <string name="study_anki_not_installed">AnkiDroid no está instalado en este teléfono.</string>
     <string name="study_anki_permission_denied">No se dio el permiso de AnkiDroid, así que no se añadió ninguna tarjeta.</string>
     <string name="study_anki_failed">AnkiDroid no aceptó la tarjeta. Abre AnkiDroid, déjalo en segundo plano, vuelve y inténtalo de nuevo.</string>

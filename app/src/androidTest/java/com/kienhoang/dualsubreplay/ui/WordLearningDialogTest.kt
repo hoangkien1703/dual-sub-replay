@@ -47,6 +47,44 @@ class WordLearningDialogTest {
     }
 
     @Test
+    fun showFirstDictionaryMeaningPutsTheSentenceMeaningUnderIt() {
+        val preferences = InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", 0)
+        preferences.edit().putString(MEANING_ORDER_PREFERENCE, MEANING_ORDER_DICTIONARY_FIRST).commit()
+        try {
+            val go =
+                selection.copy(
+                    token = AnalyzedToken("go", 2, 4, PartOfSpeech.VERB),
+                    meaningLanguage = "az",
+                    segment = SubtitleSegment(1, 1000, 3000, "I go to school.", null),
+                )
+            var saved: String? = null
+            compose.setContent {
+                DualSubTheme {
+                    WordLearningDialog(
+                        go,
+                        false,
+                        { "getmək" },
+                        { meaning, _ -> saved = meaning },
+                        {},
+                        null,
+                        {},
+                        onMeaningInContext = { ContextMeaning.Found("gedirəm") },
+                    )
+                }
+            }
+            compose.onNodeWithTag("word_meaning_text").assertTextEquals("getmək")
+            compose.onNodeWithTag("meaning_in_context_under").assertTextEquals("In this sentence: gedirəm")
+            compose.onNodeWithTag("meaning_in_context_text").assertDoesNotExist()
+            saveUiEvidence("word-card-dictionary-first")
+            compose.onNodeWithTag("save_word").performScrollTo().performClick()
+            compose.waitForIdle()
+            compose.runOnIdle { assertEquals("getmək (gedirəm)", saved) }
+        } finally {
+            preferences.edit().remove(MEANING_ORDER_PREFERENCE).commit()
+        }
+    }
+
+    @Test
     fun meaningInTheSentenceShowsAboveTheDictionaryMeaningAndIsSavedWithIt() {
         // lion737 (#81): "go" in "I go to school" is "gedirəm" there, "getmək" in a dictionary.
         val go =

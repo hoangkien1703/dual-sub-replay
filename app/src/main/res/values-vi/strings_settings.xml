@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">Thêm một bản dịch nữa dưới mỗi phụ đề, bằng một ngôn ngữ khác. Tốn thêm một chút dữ liệu mạng.</string>
     <string name="settings_third_line_title">Dòng phụ đề thứ ba</string>
     <string name="settings_third_line_choose">Chọn ngôn ngữ</string>
-    <string name="settings_subtitle_languages">Ngôn ngữ phụ đề</string>
+    <string name="settings_quick_subtitles">Phụ đề</string>
+    <string name="settings_hide_while_playing">Ẩn khi đang phát</string>
     <string name="settings_dual_subtitle_settings">Cài đặt phụ đề kép</string>
     <string name="settings_done">Xong</string>
     <string name="settings_close_settings">Đóng cài đặt</string>
@@ -115,6 +116,9 @@
     <string name="settings_phone_voice_description">Đọc từ và ghi âm thanh từ cho thẻ Anki bằng giọng đã chọn trong cài đặt chuyển văn bản thành giọng nói của Android (nam hoặc nữ), thay vì giọng trực tuyến của Google.</string>
     <string name="settings_meaning_in_context_title">Nghĩa trong câu này (AI)</string>
     <string name="settings_meaning_in_context_description">Khi bạn chạm vào một từ, AI trong Cài đặt khác → Trợ lý AI cho biết nghĩa của từ trong câu đó, ở trên nghĩa trong từ điển. Mỗi từ bạn chạm sẽ gửi câu của nó tới dịch vụ đó và dùng khóa của bạn.</string>
+    <string name="settings_meaning_order_title">Hiện trước</string>
+    <string name="settings_meaning_order_sentence">Nghĩa trong câu này</string>
+    <string name="settings_meaning_order_dictionary">Nghĩa từ điển</string>
     <string name="settings_word_learning_mode_title">Chế độ học từ (màu theo từ loại)</string>
     <string name="settings_word_learning_mode_description">Tô màu từ theo vai trò ngữ pháp (danh từ, động từ, tính từ, trợ từ) để thấy cấu trúc câu.</string>
     <string name="settings_colored_lines_title">Dòng phụ đề được tô màu</string>

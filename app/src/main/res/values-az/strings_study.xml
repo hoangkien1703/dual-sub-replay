@@ -75,6 +75,9 @@
     <string name="study_send_to_choose">Hara göndəriləcəyini seçin</string>
     <string name="study_sending_to_anki">Göndərilir…</string>
     <string name="study_sent_to_anki">Göndərildi: %1$s</string>
+    <string name="study_send_again_title">Bu kart yenidən göndərilsin?</string>
+    <string name="study_send_again_text">%1$s artıq bu söz üçün kartı var. Daha biri əlavə olunur, köhnəsini orada silə bilərsiniz.</string>
+    <string name="study_send_again">Yenidən göndər</string>
     <string name="study_anki_not_installed">Bu telefonda AnkiDroid quraşdırılmayıb.</string>
     <string name="study_anki_permission_denied">AnkiDroid-ə icazə verilmədi, ona görə kart əlavə olunmadı.</string>
     <string name="study_anki_failed">AnkiDroid kartı qəbul etmədi. AnkiDroid-i açın, arxa planda işləməyə buraxın, sonra qayıdıb yenidən cəhd edin.</string>

@@ -67,6 +67,9 @@
     <string name="study_send_to_anki">Kirim ke %1$s</string>
     <string name="study_sending_to_anki">Mengirim…</string>
     <string name="study_sent_to_anki">Terkirim ke %1$s</string>
+    <string name="study_send_again_title">Kirim kartu ini lagi?</string>
+    <string name="study_send_again_text">%1$s sudah punya kartu untuk kata ini. Satu kartu lagi ditambahkan, dan Anda bisa menghapus yang lama di sana.</string>
+    <string name="study_send_again">Kirim lagi</string>
     <string name="study_anki_not_installed">AnkiDroid tidak terpasang di ponsel ini.</string>
     <string name="study_anki_permission_denied">Izin AnkiDroid tidak diberikan, jadi tidak ada kartu yang ditambahkan.</string>
     <string name="study_anki_failed">AnkiDroid tidak menerima kartu. Buka AnkiDroid, biarkan berjalan di latar belakang, lalu kembali dan coba lagi.</string>

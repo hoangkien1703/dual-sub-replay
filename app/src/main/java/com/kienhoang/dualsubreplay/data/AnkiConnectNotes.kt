@@ -239,8 +239,9 @@ internal class AnkiConnectNotes(
         chosenDeck: String?,
         media: AnkiCardMedia? = null,
         options: CardOptions = CardOptions(),
+        again: Boolean = false,
     ): AnkiSendResult {
-        val unsent = unsentAnkiWords(words, ::wasSent)
+        val unsent = unsentAnkiWords(words, again, ::wasSent)
         var skipped = words.distinctBy { it.id }.size - unsent.size
         if (unsent.isEmpty()) return AnkiSendResult(skipped = skipped)
         var sent = 0
@@ -258,7 +259,8 @@ internal class AnkiConnectNotes(
                             picture = files.picture?.let { ankiPicture(storeMedia(it)) }.orEmpty(),
                         )
                     val values = ankiConnectFields(fields, word, fieldMedia, options.front)
-                    val noteId = (call("addNote", JSONObject().put("note", note(deck, noteType, values))) as? Number)?.toLong()
+                    val request = JSONObject().put("note", note(deck, noteType, values, allowDuplicate = again))
+                    val noteId = (call("addNote", request) as? Number)?.toLong()
                     val line = audioLineOf(word)
                     val target = ankiConnectSentenceTarget(fields, values)
                     val waits = options.audio && fieldMedia.sentence.isEmpty()
@@ -366,13 +368,15 @@ internal class AnkiConnectNotes(
         deck: String,
         noteType: String,
         fields: Map<String, String>,
+        allowDuplicate: Boolean = false,
     ): JSONObject =
         JSONObject()
             .put("deckName", deck)
             .put("modelName", noteType)
             .put("fields", JSONObject(fields))
             .put("tags", JSONArray(listOf(ANKI_TAG)))
-            .put("options", JSONObject().put("allowDuplicate", false).put("duplicateScope", "deck"))
+            // Send again (lion737, #81) asks for a second card on purpose; otherwise Anki refuses a duplicate.
+            .put("options", JSONObject().put("allowDuplicate", allowDuplicate).put("duplicateScope", "deck"))
 
     private suspend fun call(
         action: String,

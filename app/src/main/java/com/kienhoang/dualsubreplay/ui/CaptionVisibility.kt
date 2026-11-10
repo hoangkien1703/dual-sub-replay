@@ -1,15 +1,28 @@
 package com.kienhoang.dualsubreplay.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 
 internal const val ORIGINAL_VISIBILITY = "original_caption_visibility"
@@ -25,6 +38,17 @@ enum class CaptionVisibility(
 
     fun visible(paused: Boolean): Boolean = this == ALWAYS || (this == PAUSED && paused)
 }
+
+/**
+ * The gear popup's Hide while playing toggles (owner pick 2026-11-10): ticked unless the line always
+ * shows, so Never counts as hidden too.
+ */
+internal val CaptionVisibility.hiddenWhilePlaying: Boolean
+    get() = this != CaptionVisibility.ALWAYS
+
+/** A tap on a Hide while playing toggle switches Always and Only when paused; from Never it shows the line again. */
+internal fun CaptionVisibility.toggledHideWhilePlaying(): CaptionVisibility =
+    if (this == CaptionVisibility.ALWAYS) CaptionVisibility.PAUSED else CaptionVisibility.ALWAYS
 
 internal fun storedCaptionVisibility(value: String?): CaptionVisibility =
     CaptionVisibility.entries.firstOrNull { it.name == value } ?: CaptionVisibility.ALWAYS
@@ -77,6 +101,52 @@ internal fun CaptionVisibilitySettings() {
             }
         }
     }
+}
+
+/** One row in the gear popup for the setting people flip most: original or translated lines only when paused. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun HideWhilePlayingRow(
+    original: CaptionVisibility,
+    translated: CaptionVisibility,
+    onChange: (original: Boolean, visibility: CaptionVisibility) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().testTag("hide_while_playing")) {
+        Text(
+            stringResource(R.string.settings_hide_while_playing),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HideWhilePlayingChip(R.string.settings_colored_lines_original, original, "hide_original_while_playing") {
+                onChange(true, original.toggledHideWhilePlaying())
+            }
+            HideWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "hide_translation_while_playing") {
+                onChange(false, translated.toggledHideWhilePlaying())
+            }
+        }
+    }
+}
+
+@Composable
+private fun HideWhilePlayingChip(
+    @StringRes labelRes: Int,
+    visibility: CaptionVisibility,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    val selected = visibility.hiddenWhilePlaying
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(stringResource(labelRes)) },
+        leadingIcon =
+            if (selected) {
+                { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
+            } else {
+                null
+            },
+        modifier = Modifier.testTag(tag),
+    )
 }
 
 internal fun shouldSuppressNativeCaptions(

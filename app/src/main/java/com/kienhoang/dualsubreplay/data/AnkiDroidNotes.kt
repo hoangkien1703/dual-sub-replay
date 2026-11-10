@@ -158,8 +158,9 @@ internal fun cardAudioAuthority(context: Context): String = "${context.packageNa
 /** The words of [words] that were not sent before, by id. */
 internal fun unsentAnkiWords(
     words: List<SavedWord>,
+    again: Boolean = false,
     sent: (String) -> Boolean,
-): List<SavedWord> = words.distinctBy { it.id }.filterNot { sent(it.id) }
+): List<SavedWord> = words.distinctBy { it.id }.filterNot { !again && sent(it.id) }
 
 /** Why a send stopped: AnkiDroid missing or not permitted, nothing answering at AnkiConnect's address, or a refusal. */
 internal enum class AnkiProblem { NOT_INSTALLED, NO_PERMISSION, NOT_RUNNING, FAILED }
@@ -212,11 +213,12 @@ internal class AnkiDroidNotes(
         words: List<SavedWord>,
         media: AnkiCardMedia? = null,
         options: CardOptions = CardOptions(),
+        again: Boolean = false,
     ): AnkiSendResult =
         withContext(Dispatchers.IO) {
             if (!installed()) return@withContext AnkiSendResult(problem = AnkiProblem.NOT_INSTALLED)
             if (!permitted()) return@withContext AnkiSendResult(problem = AnkiProblem.NO_PERMISSION)
-            val unsent = unsentAnkiWords(words, ::wasSent)
+            val unsent = unsentAnkiWords(words, again, ::wasSent)
             val skipped = words.distinctBy { it.id }.size - unsent.size
             if (unsent.isEmpty()) return@withContext AnkiSendResult(skipped = skipped)
             var sent = 0
