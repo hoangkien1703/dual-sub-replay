@@ -90,11 +90,7 @@ internal class CardAudioSource(
     override suspend fun files(word: SavedWord): AnkiAudioFiles =
         try {
             val line = audioLineOf(word)
-            val stored = line?.let { withContext(Dispatchers.IO) { clips.file(it) } }
-            val sentence = line?.let { stored ?: LineAudioBridge.captureNow(it) }
-            com.kienhoang.dualsubreplay.data.CardAudioTrace.add(
-                "send ${word.word.take(20)} line=${line?.startMs}-${line?.endMs} stored=${stored != null} sentence=${sentence?.name}",
-            )
+            val sentence = line?.let { withContext(Dispatchers.IO) { clips.file(it) } ?: LineAudioBridge.captureNow(it) }
             AnkiAudioFiles(word = words.record(word), sentence = sentence)
         } catch (cancel: CancellationException) {
             throw cancel
@@ -103,8 +99,6 @@ internal class CardAudioSource(
         }
 
     override fun awaitSentence(item: PendingCardAudio) {
-        com.kienhoang.dualsubreplay.data.CardAudioTrace
-            .add("waits: note ${item.noteId} line ${item.line.startMs}-${item.line.endMs}")
         pending.add(item)
         LineAudioBridge.wake.trySend(Unit)
     }
