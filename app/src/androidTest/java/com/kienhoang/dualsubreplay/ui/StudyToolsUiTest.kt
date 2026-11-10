@@ -156,10 +156,16 @@ class StudyToolsUiTest {
             .onNodeWithText(
                 context.getString(R.string.study_card_front_word_sentence_description),
                 substring = true,
-            ).assertIsDisplayed()
+            ).performScrollTo()
+            .assertIsDisplayed()
         saveUiEvidence("flashcards-picture-and-card-front")
         composeRule.onNodeWithTag("card_front_listening").performClick()
-        composeRule.onNodeWithText(context.getString(R.string.study_card_front_listening_description), substring = true).assertIsDisplayed()
+        composeRule
+            .onNodeWithText(
+                context.getString(R.string.study_card_front_listening_description),
+                substring = true,
+            ).performScrollTo()
+            .assertIsDisplayed()
         composeRule.onNodeWithTag("card_picture_switch").performScrollTo().performClick()
         composeRule.runOnIdle {
             assertEquals("listening", preferences.getString(CARD_FRONT_PREFERENCE, null))
