@@ -40,6 +40,19 @@
     <string name="study_anki_description">Söz kartında və Məşq → İxrac bölməsində Göndər düyməsini göstərir. Düymədəki və ya aşağıdakı ▾ ilə başqa tətbiq seçməsəniz, AnkiDroid-ə göndərir; sonra düymə həmin tətbiqi göstərir.</string>
     <string name="study_card_audio_title">Kartlara səs əlavə et</string>
     <string name="study_card_audio_description">Kartlara söz kartının istifadə etdiyi səslə oxunan söz və videodakı cümlənin əsl səsi əlavə olunur. Cümlə oynayarkən yazılır, buna görə cümlə bitməmiş göndərilən kart səsi cümlə bitəndə alır.</string>
+    <string name="study_card_picture_title">Kartlara şəkil əlavə et</string>
+    <string name="study_card_picture_description">Kartlara videodan şəkil əlavə olunur, sözün cümləsi ekranda olarkən çəkilir. Şəkil yoxdursa, videonun miniatürü istifadə olunur.</string>
+    <string name="study_card_front_title">Kartın üzü</string>
+    <string name="study_card_front_word_sentence">Söz və cümlə</string>
+    <string name="study_card_front_word">Söz</string>
+    <string name="study_card_front_sentence">Cümlə</string>
+    <string name="study_card_front_listening">Dinləmə</string>
+    <string name="study_card_front_word_sentence_description">Üzdə söz cümləsi ilə birlikdə görünür.</string>
+    <string name="study_card_front_word_description">Üzdə yalnız söz görünür; cümlə arxadadır.</string>
+    <string name="study_card_front_sentence_description">Üzdə söz qalın yazılmış cümlə görünür; söz və mənası arxadadır.</string>
+    <string name="study_card_front_listening_description">Üz yalnız cümlənin səsini oxudur; cümlə və söz arxadadır.</string>
+    <string name="study_card_front_note">Bunu dəyişmək əvvəl göndərdiyiniz kartları da dəyişir.</string>
+    <string name="study_card_sound_waits">Cümlənin səsi cümlə sona qədər oynadıqdan sonra əlavə olunur.</string>
     <string name="study_send_to_app_title">Sözləri göndər</string>
     <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
     <string name="study_ankiconnect_description">Bu telefondakı AnkiConnect-ə (127.0.0.1:8765) göndərir, ondan AnkiConnect Android tətbiqi, Yomitan və asbplayer istifadə edir. Serverinin işləməsi üçün AnkiConnect Android-i bir dəfə açın. AnkiConnect DualSub Replay qeyd növü yarada bilmədikdə kartlar Anki-nin Basic qeyd növündən istifadə edir.</string>
@@ -90,6 +103,10 @@
     <plurals name="study_anki_sent_count">
         <item quantity="one">%1$d söz göndərildi: %2$s.</item>
         <item quantity="other">%1$d söz göndərildi: %2$s.</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="one">%1$d kart cümləsinin səsini cümlə oynadıqdan sonra alır.</item>
+        <item quantity="other">%1$d kart cümlələrinin səsini cümlələr oynadıqdan sonra alır.</item>
     </plurals>
     <string name="study_page_token_auto">Avtomatik</string>
     <string name="study_page_token_on">Yandırılıb</string>

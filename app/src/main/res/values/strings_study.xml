@@ -41,6 +41,19 @@
     <string name="study_anki_description">Shows a Send to button on the word card and in Practice → Export. It sends to AnkiDroid unless you pick another app with ▾ on the button or below; the button then shows that app.</string>
     <string name="study_card_audio_title">Add audio to cards</string>
     <string name="study_card_audio_description">Cards get the word in the voice the word card uses, and the line\'s real sound from the video. The line is recorded while it plays, so a card sent before the line ends gets its sound when it does.</string>
+    <string name="study_card_picture_title">Add a picture to cards</string>
+    <string name="study_card_picture_description">Cards get a picture from the video, taken while the word\'s line is on screen. When there is none, the video\'s thumbnail is used.</string>
+    <string name="study_card_front_title">Card front</string>
+    <string name="study_card_front_word_sentence">Word and sentence</string>
+    <string name="study_card_front_word">Word</string>
+    <string name="study_card_front_sentence">Sentence</string>
+    <string name="study_card_front_listening">Listening</string>
+    <string name="study_card_front_word_sentence_description">The front shows the word with its sentence.</string>
+    <string name="study_card_front_word_description">The front shows only the word; the sentence is on the back.</string>
+    <string name="study_card_front_sentence_description">The front shows the sentence with the word in bold; the word and its meaning are on the back.</string>
+    <string name="study_card_front_listening_description">The front only plays the line\'s sound; the sentence and the word are on the back.</string>
+    <string name="study_card_front_note">Changing this also changes cards you sent before.</string>
+    <string name="study_card_sound_waits">The sentence\'s sound is added once the line has played to the end.</string>
     <string name="study_send_to_app_title">Send words to</string>
     <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
     <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>
@@ -93,6 +106,10 @@
     <plurals name="study_anki_sent_count">
         <item quantity="one">%1$d word sent to %2$s.</item>
         <item quantity="other">%1$d words sent to %2$s.</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="one">%1$d card gets its sentence\'s sound once its line has played.</item>
+        <item quantity="other">%1$d cards get their sentence\'s sound once their lines have played.</item>
     </plurals>
     <string name="study_page_token_auto">Automatic</string>
     <string name="study_page_token_on">On</string>

@@ -52,6 +52,7 @@ class AnkiConnectNotesTest {
         val duplicates = mutableSetOf<String>()
         val media = mutableMapOf<String, ByteArray>()
         val updates = mutableListOf<JSONObject>()
+        val templates = mutableListOf<JSONObject>()
 
         fun answer(body: String): String {
             val request = JSONObject(body)
@@ -93,6 +94,17 @@ class AnkiConnectNotesTest {
                                     .decode(params.getString("data"))
                         }
                     "updateNoteFields" -> JSONObject.NULL.also { updates += params!!.getJSONObject("note") }
+                    "updateModelTemplates" ->
+                        if (canMake) {
+                            JSONObject.NULL.also {
+                                templates +=
+                                    params!!.getJSONObject(
+                                        "model",
+                                    )
+                            }
+                        } else {
+                            "AnkiConnect v.6"
+                        }
                     else -> return JSONObject().put("result", JSONObject.NULL).put("error", "unsupported action").toString()
                 }
             return JSONObject().put("result", result).put("error", JSONObject.NULL).toString()
@@ -212,14 +224,22 @@ class AnkiConnectNotesTest {
             assertFalse(refusing.wasSent("1"))
         }
 
-    /** Sounds from files on disk: [wordSound] always, [sentenceSound] when given; waiting cards are kept. */
+    /** Media from files on disk: [wordSound] always, [sentenceSound] and [picture] when given; waiting cards are kept. */
     private class FakeCardAudio(
         private val wordSound: java.io.File,
         private val sentenceSound: java.io.File? = null,
-    ) : AnkiCardAudio {
+        private val picture: java.io.File? = null,
+    ) : AnkiCardMedia {
         val waiting = mutableListOf<PendingCardAudio>()
 
-        override suspend fun files(word: SavedWord) = AnkiAudioFiles(wordSound, sentenceSound)
+        override suspend fun files(
+            word: SavedWord,
+            options: CardOptions,
+        ) = AnkiCardFiles(
+            wordSound.takeIf { options.audio },
+            sentenceSound.takeIf { options.audio },
+            picture.takeIf { options.picture },
+        )
 
         override fun awaitSentence(item: PendingCardAudio) {
             waiting += item
@@ -241,8 +261,8 @@ class AnkiConnectNotesTest {
             val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = false)
             val audio = FakeCardAudio(soundFile("word-1.mp3"))
             assertEquals(
-                AnkiSendResult(sent = 1),
-                AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio),
+                AnkiSendResult(sent = 1, waiting = 1),
+                AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio, CardOptions(audio = true)),
             )
             assertEquals(byteArrayOf(1, 2, 3).toList(), anki.media.getValue("dualsub_word-1_7.mp3").toList())
             val fields = anki.notes.single().getJSONObject("fields")
@@ -261,7 +281,7 @@ class AnkiConnectNotesTest {
         runBlocking {
             val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
             val audio = FakeCardAudio(soundFile("word-1.mp3"), soundFile("abcdefghijk-83400-85000.m4a"))
-            AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio)
+            AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio, CardOptions(audio = true))
             val fields = anki.notes.single().getJSONObject("fields")
             assertEquals("[sound:dualsub_word-1_7.mp3]", fields.getString(ANKI_WORD_AUDIO_FIELD))
             assertEquals("[sound:dualsub_abcdefghijk-83400-85000_7.m4a]", fields.getString(ANKI_SENTENCE_AUDIO_FIELD))
@@ -289,5 +309,78 @@ class AnkiConnectNotesTest {
         assertEquals("Back" to "x<br>", ankiConnectSentenceTarget(listOf("Front", "Back"), mapOf("Back" to "x")))
         assertEquals("Text" to "", ankiConnectSentenceTarget(listOf("Text"), mapOf("Text" to "")))
         assertNull(ankiConnectSentenceTarget(emptyList(), emptyMap()))
+    }
+
+    @Test
+    fun theCardFrontPicksWhatABasicCardShowsFirst() {
+        val media = CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]")
+        val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD)
+        assertEquals("猫<br><br>[sound:w.mp3]", word["Front"])
+        assertTrue(word.getValue("Back").startsWith("ねこ<br>cat<br><b>猫</b>が好き<br>I like cats<br>[sound:s.m4a]"))
+        val sentence = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.SENTENCE)
+        assertEquals("<b>猫</b>が好き", sentence["Front"])
+        assertTrue(sentence.getValue("Back").startsWith("猫<br>[sound:w.mp3]<br>ねこ<br>cat"))
+        val listening = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.LISTENING)
+        assertEquals("[sound:s.m4a]", listening["Front"])
+        assertTrue(listening.getValue("Back").startsWith("<b>猫</b>が好き<br>猫<br>[sound:w.mp3]"))
+        // Until the line's sound is there, a listening card shows its sentence.
+        assertEquals("<b>猫</b>が好き", ankiConnectFields(listOf("Front", "Back"), word("1"), CardMedia(), CardFront.LISTENING)["Front"])
+        // The DualSub Replay audio type keeps its fields whatever the front: its template does the work.
+        assertEquals(ANKI_FIELDS, ankiConnectFields(ANKI_FIELDS, word("1"), media, CardFront.LISTENING).keys.toList())
+    }
+
+    @Test
+    fun aNewFrontChangesTheTemplateOnceWhereAnkiConnectCan() =
+        runBlocking {
+            val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
+            val notes = AnkiConnectNotes(MemorySentWords(), { anki.answer(it) })
+            notes.send(listOf(word("1")), null, options = CardOptions(front = CardFront.WORD))
+            // Made with the picked front, so no template change.
+            assertTrue(anki.templates.isEmpty())
+            notes.send(listOf(word("2")), null, options = CardOptions(front = CardFront.WORD))
+            assertTrue(anki.templates.isEmpty())
+            notes.send(listOf(word("3")), null, options = CardOptions(front = CardFront.LISTENING))
+            val model = anki.templates.single()
+            assertEquals(ANKI_NOTE_TYPE_NAME, model.getString("name"))
+            val card = model.getJSONObject("templates").getJSONObject("Card 1")
+            assertEquals(ankiCardTemplate(CardFront.LISTENING).question, card.getString("Front"))
+            notes.send(listOf(word("4")), null, options = CardOptions(front = CardFront.LISTENING))
+            assertEquals(1, anki.templates.size)
+        }
+
+    @Test
+    fun aPictureGoesAboveTheVideoLinkAndWaitingCardsAreCounted() =
+        runBlocking {
+            val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
+            val media = FakeCardAudio(soundFile("word-1.mp3"), picture = soundFile("abcdefghijk-83400-85000.jpg"))
+            val result =
+                AnkiConnectNotes(MemorySentWords(), { anki.answer(it) })
+                    .send(listOf(word("1")), null, media, CardOptions(audio = true, picture = true))
+            assertEquals(AnkiSendResult(sent = 1, waiting = 1), result)
+            val source =
+                anki.notes
+                    .single()
+                    .getJSONObject("fields")
+                    .getString("Source")
+            assertTrue(source.startsWith("<img src=\"dualsub_abcdefghijk-83400-85000_7.jpg\""))
+            assertTrue(source.endsWith("<br><a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube 1:23</a>"))
+            // Without Add audio to cards no card waits for a sound.
+            val quiet = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
+            val silent = FakeCardAudio(soundFile("word-1.mp3"))
+            assertEquals(
+                AnkiSendResult(sent = 1),
+                AnkiConnectNotes(
+                    MemorySentWords(),
+                    { quiet.answer(it) },
+                ).send(listOf(word("1")), null, silent, CardOptions(picture = true)),
+            )
+            assertTrue(silent.waiting.isEmpty())
+        }
+
+    @Test
+    fun ankiConnectAndroidAnswersUnknownRequestsWithItsVersion() {
+        assertFalse(ankiConnectDone("AnkiConnect v.6"))
+        assertTrue(ankiConnectDone(null))
+        assertTrue(ankiConnectDone(JSONObject()))
     }
 }

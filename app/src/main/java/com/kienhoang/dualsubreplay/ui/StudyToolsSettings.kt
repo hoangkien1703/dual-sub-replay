@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
+import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import kotlinx.coroutines.launch
@@ -143,8 +144,67 @@ internal fun FlashcardSettingsSection() {
             onCheckedChange = { preferences.edit().putBoolean(CARD_AUDIO_PREFERENCE, it).apply() },
             testTag = "card_audio_switch",
         )
+        SettingsSwitchRow(
+            title = stringResource(R.string.study_card_picture_title),
+            description = stringResource(R.string.study_card_picture_description),
+            checked = settings.cardPicture,
+            onCheckedChange = { preferences.edit().putBoolean(CARD_PICTURE_PREFERENCE, it).apply() },
+            testTag = "card_picture_switch",
+        )
+        CardFrontSettings(
+            front = settings.cardFront,
+            onChange = { preferences.edit().putString(CARD_FRONT_PREFERENCE, it.storageValue).apply() },
+        )
     }
 }
+
+/**
+ * Flashcards & Anki → Card front (owner pick 2026-11-10, lion737's Migaku-style cards): what Anki
+ * shows before the card is turned, with a line on what goes where.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CardFrontSettings(
+    front: CardFront,
+    onChange: (CardFront) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().settingAnchor("card_front").padding(start = 16.dp, bottom = 6.dp)) {
+        Text(stringResource(R.string.study_card_front_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CardFront.entries.forEach { option ->
+                FilterChip(
+                    selected = front == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("card_front_${option.storageValue}"),
+                )
+            }
+        }
+        Text(
+            stringResource(front.descriptionRes) + " " + stringResource(R.string.study_card_front_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+internal val CardFront.labelRes: Int
+    get() =
+        when (this) {
+            CardFront.WORD_AND_SENTENCE -> R.string.study_card_front_word_sentence
+            CardFront.WORD -> R.string.study_card_front_word
+            CardFront.SENTENCE -> R.string.study_card_front_sentence
+            CardFront.LISTENING -> R.string.study_card_front_listening
+        }
+
+private val CardFront.descriptionRes: Int
+    get() =
+        when (this) {
+            CardFront.WORD_AND_SENTENCE -> R.string.study_card_front_word_sentence_description
+            CardFront.WORD -> R.string.study_card_front_word_description
+            CardFront.SENTENCE -> R.string.study_card_front_sentence_description
+            CardFront.LISTENING -> R.string.study_card_front_listening_description
+        }
 
 @Composable
 private fun StudyPlayModeSettings(

@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.AudioLine
 import com.kienhoang.dualsubreplay.data.LINE_AUDIO_KEPT_MS
 import com.kienhoang.dualsubreplay.data.LINE_AUDIO_MAX_MS
+import com.kienhoang.dualsubreplay.data.LINE_PICTURE_MAX_WIDTH
 
 private val PAGE_VIDEO_ID = Regex("[A-Za-z0-9_-]{11}")
 
@@ -180,6 +181,48 @@ internal fun webLineAudioClipScript(line: AudioLine): String {
           if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
           const recorder = window.__dualSubLineAudio;
           return recorder ? recorder.clip('$safeId', $start, $end, $lineEnd) : null;
+        })();
+        """.trimIndent()
+}
+
+/**
+ * Takes a still of the page video for [line] (owner pick 2026-11-10, spec
+ * docs/specs/2026-11-10-anki-card-picture-and-front.md): a JPEG data URL at most
+ * [LINE_PICTURE_MAX_WIDTH] wide, or null when the page shows another video, an ad, a time outside
+ * the line, or a frame it can't read (a black frame counts as unreadable). It only draws the video
+ * into a canvas of its own; it never changes the video or the page.
+ */
+internal fun webLinePictureScript(line: AudioLine): String {
+    val safeId = line.videoId.takeIf { it.matches(PAGE_VIDEO_ID) }.orEmpty()
+    val from = line.startMs / 1000.0
+    val to = line.windowEndMs / 1000.0
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          const path = window.location.pathname.match(/^\/(?:shorts|live|embed)\/([A-Za-z0-9_-]{11})/);
+          const pageId = new URLSearchParams(window.location.search).get('v') || (path ? path[1] : '');
+          if ('$safeId' === '' || pageId !== '$safeId') return null;
+          if (document.querySelector('.ad-showing, .ad-interrupting')) return null;
+          const video = document.querySelector('#movie_player video.html5-main-video') || document.querySelector('video.html5-main-video') || document.querySelector('video');
+          if (!video || video.readyState < 2 || !video.videoWidth || !video.videoHeight) return null;
+          if (video.currentTime < $from || video.currentTime > $to) return null;
+          const width = Math.min($LINE_PICTURE_MAX_WIDTH, video.videoWidth);
+          const height = Math.max(1, Math.round(video.videoHeight * width / video.videoWidth));
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, width, height);
+            const pixels = context.getImageData(0, 0, width, height).data;
+            let brightest = 0;
+            for (let i = 0; i < pixels.length && brightest < 24; i += 4 * 97) brightest = Math.max(brightest, pixels[i], pixels[i + 1], pixels[i + 2]);
+            if (brightest < 24) return null;
+            return canvas.toDataURL('image/jpeg', 0.8);
+          } catch (error) {
+            return null;
+          }
         })();
         """.trimIndent()
 }

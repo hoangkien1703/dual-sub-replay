@@ -41,6 +41,19 @@
     <string name="study_anki_description">Muestra un botón Enviar a en la tarjeta de palabra y en Práctica → Exportar. Envía a AnkiDroid salvo que elijas otra app con ▾ en el botón o aquí abajo; entonces el botón muestra esa app.</string>
     <string name="study_card_audio_title">Añadir audio a las tarjetas</string>
     <string name="study_card_audio_description">Las tarjetas llevan la palabra con la voz que usa la tarjeta de palabra y el sonido real de la frase del vídeo. La frase se graba mientras suena, así que una tarjeta enviada antes de que termine recibe el sonido cuando termina.</string>
+    <string name="study_card_picture_title">Añadir una imagen a las tarjetas</string>
+    <string name="study_card_picture_description">Las tarjetas llevan una imagen del vídeo, tomada mientras la frase de la palabra está en pantalla. Si no hay ninguna, se usa la miniatura del vídeo.</string>
+    <string name="study_card_front_title">Anverso de la tarjeta</string>
+    <string name="study_card_front_word_sentence">Palabra y frase</string>
+    <string name="study_card_front_word">Palabra</string>
+    <string name="study_card_front_sentence">Frase</string>
+    <string name="study_card_front_listening">Escucha</string>
+    <string name="study_card_front_word_sentence_description">El anverso muestra la palabra con su frase.</string>
+    <string name="study_card_front_word_description">El anverso muestra solo la palabra; la frase está en el reverso.</string>
+    <string name="study_card_front_sentence_description">El anverso muestra la frase con la palabra en negrita; la palabra y su significado están en el reverso.</string>
+    <string name="study_card_front_listening_description">El anverso solo reproduce el sonido de la frase; la frase y la palabra están en el reverso.</string>
+    <string name="study_card_front_note">Cambiarlo también cambia las tarjetas que enviaste antes.</string>
+    <string name="study_card_sound_waits">El sonido de la frase se añade cuando la frase termina de reproducirse.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>
@@ -83,6 +96,11 @@
         <item quantity="one">%1$d palabra enviada a %2$s.</item>
         <item quantity="many">%1$d palabras enviadas a %2$s.</item>
         <item quantity="other">%1$d palabras enviadas a %2$s.</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="one">%1$d tarjeta recibe el sonido de su frase cuando esta se reproduce.</item>
+        <item quantity="many">%1$d tarjetas reciben el sonido de sus frases cuando estas se reproducen.</item>
+        <item quantity="other">%1$d tarjetas reciben el sonido de sus frases cuando estas se reproducen.</item>
     </plurals>
     <string name="study_page_token_auto">Automático</string>
     <string name="study_page_token_on">Sí</string>

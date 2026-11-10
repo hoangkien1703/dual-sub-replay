@@ -41,6 +41,19 @@
     <string name="study_anki_description">Menampilkan tombol Kirim ke di kartu kata dan di Latihan → Ekspor. Tombol ini mengirim ke AnkiDroid kecuali Anda memilih aplikasi lain dengan ▾ di tombol atau di bawah; tombol lalu menampilkan aplikasi itu.</string>
     <string name="study_card_audio_title">Tambahkan audio ke kartu</string>
     <string name="study_card_audio_description">Kartu mendapat kata dengan suara yang dipakai kartu kata, dan suara asli kalimat dari video. Kalimat direkam saat diputar, jadi kartu yang dikirim sebelum kalimat selesai mendapat suaranya setelah kalimat selesai.</string>
+    <string name="study_card_picture_title">Tambahkan gambar ke kartu</string>
+    <string name="study_card_picture_description">Kartu mendapat gambar dari video, diambil saat kalimat kata itu tampil di layar. Jika tidak ada, gambar mini video yang dipakai.</string>
+    <string name="study_card_front_title">Sisi depan kartu</string>
+    <string name="study_card_front_word_sentence">Kata dan kalimat</string>
+    <string name="study_card_front_word">Kata</string>
+    <string name="study_card_front_sentence">Kalimat</string>
+    <string name="study_card_front_listening">Mendengarkan</string>
+    <string name="study_card_front_word_sentence_description">Sisi depan menampilkan kata dengan kalimatnya.</string>
+    <string name="study_card_front_word_description">Sisi depan hanya menampilkan kata; kalimat ada di belakang.</string>
+    <string name="study_card_front_sentence_description">Sisi depan menampilkan kalimat dengan kata dicetak tebal; kata dan artinya ada di belakang.</string>
+    <string name="study_card_front_listening_description">Sisi depan hanya memutar suara kalimat; kalimat dan kata ada di belakang.</string>
+    <string name="study_card_front_note">Mengubah ini juga mengubah kartu yang sudah Anda kirim.</string>
+    <string name="study_card_sound_waits">Suara kalimat ditambahkan setelah kalimat selesai diputar.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>
@@ -73,6 +86,9 @@
     </plurals>
     <plurals name="study_anki_sent_count">
         <item quantity="other">%1$d kata dikirim ke %2$s.</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="other">%1$d kartu mendapat suara kalimatnya setelah kalimatnya diputar.</item>
     </plurals>
     <string name="study_page_token_auto">Otomatis</string>
     <string name="study_page_token_on">Nyala</string>
