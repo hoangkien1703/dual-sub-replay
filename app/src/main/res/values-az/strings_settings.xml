@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">Hər altyazının altında başqa dildə daha bir tərcümə. Bir az daha çox internet trafiki işlədir.</string>
     <string name="settings_third_line_title">Üçüncü altyazı sətri</string>
     <string name="settings_third_line_choose">Dil seçin</string>
-    <string name="settings_subtitle_languages">Altyazı dilləri</string>
+    <string name="settings_quick_subtitles">Altyazılar</string>
+    <string name="settings_hide_while_playing">Oynayarkən gizlət</string>
     <string name="settings_dual_subtitle_settings">İkidilli altyazı ayarları</string>
     <string name="settings_done">Hazır</string>
     <string name="settings_close_settings">Ayarları bağla</string>

@@ -60,4 +60,14 @@ class CaptionVisibilityTest {
             )!!
         assertNull(broken.playerFrame)
     }
+
+    @Test fun hideWhilePlayingToggleSwitchesAlwaysAndOnlyWhenPaused() {
+        assertFalse(CaptionVisibility.ALWAYS.hiddenWhilePlaying)
+        assertTrue(CaptionVisibility.PAUSED.hiddenWhilePlaying)
+        assertTrue(CaptionVisibility.NEVER.hiddenWhilePlaying)
+        assertEquals(CaptionVisibility.PAUSED, CaptionVisibility.ALWAYS.toggledHideWhilePlaying())
+        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.PAUSED.toggledHideWhilePlaying())
+        // Never is only in the full settings; a tap here shows the line again.
+        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.NEVER.toggledHideWhilePlaying())
+    }
 }

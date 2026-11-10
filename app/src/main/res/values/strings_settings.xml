@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">One more translation under each subtitle, in another language. It uses a little more internet data.</string>
     <string name="settings_third_line_title">Third subtitle line</string>
     <string name="settings_third_line_choose">Choose a language</string>
-    <string name="settings_subtitle_languages">Subtitle languages</string>
+    <string name="settings_quick_subtitles">Subtitles</string>
+    <string name="settings_hide_while_playing">Hide while playing</string>
     <string name="settings_dual_subtitle_settings">Dual-subtitle settings</string>
     <string name="settings_done">Done</string>
     <string name="settings_close_settings">Close settings</string>

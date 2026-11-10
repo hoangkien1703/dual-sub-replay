@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">각 자막 아래에 다른 언어로 번역을 한 줄 더 표시합니다. 데이터를 조금 더 사용합니다.</string>
     <string name="settings_third_line_title">세 번째 자막 줄</string>
     <string name="settings_third_line_choose">언어 선택</string>
-    <string name="settings_subtitle_languages">자막 언어</string>
+    <string name="settings_quick_subtitles">자막</string>
+    <string name="settings_hide_while_playing">재생 중 숨기기</string>
     <string name="settings_dual_subtitle_settings">이중 자막 설정</string>
     <string name="settings_done">완료</string>
     <string name="settings_close_settings">설정 닫기</string>

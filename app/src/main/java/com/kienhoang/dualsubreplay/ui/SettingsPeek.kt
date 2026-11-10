@@ -228,8 +228,9 @@ internal fun SettingsPeekBackOverlay(onBack: () -> Unit) {
 }
 
 /**
- * The gear on a subtitle panel: a tap opens the small languages popup, a long press opens the full
- * settings page at the section that panel's settings live in (owner request 2026-10-31).
+ * The gear on a subtitle panel: a tap opens the small Subtitles popup (languages and Hide while
+ * playing), a long press opens the full settings page at the section that panel's settings live in
+ * (owner request 2026-10-31).
  */
 @Composable
 internal fun PanelSettingsButton(

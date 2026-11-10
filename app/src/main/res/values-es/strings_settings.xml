@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">Una traducción más bajo cada subtítulo, en otro idioma. Usa un poco más de datos.</string>
     <string name="settings_third_line_title">Tercera línea de subtítulos</string>
     <string name="settings_third_line_choose">Elegir un idioma</string>
-    <string name="settings_subtitle_languages">Idiomas de los subtítulos</string>
+    <string name="settings_quick_subtitles">Subtítulos</string>
+    <string name="settings_hide_while_playing">Ocultar al reproducir</string>
     <string name="settings_dual_subtitle_settings">Ajustes de subtítulos dobles</string>
     <string name="settings_done">Listo</string>
     <string name="settings_close_settings">Cerrar ajustes</string>

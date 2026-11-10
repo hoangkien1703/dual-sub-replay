@@ -18,6 +18,8 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
@@ -103,7 +105,7 @@ class SubtitleUiTest {
             }
         }
 
-        composeRule.onNodeWithText("Subtitle languages").assertIsDisplayed()
+        composeRule.onNodeWithText("Subtitles").assertIsDisplayed()
         composeRule.onNodeWithText("Vietnamese").assertIsDisplayed()
         composeRule.onNodeWithText("Text size: 100%").assertDoesNotExist()
         composeRule.onNodeWithText("Done").assertDoesNotExist()
@@ -114,11 +116,47 @@ class SubtitleUiTest {
         composeRule.onNodeWithTag("language_search").performTextInput("English")
         composeRule.onNodeWithTag("language_option_target_en").performClick()
         composeRule.runOnIdle { assertEquals("en", selectedTarget) }
-        composeRule.onNodeWithText("Subtitle languages").assertIsDisplayed()
+        composeRule.onNodeWithText("Subtitles").assertIsDisplayed()
         composeRule.onNodeWithTag("open_all_settings").performClick()
         composeRule.runOnIdle { assertTrue(openedAllSettings) }
         composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).performClick()
         composeRule.runOnIdle { assertTrue(dismissed) }
+    }
+
+    @Test
+    fun quickSettingsHideWhilePlayingTogglesCaptionVisibility() {
+        var original by mutableStateOf(CaptionVisibility.ALWAYS)
+        var translated by mutableStateOf(CaptionVisibility.PAUSED)
+        composeRule.setContent {
+            DualSubTheme {
+                QuickLanguageSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "vi",
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    onSourceChange = {},
+                    onTargetChange = {},
+                    onOpenAllSettings = {},
+                    originalVisibility = original,
+                    translatedVisibility = translated,
+                    onCaptionVisibilityChange = { isOriginal, visibility ->
+                        if (isOriginal) original = visibility else translated = visibility
+                    },
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Hide while playing").assertIsDisplayed()
+        composeRule.onNodeWithTag("hide_original_while_playing").assertIsNotSelected()
+        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsSelected()
+        Thread.sleep(700)
+        saveUiEvidence("subtitle-quick-hide-while-playing")
+        composeRule.onNodeWithTag("hide_translation_while_playing").performClick()
+        composeRule.runOnIdle { assertEquals(CaptionVisibility.ALWAYS, translated) }
+        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsNotSelected()
+        composeRule.onNodeWithTag("hide_original_while_playing").performClick()
+        composeRule.runOnIdle { assertEquals(CaptionVisibility.PAUSED, original) }
+        composeRule.onNodeWithTag("hide_original_while_playing").assertIsSelected()
     }
 
     @Test

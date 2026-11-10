@@ -70,7 +70,8 @@
     <string name="settings_third_line_hint">Thêm một bản dịch nữa dưới mỗi phụ đề, bằng một ngôn ngữ khác. Tốn thêm một chút dữ liệu mạng.</string>
     <string name="settings_third_line_title">Dòng phụ đề thứ ba</string>
     <string name="settings_third_line_choose">Chọn ngôn ngữ</string>
-    <string name="settings_subtitle_languages">Ngôn ngữ phụ đề</string>
+    <string name="settings_quick_subtitles">Phụ đề</string>
+    <string name="settings_hide_while_playing">Ẩn khi đang phát</string>
     <string name="settings_dual_subtitle_settings">Cài đặt phụ đề kép</string>
     <string name="settings_done">Xong</string>
     <string name="settings_close_settings">Đóng cài đặt</string>

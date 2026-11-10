@@ -168,6 +168,7 @@ fun DualSubApp(
                     onSourceChange = viewModel::setSourcePreference,
                     onTargetChange = viewModel::setTargetLanguage,
                     onThirdLineChange = viewModel::setThirdLine,
+                    onCaptionVisibilityChange = viewModel::setCaptionVisibility,
                     onFontScaleChange = viewModel::setFontScale,
                     onPortraitPanelOffsetFractionChange = viewModel::setPortraitPanelOffsetFraction,
                     onResetPortraitPanelPosition = viewModel::resetPortraitPanelPosition,
@@ -300,6 +301,7 @@ private fun DualSubExperience(
     onSourceChange: (String) -> Unit,
     onTargetChange: (String) -> Unit,
     onThirdLineChange: (ThirdLineChoice) -> Unit = {},
+    onCaptionVisibilityChange: (original: Boolean, visibility: CaptionVisibility) -> Unit = { _, _ -> },
     onFontScaleChange: (Float) -> Unit,
     onPortraitPanelOffsetFractionChange: (Float) -> Unit,
     onResetPortraitPanelPosition: () -> Unit,
@@ -342,7 +344,7 @@ private fun DualSubExperience(
         settingsJumpSection = MoreSettingsSection.LAYOUT
         showSettings = true
     }
-    // Gear icons on the player open a small languages popup; the sidebar opens the full page.
+    // Gear icons on the player open a small Subtitles popup (languages, Hide while playing); the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -556,6 +558,9 @@ private fun DualSubExperience(
             onTargetChange = onTargetChange,
             thirdLine = state.thirdLine,
             onThirdLineChange = onThirdLineChange,
+            originalVisibility = state.originalVisibility,
+            translatedVisibility = state.translatedVisibility,
+            onCaptionVisibilityChange = onCaptionVisibilityChange,
             onOpenAllSettings = {
                 showQuickSettings = false
                 showSettings = true

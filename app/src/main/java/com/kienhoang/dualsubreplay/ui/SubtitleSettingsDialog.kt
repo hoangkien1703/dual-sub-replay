@@ -454,8 +454,8 @@ private fun CompactLanguageRow(
 }
 
 /**
- * The subtitle panel's gear opens this small popup with only the languages, over the video.
- * "Dual-subtitle settings" leads to the full settings page.
+ * The subtitle panel's gear opens this small popup over the video: the languages and Hide while
+ * playing (owner pick 2026-11-10). "Dual-subtitle settings" leads to the full settings page.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -469,6 +469,9 @@ internal fun QuickLanguageSettingsDialog(
     recentTargetLanguages: List<String> = emptyList(),
     thirdLine: ThirdLineChoice = ThirdLineChoice(),
     onThirdLineChange: (ThirdLineChoice) -> Unit = {},
+    originalVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
+    translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
+    onCaptionVisibilityChange: (original: Boolean, visibility: CaptionVisibility) -> Unit = { _, _ -> },
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
@@ -502,7 +505,7 @@ internal fun QuickLanguageSettingsDialog(
         ) {
             Column(Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 12.dp).testTag("quick_language_settings")) {
                 ProvideTextStyle(MaterialTheme.typography.headlineSmall) {
-                    DialogTitle(stringResource(R.string.settings_subtitle_languages), onClose = onDismiss)
+                    DialogTitle(stringResource(R.string.settings_quick_subtitles), onClose = onDismiss)
                 }
                 Spacer(Modifier.height(12.dp))
                 CompactLanguageRows(
@@ -512,8 +515,10 @@ internal fun QuickLanguageSettingsDialog(
                     thirdLine = thirdLine,
                     onPick = languagePicker::open,
                 )
+                Spacer(Modifier.height(16.dp))
+                HideWhilePlayingRow(originalVisibility, translatedVisibility, onCaptionVisibilityChange)
                 HorizontalDivider(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
                 Row(
