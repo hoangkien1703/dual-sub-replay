@@ -143,11 +143,6 @@ internal fun FlashcardSettingsSection() {
             onCheckedChange = { preferences.edit().putBoolean(CARD_AUDIO_PREFERENCE, it).apply() },
             testTag = "card_audio_switch",
         )
-        // TEMPORARY (preview only): the line recorder's state, to find the empty Sentence audio.
-        val recorder by LineAudioBridge.status.collectAsState()
-        if (settings.cardAudio && recorder.isNotEmpty()) {
-            Text(recorder, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
     }
 }
 
