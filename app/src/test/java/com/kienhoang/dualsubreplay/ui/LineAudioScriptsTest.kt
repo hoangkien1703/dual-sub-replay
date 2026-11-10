@@ -86,7 +86,9 @@ class LineAudioScriptsTest {
 
     @Test
     fun stillsAreTakenOnlyWhereTheyCanGo() {
-        val on = StudySettings()
+        // Off until the learner turns it on (Kien, 2026-11-10).
+        assertFalse(linePictureWanted(StudySettings(), ankiDroidInstalled = true))
+        val on = StudySettings(cardPicture = true)
         assertTrue(linePictureWanted(on, ankiDroidInstalled = true))
         assertFalse(linePictureWanted(on, ankiDroidInstalled = false))
         assertTrue(linePictureWanted(on.copy(sendTo = FlashcardApp.ANKICONNECT), ankiDroidInstalled = false))

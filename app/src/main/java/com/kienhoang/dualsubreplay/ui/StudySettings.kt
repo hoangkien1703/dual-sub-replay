@@ -169,7 +169,7 @@ internal data class StudySettings(
     /** Cards carry the word's voice and the line's real sound from the video. */
     val cardAudio: Boolean = true,
     /** Cards carry a still of the line from the video, else the video's thumbnail. */
-    val cardPicture: Boolean = true,
+    val cardPicture: Boolean = false,
     val cardFront: CardFront = CardFront.WORD_AND_SENTENCE,
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
@@ -215,7 +215,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
         cardAudio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
-        cardPicture = preferences.getBoolean(CARD_PICTURE_PREFERENCE, true),
+        cardPicture = preferences.getBoolean(CARD_PICTURE_PREFERENCE, false),
         cardFront = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),

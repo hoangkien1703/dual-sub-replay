@@ -24,7 +24,7 @@ What we checked before building (2026-11-10):
 
 ## Goals
 
-- **Picture:** Settings → Flashcards & Anki → **Add a picture to cards** (on by default). A still the page takes from its own video while the word's line is on screen; when there is none, the video's 320 × 180 thumbnail from `i.ytimg.com`. It sits on the back, above the YouTube link.
+- **Picture:** Settings → Flashcards & Anki → **Add a picture to cards** (off by default, owner's pick 2026-11-10). A still the page takes from its own video while the word's line is on screen; when there is none, the video's 320 × 180 thumbnail from `i.ytimg.com`. It sits on the back, above the YouTube link.
 - **Card front:** Settings → Flashcards & Anki → **Card front**, one choice instead of a sentence switch and Migaku's settings: *Word and sentence* (default, today's card), *Word* (sentence moves to the back), *Sentence* (word in bold; word and meaning on the back), *Listening* (only the line's sound; until the sound arrives the sentence shows, so Anki never makes an empty card).
 - **Waiting sound notice:** when a card goes without its sentence's sound (the line was paused part-way, because tapping a word pauses the video), the word card says "The sentence's sound is added once the line has played to the end." Send all says how many cards wait.
 

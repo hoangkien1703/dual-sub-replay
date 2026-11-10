@@ -149,7 +149,7 @@ class StudyToolsUiTest {
     @Test
     fun flashcardsAndAnkiPicksThePictureAndTheCardFront() {
         showSettings("settings_section_flashcards")
-        // Add a picture to cards is on, and the front is the word with its sentence, until changed.
+        // Add a picture to cards is off, and the front is the word with its sentence, until changed.
         composeRule.onNodeWithTag("card_picture_switch").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("card_front_listening").performScrollTo().assertIsDisplayed()
         composeRule
@@ -169,7 +169,7 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("card_picture_switch").performScrollTo().performClick()
         composeRule.runOnIdle {
             assertEquals("listening", preferences.getString(CARD_FRONT_PREFERENCE, null))
-            assertFalse(preferences.getBoolean(CARD_PICTURE_PREFERENCE, true))
+            assertTrue(preferences.getBoolean(CARD_PICTURE_PREFERENCE, false))
         }
         saveUiEvidence("flashcards-card-front-listening")
     }
