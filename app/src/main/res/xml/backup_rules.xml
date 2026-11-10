@@ -4,7 +4,7 @@
     the Japanese dictionary (13 MB). Also leaves out the WebView profile (app_webview/), whose
     cookies hold the YouTube/Google sign-in, the AI assistant's encrypted keys (useless
     without this phone's Keystore), saved chats, and memories and instructions, and the sentence
-    clips recorded for Anki cards (line-audio/, about 25 KB each). Keep these paths
+    clips and pictures recorded for Anki cards (line-audio/, about 25 KB each, and line-pictures/). Keep these paths
     in sync with data_extraction_rules.xml and the directories AppViewModel and
     AiAssistantViewModel create.
 -->
@@ -15,4 +15,5 @@
     <exclude domain="file" path="ai-chats/" />
     <exclude domain="file" path="ai-memory/" />
     <exclude domain="file" path="line-audio/" />
+    <exclude domain="file" path="line-pictures/" />
 </full-backup-content>

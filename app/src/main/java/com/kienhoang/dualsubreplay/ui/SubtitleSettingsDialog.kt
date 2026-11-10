@@ -1159,6 +1159,7 @@ private fun WordLearningSettings(
     )
     PronunciationVolumeSetting()
     PhoneVoiceSetting()
+    MeaningInContextSetting()
     SettingsSwitchRow(
         title = stringResource(R.string.settings_word_learning_mode_title),
         description = stringResource(R.string.settings_word_learning_mode_description),

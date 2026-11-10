@@ -65,6 +65,9 @@ internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
 /** Where Send to sends words (`FlashcardApp`), which a test keeps equal. */
 internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
 
+/** The Anki card fronts (`CardFront`), which a test keeps equal. */
+internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "listening")
+
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", AI_REPEAT_FOREVER)
 
@@ -105,6 +108,7 @@ internal enum class AiSetting(
     PRONOUNCE_TAPPED_WORDS("pronounce_tapped_words"),
     PRONUNCIATION_VOLUME("pronunciation_volume", emptyList(), 25f..200f),
     PHONE_VOICE("phone_voice"),
+    MEANING_IN_CONTEXT("meaning_in_context"),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
@@ -134,6 +138,8 @@ internal enum class AiSetting(
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
     CARD_AUDIO("anki_card_audio"),
+    CARD_PICTURE("anki_card_picture"),
+    CARD_FRONT("anki_card_front", AI_CARD_FRONTS),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
@@ -623,6 +629,16 @@ private val SETTING_CHOICE_ALIASES by lazy {
         AiSetting.TRANSCRIPT_FOLLOW to
             mapOf("centre" to "center", "middle" to "center", "in_the_middle" to "center", "lyrics" to "center", "down" to "page"),
         AiSetting.SEND_TO_APP to mapOf("anki" to "ankidroid", "anki_droid" to "ankidroid", "anki_connect" to "ankiconnect"),
+        AiSetting.CARD_FRONT to
+            mapOf(
+                "word_and_sentence" to "word_sentence",
+                "both" to "word_sentence",
+                "word_only" to "word",
+                "sentence_only" to "sentence",
+                "audio" to "listening",
+                "audio_sentence" to "listening",
+                "sound" to "listening",
+            ),
         AiSetting.KNOWN_WORDS to
             mapOf("automatic" to "auto", "on" to "auto", "true" to "auto", "enabled" to "auto", "false" to "off", "disabled" to "off"),
         AiSetting.PAGE_TOKEN_CAPTIONS to
@@ -818,6 +834,17 @@ internal fun aiSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (TV layout, beta: on an Android TV, TV home with YouTube search, remote buttons on the video and words " +
                 "picked from a list; on by default on a TV; phones and tablets never use it)"
+        else -> otherSettingValues(setting)
+    }
+
+/** What the settings [aiSettingValues] doesn't list take. */
+private fun otherSettingValues(setting: AiSetting): String =
+    when (setting) {
+        AiSetting.CARD_FRONT ->
+            choiceList(setting.choices) +
+                " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +
+                "word with its sentence, word only the word, sentence the sentence with the word in bold, listening only the " +
+                "line's sound; it changes cards sent before too)"
         else -> choiceList(setting.choices)
     }
 

@@ -41,6 +41,19 @@
     <string name="study_anki_description">단어 카드와 연습 → 내보내기에 보내기 버튼을 표시합니다. 버튼의 ▾ 또는 아래에서 다른 앱을 고르지 않으면 AnkiDroid로 보냅니다. 고른 앱은 버튼에 표시됩니다.</string>
     <string name="study_card_audio_title">카드에 오디오 추가</string>
     <string name="study_card_audio_description">단어 카드와 같은 목소리로 읽은 단어와, 동영상에서 가져온 문장의 실제 소리를 카드에 넣습니다. 문장은 재생되는 동안 녹음되므로, 문장이 끝나기 전에 보낸 카드는 문장이 끝나면 소리가 추가됩니다.</string>
+    <string name="study_card_picture_title">카드에 그림 추가</string>
+    <string name="study_card_picture_description">단어가 나온 문장이 화면에 있을 때 동영상에서 찍은 그림을 카드에 넣습니다. 그림이 없으면 동영상 썸네일을 씁니다.</string>
+    <string name="study_card_front_title">카드 앞면</string>
+    <string name="study_card_front_word_sentence">단어와 문장</string>
+    <string name="study_card_front_word">단어</string>
+    <string name="study_card_front_sentence">문장</string>
+    <string name="study_card_front_listening">듣기</string>
+    <string name="study_card_front_word_sentence_description">앞면에 단어와 그 문장을 보여 줍니다.</string>
+    <string name="study_card_front_word_description">앞면에는 단어만 보여 주고, 문장은 뒷면에 있습니다.</string>
+    <string name="study_card_front_sentence_description">앞면에 단어를 굵게 표시한 문장을 보여 주고, 단어와 뜻은 뒷면에 있습니다.</string>
+    <string name="study_card_front_listening_description">앞면에서는 문장의 소리만 재생하고, 문장과 단어는 뒷면에 있습니다.</string>
+    <string name="study_card_front_note">이 설정을 바꾸면 전에 보낸 카드도 바뀝니다.</string>
+    <string name="study_card_sound_waits">문장 소리는 문장이 끝까지 재생된 뒤에 추가됩니다.</string>
     <string name="study_blur_box_title">흐림 상자</string>
     <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
     <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>
@@ -73,6 +86,9 @@
     </plurals>
     <plurals name="study_anki_sent_count">
         <item quantity="other">단어 %1$d개를 %2$s로 보냈습니다.</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="other">카드 %1$d개는 문장이 재생된 뒤에 문장 소리가 추가됩니다.</item>
     </plurals>
     <string name="study_page_token_auto">자동</string>
     <string name="study_page_token_on">켜기</string>

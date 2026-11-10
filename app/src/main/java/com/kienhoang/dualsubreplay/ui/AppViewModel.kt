@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
+import android.util.LruCache
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -118,6 +119,12 @@ private const val YOUTUBE_TRANSLATION_WAIT_MS = 1_000L
 
 /** Rows read to fill an AI request; 60 sentences need far fewer. */
 private const val AI_FILL_MAX_ROWS = 240
+
+/** Words in sentences whose meaning in context is kept for this app run. */
+private const val CONTEXT_MEANING_CACHE_SIZE = 200
+
+/** A word card waits this long for the AI before showing only the dictionary meaning. */
+private const val CONTEXT_MEANING_TIMEOUT_MS = 20_000L
 
 class AppViewModel internal constructor(
     application: Application,
@@ -1016,6 +1023,36 @@ class AppViewModel internal constructor(
 
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
         translateText(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
+
+    /** Answers already given for a word in a sentence, so tapping it again costs no request. */
+    private val contextMeanings = LruCache<String, String>(CONTEXT_MEANING_CACHE_SIZE)
+
+    /**
+     * The tapped word's meaning in its sentence, from the AI assistant's service, while Settings →
+     * Word learning → Meaning in this sentence (AI) is on (see WordMeaningInContext.kt).
+     */
+    internal suspend fun meaningInContext(selection: LearningWordSelection): ContextMeaning {
+        val application = getApplication<Application>()
+        if (!readMeaningInContext(application)) return ContextMeaning.None
+        val sentence = contextSentence(selection) ?: return ContextMeaning.None
+        val word = selection.token.text.trim()
+        val key = listOf(selection.wordLanguage, selection.meaningLanguage, word, sentence).joinToString("\u0000")
+        contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
+        val model =
+            withContext(Dispatchers.IO) {
+                application.aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport)
+            } ?: return ContextMeaning.NoKey
+        val (system, user) = contextMeaningRequest(word, sentence, selection.wordLanguage, selection.meaningLanguage)
+        val reply =
+            try {
+                withTimeoutOrNull(CONTEXT_MEANING_TIMEOUT_MS) { model.ask(system, user) }
+            } catch (_: java.io.IOException) {
+                null
+            }
+        val meaning = cleanContextMeaning(reply) ?: return ContextMeaning.None
+        contextMeanings.put(key, meaning)
+        return ContextMeaning.Found(meaning)
+    }
 
     internal suspend fun saveWord(
         selection: LearningWordSelection,

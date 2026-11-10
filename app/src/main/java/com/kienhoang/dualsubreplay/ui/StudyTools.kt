@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.ANKIDROID_PERMISSION
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
-import com.kienhoang.dualsubreplay.data.AnkiCardAudio
+import com.kienhoang.dualsubreplay.data.AnkiCardMedia
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.AnkiProblem
@@ -92,7 +92,7 @@ internal class StudyTools(
     internal val ankiConnect: AnkiConnectNotes,
     private val scope: CoroutineScope,
     /** The cards' sounds (Settings → Study tools → Add audio to cards); null where nothing records them. */
-    private val cardAudio: AnkiCardAudio? = null,
+    private val cardMedia: AnkiCardMedia? = null,
 ) {
     var settings by mutableStateOf(StudySettings())
         internal set
@@ -142,8 +142,8 @@ internal class StudyTools(
         words: List<SavedWord>,
     ): AnkiSendResult =
         when (app) {
-            FlashcardApp.ANKIDROID -> anki.send(words, cardAudio.takeIf { settings.cardAudio })
-            FlashcardApp.ANKICONNECT -> ankiConnect.send(words, settings.ankiConnectDeck, cardAudio.takeIf { settings.cardAudio })
+            FlashcardApp.ANKIDROID -> anki.send(words, cardMedia, settings.cardOptions)
+            FlashcardApp.ANKICONNECT -> ankiConnect.send(words, settings.ankiConnectDeck, cardMedia, settings.cardOptions)
         }
 
     /** AnkiDroid asks for its permission before the first card; AnkiConnect asks for none. */
@@ -192,7 +192,7 @@ internal fun rememberStudyTools(
                 AnkiDroidNotes(context),
                 AnkiConnectNotes.create(context),
                 scope,
-                CardAudioSource(context),
+                CardMediaSource(context),
             )
         }
     val settings by rememberStudySettings()
@@ -428,6 +428,7 @@ private fun SendToButton(
     var sending by remember(selection) { mutableStateOf(false) }
     var sentNow by remember(selection) { mutableStateOf(emptySet<FlashcardApp>()) }
     var problem by remember(selection) { mutableStateOf<Pair<FlashcardApp, AnkiSendResult>?>(null) }
+    var soundWaits by remember(selection) { mutableStateOf(false) }
     var menu by remember { mutableStateOf(false) }
     val sent = app in sentNow || tools.wasSent(app, word.id)
     val send: (FlashcardApp) -> Unit = { to ->
@@ -436,6 +437,7 @@ private fun SendToButton(
         scope.launch {
             val result = tools.send(to, listOf(word))
             sending = false
+            soundWaits = result.waiting > 0
             if (result.problem == null) sentNow = sentNow + to else problem = to to result
         }
     }
@@ -495,6 +497,15 @@ private fun SendToButton(
                     },
                 )
             }
+        }
+        if (soundWaits && problem == null) {
+            // The line was paused part-way (tapping a word pauses it): its sound is recorded once it has played.
+            Text(
+                stringResource(R.string.study_card_sound_waits),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.testTag("card_sound_waits"),
+            )
         }
         problem?.let { (to, result) ->
             Text(
@@ -627,9 +638,12 @@ internal fun sendResultText(
 ): String {
     val name = resources.getString(app.nameRes)
     val sent = resources.getQuantityString(R.plurals.study_anki_sent_count, result.sent, result.sent, name)
+    val waits =
+        resources.getQuantityString(R.plurals.study_anki_sound_waits_count, result.waiting, result.waiting).takeIf { result.waiting > 0 }
     return when {
-        result.problem != null -> listOfNotNull(sent.takeIf { result.sent > 0 }, sendProblemText(resources, app, result)).joinToString(" ")
+        result.problem != null ->
+            listOfNotNull(sent.takeIf { result.sent > 0 }, waits, sendProblemText(resources, app, result)).joinToString(" ")
         result.sent == 0 -> resources.getString(R.string.study_anki_all_sent_before, name)
-        else -> sent
+        else -> listOfNotNull(sent, waits).joinToString(" ")
     }
 }

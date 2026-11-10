@@ -11,7 +11,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
+import com.kienhoang.dualsubreplay.data.CardFront
+import com.kienhoang.dualsubreplay.data.CardOptions
 import com.kienhoang.dualsubreplay.data.PageTokenMode
+import com.kienhoang.dualsubreplay.data.storedCardFront
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 
 internal const val STUDY_PLAY_MODE_PREFERENCE = "study_play_mode"
@@ -31,6 +34,12 @@ internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
 
 /** Study tools → Send to → Add audio to cards (owner pick 2026-11-09), on by default. */
 internal const val CARD_AUDIO_PREFERENCE = "anki_card_audio"
+
+/** Flashcards & Anki → Add a picture to cards (owner pick 2026-11-10), on by default. */
+internal const val CARD_PICTURE_PREFERENCE = "anki_card_picture"
+
+/** Flashcards & Anki → Card front (owner pick 2026-11-10): a [CardFront] storage value. */
+internal const val CARD_FRONT_PREFERENCE = "anki_card_front"
 
 /** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
 internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
@@ -58,6 +67,8 @@ internal val STUDY_SETTING_KEYS =
         SEND_TO_APP_PREFERENCE,
         ANKICONNECT_DECK_PREFERENCE,
         CARD_AUDIO_PREFERENCE,
+        CARD_PICTURE_PREFERENCE,
+        CARD_FRONT_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
@@ -157,12 +168,18 @@ internal data class StudySettings(
     val ankiConnectDeck: String? = null,
     /** Cards carry the word's voice and the line's real sound from the video. */
     val cardAudio: Boolean = true,
+    /** Cards carry a still of the line from the video, else the video's thumbnail. */
+    val cardPicture: Boolean = false,
+    val cardFront: CardFront = CardFront.WORD_AND_SENTENCE,
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
     /** Known words is on (Automatic or Manual): the score, new-word marks and "I know this word" show. */
     val knownWords: Boolean get() = knownWordsMode != KnownWordsMode.OFF
+
+    /** What Send to puts on each card. */
+    val cardOptions: CardOptions get() = CardOptions(audio = cardAudio, picture = cardPicture, front = cardFront)
 
     /** Pause on lines with one new word needs the known-word list; without it the video plays normally. */
     val effectivePlayMode: StudyPlayMode
@@ -198,6 +215,8 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
         cardAudio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
+        cardPicture = preferences.getBoolean(CARD_PICTURE_PREFERENCE, false),
+        cardFront = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),

@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
+import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE
@@ -196,6 +197,12 @@ internal enum class SearchableSetting(
         "phone_voice_switch",
         setOf(PHONE_VOICE_PREFERENCE),
     ),
+    MEANING_IN_CONTEXT(
+        R.string.settings_meaning_in_context_title,
+        MoreSettingsSection.WORD_LEARNING,
+        "meaning_in_context_switch",
+        setOf(MEANING_IN_CONTEXT_PREFERENCE),
+    ),
     WORD_LEARNING_MODE(
         R.string.settings_word_learning_mode_title,
         MoreSettingsSection.WORD_LEARNING,
@@ -248,6 +255,14 @@ internal enum class SearchableSetting(
         setOf(ANKIDROID_PREFERENCE, SEND_TO_APP_PREFERENCE, ANKICONNECT_DECK_PREFERENCE),
     ),
     CARD_AUDIO(R.string.study_card_audio_title, MoreSettingsSection.FLASHCARDS, "card_audio_switch", setOf(CARD_AUDIO_PREFERENCE)),
+    CARD_PICTURE(R.string.study_card_picture_title, MoreSettingsSection.FLASHCARDS, "card_picture_switch", setOf(CARD_PICTURE_PREFERENCE)),
+    CARD_FRONT(
+        R.string.study_card_front_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_front",
+        setOf(CARD_FRONT_PREFERENCE),
+        CardFront.entries.map { it.labelRes },
+    ),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(
         R.string.study_kanji_details_title,

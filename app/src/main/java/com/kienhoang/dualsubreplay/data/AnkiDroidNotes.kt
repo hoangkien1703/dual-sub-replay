@@ -34,11 +34,6 @@ internal const val ANKI_FIELD_SEPARATOR = "\u001f"
 
 internal const val ANKI_TAG = "DualSubReplay"
 
-/** The front plays the word's sound, the back the sentence's. */
-internal const val ANKI_QUESTION_FORMAT = "<div class=word>{{Word}}</div><div class=sentence>{{Sentence}}</div>{{Word audio}}"
-internal const val ANKI_ANSWER_FORMAT =
-    "{{FrontSide}}<hr id=answer><div class=reading>{{Reading}}</div><div class=meaning>{{Meaning}}</div>" +
-        "<div class=translation>{{Translation}}</div>{{Sentence audio}}<div class=source>{{Source}}</div>"
 internal const val ANKI_CSS =
     ".card{font-family:sans-serif;font-size:22px;text-align:center;}.word{font-size:34px;}" +
         ".sentence,.translation{font-size:18px;margin-top:12px;}.reading{font-size:18px;}.source{font-size:14px;margin-top:12px;}"
@@ -89,10 +84,14 @@ internal fun ankiTranslationHtml(word: SavedWord): String =
         .filter { it.isNotBlank() }
         .joinToString("<br>", transform = ::ankiHtml)
 
-/** A card's sounds as Anki field text (`[sound:name]`), empty when a sound is missing. */
-internal data class CardSounds(
+/**
+ * A card's media as Anki field text: the sounds (`[sound:name]`) and the picture (`<img>`), each
+ * empty when missing.
+ */
+internal data class CardMedia(
     val word: String = "",
     val sentence: String = "",
+    val picture: String = "",
 )
 
 /** The field text that plays the media file [name] in Anki; empty for a name Anki couldn't play. */
@@ -102,10 +101,13 @@ internal fun ankiSound(name: String?): String {
     return "[sound:$clean]"
 }
 
-/** The fields of [word]'s note, in [ANKI_FIELDS] order. */
+/**
+ * The fields of [word]'s note, in [ANKI_FIELDS] order. The picture goes in Source, above the video
+ * link: AnkiDroid can't add a field to the note type people already have.
+ */
 internal fun ankiNoteFields(
     word: SavedWord,
-    sounds: CardSounds = CardSounds(),
+    media: CardMedia = CardMedia(),
 ): List<String> =
     listOf(
         ankiHtml(word.word),
@@ -113,9 +115,9 @@ internal fun ankiNoteFields(
         ankiHtml(word.reading.orEmpty()),
         ankiSentenceHtml(word.sentence, word.word),
         ankiTranslationHtml(word),
-        ankiSourceLink(word.videoId, word.startMs),
-        sounds.word,
-        sounds.sentence,
+        listOf(media.picture, ankiSourceLink(word.videoId, word.startMs)).filter { it.isNotEmpty() }.joinToString("<br>"),
+        media.word,
+        media.sentence,
     )
 
 /** [fields] (a note's fields in [ANKI_FIELDS] order) with [field] set to [value]; null when the note has other fields. */
@@ -129,23 +131,28 @@ internal fun ankiFieldsWith(
     return fields.toMutableList().also { it[index] = value }
 }
 
-/** The sound files of one card: the word's voice and the line's clip, each null when there is none. */
-internal data class AnkiAudioFiles(
+/** The media files of one card: the word's voice, the line's clip and its picture, each null when there is none. */
+internal data class AnkiCardFiles(
     val word: File? = null,
     val sentence: File? = null,
+    val picture: File? = null,
 )
 
 /**
- * Where cards get their sounds (owner pick 2026-11-09): [files] makes or finds them for a word, and
- * [awaitSentence] remembers a card sent before its line's clip was ready, so the clip is added later.
+ * Where cards get their media (owner picks 2026-11-09 and 2026-11-10): [files] makes or finds the
+ * ones [options] asks for, and [awaitSentence] remembers a card sent before its line's clip was
+ * ready, so the clip is added later.
  */
-internal interface AnkiCardAudio {
-    suspend fun files(word: SavedWord): AnkiAudioFiles
+internal interface AnkiCardMedia {
+    suspend fun files(
+        word: SavedWord,
+        options: CardOptions,
+    ): AnkiCardFiles
 
     fun awaitSentence(item: PendingCardAudio)
 }
 
-/** The authority of the provider that lends AnkiDroid the sound files (read-only, for one copy). */
+/** The authority of the provider that lends AnkiDroid the media files (read-only, for one copy). */
 internal fun cardAudioAuthority(context: Context): String = "${context.packageName}.cardaudio"
 
 /** The words of [words] that were not sent before, by id. */
@@ -159,13 +166,15 @@ internal enum class AnkiProblem { NOT_INSTALLED, NO_PERMISSION, NOT_RUNNING, FAI
 
 /**
  * What one send did: notes added, words sent before (skipped), and any problem that stopped it,
- * with AnkiConnect's own error text when it gave one.
+ * with AnkiConnect's own error text when it gave one. [waiting] cards went without their
+ * sentence's sound, which is added once the line has played.
  */
 internal data class AnkiSendResult(
     val sent: Int = 0,
     val skipped: Int = 0,
     val problem: AnkiProblem? = null,
     val detail: String? = null,
+    val waiting: Int = 0,
 )
 
 /**
@@ -178,6 +187,9 @@ internal class AnkiDroidNotes(
     private val context = context.applicationContext
     private val resolver = this.context.contentResolver
     private val sentIds = this.context.getSharedPreferences("ankidroid_sent", 0)
+
+    /** The card front last set on each note type (by id), see [cardFrontNeedsUpdate]. */
+    private val cardFronts = PreferenceCardFronts(this.context, "ankidroid_card_front")
     private val base = Uri.parse("content://$ANKIDROID_AUTHORITY")
 
     fun installed(): Boolean =
@@ -198,7 +210,8 @@ internal class AnkiDroidNotes(
 
     suspend fun send(
         words: List<SavedWord>,
-        audio: AnkiCardAudio? = null,
+        media: AnkiCardMedia? = null,
+        options: CardOptions = CardOptions(),
     ): AnkiSendResult =
         withContext(Dispatchers.IO) {
             if (!installed()) return@withContext AnkiSendResult(problem = AnkiProblem.NOT_INSTALLED)
@@ -206,21 +219,26 @@ internal class AnkiDroidNotes(
             val unsent = unsentAnkiWords(words, ::wasSent)
             val skipped = words.distinctBy { it.id }.size - unsent.size
             if (unsent.isEmpty()) return@withContext AnkiSendResult(skipped = skipped)
+            var sent = 0
+            var waiting = 0
             try {
                 val deck = deckId() ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
-                val noteType = noteTypeId(deck) ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
-                var sent = 0
+                val noteType =
+                    noteTypeId(deck, options.front) ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 for (word in unsent) {
-                    if (!addNote(noteType, deck, word, audio)) return@withContext AnkiSendResult(sent, skipped, AnkiProblem.FAILED)
+                    val added =
+                        addNote(noteType, deck, word, media, options)
+                            ?: return@withContext AnkiSendResult(sent, skipped, AnkiProblem.FAILED, waiting = waiting)
                     sentIds.edit().putBoolean(word.id, true).apply()
                     sent++
+                    if (added.waiting) waiting++
                 }
-                AnkiSendResult(sent, skipped)
+                AnkiSendResult(sent, skipped, waiting = waiting)
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (_: Exception) {
                 // AnkiDroid refused (a revoked permission, a locked collection, or another version's provider).
-                AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
+                AnkiSendResult(sent, skipped, AnkiProblem.FAILED, waiting = waiting)
             }
         }
 
@@ -237,7 +255,10 @@ internal class AnkiDroidNotes(
         return created?.lastPathSegment?.toLongOrNull()
     }
 
-    private fun noteTypeId(deck: Long): Long? {
+    private fun noteTypeId(
+        deck: Long,
+        front: CardFront,
+    ): Long? {
         val models = Uri.withAppendedPath(base, "models")
         val fields = ANKI_FIELDS.joinToString(ANKI_FIELD_SEPARATOR)
         resolver.query(models, arrayOf("_id", "name", "field_names"), null, null, null)?.use { cursor ->
@@ -245,7 +266,11 @@ internal class AnkiDroidNotes(
             val name = cursor.getColumnIndex("name")
             val names = cursor.getColumnIndex("field_names")
             while (id >= 0 && name >= 0 && names >= 0 && cursor.moveToNext()) {
-                if (cursor.getString(name) == ANKI_NOTE_TYPE_NAME && cursor.getString(names) == fields) return cursor.getLong(id)
+                if (cursor.getString(name) == ANKI_NOTE_TYPE_NAME && cursor.getString(names) == fields) {
+                    val found = cursor.getLong(id)
+                    if (cardFrontNeedsUpdate(cardFronts.applied(found.toString()), front)) setTemplate(models, found, front)
+                    return found
+                }
             }
         }
         val values =
@@ -258,30 +283,53 @@ internal class AnkiDroidNotes(
                 put("sort_field_index", 0)
             }
         val id = resolver.insert(models, values)?.lastPathSegment?.toLongOrNull() ?: return null
-        // The card shows the word with its sentence; AnkiDroid's own layout (word, then meaning) stays if this is refused.
-        runCatching {
-            val template =
-                ContentValues().apply {
-                    put("question_format", ANKI_QUESTION_FORMAT)
-                    put("answer_format", ANKI_ANSWER_FORMAT)
-                }
-            resolver.update(Uri.withAppendedPath(models, "$id/templates/0"), template, null, null)
-        }
+        // AnkiDroid's own layout (word, then meaning) stays if this is refused.
+        setTemplate(models, id, front)
         return id
     }
+
+    /**
+     * Sets the note type's card template to [front] (Settings → Flashcards & Anki → Card front) and
+     * remembers it, so a template the learner changed in Anki is only replaced by a new pick.
+     */
+    private fun setTemplate(
+        models: Uri,
+        noteType: Long,
+        front: CardFront,
+    ) {
+        val template = ankiCardTemplate(front)
+        val values =
+            ContentValues().apply {
+                put("question_format", template.question)
+                put("answer_format", template.answer)
+            }
+        val changed = runCatching { resolver.update(Uri.withAppendedPath(models, "$noteType/templates/0"), values, null, null) > 0 }
+        if (changed.getOrDefault(false)) cardFronts.remember(noteType.toString(), front)
+    }
+
+    /** A note AnkiDroid took; [waiting] when it went without its sentence's sound, which comes later. */
+    private class AddedNote(
+        val waiting: Boolean,
+    )
 
     private suspend fun addNote(
         noteType: Long,
         deck: Long,
         word: SavedWord,
-        audio: AnkiCardAudio?,
-    ): Boolean {
-        val files = audio?.files(word) ?: AnkiAudioFiles()
-        val sounds = CardSounds(word = files.word?.let(::addMedia).orEmpty(), sentence = files.sentence?.let(::addMedia).orEmpty())
+        media: AnkiCardMedia?,
+        options: CardOptions,
+    ): AddedNote? {
+        val files = media?.files(word, options) ?: AnkiCardFiles()
+        val fieldMedia =
+            CardMedia(
+                word = files.word?.let { ankiSound(addMedia(it)) }.orEmpty(),
+                sentence = files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty(),
+                picture = files.picture?.let { ankiPicture(addMedia(it)) }.orEmpty(),
+            )
         val values =
             ContentValues().apply {
                 put("mid", noteType)
-                put("flds", ankiNoteFields(word, sounds).joinToString(ANKI_FIELD_SEPARATOR))
+                put("flds", ankiNoteFields(word, fieldMedia).joinToString(ANKI_FIELD_SEPARATOR))
                 put("tags", ANKI_TAG)
             }
         val notes =
@@ -290,25 +338,27 @@ internal class AnkiDroidNotes(
                 .buildUpon()
                 .appendQueryParameter("deckId", deck.toString())
                 .build()
-        val added = resolver.insert(notes, values) ?: return false
+        val added = resolver.insert(notes, values) ?: return null
         val noteId = added.lastPathSegment?.toLongOrNull()
         val line = audioLineOf(word)
-        if (audio != null && sounds.sentence.isEmpty() && noteId != null && line != null) {
-            audio.awaitSentence(
-                PendingCardAudio(PENDING_ANKIDROID, noteId, line, ANKI_SENTENCE_AUDIO_FIELD, "", System.currentTimeMillis()),
-            )
-        }
-        return true
+        val pending =
+            if (media != null && options.audio && fieldMedia.sentence.isEmpty() && noteId != null && line != null) {
+                PendingCardAudio(PENDING_ANKIDROID, noteId, line, ANKI_SENTENCE_AUDIO_FIELD, "", System.currentTimeMillis())
+            } else {
+                null
+            }
+        pending?.let { media?.awaitSentence(it) }
+        return AddedNote(waiting = pending != null)
     }
 
     /**
-     * Copies [file] into AnkiDroid's media and returns the field text that plays it, or empty text
-     * when AnkiDroid refused it (the card then goes without that sound). AnkiDroid reads the file
-     * through a content address it may read only during this copy.
+     * Copies [file] into AnkiDroid's media and returns the name AnkiDroid gave it, or null when
+     * AnkiDroid refused it (the card then goes without it). AnkiDroid reads the file through a
+     * content address it may read only during this copy.
      */
-    private fun addMedia(file: File): String {
+    private fun addMedia(file: File): String? {
         val authority = cardAudioAuthority(context)
-        val uri = runCatching { FileProvider.getUriForFile(context, authority, file) }.getOrNull() ?: return ""
+        val uri = runCatching { FileProvider.getUriForFile(context, authority, file) }.getOrNull() ?: return null
         return try {
             context.grantUriPermission(ANKIDROID_PACKAGE, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val values =
@@ -316,11 +366,11 @@ internal class AnkiDroidNotes(
                     put("file_uri", uri.toString())
                     put("preferred_name", "dualsub_${file.nameWithoutExtension}")
                 }
-            ankiSound(resolver.insert(Uri.withAppendedPath(base, "media"), values)?.path)
+            resolver.insert(Uri.withAppendedPath(base, "media"), values)?.path
         } catch (cancel: CancellationException) {
             throw cancel
         } catch (_: Exception) {
-            ""
+            null
         } finally {
             runCatching { context.revokeUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
@@ -344,7 +394,7 @@ internal class AnkiDroidNotes(
                         val index = cursor.getColumnIndex("flds")
                         if (index >= 0 && cursor.moveToFirst()) cursor.getString(index) else null
                     } ?: return@withContext true
-                val sound = addMedia(clip).takeIf { it.isNotEmpty() } ?: return@withContext false
+                val sound = ankiSound(addMedia(clip)).takeIf { it.isNotEmpty() } ?: return@withContext false
                 val updated =
                     ankiFieldsWith(fields.split(ANKI_FIELD_SEPARATOR), item.field, item.base + sound)
                         ?: return@withContext true

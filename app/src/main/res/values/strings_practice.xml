@@ -24,6 +24,10 @@
     <string name="practice_speech_settings">Speech settings</string>
     <string name="practice_show_meaning">Show meaning</string>
     <string name="practice_meaning_label">Meaning (%1$s)</string>
+    <string name="practice_meaning_in_sentence_label">In this sentence (%1$s)</string>
+    <string name="practice_meaning_dictionary">Dictionary: %1$s</string>
+    <string name="practice_meaning_in_sentence_loading">Asking AI for the meaning in this sentence…</string>
+    <string name="practice_meaning_in_sentence_no_key">Meaning in this sentence needs an AI key: More settings → AI assistant.</string>
     <string name="practice_video_uses_original_sentence">Video example uses the original sentence.</string>
     <string name="practice_play_online_example">Play online example</string>
     <string name="practice_online_example">Online example</string>

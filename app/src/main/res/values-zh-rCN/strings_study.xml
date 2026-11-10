@@ -41,6 +41,19 @@
     <string name="study_anki_description">在单词卡片和“练习”→“导出”中显示“发送到”按钮。除非你用按钮上的 ▾ 或下方的设置选择其他应用,否则会发送到 AnkiDroid;之后按钮会显示所选应用。</string>
     <string name="study_card_audio_title">为卡片添加音频</string>
     <string name="study_card_audio_description">卡片会带上用单词卡同款声音朗读的单词，以及视频中这句台词的原声。台词在播放时录下，所以在台词结束前发送的卡片，会在台词播完后补上音频。</string>
+    <string name="study_card_picture_title">为卡片添加图片</string>
+    <string name="study_card_picture_description">卡片会带上一张视频画面，在单词所在的台词显示时截取。没有画面时，使用视频的缩略图。</string>
+    <string name="study_card_front_title">卡片正面</string>
+    <string name="study_card_front_word_sentence">单词和句子</string>
+    <string name="study_card_front_word">单词</string>
+    <string name="study_card_front_sentence">句子</string>
+    <string name="study_card_front_listening">听力</string>
+    <string name="study_card_front_word_sentence_description">正面显示单词及其句子。</string>
+    <string name="study_card_front_word_description">正面只显示单词，句子在背面。</string>
+    <string name="study_card_front_sentence_description">正面显示句子，单词加粗；单词和释义在背面。</string>
+    <string name="study_card_front_listening_description">正面只播放这句台词的声音，句子和单词在背面。</string>
+    <string name="study_card_front_note">更改此项也会改变你之前发送的卡片。</string>
+    <string name="study_card_sound_waits">这句台词播完后，会补上句子的声音。</string>
     <string name="study_blur_box_title">模糊框</string>
     <string name="study_blur_box_description">在视频上放一个模糊框，遮住画面里自带的字幕。拖动可移动，拖动角可调整大小。</string>
     <string name="study_page_token_title">用页面令牌加载字幕（测试版）</string>
@@ -73,6 +86,9 @@
     </plurals>
     <plurals name="study_anki_sent_count">
         <item quantity="other">已将 %1$d 个词发送到 %2$s。</item>
+    </plurals>
+    <plurals name="study_anki_sound_waits_count">
+        <item quantity="other">%1$d 张卡片会在台词播放后补上句子的声音。</item>
     </plurals>
     <string name="study_page_token_auto">自动</string>
     <string name="study_page_token_on">开启</string>

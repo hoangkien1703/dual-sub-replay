@@ -47,6 +47,68 @@ class WordLearningDialogTest {
     }
 
     @Test
+    fun meaningInTheSentenceShowsAboveTheDictionaryMeaningAndIsSavedWithIt() {
+        // lion737 (#81): "go" in "I go to school" is "gedirəm" there, "getmək" in a dictionary.
+        val go =
+            selection.copy(
+                token = AnalyzedToken("go", 2, 4, PartOfSpeech.VERB),
+                meaningLanguage = "az",
+                segment = SubtitleSegment(1, 1000, 3000, "I go to school.", null),
+            )
+        var saved: String? = null
+        compose.setContent {
+            DualSubTheme {
+                WordLearningDialog(
+                    go,
+                    false,
+                    { "getmək" },
+                    { meaning, _ -> saved = meaning },
+                    {},
+                    null,
+                    {},
+                    onMeaningInContext = { ContextMeaning.Found("gedirəm") },
+                )
+            }
+        }
+        compose.onNodeWithTag("meaning_in_context_text").assertTextEquals("gedirəm")
+        compose.onNodeWithTag("dictionary_meaning_text").assertTextEquals("Dictionary: getmək")
+        compose.onNodeWithText("In this sentence", substring = true).assertIsDisplayed()
+        saveUiEvidence("word-card-meaning-in-sentence")
+        compose.onNodeWithTag("save_word").performScrollTo().performClick()
+        compose.waitForIdle()
+        compose.runOnIdle { assertEquals("gedirəm (getmək)", saved) }
+
+        // Editing starts from what is saved, and the edit is then the one meaning.
+        compose.onNodeWithTag("edit_meaning").performClick()
+        compose.onNodeWithTag("word_meaning").assertTextContains("gedirəm (getmək)")
+        compose.onNodeWithTag("word_meaning").performTextReplacement("gedirəm")
+        compose.onNodeWithTag("edit_meaning").performClick()
+        compose.onNodeWithTag("meaning_in_context_text").assertDoesNotExist()
+        compose.onNodeWithTag("word_meaning_text").assertTextEquals("gedirəm")
+    }
+
+    @Test
+    fun meaningInTheSentenceWithoutAKeySaysWhereToAddOne() {
+        compose.setContent {
+            DualSubTheme {
+                WordLearningDialog(
+                    selection,
+                    false,
+                    { "từ" },
+                    { _, _ -> },
+                    {},
+                    null,
+                    {},
+                    onMeaningInContext = { ContextMeaning.NoKey },
+                )
+            }
+        }
+        compose.onNodeWithTag("meaning_in_context_no_key").assertIsDisplayed()
+        compose.onNodeWithTag("word_meaning_text").assertTextEquals("từ")
+        compose.onNodeWithTag("meaning_in_context_text").assertDoesNotExist()
+    }
+
+    @Test
     fun englishWordShowsItsDictionaryFormAndLevel() {
         LearnerData.useAssets(InstrumentationRegistry.getInstrumentation().targetContext.assets)
         assertTrue(EnglishMorphology.awaitReady())

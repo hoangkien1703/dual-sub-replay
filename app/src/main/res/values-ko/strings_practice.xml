@@ -24,6 +24,10 @@
     <string name="practice_speech_settings">음성 설정</string>
     <string name="practice_show_meaning">뜻 보기</string>
     <string name="practice_meaning_label">뜻(%1$s)</string>
+    <string name="practice_meaning_in_sentence_label">이 문장에서 (%1$s)</string>
+    <string name="practice_meaning_dictionary">사전: %1$s</string>
+    <string name="practice_meaning_in_sentence_loading">이 문장에서의 뜻을 AI에 묻는 중…</string>
+    <string name="practice_meaning_in_sentence_no_key">이 문장에서의 뜻에는 AI 키가 필요합니다: 추가 설정 → AI 도우미.</string>
     <string name="practice_video_uses_original_sentence">예시 동영상은 원래 문장을 사용해요.</string>
     <string name="practice_play_online_example">온라인 예시 재생</string>
     <string name="practice_online_example">온라인 예시</string>

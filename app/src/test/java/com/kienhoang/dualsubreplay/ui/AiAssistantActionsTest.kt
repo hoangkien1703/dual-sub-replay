@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.assistant.AI_ACCENT_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_COLORS
 import com.kienhoang.dualsubreplay.assistant.AI_APP_LANGUAGES
+import com.kienhoang.dualsubreplay.assistant.AI_CARD_FRONTS
 import com.kienhoang.dualsubreplay.assistant.AI_DAILY_GOALS
 import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_AFTER
 import com.kienhoang.dualsubreplay.assistant.AI_KNOWN_WORDS_MODES
@@ -19,6 +20,7 @@ import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiSettingValue
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.DAILY_GOAL_CHOICES
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -66,6 +68,7 @@ class AiAssistantActionsTest {
         assertEquals(KnownWordsMode.entries.map { it.storageValue }, AI_KNOWN_WORDS_MODES)
         assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)
         assertEquals(FlashcardApp.entries.map { it.storageValue }, AI_SEND_TO_APPS)
+        assertEquals(CardFront.entries.map { it.storageValue }, AI_CARD_FRONTS)
     }
 
     @Test

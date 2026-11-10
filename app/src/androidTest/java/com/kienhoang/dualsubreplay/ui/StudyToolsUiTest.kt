@@ -22,6 +22,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
@@ -143,6 +144,34 @@ class StudyToolsUiTest {
         saveUiEvidence("study-tools-send-to-settings")
         composeRule.onNodeWithTag("card_audio_switch").performClick()
         composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_AUDIO_PREFERENCE, true)) }
+    }
+
+    @Test
+    fun flashcardsAndAnkiPicksThePictureAndTheCardFront() {
+        showSettings("settings_section_flashcards")
+        // Add a picture to cards is off, and the front is the word with its sentence, until changed.
+        composeRule.onNodeWithTag("card_picture_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_front_listening").performScrollTo().assertIsDisplayed()
+        composeRule
+            .onNodeWithText(
+                context.getString(R.string.study_card_front_word_sentence_description),
+                substring = true,
+            ).performScrollTo()
+            .assertIsDisplayed()
+        saveUiEvidence("flashcards-picture-and-card-front")
+        composeRule.onNodeWithTag("card_front_listening").performClick()
+        composeRule
+            .onNodeWithText(
+                context.getString(R.string.study_card_front_listening_description),
+                substring = true,
+            ).performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag("card_picture_switch").performScrollTo().performClick()
+        composeRule.runOnIdle {
+            assertEquals("listening", preferences.getString(CARD_FRONT_PREFERENCE, null))
+            assertTrue(preferences.getBoolean(CARD_PICTURE_PREFERENCE, false))
+        }
+        saveUiEvidence("flashcards-card-front-listening")
     }
 
     @Test

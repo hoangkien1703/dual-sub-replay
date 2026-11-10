@@ -71,7 +71,7 @@ class AnkiDroidNotesTest {
 
     @Test
     fun soundsGoInTheirOwnFieldsAndTheTemplatesPlayThem() {
-        val fields = ankiNoteFields(word("1"), CardSounds(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]"))
+        val fields = ankiNoteFields(word("1"), CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]"))
         assertEquals("[sound:w.mp3]", fields[ANKI_FIELDS.indexOf(ANKI_WORD_AUDIO_FIELD)])
         assertEquals("[sound:s.m4a]", fields[ANKI_FIELDS.indexOf(ANKI_SENTENCE_AUDIO_FIELD)])
         // The word's sound plays on the front, the sentence's on the back.
