@@ -26,6 +26,7 @@
     <string name="practice_meaning_label">Significado (%1$s)</string>
     <string name="practice_meaning_in_sentence_label">En esta frase (%1$s)</string>
     <string name="practice_meaning_dictionary">Diccionario: %1$s</string>
+    <string name="practice_meaning_in_sentence_under">En esta frase: %1$s</string>
     <string name="practice_meaning_in_sentence_loading">Preguntando a la IA el significado en esta frase…</string>
     <string name="practice_meaning_in_sentence_no_key">El significado en esta frase necesita una clave de IA: Más ajustes → Asistente de IA.</string>
     <string name="practice_video_uses_original_sentence">El video de ejemplo usa la oración original.</string>

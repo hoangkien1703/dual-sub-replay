@@ -9,6 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -164,6 +165,7 @@ class LearningPlayerUiTest {
             .remove(PRONUNCIATION_VOLUME_PREFERENCE)
             .remove(PHONE_VOICE_PREFERENCE)
             .remove(MEANING_IN_CONTEXT_PREFERENCE)
+            .remove(MEANING_ORDER_PREFERENCE)
             .commit()
         try {
             composeRule.setContent {
@@ -200,6 +202,10 @@ class LearningPlayerUiTest {
             // lion737 (#81): the meaning in the sentence from the AI, off until turned on (owner, 2026-11-10).
             composeRule.onNodeWithTag("meaning_in_context_switch").performScrollTo().assertIsOff().performClick()
             composeRule.runOnIdle { assertTrue(preferences.getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false)) }
+            // Show first appears once it is on (lion737 asked for the order three times; owner pick 2026-11-11).
+            composeRule.onNodeWithTag("meaning_order_sentence").performScrollTo().assertIsSelected()
+            composeRule.onNodeWithTag("meaning_order_dictionary").performClick().assertIsSelected()
+            composeRule.runOnIdle { assertEquals(MEANING_ORDER_DICTIONARY_FIRST, preferences.getString(MEANING_ORDER_PREFERENCE, null)) }
             saveUiEvidence("pronunciation-volume-setting")
         } finally {
             preferences
@@ -207,6 +213,7 @@ class LearningPlayerUiTest {
                 .remove(PRONUNCIATION_VOLUME_PREFERENCE)
                 .remove(PHONE_VOICE_PREFERENCE)
                 .remove(MEANING_IN_CONTEXT_PREFERENCE)
+                .remove(MEANING_ORDER_PREFERENCE)
                 .commit()
         }
     }

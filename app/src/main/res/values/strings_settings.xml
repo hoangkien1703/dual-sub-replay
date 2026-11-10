@@ -116,6 +116,9 @@
     <string name="settings_phone_voice_description">Speak words, and record Anki word audio, in the voice picked in Android\'s text-to-speech settings (male or female) instead of Google\'s online voice.</string>
     <string name="settings_meaning_in_context_title">Meaning in this sentence (AI)</string>
     <string name="settings_meaning_in_context_description">When you tap a word, the AI from More settings → AI assistant gives its meaning in that sentence, above the dictionary meaning. Each tapped word sends its sentence to that service and uses your key.</string>
+    <string name="settings_meaning_order_title">Show first</string>
+    <string name="settings_meaning_order_sentence">Meaning in this sentence</string>
+    <string name="settings_meaning_order_dictionary">Dictionary meaning</string>
     <string name="settings_word_learning_mode_title">Word learning mode (POS colors)</string>
     <string name="settings_word_learning_mode_description">Color words by grammatical role (nouns, verbs, adjectives, particles) to see sentence structure.</string>
     <string name="settings_colored_lines_title">Colored subtitle lines</string>

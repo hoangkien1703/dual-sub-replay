@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +52,8 @@ internal fun WordLearningDialog(
     onDeckChange: ((String?) -> Unit)? = null,
     onMeaningInContext: suspend () -> ContextMeaning = { ContextMeaning.None },
 ) {
-    val word = remember(selection) { WordMeaningState(existingWord?.meaning.orEmpty()) }
+    val context = LocalContext.current
+    val word = remember(selection) { WordMeaningState(existingWord?.meaning.orEmpty(), readMeaningInContextFirst(context)) }
     var saved by remember(selection) { mutableStateOf(existingWord != null) }
     var saving by remember(selection) { mutableStateOf(false) }
     var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
@@ -133,6 +135,8 @@ internal fun WordLearningDialog(
 @Stable
 private class WordMeaningState(
     existing: String,
+    /** Settings → Word learning → Show first: the meaning in the sentence (default) or the dictionary meaning. */
+    val contextFirst: Boolean = true,
 ) {
     var meaning by mutableStateOf(existing)
 
@@ -143,7 +147,7 @@ private class WordMeaningState(
     var loading by mutableStateOf(true)
     var error by mutableStateOf<Int?>(null)
 
-    val saved: String get() = combinedMeaning(inContext, meaning)
+    val saved: String get() = combinedMeaning(inContext, meaning, contextFirst)
 
     fun edit(text: String) {
         meaning = text
@@ -194,6 +198,7 @@ private fun WordMeaningSection(
         },
         inContext = word.inContext,
         contextLoading = word.contextLoading,
+        contextFirst = word.contextFirst,
     )
     if (word.contextNoKey) {
         Text(
@@ -223,9 +228,11 @@ internal fun MeaningPanel(
     textTag: String = "word_meaning_text",
     inContext: String? = null,
     contextLoading: Boolean = false,
+    contextFirst: Boolean = true,
 ) {
     var editing by remember { mutableStateOf(false) }
-    val showsContext = !editing && differsFromDictionary(inContext, meaning)
+    val differs = differsFromDictionary(inContext, meaning)
+    val showsContext = !editing && differs && contextFirst
     val colors = MaterialTheme.colorScheme
     Surface(
         color = colors.primaryContainer,
@@ -260,6 +267,14 @@ internal fun MeaningPanel(
                             modifier = Modifier.padding(top = 2.dp).testTag(textTag),
                         )
                 }
+                // Show first → Dictionary meaning: the meaning in the sentence goes under it, smaller.
+                if (!contextFirst && differs && !editing && !loading) {
+                    Text(
+                        stringResource(R.string.practice_meaning_in_sentence_under, inContext.orEmpty()),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 2.dp, end = 14.dp).testTag("meaning_in_context_under"),
+                    )
+                }
                 if (contextLoading && !showsContext && !editing) {
                     Text(
                         stringResource(R.string.practice_meaning_in_sentence_loading),
@@ -272,7 +287,7 @@ internal fun MeaningPanel(
                 IconButton(onClick = {
                     if (editing) onDone()
                     // The field holds what is saved: the meaning in the sentence with the dictionary meaning.
-                    if (!editing && differsFromDictionary(inContext, meaning)) onChange(combinedMeaning(inContext, meaning))
+                    if (!editing && differs) onChange(combinedMeaning(inContext, meaning, contextFirst))
                     editing = !editing
                 }, enabled = enabled, modifier = Modifier.testTag("edit_meaning")) {
                     Icon(

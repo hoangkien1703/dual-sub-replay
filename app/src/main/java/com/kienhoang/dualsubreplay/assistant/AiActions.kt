@@ -109,6 +109,7 @@ internal enum class AiSetting(
     PRONUNCIATION_VOLUME("pronunciation_volume", emptyList(), 25f..200f),
     PHONE_VOICE("phone_voice"),
     MEANING_IN_CONTEXT("meaning_in_context"),
+    MEANING_ORDER("meaning_order", listOf("sentence_first", "dictionary_first")),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
@@ -628,6 +629,14 @@ private val SETTING_CHOICE_ALIASES by lazy {
         AiSetting.SKIP_SILENCE to mapOf("2" to "2x", "double" to "2x", "4" to "4x", "skip" to "jump"),
         AiSetting.TRANSCRIPT_FOLLOW to
             mapOf("centre" to "center", "middle" to "center", "in_the_middle" to "center", "lyrics" to "center", "down" to "page"),
+        AiSetting.MEANING_ORDER to
+            mapOf(
+                "sentence" to "sentence_first",
+                "context_first" to "sentence_first",
+                "in_context_first" to "sentence_first",
+                "dictionary" to "dictionary_first",
+                "dictionary_meaning_first" to "dictionary_first",
+            ),
         AiSetting.SEND_TO_APP to mapOf("anki" to "ankidroid", "anki_droid" to "ankidroid", "anki_connect" to "ankiconnect"),
         AiSetting.CARD_FRONT to
             mapOf(

@@ -225,6 +225,7 @@ class SubtitleWordHighlightTest {
                 PRONUNCIATION_VOLUME_PREFERENCE,
                 PHONE_VOICE_PREFERENCE,
                 MEANING_IN_CONTEXT_PREFERENCE,
+                MEANING_ORDER_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,
                 STUDY_REPEAT_COUNT_PREFERENCE,
                 SKIP_SILENCE_PREFERENCE,

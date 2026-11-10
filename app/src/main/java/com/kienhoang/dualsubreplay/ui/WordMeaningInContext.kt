@@ -2,14 +2,26 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import java.util.Locale
@@ -17,10 +29,26 @@ import java.util.Locale
 /**
  * The tapped word's meaning as used in its sentence ("go" in "I go to school" is "gedirəm", not only
  * "getmək"), asked from the AI assistant's service and shown above the dictionary meaning (lion737,
- * discussion #81; owner picks 2026-11-10: in-context meaning first with no order setting, and off by
- * default even with a key, since each tap sends the sentence to that service and uses the key).
+ * discussion #81; owner picks 2026-11-10: off by default even with a key, since each tap sends the
+ * sentence to that service and uses the key; 2026-11-11: a Show first choice puts either meaning first).
  */
 internal const val MEANING_IN_CONTEXT_PREFERENCE = "meaning_in_context"
+
+/**
+ * Which meaning the word card shows big and saves first: "sentence_first" (default) or
+ * "dictionary_first" (lion737 asked three times, owner pick 2026-11-11).
+ */
+internal const val MEANING_ORDER_PREFERENCE = "meaning_order"
+internal const val MEANING_ORDER_SENTENCE_FIRST = "sentence_first"
+internal const val MEANING_ORDER_DICTIONARY_FIRST = "dictionary_first"
+internal val MEANING_ORDERS = listOf(MEANING_ORDER_SENTENCE_FIRST, MEANING_ORDER_DICTIONARY_FIRST)
+
+internal fun storedMeaningOrder(value: String?): String = value?.takeIf { it in MEANING_ORDERS } ?: MEANING_ORDER_SENTENCE_FIRST
+
+/** True when the meaning in the sentence comes first (the default). */
+internal fun readMeaningInContextFirst(context: Context): Boolean =
+    storedMeaningOrder(context.getSharedPreferences("dual_sub_preferences", 0).getString(MEANING_ORDER_PREFERENCE, null)) ==
+        MEANING_ORDER_SENTENCE_FIRST
 
 /** A longer reply is an explanation, not the few words asked for. */
 private const val MAX_CONTEXT_MEANING_CHARS = 80
@@ -94,16 +122,19 @@ internal fun differsFromDictionary(
 
 /**
  * The meaning saved with the word (Practice, Anki's Meaning field, exports): the meaning in the
- * sentence with the dictionary meaning after it, "gedirəm (getmək)".
+ * sentence with the dictionary meaning after it, "gedirəm (getmək)", or the other way round when
+ * the dictionary meaning comes first, "getmək (gedirəm)".
  */
 internal fun combinedMeaning(
     inContext: String?,
     dictionary: String,
+    contextFirst: Boolean = true,
 ): String =
     when {
         !differsFromDictionary(inContext, dictionary) -> dictionary
         dictionary.isBlank() -> inContext.orEmpty().trim()
-        else -> "${inContext.orEmpty().trim()} (${dictionary.trim()})"
+        contextFirst -> "${inContext.orEmpty().trim()} (${dictionary.trim()})"
+        else -> "${dictionary.trim()} (${inContext.orEmpty().trim()})"
     }
 
 private fun englishLanguageName(code: String): String =
@@ -115,11 +146,13 @@ internal fun MeaningInContextSetting() {
     val context = LocalContext.current
     val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
     var enabled by remember { mutableStateOf(readMeaningInContext(context)) }
+    var contextFirst by remember { mutableStateOf(readMeaningInContextFirst(context)) }
     DisposableEffect(preferences) {
         // "Reset all settings" and the AI assistant change the key while this section is open.
         val listener =
             SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 if (key == MEANING_IN_CONTEXT_PREFERENCE || key == null) enabled = readMeaningInContext(context)
+                if (key == MEANING_ORDER_PREFERENCE || key == null) contextFirst = readMeaningInContextFirst(context)
             }
         preferences.registerOnSharedPreferenceChangeListener(listener)
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -134,4 +167,36 @@ internal fun MeaningInContextSetting() {
         },
         testTag = "meaning_in_context_switch",
     )
+    if (enabled) {
+        MeaningOrderChoice(contextFirst) { first ->
+            contextFirst = first
+            val order = if (first) MEANING_ORDER_SENTENCE_FIRST else MEANING_ORDER_DICTIONARY_FIRST
+            preferences.edit().putString(MEANING_ORDER_PREFERENCE, order).apply()
+        }
+    }
+}
+
+/** Show first: the meaning in the sentence or the dictionary meaning, only while Meaning in this sentence is on. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MeaningOrderChoice(
+    contextFirst: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().padding(bottom = 6.dp).testTag("meaning_order")) {
+        Text(stringResource(R.string.settings_meaning_order_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                true to R.string.settings_meaning_order_sentence,
+                false to R.string.settings_meaning_order_dictionary,
+            ).forEach { (first, label) ->
+                FilterChip(
+                    selected = contextFirst == first,
+                    onClick = { onChange(first) },
+                    label = { Text(stringResource(label)) },
+                    modifier = Modifier.testTag(if (first) "meaning_order_sentence" else "meaning_order_dictionary"),
+                )
+            }
+        }
+    }
 }

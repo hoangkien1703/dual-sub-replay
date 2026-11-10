@@ -244,4 +244,22 @@ class PhraseSelectionTest {
         assertNull(japaneseDictionaryNote(JapaneseDictionaryStatus.READY))
         assertNull(japaneseDictionaryNote(JapaneseDictionaryStatus.IDLE))
     }
+
+    @Test
+    fun copyKeepsTheLinesOpeningAndClosingPunctuation() {
+        val question = "¿Dónde está la escuela?"
+        val tokens = subtitleWordTokens(question, "es")
+        assertEquals("¿Dónde está la escuela?", copiedPhrase(question, tokens, 0..tokens.lastIndex))
+        assertEquals("la escuela?", copiedPhrase(question, tokens, 2..tokens.lastIndex))
+        assertEquals("¿Dónde", copiedPhrase(question, tokens, 0..0))
+        val sentence = "I go to school, every day."
+        val words = subtitleWordTokens(sentence, "en")
+        assertEquals("every day.", copiedPhrase(sentence, words, words.lastIndex - 1..words.lastIndex))
+        // A comma inside the line stays out: the selection does not reach the line's end.
+        val school = words.indexOfFirst { it.text == "school" }
+        assertEquals("I go to school", copiedPhrase(sentence, words, 0..school))
+        val japanese = "学校に行きます。"
+        val ja = subtitleWordTokens(japanese, "ja")
+        assertTrue(copiedPhrase(japanese, ja, 0..ja.lastIndex).endsWith("。"))
+    }
 }

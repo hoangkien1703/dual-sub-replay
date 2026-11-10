@@ -116,6 +116,9 @@
     <string name="settings_phone_voice_description">단어 읽기와 Anki 단어 음성에 Google 온라인 음성 대신 Android 텍스트 음성 변환 설정에서 고른 음성(남성 또는 여성)을 사용합니다.</string>
     <string name="settings_meaning_in_context_title">이 문장에서의 뜻 (AI)</string>
     <string name="settings_meaning_in_context_description">단어를 탭하면 추가 설정 → AI 도우미의 AI가 그 문장에서의 뜻을 사전 뜻 위에 보여 줍니다. 탭한 단어마다 문장이 그 서비스로 전송되고 키가 사용됩니다.</string>
+    <string name="settings_meaning_order_title">먼저 보기</string>
+    <string name="settings_meaning_order_sentence">이 문장에서의 뜻</string>
+    <string name="settings_meaning_order_dictionary">사전 뜻</string>
     <string name="settings_word_learning_mode_title">단어 학습 모드(품사별 색상)</string>
     <string name="settings_word_learning_mode_description">문법 역할(명사, 동사, 형용사, 조사)에 따라 단어에 색을 입혀 문장 구조를 보여 줘요.</string>
     <string name="settings_colored_lines_title">색상을 입힐 자막 줄</string>

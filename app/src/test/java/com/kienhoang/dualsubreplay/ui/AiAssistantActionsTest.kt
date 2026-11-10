@@ -79,6 +79,7 @@ class AiAssistantActionsTest {
             AiStoredSettings(
                 appColors = "light",
                 pronunciationVolume = 1.25f,
+                meaningOrder = MEANING_ORDER_DICTIONARY_FIRST,
                 rememberDraggedPosition = false,
                 appLanguage = "pt-BR",
                 study =

@@ -116,6 +116,9 @@
     <string name="settings_phone_voice_description">Ucapkan kata, dan rekam audio kata Anki, dengan suara yang dipilih di setelan teks ke ucapan Android (pria atau wanita), bukan suara online Google.</string>
     <string name="settings_meaning_in_context_title">Arti dalam kalimat ini (AI)</string>
     <string name="settings_meaning_in_context_description">Saat Anda mengetuk kata, AI dari Setelan lainnya → Asisten AI memberi artinya dalam kalimat itu, di atas arti kamus. Setiap kata yang diketuk mengirim kalimatnya ke layanan itu dan memakai kunci Anda.</string>
+    <string name="settings_meaning_order_title">Tampilkan dulu</string>
+    <string name="settings_meaning_order_sentence">Arti dalam kalimat ini</string>
+    <string name="settings_meaning_order_dictionary">Arti kamus</string>
     <string name="settings_word_learning_mode_title">Mode belajar kata (warna kelas kata)</string>
     <string name="settings_word_learning_mode_description">Warnai kata menurut peran tata bahasanya (kata benda, kata kerja, kata sifat, partikel) untuk melihat struktur kalimat.</string>
     <string name="settings_colored_lines_title">Baris subtitel berwarna</string>

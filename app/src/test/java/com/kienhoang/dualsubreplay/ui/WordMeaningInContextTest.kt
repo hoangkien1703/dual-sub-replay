@@ -55,6 +55,12 @@ class WordMeaningInContextTest {
         assertEquals("getmək", combinedMeaning("Getmək", "getmək"))
         assertEquals("getmək", combinedMeaning(null, "getmək"))
         assertEquals("gedirəm", combinedMeaning("gedirəm", " "))
+        // Show first → Dictionary meaning.
+        assertEquals("getmək (gedirəm)", combinedMeaning("gedirəm", "getmək", contextFirst = false))
+        assertEquals("getmək", combinedMeaning("Getmək", "getmək", contextFirst = false))
+        assertEquals(MEANING_ORDER_SENTENCE_FIRST, storedMeaningOrder(null))
+        assertEquals(MEANING_ORDER_SENTENCE_FIRST, storedMeaningOrder("sideways"))
+        assertEquals(MEANING_ORDER_DICTIONARY_FIRST, storedMeaningOrder("dictionary_first"))
         assertTrue(differsFromDictionary("gedirəm", "getmək"))
         assertFalse(differsFromDictionary(" ", "getmək"))
     }

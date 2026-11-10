@@ -67,6 +67,9 @@
     <string name="study_send_to_anki">Gửi sang %1$s</string>
     <string name="study_sending_to_anki">Đang gửi…</string>
     <string name="study_sent_to_anki">Đã gửi sang %1$s</string>
+    <string name="study_send_again_title">Gửi lại thẻ này?</string>
+    <string name="study_send_again_text">%1$s đã có thẻ cho từ này. Một thẻ nữa sẽ được thêm, và bạn có thể xóa thẻ cũ ở đó.</string>
+    <string name="study_send_again">Gửi lại</string>
     <string name="study_anki_not_installed">Điện thoại này chưa cài AnkiDroid.</string>
     <string name="study_anki_permission_denied">Chưa cấp quyền cho AnkiDroid nên không thẻ nào được thêm.</string>
     <string name="study_anki_failed">AnkiDroid không nhận thẻ. Hãy mở AnkiDroid, để nó chạy trong nền, rồi quay lại và thử lại.</string>

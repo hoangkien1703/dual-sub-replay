@@ -67,6 +67,8 @@ class AnkiDroidNotesTest {
         val words = listOf(word("1"), word("2"), word("1"), word("3"))
         assertEquals(listOf("2"), unsentAnkiWords(words) { it == "1" || it == "3" }.map { it.id })
         assertEquals(listOf("1", "2", "3"), unsentAnkiWords(words) { false }.map { it.id })
+        // Send again: every word goes, once each.
+        assertEquals(listOf("1", "2", "3"), unsentAnkiWords(words, again = true) { true }.map { it.id })
     }
 
     @Test

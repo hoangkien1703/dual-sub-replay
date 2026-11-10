@@ -67,6 +67,9 @@
     <string name="study_send_to_anki">%1$s로 보내기</string>
     <string name="study_sending_to_anki">보내는 중…</string>
     <string name="study_sent_to_anki">%1$s로 보냄</string>
+    <string name="study_send_again_title">이 카드를 다시 보낼까요?</string>
+    <string name="study_send_again_text">%1$s에 이 단어의 카드가 이미 있습니다. 카드가 하나 더 추가되며, 이전 카드는 그곳에서 삭제할 수 있습니다.</string>
+    <string name="study_send_again">다시 보내기</string>
     <string name="study_anki_not_installed">이 휴대전화에 AnkiDroid가 설치되어 있지 않습니다.</string>
     <string name="study_anki_permission_denied">AnkiDroid 권한이 허용되지 않아 카드가 추가되지 않았습니다.</string>
     <string name="study_anki_failed">AnkiDroid가 카드를 받지 않았습니다. AnkiDroid를 열어 백그라운드에서 실행해 둔 뒤 돌아와 다시 시도하세요.</string>

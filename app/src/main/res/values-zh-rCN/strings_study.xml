@@ -67,6 +67,9 @@
     <string name="study_send_to_anki">发送到 %1$s</string>
     <string name="study_sending_to_anki">正在发送…</string>
     <string name="study_sent_to_anki">已发送到 %1$s</string>
+    <string name="study_send_again_title">再次发送这张卡片？</string>
+    <string name="study_send_again_text">%1$s 中已有这个单词的卡片。会再添加一张，你可以在那里删除旧的。</string>
+    <string name="study_send_again">再次发送</string>
     <string name="study_anki_not_installed">这部手机没有安装 AnkiDroid。</string>
     <string name="study_anki_permission_denied">没有授予 AnkiDroid 权限，所以没有添加卡片。</string>
     <string name="study_anki_failed">AnkiDroid 没有接受这张卡片。请打开 AnkiDroid 并让它在后台运行，然后回来再试。</string>

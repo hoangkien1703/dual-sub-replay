@@ -26,6 +26,7 @@
     <string name="practice_meaning_label">Arti (%1$s)</string>
     <string name="practice_meaning_in_sentence_label">Dalam kalimat ini (%1$s)</string>
     <string name="practice_meaning_dictionary">Kamus: %1$s</string>
+    <string name="practice_meaning_in_sentence_under">Dalam kalimat ini: %1$s</string>
     <string name="practice_meaning_in_sentence_loading">Menanyakan arti dalam kalimat ini ke AI…</string>
     <string name="practice_meaning_in_sentence_no_key">Arti dalam kalimat ini memerlukan kunci AI: Setelan lainnya → Asisten AI.</string>
     <string name="practice_video_uses_original_sentence">Video contoh menggunakan kalimat asli.</string>

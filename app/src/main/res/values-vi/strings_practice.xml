@@ -26,6 +26,7 @@
     <string name="practice_meaning_label">Nghĩa (%1$s)</string>
     <string name="practice_meaning_in_sentence_label">Trong câu này (%1$s)</string>
     <string name="practice_meaning_dictionary">Từ điển: %1$s</string>
+    <string name="practice_meaning_in_sentence_under">Trong câu này: %1$s</string>
     <string name="practice_meaning_in_sentence_loading">Đang hỏi AI nghĩa trong câu này…</string>
     <string name="practice_meaning_in_sentence_no_key">Nghĩa trong câu này cần khóa AI: Cài đặt khác → Trợ lý AI.</string>
     <string name="practice_video_uses_original_sentence">Video ví dụ dùng câu gốc.</string>
