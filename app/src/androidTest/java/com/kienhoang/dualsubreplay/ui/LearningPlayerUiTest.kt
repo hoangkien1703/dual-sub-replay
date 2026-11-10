@@ -204,7 +204,9 @@ class LearningPlayerUiTest {
             composeRule.runOnIdle { assertTrue(preferences.getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false)) }
             // Show first appears once it is on (lion737 asked for the order three times; owner pick 2026-11-11).
             composeRule.onNodeWithTag("meaning_order_sentence").performScrollTo().assertIsSelected()
-            composeRule.onNodeWithTag("meaning_order_dictionary").performClick().assertIsSelected()
+            // The chip row sits at the bottom edge behind the navigation bar, where a touch misses it; click by its action.
+            composeRule.onNodeWithTag("meaning_order_dictionary").performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
+            composeRule.onNodeWithTag("meaning_order_dictionary").assertIsSelected()
             composeRule.runOnIdle { assertEquals(MEANING_ORDER_DICTIONARY_FIRST, preferences.getString(MEANING_ORDER_PREFERENCE, null)) }
             saveUiEvidence("pronunciation-volume-setting")
         } finally {
