@@ -278,6 +278,7 @@ internal class AnkiDroidNotes(
     ): Boolean {
         val files = audio?.files(word) ?: AnkiAudioFiles()
         val sounds = CardSounds(word = files.word?.let(::addMedia).orEmpty(), sentence = files.sentence?.let(::addMedia).orEmpty())
+        CardAudioTrace.add("card files w=${files.word?.name} s=${files.sentence?.name} -> w='${sounds.word}' s='${sounds.sentence}'")
         val values =
             ContentValues().apply {
                 put("mid", noteType)
@@ -293,6 +294,7 @@ internal class AnkiDroidNotes(
         val added = resolver.insert(notes, values) ?: return false
         val noteId = added.lastPathSegment?.toLongOrNull()
         val line = audioLineOf(word)
+        CardAudioTrace.add("note $noteId line=${line?.startMs} (${word.videoId} ${word.startMs}-${word.endMs})")
         if (audio != null && sounds.sentence.isEmpty() && noteId != null && line != null) {
             audio.awaitSentence(
                 PendingCardAudio(PENDING_ANKIDROID, noteId, line, ANKI_SENTENCE_AUDIO_FIELD, "", System.currentTimeMillis()),
@@ -308,7 +310,10 @@ internal class AnkiDroidNotes(
      */
     private fun addMedia(file: File): String {
         val authority = cardAudioAuthority(context)
-        val uri = runCatching { FileProvider.getUriForFile(context, authority, file) }.getOrNull() ?: return ""
+        val uri =
+            runCatching { FileProvider.getUriForFile(context, authority, file) }
+                .onFailure { CardAudioTrace.add("uri error ${file.name} $it") }
+                .getOrNull() ?: return ""
         return try {
             context.grantUriPermission(ANKIDROID_PACKAGE, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val values =
@@ -316,10 +321,17 @@ internal class AnkiDroidNotes(
                     put("file_uri", uri.toString())
                     put("preferred_name", "dualsub_${file.nameWithoutExtension}")
                 }
-            ankiSound(resolver.insert(Uri.withAppendedPath(base, "media"), values)?.path)
+            val inserted = resolver.insert(Uri.withAppendedPath(base, "media"), values)
+            if (file.extension ==
+                "m4a"
+            ) {
+                CardAudioTrace.add("media ${file.name} (${file.length()} B, ${resolver.getType(uri)}) -> $inserted")
+            }
+            ankiSound(inserted?.path)
         } catch (cancel: CancellationException) {
             throw cancel
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            CardAudioTrace.add("media error ${file.name} $e")
             ""
         } finally {
             runCatching { context.revokeUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
@@ -343,16 +355,17 @@ internal class AnkiDroidNotes(
                     resolver.query(note, arrayOf("flds"), null, null, null)?.use { cursor ->
                         val index = cursor.getColumnIndex("flds")
                         if (index >= 0 && cursor.moveToFirst()) cursor.getString(index) else null
-                    } ?: return@withContext true
+                    } ?: return@withContext true.also { CardAudioTrace.add("later: note ${item.noteId} gone") }
                 val sound = addMedia(clip).takeIf { it.isNotEmpty() } ?: return@withContext false
                 val updated =
                     ankiFieldsWith(fields.split(ANKI_FIELD_SEPARATOR), item.field, item.base + sound)
                         ?: return@withContext true
                 val values = ContentValues().apply { put("flds", updated.joinToString(ANKI_FIELD_SEPARATOR)) }
-                resolver.update(note, values, null, null) > 0
+                (resolver.update(note, values, null, null) > 0).also { CardAudioTrace.add("later: note ${item.noteId} updated=$it") }
             } catch (cancel: CancellationException) {
                 throw cancel
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                CardAudioTrace.add("later error ${item.noteId} $e")
                 false
             }
         }

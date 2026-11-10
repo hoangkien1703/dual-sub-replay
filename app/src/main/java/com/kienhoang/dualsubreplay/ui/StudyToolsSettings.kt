@@ -145,8 +145,14 @@ internal fun FlashcardSettingsSection() {
         )
         // TEMPORARY (preview only): the line recorder's state, to find the empty Sentence audio.
         val recorder by LineAudioBridge.status.collectAsState()
-        if (settings.cardAudio && recorder.isNotEmpty()) {
-            Text(recorder, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val trace by com.kienhoang.dualsubreplay.data.CardAudioTrace.lines
+            .collectAsState()
+        if (settings.cardAudio && (recorder.isNotEmpty() || trace.isNotEmpty())) {
+            Text(
+                recorder + "\n" + trace.joinToString("\n"),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

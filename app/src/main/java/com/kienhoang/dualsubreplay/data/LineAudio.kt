@@ -5,6 +5,7 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -165,8 +166,9 @@ internal fun encodeM4a(
             }
         }
         muxerStarted
-    } catch (_: Exception) {
+    } catch (e: Exception) {
         // A phone without a working AAC encoder, or a full disk: the card goes without the clip.
+        CardAudioTrace.add("encode error $e")
         false
     } finally {
         runCatching { codec.stop() }
@@ -192,7 +194,11 @@ internal class LineAudioStore(
     ): Boolean {
         directory.mkdirs()
         val part = File(directory, "${line.fileName}.part")
-        if (!encodeM4a(pcm, part)) return false
+        if (!encodeM4a(pcm, part)) {
+            CardAudioTrace.add("encode FAILED ${line.startMs}")
+            return false
+        }
+        CardAudioTrace.add("saved ${line.startMs} ${part.length()} B")
         return part.renameTo(File(directory, line.fileName)) ||
             run {
                 part.delete()
@@ -217,6 +223,16 @@ internal class LineAudioStore(
 }
 
 internal const val LINE_AUDIO_DIRECTORY = "line-audio"
+
+/** TEMPORARY (preview only): the last steps of card audio, shown in Settings to find the empty Sentence audio. */
+internal object CardAudioTrace {
+    val lines = MutableStateFlow<List<String>>(emptyList())
+
+    fun add(text: String) {
+        val time = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+        lines.value = (lines.value + "$time $text").takeLast(10)
+    }
+}
 
 /** The flashcard app a waiting card is in ("ankidroid" or "ankiconnect", as `send_to_app` stores them). */
 internal const val PENDING_ANKIDROID = "ankidroid"
