@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">颜色与主题</string>
     <string name="settings_section_colors_summary">字幕颜色、悬浮层背景、应用颜色和强调色</string>
     <string name="settings_section_word_learning_title">单词学习</string>
-    <string name="settings_section_word_learning_summary">单词着色、点按查看释义、发音</string>
+    <string name="settings_section_word_learning_summary">单词着色、点按查看释义、发音、已认识的词</string>
     <string name="settings_section_overlay_title">悬浮层与全屏</string>
     <string name="settings_section_overlay_summary">自动悬浮层、拖动、已保存的位置</string>
     <string name="settings_section_translation_title">字幕与翻译</string>
@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">在字幕中点按单词或打开释义时朗读该词。</string>
     <string name="settings_pronunciation_volume_title">发音音量：%1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% 跟随手机的媒体音量。调高后单词会读得更响。</string>
+    <string name="settings_phone_voice_title">使用手机的语音</string>
+    <string name="settings_phone_voice_description">朗读单词和录制 Anki 单词音频时，使用 Android 文字转语音设置中选择的语音（男声或女声），而不是 Google 在线语音。</string>
     <string name="settings_word_learning_mode_title">单词学习模式（词性着色）</string>
     <string name="settings_word_learning_mode_description">按语法作用（名词、动词、形容词、助词）为单词着色，便于看清句子结构。</string>
     <string name="settings_colored_lines_title">着色的字幕行</string>

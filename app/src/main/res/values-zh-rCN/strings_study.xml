@@ -2,7 +2,9 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, known words, AnkiDroid, blur box, page token -->
     <string name="settings_section_study_title">学习工具</string>
-    <string name="settings_section_study_summary">播放模式、跳过静音、已认识的词、发送到、模糊框</string>
+    <string name="settings_section_study_summary">播放模式、跳过静音、循环按钮、模糊框</string>
+    <string name="settings_section_flashcards_title">抽认卡与 Anki</string>
+    <string name="settings_section_flashcards_summary">发送到 AnkiDroid 或 AnkiConnect、卡片音频</string>
     <string name="study_play_mode_title">播放模式</string>
     <string name="study_play_mode_normal">正常</string>
     <string name="study_play_mode_normal_description">视频照常播放。</string>
@@ -82,7 +84,7 @@
     <string name="study_known_words_after_title">见过几次后算作认识</string>
     <string name="study_word_seen">已见 %1$d/%2$d 次</string>
     <string name="study_known_words_offer_title">要开启已认识的词吗？</string>
-    <string name="study_known_words_offer_message">开启后，字幕面板会显示每个视频中你已认识的比例，常见到的词也会自动算作已认识。之后可在设置 → 学习工具中更改。</string>
+    <string name="study_known_words_offer_message">开启后，字幕面板会显示每个视频中你已认识的比例，常见到的词也会自动算作已认识。之后可在设置 → 单词学习中更改。</string>
     <string name="study_known_words_offer_confirm">开启</string>
     <string name="study_known_words_offer_dismiss">暂不</string>
     <string name="study_send_to_app_title">单词发送到</string>

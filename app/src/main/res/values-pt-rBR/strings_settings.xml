@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Cores e tema</string>
     <string name="settings_section_colors_summary">Cores das legendas, fundo da sobreposição, cores e destaque do app</string>
     <string name="settings_section_word_learning_title">Aprendizado de palavras</string>
-    <string name="settings_section_word_learning_summary">Cores das palavras, toque para ver o significado, pronúncia</string>
+    <string name="settings_section_word_learning_summary">Cores das palavras, toque para ver o significado, pronúncia, palavras conhecidas</string>
     <string name="settings_section_overlay_title">Sobreposição e tela cheia</string>
     <string name="settings_section_overlay_summary">Sobreposição automática, arrastar, posições salvas</string>
     <string name="settings_section_translation_title">Legendas e tradução</string>
@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Fala a palavra quando você toca nela nas legendas ou abre a definição.</string>
     <string name="settings_pronunciation_volume_title">Volume da pronúncia: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% segue o volume de mídia do celular. Acima disso, as palavras soam mais alto.</string>
+    <string name="settings_phone_voice_title">Usar a voz do celular</string>
+    <string name="settings_phone_voice_description">Pronuncia as palavras, e grava o áudio da palavra do Anki, com a voz escolhida nas configurações de conversão de texto em voz do Android (masculina ou feminina) em vez da voz on-line do Google.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizado de palavras (cores por classe gramatical)</string>
     <string name="settings_word_learning_mode_description">Colore as palavras pela função gramatical (substantivos, verbos, adjetivos, partículas) para ver a estrutura da frase.</string>
     <string name="settings_colored_lines_title">Linhas de legenda coloridas</string>

@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">色とテーマ</string>
     <string name="settings_section_colors_summary">字幕の色、オーバーレイの背景、アプリの色とアクセント</string>
     <string name="settings_section_word_learning_title">単語学習</string>
-    <string name="settings_section_word_learning_summary">単語の色分け、タップで意味表示、発音</string>
+    <string name="settings_section_word_learning_summary">単語の色分け、タップで意味表示、発音、既知の単語</string>
     <string name="settings_section_overlay_title">オーバーレイと全画面</string>
     <string name="settings_section_overlay_summary">自動オーバーレイ、ドラッグ、保存した位置</string>
     <string name="settings_section_translation_title">字幕と翻訳</string>
@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">字幕の単語をタップしたときや意味を開いたときに、その単語を読み上げます。</string>
     <string name="settings_pronunciation_volume_title">発音の音量: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d%% はスマートフォンのメディア音量のままです。それより上げると単語をさらに大きく読み上げます。</string>
+    <string name="settings_phone_voice_title">スマホの音声を使う</string>
+    <string name="settings_phone_voice_description">単語の読み上げと Anki の単語音声に、Google のオンライン音声ではなく、Android のテキスト読み上げ設定で選んだ音声（男性・女性）を使います。</string>
     <string name="settings_word_learning_mode_title">単語学習モード（品詞の色分け）</string>
     <string name="settings_word_learning_mode_description">品詞（名詞、動詞、形容詞、助詞）ごとに単語を色分けして、文の構造をわかりやすくします。</string>
     <string name="settings_colored_lines_title">色分けする字幕の行</string>

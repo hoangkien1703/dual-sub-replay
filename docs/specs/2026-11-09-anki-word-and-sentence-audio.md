@@ -29,7 +29,7 @@ What we checked before picking (2026-11-09):
 - **Sentence audio:** the line's real sound, recorded inside the YouTube page while the line plays. Nothing is downloaded and no permission is asked.
 - A word saved, or sent, before its line finished playing gets its clip once the line has played. A card already sent then gets the clip added to its Sentence audio field.
 - Cards keep today's front (word and sentence), so nobody's reviews change. The word's sound plays on the front and the sentence's sound on the back. People who want an audio-only front change the card template once in Anki.
-- Settings → Study tools → **Add audio to cards** (on by default, shown under Send to). It records only while Send to can be used (AnkiDroid installed or AnkiConnect picked), so people who don't use Anki pay nothing.
+- Settings → Flashcards & Anki → **Add audio to cards** (on by default, shown under Send to). It records only while Send to can be used (AnkiDroid installed or AnkiConnect picked), so people who don't use Anki pay nothing.
 
 ## Non-goals
 
@@ -40,7 +40,7 @@ What we checked before picking (2026-11-09):
 
 ## User-visible behavior
 
-- Settings → Study tools → Send to → **Add audio to cards**: "The word in the voice the word card uses, and the line's real sound from the video. The line is recorded while it plays, so a card sent before its line ends gets the sound when it does."
+- Settings → Flashcards & Anki → Send to → **Add audio to cards**: "The word in the voice the word card uses, and the line's real sound from the video. The line is recorded while it plays, so a card sent before its line ends gets the sound when it does."
 - The word card's Send to and Practice → Export → Send all work as before. With the setting on, each card carries the two sounds when they are ready.
 - New cards use a new note type, **DualSub Replay audio**, with fields Word, Meaning, Reading, Sentence, Translation, Source, Word audio, Sentence audio. AnkiDroid can't add fields to the old "DualSub Replay" type, so old cards keep it.
 - AnkiConnect Android can't make note types, so there the word's sound goes on the front of the Basic card and the sentence's sound on the back.
@@ -90,3 +90,17 @@ Implementation notes:
 
 - A clip's tail may be missing when the video is paused right at the line's end (Pause after each line), so the line is cut then without waiting for the tail.
 - Word sounds are recorded one by one when sending, so Practice → Export → Send all with many words takes longer (one Google voice request per word).
+
+## Follow-up: empty Sentence audio in v1.8.29
+
+lion737 reported (discussion #81, 2026-11-09) a card whose Sentence audio stayed empty. First guess: the WebView's `mediaPlaybackRequiresUserGesture` keeps the recorder's audio context suspended. CI disproved it: under that rule the context runs in the main frame (Chromium applies the tap rule to Web Audio only in cross-origin frames). The wake code was removed again; `LineAudioWebViewTest` now keeps the rule on, as the app does, so this stays checked. A probe with a real YouTube video in the emulator was inconclusive (a WebView with no window never loaded the video). Cause still open: next step is a phone test.
+
+Phone test 2026-11-10 (owner's phone, temporary on-screen logs, removed before merge): the recorder runs and cuts clips (2.6 s for a finished line). The card in question was sent while the video was paused partway through its line (tapping a word pauses the video), so the line had no clip yet: the card went in with its word sound and waited for the line to finish, as designed, and was looked at before then. Not yet checked: that the waiting card gets its sound once the line plays on. Planned follow-up: tell the learner when a card waits for its sentence sound, and check the late fill-in on a phone.
+
+## Follow-up: the phone's voice for words
+
+lion737 also asked to switch the word voice to a male one. While Google translates subtitles, the word card and Anki word audio used Google's online voice (female), so the voice picked in Android's text-to-speech settings was ignored. Owner pick 2026-11-09: a setting, not an in-app voice list. Settings → Word learning → **Use the phone's voice** (off by default, `phone_voice`): words are spoken and recorded for Anki with the phone's own voice. It sits next to Pronunciation volume because it changes the word card too. The AI assistant can switch it, Settings search finds it, and Reset all settings clears it. All 9 interface languages.
+
+## Follow-up: a Flashcards & Anki section
+
+Study tools had grown into a long list mixing play modes with Anki and word-tracking settings. Owner pick 2026-11-09: a new More settings section, **Flashcards & Anki**, holds Send to (AnkiDroid or AnkiConnect, deck) and Add audio to cards. Known words, Mark new words and Character details move to Word learning, next to the word card settings they change. Study tools keeps the play modes, repeat, loop button, skip silence, blur box and page tokens. Settings search, the AI assistant guide and the device tests follow the new places; preference keys don't change, so nothing is lost on update.

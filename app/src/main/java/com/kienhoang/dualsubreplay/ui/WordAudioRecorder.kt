@@ -43,7 +43,7 @@ internal class WordAudioRecorder(
             directory.listFiles().orEmpty().forEach { if (now - it.lastModified() > CARD_WORD_AUDIO_MAX_AGE_MS) it.delete() }
         }
         return try {
-            if (speaksWithGoogle(text, language, translationEngine())) {
+            if (!readPhoneVoice(application) && speaksWithGoogle(text, language, translationEngine())) {
                 val online = File(directory, "$name.mp3")
                 if (googleSpeech.record(text, language, online) && online.length() > 0) return online
                 online.delete()

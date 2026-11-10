@@ -60,6 +60,7 @@ class LineAudioWebViewTest {
                     WebView(instrumentation.targetContext).apply {
                         settings.javaScriptEnabled = true
                         // The fixture plays without a tap; in the app the learner's tap starts the video.
+                        // The rule goes back on before the recorder starts, as the app keeps it.
                         settings.mediaPlaybackRequiresUserGesture = false
                         webViewClient =
                             object : WebViewClient() {
@@ -72,6 +73,8 @@ class LineAudioWebViewTest {
                     }
             }
             assertTrue(loaded.await(20, TimeUnit.SECONDS))
+            assumeTrue("the fixture video did not start", waitForVideo(web!!, 0.3))
+            instrumentation.runOnMainSync { web!!.settings.mediaPlaybackRequiresUserGesture = true }
             var second = 0.0
             val deadline = System.currentTimeMillis() + 20_000
             while (System.currentTimeMillis() < deadline && second < 3.5) {
@@ -94,6 +97,19 @@ class LineAudioWebViewTest {
         } finally {
             instrumentation.runOnMainSync { web?.destroy() }
         }
+    }
+
+    private fun waitForVideo(
+        web: WebView,
+        second: Double,
+    ): Boolean {
+        val deadline = System.currentTimeMillis() + 20_000
+        while (System.currentTimeMillis() < deadline) {
+            val at = evaluate(web, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
+            if (at >= second) return true
+            Thread.sleep(200)
+        }
+        return false
     }
 
     private fun evaluate(

@@ -10,6 +10,13 @@ import kotlin.math.roundToInt
 import kotlin.math.tanh
 
 internal const val PRONUNCIATION_VOLUME_PREFERENCE = "pronunciation_volume"
+
+/**
+ * Words are spoken in the phone's own voice (picked in Android's text-to-speech settings, male or
+ * female) instead of Google's online voice; asked for by lion737 in discussion #81 (owner pick
+ * 2026-11-09). Off by default.
+ */
+internal const val PHONE_VOICE_PREFERENCE = "phone_voice"
 internal const val DEFAULT_PRONUNCIATION_VOLUME = 1f
 internal const val MIN_PRONUNCIATION_VOLUME = 0.25f
 internal const val MAX_PRONUNCIATION_VOLUME = 2f
@@ -35,6 +42,9 @@ internal fun readPronunciationVolume(context: Context): Float =
             .getSharedPreferences("dual_sub_preferences", 0)
             .getFloat(PRONUNCIATION_VOLUME_PREFERENCE, DEFAULT_PRONUNCIATION_VOLUME),
     )
+
+internal fun readPhoneVoice(context: Context): Boolean =
+    context.getSharedPreferences("dual_sub_preferences", 0).getBoolean(PHONE_VOICE_PREFERENCE, false)
 
 /** The gain that brings speech whose loudest sample is [peak] (of 32767) up to the target, never down. */
 internal fun speechNormalizingGain(peak: Int): Float {

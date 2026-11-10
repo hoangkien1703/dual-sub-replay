@@ -54,7 +54,7 @@
     <string name="settings_section_colors_title">Colores y tema</string>
     <string name="settings_section_colors_summary">Colores de subtítulos, fondo de la superposición, colores y acento de la app</string>
     <string name="settings_section_word_learning_title">Aprendizaje de palabras</string>
-    <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación</string>
+    <string name="settings_section_word_learning_summary">Colores de palabras, toca para ver el significado, pronunciación, palabras conocidas</string>
     <string name="settings_section_overlay_title">Superposición y pantalla completa</string>
     <string name="settings_section_overlay_summary">Superposición automática, arrastre, posiciones guardadas</string>
     <string name="settings_section_translation_title">Subtítulos y traducción</string>
@@ -111,6 +111,8 @@
     <string name="settings_pronounce_tapped_description">Pronuncia una palabra cuando la tocas en los subtítulos o abres su definición.</string>
     <string name="settings_pronunciation_volume_title">Volumen de pronunciación: %1$d%%</string>
     <string name="settings_pronunciation_volume_description">%1$d %% sigue el volumen multimedia del teléfono. Más alto pronuncia las palabras con más fuerza.</string>
+    <string name="settings_phone_voice_title">Usar la voz del teléfono</string>
+    <string name="settings_phone_voice_description">Pronuncia las palabras, y graba el audio de palabra de Anki, con la voz elegida en los ajustes de texto a voz de Android (masculina o femenina) en lugar de la voz en línea de Google.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizaje de palabras (colores por categoría)</string>
     <string name="settings_word_learning_mode_description">Colorea las palabras según su función gramatical (sustantivos, verbos, adjetivos, partículas) para ver la estructura de la oración.</string>
     <string name="settings_colored_lines_title">Líneas de subtítulos coloreadas</string>
