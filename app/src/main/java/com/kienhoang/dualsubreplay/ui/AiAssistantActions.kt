@@ -140,6 +140,7 @@ internal data class AiStoredSettings(
     val accentColor: String = DEFAULT_APP_THEME_ACCENT_KEY,
     val pronunciationVolume: Float = DEFAULT_PRONUNCIATION_VOLUME,
     val phoneVoice: Boolean = false,
+    val meaningInContext: Boolean = false,
     val overlayInFullscreen: Boolean = true,
     val overlayWhenRotated: Boolean = true,
     val movableControls: Boolean = true,
@@ -163,6 +164,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         accentColor = storedAppThemeAccentKey(preferences.getString(APP_THEME_ACCENT_PREFERENCE, null)),
         pronunciationVolume = readPronunciationVolume(context),
         phoneVoice = preferences.getBoolean(PHONE_VOICE_PREFERENCE, false),
+        meaningInContext = preferences.getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false),
         overlayInFullscreen = preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true),
         overlayWhenRotated = preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true),
         movableControls = preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true),
@@ -200,6 +202,7 @@ private fun aiStoredSettingValue(
         AiSetting.ACCENT_COLOR -> stored.accentColor
         AiSetting.PRONUNCIATION_VOLUME -> Math.round(stored.pronunciationVolume * PERCENT).toString()
         AiSetting.PHONE_VOICE -> onOff(stored.phoneVoice)
+        AiSetting.MEANING_IN_CONTEXT -> onOff(stored.meaningInContext)
         AiSetting.OVERLAY_IN_FULLSCREEN -> onOff(stored.overlayInFullscreen)
         AiSetting.OVERLAY_WHEN_ROTATED -> onOff(stored.overlayWhenRotated)
         AiSetting.MOVABLE_SUBTITLE_CONTROLS -> onOff(stored.movableControls)
@@ -649,6 +652,7 @@ internal class AppAiActions(
             AiSetting.ACCENT_COLOR -> editor.putString(APP_THEME_ACCENT_PREFERENCE, value)
             AiSetting.PRONUNCIATION_VOLUME -> editor.putFloat(PRONUNCIATION_VOLUME_PREFERENCE, value.toFloat() / PERCENT)
             AiSetting.PHONE_VOICE -> editor.putBoolean(PHONE_VOICE_PREFERENCE, on)
+            AiSetting.MEANING_IN_CONTEXT -> editor.putBoolean(MEANING_IN_CONTEXT_PREFERENCE, on)
             AiSetting.OVERLAY_IN_FULLSCREEN -> editor.putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, on)
             AiSetting.OVERLAY_WHEN_ROTATED -> editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, on)
             AiSetting.MOVABLE_SUBTITLE_CONTROLS -> editor.putBoolean(MOVABLE_OVERLAY_PREFERENCE, on)
@@ -957,6 +961,7 @@ private val SETTING_SWITCH_TITLES =
     mapOf(
         AiSetting.HIGHLIGHT_ACTIVE_SENTENCE_ONLY to R.string.settings_active_sentence_only_title,
         AiSetting.PHONE_VOICE to R.string.settings_phone_voice_title,
+        AiSetting.MEANING_IN_CONTEXT to R.string.settings_meaning_in_context_title,
         AiSetting.OVERLAY_IN_FULLSCREEN to R.string.settings_overlay_fullscreen_title,
         AiSetting.OVERLAY_WHEN_ROTATED to R.string.settings_overlay_landscape_title,
         AiSetting.MOVABLE_SUBTITLE_CONTROLS to R.string.settings_movable_controls_title,

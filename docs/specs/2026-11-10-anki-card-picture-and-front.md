@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented, waiting for CI and a phone test. Owner picked option A ("Picture + Card front picker") on 2026-11-10 after discussing lion737's request in discussion #81. Merge and release need the owner's OK.
+Implemented, waiting for CI and a phone test. Owner picked option A ("Picture + Card front picker") on 2026-11-10 after discussing lion737's request in discussion #81. Same day: the picture is off by default (owner), and the word card gained the meaning in the sentence (owner pick A, "Meaning in context first", off by default even with a key). Merge and release need the owner's OK.
 
 ## Context / problem
 
@@ -28,6 +28,8 @@ What we checked before building (2026-11-10):
 - **Card front:** Settings → Flashcards & Anki → **Card front**, one choice instead of a sentence switch and Migaku's settings: *Word and sentence* (default, today's card), *Word* (sentence moves to the back), *Sentence* (word in bold; word and meaning on the back), *Listening* (only the line's sound; until the sound arrives the sentence shows, so Anki never makes an empty card).
 - **Waiting sound notice:** when a card goes without its sentence's sound (the line was paused part-way, because tapping a word pauses the video), the word card says "The sentence's sound is added once the line has played to the end." Send all says how many cards wait.
 
+- **Meaning in this sentence (AI)** (lion737, comments 19516234, 19516518 and 19520846): Settings → Word learning → **Meaning in this sentence (AI)**, off by default even with a key (owner). When on, a tapped word's card asks the AI assistant's service for the word's meaning as used in its sentence ("go" in "I go to school" is "gedirəm" in Azerbaijani, the dictionary says "getmək") and shows it first, with the dictionary meaning under it. No "Translation order" setting (owner pick): the meaning in the sentence is what people tap for. The saved meaning, and so Practice and Anki's Meaning field, is "gedirəm (getmək)".
+
 ## Non-goals
 
 - Not every Migaku setting (owner agreed): no card editor before each send and no combining lines. We ask lion737 which settings they still miss after this.
@@ -42,7 +44,8 @@ What we checked before building (2026-11-10):
 - Practice → Export → Send all: "N words sent to AnkiDroid. N cards get their sentence's sound once their lines have played."
 - Changing Card front changes the template of the "DualSub Replay audio" note type the next time a card is sent, so older cards change too, like Anki's own card types. A template the learner edited in Anki is only replaced when they pick another front.
 - AnkiConnect Android: cards use Basic, so the front choice decides which fields go in Front and Back; the picture is on the back.
-- The AI assistant can change both settings (`anki_card_picture`, `anki_card_front`).
+- The AI assistant can change both settings (`anki_card_picture`, `anki_card_front`) and `meaning_in_context`.
+- Word card with Meaning in this sentence on: the label reads "In this sentence (language)", the meaning in the sentence is large and bold, and "Dictionary: …" is under it. While the AI answers, "Asking AI for the meaning in this sentence…" shows under the dictionary meaning. Without a key the card says "Meaning in this sentence needs an AI key: More settings → AI assistant." When the AI fails, times out (20 s) or answers with the dictionary meaning, the card stays as before. The pencil edits the saved text, and the edit then is the one meaning.
 
 ## Technical constraints / invariants
 
@@ -51,6 +54,7 @@ What we checked before building (2026-11-10):
 - Stills and thumbnails live in `files/line-pictures/` (`<videoId>-<startMs>-<endMs>.jpg`, `<videoId>-thumbnail.jpg`), at most 1.5 MB each and JPEG only; ones no saved word needs are deleted after a day. The folder is left out of cloud backups and shared with AnkiDroid through the existing `${applicationId}.cardaudio` FileProvider (now also `line-pictures/`).
 - The thumbnail comes only from `https://i.ytimg.com/vi/<id>/mqdefault.jpg` (id checked).
 - The front last set is kept per note type (`ankidroid_card_front`, `ankiconnect_card_front` preferences). With nothing kept, the template counts as Word and sentence.
+- Meaning in this sentence sends only the tapped word, its sentence (the whole sentence when the row is part of one; the translated sentence when the word was tapped in the translation line) and the two language names, with the AI translation model (thinking off), and keeps answers for 200 words in memory for the app run. Nothing is sent while the switch is off, for a saved word reopened, or without a key. A reply longer than 80 characters is not a meaning and is dropped.
 - All new text in all 9 interface languages.
 
 ## Plan
@@ -65,6 +69,7 @@ What we checked before building (2026-11-10):
 
 ## Validation
 
+- Unit (meaning in this sentence): the sentence picked (whole sentence, translated line, none), the request text, reply cleaning, the saved "in sentence (dictionary)" text. Compose: the card shows both meanings and saves them, editing turns them into one, the no-key note, and the switch is off by default.
 - Unit: templates per front (every field on every card, front holds only its own), template update only on a new pick, picture field escaping, Source field with picture and link, Basic card sides per front, AnkiConnect template update once (desktop) and not on Android, waiting count, still parsing, store and prune, script origin and id checks, settings gating.
 - Real page (2026-11-10): the still script's drawing code read a frame from www.youtube.com in desktop Chromium. **Not yet checked in the Android WebView on a phone.**
 - Phone (owner): send a word with each front and check the card in AnkiDroid; check the picture shows on the back; send while paused mid-line and see the notice, then play past the line and check the sound arrives.

@@ -113,6 +113,8 @@
     <string name="settings_pronunciation_volume_description">%1$d%% 跟随手机的媒体音量。调高后单词会读得更响。</string>
     <string name="settings_phone_voice_title">使用手机的语音</string>
     <string name="settings_phone_voice_description">朗读单词和录制 Anki 单词音频时，使用 Android 文字转语音设置中选择的语音（男声或女声），而不是 Google 在线语音。</string>
+    <string name="settings_meaning_in_context_title">在这句话中的意思（AI）</string>
+    <string name="settings_meaning_in_context_description">点按单词时，更多设置 → AI 助手中的 AI 会给出它在这句话中的意思，显示在词典释义上方。每点按一个单词，都会把所在句子发送到该服务并使用你的密钥。</string>
     <string name="settings_word_learning_mode_title">单词学习模式（词性着色）</string>
     <string name="settings_word_learning_mode_description">按语法作用（名词、动词、形容词、助词）为单词着色，便于看清句子结构。</string>
     <string name="settings_colored_lines_title">着色的字幕行</string>

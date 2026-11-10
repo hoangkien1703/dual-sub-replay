@@ -113,6 +113,8 @@
     <string name="settings_pronunciation_volume_description">%1$d%% はスマートフォンのメディア音量のままです。それより上げると単語をさらに大きく読み上げます。</string>
     <string name="settings_phone_voice_title">スマホの音声を使う</string>
     <string name="settings_phone_voice_description">単語の読み上げと Anki の単語音声に、Google のオンライン音声ではなく、Android のテキスト読み上げ設定で選んだ音声（男性・女性）を使います。</string>
+    <string name="settings_meaning_in_context_title">この文での意味（AI）</string>
+    <string name="settings_meaning_in_context_description">単語をタップすると、その他の設定 → AI アシスタントの AI が、その文での意味を辞書の意味の上に表示します。タップした単語ごとに文がそのサービスに送られ、キーが使われます。</string>
     <string name="settings_word_learning_mode_title">単語学習モード（品詞の色分け）</string>
     <string name="settings_word_learning_mode_description">品詞（名詞、動詞、形容詞、助詞）ごとに単語を色分けして、文の構造をわかりやすくします。</string>
     <string name="settings_colored_lines_title">色分けする字幕の行</string>

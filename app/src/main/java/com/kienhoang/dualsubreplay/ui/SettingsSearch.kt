@@ -197,6 +197,12 @@ internal enum class SearchableSetting(
         "phone_voice_switch",
         setOf(PHONE_VOICE_PREFERENCE),
     ),
+    MEANING_IN_CONTEXT(
+        R.string.settings_meaning_in_context_title,
+        MoreSettingsSection.WORD_LEARNING,
+        "meaning_in_context_switch",
+        setOf(MEANING_IN_CONTEXT_PREFERENCE),
+    ),
     WORD_LEARNING_MODE(
         R.string.settings_word_learning_mode_title,
         MoreSettingsSection.WORD_LEARNING,

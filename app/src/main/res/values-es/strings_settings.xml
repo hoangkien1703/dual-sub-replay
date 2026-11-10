@@ -113,6 +113,8 @@
     <string name="settings_pronunciation_volume_description">%1$d %% sigue el volumen multimedia del teléfono. Más alto pronuncia las palabras con más fuerza.</string>
     <string name="settings_phone_voice_title">Usar la voz del teléfono</string>
     <string name="settings_phone_voice_description">Pronuncia las palabras, y graba el audio de palabra de Anki, con la voz elegida en los ajustes de texto a voz de Android (masculina o femenina) en lugar de la voz en línea de Google.</string>
+    <string name="settings_meaning_in_context_title">Significado en esta frase (IA)</string>
+    <string name="settings_meaning_in_context_description">Al tocar una palabra, la IA de Más ajustes → Asistente de IA da su significado en esa frase, encima del significado del diccionario. Cada palabra que tocas envía su frase a ese servicio y usa tu clave.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizaje de palabras (colores por categoría)</string>
     <string name="settings_word_learning_mode_description">Colorea las palabras según su función gramatical (sustantivos, verbos, adjetivos, partículas) para ver la estructura de la oración.</string>
     <string name="settings_colored_lines_title">Líneas de subtítulos coloreadas</string>

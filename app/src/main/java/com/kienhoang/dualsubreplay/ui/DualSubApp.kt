@@ -256,6 +256,7 @@ private fun SelectedWordDialog(
             onDeckChange = { deck = it },
             autoPronounce = state.autoPronounce,
             onTranslateWord = { viewModel.translateSelection(selection) },
+            onMeaningInContext = { viewModel.meaningInContext(selection) },
             onSave = { meaning, online ->
                 viewModel.saveWord(selection, meaning, online, deck)
                 rememberDeck(context, selection.wordLanguage, deck)

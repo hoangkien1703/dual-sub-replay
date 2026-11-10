@@ -108,6 +108,7 @@ internal enum class AiSetting(
     PRONOUNCE_TAPPED_WORDS("pronounce_tapped_words"),
     PRONUNCIATION_VOLUME("pronunciation_volume", emptyList(), 25f..200f),
     PHONE_VOICE("phone_voice"),
+    MEANING_IN_CONTEXT("meaning_in_context"),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
