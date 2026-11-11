@@ -3,7 +3,10 @@ name: Automatic PR preview APK
 on:
   workflow_run:
     workflows: ["Android build and releases"]
-    types: [completed]
+    # requested: publish as soon as the build job passes, while device tests still run (owner pick
+    # 2026-11-11, docs/specs/2026-11-11-earlier-pr-preview.md). completed: the fallback, as before,
+    # if that early run could not publish. Both jobs still gate the merge and the release.
+    types: [requested, completed]
   # pull_request_target so fork PRs get a write token too; this job checks out no PR code.
   pull_request_target:
     types: [closed]
@@ -13,29 +16,79 @@ permissions:
 
 concurrency:
   group: pr-preview-${{ github.event.workflow_run.id || github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: true
+  # The run that waits for the build job and the fallback share a group: the fallback queues behind an
+  # upload instead of cutting it off half-way.
+  cancel-in-progress: false
 
 jobs:
   publish-pr-preview:
     if: >-
       github.event_name == 'workflow_run' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request'
+      github.event.workflow_run.event == 'pull_request' &&
+      (github.event.action == 'requested' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Most of this is waiting for the build job, which has 30 minutes itself.
+    timeout-minutes: 45
     permissions:
       actions: read
       contents: write
       pull-requests: read
 
     steps:
+      - name: Wait for the build job to pass
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          EVENT_ACTION: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_ACTION" != "requested" ]]; then
+            echo "The whole CI run succeeded."
+            echo "built=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # A workflow cannot be started by one job of another, so this run watches the CI run it
+          # was started with until verify-build ends. It reads job states only; no PR code runs here.
+          deadline=$(( SECONDS + 35 * 60 ))
+          while (( SECONDS < deadline )); do
+            run_status="$(gh api "repos/${GH_REPO}/actions/runs/${RUN_ID}" --jq '.status' || echo unknown)"
+            job="$(gh api "repos/${GH_REPO}/actions/runs/${RUN_ID}/jobs?filter=latest&per_page=100" \
+              --jq '[.jobs[] | select(.name == "verify-build")][0] | "\(.status // "missing") \(.conclusion // "none")"' ||
+              echo "unknown none")"
+            if [[ "$job" == "completed success" ]]; then
+              echo "verify-build passed; device tests may still be running."
+              echo "built=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if [[ "$job" == completed\ * ]]; then
+              echo "verify-build ended as ${job#completed }; no preview for this run."
+              echo "built=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # The run's state was read before the job's, so a finished run has no build job left to wait for
+            # (cancelled before it started, or a fork run that still needs approval).
+            if [[ "$run_status" == "completed" || "$run_status" == "action_required" ]]; then
+              echo "The CI run ended without a finished verify-build job; no preview for this run."
+              echo "built=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::warning::verify-build did not finish in 35 minutes; the preview waits for the whole CI run."
+          echo "built=false" >> "$GITHUB_OUTPUT"
+
       - name: Verify the source PR is still open at the built commit
         id: pr
+        if: steps.build.outputs.built == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          BUILD_NUMBER: ${{ github.event.workflow_run.run_number }}
+          EVENT_ACTION: ${{ github.event.action }}
         run: |
           set -euo pipefail
           # GitHub leaves pull_requests empty for runs from forks, so find the PR by its head commit.
@@ -69,10 +122,21 @@ jobs:
           # fork approval allows it, and nothing from the artifact is executed here.
           echo "PR #$PR_NUMBER comes from $head_repo."
 
+          # The fallback has nothing to do when this build went up as soon as its build job passed.
+          if [[ "$EVENT_ACTION" == "completed" ]]; then
+            asset_name="DualSub-Replay-PR${PR_NUMBER}-build${BUILD_NUMBER}-preview.apk"
+            assets="$(gh release view preview --json assets --jq '.assets[].name' || true)"
+            if grep -Fxq "$asset_name" <<< "$assets"; then
+              echo "$asset_name is already on the preview release; nothing to do."
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
           echo "publish=true" >> "$GITHUB_OUTPUT"
           echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
-      - name: Download the APK produced by full PR CI
+      - name: Download the APK the build job produced
         if: steps.pr.outputs.publish == 'true'
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -149,7 +213,7 @@ jobs:
           done <<< "$assets"
 
           gh release upload preview "release/$ASSET_NAME" --clobber
-          echo "Published $ASSET_NAME from the already-verified CI artifact."
+          echo "Published $ASSET_NAME from the CI artifact of a build job that passed."
 
   cleanup-pr-preview:
     if: >-
