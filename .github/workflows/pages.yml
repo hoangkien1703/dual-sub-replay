@@ -11,6 +11,9 @@ on:
   workflow_run:
     workflows: ["Release merged PR"]
     types: [completed]
+  # Refresh downloads.json, the README's downloads badge, once a day between releases.
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -70,6 +73,18 @@ jobs:
           set -euo pipefail
           gh release download --pattern 'DualSub-Replay.apk' --pattern 'DualSub-Replay.apk.sha256' --dir _site
           (cd _site && sha256sum --check DualSub-Replay.apk.sha256)
+
+      # The README badge reads this file through shields.io's endpoint badge, because shields'
+      # own GitHub downloads badge reads only the newest 100 releases and counts every file.
+      - name: Count downloads for the README badge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp "repos/$GH_REPO/releases?per_page=100" \
+            | python3 tools/download_badge.py > _site/downloads.json
+          cat _site/downloads.json
 
       - name: Upload site
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

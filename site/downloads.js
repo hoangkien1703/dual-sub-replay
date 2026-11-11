@@ -1,9 +1,13 @@
 // Shows the live total of GitHub release downloads in [data-download-count] elements.
+// Only real downloads count (owner pick 2026-11-11): APKs and update patches of published
+// releases, not update-info.json (the app's daily update check), .sha256 files or the preview
+// prerelease. tools/download_badge.py counts the README badge the same way.
 (function () {
   var targets = document.querySelectorAll('[data-download-count]');
   if (!targets.length || !window.fetch) return;
 
-  var CACHE_KEY = 'dualsub-download-count';
+  var CACHE_KEY = 'dualsub-download-count-v2';
+  var COUNTED = ['.apk', '.patch'];
   var CACHE_MS = 60 * 60 * 1000;
   var API = 'https://api.github.com/repos/hoangkien1703/dual-sub-replay/releases?per_page=100&page=';
 
@@ -25,7 +29,13 @@
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (releases) {
         releases.forEach(function (release) {
-          release.assets.forEach(function (asset) { total += asset.download_count; });
+          if (release.prerelease || release.draft) return;
+          release.assets.forEach(function (asset) {
+            var counted = COUNTED.some(function (suffix) {
+              return asset.name.slice(-suffix.length) === suffix;
+            });
+            if (counted) total += asset.download_count;
+          });
         });
         return releases.length === 100 && page < 10 ? count(page + 1, total) : total;
       });
