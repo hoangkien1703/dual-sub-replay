@@ -64,7 +64,7 @@ class LearningPlayerUiTest {
         }
 
         composeRule.onNodeWithText("Dual-subtitle settings").assertIsDisplayed()
-        // Reading and Default view are one More settings section, closed until tapped.
+        // Reading and Default view are one section, closed until tapped.
         composeRule.onNodeWithTag("word_highlight_switch").assertDoesNotExist()
         saveUiEvidence("settings-reading-closed")
         composeRule.onNodeWithTag("settings_section_colors").performScrollTo()
@@ -85,8 +85,11 @@ class LearningPlayerUiTest {
             assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
         }
 
-        // Advanced controls live in collapsible sections under More settings.
-        composeRule.onNodeWithText("More settings").performScrollTo().assertIsDisplayed()
+        // Sections sit under four group names; the old "More settings" heading is gone.
+        composeRule.onNodeWithText("More settings").assertDoesNotExist()
+        listOf("subtitles", "study", "video", "app").forEach { group ->
+            composeRule.onNodeWithTag("settings_group_$group").performScrollTo().assertIsDisplayed()
+        }
         composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
         composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
         composeRule.onNodeWithText("Portrait panel position").performScrollTo().assertIsDisplayed()

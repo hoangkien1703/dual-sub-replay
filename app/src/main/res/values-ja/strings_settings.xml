@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">段落リプレイ付きの2言語字幕タイムライン全体を表示します。</string>
     <string name="settings_scroll_overlay_title">スクロールしやすいオーバーレイ</string>
     <string name="settings_scroll_overlay_description">YouTube のコメントやおすすめをスクロールできるまま、コンパクトな字幕を表示します。</string>
-    <string name="settings_more_settings">その他の設定</string>
+    <string name="settings_group_subtitles">字幕</string>
+    <string name="settings_group_study">学習</string>
+    <string name="settings_group_video">動画</string>
+    <string name="settings_group_app">アプリ</string>
     <string name="settings_landscape_split_title">横向きの分割表示</string>
     <string name="settings_landscape_split_description">横向きのオーバーレイがオフのとき、動画の横にトランスクリプトを表示します。ドラッグでサイズを変更できます。</string>
     <string name="settings_hide_transcript_hint">トランスクリプトのヘッダーを下へ（分割表示では右へ）スワイプすると非表示になります。非表示中も字幕は追従し続けます。</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">スマホの音声を使う</string>
     <string name="settings_phone_voice_description">単語の読み上げと Anki の単語音声に、Google のオンライン音声ではなく、Android のテキスト読み上げ設定で選んだ音声（男性・女性）を使います。</string>
     <string name="settings_meaning_in_context_title">この文での意味（AI）</string>
-    <string name="settings_meaning_in_context_description">単語をタップすると、その他の設定 → AI アシスタントの AI が、その文での意味を辞書の意味の上に表示します。タップした単語ごとに文がそのサービスに送られ、キーが使われます。</string>
+    <string name="settings_meaning_in_context_description">単語をタップすると、設定 → AI アシスタントの AI が、その文での意味を辞書の意味の上に表示します。タップした単語ごとに文がそのサービスに送られ、キーが使われます。</string>
     <string name="settings_meaning_order_title">先に表示</string>
     <string name="settings_meaning_order_sentence">この文での意味</string>
     <string name="settings_meaning_order_dictionary">辞書の意味</string>

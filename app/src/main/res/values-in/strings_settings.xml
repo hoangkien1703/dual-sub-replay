@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">Linimasa subtitel ganda lengkap dengan putar ulang per paragraf.</string>
     <string name="settings_scroll_overlay_title">Overlay ramah gulir</string>
     <string name="settings_scroll_overlay_description">Subtitel ringkas sementara YouTube tetap bisa digulir untuk komentar dan rekomendasi.</string>
-    <string name="settings_more_settings">Setelan lainnya</string>
+    <string name="settings_group_subtitles">Subtitel</string>
+    <string name="settings_group_study">Belajar</string>
+    <string name="settings_group_video">Video</string>
+    <string name="settings_group_app">Aplikasi</string>
     <string name="settings_landscape_split_title">Tampilan terpisah lanskap</string>
     <string name="settings_landscape_split_description">Saat overlay lanskap nonaktif, tampilkan transkrip di samping video. Seret untuk mengubah ukuran.</string>
     <string name="settings_hide_transcript_hint">Geser header transkrip ke bawah (atau ke kanan dalam tampilan terpisah) untuk menyembunyikannya. Subtitel tetap mengikuti saat tersembunyi.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">Gunakan suara ponsel</string>
     <string name="settings_phone_voice_description">Ucapkan kata, dan rekam audio kata Anki, dengan suara yang dipilih di setelan teks ke ucapan Android (pria atau wanita), bukan suara online Google.</string>
     <string name="settings_meaning_in_context_title">Arti dalam kalimat ini (AI)</string>
-    <string name="settings_meaning_in_context_description">Saat Anda mengetuk kata, AI dari Setelan lainnya → Asisten AI memberi artinya dalam kalimat itu, di atas arti kamus. Setiap kata yang diketuk mengirim kalimatnya ke layanan itu dan memakai kunci Anda.</string>
+    <string name="settings_meaning_in_context_description">Saat Anda mengetuk kata, AI dari Setelan → Asisten AI memberi artinya dalam kalimat itu, di atas arti kamus. Setiap kata yang diketuk mengirim kalimatnya ke layanan itu dan memakai kunci Anda.</string>
     <string name="settings_meaning_order_title">Tampilkan dulu</string>
     <string name="settings_meaning_order_sentence">Arti dalam kalimat ini</string>
     <string name="settings_meaning_order_dictionary">Arti kamus</string>

@@ -54,7 +54,7 @@ private val AI_INTRO_POINTS =
 
 /**
  * The panel's first page: what the assistant does and what it sends, then Let's start, or a
- * smaller Don't use AI that turns the assistant off until More settings turns it on again.
+ * smaller Don't use AI that turns the assistant off until Settings turns it on again.
  */
 @Composable
 internal fun AiIntro(
@@ -116,7 +116,7 @@ internal fun AiIntro(
         Text(
             stringResource(
                 R.string.ai_intro_decline_note,
-                stringResource(R.string.settings_more_settings),
+                stringResource(R.string.navigation_settings),
                 stringResource(R.string.ai_settings_enabled_title),
             ),
             style = MaterialTheme.typography.labelSmall,

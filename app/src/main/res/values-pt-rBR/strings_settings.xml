@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">Linha do tempo completa de legendas duplas com repetição por parágrafo.</string>
     <string name="settings_scroll_overlay_title">Sobreposição que permite rolagem</string>
     <string name="settings_scroll_overlay_description">Legendas compactas enquanto o YouTube continua rolável para comentários e recomendações.</string>
-    <string name="settings_more_settings">Mais configurações</string>
+    <string name="settings_group_subtitles">Legendas</string>
+    <string name="settings_group_study">Estudo</string>
+    <string name="settings_group_video">Vídeo</string>
+    <string name="settings_group_app">App</string>
     <string name="settings_landscape_split_title">Tela dividida na horizontal</string>
     <string name="settings_landscape_split_description">Com a sobreposição na horizontal desativada, mostra a transcrição ao lado do vídeo. Arraste para redimensionar.</string>
     <string name="settings_hide_transcript_hint">Deslize o cabeçalho da transcrição para baixo (ou para a direita na tela dividida) para ocultá-la. As legendas continuam sincronizadas enquanto ela está oculta.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">Usar a voz do celular</string>
     <string name="settings_phone_voice_description">Pronuncia as palavras, e grava o áudio da palavra do Anki, com a voz escolhida nas configurações de conversão de texto em voz do Android (masculina ou feminina) em vez da voz on-line do Google.</string>
     <string name="settings_meaning_in_context_title">Significado nesta frase (IA)</string>
-    <string name="settings_meaning_in_context_description">Ao tocar numa palavra, a IA de Mais configurações → Assistente de IA mostra o significado dela nessa frase, acima do significado do dicionário. Cada palavra tocada envia a frase para esse serviço e usa sua chave.</string>
+    <string name="settings_meaning_in_context_description">Ao tocar numa palavra, a IA de Configurações → Assistente de IA mostra o significado dela nessa frase, acima do significado do dicionário. Cada palavra tocada envia a frase para esse serviço e usa sua chave.</string>
     <string name="settings_meaning_order_title">Mostrar primeiro</string>
     <string name="settings_meaning_order_sentence">Significado nesta frase</string>
     <string name="settings_meaning_order_dictionary">Significado do dicionário</string>

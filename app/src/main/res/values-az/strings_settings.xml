@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">Abzası təkrar oynatma imkanı ilə tam ikidilli altyazı xətti.</string>
     <string name="settings_scroll_overlay_title">Sürüşdürməyə uyğun qat</string>
     <string name="settings_scroll_overlay_description">YouTube şərhlər və tövsiyələr üçün sürüşdürülə bilən qalarkən yığcam altyazılar.</string>
-    <string name="settings_more_settings">Əlavə ayarlar</string>
+    <string name="settings_group_subtitles">Altyazılar</string>
+    <string name="settings_group_study">Öyrənmə</string>
+    <string name="settings_group_video">Video</string>
+    <string name="settings_group_app">Tətbiq</string>
     <string name="settings_landscape_split_title">Üfüqi bölünmüş görünüş</string>
     <string name="settings_landscape_split_description">Üfüqi qat söndürüləndə mətni videonun yanında göstərir. Ölçüsünü dəyişmək üçün sürüşdürün.</string>
     <string name="settings_hide_transcript_hint">Gizlətmək üçün mətn başlığını aşağı (bölünmüş görünüşdə sağa) sürüşdürün. Gizli olanda da altyazılar izlənməyə davam edir.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">Telefonun səsindən istifadə et</string>
     <string name="settings_phone_voice_description">Sözləri və Anki söz səsini Google-un onlayn səsi əvəzinə Android-in mətndən nitqə ayarlarında seçilmiş səslə (kişi və ya qadın) oxu.</string>
     <string name="settings_meaning_in_context_title">Bu cümlədəki mənası (Sİ)</string>
-    <string name="settings_meaning_in_context_description">Sözə toxunanda Əlavə ayarlar → Sİ köməkçisi bölməsindəki Sİ onun bu cümlədəki mənasını lüğət mənasının üstündə göstərir. Toxunduğunuz hər söz öz cümləsini həmin xidmətə göndərir və açarınızdan istifadə edir.</string>
+    <string name="settings_meaning_in_context_description">Sözə toxunanda Ayarlar → Sİ köməkçisi bölməsindəki Sİ onun bu cümlədəki mənasını lüğət mənasının üstündə göstərir. Toxunduğunuz hər söz öz cümləsini həmin xidmətə göndərir və açarınızdan istifadə edir.</string>
     <string name="settings_meaning_order_title">Əvvəlcə göstər</string>
     <string name="settings_meaning_order_sentence">Bu cümlədəki mənası</string>
     <string name="settings_meaning_order_dictionary">Lüğət mənası</string>

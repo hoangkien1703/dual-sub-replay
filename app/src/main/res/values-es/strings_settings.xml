@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">Línea de tiempo completa de subtítulos dobles con repetición por párrafos.</string>
     <string name="settings_scroll_overlay_title">Superposición compatible con desplazamiento</string>
     <string name="settings_scroll_overlay_description">Subtítulos compactos mientras YouTube sigue desplazable para ver comentarios y recomendaciones.</string>
-    <string name="settings_more_settings">Más ajustes</string>
+    <string name="settings_group_subtitles">Subtítulos</string>
+    <string name="settings_group_study">Estudio</string>
+    <string name="settings_group_video">Video</string>
+    <string name="settings_group_app">App</string>
     <string name="settings_landscape_split_title">Vista dividida en horizontal</string>
     <string name="settings_landscape_split_description">Con la superposición horizontal desactivada, muestra la transcripción junto al video. Arrastra para cambiar el tamaño.</string>
     <string name="settings_hide_transcript_hint">Desliza el encabezado de la transcripción hacia abajo (o a la derecha en vista dividida) para ocultarla. Los subtítulos siguen sincronizados mientras está oculta.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">Usar la voz del teléfono</string>
     <string name="settings_phone_voice_description">Pronuncia las palabras, y graba el audio de palabra de Anki, con la voz elegida en los ajustes de texto a voz de Android (masculina o femenina) en lugar de la voz en línea de Google.</string>
     <string name="settings_meaning_in_context_title">Significado en esta frase (IA)</string>
-    <string name="settings_meaning_in_context_description">Al tocar una palabra, la IA de Más ajustes → Asistente de IA da su significado en esa frase, encima del significado del diccionario. Cada palabra que tocas envía su frase a ese servicio y usa tu clave.</string>
+    <string name="settings_meaning_in_context_description">Al tocar una palabra, la IA de Ajustes → Asistente de IA da su significado en esa frase, encima del significado del diccionario. Cada palabra que tocas envía su frase a ese servicio y usa tu clave.</string>
     <string name="settings_meaning_order_title">Mostrar primero</string>
     <string name="settings_meaning_order_sentence">Significado en esta frase</string>
     <string name="settings_meaning_order_dictionary">Significado del diccionario</string>

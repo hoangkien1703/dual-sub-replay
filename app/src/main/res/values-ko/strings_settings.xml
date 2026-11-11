@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">문단 다시 재생을 지원하는 전체 이중 자막 타임라인이에요.</string>
     <string name="settings_scroll_overlay_title">스크롤 친화 오버레이</string>
     <string name="settings_scroll_overlay_description">YouTube에서 댓글과 추천 영상을 계속 스크롤하면서 간단한 자막을 볼 수 있어요.</string>
-    <string name="settings_more_settings">추가 설정</string>
+    <string name="settings_group_subtitles">자막</string>
+    <string name="settings_group_study">학습</string>
+    <string name="settings_group_video">영상</string>
+    <string name="settings_group_app">앱</string>
     <string name="settings_landscape_split_title">가로 분할 화면</string>
     <string name="settings_landscape_split_description">가로 오버레이를 끄면 영상 옆에 스크립트를 표시해요. 드래그해서 크기를 조절하세요.</string>
     <string name="settings_hide_transcript_hint">스크립트 헤더를 아래로(분할 화면에서는 오른쪽으로) 밀면 숨겨져요. 숨겨진 동안에도 자막은 계속 따라가요.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">휴대폰 음성 사용</string>
     <string name="settings_phone_voice_description">단어 읽기와 Anki 단어 음성에 Google 온라인 음성 대신 Android 텍스트 음성 변환 설정에서 고른 음성(남성 또는 여성)을 사용합니다.</string>
     <string name="settings_meaning_in_context_title">이 문장에서의 뜻 (AI)</string>
-    <string name="settings_meaning_in_context_description">단어를 탭하면 추가 설정 → AI 도우미의 AI가 그 문장에서의 뜻을 사전 뜻 위에 보여 줍니다. 탭한 단어마다 문장이 그 서비스로 전송되고 키가 사용됩니다.</string>
+    <string name="settings_meaning_in_context_description">단어를 탭하면 설정 → AI 도우미의 AI가 그 문장에서의 뜻을 사전 뜻 위에 보여 줍니다. 탭한 단어마다 문장이 그 서비스로 전송되고 키가 사용됩니다.</string>
     <string name="settings_meaning_order_title">먼저 보기</string>
     <string name="settings_meaning_order_sentence">이 문장에서의 뜻</string>
     <string name="settings_meaning_order_dictionary">사전 뜻</string>

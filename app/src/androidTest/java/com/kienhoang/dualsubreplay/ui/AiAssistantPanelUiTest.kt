@@ -96,7 +96,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 
-/** The top-right assistant button, its right-side panel, and the AI section in More settings; no network. */
+/** The top-right assistant button, its right-side panel, and the AI section on the settings page; no network. */
 class AiAssistantPanelUiTest {
     @get:Rule
     val composeRule = createComposeRule()
@@ -213,7 +213,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_setup_card").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_settings_button").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_intro_decline").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithText("You can turn it on again in More settings → AI assistant.").assertExists()
+        composeRule.onNodeWithText("You can turn it on again in Settings → AI assistant.").assertExists()
         saveUiEvidence("ai_panel_intro")
         composeRule.onNodeWithTag("ai_intro_start").performScrollTo().performClick()
         assertTrue(settings.introSeen)

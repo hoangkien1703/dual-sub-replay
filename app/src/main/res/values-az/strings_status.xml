@@ -32,7 +32,7 @@
     <string name="translation_issue_youtube_message">Google Tərcümə hazırda işləmir, ona görə bu video YouTube-un öz tərcümə altyazılarından istifadə edir; YouTube-un buraxdığı sətirlər cihazınızda tərcümə olunur. Tətbiq Google-u hər 2 dəqiqədən bir və növbəti videoda yenidən yoxlayır.</string>
     <string name="translation_issue_try_google">Google-u yenidən yoxla</string>
     <string name="translation_issue_ai_title">Sİ tərcüməsi dayandırılıb</string>
-    <string name="translation_issue_ai_message">Sİ tərcüməsi alınmadı, ona görə əvəzində Google Tərcümənin sətirləri göstərilir. Tətbiq 30 saniyədən sonra Sİ-yə yenidən müraciət edir. Sİ açarınızı və onun gündəlik limitini Əlavə ayarlar → Sİ köməkçisi bölməsində yoxlayın.</string>
+    <string name="translation_issue_ai_message">Sİ tərcüməsi alınmadı, ona görə əvəzində Google Tərcümənin sətirləri göstərilir. Tətbiq 30 saniyədən sonra Sİ-yə yenidən müraciət edir. Sİ açarınızı və onun gündəlik limitini Ayarlar → Sİ köməkçisi bölməsində yoxlayın.</string>
     <string name="translation_issue_try_ai">Sİ-ni yenidən yoxla</string>
     <string name="problem_detail_show_more">Daha çox göstər</string>
     <string name="problem_detail_show_less">Daha az göstər</string>

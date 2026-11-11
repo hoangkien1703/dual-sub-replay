@@ -20,7 +20,7 @@ class SettingsSearchTest {
                 choices = listOf("Normal", "Pause after each line", "Listen first", "Dictation"),
             ),
             SettingsSearchEntry("Cỡ chữ", "Đọc & xem", SearchableSetting.TEXT_SIZE),
-            SettingsSearchEntry("Study tools", "More settings", section = MoreSettingsSection.STUDY),
+            SettingsSearchEntry("Study tools", "Study", section = MoreSettingsSection.STUDY),
             SettingsSearchEntry("Translate to", "Languages", SearchableSetting.TRANSLATE_TO),
         )
 

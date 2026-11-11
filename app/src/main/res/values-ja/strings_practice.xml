@@ -28,7 +28,7 @@
     <string name="practice_meaning_dictionary">辞書: %1$s</string>
     <string name="practice_meaning_in_sentence_under">この文では: %1$s</string>
     <string name="practice_meaning_in_sentence_loading">この文での意味を AI に問い合わせています…</string>
-    <string name="practice_meaning_in_sentence_no_key">この文での意味には AI キーが必要です: その他の設定 → AI アシスタント。</string>
+    <string name="practice_meaning_in_sentence_no_key">この文での意味には AI キーが必要です: 設定 → AI アシスタント。</string>
     <string name="practice_video_uses_original_sentence">例の動画では元の文が再生されます。</string>
     <string name="practice_play_online_example">オンラインの例を再生</string>
     <string name="practice_online_example">オンラインの例</string>

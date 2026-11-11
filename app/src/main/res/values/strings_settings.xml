@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">Full dual-subtitle timeline with paragraph replay.</string>
     <string name="settings_scroll_overlay_title">Scroll-friendly overlay</string>
     <string name="settings_scroll_overlay_description">Compact captions while YouTube stays scrollable for comments and recommendations.</string>
-    <string name="settings_more_settings">More settings</string>
+    <string name="settings_group_subtitles">Subtitles</string>
+    <string name="settings_group_study">Study</string>
+    <string name="settings_group_video">Video</string>
+    <string name="settings_group_app">App</string>
     <string name="settings_landscape_split_title">Landscape split view</string>
     <string name="settings_landscape_split_description">With the landscape overlay off, show the transcript beside the video. Drag to resize.</string>
     <string name="settings_hide_transcript_hint">Swipe the transcript header down (or right in split view) to hide it. Captions keep tracking while hidden.</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">Use the phone\'s voice</string>
     <string name="settings_phone_voice_description">Speak words, and record Anki word audio, in the voice picked in Android\'s text-to-speech settings (male or female) instead of Google\'s online voice.</string>
     <string name="settings_meaning_in_context_title">Meaning in this sentence (AI)</string>
-    <string name="settings_meaning_in_context_description">When you tap a word, the AI from More settings → AI assistant gives its meaning in that sentence, above the dictionary meaning. Each tapped word sends its sentence to that service and uses your key.</string>
+    <string name="settings_meaning_in_context_description">When you tap a word, the AI from Settings → AI assistant gives its meaning in that sentence, above the dictionary meaning. Each tapped word sends its sentence to that service and uses your key.</string>
     <string name="settings_meaning_order_title">Show first</string>
     <string name="settings_meaning_order_sentence">Meaning in this sentence</string>
     <string name="settings_meaning_order_dictionary">Dictionary meaning</string>

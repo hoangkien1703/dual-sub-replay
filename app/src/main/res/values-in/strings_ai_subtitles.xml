@@ -6,12 +6,12 @@
     <string name="ai_subtitles_try_again">Coba lagi</string>
     <string name="ai_subtitles_note">Memakai kunci Gemini gratis Anda. Gemini mendengarkan video di server Google.</string>
     <string name="ai_subtitles_add_key">Tambahkan kunci Gemini gratis</string>
-    <string name="ai_subtitles_needs_key">Subtitle AI memakai kunci Gemini gratis dari Setelan lainnya → Asisten AI. Tambahkan kunci, lalu kembali ke video ini.</string>
+    <string name="ai_subtitles_needs_key">Subtitle AI memakai kunci Gemini gratis dari Setelan → Asisten AI. Tambahkan kunci, lalu kembali ke video ini.</string>
     <string name="ai_subtitles_starting">Membuat subtitle dengan AI…</string>
     <string name="ai_subtitles_progress">Membuat subtitle dengan AI… %1$s dari %2$s</string>
     <string name="ai_subtitles_progress_unknown_length">Membuat subtitle dengan AI… %1$s selesai</string>
     <string name="ai_subtitles_track_label">%1$s (subtitle AI)</string>
-    <string name="ai_subtitles_problem_key">Gemini tidak menerima kunci Anda. Periksa di Setelan lainnya → Asisten AI.</string>
+    <string name="ai_subtitles_problem_key">Gemini tidak menerima kunci Anda. Periksa di Setelan → Asisten AI.</string>
     <string name="ai_subtitles_problem_video">Gemini tidak bisa membuka video ini. Video mungkin pribadi, dibatasi usia, atau tidak tersedia.</string>
     <string name="ai_subtitles_problem_limit">Batas gratis kunci Gemini Anda sudah habis untuk saat ini. Coba lagi nanti.</string>
     <string name="ai_subtitles_problem_busy">Gemini sedang sibuk. Coba lagi dalam satu menit.</string>

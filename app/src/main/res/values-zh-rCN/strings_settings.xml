@@ -88,7 +88,10 @@
     <string name="settings_transcript_panel_description">完整的双语字幕时间线，支持按段落重播。</string>
     <string name="settings_scroll_overlay_title">可滚动悬浮字幕</string>
     <string name="settings_scroll_overlay_description">显示紧凑字幕，同时 YouTube 仍可滚动查看评论和推荐。</string>
-    <string name="settings_more_settings">更多设置</string>
+    <string name="settings_group_subtitles">字幕</string>
+    <string name="settings_group_study">学习</string>
+    <string name="settings_group_video">视频</string>
+    <string name="settings_group_app">应用</string>
     <string name="settings_landscape_split_title">横屏分屏视图</string>
     <string name="settings_landscape_split_description">关闭横屏悬浮层时，在视频旁显示字幕文稿。拖动可调整大小。</string>
     <string name="settings_hide_transcript_hint">将字幕文稿标题栏向下滑动（分屏时向右）即可隐藏。隐藏期间字幕仍会继续同步。</string>
@@ -115,7 +118,7 @@
     <string name="settings_phone_voice_title">使用手机的语音</string>
     <string name="settings_phone_voice_description">朗读单词和录制 Anki 单词音频时，使用 Android 文字转语音设置中选择的语音（男声或女声），而不是 Google 在线语音。</string>
     <string name="settings_meaning_in_context_title">在这句话中的意思（AI）</string>
-    <string name="settings_meaning_in_context_description">点按单词时，更多设置 → AI 助手中的 AI 会给出它在这句话中的意思，显示在词典释义上方。每点按一个单词，都会把所在句子发送到该服务并使用你的密钥。</string>
+    <string name="settings_meaning_in_context_description">点按单词时，设置 → AI 助手中的 AI 会给出它在这句话中的意思，显示在词典释义上方。每点按一个单词，都会把所在句子发送到该服务并使用你的密钥。</string>
     <string name="settings_meaning_order_title">优先显示</string>
     <string name="settings_meaning_order_sentence">在这句话中的意思</string>
     <string name="settings_meaning_order_dictionary">词典释义</string>
