@@ -558,7 +558,6 @@ private fun DualSubExperience(
             onTargetChange = onTargetChange,
             thirdLine = state.thirdLine,
             onThirdLineChange = onThirdLineChange,
-            originalVisibility = state.originalVisibility,
             translatedVisibility = state.translatedVisibility,
             onCaptionVisibilityChange = onCaptionVisibilityChange,
             onOpenAllSettings = {
