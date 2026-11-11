@@ -1098,13 +1098,11 @@ private fun SettingsTopBar(
         modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onDismiss, modifier = Modifier.testTag("close_settings")) {
-            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_close_settings))
-        }
         Text(
             // The page also holds the assistant, updates, tabs and the theme, so it is plain "Settings" (owner pick 2026-11-11).
             stringResource(R.string.navigation_settings),
-            modifier = Modifier.weight(1f).padding(start = 4.dp),
+            // Lines up with the sections below.
+            modifier = Modifier.weight(1f).padding(start = 12.dp),
             style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -1115,6 +1113,10 @@ private fun SettingsTopBar(
             interactionSource = peek.buttonInteraction,
         ) {
             Icon(Icons.Default.Visibility, contentDescription = stringResource(R.string.settings_peek))
+        }
+        // In the top right corner like every dialog's X (owner request 2026-11-11); the eye sits beside it.
+        IconButton(onClick = onDismiss, modifier = Modifier.testTag("close_settings")) {
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_close_settings))
         }
     }
 }

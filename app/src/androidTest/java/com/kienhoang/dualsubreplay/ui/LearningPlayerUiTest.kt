@@ -12,7 +12,9 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -21,6 +23,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
@@ -67,6 +70,12 @@ class LearningPlayerUiTest {
         // The page is plain "Settings", and the X alone closes it (owner pick 2026-11-11).
         composeRule.onNodeWithText("Settings").assertIsDisplayed()
         composeRule.onNodeWithText("Done").assertDoesNotExist()
+        // The X is in the top right corner, right of the eye (owner request 2026-11-11).
+        val closeButton = composeRule.onNodeWithTag("close_settings").getBoundsInRoot()
+        val eyeButton = composeRule.onNodeWithTag("settings_peek").getBoundsInRoot()
+        val page = composeRule.onAllNodes(isRoot()).onLast().getBoundsInRoot()
+        assertTrue("X $closeButton should be right of the eye $eyeButton", closeButton.left >= eyeButton.right)
+        assertTrue("X $closeButton should end at the page's right edge $page", page.right - closeButton.right <= 8.dp)
         // Every section is closed until tapped, and its line shows the current value.
         composeRule.onNodeWithTag("word_highlight_switch").assertDoesNotExist()
         composeRule.onNodeWithTag("settings_section_languages").assertTextContains("Auto → Vietnamese")

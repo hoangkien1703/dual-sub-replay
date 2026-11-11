@@ -19,7 +19,7 @@ The owner found the settings page confusing, mainly the "More settings" heading.
 1. Four named groups replace "More settings": **Subtitles** (Languages, Captions & translation, Subtitle text, Screen layout), **Study** (Word learning, Study tools, Flashcards & Anki), **Video** (Overlay & fullscreen, Ads & sponsors, YouTube tabs), **App** (Colors & theme, AI assistant, App updates, Android TV, Backup & sharing). Daily use first, rare last.
 2. The line under each closed section shows its current value.
 3. One rule sorts the look settings: **Subtitle text** is what the words look like, **Screen layout** is where things sit. "Load captions with a page token" moves to Captions & translation.
-4. The top bar says **Settings** and loses Done; the X closes.
+4. The top bar says **Settings** and loses Done; the X closes. Update 2026-11-11 (owner, after the first preview): the X sits in the top right corner, like every dialog's X, with the eye just left of it.
 5. Search settings finds the AI assistant's settings, and a unit test fails when a new switch is not searchable.
 
 ## Non-goals
@@ -84,7 +84,7 @@ Searching "memory", "full access", "key", "model" or a service name such as "Cla
 - [x] Each section's line shows the values in the table, and changes with the setting (`SettingsSummariesTest`).
 - [x] The moved settings are found by search in their new sections (`SettingsSearchTest.theSettingsThatMovedAreFoundInTheirNewSections`).
 - [x] Every `Switch` test tag on the settings page is searchable, with `ai_enabled_switch` (the section's own first row) as the one listed exception (`SettingsSearchTest.everySwitchOnTheSettingsPageCanBeFound`).
-- [x] The top bar says "Settings", has no Done, and the X and Back close the page.
+- [x] The top bar says "Settings", has no Done, and the X (top right corner, right of the eye) and Back close the page.
 - [ ] Device tests and screenshots on the CI emulator (see the PR).
 
 ## Validation plan
