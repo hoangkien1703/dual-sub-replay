@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV（测试版）</string>
-    <string name="settings_section_tv_summary">适合遥控器的电视布局</string>
     <string name="tv_layout_title">电视布局（测试版）</string>
     <string name="tv_layout_description">带 YouTube 搜索的起始页、视频上的遥控器按键，以及从列表中选词。关闭后，这台电视使用手机布局。</string>
     <string name="tv_layout_note">在视频上：OK 播放或暂停，◀ ▶ 切换到上一句或下一句，▲ 重播这一句，▼ 进入字幕，返回键打开电视主页。在字幕行上按 OK 会显示这一行的词。</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">Quảng cáo &amp; nhà tài trợ</string>
-    <string name="settings_section_ads_summary">Bỏ qua quảng cáo video và đoạn tài trợ</string>
     <string name="ads_skip_ads_title">Bỏ qua quảng cáo</string>
     <string name="ads_skip_ads_description">Tắt tiếng quảng cáo video YouTube, phát nhanh và bấm Bỏ qua ngay khi nút này hiện ra. Quảng cáo dạng biểu ngữ trên video sẽ được đóng.</string>
     <string name="ads_skip_sponsors_title">Bỏ qua đoạn tài trợ</string>

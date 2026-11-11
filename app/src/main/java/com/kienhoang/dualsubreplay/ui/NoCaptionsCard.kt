@@ -28,7 +28,7 @@ import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import kotlinx.coroutines.flow.StateFlow
 
-/** What the no-captions card's buttons do: make the subtitles, or open More settings → AI assistant to add a key. */
+/** What the no-captions card's buttons do: make the subtitles, or open Settings → AI assistant to add a key. */
 internal class AiSubtitleActions(
     val make: () -> Unit,
     val openAiSettings: () -> Unit,

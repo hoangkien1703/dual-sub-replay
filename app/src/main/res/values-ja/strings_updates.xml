@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">アプリの更新</string>
-    <string name="settings_section_updates_summary">自動で更新</string>
     <string name="updates_check">アップデートを確認</string>
     <string name="updates_version">バージョン %1$s</string>
     <string name="updates_available_short">バージョン %1$s があります</string>

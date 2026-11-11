@@ -124,52 +124,50 @@ internal enum class SettingsGroup(
     APP(R.string.settings_group_app),
 }
 
-/** The sections of the settings page, in the order the page lists them; each opens when tapped. */
+/**
+ * The sections of the settings page, in the order the page lists them; each opens when tapped.
+ * The line under a closed section's name is its current value ([settingsSectionSummary]).
+ */
 internal enum class MoreSettingsSection(
     val key: String,
     val group: SettingsGroup,
     @StringRes val titleRes: Int,
-    /** Null: the page writes the summary itself. */
-    @StringRes val summaryRes: Int?,
     val icon: ImageVector,
 ) {
     /** Was an always-open card at the top; closed until tapped like the others (owner request 2026-11-06). */
-    LANGUAGES("languages", SettingsGroup.SUBTITLES, R.string.settings_group_languages, null, Icons.Default.Language),
+    LANGUAGES("languages", SettingsGroup.SUBTITLES, R.string.settings_group_languages, Icons.Default.Language),
     TRANSLATION(
         "translation",
         SettingsGroup.SUBTITLES,
         R.string.settings_section_translation_title,
-        R.string.settings_section_translation_summary,
         Icons.Default.Translate,
     ),
 
-    /** The old always-open Reading and Default view cards, merged and closed until tapped (owner request 2026-11-04). */
+    /** "Subtitle text": what the words look like (size, when they show, their order and format; owner pick 2026-11-11). */
     READING(
         "reading",
         SettingsGroup.SUBTITLES,
         R.string.settings_section_reading_title,
-        R.string.settings_section_reading_summary,
         Icons.Default.TextFields,
     ),
+
+    /** "Screen layout": where things sit (the panel's place, the default view, the playing line, split view). */
     LAYOUT(
         "layout",
         SettingsGroup.SUBTITLES,
         R.string.settings_section_layout_title,
-        R.string.settings_section_layout_summary,
         Icons.Default.ViewDay,
     ),
     WORD_LEARNING(
         "word_learning",
         SettingsGroup.STUDY,
         R.string.settings_section_word_learning_title,
-        R.string.settings_section_word_learning_summary,
         Icons.Default.School,
     ),
     STUDY(
         "study",
         SettingsGroup.STUDY,
         R.string.settings_section_study_title,
-        R.string.settings_section_study_summary,
         Icons.Default.AutoStories,
     ),
 
@@ -178,23 +176,20 @@ internal enum class MoreSettingsSection(
         "flashcards",
         SettingsGroup.STUDY,
         R.string.settings_section_flashcards_title,
-        R.string.settings_section_flashcards_summary,
         Icons.Default.Style,
     ),
     OVERLAY(
         "overlay",
         SettingsGroup.VIDEO,
         R.string.settings_section_overlay_title,
-        R.string.settings_section_overlay_summary,
         Icons.Default.Fullscreen,
     ),
-    ADS("ads", SettingsGroup.VIDEO, R.string.settings_section_ads_title, R.string.settings_section_ads_summary, Icons.Default.FastForward),
-    TABS("tabs", SettingsGroup.VIDEO, R.string.settings_section_tabs_title, R.string.settings_section_tabs_summary, Icons.Default.Tab),
+    ADS("ads", SettingsGroup.VIDEO, R.string.settings_section_ads_title, Icons.Default.FastForward),
+    TABS("tabs", SettingsGroup.VIDEO, R.string.settings_section_tabs_title, Icons.Default.Tab),
     COLORS(
         "colors",
         SettingsGroup.APP,
         R.string.settings_section_colors_title,
-        R.string.settings_section_colors_summary,
         Icons.Default.Palette,
     ),
 
@@ -203,17 +198,15 @@ internal enum class MoreSettingsSection(
         "ai_assistant",
         SettingsGroup.APP,
         R.string.settings_section_ai_title,
-        R.string.settings_section_ai_summary,
         Icons.Default.AutoAwesome,
     ),
     UPDATES(
         "updates",
         SettingsGroup.APP,
         R.string.settings_section_updates_title,
-        R.string.settings_section_updates_summary,
         Icons.Default.SystemUpdate,
     ),
-    TV("tv", SettingsGroup.APP, R.string.settings_section_tv_title, R.string.settings_section_tv_summary, Icons.Default.Tv),
+    TV("tv", SettingsGroup.APP, R.string.settings_section_tv_title, Icons.Default.Tv),
 }
 
 /**
@@ -247,6 +240,9 @@ private val SETTINGS_PAGE_GAP = 12.dp
 /** A jump to a setting waits this long for its section to open before scrolling. */
 private const val SETTINGS_JUMP_SETTLE_MILLIS = 450L
 
+/** The extra wait while a card inside the AI assistant section opens too. */
+private const val SETTINGS_NESTED_SETTLE_MILLIS = 300L
+
 /** A setting a jump lands on sits this far below the top of the page. */
 private val SETTINGS_JUMP_MARGIN = 12.dp
 
@@ -268,8 +264,11 @@ private fun SettingsJumpEffect(
     LaunchedEffect(jump) {
         val target = jump ?: return@LaunchedEffect
         target.section?.let(onOpenSection)
-        // Lets the section open (and the one that was open close) before measuring.
-        delay(SETTINGS_JUMP_SETTLE_MILLIS)
+        val aiSection = target.setting?.aiSection
+        anchors.aiSectionToOpen = aiSection
+        // Lets the section open (and the one that was open close) before measuring; a card inside
+        // the AI assistant section opens after its section did.
+        delay(if (aiSection == null) SETTINGS_JUMP_SETTLE_MILLIS else SETTINGS_JUMP_SETTLE_MILLIS + SETTINGS_NESTED_SETTLE_MILLIS)
         val anchor = target.setting?.anchor
         val anchorTop = anchor?.let { anchors.tops[it] }
         val offset =
@@ -296,7 +295,7 @@ private fun settingsSearchEntries(withAiAssistant: Boolean): List<SettingsSearch
     val groupTitles = SettingsGroup.entries.associateWith { stringResource(it.titleRes) }
     val sectionTitles = MoreSettingsSection.entries.associateWith { stringResource(it.titleRes) }
     val settings =
-        SearchableSetting.entries.map { setting ->
+        SearchableSetting.entries.filter { withAiAssistant || it.section != MoreSettingsSection.AI_ASSISTANT }.map { setting ->
             SettingsSearchEntry(
                 stringResource(setting.titleRes),
                 sectionTitles.getValue(setting.section),
@@ -443,7 +442,7 @@ private fun thirdLineLabel(thirdLanguage: String?): String =
     thirdLanguage?.let { languageDisplayName(it, currentInterfaceLocale()) } ?: stringResource(R.string.settings_third_line_choose)
 
 /**
- * Settings → Layout & format → Third subtitle line (owner request 2026-11-02: off by default, and its
+ * Settings → Subtitle text → Third subtitle line (owner request 2026-11-02: off by default, and its
  * language row shows here and in the language popup only while it is on). Turning it on with no
  * language picked yet opens the language list.
  */
@@ -519,7 +518,7 @@ private fun CompactLanguageRows(
             languageDisplayName(targetLanguage, currentInterfaceLocale()),
             "target_language_picker",
         ) { onPick(LanguagePickerMode.TARGET) }
-        // Only while Layout & format → Third subtitle line is on; "Off" in its list turns it off again.
+        // Only while Subtitle text → Third subtitle line is on; "Off" in its list turns it off again.
         if (thirdLine.enabled) {
             CompactLanguageRow(stringResource(R.string.settings_third_line), thirdLineLabel(thirdLine.language), "third_language_picker") {
                 onPick(LanguagePickerMode.THIRD)
@@ -552,7 +551,7 @@ private fun CompactLanguageRow(
 
 /**
  * The subtitle panel's gear opens this small popup over the video: the languages and Hide while
- * playing (owner pick 2026-11-10). "Dual-subtitle settings" leads to the full settings page.
+ * playing (owner pick 2026-11-10). "Settings" leads to the full settings page.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -630,7 +629,7 @@ internal fun QuickLanguageSettingsDialog(
                     Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        stringResource(R.string.settings_dual_subtitle_settings),
+                        stringResource(R.string.navigation_settings),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f),
@@ -764,18 +763,32 @@ internal fun SubtitleSettingsDialog(
     val sourceLabel =
         sourceLanguageLabel(sourcePreference, sourceChoices, autoLabel, currentInterfaceLocale())
     val searchEntries = settingsSearchEntries(withAiAssistant = aiAssistant != null)
+    val interfaceLocale = currentInterfaceLocale()
+    // "Auto" alone keeps the Languages line short; the picker's list still says "Auto (recommended)".
+    val shortSourceLabel =
+        sourceLanguageLabel(sourcePreference, sourceChoices, stringResource(R.string.settings_source_language_auto_short), interfaceLocale)
+    val summaries =
+        rememberSettingsSummaryState(
+            SettingsSummaryState(
+                languages = "$shortSourceLabel → ${languageDisplayName(targetLanguage, interfaceLocale)}",
+                translator = onlineTranslation.translator,
+                fontScale = fontScale,
+                translationPosition = translationPosition,
+                playerMode = playerMode,
+                wordColors = wordLearningEnabled,
+            ),
+        )
 
     @Composable
     fun Section(
         section: MoreSettingsSection,
         shape: RoundedCornerShape,
-        summary: String? = null,
         content: @Composable ColumnScope.() -> Unit,
     ) {
         Box(Modifier.fillMaxWidth().onPlaced { sectionTops[section] = it.positionInParent().y.roundToInt() }) {
             SettingsExpandableCard(
                 title = stringResource(section.titleRes),
-                summary = summary ?: section.summaryRes?.let { stringResource(it) }.orEmpty(),
+                summary = settingsSummaryText(settingsSectionSummary(section, summaries)),
                 icon = section.icon,
                 expanded = openSection == section,
                 onToggle = { openSection = toggleMoreSettingsSection(openSection, section) },
@@ -786,13 +799,12 @@ internal fun SubtitleSettingsDialog(
         }
     }
 
-    @Composable
-    fun ColumnScope.SectionSettings(section: MoreSettingsSection) {
-        when (section) {
-            MoreSettingsSection.LANGUAGES -> {
+    val pageSettings =
+        PageSectionSettings(
+            languages = {
                 LanguagePickerButtons(sourceLabel, targetLanguage, languagePicker::open)
-            }
-            MoreSettingsSection.TRANSLATION -> {
+            },
+            translation = {
                 if (translationEngineActions != null) {
                     OnlineTranslationSettingsRows(
                         onlineTranslation,
@@ -814,6 +826,7 @@ internal fun SubtitleSettingsDialog(
                     onCheckedChange = onHideSoundCuesChange,
                     testTag = "hide_sound_cues_switch",
                 )
+                PageTokenCaptionSettings()
                 SettingsSwitchRow(
                     title = stringResource(R.string.settings_preload_models_title),
                     description = stringResource(R.string.settings_preload_models_description),
@@ -827,8 +840,8 @@ internal fun SubtitleSettingsDialog(
                         LanguageDownloadsSettingsRow(onOpen = { showLanguageDownloads = true })
                     }
                 }
-            }
-            MoreSettingsSection.READING -> {
+            },
+            reading = {
                 val fontScaleLabel = stringResource(R.string.settings_text_size, (fontScale * 100).toInt())
                 val fontScaleSteps = fontScaleSteps(LocalTvLayout.current)
                 val fontScaleRange = MIN_FONT_SCALE..MAX_FONT_SCALE
@@ -856,9 +869,6 @@ internal fun SubtitleSettingsDialog(
                 Column(Modifier.fillMaxWidth().settingAnchor("translation_position")) {
                     TranslationPositionSettings(translationPosition, onTranslationPositionChange)
                 }
-                Column(Modifier.fillMaxWidth().settingAnchor("transcript_follow")) {
-                    TranscriptFollowSettings(transcriptFollow, onTranscriptFollowChange)
-                }
                 SettingsSwitchRow(
                     title = stringResource(R.string.settings_highlight_spoken_words_title),
                     description = stringResource(R.string.settings_highlight_spoken_words_description),
@@ -866,6 +876,22 @@ internal fun SubtitleSettingsDialog(
                     onCheckedChange = onWordHighlightChange,
                     testTag = "word_highlight_switch",
                 )
+                SettingsSectionDivider()
+                Column(Modifier.fillMaxWidth().settingAnchor("caption_format")) {
+                    CaptionFormatSettings(captionFormat, onCaptionFormatChange)
+                }
+                SettingsSectionDivider()
+                ThirdLineSettings(thirdLine, onThirdLineChange, languagePicker::open)
+            },
+            layout = {
+                Column(Modifier.fillMaxWidth().settingAnchor("portrait_panel_position")) {
+                    PortraitPanelPositionSettings(
+                        offsetFraction = portraitPanelOffsetFraction,
+                        onOffsetFractionChange = onPortraitPanelOffsetFractionChange,
+                        onReset = onResetPortraitPanelPosition,
+                        peekSlider = peek.panelPositionSlider,
+                    )
+                }
                 SettingsSectionDivider()
                 Column(Modifier.fillMaxWidth().settingAnchor("default_view")) {
                     Text(
@@ -889,22 +915,10 @@ internal fun SubtitleSettingsDialog(
                         onModeChange = onPlayerModeChange,
                     )
                 }
-            }
-            MoreSettingsSection.LAYOUT -> {
-                Column(Modifier.fillMaxWidth().settingAnchor("portrait_panel_position")) {
-                    PortraitPanelPositionSettings(
-                        offsetFraction = portraitPanelOffsetFraction,
-                        onOffsetFractionChange = onPortraitPanelOffsetFractionChange,
-                        onReset = onResetPortraitPanelPosition,
-                        peekSlider = peek.panelPositionSlider,
-                    )
-                }
                 SettingsSectionDivider()
-                Column(Modifier.fillMaxWidth().settingAnchor("caption_format")) {
-                    CaptionFormatSettings(captionFormat, onCaptionFormatChange)
+                Column(Modifier.fillMaxWidth().settingAnchor("transcript_follow")) {
+                    TranscriptFollowSettings(transcriptFollow, onTranscriptFollowChange)
                 }
-                SettingsSectionDivider()
-                ThirdLineSettings(thirdLine, onThirdLineChange, languagePicker::open)
                 SettingsSectionDivider()
                 SettingsSwitchRow(
                     title = stringResource(R.string.settings_landscape_split_title),
@@ -916,8 +930,8 @@ internal fun SubtitleSettingsDialog(
                 SettingsHint(
                     stringResource(R.string.settings_hide_transcript_hint),
                 )
-            }
-            MoreSettingsSection.WORD_LEARNING -> {
+            },
+            wordLearning = {
                 WordLearningSettings(
                     autoPronounce = autoPronounce,
                     onAutoPronounceChange = onAutoPronounceChange,
@@ -931,23 +945,11 @@ internal fun SubtitleSettingsDialog(
                     onWordLearningActiveOnlyChange = onWordLearningActiveOnlyChange,
                 )
                 KnownWordsAndCharacterSettings()
-            }
-            MoreSettingsSection.STUDY -> {
-                StudyToolsSettingsSection()
-            }
-            MoreSettingsSection.FLASHCARDS -> {
-                FlashcardSettingsSection()
-            }
-            MoreSettingsSection.OVERLAY -> {
+            },
+            overlay = {
                 OverlaySettings(lockOverlayToVideo, onLockOverlayToVideoChange)
-            }
-            MoreSettingsSection.ADS -> {
-                AdSkipSettingsSection()
-            }
-            MoreSettingsSection.TABS -> {
-                YouTubeTabsSettingsSection()
-            }
-            MoreSettingsSection.COLORS -> {
+            },
+            colors = {
                 SettingsSwitchRow(
                     title = stringResource(R.string.settings_custom_colors_title),
                     description = stringResource(R.string.settings_custom_colors_description),
@@ -980,16 +982,8 @@ internal fun SubtitleSettingsDialog(
                 }
                 SettingsSectionDivider()
                 AdvancedAppearanceSettings()
-            }
-            MoreSettingsSection.AI_ASSISTANT -> aiAssistant?.let { AiAssistantSettingsSection(it, nested = true) }
-            MoreSettingsSection.UPDATES -> {
-                AppUpdateSettingsSection()
-            }
-            MoreSettingsSection.TV -> {
-                TvLayoutSettingsSection()
-            }
-        }
-    }
+            },
+        )
 
     Dialog(
         onDismissRequest = {
@@ -1030,7 +1024,6 @@ internal fun SubtitleSettingsDialog(
                                     )
                                     Spacer(Modifier.height(SETTINGS_PAGE_GAP))
                                 }
-                                val languagesSummary = "$sourceLabel → ${languageDisplayName(targetLanguage, currentInterfaceLocale())}"
                                 settingsGroupsOnPage(withAiAssistant = aiAssistant != null).forEach { (group, sections) ->
                                     SettingsGroupHeading(group)
                                     sections.forEachIndexed { index, section ->
@@ -1038,8 +1031,7 @@ internal fun SubtitleSettingsDialog(
                                         Section(
                                             section,
                                             settingsSectionShape(index, sections.size),
-                                            summary = languagesSummary.takeIf { section == MoreSettingsSection.LANGUAGES },
-                                        ) { SectionSettings(section) }
+                                        ) { SectionSettings(section, pageSettings) }
                                     }
                                 }
 
@@ -1101,7 +1093,8 @@ private fun SettingsTopBar(
             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_close_settings))
         }
         Text(
-            stringResource(R.string.settings_dual_subtitle_settings),
+            // The page also holds the assistant, updates, tabs and the theme, so it is plain "Settings" (owner pick 2026-11-11).
+            stringResource(R.string.navigation_settings),
             modifier = Modifier.weight(1f).padding(start = 4.dp),
             style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
@@ -1114,7 +1107,44 @@ private fun SettingsTopBar(
         ) {
             Icon(Icons.Default.Visibility, contentDescription = stringResource(R.string.settings_peek))
         }
-        TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_done)) }
+    }
+}
+
+/** The settings an open section shows. */
+private typealias SectionSettingsContent = @Composable ColumnScope.() -> Unit
+
+/** The sections whose settings the page itself holds; the other sections keep their own state. */
+private class PageSectionSettings(
+    val languages: SectionSettingsContent,
+    val translation: SectionSettingsContent,
+    val reading: SectionSettingsContent,
+    val layout: SectionSettingsContent,
+    val wordLearning: SectionSettingsContent,
+    val overlay: SectionSettingsContent,
+    val colors: SectionSettingsContent,
+)
+
+/** What [section] shows when open. A new section does not compile until it has an entry here. */
+@Composable
+private fun ColumnScope.SectionSettings(
+    section: MoreSettingsSection,
+    page: PageSectionSettings,
+) {
+    when (section) {
+        MoreSettingsSection.LANGUAGES -> page.languages(this)
+        MoreSettingsSection.TRANSLATION -> page.translation(this)
+        MoreSettingsSection.READING -> page.reading(this)
+        MoreSettingsSection.LAYOUT -> page.layout(this)
+        MoreSettingsSection.WORD_LEARNING -> page.wordLearning(this)
+        MoreSettingsSection.STUDY -> StudyToolsSettingsSection()
+        MoreSettingsSection.FLASHCARDS -> FlashcardSettingsSection()
+        MoreSettingsSection.OVERLAY -> page.overlay(this)
+        MoreSettingsSection.ADS -> AdSkipSettingsSection()
+        MoreSettingsSection.TABS -> YouTubeTabsSettingsSection()
+        MoreSettingsSection.COLORS -> page.colors(this)
+        MoreSettingsSection.AI_ASSISTANT -> LocalAiAssistant.current?.let { AiAssistantSettingsSection(it, nested = true) }
+        MoreSettingsSection.UPDATES -> AppUpdateSettingsSection()
+        MoreSettingsSection.TV -> TvLayoutSettingsSection()
     }
 }
 
@@ -1143,7 +1173,7 @@ private fun SettingsSectionSeparator() {
 }
 
 /**
- * A card that opens to show its settings, as on the More settings page: an icon, a title, a
+ * A card that opens to show its settings, as on the settings page: an icon, a title, a
  * one-line summary, and the settings below a divider while [expanded]. Inside another card,
  * [color] sets it apart.
  */

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">Asisten AI</string>
-    <string name="settings_section_ai_summary">Tanya tentang aplikasi dan kata dengan kunci AI Anda sendiri</string>
     <string name="ai_button">Asisten AI</string>
     <string name="ai_button_with_problem">Asisten AI: ada masalah yang perlu dilihat</string>
     <string name="ai_panel_title">Asisten AI</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">AI 도우미</string>
-    <string name="settings_section_ai_summary">내 AI 키로 앱과 단어에 대해 질문하기</string>
     <string name="ai_button">AI 도우미</string>
     <string name="ai_button_with_problem">AI 도우미: 확인할 문제가 있습니다</string>
     <string name="ai_panel_title">AI 도우미</string>

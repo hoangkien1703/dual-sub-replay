@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">広告とスポンサー</string>
-    <string name="settings_section_ads_summary">動画広告とスポンサー部分をスキップ</string>
     <string name="ads_skip_ads_title">広告をスキップ</string>
     <string name="ads_skip_ads_description">YouTube の動画広告をミュートして速く再生し、［スキップ］が表示されたらすぐに押します。動画上のバナー広告は閉じます。</string>
     <string name="ads_skip_sponsors_title">スポンサーをスキップ</string>

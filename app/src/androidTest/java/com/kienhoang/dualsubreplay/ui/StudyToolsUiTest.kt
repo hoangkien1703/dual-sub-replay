@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -87,6 +88,15 @@ class StudyToolsUiTest {
     }
 
     @Test
+    fun pageTokensSitWithTheCaptionSettings() {
+        showSettings("settings_section_translation")
+        // Automatic by default, then On.
+        composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
+        composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
+        saveUiEvidence("settings-captions-page-token")
+    }
+
+    @Test
     fun theStudyToolsSectionTurnsEachToolOnAndOff() {
         showSettings()
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo().performClick()
@@ -101,10 +111,12 @@ class StudyToolsUiTest {
         }
         composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo()
         saveUiEvidence("study-tools-settings")
-        // Page tokens: Automatic by default, then On.
-        composeRule.onNodeWithTag("page_token_on").performScrollTo().performClick()
-        composeRule.runOnIdle { assertEquals("on", preferences.getString(PAGE_TOKEN_CAPTIONS_PREFERENCE, null)) }
+        composeRule.onNodeWithTag("blur_box_switch").performScrollTo()
         saveUiEvidence("study-tools-settings-lower")
+        // The section's line follows the stored value.
+        composeRule.onNodeWithTag("settings_section_study").assertTextContains("Play mode: Repeat each line")
+        // Page tokens are about loading captions, so they sit in Captions & translation (owner pick 2026-11-11).
+        assertTrue(composeRule.onAllNodes(hasTestTag("page_token_on")).fetchSemanticsNodes().isEmpty())
         // Send to and card audio moved to their own section (owner pick 2026-11-09).
         assertTrue(composeRule.onAllNodes(hasTestTag("ankidroid_switch")).fetchSemanticsNodes().isEmpty())
         assertTrue(composeRule.onAllNodes(hasTestTag("known_words_off")).fetchSemanticsNodes().isEmpty())

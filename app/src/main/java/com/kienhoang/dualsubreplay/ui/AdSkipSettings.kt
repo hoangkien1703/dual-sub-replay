@@ -59,7 +59,7 @@ internal fun rememberAdSkipSettings(): State<AdSkipSettings> {
     return settings
 }
 
-/** More settings → Ads and sponsors. */
+/** Settings → Ads and sponsors. */
 @Composable
 internal fun AdSkipSettingsSection() {
     val context = LocalContext.current

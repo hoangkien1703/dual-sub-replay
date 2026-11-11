@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">광고 및 스폰서</string>
-    <string name="settings_section_ads_summary">동영상 광고와 스폰서 구간 건너뛰기</string>
     <string name="ads_skip_ads_title">광고 건너뛰기</string>
     <string name="ads_skip_ads_description">YouTube 동영상 광고를 음소거하고 빠르게 재생하며, 건너뛰기 버튼이 나타나면 바로 누릅니다. 동영상 위의 배너 광고는 닫습니다.</string>
     <string name="ads_skip_sponsors_title">스폰서 건너뛰기</string>

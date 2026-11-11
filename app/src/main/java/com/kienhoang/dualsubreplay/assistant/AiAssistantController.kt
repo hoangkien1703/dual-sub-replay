@@ -368,7 +368,7 @@ internal class AiAssistantController(
     /** Let's start on the first page: the panel shows the key setup or the chat from now on. The page already told what is new. */
     fun finishIntro() = updateSettings { it.copy(introSeen = true, newsSeen = AI_NEWS_VERSION) }
 
-    /** Don't use AI on the first page: the assistant turns off until it is turned on in More settings. */
+    /** Don't use AI on the first page: the assistant turns off until it is turned on in Settings. */
     fun declineIntro() {
         updateSettings { it.copy(introSeen = true, newsSeen = AI_NEWS_VERSION) }
         setEnabled(false)

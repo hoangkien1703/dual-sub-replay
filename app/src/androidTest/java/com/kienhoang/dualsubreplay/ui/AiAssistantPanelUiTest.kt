@@ -598,7 +598,45 @@ class AiAssistantPanelUiTest {
     }
 
     @Test
-    fun theAiSectionInMoreSettingsSavesAKeyAndTurnsTheAssistantOff() {
+    fun searchSettingsFindsAnAssistantSettingAndOpensItsCard() {
+        composeRule.setContent {
+            DualSubTheme {
+                CompositionLocalProvider(LocalAiAssistant provides host) {
+                    SubtitleSettingsDialog(
+                        sourcePreference = "ja",
+                        targetLanguage = "en",
+                        availableSourceLanguages = emptyList(),
+                        fontScale = 1f,
+                        landscapeSplitEnabled = true,
+                        onSourceChange = {},
+                        onTargetChange = {},
+                        onFontScaleChange = {},
+                        onLandscapeSplitChange = {},
+                        onDismiss = {},
+                    )
+                }
+            }
+        }
+        // The section's line says what is missing before the assistant can answer.
+        composeRule.onNodeWithTag("settings_section_ai_assistant").assertTextContains("No key yet")
+        composeRule.onNodeWithTag("ai_full_access_switch").assertDoesNotExist()
+        composeRule.onNodeWithTag("settings_search").performTextInput("full access")
+        composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").assertIsDisplayed()
+        saveUiEvidence("settings-search-ai-setting")
+        composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").performClick()
+        // The AI assistant section and its Permissions card both open, and the page scrolls to the switch.
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodesWithTag("ai_full_access_switch").fetchSemanticsNodes().isNotEmpty()
+        }
+        // The jump waits for both to open before it scrolls.
+        composeRule.mainClock.advanceTimeBy(1_500)
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("ai_full_access_switch").assertIsDisplayed()
+        saveUiEvidence("settings-search-ai-jump")
+    }
+
+    @Test
+    fun theAiSectionOnTheSettingsPageSavesAKeyAndTurnsTheAssistantOff() {
         composeRule.setContent {
             DualSubTheme {
                 CompositionLocalProvider(LocalAiAssistant provides host) {

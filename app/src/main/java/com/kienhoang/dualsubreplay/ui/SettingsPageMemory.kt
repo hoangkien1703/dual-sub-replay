@@ -3,7 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 /** How long after closing the settings page it still reopens where it was (owner request 2026-10-31). */
 internal const val SETTINGS_PAGE_MEMORY_MILLIS = 3 * 60_000L
 
-/** Where the settings page was: the open "More settings" section and how far it was scrolled. */
+/** Where the settings page was: the open section and how far it was scrolled. */
 internal data class SettingsPagePlace(
     val openSection: MoreSettingsSection? = null,
     val scrollOffset: Int = 0,

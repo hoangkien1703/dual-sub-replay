@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">앱 업데이트</string>
-    <string name="settings_section_updates_summary">자동 업데이트</string>
     <string name="updates_check">업데이트 확인</string>
     <string name="updates_version">버전 %1$s</string>
     <string name="updates_available_short">버전 %1$s 사용 가능</string>

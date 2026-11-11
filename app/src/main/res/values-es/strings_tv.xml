@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV (beta)</string>
-    <string name="settings_section_tv_summary">Diseño de TV para control remoto</string>
     <string name="tv_layout_title">Diseño de TV (beta)</string>
     <string name="tv_layout_description">Una página de inicio con búsqueda de YouTube, botones del control remoto en el video y palabras elegidas de una lista. Desactivado: esta TV muestra el diseño del teléfono.</string>
     <string name="tv_layout_note">En un video: OK reproduce o pausa, ◀ ▶ van a la línea anterior o siguiente, ▲ repite la línea, ▼ va a los subtítulos y Atrás abre el inicio de TV. OK en una línea de subtítulos muestra sus palabras.</string>

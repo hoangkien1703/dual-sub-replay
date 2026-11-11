@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">Cập nhật ứng dụng</string>
-    <string name="settings_section_updates_summary">Tự động cập nhật</string>
     <string name="updates_check">Kiểm tra cập nhật</string>
     <string name="updates_version">Phiên bản %1$s</string>
     <string name="updates_available_short">Đã có phiên bản %1$s</string>

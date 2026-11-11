@@ -5,7 +5,7 @@ Addresses #61, #59, and #57. Physical-phone acceptance remains pending.
 
 ## Behavior
 
-- More settings → Caption format: Short paired phrases (default), Whole sentence.
+- Settings → Subtitle text → Caption format: Short paired phrases (default), Whole sentence.
   Existing users who explicitly disabled splitting retain Whole sentence. Reset settings returns to Short paired phrases.
 - Translations now belong to exactly one displayed unit. Whole translations are no longer repeated on every short fragment.
   Sentence joining stops at punctuation or long pauses and is bounded to 12 seconds / 240 characters.

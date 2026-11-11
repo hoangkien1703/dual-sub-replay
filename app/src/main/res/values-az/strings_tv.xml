@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV (beta)</string>
-    <string name="settings_section_tv_summary">Pult üçün TV görünüşü</string>
     <string name="tv_layout_title">TV görünüşü (beta)</string>
     <string name="tv_layout_description">YouTube axtarışı olan başlanğıc səhifə, videoda pult düymələri və siyahıdan seçilən sözlər. Söndürüləndə: bu TV telefon görünüşünü göstərir.</string>
     <string name="tv_layout_note">Videoda: OK oynadır və ya dayandırır, ◀ ▶ əvvəlki və ya növbəti sətrə keçir, ▲ sətri təkrarlayır, ▼ altyazılara keçir, Geri isə TV əsas səhifəsini açır. Altyazı sətrində OK onun sözlərini göstərir.</string>

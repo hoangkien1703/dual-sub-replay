@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">Sİ köməkçisi</string>
-    <string name="settings_section_ai_summary">Öz Sİ açarınızla tətbiq və sözlər barədə soruşun</string>
     <string name="ai_button">Sİ köməkçisi</string>
     <string name="ai_button_with_problem">Sİ köməkçisi: diqqətinizi tələb edən problem var</string>
     <string name="ai_panel_title">Sİ köməkçisi</string>

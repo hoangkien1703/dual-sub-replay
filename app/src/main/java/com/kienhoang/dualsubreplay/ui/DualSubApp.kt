@@ -125,7 +125,7 @@ fun DualSubApp(
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
     var showVocabulary by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
-    // The no-captions card's "Add a free Gemini key" opens More settings → AI assistant.
+    // The no-captions card's "Add a free Gemini key" opens Settings → AI assistant.
     var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
     val aiSubtitleActions = remember(viewModel) { AiSubtitleActions(viewModel::makeAiSubtitles) { aiSettingsRequestId++ } }
 

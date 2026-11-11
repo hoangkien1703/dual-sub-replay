@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
+import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE
@@ -66,7 +67,7 @@ import java.util.Locale
 
 /**
  * A setting that Search settings finds and Often changed lists (owner request 2026-11-06): its
- * name, the More settings section it is in, the tag of the place on the
+ * name, the settings section it is in, the tag of the place on the
  * page to scroll to ([settingAnchor]; [SettingsSwitchRow] uses its test tag), and the preference
  * keys a change of it writes.
  */
@@ -77,6 +78,8 @@ internal enum class SearchableSetting(
     val keys: Set<String>,
     /** Names of the setting's choices, so "pause" or "dictation" finds Play mode (2026-11-09). */
     val alsoFinds: List<Int> = emptyList(),
+    /** The card inside the AI assistant section that holds the setting; a jump opens it too. */
+    val aiSection: AiSettingsSection? = null,
 ) {
     ORIGINAL_LANGUAGE(
         R.string.settings_original_language,
@@ -106,7 +109,7 @@ internal enum class SearchableSetting(
     ),
     TRANSCRIPT_FOLLOW(
         R.string.settings_transcript_follow_title,
-        MoreSettingsSection.READING,
+        MoreSettingsSection.LAYOUT,
         "transcript_follow",
         setOf(TRANSCRIPT_FOLLOW_PREFERENCE),
     ),
@@ -118,7 +121,7 @@ internal enum class SearchableSetting(
     ),
     DEFAULT_VIEW(
         R.string.settings_group_default_view,
-        MoreSettingsSection.READING,
+        MoreSettingsSection.LAYOUT,
         "default_view",
         setOf(PLAYER_EXPERIENCE_MODE_PREFERENCE),
     ),
@@ -128,10 +131,10 @@ internal enum class SearchableSetting(
         "portrait_panel_position",
         setOf(PORTRAIT_PANEL_OFFSET_PREFERENCE),
     ),
-    CAPTION_FORMAT(R.string.settings_caption_format_title, MoreSettingsSection.LAYOUT, "caption_format", setOf(CAPTION_FORMAT_PREFERENCE)),
+    CAPTION_FORMAT(R.string.settings_caption_format_title, MoreSettingsSection.READING, "caption_format", setOf(CAPTION_FORMAT_PREFERENCE)),
     THIRD_LINE(
         R.string.settings_third_line_title,
-        MoreSettingsSection.LAYOUT,
+        MoreSettingsSection.READING,
         "third_line_switch",
         setOf(THIRD_LINE_ENABLED_PREFERENCE, THIRD_LANGUAGE_PREFERENCE),
     ),
@@ -270,7 +273,7 @@ internal enum class SearchableSetting(
         "kanji_details_switch",
         setOf(KANJI_DETAILS_PREFERENCE),
     ),
-    PAGE_TOKEN(R.string.study_page_token_title, MoreSettingsSection.STUDY, "page_token", setOf(PAGE_TOKEN_CAPTIONS_PREFERENCE)),
+    PAGE_TOKEN(R.string.study_page_token_title, MoreSettingsSection.TRANSLATION, "page_token", setOf(PAGE_TOKEN_CAPTIONS_PREFERENCE)),
     OVERLAY_FULLSCREEN(
         R.string.settings_overlay_fullscreen_title,
         MoreSettingsSection.OVERLAY,
@@ -348,6 +351,72 @@ internal enum class SearchableSetting(
     ),
     AUTO_UPDATE(R.string.updates_auto_title, MoreSettingsSection.UPDATES, "auto_update_switch", setOf(APP_AUTO_UPDATE_PREFERENCE)),
     TV_LAYOUT(R.string.tv_layout_title, MoreSettingsSection.TV, "tv_layout_switch", setOf(TV_LAYOUT_PREFERENCE)),
+
+    // The assistant's own settings (owner pick 2026-11-11: Search found none of them). They live in the
+    // assistant's preferences, which Often changed does not follow, so they have no keys.
+    AI_SERVICE(
+        R.string.ai_settings_service,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_service",
+        emptySet(),
+        AiProvider.entries.map { it.labelRes },
+    ),
+    AI_KEYS(
+        R.string.ai_settings_keys_section,
+        MoreSettingsSection.AI_ASSISTANT,
+        AiSettingsSection.KEYS.anchor,
+        emptySet(),
+        aiSection = AiSettingsSection.KEYS,
+    ),
+    AI_MODEL(
+        R.string.ai_settings_model_section,
+        MoreSettingsSection.AI_ASSISTANT,
+        AiSettingsSection.MODEL.anchor,
+        emptySet(),
+        aiSection = AiSettingsSection.MODEL,
+    ),
+    AI_YOUTUBE_SEARCH(
+        R.string.ai_search_youtube_title,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_youtube_search_switch",
+        emptySet(),
+        aiSection = AiSettingsSection.SEARCH,
+    ),
+    AI_WEB_SEARCH(
+        R.string.ai_search_web_title,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_web_search",
+        emptySet(),
+        aiSection = AiSettingsSection.SEARCH,
+    ),
+    AI_SCREEN(
+        R.string.ai_search_screen_title,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_screen_switch",
+        emptySet(),
+        aiSection = AiSettingsSection.SEARCH,
+    ),
+    AI_MEMORY(
+        R.string.ai_memory_enabled_title,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_memory_switch",
+        emptySet(),
+        aiSection = AiSettingsSection.MEMORY,
+    ),
+    AI_HISTORY(
+        R.string.ai_history,
+        MoreSettingsSection.AI_ASSISTANT,
+        AiSettingsSection.HISTORY.anchor,
+        emptySet(),
+        aiSection = AiSettingsSection.HISTORY,
+    ),
+    AI_FULL_ACCESS(
+        R.string.ai_settings_full_access_title,
+        MoreSettingsSection.AI_ASSISTANT,
+        "ai_full_access_switch",
+        emptySet(),
+        aiSection = AiSettingsSection.PERMISSIONS,
+    ),
     ;
 
     companion object {
@@ -358,7 +427,7 @@ internal enum class SearchableSetting(
     }
 }
 
-/** One search result: a setting, or a whole More settings section when its name matches. */
+/** One search result: a setting, or a whole settings section when its name matches. */
 internal data class SettingsSearchEntry(
     val title: String,
     val sectionTitle: String,
@@ -522,6 +591,9 @@ internal fun RecordSettingChanges(
 internal class SettingsAnchors {
     val tops = HashMap<String, Float>()
     var flashing by mutableStateOf<String?>(null)
+
+    /** The card inside the AI assistant section a jump wants open; the section clears it once it opened. */
+    var aiSectionToOpen by mutableStateOf<AiSettingsSection?>(null)
 }
 
 internal val LocalSettingsAnchors = staticCompositionLocalOf<SettingsAnchors?> { null }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">广告和赞助</string>
-    <string name="settings_section_ads_summary">跳过视频广告和赞助片段</string>
     <string name="ads_skip_ads_title">跳过广告</string>
     <string name="ads_skip_ads_description">将 YouTube 视频广告静音并快速播放，“跳过”按钮一出现就自动点按。视频上的横幅广告会被关闭。</string>
     <string name="ads_skip_sponsors_title">跳过赞助片段</string>

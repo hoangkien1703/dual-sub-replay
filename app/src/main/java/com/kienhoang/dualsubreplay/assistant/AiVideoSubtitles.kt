@@ -65,7 +65,7 @@ internal interface AiSubtitleKeys {
     suspend fun key(id: String): String?
 }
 
-/** Gemini's keys from More settings → AI assistant, whichever service the assistant uses now. */
+/** Gemini's keys from Settings → AI assistant, whichever service the assistant uses now. */
 internal class StoredGeminiKeys(
     private val store: AiKeyStore,
 ) : AiSubtitleKeys {

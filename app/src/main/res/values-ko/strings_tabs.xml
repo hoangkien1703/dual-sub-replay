@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">YouTube 탭</string>
-    <string name="settings_section_tabs_summary">탭과 Google 계정</string>
     <string name="tabs_menu_title">탭 (%1$d)</string>
     <string name="tabs_list_shown">탭 목록 표시됨</string>
     <string name="tabs_list_hidden">탭 목록 숨겨짐</string>

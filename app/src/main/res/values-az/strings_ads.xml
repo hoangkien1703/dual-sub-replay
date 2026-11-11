@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">Reklamlar və sponsorlar</string>
-    <string name="settings_section_ads_summary">Video reklamlarını və sponsor hissələrini ötür</string>
     <string name="ads_skip_ads_title">Reklamları ötür</string>
     <string name="ads_skip_ads_description">YouTube video reklamlarının səsini söndürür, onları sürətlə oynadır və Ötür düyməsi görünən kimi ona basır. Videonun üzərindəki banner reklamlar bağlanır.</string>
     <string name="ads_skip_sponsors_title">Sponsorları ötür</string>

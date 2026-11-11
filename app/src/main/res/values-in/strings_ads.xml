@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">Iklan &amp; sponsor</string>
-    <string name="settings_section_ads_summary">Lewati iklan video dan bagian sponsor</string>
     <string name="ads_skip_ads_title">Lewati iklan</string>
     <string name="ads_skip_ads_description">Membisukan iklan video YouTube, memutarnya dengan cepat, dan menekan Lewati begitu tombolnya muncul. Iklan banner di atas video ditutup.</string>
     <string name="ads_skip_sponsors_title">Lewati sponsor</string>

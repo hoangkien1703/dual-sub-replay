@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV (beta)</string>
-    <string name="settings_section_tv_summary">Tata letak TV untuk remote</string>
     <string name="tv_layout_title">Tata letak TV (beta)</string>
     <string name="tv_layout_description">Halaman awal dengan pencarian YouTube, tombol remote pada video, dan kata yang dipilih dari daftar. Mati: TV ini memakai tata letak ponsel.</string>
     <string name="tv_layout_note">Pada video: OK memutar atau menjeda, ◀ ▶ ke baris sebelumnya atau berikutnya, ▲ memutar ulang baris, ▼ ke subtitle, dan Kembali membuka beranda TV. OK pada baris subtitle menampilkan kata-katanya.</string>

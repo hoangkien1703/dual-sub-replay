@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">Assistente de IA</string>
-    <string name="settings_section_ai_summary">Pergunte sobre o app e palavras com sua própria chave de IA</string>
     <string name="ai_button">Assistente de IA</string>
     <string name="ai_button_with_problem">Assistente de IA: há um problema para ver</string>
     <string name="ai_panel_title">Assistente de IA</string>

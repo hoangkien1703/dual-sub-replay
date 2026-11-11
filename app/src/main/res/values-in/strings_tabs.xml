@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">Tab YouTube</string>
-    <string name="settings_section_tabs_summary">Tab dan akun Google</string>
     <string name="tabs_menu_title">Tab (%1$d)</string>
     <string name="tabs_list_shown">Daftar tab ditampilkan</string>
     <string name="tabs_list_hidden">Daftar tab disembunyikan</string>

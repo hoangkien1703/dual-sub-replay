@@ -23,7 +23,7 @@ import java.io.IOException
 
 internal const val THIRD_LANGUAGE_PREFERENCE = "third_subtitle_language"
 
-/** Settings → Layout & format → Third subtitle line; off by default (owner request 2026-11-02). */
+/** Settings → Subtitle text → Third subtitle line; off by default (owner request 2026-11-02). */
 internal const val THIRD_LINE_ENABLED_PREFERENCE = "third_subtitle_line_enabled"
 
 /** The switch and the language it remembers; the language is kept while the switch is off. */

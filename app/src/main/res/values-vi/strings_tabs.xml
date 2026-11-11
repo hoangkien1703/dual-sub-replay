@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">Thẻ YouTube</string>
-    <string name="settings_section_tabs_summary">Thẻ và tài khoản Google</string>
     <string name="tabs_menu_title">Thẻ (%1$d)</string>
     <string name="tabs_list_shown">Đang hiện danh sách thẻ</string>
     <string name="tabs_list_hidden">Đang ẩn danh sách thẻ</string>

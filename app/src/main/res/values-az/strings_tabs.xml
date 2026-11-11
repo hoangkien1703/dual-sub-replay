@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">YouTube vərəqləri</string>
-    <string name="settings_section_tabs_summary">Vərəqlər və Google hesabları</string>
     <string name="tabs_menu_title">Vərəqlər (%1$d)</string>
     <string name="tabs_list_shown">Vərəq siyahısı göstərilir</string>
     <string name="tabs_list_hidden">Vərəq siyahısı gizlədilib</string>

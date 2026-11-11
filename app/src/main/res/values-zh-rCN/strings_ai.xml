@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">AI 助手</string>
-    <string name="settings_section_ai_summary">用你自己的 AI 密钥询问应用和词语</string>
     <string name="ai_button">AI 助手</string>
     <string name="ai_button_with_problem">AI 助手：有问题需要你查看</string>
     <string name="ai_panel_title">AI 助手</string>

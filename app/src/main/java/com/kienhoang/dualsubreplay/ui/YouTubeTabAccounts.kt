@@ -79,7 +79,7 @@ internal fun rememberDifferentTabAccounts(): State<Boolean> {
     return on
 }
 
-/** More settings → YouTube tabs. */
+/** Settings → YouTube tabs. */
 @Composable
 internal fun YouTubeTabsSettingsSection() {
     val context = LocalContext.current

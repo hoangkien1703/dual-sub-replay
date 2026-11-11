@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">Atualizações do app</string>
-    <string name="settings_section_updates_summary">Atualizar automaticamente</string>
     <string name="updates_check">Verificar atualizações</string>
     <string name="updates_version">Versão %1$s</string>
     <string name="updates_available_short">Versão %1$s disponível</string>
