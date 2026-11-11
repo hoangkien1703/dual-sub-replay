@@ -80,6 +80,13 @@ class LearningPlayerUiTest {
         listOf("subtitles", "study", "video", "app").forEach { group ->
             composeRule.onNodeWithTag("settings_group_$group").performScrollTo().assertIsDisplayed()
         }
+        // Backup & sharing has nothing to switch, so its line says what it does; it stays last, above Reset.
+        composeRule
+            .onNodeWithTag("settings_section_backup")
+            .performScrollTo()
+            .assertTextContains("Move to a new phone, share your setup")
+        composeRule.onNodeWithTag("reset_all_settings").performScrollTo()
+        saveUiEvidence("settings-app-group")
 
         // Subtitle text: what the words look like.
         composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()

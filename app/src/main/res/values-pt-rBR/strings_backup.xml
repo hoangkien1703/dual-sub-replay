@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">Backup e compartilhamento</string>
+    <string name="backup_section_summary">Mude para um celular novo, compartilhe sua configuração</string>
+    <string name="backup_title">Backup</string>
+    <string name="backup_description">Configurações, palavras da Prática e Progresso em um só arquivo. Guarde-o em um lugar seguro para um celular novo.</string>
+    <string name="backup_button">Fazer backup</string>
+    <string name="restore_button">Restaurar</string>
+    <string name="backup_last">Último backup: %1$s</string>
+    <string name="backup_last_never">Último backup: nunca</string>
+    <string name="share_title">Compartilhar minha configuração</string>
+    <string name="share_description">Envie suas configurações para um amigo por um link. Só configurações: nunca suas palavras, seu progresso, as configurações de IA ou as chaves.</string>
+    <string name="share_button">Compartilhar link</string>
+    <string name="use_setup_button">Usar uma configuração</string>
+    <string name="undo_setup_button">Desfazer a última configuração</string>
+    <string name="backup_dialog_message">Escolha o que vai no arquivo.</string>
+    <string name="backup_part_settings">Configurações</string>
+    <string name="backup_part_settings_detail">Idiomas, aparência, ferramentas de estudo, opções de IA</string>
+    <string name="backup_part_words">Palavras da Prática</string>
+    <string name="backup_part_progress">Progresso</string>
+    <string name="backup_part_progress_detail">%1$s de estudo e sua meta diária</string>
+    <string name="backup_never_included">Nunca no arquivo: chaves de IA, seu login do YouTube, chats e memórias da IA, o endereço de IA personalizado, o acesso total, e os áudios e imagens dos cartões do Anki.</string>
+    <string name="backup_save">Salvar arquivo</string>
+    <string name="backup_saved">Backup salvo.</string>
+    <string name="restore_dialog_title">Restaurar este backup?</string>
+    <string name="restore_from">De %1$s, versão do app %2$s</string>
+    <string name="restore_settings_detail">Substitui suas configurações atuais</string>
+    <string name="restore_keys_note">Depois de restaurar, adicione suas chaves de IA de novo se você usa o assistente de IA.</string>
+    <string name="restore_restart_note">O app reinicia para terminar.</string>
+    <string name="restore_nothing">Este backup não tem nada para restaurar.</string>
+    <string name="backup_cancel">Cancelar</string>
+    <string name="use_setup_title">Usar esta configuração?</string>
+    <string name="use_setup_no_changes">Suas configurações já são iguais a esta configuração.</string>
+    <string name="use_setup_other">Outras configurações</string>
+    <string name="use_setup_note">Uma configuração compartilhada nunca muda suas palavras, seu progresso, as configurações de IA ou as chaves. Você pode desfazê-la em Configurações, Backup e compartilhamento. O app reinicia para terminar.</string>
+    <string name="use_setup_confirm">Usar configuração</string>
+    <string name="paste_setup_message">Cole o link de configuração que um amigo enviou.</string>
+    <string name="paste_setup_label">Link de configuração</string>
+    <string name="paste_setup_continue">Continuar</string>
+    <string name="setup_link_invalid">Isto não é um link de configuração, ou falta uma parte dele.</string>
+    <string name="share_setup_text">Minha configuração do Dual Sub Replay: %1$s</string>
+    <string name="backup_failed">Não foi possível terminar: %1$s</string>
+    <string name="backup_open_failed">Não foi possível abrir o arquivo.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="one">%1$d palavra, com baralhos, datas de revisão, palavras conhecidas e suas próprias histórias de kanji</item>
+        <item quantity="many">%1$d palavras, com baralhos, datas de revisão, palavras conhecidas e suas próprias histórias de kanji</item>
+        <item quantity="other">%1$d palavras, com baralhos, datas de revisão, palavras conhecidas e suas próprias histórias de kanji</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="one">Adiciona %1$d palavra nova. As que você já tem mantêm a revisão mais recente.</item>
+        <item quantity="many">Adiciona %1$d palavras novas. As que você já tem mantêm a revisão mais recente.</item>
+        <item quantity="other">Adiciona %1$d palavras novas. As que você já tem mantêm a revisão mais recente.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="one">Adiciona %1$d dia de estudo. Os dias que você já tem mantêm o maior tempo.</item>
+        <item quantity="many">Adiciona %1$d dias de estudo. Os dias que você já tem mantêm o maior tempo.</item>
+        <item quantity="other">Adiciona %1$d dias de estudo. Os dias que você já tem mantêm o maior tempo.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="one">%1$d configuração vai mudar:</item>
+        <item quantity="many">%1$d configurações vão mudar:</item>
+        <item quantity="other">%1$d configurações vão mudar:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="one">+ %1$d a mais</item>
+        <item quantity="many">+ %1$d a mais</item>
+        <item quantity="other">+ %1$d a mais</item>
+    </plurals>
+</resources>

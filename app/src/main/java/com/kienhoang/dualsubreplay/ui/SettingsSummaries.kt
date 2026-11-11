@@ -127,6 +127,8 @@ internal fun settingsSectionSummary(
         MoreSettingsSection.AI_ASSISTANT -> aiSummary(state.ai)
         MoreSettingsSection.UPDATES -> listOf(SummaryPart.Value(R.string.updates_auto_title, onOff(state.autoUpdate)))
         MoreSettingsSection.TV -> listOf(SummaryPart.Value(R.string.tv_layout_title, onOff(state.tvLayout)))
+        // Nothing to switch here, so the line says what the section does.
+        MoreSettingsSection.BACKUP -> listOf(SummaryPart.Label(R.string.backup_section_summary))
     }
 
 private fun aiSummary(ai: AiSummaryState?): List<SummaryPart> =

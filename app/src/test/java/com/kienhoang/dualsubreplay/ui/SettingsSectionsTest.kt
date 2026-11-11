@@ -39,6 +39,13 @@ class SettingsSectionsTest {
     }
 
     @Test
+    fun backupAndSharingStaysLastJustAboveReset() {
+        val (group, sections) = settingsGroupsOnPage(withAiAssistant = true).last()
+        assertEquals(SettingsGroup.APP, group)
+        assertEquals(MoreSettingsSection.BACKUP, sections.last())
+    }
+
+    @Test
     fun theAiAssistantSectionShowsOnlyInBuildsWithTheAssistant() {
         val without = settingsGroupsOnPage(withAiAssistant = false).flatMap { it.second }
         assertEquals(MoreSettingsSection.entries - MoreSettingsSection.AI_ASSISTANT, without)

@@ -85,6 +85,45 @@ internal class ImmersionRepository internal constructor(
             }
         }
 
+    /** Every stored day, read now (Backup & sharing). */
+    suspend fun allDays(): List<ImmersionDay> = withContext(Dispatchers.IO) { mutex.withLock { readAll() } }
+
+    /**
+     * Restores [days] from a backup: each day and language keeps the higher time and video count of
+     * the two, so restoring the same backup twice never adds the time again.
+     */
+    suspend fun mergeDays(days: List<ImmersionDay>) =
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                val db = database.writableDatabase
+                db.beginTransaction()
+                try {
+                    days.forEach { row ->
+                        val day = row.day.toString()
+                        db.insertWithOnConflict(
+                            "daily_time",
+                            null,
+                            ContentValues().apply {
+                                put("day", day)
+                                put("language", row.language)
+                                put("ms", 0L)
+                                put("videos", 0)
+                            },
+                            SQLiteDatabase.CONFLICT_IGNORE,
+                        )
+                        db.execSQL(
+                            "UPDATE daily_time SET ms = MAX(ms, ?), videos = MAX(videos, ?) WHERE day = ? AND language = ?",
+                            arrayOf<Any>(row.ms.coerceAtLeast(0), row.videos.coerceAtLeast(0), day, row.language),
+                        )
+                    }
+                    db.setTransactionSuccessful()
+                } finally {
+                    db.endTransaction()
+                }
+                publish()
+            }
+        }
+
     private fun readAll(): List<ImmersionDay> {
         val list = mutableListOf<ImmersionDay>()
         database.readableDatabase

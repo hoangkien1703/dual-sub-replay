@@ -622,6 +622,9 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_full_access_switch").assertDoesNotExist()
         composeRule.onNodeWithTag("settings_search").performTextInput("full access")
         composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").assertIsDisplayed()
+        // Results replace the sections while a search is typed.
+        assertTrue(composeRule.onAllNodesWithTag("settings_section_ai_assistant").fetchSemanticsNodes().isEmpty())
+        composeRule.waitForIdle()
         saveUiEvidence("settings-search-ai-setting")
         composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").performClick()
         // The AI assistant section and its Permissions card both open, and the page scrolls to the switch.

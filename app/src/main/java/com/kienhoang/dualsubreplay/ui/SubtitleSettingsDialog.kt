@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tab
@@ -207,6 +208,14 @@ internal enum class MoreSettingsSection(
         Icons.Default.SystemUpdate,
     ),
     TV("tv", SettingsGroup.APP, R.string.settings_section_tv_title, Icons.Default.Tv),
+
+    /** Back up, restore, and share a setup by link (owner pick 2026-11-10); last, just above Reset. */
+    BACKUP(
+        "backup",
+        SettingsGroup.APP,
+        R.string.backup_section_title,
+        Icons.Default.SettingsBackupRestore,
+    ),
 }
 
 /**
@@ -1145,6 +1154,7 @@ private fun ColumnScope.SectionSettings(
         MoreSettingsSection.AI_ASSISTANT -> LocalAiAssistant.current?.let { AiAssistantSettingsSection(it, nested = true) }
         MoreSettingsSection.UPDATES -> AppUpdateSettingsSection()
         MoreSettingsSection.TV -> TvLayoutSettingsSection()
+        MoreSettingsSection.BACKUP -> BackupSharingSettingsSection()
     }
 }
 

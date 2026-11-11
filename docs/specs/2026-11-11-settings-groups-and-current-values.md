@@ -8,7 +8,7 @@ Implemented. The owner picked "Changes 1 to 5 in one PR" on 2026-11-11 from a ra
 
 The owner found the settings page confusing, mainly the "More settings" heading. Emulator screenshots of `main` (2c4a0a1) showed why:
 
-- Languages (2026-11-06) and Reading & view (2026-11-04) were folded into the list at the owner's request, so "More settings" sat above all 14 sections and said nothing.
+- Languages (2026-11-06) and Reading & view (2026-11-04) were folded into the list at the owner's request, so "More settings" sat above all 14 sections (15 with Backup & sharing) and said nothing.
 - Only Languages showed its current value. The other lines listed what was inside ("Caption flow and model preloading"), so every answer needed a section opened.
 - The look settings were split without a rule: Translation position in *Reading & view*, Caption format and Third line in *Layout & format*, Default view apart from Panel position. The page-token caption setting sat in Study tools.
 - The top bar said "Dual-subtitle settings" and had both an X and a Done button that did the same.
@@ -16,7 +16,7 @@ The owner found the settings page confusing, mainly the "More settings" heading.
 
 ## Goals
 
-1. Four named groups replace "More settings": **Subtitles** (Languages, Captions & translation, Subtitle text, Screen layout), **Study** (Word learning, Study tools, Flashcards & Anki), **Video** (Overlay & fullscreen, Ads & sponsors, YouTube tabs), **App** (Colors & theme, AI assistant, App updates, Android TV). Daily use first, rare last.
+1. Four named groups replace "More settings": **Subtitles** (Languages, Captions & translation, Subtitle text, Screen layout), **Study** (Word learning, Study tools, Flashcards & Anki), **Video** (Overlay & fullscreen, Ads & sponsors, YouTube tabs), **App** (Colors & theme, AI assistant, App updates, Android TV, Backup & sharing). Daily use first, rare last.
 2. The line under each closed section shows its current value.
 3. One rule sorts the look settings: **Subtitle text** is what the words look like, **Screen layout** is where things sit. "Load captions with a page token" moves to Captions & translation.
 4. The top bar says **Settings** and loses Done; the X closes.
@@ -51,6 +51,7 @@ After: Often changed, Search settings, then four small headings, each above a jo
 | AI assistant | Off, "No key yet", or the service's name |
 | App updates | Update automatically: Off |
 | Android TV | TV layout (beta): Off |
+| Backup & sharing | Move to a new phone, share your setup (it has nothing to switch, so the line says what it does) |
 
 The exact names come from the settings' own titles in the app's language. The line follows a change at once, also after Reset all settings.
 
@@ -100,7 +101,7 @@ Searching "memory", "full access", "key", "model" or a service name such as "Cla
 
 - A long line (two values in a long language) is cut with an ellipsis after two lines, as before.
 - People who knew the old places of the four moved settings need Search settings or the new names once. The names follow one rule now, so the change should not need repeating.
-- PR #215 adds a Backup & sharing section to the same file; after it merges, that section goes last in the App group.
+- PR #215 (Backup & sharing) merged first; its section is the last one of the App group, just above Reset as before.
 
 ## Release intent
 

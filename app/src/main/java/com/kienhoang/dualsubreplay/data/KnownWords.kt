@@ -295,6 +295,20 @@ internal class KnownWordsRepository internal constructor(
             }
         }
 
+    /** Every language's known words, read from their files (Backup & sharing). */
+    suspend fun allKnown(): Map<String, Set<String>> =
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                directory
+                    .listFiles { file -> file.name.endsWith(".txt") }
+                    .orEmpty()
+                    .map { it.name.removeSuffix(".txt") }
+                    .filter { knownWordLanguage(it) == it }
+                    .associateWith { knownList(it).value }
+                    .filterValues { it.isNotEmpty() }
+            }
+        }
+
     suspend fun refreshTotal() =
         withContext(Dispatchers.IO) {
             mutex.withLock {
