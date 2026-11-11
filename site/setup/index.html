@@ -47,7 +47,7 @@
       var vietnamese = /^vi\b/i.test(navigator.language || "");
       if (vietnamese) {
         document.documentElement.lang = "vi";
-        document.querySelectorAll("[data-vi]").forEach(function (node) { node.innerHTML = node.getAttribute("data-vi"); });
+        document.querySelectorAll("[data-vi]").forEach(function (node) { node.textContent = node.getAttribute("data-vi"); });
       }
       var code = location.hash.slice(1);
       var valid = /^1\.[A-Za-z0-9_-]{8,}$/.test(code);
