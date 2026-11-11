@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tab
@@ -145,6 +146,9 @@ internal enum class MoreSettingsSection(
 
     /** Only in builds with the assistant ([LocalAiAssistant] is set). */
     AI_ASSISTANT("ai_assistant", R.string.settings_section_ai_title, R.string.settings_section_ai_summary),
+
+    /** Back up, restore, and share a setup by link (owner pick 2026-11-10); last, just above Reset. */
+    BACKUP("backup", R.string.backup_section_title, R.string.backup_section_summary),
 }
 
 /** A jump to a setting waits this long for its section to open before scrolling. */
@@ -951,6 +955,10 @@ internal fun SubtitleSettingsDialog(
                                     Section(MoreSettingsSection.AI_ASSISTANT, Icons.Default.AutoAwesome) {
                                         AiAssistantSettingsSection(aiAssistant, nested = true)
                                     }
+                                }
+
+                                Section(MoreSettingsSection.BACKUP, Icons.Default.SettingsBackupRestore) {
+                                    BackupSharingSettingsSection()
                                 }
 
                                 OutlinedButton(

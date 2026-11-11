@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open a shared setup · DualSub Replay</title>
+  <meta name="description" content="Open settings a friend shared from DualSub Replay in the app on your Android phone.">
+  <!-- A shared setup lives after # in the address, which browsers never send to a server. -->
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <meta name="theme-color" content="#0b1c20">
+  <style>
+    .setup { max-width: 560px; margin: 0 auto; padding: 48px 16px; }
+    .setup h1 { font-size: 1.6rem; line-height: 1.3; margin: 0 0 12px; }
+    .setup p { color: var(--muted); }
+    .setup .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+    .setup .note { font-size: 0.9rem; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="setup">
+    <a class="brand" href="../"><img src="../favicon.svg" alt="" width="32" height="32">DualSub Replay</a>
+    <section id="ok" hidden>
+      <h1 data-en="A friend shared their DualSub Replay setup" data-vi="Bạn bè đã chia sẻ cài đặt DualSub Replay">A friend shared their DualSub Replay setup</h1>
+      <p data-en="Open it in the app. The app shows which settings will change and asks before using them. Your words, progress, AI settings and keys never change."
+         data-vi="Mở trong ứng dụng. Ứng dụng sẽ cho bạn xem những cài đặt nào thay đổi và hỏi trước khi dùng. Từ, tiến độ, cài đặt AI và khóa của bạn không bao giờ bị thay đổi.">Open it in the app. The app shows which settings will change and asks before using them. Your words, progress, AI settings and keys never change.</p>
+      <div class="actions">
+        <a id="open" class="button primary" href="#" data-en="Open in DualSub Replay" data-vi="Mở trong DualSub Replay">Open in DualSub Replay</a>
+        <button id="copy" class="button" type="button" data-en="Copy link" data-vi="Sao chép link">Copy link</button>
+      </div>
+      <p class="note" data-en="Nothing happens? Copy the link, then in the app open Settings, Backup &amp; sharing, Use a setup, and paste it."
+         data-vi="Không có gì xảy ra? Sao chép link, rồi trong ứng dụng mở Cài đặt, Sao lưu &amp; chia sẻ, Dùng cài đặt và dán vào.">Nothing happens? Copy the link, then in the app open Settings, Backup &amp; sharing, Use a setup, and paste it.</p>
+      <p data-en="Don't have the app yet?" data-vi="Chưa có ứng dụng?">Don't have the app yet?</p>
+      <a class="button" href="../" data-en="Get DualSub Replay" data-vi="Tải DualSub Replay">Get DualSub Replay</a>
+    </section>
+    <section id="broken" hidden>
+      <h1 data-en="This setup link is incomplete" data-vi="Link cài đặt này bị thiếu">This setup link is incomplete</h1>
+      <p data-en="Ask your friend to share it again from Settings, Backup &amp; sharing, Share link."
+         data-vi="Hãy nhờ bạn bè chia sẻ lại từ Cài đặt, Sao lưu &amp; chia sẻ, Chia sẻ link.">Ask your friend to share it again from Settings, Backup &amp; sharing, Share link.</p>
+      <a class="button" href="../" data-en="About DualSub Replay" data-vi="Về DualSub Replay">About DualSub Replay</a>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var vietnamese = /^vi\b/i.test(navigator.language || "");
+      if (vietnamese) {
+        document.documentElement.lang = "vi";
+        document.querySelectorAll("[data-vi]").forEach(function (node) { node.textContent = node.getAttribute("data-vi"); });
+      }
+      var code = location.hash.slice(1);
+      var valid = /^1\.[A-Za-z0-9_-]{8,}$/.test(code);
+      document.getElementById(valid ? "ok" : "broken").hidden = false;
+      if (!valid) return;
+      var fallback = encodeURIComponent(location.origin + location.pathname.replace(/setup\/?$/, ""));
+      document.getElementById("open").href =
+        "intent://setup?d=" + code + "#Intent;scheme=dualsubreplay;S.browser_fallback_url=" + fallback + ";end";
+      document.getElementById("copy").addEventListener("click", function () {
+        var done = this;
+        navigator.clipboard.writeText(location.href).then(function () {
+          done.textContent = vietnamese ? "Đã sao chép" : "Copied";
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

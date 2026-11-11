@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">Ehtiyat nüsxə və paylaşma</string>
+    <string name="backup_section_summary">Yeni telefona keçin, ayarlarınızı paylaşın</string>
+    <string name="backup_title">Ehtiyat nüsxə</string>
+    <string name="backup_description">Ayarlar, Məşq sözləri və İrəliləyiş bir faylda. Yeni telefon üçün onu təhlükəsiz yerdə saxlayın.</string>
+    <string name="backup_button">Ehtiyat nüsxə çıxar</string>
+    <string name="restore_button">Bərpa et</string>
+    <string name="backup_last">Son ehtiyat nüsxə: %1$s</string>
+    <string name="backup_last_never">Son ehtiyat nüsxə: heç vaxt</string>
+    <string name="share_title">Ayarlarımı paylaş</string>
+    <string name="share_description">Ayarlarınızı dosta keçid kimi göndərin. Yalnız ayarlar: sözləriniz, irəliləyişiniz, AI ayarları və açarlar heç vaxt göndərilmir.</string>
+    <string name="share_button">Keçidi paylaş</string>
+    <string name="use_setup_button">Ayarları istifadə et</string>
+    <string name="undo_setup_button">Son ayarları geri qaytar</string>
+    <string name="backup_dialog_message">Fayla nələrin düşəcəyini seçin.</string>
+    <string name="backup_part_settings">Ayarlar</string>
+    <string name="backup_part_settings_detail">Dillər, görünüş, öyrənmə alətləri, AI seçimləri</string>
+    <string name="backup_part_words">Məşq sözləri</string>
+    <string name="backup_part_progress">İrəliləyiş</string>
+    <string name="backup_part_progress_detail">%1$s öyrənmə və gündəlik hədəfiniz</string>
+    <string name="backup_never_included">Faylda heç vaxt olmur: AI açarları, YouTube girişiniz, AI söhbətləri və yaddaşı, xüsusi AI ünvanı, tam giriş, Anki kartlarının səsləri və şəkilləri.</string>
+    <string name="backup_save">Faylı saxla</string>
+    <string name="backup_saved">Ehtiyat nüsxə saxlandı.</string>
+    <string name="restore_dialog_title">Bu ehtiyat nüsxə bərpa edilsin?</string>
+    <string name="restore_from">%1$s, tətbiq versiyası %2$s</string>
+    <string name="restore_settings_detail">Hazırkı ayarlarınızı əvəz edir</string>
+    <string name="restore_keys_note">AI köməkçisindən istifadə edirsinizsə, bərpadan sonra AI açarlarını yenidən əlavə edin.</string>
+    <string name="restore_restart_note">Tamamlamaq üçün tətbiq yenidən başlayır.</string>
+    <string name="restore_nothing">Bu ehtiyat nüsxədə bərpa ediləcək heç nə yoxdur.</string>
+    <string name="backup_cancel">Ləğv et</string>
+    <string name="use_setup_title">Bu ayarlar istifadə edilsin?</string>
+    <string name="use_setup_no_changes">Ayarlarınız artıq bu ayarlarla eynidir.</string>
+    <string name="use_setup_other">Digər ayarlar</string>
+    <string name="use_setup_note">Paylaşılan ayarlar sözlərinizi, irəliləyişinizi, AI ayarlarını və açarları heç vaxt dəyişmir. Bunu Ayarlar, Ehtiyat nüsxə və paylaşma bölməsində geri qaytara bilərsiniz. Tamamlamaq üçün tətbiq yenidən başlayır.</string>
+    <string name="use_setup_confirm">Ayarları istifadə et</string>
+    <string name="paste_setup_message">Dostunuzun göndərdiyi ayar keçidini yapışdırın.</string>
+    <string name="paste_setup_label">Ayar keçidi</string>
+    <string name="paste_setup_continue">Davam et</string>
+    <string name="setup_link_invalid">Bu ayar keçidi deyil və ya onun bir hissəsi çatışmır.</string>
+    <string name="share_setup_text">Dual Sub Replay ayarlarım: %1$s</string>
+    <string name="backup_failed">Tamamlamaq mümkün olmadı: %1$s</string>
+    <string name="backup_open_failed">Faylı açmaq mümkün olmadı.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="one">%1$d söz: dəstlər, təkrar tarixləri, bilinən sözlər və öz kanji hekayələriniz ilə</item>
+        <item quantity="other">%1$d söz: dəstlər, təkrar tarixləri, bilinən sözlər və öz kanji hekayələriniz ilə</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="one">%1$d yeni söz əlavə edir. Artıq olan sözlər daha yeni təkrar tarixini saxlayır.</item>
+        <item quantity="other">%1$d yeni söz əlavə edir. Artıq olan sözlər daha yeni təkrar tarixini saxlayır.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="one">%1$d öyrənmə günü əlavə edir. Artıq olan günlər daha çox vaxtı saxlayır.</item>
+        <item quantity="other">%1$d öyrənmə günü əlavə edir. Artıq olan günlər daha çox vaxtı saxlayır.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="one">%1$d ayar dəyişəcək:</item>
+        <item quantity="other">%1$d ayar dəyişəcək:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="one">+ daha %1$d</item>
+        <item quantity="other">+ daha %1$d</item>
+    </plurals>
+</resources>

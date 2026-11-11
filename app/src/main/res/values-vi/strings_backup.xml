@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">Sao lưu &amp; chia sẻ</string>
+    <string name="backup_section_summary">Chuyển sang điện thoại mới, chia sẻ cài đặt của bạn</string>
+    <string name="backup_title">Sao lưu</string>
+    <string name="backup_description">Cài đặt, từ Luyện tập và Tiến độ trong một tệp. Hãy giữ tệp ở nơi an toàn để dùng trên điện thoại mới.</string>
+    <string name="backup_button">Sao lưu</string>
+    <string name="restore_button">Khôi phục</string>
+    <string name="backup_last">Lần sao lưu cuối: %1$s</string>
+    <string name="backup_last_never">Lần sao lưu cuối: chưa có</string>
+    <string name="share_title">Chia sẻ cài đặt của tôi</string>
+    <string name="share_description">Gửi cài đặt của bạn cho bạn bè bằng một đường link. Chỉ có cài đặt: không bao giờ có từ, tiến độ, cài đặt AI hay khóa API.</string>
+    <string name="share_button">Chia sẻ link</string>
+    <string name="use_setup_button">Dùng cài đặt</string>
+    <string name="undo_setup_button">Hoàn tác cài đặt vừa dùng</string>
+    <string name="backup_dialog_message">Chọn những gì cho vào tệp.</string>
+    <string name="backup_part_settings">Cài đặt</string>
+    <string name="backup_part_settings_detail">Ngôn ngữ, giao diện, công cụ học, lựa chọn AI</string>
+    <string name="backup_part_words">Từ Luyện tập</string>
+    <string name="backup_part_progress">Tiến độ</string>
+    <string name="backup_part_progress_detail">%1$s học và mục tiêu hằng ngày</string>
+    <string name="backup_never_included">Không bao giờ có trong tệp: khóa AI, đăng nhập YouTube, cuộc trò chuyện và ghi nhớ AI, địa chỉ AI tùy chỉnh, toàn quyền, và âm thanh, hình ảnh của thẻ Anki.</string>
+    <string name="backup_save">Lưu tệp</string>
+    <string name="backup_saved">Đã sao lưu.</string>
+    <string name="restore_dialog_title">Khôi phục bản sao lưu này?</string>
+    <string name="restore_from">Từ %1$s, phiên bản ứng dụng %2$s</string>
+    <string name="restore_settings_detail">Thay thế cài đặt hiện tại của bạn</string>
+    <string name="restore_keys_note">Sau khi khôi phục, hãy thêm lại khóa AI nếu bạn dùng trợ lý AI.</string>
+    <string name="restore_restart_note">Ứng dụng sẽ khởi động lại để hoàn tất.</string>
+    <string name="restore_nothing">Bản sao lưu này không có gì để khôi phục.</string>
+    <string name="backup_cancel">Hủy</string>
+    <string name="use_setup_title">Dùng cài đặt này?</string>
+    <string name="use_setup_no_changes">Cài đặt của bạn đã giống cài đặt này.</string>
+    <string name="use_setup_other">Cài đặt khác</string>
+    <string name="use_setup_note">Cài đặt được chia sẻ không bao giờ thay đổi từ, tiến độ, cài đặt AI hay khóa của bạn. Bạn có thể hoàn tác trong Cài đặt, Sao lưu &amp; chia sẻ. Ứng dụng sẽ khởi động lại để hoàn tất.</string>
+    <string name="use_setup_confirm">Dùng cài đặt</string>
+    <string name="paste_setup_message">Dán link cài đặt mà bạn bè gửi cho bạn.</string>
+    <string name="paste_setup_label">Link cài đặt</string>
+    <string name="paste_setup_continue">Tiếp tục</string>
+    <string name="setup_link_invalid">Đây không phải link cài đặt, hoặc link bị thiếu một phần.</string>
+    <string name="share_setup_text">Cài đặt Dual Sub Replay của mình: %1$s</string>
+    <string name="backup_failed">Không thể hoàn tất: %1$s</string>
+    <string name="backup_open_failed">Không mở được tệp.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="other">%1$d từ, cùng bộ thẻ, ngày ôn tập, từ đã biết và câu chuyện kanji của riêng bạn</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="other">Thêm %1$d từ mới. Từ bạn đã có giữ ngày ôn tập mới hơn.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="other">Thêm %1$d ngày học. Ngày bạn đã có giữ thời gian cao hơn.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="other">%1$d cài đặt sẽ thay đổi:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="other">+ %1$d cài đặt khác</item>
+    </plurals>
+</resources>

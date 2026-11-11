@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">Copia de seguridad y compartir</string>
+    <string name="backup_section_summary">Pasa a un teléfono nuevo, comparte tu configuración</string>
+    <string name="backup_title">Copia de seguridad</string>
+    <string name="backup_description">Ajustes, palabras de Práctica y Progreso en un solo archivo. Guárdalo en un lugar seguro para un teléfono nuevo.</string>
+    <string name="backup_button">Hacer copia</string>
+    <string name="restore_button">Restaurar</string>
+    <string name="backup_last">Última copia: %1$s</string>
+    <string name="backup_last_never">Última copia: nunca</string>
+    <string name="share_title">Compartir mi configuración</string>
+    <string name="share_description">Envía tus ajustes a un amigo con un enlace. Solo ajustes: nunca tus palabras, tu progreso, los ajustes de IA ni las claves.</string>
+    <string name="share_button">Compartir enlace</string>
+    <string name="use_setup_button">Usar una configuración</string>
+    <string name="undo_setup_button">Deshacer la última configuración</string>
+    <string name="backup_dialog_message">Elige qué va en el archivo.</string>
+    <string name="backup_part_settings">Ajustes</string>
+    <string name="backup_part_settings_detail">Idiomas, aspecto, herramientas de estudio, opciones de IA</string>
+    <string name="backup_part_words">Palabras de Práctica</string>
+    <string name="backup_part_progress">Progreso</string>
+    <string name="backup_part_progress_detail">%1$s de estudio y tu meta diaria</string>
+    <string name="backup_never_included">Nunca en el archivo: claves de IA, tu sesión de YouTube, chats y memorias de IA, la dirección de IA personalizada, el acceso total, ni los audios e imágenes de las tarjetas de Anki.</string>
+    <string name="backup_save">Guardar archivo</string>
+    <string name="backup_saved">Copia guardada.</string>
+    <string name="restore_dialog_title">¿Restaurar esta copia?</string>
+    <string name="restore_from">Del %1$s, versión de la app %2$s</string>
+    <string name="restore_settings_detail">Reemplaza tus ajustes actuales</string>
+    <string name="restore_keys_note">Después de restaurar, vuelve a añadir tus claves de IA si usas el asistente de IA.</string>
+    <string name="restore_restart_note">La app se reinicia para terminar.</string>
+    <string name="restore_nothing">Esta copia no tiene nada que restaurar.</string>
+    <string name="backup_cancel">Cancelar</string>
+    <string name="use_setup_title">¿Usar esta configuración?</string>
+    <string name="use_setup_no_changes">Tus ajustes ya coinciden con esta configuración.</string>
+    <string name="use_setup_other">Otros ajustes</string>
+    <string name="use_setup_note">Una configuración compartida nunca cambia tus palabras, tu progreso, los ajustes de IA ni las claves. Puedes deshacerla en Ajustes, Copia de seguridad y compartir. La app se reinicia para terminar.</string>
+    <string name="use_setup_confirm">Usar configuración</string>
+    <string name="paste_setup_message">Pega el enlace de configuración que te envió un amigo.</string>
+    <string name="paste_setup_label">Enlace de configuración</string>
+    <string name="paste_setup_continue">Continuar</string>
+    <string name="setup_link_invalid">Esto no es un enlace de configuración, o le falta una parte.</string>
+    <string name="share_setup_text">Mi configuración de Dual Sub Replay: %1$s</string>
+    <string name="backup_failed">No se pudo terminar: %1$s</string>
+    <string name="backup_open_failed">No se pudo abrir el archivo.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="one">%1$d palabra, con mazos, fechas de repaso, palabras conocidas y tus propias historias de kanji</item>
+        <item quantity="many">%1$d palabras, con mazos, fechas de repaso, palabras conocidas y tus propias historias de kanji</item>
+        <item quantity="other">%1$d palabras, con mazos, fechas de repaso, palabras conocidas y tus propias historias de kanji</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="one">Añade %1$d palabra nueva. Las que ya tienes conservan el repaso más reciente.</item>
+        <item quantity="many">Añade %1$d palabras nuevas. Las que ya tienes conservan el repaso más reciente.</item>
+        <item quantity="other">Añade %1$d palabras nuevas. Las que ya tienes conservan el repaso más reciente.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="one">Añade %1$d día de estudio. Los días que ya tienes conservan el tiempo mayor.</item>
+        <item quantity="many">Añade %1$d días de estudio. Los días que ya tienes conservan el tiempo mayor.</item>
+        <item quantity="other">Añade %1$d días de estudio. Los días que ya tienes conservan el tiempo mayor.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="one">Cambiará %1$d ajuste:</item>
+        <item quantity="many">Cambiarán %1$d ajustes:</item>
+        <item quantity="other">Cambiarán %1$d ajustes:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="one">+ %1$d más</item>
+        <item quantity="many">+ %1$d más</item>
+        <item quantity="other">+ %1$d más</item>
+    </plurals>
+</resources>

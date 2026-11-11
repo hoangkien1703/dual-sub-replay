@@ -203,6 +203,8 @@ fun DualSubApp(
                 )
             }
         }
+        // A setup link from the landing site or a chat asks before it changes anything.
+        if (state.onboardingCompleted) PendingSetupDialog()
         state.selectedLearningWord?.let { selection ->
             SelectedWordDialog(selection, state, savedWords, viewModel, webController, pronouncer)
         }
