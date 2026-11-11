@@ -33,6 +33,7 @@ import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -125,8 +126,8 @@ class SubtitleUiTest {
 
     @Test
     fun quickSettingsHideWhilePlayingTogglesCaptionVisibility() {
-        var original by mutableStateOf(CaptionVisibility.ALWAYS)
         var translated by mutableStateOf(CaptionVisibility.PAUSED)
+        var originalChanged = false
         composeRule.setContent {
             DualSubTheme {
                 QuickLanguageSettingsDialog(
@@ -136,10 +137,9 @@ class SubtitleUiTest {
                     onSourceChange = {},
                     onTargetChange = {},
                     onOpenAllSettings = {},
-                    originalVisibility = original,
                     translatedVisibility = translated,
                     onCaptionVisibilityChange = { isOriginal, visibility ->
-                        if (isOriginal) original = visibility else translated = visibility
+                        if (isOriginal) originalChanged = true else translated = visibility
                     },
                     onDismiss = {},
                 )
@@ -147,16 +147,20 @@ class SubtitleUiTest {
         }
 
         composeRule.onNodeWithText("Hide while playing").assertIsDisplayed()
-        composeRule.onNodeWithTag("hide_original_while_playing").assertIsNotSelected()
+        // Only Translation is offered here, so the popup can never hide both lines.
+        composeRule.onNodeWithTag("hide_original_while_playing").assertDoesNotExist()
         composeRule.onNodeWithTag("hide_translation_while_playing").assertIsSelected()
         Thread.sleep(700)
         saveUiEvidence("subtitle-quick-hide-while-playing")
         composeRule.onNodeWithTag("hide_translation_while_playing").performClick()
         composeRule.runOnIdle { assertEquals(CaptionVisibility.ALWAYS, translated) }
         composeRule.onNodeWithTag("hide_translation_while_playing").assertIsNotSelected()
-        composeRule.onNodeWithTag("hide_original_while_playing").performClick()
-        composeRule.runOnIdle { assertEquals(CaptionVisibility.PAUSED, original) }
-        composeRule.onNodeWithTag("hide_original_while_playing").assertIsSelected()
+        composeRule.onNodeWithTag("hide_translation_while_playing").performClick()
+        composeRule.runOnIdle {
+            assertEquals(CaptionVisibility.PAUSED, translated)
+            assertFalse(originalChanged)
+        }
+        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsSelected()
     }
 
     @Test

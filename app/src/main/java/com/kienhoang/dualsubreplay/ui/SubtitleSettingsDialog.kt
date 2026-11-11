@@ -473,7 +473,6 @@ internal fun QuickLanguageSettingsDialog(
     recentTargetLanguages: List<String> = emptyList(),
     thirdLine: ThirdLineChoice = ThirdLineChoice(),
     onThirdLineChange: (ThirdLineChoice) -> Unit = {},
-    originalVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     onCaptionVisibilityChange: (original: Boolean, visibility: CaptionVisibility) -> Unit = { _, _ -> },
     onDismiss: () -> Unit,
@@ -520,7 +519,7 @@ internal fun QuickLanguageSettingsDialog(
                     onPick = languagePicker::open,
                 )
                 Spacer(Modifier.height(16.dp))
-                HideWhilePlayingRow(originalVisibility, translatedVisibility, onCaptionVisibilityChange)
+                HideWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
