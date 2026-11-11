@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">Adicionar uma imagem aos cartões</string>
     <string name="study_card_picture_description">Os cartões recebem uma imagem do vídeo, tirada enquanto a frase da palavra está na tela. Se não houver nenhuma, é usada a miniatura do vídeo.</string>
     <string name="study_card_front_title">Frente do cartão</string>
+    <string name="study_card_front_sound_title">Som da frase na frente</string>
+    <string name="study_card_front_sound_description">A frente também toca o som da frase do vídeo, não só o verso.</string>
     <string name="study_card_front_word_sentence">Palavra e frase</string>
     <string name="study_card_front_word">Palavra</string>
     <string name="study_card_front_sentence">Frase</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">A frente só toca o som da frase; a frase e a palavra ficam no verso.</string>
     <string name="study_card_front_note">Mudar isso também muda os cartões que você já enviou.</string>
     <string name="study_card_sound_waits">O som da frase é adicionado depois que a frase toca até o fim.</string>
+    <string name="study_card_sound_replaying">Tocando a frase uma vez para colocar o som no cartão.</string>
     <string name="study_blur_box_title">Caixa desfocada</string>
     <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
     <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>

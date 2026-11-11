@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">Thêm hình ảnh vào thẻ</string>
     <string name="study_card_picture_description">Thẻ có một hình ảnh lấy từ video, chụp khi câu chứa từ đó đang hiện trên màn hình. Nếu không có, ảnh thu nhỏ của video sẽ được dùng.</string>
     <string name="study_card_front_title">Mặt trước thẻ</string>
+    <string name="study_card_front_sound_title">Âm thanh câu ở mặt trước</string>
+    <string name="study_card_front_sound_description">Mặt trước cũng phát âm thanh của câu từ video, không chỉ mặt sau.</string>
     <string name="study_card_front_word_sentence">Từ và câu</string>
     <string name="study_card_front_word">Từ</string>
     <string name="study_card_front_sentence">Câu</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">Mặt trước chỉ phát âm thanh của câu; câu và từ nằm ở mặt sau.</string>
     <string name="study_card_front_note">Đổi mục này cũng đổi các thẻ bạn đã gửi trước đó.</string>
     <string name="study_card_sound_waits">Âm thanh của câu sẽ được thêm khi câu phát hết.</string>
+    <string name="study_card_sound_replaying">Đang phát lại câu một lần để thêm âm thanh vào thẻ.</string>
     <string name="study_blur_box_title">Ô làm mờ</string>
     <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
     <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>

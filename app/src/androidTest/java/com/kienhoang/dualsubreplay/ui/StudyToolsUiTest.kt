@@ -184,6 +184,21 @@ class StudyToolsUiTest {
             assertTrue(preferences.getBoolean(CARD_PICTURE_PREFERENCE, false))
         }
         saveUiEvidence("flashcards-card-front-listening")
+        // Listening has only the line's sound on the front already, so the switch goes away.
+        composeRule.onNodeWithTag("card_front_sound_switch").assertDoesNotExist()
+    }
+
+    @Test
+    fun sentenceSoundOnTheFrontIsOffUntilTurnedOn() {
+        showSettings("settings_section_flashcards")
+        composeRule.onNodeWithTag("card_front_word").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_front_sound_switch").performScrollTo().assertIsDisplayed()
+        composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false)) }
+        composeRule.onNodeWithTag("card_front_sound_switch").performClick()
+        composeRule.runOnIdle { assertTrue(preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false)) }
+        composeRule.onNodeWithTag("card_front_sound_switch").performScrollTo()
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-sentence-sound-on-front")
     }
 
     @Test

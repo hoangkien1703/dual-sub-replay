@@ -266,6 +266,12 @@ internal enum class SearchableSetting(
         setOf(CARD_FRONT_PREFERENCE),
         CardFront.entries.map { it.labelRes },
     ),
+    CARD_FRONT_SOUND(
+        R.string.study_card_front_sound_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_front_sound_switch",
+        setOf(CARD_FRONT_SOUND_PREFERENCE),
+    ),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(
         R.string.study_kanji_details_title,

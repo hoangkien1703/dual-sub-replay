@@ -330,6 +330,17 @@ class AnkiConnectNotesTest {
     }
 
     @Test
+    fun sentenceSoundOnTheFrontPutsTheLinesSoundOnABasicCardsFront() {
+        val media = CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]")
+        val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, frontSound = true)
+        assertEquals("猫<br><br>[sound:w.mp3]<br><br>[sound:s.m4a]", word["Front"])
+        assertFalse("[sound:s.m4a]" in word.getValue("Back"))
+        // Listening already has it there and nothing else.
+        val listening = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.LISTENING, frontSound = true)
+        assertEquals("[sound:s.m4a]", listening["Front"])
+    }
+
+    @Test
     fun aNewFrontChangesTheTemplateOnceWhereAnkiConnectCan() =
         runBlocking {
             val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)

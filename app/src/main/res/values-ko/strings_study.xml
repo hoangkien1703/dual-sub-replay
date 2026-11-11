@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">카드에 그림 추가</string>
     <string name="study_card_picture_description">단어가 나온 문장이 화면에 있을 때 동영상에서 찍은 그림을 카드에 넣습니다. 그림이 없으면 동영상 썸네일을 씁니다.</string>
     <string name="study_card_front_title">카드 앞면</string>
+    <string name="study_card_front_sound_title">앞면에 문장 소리</string>
+    <string name="study_card_front_sound_description">뒷면뿐 아니라 앞면에서도 영상의 문장 소리를 재생합니다.</string>
     <string name="study_card_front_word_sentence">단어와 문장</string>
     <string name="study_card_front_word">단어</string>
     <string name="study_card_front_sentence">문장</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">앞면에서는 문장의 소리만 재생하고, 문장과 단어는 뒷면에 있습니다.</string>
     <string name="study_card_front_note">이 설정을 바꾸면 전에 보낸 카드도 바뀝니다.</string>
     <string name="study_card_sound_waits">문장 소리는 문장이 끝까지 재생된 뒤에 추가됩니다.</string>
+    <string name="study_card_sound_replaying">카드에 소리를 넣기 위해 문장을 한 번 재생하는 중입니다.</string>
     <string name="study_blur_box_title">흐림 상자</string>
     <string name="study_blur_box_description">동영상 위에 흐림 상자를 놓아 화면에 새겨진 자막을 가립니다. 끌어서 옮기고, 모서리를 끌어 크기를 바꿉니다.</string>
     <string name="study_page_token_title">페이지 토큰으로 자막 불러오기(베타)</string>

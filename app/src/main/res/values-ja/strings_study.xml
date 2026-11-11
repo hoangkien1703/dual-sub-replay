@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">カードに画像を追加</string>
     <string name="study_card_picture_description">単語のセリフが画面に出ている間に動画から撮った画像をカードに付けます。画像がないときは動画のサムネイルを使います。</string>
     <string name="study_card_front_title">カードの表面</string>
+    <string name="study_card_front_sound_title">表面に文の音声</string>
+    <string name="study_card_front_sound_description">文の動画音声を裏面だけでなく表面でも再生します。</string>
     <string name="study_card_front_word_sentence">単語と文</string>
     <string name="study_card_front_word">単語</string>
     <string name="study_card_front_sentence">文</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">表面ではセリフの音声だけを再生し、文と単語は裏面に表示します。</string>
     <string name="study_card_front_note">変更すると、前に送ったカードも変わります。</string>
     <string name="study_card_sound_waits">文の音声は、セリフが最後まで再生されたあとに追加されます。</string>
+    <string name="study_card_sound_replaying">音声をカードに入れるため、セリフを1回再生しています。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>

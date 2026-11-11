@@ -430,6 +430,7 @@ private fun SendToButton(
     var sentNow by remember(selection) { mutableStateOf(emptySet<FlashcardApp>()) }
     var problem by remember(selection) { mutableStateOf<Pair<FlashcardApp, AnkiSendResult>?>(null) }
     var soundWaits by remember(selection) { mutableStateOf(false) }
+    var soundReplaying by remember(selection) { mutableStateOf(false) }
     var menu by remember { mutableStateOf(false) }
     var askAgain by remember(selection) { mutableStateOf(false) }
     val sent = app in sentNow || tools.wasSent(app, word.id)
@@ -440,6 +441,8 @@ private fun SendToButton(
             val result = tools.send(to, listOf(word), again)
             sending = false
             soundWaits = result.waiting > 0
+            // The line was paused part-way: play it once now, so the card gets its sound without waiting.
+            soundReplaying = soundWaits && LineAudioBridge.replayForSound(word)
             if (result.problem == null) sentNow = sentNow + to else problem = to to result
         }
     }
@@ -504,7 +507,7 @@ private fun SendToButton(
             }
         }
         if (askAgain) SendAgainDialog(name, { askAgain = false }) { send(app, true) }
-        if (soundWaits && problem == null) CardSoundWaitsNote()
+        if (soundWaits && problem == null) CardSoundWaitsNote(soundReplaying)
         problem?.let { (to, result) ->
             Text(
                 sendProblemText(LocalResources.current, to, result),
@@ -646,11 +649,14 @@ internal fun sendResultText(
     }
 }
 
-/** The line was paused part-way (tapping a word pauses it): its sound is recorded once it has played. */
+/**
+ * The line was paused part-way (tapping a word pauses it): its sound is recorded once it has played,
+ * which [replaying] does right away.
+ */
 @Composable
-private fun CardSoundWaitsNote() {
+private fun CardSoundWaitsNote(replaying: Boolean) {
     Text(
-        stringResource(R.string.study_card_sound_waits),
+        stringResource(if (replaying) R.string.study_card_sound_replaying else R.string.study_card_sound_waits),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("card_sound_waits"),

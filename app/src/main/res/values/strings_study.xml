@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">Add a picture to cards</string>
     <string name="study_card_picture_description">Cards get a picture from the video, taken while the word\'s line is on screen. When there is none, the video\'s thumbnail is used.</string>
     <string name="study_card_front_title">Card front</string>
+    <string name="study_card_front_sound_title">Sentence sound on the front</string>
+    <string name="study_card_front_sound_description">The front also plays the line\'s sound from the video, not only the back.</string>
     <string name="study_card_front_word_sentence">Word and sentence</string>
     <string name="study_card_front_word">Word</string>
     <string name="study_card_front_sentence">Sentence</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">The front only plays the line\'s sound; the sentence and the word are on the back.</string>
     <string name="study_card_front_note">Changing this also changes cards you sent before.</string>
     <string name="study_card_sound_waits">The sentence\'s sound is added once the line has played to the end.</string>
+    <string name="study_card_sound_replaying">Playing the line once so its sound goes on the card.</string>
     <string name="study_send_to_app_title">Send words to</string>
     <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
     <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>

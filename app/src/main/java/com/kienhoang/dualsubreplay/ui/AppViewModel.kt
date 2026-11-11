@@ -979,26 +979,27 @@ class AppViewModel internal constructor(
     }
 
     fun selectLearningWord(tap: WordTap?) {
+        _state.update { it.copy(selectedLearningWord = tap?.let(::learningSelectionOf)) }
+    }
+
+    /** The word card's selection for [tap], in the languages and video now playing. */
+    private fun learningSelectionOf(tap: WordTap): LearningWordSelection {
         val current = _state.value
         val source =
             com.kienhoang.dualsubreplay.data
                 .learningSourceLanguage(current.resolvedSourceLanguage, current.sourcePreference)
-        _state.update {
-            it.copy(
-                selectedLearningWord =
-                    tap?.let { selected ->
-                        current.withThirdLineOnScreen(
-                            com.kienhoang.dualsubreplay.data.learningSelection(
-                                if (current.liveFallback) selected.copy(segment = null) else selected,
-                                source,
-                                current.targetLanguage,
-                                current.activeVideoId.takeUnless { current.liveFallback },
-                            ),
-                        )
-                    },
-            )
-        }
+        return current.withThirdLineOnScreen(
+            com.kienhoang.dualsubreplay.data.learningSelection(
+                if (current.liveFallback) tap.copy(segment = null) else tap,
+                source,
+                current.targetLanguage,
+                current.activeVideoId.takeUnless { current.liveFallback },
+            ),
+        )
     }
+
+    /** [meaningInContext] for a selection in the bar above a subtitle line, before any word card opens. */
+    internal suspend fun meaningInContext(tap: WordTap): ContextMeaning = meaningInContext(learningSelectionOf(tap))
 
     fun setAutoPronounce(enabled: Boolean) {
         preferences.edit().putBoolean("auto_pronounce", enabled).apply()
@@ -1034,24 +1035,49 @@ class AppViewModel internal constructor(
     internal suspend fun meaningInContext(selection: LearningWordSelection): ContextMeaning {
         val application = getApplication<Application>()
         if (!readMeaningInContext(application)) return ContextMeaning.None
-        val sentence = contextSentence(selection) ?: return ContextMeaning.None
+        val context = meaningContext(selection, _state.value.segments) ?: return ContextMeaning.None
         val word = selection.token.text.trim()
-        val key = listOf(selection.wordLanguage, selection.meaningLanguage, word, sentence).joinToString("\u0000")
+        val key =
+            listOf(selection.wordLanguage, selection.meaningLanguage, word, context.sentence, context.translation.orEmpty())
+                .joinToString("\u0000")
         contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
+        // The bar above the line and the word card ask for the same selection: one request serves both,
+        // and it finishes even when the bar closes first.
+        val request =
+            contextMeaningRequests[key] ?: viewModelScope
+                .async {
+                    try {
+                        askMeaningInContext(selection, context)
+                    } finally {
+                        contextMeaningRequests.remove(key)
+                    }
+                }.also { contextMeaningRequests[key] = it }
+        val found = request.await()
+        if (found is ContextMeaning.Found) contextMeanings.put(key, found.text)
+        return found
+    }
+
+    /** Requests for the meaning in a sentence still waiting for their answer, by [contextMeanings] key (main thread only). */
+    private val contextMeaningRequests = HashMap<String, kotlinx.coroutines.Deferred<ContextMeaning>>()
+
+    private suspend fun askMeaningInContext(
+        selection: LearningWordSelection,
+        context: MeaningContext,
+    ): ContextMeaning {
+        val application = getApplication<Application>()
         val model =
             withContext(Dispatchers.IO) {
                 application.aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport)
             } ?: return ContextMeaning.NoKey
-        val (system, user) = contextMeaningRequest(word, sentence, selection.wordLanguage, selection.meaningLanguage)
+        val word = selection.token.text.trim()
+        val (system, user) = contextMeaningRequest(word, context, selection.wordLanguage, selection.meaningLanguage, selection.isPhrase)
         val reply =
             try {
                 withTimeoutOrNull(CONTEXT_MEANING_TIMEOUT_MS) { model.ask(system, user) }
             } catch (_: java.io.IOException) {
                 null
             }
-        val meaning = cleanContextMeaning(reply) ?: return ContextMeaning.None
-        contextMeanings.put(key, meaning)
-        return ContextMeaning.Found(meaning)
+        return cleanContextMeaning(reply, selection.isPhrase)?.let(ContextMeaning::Found) ?: ContextMeaning.None
     }
 
     internal suspend fun saveWord(

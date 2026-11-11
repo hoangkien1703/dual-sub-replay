@@ -49,6 +49,19 @@ class LineAudioTest {
     }
 
     @Test
+    fun aLineReplayedForItsSoundStartsBeforeTheLeadAndEndsAfterTheTail() {
+        val clip = soundReplayClip(word())!!
+        val line = audioLineOf(word())!!
+        assertEquals(line.windowStartMs - LINE_AUDIO_REPLAY_EARLY_MS, clip.startMs)
+        assertEquals(line.windowEndMs, clip.endMs)
+        // Paused where the replay stops, the whole line with its tail is there to cut.
+        assertTrue(lineAudioReady(line, clip.endMs, paused = true))
+        assertTrue(lineAudioReady(line, clip.endMs))
+        assertEquals(0L, soundReplayClip(word(startMs = 300, endMs = 2_000))!!.startMs)
+        assertNull(soundReplayClip(word(videoId = null)))
+    }
+
+    @Test
     fun aLineIsCutOnceItHasPlayedAndWhileThePageStillHoldsIt() {
         val line = audioLine("abcdefghijk", 10_000, 12_500)!!
         assertFalse(lineAudioReady(line, 11_000))
