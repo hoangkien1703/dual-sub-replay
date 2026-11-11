@@ -54,8 +54,8 @@ Paths below are relative to
   captions the player loads later still give the full transcript. When the player never downloads
   the track, the page opens YouTube's own transcript panel and `data/TranscriptPanelParser.kt`
   reads its lines (line timing only). See the
-  [spec](../specs/2026-10-18-page-first-full-transcript.md). With Settings → Study tools → Load
-  captions with a page token (beta, owner request 2026-10-20; Automatic by default, On, Off), a page whose plain
+  [spec](../specs/2026-10-18-page-first-full-transcript.md). With Settings → Captions & translation →
+  Load captions with a page token (beta, owner request 2026-10-20; Automatic by default, On, Off), a page whose plain
   track request comes back empty mints its own proof-of-origin token the way YouTube's web player
   does (`ui/PageTokenScript.kt`: BotGuard's challenge from the page's own `att/get`, its interpreter
   only from `https://www.google.com/js/th/`, `GenerateIT` on the page's own origin) and asks again

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">Ads &amp; sponsors</string>
-    <string name="settings_section_ads_summary">Skip video ads and sponsor parts</string>
     <string name="ads_skip_ads_title">Skip ads</string>
     <string name="ads_skip_ads_description">Mutes YouTube video ads, plays them fast and presses Skip as soon as it appears. Banner ads on the video are closed.</string>
     <string name="ads_skip_sponsors_title">Skip sponsors</string>

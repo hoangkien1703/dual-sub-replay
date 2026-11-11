@@ -19,7 +19,7 @@ data class LearningWordSelection(
     val segment: SubtitleSegment?,
     val translated: Boolean,
     val parts: List<AnalyzedToken> = listOf(token),
-    /** The line's third subtitle line (Settings → Layout & format) and its language; null while that line is off or not translated yet. */
+    /** The line's third subtitle line (Settings → Subtitle text) and its language; null while that line is off or not translated yet. */
     val thirdText: String? = null,
     val thirdLanguage: String? = null,
 ) {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">AI アシスタント</string>
-    <string name="settings_section_ai_summary">自分の AI キーでアプリや単語について質問</string>
     <string name="ai_button">AI アシスタント</string>
     <string name="ai_button_with_problem">AI アシスタント: 確認が必要な問題があります</string>
     <string name="ai_panel_title">AI アシスタント</string>

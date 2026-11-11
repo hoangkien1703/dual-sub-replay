@@ -6,12 +6,12 @@
     <string name="ai_subtitles_try_again">Tentar de novo</string>
     <string name="ai_subtitles_note">Usa sua chave gratuita do Gemini. O Gemini ouve o vídeo nos servidores do Google.</string>
     <string name="ai_subtitles_add_key">Adicionar chave gratuita do Gemini</string>
-    <string name="ai_subtitles_needs_key">As legendas com IA usam uma chave gratuita do Gemini em Mais configurações → Assistente de IA. Adicione uma e volte a este vídeo.</string>
+    <string name="ai_subtitles_needs_key">As legendas com IA usam uma chave gratuita do Gemini em Configurações → Assistente de IA. Adicione uma e volte a este vídeo.</string>
     <string name="ai_subtitles_starting">Criando legendas com IA…</string>
     <string name="ai_subtitles_progress">Criando legendas com IA… %1$s de %2$s</string>
     <string name="ai_subtitles_progress_unknown_length">Criando legendas com IA… %1$s prontos</string>
     <string name="ai_subtitles_track_label">%1$s (legendas com IA)</string>
-    <string name="ai_subtitles_problem_key">O Gemini não aceitou sua chave. Confira em Mais configurações → Assistente de IA.</string>
+    <string name="ai_subtitles_problem_key">O Gemini não aceitou sua chave. Confira em Configurações → Assistente de IA.</string>
     <string name="ai_subtitles_problem_video">O Gemini não consegue abrir este vídeo. Ele pode ser privado, ter restrição de idade ou estar indisponível.</string>
     <string name="ai_subtitles_problem_limit">O limite gratuito da sua chave do Gemini acabou por enquanto. Tente mais tarde.</string>
     <string name="ai_subtitles_problem_busy">O Gemini está ocupado agora. Tente de novo em um minuto.</string>

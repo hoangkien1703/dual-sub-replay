@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV (베타)</string>
-    <string name="settings_section_tv_summary">리모컨용 TV 레이아웃</string>
     <string name="tv_layout_title">TV 레이아웃 (베타)</string>
     <string name="tv_layout_description">YouTube 검색이 있는 시작 페이지, 영상에서 쓰는 리모컨 버튼, 목록에서 고르는 단어. 끄면 이 TV에서 휴대전화 레이아웃이 표시됩니다.</string>
     <string name="tv_layout_note">영상에서: OK는 재생 또는 일시정지, ◀ ▶는 이전 또는 다음 줄, ▲는 줄 다시 재생, ▼는 자막으로 이동, 뒤로는 TV 홈을 엽니다. 자막 줄에서 OK를 누르면 그 줄의 단어가 표시됩니다.</string>

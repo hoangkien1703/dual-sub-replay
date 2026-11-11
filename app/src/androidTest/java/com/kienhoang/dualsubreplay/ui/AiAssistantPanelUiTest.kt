@@ -96,7 +96,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 
-/** The top-right assistant button, its right-side panel, and the AI section in More settings; no network. */
+/** The top-right assistant button, its right-side panel, and the AI section on the settings page; no network. */
 class AiAssistantPanelUiTest {
     @get:Rule
     val composeRule = createComposeRule()
@@ -213,7 +213,7 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_setup_card").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_settings_button").assertDoesNotExist()
         composeRule.onNodeWithTag("ai_intro_decline").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithText("You can turn it on again in More settings → AI assistant.").assertExists()
+        composeRule.onNodeWithText("You can turn it on again in Settings → AI assistant.").assertExists()
         saveUiEvidence("ai_panel_intro")
         composeRule.onNodeWithTag("ai_intro_start").performScrollTo().performClick()
         assertTrue(settings.introSeen)
@@ -598,7 +598,48 @@ class AiAssistantPanelUiTest {
     }
 
     @Test
-    fun theAiSectionInMoreSettingsSavesAKeyAndTurnsTheAssistantOff() {
+    fun searchSettingsFindsAnAssistantSettingAndOpensItsCard() {
+        composeRule.setContent {
+            DualSubTheme {
+                CompositionLocalProvider(LocalAiAssistant provides host) {
+                    SubtitleSettingsDialog(
+                        sourcePreference = "ja",
+                        targetLanguage = "en",
+                        availableSourceLanguages = emptyList(),
+                        fontScale = 1f,
+                        landscapeSplitEnabled = true,
+                        onSourceChange = {},
+                        onTargetChange = {},
+                        onFontScaleChange = {},
+                        onLandscapeSplitChange = {},
+                        onDismiss = {},
+                    )
+                }
+            }
+        }
+        // The section's line says what is missing before the assistant can answer.
+        composeRule.onNodeWithTag("settings_section_ai_assistant").assertTextContains("No key yet")
+        composeRule.onNodeWithTag("ai_full_access_switch").assertDoesNotExist()
+        composeRule.onNodeWithTag("settings_search").performTextInput("full access")
+        composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").assertIsDisplayed()
+        // Results replace the sections while a search is typed.
+        assertTrue(composeRule.onAllNodesWithTag("settings_section_ai_assistant").fetchSemanticsNodes().isEmpty())
+        composeRule.waitForIdle()
+        saveUiEvidence("settings-search-ai-setting")
+        composeRule.onNodeWithTag("settings_search_result_AI_FULL_ACCESS").performClick()
+        // The AI assistant section and its Permissions card both open, and the page scrolls to the switch.
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodesWithTag("ai_full_access_switch").fetchSemanticsNodes().isNotEmpty()
+        }
+        // The jump waits for both to open before it scrolls.
+        composeRule.mainClock.advanceTimeBy(1_500)
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("ai_full_access_switch").assertIsDisplayed()
+        saveUiEvidence("settings-search-ai-jump")
+    }
+
+    @Test
+    fun theAiSectionOnTheSettingsPageSavesAKeyAndTurnsTheAssistantOff() {
         composeRule.setContent {
             DualSubTheme {
                 CompositionLocalProvider(LocalAiAssistant provides host) {

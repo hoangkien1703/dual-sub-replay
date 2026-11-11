@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">应用更新</string>
-    <string name="settings_section_updates_summary">自动更新</string>
     <string name="updates_check">检查更新</string>
     <string name="updates_version">版本 %1$s</string>
     <string name="updates_available_short">有新版本 %1$s</string>

@@ -246,7 +246,7 @@ private fun aiStudySettingValue(
         else -> null
     }
 
-/** The Reading & view, Layout and Colors settings that the view model holds. */
+/** The Subtitle text, Screen layout and Colors settings that the view model holds. */
 private fun aiReadingSettingValue(
     state: DualSubUiState,
     playerMode: PlayerExperienceMode,

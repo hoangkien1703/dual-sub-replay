@@ -45,6 +45,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -258,8 +259,8 @@ private fun ClipData.firstText(context: android.content.Context): String? =
         null
     }
 
-/** The sections under the AI service row; one is open at a time, like More settings. */
-private enum class AiSettingsSection(
+/** The sections under the AI service row; one is open at a time, like the settings page's own. */
+internal enum class AiSettingsSection(
     val key: String,
     @StringRes val titleRes: Int,
     val icon: ImageVector,
@@ -270,11 +271,15 @@ private enum class AiSettingsSection(
     MEMORY("memory", R.string.ai_memory_title, Icons.Default.Psychology),
     HISTORY("history", R.string.ai_history, Icons.Default.History),
     PERMISSIONS("permissions", R.string.ai_settings_permissions_section, Icons.Default.Shield),
+    ;
+
+    /** Where Search settings lands for a result that is this whole card ([settingAnchor]). */
+    val anchor: String get() = "ai_section_$key"
 }
 
 /**
- * More settings → AI assistant, and the settings page inside the panel: the on/off switch, the
- * service row, then sections that open one at a time. [nested] is true inside a More settings
+ * Settings → AI assistant, and the settings page inside the panel: the on/off switch, the
+ * service row, then sections that open one at a time. [nested] is true inside a settings page
  * card, so the sections take a lighter color.
  */
 @Composable
@@ -293,31 +298,44 @@ internal fun AiAssistantSettingsSection(
     )
     if (!aiState.settings.enabled) return
     SettingsSectionDivider()
-    SettingsSubheading(stringResource(R.string.ai_settings_service))
-    AiServiceMenu(aiState, onSelect = controller::selectProvider)
+    Column(Modifier.fillMaxWidth().settingAnchor("ai_service")) {
+        SettingsSubheading(stringResource(R.string.ai_settings_service))
+        AiServiceMenu(aiState, onSelect = controller::selectProvider)
+    }
     if (aiState.settings.provider == AiProvider.CUSTOM) AiCustomAddressField(aiState, controller)
     Spacer(Modifier.height(12.dp))
     // Without a key, the keys section starts open: adding one is the next step.
     var open by rememberSaveable { mutableStateOf(if (aiState.hasKey) null else AiSettingsSection.KEYS.key) }
+    // A jump from Search settings to a setting in one of the cards opens that card.
+    val anchors = LocalSettingsAnchors.current
+    val wanted = anchors?.aiSectionToOpen
+    LaunchedEffect(wanted) {
+        if (wanted != null) {
+            open = wanted.key
+            anchors.aiSectionToOpen = null
+        }
+    }
     val color = if (nested) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         AiSettingsSection.entries.forEach { section ->
-            SettingsExpandableCard(
-                title = stringResource(section.titleRes),
-                summary = aiSectionSummary(section, aiState),
-                icon = section.icon,
-                expanded = open == section.key,
-                onToggle = { open = if (open == section.key) null else section.key },
-                testTag = "ai_section_${section.key}",
-                color = color,
-            ) {
-                when (section) {
-                    AiSettingsSection.KEYS -> AiKeySettings(aiState, controller)
-                    AiSettingsSection.MODEL -> AiModelSettings(aiState, controller)
-                    AiSettingsSection.SEARCH -> AiSearchSettings(aiState, controller)
-                    AiSettingsSection.MEMORY -> AiMemorySettings(aiState, controller)
-                    AiSettingsSection.HISTORY -> AiHistorySettings(aiState, controller)
-                    AiSettingsSection.PERMISSIONS -> AiPermissionSettings(aiState, controller)
+            Box(Modifier.fillMaxWidth().settingAnchor(section.anchor)) {
+                SettingsExpandableCard(
+                    title = stringResource(section.titleRes),
+                    summary = aiSectionSummary(section, aiState),
+                    icon = section.icon,
+                    expanded = open == section.key,
+                    onToggle = { open = if (open == section.key) null else section.key },
+                    testTag = "ai_section_${section.key}",
+                    color = color,
+                ) {
+                    when (section) {
+                        AiSettingsSection.KEYS -> AiKeySettings(aiState, controller)
+                        AiSettingsSection.MODEL -> AiModelSettings(aiState, controller)
+                        AiSettingsSection.SEARCH -> AiSearchSettings(aiState, controller)
+                        AiSettingsSection.MEMORY -> AiMemorySettings(aiState, controller)
+                        AiSettingsSection.HISTORY -> AiHistorySettings(aiState, controller)
+                        AiSettingsSection.PERMISSIONS -> AiPermissionSettings(aiState, controller)
+                    }
                 }
             }
         }

@@ -42,7 +42,7 @@ import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import kotlinx.coroutines.launch
 
-/** More settings → Study tools: play modes, loop button, skip silence, blur box and page tokens. */
+/** Settings → Study tools: play modes, loop button, skip silence and blur box. */
 @Composable
 internal fun StudyToolsSettingsSection() {
     val context = LocalContext.current
@@ -73,6 +73,17 @@ internal fun StudyToolsSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(BLUR_BOX_PREFERENCE, it).apply() },
         testTag = "blur_box_switch",
     )
+}
+
+/**
+ * Settings → Captions & translation → Load captions with a page token: how captions load, so it
+ * sits with the caption settings rather than under Study tools (owner pick 2026-11-11).
+ */
+@Composable
+internal fun PageTokenCaptionSettings() {
+    val context = LocalContext.current
+    val preferences = remember(context) { studyPreferences(context) }
+    val settings by rememberStudySettings()
     PageTokenSettings(settings.pageTokenCaptions) { mode ->
         // A new choice starts over: Automatic learns again whether YouTube wants a token.
         preferences
@@ -83,7 +94,7 @@ internal fun StudyToolsSettingsSection() {
     }
 }
 
-/** More settings → Word learning, after the word settings: known words and character details (owner pick 2026-11-09). */
+/** Settings → Word learning, after the word settings: known words and character details (owner pick 2026-11-09). */
 @Composable
 internal fun KnownWordsAndCharacterSettings() {
     val context = LocalContext.current
@@ -114,7 +125,7 @@ internal fun KnownWordsAndCharacterSettings() {
     )
 }
 
-/** More settings → Flashcards & Anki: Send to and card audio (owner pick 2026-11-09). */
+/** Settings → Flashcards & Anki: Send to and card audio (owner pick 2026-11-09). */
 @Composable
 internal fun FlashcardSettingsSection() {
     val context = LocalContext.current

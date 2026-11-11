@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 class SettingsSearchTest {
     private val day = 24L * 60 * 60 * 1000
@@ -11,7 +12,7 @@ class SettingsSearchTest {
 
     private val entries =
         listOf(
-            SettingsSearchEntry("Text size", "Reading & view", SearchableSetting.TEXT_SIZE),
+            SettingsSearchEntry("Text size", "Subtitle text", SearchableSetting.TEXT_SIZE),
             SettingsSearchEntry("Loop button on the playing line", "Study tools", SearchableSetting.LOOP_BUTTON),
             SettingsSearchEntry(
                 "Play mode",
@@ -20,7 +21,7 @@ class SettingsSearchTest {
                 choices = listOf("Normal", "Pause after each line", "Listen first", "Dictation"),
             ),
             SettingsSearchEntry("Cỡ chữ", "Đọc & xem", SearchableSetting.TEXT_SIZE),
-            SettingsSearchEntry("Study tools", "More settings", section = MoreSettingsSection.STUDY),
+            SettingsSearchEntry("Study tools", "Study", section = MoreSettingsSection.STUDY),
             SettingsSearchEntry("Translate to", "Languages", SearchableSetting.TRANSLATE_TO),
         )
 
@@ -50,6 +51,64 @@ class SettingsSearchTest {
         assertEquals(listOf("Play mode", "Loop button on the playing line"), searchSettings(entries, "play").map { it.title })
         // Words can come from the name and the section together.
         assertEquals(listOf("Loop button on the playing line"), searchSettings(entries, "loop study").map { it.title })
+    }
+
+    /**
+     * Search found no AI assistant setting until 2026-11-11, because nothing checked that a new
+     * switch joined [SearchableSetting]. A switch row's test tag is also its place on the page.
+     */
+    @Test
+    fun everySwitchOnTheSettingsPageCanBeFound() {
+        val switchTag = Regex("""SettingsSwitchRow\([\s\S]*?testTag = "([a-z0-9_]+)"""")
+        val tags =
+            File("src/main/java/com/kienhoang/dualsubreplay/ui")
+                .listFiles { file -> file.extension == "kt" }
+                .orEmpty()
+                .flatMap { file -> switchTag.findAll(file.readText()).map { it.groupValues[1] } }
+                .toSet()
+        assertTrue("Only ${tags.size} switches were read from the source", tags.size > 30)
+        val places = SearchableSetting.entries.mapNotNull { it.anchor }.toSet()
+        // The first row of its section, which Search already finds by the section's own name.
+        val foundByItsSection = setOf("ai_enabled_switch")
+        assertEquals(emptyList<String>(), (tags - places - foundByItsSection).sorted())
+    }
+
+    @Test
+    fun theAssistantsSettingsAreFoundInItsSection() {
+        val ai = SearchableSetting.entries.filter { it.section == MoreSettingsSection.AI_ASSISTANT }
+        assertEquals(
+            setOf(
+                SearchableSetting.AI_SERVICE,
+                SearchableSetting.AI_KEYS,
+                SearchableSetting.AI_MODEL,
+                SearchableSetting.AI_YOUTUBE_SEARCH,
+                SearchableSetting.AI_WEB_SEARCH,
+                SearchableSetting.AI_SCREEN,
+                SearchableSetting.AI_MEMORY,
+                SearchableSetting.AI_HISTORY,
+                SearchableSetting.AI_FULL_ACCESS,
+            ),
+            ai.toSet(),
+        )
+        // Their values live in the assistant's own preferences, which Often changed does not follow.
+        assertTrue(ai.all { it.keys.isEmpty() })
+        // A setting inside one of the assistant's cards names the card, so a jump can open it.
+        assertEquals(AiSettingsSection.PERMISSIONS, SearchableSetting.AI_FULL_ACCESS.aiSection)
+        assertEquals(AiSettingsSection.SEARCH, SearchableSetting.AI_WEB_SEARCH.aiSection)
+        assertNull(SearchableSetting.AI_SERVICE.aiSection)
+        assertTrue(SearchableSetting.entries.filter { it.aiSection != null }.all { it.section == MoreSettingsSection.AI_ASSISTANT })
+        // "gemini" or "claude" finds the service row.
+        assertTrue(SearchableSetting.AI_SERVICE.alsoFinds.isNotEmpty())
+    }
+
+    @Test
+    fun theSettingsThatMovedAreFoundInTheirNewSections() {
+        assertEquals(MoreSettingsSection.READING, SearchableSetting.CAPTION_FORMAT.section)
+        assertEquals(MoreSettingsSection.READING, SearchableSetting.THIRD_LINE.section)
+        assertEquals(MoreSettingsSection.LAYOUT, SearchableSetting.DEFAULT_VIEW.section)
+        assertEquals(MoreSettingsSection.LAYOUT, SearchableSetting.TRANSCRIPT_FOLLOW.section)
+        assertEquals(MoreSettingsSection.LAYOUT, SearchableSetting.PANEL_POSITION.section)
+        assertEquals(MoreSettingsSection.TRANSLATION, SearchableSetting.PAGE_TOKEN.section)
     }
 
     @Test

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV (beta)</string>
-    <string name="settings_section_tv_summary">Giao diện TV cho điều khiển từ xa</string>
     <string name="tv_layout_title">Giao diện TV (beta)</string>
     <string name="tv_layout_description">Trang bắt đầu có tìm kiếm YouTube, nút điều khiển trên video và chọn từ trong danh sách. Tắt: TV này dùng giao diện điện thoại.</string>
     <string name="tv_layout_note">Trên video: OK để phát hoặc tạm dừng, ◀ ▶ sang câu trước hoặc câu sau, ▲ phát lại câu, ▼ xuống phụ đề, Back mở trang chủ TV. OK trên một dòng phụ đề sẽ hiện các từ của dòng đó.</string>

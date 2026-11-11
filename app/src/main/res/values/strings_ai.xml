@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">AI assistant</string>
-    <string name="settings_section_ai_summary">Ask about the app and words with your own AI key</string>
     <string name="ai_button">AI assistant</string>
     <string name="ai_button_with_problem">AI assistant: a problem needs your attention</string>
     <string name="ai_panel_title">AI assistant</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">Pembaruan aplikasi</string>
-    <string name="settings_section_updates_summary">Perbarui otomatis</string>
     <string name="updates_check">Periksa pembaruan</string>
     <string name="updates_version">Versi %1$s</string>
     <string name="updates_available_short">Versi %1$s tersedia</string>

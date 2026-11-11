@@ -125,7 +125,7 @@ class TranslationPositionAndThemeUiTest {
     }
 
     @Test
-    fun theReadingSectionSwitchesTheTranscriptToInTheMiddle() {
+    fun theScreenLayoutSectionSwitchesTheTranscriptToInTheMiddle() {
         var follow by mutableStateOf(TranscriptFollow.PAGE)
         composeRule.setContent {
             DualSubTheme {
@@ -146,10 +146,9 @@ class TranslationPositionAndThemeUiTest {
             }
         }
 
-        composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
+        composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
         composeRule.onNodeWithTag("transcript_follow_center").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals(TranscriptFollow.CENTER, follow) }
-        composeRule.onNodeWithTag("translation_position_below").performScrollTo()
         saveUiEvidence("settings-transcript-follow")
     }
 

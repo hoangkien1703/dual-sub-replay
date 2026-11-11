@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ads_title">Anúncios e patrocínios</string>
-    <string name="settings_section_ads_summary">Pular anúncios em vídeo e trechos patrocinados</string>
     <string name="ads_skip_ads_title">Pular anúncios</string>
     <string name="ads_skip_ads_description">Silencia os anúncios em vídeo do YouTube, reproduz rápido e toca em Pular assim que ele aparece. Anúncios em banner sobre o vídeo são fechados.</string>
     <string name="ads_skip_sponsors_title">Pular patrocínios</string>

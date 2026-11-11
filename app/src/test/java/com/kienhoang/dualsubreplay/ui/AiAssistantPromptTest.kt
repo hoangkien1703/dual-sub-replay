@@ -44,10 +44,10 @@ class AiAssistantPromptTest {
     }
 
     @Test
-    fun theGuideNamesEveryMoreSettingsSection() {
+    fun theGuideNamesEverySettingsSectionUnderItsGroup() {
         for (section in MoreSettingsSection.entries) {
-            val title = englishString(section.titleRes)
-            assertTrue(title, "More settings, $title:" in guide)
+            val place = "Settings, ${englishString(section.group.titleRes)}, ${englishString(section.titleRes)}:"
+            assertTrue(place, place in guide)
         }
     }
 

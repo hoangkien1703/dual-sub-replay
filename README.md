@@ -32,7 +32,7 @@
 
 Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
 
-**Updating:** open the menu at the top left and tap **Check for updates**. To get new versions without asking, turn on **Settings → More settings → App updates → Update automatically**.
+**Updating:** open the menu at the top left and tap **Check for updates**. To get new versions without asking, turn on **Settings → App updates → Update automatically**.
 
 > **About preview builds:** they install as a separate app called **DualSub Replay Preview**, so you can keep both. Your saved words do not move between them automatically; use **Saved words → Export** and **Import** to copy them.
 
@@ -97,7 +97,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Captions load automatically, manual or auto-generated, in any language the video offers.
 - Translations go into any of 101 languages. The 59 that Google ML Kit supports can also translate offline: download their models ahead of time in **Settings → Translation → Languages on this device**. The rest, such as Azerbaijani, Kazakh, Uzbek, Armenian and Burmese, translate online with Google Translate or AI.
 - Short caption fragments are merged into readable sentences, and the current one is highlighted. On eligible auto-generated captions, the spoken word is highlighted too.
-- Want a third language? Turn on **Settings → Layout & format → Third subtitle line** (off by default) to add one more translation under each subtitle.
+- Want a third language? Turn on **Settings → Subtitle text → Third subtitle line** (off by default) to add one more translation under each subtitle.
 
 ### Replay any sentence
 
@@ -127,7 +127,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Problems such as Google Translate failing or subtitles not loading show at the top of the panel, with **Ask AI about this**.
 - It uses your own free or paid API key from Google Gemini, OpenRouter, OpenAI, Claude, OpenCode, or another OpenAI-compatible service. Pick a service in the panel, and **Get a key** opens the page that gives you one. The key is checked before the first question.
 - Under the chat box, **+** adds photos and files (pictures, PDFs, subtitle and text files), and you can switch the model and how long it thinks, as in other chat apps.
-- Your key is encrypted on the phone and never backed up. Chats stay on the phone for 7 days by default. Turn the assistant off completely in **More settings → AI assistant**.
+- Your key is encrypted on the phone and never backed up. Chats stay on the phone for 7 days by default. Turn the assistant off completely in **Settings → AI assistant**.
 
 ### Track your progress
 

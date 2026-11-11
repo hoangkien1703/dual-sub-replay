@@ -2,9 +2,7 @@
 <resources>
     <!-- Study tools (2026-10-20): play modes, skip silence, blur box, page token. Known words and character details sit in Word learning, Send to and card audio in Flashcards &amp; Anki (2026-11-09). -->
     <string name="settings_section_study_title">Study tools</string>
-    <string name="settings_section_study_summary">Play modes, skip silence, loop button, blur box</string>
     <string name="settings_section_flashcards_title">Flashcards &amp; Anki</string>
-    <string name="settings_section_flashcards_summary">Send to AnkiDroid or AnkiConnect, card audio</string>
     <string name="study_play_mode_title">Play mode</string>
     <string name="study_play_mode_normal">Normal</string>
     <string name="study_play_mode_normal_description">The video plays as usual.</string>

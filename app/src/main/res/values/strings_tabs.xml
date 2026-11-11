@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">YouTube tabs</string>
-    <string name="settings_section_tabs_summary">Tabs and Google accounts</string>
     <string name="tabs_menu_title">Tabs (%1$d)</string>
     <string name="tabs_list_shown">Tab list shown</string>
     <string name="tabs_list_hidden">Tab list hidden</string>

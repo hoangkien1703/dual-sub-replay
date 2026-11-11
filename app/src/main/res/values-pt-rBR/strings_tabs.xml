@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">Abas do YouTube</string>
-    <string name="settings_section_tabs_summary">Abas e contas do Google</string>
     <string name="tabs_menu_title">Abas (%1$d)</string>
     <string name="tabs_list_shown">Lista de abas aberta</string>
     <string name="tabs_list_hidden">Lista de abas fechada</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_updates_title">Tətbiq yeniləmələri</string>
-    <string name="settings_section_updates_summary">Avtomatik yenilə</string>
     <string name="updates_check">Yeniləmələri yoxla</string>
     <string name="updates_version">Versiya %1$s</string>
     <string name="updates_available_short">Versiya %1$s mövcuddur</string>

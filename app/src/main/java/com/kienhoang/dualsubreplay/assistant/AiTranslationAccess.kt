@@ -128,7 +128,7 @@ internal fun aiTranslationScope(
 }
 
 /**
- * The model subtitles are translated with: the service and keys chosen in More settings → AI
+ * The model subtitles are translated with: the service and keys chosen in Settings → AI
  * assistant, and the model chosen in Settings → Translation (owner request 2026-10-28). Null when
  * that service has no key, so Google translates.
  */

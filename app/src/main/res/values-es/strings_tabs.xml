@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">Pestañas de YouTube</string>
-    <string name="settings_section_tabs_summary">Pestañas y cuentas de Google</string>
     <string name="tabs_menu_title">Pestañas (%1$d)</string>
     <string name="tabs_list_shown">Lista de pestañas visible</string>
     <string name="tabs_list_hidden">Lista de pestañas oculta</string>

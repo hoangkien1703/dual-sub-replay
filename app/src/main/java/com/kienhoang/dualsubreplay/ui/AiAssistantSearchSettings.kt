@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.content.ClipData
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -79,15 +80,17 @@ internal fun AiSearchSettings(
         testTag = "ai_youtube_search_switch",
     )
     SettingsSectionDivider()
-    SettingsSubheading(stringResource(R.string.ai_search_web_title))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        AiWebSearchMode.entries.forEach { mode ->
-            FilterChip(
-                selected = settings.webSearch == mode,
-                onClick = { controller.setWebSearch(mode) },
-                label = { Text(stringResource(mode.labelRes)) },
-                modifier = Modifier.testTag("ai_web_search_${mode.key}"),
-            )
+    Column(Modifier.fillMaxWidth().settingAnchor("ai_web_search")) {
+        SettingsSubheading(stringResource(R.string.ai_search_web_title))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AiWebSearchMode.entries.forEach { mode ->
+                FilterChip(
+                    selected = settings.webSearch == mode,
+                    onClick = { controller.setWebSearch(mode) },
+                    label = { Text(stringResource(mode.labelRes)) },
+                    modifier = Modifier.testTag("ai_web_search_${mode.key}"),
+                )
+            }
         }
     }
     val service = stringResource(settings.provider.labelRes)

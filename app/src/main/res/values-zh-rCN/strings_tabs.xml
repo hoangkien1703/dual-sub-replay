@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">YouTube 标签页</string>
-    <string name="settings_section_tabs_summary">标签页和 Google 账号</string>
     <string name="tabs_menu_title">标签页 (%1$d)</string>
     <string name="tabs_list_shown">标签页列表已展开</string>
     <string name="tabs_list_hidden">标签页列表已收起</string>

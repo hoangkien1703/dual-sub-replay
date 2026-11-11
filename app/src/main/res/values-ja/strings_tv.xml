@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tv_title">Android TV（ベータ）</string>
-    <string name="settings_section_tv_summary">リモコン向けのTVレイアウト</string>
     <string name="tv_layout_title">TVレイアウト（ベータ）</string>
     <string name="tv_layout_description">YouTube検索のあるスタートページ、動画でのリモコン操作、一覧から選ぶ単語。オフにすると、このTVでもスマホと同じレイアウトになります。</string>
     <string name="tv_layout_note">動画では：OKで再生／一時停止、◀ ▶で前／次の行、▲で行をもう一度再生、▼で字幕へ、戻るでTVホームを開きます。字幕の行でOKを押すと、その行の単語が表示されます。</string>

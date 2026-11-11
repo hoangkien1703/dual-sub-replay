@@ -19,7 +19,7 @@ access, and patched APKs break the updater's signature check. What people actual
 
 ## Goals
 
-- Settings → More settings → **Backup & sharing**, the last section, just above Reset.
+- Settings → **Backup & sharing**, the last section, just above Reset (in the App group since the [settings groups change](2026-11-11-settings-groups-and-current-values.md)).
 - **Back up**: one JSON file the user saves anywhere, with ticks for Settings, Practice words
   (decks, review dates, known words, the learner's own kanji and hanzi stories) and Progress
   (study days and the daily goal setting).

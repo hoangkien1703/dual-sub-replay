@@ -112,7 +112,7 @@ internal fun rememberTvLayout(): State<Boolean> {
 /** True while the app shows its TV layout; false everywhere else, including isolated UI tests. */
 internal val LocalTvLayout = compositionLocalOf { false }
 
-/** More settings → Android TV (beta). On anything but a TV the switch stays off and greyed out. */
+/** Settings → Android TV (beta). On anything but a TV the switch stays off and greyed out. */
 @Composable
 internal fun TvLayoutSettingsSection() {
     val context = LocalContext.current

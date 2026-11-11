@@ -10,8 +10,11 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -20,6 +23,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
@@ -63,20 +67,52 @@ class LearningPlayerUiTest {
             }
         }
 
-        composeRule.onNodeWithText("Dual-subtitle settings").assertIsDisplayed()
-        // Reading and Default view are one More settings section, closed until tapped.
+        // The page is plain "Settings", and the X alone closes it (owner pick 2026-11-11).
+        composeRule.onNodeWithText("Settings").assertIsDisplayed()
+        composeRule.onNodeWithText("Done").assertDoesNotExist()
+        // The X is in the top right corner, right of the eye (owner request 2026-11-11).
+        val closeButton = composeRule.onNodeWithTag("close_settings").getBoundsInRoot()
+        val eyeButton = composeRule.onNodeWithTag("settings_peek").getBoundsInRoot()
+        val page = composeRule.onAllNodes(isRoot()).onLast().getBoundsInRoot()
+        assertTrue("X $closeButton should be right of the eye $eyeButton", closeButton.left >= eyeButton.right)
+        assertTrue("X $closeButton should end at the page's right edge $page", page.right - closeButton.right <= 8.dp)
+        // Every section is closed until tapped, and its line shows the current value.
         composeRule.onNodeWithTag("word_highlight_switch").assertDoesNotExist()
+        composeRule.onNodeWithTag("settings_section_languages").assertTextContains("Auto → Vietnamese")
+        composeRule.onNodeWithTag("settings_section_reading").assertTextContains("Text size: 100% · Translation below")
+        composeRule.onNodeWithTag("settings_section_layout").assertTextContains("Default view: Transcript panel")
         saveUiEvidence("settings-reading-closed")
         composeRule.onNodeWithTag("settings_section_colors").performScrollTo()
         saveUiEvidence("settings-section-order")
+        // Sections sit under four group names; the old "More settings" heading is gone.
+        composeRule.onNodeWithText("More settings").assertDoesNotExist()
+        listOf("subtitles", "study", "video", "app").forEach { group ->
+            composeRule.onNodeWithTag("settings_group_$group").performScrollTo().assertIsDisplayed()
+        }
+        // Backup & sharing has nothing to switch, so its line says what it does; it stays last, above Reset.
+        composeRule
+            .onNodeWithTag("settings_section_backup")
+            .performScrollTo()
+            .assertTextContains("Move to a new phone, share your setup")
+        composeRule.onNodeWithTag("reset_all_settings").performScrollTo()
+        saveUiEvidence("settings-app-group")
+
+        // Subtitle text: what the words look like.
         composeRule.onNodeWithTag("settings_section_reading").performScrollTo().performClick()
         composeRule.waitForIdle()
         saveUiEvidence("settings-reading-open")
-        composeRule.onNodeWithText("Default view").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithText("Transcript panel").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithText("Scroll-friendly overlay").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("word_highlight_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("caption_format_short_phrases").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("third_line_switch").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("player_mode_transcript_panel").assertDoesNotExist()
 
+        // Screen layout: where things sit.
+        composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
+        composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
+        composeRule.onNodeWithTag("third_line_switch").assertDoesNotExist()
+        composeRule.onNodeWithText("Default view").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("player_mode_transcript_panel").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("transcript_follow_center").performScrollTo().assertIsDisplayed()
         composeRule
             .onNodeWithTag("player_mode_scroll_friendly_overlay")
             .performScrollTo()
@@ -84,11 +120,7 @@ class LearningPlayerUiTest {
         composeRule.runOnIdle {
             assertEquals(PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY, selected)
         }
-
-        // Advanced controls live in collapsible sections under More settings.
-        composeRule.onNodeWithText("More settings").performScrollTo().assertIsDisplayed()
-        composeRule.onNodeWithTag("portrait_panel_position_slider").assertDoesNotExist()
-        composeRule.onNodeWithTag("settings_section_layout").performScrollTo().performClick()
+        saveUiEvidence("settings-layout-open")
         composeRule.onNodeWithText("Portrait panel position").performScrollTo().assertIsDisplayed()
         composeRule
             .onNodeWithTag("portrait_panel_position_slider")

@@ -32,7 +32,7 @@ internal enum class AiOwnSetting(
 internal enum class AiResetTarget(
     val key: String,
 ) {
-    /** Like More settings → Reset all settings: the AI settings, keys and saved words stay. */
+    /** Like Settings → Reset all settings: the AI settings, keys and saved words stay. */
     ALL_SETTINGS("all_settings"),
 
     /** Like Layout → Reset subtitle positions: where the overlay and the CC button were dragged. */

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_ai_title">Trợ lý AI</string>
-    <string name="settings_section_ai_summary">Hỏi về ứng dụng và từ vựng bằng khóa AI của bạn</string>
     <string name="ai_button">Trợ lý AI</string>
     <string name="ai_button_with_problem">Trợ lý AI: có sự cố cần bạn xem</string>
     <string name="ai_panel_title">Trợ lý AI</string>

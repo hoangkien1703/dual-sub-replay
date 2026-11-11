@@ -247,7 +247,7 @@ private fun Busy(
     }
 }
 
-/** More settings → App updates. */
+/** Settings → App updates. */
 @Composable
 internal fun AppUpdateSettingsSection() {
     val context = LocalContext.current

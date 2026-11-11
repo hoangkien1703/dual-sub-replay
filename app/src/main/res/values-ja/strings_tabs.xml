@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_section_tabs_title">YouTube タブ</string>
-    <string name="settings_section_tabs_summary">タブと Google アカウント</string>
     <string name="tabs_menu_title">タブ (%1$d)</string>
     <string name="tabs_list_shown">タブ一覧を表示中</string>
     <string name="tabs_list_hidden">タブ一覧を非表示</string>

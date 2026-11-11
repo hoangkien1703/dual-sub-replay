@@ -756,7 +756,7 @@ class AppViewModel internal constructor(
         _state.update { it.copy(targetLanguage = normalized, recentTargetLanguages = recent, liveTranslated = null) }
     }
 
-    /** Layout & format → Third subtitle line, and its language; the open video's third lines follow at once. */
+    /** Subtitle text → Third subtitle line, and its language; the open video's third lines follow at once. */
     fun setThirdLine(choice: ThirdLineChoice) {
         val language = choice.language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
         preferences

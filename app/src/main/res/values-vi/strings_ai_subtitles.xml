@@ -6,12 +6,12 @@
     <string name="ai_subtitles_try_again">Thử lại</string>
     <string name="ai_subtitles_note">Dùng khóa Gemini miễn phí của bạn. Gemini nghe video trên máy chủ của Google.</string>
     <string name="ai_subtitles_add_key">Thêm khóa Gemini miễn phí</string>
-    <string name="ai_subtitles_needs_key">Phụ đề AI dùng khóa Gemini miễn phí trong Cài đặt khác → Trợ lý AI. Hãy thêm khóa rồi quay lại video này.</string>
+    <string name="ai_subtitles_needs_key">Phụ đề AI dùng khóa Gemini miễn phí trong Cài đặt → Trợ lý AI. Hãy thêm khóa rồi quay lại video này.</string>
     <string name="ai_subtitles_starting">Đang tạo phụ đề bằng AI…</string>
     <string name="ai_subtitles_progress">Đang tạo phụ đề bằng AI… %1$s / %2$s</string>
     <string name="ai_subtitles_progress_unknown_length">Đang tạo phụ đề bằng AI… xong %1$s</string>
     <string name="ai_subtitles_track_label">%1$s (phụ đề AI)</string>
-    <string name="ai_subtitles_problem_key">Gemini không chấp nhận khóa của bạn. Hãy kiểm tra ở Cài đặt khác → Trợ lý AI.</string>
+    <string name="ai_subtitles_problem_key">Gemini không chấp nhận khóa của bạn. Hãy kiểm tra ở Cài đặt → Trợ lý AI.</string>
     <string name="ai_subtitles_problem_video">Gemini không mở được video này. Video có thể ở chế độ riêng tư, giới hạn độ tuổi hoặc không khả dụng.</string>
     <string name="ai_subtitles_problem_limit">Khóa Gemini của bạn đã hết lượt miễn phí lúc này. Hãy thử lại sau.</string>
     <string name="ai_subtitles_problem_busy">Gemini đang bận. Hãy thử lại sau một phút.</string>

@@ -83,7 +83,7 @@ class SubtitleUiTest {
         composeRule.onNodeWithTag("language_search").performTextInput("English")
         composeRule.onNodeWithTag("language_option_target_en").performClick()
         composeRule.runOnIdle { assertEquals("en", selectedTarget) }
-        composeRule.onNodeWithText("Done").performClick()
+        composeRule.onNodeWithTag("close_settings").performClick()
         composeRule.runOnIdle { assertTrue(dismissed) }
     }
 
