@@ -19,6 +19,7 @@ import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.ui.AppLanguageSettings
 import com.kienhoang.dualsubreplay.ui.AppViewModel
 import com.kienhoang.dualsubreplay.ui.LearningPlayerRoot
+import com.kienhoang.dualsubreplay.ui.SetupLinkInbox
 import com.kienhoang.dualsubreplay.ui.TvRemoteKeys
 import com.kienhoang.dualsubreplay.update.AppUpdater
 import com.kienhoang.dualsubreplay.update.RemoteSwitchFetcher
@@ -103,6 +104,9 @@ class MainActivity : ComponentActivity() {
             Intent.ACTION_VIEW -> intent.dataString
             else -> null
         }
-        if (!sharedText.isNullOrBlank()) viewModel.acceptSharedText(sharedText)
+        if (sharedText.isNullOrBlank()) return
+        // A shared setup link (Settings → Backup & sharing) asks before it changes any setting.
+        if (SetupLinkInbox.offer(sharedText)) return
+        viewModel.acceptSharedText(sharedText)
     }
 }

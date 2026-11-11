@@ -92,6 +92,14 @@
                 <data android:scheme="https" android:host="m.youtube.com" />
                 <data android:scheme="https" android:host="youtube.com" />
             </intent-filter>
+
+            <!-- A shared setup opened from the landing site's "Open in app" (Settings → Backup & sharing). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="dualsubreplay" android:host="setup" />
+            </intent-filter>
         </activity>
 
         <service

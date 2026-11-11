@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">Cadangan &amp; berbagi</string>
+    <string name="backup_section_summary">Pindah ke ponsel baru, bagikan pengaturanmu</string>
+    <string name="backup_title">Cadangan</string>
+    <string name="backup_description">Pengaturan, kata Latihan, dan Progres dalam satu file. Simpan di tempat aman untuk ponsel baru.</string>
+    <string name="backup_button">Cadangkan</string>
+    <string name="restore_button">Pulihkan</string>
+    <string name="backup_last">Cadangan terakhir: %1$s</string>
+    <string name="backup_last_never">Cadangan terakhir: belum pernah</string>
+    <string name="share_title">Bagikan pengaturanku</string>
+    <string name="share_description">Kirim pengaturanmu ke teman lewat tautan. Hanya pengaturan: tidak pernah kata, progres, pengaturan AI, atau kunci.</string>
+    <string name="share_button">Bagikan tautan</string>
+    <string name="use_setup_button">Pakai pengaturan</string>
+    <string name="undo_setup_button">Batalkan pengaturan terakhir</string>
+    <string name="backup_dialog_message">Pilih apa yang masuk ke file.</string>
+    <string name="backup_part_settings">Pengaturan</string>
+    <string name="backup_part_settings_detail">Bahasa, tampilan, alat belajar, pilihan AI</string>
+    <string name="backup_part_words">Kata Latihan</string>
+    <string name="backup_part_progress">Progres</string>
+    <string name="backup_part_progress_detail">%1$s belajar dan target harianmu</string>
+    <string name="backup_never_included">Tidak pernah ada di file: kunci AI, login YouTube, chat dan memori AI, alamat AI khusus, akses penuh, serta suara dan gambar kartu Anki.</string>
+    <string name="backup_save">Simpan file</string>
+    <string name="backup_saved">Cadangan disimpan.</string>
+    <string name="restore_dialog_title">Pulihkan cadangan ini?</string>
+    <string name="restore_from">Dari %1$s, versi aplikasi %2$s</string>
+    <string name="restore_settings_detail">Mengganti pengaturanmu sekarang</string>
+    <string name="restore_keys_note">Setelah memulihkan, tambahkan lagi kunci AI jika kamu memakai asisten AI.</string>
+    <string name="restore_restart_note">Aplikasi dimulai ulang untuk menyelesaikan.</string>
+    <string name="restore_nothing">Cadangan ini tidak berisi apa pun untuk dipulihkan.</string>
+    <string name="backup_cancel">Batal</string>
+    <string name="use_setup_title">Pakai pengaturan ini?</string>
+    <string name="use_setup_no_changes">Pengaturanmu sudah sama dengan pengaturan ini.</string>
+    <string name="use_setup_other">Pengaturan lain</string>
+    <string name="use_setup_note">Pengaturan yang dibagikan tidak pernah mengubah kata, progres, pengaturan AI, atau kuncimu. Kamu bisa membatalkannya di Pengaturan, Cadangan &amp; berbagi. Aplikasi dimulai ulang untuk menyelesaikan.</string>
+    <string name="use_setup_confirm">Pakai pengaturan</string>
+    <string name="paste_setup_message">Tempel tautan pengaturan yang dikirim temanmu.</string>
+    <string name="paste_setup_label">Tautan pengaturan</string>
+    <string name="paste_setup_continue">Lanjut</string>
+    <string name="setup_link_invalid">Ini bukan tautan pengaturan, atau sebagian tautannya hilang.</string>
+    <string name="share_setup_text">Pengaturan Dual Sub Replay-ku: %1$s</string>
+    <string name="backup_failed">Tidak bisa selesai: %1$s</string>
+    <string name="backup_open_failed">Tidak bisa membuka file.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="other">%1$d kata, dengan dek, tanggal ulasan, kata yang diketahui, dan cerita kanji milikmu</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="other">Menambah %1$d kata baru. Kata yang sudah ada menyimpan ulasan yang lebih baru.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="other">Menambah %1$d hari belajar. Hari yang sudah ada menyimpan waktu yang lebih lama.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="other">%1$d pengaturan akan berubah:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="other">+ %1$d lainnya</item>
+    </plurals>
+</resources>

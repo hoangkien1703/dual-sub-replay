@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">备份与分享</string>
+    <string name="backup_section_summary">换到新手机，分享你的设置</string>
+    <string name="backup_title">备份</string>
+    <string name="backup_description">把设置、练习单词和进度放进一个文件。请把它放在安全的地方，以便在新手机上使用。</string>
+    <string name="backup_button">备份</string>
+    <string name="restore_button">恢复</string>
+    <string name="backup_last">上次备份：%1$s</string>
+    <string name="backup_last_never">上次备份：从未</string>
+    <string name="share_title">分享我的设置</string>
+    <string name="share_description">用链接把你的设置发给朋友。只有设置：绝不包括你的单词、进度、AI 设置或密钥。</string>
+    <string name="share_button">分享链接</string>
+    <string name="use_setup_button">使用设置</string>
+    <string name="undo_setup_button">撤销上次使用的设置</string>
+    <string name="backup_dialog_message">选择要放进文件的内容。</string>
+    <string name="backup_part_settings">设置</string>
+    <string name="backup_part_settings_detail">语言、外观、学习工具、AI 选项</string>
+    <string name="backup_part_words">练习单词</string>
+    <string name="backup_part_progress">进度</string>
+    <string name="backup_part_progress_detail">学习时长 %1$s 和每日目标</string>
+    <string name="backup_never_included">文件中绝不包括：AI 密钥、你的 YouTube 登录、AI 聊天和记忆、自定义 AI 地址、完全访问权限，以及 Anki 卡片的声音和图片。</string>
+    <string name="backup_save">保存文件</string>
+    <string name="backup_saved">已保存备份。</string>
+    <string name="restore_dialog_title">恢复这个备份？</string>
+    <string name="restore_from">来自 %1$s，应用版本 %2$s</string>
+    <string name="restore_settings_detail">替换你当前的设置</string>
+    <string name="restore_keys_note">如果你使用 AI 助手，恢复后请重新添加 AI 密钥。</string>
+    <string name="restore_restart_note">应用会重新启动以完成恢复。</string>
+    <string name="restore_nothing">这个备份中没有可恢复的内容。</string>
+    <string name="backup_cancel">取消</string>
+    <string name="use_setup_title">使用这个设置？</string>
+    <string name="use_setup_no_changes">你的设置已经和这个设置相同。</string>
+    <string name="use_setup_other">其他设置</string>
+    <string name="use_setup_note">分享的设置绝不会更改你的单词、进度、AI 设置或密钥。你可以在 设置 > 备份与分享 中撤销。应用会重新启动以完成。</string>
+    <string name="use_setup_confirm">使用设置</string>
+    <string name="paste_setup_message">粘贴朋友发给你的设置链接。</string>
+    <string name="paste_setup_label">设置链接</string>
+    <string name="paste_setup_continue">继续</string>
+    <string name="setup_link_invalid">这不是设置链接，或者链接缺了一部分。</string>
+    <string name="share_setup_text">我的 Dual Sub Replay 设置：%1$s</string>
+    <string name="backup_failed">无法完成：%1$s</string>
+    <string name="backup_open_failed">无法打开文件。</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="other">%1$d 个单词，包括卡组、复习日期、已认识的单词和你自己的汉字故事</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="other">添加 %1$d 个新单词。已有的单词保留较新的复习日期。</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="other">添加 %1$d 个学习日。已有的日子保留较长的时间。</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="other">%1$d 项设置将会更改：</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="other">另外 %1$d 项</item>
+    </plurals>
+</resources>

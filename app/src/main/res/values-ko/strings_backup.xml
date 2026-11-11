@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings, Backup &amp; sharing (docs/specs/2026-11-11-backup-and-setup-sharing.md). -->
+<resources>
+    <string name="backup_section_title">백업 및 공유</string>
+    <string name="backup_section_summary">새 휴대폰으로 옮기기, 내 설정 공유</string>
+    <string name="backup_title">백업</string>
+    <string name="backup_description">설정, 연습 단어, 진행 상황을 파일 하나에 담아요. 새 휴대폰을 위해 안전한 곳에 보관하세요.</string>
+    <string name="backup_button">백업</string>
+    <string name="restore_button">복원</string>
+    <string name="backup_last">마지막 백업: %1$s</string>
+    <string name="backup_last_never">마지막 백업: 없음</string>
+    <string name="share_title">내 설정 공유</string>
+    <string name="share_description">내 설정을 링크로 친구에게 보내요. 설정만 보내며 단어, 진행 상황, AI 설정, 키는 절대 포함되지 않아요.</string>
+    <string name="share_button">링크 공유</string>
+    <string name="use_setup_button">설정 사용</string>
+    <string name="undo_setup_button">마지막 설정 되돌리기</string>
+    <string name="backup_dialog_message">파일에 넣을 항목을 고르세요.</string>
+    <string name="backup_part_settings">설정</string>
+    <string name="backup_part_settings_detail">언어, 모양, 학습 도구, AI 선택</string>
+    <string name="backup_part_words">연습 단어</string>
+    <string name="backup_part_progress">진행 상황</string>
+    <string name="backup_part_progress_detail">학습 시간 %1$s 및 하루 목표</string>
+    <string name="backup_never_included">파일에 절대 포함되지 않는 것: AI 키, YouTube 로그인, AI 채팅과 메모리, AI 사용자 지정 주소, 전체 권한, Anki 카드의 소리와 그림.</string>
+    <string name="backup_save">파일 저장</string>
+    <string name="backup_saved">백업을 저장했어요.</string>
+    <string name="restore_dialog_title">이 백업을 복원할까요?</string>
+    <string name="restore_from">%1$s, 앱 버전 %2$s</string>
+    <string name="restore_settings_detail">지금 설정을 바꿔요</string>
+    <string name="restore_keys_note">AI 도우미를 쓴다면 복원한 뒤 AI 키를 다시 추가하세요.</string>
+    <string name="restore_restart_note">마무리하려고 앱이 다시 시작돼요.</string>
+    <string name="restore_nothing">이 백업에는 복원할 것이 없어요.</string>
+    <string name="backup_cancel">취소</string>
+    <string name="use_setup_title">이 설정을 사용할까요?</string>
+    <string name="use_setup_no_changes">지금 설정이 이 설정과 같아요.</string>
+    <string name="use_setup_other">기타 설정</string>
+    <string name="use_setup_note">공유된 설정은 단어, 진행 상황, AI 설정, 키를 절대 바꾸지 않아요. 설정 > 백업 및 공유에서 되돌릴 수 있어요. 마무리하려고 앱이 다시 시작돼요.</string>
+    <string name="use_setup_confirm">설정 사용</string>
+    <string name="paste_setup_message">친구가 보낸 설정 링크를 붙여 넣으세요.</string>
+    <string name="paste_setup_label">설정 링크</string>
+    <string name="paste_setup_continue">계속</string>
+    <string name="setup_link_invalid">설정 링크가 아니거나 링크 일부가 빠졌어요.</string>
+    <string name="share_setup_text">내 Dual Sub Replay 설정: %1$s</string>
+    <string name="backup_failed">끝내지 못했어요: %1$s</string>
+    <string name="backup_open_failed">파일을 열 수 없어요.</string>
+    <plurals name="backup_part_words_detail">
+        <item quantity="other">단어 %1$d개 (덱, 복습 날짜, 아는 단어, 나만의 한자 이야기 포함)</item>
+    </plurals>
+    <plurals name="restore_words_detail">
+        <item quantity="other">새 단어 %1$d개를 추가해요. 이미 있는 단어는 더 최근 복습 날짜를 유지해요.</item>
+    </plurals>
+    <plurals name="restore_progress_detail">
+        <item quantity="other">학습한 날 %1$d일을 추가해요. 이미 있는 날은 더 긴 시간을 유지해요.</item>
+    </plurals>
+    <plurals name="use_setup_changes">
+        <item quantity="other">설정 %1$d개가 바뀌어요:</item>
+    </plurals>
+    <plurals name="use_setup_more">
+        <item quantity="other">+ %1$d개 더</item>
+    </plurals>
+</resources>
