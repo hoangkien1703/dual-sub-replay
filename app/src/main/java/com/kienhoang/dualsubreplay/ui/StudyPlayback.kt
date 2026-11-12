@@ -490,8 +490,24 @@ internal fun lineBoundary(
 }
 
 /**
+ * Whether the play modes, the loop or skip silence steer the video: then the page's time and the
+ * lines around it are followed off screen too (screen off, or the app in the background), where
+ * they otherwise rest (25kiuo, #81, 2026-11-12).
+ */
+internal fun studySteersPlayback(
+    settings: StudySettings,
+    loopLineId: Long?,
+): Boolean = settings.effectivePlayMode != StudyPlayMode.NORMAL || loopLineId != null || settings.skipSilence != SkipSilence.OFF
+
+/** Read by the page's playback poll, which lives apart from the runner; see [studySteersPlayback]. */
+internal object StudyOffScreen {
+    @Volatile var steering = false
+}
+
+/**
  * Runs [StudyPlaybackDriver] on the page's playback ticks and carries out its actions through
- * [controller]. Composition keeps [state], [settings] and [newWordLines] current.
+ * [controller]. Composition keeps [state], [settings] and [newWordLines] current; off screen,
+ * where composition rests, [liveState] gives the view model's state.
  */
 internal class StudyPlaybackRunner(
     private val controller: YouTubeWebController,
@@ -510,6 +526,24 @@ internal class StudyPlaybackRunner(
     @Volatile var settings = StudySettings()
 
     @Volatile var newWordLines: Set<Int> = emptySet()
+
+    /** The view model's state now, kept current off screen too (composition's [state] waits for the screen). */
+    @Volatile var liveState: (() -> DualSubUiState)? = null
+
+    /** Told when [studySteersPlayback] changes, so the lines around the playing time keep coming off screen. */
+    @Volatile var onSteeringChanged: ((Boolean) -> Unit)? = null
+
+    private var steering = false
+
+    /** Tells the page poll and [onSteeringChanged] whether the play modes steer the video now. */
+    fun updateSteering() {
+        val now = studySteersPlayback(settings, if (settings.loopButton) lineLoop.lineId else null)
+        StudyOffScreen.steering = now
+        if (now != steering) {
+            steering = now
+            onSteeringChanged?.invoke(now)
+        }
+    }
 
     /** A line the learner tapped: see [StudyPlaybackDriver.learnerSeek]. */
     fun onLearnerSeek(second: Float) {
@@ -539,7 +573,7 @@ internal class StudyPlaybackRunner(
         second: Float,
         sessionId: String,
     ) {
-        val current = state ?: return
+        val current = liveState?.invoke() ?: state ?: return
         // An ad plays on the same page with its own clock: the play modes and the loop leave it alone.
         val active = !current.liveFallback && current.activeVideoId == videoId && !controller.clipPlaying && !controller.adShowing
         val tick =
@@ -556,6 +590,7 @@ internal class StudyPlaybackRunner(
             )
         val action = driver.tick(tick)
         driver.takeLoopMove()?.let(lineLoop::follow)
+        updateSteering()
         when (action) {
             StudyAction.Pause -> controller.pause()
             is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND, byPlayMode = true)
@@ -589,6 +624,7 @@ internal fun rememberStudyPlaybackRunner(
         runner.state = state
         runner.settings = settings
         runner.newWordLines = newWordLines
+        runner.updateSteering()
     }
     return runner
 }

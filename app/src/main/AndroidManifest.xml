@@ -47,9 +47,10 @@
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="true" />
 
-        <!-- Send to lends AnkiDroid a card's sound files to copy (read-only, granted to AnkiDroid for one copy). -->
+        <!-- Send to lends AnkiDroid a card's sound files to copy (read-only, granted to AnkiDroid for one copy).
+             CardMediaProvider reports clips as audio/mp4 so AnkiDroid keeps them as .m4a, not .mp3. -->
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name=".data.CardMediaProvider"
             android:authorities="${applicationId}.cardaudio"
             android:exported="false"
             android:grantUriPermissions="true">

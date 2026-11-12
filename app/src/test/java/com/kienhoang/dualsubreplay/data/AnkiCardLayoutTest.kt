@@ -50,30 +50,33 @@ class AnkiCardLayoutTest {
     @Test
     fun sentenceSoundOnTheFrontMovesTheLinesSoundFromTheBack() {
         CardFront.entries.forEach { front ->
-            val template = ankiCardTemplate(front, frontSound = true)
+            val template = ankiCardTemplate(front, CardSides(sentenceSoundFront = true))
             assertEquals(front.name, fields, shown(template.question + template.answer))
             assertTrue(front.name, "{{Sentence audio}}" in template.question)
             assertFalse(front.name, "{{Sentence audio}}" in template.answer.removePrefix("{{FrontSide}}<hr id=answer>"))
         }
-        assertEquals(listOf("{{Word}}", "{{Word audio}}", "{{Sentence audio}}"), shown(ankiCardTemplate(CardFront.WORD, true).question))
+        assertEquals(
+            listOf("{{Word}}", "{{Word audio}}", "{{Sentence audio}}"),
+            shown(ankiCardTemplate(CardFront.WORD, CardSides(sentenceSoundFront = true)).question),
+        )
         // Listening has nothing but the line's sound on the front already.
-        assertEquals(ankiCardTemplate(CardFront.LISTENING), ankiCardTemplate(CardFront.LISTENING, true))
-        assertEquals(CardOptions(front = CardFront.WORD, frontSound = true).soundOnFront, true)
-        assertFalse(CardOptions(front = CardFront.LISTENING, frontSound = true).soundOnFront)
+        assertEquals(ankiCardTemplate(CardFront.LISTENING), ankiCardTemplate(CardFront.LISTENING, CardSides(sentenceSoundFront = true)))
+        assertEquals(CardSides(sentenceSoundFront = true), CardOptions(front = CardFront.WORD, sentenceSound = CardPlace.FRONT).sides)
+        assertEquals(CardSides(), CardOptions(front = CardFront.WORD, sentenceSound = CardPlace.BACK).sides)
     }
 
     @Test
     fun turningSentenceSoundOnTheFrontOnOrOffChangesTheTemplateOnce() {
-        assertTrue(cardFrontNeedsUpdate("word", CardFront.WORD, frontSound = true))
-        assertFalse(cardFrontNeedsUpdate("word+sound", CardFront.WORD, frontSound = true))
+        assertTrue(cardFrontNeedsUpdate("word", CardFront.WORD, CardSides(sentenceSoundFront = true)))
+        assertFalse(cardFrontNeedsUpdate("word+sound", CardFront.WORD, CardSides(sentenceSoundFront = true)))
         assertTrue(cardFrontNeedsUpdate("word+sound", CardFront.WORD))
-        assertTrue(cardFrontNeedsUpdate(null, CardFront.WORD_AND_SENTENCE, frontSound = true))
+        assertTrue(cardFrontNeedsUpdate(null, CardFront.WORD_AND_SENTENCE, CardSides(sentenceSoundFront = true)))
         // The switch means nothing for Listening, so it never changes that template.
-        assertFalse(cardFrontNeedsUpdate("listening", CardFront.LISTENING, frontSound = true))
+        assertFalse(cardFrontNeedsUpdate("listening", CardFront.LISTENING, CardSides(sentenceSoundFront = true)))
         val memory = InMemoryCardFronts()
-        memory.remember("x", CardFront.SENTENCE, frontSound = true)
+        memory.remember("x", CardFront.SENTENCE, CardSides(sentenceSoundFront = true))
         assertEquals("sentence+sound", memory.applied("x"))
-        assertFalse(cardFrontNeedsUpdate(memory.applied("x"), CardFront.SENTENCE, frontSound = true))
+        assertFalse(cardFrontNeedsUpdate(memory.applied("x"), CardFront.SENTENCE, CardSides(sentenceSoundFront = true)))
     }
 
     @Test
@@ -87,5 +90,69 @@ class AnkiCardLayoutTest {
         assertEquals("", ankiPicture("a b.jpg"))
         assertEquals("", ankiPicture("dir/a.jpg"))
         assertEquals("", ankiPicture("<script>.jpg"))
+    }
+
+    @Test
+    fun theWordsVoiceGoesWhereItIsPutAndTheCardStillShowsEveryField() {
+        // Word sound → Back on a word front: the front is only the word, the back plays it.
+        val back = ankiCardTemplate(CardFront.WORD, CardSides(wordSoundFront = false))
+        assertEquals(listOf("{{Word}}"), shown(back.question))
+        assertTrue(back.answer.startsWith("{{FrontSide}}<hr id=answer>{{Word audio}}"))
+        // Word sound → Front on a sentence front, before the line's sound.
+        val front = ankiCardTemplate(CardFront.SENTENCE, CardSides(wordSoundFront = true, sentenceSoundFront = true))
+        assertEquals(listOf("{{Sentence}}", "{{Word audio}}", "{{Sentence audio}}"), shown(front.question))
+        assertTrue(front.question.indexOf("{{Word audio}}") < front.question.indexOf("{{Sentence audio}}"))
+        assertFalse("{{Word audio}}" in front.answer)
+        // Its usual side is the template every version made.
+        assertEquals(ankiCardTemplate(CardFront.WORD), ankiCardTemplate(CardFront.WORD, CardSides(wordSoundFront = true)))
+        assertEquals(ankiCardTemplate(CardFront.SENTENCE), ankiCardTemplate(CardFront.SENTENCE, CardSides(wordSoundFront = false)))
+        CardFront.entries.forEach { card ->
+            listOf(null, true, false).forEach { word ->
+                listOf(true, false).forEach { picture ->
+                    val template = ankiCardTemplate(card, CardSides(word, sentenceSoundFront = true, pictureFront = picture))
+                    assertEquals("$card $word $picture", fields, shown(template.question + template.answer))
+                    // Each sound plays once: the back shows the front above it.
+                    assertEquals(1, Regex("\\{\\{Word audio}}").findAll(template.question + template.answer).count())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun aPictureOnTheFrontLeavesTheVideoLinkOnTheBack() {
+        val template = ankiCardTemplate(CardFront.WORD, CardSides(pictureFront = true))
+        assertTrue("<div class=\"source pf\">{{Source}}</div><style>.pf a,.pf br{display:none}</style>" in template.question)
+        assertTrue(template.answer.endsWith("<div class=\"source sl\">{{Source}}</div><style>.sl img,.sl br{display:none}</style>"))
+        // Back (the default) keeps the plain Source on the back only.
+        assertFalse("{{Source}}" in ankiCardTemplate(CardFront.WORD).question)
+    }
+
+    @Test
+    fun aCardTemplateKeyNamesEveryPlaceAndOldKeysStillMatch() {
+        assertEquals("word_sentence", cardTemplateKey(CardFront.WORD_AND_SENTENCE, CardSides(wordSoundFront = true)))
+        assertEquals("word+sound", cardTemplateKey(CardFront.WORD, CardSides(sentenceSoundFront = true)))
+        assertEquals("word+wordback", cardTemplateKey(CardFront.WORD, CardSides(wordSoundFront = false)))
+        assertEquals("sentence+wordfront+picture", cardTemplateKey(CardFront.SENTENCE, CardSides(true, pictureFront = true)))
+        assertEquals("listening", cardTemplateKey(CardFront.LISTENING, CardSides(wordSoundFront = false, sentenceSoundFront = true)))
+        assertFalse(
+            cardFrontNeedsUpdate("word+sound", CardFront.WORD, CardOptions(CardPlace.FRONT, CardPlace.FRONT, front = CardFront.WORD).sides),
+        )
+        assertTrue(cardFrontNeedsUpdate("word", CardFront.WORD, CardOptions(CardPlace.BACK, CardPlace.BACK, front = CardFront.WORD).sides))
+        assertTrue(cardFrontNeedsUpdate("word", CardFront.WORD, CardOptions(picture = CardPlace.FRONT, front = CardFront.WORD).sides))
+        // A medium that is off changes nothing: its field is empty wherever the template puts it.
+        assertFalse(
+            cardFrontNeedsUpdate("word", CardFront.WORD, CardOptions(CardPlace.OFF, CardPlace.OFF, CardPlace.OFF, CardFront.WORD).sides),
+        )
+    }
+
+    @Test
+    fun theWordsVoiceUsuallyGoesWithTheWord() {
+        assertEquals(CardPlace.FRONT, usualWordSoundPlace(CardFront.WORD_AND_SENTENCE))
+        assertEquals(CardPlace.FRONT, usualWordSoundPlace(CardFront.WORD))
+        assertEquals(CardPlace.BACK, usualWordSoundPlace(CardFront.SENTENCE))
+        assertEquals(CardPlace.BACK, usualWordSoundPlace(CardFront.LISTENING))
+        assertEquals(CardPlace.BACK, storedCardPlace("back", CardPlace.OFF))
+        assertEquals(CardPlace.OFF, storedCardPlace("sideways", CardPlace.OFF))
+        assertEquals(CardPlace.FRONT, storedCardPlace(null, CardPlace.FRONT))
     }
 }

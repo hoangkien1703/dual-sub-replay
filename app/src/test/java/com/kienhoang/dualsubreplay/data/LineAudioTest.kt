@@ -127,4 +127,22 @@ class LineAudioTest {
         assertFalse(store.has(unused))
         assertTrue(store.has(fresh))
     }
+
+    @Test
+    fun aSilentClipNeverGoesOnACard() {
+        assertFalse(audible(LinePcm(24_000, ShortArray(24_000))))
+        assertFalse(audible(LinePcm(24_000, ShortArray(24_000) { if (it % 2 == 0) 40 else -40 })))
+        assertTrue(audible(LinePcm(24_000, ShortArray(24_000) { if (it == 12_000) -900 else 0 })))
+    }
+
+    @Test
+    fun aClipIsLentAsAudioMp4SoAnkiDroidKeepsItsM4aName() {
+        assertEquals("audio/mp4", cardMediaType("abcdefghijk-10000-12500.m4a"))
+        assertEquals("audio/mp4", cardMediaType("CLIP.M4A"))
+        // The word's sound and the picture keep Android's own types.
+        assertNull(cardMediaType("word.wav"))
+        assertNull(cardMediaType("word.mp3"))
+        assertNull(cardMediaType("abcdefghijk-10000-12500.jpg"))
+        assertNull(cardMediaType(null))
+    }
 }

@@ -25,17 +25,60 @@ internal enum class CardFront(
 internal fun storedCardFront(value: String?): CardFront =
     CardFront.entries.firstOrNull { it.storageValue == value } ?: CardFront.WORD_AND_SENTENCE
 
-/** What Send to puts on each card: the two sounds, a picture from the video, and the front. */
-internal data class CardOptions(
-    val audio: Boolean = false,
-    val picture: Boolean = false,
-    val front: CardFront = CardFront.WORD_AND_SENTENCE,
-    /** Card front → Sentence sound on the front (lion737, #81, 2026-11-11): the line's sound plays with the front. */
-    val frontSound: Boolean = false,
+/**
+ * Where a card carries one of its media (lion737, #81, 2026-11-12): on the front (so also on the
+ * back, which shows the front above it), on the back only, or not at all.
+ */
+internal enum class CardPlace(
+    val storageValue: String,
 ) {
-    /** The line's sound moves to the front; a Listening front has nothing but it already. */
-    val soundOnFront: Boolean get() = frontSound && front != CardFront.LISTENING
+    FRONT("front"),
+    BACK("back"),
+    OFF("off"),
 }
+
+internal fun storedCardPlace(
+    value: String?,
+    otherwise: CardPlace,
+): CardPlace = CardPlace.entries.firstOrNull { it.storageValue == value } ?: otherwise
+
+/** Where the word's voice usually goes for [front]: with the word, so on the back when the front hides the word. */
+internal fun usualWordSoundPlace(front: CardFront): CardPlace =
+    if (front == CardFront.SENTENCE || front == CardFront.LISTENING) CardPlace.BACK else CardPlace.FRONT
+
+/**
+ * What Send to puts on each card, and where (Settings → Flashcards & Anki): the word's voice, the
+ * line's real sound from the video, a picture of the line, and the front.
+ */
+internal data class CardOptions(
+    val wordSound: CardPlace = CardPlace.OFF,
+    val sentenceSound: CardPlace = CardPlace.OFF,
+    val picture: CardPlace = CardPlace.OFF,
+    val front: CardFront = CardFront.WORD_AND_SENTENCE,
+) {
+    val wordAudio: Boolean get() = wordSound != CardPlace.OFF
+    val sentenceAudio: Boolean get() = sentenceSound != CardPlace.OFF
+    val pictureWanted: Boolean get() = picture != CardPlace.OFF
+
+    /** The note type's template sides; a medium that is off keeps its usual side, as its field stays empty. */
+    val sides: CardSides
+        get() =
+            CardSides(
+                wordSoundFront = if (wordAudio) wordSound == CardPlace.FRONT else null,
+                sentenceSoundFront = sentenceSound == CardPlace.FRONT,
+                pictureFront = picture == CardPlace.FRONT,
+            )
+}
+
+/**
+ * Which media the template shows on the front. [wordSoundFront] null keeps the word's voice where
+ * [usualWordSoundPlace] puts it; the line's sound is always on a Listening front.
+ */
+internal data class CardSides(
+    val wordSoundFront: Boolean? = null,
+    val sentenceSoundFront: Boolean = false,
+    val pictureFront: Boolean = false,
+)
 
 /** One card template of the DualSub Replay audio note type. */
 internal data class AnkiCardTemplate(
@@ -61,61 +104,89 @@ internal const val ANKI_QUESTION_FORMAT = WORD_HTML + SENTENCE_HTML + WORD_AUDIO
 internal const val ANKI_ANSWER_FORMAT = BACK_START + READING_HTML + MEANING_HTML + TRANSLATION_HTML + SENTENCE_AUDIO + SOURCE_HTML
 
 /**
- * The card template for [front]; the picture is in the Source field, so it is on the back of every
- * one. With [frontSound] the line's sound moves from the back to the front (Listening has it there).
+ * The picture on the front: the Source field holds the picture and the video link, so the front
+ * hides the link and the back's Source hides the picture (the back shows the front above it).
+ */
+private const val PICTURE_FRONT_HTML = "<div class=\"source pf\">{{Source}}</div><style>.pf a,.pf br{display:none}</style>"
+private const val SOURCE_LINK_HTML = "<div class=\"source sl\">{{Source}}</div><style>.sl img,.sl br{display:none}</style>"
+
+/**
+ * The card template for [front], with [sides] saying which media show on the front. The picture is
+ * in the Source field, so without [CardSides.pictureFront] it is on the back of every card.
  */
 internal fun ankiCardTemplate(
     front: CardFront,
-    frontSound: Boolean = false,
+    sides: CardSides = CardSides(),
 ): AnkiCardTemplate {
-    val template = cardTemplateOf(front)
-    if (!frontSound || front == CardFront.LISTENING) return template
-    return AnkiCardTemplate(template.question + SENTENCE_AUDIO, template.answer.replace(SENTENCE_AUDIO, ""))
-}
-
-private fun cardTemplateOf(front: CardFront): AnkiCardTemplate =
-    when (front) {
-        CardFront.WORD_AND_SENTENCE -> AnkiCardTemplate(ANKI_QUESTION_FORMAT, ANKI_ANSWER_FORMAT)
+    val wordFront = sides.wordSoundFront ?: (usualWordSoundPlace(front) == CardPlace.FRONT)
+    val sentenceFront = sides.sentenceSoundFront || front == CardFront.LISTENING
+    val wordSound = { onFront: Boolean -> if (wordFront == onFront) WORD_AUDIO else "" }
+    val sentenceSound = { onFront: Boolean -> if (sentenceFront == onFront) SENTENCE_AUDIO else "" }
+    val picture = if (sides.pictureFront) PICTURE_FRONT_HTML else ""
+    val source = if (sides.pictureFront) SOURCE_LINK_HTML else SOURCE_HTML
+    val details = READING_HTML + MEANING_HTML
+    return when (front) {
+        CardFront.WORD_AND_SENTENCE ->
+            AnkiCardTemplate(
+                WORD_HTML + SENTENCE_HTML + picture + wordSound(true) + sentenceSound(true),
+                BACK_START + wordSound(false) + details + TRANSLATION_HTML + sentenceSound(false) + source,
+            )
         CardFront.WORD ->
             AnkiCardTemplate(
-                WORD_HTML + WORD_AUDIO,
-                BACK_START + READING_HTML + MEANING_HTML + SENTENCE_HTML + TRANSLATION_HTML + SENTENCE_AUDIO + SOURCE_HTML,
+                WORD_HTML + picture + wordSound(true) + sentenceSound(true),
+                BACK_START + wordSound(false) + details + SENTENCE_HTML + TRANSLATION_HTML + sentenceSound(false) + source,
             )
         CardFront.SENTENCE ->
             AnkiCardTemplate(
-                SENTENCE_FRONT_HTML,
-                BACK_START + WORD_HTML + WORD_AUDIO + READING_HTML + MEANING_HTML + TRANSLATION_HTML + SENTENCE_AUDIO + SOURCE_HTML,
+                SENTENCE_FRONT_HTML + picture + wordSound(true) + sentenceSound(true),
+                BACK_START + WORD_HTML + wordSound(false) + details + TRANSLATION_HTML + sentenceSound(false) + source,
             )
         CardFront.LISTENING ->
             AnkiCardTemplate(
-                "$SENTENCE_AUDIO{{^Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}",
+                "$SENTENCE_AUDIO{{^Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" + picture + wordSound(true),
                 BACK_START + "{{#Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" +
-                    WORD_HTML + WORD_AUDIO + READING_HTML + MEANING_HTML + TRANSLATION_HTML + SOURCE_HTML,
+                    WORD_HTML + wordSound(false) + details + TRANSLATION_HTML + source,
             )
     }
+}
 
-/** What a note type's template was last set to: the front's storage value, with [FRONT_SOUND_SUFFIX] for Sentence sound on the front. */
+/**
+ * What a note type's template was last set to: the front's storage value, then [FRONT_SOUND_SUFFIX]
+ * for the line's sound on the front, a suffix for the word's voice away from its usual side, and
+ * [PICTURE_FRONT_SUFFIX] for the picture on the front. Keys stored before the places existed
+ * ("word", "word+sound") still name the same template.
+ */
 internal fun cardTemplateKey(
     front: CardFront,
-    frontSound: Boolean = false,
-): String = if (frontSound && front != CardFront.LISTENING) front.storageValue + FRONT_SOUND_SUFFIX else front.storageValue
+    sides: CardSides = CardSides(),
+): String {
+    val usualWordFront = usualWordSoundPlace(front) == CardPlace.FRONT
+    val word =
+        when (sides.wordSoundFront) {
+            null, usualWordFront -> ""
+            true -> WORD_FRONT_SUFFIX
+            false -> WORD_BACK_SUFFIX
+        }
+    val sound = if (sides.sentenceSoundFront && front != CardFront.LISTENING) FRONT_SOUND_SUFFIX else ""
+    val picture = if (sides.pictureFront) PICTURE_FRONT_SUFFIX else ""
+    return front.storageValue + sound + word + picture
+}
 
 private const val FRONT_SOUND_SUFFIX = "+sound"
+private const val WORD_FRONT_SUFFIX = "+wordfront"
+private const val WORD_BACK_SUFFIX = "+wordback"
+private const val PICTURE_FRONT_SUFFIX = "+picture"
 
 /**
  * Whether the note type's template has to change: it was last set to [applied] (null: never by this
  * version, so the old fixed word-and-sentence front). A template the learner edited in Anki is left
- * alone until they pick another front or turn Sentence sound on the front on or off.
+ * alone until they pick another front or move a sound or the picture.
  */
 internal fun cardFrontNeedsUpdate(
     applied: String?,
     wanted: CardFront,
-    frontSound: Boolean = false,
-): Boolean {
-    val sound = applied?.endsWith(FRONT_SOUND_SUFFIX) == true
-    val appliedKey = cardTemplateKey(storedCardFront(applied?.removeSuffix(FRONT_SOUND_SUFFIX)), sound)
-    return appliedKey != cardTemplateKey(wanted, frontSound)
-}
+    sides: CardSides = CardSides(),
+): Boolean = (applied ?: CardFront.WORD_AND_SENTENCE.storageValue) != cardTemplateKey(wanted, sides)
 
 /** The field text that shows the media file [name] as a picture; empty for a name that isn't a plain file. */
 internal fun ankiPicture(name: String?): String {
@@ -131,7 +202,7 @@ internal interface CardFrontMemory {
     fun remember(
         noteType: String,
         front: CardFront,
-        frontSound: Boolean = false,
+        sides: CardSides = CardSides(),
     )
 }
 
@@ -143,9 +214,9 @@ internal class InMemoryCardFronts : CardFrontMemory {
     override fun remember(
         noteType: String,
         front: CardFront,
-        frontSound: Boolean,
+        sides: CardSides,
     ) {
-        fronts[noteType] = cardTemplateKey(front, frontSound)
+        fronts[noteType] = cardTemplateKey(front, sides)
     }
 }
 
@@ -160,8 +231,8 @@ internal class PreferenceCardFronts(
     override fun remember(
         noteType: String,
         front: CardFront,
-        frontSound: Boolean,
+        sides: CardSides,
     ) {
-        preferences.edit().putString(noteType, cardTemplateKey(front, frontSound)).apply()
+        preferences.edit().putString(noteType, cardTemplateKey(front, sides)).apply()
     }
 }

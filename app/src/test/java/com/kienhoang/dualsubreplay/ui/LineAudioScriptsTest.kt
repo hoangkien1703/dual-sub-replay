@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import com.kienhoang.dualsubreplay.data.AudioLine
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardOptions
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.data.audioLine
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,7 +55,9 @@ class LineAudioScriptsTest {
         assertTrue(lineAudioWanted(on, ankiDroidInstalled = true))
         assertFalse(lineAudioWanted(on, ankiDroidInstalled = false))
         assertTrue(lineAudioWanted(on.copy(sendTo = FlashcardApp.ANKICONNECT), ankiDroidInstalled = false))
-        assertFalse(lineAudioWanted(on.copy(cardAudio = false), ankiDroidInstalled = true))
+        assertFalse(lineAudioWanted(on.copy(cardSentenceSound = CardPlace.OFF), ankiDroidInstalled = true))
+        // The word's voice alone needs no recording.
+        assertTrue(lineAudioWanted(on.copy(cardWordSound = CardPlace.OFF), ankiDroidInstalled = true))
         assertFalse(lineAudioWanted(on.copy(ankiDroid = false), ankiDroidInstalled = true))
     }
 
@@ -88,15 +91,15 @@ class LineAudioScriptsTest {
     fun stillsAreTakenOnlyWhereTheyCanGo() {
         // Off until the learner turns it on (Kien, 2026-11-10).
         assertFalse(linePictureWanted(StudySettings(), ankiDroidInstalled = true))
-        val on = StudySettings(cardPicture = true)
+        val on = StudySettings(cardPicture = CardPlace.BACK)
         assertTrue(linePictureWanted(on, ankiDroidInstalled = true))
         assertFalse(linePictureWanted(on, ankiDroidInstalled = false))
         assertTrue(linePictureWanted(on.copy(sendTo = FlashcardApp.ANKICONNECT), ankiDroidInstalled = false))
-        assertFalse(linePictureWanted(on.copy(cardPicture = false), ankiDroidInstalled = true))
-        assertTrue(linePictureWanted(on.copy(cardAudio = false), ankiDroidInstalled = true))
+        assertFalse(linePictureWanted(on.copy(cardPicture = CardPlace.OFF), ankiDroidInstalled = true))
+        assertTrue(linePictureWanted(on.copy(cardSentenceSound = CardPlace.OFF), ankiDroidInstalled = true))
         assertEquals(
-            CardOptions(audio = true, picture = false, front = CardFront.WORD),
-            on.copy(cardPicture = false, cardFront = CardFront.WORD).cardOptions,
+            CardOptions(CardPlace.FRONT, CardPlace.BACK, CardPlace.OFF, CardFront.WORD),
+            on.copy(cardPicture = CardPlace.OFF, cardFront = CardFront.WORD).cardOptions,
         )
     }
 

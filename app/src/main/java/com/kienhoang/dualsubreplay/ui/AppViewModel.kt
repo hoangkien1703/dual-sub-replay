@@ -239,6 +239,7 @@ class AppViewModel internal constructor(
     private val playbackRequests = MutableStateFlow(CaptionPlaybackRequest())
     private var playbackKnown = false
     private var appVisible = true
+    private var studySteering = false
     private val liveCaptionTracker = LiveCaptionTracker()
     private val captionHighlightResolver = CaptionHighlightResolver()
     private var liveCaptionProgress: LiveCaptionProgress? = null
@@ -411,6 +412,16 @@ class AppViewModel internal constructor(
         updatePlaybackRequest()
     }
 
+    /**
+     * The play modes or the loop steer the video (see `studySteersPlayback`): off screen the lines
+     * around the playing time keep coming, or a repeat or loop would lose its line (25kiuo, #81,
+     * 2026-11-12).
+     */
+    internal fun setStudySteering(steering: Boolean) {
+        studySteering = steering
+        updatePlaybackRequest()
+    }
+
     internal fun setAppVisible(visible: Boolean) {
         appVisible = visible
         if (!visible) {
@@ -450,7 +461,7 @@ class AppViewModel internal constructor(
                         it.timeMs
                     },
                 paused = _state.value.playbackPaused,
-                enabled = appVisible && playbackKnown && _state.value.activeVideoId != null,
+                enabled = (appVisible || studySteering) && playbackKnown && _state.value.activeVideoId != null,
                 seekGeneration = it.seekGeneration + if (seek) 1 else 0,
                 translationAttempt = it.translationAttempt,
             )

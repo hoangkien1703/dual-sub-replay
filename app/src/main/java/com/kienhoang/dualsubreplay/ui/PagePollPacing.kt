@@ -17,6 +17,9 @@ internal const val PLAYBACK_TICK_PLAYING_MS = 33L
 /** Paused, the position does not move; the clock only needs to notice when playing starts again. */
 internal const val PLAYBACK_TICK_IDLE_MS = 100L
 
+/** How often a hidden page with a paused video is looked at again: only to notice that it plays. */
+internal const val OFF_SCREEN_IDLE_MS = 1_000L
+
 internal fun playbackPollIntervalMs(
     watchPage: Boolean,
     latest: WebPlaybackSnapshot?,

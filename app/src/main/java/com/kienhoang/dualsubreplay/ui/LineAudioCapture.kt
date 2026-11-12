@@ -14,6 +14,7 @@ import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.AudioLine
 import com.kienhoang.dualsubreplay.data.CardOptions
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.data.LINE_PICTURE_MAX_BYTES
 import com.kienhoang.dualsubreplay.data.LineAudioStore
 import com.kienhoang.dualsubreplay.data.LinePictureStore
@@ -22,6 +23,7 @@ import com.kienhoang.dualsubreplay.data.PendingCardAudio
 import com.kienhoang.dualsubreplay.data.PendingCardAudioStore
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
+import com.kienhoang.dualsubreplay.data.audible
 import com.kienhoang.dualsubreplay.data.audioLineOf
 import com.kienhoang.dualsubreplay.data.lineAudioReady
 import com.kienhoang.dualsubreplay.data.linePictureTime
@@ -133,9 +135,9 @@ internal class CardMediaSource(
         options: CardOptions,
     ): AnkiCardFiles =
         AnkiCardFiles(
-            word = if (options.audio) safely { words.record(word) } else null,
-            sentence = if (options.audio) safely { sentence(word) } else null,
-            picture = if (options.picture) safely { picture(word) } else null,
+            word = if (options.wordAudio) safely { words.record(word) } else null,
+            sentence = if (options.sentenceAudio) safely { sentence(word) } else null,
+            picture = if (options.pictureWanted) safely { picture(word) } else null,
         )
 
     private suspend fun sentence(word: SavedWord): File? {
@@ -327,13 +329,13 @@ private class PageCardMedia(
 internal fun lineAudioWanted(
     settings: StudySettings,
     ankiDroidInstalled: Boolean,
-): Boolean = settings.cardAudio && sendToUsable(settings, ankiDroidInstalled)
+): Boolean = settings.cardSentenceSound != CardPlace.OFF && sendToUsable(settings, ankiDroidInstalled)
 
 /** Stills are taken only where they can go somewhere. */
 internal fun linePictureWanted(
     settings: StudySettings,
     ankiDroidInstalled: Boolean,
-): Boolean = settings.cardPicture && sendToUsable(settings, ankiDroidInstalled)
+): Boolean = settings.cardPicture != CardPlace.OFF && sendToUsable(settings, ankiDroidInstalled)
 
 private fun sendToUsable(
     settings: StudySettings,
@@ -374,6 +376,6 @@ private suspend fun captureLine(
                 webView.evaluateJavascript(webLineAudioClipScript(line)) { value -> if (continuation.isActive) continuation.resume(value) }
             }
         } ?: return null
-    val pcm = withContext(Dispatchers.Default) { parseLinePcm(raw) } ?: return null
+    val pcm = withContext(Dispatchers.Default) { parseLinePcm(raw)?.takeIf(::audible) } ?: return null
     return withContext(Dispatchers.IO) { if (clips.save(line, pcm)) clips.file(line) else null }
 }

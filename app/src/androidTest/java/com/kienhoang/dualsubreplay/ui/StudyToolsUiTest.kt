@@ -151,18 +151,19 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("send_to_app_ankiconnect").performScrollTo().performClick()
         composeRule.onNodeWithTag("ankiconnect_choose_deck").performScrollTo().assertIsDisplayed()
         composeRule.runOnIdle { assertEquals("ankiconnect", preferences.getString(SEND_TO_APP_PREFERENCE, null)) }
-        // Add audio to cards is on until turned off.
-        composeRule.onNodeWithTag("card_audio_switch").performScrollTo().assertIsDisplayed()
+        // The word's voice and the line's sound are on cards until turned off (lion737, #81, 2026-11-12).
+        composeRule.onNodeWithTag("card_word_sound_front").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_sentence_sound_off").performScrollTo().assertIsDisplayed()
         saveUiEvidence("study-tools-send-to-settings")
-        composeRule.onNodeWithTag("card_audio_switch").performClick()
-        composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_AUDIO_PREFERENCE, true)) }
+        composeRule.onNodeWithTag("card_sentence_sound_off").performClick()
+        composeRule.runOnIdle { assertEquals("off", preferences.getString(CARD_SENTENCE_SOUND_PREFERENCE, null)) }
     }
 
     @Test
     fun flashcardsAndAnkiPicksThePictureAndTheCardFront() {
         showSettings("settings_section_flashcards")
-        // Add a picture to cards is off, and the front is the word with its sentence, until changed.
-        composeRule.onNodeWithTag("card_picture_switch").performScrollTo().assertIsDisplayed()
+        // No picture, and the front is the word with its sentence, until changed.
+        composeRule.onNodeWithTag("card_picture_off").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("card_front_listening").performScrollTo().assertIsDisplayed()
         composeRule
             .onNodeWithText(
@@ -178,25 +179,28 @@ class StudyToolsUiTest {
                 substring = true,
             ).performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag("card_picture_switch").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_picture_front").performScrollTo().performClick()
         composeRule.runOnIdle {
             assertEquals("listening", preferences.getString(CARD_FRONT_PREFERENCE, null))
-            assertTrue(preferences.getBoolean(CARD_PICTURE_PREFERENCE, false))
+            assertEquals("front", preferences.getString(CARD_PICTURE_PLACE_PREFERENCE, null))
+            // The front hides the word, so its voice moved to the back with it.
+            assertEquals("back", preferences.getString(CARD_WORD_SOUND_PREFERENCE, null))
         }
+        // A Listening front is the line's sound: it plays on the front or not at all.
+        composeRule.onNodeWithTag("card_sentence_sound_back").assertDoesNotExist()
+        composeRule.onNodeWithTag("card_sentence_sound_front").performScrollTo().assertIsDisplayed()
         saveUiEvidence("flashcards-card-front-listening")
-        // Listening has only the line's sound on the front already, so the switch goes away.
-        composeRule.onNodeWithTag("card_front_sound_switch").assertDoesNotExist()
     }
 
     @Test
-    fun sentenceSoundOnTheFrontIsOffUntilTurnedOn() {
+    fun theSentenceSoundIsOnTheBackUntilMoved() {
         showSettings("settings_section_flashcards")
         composeRule.onNodeWithTag("card_front_word").performScrollTo().performClick()
-        composeRule.onNodeWithTag("card_front_sound_switch").performScrollTo().assertIsDisplayed()
-        composeRule.runOnIdle { assertFalse(preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false)) }
-        composeRule.onNodeWithTag("card_front_sound_switch").performClick()
-        composeRule.runOnIdle { assertTrue(preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false)) }
-        composeRule.onNodeWithTag("card_front_sound_switch").performScrollTo()
+        composeRule.onNodeWithTag("card_sentence_sound_front").performScrollTo().assertIsDisplayed()
+        composeRule.runOnIdle { assertEquals(null, preferences.getString(CARD_SENTENCE_SOUND_PREFERENCE, null)) }
+        composeRule.onNodeWithTag("card_sentence_sound_front").performClick()
+        composeRule.runOnIdle { assertEquals("front", preferences.getString(CARD_SENTENCE_SOUND_PREFERENCE, null)) }
+        composeRule.onNodeWithTag("card_picture_off").performScrollTo()
         composeRule.waitForIdle()
         saveUiEvidence("flashcards-sentence-sound-on-front")
     }

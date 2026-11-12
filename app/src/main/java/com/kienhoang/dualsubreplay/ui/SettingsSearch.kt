@@ -257,8 +257,6 @@ internal enum class SearchableSetting(
         "ankidroid_switch",
         setOf(ANKIDROID_PREFERENCE, SEND_TO_APP_PREFERENCE, ANKICONNECT_DECK_PREFERENCE),
     ),
-    CARD_AUDIO(R.string.study_card_audio_title, MoreSettingsSection.FLASHCARDS, "card_audio_switch", setOf(CARD_AUDIO_PREFERENCE)),
-    CARD_PICTURE(R.string.study_card_picture_title, MoreSettingsSection.FLASHCARDS, "card_picture_switch", setOf(CARD_PICTURE_PREFERENCE)),
     CARD_FRONT(
         R.string.study_card_front_title,
         MoreSettingsSection.FLASHCARDS,
@@ -266,11 +264,26 @@ internal enum class SearchableSetting(
         setOf(CARD_FRONT_PREFERENCE),
         CardFront.entries.map { it.labelRes },
     ),
-    CARD_FRONT_SOUND(
-        R.string.study_card_front_sound_title,
+    CARD_WORD_SOUND(
+        R.string.study_card_word_sound_title,
         MoreSettingsSection.FLASHCARDS,
-        "card_front_sound_switch",
-        setOf(CARD_FRONT_SOUND_PREFERENCE),
+        "card_word_sound",
+        setOf(CARD_WORD_SOUND_PREFERENCE, CARD_AUDIO_PREFERENCE),
+        CARD_PLACE_LABELS,
+    ),
+    CARD_SENTENCE_SOUND(
+        R.string.study_card_sentence_sound_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_sentence_sound",
+        setOf(CARD_SENTENCE_SOUND_PREFERENCE, CARD_FRONT_SOUND_PREFERENCE),
+        CARD_PLACE_LABELS,
+    ),
+    CARD_PICTURE(
+        R.string.study_card_picture_place_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_picture",
+        setOf(CARD_PICTURE_PLACE_PREFERENCE, CARD_PICTURE_PREFERENCE),
+        CARD_PLACE_LABELS,
     ),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(

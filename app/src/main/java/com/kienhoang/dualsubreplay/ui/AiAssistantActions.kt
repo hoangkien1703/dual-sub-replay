@@ -22,11 +22,13 @@ import com.kienhoang.dualsubreplay.assistant.AiPlayback
 import com.kienhoang.dualsubreplay.assistant.AiSetting
 import com.kienhoang.dualsubreplay.assistant.aiActionNote
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.cleanSourceTitle
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
 import com.kienhoang.dualsubreplay.data.storedCardFront
+import com.kienhoang.dualsubreplay.data.storedCardPlace
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.validClipRange
 import com.kienhoang.dualsubreplay.data.withThirdLine
@@ -236,9 +238,9 @@ private fun aiStudySettingValue(
         AiSetting.MARK_NEW_WORDS -> onOff(study.markNewWords)
         AiSetting.SEND_TO_ANKIDROID -> onOff(study.ankiDroid)
         AiSetting.SEND_TO_APP -> study.sendTo.storageValue
-        AiSetting.CARD_AUDIO -> onOff(study.cardAudio)
-        AiSetting.CARD_PICTURE -> onOff(study.cardPicture)
-        AiSetting.CARD_FRONT_SOUND -> onOff(study.cardFrontSound)
+        AiSetting.CARD_WORD_SOUND -> study.cardWordSound.storageValue
+        AiSetting.CARD_SENTENCE_SOUND -> study.cardSentenceSound.storageValue
+        AiSetting.CARD_PICTURE -> study.cardPicture.storageValue
         AiSetting.CARD_FRONT -> study.cardFront.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
         AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
@@ -696,9 +698,10 @@ internal class AppAiActions(
             AiSetting.MARK_NEW_WORDS -> editor.putBoolean(MARK_NEW_WORDS_PREFERENCE, on)
             AiSetting.SEND_TO_ANKIDROID -> editor.putBoolean(ANKIDROID_PREFERENCE, on)
             AiSetting.SEND_TO_APP -> editor.putString(SEND_TO_APP_PREFERENCE, storedFlashcardApp(value).storageValue)
-            AiSetting.CARD_AUDIO -> editor.putBoolean(CARD_AUDIO_PREFERENCE, on)
-            AiSetting.CARD_PICTURE -> editor.putBoolean(CARD_PICTURE_PREFERENCE, on)
-            AiSetting.CARD_FRONT_SOUND -> editor.putBoolean(CARD_FRONT_SOUND_PREFERENCE, on)
+            AiSetting.CARD_WORD_SOUND -> editor.putString(CARD_WORD_SOUND_PREFERENCE, storedCardPlace(value, CardPlace.FRONT).storageValue)
+            AiSetting.CARD_SENTENCE_SOUND ->
+                editor.putString(CARD_SENTENCE_SOUND_PREFERENCE, storedCardPlace(value, CardPlace.BACK).storageValue)
+            AiSetting.CARD_PICTURE -> editor.putString(CARD_PICTURE_PLACE_PREFERENCE, storedCardPlace(value, CardPlace.OFF).storageValue)
             AiSetting.CARD_FRONT -> editor.putString(CARD_FRONT_PREFERENCE, storedCardFront(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
             AiSetting.LOOP_BUTTON -> editor.putBoolean(LOOP_BUTTON_PREFERENCE, on)
@@ -893,9 +896,14 @@ internal class AppAiActions(
         when (setting) {
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
-            AiSetting.CARD_AUDIO -> switch(R.string.study_card_audio_title, value)
-            AiSetting.CARD_PICTURE -> switch(R.string.study_card_picture_title, value)
-            AiSetting.CARD_FRONT_SOUND -> switch(R.string.study_card_front_sound_title, value)
+            AiSetting.CARD_WORD_SOUND ->
+                named(
+                    R.string.study_card_word_sound_title,
+                    string(storedCardPlace(value, CardPlace.FRONT).labelRes),
+                )
+            AiSetting.CARD_SENTENCE_SOUND ->
+                named(R.string.study_card_sentence_sound_title, string(storedCardPlace(value, CardPlace.BACK).labelRes))
+            AiSetting.CARD_PICTURE -> named(R.string.study_card_picture_place_title, string(storedCardPlace(value, CardPlace.OFF).labelRes))
             AiSetting.CARD_FRONT -> named(R.string.study_card_front_title, string(storedCardFront(value).labelRes))
             // settingLabel and otherSettingLabel name the others.
             else -> value

@@ -91,6 +91,16 @@ internal class LinePcm(
     val samples: ShortArray,
 )
 
+/** Quieter than this everywhere (about -54 dB), a clip holds no speech: it never goes on a card. */
+internal const val LINE_AUDIO_SILENT_PEAK = 64
+
+/**
+ * Whether [pcm] has any sound in it. A page that hands over silence (a muted or not yet running
+ * recorder) must not leave a card with a sound button that plays nothing (lion737, #81,
+ * 2026-11-12); the card keeps waiting for the line instead.
+ */
+internal fun audible(pcm: LinePcm): Boolean = pcm.samples.any { it > LINE_AUDIO_SILENT_PEAK || it < -LINE_AUDIO_SILENT_PEAK }
+
 /**
  * The page's answer to a clip request (the raw `evaluateJavascript` value): a JSON text with the
  * sample rate and base64 little-endian samples, or null when the page doesn't hold the whole line.
