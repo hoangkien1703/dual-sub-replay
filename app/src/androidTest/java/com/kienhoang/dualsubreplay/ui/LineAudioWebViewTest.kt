@@ -89,7 +89,7 @@ class LineAudioWebViewTest {
             evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 3.25; v.play(); })()")
             playTo(web!!, 6.7)
             val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
-            assertNotNull("the replayed line has no clip", clip)
+            assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
             assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
             assertTrue("the clip is silent", audible(clip))
         } finally {
@@ -177,6 +177,8 @@ class LineAudioWebViewTest {
         }
         return false
     }
+
+    private fun runs(web: WebView): String? = evaluate(web, "window.__dualSubLineAudio ? window.__dualSubLineAudio.runs() : null")
 
     private fun evaluate(
         web: WebView,

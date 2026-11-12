@@ -163,6 +163,16 @@ private val WEB_LINE_AUDIO_RECORDER =
         for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
         return JSON.stringify({ rate: state.context.sampleRate, pcm: btoa(binary) });
       },
+      // The unbroken runs of kept sound as [start, end] seconds, for tests and debugging.
+      runs: function() {
+        const runs = [];
+        state.blocks.forEach(function(block) {
+          const run = runs[runs.length - 1];
+          if (run && Math.abs(block.start - run[1]) <= 0.06) run[1] = block.end;
+          else runs.push([block.start, block.end]);
+        });
+        return JSON.stringify(runs.map(function(run) { return [Math.round(run[0] * 100) / 100, Math.round(run[1] * 100) / 100]; }));
+      },
       stop: function() {
         document.removeEventListener('pointerdown', resume, true);
         document.removeEventListener('touchend', resume, true);
