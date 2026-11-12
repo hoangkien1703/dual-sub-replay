@@ -66,6 +66,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
@@ -93,6 +94,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.DictationCheck
+import com.kienhoang.dualsubreplay.data.soundReplayClip
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import java.util.Locale
@@ -121,7 +123,8 @@ fun DualSubApp(
     val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
     val webController = rememberYouTubeWebController()
     val pronouncer = rememberWordPronouncer()
-    BindPhraseActions(state, webController, pronouncer, viewModel::translateSubtitleText)
+    BindPhraseActions(state, webController, pronouncer, viewModel::translateSubtitleText) { tap -> viewModel.meaningInContext(tap) }
+    BindLineSoundReplay(webController, state.activeVideoId.takeUnless { state.liveFallback })
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
     var showVocabulary by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
@@ -1465,3 +1468,21 @@ internal fun captionTrackLabel(
     generated: Boolean,
     markGenerated: (String) -> String,
 ): String = if (generated && !name.contains("auto-generated", ignoreCase = true)) markGenerated(name) else name
+
+/** Lets a card sent before its line had played to the end replay that line, so its sound is recorded (see [LineAudioBridge.replayForSound]). */
+@Composable
+private fun BindLineSoundReplay(
+    webController: YouTubeWebController,
+    videoId: String?,
+) {
+    val playing by rememberUpdatedState(videoId)
+    DisposableEffect(webController) {
+        val token =
+            LineAudioBridge.bindReplay { word ->
+                val clip = soundReplayClip(word)?.takeIf { it.videoId != null && it.videoId == playing }
+                clip?.let(webController::replayClip)
+                clip != null
+            }
+        onDispose { LineAudioBridge.unbindReplay(token) }
+    }
+}

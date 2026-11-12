@@ -166,6 +166,16 @@ internal fun FlashcardSettingsSection() {
             front = settings.cardFront,
             onChange = { preferences.edit().putString(CARD_FRONT_PREFERENCE, it.storageValue).apply() },
         )
+        // Listening already has nothing but the line's sound on the front.
+        if (settings.cardFront != CardFront.LISTENING) {
+            SettingsSwitchRow(
+                title = stringResource(R.string.study_card_front_sound_title),
+                description = stringResource(R.string.study_card_front_sound_description),
+                checked = settings.cardFrontSound,
+                onCheckedChange = { preferences.edit().putBoolean(CARD_FRONT_SOUND_PREFERENCE, it).apply() },
+                testTag = "card_front_sound_switch",
+            )
+        }
     }
 }
 

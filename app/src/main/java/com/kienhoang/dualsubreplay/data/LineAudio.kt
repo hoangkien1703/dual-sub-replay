@@ -46,6 +46,19 @@ internal data class AudioLine(
     val windowEndMs: Long get() = endMs + LINE_AUDIO_TAIL_MS
 }
 
+/** Extra sound played before a line's lead when it is replayed for its clip: the recorder needs a moment after the seek. */
+internal const val LINE_AUDIO_REPLAY_EARLY_MS = 500L
+
+/**
+ * [word] with the times its line is replayed at so the page records the whole clip, lead and tail
+ * included, for a card sent before the line had played to its end (lion737, #81, 2026-11-11);
+ * null when the line can't be recorded.
+ */
+internal fun soundReplayClip(word: SavedWord): SavedWord? {
+    val line = audioLineOf(word) ?: return null
+    return word.copy(startMs = (line.windowStartMs - LINE_AUDIO_REPLAY_EARLY_MS).coerceAtLeast(0L), endMs = line.windowEndMs)
+}
+
 /** [word]'s line, or null when it has no usable video line (or one too long to record). */
 internal fun audioLineOf(word: SavedWord): AudioLine? = audioLine(word.videoId, word.startMs, word.endMs)
 

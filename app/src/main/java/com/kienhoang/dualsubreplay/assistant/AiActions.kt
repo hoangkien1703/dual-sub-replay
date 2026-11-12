@@ -141,6 +141,7 @@ internal enum class AiSetting(
     CARD_AUDIO("anki_card_audio"),
     CARD_PICTURE("anki_card_picture"),
     CARD_FRONT("anki_card_front", AI_CARD_FRONTS),
+    CARD_FRONT_SOUND("anki_card_front_sound"),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
@@ -854,6 +855,10 @@ private fun otherSettingValues(setting: AiSetting): String =
                 " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +
                 "word with its sentence, word only the word, sentence the sentence with the word in bold, listening only the " +
                 "line's sound; it changes cards sent before too)"
+        AiSetting.CARD_FRONT_SOUND ->
+            choiceList(setting.choices) +
+                " (Sentence sound on the front: the line's sound from the video plays on the card's front too, not only on the " +
+                "back; for every Card front but listening, which has only that sound; off by default)"
         else -> choiceList(setting.choices)
     }
 

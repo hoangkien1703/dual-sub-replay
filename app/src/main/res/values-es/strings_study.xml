@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">Añadir una imagen a las tarjetas</string>
     <string name="study_card_picture_description">Las tarjetas llevan una imagen del vídeo, tomada mientras la frase de la palabra está en pantalla. Si no hay ninguna, se usa la miniatura del vídeo.</string>
     <string name="study_card_front_title">Anverso de la tarjeta</string>
+    <string name="study_card_front_sound_title">Sonido de la frase en el anverso</string>
+    <string name="study_card_front_sound_description">El anverso también reproduce el sonido de la frase del vídeo, no solo el reverso.</string>
     <string name="study_card_front_word_sentence">Palabra y frase</string>
     <string name="study_card_front_word">Palabra</string>
     <string name="study_card_front_sentence">Frase</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">El anverso solo reproduce el sonido de la frase; la frase y la palabra están en el reverso.</string>
     <string name="study_card_front_note">Cambiarlo también cambia las tarjetas que enviaste antes.</string>
     <string name="study_card_sound_waits">El sonido de la frase se añade cuando la frase termina de reproducirse.</string>
+    <string name="study_card_sound_replaying">Reproduciendo la frase una vez para añadir su sonido a la tarjeta.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>

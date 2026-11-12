@@ -42,6 +42,8 @@
     <string name="study_card_picture_title">Tambahkan gambar ke kartu</string>
     <string name="study_card_picture_description">Kartu mendapat gambar dari video, diambil saat kalimat kata itu tampil di layar. Jika tidak ada, gambar mini video yang dipakai.</string>
     <string name="study_card_front_title">Sisi depan kartu</string>
+    <string name="study_card_front_sound_title">Suara kalimat di sisi depan</string>
+    <string name="study_card_front_sound_description">Sisi depan juga memutar suara kalimat dari video, tidak hanya sisi belakang.</string>
     <string name="study_card_front_word_sentence">Kata dan kalimat</string>
     <string name="study_card_front_word">Kata</string>
     <string name="study_card_front_sentence">Kalimat</string>
@@ -52,6 +54,7 @@
     <string name="study_card_front_listening_description">Sisi depan hanya memutar suara kalimat; kalimat dan kata ada di belakang.</string>
     <string name="study_card_front_note">Mengubah ini juga mengubah kartu yang sudah Anda kirim.</string>
     <string name="study_card_sound_waits">Suara kalimat ditambahkan setelah kalimat selesai diputar.</string>
+    <string name="study_card_sound_replaying">Memutar kalimat sekali agar suaranya masuk ke kartu.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>

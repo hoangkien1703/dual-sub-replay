@@ -75,6 +75,25 @@ internal object LineAudioBridge {
     }
 
     suspend fun captureNow(line: AudioLine): File? = capturer?.invoke(line)
+
+    @Volatile
+    private var replayer: ((SavedWord) -> Boolean)? = null
+
+    /** Lets [replayForSound] play a line in the page video; [replay] says false when it can't (another video plays). */
+    fun bindReplay(replay: (SavedWord) -> Boolean): Any {
+        replayer = replay
+        return replay
+    }
+
+    fun unbindReplay(token: Any) {
+        if (replayer === token) replayer = null
+    }
+
+    /**
+     * Plays [word]'s line once, a moment before its start to just after its end, so the recorder
+     * gets the sound of a card that waits for it; false when no page video can play it now.
+     */
+    fun replayForSound(word: SavedWord): Boolean = replayer?.invoke(word) ?: false
 }
 
 /** Like [LineAudioBridge], for stills: while the page runs, [captureNow] takes one if the video shows the line. */

@@ -12,6 +12,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -41,7 +42,12 @@ class PhraseSelectionUiTest {
     private var replays = 0
     private val translatedTexts = mutableListOf<Pair<String, Boolean>>()
 
-    private fun showCard() {
+    private val askedInSentence = mutableListOf<WordTap>()
+
+    private fun showCard(
+        inSentence: String? = null,
+        inSentenceFirst: Boolean = true,
+    ) {
         val controller = PhraseSelectionController()
         controller.actions =
             PhraseActions(
@@ -52,6 +58,14 @@ class PhraseSelectionUiTest {
                     translatedTexts += text to isTranslated
                     "nghĩa của $text"
                 },
+                meaningInSentence =
+                    inSentence?.let { meaning ->
+                        { tap ->
+                            askedInSentence += tap
+                            ContextMeaning.Found(meaning)
+                        }
+                    },
+                meaningInSentenceFirst = inSentenceFirst,
             )
         compose.setContent {
             DualSubTheme {
@@ -123,6 +137,36 @@ class PhraseSelectionUiTest {
             up()
         }
         compose.waitForIdle()
+    }
+
+    @Test
+    fun theBarShowsTheMeaningInTheSentenceWhileThatSettingIsOn() {
+        showCard(inSentence = "mong chờ")
+        tapWord(original, "looking")
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("mong chờ").fetchSemanticsNodes().isNotEmpty() }
+        // Show first → Meaning in this sentence: it is the big line, the dictionary meaning under it.
+        compose.onNodeWithText("mong chờ").assertIsDisplayed()
+        compose.onNodeWithText("Dictionary: nghĩa của looking").assertIsDisplayed()
+        assertEquals("looking", askedInSentence.single().token.text)
+        saveUiEvidence("phrase-action-bar-meaning-in-sentence")
+    }
+
+    @Test
+    fun theBarPutsTheDictionaryMeaningFirstWhenShowFirstSaysSo() {
+        showCard(inSentence = "mong chờ", inSentenceFirst = false)
+        tapWord(original, "looking")
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("In this sentence: mong chờ").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("nghĩa của looking").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-dictionary-first")
+    }
+
+    @Test
+    fun theBarAsksNothingWhileMeaningInThisSentenceIsOff() {
+        showCard()
+        tapWord(original, "looking")
+        compose.onNodeWithText("nghĩa của looking").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_meaning_in_sentence_loading").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_meaning_in_sentence").assertDoesNotExist()
     }
 
     @Test

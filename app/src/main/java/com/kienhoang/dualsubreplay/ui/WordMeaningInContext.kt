@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import java.util.Locale
 
 /**
@@ -53,6 +54,9 @@ internal fun readMeaningInContextFirst(context: Context): Boolean =
 /** A longer reply is an explanation, not the few words asked for. */
 private const val MAX_CONTEXT_MEANING_CHARS = 80
 
+/** A selected phrase can take a longer piece of the translation. */
+private const val MAX_PHRASE_MEANING_CHARS = 240
+
 internal fun readMeaningInContext(context: Context): Boolean =
     context.getSharedPreferences("dual_sub_preferences", 0).getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false)
 
@@ -69,37 +73,106 @@ internal sealed interface ContextMeaning {
     data object None : ContextMeaning
 }
 
-/** The sentence [selection]'s word was tapped in: the whole sentence when the row is part of one. */
-internal fun contextSentence(selection: LearningWordSelection): String? {
+/**
+ * What the AI reads to find the selection's meaning: the sentence it was selected in, that
+ * sentence's translation as the line under it shows it (null until it is translated), and the lines
+ * just before and after. With the translation the answer matches the line the learner reads
+ * ("spitting" → "çiskin" where the translation says "çiskin", not the dictionary's "tüpürmək";
+ * lion737, discussion #81, 2026-11-11).
+ */
+internal data class MeaningContext(
+    val sentence: String,
+    val translation: String? = null,
+    val before: String? = null,
+    val after: String? = null,
+)
+
+/** The [MeaningContext] of [selection], taking the translation and the lines around it from [segments]. */
+internal fun meaningContext(
+    selection: LearningWordSelection,
+    segments: List<SubtitleSegment> = emptyList(),
+): MeaningContext? {
     val segment = selection.segment ?: return null
-    val text =
-        if (selection.translated) {
-            segment.translatedText
-        } else {
-            segment.sentence?.text?.takeIf { it.isNotBlank() } ?: segment.originalText
-        }
-    return text?.trim()?.takeIf { it.isNotEmpty() && selection.token.text.isNotBlank() }
+    if (selection.token.text.isBlank()) return null
+    val index = segments.indexOfFirst { it.id == segment.id }
+    val rows = if (index >= 0) sentenceRows(segments, index) else IntRange.EMPTY
+    val rowSegments = if (index >= 0) segments.subList(rows.first, rows.last + 1) else listOf(segment)
+    val original =
+        segment.sentence
+            ?.text
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() } ?: segment.originalText.trim()
+    // A sentence split over rows is only whole when every row of it is in the transcript window.
+    val wholeSentence = segment.sentence == null || segment.sentence.cuts.size + 1 == rowSegments.size
+    val translation =
+        rowSegments
+            .map { it.translatedText?.trim().orEmpty() }
+            .takeIf { wholeSentence && it.none(String::isEmpty) }
+            ?.joinToString(" ")
+
+    fun lineText(row: SubtitleSegment?): String? =
+        (if (selection.translated) row?.translatedText else row?.originalText)?.trim()?.takeIf { it.isNotEmpty() }
+    val before = if (index >= 0) lineText(segments.getOrNull(rows.first - 1)) else null
+    val after = if (index >= 0) lineText(segments.getOrNull(rows.last + 1)) else null
+    return if (selection.translated) {
+        // A word tapped in the translation line is read in the translated sentence.
+        val sentence = translation ?: segment.translatedText?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        MeaningContext(sentence, original.takeIf { it.isNotEmpty() }, before, after)
+    } else {
+        original.takeIf { it.isNotEmpty() }?.let { MeaningContext(it, translation, before, after) }
+    }
 }
 
-/** The system and user text of the request for [word]'s meaning in [sentence]. */
+/** The rows of [segments] around [index] that show parts of the same sentence, in order. */
+private fun sentenceRows(
+    segments: List<SubtitleSegment>,
+    index: Int,
+): IntRange {
+    val sentence = segments[index].sentence ?: return index..index
+
+    fun partIndex(row: SubtitleSegment?): Int? = row?.sentence?.takeIf { it.text == sentence.text && it.cuts == sentence.cuts }?.index
+    var first = index
+    while (partIndex(segments.getOrNull(first - 1)) == partIndex(segments[first])!! - 1) first--
+    var last = index
+    while (partIndex(segments.getOrNull(last + 1)) == partIndex(segments[last])!! + 1) last++
+    return first..last
+}
+
+/** The system and user text of the request for [word]'s meaning in [context]; [phrase] for several selected words. */
 internal fun contextMeaningRequest(
     word: String,
-    sentence: String,
+    context: MeaningContext,
     wordLanguage: String,
     meaningLanguage: String,
+    phrase: Boolean = false,
 ): Pair<String, String> {
     val meaningName = englishLanguageName(meaningLanguage)
+    val selected = if (phrase) "selected words" else "tapped word"
+    // "One to four words" cut a selected phrase to its first words (lion737, 2026-11-11).
+    val length = if (phrase) "the whole selection, as many words as it needs" else "one to four words"
     val system =
-        "You help a language learner who tapped a word in a video subtitle. Reply with only the meaning " +
-            "of the tapped word as it is used in this sentence, written in $meaningName: one to four " +
-            "words, in the form that fits the sentence (tense, person, number, case), as a good " +
-            "translation of the whole sentence would render it. No quotes, no explanation, no other text."
-    val user = "Sentence (${englishLanguageName(wordLanguage)}): $sentence\nTapped word: $word"
+        "You help a language learner who ${if (phrase) "selected words" else "tapped a word"} in a video subtitle. " +
+            "Reply with only the meaning of the $selected as used in this sentence, written in $meaningName: " +
+            "$length, in the form that fits the sentence (tense, person, number, case), as a good translation " +
+            "of the whole sentence would render it. When a translation of the sentence is given and it renders " +
+            "the $selected, reply with exactly the words of that translation that render them, as written there; " +
+            "if it leaves them out or gets them wrong, give your own. No quotes, no explanation, no other text."
+    val user =
+        buildString {
+            context.before?.let { append("Line before: ").append(it).append('\n') }
+            append("Sentence (").append(englishLanguageName(wordLanguage)).append("): ").append(context.sentence)
+            context.after?.let { append("\nLine after: ").append(it) }
+            context.translation?.let { append("\nTranslation of the sentence (").append(meaningName).append("): ").append(it) }
+            append(if (phrase) "\nSelected words: " else "\nTapped word: ").append(word)
+        }
     return system to user
 }
 
 /** The model's reply as the card shows it, or null when it is not a short meaning. */
-internal fun cleanContextMeaning(reply: String?): String? {
+internal fun cleanContextMeaning(
+    reply: String?,
+    phrase: Boolean = false,
+): String? {
     val line =
         reply
             ?.lineSequence()
@@ -111,7 +184,8 @@ internal fun cleanContextMeaning(reply: String?): String? {
             .trim('"', '\'', '“', '”', '«', '»', '「', '」', '`', '*', ' ')
             .removeSuffix(".")
             .trim()
-    return clean.takeIf { it.isNotEmpty() && it.length <= MAX_CONTEXT_MEANING_CHARS }
+    val limit = if (phrase) MAX_PHRASE_MEANING_CHARS else MAX_CONTEXT_MEANING_CHARS
+    return clean.takeIf { it.isNotEmpty() && it.length <= limit }
 }
 
 /** True when the meaning in context says something the dictionary meaning does not. */

@@ -41,6 +41,9 @@ internal const val CARD_PICTURE_PREFERENCE = "anki_card_picture"
 /** Flashcards & Anki → Card front (owner pick 2026-11-10): a [CardFront] storage value. */
 internal const val CARD_FRONT_PREFERENCE = "anki_card_front"
 
+/** Flashcards & Anki → Card front → Sentence sound on the front (lion737, #81, 2026-11-11), off by default. */
+internal const val CARD_FRONT_SOUND_PREFERENCE = "anki_card_front_sound"
+
 /** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
 internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
 internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
@@ -69,6 +72,7 @@ internal val STUDY_SETTING_KEYS =
         CARD_AUDIO_PREFERENCE,
         CARD_PICTURE_PREFERENCE,
         CARD_FRONT_PREFERENCE,
+        CARD_FRONT_SOUND_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
@@ -171,6 +175,8 @@ internal data class StudySettings(
     /** Cards carry a still of the line from the video, else the video's thumbnail. */
     val cardPicture: Boolean = false,
     val cardFront: CardFront = CardFront.WORD_AND_SENTENCE,
+    /** The line's sound plays with the card's front, not only on the back. */
+    val cardFrontSound: Boolean = false,
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
@@ -179,7 +185,13 @@ internal data class StudySettings(
     val knownWords: Boolean get() = knownWordsMode != KnownWordsMode.OFF
 
     /** What Send to puts on each card. */
-    val cardOptions: CardOptions get() = CardOptions(audio = cardAudio, picture = cardPicture, front = cardFront)
+    val cardOptions: CardOptions get() =
+        CardOptions(
+            audio = cardAudio,
+            picture = cardPicture,
+            front = cardFront,
+            frontSound = cardFrontSound,
+        )
 
     /** Pause on lines with one new word needs the known-word list; without it the video plays normally. */
     val effectivePlayMode: StudyPlayMode
@@ -217,6 +229,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         cardAudio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
         cardPicture = preferences.getBoolean(CARD_PICTURE_PREFERENCE, false),
         cardFront = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
+        cardFrontSound = preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),

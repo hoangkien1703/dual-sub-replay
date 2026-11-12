@@ -30,7 +30,12 @@ internal data class CardOptions(
     val audio: Boolean = false,
     val picture: Boolean = false,
     val front: CardFront = CardFront.WORD_AND_SENTENCE,
-)
+    /** Card front → Sentence sound on the front (lion737, #81, 2026-11-11): the line's sound plays with the front. */
+    val frontSound: Boolean = false,
+) {
+    /** The line's sound moves to the front; a Listening front has nothing but it already. */
+    val soundOnFront: Boolean get() = frontSound && front != CardFront.LISTENING
+}
 
 /** One card template of the DualSub Replay audio note type. */
 internal data class AnkiCardTemplate(
@@ -55,8 +60,20 @@ private const val BACK_START = "{{FrontSide}}<hr id=answer>"
 internal const val ANKI_QUESTION_FORMAT = WORD_HTML + SENTENCE_HTML + WORD_AUDIO
 internal const val ANKI_ANSWER_FORMAT = BACK_START + READING_HTML + MEANING_HTML + TRANSLATION_HTML + SENTENCE_AUDIO + SOURCE_HTML
 
-/** The card template for [front]; the picture is in the Source field, so it is on the back of every one. */
-internal fun ankiCardTemplate(front: CardFront): AnkiCardTemplate =
+/**
+ * The card template for [front]; the picture is in the Source field, so it is on the back of every
+ * one. With [frontSound] the line's sound moves from the back to the front (Listening has it there).
+ */
+internal fun ankiCardTemplate(
+    front: CardFront,
+    frontSound: Boolean = false,
+): AnkiCardTemplate {
+    val template = cardTemplateOf(front)
+    if (!frontSound || front == CardFront.LISTENING) return template
+    return AnkiCardTemplate(template.question + SENTENCE_AUDIO, template.answer.replace(SENTENCE_AUDIO, ""))
+}
+
+private fun cardTemplateOf(front: CardFront): AnkiCardTemplate =
     when (front) {
         CardFront.WORD_AND_SENTENCE -> AnkiCardTemplate(ANKI_QUESTION_FORMAT, ANKI_ANSWER_FORMAT)
         CardFront.WORD ->
@@ -77,15 +94,28 @@ internal fun ankiCardTemplate(front: CardFront): AnkiCardTemplate =
             )
     }
 
+/** What a note type's template was last set to: the front's storage value, with [FRONT_SOUND_SUFFIX] for Sentence sound on the front. */
+internal fun cardTemplateKey(
+    front: CardFront,
+    frontSound: Boolean = false,
+): String = if (frontSound && front != CardFront.LISTENING) front.storageValue + FRONT_SOUND_SUFFIX else front.storageValue
+
+private const val FRONT_SOUND_SUFFIX = "+sound"
+
 /**
  * Whether the note type's template has to change: it was last set to [applied] (null: never by this
  * version, so the old fixed word-and-sentence front). A template the learner edited in Anki is left
- * alone until they pick another front.
+ * alone until they pick another front or turn Sentence sound on the front on or off.
  */
 internal fun cardFrontNeedsUpdate(
     applied: String?,
     wanted: CardFront,
-): Boolean = storedCardFront(applied) != wanted
+    frontSound: Boolean = false,
+): Boolean {
+    val sound = applied?.endsWith(FRONT_SOUND_SUFFIX) == true
+    val appliedKey = cardTemplateKey(storedCardFront(applied?.removeSuffix(FRONT_SOUND_SUFFIX)), sound)
+    return appliedKey != cardTemplateKey(wanted, frontSound)
+}
 
 /** The field text that shows the media file [name] as a picture; empty for a name that isn't a plain file. */
 internal fun ankiPicture(name: String?): String {
@@ -101,6 +131,7 @@ internal interface CardFrontMemory {
     fun remember(
         noteType: String,
         front: CardFront,
+        frontSound: Boolean = false,
     )
 }
 
@@ -112,8 +143,9 @@ internal class InMemoryCardFronts : CardFrontMemory {
     override fun remember(
         noteType: String,
         front: CardFront,
+        frontSound: Boolean,
     ) {
-        fronts[noteType] = front.storageValue
+        fronts[noteType] = cardTemplateKey(front, frontSound)
     }
 }
 
@@ -128,7 +160,8 @@ internal class PreferenceCardFronts(
     override fun remember(
         noteType: String,
         front: CardFront,
+        frontSound: Boolean,
     ) {
-        preferences.edit().putString(noteType, front.storageValue).apply()
+        preferences.edit().putString(noteType, cardTemplateKey(front, frontSound)).apply()
     }
 }

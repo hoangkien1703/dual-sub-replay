@@ -226,7 +226,8 @@ internal class AnkiDroidNotes(
             try {
                 val deck = deckId() ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 val noteType =
-                    noteTypeId(deck, options.front) ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
+                    noteTypeId(deck, options.front, options.soundOnFront)
+                        ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 for (word in unsent) {
                     val added =
                         addNote(noteType, deck, word, media, options)
@@ -260,6 +261,7 @@ internal class AnkiDroidNotes(
     private fun noteTypeId(
         deck: Long,
         front: CardFront,
+        frontSound: Boolean,
     ): Long? {
         val models = Uri.withAppendedPath(base, "models")
         val fields = ANKI_FIELDS.joinToString(ANKI_FIELD_SEPARATOR)
@@ -270,7 +272,9 @@ internal class AnkiDroidNotes(
             while (id >= 0 && name >= 0 && names >= 0 && cursor.moveToNext()) {
                 if (cursor.getString(name) == ANKI_NOTE_TYPE_NAME && cursor.getString(names) == fields) {
                     val found = cursor.getLong(id)
-                    if (cardFrontNeedsUpdate(cardFronts.applied(found.toString()), front)) setTemplate(models, found, front)
+                    if (cardFrontNeedsUpdate(cardFronts.applied(found.toString()), front, frontSound)) {
+                        setTemplate(models, found, front, frontSound)
+                    }
                     return found
                 }
             }
@@ -286,7 +290,7 @@ internal class AnkiDroidNotes(
             }
         val id = resolver.insert(models, values)?.lastPathSegment?.toLongOrNull() ?: return null
         // AnkiDroid's own layout (word, then meaning) stays if this is refused.
-        setTemplate(models, id, front)
+        setTemplate(models, id, front, frontSound)
         return id
     }
 
@@ -298,15 +302,16 @@ internal class AnkiDroidNotes(
         models: Uri,
         noteType: Long,
         front: CardFront,
+        frontSound: Boolean,
     ) {
-        val template = ankiCardTemplate(front)
+        val template = ankiCardTemplate(front, frontSound)
         val values =
             ContentValues().apply {
                 put("question_format", template.question)
                 put("answer_format", template.answer)
             }
         val changed = runCatching { resolver.update(Uri.withAppendedPath(models, "$noteType/templates/0"), values, null, null) > 0 }
-        if (changed.getOrDefault(false)) cardFronts.remember(noteType.toString(), front)
+        if (changed.getOrDefault(false)) cardFronts.remember(noteType.toString(), front, frontSound)
     }
 
     /** A note AnkiDroid took; [waiting] when it went without its sentence's sound, which comes later. */

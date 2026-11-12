@@ -111,11 +111,12 @@ internal fun ankiConnectFields(
     word: SavedWord,
     media: CardMedia = CardMedia(),
     front: CardFront = CardFront.WORD_AND_SENTENCE,
+    frontSound: Boolean = false,
 ): Map<String, String> {
     val values = ankiNoteFields(word, media)
     if (fieldNames == ANKI_FIELDS) return ANKI_FIELDS.zip(values).toMap()
     if (fieldNames.isEmpty()) return emptyMap()
-    val (frontParts, backParts) = basicCardSides(front, values)
+    val (frontParts, backParts) = basicCardSides(front, values, frontSound)
     val frontText = frontParts.filter { it.isNotBlank() }.joinToString("<br><br>")
     val back = backParts.filter { it.isNotBlank() }.joinToString("<br>")
     if (fieldNames.size == 1) return mapOf(fieldNames[0] to listOf(frontText, back).filter { it.isNotBlank() }.joinToString("<hr>"))
@@ -124,6 +125,17 @@ internal fun ankiConnectFields(
 
 /** The fields ([values], in [ANKI_FIELDS] order) on a two-sided card's front and back for [front]. */
 private fun basicCardSides(
+    front: CardFront,
+    values: List<String>,
+    frontSound: Boolean,
+): Pair<List<String>, List<String>> {
+    val (frontParts, backParts) = basicCardSidesOf(front, values)
+    if (!frontSound || front == CardFront.LISTENING) return frontParts to backParts
+    val sentenceAudio = values[7]
+    return frontParts + sentenceAudio to backParts - sentenceAudio
+}
+
+private fun basicCardSidesOf(
     front: CardFront,
     values: List<String>,
 ): Pair<List<String>, List<String>> {
@@ -161,8 +173,11 @@ internal fun ankiConnectSentenceTarget(
 }
 
 /** The DualSub Replay note type, made where AnkiConnect can make one (desktop Anki). */
-internal fun ankiConnectNoteTypeParams(front: CardFront = CardFront.WORD_AND_SENTENCE): JSONObject {
-    val template = ankiCardTemplate(front)
+internal fun ankiConnectNoteTypeParams(
+    front: CardFront = CardFront.WORD_AND_SENTENCE,
+    frontSound: Boolean = false,
+): JSONObject {
+    val template = ankiCardTemplate(front, frontSound)
     return JSONObject()
         .put("modelName", ANKI_NOTE_TYPE_NAME)
         .put("inOrderFields", JSONArray(ANKI_FIELDS))
@@ -180,8 +195,11 @@ internal fun ankiConnectNoteTypeParams(front: CardFront = CardFront.WORD_AND_SEN
 }
 
 /** The note type's card template set to [front] (AnkiConnect's `updateModelTemplates`). */
-internal fun ankiConnectTemplateParams(front: CardFront): JSONObject {
-    val template = ankiCardTemplate(front)
+internal fun ankiConnectTemplateParams(
+    front: CardFront,
+    frontSound: Boolean = false,
+): JSONObject {
+    val template = ankiCardTemplate(front, frontSound)
     val card = JSONObject().put("Front", template.question).put("Back", template.answer)
     return JSONObject().put(
         "model",
@@ -248,7 +266,9 @@ internal class AnkiConnectNotes(
         var waiting = 0
         return try {
             val deck = deck(chosenDeck) ?: return AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
-            val (noteType, fields) = noteType(options.front) ?: return AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
+            val (noteType, fields) =
+                noteType(options.front, options.soundOnFront)
+                    ?: return AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
             for (word in unsent) {
                 try {
                     val files = media?.files(word, options) ?: AnkiCardFiles()
@@ -258,7 +278,7 @@ internal class AnkiConnectNotes(
                             sentence = files.sentence?.let { ankiSound(storeMedia(it)) }.orEmpty(),
                             picture = files.picture?.let { ankiPicture(storeMedia(it)) }.orEmpty(),
                         )
-                    val values = ankiConnectFields(fields, word, fieldMedia, options.front)
+                    val values = ankiConnectFields(fields, word, fieldMedia, options.front, options.soundOnFront)
                     val request = JSONObject().put("note", note(deck, noteType, values, allowDuplicate = again))
                     val noteId = (call("addNote", request) as? Number)?.toLong()
                     val line = audioLineOf(word)
@@ -351,14 +371,21 @@ internal class AnkiConnectNotes(
         return ankiConnectDeck(after, chosen) ?: ankiConnectFallbackDeck(after)
     }
 
-    private suspend fun noteType(front: CardFront): Pair<String, List<String>>? {
+    private suspend fun noteType(
+        front: CardFront,
+        frontSound: Boolean,
+    ): Pair<String, List<String>>? {
         var names = ankiConnectNames(call("modelNames"))
         if (ANKI_NOTE_TYPE_NAME !in names) {
-            if (tryCall("createModel", ankiConnectNoteTypeParams(front))) cardFronts.remember(ANKI_NOTE_TYPE_NAME, front)
+            if (tryCall("createModel", ankiConnectNoteTypeParams(front, frontSound))) {
+                cardFronts.remember(ANKI_NOTE_TYPE_NAME, front, frontSound)
+            }
             names = ankiConnectNames(call("modelNames"))
-        } else if (cardFrontNeedsUpdate(cardFronts.applied(ANKI_NOTE_TYPE_NAME), front)) {
+        } else if (cardFrontNeedsUpdate(cardFronts.applied(ANKI_NOTE_TYPE_NAME), front, frontSound)) {
             // Desktop AnkiConnect changes the template; AnkiConnect Android can't, and is asked again next time.
-            if (tryCall("updateModelTemplates", ankiConnectTemplateParams(front))) cardFronts.remember(ANKI_NOTE_TYPE_NAME, front)
+            if (tryCall("updateModelTemplates", ankiConnectTemplateParams(front, frontSound))) {
+                cardFronts.remember(ANKI_NOTE_TYPE_NAME, front, frontSound)
+            }
         }
         val name = ANKI_NOTE_TYPE_NAME.takeIf { it in names } ?: ankiConnectFallbackNoteType(names) ?: return null
         return name to ankiConnectNames(call("modelFieldNames", JSONObject().put("modelName", name)))

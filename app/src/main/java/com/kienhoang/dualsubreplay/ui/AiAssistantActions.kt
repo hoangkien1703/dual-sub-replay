@@ -238,6 +238,7 @@ private fun aiStudySettingValue(
         AiSetting.SEND_TO_APP -> study.sendTo.storageValue
         AiSetting.CARD_AUDIO -> onOff(study.cardAudio)
         AiSetting.CARD_PICTURE -> onOff(study.cardPicture)
+        AiSetting.CARD_FRONT_SOUND -> onOff(study.cardFrontSound)
         AiSetting.CARD_FRONT -> study.cardFront.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
         AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
@@ -697,6 +698,7 @@ internal class AppAiActions(
             AiSetting.SEND_TO_APP -> editor.putString(SEND_TO_APP_PREFERENCE, storedFlashcardApp(value).storageValue)
             AiSetting.CARD_AUDIO -> editor.putBoolean(CARD_AUDIO_PREFERENCE, on)
             AiSetting.CARD_PICTURE -> editor.putBoolean(CARD_PICTURE_PREFERENCE, on)
+            AiSetting.CARD_FRONT_SOUND -> editor.putBoolean(CARD_FRONT_SOUND_PREFERENCE, on)
             AiSetting.CARD_FRONT -> editor.putString(CARD_FRONT_PREFERENCE, storedCardFront(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
             AiSetting.LOOP_BUTTON -> editor.putBoolean(LOOP_BUTTON_PREFERENCE, on)
@@ -893,6 +895,7 @@ internal class AppAiActions(
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
             AiSetting.CARD_AUDIO -> switch(R.string.study_card_audio_title, value)
             AiSetting.CARD_PICTURE -> switch(R.string.study_card_picture_title, value)
+            AiSetting.CARD_FRONT_SOUND -> switch(R.string.study_card_front_sound_title, value)
             AiSetting.CARD_FRONT -> named(R.string.study_card_front_title, string(storedCardFront(value).labelRes))
             // settingLabel and otherSettingLabel name the others.
             else -> value
