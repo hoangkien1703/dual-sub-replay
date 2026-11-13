@@ -26,7 +26,8 @@ internal enum class JlptLevel(
  *   (助け合う, not 似合う); `第~` means a longer word starting with it (第一).
  * - `@名詞` the part of speech (any IPADIC level) is this; `@動詞,形容詞` is any of them, and
  *   several `@` groups must all hold.
- * - `%連用` the conjugation form starts with this (`%基本形,体言` is either).
+ * - `%連用` the conjugation form starts with this (`%基本形,体言` is either); a form with several
+ *   readings joined by `|` (Spanish PRES|PRET) matches when one of them does.
  * - `!似合う` never this word, whatever else matches.
  * - `?` at the end makes the condition optional.
  * - A first condition starting with `^` checks the morpheme before the point, and a last one
@@ -151,7 +152,11 @@ private class MorphemeCondition(
             morpheme.baseForm !in excluded &&
             textMatches(morpheme) &&
             tagGroups.all { group -> morpheme.pos in group || morpheme.detail in group || morpheme.subDetail in group } &&
-            (conjugations.isEmpty() || conjugations.any(morpheme.conjugationForm::startsWith))
+            (conjugations.isEmpty() || conjugationMatches(morpheme.conjugationForm))
+
+    /** A Spanish verb form can be read several ways (hablamos: PRES|PRET); any of them counts. */
+    private fun conjugationMatches(form: String): Boolean =
+        if ('|' in form) form.split('|').any { reading -> conjugations.any(reading::startsWith) } else conjugations.any(form::startsWith)
 
     private fun textMatches(morpheme: Morpheme): Boolean =
         when {

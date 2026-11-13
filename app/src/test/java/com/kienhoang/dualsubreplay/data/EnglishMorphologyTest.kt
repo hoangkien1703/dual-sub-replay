@@ -5,7 +5,7 @@ import org.junit.Test
 
 class EnglishMorphologyTest {
     private companion object {
-        val analyzer by lazy { EnglishAnalyzer(LearnerData.open("en-pos.zip").use(EnglishPosTagger::load), loadEnglishLexicon()) }
+        val analyzer by lazy { EnglishAnalyzer(LearnerData.open("en-pos.zip").use(OpenNlpPosTagger::load), loadEnglishLexicon()) }
     }
 
     private fun tags(line: String) = tagEnglish(analyzer.tagger, line).map { it.tag }

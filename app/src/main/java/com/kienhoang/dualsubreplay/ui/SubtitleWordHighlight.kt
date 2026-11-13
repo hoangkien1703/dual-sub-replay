@@ -16,6 +16,7 @@ import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
+import com.kienhoang.dualsubreplay.data.SpanishMorphology
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import kotlinx.coroutines.Dispatchers
@@ -164,15 +165,16 @@ internal fun annotatedSubtitleText(
 }
 
 /**
- * Changes once the Japanese, English or Chinese analyzer finishes loading in the background. Use
- * it as a `remember` key wherever subtitle text is tokenized, so lines shown before it loaded are
- * split again. Each revision only grows, so their sum changes whenever one does.
+ * Changes once the Japanese, English, Chinese or Spanish analyzer finishes loading in the
+ * background. Use it as a `remember` key wherever subtitle text is tokenized, so lines shown before
+ * it loaded are split again. Each revision only grows, so their sum changes whenever one does.
  */
 @Composable
 internal fun tokenizerRevision(): Int =
     JapaneseMorphology.revision.collectAsState().value +
         EnglishMorphology.revision.collectAsState().value +
-        ChineseMorphology.revision.collectAsState().value
+        ChineseMorphology.revision.collectAsState().value +
+        SpanishMorphology.revision.collectAsState().value
 
 /** Rows split ahead of the playing line; about a screenful of subtitle rows. */
 private const val UPCOMING_TOKEN_ROWS = 12

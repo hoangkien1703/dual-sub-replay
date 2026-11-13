@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** The English model and the Chinese word list and tables are packaged in the APK and load on Android's runtime. */
+/** The English and Spanish models and word lists and the Chinese tables are packaged in the APK and load on Android's runtime. */
 class LearnerDataDeviceTest {
     @Test
     fun englishAndChineseAnalyzersLoadFromTheApk() {
@@ -29,5 +29,20 @@ class LearnerDataDeviceTest {
         assertEquals(PartOfSpeech.NOUN, chinese[2].partOfSpeech)
         val le = grammarMatches(line, GrammarLanguage.CHINESE).orEmpty().single { GrammarMeaning.ZH_LE_COMPLETED in it.meanings }
         assertEquals(HskLevel.HSK1, le.level)
+    }
+
+    @Test
+    fun spanishAnalyzerLoadsFromTheApk() {
+        LearnerData.useAssets(InstrumentationRegistry.getInstrumentation().targetContext.assets)
+        assertTrue(SpanishMorphology.awaitReady())
+
+        val line = "Ayer fuimos a la playa con mis amigas."
+        val words = LanguageAwareTokenizer.tokenize(line, "es")
+        assertEquals("ir", words.first { it.text == "fuimos" }.baseForm)
+        assertEquals("amigo", words.first { it.text == "amigas" }.baseForm)
+        val preterite = grammarMatches(line, GrammarLanguage.SPANISH).orEmpty().first { GrammarMeaning.ES_PRETERITE in it.meanings }
+        assertEquals(CefrLevel.A2, preterite.level)
+        val details = SpanishMorphology.verbDetails(line, line.indexOf("fuimos"), line.indexOf("fuimos") + "fuimos".length)
+        assertEquals(SpanishPerson.NOSOTROS, details?.readings?.first()?.person)
     }
 }

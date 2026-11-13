@@ -7,10 +7,10 @@ import java.util.zip.ZipInputStream
 import kotlin.math.exp
 
 /**
- * Apache OpenNLP's English part-of-speech model (Universal Dependencies English EWT, maxent, beam 3),
- * run without the OpenNLP library: its loader asks Android's XML parser for a feature that Android
- * rejects. The features below are the ones OpenNLP 2.5.4 uses with this model's
- * `generator.featuregen`, so the tags are the same. Tags are UD parts of speech (NOUN, VERB, AUX,
+ * Apache OpenNLP's part-of-speech models (Universal Dependencies English EWT and Spanish GSD, maxent,
+ * beam 3), run without the OpenNLP library: its loader asks Android's XML parser for a feature that
+ * Android rejects. The features below are the ones OpenNLP 2.5.4 uses with these models'
+ * `generator.featuregen` (the same file in both), so the tags are the same. Tags are UD parts of speech (NOUN, VERB, AUX,
  * …); a contraction kept whole is tagged as its parts (`can't` AUX+PART).
  *
  * OpenNLP runs a beam of 3, but the model caches each word's features (`cache="true"`) from the
@@ -18,7 +18,7 @@ import kotlin.math.exp
  * the same scores, so the beam always ends on the best tag after the best sequence so far: taking
  * the best tag word by word gives the same tags.
  */
-internal class EnglishPosTagger private constructor(
+internal class OpenNlpPosTagger private constructor(
     private val outcomes: Array<String>,
     private val parameters: Map<String, Context>,
 ) {
@@ -59,18 +59,18 @@ internal class EnglishPosTagger private constructor(
         private const val MODEL_ENTRY = "pos.model"
 
         /** Reads the model from OpenNLP's model package (a zip holding `pos.model`). */
-        fun load(input: InputStream): EnglishPosTagger {
+        fun load(input: InputStream): OpenNlpPosTagger {
             ZipInputStream(input.buffered()).use { zip ->
                 while (true) {
-                    val entry = zip.nextEntry ?: throw IOException("No $MODEL_ENTRY in the English model.")
+                    val entry = zip.nextEntry ?: throw IOException("No $MODEL_ENTRY in the model package.")
                     if (entry.name == MODEL_ENTRY) return readGisModel(DataInputStream(zip.buffered()))
                 }
             }
         }
 
         /** OpenNLP's binary GIS format: type, correction constants, outcomes, outcome patterns, predicates, weights. */
-        private fun readGisModel(data: DataInputStream): EnglishPosTagger {
-            if (data.readUTF() != "GIS") throw IOException("The English model is not a GIS model.")
+        private fun readGisModel(data: DataInputStream): OpenNlpPosTagger {
+            if (data.readUTF() != "GIS") throw IOException("The model is not a GIS model.")
             data.readInt()
             data.readDouble()
             val outcomes = Array(data.readInt()) { data.readUTF() }
@@ -92,7 +92,7 @@ internal class EnglishPosTagger private constructor(
                     parameters[predicates[predicate++]] = Context(outcomeIds, DoubleArray(outcomeIds.size) { data.readDouble() })
                 }
             }
-            return EnglishPosTagger(outcomes, parameters)
+            return OpenNlpPosTagger(outcomes, parameters)
         }
 
         /** OpenNLP's features for [index]: prior, affixes, ±2-word window with sentence start, token class with word, previous tags. */

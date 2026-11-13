@@ -50,10 +50,11 @@ import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
 /**
  * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
- * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`.
+ * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`, Spanish in
+ * `SpanishGrammarText.kt`.
  */
 internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
-    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT + SPANISH_GRAMMAR_TEXT
 }
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
@@ -165,7 +166,7 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese, English or Chinese selection, read from its whole subtitle line, and
+ * The grammar of a Japanese, English, Chinese or Spanish selection, read from its whole subtitle line, and
  * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
  * nothing for other languages.
  */

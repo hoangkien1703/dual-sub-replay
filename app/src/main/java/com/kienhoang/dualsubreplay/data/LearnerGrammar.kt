@@ -3,9 +3,9 @@ package com.kienhoang.dualsubreplay.data
 import java.util.Locale
 
 /** The languages the word card explains grammar for. */
-internal enum class GrammarLanguage { JAPANESE, ENGLISH, CHINESE }
+internal enum class GrammarLanguage { JAPANESE, ENGLISH, CHINESE, SPANISH }
 
-/** Which grammar applies to [text]: Japanese by code or kana, English and Chinese by their language codes. */
+/** Which grammar applies to [text]: Japanese by code or kana, English, Chinese and Spanish by their language codes. */
 internal fun grammarLanguage(
     text: String,
     languageCode: String?,
@@ -15,6 +15,7 @@ internal fun grammarLanguage(
         LanguageAwareTokenizer.isJapanese(text, languageCode) -> GrammarLanguage.JAPANESE
         code == "en" || code.startsWith("en-") || code.startsWith("en_") -> GrammarLanguage.ENGLISH
         code == "zh" || code.startsWith("zh-") || code.startsWith("zh_") -> GrammarLanguage.CHINESE
+        LanguageAwareTokenizer.isSpanishCode(languageCode) -> GrammarLanguage.SPANISH
         else -> null
     }
 }
@@ -28,4 +29,5 @@ internal fun grammarMatches(
         GrammarLanguage.JAPANESE -> JapaneseMorphology.morphemes(line)?.let(::japaneseGrammar)
         GrammarLanguage.ENGLISH -> EnglishMorphology.morphemes(line)?.let(::englishGrammar)
         GrammarLanguage.CHINESE -> ChineseMorphology.morphemes(line)?.let(::chineseGrammar)
+        GrammarLanguage.SPANISH -> SpanishMorphology.morphemes(line)?.let(::spanishGrammar)
     }

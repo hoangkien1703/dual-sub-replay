@@ -10,7 +10,8 @@ DualSub Replay includes these libraries, all under the Apache License 2.0 (full 
 - Kuromoji 0.9.0 (code only): Copyright 2010-2015 Atilika Inc. and contributors. Its NOTICE file
   is kept in the APK under META-INF. The Japanese dictionary it uses is downloaded on first use
   and is not part of the app.
-- Apache OpenNLP English part-of-speech model (UD English EWT, data only): Copyright 2025 The
+- Apache OpenNLP English and Spanish part-of-speech models (UD English EWT and UD Spanish GSD,
+  data only): Copyright 2025 The
   Apache Software Foundation. This product includes software developed at The Apache Software
   Foundation (http://www.apache.org/).
 - HanLP pinyin and traditional-to-simplified tables (data only): Copyright hankcs.
@@ -22,6 +23,12 @@ DualSub Replay includes these libraries, all under the Apache License 2.0 (full 
   University of Foreign Studies (http://www.cefr-j.org/download.html). English grammar levels
   follow the CEFR-J Grammar Profile Version 20180315. Both may be used for research and
   commercial purposes with this citation.
+
+Spanish verb and word lists (es-verbs.txt, es-words.txt; data only, not under the Apache License):
+made from Wiktionary entries (English Wiktionary, by its contributors, CC BY-SA 4.0) as extracted
+by Wiktextract (kaikki.org), and ranked by the Spanish OpenSubtitles 2018 frequency list of
+hermitdave/FrequencyWords (CC BY-SA 4.0). The two lists are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 licence (https://creativecommons.org/licenses/by-sa/4.0/).
 
 Kanji details on the word card use these data files (not under the Apache License):
 

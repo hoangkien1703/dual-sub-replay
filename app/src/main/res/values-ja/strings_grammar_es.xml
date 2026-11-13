@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- スペイン語学習者向けのスペイン語の文法項目。スペイン語の語と例はそのまま残す。 -->
+    <string name="grammar_es_me_gustaria">Me gustaría: 〜したいのですが（ていねいな願望）</string>
+    <string name="grammar_es_gustar">gustar型の動詞：好かれるものが主語になる（me gusta el café = コーヒーが好き）</string>
+    <string name="grammar_es_emotion_subj">感情を表す：後の動詞は接続法になる（me alegra que estés aquí = 君がいてうれしい）</string>
+    <string name="grammar_es_tener_que">Tener que: 〜しなければならない</string>
+    <string name="grammar_es_hay_que">Hay que: （一般に）〜しなければならない、主語なし</string>
+    <string name="grammar_es_vamos_a">Vamos a: 〜しよう、または（私たちは）〜するつもり</string>
+    <string name="grammar_es_ir_a">Ir a + 不定詞: 〜するつもり、もうすぐ〜する</string>
+    <string name="grammar_es_estar_gerund">Estar + 現在分詞: 今〜しているところ（estoy comiendo = 食べているところ）</string>
+    <string name="grammar_es_seguir_gerund">Seguir + 現在分詞: まだ〜している、〜し続ける</string>
+    <string name="grammar_es_llevar_gerund">Llevar + 期間 + 現在分詞: 〜の間ずっと〜している（llevo dos horas esperando = 2時間待っている）</string>
+    <string name="grammar_es_ir_gerund">Ir + 現在分詞: 少しずつ〜していく（andar + 現在分詞: 〜して回る）</string>
+    <string name="grammar_es_poder">Poder: 〜できる、〜してもよい</string>
+    <string name="grammar_es_querer">Querer + 不定詞: 〜したい</string>
+    <string name="grammar_es_deber">Deber: 〜すべきだ（debería = 〜したほうがいい）</string>
+    <string name="grammar_es_soler">Soler: ふだん〜する（solía = 以前はよく〜した）</string>
+    <string name="grammar_es_acabar_de">Acabar de: 〜したばかり（acabo de llegar = 着いたばかり）</string>
+    <string name="grammar_es_volver_a">Volver a: もう一度〜する</string>
+    <string name="grammar_es_empezar_a">〜し始める（ponerse a = 急に〜し始める）</string>
+    <string name="grammar_es_dejar_de">Dejar de: 〜するのをやめる</string>
+    <string name="grammar_es_estar_a_punto">今にも〜するところ</string>
+    <string name="grammar_es_hacer_falta">Hacer falta: 必要だ（me hace falta = 私には〜が必要）</string>
+    <string name="grammar_es_tener_noun">Tener + 名詞: 状態・年齢（tengo hambre = おなかがすいた、tengo veinte años = 20歳だ）</string>
+    <string name="grammar_es_present_perfect">現在完了: 〜したことがある、〜した（今日・今週のことによく使う）</string>
+    <string name="grammar_es_pluperfect">過去完了: （過去のある時点より前に）〜していた</string>
+    <string name="grammar_es_future_perfect">未来完了: 〜してしまっているだろう、過去の推量（habrá salido = 出かけたのだろう）</string>
+    <string name="grammar_es_conditional_perfect">過去未来完了: 〜していただろう</string>
+    <string name="grammar_es_perfect_subjunctive">接続法現在完了: 接続法が必要な文で「〜した」（espero que hayas dormido bien）</string>
+    <string name="grammar_es_pluperfect_subjunctive">接続法過去完了: 過去の非現実・願望（ojalá hubiera sabido = 知っていればよかった）</string>
+    <string name="grammar_es_passive">受け身: 〜される（〜によって: por）</string>
+    <string name="grammar_es_estar_participle">Estar + 過去分詞: 結果の状態（está cerrada = 閉まっている）</string>
+    <string name="grammar_es_wish_subj">他の人に〜してほしい・頼む：後の動詞は接続法（quiero que vengas = 来てほしい）</string>
+    <string name="grammar_es_impersonal_subj">〜することが大事だ・ありうる・望ましい：後の動詞は接続法</string>
+    <string name="grammar_es_doubt_subj">疑い・否定：後の動詞は接続法（no creo que venga = 彼が来るとは思わない）</string>
+    <string name="grammar_es_ojala">Ojalá: 〜だといいな、〜ならいいのに（+ 接続法）</string>
+    <string name="grammar_es_para_que">Para que: 〜するように（+ 接続法）</string>
+    <string name="grammar_es_antes_de_que">Antes de que: 〜する前に（+ 接続法）</string>
+    <string name="grammar_es_subj_conjunctions">〜でない限り、〜せずに、〜さえすれば、〜の場合：いつも + 接続法</string>
+    <string name="grammar_es_como_si">Como si: まるで〜かのように（+ 接続法過去）</string>
+    <string name="grammar_es_tal_vez">たぶん（quizás, tal vez はよく接続法、a lo mejor は直説法）</string>
+    <string name="grammar_es_ser">Ser: 〜である：正体・出身・性質・時刻（es médica, son las tres）</string>
+    <string name="grammar_es_estar">Estar: 〜にいる・ある、今〜の状態だ（estoy cansado = 疲れている）</string>
+    <string name="grammar_es_hay">Hay: 〜がある・いる（había = あった）</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!: なんて〜なんだ！（¡qué bonito! = なんてきれい！）</string>
+    <string name="grammar_es_por_que">Por qué: なぜ（porque と一語なら「なぜなら」）</string>
+    <string name="grammar_es_question_word">疑問詞：いつもアクセント記号付き（¿dónde?, ¿cómo?, ¿qué?）、文の中でも（no sé dónde está）</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?: 〜だよね？（同意を求める）</string>
+    <string name="grammar_es_negative_word">否定語：動詞の後に来るときは動詞の前に no が必要（no veo nada = 何も見えない）</string>
+    <string name="grammar_es_tambien">También: 〜も；tampoco: 〜も〜ない（yo tampoco = 私も違う）</string>
+    <string name="grammar_es_contraction">Al = a + el、del = de + el（いつも一語で書く）</string>
+    <string name="grammar_es_definite_article">定冠詞：el（男性）、la（女性）、los, las（複数）。名詞に合わせる</string>
+    <string name="grammar_es_indefinite_article">不定冠詞：un（男性）、una（女性）。unos, unas = いくつかの</string>
+    <string name="grammar_es_lo_que">Lo que: 〜すること・もの（lo que dices = 君が言うこと）</string>
+    <string name="grammar_es_lo_adj">Lo + 形容詞: 〜なこと（lo bueno = よいこと）</string>
+    <string name="grammar_es_el_que">El que, la que: 〜する人・もの</string>
+    <string name="grammar_es_possessive">所有詞：mi（私の）、tu（君の）、su（彼・彼女・彼ら・あなたの）。持ち物に合わせる</string>
+    <string name="grammar_es_demonstrative">指示詞：este（自分の近く）、ese（相手の近く）、aquel（両方から遠い）。esto, eso = これ、それ（こと）</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo：私のもの、君のもの、彼・彼女のもの。名詞の後か単独で使う（un amigo mío, el tuyo）</string>
+    <string name="grammar_es_otro">Otro: 別の、もう一つの（un otro とは言わない）</string>
+    <string name="grammar_es_todo">Todo：全部、すべての、毎〜（todo el día = 一日中、todos los días = 毎日）</string>
+    <string name="grammar_es_cada">Cada：それぞれの、毎〜（cada día）。形は変わらない</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún：何か、誰か、いくつかの（否定は nada, nadie, ningún）</string>
+    <string name="grammar_es_quantity">量の言葉：poco（少ない）、un poco（少し）、demasiado（多すぎる）、bastante（かなり、十分）、varios（いくつかの）、tanto（そんなに）</string>
+    <string name="grammar_es_muy_mucho">Muy: とても（+ 形容詞・副詞）。mucho: たくさん（+ 名詞・動詞）</string>
+    <string name="grammar_es_mas_que">比較：más … que = 〜より…だ、menos … que = 〜ほど…でない（más de + 数）</string>
+    <string name="grammar_es_como">Como（アクセントなし）：〜のように（como tú）、文頭では〜なので（como llovía, = 雨だったので）</string>
+    <string name="grammar_es_tan_como">Tan … como: 〜と同じくらい…；tanto como = 〜と同じだけ</string>
+    <string name="grammar_es_superlative">最上級：el / la más … = いちばん…、el / la menos … = いちばん…でない</string>
+    <string name="grammar_es_comparative_irregular">Mejor（よりよい）、peor（より悪い）、mayor（年上・より大きい）、menor（年下・より小さい）</string>
+    <string name="grammar_es_isimo">-ísimo: ものすごく〜（buenísimo = すごくいい）</string>
+    <string name="grammar_es_por">Por: 〜のために（理由）、〜を通って、〜によって、交換、時間帯（gracias por…, por la mañana）</string>
+    <string name="grammar_es_para_inf">Para + 不定詞: 〜するために</string>
+    <string name="grammar_es_para">Para: 〜のために、〜宛て、〜までに、〜の方へ</string>
+    <string name="grammar_es_a">A: 〜へ（場所）、〜時に（時刻）、目的語の人の前にも（veo a María）</string>
+    <string name="grammar_es_en">En: 〜に、〜で；〜で（en coche = 車で）</string>
+    <string name="grammar_es_de">De: 〜の、〜から（el libro de Ana = アナの本）</string>
+    <string name="grammar_es_con">Con: 〜と、〜で（conmigo = 私と、contigo = 君と）</string>
+    <string name="grammar_es_sin">Sin: 〜なしで（sin + 不定詞 = 〜せずに）</string>
+    <string name="grammar_es_desde_hasta">Desde: 〜から；hasta: 〜まで、〜さえ（¡hasta luego! = またね）</string>
+    <string name="grammar_es_other_preposition">Entre（〜の間）、sobre（〜の上、〜について）、hacia（〜の方へ）、durante（〜の間ずっと）、según（〜によると）、contra（〜に反対して）</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + 不定詞: 〜する前に／〜した後で</string>
+    <string name="grammar_es_al_inf">Al + 不定詞: 〜するとき、〜すると（al llegar = 着いたとき）</string>
+    <string name="grammar_es_y">Y: そして、〜と（i の音で始まる語の前では e: padres e hijos）</string>
+    <string name="grammar_es_o">O: または（o の音で始まる語の前では u: siete u ocho）</string>
+    <string name="grammar_es_ni">Ni：〜も〜もない、〜さえない（ni tú ni yo = 君も私も〜ない、no tengo ni idea = 全然わからない）</string>
+    <string name="grammar_es_pero">Pero: でも、しかし</string>
+    <string name="grammar_es_sino">Sino: 〜ではなく〜（no es rojo, sino azul = 赤ではなく青）</string>
+    <string name="grammar_es_porque">Porque: なぜなら、〜だから（+ 文）</string>
+    <string name="grammar_es_asi_que">だから、それで（así que, por eso, entonces）</string>
+    <string name="grammar_es_mientras">Mientras: 〜している間；mientras tanto = その間に</string>
+    <string name="grammar_es_hace_time">Hace + 期間: 〜前（hace tres años = 3年前）</string>
+    <string name="grammar_es_desde_hace">Desde hace + 期間: 〜前からずっと（vivo aquí desde hace dos años = 2年前からここに住んでいる）</string>
+    <string name="grammar_es_ya_todavia">Ya: もう、すでに（ya no = もう〜ない）；todavía, aún: まだ（todavía no = まだ〜ない）</string>
+    <string name="grammar_es_cada_vez">Cada vez más: ますます（cada vez menos = だんだん少なく）</string>
+    <string name="grammar_es_frequency">頻度：siempre（いつも）、a menudo（よく）、a veces（ときどき）、de vez en cuando（たまに）</string>
+    <string name="grammar_es_usted">Usted: 丁寧な「あなた」、動詞は él / ella の形（usted habla）。ustedes: あなたたち</string>
+    <string name="grammar_es_subject_pronoun">主語の代名詞：動詞の語尾で人称がわかるので、よく省略される（hablo = 私は話す）。強調や対比のときに言う</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti：前置詞の後の yo と tú の形（para mí, sin ti。ただし conmigo, contigo）</string>
+    <string name="grammar_es_vosotros">Vosotros: 君たち（スペインのくだけた言い方）。中南米では ustedes</string>
+    <string name="grammar_es_vos">Vos: アルゼンチン・ウルグアイ・中米の一部での「君」（vos sabés = tú sabes）</string>
+    <string name="grammar_es_que_relative">Que: 〜する（名詞を説明する関係詞）</string>
+    <string name="grammar_es_que_conjunction">Que: 〜ということ（creo que… = 〜だと思う）</string>
+    <string name="grammar_es_quien_relative">Quien: 〜する人（前置詞やコンマの後: con quien = その人と）</string>
+    <string name="grammar_es_donde_relative">Donde（アクセントなし）: 〜するところ</string>
+    <string name="grammar_es_cuyo">Cuyo: その〜が（持ち物に合わせる: cuya casa）</string>
+    <string name="grammar_es_present">現在形：今のこと、習慣、近い未来（como = 食べる、食べている）</string>
+    <string name="grammar_es_preterite">点過去：過去のある時点で終わった出来事（ayer comí = 昨日食べた）</string>
+    <string name="grammar_es_imperfect">線過去：過去の背景・習慣・続いていたこと（comía = よく食べていた、食べていた）</string>
+    <string name="grammar_es_future">未来形：〜するだろう、現在の推量（será él = きっと彼だ）</string>
+    <string name="grammar_es_conditional">過去未来（条件法）：〜するだろうに、ていねいな依頼（¿podrías…? = 〜してくれる？）</string>
+    <string name="grammar_es_present_subjunctive">接続法現在：願望・感情・疑い・目的・未来の cuando の後（quiero que vengas）</string>
+    <string name="grammar_es_imperfect_subjunctive">接続法過去：過去の接続法、非現実の仮定（si tuviera = もし〜があれば）</string>
+    <string name="grammar_es_imperative">命令形：〜しなさい、〜して（habla = 話して！）</string>
+    <string name="grammar_es_negative_command">否定命令：no + 接続法（no hables = 話さないで）</string>
+    <string name="grammar_es_gerund">現在分詞（-ando / -iendo）：〜しながら、〜することで（estar と: 〜している）</string>
+    <string name="grammar_es_participle">過去分詞（-ado / -ido）：〜された、haber の後や形容詞として（cansado = 疲れた）</string>
+    <string name="grammar_es_infinitive">不定詞：動詞の辞書形（-ar, -er, -ir）。他の動詞や前置詞の後で使う（para comer, sin hablar）</string>
+    <string name="grammar_es_no">No: 〜ない。動詞の前（me, te, lo… の前）に置く</string>
+    <string name="grammar_es_object_pronoun">動詞の前の目的語代名詞：lo, la（それ・彼・彼女を）、le（彼・彼女に）、me, te, nos（私・君・私たちを）</string>
+    <string name="grammar_es_reflexive">再帰動詞：自分自身に向かう動作（me llamo = 私の名前は、se levanta = 起きる）</string>
+    <string name="grammar_es_se_impersonal">Se: 一般の人、受け身（se habla español = スペイン語が話されている）</string>
+    <string name="grammar_es_se_lo">Se lo: lo, la, los, las の前で le は se になる（se lo di = 彼にそれをあげた）</string>
+    <string name="grammar_es_se_accidental">Se me…: うっかり〜してしまった（se me olvidó = 忘れちゃった、se me cayó = 落としちゃった）</string>
+    <string name="grammar_es_attached_pronouns">語尾につく代名詞：命令形・不定詞・現在分詞の後（dámelo = それを私にちょうだい）</string>
+    <string name="grammar_es_si_real">もし：実際にありうる条件（si llueve, no salgo = 雨なら出かけない）</string>
+    <string name="grammar_es_si_unreal">もし：今は非現実・可能性が低い（si tuviera dinero, viajaría = お金があれば旅行するのに）</string>
+    <string name="grammar_es_si_past_unreal">もし：過去の非現実（si hubiera sabido = 知っていたなら）</string>
+    <string name="grammar_es_si_whether">知る・尋ねるの後の si: 〜かどうか（no sé si viene = 彼が来るかどうか知らない）</string>
+    <string name="grammar_es_cuando">Cuando: 〜するとき（アクセント付きの cuándo は「いつ？」）</string>
+    <string name="grammar_es_cuando_future">Cuando + 接続法: まだ起きていないことの「〜したら」（cuando llegues = 着いたら）</string>
+    <string name="grammar_es_aunque">Aunque: 〜けれども</string>
+    <string name="grammar_es_aunque_subj">Aunque + 接続法: たとえ〜でも</string>
+    <string name="grammar_es_es_que">Es que: 実は〜なんだ（言い訳・説明）</string>
+    <string name="grammar_es_tense_present">現在形</string>
+    <string name="grammar_es_tense_preterite">点過去</string>
+    <string name="grammar_es_tense_imperfect">線過去</string>
+    <string name="grammar_es_tense_future">未来形</string>
+    <string name="grammar_es_tense_conditional">過去未来形（条件法）</string>
+    <string name="grammar_es_tense_present_subjunctive">接続法現在</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">接続法過去</string>
+    <string name="grammar_es_tense_imperative">命令形</string>
+    <string name="grammar_es_tense_infinitive">不定詞</string>
+    <string name="grammar_es_tense_gerund">現在分詞（-ando / -iendo）</string>
+    <string name="grammar_es_tense_participle">過去分詞</string>
+    <string name="practice_spanish_verb_form">活用：%1$s</string>
+    <string name="practice_spanish_attached_pronouns">後ろに付いた代名詞：%1$s</string>
+</resources>
