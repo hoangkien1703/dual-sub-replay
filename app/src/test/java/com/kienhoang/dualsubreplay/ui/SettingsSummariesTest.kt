@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -59,7 +60,7 @@ class SettingsSummariesTest {
                 playMode = StudyPlayMode.DICTATION,
                 knownWordsMode = KnownWordsMode.AUTO,
                 sendTo = FlashcardApp.ANKICONNECT,
-                cardAudio = false,
+                cardSentenceSound = CardPlace.OFF,
             )
         val state = defaults.copy(study = study, wordColors = false)
         assertEquals(
@@ -74,7 +75,10 @@ class SettingsSummariesTest {
             summary(MoreSettingsSection.STUDY, state),
         )
         assertEquals(
-            listOf(SummaryPart.Label(R.string.study_app_ankiconnect), value(R.string.study_card_audio_title, on = false)),
+            listOf(
+                SummaryPart.Label(R.string.study_app_ankiconnect),
+                SummaryPart.Value(R.string.study_card_sentence_sound_title, R.string.study_card_place_off),
+            ),
             summary(MoreSettingsSection.FLASHCARDS, state),
         )
         // With Send to off, the app and the card's sound mean nothing.

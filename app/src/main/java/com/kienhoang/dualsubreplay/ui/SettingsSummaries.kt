@@ -109,7 +109,7 @@ internal fun settingsSectionSummary(
             if (state.study.ankiDroid) {
                 listOf(
                     SummaryPart.Label(state.study.sendTo.nameRes),
-                    SummaryPart.Value(R.string.study_card_audio_title, onOff(state.study.cardAudio)),
+                    SummaryPart.Value(R.string.study_card_sentence_sound_title, state.study.cardSentenceSound.labelRes),
                 )
             } else {
                 listOf(SummaryPart.Value(R.string.study_anki_title, onOff(false)))

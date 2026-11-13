@@ -122,19 +122,30 @@ private val WEB_LINE_AUDIO_RECORDER =
       clip: function(videoId, startSecond, endSecond, lineEnd) {
         if (videoId !== state.videoId || !state.context || !(endSecond > startSecond)) return null;
         const blocks = state.blocks;
-        let first = -1;
-        for (let i = 0; i < blocks.length; i++) { if (blocks[i].end > startSecond) { first = i; break; } }
-        if (first < 0 || blocks[first].start > startSecond + 0.05) return null;
-        let last = first;
-        while (blocks[last].end < endSecond) {
-          const next = blocks[last + 1];
-          if (!next || Math.abs(next.start - blocks[last].end) > 0.06) {
-            // A video paused right at the line's end (Pause after each line) has the line without its tail.
-            if (blocks[last].end >= lineEnd - 0.15) break;
-            return null;
+        // The last block of an unbroken run of played sound from block [from] that reaches the line's end, or -1.
+        const runEnd = function(from) {
+          let at = from;
+          while (blocks[at].end < endSecond) {
+            const next = blocks[at + 1];
+            if (!next || Math.abs(next.start - blocks[at].end) > 0.06) {
+              // A video paused right at the line's end (Pause after each line) has the line without its tail.
+              return blocks[at].end >= lineEnd - 0.15 ? at : -1;
+            }
+            at++;
           }
-          last++;
+          return at;
+        };
+        // The newest run that holds the whole line: a line paused half way and then replayed (a card
+        // sent mid-line) also has an older, broken run, which must not hide the replay.
+        let first = -1;
+        let last = -1;
+        for (let i = blocks.length - 1; i >= 0 && last < 0; i--) {
+          if (blocks[i].end > startSecond && blocks[i].start <= startSecond + 0.05) {
+            last = runEnd(i);
+            first = i;
+          }
         }
+        if (last < 0) return null;
         const pieces = [];
         let total = 0;
         for (let i = first; i <= last; i++) {
@@ -151,6 +162,16 @@ private val WEB_LINE_AUDIO_RECORDER =
         let binary = '';
         for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
         return JSON.stringify({ rate: state.context.sampleRate, pcm: btoa(binary) });
+      },
+      // The unbroken runs of kept sound as [start, end] seconds, for tests and debugging.
+      runs: function() {
+        const runs = [];
+        state.blocks.forEach(function(block) {
+          const run = runs[runs.length - 1];
+          if (run && Math.abs(block.start - run[1]) <= 0.06) run[1] = block.end;
+          else runs.push([block.start, block.end]);
+        });
+        return JSON.stringify(runs.map(function(run) { return [Math.round(run[0] * 100) / 100, Math.round(run[1] * 100) / 100]; }));
       },
       stop: function() {
         document.removeEventListener('pointerdown', resume, true);

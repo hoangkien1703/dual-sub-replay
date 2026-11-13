@@ -126,6 +126,15 @@ fun DualSubApp(
     BindPhraseActions(state, webController, pronouncer, viewModel::translateSubtitleText) { tap -> viewModel.meaningInContext(tap) }
     BindLineSoundReplay(webController, state.activeVideoId.takeUnless { state.liveFallback })
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
+    DisposableEffect(studyRunner, viewModel) {
+        studyRunner.liveState = { viewModel.state.value }
+        studyRunner.onSteeringChanged = viewModel::setStudySteering
+        onDispose {
+            studyRunner.liveState = null
+            studyRunner.onSteeringChanged = null
+            StudyOffScreen.steering = false
+        }
+    }
     var showVocabulary by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
     // The no-captions card's "Add a free Gemini key" opens Settings → AI assistant.

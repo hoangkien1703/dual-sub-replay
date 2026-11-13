@@ -38,8 +38,10 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.CardFront
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
+import com.kienhoang.dualsubreplay.data.usualWordSoundPlace
 import kotlinx.coroutines.launch
 
 /** Settings → Study tools: play modes, loop button, skip silence and blur box. */
@@ -148,36 +150,92 @@ internal fun FlashcardSettingsSection() {
                 editor.apply()
             },
         )
-        SettingsSwitchRow(
-            title = stringResource(R.string.study_card_audio_title),
-            description = stringResource(R.string.study_card_audio_description),
-            checked = settings.cardAudio,
-            onCheckedChange = { preferences.edit().putBoolean(CARD_AUDIO_PREFERENCE, it).apply() },
-            testTag = "card_audio_switch",
-        )
-        SettingsSwitchRow(
-            title = stringResource(R.string.study_card_picture_title),
-            description = stringResource(R.string.study_card_picture_description),
-            checked = settings.cardPicture,
-            onCheckedChange = { preferences.edit().putBoolean(CARD_PICTURE_PREFERENCE, it).apply() },
-            testTag = "card_picture_switch",
-        )
         CardFrontSettings(
             front = settings.cardFront,
-            onChange = { preferences.edit().putString(CARD_FRONT_PREFERENCE, it.storageValue).apply() },
+            onChange = { front ->
+                val editor = preferences.edit().putString(CARD_FRONT_PREFERENCE, front.storageValue)
+                // The word's voice follows the word: a front that hides the word moves it to the back.
+                if (settings.cardWordSound != CardPlace.OFF) {
+                    editor.putString(CARD_WORD_SOUND_PREFERENCE, usualWordSoundPlace(front).storageValue)
+                }
+                editor.apply()
+            },
         )
-        // Listening already has nothing but the line's sound on the front.
-        if (settings.cardFront != CardFront.LISTENING) {
-            SettingsSwitchRow(
-                title = stringResource(R.string.study_card_front_sound_title),
-                description = stringResource(R.string.study_card_front_sound_description),
-                checked = settings.cardFrontSound,
-                onCheckedChange = { preferences.edit().putBoolean(CARD_FRONT_SOUND_PREFERENCE, it).apply() },
-                testTag = "card_front_sound_switch",
-            )
-        }
+        CardPlaceSettings(
+            title = stringResource(R.string.study_card_word_sound_title),
+            description = stringResource(R.string.study_card_word_sound_description),
+            place = settings.cardWordSound,
+            onChange = { preferences.edit().putString(CARD_WORD_SOUND_PREFERENCE, it.storageValue).apply() },
+            testTag = "card_word_sound",
+        )
+        // A Listening front is the line's sound, so it plays on the front or not at all.
+        val listening = settings.cardFront == CardFront.LISTENING
+        CardPlaceSettings(
+            title = stringResource(R.string.study_card_sentence_sound_title),
+            description =
+                stringResource(R.string.study_card_sentence_sound_description) +
+                    if (listening) " " + stringResource(R.string.study_card_sentence_sound_listening) else "",
+            place = if (listening && settings.cardSentenceSound == CardPlace.BACK) CardPlace.FRONT else settings.cardSentenceSound,
+            choices = if (listening) listOf(CardPlace.FRONT, CardPlace.OFF) else CardPlace.entries,
+            onChange = { preferences.edit().putString(CARD_SENTENCE_SOUND_PREFERENCE, it.storageValue).apply() },
+            testTag = "card_sentence_sound",
+        )
+        CardPlaceSettings(
+            title = stringResource(R.string.study_card_picture_place_title),
+            description = stringResource(R.string.study_card_picture_description),
+            place = settings.cardPicture,
+            onChange = { preferences.edit().putString(CARD_PICTURE_PLACE_PREFERENCE, it.storageValue).apply() },
+            testTag = "card_picture",
+        )
+        Text(
+            stringResource(R.string.study_card_place_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, bottom = 6.dp),
+        )
     }
 }
+
+/**
+ * Flashcards & Anki → Word sound, Sentence sound and Picture (lion737, #81, 2026-11-12): Front,
+ * Back or Off, chips like Card front's.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CardPlaceSettings(
+    title: String,
+    description: String,
+    place: CardPlace,
+    onChange: (CardPlace) -> Unit,
+    testTag: String,
+    choices: List<CardPlace> = CardPlace.entries,
+) {
+    Column(Modifier.fillMaxWidth().settingAnchor(testTag).padding(start = 16.dp, bottom = 6.dp)) {
+        Text(title, style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            choices.forEach { option ->
+                FilterChip(
+                    selected = place == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("${testTag}_${option.storageValue}"),
+                )
+            }
+        }
+        Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+internal val CardPlace.labelRes: Int
+    get() =
+        when (this) {
+            CardPlace.FRONT -> R.string.study_card_place_front
+            CardPlace.BACK -> R.string.study_card_place_back
+            CardPlace.OFF -> R.string.study_card_place_off
+        }
+
+/** The chips of Word sound, Sentence sound and Picture, for Settings search. */
+internal val CARD_PLACE_LABELS: List<Int> get() = CardPlace.entries.map { it.labelRes }
 
 /**
  * Flashcards & Anki → Card front (owner pick 2026-11-10, lion737's Migaku-style cards): what Anki

@@ -13,9 +13,12 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardOptions
+import com.kienhoang.dualsubreplay.data.CardPlace
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.storedCardFront
+import com.kienhoang.dualsubreplay.data.storedCardPlace
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
+import com.kienhoang.dualsubreplay.data.usualWordSoundPlace
 
 internal const val STUDY_PLAY_MODE_PREFERENCE = "study_play_mode"
 internal const val STUDY_REPEAT_COUNT_PREFERENCE = "study_repeat_count"
@@ -43,6 +46,15 @@ internal const val CARD_FRONT_PREFERENCE = "anki_card_front"
 
 /** Flashcards & Anki → Card front → Sentence sound on the front (lion737, #81, 2026-11-11), off by default. */
 internal const val CARD_FRONT_SOUND_PREFERENCE = "anki_card_front_sound"
+
+/**
+ * Flashcards & Anki → Word sound, Sentence sound and Picture (lion737, #81, 2026-11-12): each a
+ * [CardPlace] storage value (Front, Back or Off). They replace Add audio to cards, Sentence sound on
+ * the front and Add a picture to cards, which only decide the first value (see [readStudySettings]).
+ */
+internal const val CARD_WORD_SOUND_PREFERENCE = "anki_card_word_sound"
+internal const val CARD_SENTENCE_SOUND_PREFERENCE = "anki_card_sentence_sound"
+internal const val CARD_PICTURE_PLACE_PREFERENCE = "anki_card_picture_place"
 
 /** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
 internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
@@ -73,6 +85,9 @@ internal val STUDY_SETTING_KEYS =
         CARD_PICTURE_PREFERENCE,
         CARD_FRONT_PREFERENCE,
         CARD_FRONT_SOUND_PREFERENCE,
+        CARD_WORD_SOUND_PREFERENCE,
+        CARD_SENTENCE_SOUND_PREFERENCE,
+        CARD_PICTURE_PLACE_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
@@ -170,13 +185,13 @@ internal data class StudySettings(
     val ankiDroid: Boolean = true,
     val sendTo: FlashcardApp = FlashcardApp.ANKIDROID,
     val ankiConnectDeck: String? = null,
-    /** Cards carry the word's voice and the line's real sound from the video. */
-    val cardAudio: Boolean = true,
-    /** Cards carry a still of the line from the video, else the video's thumbnail. */
-    val cardPicture: Boolean = false,
+    /** Where cards carry the word's voice. */
+    val cardWordSound: CardPlace = CardPlace.FRONT,
+    /** Where cards carry the line's real sound from the video. */
+    val cardSentenceSound: CardPlace = CardPlace.BACK,
+    /** Where cards carry a still of the line from the video (else the video's thumbnail). */
+    val cardPicture: CardPlace = CardPlace.OFF,
     val cardFront: CardFront = CardFront.WORD_AND_SENTENCE,
-    /** The line's sound plays with the card's front, not only on the back. */
-    val cardFrontSound: Boolean = false,
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
@@ -187,10 +202,10 @@ internal data class StudySettings(
     /** What Send to puts on each card. */
     val cardOptions: CardOptions get() =
         CardOptions(
-            audio = cardAudio,
+            wordSound = cardWordSound,
+            sentenceSound = cardSentenceSound,
             picture = cardPicture,
             front = cardFront,
-            frontSound = cardFrontSound,
         )
 
     /** Pause on lines with one new word needs the known-word list; without it the video plays normally. */
@@ -226,14 +241,58 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         ankiDroid = preferences.getBoolean(ANKIDROID_PREFERENCE, true),
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
-        cardAudio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
-        cardPicture = preferences.getBoolean(CARD_PICTURE_PREFERENCE, false),
+        cardWordSound = storedCardWordSound(preferences),
+        cardSentenceSound = storedCardSentenceSound(preferences),
+        // Add a picture to cards put it on the back.
+        cardPicture =
+            storedCardPlace(
+                preferences.getString(CARD_PICTURE_PLACE_PREFERENCE, null),
+                otherwise = if (preferences.getBoolean(CARD_PICTURE_PREFERENCE, false)) CardPlace.BACK else CardPlace.OFF,
+            ),
         cardFront = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
-        cardFrontSound = preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),
     )
+
+/** The word's voice: its own setting, else what Add audio to cards and the card front gave before it existed. */
+private fun storedCardWordSound(preferences: SharedPreferences): CardPlace =
+    storedCardPlace(
+        preferences.getString(CARD_WORD_SOUND_PREFERENCE, null),
+        otherwise =
+            earlierCardWordSound(
+                audio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
+                front = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
+            ),
+    )
+
+/** The line's sound: its own setting, else what Add audio to cards and Sentence sound on the front gave. */
+private fun storedCardSentenceSound(preferences: SharedPreferences): CardPlace =
+    storedCardPlace(
+        preferences.getString(CARD_SENTENCE_SOUND_PREFERENCE, null),
+        otherwise =
+            earlierCardSentenceSound(
+                audio = preferences.getBoolean(CARD_AUDIO_PREFERENCE, true),
+                frontSound = preferences.getBoolean(CARD_FRONT_SOUND_PREFERENCE, false),
+            ),
+    )
+
+/** Where the word's voice was before Word sound existed: nowhere without Add audio to cards, else with the word. */
+internal fun earlierCardWordSound(
+    audio: Boolean,
+    front: CardFront,
+): CardPlace = if (audio) usualWordSoundPlace(front) else CardPlace.OFF
+
+/** Where the line's sound was before Sentence sound existed. */
+internal fun earlierCardSentenceSound(
+    audio: Boolean,
+    frontSound: Boolean,
+): CardPlace =
+    when {
+        !audio -> CardPlace.OFF
+        frontSound -> CardPlace.FRONT
+        else -> CardPlace.BACK
+    }
 
 internal fun studyPreferences(context: Context): SharedPreferences = context.getSharedPreferences("dual_sub_preferences", 0)
 

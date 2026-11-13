@@ -621,8 +621,10 @@ internal fun SingleYouTubePage(
     }
 
     val pollNow = remember(webView) { Channel<Unit>(Channel.CONFLATED) }
-    LaunchedEffect(webView, lifecycleStarted, fullscreenSession, initialUrl) {
-        if (!lifecycleStarted) return@LaunchedEffect
+    // Off screen (screen off, or the app in the background) it goes on while the play modes or the loop
+    // steer a playing video, so they keep their line (25kiuo, #81, 2026-11-12); otherwise it rests.
+    LaunchedEffect(webView, fullscreenSession, initialUrl) {
+        val polling = { lifecycleStarted || (StudyOffScreen.steering && WebVideoBridge.playback.value.isPlaying()) }
         val gate = PlaybackSnapshotGate()
         val clock = CaptionPlaybackClock()
         var pending = false
@@ -633,6 +635,10 @@ internal fun SingleYouTubePage(
         val ticker =
             launch {
                 while (isActive) {
+                    if (!polling()) {
+                        delay(OFF_SCREEN_IDLE_MS)
+                        continue
+                    }
                     val snapshot = clock.sample()
                     val now = android.os.SystemClock.elapsedRealtime()
                     val position = clock.position(now)
@@ -647,7 +653,8 @@ internal fun SingleYouTubePage(
                             snapshot.sessionId,
                         )
                     }
-                    delay(playbackTickIntervalMs(latest))
+                    // Off screen nothing shows the karaoke word, and the play modes need only the poll's pace.
+                    delay(if (lifecycleStarted) playbackTickIntervalMs(latest) else PLAYBACK_POLL_PLAYING_MS)
                 }
             }
         try {
@@ -657,7 +664,7 @@ internal fun SingleYouTubePage(
                 val due =
                     woken || url != lastUrl ||
                         now - lastRequest >= playbackPollIntervalMs(browseVideoSelection(url) != null, latest)
-                if (due && isYouTubeWebUrl(url) && (!pending || now - lastRequest > 500)) {
+                if (due && polling() && isYouTubeWebUrl(url) && (!pending || now - lastRequest > 500)) {
                     lastUrl = url
                     pending = true
                     val requestedUrl = webView.url
@@ -714,6 +721,14 @@ internal fun SingleYouTubePage(
         }
     }
 
+    // WebView pauses a hidden page's video and resumes it once the page is shown again. Off
+    // screen, tell WebView (and the full-screen view, which has its own window) it is visible.
+    fun keepPageShownOffScreen() {
+        webView.onResume()
+        webView.dispatchWindowVisibilityChanged(View.VISIBLE)
+        fullscreenSession?.view?.dispatchWindowVisibilityChanged(View.VISIBLE)
+    }
+
     DisposableEffect(controller, webView) {
         controller.bindScripts { script ->
             webView.evaluateJavascript(script, null)
@@ -721,6 +736,8 @@ internal fun SingleYouTubePage(
         }
         val token = controller.bind { second ->
             if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+                // A play mode or the loop replays a line off screen: the hidden page may play again.
+                if (!lifecycleStarted) keepPageShownOffScreen()
                 webView.evaluateJavascript(webReplayScript(second), null)
                 pollNow.trySend(Unit)
             }
@@ -750,14 +767,6 @@ internal fun SingleYouTubePage(
             refreshMediaState()
             delay(MEDIA_STATE_POLL_INTERVAL_MS)
         }
-    }
-
-    // WebView pauses a hidden page's video and resumes it once the page is shown again. Off
-    // screen, tell WebView (and the full-screen view, which has its own window) it is visible.
-    fun keepPageShownOffScreen() {
-        webView.onResume()
-        webView.dispatchWindowVisibilityChanged(View.VISIBLE)
-        fullscreenSession?.view?.dispatchWindowVisibilityChanged(View.VISIBLE)
     }
 
     DisposableEffect(webView) {

@@ -236,9 +236,9 @@ class AnkiConnectNotesTest {
             word: SavedWord,
             options: CardOptions,
         ) = AnkiCardFiles(
-            wordSound.takeIf { options.audio },
-            sentenceSound.takeIf { options.audio },
-            picture.takeIf { options.picture },
+            wordSound.takeIf { options.wordAudio },
+            sentenceSound.takeIf { options.sentenceAudio },
+            picture.takeIf { options.pictureWanted },
         )
 
         override fun awaitSentence(item: PendingCardAudio) {
@@ -262,7 +262,10 @@ class AnkiConnectNotesTest {
             val audio = FakeCardAudio(soundFile("word-1.mp3"))
             assertEquals(
                 AnkiSendResult(sent = 1, waiting = 1),
-                AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio, CardOptions(audio = true)),
+                AnkiConnectNotes(
+                    MemorySentWords(),
+                    { anki.answer(it) },
+                ).send(listOf(word("1")), null, audio, CardOptions(CardPlace.FRONT, CardPlace.BACK)),
             )
             assertEquals(byteArrayOf(1, 2, 3).toList(), anki.media.getValue("dualsub_word-1_7.mp3").toList())
             val fields = anki.notes.single().getJSONObject("fields")
@@ -281,7 +284,10 @@ class AnkiConnectNotesTest {
         runBlocking {
             val anki = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
             val audio = FakeCardAudio(soundFile("word-1.mp3"), soundFile("abcdefghijk-83400-85000.m4a"))
-            AnkiConnectNotes(MemorySentWords(), { anki.answer(it) }).send(listOf(word("1")), null, audio, CardOptions(audio = true))
+            AnkiConnectNotes(
+                MemorySentWords(),
+                { anki.answer(it) },
+            ).send(listOf(word("1")), null, audio, CardOptions(CardPlace.FRONT, CardPlace.BACK))
             val fields = anki.notes.single().getJSONObject("fields")
             assertEquals("[sound:dualsub_word-1_7.mp3]", fields.getString(ANKI_WORD_AUDIO_FIELD))
             assertEquals("[sound:dualsub_abcdefghijk-83400-85000_7.m4a]", fields.getString(ANKI_SENTENCE_AUDIO_FIELD))
@@ -332,11 +338,12 @@ class AnkiConnectNotesTest {
     @Test
     fun sentenceSoundOnTheFrontPutsTheLinesSoundOnABasicCardsFront() {
         val media = CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]")
-        val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, frontSound = true)
+        val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, CardSides(sentenceSoundFront = true))
         assertEquals("猫<br><br>[sound:w.mp3]<br><br>[sound:s.m4a]", word["Front"])
         assertFalse("[sound:s.m4a]" in word.getValue("Back"))
         // Listening already has it there and nothing else.
-        val listening = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.LISTENING, frontSound = true)
+        val listening =
+            ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.LISTENING, CardSides(sentenceSoundFront = true))
         assertEquals("[sound:s.m4a]", listening["Front"])
     }
 
@@ -366,7 +373,7 @@ class AnkiConnectNotesTest {
             val media = FakeCardAudio(soundFile("word-1.mp3"), picture = soundFile("abcdefghijk-83400-85000.jpg"))
             val result =
                 AnkiConnectNotes(MemorySentWords(), { anki.answer(it) })
-                    .send(listOf(word("1")), null, media, CardOptions(audio = true, picture = true))
+                    .send(listOf(word("1")), null, media, CardOptions(CardPlace.FRONT, CardPlace.BACK, picture = CardPlace.BACK))
             assertEquals(AnkiSendResult(sent = 1, waiting = 1), result)
             val source =
                 anki.notes
@@ -383,7 +390,7 @@ class AnkiConnectNotesTest {
                 AnkiConnectNotes(
                     MemorySentWords(),
                     { quiet.answer(it) },
-                ).send(listOf(word("1")), null, silent, CardOptions(picture = true)),
+                ).send(listOf(word("1")), null, silent, CardOptions(picture = CardPlace.BACK)),
             )
             assertTrue(silent.waiting.isEmpty())
         }

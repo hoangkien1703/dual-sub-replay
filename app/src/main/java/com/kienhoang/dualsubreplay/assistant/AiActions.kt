@@ -68,6 +68,9 @@ internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
 /** The Anki card fronts (`CardFront`), which a test keeps equal. */
 internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "listening")
 
+/** Where a card carries the word's voice, the line's sound or the picture (`CardPlace` storage values). */
+internal val AI_CARD_PLACES = listOf("front", "back", "off")
+
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", AI_REPEAT_FOREVER)
 
@@ -138,10 +141,10 @@ internal enum class AiSetting(
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
-    CARD_AUDIO("anki_card_audio"),
-    CARD_PICTURE("anki_card_picture"),
     CARD_FRONT("anki_card_front", AI_CARD_FRONTS),
-    CARD_FRONT_SOUND("anki_card_front_sound"),
+    CARD_WORD_SOUND("anki_card_word_sound", AI_CARD_PLACES),
+    CARD_SENTENCE_SOUND("anki_card_sentence_sound", AI_CARD_PLACES),
+    CARD_PICTURE("anki_card_picture_place", AI_CARD_PLACES),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
@@ -855,10 +858,17 @@ private fun otherSettingValues(setting: AiSetting): String =
                 " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +
                 "word with its sentence, word only the word, sentence the sentence with the word in bold, listening only the " +
                 "line's sound; it changes cards sent before too)"
-        AiSetting.CARD_FRONT_SOUND ->
+        AiSetting.CARD_WORD_SOUND ->
             choiceList(setting.choices) +
-                " (Sentence sound on the front: the line's sound from the video plays on the card's front too, not only on the " +
-                "back; for every Card front but listening, which has only that sound; off by default)"
+                " (where an Anki card sent with Send to plays the word in the word card's voice; front also shows it on the " +
+                "back; front by default, back for the sentence and listening fronts)"
+        AiSetting.CARD_SENTENCE_SOUND ->
+            choiceList(setting.choices) +
+                " (where an Anki card plays the line's real sound from the video; back by default; a listening front always " +
+                "plays it on the front; off stops recording it)"
+        AiSetting.CARD_PICTURE ->
+            choiceList(setting.choices) +
+                " (where an Anki card shows a picture of the line from the video; off by default)"
         else -> choiceList(setting.choices)
     }
 

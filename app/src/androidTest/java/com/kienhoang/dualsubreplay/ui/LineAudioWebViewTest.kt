@@ -2,11 +2,16 @@ package com.kienhoang.dualsubreplay.ui
 
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.webkit.MimeTypeMap
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.content.FileProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.data.LINE_AUDIO_DIRECTORY
 import com.kienhoang.dualsubreplay.data.LinePcm
+import com.kienhoang.dualsubreplay.data.audible
 import com.kienhoang.dualsubreplay.data.audioLine
+import com.kienhoang.dualsubreplay.data.cardAudioAuthority
 import com.kienhoang.dualsubreplay.data.encodeM4a
 import com.kienhoang.dualsubreplay.data.parseLinePcm
 import org.junit.Assert.assertEquals
@@ -52,38 +57,9 @@ class LineAudioWebViewTest {
 
     @Test
     fun thePageRecorderKeepsThePlayedSoundOfThePageVideo() {
-        val loaded = CountDownLatch(1)
         var web: WebView? = null
         try {
-            instrumentation.runOnMainSync {
-                web =
-                    WebView(instrumentation.targetContext).apply {
-                        settings.javaScriptEnabled = true
-                        // The fixture plays without a tap; in the app the learner's tap starts the video.
-                        // The rule goes back on before the recorder starts, as the app keeps it.
-                        settings.mediaPlaybackRequiresUserGesture = false
-                        webViewClient =
-                            object : WebViewClient() {
-                                override fun onPageFinished(
-                                    view: WebView,
-                                    url: String,
-                                ) = loaded.countDown()
-                            }
-                        loadDataWithBaseURL("https://www.youtube.com/watch?v=abcdefghijk", FIXTURE, "text/html", "UTF-8", null)
-                    }
-            }
-            assertTrue(loaded.await(20, TimeUnit.SECONDS))
-            assumeTrue("the fixture video did not start", waitForVideo(web!!, 0.3))
-            instrumentation.runOnMainSync { web!!.settings.mediaPlaybackRequiresUserGesture = true }
-            var second = 0.0
-            val deadline = System.currentTimeMillis() + 20_000
-            while (System.currentTimeMillis() < deadline && second < 3.5) {
-                evaluate(web!!, webLineAudioScript(on = true, videoId = "abcdefghijk"))
-                second = evaluate(web!!, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
-                Thread.sleep(300)
-            }
-            // An emulator without sound output never plays the fixture; there is nothing to record then.
-            assumeTrue("the fixture video did not play (at $second s)", second >= 3.5)
+            web = playingFixture(untilSecond = 3.5)
             val pcm = parseLinePcm(evaluate(web!!, webLineAudioClipScript(audioLine("abcdefghijk", 1_000, 2_000)!!)))
             assertNotNull("the page did not hold the line", pcm)
             val clip = pcm!!
@@ -99,6 +75,96 @@ class LineAudioWebViewTest {
         }
     }
 
+    @Test
+    fun aLinePausedHalfWayAndReplayedStillGivesItsClip() {
+        var web: WebView? = null
+        try {
+            // The line 4.0-6.0 s plays half way, and the card is sent: the video pauses there...
+            web = playingFixture(untilSecond = 5.0)
+            evaluate(web!!, "document.querySelector('video').pause()")
+            val line = audioLine("abcdefghijk", 4_000, 6_000)!!
+            assertEquals("null", evaluate(web!!, webLineAudioClipScript(line)))
+            // ...and the app replays the line from just before it (lion737, #81, 2026-11-12). The broken
+            // first run is still kept, and must not hide the whole replayed one.
+            evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 3.25; v.play(); })()")
+            playTo(web!!, 6.7)
+            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
+            assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
+            assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
+            assertTrue("the clip is silent", audible(clip))
+        } finally {
+            instrumentation.runOnMainSync { web?.destroy() }
+        }
+    }
+
+    @Test
+    fun aClipLentToAnkiDroidKeepsItsM4aName() {
+        val context = instrumentation.targetContext
+        val file = File(File(context.filesDir, LINE_AUDIO_DIRECTORY).apply { mkdirs() }, "abcdefghijk-1000-2000.m4a")
+        try {
+            file.writeBytes(ByteArray(16))
+            val uri = FileProvider.getUriForFile(context, cardAudioAuthority(context), file)
+            val type = context.contentResolver.getType(uri)
+            // AnkiDroid names its copy after this type; Android's own table would say audio/mpeg, so .mp3.
+            assertEquals("audio/mp4", type)
+            assertEquals("m4a", MimeTypeMap.getSingleton().getExtensionFromMimeType(type))
+        } finally {
+            file.delete()
+        }
+    }
+
+    /**
+     * Opens the tone fixture in a WebView, runs the page recorder and waits until the video played to
+     * [untilSecond]. It skips the test on an emulator without sound output, which never plays it.
+     */
+    private fun playingFixture(untilSecond: Double): WebView {
+        val loaded = CountDownLatch(1)
+        var web: WebView? = null
+        instrumentation.runOnMainSync {
+            web =
+                WebView(instrumentation.targetContext).apply {
+                    settings.javaScriptEnabled = true
+                    // The fixture plays without a tap; in the app the learner's tap starts the video.
+                    // The rule goes back on before the recorder starts, as the app keeps it.
+                    settings.mediaPlaybackRequiresUserGesture = false
+                    webViewClient =
+                        object : WebViewClient() {
+                            override fun onPageFinished(
+                                view: WebView,
+                                url: String,
+                            ) = loaded.countDown()
+                        }
+                    loadDataWithBaseURL("https://www.youtube.com/watch?v=abcdefghijk", FIXTURE, "text/html", "UTF-8", null)
+                }
+        }
+        try {
+            assertTrue(loaded.await(20, TimeUnit.SECONDS))
+            assumeTrue("the fixture video did not start", waitForVideo(web!!, 0.3))
+            instrumentation.runOnMainSync { web!!.settings.mediaPlaybackRequiresUserGesture = true }
+            playTo(web!!, untilSecond)
+            return web!!
+        } catch (failure: Throwable) {
+            instrumentation.runOnMainSync { web?.destroy() }
+            throw failure
+        }
+    }
+
+    /** Keeps the recorder on while the fixture plays to [second]; skips the test when it doesn't get there. */
+    private fun playTo(
+        web: WebView,
+        second: Double,
+    ) {
+        var at = 0.0
+        val deadline = System.currentTimeMillis() + 20_000
+        while (System.currentTimeMillis() < deadline && at < second) {
+            evaluate(web, webLineAudioScript(on = true, videoId = "abcdefghijk"))
+            at = evaluate(web, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
+            Thread.sleep(300)
+        }
+        // An emulator without sound output never plays the fixture; there is nothing to record then.
+        assumeTrue("the fixture video did not play (at $at s)", at >= second)
+    }
+
     private fun waitForVideo(
         web: WebView,
         second: Double,
@@ -111,6 +177,8 @@ class LineAudioWebViewTest {
         }
         return false
     }
+
+    private fun runs(web: WebView): String? = evaluate(web, "window.__dualSubLineAudio ? window.__dualSubLineAudio.runs() : null")
 
     private fun evaluate(
         web: WebView,
