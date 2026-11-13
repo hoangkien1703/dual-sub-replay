@@ -55,14 +55,14 @@ val japaneseTestDictionary by tasks.registering(JapaneseTestDictionary::class) {
     output.set(layout.buildDirectory.dir("generated/japanese-test-dictionary"))
 }
 
-// English and Chinese learner data: only these data files are packaged, none of the libraries' code.
+// English, Spanish and Chinese learner data: only these data files are packaged, none of the libraries' code.
 val learnerData by configurations.creating { isTransitive = false }
 
 abstract class LearnerLanguageData : DefaultTask() {
     @get:InputFiles
     abstract val artifacts: ConfigurableFileCollection
 
-    /** Data kept in the repository (word levels), copied as they are. */
+    /** Data kept in the repository (word levels, Spanish verbs and words, kanji and hanzi), copied as they are. */
     @get:InputFiles
     abstract val bundled: ConfigurableFileCollection
 
@@ -78,6 +78,7 @@ abstract class LearnerLanguageData : DefaultTask() {
                 "data/dictionary/pinyin/pinyin.txt" to "zh-pinyin.txt",
                 "data/dictionary/tc/t2s.txt" to "zh-t2s.txt",
                 "opennlp-en-ud-ewt-pos-1.3-2.5.4.bin" to "en-pos.zip",
+                "opennlp-es-ud-gsd-pos-1.3-2.5.4.bin" to "es-pos.zip",
             )
         val directory = output.dir("learner-data").get().asFile
         directory.mkdirs()
@@ -314,10 +315,11 @@ dependencies {
     // The APK keeps only its code; the dictionary files are excluded from packaging below.
     implementation("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
     japaneseDictionary("com.atilika.kuromoji:kuromoji-ipadic:0.9.0")
-    // Data files only (see LearnerLanguageData): English part-of-speech model (Apache-2.0), WordNet 3.1's
+    // Data files only (see LearnerLanguageData): English and Spanish part-of-speech models (Apache-2.0), WordNet 3.1's
     // word and exception lists (WordNet licence), jieba's Chinese word list (MIT, in an Apache-2.0 jar),
     // HanLP's pinyin and character tables (Apache-2.0).
     learnerData("org.apache.opennlp:opennlp-models-pos-en:1.3.0")
+    learnerData("org.apache.opennlp:opennlp-models-pos-es:1.3.0")
     learnerData("net.sf.extjwnl:extjwnl-data-wn31:1.2")
     learnerData("com.huaban:jieba-analysis:1.0.2")
     learnerData("com.hankcs:hanlp:portable-1.8.6")

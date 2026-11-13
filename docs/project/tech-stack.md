@@ -14,6 +14,7 @@ version snapshot here drifts, and update relevant documentation with lasting cha
 | Translation/network | ML Kit Translate 17.0.3, OkHttp, Kotlin coroutines | [App dependencies](../../app/build.gradle.kts) |
 | Japanese words | Kuromoji 0.9.0 (Apache-2.0, pure Java); its 13 MB IPADIC dictionary downloads on first Japanese use | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-09-29-word-audio-jump-back-japanese-words.md) |
 | English words | Data files only, extracted at build time into `assets/learner-data/`: Apache OpenNLP's UD English part-of-speech model (Apache-2.0) and WordNet 3.1's word and irregular-form lists (WordNet licence), plus the committed CEFR-J word levels (`app/src/main/learner-data/`, free with citation); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-10-18-english-learner-help.md) |
+| Spanish words | Data files only: Apache OpenNLP's UD Spanish GSD part-of-speech model (Apache-2.0, extracted at build time) and verb and word lists made from Wiktionary and FrequencyWords by `tools/spanish/build_spanish_data.py` (CC BY-SA 4.0, committed in `app/src/main/learner-data/`); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-11-13-spanish-learner-help.md) |
 | Chinese words | Data files only, extracted at build time into `assets/learner-data/`: jieba's word list (MIT) and HanLP's pinyin and traditional-to-simplified tables (Apache-2.0); no library code | [App dependencies](../../app/build.gradle.kts), [spec](../specs/2026-10-18-chinese-learner-help.md) |
 | Media controls | `androidx.media` 1.7.1 media session and notification (no player library) | [App dependencies](../../app/build.gradle.kts) |
 | Tests | JUnit4 4.13.2; Compose/Android instrumentation, API 36 AOSP x86_64 managed Pixel 2 | [App test configuration](../../app/build.gradle.kts) |
@@ -162,9 +163,13 @@ Paths below are relative to
   `strings_grammar_zh.xml` and an example sentence per point in `ChineseGrammarCatalogueTest`.
   English (`EnglishGrammar.kt`, CEFR A1 to B2 from the CEFR-J Grammar Profile) is the same again:
   `EnglishGrammarCatalogue.kt`, a few rules, `strings_grammar_en.xml` and `EnglishGrammarCatalogueTest`.
+  Spanish (`SpanishGrammar.kt`, CEFR A1 to C1 placed from the PCIC) has more rules: every verb's
+  tense and mood, commands, ser / estar, clitic pronouns and se, and si / cuando / aunque clauses;
+  `SpanishGrammarCatalogue.kt`, `strings_grammar_es.xml` and `SpanishGrammarCatalogueTest`.
   `LearnerGrammar.kt` picks the language's grammar for the word card. See the
   [Chinese spec](../specs/2026-10-18-chinese-learner-help.md) and the
-  [English spec](../specs/2026-10-18-english-learner-help.md).
+  [English spec](../specs/2026-10-18-english-learner-help.md) and the
+  [Spanish spec](../specs/2026-11-13-spanish-learner-help.md).
 - `data/VocabularyRepository.kt` stores study cards/review data in local SQLite;
   `PracticeTransfer.kt` handles JSON/Anki TSV transfer. `data/ImmersionRepository.kt` keeps
   watched time per local day and language in a separate SQLite database; `ImmersionStats.kt`
@@ -188,9 +193,14 @@ Paths below are relative to
   probable split over its word list, traditional characters read through the simplified table,
   and tone-marked pinyin per word. It loads from `LearnerData` (APK assets) on a background
   thread; until then the script-boundary heuristic is used. English (caption language `en*`)
-  goes through `data/EnglishMorphology.kt`: `EnglishPosTagger` runs OpenNLP's model without the
+  goes through `data/EnglishMorphology.kt`: `OpenNlpPosTagger` runs OpenNLP's model without the
   library (same features, same tags), and `EnglishLexicon` gives dictionary forms (WordNet's
   morphy after the app's irregular-verb table) and CEFR-J word levels for the word card.
+  Spanish (caption language `es*`) goes through `data/SpanishMorphology.kt`: the same tagger with
+  OpenNLP's Spanish model, then del / al and attached pronouns are split off, and `SpanishVerbs`
+  (`SpanishConjugation.kt`) reads each verb's dictionary form, tense and person from regular
+  endings plus the irregular forms in `es-verbs.txt`; `SpanishWords` gives noun and adjective
+  dictionary forms (canciones → canción). `ui/SpanishVerbForm.kt` shows the form on the word card.
 
 ## Architecture invariants
 

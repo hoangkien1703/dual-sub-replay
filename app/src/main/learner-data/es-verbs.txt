@@ -1,0 +1,2470 @@
+# Spanish verbs for DualSub Replay, made by tools/spanish/build_spanish_data.py.
+# Data: Wiktionary (via Wiktextract, kaikki.org) and hermitdave/FrequencyWords (OpenSubtitles 2018), CC BY-SA 4.0.
+# This file is licensed CC BY-SA 4.0. Most common first. Format: see the script.
+ser P2=er P1:soy P3:es P4:somos P5:sois P6:son Pv:sos I245=fu I1:fui I3:fue I6:fueron M1:era M2:eras M3:era M4:éramos M5:erais M6:eran S123456v=se R1:fuera R2:fueras R3:fuera R4:fuéramos R5:fuerais R6:fueran E1:fuese E2:fueses E3:fuese E4:fuésemos E5:fueseis E6:fuesen A2:sé
+estar P1:estoy P2:estás P3:está P6:están I1:estuve I2:estuviste I3:estuvo I4:estuvimos I5:estuvisteis I6:estuvieron S1:esté S2:estés S3:esté S6:estén R1:estuviera R2:estuvieras R3:estuviera R4:estuviéramos R5:estuvierais R6:estuvieran E1:estuviese E2:estuvieses E3:estuviese E4:estuviésemos E5:estuvieseis E6:estuviesen A2:está
+tener P1=teng P236=tien I2456=tuv I1:tuve I3:tuvo F123456=tendr C123456=tendr S123456v=teng R123456=tuv E123456=tuv A2:ten
+haber P4=h P1:he P2:has P3:ha,hay P6:han I2456=hub I1:hube I3:hubo F123456=habr C123456=habr S123456v=hay R123456=hub E123456=hub A2:habe,he
+hacer P1=hag I2456=hic I1:hice I3:hizo F123456=har C123456=har S123456v=hag R123456=hic E123456=hic A2:haz D:hecho
+decir P1=dig P236=dic I245=dij I1:dije I3:dijo I6:dijeron F123456=dir C123456=dir S123456v=dig R1:dijera R2:dijeras R3:dijera R4:dijéramos R5:dijerais R6:dijeran E1:dijese E2:dijeses E3:dijese E4:dijésemos E5:dijeseis E6:dijesen A2:di G:diciendo D:dicho
+poder P1236=pued I2456=pud I1:pude I3:pudo F123456=podr C123456=podr S1236=pued R123456=pud E123456=pud A2=pued G:pudiendo
+querer P1236=quier I2456=quis I1:quise I3:quiso F123456=querr C123456=querr S1236=quier R123456=quis E123456=quis A2=quier
+ir P1:voy P2:vas P3:va P4:vamos P5:vais P6:van I245=fu I1:fui I3:fue I6:fueron M1:iba M2:ibas M3:iba M4:íbamos M5:ibais M6:iban S123456v=vay R1:fuera R2:fueras R3:fuera R4:fuéramos R5:fuerais R6:fueran E1:fuese E2:fueses E3:fuese E4:fuésemos E5:fueseis E6:fuesen A2=v A5:id,iros Av:andá G:yendo
+ver P1=ve P5:veis I1:vi I3:vio M123456=ve S123456v=ve D:visto
+hablar
+saber P1:sé I2456=sup I1:supe I3:supo F123456=sabr C123456=sabr S123456v=sep R123456=sup E123456=sup
+deber
+pasar
+dar P1:doy P5:dais I1:di I2:diste I3:dio I4:dimos I5:disteis I6:dieron S1:dé S3:dé S5:deis R1:diera R2:dieras R3:diera R4:diéramos R5:dierais R6:dieran E1:diese E2:dieses E3:diese E4:diésemos E5:dieseis E6:diesen
+venir P1=veng P236=vien I2456=vin I1:vine I3:vino F123456=vendr C123456=vendr S123456v=veng R123456=vin E123456=vin A2:ven G:viniendo
+volver P1236=vuelv S1236=vuelv A2=vuelv D:vuelto
+pensar P1236=piens S1236=piens A2=piens
+dejar
+necesitar
+encontrar P1236=encuentr S1236=encuentr A2=encuentr
+esperar
+morir P1236=muer I36=mur S1236=muer S45v=mur R123456=mur E123456=mur A2=muer G:muriendo D:muerto
+llamar
+tomar
+salir P1=salg F123456=saldr C123456=saldr S123456v=salg A2:sal
+llegar I1=llegu S123456v=llegu
+parecer P1=parezc S123456v=parezc
+llevar
+poner P1=pong I2456=pus I1:puse I3:puso F123456=pondr C123456=pondr S123456v=pong R123456=pus E123456=pus A2:pon D:puesto
+gustar
+suponer P1=supong I2456=supus I1:supuse I3:supuso F123456=supondr C123456=supondr S123456v=supong R123456=supus E123456=supus A2:supón D:supuesto
+seguir P1=sig P236=sigu I36=sigu S123456v=sig R123456=sigu E123456=sigu A2=sigu G:siguiendo
+conocer P1=conozc S123456v=conozc
+trabajar
+entender P1236=entiend S1236=entiend A2=entiend
+perder P1236=pierd S1236=pierd A2=pierd
+coser
+matar
+buscar I1=busqu S123456v=busqu
+entrar
+sentir P1236=sient I36=sint S1236=sient S45v=sint R123456=sint E123456=sint A2=sient G:sintiendo
+oír P1=oig P236=oy P4:oímos I2:oíste I3:oyó I4:oímos I5:oísteis I6:oyeron F123456=oir C123456=oir S123456v=oig R1:oyera R2:oyeras R3:oyera R4:oyéramos R5:oyerais R6:oyeran E1:oyese E2:oyeses E3:oyese E4:oyésemos E5:oyeseis E6:oyesen A2=oy A5:oíd G:oyendo D:oído
+mirar
+cuidar
+acabar
+terminar
+conseguir P1=consig P236=consigu I36=consigu S123456v=consig R123456=consigu E123456=consigu A2=consigu G:consiguiendo
+intentar
+usar
+vivir
+escuchar
+empezar P1236=empiez I1=empec S1236=empiec S45v=empec A2=empiez
+pedir P1236=pid I36=pid S123456v=pid R123456=pid E123456=pid A2=pid G:pidiendo
+quedar
+creer I2:creíste I3:creyó I4:creímos I5:creísteis I6:creyeron R1:creyera R2:creyeras R3:creyera R4:creyéramos R5:creyerais R6:creyeran E1:creyese E2:creyeses E3:creyese E4:creyésemos E5:creyeseis E6:creyesen G:creyendo D:creído
+tratar
+ayudar
+cambiar
+comer
+preguntar
+dormir P1236=duerm I36=durm S1236=duerm S45v=durm R123456=durm E123456=durm A2=duerm G:durmiendo
+importar
+ganar
+traer P1=traig I245=traj I1:traje I3:trajo I6:trajeron S123456v=traig R1:trajera R2:trajeras R3:trajera R4:trajéramos R5:trajerais R6:trajeran E1:trajese E2:trajeses E3:trajese E4:trajésemos E5:trajeseis E6:trajesen G:trayendo D:traído
+jugar P1236=jueg I1=jugu S1236=juegu S45v=jugu A2=jueg
+recordar P1236=recuerd S1236=recuerd A2=recuerd
+preocupar
+comprar
+contar P1236=cuent S1236=cuent A2=cuent
+olvidar
+pagar I1=pagu S123456v=pagu
+escribir D:escrito
+abrir D:abierto
+leer I2:leíste I3:leyó I4:leímos I5:leísteis I6:leyeron R1:leyera R2:leyeras R3:leyera R4:leyéramos R5:leyerais R6:leyeran E1:leyese E2:leyeses E3:leyese E4:leyésemos E5:leyeseis E6:leyesen G:leyendo D:leído
+suceder
+regresar
+ocurrir
+significar I1=signifiqu S123456v=signifiqu
+sacar I1=saqu S123456v=saqu
+mantener P1=manteng P236=mantien I2456=mantuv I1:mantuve I3:mantuvo F123456=mantendr C123456=mantendr S123456v=manteng R123456=mantuv E123456=mantuv A2:mantén
+correr
+caer P1=caig I2:caíste I3:cayó I4:caímos I5:caísteis I6:cayeron S123456v=caig R1:cayera R2:cayeras R3:cayera R4:cayéramos R5:cayerais R6:cayeran E1:cayese E2:cayeses E3:cayese E4:cayésemos E5:cayeseis E6:cayesen G:cayendo D:caído
+funcionar
+enviar P1236=enví S1236=enví A2=enví
+tocar I1=toqu S123456v=toqu
+encantar
+recibir
+probar P1236=prueb S1236=prueb A2=prueb
+beber
+personarse A2:persónate A5:personaos Av:personate G:personándose
+divertir P1236=diviert I36=divirt S1236=diviert S45v=divirt R123456=divirt E123456=divirt A2=diviert G:divirtiendo
+casar
+maldecir P1=maldig P236=maldic I245=maldij I1:maldije I3:maldijo I6:maldijeron S123456v=maldig R1:maldijera R2:maldijeras R3:maldijera R4:maldijéramos R5:maldijerais R6:maldijeran E1:maldijese E2:maldijeses E3:maldijese E4:maldijésemos E5:maldijeseis E6:maldijesen A2=maldic G:maldiciendo D:maldecido,maldito
+robar
+comenzar P1236=comienz I1=comenc S1236=comienc S45v=comenc A2=comienz
+meter
+decidir
+cerrar P1236=cierr S1236=cierr A2=cierr
+aprender
+unir
+disparar
+subir
+echar
+partir
+confiar P1236=confí S1236=confí A2=confí
+preparar
+salvar
+joder
+coger P1=coj S123456v=coj
+aceptar
+sonar P1236=suen S1236=suen A2=suen
+mover P1236=muev S1236=muev A2=muev
+parar
+convertir P1236=conviert I36=convirt S1236=conviert S45v=convirt R123456=convirt E123456=convirt A2=conviert G:convirtiendo
+descubrir D:descubierto
+prometer
+desaparecer P1=desaparezc S123456v=desaparezc
+detener P1=deteng P236=detien I2456=detuv I1:detuve I3:detuvo F123456=detendr C123456=detendr S123456v=deteng R123456=detuv E123456=detuv A2:detén
+bajar
+amar
+llorar
+permitir
+escapar
+equivocar I1=equivoqu S123456v=equivoqu
+mentir P1236=mient I36=mint S1236=mient S45v=mint R123456=mint E123456=mint A2=mient G:mintiendo
+arreglar
+abogar I1=abogu S123456v=abogu
+bailar
+vender
+volar P1236=vuel S1236=vuel A2=vuel
+caminar
+ocupar
+mesar
+romper D:roto
+vetar
+elegir P1=elij P236=elig I36=elig S123456v=elij R123456=elig E123456=elig A2=elig G:eligiendo D:elegido,electo
+imaginar
+servir P1236=sirv I36=sirv S123456v=sirv R123456=sirv E123456=sirv A2=sirv G:sirviendo
+luchar
+placer P1=plazc I3:plació,plugo I6:placieron,pluguieron S12456v=plazc S3:plazca,plega,plegue R3:placiera,pluguiera R6:placieran,pluguieran E3:placiese,pluguiese E6:placiesen,pluguiesen
+vestir P1236=vist I36=vist S123456v=vist R123456=vist E123456=vist A2=vist G:vistiendo
+desear
+molestar
+tirar
+mostrar P1236=muestr S1236=muestr A2=muestr
+conducir P1=conduzc I245=conduj I1:conduje I3:condujo I6:condujeron S123456v=conduzc R1:condujera R2:condujeras R3:condujera R4:condujéramos R5:condujerais R6:condujeran E1:condujese E2:condujeses E3:condujese E4:condujésemos E5:condujeseis E6:condujesen
+pelear
+resultar
+mejorar
+despertar P1236=despiert S1236=despiert A2=despiert
+perdonar
+armar
+actuar P1236=actú S1236=actú A2=actú
+presentar
+cenar
+cantar
+aparecer P1=aparezc S123456v=aparezc
+enseñar
+asustar
+obtener P1=obteng P236=obtien I2456=obtuv I1:obtuve I3:obtuvo F123456=obtendr C123456=obtendr S123456v=obteng R123456=obtuv E123456=obtuv A2:obtén
+continuar P1236=continú S1236=continú A2=continú
+alegrar
+cortar
+atrapar
+lograr
+golpear
+bromear
+responder
+pesar
+proteger P1=protej S123456v=protej
+andar I1:anduve I2:anduviste I3:anduvo I4:anduvimos I5:anduvisteis I6:anduvieron R1:anduviera R2:anduvieras R3:anduviera R4:anduviéramos R5:anduvierais R6:anduvieran E1:anduviese E2:anduvieses E3:anduviese E4:anduviésemos E5:anduvieseis E6:anduviesen
+explicar I1=expliqu S123456v=expliqu
+referir P1236=refier I36=refir S1236=refier S45v=refir R123456=refir E123456=refir A2=refier G:refiriendo
+amigar I1=amigu S123456v=amigu
+interesar
+asesinar
+atacar I1=ataqu S123456v=ataqu
+crecer P1=crezc S123456v=crezc
+evitar
+existir
+averiguar I1=averigü S123456v=averigü
+sentar P1236=sient S1236=sient A2=sient
+destruir P1236=destruy I3:destruyó I6:destruyeron S123456v=destruy R1:destruyera R2:destruyeras R3:destruyera R4:destruyéramos R5:destruyerais R6:destruyeran E1:destruyese E2:destruyeses E3:destruyese E4:destruyésemos E5:destruyeseis E6:destruyesen A2=destruy G:destruyendo
+invitar
+crear
+sufrir
+considerar
+levantar
+abandonar
+cumplir
+construir P1236=construy I3:construyó I6:construyeron S123456v=construy R1:construyera R2:construyeras R3:construyera R4:construyéramos R5:construyerais R6:construyeran E1:construyese E2:construyeses E3:construyese E4:construyésemos E5:construyeseis E6:construyesen A2=construy G:construyendo
+gritar
+preferir P1236=prefier I36=prefir S1236=prefier S45v=prefir R123456=prefir E123456=prefir A2=prefier G:prefiriendo
+recoger P1=recoj S123456v=recoj
+huir P1236=huy P5:huis Pv:huis I1:hui I3:huyó I6:huyeron S123456v=huy R1:huyera R2:huyeras R3:huyera R4:huyéramos R5:huyerais R6:huyeran E1:huyese E2:huyeses E3:huyese E4:huyésemos E5:huyeseis E6:huyesen A2=huy Av:hui G:huyendo
+nacer P1=nazc S123456v=nazc
+recuperar
+formar
+quitar
+esconder
+cometer
+viajar
+enterar
+revisar
+limpiar
+resolver P1236=resuelv S1236=resuelv A2=resuelv D:resuelto
+comprender
+ofrecer P1=ofrezc S123456v=ofrezc
+descansar
+estudiar
+reír P1236=rí P4:reímos I6=r I2:reíste I3:rio I4:reímos I5:reísteis F123456=reir C123456=reir S1236=rí S4=ri S5:riais Sv:rias R123456=r E123456=r A2=rí A5:reíd G:riendo D:reído
+disfrutar
+noticiar
+mandar
+herir P1236=hier I36=hir S1236=hier S45v=hir R123456=hir E123456=hir A2=hier G:hiriendo
+discutir
+merecer P1=merezc S123456v=merezc
+sobrevivir
+manejar
+cansar
+controlar
+saltar
+guardar
+utilizar I1=utilic S123456v=utilic
+compartir
+arruinar
+llenar
+firmar
+agradecer P1=agradezc S123456v=agradezc
+planear
+tardar
+enamorar
+dirigir P1=dirij S123456v=dirij
+engañar
+respirar
+investigar I1=investigu S123456v=investigu
+callar
+reconocer P1=reconozc S123456v=reconozc
+cubrir D:cubierto
+odiar
+asegurar
+extrañar
+jurar
+entregar I1=entregu S123456v=entregu
+informar
+cruzar I1=cruc S123456v=cruc
+causar
+devolver P1236=devuelv S1236=devuelv A2=devuelv D:devuelto
+doler P1236=duel S1236=duel A2=duel
+durar
+soldar P1236=sueld S1236=sueld A2=sueld
+mencionar
+sorprender
+lucir P1=luzc S123456v=luzc
+visitar
+oler P1236=huel S1236=huel A2=huel
+acordar P1236=acuerd S1236=acuerd A2=acuerd
+drogar I1=drogu S123456v=drogu
+disculpar
+pescar I1=pesqu S123456v=pesqu
+soler P1236=suel S1236=suel A2=suel
+marchar
+ordenar
+soñar P1236=sueñ S1236=sueñ A2=sueñ
+encargar I1=encargu S123456v=encargu
+acusar
+despedir P1236=despid I36=despid S123456v=despid R123456=despid E123456=despid A2=despid G:despidiendo
+fumar
+quemar
+reunir P1236=reún S1236=reún A2=reún
+costar P1236=cuest S1236=cuest A2=cuest
+dudar
+enojar
+vigilar
+arrestar
+permanecer P1=permanezc S123456v=permanezc
+apagar I1=apagu S123456v=apagu
+soportar
+comprobar P1236=comprueb S1236=comprueb A2=comprueb
+demostrar P1236=demuestr S1236=demuestr A2=demuestr
+convencer P1=convenz S123456v=convenz
+pegar I1=pegu S123456v=pegu
+acercar I1=acerqu S123456v=acerqu
+largar I1=largu S123456v=largu
+prestar
+colgar P1236=cuelg I1=colgu S1236=cuelgu S45v=colgu A2=cuelg
+besar
+admitir
+hallar
+lindar
+nombrar
+mercar I1=merqu S123456v=merqu
+adivinar
+cargar I1=cargu S123456v=cargu
+privar
+piar P1236=pí P5:piais Pv:pias I1:pie I3:pio S1236=pí S5:pieis Sv:pies A2=pí Av:pia
+disponer P1=dispong I2456=dispus I1:dispuse I3:dispuso F123456=dispondr C123456=dispondr S123456v=dispong R123456=dispus E123456=dispus A2:dispón D:dispuesto
+fingir P1=finj S123456v=finj
+celebrar
+alcanzar I1=alcanc S123456v=alcanc
+lanzar I1=lanc S123456v=lanc
+ocultar
+negar P1236=nieg I1=negu S1236=niegu S45v=negu A2=nieg
+contratar
+observar
+contestar
+encender P1236=enciend S1236=enciend A2=enciend
+librar
+sugerir P1236=sugier I36=sugir S1236=sugier S45v=sugir R123456=sugir E123456=sugir A2=sugier G:sugiriendo
+enfadar
+forzar P1236=fuerz I1=forc S1236=fuerc S45v=forc A2=fuerz
+depender
+pertenecer P1=pertenezc S123456v=pertenezc
+montar
+cocinar
+notar
+militar
+lastimar
+aburrir
+liberar
+agarrar
+complicar I1=compliqu S123456v=compliqu
+apostar P1236=apuest S1236=apuest A2=apuest
+grabar
+incluir P1236=incluy I3:incluyó I6:incluyeron S123456v=incluy R1:incluyera R2:incluyeras R3:incluyera R4:incluyéramos R5:incluyerais R6:incluyeran E1:incluyese E2:incluyeses E3:incluyese E4:incluyésemos E5:incluyeseis E6:incluyesen A2=incluy G:incluyendo
+renunciar
+juzgar I1=juzgu S123456v=juzgu
+obligar I1=obligu S123456v=obligu
+acostar P1:acuesto,acosto P2:acuestas,acostas P3:acuesta,acosta P6:acuestan,acostan S1:acueste,acoste S2:acuestes,acostes S3:acueste,acoste S6:acuesten,acosten A2:acuesta,acosta
+lavar
+superar
+relacionar
+perseguir P1=persig P236=persigu I36=persigu S123456v=persig R123456=persigu E123456=persigu A2=persigu G:persiguiendo
+gastar
+retirar
+marcar I1=marqu S123456v=marqu
+atrever
+escoger P1=escoj S123456v=escoj
+enfrentar
+repetir P1236=repit I36=repit S123456v=repit R123456=repit E123456=repit A2=repit G:repitiendo
+avanzar I1=avanc S123456v=avanc
+separar
+sonreír P1236=sonrí P4:sonreímos I36=sonr I2:sonreíste I4:sonreímos I5:sonreísteis F123456=sonreir C123456=sonreir S1236=sonrí S45v=sonri R123456=sonr E123456=sonr A2=sonrí A5:sonreíd G:sonriendo D:sonreído
+helar P1236=hiel S1236=hiel A2=hiel
+avisar
+acompañar
+alejar
+aguantar
+organizar I1=organic S123456v=organic
+confirmar
+apuntar
+inventar
+asumir
+arriesgar I1=arriesgu S123456v=arriesgu
+explotar
+estrellar
+encerrar P1236=encierr S1236=encierr A2=encierr
+faltar
+completar
+enfermar
+reglar
+declarar
+defender P1236=defiend S1236=defiend A2=defiend
+amenazar I1=amenac S123456v=amenac
+practicar I1=practiqu S123456v=practiqu
+juntar
+realizar I1=realic S123456v=realic
+parir
+enterrar P1236=entierr S1236=entierr A2=entierr
+identificar I1=identifiqu S123456v=identifiqu
+vencer P1=venz S123456v=venz
+votar
+mudar
+eliminar
+nadar
+rezar I1=rec S123456v=rec
+colocar I1=coloqu S123456v=coloqu
+doctorar
+florar
+involucrar
+empujar
+apoyar
+atender P1236=atiend S1236=atiend A2=atiend
+afectar
+pintar
+culpar
+entrenar
+interrumpir
+fallar
+rechazar I1=rechac S123456v=rechac
+conectar
+tranquilar
+soltar P1236=suelt S1236=suelt A2=suelt
+vacacionar
+confundir
+rodar P1236=rued S1236=rued A2=rued
+registrar
+llavir
+emocionar
+idear
+contener P1=conteng P236=contien I2456=contuv I1:contuve I3:contuvo F123456=contendr C123456=contendr S123456v=conteng R123456=contuv E123456=contuv A2:contén
+traicionar
+provocar I1=provoqu S123456v=provoqu
+producir P1=produzc I245=produj I1:produje I3:produjo I6:produjeron S123456v=produzc R1:produjera R2:produjeras R3:produjera R4:produjéramos R5:produjerais R6:produjeran E1:produjese E2:produjeses E3:produjese E4:produjésemos E5:produjeseis E6:produjesen
+criar P1236=crí P5:criais Pv:crias I1:crie I3:crio S1236=crí S5:crieis Sv:cries A2=crí Av:cria
+confesar P1236=confies S1236=confies A2=confies
+cazar I1=cac S123456v=cac
+representar
+curar
+pecar I1=pequ S123456v=pequ
+dentar P1236=dient S1236=dient A2=dient
+pretender
+despejar
+condenar
+sangrar
+atravesar P1236=atravies S1236=atravies A2=atravies
+girar
+insistir
+cagar I1=cagu S123456v=cagu
+pillar
+prohibir P1236=prohíb S1236=prohíb A2=prohíb
+señalar
+humanar
+detallar
+cancelar
+aumentar
+contactar
+establecer P1=establezc S123456v=establezc
+indicar I1=indiqu S123456v=indiqu
+dedicar I1=dediqu S123456v=dediqu
+presionar
+alimentar
+acostumbrar
+amanecer P1=amanezc S123456v=amanezc
+saludar
+participar
+hollar P1236=huell S1236=huell A2=huell
+arrancar I1=arranqu S123456v=arranqu
+bendecir P1=bendig P236=bendic I245=bendij I1:bendije I3:bendijo I6:bendijeron S123456v=bendig R1:bendijera R2:bendijeras R3:bendijera R4:bendijéramos R5:bendijerais R6:bendijeran E1:bendijese E2:bendijeses E3:bendijese E4:bendijésemos E5:bendijeseis E6:bendijesen A2=bendic G:bendiciendo D:bendecido,bendito
+respetar
+desgraciar
+adecuar P1:adecuo,adecúo P2:adecuas,adecúas P3:adecua,adecúa P6:adecuan,adecúan S1:adecue,adecúe S2:adecues,adecúes S3:adecue,adecúe S6:adecuen,adecúen A2:adecua,adecúa
+razonar
+violar
+historiar P1:historío,historio P2:historías,historias P3:historía,historia P6:historían,historian S1:historíe,historie S2:historíes,histories S3:historíe,historie S6:historíen,historien A2:historía,historia
+temer
+rendir P1236=rind I36=rind S123456v=rind R123456=rind E123456=rind A2=rind G:rindiendo
+advertir P1236=adviert I36=advirt S1236=adviert S45v=advirt R123456=advirt E123456=advirt A2=adviert G:advirtiendo
+aprovechar
+iniciar
+impresionar
+resistir
+sostener P1=sosteng P236=sostien I2456=sostuv I1:sostuve I3:sostuvo F123456=sostendr C123456=sostendr S123456v=sosteng R123456=sostuv E123456=sostuv A2:sostén
+valer P1=valg F123456=valdr C123456=valdr S123456v=valg
+vomitar
+capturar
+atraer P1=atraig I245=atraj I1:atraje I3:atrajo I6:atrajeron S123456v=atraig R1:atrajera R2:atrajeras R3:atrajera R4:atrajéramos R5:atrajerais R6:atrajeran E1:atrajese E2:atrajeses E3:atrajese E4:atrajésemos E5:atrajeseis E6:atrajesen G:atrayendo D:atraído
+destrozar I1=destroc S123456v=destroc
+tender P1236=tiend S1236=tiend A2=tiend
+publicar I1=publiqu S123456v=publiqu
+latir
+secuestrar
+filmar
+avergonzar P1236=avergüenz I1=avergonc S1236=avergüenc S45v=avergonc A2=avergüenz
+morder P1236=muerd S1236=muerd A2=muerd
+datar
+ofender
+revelar
+seriar
+desconocer P1=desconozc S123456v=desconozc
+ignorar
+reducir P1=reduzc I245=reduj I1:reduje I3:redujo I6:redujeron S123456v=reduzc R1:redujera R2:redujeras R3:redujera R4:redujéramos R5:redujerais R6:redujeran E1:redujese E2:redujeses E3:redujese E4:redujésemos E5:redujeseis E6:redujesen
+plantar
+antiguar I1=antigü S123456v=antigü
+apretar P1236=apriet S1236=apriet A2=apriet
+atar
+proponer P1=propong I2456=propus I1:propuse I3:propuso F123456=propondr C123456=propondr S123456v=propong R123456=propus E123456=propus A2:propón D:propuesto
+llover P1236=lluev S1236=lluev A2=lluev
+desarrollar
+emplear
+cobrar
+almorzar P1236=almuerz I1=almorc S1236=almuerc S45v=almorc A2=almuerz
+rodear
+fijar
+lidiar
+rastrear
+afortunar
+reservar
+aprobar P1236=aprueb S1236=aprueb A2=aprueb
+vaciar P1236=vací S1236=vací A2=vací
+aterrizar I1=aterric S123456v=aterric
+castigar I1=castigu S123456v=castigu
+pasear
+ahorrar
+aclarar
+impedir P1236=impid I36=impid S123456v=impid R123456=impid E123456=impid A2=impid G:impidiendo
+solicitar
+recorrer
+operar
+copiar
+borrar
+opinar
+apestar
+arrastrar
+experimentar
+localizar I1=localic S123456v=localic
+describir D:descrito
+decepcionar
+satisfacer P1=satisfag I2456=satisfic I1:satisfice I3:satisfizo F123456=satisfar C123456=satisfar S123456v=satisfag R123456=satisfic E123456=satisfic A2:satisface,satisfaz D:satisfecho
+sospechar
+solucionar
+citar
+arder
+comparar
+activar
+falsar
+escolar P1236=escuel S1236=escuel A2=escuel
+negociar
+cuadrar
+determinar
+calentar P1236=calient S1236=calient A2=calient
+retroceder
+retrasar
+desayunar
+bloquear
+ahogar I1=ahogu S123456v=ahogu
+requerir P1236=requier I36=requir S1236=requier S45v=requir R123456=requir E123456=requir A2=requier G:requiriendo
+nuclear
+patear
+añadir
+exagerar
+expulsar
+colorar
+comprometer
+basar
+traducir P1=traduzc I245=traduj I1:traduje I3:tradujo I6:tradujeron S123456v=traduzc R1:tradujera R2:tradujeras R3:tradujera R4:tradujéramos R5:tradujerais R6:tradujeran E1:tradujese E2:tradujeses E3:tradujese E4:tradujésemos E5:tradujeseis E6:tradujesen
+pilotar
+deshacer P1=deshag I2456=deshic I1:deshice I3:deshizo F123456=deshar C123456=deshar S123456v=deshag R123456=deshic E123456=deshic A2:deshaz D:deshecho
+arrepentir P1236=arrepient I36=arrepint S1236=arrepient S45v=arrepint R123456=arrepint E123456=arrepint A2=arrepient G:arrepintiendo
+alquilar
+anunciar
+brillar
+accionar
+poseer I2:poseíste I3:poseyó I4:poseímos I5:poseísteis I6:poseyeron R1:poseyera R2:poseyeras R3:poseyera R4:poseyéramos R5:poseyerais R6:poseyeran E1:poseyese E2:poseyeses E3:poseyese E4:poseyésemos E5:poseyeseis E6:poseyesen G:poseyendo D:poseído
+asistir
+examinar
+apropiar
+calmar
+acceder
+rondar
+arrojar
+adorar
+dañar
+condicionar
+regalar
+garantizar I1=garantic S123456v=garantic
+apreciar
+estropear
+ejecutar
+botar
+adelantar
+fracasar
+hundir
+quejar
+comunicar I1=comuniqu S123456v=comuniqu
+agradar
+contentar
+reaccionar
+encajar
+igualar
+solar P1236=suel S1236=suel A2=suel
+espiar P1236=espí S1236=espí A2=espí
+analizar I1=analic S123456v=analic
+interrogar I1=interrogu S123456v=interrogu
+empeorar
+invertir P1236=inviert I36=invirt S1236=inviert S45v=invirt R123456=invirt E123456=invirt A2=inviert G:invirtiendo
+follar
+demandar
+derrotar
+surgir P1=surj S123456v=surj
+apartar
+expresar
+congelar
+programar
+dibujar
+alterar
+temblar P1236=tiembl S1236=tiembl A2=tiembl
+mear
+interpretar
+competir P1236=compit I36=compit S123456v=compit R123456=compit E123456=compit A2=compit G:compitiendo
+diseñar
+reportar
+detectar
+reparar
+honrar
+conservar
+admirar
+estacionar
+balar
+verificar I1=verifiqu S123456v=verifiqu
+animar
+desesperar
+normar
+mezclar
+sacrificar I1=sacrifiqu S123456v=sacrifiqu
+doblar
+charlar
+enloquecer P1=enloquezc S123456v=enloquezc
+dividir
+chocar I1=choqu S123456v=choqu
+hermanar
+portar
+anotar
+estallar
+tejer
+exponer P1=expong I2456=expus I1:expuse I3:expuso F123456=expondr C123456=expondr S123456v=expong R123456=expus E123456=expus A2:expón D:expuesto
+burlar
+suicidar
+recomendar P1236=recomiend S1236=recomiend A2=recomiend
+sudar
+tragar I1=tragu S123456v=tragu
+aplastar
+secar I1=sequ S123456v=sequ
+derribar
+obedecer P1=obedezc S123456v=obedezc
+cavar
+lamentar
+extender P1236=extiend S1236=extiend A2=extiend
+rescatar
+dominar
+secretar
+acelerar
+oponer P1=opong I2456=opus I1:opuse I3:opuso F123456=opondr C123456=opondr S123456v=opong R123456=opus E123456=opus A2:opón D:opuesto
+ajustar
+medir P1236=mid I36=mid S123456v=mid R123456=mid E123456=mid A2=mid G:midiendo
+agotar
+pastar
+desperdiciar
+conversar
+coincidir
+adoptar
+conceder
+internar
+circunstanciar
+mojar
+acudir
+guiar P1236=guí P5:guiais Pv:guias I1:guie I3:guio S1236=guí S5:guieis Sv:guies A2=guí Av:guia
+ciar P1236=cí P5:ciais Pv:cias I1:cie I3:cio S1236=cí S5:cieis Sv:cies A2=cí Av:cia
+educar I1=eduqu S123456v=eduqu
+transmitir
+brindar
+dorar
+retener P1=reteng P236=retien I2456=retuv I1:retuve I3:retuvo F123456=retendr C123456=retendr S123456v=reteng R123456=retuv E123456=retuv A2:retén
+empacar I1=empaqu S123456v=empaqu
+testificar I1=testifiqu S123456v=testifiqu
+transformar
+cuestionar
+suspender
+valorar
+abrazar I1=abrac S123456v=abrac
+proceder
+exigir P1=exij S123456v=exij
+navegar I1=navegu S123456v=navegu
+apetecer P1=apetezc S123456v=apetezc
+combatir
+tetar
+envolver P1236=envuelv S1236=envuelv A2=envuelv D:envuelto
+desnudar
+batir
+rogar P1236=rueg I1=rogu S1236=ruegu S45v=rogu A2=rueg
+pervertir P1236=perviert I36=pervirt S1236=perviert S45v=pervirt R123456=pervirt E123456=pervirt A2=perviert G:pervirtiendo
+autorizar I1=autoric S123456v=autoric
+entrevistar
+divorciar
+fotografiar P1236=fotografí S1236=fotografí A2=fotografí
+implicar I1=impliqu S123456v=impliqu
+malentender P1236=malentiend S1236=malentiend A2=malentiend
+reemplazar I1=reemplac S123456v=reemplac
+interferir P1236=interfier I36=interfir S1236=interfier S45v=interfir R123456=interfir E123456=interfir A2=interfier G:interfiriendo
+agregar I1=agregu S123456v=agregu
+explorar
+ultimar
+sanar
+distraer P1=distraig I245=distraj I1:distraje I3:distrajo I6:distrajeron S123456v=distraig R1:distrajera R2:distrajeras R3:distrajera R4:distrajéramos R5:distrajerais R6:distrajeran E1:distrajese E2:distrajeses E3:distrajese E4:distrajésemos E5:distrajeseis E6:distrajesen G:distrayendo D:distraído
+orinar
+pisar
+envenenar
+instalar
+insultar
+elevar
+fabricar I1=fabriqu S123456v=fabriqu
+apuñalar
+encubrir D:encubierto
+comportar
+inspirar
+denunciar
+clavar
+ensayar
+conquistar
+flotar
+rotar
+suplicar I1=supliqu S123456v=supliqu
+certificar I1=certifiqu S123456v=certifiqu
+rumorar
+transferir P1236=transfier I36=transfir S1236=transfier S45v=transfir R123456=transfir E123456=transfir A2=transfier G:transfiriendo
+timar
+limitar
+manipular
+desmayar
+relajar
+torturar
+concentrar
+fallecer P1=fallezc S123456v=fallezc
+emitir
+fluir P1236=fluy P5:fluis Pv:fluis I1:flui I3:fluyó I6:fluyeron S123456v=fluy R1:fluyera R2:fluyeras R3:fluyera R4:fluyéramos R5:fluyerais R6:fluyeran E1:fluyese E2:fluyeses E3:fluyese E4:fluyésemos E5:fluyeseis E6:fluyesen A2=fluy Av:flui G:fluyendo
+cooperar
+obsesionar
+fastidiar
+calcular
+aplicar I1=apliqu S123456v=apliqu
+hartar
+profundar
+papar
+prever P1=preve P2:prevés P3:prevé P6:prevén M123456=preve S123456v=preve A2:prevé D:previsto
+transportar
+ceder
+cegar P1236=cieg I1=cegu S1236=ciegu S45v=cegu A2=cieg
+despegar I1=despegu S123456v=despegu
+aguardar
+mayar
+estimar
+atascar I1=atasqu S123456v=atasqu
+donar
+madurar
+trasladar
+tejar
+ingresar
+soplar
+aliviar
+listar
+invadir
+procesar
+miar P5:miais I1:mie I3:mio S5:mieis
+captar
+manchar
+asignar
+imponer P1=impong I2456=impus I1:impuse I3:impuso F123456=impondr C123456=impondr S123456v=impong R123456=impus E123456=impus A2:impón D:impuesto
+cuñar
+distinguir P1=disting S123456v=disting
+corregir P1=corrij P236=corrig I36=corrig S123456v=corrij R123456=corrig E123456=corrig A2=corrig G:corrigiendo
+descargar I1=descargu S123456v=descargu
+picar I1=piqu S123456v=piqu
+obrar
+componer P1=compong I2456=compus I1:compuse I3:compuso F123456=compondr C123456=compondr S123456v=compong R123456=compus E123456=compus A2:compón D:compuesto
+pistar
+agitar
+proporcionar
+reclamar
+velar
+repartir
+excitar
+afirmar
+gobernar P1236=gobiern S1236=gobiern A2=gobiern
+pudrir D:podrido
+deprimir
+complacer P1=complazc I3:complació,complugo I6:complacieron,compluguieron S12456v=complazc S3:complazca,complega,complegue R3:complaciera,compluguiera R6:complacieran,compluguieran E3:complaciese,compluguiese E6:complaciesen,compluguiesen
+abusar
+sujetar
+ligar I1=ligu S123456v=ligu
+entretener P1=entreteng P236=entretien I2456=entretuv I1:entretuve I3:entretuvo F123456=entretendr C123456=entretendr S123456v=entreteng R123456=entretuv E123456=entretuv A2:entretén
+quebrar P1236=quiebr S1236=quiebr A2=quiebr
+tolerar
+comisionar
+escalar
+escupir
+circular
+ascender P1236=asciend S1236=asciend A2=asciend
+chupar
+consultar
+disfrazar I1=disfrac S123456v=disfrac
+destinar
+esperanzar I1=esperanc S123456v=esperanc
+generar
+envejecer P1=envejezc S123456v=envejezc
+afeitar
+azular
+legar I1=legu S123456v=legu
+acosar
+uñir I3:uñó I6:uñeron R1:uñera R2:uñeras R3:uñera R4:uñéramos R5:uñerais R6:uñeran E1:uñese E2:uñeses E3:uñese E4:uñésemos E5:uñeseis E6:uñesen G:uñendo
+aislar P1236=aísl S1236=aísl A2=aísl
+regular
+reventar P1236=revient S1236=revient A2=revient
+intencionar
+corresponder
+atropellar
+desafiar P1236=desafí S1236=desafí A2=desafí
+aconsejar
+nivelar
+intervenir P1=interveng P236=intervien I2456=intervin I1:intervine I3:intervino F123456=intervendr C123456=intervendr S123456v=interveng R123456=intervin E123456=intervin A2:intervén G:interviniendo
+presumir
+minar
+graduar P1236=gradú S1236=gradú A2=gradú
+deportar
+consumir
+comentar
+compensar
+esforzar P1236=esfuerz I1=esforc S1236=esfuerc S45v=esforc A2=esfuerz
+arar
+descartar
+hadar
+peinar
+justificar I1=justifiqu S123456v=justifiqu
+insinuar P1236=insinú S1236=insinú A2=insinú
+asar
+introducir P1=introduzc I245=introduj I1:introduje I3:introdujo I6:introdujeron S123456v=introduzc R1:introdujera R2:introdujeras R3:introdujera R4:introdujéramos R5:introdujerais R6:introdujeran E1:introdujese E2:introdujeses E3:introdujese E4:introdujésemos E5:introdujeseis E6:introdujesen
+freír P1236=frí P4:freímos I6=fr I2:freíste I3:frio I4:freímos I5:freísteis F123456=freir C123456=freir S1236=frí S4=fri S5:friais Sv:frias R123456=fr E123456=fr A2=frí A5:freíd G:friendo D:freído,frito
+evacuar P1:evacuo,evacúo P2:evacuas,evacúas P3:evacua,evacúa P6:evacuan,evacúan S1:evacue,evacúe S2:evacues,evacúes S3:evacue,evacúe S6:evacuen,evacúen A2:evacua,evacúa
+vagar I1=vagu S123456v=vagu
+honestar
+extraer P1=extraig I245=extraj I1:extraje I3:extrajo I6:extrajeron S123456v=extraig R1:extrajera R2:extrajeras R3:extrajera R4:extrajéramos R5:extrajerais R6:extrajeran E1:extrajese E2:extrajeses E3:extrajese E4:extrajésemos E5:extrajeseis E6:extrajesen G:extrayendo D:extraído
+intercambiar
+sacudir
+sellar
+morar
+convenir P1=conveng P236=convien I2456=convin I1:convine I3:convino F123456=convendr C123456=convendr S123456v=conveng R123456=convin E123456=convin A2:convén G:conviniendo
+criticar I1=critiqu S123456v=critiqu
+derramar
+reclutar
+predecir P1=predig P236=predic I245=predij I1:predije I3:predijo I6:predijeron F1:predeciré,prediré F2:predecirás,predirás F3:predecirá,predirá F4:predeciremos,prediremos F5:predeciréis,prediréis F6:predecirán,predirán C1:predeciría,prediría C2:predecirías,predirías C3:predeciría,prediría C4:predeciríamos,prediríamos C5:predeciríais,prediríais C6:predecirían,predirían S123456v=predig R1:predijera R2:predijeras R3:predijera R4:predijéramos R5:predijerais R6:predijeran E1:predijese E2:predijeses E3:predijese E4:predijésemos E5:predijeseis E6:predijesen A2=predic G:prediciendo D:predicho
+amantar
+chiflar
+tumbar
+fiar P1236=fí P5:fiais Pv:fias I1:fie I3:fio S1236=fí S5:fieis Sv:fies A2=fí Av:fia
+definir
+iluminar
+infectar
+desviar P1236=desví S1236=desví A2=desví
+asaltar
+descender P1236=desciend S1236=desciend A2=desciend
+sombrar
+titular
+disminuir P1236=disminuy I3:disminuyó I6:disminuyeron S123456v=disminuy R1:disminuyera R2:disminuyeras R3:disminuyera R4:disminuyéramos R5:disminuyerais R6:disminuyeran E1:disminuyese E2:disminuyeses E3:disminuyese E4:disminuyésemos E5:disminuyeseis E6:disminuyesen A2=disminuy G:disminuyendo
+apurar
+repasar
+adquirir P1236=adquier S1236=adquier A2=adquier
+heredar
+rellenar
+acondicionar
+tramar
+reconstruir P1236=reconstruy I3:reconstruyó I6:reconstruyeron S123456v=reconstruy R1:reconstruyera R2:reconstruyeras R3:reconstruyera R4:reconstruyéramos R5:reconstruyerais R6:reconstruyeran E1:reconstruyese E2:reconstruyeses E3:reconstruyese E4:reconstruyésemos E5:reconstruyeseis E6:reconstruyesen A2=reconstruy G:reconstruyendo
+enfriar P1236=enfrí S1236=enfrí A2=enfrí
+copar
+excusar
+estirar
+ocasionar
+prevenir P1=preveng P236=previen I2456=previn I1:previne I3:previno F123456=prevendr C123456=prevendr S123456v=preveng R123456=previn E123456=previn A2:prevén G:previniendo
+marear
+vengar I1=vengu S123456v=vengu
+acertar P1236=aciert S1236=aciert A2=aciert
+sincerar
+provenir P1=proveng P236=provien I2456=provin I1:provine I3:provino F123456=provendr C123456=provendr S123456v=proveng R123456=provin E123456=provin A2:provén G:proviniendo
+anular
+frenar
+demorar
+liar P1236=lí P5:liais Pv:lias I1:lie I3:lio S1236=lí S5:lieis Sv:lies A2=lí Av:lia
+quietar
+resfriar P1236=resfrí S1236=resfrí A2=resfrí
+combinar
+desconectar
+aparcar I1=aparqu S123456v=aparqu
+cabrear
+progresar
+reinar
+alabar
+pronunciar
+humillar
+bastar
+protestar
+atentar
+acampar
+tapar
+tropezar P1236=tropiez I1=tropec S1236=tropiec S45v=tropec A2=tropiez
+inclinar
+gravar
+cesar
+liderar
+numerar
+variar P1236=varí S1236=varí A2=varí
+diferenciar
+descifrar
+orar
+imprimir D:imprimido,impreso
+raizar P1236=raíz I1=raic S1236=raíc S45v=raic A2=raíz
+revolver P1236=revuelv S1236=revuelv A2=revuelv D:revuelto
+patinar
+prender
+aficionar
+susurrar
+detestar
+reponer P1=repong I2456=repus I1:repuse I3:repuso F123456=repondr C123456=repondr S123456v=repong R123456=repus E123456=repus A2:repón D:repuesto
+derretir P1236=derrit I36=derrit S123456v=derrit R123456=derrit E123456=derrit A2=derrit G:derritiendo
+precisar
+barbar
+barrer
+incendiar
+afrontar
+seducir P1=seduzc I245=seduj I1:seduje I3:sedujo I6:sedujeron S123456v=seduzc R1:sedujera R2:sedujeras R3:sedujera R4:sedujéramos R5:sedujerais R6:sedujeran E1:sedujese E2:sedujeses E3:sedujese E4:sedujésemos E5:sedujeseis E6:sedujesen
+abordar
+improvisar
+anochecer P1=anochezc S123456v=anochezc
+coquetear
+evolucionar
+hervir P1236=hierv I36=hirv S1236=hierv S45v=hirv R123456=hirv E123456=hirv A2=hierv G:hirviendo
+especiar
+triunfar
+cultivar
+aterrorizar I1=aterroric S123456v=aterroric
+nevar P1236=niev S1236=niev A2=niev
+felicitar
+linear
+descuidar
+concluir P1236=concluy I3:concluyó I6:concluyeron S123456v=concluy R1:concluyera R2:concluyeras R3:concluyera R4:concluyéramos R5:concluyerais R6:concluyeran E1:concluyese E2:concluyeses E3:concluyese E4:concluyésemos E5:concluyeseis E6:concluyesen A2=concluy G:concluyendo
+irrumpir
+aliar P1236=alí S1236=alí A2=alí
+vacar I1=vaqu S123456v=vaqu
+signar
+subestimar
+bañar
+penar
+enganchar
+promesar
+atardecer S3=atardezc
+colaborar
+delatar
+talar
+reflexionar
+absorber
+proyectar
+chistar
+convocar I1=convoqu S123456v=convoqu
+financiar
+patrullar
+lesionar
+entusiasmar
+desarmar
+decorar
+contribuir P1236=contribuy I3:contribuyó I6:contribuyeron S123456v=contribuy R1:contribuyera R2:contribuyeras R3:contribuyera R4:contribuyéramos R5:contribuyerais R6:contribuyeran E1:contribuyese E2:contribuyeses E3:contribuyese E4:contribuyésemos E5:contribuyeseis E6:contribuyesen A2=contribuy G:contribuyendo
+ejercer P1=ejerz S123456v=ejerz
+trenar
+cabalgar I1=cabalgu S123456v=cabalgu
+tornar
+tancar I1=tanqu S123456v=tanqu
+sustituir P1236=sustituy I3:sustituyó I6:sustituyeron S123456v=sustituy R1:sustituyera R2:sustituyeras R3:sustituyera R4:sustituyéramos R5:sustituyerais R6:sustituyeran E1:sustituyese E2:sustituyeses E3:sustituyese E4:sustituyésemos E5:sustituyeseis E6:sustituyesen A2=sustituy G:sustituyendo
+recortar
+fritar
+recurrir
+imitar
+penetrar
+presenciar
+direccionar
+evaluar P1236=evalú S1236=evalú A2=evalú
+medicinar
+torrar
+ejercitar
+estrangular
+emborrachar
+revivir
+victimar
+perturbar
+florecer P1=florezc S123456v=florezc
+tarar
+torcer P1=tuerz P236=tuerc S1236=tuerz S45v=torz A2=tuerc
+versar
+hilar
+restaurar
+pelar
+contemplar
+centrar
+estafar
+accidentar
+percibir
+salar
+yacer P1:yazco,yazgo,yago Sv=yag S1:yazca,yazga,yaga S2:yazcas,yazgas,yagas,yazcás,yazgás S3:yazca,yazga,yaga S4:yazcamos,yazgamos,yagamos S5:yazcáis,yazgáis,yagáis S6:yazcan,yazgan,yagan A2:yace,yaz
+expandir
+modificar I1=modifiqu S123456v=modifiqu
+malgastar
+asociar
+disgustar
+finalizar I1=finalic S123456v=finalic
+suspirar
+almacenar
+concordar P1236=concuerd S1236=concuerd A2=concuerd
+adaptar
+acumular
+apasionar
+cifrar
+filtrar
+abortar
+divinar
+figurar
+remover P1236=remuev S1236=remuev A2=remuev
+palmar
+sobrar
+destacar I1=destaqu S123456v=destaqu
+ahorcar I1=ahorqu S123456v=ahorqu
+ampliar P1236=amplí S1236=amplí A2=amplí
+comedir P1236=comid I36=comid S123456v=comid R123456=comid E123456=comid A2=comid G:comidiendo
+desactivar
+posicionar
+paralizar I1=paralic S123456v=paralic
+proveer I2:proveíste I3:proveyó I4:proveímos I5:proveísteis I6:proveyeron R1:proveyera R2:proveyeras R3:proveyera R4:proveyéramos R5:proveyerais R6:proveyeran E1:proveyese E2:proveyeses E3:proveyese E4:proveyésemos E5:proveyeseis E6:proveyesen G:proveyendo D:provisto,proveído
+recompensar
+lamer
+posar
+resucitar
+marinar
+perforar
+aspirar
+fichar
+calificar I1=califiqu S123456v=califiqu
+derrumbar
+reflejar
+aplaudir
+frustrar
+acantilar
+oscurecer P1=oscurezc S123456v=oscurezc
+sofisticar I1=sofistiqu S123456v=sofistiqu
+preservar
+batallar
+husmear
+bombardear
+enfocar I1=enfoqu S123456v=enfoqu
+alucinar
+mercedar
+seleccionar
+evidenciar
+diputar
+clasificar I1=clasifiqu S123456v=clasifiqu
+violentar
+engordar
+retorcer P1=retuerz P236=retuerc S1236=retuerz S45v=retorz A2=retuerc
+tentar P1236=tient S1236=tient A2=tient
+resbalar
+encarcelar
+positivar
+colapsar
+ensuciar
+aventurar
+mascar I1=masqu S123456v=masqu
+infiltrar
+esparcir P1=esparz S123456v=esparz
+instrumentar
+apresurar
+atrasar
+sobornar
+trazar I1=trac S123456v=trac
+incrementar
+renovar P1236=renuev S1236=renuev A2=renuev
+esquiar P1236=esquí S1236=esquí A2=esquí
+pinchar
+ubicar I1=ubiqu S123456v=ubiqu
+amargar I1=amargu S123456v=amargu
+aproximar
+recaudar
+dallar
+familiarizar I1=familiaric S123456v=familiaric
+maravillar
+uniformar
+serenar
+subtitular
+chequear
+desatar
+deducir P1=deduzc I245=deduj I1:deduje I3:dedujo I6:dedujeron S123456v=deduzc R1:dedujera R2:dedujeras R3:dedujera R4:dedujéramos R5:dedujerais R6:dedujeran E1:dedujese E2:dedujeses E3:dedujese E4:dedujésemos E5:dedujeseis E6:dedujesen
+devorar
+masticar I1=mastiqu S123456v=mastiqu
+concernir P36=conciern S36=conciern
+someter
+supervisar
+pilar
+coronar
+bordar
+constar
+simular
+chantajear
+administrar
+arrasar
+contaminar
+excavar
+traficar I1=trafiqu S123456v=trafiqu
+estresar
+promover P1236=promuev S1236=promuev A2=promuev
+gemir P1236=gim I36=gim S123456v=gim R123456=gim E123456=gim A2=gim G:gimiendo
+telefonear
+beneficiar
+experienciar
+manuscribir D:manuscrito
+intimidar
+estrechar
+arañar
+concebir P1236=concib I36=concib S123456v=concib R123456=concib E123456=concib A2=concib G:concibiendo
+pulsar
+esquivar
+inspeccionar
+dictar
+desvanecer P1=desvanezc S123456v=desvanezc
+consentir P1236=consient I36=consint S1236=consient S45v=consint R123456=consint E123456=consint A2=consient G:consintiendo
+acechar
+hopar A2:hópate A5:hopaos Av:hopate G:hopándose
+merodear
+facturar
+visionar
+atormentar
+influenciar
+sabotear
+estofar
+placar I1=plaqu S123456v=plaqu
+inyectar
+municionar
+debilitar
+resumir
+fugar I1=fugu S123456v=fugu
+ilusionar
+extremar
+duplicar I1=dupliqu S123456v=dupliqu
+fechar
+fundir
+coleccionar
+inundar
+halagar I1=halagu S123456v=halagu
+interceptar
+interponer P1=interpong I2456=interpus I1:interpuse I3:interpuso F123456=interpondr C123456=interpondr S123456v=interpong R123456=interpus E123456=interpus A2:interpón D:interpuesto
+nominar
+conexionar
+orlar
+falsificar I1=falsifiqu S123456v=falsifiqu
+molar
+liquidar
+ladrar
+gruñir I3:gruñó I6:gruñeron R1:gruñera R2:gruñeras R3:gruñera R4:gruñéramos R5:gruñerais R6:gruñeran E1:gruñese E2:gruñeses E3:gruñese E4:gruñésemos E5:gruñeseis E6:gruñesen G:gruñendo
+colar P1236=cuel S1236=cuel A2=cuel
+frutar
+anticuar
+moscar I1=mosqu S123456v=mosqu
+pacer P1=pazc S123456v=pazc
+empeñar
+fundar
+conmover P1236=conmuev S1236=conmuev A2=conmuev
+difundir
+ruinar
+toser
+mamar
+provisionar
+cristianar
+depositar
+despreciar
+elaborar
+conspirar
+impulsar
+duchar
+remar
+filar
+situar P1236=sitú S1236=sitú A2=sitú
+recetar
+reforzar P1236=refuerz I1=reforc S1236=refuerc S45v=reforc A2=refuerz
+caber P1=quep I2456=cup I1:cupe I3:cupo F123456=cabr C123456=cabr S123456v=quep R123456=cup E123456=cup
+etiquetar
+broncear
+motivar
+malinterpretar
+campeonar
+diagnosticar I1=diagnostiqu S123456v=diagnostiqu
+recentar P1236=recient S1236=recient A2=recient
+zarpar
+alertar
+consistir
+trepar
+fregar P1:friego,frego P2:friegas,fregas P3:friega,frega P6:friegan,fregan I1=fregu S45v=fregu S1:friegue,fregue S2:friegues,fregues S3:friegue,fregue S6:frieguen,freguen A2:friega,frega
+aportar
+misionar
+sentenciar
+posponer P1=pospong I2456=pospus I1:pospuse I3:pospuso F123456=pospondr C123456=pospondr S123456v=pospong R123456=pospus E123456=pospus A2:pospón D:pospuesto
+distribuir P1236=distribuy I3:distribuyó I6:distribuyeron S123456v=distribuy R1:distribuyera R2:distribuyeras R3:distribuyera R4:distribuyéramos R5:distribuyerais R6:distribuyeran E1:distribuyese E2:distribuyeses E3:distribuyese E4:distribuyésemos E5:distribuyeseis E6:distribuyesen A2=distribuy G:distribuyendo
+auxiliar
+recolectar
+alardear
+influir P1236=influy I3:influyó I6:influyeron S123456v=influy R1:influyera R2:influyeras R3:influyera R4:influyéramos R5:influyerais R6:influyeran E1:influyese E2:influyeses E3:influyese E4:influyésemos E5:influyeseis E6:influyesen A2=influy G:influyendo
+cicatrizar I1=cicatric S123456v=cicatric
+plantear
+debatir
+aparentar
+rebotar
+afilar
+otorgar I1=otorgu S123456v=otorgu
+reconsiderar
+delirar
+osar
+delegar I1=delegu S123456v=delegu
+fracturar
+desangrar
+fascinar
+medicar I1=mediqu S123456v=mediqu
+herbar P1236=hierb S1236=hierb A2=hierb
+perjudicar I1=perjudiqu S123456v=perjudiqu
+azotar
+topar
+abatir
+perlar
+actualizar I1=actualic S123456v=actualic
+excluir P1236=excluy I3:excluyó I6:excluyeron S123456v=excluy R1:excluyera R2:excluyeras R3:excluyera R4:excluyéramos R5:excluyerais R6:excluyeran E1:excluyese E2:excluyeses E3:excluyese E4:excluyésemos E5:excluyeseis E6:excluyesen A2=excluy G:excluyendo
+apelar
+capar
+ratonar
+anticipar
+solear
+sincronizar I1=sincronic S123456v=sincronic
+alegar I1=alegu S123456v=alegu
+maquinar
+facilitar
+vincular
+sembrar P1236=siembr S1236=siembr A2=siembr
+notificar I1=notifiqu S123456v=notifiqu
+festejar
+jalar
+alzar I1=alc S123456v=alc
+embarcar I1=embarqu S123456v=embarqu
+respectar
+sesionar
+defraudar
+rugir P1=ruj S123456v=ruj
+conferenciar
+atracar I1=atraqu S123456v=atraqu
+incrustar
+apenar
+arrebatar
+empapar
+engreír P1236=engrí P4:engreímos I36=engr I2:engreíste I4:engreímos I5:engreísteis F123456=engreir C123456=engreir S1236=engrí S45v=engri R123456=engr E123456=engr A2=engrí A5:engreíd G:engriendo D:engreído
+acariciar
+rizar I1=ric S123456v=ric
+contraer P1=contraig I245=contraj I1:contraje I3:contrajo I6:contrajeron S123456v=contraig R1:contrajera R2:contrajeras R3:contrajera R4:contrajéramos R5:contrajerais R6:contrajeran E1:contrajese E2:contrajeses E3:contrajese E4:contrajésemos E5:contrajeseis E6:contrajesen G:contrayendo D:contraído
+designar
+saquear
+meditar
+platear
+licenciar
+hornear
+planificar I1=planifiqu S123456v=planifiqu
+predicar I1=prediqu S123456v=prediqu
+pulir
+referenciar
+revertir P1236=reviert I36=revirt S1236=reviert S45v=revirt R123456=revirt E123456=revirt A2=reviert G:revirtiendo
+halar
+muscular
+dimitir
+apoderar
+reformar
+envidiar
+descararse A2:descárate A5:descaraos Av:descarate G:descarándose
+asombrar
+confiscar I1=confisqu S123456v=confisqu
+civilizar I1=civilic S123456v=civilic
+musicar I1=musiqu S123456v=musiqu
+precipitar
+voltear
+sobrepasar
+impactar
+condonar
+deslizar I1=deslic S123456v=deslic
+verter P1236=viert S1236=viert A2=viert
+ofertar
+escanear
+frotar
+persuadir
+cocer P1=cuez P236=cuec S1236=cuez S45v=coz A2=cuec
+dignarse A2:dígnate A5:dignaos Av:dignate G:dignándose
+planchar
+raptar
+recitar
+candar
+retardar
+coordinar
+recrear
+adir
+disolver P1236=disuelv S1236=disuelv A2=disuelv D:disuelto
+seer I2:seíste I3:seyó I4:seímos I5:seísteis I6:seyeron R1:seyera R2:seyeras R3:seyera R4:seyéramos R5:seyerais R6:seyeran E1:seyese E2:seyeses E3:seyese E4:seyésemos E5:seyeseis E6:seyesen G:seyendo D:seído
+calzar I1=calc S123456v=calc
+maniobrar
+irritar
+acomodar
+desplegar P1236=desplieg I1=desplegu S1236=despliegu S45v=desplegu A2=desplieg
+detonar
+expedientar
+ademar
+novelar
+silbar
+especializar I1=especialic S123456v=especialic
+deletrear
+masar
+sumar
+retomar
+jubilar
+desenterrar P1236=desentierr S1236=desentierr A2=desentierr
+enfurecer P1=enfurezc S123456v=enfurezc
+desobedecer P1=desobedezc S123456v=desobedezc
+tensar
+respaldar
+atorar
+obviar
+preciar
+errar P1:yerro,erro P2:yerras,erras P3:yerra,erra P6:yerran,erran S1:yerre,erre S2:yerres,erres S3:yerre,erre S6:yerren,erren A2:yerra,erra
+moler P1236=muel S1236=muel A2=muel
+entrometerse A2=entrométet A5:entrometeos Av:entrometete G:entrometiéndose
+implantar
+lloriquear
+clivar
+industriar
+renacer P1=renazc S123456v=renazc
+amarrar
+lisiar
+emerger P1=emerj S123456v=emerj
+arrugar I1=arrugu S123456v=arrugu
+alentar P1236=alient S1236=alient A2=alient
+denegar P1236=denieg I1=denegu S1236=deniegu S45v=denegu A2=denieg
+tranquilizar I1=tranquilic S123456v=tranquilic
+roncar I1=ronqu S123456v=ronqu
+alarmar
+conformar
+memorizar I1=memoric S123456v=memoric
+blindar
+habitar
+chillar
+poblar P1236=puebl S1236=puebl A2=puebl
+cosechar
+flechar
+maleducar I1=maleduqu S123456v=maleduqu
+prosperar
+reproducir P1=reproduzc I245=reproduj I1:reproduje I3:reprodujo I6:reprodujeron S123456v=reproduzc R1:reprodujera R2:reprodujeras R3:reprodujera R4:reprodujéramos R5:reprodujerais R6:reprodujeran E1:reprodujese E2:reprodujeses E3:reprodujese E4:reprodujésemos E5:reprodujeseis E6:reprodujesen
+bombear
+tallar
+oxidar
+alojar
+deambular
+murmurar
+surfear
+machacar I1=machaqu S123456v=machaqu
+perfeccionar
+manifestar P1236=manifiest S1236=manifiest A2=manifiest
+carecer P1=carezc S123456v=carezc
+sumergir P1=sumerj S123456v=sumerj
+fusilar
+enredar
+bautizar I1=bautic S123456v=bautic
+brear
+bucear
+espantar
+honorar
+dotar
+hormonar
+multar
+entrañar
+corromper
+hinchar
+tostar P1236=tuest S1236=tuest A2=tuest
+complejar
+exterminar
+recobrar
+desordenar
+parpadear
+agenciar
+asfixiar
+desfilar
+descomponer P1=descompong I2456=descompus I1:descompuse I3:descompuso F123456=descompondr C123456=descompondr S123456v=descompong R123456=descompus E123456=descompus A2:descompón D:descompuesto
+agredir
+saborear
+desconfiar P1236=desconfí S1236=desconfí A2=desconfí
+proseguir P1=prosig P236=prosigu I36=prosigu S123456v=prosig R123456=prosigu E123456=prosigu A2=prosigu G:prosiguiendo
+presentir P1236=presient I36=presint S1236=presient S45v=presint R123456=presint E123456=presint A2=presient G:presintiendo
+esposar
+rehusar P1236=rehús S1236=rehús A2=rehús
+concretar
+degenerar
+invocar I1=invoqu S123456v=invoqu
+acoger P1=acoj S123456v=acoj
+inhalar
+incriminar
+editar
+audicionar
+cejar
+incidentar
+prescindir
+equipar
+ojalar
+frecuentar
+equilibrar
+prolongar I1=prolongu S123456v=prolongu
+contagiar
+evadir
+premeditar
+aterrar P1236=atierr S1236=atierr A2=atierr
+forjar
+rebajar
+inducir P1=induzc I245=induj I1:induje I3:indujo I6:indujeron S123456v=induzc R1:indujera R2:indujeras R3:indujera R4:indujéramos R5:indujerais R6:indujeran E1:indujese E2:indujeses E3:indujese E4:indujésemos E5:indujeseis E6:indujesen
+derrocar I1=derroqu S123456v=derroqu
+documentar
+gozar I1=goc S123456v=goc
+batear
+estabilizar I1=estabilic S123456v=estabilic
+inscribir D:inscrito
+externar
+anhelar
+rentar
+volcar P1236=vuelc I1=volqu S1236=vuelqu S45v=volqu A2=vuelc
+renegar P1236=renieg I1=renegu S1236=reniegu S45v=renegu A2=renieg
+nublar
+encadenar
+especular
+averiar P1236=averí S1236=averí A2=averí
+favorecer P1=favorezc S123456v=favorezc
+monitorear
+multiplicar I1=multipliqu S123456v=multipliqu
+anfitrionar
+visar
+aferrar P1:aferro,afierro P2:aferras,afierras P3:aferra,afierra P6:aferran,afierran S1:aferre,afierre S2:aferres,afierres S3:aferre,afierre S6:aferren,afierren A2:aferra,afierra
+explosionar
+abrumar
+masacrar
+enrollar
+fortalecer P1=fortalezc S123456v=fortalezc
+inquietar
+obstinar
+hurgar I1=hurgu S123456v=hurgu
+maltratar
+retar
+escobar
+flirtear
+reprimir
+desgarrar
+restablecer P1=restablezc S123456v=restablezc
+restringir P1=restrinj S123456v=restrinj
+desmoronar
+concertar P1236=conciert S1236=conciert A2=conciert
+vacilar
+estimular
+promocionar
+reabrir D:reabierto
+desembarcar I1=desembarqu S123456v=desembarqu
+desertar
+intrigar I1=intrigu S123456v=intrigu
+pinzar I1=pinc S123456v=pinc
+recargar I1=recargu S123456v=recargu
+culturar
+gotear
+dronar
+redactar
+dimensionar
+procurar
+altercar I1=alterqu S123456v=alterqu
+confinar
+integrar
+propagar I1=propagu S123456v=propagu
+distanciar
+santificar I1=santifiqu S123456v=santifiqu
+neutralizar I1=neutralic S123456v=neutralic
+blocar I1=bloqu S123456v=bloqu
+eludir
+aflojar
+refinar
+mendigar I1=mendigu S123456v=mendigu
+tontear
+aniquilar
+curvar
+deshonrar
+emparedar
+escoltar
+extinguir P1=exting S123456v=exting
+noquear
+babear
+desencadenar
+propinar
+resentirse P1236=resient I36=resint S1236=resient S45v=resint R123456=resint E123456=resint A2=resiéntet A5:resentíos Av:resentite G:resintiéndose
+plagar I1=plagu S123456v=plagu
+trabar
+trastornar
+argumentar
+podar
+rehacer P1=rehag I2456=rehic I1:rehíce I3:rehízo F123456=rehar C123456=rehar S123456v=rehag R123456=rehic E123456=rehic A2:rehaz D:rehecho
+alinear
+fresar
+indagar I1=indagu S123456v=indagu
+alcantarillar
+alistar
+engendrar
+decapitar
+brotar
+crujir
+incumbir
+suprimir
+deliberar
+vibrar
+descafeinar P1236=descafeín S1236=descafeín A2=descafeín
+enmascarar
+blandir
+cablear
+enseriar
+padecer P1=padezc S123456v=padezc
+consolar P1236=consuel S1236=consuel A2=consuel
+desconcertar P1236=desconciert S1236=desconciert A2=desconciert
+esquinar
+pisotear
+relucir P1=reluzc S123456v=reluzc
+absolver P1236=absuelv S1236=absuelv A2=absuelv D:absuelto
+regar P1236=rieg I1=regu S1236=riegu S45v=regu A2=rieg
+disimular
+postrar
+aturdir
+refrescar I1=refresqu S123456v=refresqu
+digerir P1236=digier I36=digir S1236=digier S45v=digir R123456=digir E123456=digir A2=digier G:digiriendo
+crucificar I1=crucifiqu S123456v=crucifiqu
+escriturar
+saldar
+enorgullecer P1=enorgullezc S123456v=enorgullezc
+devastar
+orbitar
+albergar I1=albergu S123456v=albergu
+señar
+vallar
+desistir
+sedar
+efectivar
+archivar
+despistar
+rasgar I1=rasgu S123456v=rasgu
+alfombrar
+pujar
+escalonar
+rozar I1=roc S123456v=roc
+alargar I1=alargu S123456v=alargu
+afligir P1=aflij S123456v=aflij
+desterrar P1236=destierr S1236=destierr A2=destierr
+incorporar
+angustiar
+magnificar I1=magnifiqu S123456v=magnifiqu
+transplantar
+embarazar I1=embarac S123456v=embarac
+embrujar
+esfumar
+candidatar
+cortejar
+rajar
+empaquetar
+reciclar
+sustanciar
+mutilar
+estomagar I1=estomagu S123456v=estomagu
+chisparse A2:chíspate A5:chispaos Av:chispate G:chispándose
+rayar
+refugiar
+capacitar
+demoler P1236=demuel S1236=demuel A2=demuel
+asesorar
+boxear
+danzar I1=danc S123456v=danc
+dispersar
+puntar
+condecorar
+relevar
+estructurar
+desechar
+exhibir
+vacunar
+abofetear
+clonar
+aplazar I1=aplac S123456v=aplac
+suministrar
+peticionar
+decaer P1=decaig I2:decaíste I3:decayó I4:decaímos I5:decaísteis I6:decayeron S123456v=decaig R1:decayera R2:decayeras R3:decayera R4:decayéramos R5:decayerais R6:decayeran E1:decayese E2:decayeses E3:decayese E4:decayésemos E5:decayeseis E6:decayesen G:decayendo D:decaído
+fallir I3:falló I6:falleron R1:fallera R2:falleras R3:fallera R4:falléramos R5:fallerais R6:falleran E1:fallese E2:falleses E3:fallese E4:fallésemos E5:falleseis E6:fallesen G:fallendo
+mangar I1=mangu S123456v=mangu
+escarbar
+traspasar
+adelgazar I1=adelgac S123456v=adelgac
+cualificar I1=cualifiqu S123456v=cualifiqu
+desolar P1:desuelo,desolo P2:desuelas,desolas P3:desuela,desola P6:desuelan,desolan S1:desuele,desole S2:desueles,desoles S3:desuele,desole S6:desuelen,desolen A2:desuela,desola
+reiniciar
+desplazar I1=desplac S123456v=desplac
+enmendar P1236=enmiend S1236=enmiend A2=enmiend
+desagradecer P1=desagradezc S123456v=desagradezc
+posesionar
+proclamar
+articular
+codificar I1=codifiqu S123456v=codifiqu
+garantir
+residir
+templar P1:templo,tiemplo P2:templas,tiemplas P3:templa,tiempla P6:templan,tiemplan S1:temple,tiemple S2:temples,tiemples S3:temple,tiemple S6:templen,tiemplen A2:templa,tiempla
+asimilar
+chalar
+izar I1=ic S123456v=ic
+formular
+inflar
+roer P1:roo,roigo,royo I2:roíste I3:royó I4:roímos I5:roísteis I6:royeron Sv=roy S1:roa,roiga,roya S2:roas,roigas,royas,roás,roigás S3:roa,roiga,roya S4:roamos,roigamos,royamos S5:roáis,roigáis,royáis S6:roan,roigan,royan R1:royera R2:royeras R3:royera R4:royéramos R5:royerais R6:royeran E1:royese E2:royeses E3:royese E4:royésemos E5:royeseis E6:royesen G:royendo D:roído
+alocar I1=aloqu S123456v=aloqu
+ambicionar
+desilusionar
+oprimir
+encuestar
+flipar
+acorralar
+consumar
+encabezar I1=encabec S123456v=encabec
+ahumar P1236=ahúm S1236=ahúm A2=ahúm
+enderezar I1=enderec S123456v=enderec
+latinar
+perfumar
+jadear
+raer P1:raigo,rayo I2:raíste I3:rayó I4:raímos I5:raísteis I6:rayeron Sv=ray S1:raiga,raya S2:raigas,rayas,raigás S3:raiga,raya S4:raigamos,rayamos S5:raigáis,rayáis S6:raigan,rayan R1:rayera R2:rayeras R3:rayera R4:rayéramos R5:rayerais R6:rayeran E1:rayese E2:rayeses E3:rayese E4:rayésemos E5:rayeseis E6:rayesen G:rayendo D:raído
+cautivar
+sofocar I1=sofoqu S123456v=sofoqu
+pitar
+aullar P1236=aúll S1236=aúll A2=aúll
+discapacitar
+afeminar
+versionar
+silenciar
+rascar I1=rasqu S123456v=rasqu
+paginar
+exprimir
+acortar
+espinar
+optar
+ingerir P1236=ingier I36=ingir S1236=ingier S45v=ingir R123456=ingir E123456=ingir A2=ingier G:ingiriendo
+estrenar
+ansiar P1236=ansí S1236=ansí A2=ansí
+hipnotizar I1=hipnotic S123456v=hipnotic
+angular
+convivir
+interactuar P1236=interactú S1236=interactú A2=interactú
+estancar I1=estanqu S123456v=estanqu
+revolucionar
+arrodillar
+desanimar
+patentar
+emprender
+deteriorar
+tatuar P1236=tatú S1236=tatú A2=tatú
+decentar
+parlotear
+migar I1=migu S123456v=migu
+agachar
+modelar
+realistar
+reposar
+exceder
+malherir P1236=malhier I36=malhir S1236=malhier S45v=malhir R123456=malhir E123456=malhir A2=malhier G:malhiriendo
+desmontar
+piratear
+remolcar I1=remolqu S123456v=remolqu
+ilustrar
+patrocinar
+afinar
+rociar P1236=rocí S1236=rocí A2=rocí
+mimar
+brincar I1=brinqu S123456v=brinqu
+desestimar
+racionar
+conmocionar
+suavizar I1=suavic S123456v=suavic
+revocar I1=revoqu S123456v=revoqu
+tararear
+desorientar
+incitar
+varar
+salpicar I1=salpiqu S123456v=salpiqu
+especificar I1=especifiqu S123456v=especifiqu
+obstruir P1236=obstruy I3:obstruyó I6:obstruyeron S123456v=obstruy R1:obstruyera R2:obstruyeras R3:obstruyera R4:obstruyéramos R5:obstruyerais R6:obstruyeran E1:obstruyese E2:obstruyeses E3:obstruyese E4:obstruyésemos E5:obstruyeseis E6:obstruyesen A2=obstruy G:obstruyendo
+feriar
+erradicar I1=erradiqu S123456v=erradiqu
+fanfarronear
+toar
+desempacar I1=desempaqu S123456v=desempaqu
+encoger P1=encoj S123456v=encoj
+masturbar
+reanudar
+cepillar
+desacreditar
+glasear
+platicar I1=platiqu S123456v=platiqu
+sollozar I1=solloc S123456v=solloc
+malcriar P1236=malcrí S1236=malcrí A2=malcrí
+radiografiar P1236=radiografí S1236=radiografí A2=radiografí
+descabellar
+indignar
+resaltar
+acorazar I1=acorac S123456v=acorac
+exiliar
+inculpar
+incomodar
+holgazanear
+seccionar
+hostiar
+disparatar
+enchufar
+profundizar I1=profundic S123456v=profundic
+tachar
+contraatacar I1=contraataqu S123456v=contraataqu
+estornudar
+fisgonear
+triangular
+implorar
+depravar
+hechizar I1=hechic S123456v=hechic
+desconsiderar
+insertar
+recopilar
+exhalar
+sobresalir P1=sobresalg F123456=sobresaldr C123456=sobresaldr S123456v=sobresalg A2:sobresal
+configurar
+quebrantar
+comprimir
+convulsionar
+arenar
+corroborar
+minimizar I1=minimic S123456v=minimic
+cojear
+zumbar
+fantasear
+fomentar
+represaliar
+reescribir D:reescrito
+horrorizar I1=horroric S123456v=horroric
+moldear
+divulgar I1=divulgu S123456v=divulgu
+madrugar I1=madrugu S123456v=madrugu
+yugular
+comerciar
+conllevar
+juguetear
+guionar
+adornar
+forrar
+recaer P1=recaig I2:recaíste I3:recayó I4:recaímos I5:recaísteis I6:recayeron S123456v=recaig R1:recayera R2:recayeras R3:recayera R4:recayéramos R5:recayerais R6:recayeran E1:recayese E2:recayeses E3:recayese E4:recayésemos E5:recayeseis E6:recayesen G:recayendo D:recaído
+movilizar I1=movilic S123456v=movilic
+precaver
+reprogramar
+jorobar
+extraviar P1236=extraví S1236=extraví A2=extraví
+cremar
+desquiciar
+balbucear
+encriptar
+costear
+ringar I1=ringu S123456v=ringu
+teñir P1236=tiñ I3:tiñó I6:tiñeron S123456v=tiñ R1:tiñera R2:tiñeras R3:tiñera R4:tiñéramos R5:tiñerais R6:tiñeran E1:tiñese E2:tiñeses E3:tiñese E4:tiñésemos E5:tiñeseis E6:tiñesen A2=tiñ G:tiñendo
+trotar
+capitular
+cuartelar
+desalojar
+expirar
+contusionar
+despreocuparse A2:despreocúpate A5:despreocupaos Av:despreocupate G:despreocupándose
+encarar
+socializar I1=socialic S123456v=socialic
+omitir
+orillar
+raspar
+sancionar
+balancear
+colear
+constituir P1236=constituy I3:constituyó I6:constituyeron S123456v=constituy R1:constituyera R2:constituyeras R3:constituyera R4:constituyéramos R5:constituyerais R6:constituyeran E1:constituyese E2:constituyeses E3:constituyese E4:constituyésemos E5:constituyeseis E6:constituyesen A2=constituy G:constituyendo
+contradecir P1=contradig P236=contradic I245=contradij I1:contradije I3:contradijo I6:contradijeron F1:contradeciré,contradiré F2:contradecirás,contradirás F3:contradecirá,contradirá F4:contradeciremos,contradiremos F5:contradeciréis,contradiréis F6:contradecirán,contradirán C1:contradeciría,contradiría C2:contradecirías,contradirías C3:contradeciría,contradiría C4:contradeciríamos,contradiríamos C5:contradeciríais,contradiríais C6:contradecirían,contradirían S123456v=contradig R1:contradijera R2:contradijeras R3:contradijera R4:contradijéramos R5:contradijerais R6:contradijeran E1:contradijese E2:contradijeses E3:contradijese E4:contradijésemos E5:contradijeseis E6:contradijesen A2=contradic G:contradiciendo D:contradicho
+lazar I1=lac S123456v=lac
+anclar
+atontar
+ensangrentar P1236=ensangrient S1236=ensangrient A2=ensangrient
+degradar
+reprobar P1236=reprueb S1236=reprueb A2=reprueb
+cercar I1=cerqu S123456v=cerqu
+transcurrir
+enriquecer P1=enriquezc S123456v=enriquezc
+incapacitar
+amputar
+calar
+estorbar
+segundar
+descontrolar
+ablandar
+retornar
+gatear
+pirar
+conjuntar
+enlazar I1=enlac S123456v=enlac
+primar
+desinteresarse A2:desinterésate A5:desinteresaos Av:desinteresate G:desinteresándose
+infringir P1=infrinj S123456v=infrinj
+contrarrestar
+canalizar I1=canalic S123456v=canalic
+pensionar
+hospitalizar I1=hospitalic S123456v=hospitalic
+objetar
+virar
+trinar
+rebobinar
+tintar
+agonizar I1=agonic S123456v=agonic
+acaparar
+presidir
+profanar
+moderar
+empatar
+ordeñar
+perfilar
+efectuar P1236=efectú S1236=efectú A2=efectú
+encomendar P1236=encomiend S1236=encomiend A2=encomiend
+remediar
+suturar
+marginar
+censurar
+rimar
+levar
+rumorear
+lagrimar
+replicar I1=repliqu S123456v=repliqu
+curiosear
+indisponer P1=indispong I2456=indispus I1:indispuse I3:indispuso F123456=indispondr C123456=indispondr S123456v=indispong R123456=indispus E123456=indispus A2:indispón D:indispuesto
+pactar
+sobrevalorar
+privilegiar
+reñir P1236=riñ I3:riñó I6:riñeron S123456v=riñ R1:riñera R2:riñeras R3:riñera R4:riñéramos R5:riñerais R6:riñeran E1:riñese E2:riñeses E3:riñese E4:riñésemos E5:riñeseis E6:riñesen A2=riñ G:riñendo
+almendrar
+comparecer P1=comparezc S123456v=comparezc
+derivar
+ampollar
+apegar I1=apegu S123456v=apegu
+apachar
+entristecer P1=entristezc S123456v=entristezc
+majar
+desmantelar
+espabilar
+deshidratar
+flexionar
+castrar
+alambrar
+rolar
+subordinar
+ahuyentar
+sepultar
+unificar I1=unifiqu S123456v=unifiqu
+drenar
+exaltar
+agravar
+arbolar
+catalogar I1=catalogu S123456v=catalogu
+despedazar I1=despedac S123456v=despedac
+entablar
+secuenciar
+monitorizar I1=monitoric S123456v=monitoric
+traumatizar I1=traumatic S123456v=traumatic
+cuchar
+pilotear
+esclavizar I1=esclavic S123456v=esclavic
+espesar
+exceptuar P1236=exceptú S1236=exceptú A2=exceptú
+becar I1=bequ S123456v=bequ
+tasar
+equivaler P1=equivalg F123456=equivaldr C123456=equivaldr S123456v=equivalg
+avecinar
+confrontar
+descalificar I1=descalifiqu S123456v=descalifiqu
+procrear
+reconciliar
+conmemorar
+encariñar
+surtir
+asentar P1236=asient S1236=asient A2=asient
+conciliar
+infeccionar
+autenticar I1=autentiqu S123456v=autentiqu
+balear
+originar
+domar
+clamar
+premiar
+trenzar I1=trenc S123456v=trenc
+desempeñar
+ministrar
+remontar
+disputar
+atestiguar I1=atestigü S123456v=atestigü
+abarrotar
+pelucar I1=peluqu S123456v=peluqu
+intensificar I1=intensifiqu S123456v=intensifiqu
+percatar
+aspar
+tensionar
+sobrecargar I1=sobrecargu S123456v=sobrecargu
+gradar
+ahijar P1236=ahíj S1236=ahíj A2=ahíj
+estampar
+intimar
+trizar I1=tric S123456v=tric
+erguir P1:irgo,yergo P2:irgues,yergues P3:irgue,yergue P6:irguen,yerguen I36=irgu Sv=yerg S1:irga,yerga S2:irgas,yergas,irgás S3:irga,yerga S4:irgamos,yergamos S5:irgáis,yergáis S6:irgan,yergan R123456=irgu E123456=irgu A2:irgue,yergue G:irguiendo
+concesionar
+purificar I1=purifiqu S123456v=purifiqu
+regatear
+regañar
+agobiar
+despojar
+pasmar
+conjeturar
+denominar
+desbloquear
+divagar I1=divagu S123456v=divagu
+antojar G:antojándose
+oxigenar
+desamparar
+enjaular
+guisar
+predestinar
+ruar P1236=rú P5:ruais Pv:ruas I1:rue I3:ruo S1236=rú S5:rueis Sv:rues A2=rú Av:rua
+emigrar
+reorganizar I1=reorganic S123456v=reorganic
+disciplinar
+discrepar
+consagrar
+dialogar I1=dialogu S123456v=dialogu
+escuadronar
+refutar
+disipar
+gestionar
+sobrellevar
+tamponar
+maximizar I1=maximic S123456v=maximic
+pringar I1=pringu S123456v=pringu
+electrocutar
+extirpar
+trufar
+desfigurar
+peligrar
+implementar
+perecer P1=perezc S123456v=perezc
+simplificar I1=simplifiqu S123456v=simplifiqu
+prevalecer P1=prevalezc S123456v=prevalezc
+visualizar I1=visualic S123456v=visualic
+desequilibrar
+evaporar
+adinerarse A2:adinérate A5:adineraos Av:adinerate G:adinerándose
+instruir P1236=instruy I3:instruyó I6:instruyeron S123456v=instruy R1:instruyera R2:instruyeras R3:instruyera R4:instruyéramos R5:instruyerais R6:instruyeran E1:instruyese E2:instruyeses E3:instruyese E4:instruyésemos E5:instruyeseis E6:instruyesen A2=instruy G:instruyendo
+rectificar I1=rectifiqu S123456v=rectifiqu
+triplicar I1=tripliqu S123456v=tripliqu
+compadecer P1=compadezc S123456v=compadezc
+intoxicar I1=intoxiqu S123456v=intoxiqu
+infestar
+inaugurar
+ajetrear
+corretear
+dislocar I1=disloqu S123456v=disloqu
+evocar I1=evoqu S123456v=evoqu
+acatar
+comandar
+zanjar
+avispar
+endurecer P1=endurezc S123456v=endurezc
+traumar
+quilatar
+avivar
+pacificar I1=pacifiqu S123456v=pacifiqu
+perar
+justar
+apañar
+apresar
+desaliñar
+lisar
+repletar
+zafar
+tarifar
+pestañear
+deformar
+dementar
+emboscar I1=embosqu S123456v=embosqu
+rockear
+fosar
+desgastar
+subastar
+devotar
+expiar P1236=expí S1236=expí A2=expí
+fruncir P1=frunz S123456v=frunz
+revolotear
+sobrevolar P1236=sobrevuel S1236=sobrevuel A2=sobrevuel
+aviar P1236=aví S1236=aví A2=aví
+colorear
+destapar
+enfatizar I1=enfatic S123456v=enfatic
+gratar
+laborar
+conglomerar
+distorsionar
+incinerar
+descerebrar
+desocupar
+mallar
+parchar
+caducar I1=caduqu S123456v=caduqu
+chorrear
+currar
+desbordar
+inmovilizar I1=inmovilic S123456v=inmovilic
+mazar I1=mac S123456v=mac
+romanzar I1=romanc S123456v=romanc
+simbolizar I1=simbolic S123456v=simbolic
+petrificar I1=petrifiqu S123456v=petrifiqu
+fornicar I1=forniqu S123456v=forniqu
+peraltar
+tullir I3:tulló I6:tulleron R1:tullera R2:tulleras R3:tullera R4:tulléramos R5:tullerais R6:tulleran E1:tullese E2:tulleses E3:tullese E4:tullésemos E5:tulleseis E6:tullesen G:tullendo
+ventilar
+impacientar
+adamar
+caricaturar
+chapar
+hipotecar I1=hipotequ S123456v=hipotequ
+renombrar
+aligerar
+taponar
+sucumbir
+encapuchar
+tripular
+controvertir P1236=controviert I36=controvirt S1236=controviert S45v=controvirt R123456=controvirt E123456=controvirt A2=controviert G:controvirtiendo
+reprochar
+concurrir
+fatigar I1=fatigu S123456v=fatigu
+saciar
+redecorar
+ripear
+endeudar
+recostar P1236=recuest S1236=recuest A2=recuest
+purgar I1=purgu S123456v=purgu
+inflamar
+avezar I1=avec S123456v=avec
+desenmascarar
+resonar P1236=resuen S1236=resuen A2=resuen
+mezquinar
+repostar
+regir P1=rij P236=rig I36=rig S123456v=rij R123456=rig E123456=rig A2=rig G:rigiendo
+amañar
+barritar
+abolir
+apalear
+apilar
+eructar
+objetivar
+esplender
+preceder
+catar
+exonerar
+protonar
+abrigar I1=abrigu S123456v=abrigu
+acojonar
+custodiar
+empedernir
+salomar
+intubar
+holgar P1236=huelg I1=holgu S1236=huelgu S45v=holgu A2=huelg
+repeler
+vehicular
+ofrendar
+agrandar
+escamar
+trasplantar
+rastrar
+salvaguardar
+atestar P1:atiesto,atesto P2:atiestas,atestas P3:atiesta,atesta P6:atiestan,atestan S1:atieste,ateste S2:atiestes,atestes S3:atieste,ateste S6:atiesten,atesten A2:atiesta,atesta
+perdurar
+sintonizar I1=sintonic S123456v=sintonic
+humar
+astillar
+circuncidar
+confederar
+infligir P1=inflij S123456v=inflij
+recluir P1236=recluy I3:recluyó I6:recluyeron S123456v=recluy R1:recluyera R2:recluyeras R3:recluyera R4:recluyéramos R5:recluyerais R6:recluyeran E1:recluyese E2:recluyeses E3:recluyese E4:recluyésemos E5:recluyeseis E6:recluyesen A2=recluy G:recluyendo
+abundar
+arrollar
+codiciar
+defecar I1=defequ S123456v=defequ
+estampillar
+reasignar
+consternar
+roblar
+apaciguar I1=apacigü S123456v=apacigü
+brizar I1=bric S123456v=bric
+elijar
+rehabilitar
+colonizar I1=colonic S123456v=colonic
+cotillear
+desenfrenar
+domesticar I1=domestiqu S123456v=domestiqu
+erupcionar
+sortear
+afiliar
+avistar
+personalizar I1=personalic S123456v=personalic
+rematar
+saturar
+amamantar
+rapear
+trillar
+endemoniar
+blanquear
+ducir P1=duzc I245=duj I1:duje I3:dujo I6:dujeron S123456v=duzc R1:dujera R2:dujeras R3:dujera R4:dujéramos R5:dujerais R6:dujeran E1:dujese E2:dujeses E3:dujese E4:dujésemos E5:dujeseis E6:dujesen
+eficientar
+venerar
+desvelar
+destituir P1236=destituy I3:destituyó I6:destituyeron S123456v=destituy R1:destituyera R2:destituyeras R3:destituyera R4:destituyéramos R5:destituyerais R6:destituyeran E1:destituyese E2:destituyeses E3:destituyese E4:destituyésemos E5:destituyeseis E6:destituyesen A2=destituy G:destituyendo
+desprender
+desagradar
+menear
+mitigar I1=mitigu S123456v=mitigu
+despachar
+erizar I1=eric S123456v=eric
+emparejar
+fraudar
+orientar
+resignar
+socavar
+arraigar I1=arraigu S123456v=arraigu
+consolidar
+destripar
+simpatizar I1=simpatic S123456v=simpatic
+allanar
+descalzar I1=descalc S123456v=descalc
+apodar
+descolgar P1236=descuelg I1=descolgu S1236=descuelgu S45v=descolgu A2=descuelg
+merendar P1236=meriend S1236=meriend A2=meriend
+recomenzar P1236=recomienz I1=recomenc S1236=recomienc S45v=recomenc A2=recomienz
+camuflar
+abreviar
+aplacar I1=aplaqu S123456v=aplaqu
+chinchar
+olfatear
+menospreciar
+renegociar
+sintetizar I1=sintetic S123456v=sintetic
+remodelar
+asentir P1236=asient I36=asint S1236=asient S45v=asint R123456=asint E123456=asint A2=asient G:asintiendo
+repensar P1236=repiens S1236=repiens A2=repiens
+asquear
+atemorizar I1=atemoric S123456v=atemoric
+ausentar
+carpir
+deparar
+mediar
+adjuntar
+anchar
+ferrar P1236=fierr S1236=fierr A2=fierr
+sumir
+acalorar
+discernir P1236=disciern S1236=disciern A2=disciern
+encintar
+reactivar
+redirigir P1=redirij S123456v=redirij
+disuadir
+empapelar
+estacar I1=estaqu S123456v=estaqu
+excursionar
+sondar
+agriar P1:agrío,agrio P2:agrías,agrias P3:agría,agria P6:agrían,agrian S1:agríe,agrie S2:agríes,agries S3:agríe,agrie S6:agríen,agrien A2:agría,agria
+ondear
+derrochar
+pedalear
+potenciar
+coexistir
+untar
+aclamar
+apiadar
+degollar P1236=degüell S1236=degüell A2=degüell
+desplomar
+acarrear
+ovular
+persistir
+habituar P1236=habitú S1236=habitú A2=habitú
+reconectar
+adjudicar I1=adjudiqu S123456v=adjudiqu
+calumniar
+hospedar
+tirotear
+abastecer P1=abastezc S123456v=abastezc
+simbar
+succionar
+asomar
+descontar P1236=descuent S1236=descuent A2=descuent
+entumecer P1=entumezc S123456v=entumezc
+vendar
+ambientar
+impartir
+recomponer P1=recompong I2456=recompus I1:recompuse I3:recompuso F123456=recompondr C123456=recompondr S123456v=recompong R123456=recompus E123456=recompus A2:recompón D:recompuesto
+rielar
+desafinar
+desproteger P1=desprotej S123456v=desprotej
+estriar P1236=estrí S1236=estrí A2=estrí
+rallar
+abducir P1=abduzc I245=abduj I1:abduje I3:abdujo I6:abdujeron S123456v=abduzc R1:abdujera R2:abdujeras R3:abdujera R4:abdujéramos R5:abdujerais R6:abdujeran E1:abdujese E2:abdujeses E3:abdujese E4:abdujésemos E5:abdujeseis E6:abdujesen
+aceitar
+contrabandear
+marchitar
+disecar I1=disequ S123456v=disequ
+empalmar
+taladrar
+generalizar I1=generalic S123456v=generalic
+residenciar
+abarcar I1=abarqu S123456v=abarqu
+desorganizar I1=desorganic S123456v=desorganic
+hachar
+machar
+arrinconar
+eyacular
+compincharse A2:compínchate A5:compinchaos Av:compinchate G:compinchándose
+empinar
+degustar
+dificultar
+interceder
+molinar
+rabiar
+redimir
+acallar
+fotocopiar
+ondular
+repugnar
+ridiculizar I1=ridiculic S123456v=ridiculic
+conjurar
+decodificar I1=decodifiqu S123456v=decodifiqu
+despellejar
+embriagar I1=embriagu S123456v=embriagu
+esculpir
+extorsionar
+peer I2:peíste I3:peyó I4:peímos I5:peísteis I6:peyeron R1:peyera R2:peyeras R3:peyera R4:peyéramos R5:peyerais R6:peyeran E1:peyese E2:peyeses E3:peyese E4:peyésemos E5:peyeseis E6:peyesen G:peyendo D:peído
+acolchar
+diseccionar
+disentir P1236=disient I36=disint S1236=disient S45v=disint R123456=disint E123456=disint A2=disient G:disintiendo
+doblegar I1=doblegu S123456v=doblegu
+reanimar
+chasquear
+desenfundar
+protagonizar I1=protagonic S123456v=protagonic
+remunerar
+incomunicar I1=incomuniqu S123456v=incomuniqu
+fantasiar
+glorificar I1=glorifiqu S123456v=glorifiqu
+legalizar I1=legalic S123456v=legalic
+licuar P1:licuo,licúo P2:licuas,licúas P3:licua,licúa P6:licuan,licúan S1:licue,licúe S2:licues,licúes S3:licue,licúe S6:licuen,licúen A2:licua,licúa
+pender
+contrariar P1236=contrarí S1236=contrarí A2=contrarí
+sachar
+perpetuar P1236=perpetú S1236=perpetú A2=perpetú
+sopesar
+endulzar I1=endulc S123456v=endulc
+priorizar I1=prioric S123456v=prioric
+expedicionar
+atarear
+encorvar
+enmarcar I1=enmarqu S123456v=enmarqu
+esterilizar I1=esterilic S123456v=esterilic
+infraccionar
+prescribir D:prescrito
+resurgir P1=resurj S123456v=resurj
+sondear
+asear
+decretar
+desentrañar
+embalar
+encerar
+triturar
+matizar I1=matic S123456v=matic
+pipar
+roscar I1=rosqu S123456v=rosqu
+descuartizar I1=descuartic S123456v=descuartic
+deslumbrar
+encestar
+retratar
+trajear
+chamuscar I1=chamusqu S123456v=chamusqu
+empecer P1=empezc S123456v=empezc
+granizar I1=granic S123456v=granic
+obstaculizar I1=obstaculic S123456v=obstaculic
+revisionar
+magullar
+declinar
+matricular
+reafirmar
+desconsolar P1236=desconsuel S1236=desconsuel A2=desconsuel
+emparentar P1:empariento,emparento P2:emparientas,emparentas P3:emparienta,emparenta P6:emparientan,emparentan S1:empariente,emparente S2:emparientes,emparentes S3:empariente,emparente S6:emparienten,emparenten A2:emparienta,emparenta
+enlatar
+moldar
+patalear
+retozar I1=retoc S123456v=retoc
+amasar
+finar
+impregnar
+imputar
+subsistir
+descongelar
+escasear
+exhumar
+reavivar
+reevaluar P1236=reevalú S1236=reevalú A2=reevalú
+urgir P1=urj S123456v=urj
+calibrar
+fibrilar
+tapizar I1=tapic S123456v=tapic
+encaminar
+petar
+predeterminar
+proscribir D:proscrito
+aguar I1=agü S123456v=agü
+incautarse A2:incáutate A5:incautaos Av:incautate G:incautándose
+ralentizar I1=ralentic S123456v=ralentic
+serrar P1236=sierr S1236=sierr A2=sierr
+esponjar
+pautar
+sopar
+entonar
+turbinar
+diligenciar
+radicar I1=radiqu S123456v=radiqu
+agir P1=aj S123456v=aj
+arcar I1=arqu S123456v=arqu
+lalar
+tambalear
+alternar
+plegar P1236=plieg I1=plegu S1236=pliegu S45v=plegu A2=plieg
+luir P1236=luy P5:luis Pv:luis I1:lui I3:luyó I6:luyeron S123456v=luy R1:luyera R2:luyeras R3:luyera R4:luyéramos R5:luyerais R6:luyeran E1:luyese E2:luyeses E3:luyese E4:luyésemos E5:luyeseis E6:luyesen A2=luy Av:lui G:luyendo
+añorar
+llagar I1=llagu S123456v=llagu
+chilar
+asemejar
+jeringar I1=jeringu S123456v=jeringu
+paralelar
+parcelar
+reconfortar
+apellidar
+espartar
+mimir
+mechar
+pausar
+vegetar
+crepar
+taquillar
+baldar
+diplomar
+emanar
+incursionar
+grapar
+reverenciar
+femar
+pincelar
+diagramar
+frangir P1=franj S123456v=franj
+escabullirse I3:escabulló I6:escabulleron R1:escabullera R2:escabulleras R3:escabullera R4:escabulléramos R5:escabullerais R6:escabulleran E1:escabullese E2:escabulleses E3:escabullese E4:escabullésemos E5:escabulleseis E6:escabullesen A2=escabúllet A5:escabullíos Av:escabullite G:escabulléndose
+desventajar
+fisurar
+bobinar
+restar
+transparentar
+agendar
+maquetar
+infamar
+capsular
+envasar
+retocar I1=retoqu S123456v=retoqu
+acerar
+promiscuar P1:promiscuo,promiscúo P2:promiscuas,promiscúas P3:promiscua,promiscúa P6:promiscuan,promiscúan S1:promiscue,promiscúe S2:promiscues,promiscúes S3:promiscue,promiscúe S6:promiscuen,promiscúen A2:promiscua,promiscúa
+fraccionar
+aromar
+jabonar
+secundar
+demarcar I1=demarqu S123456v=demarqu
+alicatar
+lampar
+aborrecer P1=aborrezc S123456v=aborrezc
+canchar
+interaccionar
+felar
+compadrar
+cranear
+resoplar
+resplandecer P1=resplandezc S123456v=resplandezc
+colisionar
+gayar
+bocinar
+estremecer P1=estremezc S123456v=estremezc
+republicar I1=republiqu S123456v=republiqu
+tangar I1=tangu S123456v=tangu
+narrar
+tartamudear
+timbrar
+atribuir P1236=atribuy I3:atribuyó I6:atribuyeron S123456v=atribuy R1:atribuyera R2:atribuyeras R3:atribuyera R4:atribuyéramos R5:atribuyerais R6:atribuyeran E1:atribuyese E2:atribuyeses E3:atribuyese E4:atribuyésemos E5:atribuyeseis E6:atribuyesen A2=atribuy G:atribuyendo
+subvencionar
+mocar I1=moqu S123456v=moqu
+arbitrar
+herver P1236=hierv S1236=hierv A2=hierv
+plasticar I1=plastiqu S123456v=plastiqu
+trascender P1236=trasciend S1236=trasciend A2=trasciend
+tildar
+abalanzar I1=abalanc S123456v=abalanc
+confidenciar
+instanciar
+losar
+palpitar
+acontecer P1=acontezc S123456v=acontezc
+fincar I1=finqu S123456v=finqu
+loar
+carraspear
+alisar
+apremiar
+encarnar
+atañer I3:atañó I6:atañeron R3:atañera R6:atañeran E3:atañese E6:atañesen G:atañendo
+caracterizar I1=caracteric S123456v=caracteric
+concienciar
+intuir P1236=intuy I3:intuyó I6:intuyeron S123456v=intuy R1:intuyera R2:intuyeras R3:intuyera R4:intuyéramos R5:intuyerais R6:intuyeran E1:intuyese E2:intuyeses E3:intuyese E4:intuyésemos E5:intuyeseis E6:intuyesen A2=intuy G:intuyendo
+previsionar
+amparar
+rebosar
+transitar
+misar
+ranurar
+ameritar
+desaguar I1=desagü S123456v=desagü
+regentar
+carrozar I1=carroc S123456v=carroc
+conferir P1236=confier I36=confir S1236=confier S45v=confir R123456=confir E123456=confir A2=confier G:confiriendo
+laudar
+limar
+compasar
+desaprobar P1236=desaprueb S1236=desaprueb A2=desaprueb
+almohadillar
+cimar
+cobijar
+corroer P1:corroo,corroigo,corroyo I2:corroíste I3:corroyó I4:corroímos I5:corroísteis I6:corroyeron Sv=corroy S1:corroa,corroiga,corroya S2:corroas,corroigas,corroyas,corroás,corroigás S3:corroa,corroiga,corroya S4:corroamos,corroigamos,corroyamos S5:corroáis,corroigáis,corroyáis S6:corroan,corroigan,corroyan R1:corroyera R2:corroyeras R3:corroyera R4:corroyéramos R5:corroyerais R6:corroyeran E1:corroyese E2:corroyeses E3:corroyese E4:corroyésemos E5:corroyeseis E6:corroyesen G:corroyendo D:corroído
+alumbrar
+divisar
+nutrir
+retractar
+diferir P1236=difier I36=difir S1236=difier S45v=difir R123456=difir E123456=difir A2=difier G:difiriendo
+macizar I1=macic S123456v=macic
+purpurar
+ovar
+travesar P1236=travies S1236=travies A2=travies
+boletinar
+congeniar
+estipular
+dragar I1=dragu S123456v=dragu
+mecer P1=mez S123456v=mez
+reaparecer P1=reaparezc S123456v=reaparezc
+instar
+irisar
+irradiar
+tiritar
+franquiciar
+intrusar A2:intrúsate A5:intrusaos Av:intrusate G:intrusándose
+perchar
+adherir P1236=adhier I36=adhir S1236=adhier S45v=adhir R123456=adhir E123456=adhir A2=adhier G:adhiriendo
+retumbar
+mestizar I1=mestic S123456v=mestic
+sermonear
+fusionar
+litar
+rebelar
+recepcionar
+togarse I1=togu S123456v=togu A2:tógate A5:togaos Av:togate G:togándose
+escurrir
+remitir

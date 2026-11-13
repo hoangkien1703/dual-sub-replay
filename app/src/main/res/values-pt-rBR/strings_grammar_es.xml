@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pontos de gramática do espanhol para quem aprende espanhol. Mantenha como estão as palavras e os exemplos em espanhol. -->
+    <string name="grammar_es_me_gustaria">Me gustaría: eu gostaria (um desejo educado)</string>
+    <string name="grammar_es_gustar">Verbo como gustar: a coisa de que se gosta é o sujeito (me gusta el café = eu gosto de café)</string>
+    <string name="grammar_es_emotion_subj">Um sentimento sobre algo: o verbo seguinte vai no subjuntivo (me alegra que estés aquí = fico feliz que você esteja aqui)</string>
+    <string name="grammar_es_tener_que">Tener que: ter que, precisar</string>
+    <string name="grammar_es_hay_que">Hay que: é preciso, tem que (sem sujeito específico)</string>
+    <string name="grammar_es_vamos_a">Vamos a: vamos…, ou nós vamos…</string>
+    <string name="grammar_es_ir_a">Ir a + infinitivo: ir + verbo (um plano ou o futuro próximo)</string>
+    <string name="grammar_es_estar_gerund">Estar + gerúndio: acontecendo agora, ou naquele momento (estoy comiendo = estou comendo)</string>
+    <string name="grammar_es_seguir_gerund">Seguir + gerúndio: continuar fazendo</string>
+    <string name="grammar_es_llevar_gerund">Llevar + tempo + gerúndio: estar fazendo há… (llevo dos horas esperando = estou esperando há duas horas)</string>
+    <string name="grammar_es_ir_gerund">Ir + gerúndio: aos poucos (andar + gerúndio: andar fazendo)</string>
+    <string name="grammar_es_poder">Poder: poder, conseguir, ter permissão</string>
+    <string name="grammar_es_querer">Querer + infinitivo: querer fazer</string>
+    <string name="grammar_es_deber">Deber: dever (debería = deveria)</string>
+    <string name="grammar_es_soler">Soler: costumar (solía = costumava)</string>
+    <string name="grammar_es_acabar_de">Acabar de: acabar de (acabo de llegar = acabei de chegar)</string>
+    <string name="grammar_es_volver_a">Volver a: fazer de novo</string>
+    <string name="grammar_es_empezar_a">Começar a (ponerse a = de repente começar a)</string>
+    <string name="grammar_es_dejar_de">Dejar de: parar de fazer</string>
+    <string name="grammar_es_estar_a_punto">Prestes a fazer algo</string>
+    <string name="grammar_es_hacer_falta">Hacer falta: ser preciso (me hace falta = eu preciso)</string>
+    <string name="grammar_es_tener_noun">Tener + substantivo: estar com (tengo hambre = estou com fome; tengo veinte años = tenho vinte anos)</string>
+    <string name="grammar_es_present_perfect">Pretérito perfeito composto: ter feito (he comido = comi), muitas vezes para hoje ou esta semana</string>
+    <string name="grammar_es_pluperfect">Mais-que-perfeito: tinha feito (antes de outro momento passado)</string>
+    <string name="grammar_es_future_perfect">Futuro perfeito: terá feito; também um palpite sobre o passado (habrá salido = deve ter saído)</string>
+    <string name="grammar_es_conditional_perfect">Condicional composto: teria feito</string>
+    <string name="grammar_es_perfect_subjunctive">Pretérito perfeito do subjuntivo: tenha feito (espero que hayas dormido bien)</string>
+    <string name="grammar_es_pluperfect_subjunctive">Mais-que-perfeito do subjuntivo: tivesse feito (ojalá hubiera sabido = quem dera eu soubesse)</string>
+    <string name="grammar_es_passive">Voz passiva: é / foi feito (por alguém: por)</string>
+    <string name="grammar_es_estar_participle">Estar + particípio: um estado que resulta de algo (está cerrada = está fechada)</string>
+    <string name="grammar_es_wish_subj">Querer ou pedir que outra pessoa faça algo: o verbo seguinte vai no subjuntivo (quiero que vengas = quero que você venha)</string>
+    <string name="grammar_es_impersonal_subj">É importante / possível / melhor que…: o verbo seguinte vai no subjuntivo</string>
+    <string name="grammar_es_doubt_subj">Dúvida ou negação: o verbo seguinte vai no subjuntivo (no creo que venga = não acho que ele venha)</string>
+    <string name="grammar_es_ojala">Ojalá: tomara, quem dera (+ subjuntivo)</string>
+    <string name="grammar_es_para_que">Para que: para que (+ subjuntivo)</string>
+    <string name="grammar_es_antes_de_que">Antes de que: antes que (+ subjuntivo)</string>
+    <string name="grammar_es_subj_conjunctions">A menos que, sem que, contanto que, caso: sempre + subjuntivo</string>
+    <string name="grammar_es_como_si">Como si: como se (+ imperfeito do subjuntivo)</string>
+    <string name="grammar_es_tal_vez">Talvez (quizás e tal vez muitas vezes com subjuntivo; a lo mejor com indicativo)</string>
+    <string name="grammar_es_ser">Ser: ser: quem ou o que é, de onde é, como é, as horas (es médica, son las tres)</string>
+    <string name="grammar_es_estar">Estar: estar: onde algo está, ou como está agora (estoy cansado = estou cansado)</string>
+    <string name="grammar_es_hay">Hay: há, tem (había = havia, tinha)</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!: Que…! (¡qué bonito! = que bonito!)</string>
+    <string name="grammar_es_por_que">Por qué: por que, por quê (porque junto = porque)</string>
+    <string name="grammar_es_question_word">Palavra interrogativa: sempre com acento (¿dónde?, ¿cómo?, ¿qué?), também dentro da frase (no sé dónde está)</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, né? (pede que o outro concorde)</string>
+    <string name="grammar_es_negative_word">Palavra negativa: depois do verbo pede no antes dele (no veo nada = não vejo nada)</string>
+    <string name="grammar_es_tambien">También: também; tampoco: também não (yo tampoco = eu também não)</string>
+    <string name="grammar_es_contraction">Al = a + el, del = de + el (sempre escritos juntos)</string>
+    <string name="grammar_es_definite_article">Artigo definido: el (masculino), la (feminino), los, las (plural); concorda com o substantivo</string>
+    <string name="grammar_es_indefinite_article">Artigo indefinido: un (masculino), una (feminino); unos, unas = uns, umas</string>
+    <string name="grammar_es_lo_que">Lo que: o que (lo que dices = o que você diz)</string>
+    <string name="grammar_es_lo_adj">Lo + adjetivo: o … (lo bueno = o bom)</string>
+    <string name="grammar_es_el_que">El que, la que: o que, a que</string>
+    <string name="grammar_es_possessive">Possessivo: mi (meu), tu (teu), su (dele, dela, deles, ou seu com usted); concorda com a coisa possuída</string>
+    <string name="grammar_es_demonstrative">Demonstrativo: este (perto de mim), ese (perto de você), aquel (longe dos dois); esto, eso = isto, isso</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo: meu, teu, dele ou dela; depois do substantivo ou sozinho (un amigo mío, el tuyo)</string>
+    <string name="grammar_es_otro">Otro: outro (nunca un otro)</string>
+    <string name="grammar_es_todo">Todo: todo, cada, tudo (todo el día = o dia todo; todos los días = todos os dias)</string>
+    <string name="grammar_es_cada">Cada: cada (cada día); nunca muda de forma</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún: algo, alguém, algum (os negativos são nada, nadie, ningún)</string>
+    <string name="grammar_es_quantity">Quantidade: poco (pouco), un poco (um pouco), demasiado (demais), bastante (bastante), varios (vários), tanto (tanto)</string>
+    <string name="grammar_es_muy_mucho">Muy: muito (+ adjetivo ou advérbio); mucho: muito, muitos (+ substantivo ou verbo)</string>
+    <string name="grammar_es_mas_que">Comparação: más … que = mais … que; menos … que = menos … que (más de + número)</string>
+    <string name="grammar_es_como">Como (sem acento): como (como tú = como você), ou no início: como, já que (como llovía, = como chovia)</string>
+    <string name="grammar_es_tan_como">Tan … como: tão … quanto; tanto como = tanto quanto</string>
+    <string name="grammar_es_superlative">Superlativo: el / la más … = o / a mais …; el / la menos … = o / a menos …</string>
+    <string name="grammar_es_comparative_irregular">Mejor (melhor), peor (pior), mayor (mais velho, maior), menor (mais novo, menor)</string>
+    <string name="grammar_es_isimo">-ísimo: muitíssimo (buenísimo = ótimo)</string>
+    <string name="grammar_es_por">Por: por causa de, através de, por, em troca de, parte do dia (gracias por…, por la mañana)</string>
+    <string name="grammar_es_para_inf">Para + infinitivo: para (fazer)</string>
+    <string name="grammar_es_para">Para: para (uma pessoa, um objetivo, um prazo), em direção a</string>
+    <string name="grammar_es_a">A: a, para (um lugar), às (horas); também antes de pessoa como objeto (veo a María)</string>
+    <string name="grammar_es_en">En: em; de (en coche = de carro)</string>
+    <string name="grammar_es_de">De: de (el libro de Ana = o livro da Ana)</string>
+    <string name="grammar_es_con">Con: com (conmigo = comigo, contigo = contigo)</string>
+    <string name="grammar_es_sin">Sin: sem (sin + infinitivo = sem fazer)</string>
+    <string name="grammar_es_desde_hasta">Desde: desde; hasta: até (¡hasta luego! = até logo)</string>
+    <string name="grammar_es_other_preposition">Entre (entre), sobre (sobre), hacia (em direção a), durante (durante), según (segundo), contra (contra)</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + infinitivo: antes de / depois de fazer</string>
+    <string name="grammar_es_al_inf">Al + infinitivo: ao fazer (al llegar = ao chegar)</string>
+    <string name="grammar_es_y">Y: e (antes de som de i vira e: padres e hijos)</string>
+    <string name="grammar_es_o">O: ou (antes de som de o vira u: siete u ocho)</string>
+    <string name="grammar_es_ni">Ni: nem (ni tú ni yo = nem você nem eu; no tengo ni idea = não faço ideia)</string>
+    <string name="grammar_es_pero">Pero: mas, porém</string>
+    <string name="grammar_es_sino">Sino: mas sim (no es rojo, sino azul = não é vermelho, mas azul)</string>
+    <string name="grammar_es_porque">Porque: porque (+ frase)</string>
+    <string name="grammar_es_asi_que">Então, por isso (así que, por eso, entonces)</string>
+    <string name="grammar_es_mientras">Mientras: enquanto; mientras tanto = enquanto isso</string>
+    <string name="grammar_es_hace_time">Hace + tempo: há, atrás (hace tres años = há três anos)</string>
+    <string name="grammar_es_desde_hace">Desde hace + tempo: há (e ainda continua) (vivo aquí desde hace dos años = moro aqui há dois anos)</string>
+    <string name="grammar_es_ya_todavia">Ya: já (ya no = não mais); todavía, aún: ainda (todavía no = ainda não)</string>
+    <string name="grammar_es_cada_vez">Cada vez más: cada vez mais (cada vez menos = cada vez menos)</string>
+    <string name="grammar_es_frequency">Frequência: siempre (sempre), a menudo (frequentemente), a veces (às vezes), de vez en cuando (de vez em quando)</string>
+    <string name="grammar_es_usted">Usted: o senhor, a senhora, com o verbo na forma de él / ella (usted habla); ustedes: vocês, os senhores</string>
+    <string name="grammar_es_subject_pronoun">Pronome sujeito: muitas vezes omitido, pois a terminação do verbo já mostra a pessoa (hablo = eu falo); usado para dar ênfase ou contrastar</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti: yo e tú depois de uma preposição (para mí, sin ti; mas conmigo, contigo)</string>
+    <string name="grammar_es_vosotros">Vosotros: vocês, informal (Espanha); na América Latina se diz ustedes</string>
+    <string name="grammar_es_vos">Vos: você informal na Argentina, no Uruguai e em partes da América Central (vos sabés = tú sabes)</string>
+    <string name="grammar_es_que_relative">Que: que (acrescenta uma descrição a um substantivo)</string>
+    <string name="grammar_es_que_conjunction">Que: que (creo que… = acho que…)</string>
+    <string name="grammar_es_quien_relative">Quien: quem (depois de preposição ou vírgula: con quien = com quem)</string>
+    <string name="grammar_es_donde_relative">Donde (sem acento): onde, o lugar onde</string>
+    <string name="grammar_es_cuyo">Cuyo: cujo (concorda com a coisa possuída: cuya casa)</string>
+    <string name="grammar_es_present">Presente: o que acontece agora, sempre, ou em breve (como = eu como)</string>
+    <string name="grammar_es_preterite">Pretérito perfeito: uma ação terminada num momento do passado (ayer comí = ontem comi)</string>
+    <string name="grammar_es_imperfect">Pretérito imperfeito: fundo, hábitos ou algo em andamento no passado (comía = eu comia)</string>
+    <string name="grammar_es_future">Futuro: fará; também um palpite sobre agora (será él = deve ser ele)</string>
+    <string name="grammar_es_conditional">Condicional: faria; também pedidos educados (¿podrías…? = você poderia…?)</string>
+    <string name="grammar_es_present_subjunctive">Presente do subjuntivo: depois de desejos, sentimentos, dúvidas, finalidade e um “quando” futuro (quiero que vengas)</string>
+    <string name="grammar_es_imperfect_subjunctive">Imperfeito do subjuntivo: o subjuntivo no passado e os “se” irreais (si tuviera = se eu tivesse)</string>
+    <string name="grammar_es_imperative">Imperativo: manda alguém fazer algo (habla = fala!)</string>
+    <string name="grammar_es_negative_command">Ordem negativa: no + subjuntivo (no hables = não fale)</string>
+    <string name="grammar_es_gerund">Gerúndio (-ando / -iendo): fazendo (com estar: acontecendo agora)</string>
+    <string name="grammar_es_participle">Particípio (-ado / -ido): feito; depois de haber e como adjetivo (cansado = cansado)</string>
+    <string name="grammar_es_infinitive">Infinitivo: a forma de dicionário do verbo (-ar, -er, -ir), usada depois de outro verbo ou de uma preposição (para comer, sin hablar)</string>
+    <string name="grammar_es_no">No: não; vem antes do verbo (e antes de me, te, lo…)</string>
+    <string name="grammar_es_object_pronoun">Pronome objeto antes do verbo: lo, la (o, a), le (lhe), me, te, nos</string>
+    <string name="grammar_es_reflexive">Reflexivo: a ação é feita em si mesmo (me llamo = eu me chamo; se levanta = ele se levanta)</string>
+    <string name="grammar_es_se_impersonal">Se: as pessoas em geral, ou passiva (se habla español = fala-se espanhol)</string>
+    <string name="grammar_es_se_lo">Se lo: le vira se antes de lo, la, los, las (se lo di = dei isso a ele)</string>
+    <string name="grammar_es_se_accidental">Se me…: algo me aconteceu sem querer (se me olvidó = esqueci; se me cayó = caiu)</string>
+    <string name="grammar_es_attached_pronouns">Pronomes no fim: depois de uma ordem, um infinitivo ou um gerúndio (dámelo = me dá isso)</string>
+    <string name="grammar_es_si_real">Se: uma condição real ou provável (si llueve, no salgo = se chover, não saio)</string>
+    <string name="grammar_es_si_unreal">Se: irreal ou improvável agora (si tuviera dinero, viajaría = se eu tivesse dinheiro, viajaria)</string>
+    <string name="grammar_es_si_past_unreal">Se: um passado irreal (si hubiera sabido = se eu tivesse sabido)</string>
+    <string name="grammar_es_si_whether">Si depois de saber ou perguntar: se (no sé si viene = não sei se ele vem)</string>
+    <string name="grammar_es_cuando">Cuando: quando (cuándo com acento faz uma pergunta)</string>
+    <string name="grammar_es_cuando_future">Cuando + subjuntivo: quando, para algo que ainda não aconteceu (cuando llegues = quando você chegar)</string>
+    <string name="grammar_es_aunque">Aunque: embora, apesar de</string>
+    <string name="grammar_es_aunque_subj">Aunque + subjuntivo: mesmo que</string>
+    <string name="grammar_es_es_que">Es que: é que… (uma desculpa ou explicação)</string>
+    <string name="grammar_es_tense_present">Presente</string>
+    <string name="grammar_es_tense_preterite">Pretérito perfeito</string>
+    <string name="grammar_es_tense_imperfect">Pretérito imperfeito</string>
+    <string name="grammar_es_tense_future">Futuro</string>
+    <string name="grammar_es_tense_conditional">Condicional</string>
+    <string name="grammar_es_tense_present_subjunctive">Presente do subjuntivo</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">Imperfeito do subjuntivo</string>
+    <string name="grammar_es_tense_imperative">Imperativo</string>
+    <string name="grammar_es_tense_infinitive">Infinitivo</string>
+    <string name="grammar_es_tense_gerund">Gerúndio</string>
+    <string name="grammar_es_tense_participle">Particípio</string>
+    <string name="practice_spanish_verb_form">Forma verbal: %1$s</string>
+    <string name="practice_spanish_attached_pronouns">Pronomes ligados: %1$s</string>
+</resources>

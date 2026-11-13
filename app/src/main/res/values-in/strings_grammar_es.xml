@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Poin tata bahasa Spanyol untuk pelajar bahasa Spanyol. Biarkan kata dan contoh bahasa Spanyol apa adanya. -->
+    <string name="grammar_es_me_gustaria">Me gustaría: saya ingin (keinginan yang sopan)</string>
+    <string name="grammar_es_gustar">Kata kerja seperti gustar: hal yang disukai adalah subjeknya (me gusta el café = saya suka kopi)</string>
+    <string name="grammar_es_emotion_subj">Perasaan tentang sesuatu: kata kerja berikutnya dalam subjungtif (me alegra que estés aquí = aku senang kamu di sini)</string>
+    <string name="grammar_es_tener_que">Tener que: harus</string>
+    <string name="grammar_es_hay_que">Hay que: perlu, harus (tidak untuk orang tertentu)</string>
+    <string name="grammar_es_vamos_a">Vamos a: ayo…, atau kita akan…</string>
+    <string name="grammar_es_ir_a">Ir a + infinitif: akan (rencana atau masa depan dekat)</string>
+    <string name="grammar_es_estar_gerund">Estar + gerundium: sedang terjadi sekarang atau saat itu (estoy comiendo = saya sedang makan)</string>
+    <string name="grammar_es_seguir_gerund">Seguir + gerundium: masih, terus melakukan</string>
+    <string name="grammar_es_llevar_gerund">Llevar + waktu + gerundium: sudah … lamanya (llevo dos horas esperando = sudah dua jam saya menunggu)</string>
+    <string name="grammar_es_ir_gerund">Ir + gerundium: sedikit demi sedikit (andar + gerundium: ke sana kemari sambil…)</string>
+    <string name="grammar_es_poder">Poder: bisa, dapat, boleh</string>
+    <string name="grammar_es_querer">Querer + infinitif: ingin, mau</string>
+    <string name="grammar_es_deber">Deber: harus, sebaiknya (debería = seharusnya)</string>
+    <string name="grammar_es_soler">Soler: biasanya (suelo = saya biasanya; solía = dulu biasanya)</string>
+    <string name="grammar_es_acabar_de">Acabar de: baru saja (acabo de llegar = saya baru saja tiba)</string>
+    <string name="grammar_es_volver_a">Volver a: melakukan lagi</string>
+    <string name="grammar_es_empezar_a">Mulai (empezar a, comenzar a; ponerse a = tiba-tiba mulai)</string>
+    <string name="grammar_es_dejar_de">Dejar de: berhenti melakukan</string>
+    <string name="grammar_es_estar_a_punto">Hampir, akan segera</string>
+    <string name="grammar_es_hacer_falta">Hacer falta: diperlukan (me hace falta = saya butuh)</string>
+    <string name="grammar_es_tener_noun">Tener + kata benda: merasa (tengo hambre = saya lapar; tengo veinte años = umur saya dua puluh)</string>
+    <string name="grammar_es_present_perfect">Present perfect: sudah (he comido = saya sudah makan), sering untuk hari ini atau minggu ini</string>
+    <string name="grammar_es_pluperfect">Pluperfect: sudah (sebelum saat lain di masa lalu)</string>
+    <string name="grammar_es_future_perfect">Future perfect: akan sudah; juga dugaan tentang masa lalu (habrá salido = mungkin dia sudah keluar)</string>
+    <string name="grammar_es_conditional_perfect">Conditional perfect: akan sudah (seandainya)</string>
+    <string name="grammar_es_perfect_subjunctive">Perfect subjunctive: sudah, di tempat yang butuh subjungtif (espero que hayas dormido bien)</string>
+    <string name="grammar_es_pluperfect_subjunctive">Pluperfect subjunctive: dalam harapan dan masa lalu yang tidak nyata (ojalá hubiera sabido = andai saya tahu)</string>
+    <string name="grammar_es_passive">Kalimat pasif: di- (oleh: por)</string>
+    <string name="grammar_es_estar_participle">Estar + partisip: keadaan sebagai hasil (está cerrada = sudah tutup)</string>
+    <string name="grammar_es_wish_subj">Ingin atau meminta orang lain melakukan sesuatu: kata kerja berikutnya subjungtif (quiero que vengas = aku ingin kamu datang)</string>
+    <string name="grammar_es_impersonal_subj">Penting / mungkin / lebih baik bahwa…: kata kerja berikutnya subjungtif</string>
+    <string name="grammar_es_doubt_subj">Ragu atau menyangkal: kata kerja berikutnya subjungtif (no creo que venga = saya rasa dia tidak datang)</string>
+    <string name="grammar_es_ojala">Ojalá: semoga, andai saja (+ subjungtif)</string>
+    <string name="grammar_es_para_que">Para que: supaya, agar (+ subjungtif)</string>
+    <string name="grammar_es_antes_de_que">Antes de que: sebelum (+ subjungtif)</string>
+    <string name="grammar_es_subj_conjunctions">Kecuali, tanpa, asalkan, jika sampai: selalu + subjungtif</string>
+    <string name="grammar_es_como_si">Como si: seolah-olah (+ subjungtif lampau: como si fuera)</string>
+    <string name="grammar_es_tal_vez">Mungkin (quizás, tal vez sering + subjungtif; a lo mejor + indikatif)</string>
+    <string name="grammar_es_ser">Ser: adalah: siapa atau apa, asal, sifat, jam (es médica, son las tres)</string>
+    <string name="grammar_es_estar">Estar: berada, sedang: tempat, atau keadaan saat ini (estoy cansado = saya lelah)</string>
+    <string name="grammar_es_hay">Hay: ada (había = dulu ada)</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!: Betapa…! (¡qué bonito! = indah sekali!)</string>
+    <string name="grammar_es_por_que">Por qué: mengapa (porque, satu kata = karena)</string>
+    <string name="grammar_es_question_word">Kata tanya: selalu ditulis dengan aksen (¿dónde?, ¿cómo?, ¿qué?), juga di dalam kalimat (no sé dónde está)</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, kan? (meminta persetujuan)</string>
+    <string name="grammar_es_negative_word">Kata negatif: jika setelah kata kerja, perlu no sebelumnya, keduanya tetap ada (no veo nada = saya tidak melihat apa-apa)</string>
+    <string name="grammar_es_tambien">También: juga; tampoco: juga tidak (yo tampoco = saya juga tidak)</string>
+    <string name="grammar_es_contraction">Al = a + el, del = de + el (selalu ditulis menjadi satu kata)</string>
+    <string name="grammar_es_definite_article">Kata sandang tentu: el (maskulin), la (feminin), los, las (jamak); sesuai dengan kata bendanya</string>
+    <string name="grammar_es_indefinite_article">Kata sandang tak tentu: un (maskulin), una (feminin); unos, unas = beberapa</string>
+    <string name="grammar_es_lo_que">Lo que: apa yang (lo que dices = apa yang kamu katakan)</string>
+    <string name="grammar_es_lo_adj">Lo + kata sifat: hal yang … (lo bueno = hal yang baik)</string>
+    <string name="grammar_es_el_que">El que, la que: yang (orang atau benda yang…)</string>
+    <string name="grammar_es_possessive">Kepemilikan: mi (saya), tu (kamu), su (dia, mereka, atau Anda dengan usted); sesuai dengan benda yang dimiliki</string>
+    <string name="grammar_es_demonstrative">Ini dan itu: este (dekat saya), ese (dekat kamu), aquel (jauh dari kita); esto, eso = ini, itu (hal)</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo: milikku, milikmu, miliknya; setelah kata benda atau sendiri (un amigo mío, el tuyo)</string>
+    <string name="grammar_es_otro">Otro: lain, satu lagi (tidak pernah un otro)</string>
+    <string name="grammar_es_todo">Todo: semua, setiap, segalanya (todo el día = sepanjang hari; todos los días = setiap hari)</string>
+    <string name="grammar_es_cada">Cada: setiap, masing-masing (cada día); bentuknya tidak pernah berubah</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún: sesuatu, seseorang, beberapa (bentuk negatifnya nada, nadie, ningún)</string>
+    <string name="grammar_es_quantity">Jumlah: poco (sedikit), un poco (sedikit saja), demasiado (terlalu banyak), bastante (cukup), varios (beberapa), tanto (begitu banyak)</string>
+    <string name="grammar_es_muy_mucho">Muy: sangat (+ kata sifat atau keterangan); mucho: banyak (+ kata benda atau kerja)</string>
+    <string name="grammar_es_mas_que">Perbandingan: más … que = lebih … daripada; menos … que = kurang … daripada (más de + angka)</string>
+    <string name="grammar_es_como">Como (tanpa aksen): seperti (como tú = sepertimu), atau di awal: karena (como llovía, = karena hujan)</string>
+    <string name="grammar_es_tan_como">Tan … como: sama … dengan; tanto como = sebanyak</string>
+    <string name="grammar_es_superlative">Superlatif: el / la más … = paling …; el / la menos … = paling tidak …</string>
+    <string name="grammar_es_comparative_irregular">Mejor (lebih baik), peor (lebih buruk), mayor (lebih tua, lebih besar), menor (lebih muda, lebih kecil)</string>
+    <string name="grammar_es_isimo">-ísimo: sangat sekali (buenísimo = bagus sekali)</string>
+    <string name="grammar_es_por">Por: karena, melalui, oleh, sepanjang; sebagai ganti, bagian hari (gracias por…, por la mañana)</string>
+    <string name="grammar_es_para_inf">Para + infinitif: untuk, supaya</string>
+    <string name="grammar_es_para">Para: untuk (orang, tujuan, batas waktu), menuju</string>
+    <string name="grammar_es_a">A: ke (tempat), pada (waktu); juga sebelum orang sebagai objek (veo a María)</string>
+    <string name="grammar_es_en">En: di, pada; dengan (en coche = dengan mobil)</string>
+    <string name="grammar_es_de">De: dari, milik (el libro de Ana = buku Ana)</string>
+    <string name="grammar_es_con">Con: dengan (conmigo = dengan saya, contigo = denganmu)</string>
+    <string name="grammar_es_sin">Sin: tanpa (sin + infinitif = tanpa melakukan)</string>
+    <string name="grammar_es_desde_hasta">Desde: dari, sejak; hasta: sampai, bahkan (¡hasta luego! = sampai jumpa)</string>
+    <string name="grammar_es_other_preposition">Entre (di antara), sobre (di atas, tentang), hacia (menuju), durante (selama), según (menurut), contra (melawan)</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + infinitif: sebelum / setelah melakukan</string>
+    <string name="grammar_es_al_inf">Al + infinitif: ketika, saat (al llegar = saat tiba)</string>
+    <string name="grammar_es_y">Y: dan (e sebelum kata berawalan bunyi i: padres e hijos)</string>
+    <string name="grammar_es_o">O: atau (u sebelum kata berawalan bunyi o: siete u ocho)</string>
+    <string name="grammar_es_ni">Ni: maupun tidak, bahkan tidak (ni tú ni yo = baik kamu maupun aku tidak; no tengo ni idea = aku sama sekali tidak tahu)</string>
+    <string name="grammar_es_pero">Pero: tetapi</string>
+    <string name="grammar_es_sino">Sino: melainkan (setelah no: no es rojo, sino azul)</string>
+    <string name="grammar_es_porque">Porque: karena (+ kalimat)</string>
+    <string name="grammar_es_asi_que">Jadi, karena itu (así que, por eso, entonces)</string>
+    <string name="grammar_es_mientras">Mientras: sementara; mientras tanto = sementara itu</string>
+    <string name="grammar_es_hace_time">Hace + waktu: … yang lalu (hace tres años = tiga tahun lalu)</string>
+    <string name="grammar_es_desde_hace">Desde hace + waktu: sejak … lalu, masih berlangsung (vivo aquí desde hace dos años = sudah dua tahun saya tinggal di sini)</string>
+    <string name="grammar_es_ya_todavia">Ya: sudah, sekarang (ya no = tidak lagi); todavía, aún: masih (todavía no = belum)</string>
+    <string name="grammar_es_cada_vez">Cada vez más: semakin (cada vez menos = semakin sedikit)</string>
+    <string name="grammar_es_frequency">Seberapa sering: siempre (selalu), a menudo (sering), a veces (kadang-kadang), de vez en cuando (sesekali)</string>
+    <string name="grammar_es_usted">Usted: Anda (sopan), kata kerja bentuk él / ella (usted habla); ustedes: kalian, Anda sekalian</string>
+    <string name="grammar_es_subject_pronoun">Kata ganti subjek: sering dihilangkan karena akhiran kata kerja sudah menunjukkan orangnya (hablo = saya bicara); dipakai untuk penekanan atau kontras</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti: bentuk yo dan tú setelah kata depan (para mí, sin ti; tetapi conmigo, contigo)</string>
+    <string name="grammar_es_vosotros">Vosotros: kalian, tidak formal (Spanyol); Amerika Latin memakai ustedes</string>
+    <string name="grammar_es_vos">Vos: kamu (tidak formal) di Argentina, Uruguay dan sebagian Amerika Tengah (vos sabés = tú sabes)</string>
+    <string name="grammar_es_que_relative">Que: yang (menambahkan keterangan pada kata benda)</string>
+    <string name="grammar_es_que_conjunction">Que: bahwa (creo que… = saya pikir bahwa…)</string>
+    <string name="grammar_es_quien_relative">Quien: yang, siapa (setelah preposisi atau koma: con quien = dengan siapa)</string>
+    <string name="grammar_es_donde_relative">Donde (tanpa aksen): tempat di mana</string>
+    <string name="grammar_es_cuyo">Cuyo: yang … nya (sesuai dengan benda yang dimiliki: cuya casa)</string>
+    <string name="grammar_es_present">Kala kini: sekarang, biasanya, atau sebentar lagi (como = saya makan)</string>
+    <string name="grammar_es_preterite">Lampau (selesai): tindakan selesai pada waktu tertentu di masa lalu (ayer comí = kemarin saya makan)</string>
+    <string name="grammar_es_imperfect">Lampau (latar/kebiasaan): latar, kebiasaan, atau yang sedang berlangsung di masa lalu (comía = dulu biasa makan, sedang makan)</string>
+    <string name="grammar_es_future">Masa depan: akan; juga dugaan tentang sekarang (será él = pasti dia)</string>
+    <string name="grammar_es_conditional">Kondisional: akan (seandainya); juga permintaan sopan (¿podrías…? = bisakah kamu…?)</string>
+    <string name="grammar_es_present_subjunctive">Subjungtif kini: setelah keinginan, perasaan, keraguan, tujuan dan “ketika” di masa depan (quiero que vengas)</string>
+    <string name="grammar_es_imperfect_subjunctive">Subjungtif lampau: subjungtif di masa lalu, dan pengandaian (si tuviera = seandainya saya punya)</string>
+    <string name="grammar_es_imperative">Perintah: menyuruh seseorang melakukan sesuatu (habla = bicaralah!)</string>
+    <string name="grammar_es_negative_command">Larangan: no + subjungtif (no hables = jangan bicara)</string>
+    <string name="grammar_es_gerund">Gerundium (-ando / -iendo): sambil, dengan cara (dengan estar: sedang terjadi)</string>
+    <string name="grammar_es_participle">Partisip lampau (-ado / -ido): sudah di-; setelah haber, dan sebagai kata sifat (cansado = lelah)</string>
+    <string name="grammar_es_infinitive">Infinitif: bentuk dasar kata kerja (-ar, -er, -ir), dipakai setelah kata kerja lain atau kata depan (para comer, sin hablar)</string>
+    <string name="grammar_es_no">No: tidak; diletakkan sebelum kata kerja (dan sebelum me, te, lo…)</string>
+    <string name="grammar_es_object_pronoun">Kata ganti objek sebelum kata kerja: lo, la (dia/itu), le (kepadanya), me, te, nos (saya, kamu, kami)</string>
+    <string name="grammar_es_reflexive">Refleksif: tindakan dilakukan pada diri sendiri (me llamo = nama saya; se levanta = dia bangun)</string>
+    <string name="grammar_es_se_impersonal">Se: orang pada umumnya, atau pasif (se habla español = bahasa Spanyol digunakan)</string>
+    <string name="grammar_es_se_lo">Se lo: le menjadi se sebelum lo, la, los, las (se lo di = saya memberikannya kepadanya)</string>
+    <string name="grammar_es_se_accidental">Se me…: terjadi tanpa sengaja (se me olvidó = saya lupa; se me cayó = terjatuh)</string>
+    <string name="grammar_es_attached_pronouns">Kata ganti yang menempel di akhir: setelah perintah, infinitif, atau gerundium (dámelo = berikan itu padaku)</string>
+    <string name="grammar_es_si_real">Jika: syarat yang nyata atau mungkin (si llueve, no salgo = jika hujan, saya tidak keluar)</string>
+    <string name="grammar_es_si_unreal">Jika: tidak nyata atau kecil kemungkinannya sekarang (si tuviera dinero, viajaría = seandainya saya punya uang, saya akan bepergian)</string>
+    <string name="grammar_es_si_past_unreal">Jika: masa lalu yang tidak nyata (si hubiera sabido = seandainya saya tahu)</string>
+    <string name="grammar_es_si_whether">Si setelah tahu atau bertanya: apakah (no sé si viene = saya tidak tahu apakah dia datang)</string>
+    <string name="grammar_es_cuando">Cuando: ketika (cuándo dengan aksen untuk bertanya)</string>
+    <string name="grammar_es_cuando_future">Cuando + subjungtif: ketika, untuk hal yang belum terjadi (cuando llegues = saat kamu tiba)</string>
+    <string name="grammar_es_aunque">Aunque: meskipun</string>
+    <string name="grammar_es_aunque_subj">Aunque + subjungtif: walaupun (seandainya)</string>
+    <string name="grammar_es_es_que">Es que: soalnya…, masalahnya… (alasan atau penjelasan)</string>
+    <string name="grammar_es_tense_present">Kala kini</string>
+    <string name="grammar_es_tense_preterite">Lampau (pretérito)</string>
+    <string name="grammar_es_tense_imperfect">Lampau berulang (imperfecto)</string>
+    <string name="grammar_es_tense_future">Masa depan</string>
+    <string name="grammar_es_tense_conditional">Kondisional</string>
+    <string name="grammar_es_tense_present_subjunctive">Subjungtif kini</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">Subjungtif lampau</string>
+    <string name="grammar_es_tense_imperative">Perintah</string>
+    <string name="grammar_es_tense_infinitive">Infinitif</string>
+    <string name="grammar_es_tense_gerund">Gerundium (-ando / -iendo)</string>
+    <string name="grammar_es_tense_participle">Partisip lampau</string>
+    <string name="practice_spanish_verb_form">Bentuk kata kerja: %1$s</string>
+    <string name="practice_spanish_attached_pronouns">Kata ganti yang menempel: %1$s</string>
+</resources>

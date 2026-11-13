@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ngữ pháp tiếng Tây Ban Nha cho người học tiếng Tây Ban Nha. Giữ nguyên các từ và ví dụ tiếng Tây Ban Nha. -->
+    <string name="grammar_es_me_gustaria">Me gustaría: tôi muốn (cách nói mong muốn lịch sự)</string>
+    <string name="grammar_es_gustar">Động từ kiểu gustar: thứ được thích là chủ ngữ (me gusta el café = tôi thích cà phê)</string>
+    <string name="grammar_es_emotion_subj">Cảm xúc về điều gì: động từ sau ở thức giả định (me alegra que estés aquí = mình vui vì bạn ở đây)</string>
+    <string name="grammar_es_tener_que">Tener que: phải (làm gì)</string>
+    <string name="grammar_es_hay_que">Hay que: cần phải (nói chung, không chỉ ai cụ thể)</string>
+    <string name="grammar_es_vamos_a">Vamos a: chúng ta hãy…, hoặc chúng ta sẽ…</string>
+    <string name="grammar_es_ir_a">Ir a + nguyên mẫu: sắp, định (kế hoạch hoặc tương lai gần)</string>
+    <string name="grammar_es_estar_gerund">Estar + danh động từ: đang diễn ra (estoy comiendo = tôi đang ăn)</string>
+    <string name="grammar_es_seguir_gerund">Seguir + danh động từ: vẫn còn, tiếp tục làm</string>
+    <string name="grammar_es_llevar_gerund">Llevar + thời gian + danh động từ: đã làm được bao lâu (llevo dos horas esperando = tôi đã đợi hai tiếng)</string>
+    <string name="grammar_es_ir_gerund">Ir + danh động từ: dần dần (andar + danh động từ: đi khắp nơi làm gì)</string>
+    <string name="grammar_es_poder">Poder: có thể, được phép</string>
+    <string name="grammar_es_querer">Querer + nguyên mẫu: muốn làm gì</string>
+    <string name="grammar_es_deber">Deber: nên, phải (debería = lẽ ra nên)</string>
+    <string name="grammar_es_soler">Soler: thường làm (solía = trước đây thường)</string>
+    <string name="grammar_es_acabar_de">Acabar de: vừa mới (acabo de llegar = tôi vừa mới đến)</string>
+    <string name="grammar_es_volver_a">Volver a: làm lại lần nữa</string>
+    <string name="grammar_es_empezar_a">Bắt đầu làm (ponerse a = bỗng bắt đầu)</string>
+    <string name="grammar_es_dejar_de">Dejar de: thôi, ngừng làm</string>
+    <string name="grammar_es_estar_a_punto">Sắp sửa làm gì</string>
+    <string name="grammar_es_hacer_falta">Hacer falta: cần (me hace falta = tôi cần)</string>
+    <string name="grammar_es_tener_noun">Tener + danh từ: cảm thấy, tuổi (tengo hambre = tôi đói; tengo veinte años = tôi hai mươi tuổi)</string>
+    <string name="grammar_es_present_perfect">Hiện tại hoàn thành: đã làm (he comido = tôi đã ăn), thường dùng cho hôm nay, tuần này</string>
+    <string name="grammar_es_pluperfect">Quá khứ hoàn thành: đã làm (trước một lúc khác trong quá khứ)</string>
+    <string name="grammar_es_future_perfect">Tương lai hoàn thành: sẽ đã làm xong; cũng là phỏng đoán về quá khứ (habrá salido = chắc anh ấy đã ra ngoài)</string>
+    <string name="grammar_es_conditional_perfect">Điều kiện hoàn thành: lẽ ra đã làm</string>
+    <string name="grammar_es_perfect_subjunctive">Giả định hoàn thành: đã làm, ở chỗ cần thức giả định (espero que hayas dormido bien)</string>
+    <string name="grammar_es_pluperfect_subjunctive">Giả định quá khứ hoàn thành: điều ước, điều không có thật trong quá khứ (ojalá hubiera sabido = giá mà tôi biết)</string>
+    <string name="grammar_es_passive">Câu bị động: được, bị (bởi ai: por)</string>
+    <string name="grammar_es_estar_participle">Estar + quá khứ phân từ: trạng thái là kết quả (está cerrada = đã đóng cửa)</string>
+    <string name="grammar_es_wish_subj">Muốn hoặc nhờ người khác làm gì: động từ sau ở thức giả định (quiero que vengas = tôi muốn bạn đến)</string>
+    <string name="grammar_es_impersonal_subj">Điều quan trọng / có thể / tốt hơn là…: động từ sau ở thức giả định</string>
+    <string name="grammar_es_doubt_subj">Nghi ngờ hoặc phủ nhận: động từ sau ở thức giả định (no creo que venga = tôi không nghĩ anh ấy sẽ đến)</string>
+    <string name="grammar_es_ojala">Ojalá: mong là, giá mà (+ thức giả định)</string>
+    <string name="grammar_es_para_que">Para que: để cho (+ thức giả định)</string>
+    <string name="grammar_es_antes_de_que">Antes de que: trước khi (+ thức giả định)</string>
+    <string name="grammar_es_subj_conjunctions">Trừ khi, mà không, miễn là, phòng khi: luôn + thức giả định</string>
+    <string name="grammar_es_como_si">Como si: như thể (+ giả định quá khứ: como si fuera)</string>
+    <string name="grammar_es_tal_vez">Có lẽ (quizás, tal vez thường + giả định; a lo mejor + trình bày)</string>
+    <string name="grammar_es_ser">Ser: là: ai hoặc cái gì, quê ở đâu, tính chất, giờ (es médica, son las tres)</string>
+    <string name="grammar_es_estar">Estar: ở, đang: ở đâu, hoặc trạng thái lúc này (estoy cansado = tôi mệt)</string>
+    <string name="grammar_es_hay">Hay: có (había = đã có)</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!: Thật là…! (¡qué bonito! = đẹp quá!)</string>
+    <string name="grammar_es_por_que">Por qué: tại sao (porque viết liền = vì)</string>
+    <string name="grammar_es_question_word">Từ để hỏi: luôn có dấu (¿dónde?, ¿cómo?, ¿qué?), kể cả trong câu (no sé dónde está)</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, phải không? (hỏi để người nghe đồng ý)</string>
+    <string name="grammar_es_negative_word">Từ phủ định: khi đứng sau động từ thì cần no trước động từ, giữ cả hai (no veo nada = tôi không thấy gì)</string>
+    <string name="grammar_es_tambien">También: cũng; tampoco: cũng không (yo tampoco = tôi cũng không)</string>
+    <string name="grammar_es_contraction">Al = a + el, del = de + el (luôn viết liền)</string>
+    <string name="grammar_es_definite_article">Mạo từ xác định: el (giống đực), la (giống cái), los, las (số nhiều); hợp với danh từ</string>
+    <string name="grammar_es_indefinite_article">Mạo từ không xác định: un (giống đực), una (giống cái); unos, unas = vài</string>
+    <string name="grammar_es_lo_que">Lo que: điều mà, cái mà (lo que dices = điều bạn nói)</string>
+    <string name="grammar_es_lo_adj">Lo + tính từ: điều … (lo bueno = điều tốt)</string>
+    <string name="grammar_es_el_que">El que, la que: người mà, cái mà</string>
+    <string name="grammar_es_possessive">Sở hữu: mi (của tôi), tu (của bạn), su (của anh ấy, cô ấy, họ, hoặc của ngài); hợp với vật được sở hữu</string>
+    <string name="grammar_es_demonstrative">Chỉ định: este (gần tôi), ese (gần bạn), aquel (xa cả hai); esto, eso = cái này, cái đó</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo: của tôi, của bạn, của anh ấy / cô ấy; đứng sau danh từ hoặc đứng một mình (un amigo mío, el tuyo)</string>
+    <string name="grammar_es_otro">Otro: khác, thêm một (không bao giờ nói un otro)</string>
+    <string name="grammar_es_todo">Todo: tất cả, mọi, mọi thứ (todo el día = cả ngày; todos los días = mỗi ngày)</string>
+    <string name="grammar_es_cada">Cada: mỗi (cada día); không bao giờ đổi dạng</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún: cái gì đó, ai đó, một vài (dạng phủ định là nada, nadie, ningún)</string>
+    <string name="grammar_es_quantity">Số lượng: poco (ít), un poco (một chút), demasiado (quá nhiều), bastante (khá, đủ), varios (vài), tanto (nhiều đến thế)</string>
+    <string name="grammar_es_muy_mucho">Muy: rất (+ tính từ hoặc trạng từ); mucho: nhiều (+ danh từ hoặc động từ)</string>
+    <string name="grammar_es_mas_que">So sánh: más … que = hơn; menos … que = kém (más de + số)</string>
+    <string name="grammar_es_como">Como (không dấu): như (como tú = như bạn), hoặc ở đầu câu: vì (como llovía, = vì trời mưa)</string>
+    <string name="grammar_es_tan_como">Tan … como: … bằng; tanto como = nhiều bằng</string>
+    <string name="grammar_es_superlative">So sánh nhất: el / la más … = … nhất; el / la menos … = ít … nhất</string>
+    <string name="grammar_es_comparative_irregular">Mejor (tốt hơn), peor (tệ hơn), mayor (lớn tuổi hơn, lớn hơn), menor (nhỏ tuổi hơn, nhỏ hơn)</string>
+    <string name="grammar_es_isimo">-ísimo: cực kỳ (buenísimo = rất tốt)</string>
+    <string name="grammar_es_por">Por: vì, qua, bởi, dọc theo; để đổi lấy, buổi trong ngày (gracias por…, por la mañana)</string>
+    <string name="grammar_es_para_inf">Para + nguyên mẫu: để (làm gì)</string>
+    <string name="grammar_es_para">Para: cho, để, trước (hạn), về phía</string>
+    <string name="grammar_es_a">A: đến (nơi), lúc (giờ); cũng đứng trước người làm tân ngữ (veo a María)</string>
+    <string name="grammar_es_en">En: ở, trong, trên; bằng (en coche = bằng ô tô)</string>
+    <string name="grammar_es_de">De: của, từ (el libro de Ana = sách của Ana)</string>
+    <string name="grammar_es_con">Con: với (conmigo = với tôi, contigo = với bạn)</string>
+    <string name="grammar_es_sin">Sin: không có (sin + nguyên mẫu = mà không làm)</string>
+    <string name="grammar_es_desde_hasta">Desde: từ, kể từ; hasta: cho đến, thậm chí (¡hasta luego! = hẹn gặp lại)</string>
+    <string name="grammar_es_other_preposition">Entre (giữa), sobre (trên, về), hacia (về phía), durante (trong suốt), según (theo), contra (chống lại)</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + nguyên mẫu: trước khi / sau khi làm</string>
+    <string name="grammar_es_al_inf">Al + nguyên mẫu: khi (al llegar = khi đến nơi)</string>
+    <string name="grammar_es_y">Y: và (đổi thành e trước từ bắt đầu bằng âm i: padres e hijos)</string>
+    <string name="grammar_es_o">O: hoặc (đổi thành u trước từ bắt đầu bằng âm o: siete u ocho)</string>
+    <string name="grammar_es_ni">Ni: không … cũng không, thậm chí không (ni tú ni yo = cả bạn lẫn tôi đều không; no tengo ni idea = tôi chẳng biết gì)</string>
+    <string name="grammar_es_pero">Pero: nhưng</string>
+    <string name="grammar_es_sino">Sino: mà là (no es rojo, sino azul = không phải đỏ mà là xanh)</string>
+    <string name="grammar_es_porque">Porque: vì (+ câu)</string>
+    <string name="grammar_es_asi_que">Vì vậy, cho nên (así que, por eso, entonces)</string>
+    <string name="grammar_es_mientras">Mientras: trong khi; mientras tanto = trong lúc đó</string>
+    <string name="grammar_es_hace_time">Hace + thời gian: … trước (hace tres años = ba năm trước)</string>
+    <string name="grammar_es_desde_hace">Desde hace + thời gian: đã … (và vẫn còn) (vivo aquí desde hace dos años = tôi đã sống ở đây hai năm)</string>
+    <string name="grammar_es_ya_todavia">Ya: đã, rồi (ya no = không còn nữa); todavía, aún: vẫn còn (todavía no = chưa)</string>
+    <string name="grammar_es_cada_vez">Cada vez más: ngày càng (cada vez menos = ngày càng ít)</string>
+    <string name="grammar_es_frequency">Tần suất: siempre (luôn luôn), a menudo (thường), a veces (đôi khi), de vez en cuando (thỉnh thoảng)</string>
+    <string name="grammar_es_usted">Usted: ngài, ông, bà (lịch sự), động từ chia như él / ella (usted habla); ustedes: các ngài, các bạn</string>
+    <string name="grammar_es_subject_pronoun">Đại từ chủ ngữ: thường được lược bỏ vì đuôi động từ đã cho biết ngôi (hablo = tôi nói); dùng để nhấn mạnh hoặc đối chiếu</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti: dạng của yo và tú sau giới từ (para mí, sin ti; nhưng conmigo, contigo)</string>
+    <string name="grammar_es_vosotros">Vosotros: các bạn, thân mật (Tây Ban Nha); Mỹ Latinh dùng ustedes</string>
+    <string name="grammar_es_vos">Vos: “bạn” thân mật ở Argentina, Uruguay và một phần Trung Mỹ (vos sabés = tú sabes)</string>
+    <string name="grammar_es_que_relative">Que: mà, người mà (thêm mô tả cho danh từ)</string>
+    <string name="grammar_es_que_conjunction">Que: rằng (creo que… = tôi nghĩ rằng…)</string>
+    <string name="grammar_es_quien_relative">Quien: người mà (sau giới từ hoặc dấu phẩy: con quien = người mà… cùng)</string>
+    <string name="grammar_es_donde_relative">Donde (không dấu): nơi mà</string>
+    <string name="grammar_es_cuyo">Cuyo: mà … của người đó (hợp với vật được sở hữu: cuya casa)</string>
+    <string name="grammar_es_present">Hiện tại: việc bây giờ, thói quen, hoặc sắp tới (como = tôi ăn)</string>
+    <string name="grammar_es_preterite">Quá khứ (đã xong): việc đã xong vào một lúc trong quá khứ (ayer comí = hôm qua tôi đã ăn)</string>
+    <string name="grammar_es_imperfect">Quá khứ (tiếp diễn/thói quen): bối cảnh, thói quen hoặc việc đang diễn ra trong quá khứ (comía = tôi thường ăn, tôi đang ăn)</string>
+    <string name="grammar_es_future">Tương lai: sẽ làm; cũng là phỏng đoán về hiện tại (será él = chắc là anh ấy)</string>
+    <string name="grammar_es_conditional">Điều kiện: sẽ (nếu…); cũng là lời nhờ lịch sự (¿podrías…? = bạn có thể…?)</string>
+    <string name="grammar_es_present_subjunctive">Giả định hiện tại: sau mong muốn, cảm xúc, nghi ngờ, mục đích và “khi” trong tương lai (quiero que vengas)</string>
+    <string name="grammar_es_imperfect_subjunctive">Giả định quá khứ: thức giả định trong quá khứ và câu “nếu” không có thật (si tuviera = nếu tôi có)</string>
+    <string name="grammar_es_imperative">Mệnh lệnh: bảo ai làm gì (habla = nói đi!)</string>
+    <string name="grammar_es_negative_command">Mệnh lệnh phủ định: no + giả định (no hables = đừng nói)</string>
+    <string name="grammar_es_gerund">Danh động từ (-ando / -iendo): đang, bằng cách (với estar: đang diễn ra)</string>
+    <string name="grammar_es_participle">Quá khứ phân từ (-ado / -ido): đã được; sau haber và làm tính từ (cansado = mệt)</string>
+    <string name="grammar_es_infinitive">Nguyên mẫu: dạng từ điển của động từ (-ar, -er, -ir), dùng sau một động từ khác hoặc giới từ (para comer, sin hablar)</string>
+    <string name="grammar_es_no">No: không; đứng trước động từ (và trước me, te, lo…)</string>
+    <string name="grammar_es_object_pronoun">Đại từ tân ngữ đứng trước động từ: lo, la (nó, anh ấy, cô ấy), le (cho anh ấy, cô ấy), me, te, nos (tôi, bạn, chúng tôi)</string>
+    <string name="grammar_es_reflexive">Phản thân: hành động hướng vào bản thân (me llamo = tôi tên là; se levanta = anh ấy thức dậy)</string>
+    <string name="grammar_es_se_impersonal">Se: người ta nói chung, hoặc bị động (se habla español = tiếng Tây Ban Nha được nói)</string>
+    <string name="grammar_es_se_lo">Se lo: le đổi thành se trước lo, la, los, las (se lo di = tôi đã đưa nó cho anh ấy)</string>
+    <string name="grammar_es_se_accidental">Se me…: vô tình xảy ra với tôi (se me olvidó = tôi quên mất; se me cayó = tôi làm rơi)</string>
+    <string name="grammar_es_attached_pronouns">Đại từ gắn vào cuối: sau mệnh lệnh, nguyên mẫu hoặc danh động từ (dámelo = đưa nó cho tôi)</string>
+    <string name="grammar_es_si_real">Nếu: điều kiện có thật hoặc có thể xảy ra (si llueve, no salgo = nếu mưa, tôi không ra ngoài)</string>
+    <string name="grammar_es_si_unreal">Nếu: không có thật hoặc khó xảy ra lúc này (si tuviera dinero, viajaría = nếu có tiền, tôi sẽ đi du lịch)</string>
+    <string name="grammar_es_si_past_unreal">Nếu: quá khứ không có thật (si hubiera sabido = nếu tôi đã biết)</string>
+    <string name="grammar_es_si_whether">Si sau biết hoặc hỏi: liệu có… không (no sé si viene = tôi không biết anh ấy có đến không)</string>
+    <string name="grammar_es_cuando">Cuando: khi (cuándo có dấu là để hỏi)</string>
+    <string name="grammar_es_cuando_future">Cuando + giả định: khi, cho việc chưa xảy ra (cuando llegues = khi bạn đến)</string>
+    <string name="grammar_es_aunque">Aunque: mặc dù</string>
+    <string name="grammar_es_aunque_subj">Aunque + giả định: cho dù</string>
+    <string name="grammar_es_es_que">Es que: chả là…, là vì… (lý do hoặc giải thích)</string>
+    <string name="grammar_es_tense_present">Hiện tại</string>
+    <string name="grammar_es_tense_preterite">Quá khứ đơn</string>
+    <string name="grammar_es_tense_imperfect">Quá khứ chưa hoàn thành</string>
+    <string name="grammar_es_tense_future">Tương lai</string>
+    <string name="grammar_es_tense_conditional">Điều kiện</string>
+    <string name="grammar_es_tense_present_subjunctive">Giả định hiện tại</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">Giả định quá khứ</string>
+    <string name="grammar_es_tense_imperative">Mệnh lệnh</string>
+    <string name="grammar_es_tense_infinitive">Nguyên mẫu</string>
+    <string name="grammar_es_tense_gerund">Danh động từ (-ando / -iendo)</string>
+    <string name="grammar_es_tense_participle">Quá khứ phân từ</string>
+    <string name="practice_spanish_verb_form">Dạng động từ: %1$s</string>
+    <string name="practice_spanish_attached_pronouns">Đại từ gắn kèm: %1$s</string>
+</resources>

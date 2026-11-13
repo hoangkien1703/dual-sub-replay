@@ -12,7 +12,9 @@ class LearnerGrammarTest {
         assertEquals(GrammarLanguage.JAPANESE, grammarLanguage("こんにちは", "ja"))
         assertEquals(GrammarLanguage.ENGLISH, grammarLanguage("Hello there", "en"))
         assertEquals(GrammarLanguage.ENGLISH, grammarLanguage("Hello there", "en-GB"))
-        assertNull(grammarLanguage("Hola", "es"))
+        assertEquals(GrammarLanguage.SPANISH, grammarLanguage("Hola", "es"))
+        assertEquals(GrammarLanguage.SPANISH, grammarLanguage("Hola", "es-419"))
+        assertNull(grammarLanguage("Bonjour", "fr"))
         assertNull(grammarLanguage("Hello", null))
         assertNull(grammarLanguage("Hello", "eng"))
         // A line of hanzi whose language is unknown keeps the Japanese heuristic, as before.

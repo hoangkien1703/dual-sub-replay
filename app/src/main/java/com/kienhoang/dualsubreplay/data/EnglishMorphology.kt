@@ -12,7 +12,7 @@ import java.util.Locale
 internal object EnglishMorphology {
     private val analyzer =
         BackgroundLoaded("english-analyzer") {
-            EnglishAnalyzer(LearnerData.open("en-pos.zip").use(EnglishPosTagger::load), loadEnglishLexicon())
+            EnglishAnalyzer(LearnerData.open("en-pos.zip").use(OpenNlpPosTagger::load), loadEnglishLexicon())
         }
 
     val revision: StateFlow<Int> get() = analyzer.revision
@@ -33,7 +33,7 @@ internal object EnglishMorphology {
 
 /** What English analysis needs: the tagger and the dictionary forms and levels. */
 internal class EnglishAnalyzer(
-    val tagger: EnglishPosTagger,
+    val tagger: OpenNlpPosTagger,
     val lexicon: EnglishLexicon,
 )
 
@@ -74,7 +74,7 @@ internal data class TaggedEnglishToken(
 private val ENGLISH_TOKEN = Regex("([\\p{L}\\p{M}\\p{N}_]+(?:['’-]+[\\p{L}\\p{M}\\p{N}_]+)*)|[^\\s\\p{L}\\p{M}\\p{N}_]")
 
 internal fun tagEnglish(
-    tagger: EnglishPosTagger,
+    tagger: OpenNlpPosTagger,
     text: String,
 ): List<TaggedEnglishToken> {
     val matches = ENGLISH_TOKEN.findAll(text).toList()

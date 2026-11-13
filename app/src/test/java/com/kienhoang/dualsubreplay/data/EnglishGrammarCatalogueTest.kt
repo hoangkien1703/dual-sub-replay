@@ -6,7 +6,7 @@ import org.junit.Test
 
 class EnglishGrammarCatalogueTest {
     private companion object {
-        val analyzer by lazy { EnglishAnalyzer(LearnerData.open("en-pos.zip").use(EnglishPosTagger::load), loadEnglishLexicon()) }
+        val analyzer by lazy { EnglishAnalyzer(LearnerData.open("en-pos.zip").use(OpenNlpPosTagger::load), loadEnglishLexicon()) }
 
         /** One sentence per point (catalogue and rules), run through the real analyzer: each must find its point. */
         val EXAMPLES: List<Pair<GrammarMeaning, String>> =

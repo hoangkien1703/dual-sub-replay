@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 面向西班牙语学习者的西班牙语语法点。西班牙语单词和例子保持原样。 -->
+    <string name="grammar_es_me_gustaria">Me gustaría：我想要（礼貌的愿望）</string>
+    <string name="grammar_es_gustar">gustar类动词：被喜欢的东西是主语（me gusta el café = 我喜欢咖啡）</string>
+    <string name="grammar_es_emotion_subj">表达感受：后面的动词用虚拟式（me alegra que estés aquí = 很高兴你在这儿）</string>
+    <string name="grammar_es_tener_que">Tener que：必须，不得不</string>
+    <string name="grammar_es_hay_que">Hay que：（泛指）必须，需要，没有具体主语</string>
+    <string name="grammar_es_vamos_a">Vamos a：我们来…吧，或我们将要…</string>
+    <string name="grammar_es_ir_a">Ir a + 原形：打算，将要（计划或不久的将来）</string>
+    <string name="grammar_es_estar_gerund">Estar + 副动词：正在进行（estoy comiendo = 我正在吃）</string>
+    <string name="grammar_es_seguir_gerund">Seguir + 副动词：仍在，继续做</string>
+    <string name="grammar_es_llevar_gerund">Llevar + 时间 + 副动词：已经做了多久（llevo dos horas esperando = 我已经等了两个小时）</string>
+    <string name="grammar_es_ir_gerund">Ir + 副动词：逐渐，一点点地（andar + 副动词：到处做…）</string>
+    <string name="grammar_es_poder">Poder：能，可以</string>
+    <string name="grammar_es_querer">Querer + 原形：想要做</string>
+    <string name="grammar_es_deber">Deber：应该，必须（debería = 最好…）</string>
+    <string name="grammar_es_soler">Soler：通常，习惯做（solía = 过去常常）</string>
+    <string name="grammar_es_acabar_de">Acabar de：刚刚做完（acabo de llegar = 我刚到）</string>
+    <string name="grammar_es_volver_a">Volver a：再一次做</string>
+    <string name="grammar_es_empezar_a">开始做（ponerse a = 突然开始）</string>
+    <string name="grammar_es_dejar_de">Dejar de：停止做，戒掉</string>
+    <string name="grammar_es_estar_a_punto">正要，即将</string>
+    <string name="grammar_es_hacer_falta">Hacer falta：需要（me hace falta = 我需要）</string>
+    <string name="grammar_es_tener_noun">Tener + 名词：状态、年龄（tengo hambre = 我饿了；tengo veinte años = 我二十岁）</string>
+    <string name="grammar_es_present_perfect">现在完成时：已经做了（he comido = 我吃过了），常用于今天、这周</string>
+    <string name="grammar_es_pluperfect">过去完成时：（在过去某时之前）已经做了</string>
+    <string name="grammar_es_future_perfect">将来完成时：将已经做完；也表示对过去的推测（habrá salido = 他大概出去了）</string>
+    <string name="grammar_es_conditional_perfect">条件式完成时：本来会做</string>
+    <string name="grammar_es_perfect_subjunctive">虚拟式现在完成时：需要虚拟式时表示“已经做了”（espero que hayas dormido bien）</string>
+    <string name="grammar_es_pluperfect_subjunctive">虚拟式过去完成时：过去的愿望或非真实情况（ojalá hubiera sabido = 要是早知道就好了）</string>
+    <string name="grammar_es_passive">被动：被…（由谁：por）</string>
+    <string name="grammar_es_estar_participle">Estar + 过去分词：结果状态（está cerrada = 关着门）</string>
+    <string name="grammar_es_wish_subj">希望或要求别人做某事：后面的动词用虚拟式（quiero que vengas = 我希望你来）</string>
+    <string name="grammar_es_impersonal_subj">…很重要 / 可能 / 最好：后面的动词用虚拟式</string>
+    <string name="grammar_es_doubt_subj">怀疑或否定：后面的动词用虚拟式（no creo que venga = 我不觉得他会来）</string>
+    <string name="grammar_es_ojala">Ojalá：但愿，要是…就好了（+ 虚拟式）</string>
+    <string name="grammar_es_para_que">Para que：为了让（+ 虚拟式）</string>
+    <string name="grammar_es_antes_de_que">Antes de que：在…之前（+ 虚拟式）</string>
+    <string name="grammar_es_subj_conjunctions">除非、而不、只要、万一：总是 + 虚拟式</string>
+    <string name="grammar_es_como_si">Como si：好像，仿佛（+ 虚拟式过去时）</string>
+    <string name="grammar_es_tal_vez">也许（quizás、tal vez 常接虚拟式；a lo mejor 接陈述式）</string>
+    <string name="grammar_es_ser">Ser：是：身份、来源、特征、时间（es médica, son las tres）</string>
+    <string name="grammar_es_estar">Estar：在，处于：位置或当下的状态（estoy cansado = 我累了）</string>
+    <string name="grammar_es_hay">Hay：有（había = 曾经有）</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!：多么…啊！（¡qué bonito! = 真漂亮！）</string>
+    <string name="grammar_es_por_que">Por qué：为什么（连写的 porque = 因为）</string>
+    <string name="grammar_es_question_word">疑问词：总是带重音符号（¿dónde?、¿cómo?、¿qué?），句中也一样（no sé dónde está）</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?：…，对吧？（请对方同意）</string>
+    <string name="grammar_es_negative_word">否定词：放在动词后时，动词前要有 no，两者都保留（no veo nada = 我什么也看不见）</string>
+    <string name="grammar_es_tambien">También：也；tampoco：也不（yo tampoco = 我也不）</string>
+    <string name="grammar_es_contraction">Al = a + el，del = de + el（总是连写）</string>
+    <string name="grammar_es_definite_article">定冠词：el（阳性）、la（阴性）、los、las（复数），与名词一致</string>
+    <string name="grammar_es_indefinite_article">不定冠词：un（阳性）、una（阴性）；unos、unas = 一些</string>
+    <string name="grammar_es_lo_que">Lo que：…的事情（lo que dices = 你说的话）</string>
+    <string name="grammar_es_lo_adj">Lo + 形容词：…的事，…的地方（lo bueno = 好的地方）</string>
+    <string name="grammar_es_el_que">El que, la que：…的那个人 / 那个</string>
+    <string name="grammar_es_possessive">物主词：mi（我的）、tu（你的）、su（他的、她的、他们的、您的），与所属物一致</string>
+    <string name="grammar_es_demonstrative">指示词：este（离我近）、ese（离你近）、aquel（离两人都远）；esto、eso = 这、那（事）</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo：我的、你的、他/她的（东西）；放在名词后或单独使用（un amigo mío, el tuyo）</string>
+    <string name="grammar_es_otro">Otro：另一个，别的（不说 un otro）</string>
+    <string name="grammar_es_todo">Todo：全部、每、一切（todo el día = 一整天；todos los días = 每天）</string>
+    <string name="grammar_es_cada">Cada：每个，每（cada día），形式不变</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún：某物、某人、某些（否定形是 nada, nadie, ningún）</string>
+    <string name="grammar_es_quantity">数量词：poco（少）、un poco（一点）、demasiado（太多）、bastante（相当、足够）、varios（几个）、tanto（那么多）</string>
+    <string name="grammar_es_muy_mucho">Muy：很（+ 形容词或副词）；mucho：很多（+ 名词或动词）</string>
+    <string name="grammar_es_mas_que">比较：más … que = 比…更；menos … que = 不如…（más de + 数字）</string>
+    <string name="grammar_es_como">Como（不带重音）：像（como tú = 像你），或在句首表示由于（como llovía, = 因为在下雨）</string>
+    <string name="grammar_es_tan_como">Tan … como：和…一样；tanto como = 和…一样多</string>
+    <string name="grammar_es_superlative">最高级：el / la más … = 最…；el / la menos … = 最不…</string>
+    <string name="grammar_es_comparative_irregular">Mejor（更好）、peor（更差）、mayor（年长、更大）、menor（年幼、更小）</string>
+    <string name="grammar_es_isimo">-ísimo：极其（buenísimo = 非常好）</string>
+    <string name="grammar_es_por">Por：因为，经过，被，沿着；交换，一天中的时段（gracias por…, por la mañana）</string>
+    <string name="grammar_es_para_inf">Para + 原形：为了做…</string>
+    <string name="grammar_es_para">Para：为了，给，在…之前（期限），朝向</string>
+    <string name="grammar_es_a">A：到（地方），在（时间）；人作宾语时也放在前面（veo a María）</string>
+    <string name="grammar_es_en">En：在…里/上；乘（en coche = 坐车）</string>
+    <string name="grammar_es_de">De：…的，从…来（el libro de Ana = 安娜的书）</string>
+    <string name="grammar_es_con">Con：和，用（conmigo = 和我，contigo = 和你）</string>
+    <string name="grammar_es_sin">Sin：没有（sin + 原形 = 不做…就）</string>
+    <string name="grammar_es_desde_hasta">Desde：从，自从；hasta：直到，甚至（¡hasta luego! = 回头见）</string>
+    <string name="grammar_es_other_preposition">Entre（在…之间）、sobre（在…上，关于）、hacia（朝向）、durante（在…期间）、según（根据）、contra（反对）</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + 原形：在做…之前 / 之后</string>
+    <string name="grammar_es_al_inf">Al + 原形：在…的时候（al llegar = 到达时）</string>
+    <string name="grammar_es_y">Y：和（在 i 音开头的词前变为 e：padres e hijos）</string>
+    <string name="grammar_es_o">O：或者（在 o 音开头的词前变为 u：siete u ocho）</string>
+    <string name="grammar_es_ni">Ni：既不…也不，连…都不（ni tú ni yo = 你和我都不；no tengo ni idea = 我完全不知道）</string>
+    <string name="grammar_es_pero">Pero：但是</string>
+    <string name="grammar_es_sino">Sino：而是（no es rojo, sino azul = 不是红色，而是蓝色）</string>
+    <string name="grammar_es_porque">Porque：因为（+ 句子）</string>
+    <string name="grammar_es_asi_que">所以，因此（así que, por eso, entonces）</string>
+    <string name="grammar_es_mientras">Mientras：在…的时候；mientras tanto = 与此同时</string>
+    <string name="grammar_es_hace_time">Hace + 时间：…以前（hace tres años = 三年前）</string>
+    <string name="grammar_es_desde_hace">Desde hace + 时间：已经…了（仍在继续）（vivo aquí desde hace dos años = 我在这里住了两年了）</string>
+    <string name="grammar_es_ya_todavia">Ya：已经（ya no = 不再）；todavía、aún：还，仍然（todavía no = 还没有）</string>
+    <string name="grammar_es_cada_vez">Cada vez más：越来越（cada vez menos = 越来越少）</string>
+    <string name="grammar_es_frequency">频率：siempre（总是）、a menudo（经常）、a veces（有时）、de vez en cuando（偶尔）</string>
+    <string name="grammar_es_usted">Usted：您（礼貌），动词用 él / ella 的形式（usted habla）；ustedes：你们，诸位</string>
+    <string name="grammar_es_subject_pronoun">主语代词：常常省略，因为动词词尾已表明人称（hablo = 我说）；用于强调或对比</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti：介词后 yo 和 tú 的形式（para mí, sin ti；但说 conmigo, contigo）</string>
+    <string name="grammar_es_vosotros">Vosotros：你们（西班牙的非正式说法）；拉丁美洲用 ustedes</string>
+    <string name="grammar_es_vos">Vos：阿根廷、乌拉圭和中美洲部分地区的“你”（vos sabés = tú sabes）</string>
+    <string name="grammar_es_que_relative">Que：…的（引导修饰名词的从句）</string>
+    <string name="grammar_es_que_conjunction">Que：（引导从句）说…，认为…（creo que… = 我觉得…）</string>
+    <string name="grammar_es_quien_relative">Quien：…的人（介词或逗号后：con quien = 和…一起的人）</string>
+    <string name="grammar_es_donde_relative">Donde（不带重音）：…的地方</string>
+    <string name="grammar_es_cuyo">Cuyo：其…（与所属物一致：cuya casa）</string>
+    <string name="grammar_es_present">现在时：现在、习惯或不久将发生的事（como = 我吃）</string>
+    <string name="grammar_es_preterite">简单过去时：过去某个时间完成的动作（ayer comí = 我昨天吃了）</string>
+    <string name="grammar_es_imperfect">过去未完成时：过去的背景、习惯或正在进行的事（comía = 我以前常吃，我当时在吃）</string>
+    <string name="grammar_es_future">将来时：将会；也表示对现在的推测（será él = 大概是他）</string>
+    <string name="grammar_es_conditional">条件式：会（假设）；也用于礼貌请求（¿podrías…? = 你能…吗？）</string>
+    <string name="grammar_es_present_subjunctive">虚拟式现在时：用于愿望、情感、怀疑、目的及将来的“当…时”之后（quiero que vengas）</string>
+    <string name="grammar_es_imperfect_subjunctive">虚拟式过去时：过去时的虚拟式及与事实相反的假设（si tuviera = 要是我有）</string>
+    <string name="grammar_es_imperative">命令式：让别人做某事（habla = 说吧！）</string>
+    <string name="grammar_es_negative_command">否定命令：no + 虚拟式（no hables = 别说）</string>
+    <string name="grammar_es_gerund">副动词（-ando / -iendo）：一边…，通过…（与 estar 连用：正在）</string>
+    <string name="grammar_es_participle">过去分词（-ado / -ido）：已…的；用于 haber 之后和作形容词（cansado = 累的）</string>
+    <string name="grammar_es_infinitive">不定式：动词的原形（-ar, -er, -ir），用在另一个动词或介词后（para comer, sin hablar）</string>
+    <string name="grammar_es_no">No：不，没；放在动词前（也在 me、te、lo… 之前）</string>
+    <string name="grammar_es_object_pronoun">动词前的宾格代词：lo、la（它、他、她）、le（给他、给她）、me、te、nos（我、你、我们）</string>
+    <string name="grammar_es_reflexive">反身动词：动作作用于自己（me llamo = 我叫…；se levanta = 他起床）</string>
+    <string name="grammar_es_se_impersonal">Se：泛指人们，或被动（se habla español = 讲西班牙语）</string>
+    <string name="grammar_es_se_lo">Se lo：le 在 lo、la、los、las 前变为 se（se lo di = 我把它给了他）</string>
+    <string name="grammar_es_se_accidental">Se me…：不小心发生了（se me olvidó = 我忘了；se me cayó = 我弄掉了）</string>
+    <string name="grammar_es_attached_pronouns">附在词尾的代词：用于命令式、原形或副动词之后（dámelo = 把它给我）</string>
+    <string name="grammar_es_si_real">如果：真实或可能的条件（si llueve, no salgo = 如果下雨，我就不出门）</string>
+    <string name="grammar_es_si_unreal">如果：现在不真实或不太可能（si tuviera dinero, viajaría = 要是有钱，我就去旅行）</string>
+    <string name="grammar_es_si_past_unreal">如果：与过去事实相反（si hubiera sabido = 要是我早知道）</string>
+    <string name="grammar_es_si_whether">知道、问之后的 si：是否（no sé si viene = 我不知道他来不来）</string>
+    <string name="grammar_es_cuando">Cuando：当…时（带重音的 cuándo 用于提问）</string>
+    <string name="grammar_es_cuando_future">Cuando + 虚拟式：用于尚未发生的事“等…时”（cuando llegues = 你到了以后）</string>
+    <string name="grammar_es_aunque">Aunque：虽然，尽管</string>
+    <string name="grammar_es_aunque_subj">Aunque + 虚拟式：即使</string>
+    <string name="grammar_es_es_que">Es que：其实是因为…（解释或借口）</string>
+    <string name="grammar_es_tense_present">现在时</string>
+    <string name="grammar_es_tense_preterite">简单过去时</string>
+    <string name="grammar_es_tense_imperfect">过去未完成时</string>
+    <string name="grammar_es_tense_future">将来时</string>
+    <string name="grammar_es_tense_conditional">条件式</string>
+    <string name="grammar_es_tense_present_subjunctive">虚拟式现在时</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">虚拟式过去时</string>
+    <string name="grammar_es_tense_imperative">命令式</string>
+    <string name="grammar_es_tense_infinitive">原形（不定式）</string>
+    <string name="grammar_es_tense_gerund">副动词（-ando / -iendo）</string>
+    <string name="grammar_es_tense_participle">过去分词</string>
+    <string name="practice_spanish_verb_form">动词形式：%1$s</string>
+    <string name="practice_spanish_attached_pronouns">附着的代词：%1$s</string>
+</resources>

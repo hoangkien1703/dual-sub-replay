@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- İspan dilini öyrənənlər üçün ispan qrammatikası. İspanca sözləri və nümunələri olduğu kimi saxla. -->
+    <string name="grammar_es_me_gustaria">Me gustaría: istərdim (nəzakətli arzu)</string>
+    <string name="grammar_es_gustar">Gustar kimi fel: xoşa gələn şey mübtədadır (me gusta el café = qəhvə mənim xoşuma gəlir)</string>
+    <string name="grammar_es_emotion_subj">Bir şey barədə hiss: sonrakı fel subyunktivdə olur (me alegra que estés aquí = burada olmağına sevinirəm)</string>
+    <string name="grammar_es_tener_que">Tener que: məcburdur, lazımdır</string>
+    <string name="grammar_es_hay_que">Hay que: lazımdır, gərəkdir (konkret bir şəxs olmadan)</string>
+    <string name="grammar_es_vamos_a">Vamos a: gəlin …-aq, ya da …-acağıq</string>
+    <string name="grammar_es_ir_a">Ir a + məsdər: …-acaq (plan, ya da yaxın gələcək)</string>
+    <string name="grammar_es_estar_gerund">Estar + gerundi: indi baş verir, ya da o an baş verirdi (estoy comiendo = yemək yeyirəm)</string>
+    <string name="grammar_es_seguir_gerund">Seguir + gerundi: hələ də …, davam etmək</string>
+    <string name="grammar_es_llevar_gerund">Llevar + vaxt + gerundi: … müddətdir edir (llevo dos horas esperando = iki saatdır gözləyirəm)</string>
+    <string name="grammar_es_ir_gerund">Ir + gerundi: yavaş-yavaş (andar + gerundi: gəzib … etmək)</string>
+    <string name="grammar_es_poder">Poder: bacarmaq, …-a bilmək, icazə</string>
+    <string name="grammar_es_querer">Querer + məsdər: istəmək</string>
+    <string name="grammar_es_deber">Deber: gərəkdir, lazımdır (debería = etməli idi)</string>
+    <string name="grammar_es_soler">Soler: adətən etmək (suelo = adətən; solía = əvvəllər edərdim)</string>
+    <string name="grammar_es_acabar_de">Acabar de: indicə etmək (acabo de llegar = indicə gəldim)</string>
+    <string name="grammar_es_volver_a">Volver a: yenidən etmək</string>
+    <string name="grammar_es_empezar_a">Başlamaq (empezar a, comenzar a; ponerse a = birdən başlamaq)</string>
+    <string name="grammar_es_dejar_de">Dejar de: etməyi dayandırmaq, tərgitmək</string>
+    <string name="grammar_es_estar_a_punto">Bir şeyi etmək üzrə olmaq</string>
+    <string name="grammar_es_hacer_falta">Hacer falta: lazım olmaq (me hace falta = mənə lazımdır)</string>
+    <string name="grammar_es_tener_noun">Tener + isim: olmaq (tengo hambre = acam; tengo veinte años = iyirmi yaşım var)</string>
+    <string name="grammar_es_present_perfect">İndiki bitmiş zaman: etmişəm (he comido = yemişəm), çox vaxt bu gün, bu həftə üçün</string>
+    <string name="grammar_es_pluperfect">Uzaq keçmiş: etmişdi (başqa keçmiş andan əvvəl)</string>
+    <string name="grammar_es_future_perfect">Gələcək bitmiş zaman: etmiş olacaq; həm də keçmiş barədə ehtimal (habrá salido = yəqin çıxıb)</string>
+    <string name="grammar_es_conditional_perfect">Şərt bitmiş forması: etmiş olardı</string>
+    <string name="grammar_es_perfect_subjunctive">Bitmiş subyunktiv: subyunktiv lazım olan yerdə “etmiş” (espero que hayas dormido bien)</string>
+    <string name="grammar_es_pluperfect_subjunctive">Uzaq keçmiş subyunktiv: arzularda və qeyri-real keçmişdə (ojalá hubiera sabido = kaş biləydim)</string>
+    <string name="grammar_es_passive">Məchul növ: edilir, edildi (kim tərəfindən: por)</string>
+    <string name="grammar_es_estar_participle">Estar + feli sifət: bir şeyin nəticəsi olan vəziyyət (está cerrada = bağlıdır)</string>
+    <string name="grammar_es_wish_subj">Başqasının nəsə etməsini istəmək: sonrakı fel subyunktivdə olur (quiero que vengas = gəlməyini istəyirəm)</string>
+    <string name="grammar_es_impersonal_subj">Vacibdir / mümkündür / yaxşıdır ki…: sonrakı fel subyunktivdə olur</string>
+    <string name="grammar_es_doubt_subj">Şübhə və ya inkar: sonrakı fel subyunktivdə olur (no creo que venga = gələcəyinə inanmıram)</string>
+    <string name="grammar_es_ojala">Ojalá: kaş, ümid edirəm (+ subyunktiv: ojalá llueva)</string>
+    <string name="grammar_es_para_que">Para que: ki, …-sın deyə (+ subyunktiv)</string>
+    <string name="grammar_es_antes_de_que">Antes de que: …-dan əvvəl (+ subyunktiv)</string>
+    <string name="grammar_es_subj_conjunctions">Əgər … olmasa, … olmadan, … şərtilə, … olarsa: həmişə + subyunktiv</string>
+    <string name="grammar_es_como_si">Como si: sanki (+ keçmiş subyunktiv: como si fuera = sanki o idi)</string>
+    <string name="grammar_es_tal_vez">Bəlkə (quizás, tal vez çox vaxt subyunktivlə; a lo mejor indikativlə)</string>
+    <string name="grammar_es_ser">Ser: olmaq: kim və ya nə olduğu, haradan olduğu, necə olduğu, saat (es médica, son las tres)</string>
+    <string name="grammar_es_estar">Estar: olmaq: harada olduğu, ya da indi necə olduğu (estoy cansado = yorğunam)</string>
+    <string name="grammar_es_hay">Hay: var (había = var idi)</string>
+    <string name="grammar_es_que_exclamation">¡Qué…!: Nə qədər…! (¡qué bonito! = nə gözəldir!)</string>
+    <string name="grammar_es_por_que">Por qué: niyə (porque, bitişik = çünki)</string>
+    <string name="grammar_es_question_word">Sual sözü: həmişə vurğu işarəsi ilə yazılır (¿dónde?, ¿cómo?, ¿qué?), cümlənin içində də (no sé dónde está)</string>
+    <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, elə deyil? (razılıq istəyir)</string>
+    <string name="grammar_es_negative_word">İnkar sözü: feldən sonra gələndə feldən əvvəl no lazımdır, ikisi də qalır (no veo nada = heç nə görmürəm)</string>
+    <string name="grammar_es_tambien">También: də, həmçinin; tampoco: … da yox (yo tampoco = mən də yox)</string>
+    <string name="grammar_es_contraction">Al = a + el, del = de + el (həmişə bitişik yazılır)</string>
+    <string name="grammar_es_definite_article">Müəyyənlik artikli: el (kişi cinsi), la (qadın cinsi), los, las (cəm); isimə uyğun gəlir</string>
+    <string name="grammar_es_indefinite_article">Qeyri-müəyyənlik artikli: un (kişi cinsi), una (qadın cinsi); unos, unas = bir neçə</string>
+    <string name="grammar_es_lo_que">Lo que: … şey, nə ki (lo que dices = dediyin şey)</string>
+    <string name="grammar_es_lo_adj">Lo + sifət: … olan şey, … tərəfi (lo bueno = yaxşı tərəfi)</string>
+    <string name="grammar_es_el_que">El que, la que: … olan (adam, şey)</string>
+    <string name="grammar_es_possessive">Yiyəlik: mi (mənim), tu (sənin), su (onun, onların, ya da usted ilə sizin); sahib olunan şeyə uyğun gəlir</string>
+    <string name="grammar_es_demonstrative">Bu və o: este (mənə yaxın), ese (sənə yaxın), aquel (ikimizdən uzaq); esto, eso = bu, o (şey)</string>
+    <string name="grammar_es_possessive_pronoun">Mío, tuyo, suyo: mənimki, səninki, onunku; isimdən sonra və ya tək (un amigo mío, el tuyo)</string>
+    <string name="grammar_es_otro">Otro: başqa, daha bir (heç vaxt un otro deyil)</string>
+    <string name="grammar_es_todo">Todo: bütün, hər, hər şey (todo el día = bütün gün; todos los días = hər gün)</string>
+    <string name="grammar_es_cada">Cada: hər, hər bir (cada día); forması heç dəyişmir</string>
+    <string name="grammar_es_indefinite">Algo, alguien, algún: nəsə, kimsə, hansısa (inkarları nada, nadie, ningún)</string>
+    <string name="grammar_es_quantity">Miqdar: poco (az), un poco (bir az), demasiado (həddən artıq), bastante (kifayət qədər), varios (bir neçə), tanto (o qədər)</string>
+    <string name="grammar_es_muy_mucho">Muy: çox (+ sifət və ya zərf); mucho: çoxlu (+ isim və ya fel)</string>
+    <string name="grammar_es_mas_que">Müqayisə: más … que = …-dan daha; menos … que = …-dan az (más de + say)</string>
+    <string name="grammar_es_como">Como (vurğusuz): kimi (como tú = sənin kimi), ya da əvvəldə: çünki (como llovía, = yağış yağdığı üçün)</string>
+    <string name="grammar_es_tan_como">Tan … como: … qədər; tanto como = … qədər çox</string>
+    <string name="grammar_es_superlative">Üstünlük dərəcəsi: el / la más … = ən …; el / la menos … = ən az …</string>
+    <string name="grammar_es_comparative_irregular">Mejor (daha yaxşı), peor (daha pis), mayor (daha böyük, yaşlı), menor (daha kiçik, cavan)</string>
+    <string name="grammar_es_isimo">-ísimo: son dərəcə (buenísimo = çox yaxşı)</string>
+    <string name="grammar_es_por">Por: … görə, … vasitəsilə, … tərəfindən, boyunca; əvəzində, günün hissəsi (gracias por…, por la mañana)</string>
+    <string name="grammar_es_para_inf">Para + məsdər: … üçün, … məqsədilə</string>
+    <string name="grammar_es_para">Para: üçün (şəxs, məqsəd, son tarix), … tərəfə</string>
+    <string name="grammar_es_a">A: …-a, …-yə (yer), saatda (vaxt); həmçinin obyekt olan şəxsdən əvvəl (veo a María)</string>
+    <string name="grammar_es_en">En: …-da, üstündə; ilə (en coche = maşınla)</string>
+    <string name="grammar_es_de">De: …-ın, …-dan (el libro de Ana = Ananın kitabı)</string>
+    <string name="grammar_es_con">Con: ilə (conmigo = mənimlə, contigo = səninlə)</string>
+    <string name="grammar_es_sin">Sin: …-sız (sin + məsdər = etmədən)</string>
+    <string name="grammar_es_desde_hasta">Desde: …-dan, … bəri; hasta: …-a qədər, hətta (¡hasta luego! = sonra görüşərik)</string>
+    <string name="grammar_es_other_preposition">Entre (arasında), sobre (üstündə, haqqında), hacia (… tərəfə), durante (… ərzində), según (… görə), contra (… qarşı)</string>
+    <string name="grammar_es_antes_despues_inf">Antes de / después de + məsdər: etmədən əvvəl / etdikdən sonra</string>
+    <string name="grammar_es_al_inf">Al + məsdər: … edəndə (al llegar = gələndə)</string>
+    <string name="grammar_es_y">Y: və (i səsi ilə başlayan sözdən əvvəl e: padres e hijos)</string>
+    <string name="grammar_es_o">O: və ya (o səsi ilə başlayan sözdən əvvəl u: siete u ocho)</string>
+    <string name="grammar_es_ni">Ni: nə … nə, heç (ni tú ni yo = nə sən, nə də mən; no tengo ni idea = heç fikrim yoxdur)</string>
+    <string name="grammar_es_pero">Pero: amma, lakin</string>
+    <string name="grammar_es_sino">Sino: əksinə, … deyil, … (no es rojo, sino azul = qırmızı deyil, mavidir)</string>
+    <string name="grammar_es_porque">Porque: çünki (+ cümlə)</string>
+    <string name="grammar_es_asi_que">Buna görə də, odur ki (así que, por eso, entonces)</string>
+    <string name="grammar_es_mientras">Mientras: …-kən; mientras tanto = bu arada</string>
+    <string name="grammar_es_hace_time">Hace + vaxt: … əvvəl (hace tres años = üç il əvvəl)</string>
+    <string name="grammar_es_desde_hace">Desde hace + vaxt: … müddətdir, hələ davam edir (vivo aquí desde hace dos años = iki ildir burada yaşayıram)</string>
+    <string name="grammar_es_ya_todavia">Ya: artıq, indi (ya no = daha yox); todavía, aún: hələ (todavía no = hələ yox)</string>
+    <string name="grammar_es_cada_vez">Cada vez más: getdikcə daha çox (cada vez menos = getdikcə az)</string>
+    <string name="grammar_es_frequency">Nə qədər tez-tez: siempre (həmişə), a menudo (tez-tez), a veces (bəzən), de vez en cuando (arabir)</string>
+    <string name="grammar_es_usted">Usted: nəzakətli “siz”, fel él / ella formasındadır (usted habla); ustedes: sizlər</string>
+    <string name="grammar_es_subject_pronoun">Mübtəda əvəzliyi: çox vaxt buraxılır, çünki fel sonluğu şəxsi göstərir (hablo = danışıram); vurğu və ya qarşılaşdırma üçün deyilir</string>
+    <string name="grammar_es_prepositional_pronoun">Mí, ti: ön qoşmadan sonra yo və tú (para mí, sin ti; amma conmigo, contigo)</string>
+    <string name="grammar_es_vosotros">Vosotros: sizlər, səmimi (İspaniya); Latın Amerikasında ustedes deyilir</string>
+    <string name="grammar_es_vos">Vos: Argentina, Uruqvay və Mərkəzi Amerikanın bir hissəsində səmimi “sən” (vos sabés = tú sabes)</string>
+    <string name="grammar_es_que_relative">Que: hansı ki, ki (isimə izah əlavə edir)</string>
+    <string name="grammar_es_que_conjunction">Que: ki (creo que… = düşünürəm ki…)</string>
+    <string name="grammar_es_quien_relative">Quien: kim ki (ön söz və ya vergüldən sonra: con quien = kiminlə ki)</string>
+    <string name="grammar_es_donde_relative">Donde (vurğusuz): harada ki, olduğu yer</string>
+    <string name="grammar_es_cuyo">Cuyo: kimin ki (sahib olunan şeyə uyğun gəlir: cuya casa)</string>
+    <string name="grammar_es_present">İndiki zaman: indi, adətən, ya da tezliklə olan (como = yeyirəm)</string>
+    <string name="grammar_es_preterite">Keçmiş zaman (bitmiş): keçmişdə müəyyən vaxtda bitmiş hərəkət (ayer comí = dünən yedim)</string>
+    <string name="grammar_es_imperfect">Keçmiş zaman (davamlı): keçmişdə fon, vərdiş və ya davam edən iş (comía = yeyərdim, yeyirdim)</string>
+    <string name="grammar_es_future">Gələcək zaman: edəcək; həm də indiki barədə ehtimal (será él = yəqin odur)</string>
+    <string name="grammar_es_conditional">Şərt forması: edərdi; həm də nəzakətli xahiş (¿podrías…? = edə bilərdinmi?)</string>
+    <string name="grammar_es_present_subjunctive">İndiki subyunktiv: arzu, hiss, şübhə, məqsəd və gələcək “nə vaxt”dan sonra (quiero que vengas)</string>
+    <string name="grammar_es_imperfect_subjunctive">Keçmiş subyunktiv: keçmişdə subyunktiv və qeyri-real şərt (si tuviera = olsaydı)</string>
+    <string name="grammar_es_imperative">Əmr forması: kiməsə nəsə etməyi deyir (habla = danış!)</string>
+    <string name="grammar_es_negative_command">İnkar əmri: no + subyunktiv (no hables = danışma)</string>
+    <string name="grammar_es_gerund">Gerundi (-ando / -iendo): edərək (estar ilə: indi baş verir)</string>
+    <string name="grammar_es_participle">Keçmiş zaman feli sifəti (-ado / -ido): edilmiş; haber-dən sonra və sifət kimi (cansado = yorğun)</string>
+    <string name="grammar_es_infinitive">Məsdər: felin lüğət forması (-ar, -er, -ir), başqa feldən və ya ön qoşmadan sonra işlənir (para comer, sin hablar)</string>
+    <string name="grammar_es_no">No: yox, deyil; feldən əvvəl gəlir (me, te, lo… əvəzliklərindən də əvvəl)</string>
+    <string name="grammar_es_object_pronoun">Feldən əvvəl obyekt əvəzliyi: lo, la (onu), le (ona), me, te, nos (məni, səni, bizi)</string>
+    <string name="grammar_es_reflexive">Qayıdış: hərəkət özünə yönəlir (me llamo = adım …dır; se levanta = o qalxır)</string>
+    <string name="grammar_es_se_impersonal">Se: ümumiyyətlə insanlar, ya da məchul (se habla español = ispanca danışılır)</string>
+    <string name="grammar_es_se_lo">Se lo: lo, la, los, las-dan əvvəl le se olur (se lo di = onu ona verdim)</string>
+    <string name="grammar_es_se_accidental">Se me…: təsadüfən başıma gəldi (se me olvidó = unutdum; se me cayó = əlimdən düşdü)</string>
+    <string name="grammar_es_attached_pronouns">Sona birləşən əvəzliklər: əmrdən, məsdərdən və ya gerundidən sonra (dámelo = onu mənə ver)</string>
+    <string name="grammar_es_si_real">Əgər: real və ya ehtimal olunan şərt (si llueve, no salgo = yağış yağsa, çıxmıram)</string>
+    <string name="grammar_es_si_unreal">Əgər: indi qeyri-real və ya çətin (si tuviera dinero, viajaría = pulum olsaydı, səyahət edərdim)</string>
+    <string name="grammar_es_si_past_unreal">Əgər: qeyri-real keçmiş (si hubiera sabido = bilsəydim)</string>
+    <string name="grammar_es_si_whether">Bilmək və ya soruşmaqdan sonra si: …-mı, …-mi (no sé si viene = gəlib-gəlmədiyini bilmirəm)</string>
+    <string name="grammar_es_cuando">Cuando: … vaxt, …-anda (vurğulu cuándo sual verir)</string>
+    <string name="grammar_es_cuando_future">Cuando + subyunktiv: hələ baş verməmiş iş üçün “…-anda” (cuando llegues = gələndə)</string>
+    <string name="grammar_es_aunque">Aunque: baxmayaraq ki</string>
+    <string name="grammar_es_aunque_subj">Aunque + subyunktiv: hətta … olsa belə</string>
+    <string name="grammar_es_es_que">Es que: məsələ ondadır ki… (bəhanə və ya izah)</string>
+    <string name="grammar_es_tense_present">İndiki zaman</string>
+    <string name="grammar_es_tense_preterite">Keçmiş zaman (pretérito)</string>
+    <string name="grammar_es_tense_imperfect">İmperfekt (davamlı keçmiş)</string>
+    <string name="grammar_es_tense_future">Gələcək zaman</string>
+    <string name="grammar_es_tense_conditional">Şərt forması</string>
+    <string name="grammar_es_tense_present_subjunctive">İndiki subyunktiv</string>
+    <string name="grammar_es_tense_imperfect_subjunctive">İmperfekt subyunktiv</string>
+    <string name="grammar_es_tense_imperative">Əmr forması</string>
+    <string name="grammar_es_tense_infinitive">Məsdər</string>
+    <string name="grammar_es_tense_gerund">Gerundi (-ando / -iendo)</string>
+    <string name="grammar_es_tense_participle">Feli sifət (participio)</string>
+    <string name="practice_spanish_verb_form">Fel forması: %1$s</string>
+    <string name="practice_spanish_attached_pronouns">Birləşmiş əvəzliklər: %1$s</string>
+</resources>
