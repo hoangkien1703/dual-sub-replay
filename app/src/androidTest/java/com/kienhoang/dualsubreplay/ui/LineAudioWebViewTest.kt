@@ -98,6 +98,30 @@ class LineAudioWebViewTest {
     }
 
     @Test
+    fun aLineReplayedAfterALongPauseStillGivesItsClip() {
+        var web: WebView? = null
+        try {
+            // The line 4.0-6.0 s plays half way and the card is sent; the learner then stays paused
+            // for over a minute, so the recorder's audio context rests (lion737, #81, 2026-11-14)...
+            web = playingFixture(untilSecond = 5.0)
+            evaluate(web!!, "document.querySelector('video').pause()")
+            evaluate(web!!, "window.__dualSubLineAudio.rest()")
+            assertTrue("the audio context did not rest", waitForContext(web!!, "suspended"))
+            val line = audioLine("abcdefghijk", 4_000, 6_000)!!
+            // ...and the replay starts 1.75 s before the line, with no check of the app in between:
+            // the video's own play event has to wake the recorder.
+            evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 2.25; v.play(); })()")
+            assumeTrue("the fixture video did not play on", waitForVideo(web!!, 6.7))
+            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
+            assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
+            assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
+            assertTrue("the clip is silent", audible(clip))
+        } finally {
+            instrumentation.runOnMainSync { web?.destroy() }
+        }
+    }
+
+    @Test
     fun aClipLentToAnkiDroidKeepsItsM4aName() {
         val context = instrumentation.targetContext
         val file = File(File(context.filesDir, LINE_AUDIO_DIRECTORY).apply { mkdirs() }, "abcdefghijk-1000-2000.m4a")
@@ -174,6 +198,19 @@ class LineAudioWebViewTest {
             val at = evaluate(web, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
             if (at >= second) return true
             Thread.sleep(200)
+        }
+        return false
+    }
+
+    private fun waitForContext(
+        web: WebView,
+        wanted: String,
+    ): Boolean {
+        val deadline = System.currentTimeMillis() + 5_000
+        while (System.currentTimeMillis() < deadline) {
+            val state = evaluate(web, "JSON.parse(window.__dualSubLineAudio.ensure('abcdefghijk')).state")
+            if (state == "\"$wanted\"") return true
+            Thread.sleep(100)
         }
         return false
     }

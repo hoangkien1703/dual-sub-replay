@@ -140,7 +140,7 @@ private fun basicCardSides(
     val sentenceAudio = values[7]
     var onFront = frontParts
     var onBack = backParts
-    val wordFront = sides.wordSoundFront ?: (usualWordSoundPlace(front) == CardPlace.FRONT)
+    val wordFront = wordSoundOnFront(front, sides)
     if (wordFront != (wordAudio in frontParts)) {
         if (wordFront) {
             onFront = onFront + wordAudio
@@ -159,7 +159,23 @@ private fun basicCardSides(
         onFront = onFront + picture
         onBack = onBack.map { if (it == source) link else it }
     }
+    if (sentenceSoundPlaysFirst(front, sides) && wordAudio.isNotBlank() && sentenceAudio.isNotBlank()) {
+        onFront = sentenceSoundFirst(onFront, wordAudio, sentenceAudio)
+        onBack = sentenceSoundFirst(onBack, wordAudio, sentenceAudio)
+    }
     return onFront to onBack
+}
+
+/** [parts] with [wordAudio] moved to just after [sentenceAudio] when both are there. */
+private fun sentenceSoundFirst(
+    parts: List<String>,
+    wordAudio: String,
+    sentenceAudio: String,
+): List<String> {
+    if (wordAudio !in parts || sentenceAudio !in parts) return parts
+    val without = parts - wordAudio
+    val at = without.indexOf(sentenceAudio) + 1
+    return without.take(at) + wordAudio + without.drop(at)
 }
 
 private fun basicCardSidesOf(

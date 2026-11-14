@@ -336,6 +336,21 @@ class AnkiConnectNotesTest {
     }
 
     @Test
+    fun playFirstPutsTheLinesSoundBeforeTheWordsOnABasicCard() {
+        val media = CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]")
+        val first = CardSides(sentenceSoundFront = true, sentenceFirst = true)
+        val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, first)
+        assertEquals("猫<br><br>[sound:s.m4a]<br><br>[sound:w.mp3]", word["Front"])
+        // Both on the back: the word's voice follows the line's sound there.
+        val back = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.SENTENCE, CardSides(sentenceFirst = true))
+        val text = back.getValue("Back")
+        assertTrue(text.indexOf("[sound:s.m4a]") < text.indexOf("[sound:w.mp3]"))
+        // On different sides there is nothing to order.
+        val apart = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, CardSides(sentenceFirst = true))
+        assertEquals("猫<br><br>[sound:w.mp3]", apart["Front"])
+    }
+
+    @Test
     fun sentenceSoundOnTheFrontPutsTheLinesSoundOnABasicCardsFront() {
         val media = CardMedia(word = "[sound:w.mp3]", sentence = "[sound:s.m4a]")
         val word = ankiConnectFields(listOf("Front", "Back"), word("1"), media, CardFront.WORD, CardSides(sentenceSoundFront = true))

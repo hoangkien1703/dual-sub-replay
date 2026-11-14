@@ -241,6 +241,7 @@ class SubtitleWordHighlightTest {
                 CARD_WORD_SOUND_PREFERENCE,
                 CARD_SENTENCE_SOUND_PREFERENCE,
                 CARD_PICTURE_PLACE_PREFERENCE,
+                CARD_SOUND_FIRST_PREFERENCE,
                 BLUR_BOX_PREFERENCE,
                 LOOP_BUTTON_PREFERENCE,
                 KANJI_DETAILS_PREFERENCE,

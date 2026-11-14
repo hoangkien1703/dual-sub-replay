@@ -70,6 +70,7 @@ internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "liste
 
 /** Where a card carries the word's voice, the line's sound or the picture (`CardPlace` storage values). */
 internal val AI_CARD_PLACES = listOf("front", "back", "off")
+internal val AI_CARD_SOUNDS_FIRST = listOf("word", "sentence")
 
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
 internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", AI_REPEAT_FOREVER)
@@ -145,6 +146,7 @@ internal enum class AiSetting(
     CARD_WORD_SOUND("anki_card_word_sound", AI_CARD_PLACES),
     CARD_SENTENCE_SOUND("anki_card_sentence_sound", AI_CARD_PLACES),
     CARD_PICTURE("anki_card_picture_place", AI_CARD_PLACES),
+    CARD_SOUND_FIRST("anki_card_sound_first", AI_CARD_SOUNDS_FIRST),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
@@ -869,6 +871,10 @@ private fun otherSettingValues(setting: AiSetting): String =
         AiSetting.CARD_PICTURE ->
             choiceList(setting.choices) +
                 " (where an Anki card shows a picture of the line from the video; off by default)"
+        AiSetting.CARD_SOUND_FIRST ->
+            choiceList(setting.choices) +
+                " (which sound an Anki card plays first on a side that has both the word's voice and the line's sound; " +
+                "word by default; a listening front always starts with the line)"
         else -> choiceList(setting.choices)
     }
 

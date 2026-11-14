@@ -206,6 +206,24 @@ class StudyToolsUiTest {
     }
 
     @Test
+    fun playFirstShowsOnlyWhileBothSoundsGoOnCards() {
+        showSettings("settings_section_flashcards")
+        // Word first until changed (lion737, #81, 2026-11-13).
+        composeRule.onNodeWithTag("card_sound_first_word").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_sound_first_sentence").performClick()
+        composeRule.runOnIdle { assertEquals("sentence", preferences.getString(CARD_SOUND_FIRST_PREFERENCE, null)) }
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-play-first")
+        // With one sound off, or a Listening front, there is nothing to order.
+        composeRule.onNodeWithTag("card_word_sound_off").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_sound_first_sentence").assertDoesNotExist()
+        composeRule.onNodeWithTag("card_word_sound_front").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_sound_first_sentence").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_front_listening").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_sound_first_sentence").assertDoesNotExist()
+    }
+
+    @Test
     fun theStudyToolsSectionFollowsTheLightTheme() {
         preferences.edit().putString(APP_COLOR_THEME_PREFERENCE, AppColorThemeOption.LIGHT.key).commit()
         showSettings()

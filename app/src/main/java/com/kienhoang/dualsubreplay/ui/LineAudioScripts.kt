@@ -57,7 +57,16 @@ private val WEB_LINE_AUDIO_RECORDER =
     const adShowing = function() { return !!document.querySelector('.ad-showing, .ad-interrupting'); };
     const clear = function() { state.blocks = []; state.samples = 0; state.last = null; };
     const resume = function() {
-      if (state.context && state.context.state === 'suspended') state.context.resume().catch(function() {});
+      if (state.context && state.context.state !== 'running' && state.context.state !== 'closed') state.context.resume().catch(function() {});
+    };
+    // The page video started playing: wake the recorder now rather than on the app's next check. After
+    // a minute of pause the context rests, and a line replayed for a card's sound starts less than a
+    // second before the line, so waiting for the check missed the line's start (lion737, #81, 2026-11-14).
+    const wake = function(event) {
+      if (!state.context || !event || event.target !== pageVideo()) return;
+      state.pausedAt = 0;
+      if (event.target !== state.video || !state.track || state.track.readyState !== 'live') attach(event.target);
+      resume();
     };
     const listen = function(event) {
       const video = state.video;
@@ -98,11 +107,16 @@ private val WEB_LINE_AUDIO_RECORDER =
     recorder = {
       ensure: function(videoId) {
         if (videoId !== state.videoId) { clear(); state.videoId = videoId; }
+        // A context the system closed can't record again; start a new one.
+        if (state.context && state.context.state === 'closed') { state.context = null; state.source = null; state.track = null; state.video = null; }
         if (!state.context) {
           try { state.context = new AudioContext({ sampleRate: 24000 }); } catch (error) { state.context = new AudioContext(); }
           state.node = state.context.createScriptProcessor(2048, 1, 1);
           state.node.onaudioprocess = listen;
           state.node.connect(state.context.destination);
+          // Media events don't bubble, so the document hears them while capturing.
+          document.addEventListener('play', wake, true);
+          document.addEventListener('playing', wake, true);
           document.addEventListener('pointerdown', resume, true);
           document.addEventListener('touchend', resume, true);
           document.addEventListener('keydown', resume, true);
@@ -173,7 +187,14 @@ private val WEB_LINE_AUDIO_RECORDER =
         });
         return JSON.stringify(runs.map(function(run) { return [Math.round(run[0] * 100) / 100, Math.round(run[1] * 100) / 100]; }));
       },
+      // Lets the audio context rest now, as a minute of pause does; for tests.
+      rest: function() {
+        state.pausedAt = Date.now() - 60001;
+        return state.context ? state.context.suspend() : null;
+      },
       stop: function() {
+        document.removeEventListener('play', wake, true);
+        document.removeEventListener('playing', wake, true);
         document.removeEventListener('pointerdown', resume, true);
         document.removeEventListener('touchend', resume, true);
         document.removeEventListener('keydown', resume, true);

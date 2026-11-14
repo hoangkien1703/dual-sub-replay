@@ -56,6 +56,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_MODEL_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.data.CardFront
+import com.kienhoang.dualsubreplay.data.CardSoundFirst
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE
@@ -284,6 +285,13 @@ internal enum class SearchableSetting(
         "card_picture",
         setOf(CARD_PICTURE_PLACE_PREFERENCE, CARD_PICTURE_PREFERENCE),
         CARD_PLACE_LABELS,
+    ),
+    CARD_SOUND_FIRST(
+        R.string.study_card_sound_first_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_sound_first",
+        setOf(CARD_SOUND_FIRST_PREFERENCE),
+        CardSoundFirst.entries.map { it.labelRes },
     ),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(

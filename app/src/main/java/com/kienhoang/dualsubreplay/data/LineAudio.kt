@@ -46,8 +46,11 @@ internal data class AudioLine(
     val windowEndMs: Long get() = endMs + LINE_AUDIO_TAIL_MS
 }
 
-/** Extra sound played before a line's lead when it is replayed for its clip: the recorder needs a moment after the seek. */
-internal const val LINE_AUDIO_REPLAY_EARLY_MS = 500L
+/**
+ * Extra sound played before a line's lead when it is replayed for its clip: the recorder needs a
+ * moment after the seek, and longer when its audio context was resting after a long pause.
+ */
+internal const val LINE_AUDIO_REPLAY_EARLY_MS = 1_000L
 
 /**
  * [word] with the times its line is replayed at so the page records the whole clip, lead and tail

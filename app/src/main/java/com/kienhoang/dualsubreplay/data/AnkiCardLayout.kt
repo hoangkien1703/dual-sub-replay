@@ -42,6 +42,21 @@ internal fun storedCardPlace(
     otherwise: CardPlace,
 ): CardPlace = CardPlace.entries.firstOrNull { it.storageValue == value } ?: otherwise
 
+/**
+ * Which sound plays first on a side of the card that has both (lion737, #81, 2026-11-13). Anki
+ * plays a side's sounds in the order they appear; the word's voice comes first unless the learner
+ * picks the line's sound.
+ */
+internal enum class CardSoundFirst(
+    val storageValue: String,
+) {
+    WORD("word"),
+    SENTENCE("sentence"),
+}
+
+internal fun storedCardSoundFirst(value: String?): CardSoundFirst =
+    CardSoundFirst.entries.firstOrNull { it.storageValue == value } ?: CardSoundFirst.WORD
+
 /** Where the word's voice usually goes for [front]: with the word, so on the back when the front hides the word. */
 internal fun usualWordSoundPlace(front: CardFront): CardPlace =
     if (front == CardFront.SENTENCE || front == CardFront.LISTENING) CardPlace.BACK else CardPlace.FRONT
@@ -55,6 +70,7 @@ internal data class CardOptions(
     val sentenceSound: CardPlace = CardPlace.OFF,
     val picture: CardPlace = CardPlace.OFF,
     val front: CardFront = CardFront.WORD_AND_SENTENCE,
+    val soundFirst: CardSoundFirst = CardSoundFirst.WORD,
 ) {
     val wordAudio: Boolean get() = wordSound != CardPlace.OFF
     val sentenceAudio: Boolean get() = sentenceSound != CardPlace.OFF
@@ -67,18 +83,36 @@ internal data class CardOptions(
                 wordSoundFront = if (wordAudio) wordSound == CardPlace.FRONT else null,
                 sentenceSoundFront = sentenceSound == CardPlace.FRONT,
                 pictureFront = picture == CardPlace.FRONT,
+                sentenceFirst = soundFirst == CardSoundFirst.SENTENCE && wordAudio && sentenceAudio,
             )
 }
 
 /**
  * Which media the template shows on the front. [wordSoundFront] null keeps the word's voice where
- * [usualWordSoundPlace] puts it; the line's sound is always on a Listening front.
+ * [usualWordSoundPlace] puts it; the line's sound is always on a Listening front. [sentenceFirst]
+ * plays the line's sound before the word's on a side with both.
  */
 internal data class CardSides(
     val wordSoundFront: Boolean? = null,
     val sentenceSoundFront: Boolean = false,
     val pictureFront: Boolean = false,
+    val sentenceFirst: Boolean = false,
 )
+
+/** Whether the word's voice is on the front for [front] and [sides]. */
+internal fun wordSoundOnFront(
+    front: CardFront,
+    sides: CardSides,
+): Boolean = sides.wordSoundFront ?: (usualWordSoundPlace(front) == CardPlace.FRONT)
+
+/**
+ * Whether a side of the card plays the line's sound before the word's: only where both sounds
+ * share a side. A Listening front always starts with the line, which is its question.
+ */
+internal fun sentenceSoundPlaysFirst(
+    front: CardFront,
+    sides: CardSides,
+): Boolean = sides.sentenceFirst && front != CardFront.LISTENING && wordSoundOnFront(front, sides) == sides.sentenceSoundFront
 
 /** One card template of the DualSub Replay audio note type. */
 internal data class AnkiCardTemplate(
@@ -118,10 +152,18 @@ internal fun ankiCardTemplate(
     front: CardFront,
     sides: CardSides = CardSides(),
 ): AnkiCardTemplate {
-    val wordFront = sides.wordSoundFront ?: (usualWordSoundPlace(front) == CardPlace.FRONT)
+    val wordFront = wordSoundOnFront(front, sides)
     val sentenceFront = sides.sentenceSoundFront || front == CardFront.LISTENING
-    val wordSound = { onFront: Boolean -> if (wordFront == onFront) WORD_AUDIO else "" }
-    val sentenceSound = { onFront: Boolean -> if (sentenceFront == onFront) SENTENCE_AUDIO else "" }
+    // With the line's sound first, the word's voice moves to just after it on their shared side.
+    val sentenceFirst = sentenceSoundPlaysFirst(front, sides)
+    val wordSound = { onFront: Boolean -> if (wordFront == onFront && !sentenceFirst) WORD_AUDIO else "" }
+    val sentenceSound = { onFront: Boolean ->
+        when {
+            sentenceFront != onFront -> ""
+            sentenceFirst -> SENTENCE_AUDIO + WORD_AUDIO
+            else -> SENTENCE_AUDIO
+        }
+    }
     val picture = if (sides.pictureFront) PICTURE_FRONT_HTML else ""
     val source = if (sides.pictureFront) SOURCE_LINK_HTML else SOURCE_HTML
     val details = READING_HTML + MEANING_HTML
@@ -169,13 +211,15 @@ internal fun cardTemplateKey(
         }
     val sound = if (sides.sentenceSoundFront && front != CardFront.LISTENING) FRONT_SOUND_SUFFIX else ""
     val picture = if (sides.pictureFront) PICTURE_FRONT_SUFFIX else ""
-    return front.storageValue + sound + word + picture
+    val order = if (sentenceSoundPlaysFirst(front, sides)) SENTENCE_FIRST_SUFFIX else ""
+    return front.storageValue + sound + word + picture + order
 }
 
 private const val FRONT_SOUND_SUFFIX = "+sound"
 private const val WORD_FRONT_SUFFIX = "+wordfront"
 private const val WORD_BACK_SUFFIX = "+wordback"
 private const val PICTURE_FRONT_SUFFIX = "+picture"
+private const val SENTENCE_FIRST_SUFFIX = "+sentencefirst"
 
 /**
  * Whether the note type's template has to change: it was last set to [applied] (null: never by this
