@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?：…，对吧？（请对方同意）</string>
     <string name="grammar_es_negative_word">否定词：放在动词后时，动词前要有 no，两者都保留（no veo nada = 我什么也看不见）</string>
     <string name="grammar_es_tambien">También：也；tampoco：也不（yo tampoco = 我也不）</string>
+    <string name="grammar_es_courtesy">礼貌用语：por favor（请；口语简称 porfa）、gracias（谢谢）、de nada（不客气）、perdón / lo siento（对不起）</string>
     <string name="grammar_es_contraction">Al = a + el，del = de + el（总是连写）</string>
     <string name="grammar_es_definite_article">定冠词：el（阳性）、la（阴性）、los、las（复数），与名词一致</string>
     <string name="grammar_es_indefinite_article">不定冠词：un（阳性）、una（阴性）；unos、unas = 一些</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque：虽然，尽管</string>
     <string name="grammar_es_aunque_subj">Aunque + 虚拟式：即使</string>
     <string name="grammar_es_es_que">Es que：其实是因为…（解释或借口）</string>
+    <string name="grammar_es_discourse_marker">会话标记词：填充或引导对话（vale = 好的，bueno = 嗯/好吧，pues = 那么，venga = 来吧，a ver = 我看看，o sea = 也就是说）</string>
     <string name="grammar_es_tense_present">现在时</string>
     <string name="grammar_es_tense_preterite">简单过去时</string>
     <string name="grammar_es_tense_imperfect">过去未完成时</string>

@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: 〜だよね？（同意を求める）</string>
     <string name="grammar_es_negative_word">否定語：動詞の後に来るときは動詞の前に no が必要（no veo nada = 何も見えない）</string>
     <string name="grammar_es_tambien">También: 〜も；tampoco: 〜も〜ない（yo tampoco = 私も違う）</string>
+    <string name="grammar_es_courtesy">丁寧な表現：por favor（お願いします。くだけた言い方は porfa）、gracias（ありがとう）、de nada（どういたしまして）、perdón / lo siento（ごめんなさい）</string>
     <string name="grammar_es_contraction">Al = a + el、del = de + el（いつも一語で書く）</string>
     <string name="grammar_es_definite_article">定冠詞：el（男性）、la（女性）、los, las（複数）。名詞に合わせる</string>
     <string name="grammar_es_indefinite_article">不定冠詞：un（男性）、una（女性）。unos, unas = いくつかの</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: 〜けれども</string>
     <string name="grammar_es_aunque_subj">Aunque + 接続法: たとえ〜でも</string>
     <string name="grammar_es_es_que">Es que: 実は〜なんだ（言い訳・説明）</string>
+    <string name="grammar_es_discourse_marker">会話の言葉：話をつないだり進めたりする（vale = オーケー、bueno = さて、pues = じゃあ、venga = さあ、a ver = どれどれ、o sea = つまり）</string>
     <string name="grammar_es_tense_present">現在形</string>
     <string name="grammar_es_tense_preterite">点過去</string>
     <string name="grammar_es_tense_imperfect">線過去</string>

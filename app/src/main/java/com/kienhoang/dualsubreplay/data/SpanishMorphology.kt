@@ -213,6 +213,23 @@ internal fun spanishPiecesOf(
 }
 
 /**
+ * The tag a word gets: a fixed one for words the model often gets wrong, and for a word the model
+ * calls a verb that is no verb form at all (azúcar, ah), its part of speech in the word lists.
+ */
+private fun pieceTag(
+    analyzer: SpanishAnalyzer,
+    lower: String,
+    modelTag: String,
+): String {
+    FIXED_TAGS[lower]?.let { return it }
+    // A capitalized interjection at the start of a line (Eh, Vale) is not a name.
+    if (modelTag == "PROPN" && analyzer.words.isInterjection(lower)) return "INTJ"
+    if (modelTag != "VERB" && modelTag != "AUX") return modelTag
+    if (analyzer.verbs.readings(lower).isNotEmpty() || splitEnclitics(analyzer.verbs, lower) != null) return modelTag
+    return analyzer.words.tagOf(lower) ?: modelTag
+}
+
+/**
  * Whether the word lists have [lower] as a word of its own with this tag; after cuando, que, si, no
  * or a pronoun, a word that can be a finite verb is one instead (cuando llegues).
  */
@@ -236,7 +253,7 @@ private fun wordPieces(
     sentenceStart: Boolean,
     previous: SpanishPiece?,
 ): List<SpanishPiece> {
-    val tag = FIXED_TAGS[lower] ?: token.tag
+    val tag = pieceTag(analyzer, lower, token.tag)
     val properName = tag == "PROPN" && !sentenceStart
     val ownReadings = if (properName) emptyList() else analyzer.verbs.readings(lower)
     val listedOtherwise = listedAsOtherWord(analyzer.words, lower, tag, previous, ownReadings)
@@ -285,7 +302,7 @@ private fun otherLemma(
         "ADJ" -> words.lemma(word, 'a') ?: words.lemma(word, 'n')
         "DET", "PRON", "NUM" -> words.lemma(word, 'd')
         "PROPN" -> words.lemma(word, 'n') ?: words.lemma(word, 'a')
-        "ADP", "CCONJ", "SCONJ", "ADV", "INTJ" -> word.takeIf { words.has(it, 'f') }
+        "ADP", "CCONJ", "SCONJ", "ADV", "INTJ" -> word.takeIf(words::isFunctionWord)
         else -> null
     }
 

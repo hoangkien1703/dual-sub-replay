@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, right? (asks the listener to agree)</string>
     <string name="grammar_es_negative_word">Negative word: after the verb it needs no before it, and Spanish keeps both (no veo nada = I don’t see anything)</string>
     <string name="grammar_es_tambien">También: too, also; tampoco: not … either (yo tampoco = me neither)</string>
+    <string name="grammar_es_courtesy">Courtesy: por favor (please; porfa is the casual short form), gracias (thanks), de nada (you’re welcome), perdón / lo siento (sorry)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (always written as one word)</string>
     <string name="grammar_es_definite_article">The: el (masculine), la (feminine), los, las (plural); it matches its noun</string>
     <string name="grammar_es_indefinite_article">A, an: un (masculine), una (feminine); unos, unas = some</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: although, even though</string>
     <string name="grammar_es_aunque_subj">Aunque + subjunctive: even if</string>
     <string name="grammar_es_es_que">Es que: the thing is…, it’s just that… (gives an excuse or explanation)</string>
+    <string name="grammar_es_discourse_marker">Conversation word: fills or steers the talk (vale = okay, bueno = well, pues = well / so, venga = come on, a ver = let’s see, o sea = I mean)</string>
     <string name="grammar_es_tense_present">Present</string>
     <string name="grammar_es_tense_preterite">Preterite (simple past)</string>
     <string name="grammar_es_tense_imperfect">Imperfect (past habit or background)</string>

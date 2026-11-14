@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: ~지요? (동의를 구함)</string>
     <string name="grammar_es_negative_word">부정어: 동사 뒤에 오면 동사 앞에 no가 필요하다 (no veo nada = 아무것도 안 보여)</string>
     <string name="grammar_es_tambien">También: ~도; tampoco: ~도 아니다 (yo tampoco = 나도 아니야)</string>
+    <string name="grammar_es_courtesy">예의 표현: por favor(부탁해요, 구어로 porfa), gracias(고마워요), de nada(천만에요), perdón / lo siento(미안해요)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (항상 한 단어로 씀)</string>
     <string name="grammar_es_definite_article">정관사: el(남성), la(여성), los, las(복수). 명사에 맞춘다</string>
     <string name="grammar_es_indefinite_article">부정관사: un(남성), una(여성). unos, unas = 몇몇의</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: ~이지만, ~인데도</string>
     <string name="grammar_es_aunque_subj">Aunque + 접속법: 설령 ~하더라도</string>
     <string name="grammar_es_es_que">Es que: 사실은 ~거든 (변명이나 설명)</string>
+    <string name="grammar_es_discourse_marker">대화 표현: 말을 잇거나 이끈다 (vale = 오케이, bueno = 음/자, pues = 그럼, venga = 자 어서, a ver = 어디 보자, o sea = 그러니까)</string>
     <string name="grammar_es_tense_present">현재</string>
     <string name="grammar_es_tense_preterite">단순과거</string>
     <string name="grammar_es_tense_imperfect">불완료과거</string>

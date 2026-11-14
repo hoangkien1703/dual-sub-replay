@@ -5,7 +5,7 @@ internal fun spanishGrammar(morphemes: List<Morpheme>): List<GrammarMatch> =
     matchGrammar(morphemes, SPANISH_GRAMMAR_CATALOGUE, SPANISH_RULES) { CefrLevel.A1 }
 
 private val SPANISH_RULES: List<GrammarRule> =
-    listOf(::verbForm, ::negation, ::objectPronouns, ::attachedPronouns, ::conditional, ::cuando, ::aunque, ::esQue)
+    listOf(::discourseMarker, ::verbForm, ::negation, ::objectPronouns, ::attachedPronouns, ::conditional, ::cuando, ::aunque, ::esQue)
 
 /** A hit whose form and level are those of its first meaning. */
 private fun hit(
@@ -257,4 +257,38 @@ private fun esQue(
 ): RuleHit? {
     if (morphemes[index].surface != "es" || morphemes.getOrNull(index + 1)?.surface != "que") return null
     return if (startsSentence(morphemes, index)) hit(2, GrammarMeaning.ES_ES_QUE) else null
+}
+
+private val MARKER_WORDS = setOf("bueno", "vale", "venga", "vaya", "anda", "hale", "mira", "oye", "oiga", "eh")
+
+private val MARKER_PHRASES = setOf("a ver", "o sea", "en fin", "por cierto", "es decir")
+
+private val COURTESY_WORDS = setOf("gracias", "porfa", "perdón", "perdona", "vale", "bueno", "venga", "sí", "no")
+
+/** Whether [index] is followed by punctuation, the end of the line or a courtesy word (vale, gracias). */
+private fun standsAlone(
+    morphemes: List<Morpheme>,
+    index: Int,
+): Boolean {
+    val next = morphemes.getOrNull(index + 1) ?: return true
+    return next.pos == "PUNCT" || next.surface in COURTESY_WORDS
+}
+
+/**
+ * A conversation word: pues anywhere; vale, bueno, venga, mira, oye or eh when they start a
+ * sentence and stand alone (Vale, nos vemos; ¿vale?; Mira, …, but not ¿Cuánto vale? or Mira la
+ * casa); and a ver, o sea, en fin, por cierto, es decir (a ver not after a verb: voy a ver).
+ */
+private fun discourseMarker(
+    morphemes: List<Morpheme>,
+    index: Int,
+): RuleHit? {
+    val word = morphemes[index].surface
+    val pair = morphemes.getOrNull(index + 1)?.let { "$word ${it.surface}" }
+    if (pair in MARKER_PHRASES) {
+        val afterVerb = pair == "a ver" && morphemes.getOrNull(index - 1)?.let(::isVerb) == true
+        return if (afterVerb) null else hit(2, GrammarMeaning.ES_DISCOURSE_MARKER)
+    }
+    val marker = word == "pues" || (word in MARKER_WORDS && startsSentence(morphemes, index) && standsAlone(morphemes, index))
+    return if (marker) hit(1, GrammarMeaning.ES_DISCOURSE_MARKER) else null
 }

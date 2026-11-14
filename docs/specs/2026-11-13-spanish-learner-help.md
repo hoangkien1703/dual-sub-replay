@@ -59,7 +59,7 @@ Data used:
 - The word card shows the dictionary form (fuimos → ir, canciones → canción, bonitas → bonito),
   and for a verb its form and person ("Verb form: Preterite · nosotros") and the pronouns written
   onto it ("Pronouns attached: me, lo").
-- Grammar cards for Spanish with CEFR badges: 102 catalogue patterns and 30 rule-based meanings
+- Grammar cards for Spanish with CEFR badges: 103 catalogue patterns and 31 rule-based meanings
   (tenses and moods, commands, ser / estar, pronouns and se, si / cuando / aunque clauses), each
   explained in all 9 interface languages, plus the existing AI button.
 - Release as **v1.9.0**.
@@ -180,3 +180,21 @@ Local (Linux, JDK 21):
   model's tag, so "Todos los días como fruta" reads como as "like".
 - Not verified here: the managed-device tests (CI), a physical phone and live YouTube (the
   owner's preview test).
+
+## Follow-up (2026-11-14, v1.9.1 patch): casual lines
+
+The owner opened a Spanish video and saw no grammar card for "Eh, sí porfa hale, ¡gracias!".
+That line has only filler and courtesy words, which had no point, so only the AI button showed.
+Two problems were found and fixed:
+
+- Words the model calls verbs that are no verb form (azúcar, ah) were shown as verbs. The words
+  list now gives each word its parts of speech (n, a, d, p preposition, c conjunction, r adverb,
+  i interjection, instead of one f letter), so such a word takes its listed tag, and a capitalized
+  interjection at the start of a line (Eh, Vale) is no longer a name.
+- Two A1–A2 points were added: "por favor / gracias" (courtesy words: por favor, porfa, gracias,
+  de nada, perdón, lo siento) and "vale / bueno / pues", a rule for conversation words (pues
+  anywhere; vale, bueno, venga, mira, oye, eh at the start of a sentence when they stand alone,
+  so not ¿Cuánto vale? or Mira la casa; a ver, o sea, en fin, por cierto, es decir).
+
+"Hale" (Spain, "there you go") is slang that neither Wiktionary's lists nor Google Translate
+know, so it still has no dictionary form or translation.

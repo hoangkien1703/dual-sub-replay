@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, né? (pede que o outro concorde)</string>
     <string name="grammar_es_negative_word">Palavra negativa: depois do verbo pede no antes dele (no veo nada = não vejo nada)</string>
     <string name="grammar_es_tambien">También: também; tampoco: também não (yo tampoco = eu também não)</string>
+    <string name="grammar_es_courtesy">Cortesia: por favor (porfa é a forma informal), gracias (obrigado), de nada (de nada), perdón / lo siento (desculpe)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (sempre escritos juntos)</string>
     <string name="grammar_es_definite_article">Artigo definido: el (masculino), la (feminino), los, las (plural); concorda com o substantivo</string>
     <string name="grammar_es_indefinite_article">Artigo indefinido: un (masculino), una (feminino); unos, unas = uns, umas</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: embora, apesar de</string>
     <string name="grammar_es_aunque_subj">Aunque + subjuntivo: mesmo que</string>
     <string name="grammar_es_es_que">Es que: é que… (uma desculpa ou explicação)</string>
+    <string name="grammar_es_discourse_marker">Marcador de conversa: preenche ou conduz a fala (vale = ok, bueno = bom, pues = então, venga = vamos, a ver = vamos ver, o sea = ou seja)</string>
     <string name="grammar_es_tense_present">Presente</string>
     <string name="grammar_es_tense_preterite">Pretérito perfeito</string>
     <string name="grammar_es_tense_imperfect">Pretérito imperfeito</string>

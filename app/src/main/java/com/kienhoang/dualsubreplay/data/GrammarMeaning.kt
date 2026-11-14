@@ -856,6 +856,7 @@ internal enum class GrammarMeaning {
     ES_TAG_QUESTION,
     ES_NEGATIVE_WORD,
     ES_TAMBIEN,
+    ES_COURTESY,
     ES_CONTRACTION,
     ES_DEFINITE_ARTICLE,
     ES_INDEFINITE_ARTICLE,
@@ -940,4 +941,5 @@ internal enum class GrammarMeaning {
     ES_AUNQUE,
     ES_AUNQUE_SUBJ,
     ES_ES_QUE,
+    ES_DISCOURSE_MARKER,
 }
