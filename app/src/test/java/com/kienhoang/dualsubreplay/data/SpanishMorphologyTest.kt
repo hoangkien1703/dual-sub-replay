@@ -70,6 +70,14 @@ class SpanishMorphologyTest {
     }
 
     @Test
+    fun wordsTheModelCallsVerbsKeepTheirListedPartOfSpeech() {
+        // The model tags these as verbs, but they are no verb form.
+        assertEquals("NOUN", pieces("¿Azúcar?").first { it.text == "azúcar" }.tag)
+        assertEquals("INTJ", pieces("Ah, ya veo.").first { it.text == "ah" }.tag)
+        assertTrue(pieces("¿Azúcar?").first { it.text == "azúcar" }.readings.isEmpty())
+    }
+
+    @Test
     fun splitsContractionsAndAttachedPronouns() {
         assertEquals(listOf("vamos", "a", "l", "parque"), pieces("Vamos al parque.").map { it.text })
         assertEquals("el", pieces("Vamos al parque.")[2].lemma)

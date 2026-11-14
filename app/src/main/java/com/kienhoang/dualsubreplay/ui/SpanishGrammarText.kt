@@ -55,6 +55,7 @@ internal val SPANISH_GRAMMAR_TEXT: Map<GrammarMeaning, Int> =
         GrammarMeaning.ES_TAG_QUESTION to R.string.grammar_es_tag_question,
         GrammarMeaning.ES_NEGATIVE_WORD to R.string.grammar_es_negative_word,
         GrammarMeaning.ES_TAMBIEN to R.string.grammar_es_tambien,
+        GrammarMeaning.ES_COURTESY to R.string.grammar_es_courtesy,
         GrammarMeaning.ES_CONTRACTION to R.string.grammar_es_contraction,
         GrammarMeaning.ES_DEFINITE_ARTICLE to R.string.grammar_es_definite_article,
         GrammarMeaning.ES_INDEFINITE_ARTICLE to R.string.grammar_es_indefinite_article,
@@ -139,6 +140,7 @@ internal val SPANISH_GRAMMAR_TEXT: Map<GrammarMeaning, Int> =
         GrammarMeaning.ES_AUNQUE to R.string.grammar_es_aunque,
         GrammarMeaning.ES_AUNQUE_SUBJ to R.string.grammar_es_aunque_subj,
         GrammarMeaning.ES_ES_QUE to R.string.grammar_es_es_que,
+        GrammarMeaning.ES_DISCOURSE_MARKER to R.string.grammar_es_discourse_marker,
     )
 
 /** The name of a Spanish verb form on the word card. */

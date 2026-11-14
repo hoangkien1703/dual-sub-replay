@@ -13,8 +13,8 @@ Outputs:
   verb that conjugates like the regular -ar, -er or -ir model is only its infinitive; otherwise the
   line lists the cells that differ from that model (see `encode_verb`). The app's
   `SpanishConjugation.kt` holds the same regular endings and reads the file back.
-- es-words.txt: nouns (n), adjectives (a), determiners or pronouns (d) and other words that are
-  not verbs (f: prepositions, conjunctions, adverbs, interjections) seen in subtitles, with the
+- es-words.txt: nouns (n), adjectives (a), determiners or pronouns (d), prepositions (p),
+  conjunctions (c), adverbs (r) and interjections (i) seen in subtitles, with the
   plural and feminine forms the app's rules can't find (`=form letter lemma`).
 """
 
@@ -201,10 +201,10 @@ def read_entries(path):
 
 
 WORD = re.compile(r"^[a-záéíóúüñ]+$")
-# n noun, a adjective, d determiner or pronoun, f any other word that is not a verb (para, como, sobre).
+# n noun, a adjective, d determiner or pronoun, p preposition, c conjunction, r adverb, i interjection.
 WORD_LETTERS = {
     "noun": "n", "adj": "a", "det": "d", "article": "d", "pron": "d", "num": "d",
-    "prep": "f", "conj": "f", "adv": "f", "intj": "f", "particle": "f", "contraction": "f",
+    "prep": "p", "contraction": "p", "conj": "c", "adv": "r", "intj": "i", "particle": "i",
 }
 SKIPPED_FORM_TAGS = {"diminutive", "augmentative", "superlative", "apocopic", "abbreviation", "alt-of", "misspelling", "gender-neutral"}
 
@@ -284,8 +284,8 @@ VERB_HEADER = """# Spanish verbs for DualSub Replay, made by tools/spanish/build
 # This file is licensed CC BY-SA 4.0. Most common first. Format: see the script.
 """
 
-WORD_HEADER = """# Spanish nouns (n), adjectives (a), determiners or pronouns (d) and other words (f: prepositions,
-# conjunctions, adverbs, interjections) for DualSub Replay, made by
+WORD_HEADER = """# Spanish nouns (n), adjectives (a), determiners or pronouns (d), prepositions (p), conjunctions (c),
+# adverbs (r) and interjections (i) for DualSub Replay, made by
 # tools/spanish/build_spanish_data.py. Data: Wiktionary (via Wiktextract, kaikki.org) and
 # hermitdave/FrequencyWords (OpenSubtitles 2018), CC BY-SA 4.0. This file is licensed CC BY-SA 4.0.
 # `=form letter lemma` lines are plural or feminine forms the app's rules don't find.

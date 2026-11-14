@@ -108,6 +108,11 @@ internal val SPANISH_GRAMMAR_CATALOGUE: List<GrammarPattern> by lazy {
         a2("…, ¿verdad?", "^¿ verdad|no >?", GrammarMeaning.ES_TAG_QUESTION),
         a2("nada / nadie / nunca", "nada|nadie|nunca|jamás|ningún|ninguno|ninguna", GrammarMeaning.ES_NEGATIVE_WORD),
         a1("también / tampoco", "también|tampoco", GrammarMeaning.ES_TAMBIEN),
+        a1(
+            "por favor / gracias",
+            "por favor / porfa / muchas|mil? gracias / de nada / perdón|perdona|perdone|disculpa|disculpe / lo siento",
+            GrammarMeaning.ES_COURTESY,
+        ),
         a1("al / del", "a|de@ADP l@DET", GrammarMeaning.ES_CONTRACTION),
         a1("el / la / los / las", "el|la|los|las@DET", GrammarMeaning.ES_DEFINITE_ARTICLE),
         a1("un / una", "un|una|unos|unas@DET", GrammarMeaning.ES_INDEFINITE_ARTICLE),
@@ -232,4 +237,5 @@ internal val SPANISH_RULE_POINTS: Map<GrammarMeaning, Pair<String, CefrLevel>> =
         GrammarMeaning.ES_AUNQUE to ("aunque" to CefrLevel.B1),
         GrammarMeaning.ES_AUNQUE_SUBJ to ("aunque + subjuntivo" to CefrLevel.B1),
         GrammarMeaning.ES_ES_QUE to ("es que" to CefrLevel.B1),
+        GrammarMeaning.ES_DISCOURSE_MARKER to ("vale / bueno / pues" to CefrLevel.A2),
     )

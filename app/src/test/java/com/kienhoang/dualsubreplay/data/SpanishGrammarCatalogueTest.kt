@@ -59,6 +59,7 @@ class SpanishGrammarCatalogueTest {
                 GrammarMeaning.ES_TAG_QUESTION to "Hace frío, ¿verdad?",
                 GrammarMeaning.ES_NEGATIVE_WORD to "No veo nada.",
                 GrammarMeaning.ES_TAMBIEN to "Yo también quiero ir.",
+                GrammarMeaning.ES_COURTESY to "Perdón, ¿me ayudas, por favor?",
                 GrammarMeaning.ES_CONTRACTION to "Vamos al parque.",
                 GrammarMeaning.ES_DEFINITE_ARTICLE to "La casa es grande.",
                 GrammarMeaning.ES_INDEFINITE_ARTICLE to "Tengo un perro.",
@@ -143,6 +144,7 @@ class SpanishGrammarCatalogueTest {
                 GrammarMeaning.ES_AUNQUE to "Aunque estoy cansado, voy a salir.",
                 GrammarMeaning.ES_AUNQUE_SUBJ to "Aunque llueva, iremos.",
                 GrammarMeaning.ES_ES_QUE to "Es que no tengo tiempo.",
+                GrammarMeaning.ES_DISCOURSE_MARKER to "Vale, nos vemos mañana.",
             )
 
         /** The points found by the rules in SpanishGrammar.kt rather than by catalogue patterns. */
@@ -178,6 +180,7 @@ class SpanishGrammarCatalogueTest {
                 GrammarMeaning.ES_AUNQUE,
                 GrammarMeaning.ES_AUNQUE_SUBJ,
                 GrammarMeaning.ES_ES_QUE,
+                GrammarMeaning.ES_DISCOURSE_MARKER,
             )
     }
 
@@ -234,6 +237,20 @@ class SpanishGrammarCatalogueTest {
         assertTrue(grammar("Aunque estoy cansado, voy a salir.").none { GrammarMeaning.ES_AUNQUE_SUBJ in it.meanings })
         assertEquals(listOf(GrammarMeaning.ES_REFLEXIVE, GrammarMeaning.ES_OBJECT_PRONOUN), meaningsOf("Me llamo Ana.", "me"))
         assertEquals(listOf(GrammarMeaning.ES_OBJECT_PRONOUN), meaningsOf("Te quiero mucho.", "te"))
+    }
+
+    @Test
+    fun casualLinesFindCourtesyAndConversationWords() {
+        val line = "Eh, sí porfa hale, ¡gracias!"
+        assertEquals(listOf(GrammarMeaning.ES_DISCOURSE_MARKER), meaningsOf(line, "eh"))
+        assertEquals(listOf(GrammarMeaning.ES_COURTESY), meaningsOf(line, "porfa"))
+        assertEquals(listOf(GrammarMeaning.ES_COURTESY), meaningsOf(line, "gracias"))
+        assertTrue(grammar("Vale gracias.").any { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
+        assertTrue(grammar("Si te quieres sentar aquí hay mesa ¿vale?").any { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
+        assertTrue(grammar("¿Cuánto vale?").none { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
+        assertTrue(grammar("Mira la casa.").none { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
+        assertTrue(grammar("Voy a ver la película.").none { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
+        assertTrue(grammar("Es mi primo, o sea, el hijo de mi tío.").any { GrammarMeaning.ES_DISCOURSE_MARKER in it.meanings })
     }
 
     private fun meaningsOf(

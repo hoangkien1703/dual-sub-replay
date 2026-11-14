@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, elə deyil? (razılıq istəyir)</string>
     <string name="grammar_es_negative_word">İnkar sözü: feldən sonra gələndə feldən əvvəl no lazımdır, ikisi də qalır (no veo nada = heç nə görmürəm)</string>
     <string name="grammar_es_tambien">También: də, həmçinin; tampoco: … da yox (yo tampoco = mən də yox)</string>
+    <string name="grammar_es_courtesy">Nəzakət: por favor (zəhmət olmasa; porfa danışıq dilində qısa formasıdır), gracias (sağ ol), de nada (dəyməz), perdón / lo siento (bağışlayın)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (həmişə bitişik yazılır)</string>
     <string name="grammar_es_definite_article">Müəyyənlik artikli: el (kişi cinsi), la (qadın cinsi), los, las (cəm); isimə uyğun gəlir</string>
     <string name="grammar_es_indefinite_article">Qeyri-müəyyənlik artikli: un (kişi cinsi), una (qadın cinsi); unos, unas = bir neçə</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: baxmayaraq ki</string>
     <string name="grammar_es_aunque_subj">Aunque + subyunktiv: hətta … olsa belə</string>
     <string name="grammar_es_es_que">Es que: məsələ ondadır ki… (bəhanə və ya izah)</string>
+    <string name="grammar_es_discourse_marker">Danışıq sözü: söhbəti doldurur və ya istiqamətləndirir (vale = oldu, bueno = yaxşı, pues = elə isə, venga = hadi, a ver = görək, o sea = yəni)</string>
     <string name="grammar_es_tense_present">İndiki zaman</string>
     <string name="grammar_es_tense_preterite">Keçmiş zaman (pretérito)</string>
     <string name="grammar_es_tense_imperfect">İmperfekt (davamlı keçmiş)</string>

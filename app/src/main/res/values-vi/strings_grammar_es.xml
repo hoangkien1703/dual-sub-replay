@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, phải không? (hỏi để người nghe đồng ý)</string>
     <string name="grammar_es_negative_word">Từ phủ định: khi đứng sau động từ thì cần no trước động từ, giữ cả hai (no veo nada = tôi không thấy gì)</string>
     <string name="grammar_es_tambien">También: cũng; tampoco: cũng không (yo tampoco = tôi cũng không)</string>
+    <string name="grammar_es_courtesy">Lịch sự: por favor (làm ơn; porfa là cách nói tắt thân mật), gracias (cảm ơn), de nada (không có gì), perdón / lo siento (xin lỗi)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (luôn viết liền)</string>
     <string name="grammar_es_definite_article">Mạo từ xác định: el (giống đực), la (giống cái), los, las (số nhiều); hợp với danh từ</string>
     <string name="grammar_es_indefinite_article">Mạo từ không xác định: un (giống đực), una (giống cái); unos, unas = vài</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: mặc dù</string>
     <string name="grammar_es_aunque_subj">Aunque + giả định: cho dù</string>
     <string name="grammar_es_es_que">Es que: chả là…, là vì… (lý do hoặc giải thích)</string>
+    <string name="grammar_es_discourse_marker">Từ đệm hội thoại: lấp chỗ hoặc dẫn dắt câu chuyện (vale = được, bueno = à, pues = vậy thì, venga = nào, a ver = để xem, o sea = ý là)</string>
     <string name="grammar_es_tense_present">Hiện tại</string>
     <string name="grammar_es_tense_preterite">Quá khứ đơn</string>
     <string name="grammar_es_tense_imperfect">Quá khứ chưa hoàn thành</string>

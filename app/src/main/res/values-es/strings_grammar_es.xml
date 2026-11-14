@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: pide confirmación al oyente</string>
     <string name="grammar_es_negative_word">Palabra negativa: detrás del verbo exige no delante (no veo nada)</string>
     <string name="grammar_es_tambien">También: afirmación igual; tampoco: negación igual (yo tampoco)</string>
+    <string name="grammar_es_courtesy">Cortesía: por favor (porfa en registro coloquial), gracias, de nada, perdón / lo siento</string>
     <string name="grammar_es_contraction">Contracción: al = a + el, del = de + el</string>
     <string name="grammar_es_definite_article">Artículo determinado: concuerda en género y número con el nombre</string>
     <string name="grammar_es_indefinite_article">Artículo indeterminado: un, una; unos, unas (algunos)</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque + indicativo: concesión real</string>
     <string name="grammar_es_aunque_subj">Aunque + subjuntivo: concesión hipotética</string>
     <string name="grammar_es_es_que">Es que: justificación o explicación</string>
+    <string name="grammar_es_discourse_marker">Marcador del discurso: organiza o rellena la conversación (vale, bueno, pues, venga, a ver, o sea)</string>
     <string name="grammar_es_tense_present">Presente</string>
     <string name="grammar_es_tense_preterite">Pretérito indefinido</string>
     <string name="grammar_es_tense_imperfect">Pretérito imperfecto</string>

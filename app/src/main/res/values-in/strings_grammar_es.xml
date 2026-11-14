@@ -49,6 +49,7 @@
     <string name="grammar_es_tag_question">¿Verdad? / ¿no?: …, kan? (meminta persetujuan)</string>
     <string name="grammar_es_negative_word">Kata negatif: jika setelah kata kerja, perlu no sebelumnya, keduanya tetap ada (no veo nada = saya tidak melihat apa-apa)</string>
     <string name="grammar_es_tambien">También: juga; tampoco: juga tidak (yo tampoco = saya juga tidak)</string>
+    <string name="grammar_es_courtesy">Sopan santun: por favor (tolong; porfa bentuk santainya), gracias (terima kasih), de nada (sama-sama), perdón / lo siento (maaf)</string>
     <string name="grammar_es_contraction">Al = a + el, del = de + el (selalu ditulis menjadi satu kata)</string>
     <string name="grammar_es_definite_article">Kata sandang tentu: el (maskulin), la (feminin), los, las (jamak); sesuai dengan kata bendanya</string>
     <string name="grammar_es_indefinite_article">Kata sandang tak tentu: un (maskulin), una (feminin); unos, unas = beberapa</string>
@@ -133,6 +134,7 @@
     <string name="grammar_es_aunque">Aunque: meskipun</string>
     <string name="grammar_es_aunque_subj">Aunque + subjungtif: walaupun (seandainya)</string>
     <string name="grammar_es_es_que">Es que: soalnya…, masalahnya… (alasan atau penjelasan)</string>
+    <string name="grammar_es_discourse_marker">Kata percakapan: mengisi atau mengarahkan obrolan (vale = oke, bueno = nah, pues = jadi, venga = ayo, a ver = coba lihat, o sea = maksudku)</string>
     <string name="grammar_es_tense_present">Kala kini</string>
     <string name="grammar_es_tense_preterite">Lampau (pretérito)</string>
     <string name="grammar_es_tense_imperfect">Lampau berulang (imperfecto)</string>
