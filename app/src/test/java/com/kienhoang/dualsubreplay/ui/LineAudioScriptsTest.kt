@@ -46,6 +46,15 @@ class LineAudioScriptsTest {
     }
 
     @Test
+    fun theRecorderFollowsTheNewestTrackWhenTheVideoSourceChanges() {
+        val script = webLineAudioScript(on = true, videoId = "abcdefghijk")
+        // After an ad or another video in the same element, the old track only gives silence (#81, 2026-11-14).
+        assertTrue("state.stream.addEventListener('addtrack', follow);" in script)
+        assertTrue("tracks[tracks.length - 1]" in script)
+        assertTrue("else follow();" in script)
+    }
+
+    @Test
     fun anOddVideoIdTurnsTheRecorderOff() {
         assertTrue("if (!false)" in webLineAudioScript(on = true, videoId = "'); alert(1); ('"))
         assertTrue("if (!false)" in webLineAudioScript(on = false, videoId = "abcdefghijk"))

@@ -10,6 +10,7 @@ Implemented. The owner picked "Fix sound + order picker" on 2026-11-14 after rea
    - The page recorder (`ui/LineAudioScripts.kt`) lets its audio context rest after the video has been paused for a minute, to save battery. It woke up only on the app's next check, up to 1.5 s after the video started playing again.
    - A card sent while its line is paused half way waits for the line, and the app replays that line from 0.75 s before it starts (0.25 s lead + 0.5 s early).
    - After a long pause (looking up words, checking AnkiDroid) the recorder is resting, so it starts recording after the line has begun. `clip()` finds no run that holds the whole line, and the card waits for good. The first cards are sent quickly, before the recorder rests, so they work.
+   A second cause showed up when the preview was checked on an emulator with real YouTube: when the page video's source changes in the same element (a pre-roll ad ends, or another video opens in the app), `captureStream()` adds a new audio track. The old track stays `live` but only gives zeros. The recorder kept the old track, because it only re-attached when the element changed or the track ended, so it recorded silence. `audible()` then dropped the clip and the card waited for good. So every card from a video that started with an ad, or from the second video opened, got no sound.
 2. lion737 asks to cut the sound right away from the subtitle times. The app can't download YouTube's audio (YouTube doesn't allow it; rejected in the 2026-11-09 spec), so it records the sound while the video plays. Sending mid-line already replays the line; that replay is what failed.
 3. lion737 asks to pick which sound plays first, separately for the front and the back. The back template starts with `{{FrontSide}}`, so the back repeats the front's sounds in the front's order, and the order only matters on a side that has both sounds. One picker covers every case.
 
@@ -17,6 +18,7 @@ Implemented. The owner picked "Fix sound + order picker" on 2026-11-14 after rea
 
 - The recorder wakes the moment the page video starts playing (its `play` and `playing` events, heard on the document while capturing), not on the app's next check.
 - A context in any state other than running or closed is resumed; a closed one is replaced on the next check.
+- The recorder keeps the video element's captured stream and always listens to its newest live audio track: on the stream's `addtrack` event, on the video's play events and on every check.
 - A line replayed for a card's sound starts 1 s before its lead (was 0.5 s), so the recorder has time to wake.
 - Flashcards & Anki → **Play first**: Word sound (default, today's cards) or Sentence sound. Shown only while both sounds go on cards and the front isn't Listening (a Listening front always starts with the line).
 - With Sentence sound first, a side with both sounds plays the line's sound, then the word's: in the DualSub Replay note type's template (the word's voice moves to just after the line's sound) and in basic note types' fields. Sounds on different sides, or a missing sound, leave the template as it is.
@@ -31,10 +33,13 @@ Implemented. The owner picked "Fix sound + order picker" on 2026-11-14 after rea
 ## Acceptance criteria
 
 - [x] The recorder listens for the page video's `play` / `playing` events and removes them when stopped (unit test `theRecorderWakesWhenThePageVideoStartsPlaying`).
-- [ ] A line paused half way, left until the recorder rests, and replayed from 1.75 s before the line with no app check in between gives its clip (device test `aLineReplayedAfterALongPauseStillGivesItsClip`).
+- [x] A line paused half way, left until the recorder rests, and replayed from 1.75 s before the line with no app check in between gives its clip (device test `aLineReplayedAfterALongPauseStillGivesItsClip`, PR CI).
+- [x] The recorder follows the newest audio track (unit test `theRecorderFollowsTheNewestTrackWhenTheVideoSourceChanges`).
+- [ ] A new source in the same video element is recorded with sound (device test `aNewSourceInTheSameVideoElementIsStillRecorded`).
 - [x] Play first orders the sounds only on a side with both; defaults stay byte for byte the same; the template key changes only when the order does (unit tests in `AnkiCardLayoutTest`, `AnkiConnectNotesTest`).
-- [ ] Play first shows and stores its choice, and hides with one sound off or a Listening front (Compose test `playFirstShowsOnlyWhileBothSoundsGoOnCards`).
-- [ ] On an emulator with a real YouTube video: send a card mid-line, stay paused for over a minute (app in the background), come back and send another mid-line; both cards get their sound.
+- [x] Play first shows and stores its choice, and hides with one sound off or a Listening front (Compose test `playFirstShowsOnlyWhileBothSoundsGoOnCards`, PR CI).
+- [x] On an emulator with a real YouTube video (build 750, Pixel 7 API 37, AnkiDroid 2.25.3): a card sent mid-line and three cards sent after 1 min 55 s to 2 min 16 s of pause (Home and AnkiDroid in between) all got a 1.8-4.8 s clip with speech (peak about -2 dB). v1.9.1 left the same flow empty. Play first = Sentence played the sentence before the word in AnkiDroid's preview.
+- [ ] On an emulator with a real YouTube video: a card from a video that started with an ad, and from a second video, gets its sound.
 - [ ] A new card sent to AnkiDroid after a long pause plays the line's sound (owner, preview APK).
 
 ## Validation plan

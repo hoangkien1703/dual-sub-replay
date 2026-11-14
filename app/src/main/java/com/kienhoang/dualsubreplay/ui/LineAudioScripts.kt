@@ -44,7 +44,7 @@ internal fun webLineAudioScript(
  */
 private val WEB_LINE_AUDIO_RECORDER =
     """
-    const state = { context: null, node: null, source: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0 };
+    const state = { context: null, node: null, source: null, stream: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0 };
     const pageVideo = function() {
       return document.querySelector('#movie_player video.html5-main-video') || document.querySelector('video.html5-main-video') || document.querySelector('video');
     };
@@ -65,7 +65,8 @@ private val WEB_LINE_AUDIO_RECORDER =
     const wake = function(event) {
       if (!state.context || !event || event.target !== pageVideo()) return;
       state.pausedAt = 0;
-      if (event.target !== state.video || !state.track || state.track.readyState !== 'live') attach(event.target);
+      if (event.target !== state.video || !state.stream) attach(event.target);
+      else follow();
       resume();
     };
     const listen = function(event) {
@@ -91,24 +92,37 @@ private val WEB_LINE_AUDIO_RECORDER =
         state.samples -= state.blocks.shift().samples.length;
       }
     };
-    const attach = function(video) {
+    const connect = function(track) {
       if (state.source) { try { state.source.disconnect(); } catch (error) {} }
       state.source = null;
-      state.track = null;
-      state.video = video;
-      if (!video || typeof video.captureStream !== 'function') return;
-      let tracks = [];
-      try { tracks = video.captureStream().getAudioTracks(); } catch (error) { return; }
-      if (!tracks.length) return;
-      state.track = tracks[0];
-      state.source = state.context.createMediaStreamSource(new MediaStream([state.track]));
+      state.track = track;
+      if (!track) return;
+      state.source = state.context.createMediaStreamSource(new MediaStream([track]));
       state.source.connect(state.node);
+    };
+    // When the video's source changes (an ad ends, another video opens in the same element), its
+    // captured stream gains a new audio track; the old one stays "live" but only gives silence. So
+    // the recorder always listens to the newest live track (lion737, #81, 2026-11-14).
+    const follow = function() {
+      const tracks = state.stream ? state.stream.getAudioTracks().filter(function(track) { return track.readyState === 'live'; }) : [];
+      const newest = tracks.length ? tracks[tracks.length - 1] : null;
+      if (newest !== state.track) connect(newest);
+    };
+    const attach = function(video) {
+      if (state.stream) state.stream.removeEventListener('addtrack', follow);
+      state.stream = null;
+      state.video = video;
+      connect(null);
+      if (!video || typeof video.captureStream !== 'function') return;
+      try { state.stream = video.captureStream(); } catch (error) { return; }
+      state.stream.addEventListener('addtrack', follow);
+      follow();
     };
     recorder = {
       ensure: function(videoId) {
         if (videoId !== state.videoId) { clear(); state.videoId = videoId; }
         // A context the system closed can't record again; start a new one.
-        if (state.context && state.context.state === 'closed') { state.context = null; state.source = null; state.track = null; state.video = null; }
+        if (state.context && state.context.state === 'closed') { state.context = null; state.source = null; state.stream = null; state.track = null; state.video = null; }
         if (!state.context) {
           try { state.context = new AudioContext({ sampleRate: 24000 }); } catch (error) { state.context = new AudioContext(); }
           state.node = state.context.createScriptProcessor(2048, 1, 1);
@@ -122,7 +136,8 @@ private val WEB_LINE_AUDIO_RECORDER =
           document.addEventListener('keydown', resume, true);
         }
         const video = pageVideo();
-        if (video !== state.video || !state.track || state.track.readyState !== 'live') attach(video);
+        if (video !== state.video || !state.stream) attach(video);
+        else follow();
         // A paused video lets the audio context rest after a minute; playing wakes it again.
         if (video && video.paused) {
           if (!state.pausedAt) state.pausedAt = Date.now();
@@ -198,6 +213,7 @@ private val WEB_LINE_AUDIO_RECORDER =
         document.removeEventListener('pointerdown', resume, true);
         document.removeEventListener('touchend', resume, true);
         document.removeEventListener('keydown', resume, true);
+        if (state.stream) state.stream.removeEventListener('addtrack', follow);
         if (state.source) { try { state.source.disconnect(); } catch (error) {} }
         if (state.node) { try { state.node.disconnect(); } catch (error) {} }
         if (state.context) state.context.close().catch(function() {});
