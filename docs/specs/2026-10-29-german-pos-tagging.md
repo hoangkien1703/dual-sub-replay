@@ -1,6 +1,6 @@
 # Offline German POS tagging for the Original Subtitle colors
 
-Feature spec. Owner request 2026-10-29. Status: implementing.
+Feature spec. Contributor request (mrAlishah, made on their fork 2026-10-29; upstream in PR #233). Status: shipped.
 
 ## Problem
 

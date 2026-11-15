@@ -1,6 +1,8 @@
 # German grammar (A1–B2, C1 where reliable)
 
-Owner request 2026-11-14. Branch `feature/german-grammar`, from `mydevelop` at `b3541b12`.
+Contributor request (mrAlishah, PR #233), 2026-11-14; merged by the maintainer with the review fixes below.
+In this spec "owner" and "user" mean the contributor who directed the work on their fork, not this
+repository's maintainer, unless it says "maintainer".
 Offline only: no network, no AI, no new permission. Optional AI explanations (Stage 6) are not part
 of this work and stay disabled; the existing "Ask AI" button of the grammar section will appear for
 German like for every language with a grammar section (it is user-started and unchanged).
@@ -407,7 +409,7 @@ the verb (and now requires that subject); word-card readings agree with the subj
 a modal and infinitive across `und` (`kann kochen und will heiraten`), a verb form read as a comparative (`ärgere`), `gab mir` read as reflexive (the subject's person is ignored), a reflexive with an infinitive (`muss dich beeilen`), an inverted conditional without
 `wenn`; and three that are arguably correct or deliberate (`wollte wissen`, `geboren wurde`, `In der Nacht` is temporal). These are open defects; v4 is spent and a new set is needed before any further accuracy claim. No annotation independent of the author exists.
 
-### FrequencyWords provenance assessment (the frequency source is kept; this is a release blocker until resolved)
+### FrequencyWords provenance assessment (the frequency source is kept; accepted by the maintainer, same as the Spanish data)
 
 1. **Licence of FrequencyWords:** "MIT License for code. CC-by-sa-4.0 for content." (repository README).
 2. **Underlying source:** the 2018 lists come from the OpenSubtitles2018 corpus at OPUS. That page states no licence, copyright notice or terms of use; it asks for a link to opensubtitles.org and a citation of Lison and Tiedemann (LREC 2016).
@@ -417,7 +419,7 @@ a modal and infinitive across `und` (`kann kochen und will heiraten`), a verb fo
 5. **Frequency redistributed:** the counts are not, but the files list lemmas most common first, so the **rank order** of the selected lemmas is visible in the line order. The ranking, not the counts, is therefore partly present.
 6. **Obligations:** CC BY-SA 4.0 for the list (credit, indicate changes, share the data files alike, which the files' headers do) and the requested OpenSubtitles link and citation (in the notices and the licence screen).
 7. **Unresolved:** no source says that word counts or rankings derived from the corpus may be redistributed; the maintainer's CC BY-SA label does not by itself grant rights in the corpus. The Spanish data has the same exposure, and it is not treated as settled for that reason.
-   Per the owner's decision the source is **not** being replaced; the earlier replacement analysis above stays as information only. This remains open for release.
+   Per the owner's decision the source is **not** being replaced; the earlier replacement analysis above stays as information only. The maintainer accepted it for release on 2026-11-15 (PR #233 review): it is the same source, credit and exposure as the already shipped Spanish data (`es-words.txt`), and a change of source would be made for both languages together.
 
 ### Known limitations (the engine says nothing rather than guessing)
 
@@ -475,5 +477,5 @@ a modal and infinitive across `und` (`kann kochen und will heiraten`), a verb fo
 - `lintDebug assembleDebug assembleDebugAndroidTest`: BUILD SUCCESSFUL, exit code 0, 82 actionable tasks.
 - `pixel2Api36DebugAndroidTest` (API 36 managed emulator, five German and word-learning classes): BUILD SUCCESSFUL, exit code 0. The generated XML (`app/build/outputs/androidTest-results/managedDevice/debug/pixel2Api36/TEST-pixel2Api36.xml`) reports 41 tests, 0 failures, 0 errors, 0 skipped: `GermanRoleUiTest` 14, `GermanWordDialogUiTest` 8, `WordLearningDialogTest` 13, `GrammarExplanationsUiTest` 4, `GermanPosColorUiTest` 2.
 - Earlier in the same session, on the same tree: `formatCheck`, `complexityCheck` and `testDebugUnitTest` (1788 tests, 0 failures).
-- Still unverified: a physical phone and a live video; a Compose test with the analyzer still unloaded (covered at unit level by `GermanLoadingStateTest`); an independent accuracy estimate. The FrequencyWords source is unchanged and its licensing caveat (OpenSubtitles2018 states no licence; release blocker) stands.
+- Still unverified: a physical phone and a live video; a Compose test with the analyzer still unloaded (covered at unit level by `GermanLoadingStateTest`); an independent accuracy estimate. The FrequencyWords source is unchanged and its licensing caveat (OpenSubtitles2018 states no licence) is accepted by the maintainer as for the Spanish data.
 - Python tests: **NOT RUN, reserved for manual execution by the user.**

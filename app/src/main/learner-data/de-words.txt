@@ -1,4 +1,4 @@
-# German learner data for TripleSub Replay, made by tools/german/build_german_data.py.
+# German learner data for DualSub Replay, made by tools/german/build_german_data.py.
 # Data: Wiktionary (via Wiktextract, kaikki.org) and hermitdave/FrequencyWords (OpenSubtitles 2018), CC BY-SA 4.0.
 # This file is licensed CC BY-SA 4.0. Most common first. Format: see the script.
 # Inputs: kaikki-German.jsonl sha256 4fb15662a125085e1eb6b533a210b45edcdffa7b8e72e07634f46e1485e4e715; de_50k.txt sha256 d9e50546fd7e8b6fe6542a2b33c51d1331092b2a3916ec09f80d97856068705b

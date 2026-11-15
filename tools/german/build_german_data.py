@@ -327,7 +327,7 @@ def main(argv):
         return sorted(table.items(), key=lambda kv: (kv[1][0], kv[0]))[:limit]
 
     header = [
-        "# German learner data for TripleSub Replay, made by tools/german/build_german_data.py.",
+        "# German learner data for DualSub Replay, made by tools/german/build_german_data.py.",
         "# Data: Wiktionary (via Wiktextract, kaikki.org) and hermitdave/FrequencyWords (OpenSubtitles 2018), CC BY-SA 4.0.",
         "# This file is licensed CC BY-SA 4.0. Most common first. Format: see the script.",
         f"# Inputs: {extract.split('/')[-1]} sha256 {sha256(extract)}; {frequency.split('/')[-1]} sha256 {sha256(frequency)}",
