@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- German grammar points for learners of German. German terms and examples stay German; only the
+         explanation is translated. Non-English files are machine-drafted and NOT reviewed by a German teacher. -->
+    <string name="grammar_de_praesens">Präsens: the present tense (ich gehe, er geht)</string>
+    <string name="grammar_de_praeteritum">Präteritum: the simple past, mostly written, and common for sein, haben and modals (ich ging, ich war)</string>
+    <string name="grammar_de_perfekt">Perfekt: the usual spoken past, haben or sein + Partizip II (ich habe gesehen, ich bin gegangen)</string>
+    <string name="grammar_de_plusquamperfekt">Plusquamperfekt: the past before another past, hatte or war + Partizip II (er hatte gelesen)</string>
+    <string name="grammar_de_futur_i">Futur I: werden + Infinitiv, a plan or a guess about the future (ich werde kommen)</string>
+    <string name="grammar_de_futur_ii">Futur II: werden + Partizip II + haben or sein, something will be done by then or probably happened (er wird es gesehen haben)</string>
+    <string name="grammar_de_imperativ">Imperativ: a command or request (komm!, geht!, kommen Sie!)</string>
+    <string name="grammar_de_konjunktiv_i">Konjunktiv I: the form for reported speech (er sagt, er sei krank)</string>
+    <string name="grammar_de_konjunktiv_ii">Konjunktiv II: unreal, polite or wishful (ich hätte, wenn ich könnte)</string>
+    <string name="grammar_de_wuerde_infinitiv">würde + Infinitiv: the usual Konjunktiv II for most verbs (ich würde gehen)</string>
+    <string name="grammar_de_konjunktiv_ii_vergangenheit">Konjunktiv II of the past: something that did not happen, hätte or wäre + Partizip II (ich hätte gewusst)</string>
+    <string name="grammar_de_ersatzinfinitiv">Ersatzinfinitiv: with a modal in a perfect tense, two infinitives stand at the end (ich hätte es wissen müssen)</string>
+    <string name="grammar_de_vorgangspassiv">Vorgangspassiv: werden + Partizip II, the action is done to the subject (das Haus wird gebaut)</string>
+    <string name="grammar_de_zustandspassiv">Zustandspassiv: sein + Partizip II, the resulting state (das Haus ist gebaut); it can also read as an adjective</string>
+    <string name="grammar_de_passiv_perfekt">Passiv Perfekt: sein + Partizip II + worden (das Haus ist gebaut worden)</string>
+    <string name="grammar_de_modalverb">Modalverb + Infinitiv: can, must, want, should, may; the infinitive goes to the end (ich muss gehen)</string>
+    <string name="grammar_de_trennbares_verb">Trennbares Verb: the prefix leaves the verb and goes to the end of the clause (ich stehe früh auf)</string>
+    <string name="grammar_de_reflexives_verb">Reflexives Verb: used with a reflexive pronoun (ich freue mich)</string>
+    <string name="grammar_de_zu_infinitiv">zu + Infinitiv: the infinitive with zu after many verbs and nouns (er hofft, dich zu sehen)</string>
+    <string name="grammar_de_um_zu">um … zu + Infinitiv: in order to (er lernt, um zu verstehen)</string>
+    <string name="grammar_de_ohne_zu">ohne … zu / (an)statt … zu + Infinitiv: without doing / instead of doing</string>
+    <string name="grammar_de_prep_akkusativ">Preposition with Akkusativ: durch, für, gegen, ohne, um always take the accusative</string>
+    <string name="grammar_de_prep_dativ">Preposition with Dativ: aus, bei, mit, nach, seit, von, zu always take the dative</string>
+    <string name="grammar_de_prep_genitiv">Preposition with Genitiv: wegen, trotz, während, statt take the genitive (wegen des Wetters)</string>
+    <string name="grammar_de_wechsel_akkusativ">Wechselpräposition with Akkusativ: a movement toward a place, wohin? (ich gehe in die Stadt)</string>
+    <string name="grammar_de_wechsel_dativ">Wechselpräposition with Dativ: a position or a place, wo? (ich bin in der Stadt)</string>
+    <string name="grammar_de_verb_prep_akkusativ">Verb with a fixed preposition and Akkusativ (warten auf + Akk.): learn the preposition together with the verb</string>
+    <string name="grammar_de_verb_prep_dativ">Verb with a fixed preposition and Dativ (träumen von + Dat.): learn the preposition together with the verb</string>
+    <string name="grammar_de_dativ_verb">Verb with Dativ: the person is in the dative (ich helfe dir)</string>
+    <string name="grammar_de_dativ_akkusativ">Dativ and Akkusativ objects: the person (dative) usually comes before the thing (accusative) (ich gebe dem Kind einen Ball)</string>
+    <string name="grammar_de_genitivattribut">Genitivattribut: the genitive says whose something is, and follows the noun (die Bücher der Kinder)</string>
+    <string name="grammar_de_adjektiv_schwach">Adjective ending after der, die, das: only -e or -en (der alte Mann)</string>
+    <string name="grammar_de_adjektiv_gemischt">Adjective ending after ein, kein, mein: -er, -es or -e show the gender (ein alter Mann)</string>
+    <string name="grammar_de_adjektiv_stark">Adjective ending without an article: the ending shows case and gender (alter Wein)</string>
+    <string name="grammar_de_komparativ">Komparativ: -er, comparing two things (größer als)</string>
+    <string name="grammar_de_superlativ">Superlativ: am … -sten, the most (am schönsten)</string>
+    <string name="grammar_de_sub_weil">weil / da: because; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_dass">dass: that; the verb goes to the end of the clause (ich weiß, dass er kommt)</string>
+    <string name="grammar_de_sub_ob">ob: whether; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_wenn">wenn / falls: if or whenever; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_als">als: when, for one event in the past; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_obwohl">obwohl / obgleich: although; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_damit">damit: so that, a purpose; the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_zeit">A time conjunction (bevor, nachdem, während, sobald, bis …): the verb goes to the end of the clause</string>
+    <string name="grammar_de_sub_folge">sodass / indem: so that (a result) or by doing; the verb goes to the end of the clause</string>
+    <string name="grammar_de_relativsatz">Relativsatz: a clause that describes a noun, starting with der, die, das …; the verb goes to the end of the clause</string>
+    <string name="grammar_de_indirekte_frage">Indirect question: a question word inside a sentence; the verb goes to the end of the clause (ich weiß nicht, wo er wohnt)</string>
+    <string name="grammar_de_w_frage">W-Frage: a question word first, then the verb (wo wohnst du?)</string>
+    <string name="grammar_de_ja_nein_frage">Ja/Nein-Frage: a yes/no question puts the verb first (kommst du?)</string>
+    <string name="grammar_de_inversion">Inversion: after an adverb or another first element, the verb stays second and the subject follows (heute gehe ich)</string>
+    <string name="grammar_de_koordination">und, aber, oder, denn, sondern: join two clauses without changing the word order</string>
+    <string name="grammar_de_nicht">nicht: not; it negates the verb, the sentence or the word after it</string>
+    <string name="grammar_de_kein">kein-: not a, no; it negates a noun and takes the endings of ein</string>
+    <string name="grammar_de_es_gibt">es gibt + Akkusativ: there is, there are (es gibt einen Bus)</string>
+    <string name="grammar_de_konditional_irreal">Unreal condition: wenn + Konjunktiv II, then würde or Konjunktiv II (wenn ich Zeit hätte, würde ich kommen)</string>
+    <string name="grammar_de_adjektiv_prep_akkusativ">Adjective with a fixed preposition and Akkusativ (stolz auf + Akk.): learn the preposition together with the adjective</string>
+    <string name="grammar_de_adjektiv_prep_dativ">Adjective with a fixed preposition and Dativ (zufrieden mit + Dat.): learn the preposition together with the adjective</string>
+    <string name="german_word_lemma">Dictionary form: %1$s</string>
+    <string name="german_word_noun">Noun, %1$s</string>
+    <string name="german_word_masculine">masculine</string>
+    <string name="german_word_feminine">feminine</string>
+    <string name="german_word_neuter">neuter</string>
+    <string name="german_word_plural">plural %1$s</string>
+    <string name="german_word_verb">Verb, %1$s</string>
+    <string name="german_word_adjective">Adjective, %1$s</string>
+    <string name="german_word_auxiliary">perfect with %1$s</string>
+    <string name="german_word_separable">separable verb (%1$s-)</string>
+    <string name="german_word_reflexive">can be reflexive</string>
+    <string name="german_word_modal">modal verb</string>
+    <string name="grammar_tentative">Likely, a guess from the sentence</string>
+    <string name="german_case_nominative" translatable="false">Nominativ</string>
+    <string name="german_case_genitive" translatable="false">Genitiv</string>
+    <string name="german_case_dative" translatable="false">Dativ</string>
+    <string name="german_case_accusative" translatable="false">Akkusativ</string>
+    <string name="german_tense_present" translatable="false">Präsens</string>
+    <string name="german_tense_preterite" translatable="false">Präteritum</string>
+    <string name="german_tense_subjunctive_i" translatable="false">Konjunktiv I</string>
+    <string name="german_tense_subjunctive_ii" translatable="false">Konjunktiv II</string>
+    <string name="german_tense_imperative" translatable="false">Imperativ</string>
+    <string name="german_tense_participle_i" translatable="false">Partizip I</string>
+    <string name="german_tense_participle_ii" translatable="false">Partizip II</string>
+    <string name="german_tense_infinitive" translatable="false">Infinitiv</string>
+    <string name="german_word_person" translatable="false">%1$s. Person %2$s</string>
+    <string name="german_word_singular" translatable="false">Singular</string>
+    <string name="german_word_plural_number" translatable="false">Plural</string>
+    <string name="german_word_noun_genitive" translatable="false">Genitiv: %1$s</string>
+    <string name="german_feature_singular" translatable="false">%1$s Sg. %2$s</string>
+    <string name="german_feature_plural" translatable="false">%1$s Pl.</string>
+    <string name="german_gender_letter_masculine" translatable="false">m.</string>
+    <string name="german_gender_letter_feminine" translatable="false">f.</string>
+    <string name="german_gender_letter_neuter" translatable="false">n.</string>
+    <string name="german_degree_comparative" translatable="false">Komparativ</string>
+    <string name="german_degree_superlative" translatable="false">Superlativ</string>
+    <string name="german_article_masculine" translatable="false">der</string>
+    <string name="german_article_feminine" translatable="false">die</string>
+    <string name="german_article_neuter" translatable="false">das</string>
+</resources>

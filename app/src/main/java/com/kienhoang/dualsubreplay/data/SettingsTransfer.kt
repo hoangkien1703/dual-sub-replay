@@ -118,6 +118,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "word_card_kanji_open" to share(B),
         "word_card_hanzi_open" to share(B),
         "word_card_grammar_open" to share(B),
+        "word_card_german_conjugation_open" to share(B),
         "known_words_mode" to share(S),
         "known_words_after" to share(I),
         "known_words_offered" to backup(B),

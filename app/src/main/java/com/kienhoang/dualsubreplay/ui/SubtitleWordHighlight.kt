@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.ChineseMorphology
 import com.kienhoang.dualsubreplay.data.EnglishMorphology
+import com.kienhoang.dualsubreplay.data.GermanMorphology
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
@@ -165,7 +166,7 @@ internal fun annotatedSubtitleText(
 }
 
 /**
- * Changes once the Japanese, English, Chinese or Spanish analyzer finishes loading in the
+ * Changes once the Japanese, English, Chinese, German or Spanish analyzer finishes loading in the
  * background. Use it as a `remember` key wherever subtitle text is tokenized, so lines shown before
  * it loaded are split again. Each revision only grows, so their sum changes whenever one does.
  */
@@ -174,6 +175,8 @@ internal fun tokenizerRevision(): Int =
     JapaneseMorphology.revision.collectAsState().value +
         EnglishMorphology.revision.collectAsState().value +
         ChineseMorphology.revision.collectAsState().value +
+        GermanMorphology.revision.collectAsState().value +
+        GermanMorphology.lexiconRevision.collectAsState().value +
         SpanishMorphology.revision.collectAsState().value
 
 /** Rows split ahead of the playing line; about a screenful of subtitle rows. */

@@ -1,0 +1,99 @@
+# German grammar evaluation corpus. Written by the implementer from the grammar rules, not from the analyzer's output,
+# and kept apart from the unit tests' examples. Expected points are RULE|evidence words in text order, ';' between
+# points; empty means none of the evaluated rules. The rules DE_PRAESENS, DE_PRAETERITUM, DE_KOORDINATION, DE_NICHT
+# and DE_KEIN are not evaluated (lexical, tested one by one). This measures regressions on a small set of sentences
+# by one author; it is NOT a measure of accuracy on German in general.
+# ANNOTATION UPDATE (2026-11-14, third pass): two sentences gained DE_INVERSION because the rule was extended from adverb openers to prepositional-phrase openers; this is a development set, and the locked held-out sets were not touched.
+Ich habe das Buch gelesen.	DE_PERFEKT|habe gelesen
+Wir sind nach Berlin gefahren.	DE_PERFEKT|sind gefahren
+Sie hatte schon gegessen.	DE_PLUSQUAMPERFEKT|hatte gegessen
+Morgen werde ich dich besuchen.	DE_FUTUR_I|werde besuchen;DE_INVERSION|Morgen werde
+Der Brief wurde gestern geschrieben.	DE_VORGANGSPASSIV|wurde geschrieben
+Er will nach Hause gehen.	DE_MODALVERB|will gehen;DE_PREP_DATIV|nach Hause
+Ich kann nicht schlafen.	DE_MODALVERB|kann schlafen
+Sie ruft ihn an.	DE_TRENNBARES_VERB|ruft an
+Wir fangen um acht Uhr an.	DE_TRENNBARES_VERB|fangen an
+Er hat sich gewaschen.	DE_PERFEKT|hat gewaschen
+Ich wasche mich.	DE_REFLEXIVES_VERB|wasche mich
+Er hofft, dich bald zu sehen.	DE_ZU_INFINITIV|zu sehen
+Sie lernt Deutsch, um in Berlin zu arbeiten.	DE_UM_ZU|um zu arbeiten
+Er geht, ohne ein Wort zu sagen.	DE_OHNE_ZU|ohne zu sagen
+Ich warte auf dich.	DE_VERB_PREP_AKKUSATIV|warte auf dich
+Er denkt oft an seine Mutter.	DE_VERB_PREP_AKKUSATIV|denkt an seine Mutter
+Sie träumt von einem Haus.	DE_VERB_PREP_DATIV|träumt von einem Haus
+Ich spreche mit meinem Chef.	DE_VERB_PREP_DATIV|spreche mit meinem Chef
+Wir fahren mit dem Bus.	DE_PREP_DATIV|mit dem Bus
+Sie kauft Blumen für ihre Mutter.	DE_PREP_AKKUSATIV|für ihre Mutter
+Das Kind spielt im Garten.	DE_WECHSEL_DATIV|im Garten
+Er geht in den Garten.	DE_WECHSEL_AKKUSATIV|in den Garten
+Der Hund liegt unter dem Tisch.	DE_WECHSEL_DATIV|unter dem Tisch
+Er hängt das Bild an die Wand.	DE_WECHSEL_AKKUSATIV|an die Wand
+Wegen des Regens bleibt er zu Hause.	DE_PREP_GENITIV|Wegen des Regens;DE_PREP_DATIV|zu Hause;DE_INVERSION|Wegen bleibt
+Trotz des Wetters gehen wir spazieren.	DE_PREP_GENITIV|Trotz des Wetters;DE_INVERSION|Trotz gehen
+Ich helfe dir.	DE_DATIV_VERB|helfe dir
+Das Buch gehört mir.	DE_DATIV_VERB|gehört mir
+Er schenkt seiner Frau einen Ring.	DE_DATIV_AKKUSATIV|schenkt seiner Frau einen Ring
+Ich zeige dir das Haus.	DE_DATIV_AKKUSATIV|zeige dir das Haus
+Das Auto meines Vaters ist neu.	DE_GENITIVATTRIBUT|Das Auto meines Vaters
+Ich möchte einen Kaffee.	DE_KONJUNKTIV_II|möchte
+Wenn er käme, wäre ich froh.	DE_KONDITIONAL_IRREAL|Wenn käme wäre;DE_SUB_WENN|Wenn käme;DE_KONJUNKTIV_II|käme;DE_KONJUNKTIV_II|wäre
+Ich würde gern reisen.	DE_WUERDE_INFINITIV|würde reisen
+Wenn ich reich wäre, würde ich reisen.	DE_KONDITIONAL_IRREAL|Wenn wäre würde;DE_SUB_WENN|Wenn wäre;DE_KONJUNKTIV_II|wäre;DE_WUERDE_INFINITIV|würde reisen
+Er sagt, sie sei zu Hause.	DE_KONJUNKTIV_I|sie sei;DE_PREP_DATIV|zu Hause
+Er meinte, er habe keine Zeit.	DE_KONJUNKTIV_I|er habe
+Weil es regnet, bleiben wir hier.	DE_SUB_WEIL|Weil regnet
+Ich glaube, dass sie kommt.	DE_SUB_DASS|dass kommt
+Ich weiß nicht, ob er kommt.	DE_SUB_OB|ob kommt
+Obwohl er müde war, ging er zur Arbeit.	DE_SUB_OBWOHL|Obwohl war;DE_PREP_DATIV|zur Arbeit
+Als ich jung war, wohnte ich in Wien.	DE_SUB_ALS|Als war
+Nachdem er gegessen hatte, ging er schlafen.	DE_SUB_ZEIT|Nachdem gegessen hatte;DE_PLUSQUAMPERFEKT|gegessen hatte
+Das ist der Mann, der mir geholfen hat.	DE_RELATIVSATZ|der geholfen hat;DE_PERFEKT|geholfen hat
+Die Frau, die dort wohnt, ist nett.	DE_RELATIVSATZ|die wohnt
+Wo wohnst du?	DE_W_FRAGE|Wo wohnst
+Kommst du heute?	DE_JA_NEIN_FRAGE|Kommst
+Heute gehe ich ins Kino.	DE_INVERSION|Heute gehe;DE_WECHSEL_AKKUSATIV|ins Kino
+Komm bitte schnell!	DE_IMPERATIV|Komm
+Gehen Sie bitte nach Hause!	DE_IMPERATIV|Gehen Sie;DE_PREP_DATIV|nach Hause
+Er ist größer als ich.	DE_KOMPARATIV|größer als
+Das ist am besten.	DE_SUPERLATIV|am besten
+Es gibt hier einen Supermarkt.	DE_ES_GIBT|Es gibt
+Der kleine Junge spielt.	DE_ADJEKTIV_SCHWACH|Der kleine Junge
+Ein großes Haus steht dort.	DE_ADJEKTIV_GEMISCHT|Ein großes Haus
+Sie trinkt kalten Tee.	DE_ADJEKTIV_STARK|kalten Tee
+Ich habe viel Arbeit.	
+Das Wetter ist schön.	
+Er arbeitet bei einer Bank.	DE_PREP_DATIV|bei einer Bank
+Sie geht ohne ihren Mann.	DE_PREP_AKKUSATIV|ohne ihren Mann
+Ich fahre durch die Stadt.	DE_PREP_AKKUSATIV|durch die Stadt
+Er ist müde.	
+Wir haben Hunger.	
+Das Essen schmeckt mir.	DE_DATIV_VERB|schmeckt mir
+Ich werde müde.	
+Er wird Arzt.	
+Das Haus wurde im Jahr 1990 gebaut.	DE_VORGANGSPASSIV|wurde gebaut
+Das Fenster ist offen.	
+Ich habe keine Zeit gehabt.	DE_PERFEKT|habe gehabt
+Er ist gestern gekommen.	DE_PERFEKT|ist gekommen
+Wir müssen jetzt gehen.	DE_MODALVERB|müssen gehen
+Du sollst nicht lügen.	DE_MODALVERB|sollst lügen
+Ich lade dich ein.	DE_TRENNBARES_VERB|lade ein
+Er macht die Tür auf.	DE_TRENNBARES_VERB|macht auf
+Sie steht um sieben Uhr auf.	DE_TRENNBARES_VERB|steht auf
+Was machst du jetzt?	DE_W_FRAGE|Was machst
+Ich denke, die Frau kommt morgen.	
+Ich sehe die Frau.	
+Er gibt dem Mann das Buch.	DE_DATIV_AKKUSATIV|gibt dem Mann das Buch
+Ich gehe nach Hause.	DE_PREP_DATIV|nach Hause
+Ich bin gestern nach Hause gegangen.	DE_PERFEKT|bin gegangen;DE_PREP_DATIV|nach Hause
+Er hatte das Buch gelesen.	DE_PLUSQUAMPERFEKT|hatte gelesen
+Ich hätte das früher wissen müssen.	DE_KONJUNKTIV_II_VERGANGENHEIT|hätte wissen müssen;DE_KOMPARATIV|früher
+Das Buch liegt auf dem Tisch.	DE_WECHSEL_DATIV|auf dem Tisch
+Ich lege das Buch auf den Tisch.	DE_WECHSEL_AKKUSATIV|auf den Tisch
+Ich stehe früh auf.	DE_TRENNBARES_VERB|stehe auf
+Ich weiß, dass er morgen kommt.	DE_SUB_DASS|dass kommt
+Das Buch, das ich gelesen habe, ist interessant.	DE_RELATIVSATZ|das gelesen habe;DE_PERFEKT|gelesen habe
+Das Haus wird gebaut.	DE_VORGANGSPASSIV|wird gebaut
+Er sagte, er sei krank.	DE_KONJUNKTIV_I|er sei
+Ich freue mich darauf, dich zu sehen.	DE_VERB_PREP_AKKUSATIV|freue darauf;DE_REFLEXIVES_VERB|freue mich;DE_ZU_INFINITIV|zu sehen
+Der alte Mann hilft der jungen Frau.	DE_ADJEKTIV_SCHWACH|Der alte Mann;DE_ADJEKTIV_SCHWACH|der jungen Frau;DE_DATIV_VERB|hilft der jungen Frau
+Die Bücher der Kinder liegen hier.	DE_GENITIVATTRIBUT|Die Bücher der Kinder
