@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.app.Application
+import android.os.Debug
 import android.os.Process
 import android.system.Os
 import android.system.OsConstants
@@ -20,12 +21,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 private const val CPU_LOG_TAG = "PageCpuUse"
+private const val MEMORY_LOG_TAG = "MemoryUse"
 private const val VIDEO_ID = "cpubudget01"
 
 /**
@@ -35,6 +38,11 @@ private const val VIDEO_ID = "cpubudget01"
  * a video plays, while it is paused, and on a page without a video. The page fakes its video, so
  * the numbers are our scripts, polling and screen updates, not video decoding. Each result is
  * logged with the [CPU_LOG_TAG] tag; CI prints those lines in the job summary.
+ *
+ * While the video plays it also logs memory (PSS of the app and the page) and the app's data on disk
+ * with the [MEMORY_LOG_TAG] tag. Those are report only (owner pick 2026-11-15): emulator memory varies
+ * between runs, so CI compares them with main in the job summary and warns on a big jump, never fails
+ * (tools/report_memory.py).
  */
 class PageCpuUseTest {
     @get:Rule val compose = createComposeRule()
@@ -86,6 +94,7 @@ class PageCpuUseTest {
             Thread.sleep(SETTLE_MS)
 
             val playing = measure("playing", PLAYING_MS)
+            logMemory("playing", application)
             javascript(page.get(), "window.setPaused(true); true")
             Thread.sleep(SETTLE_MS)
             val paused = quietest("paused")
@@ -156,14 +165,44 @@ class PageCpuUseTest {
         return use
     }
 
+    /** Memory and disk use, logged for the job summary; nothing is asserted. */
+    private fun logMemory(
+        scenario: String,
+        application: Application,
+    ) {
+        val appKb = Debug.getPss()
+        val pageKb = pageProcessPssKb()
+        val storageKb = folderBytes(application.dataDir) / 1024
+        Log.i(
+            MEMORY_LOG_TAG,
+            "scenario=$scenario app_pss_kb=$appKb page_pss_kb=${pageKb ?: 0} total_pss_kb=${appKb + (pageKb ?: 0)} " +
+                "storage_kb=$storageKb" + (if (pageKb == null) " page_process=unreadable" else ""),
+        )
+    }
+
+    /** PSS of every WebView renderer process, read through the shell; null when it cannot be read. */
+    private fun pageProcessPssKb(): Long? {
+        val pids = pageProcessIds()
+        if (pids.isEmpty()) return null
+        return pids.sumOf { pid ->
+            val meminfo = shell("dumpsys meminfo $pid")
+            val total = PSS_TOTAL.find(meminfo) ?: OLD_PSS_TOTAL.find(meminfo)
+            total?.groupValues?.get(1)?.toLongOrNull() ?: return null
+        }
+    }
+
+    private fun folderBytes(folder: File): Long = folder.walkTopDown().filter(File::isFile).sumOf(File::length)
+
+    private fun pageProcessIds(): List<Int> =
+        shell("ps -A -o PID,NAME")
+            .lines()
+            .filter { it.contains("sandboxed_process") }
+            .mapNotNull { it.trim().substringBefore(' ').toIntOrNull() }
+
     /** CPU time of every WebView renderer process, read through the shell; null when it cannot be read. */
     private fun pageProcessCpuMs(): Long? {
         val ticksPerSecond = Os.sysconf(OsConstants._SC_CLK_TCK).takeIf { it > 0 } ?: 100L
-        val pids =
-            shell("ps -A -o PID,NAME")
-                .lines()
-                .filter { it.contains("sandboxed_process") }
-                .mapNotNull { it.trim().substringBefore(' ').toIntOrNull() }
+        val pids = pageProcessIds()
         if (pids.isEmpty()) return null
         var ticks = 0L
         for (pid in pids) {
@@ -232,6 +271,10 @@ class PageCpuUseTest {
         private const val PLAYING_MS = 30_000L
         private const val IDLE_MS = 15_000L
         private const val IDLE_RUNS = 3
+
+        /** `dumpsys meminfo <pid>`: "TOTAL PSS: 51234" on new Android versions, a "TOTAL 51234 …" row on older ones. */
+        private val PSS_TOTAL = Regex("TOTAL PSS:\\s*(\\d+)")
+        private val OLD_PSS_TOTAL = Regex("(?m)^\\s*TOTAL\\s+(\\d+)")
 
         // About three times what CI measured on 2026-10-22 (13 ms playing, about 1 ms paused or without
         // a video; runs vary by a third). The spec records the numbers.

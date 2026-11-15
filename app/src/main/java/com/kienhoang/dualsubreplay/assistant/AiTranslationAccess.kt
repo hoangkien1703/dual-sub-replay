@@ -277,7 +277,7 @@ private class KeyedAiTranslationModel(
             try {
                 val key = withContext(Dispatchers.IO) { keyStore.load(provider, id) }
                 if (key !is StoredAiKey.Found) throw AiChatException(AiErrorKind.KEY_UNREADABLE)
-                val reply = completeWhenBusy(key.key, messages, text)
+                val reply = completeWhenBusy(key.key, messages, text) { pacer.take(listOf(paced)) != null }
                 pacer.answered(paced)
                 return reply.text
             } catch (error: AiChatException) {
@@ -296,12 +296,15 @@ private class KeyedAiTranslationModel(
 
     /**
      * A busy model is asked again after the assistant's waits; a refused JSON schema, then a refused
-     * thinking setting, is dropped.
+     * thinking setting, is dropped and the request is sent again on the key's next turn ([nextTurn],
+     * false when the key now rests). Sent at once, those two retries put a free key over 10 requests
+     * a minute (AiRequestBudgetTest, 2026-11-15).
      */
     private suspend fun completeWhenBusy(
         apiKey: String,
         messages: List<AiWireMessage>,
         text: StreamedText,
+        nextTurn: suspend () -> Boolean,
     ): AiReply {
         val waits = AI_BUSY_RETRY_DELAYS_MS.iterator()
         while (true) {
@@ -321,8 +324,14 @@ private class KeyedAiTranslationModel(
             } catch (error: AiChatException) {
                 when {
                     text.started -> throw error
-                    responseFormat != null && error.kind in FORMAT_REFUSALS -> responseFormat = null
-                    effort != null && error.kind in setOf(AiErrorKind.UNSUPPORTED_THINKING, AiErrorKind.BAD_REQUEST) -> effort = null
+                    responseFormat != null && error.kind in FORMAT_REFUSALS -> {
+                        responseFormat = null
+                        if (!nextTurn()) throw error
+                    }
+                    effort != null && error.kind in setOf(AiErrorKind.UNSUPPORTED_THINKING, AiErrorKind.BAD_REQUEST) -> {
+                        effort = null
+                        if (!nextTurn()) throw error
+                    }
                     error.kind == AiErrorKind.SERVER && waits.hasNext() -> delay(waits.next())
                     else -> throw error
                 }
