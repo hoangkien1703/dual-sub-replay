@@ -1,0 +1,112 @@
+name: Outside PR checks
+
+# Owner request 2026-11-15 (docs/specs/2026-11-15-flag-risky-outside-prs.md): before the owner taps
+# "Approve workflows to run" on a fork PR, label it and list the files that can run code, change app
+# permissions or bring in binaries; and review every PR's new dependencies against known advisories.
+#
+# pull_request_target runs this file as it is on main, with a token that can label and comment on fork
+# PRs, and GitHub runs it without waiting for that approval. That is safe only because NOTHING from the
+# PR is checked out, built, installed or run here: the PR's file list and diff text come from GitHub's
+# API and are read as data by main's own tools/pr_review_flags.py. Never add a checkout of the PR head
+# (github.event.pull_request.head.*, refs/pull/*), never run a script or action from the PR, and never
+# put PR text (title, body, branch or file names) straight into a run: block. tools/tests/
+# test_pr_review_flags.py fails if this file does.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: outside-pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  flag-risky-files:
+    # Fork PRs only (a deleted fork has no head repo, so it counts as one); the owner's own branches skip.
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      # main's own tool, never the PR's code.
+      - name: Check out the review tool from main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: main-tools
+          sparse-checkout: tools
+          persist-credentials: false
+
+      - name: List the files that need a careful look
+        id: flags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # The API lists up to 3000 files with their diffs; the tool says when a PR has more.
+          gh api --paginate "repos/${GH_REPO}/pulls/${PR_NUMBER}/files?per_page=100" --jq '.[]' > "$RUNNER_TEMP/files.jsonl"
+          python3 -I main-tools/tools/pr_review_flags.py "$RUNNER_TEMP/files.jsonl" \
+            --changed-files "$CHANGED_FILES" --head-sha "$HEAD_SHA" --body "$RUNNER_TEMP/comment.md" >> "$GITHUB_OUTPUT"
+          cat "$RUNNER_TEMP/comment.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Label the PR and keep one comment up to date
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RISKY: ${{ steps.flags.outputs.risky }}
+        run: |
+          set -euo pipefail
+          label="needs careful review"
+          marker="<!-- outside-pr-review-flags -->"
+          # Only this workflow's own comment: anyone can paste the marker into a comment of theirs.
+          comment_ids="$(gh api --paginate "repos/${GH_REPO}/issues/${PR_NUMBER}/comments?per_page=100" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"${marker}\"))) | .id")"
+          comment_id="${comment_ids%%$'\n'*}"
+
+          if [[ "$RISKY" == "true" ]]; then
+            gh api "repos/${GH_REPO}/labels/needs%20careful%20review" > /dev/null 2>&1 ||
+              gh api "repos/${GH_REPO}/labels" -f name="$label" -f color="d93f0b" \
+                -f description="Outside PR touches files that can run code or change app permissions" > /dev/null
+            gh api "repos/${GH_REPO}/issues/${PR_NUMBER}/labels" -f "labels[]=$label" > /dev/null
+            echo "Labelled PR #$PR_NUMBER \"$label\"."
+          elif [[ -z "$comment_id" ]]; then
+            echo "Nothing to flag and no earlier comment; done."
+            exit 0
+          else
+            gh api -X DELETE "repos/${GH_REPO}/issues/${PR_NUMBER}/labels/needs%20careful%20review" > /dev/null 2>&1 || true
+            echo "Nothing to flag any more; label removed."
+          fi
+
+          if [[ -n "$comment_id" ]]; then
+            gh api -X PATCH "repos/${GH_REPO}/issues/comments/${comment_id}" -F body=@"$RUNNER_TEMP/comment.md" > /dev/null
+            echo "Updated comment $comment_id."
+          else
+            gh api "repos/${GH_REPO}/issues/${PR_NUMBER}/comments" -F body=@"$RUNNER_TEMP/comment.md" > /dev/null
+            echo "Posted the file list."
+          fi
+
+  dependency-review:
+    # Every PR, the owner's and Dependabot's too. GitHub's own action compares the dependency graph of
+    # main and the PR head through the API; it checks out and runs nothing from the PR. The graph sees
+    # GitHub Actions and the promo-video npm packages; Gradle libraries are not in it (no dependency
+    # submission yet), so flag-risky-files lists changes to gradle/libs.versions.toml instead.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Review new dependencies for known advisories
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: never
