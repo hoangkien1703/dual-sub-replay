@@ -72,7 +72,7 @@ class GermanRoleUiTest {
                 SubtitleSegment(1, 1000, 3000, line, null)
             }
         val selection = LearningWordSelection(token, "de", "en", "dQw4w9WgXcQ", segment, translated)
-        compose.setContent { DualSubTheme { WordLearningDialog(selection, false, { "meaning" }, { _, _, _ -> }, {}, null, {}) } }
+        compose.setContent { DualSubTheme { WordLearningDialog(selection, false, { "meaning" }, { _, _ -> }, {}, null, {}) } }
     }
 
     private fun title() = compose.onNodeWithTag("german_role_title", useUnmergedTree = true)

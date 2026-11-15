@@ -56,7 +56,7 @@ class GermanWordDialogUiTest {
         val token = LanguageAwareTokenizer.tokenize(line, "de").filter { it.text == word }[occurrence]
         val selection = LearningWordSelection(token, "de", "en", "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, line, null), false)
         compose.setContent {
-            DualSubTheme { WordLearningDialog(selection, false, { "get up" }, { _, _, _ -> }, {}, null, {}) }
+            DualSubTheme { WordLearningDialog(selection, false, { "get up" }, { _, _ -> }, {}, null, {}) }
         }
     }
 
@@ -115,7 +115,7 @@ class GermanWordDialogUiTest {
         val segment = SubtitleSegment(1, 1000, 3000, "I get up early.", german)
         val selection = LearningWordSelection(token, "de", "en", "dQw4w9WgXcQ", segment, true)
         compose.setContent {
-            DualSubTheme { WordLearningDialog(selection, false, { "get up" }, { _, _, _ -> }, {}, null, {}) }
+            DualSubTheme { WordLearningDialog(selection, false, { "get up" }, { _, _ -> }, {}, null, {}) }
         }
         compose.onNodeWithTag("german_lemma").assertTextEquals("Dictionary form: aufstehen")
         assertTrue(grammarTexts().fetchSemanticsNodes().isNotEmpty())
