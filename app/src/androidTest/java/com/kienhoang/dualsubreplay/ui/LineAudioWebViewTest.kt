@@ -89,12 +89,7 @@ class LineAudioWebViewTest {
             evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 3.25; v.play(); })()")
             playTo(web!!, 6.7)
             val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
-            // The test seeks back once, so only one run starts after 3 s. A second one means the
-            // emulator stalled the sound against the video's clock mid-replay (main run, 2026-11-15:
-            // [3.16, 4.1] then [3.83, 6.91]), which is not what this test checks.
-            val kept = runs(web!!)
-            assumeTrue("the emulator broke the replayed run: $kept", clip != null || runStartsAfter(kept, 3.0) <= 1)
-            assertNotNull("the replayed line has no clip; kept runs $kept", clip)
+            assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
             assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
             assertTrue("the clip is silent", audible(clip))
         } finally {
@@ -240,12 +235,6 @@ class LineAudioWebViewTest {
     }
 
     private fun runs(web: WebView): String? = evaluate(web, "window.__dualSubLineAudio ? window.__dualSubLineAudio.runs() : null")
-
-    private fun runStartsAfter(
-        runs: String?,
-        second: Double,
-    ): Int =
-        Regex("""\[(-?[0-9.]+),""").findAll(runs.orEmpty()).count { it.groupValues[1].toDouble() >= second }
 
     private fun evaluate(
         web: WebView,
