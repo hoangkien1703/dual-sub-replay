@@ -71,7 +71,7 @@ internal data class TaggedEnglishToken(
 )
 
 /** Same words as the spaced-language tokenizer, plus each punctuation mark the model expects to see. */
-private val ENGLISH_TOKEN = Regex("([\\p{L}\\p{M}\\p{N}_]+(?:['’-]+[\\p{L}\\p{M}\\p{N}_]+)*)|[^\\s\\p{L}\\p{M}\\p{N}_]")
+internal val ENGLISH_TOKEN = Regex("([\\p{L}\\p{M}\\p{N}_]+(?:['’-]+[\\p{L}\\p{M}\\p{N}_]+)*)|[^\\s\\p{L}\\p{M}\\p{N}_]")
 
 internal fun tagEnglish(
     tagger: OpenNlpPosTagger,

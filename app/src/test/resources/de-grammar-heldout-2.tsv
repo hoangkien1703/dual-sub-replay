@@ -1,0 +1,65 @@
+# HELD-OUT SET 2 for the German grammar rules. Written on 2026-11-14 BEFORE the second round of fixes, annotated by the
+# implementer from the grammar (no independent annotator was available), and run only AFTER those fixes, once. It must not be
+# edited or tuned on: its SHA-256 is recorded in docs/specs/2026-11-14-german-grammar.md. If a rule is changed because of a result
+# here, this set stops being held-out and a new one must be written. Same format and guideline as de-grammar-eval.tsv.
+Am Abend sehen wir gern fern.	DE_TRENNBARES_VERB|sehen fern
+Meine Eltern sehen jeden Tag fern.	DE_TRENNBARES_VERB|sehen fern
+Er kauft im Supermarkt Brot ein.	DE_TRENNBARES_VERB|kauft ein;DE_WECHSEL_DATIV|im Supermarkt
+Hör mir bitte zu!	DE_IMPERATIV|Hör;DE_TRENNBARES_VERB|Hör zu;DE_DATIV_VERB|Hör mir
+Schließ bitte die Tür ab!	DE_IMPERATIV|Schließ;DE_TRENNBARES_VERB|Schließ ab
+Ruf mich morgen an.	DE_IMPERATIV|Ruf;DE_TRENNBARES_VERB|Ruf an
+Bring das Buch zurück!	DE_IMPERATIV|Bring;DE_TRENNBARES_VERB|Bring zurück
+Mach bitte das Licht aus.	DE_IMPERATIV|Mach;DE_TRENNBARES_VERB|Mach aus
+Gehen Sie bitte geradeaus!	DE_IMPERATIV|Gehen Sie
+Sie ist stolz auf ihren Bruder.	DE_ADJEKTIV_PREP_AKKUSATIV|stolz auf ihren Bruder
+Wir sind sehr gespannt auf das Ergebnis.	DE_ADJEKTIV_PREP_AKKUSATIV|gespannt auf das Ergebnis
+Er ist verliebt in seine Nachbarin.	DE_ADJEKTIV_PREP_AKKUSATIV|verliebt in seine Nachbarin
+Ich bin mit dem Ergebnis zufrieden.	DE_PREP_DATIV|mit dem Ergebnis
+Er ist begeistert von dem Film.	DE_ADJEKTIV_PREP_DATIV|begeistert von dem Film
+Das Buch ist auf dem Tisch.	DE_WECHSEL_DATIV|auf dem Tisch
+Der Schlüssel liegt neben der Tasche.	DE_WECHSEL_DATIV|neben der Tasche
+Sie stellt die Vase auf den Schrank.	DE_WECHSEL_AKKUSATIV|auf den Schrank
+Die Schüler haben den Text gelesen.	DE_PERFEKT|haben gelesen
+Nach dem Unterricht sind wir nach Hause gegangen.	DE_PERFEKT|sind gegangen;DE_PREP_DATIV|Nach dem Unterricht;DE_PREP_DATIV|nach Hause
+Der Zug fährt um acht Uhr ab.	DE_TRENNBARES_VERB|fährt ab
+Wir ziehen nächste Woche um.	DE_TRENNBARES_VERB|ziehen um
+Sie hat mir ihr Auto geliehen.	DE_PERFEKT|hat geliehen
+Das Essen wurde von dem Koch zubereitet.	DE_VORGANGSPASSIV|wurde zubereitet;DE_PREP_DATIV|von dem Koch
+Er kann sehr gut schwimmen.	DE_MODALVERB|kann schwimmen
+Wir müssen morgen früh aufstehen.	DE_MODALVERB|müssen aufstehen
+Wenn es morgen regnet, bleiben wir zu Hause.	DE_SUB_WENN|Wenn regnet;DE_PREP_DATIV|zu Hause
+Sie weiß, dass ihr Bruder krank ist.	DE_SUB_DASS|dass ist
+Ich frage mich, warum er nicht kommt.	DE_INDIREKTE_FRAGE|warum kommt;DE_REFLEXIVES_VERB|frage mich
+Das ist die Frau, deren Sohn Arzt ist.	DE_RELATIVSATZ|deren ist
+Er sagte, dass er keine Zeit habe.	DE_SUB_DASS|dass habe
+Er erzählte, sie sei nach Italien gereist.	DE_KONJUNKTIV_I|sie sei
+Wenn ich du wäre, würde ich das nicht tun.	DE_KONDITIONAL_IRREAL|Wenn wäre würde;DE_SUB_WENN|Wenn wäre;DE_KONJUNKTIV_II|wäre;DE_WUERDE_INFINITIV|würde tun
+Hätten wir mehr Zeit gehabt, wären wir geblieben.	DE_KONJUNKTIV_II_VERGANGENHEIT|Hätten gehabt;DE_KONJUNKTIV_II_VERGANGENHEIT|wären geblieben
+Das Zimmer ist größer als die Küche.	DE_KOMPARATIV|größer als
+Dies ist das höchste Gebäude der Stadt.	DE_SUPERLATIV|höchste;DE_ADJEKTIV_SCHWACH|das höchste Gebäude;DE_GENITIVATTRIBUT|das höchste Gebäude der Stadt
+Das ist ein sehr interessantes Buch.	DE_ADJEKTIV_GEMISCHT|ein sehr interessantes Buch
+Er trägt einen schwarzen Mantel.	DE_ADJEKTIV_GEMISCHT|einen schwarzen Mantel
+Frische Milch ist gesund.	DE_ADJEKTIV_STARK|Frische Milch
+Es gibt keine Probleme.	DE_ES_GIBT|Es gibt
+Wo ist der Bahnhof?	DE_W_FRAGE|Wo ist
+Hast du morgen Zeit?	DE_JA_NEIN_FRAGE|Hast
+Morgen fahren wir nach Berlin.	DE_INVERSION|Morgen fahren
+Leider kann ich nicht kommen.	DE_INVERSION|Leider kann;DE_MODALVERB|kann kommen
+Er geht jeden Tag zur Schule.	DE_PREP_DATIV|zur Schule
+Sie arbeitet für eine große Firma.	DE_PREP_AKKUSATIV|für eine große Firma;DE_ADJEKTIV_GEMISCHT|eine große Firma
+Wir gehen durch den Park.	DE_PREP_AKKUSATIV|durch den Park
+Trotz der Kälte gingen sie spazieren.	DE_PREP_GENITIV|Trotz der Kälte
+Der Lehrer hilft den Kindern.	DE_DATIV_VERB|hilft den Kindern
+Ich gebe dem Hund einen Knochen.	DE_DATIV_AKKUSATIV|gebe dem Hund einen Knochen
+Ich habe Hunger.	
+Das Wetter war schön.	
+Sie versucht, früh ins Bett zu gehen.	DE_ZU_INFINITIV|zu gehen;DE_WECHSEL_AKKUSATIV|ins Bett
+Er lernt, um besser zu werden.	DE_UM_ZU|um zu werden;DE_KOMPARATIV|besser
+Sie spricht über ihre Reise.	DE_VERB_PREP_AKKUSATIV|spricht über ihre Reise
+Wir warten auf den Bus.	DE_VERB_PREP_AKKUSATIV|warten auf den Bus
+Er hat sich über das Geschenk gefreut.	DE_PERFEKT|hat gefreut
+Das Kind schläft im Bett.	DE_WECHSEL_DATIV|im Bett
+Wir fahren ans Meer.	DE_WECHSEL_AKKUSATIV|ans Meer
+Sie ruft ihre Freundin an.	DE_TRENNBARES_VERB|ruft an
+Er macht jeden Morgen das Fenster auf.	DE_TRENNBARES_VERB|macht auf
+Kommt ihr morgen mit?	DE_JA_NEIN_FRAGE|Kommt;DE_TRENNBARES_VERB|Kommt mit

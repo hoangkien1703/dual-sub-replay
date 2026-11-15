@@ -1,0 +1,55 @@
+# Held-out German grammar sentences v4. Written after the third pass and BEFORE the Spanish-comparison hardening pass (2026-11-14),
+# annotated before being run, never edited, never fixed against. Its SHA-256 is enforced by GermanGrammarEvalTest. If a fix
+# is made for one of its failures, this set stops being held out. Same format and guideline as de-grammar-eval.tsv (evidence includes a
+# noun phrase's determiner and adjectives, and a point's participle or infinitive counts as evidence). Author-annotated: not independent. Reported, not gated.
+Am Wochenende fahren wir weg.	DE_INVERSION|Am fahren;DE_TRENNBARES_VERB|fahren weg
+Morgen Abend gehen wir tanzen.	DE_INVERSION|Morgen gehen
+Im letzten Sommer waren wir in Spanien.	DE_ADJEKTIV_SCHWACH|letzten Sommer;DE_INVERSION|Im waren
+Nach dem Essen trinken wir Kaffee.	DE_PREP_DATIV|Nach dem Essen;DE_INVERSION|Nach trinken
+Vor dem Haus steht ein alter Baum.	DE_WECHSEL_DATIV|Vor dem Haus;DE_ADJEKTIV_GEMISCHT|ein alter Baum;DE_INVERSION|Vor steht
+In der Nacht schlafen die Kinder tief.	DE_WECHSEL_DATIV|In der Nacht;DE_INVERSION|In schlafen
+Dann rufe ich dich an.	DE_INVERSION|Dann rufe;DE_TRENNBARES_VERB|rufe an
+Er hat das Fenster geöffnet.	DE_PERFEKT|hat geöffnet
+Das Fenster ist geöffnet.	DE_ZUSTANDSPASSIV|ist geöffnet
+Sie ist sehr müde.	
+Wir haben das Spiel gewonnen.	DE_PERFEKT|haben gewonnen
+Du musst dich beeilen.	DE_MODALVERB|musst beeilen;DE_REFLEXIVES_VERB|beeilen dich
+Ich ärgere mich über den Lärm.	DE_REFLEXIVES_VERB|ärgere mich;DE_VERB_PREP_AKKUSATIV|ärgere über den Lärm
+Er bedankt sich bei dem Lehrer.	DE_REFLEXIVES_VERB|bedankt sich;DE_PREP_DATIV|bei dem Lehrer
+Wir freuen uns auf die Ferien.	DE_REFLEXIVES_VERB|freuen uns;DE_VERB_PREP_AKKUSATIV|freuen auf die Ferien
+Es regnet seit drei Tagen.	
+Seit dem Unfall geht er nicht mehr zur Arbeit.	DE_PREP_DATIV|Seit dem Unfall;DE_PREP_DATIV|zur Arbeit;DE_INVERSION|Seit geht
+Wegen der Kälte bleiben wir im Haus.	DE_PREP_GENITIV|Wegen der Kälte;DE_WECHSEL_DATIV|im Haus;DE_INVERSION|Wegen bleiben
+Er hilft seiner Mutter im Garten.	DE_DATIV_VERB|hilft seiner Mutter;DE_WECHSEL_DATIV|im Garten
+Ich schenke meinem Vater ein Buch.	DE_DATIV_AKKUSATIV|schenke meinem Vater ein Buch
+Der Bruder meiner Freundin wohnt in Köln.	DE_GENITIVATTRIBUT|Der Bruder meiner Freundin
+Hast du den Film gesehen?	DE_JA_NEIN_FRAGE|Hast;DE_PERFEKT|Hast gesehen
+Wann kommst du nach Hause?	DE_W_FRAGE|Wann kommst;DE_PREP_DATIV|nach Hause
+Warum bist du so spät gekommen?	DE_W_FRAGE|Warum bist;DE_PERFEKT|bist gekommen
+Wenn es morgen schneit, bleiben wir zu Hause.	DE_SUB_WENN|Wenn schneit;DE_PREP_DATIV|zu Hause
+Ich glaube, dass er recht hat.	DE_SUB_DASS|dass hat
+Sie wollte wissen, ob wir Zeit haben.	DE_SUB_OB|ob haben
+Obwohl es regnete, gingen wir spazieren.	DE_SUB_OBWOHL|Obwohl regnete
+Bevor er ging, gab er mir das Buch.	DE_SUB_ZEIT|Bevor ging;DE_DATIV_AKKUSATIV|gab mir das Buch
+Der Mann, dem ich geholfen habe, ist dankbar.	DE_RELATIVSATZ|dem geholfen habe;DE_PERFEKT|geholfen habe
+Das ist das Haus, in dem ich geboren wurde.	
+Mach die Tür zu!	DE_IMPERATIV|Mach;DE_TRENNBARES_VERB|Mach zu
+Schreib mir bald!	DE_IMPERATIV|Schreib;DE_DATIV_VERB|Schreib mir
+Komm bitte herein!	DE_IMPERATIV|Komm;DE_TRENNBARES_VERB|Komm herein
+Er würde gern mitkommen.	DE_WUERDE_INFINITIV|würde mitkommen
+Hätte ich Zeit, würde ich dich besuchen.	DE_KONDITIONAL_IRREAL|Hätte würde;DE_KONJUNKTIV_II|Hätte;DE_WUERDE_INFINITIV|würde besuchen
+Sie meinte, es sei zu spät.	DE_KONJUNKTIV_I|es sei
+Die Aufgabe wird von den Schülern gelöst.	DE_VORGANGSPASSIV|wird gelöst;DE_PREP_DATIV|von den Schülern
+Das Buch ist größer als das Heft.	DE_KOMPARATIV|größer als
+Sie ist die klügste Schülerin der Klasse.	DE_SUPERLATIV|klügste;DE_ADJEKTIV_SCHWACH|die klügste Schülerin;DE_GENITIVATTRIBUT|die klügste Schülerin der Klasse
+Es gibt hier keine Probleme.	DE_ES_GIBT|Es gibt
+Mein neuer Kollege kommt aus Polen.	DE_ADJEKTIV_GEMISCHT|Mein neuer Kollege;DE_PREP_DATIV|aus Polen
+Er liebt frische Luft.	DE_ADJEKTIV_STARK|frische Luft
+Ich warte seit einer Stunde auf dich.	DE_VERB_PREP_AKKUSATIV|warte auf dich;DE_PREP_DATIV|seit einer Stunde
+Sie antwortet auf meine Frage.	DE_VERB_PREP_AKKUSATIV|antwortet auf meine Frage
+Er versucht, nicht zu lachen.	DE_ZU_INFINITIV|zu lachen
+Ohne zu fragen nahm er das Buch.	DE_OHNE_ZU|Ohne zu fragen
+Wir sind stolz auf unsere Mannschaft.	DE_ADJEKTIV_PREP_AKKUSATIV|stolz auf unsere Mannschaft
+Das Kind ist neugierig auf die Geschenke.	DE_ADJEKTIV_PREP_AKKUSATIV|neugierig auf die Geschenke
+Er kann gut kochen und will bald heiraten.	DE_MODALVERB|kann kochen;DE_MODALVERB|will heiraten
+Ich habe Durst.	

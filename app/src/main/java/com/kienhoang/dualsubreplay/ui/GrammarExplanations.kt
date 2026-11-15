@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +38,8 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiPendingQuestion
 import com.kienhoang.dualsubreplay.assistant.aiGrammarContext
 import com.kienhoang.dualsubreplay.data.CefrLevel
+import com.kienhoang.dualsubreplay.data.GermanMorphology
+import com.kienhoang.dualsubreplay.data.GrammarLanguage
 import com.kienhoang.dualsubreplay.data.GrammarLevel
 import com.kienhoang.dualsubreplay.data.GrammarMatch
 import com.kienhoang.dualsubreplay.data.GrammarMeaning
@@ -51,10 +54,10 @@ import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 /**
  * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
  * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`, Spanish in
- * `SpanishGrammarText.kt`.
+ * `SpanishGrammarText.kt`, German in `GermanGrammarText.kt`.
  */
 internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
-    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT + SPANISH_GRAMMAR_TEXT
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT + SPANISH_GRAMMAR_TEXT + GERMAN_GRAMMAR_TEXT
 }
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
@@ -166,7 +169,7 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese, English, Chinese or Spanish selection, read from its whole subtitle line, and
+ * The grammar of a Japanese, English, Chinese, Spanish or German selection, read from its whole subtitle line, and
  * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
  * nothing for other languages.
  */
@@ -185,7 +188,23 @@ internal fun GrammarExplanations(
             val range = selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
             if (range == null) emptyList() else grammarForSelection(lineMatches, range.first, range.last + 1)
         }
-    GrammarPointList(matches)
+    // What a German word does in its line belongs to the Grammar section, so closing Grammar hides it too.
+    val germanRole =
+        remember(line, language, selection.token, revision) {
+            if (language != GrammarLanguage.GERMAN) {
+                null
+            } else {
+                selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
+                    ?.let { GermanMorphology.wordRole(line, it.first, it.last + 1) }
+            }
+        }
+    val lead: (@Composable ColumnScope.() -> Unit)? =
+        if (germanRole == null) {
+            null
+        } else {
+            { GermanRoleSection(germanRole, selection.token.text) }
+        }
+    GrammarPointList(matches, lead, leadCount = if (germanRole == null) 0 else 1)
     AiGrammarButton(selection, line, lineMatches, onAskedAi)
 }
 
@@ -224,16 +243,24 @@ private fun AiGrammarButton(
     }
 }
 
-/** The "Grammar" heading (a tap hides or shows the points) and one card per point; nothing when there are none. */
+/**
+ * The "Grammar" heading (a tap hides or shows the points) and one card per point; nothing when there are none.
+ * [lead], counted as [leadCount] items, goes above the points (German's "Grammar in this sentence").
+ */
 @Composable
-internal fun GrammarPointList(matches: List<GrammarMatch>) {
-    if (matches.isEmpty()) return
+internal fun GrammarPointList(
+    matches: List<GrammarMatch>,
+    lead: (@Composable ColumnScope.() -> Unit)? = null,
+    leadCount: Int = 0,
+) {
+    if (matches.isEmpty() && lead == null) return
     CollapsibleWordCardSection(
         title = stringResource(R.string.grammar_title),
-        count = matches.size,
+        count = matches.size + leadCount,
         preferenceKey = WORD_CARD_GRAMMAR_OPEN_PREFERENCE,
         testTag = "grammar_section",
     ) {
+        lead?.invoke(this)
         matches.forEach { GrammarPointCard(it) }
     }
 }
@@ -299,6 +326,14 @@ private fun GrammarPointCard(match: GrammarMatch) {
                     LevelBadge(match.level)
                 }
                 Text(text, modifier = Modifier.padding(top = 4.dp))
+            }
+            if (match.tentative) {
+                Text(
+                    stringResource(R.string.grammar_tentative),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp).testTag("grammar_tentative"),
+                )
             }
             val others = match.meanings.drop(1)
             if (others.isNotEmpty()) {

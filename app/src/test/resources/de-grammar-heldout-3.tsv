@@ -1,0 +1,62 @@
+# Held-out German grammar sentences, set 3. Written BEFORE the error categories found on set 2 were investigated or fixed, and never
+# edited or fixed against (a test checks this file's SHA-256). Same format and guideline as de-grammar-eval.tsv. Annotations are the author's;
+# no independent reference annotation exists, so this stays an optimistic estimate. If anything is changed because of its results,
+# this set stops being held out and a new one must be written. Reported, not gated.
+Die Tür ist geschlossen.	DE_ZUSTANDSPASSIV|ist geschlossen
+Das Konzert ist ausverkauft.	DE_ZUSTANDSPASSIV|ist ausverkauft
+Sie ist verheiratet.	
+Er ist sehr erschöpft.	
+Die Kinder sind begeistert.	
+Wir sind interessiert an einem neuen Auto.	DE_ADJEKTIV_PREP_DATIV|interessiert an einem neuen Auto;DE_ADJEKTIV_GEMISCHT|einem neuen Auto
+Leider haben wir keine Zeit.	DE_INVERSION|Leider haben
+Er kommt leider nicht.	
+Das Wetter wird leider schlechter.	DE_KOMPARATIV|schlechter
+Sie trägt ein ganz neues Kleid.	DE_ADJEKTIV_GEMISCHT|ein ganz neues Kleid
+Das war eine wirklich gute Idee.	DE_ADJEKTIV_GEMISCHT|eine wirklich gute Idee
+Er hat einen sehr alten Wagen.	DE_ADJEKTIV_GEMISCHT|einen sehr alten Wagen
+Alte Bücher riechen gut.	DE_ADJEKTIV_STARK|Alte Bücher
+Kalte Getränke sind teuer.	DE_ADJEKTIV_STARK|Kalte Getränke
+Große Hunde brauchen viel Bewegung.	DE_ADJEKTIV_STARK|Große Hunde
+Wären wir früher gekommen, hätten wir ihn gesehen.	DE_KONJUNKTIV_II_VERGANGENHEIT|Wären gekommen;DE_KONJUNKTIV_II_VERGANGENHEIT|hätten gesehen;DE_KOMPARATIV|früher
+Hätte er das gewusst, wäre er geblieben.	DE_KONJUNKTIV_II_VERGANGENHEIT|Hätte gewusst;DE_KONJUNKTIV_II_VERGANGENHEIT|wäre geblieben
+Hast du das Buch schon gelesen?	DE_JA_NEIN_FRAGE|Hast;DE_PERFEKT|Hast gelesen
+Nächsten Monat fahren wir nach Italien.	DE_ADJEKTIV_STARK|Nächsten Monat
+Letzte Woche waren wir krank.	DE_ADJEKTIV_STARK|Letzte Woche
+Im nächsten Jahr ziehen wir um.	DE_ADJEKTIV_SCHWACH|nächsten Jahr;DE_TRENNBARES_VERB|ziehen um
+Sie hat lange auf den Brief gewartet.	DE_PERFEKT|hat gewartet;DE_VERB_PREP_AKKUSATIV|auf den Brief gewartet
+Er wartet auf den Zug.	DE_VERB_PREP_AKKUSATIV|wartet auf den Zug
+Wir haben über das Problem gesprochen.	DE_PERFEKT|haben gesprochen;DE_VERB_PREP_AKKUSATIV|über das Problem gesprochen
+Sie hat sich um ihre Mutter gekümmert.	DE_PERFEKT|hat gekümmert;DE_VERB_PREP_AKKUSATIV|um ihre Mutter gekümmert
+Die Gäste sind schon angekommen.	DE_PERFEKT|sind angekommen
+Er hat den Schlüssel verloren.	DE_PERFEKT|hat verloren
+Wir wollten gestern ins Theater gehen.	DE_MODALVERB|wollten gehen;DE_WECHSEL_AKKUSATIV|ins Theater
+Das Fahrrad wird von meinem Vater repariert.	DE_VORGANGSPASSIV|wird repariert;DE_PREP_DATIV|von meinem Vater
+Ich stehe jeden Morgen um sechs auf.	DE_TRENNBARES_VERB|stehe auf
+Sie nimmt ihren Hund mit.	DE_TRENNBARES_VERB|nimmt mit
+Der Kellner bringt der Frau die Rechnung.	DE_DATIV_AKKUSATIV|bringt der Frau die Rechnung
+Das Mädchen dankt dem Lehrer.	DE_DATIV_VERB|dankt dem Lehrer
+Die Mutter des Jungen arbeitet in einer Bank.	DE_GENITIVATTRIBUT|Die Mutter des Jungen;DE_WECHSEL_DATIV|in einer Bank
+Wegen der Hitze bleiben wir drinnen.	DE_PREP_GENITIV|Wegen der Hitze
+Er fährt mit dem Zug nach München.	DE_PREP_DATIV|mit dem Zug
+Sie gehen ohne ihren Hund spazieren.	DE_PREP_AKKUSATIV|ohne ihren Hund
+Ich glaube, dass er recht hat.	DE_SUB_DASS|dass hat
+Weil der Bus spät kam, kamen wir zu spät.	DE_SUB_WEIL|Weil kam
+Ob sie kommt, weiß ich nicht.	DE_SUB_OB|Ob kommt
+Das ist der Film, den wir gestern gesehen haben.	DE_RELATIVSATZ|den gesehen haben;DE_PERFEKT|gesehen haben
+Wann beginnt der Film?	DE_W_FRAGE|Wann beginnt
+Kannst du mir bitte helfen?	DE_JA_NEIN_FRAGE|Kannst;DE_MODALVERB|Kannst helfen
+Setz dich bitte hin!	DE_IMPERATIV|Setz;DE_TRENNBARES_VERB|Setz hin
+Fahr bitte vorsichtig!	DE_IMPERATIV|Fahr
+Heute Abend gehen wir ins Kino.	DE_INVERSION|Heute gehen;DE_WECHSEL_AKKUSATIV|ins Kino
+Er sagte, sie habe keine Zeit gehabt.	DE_KONJUNKTIV_I|sie habe;DE_PERFEKT|habe gehabt
+Wenn ich reich wäre, würde ich ein Schloss kaufen.	DE_KONDITIONAL_IRREAL|Wenn wäre würde;DE_SUB_WENN|Wenn wäre;DE_KONJUNKTIV_II|wäre;DE_WUERDE_INFINITIV|würde kaufen
+Der Turm ist höher als das Haus.	DE_KOMPARATIV|höher als
+Das ist der schönste Tag meines Lebens.	DE_SUPERLATIV|schönste;DE_ADJEKTIV_SCHWACH|der schönste Tag;DE_GENITIVATTRIBUT|der schönste Tag meines Lebens
+Sie freut sich auf den Urlaub.	DE_REFLEXIVES_VERB|freut sich;DE_VERB_PREP_AKKUSATIV|freut auf den Urlaub
+Er versucht, das Problem zu lösen.	DE_ZU_INFINITIV|zu lösen
+Sie spart Geld, um ein Auto zu kaufen.	DE_UM_ZU|um zu kaufen
+Es gibt hier keinen Parkplatz.	DE_ES_GIBT|Es gibt
+Das Kind spielt mit dem Hund im Park.	DE_PREP_DATIV|mit dem Hund;DE_WECHSEL_DATIV|im Park
+Ich habe Durst.	
+Das Buch ist spannend.	
+Er arbeitet heute nicht.	

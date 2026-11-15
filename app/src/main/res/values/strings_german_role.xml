@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- German word roles and conjugation. Machine-drafted, not yet reviewed by a German teacher. German terms stay German. -->
+<resources>
+    <string name="german_role_heading">Grammar in this sentence</string>
+    <string name="german_conj_heading">Verb conjugation</string>
+    <string name="german_conj_this_form">Form used in this sentence</string>
+    <string name="german_conj_reflexive">Shown with its reflexive pronoun, as in this sentence.</string>
+    <string name="german_conj_ersatz">Next to another infinitive, the infinitive replaces the participle: %1$s.</string>
+    <string name="german_conj_kind_weak">Weak verb (schwach): regular -te past</string>
+    <string name="german_conj_kind_strong">Strong verb (stark): the stem vowel changes</string>
+    <string name="german_conj_kind_mixed">Mixed verb (gemischt): vowel change plus -te</string>
+    <string name="german_conj_kind_modal">Modal verb (Modalverb)</string>
+    <string name="german_conj_kind_preterite_present">Preterite-present verb (Präteritopräsens)</string>
+    <string name="german_conj_kind_auxiliary">Auxiliary verb (Hilfsverb)</string>
+    <string name="german_role_personal">Personal pronoun (Personalpronomen)</string>
+    <string name="german_role_reflexive">Reflexive pronoun (Reflexivpronomen)</string>
+    <string name="german_role_relative">Relative pronoun (Relativpronomen)</string>
+    <string name="german_role_demonstrative_pronoun">Demonstrative pronoun (Demonstrativpronomen)</string>
+    <string name="german_role_indefinite_pronoun">Indefinite pronoun (Indefinitpronomen)</string>
+    <string name="german_role_interrogative">Question word (Interrogativpronomen / Fragewort)</string>
+    <string name="german_role_def_article">Definite article (bestimmter Artikel)</string>
+    <string name="german_role_indef_article">Indefinite article (unbestimmter Artikel)</string>
+    <string name="german_role_neg_article">Negative article (Negationsartikel: kein)</string>
+    <string name="german_role_possessive">Possessive determiner (Possessivartikel)</string>
+    <string name="german_role_demo_det">Demonstrative determiner (Demonstrativartikel)</string>
+    <string name="german_role_other_det">Determiner (Artikelwort)</string>
+    <string name="german_role_preposition">Preposition (Präposition)</string>
+    <string name="german_role_coordinator">Coordinating conjunction (nebenordnende Konjunktion)</string>
+    <string name="german_role_infinitive_zu">Infinitive marker (zu + Infinitiv)</string>
+    <string name="german_why_zu">Stands directly before the infinitive %1$s (zu + Infinitiv).</string>
+    <string name="german_role_subordinator">Subordinating conjunction (unterordnende Konjunktion)</string>
+    <string name="german_role_adverb">Adverb (Adverb)</string>
+    <string name="german_role_degree">Degree word (Gradpartikel)</string>
+    <string name="german_role_adj_attr">Adjective before a noun (attributives Adjektiv)</string>
+    <string name="german_role_adj_pred">Predicate adjective (prädikatives Adjektiv)</string>
+    <string name="german_role_adj_adv">Adjective used as an adverb (adverbial gebrauchtes Adjektiv)</string>
+    <string name="german_adverb_time">of time (temporal)</string>
+    <string name="german_adverb_place">of place (lokal)</string>
+    <string name="german_adverb_manner">of manner (modal)</string>
+    <string name="german_adverb_attitude">of attitude (Satzadverb)</string>
+    <string name="german_adverb_connective">linking sentences (Konjunktionaladverb)</string>
+    <string name="german_adverb_negation">of negation (nicht, nie)</string>
+    <string name="german_decl_weak">weak</string>
+    <string name="german_decl_mixed">mixed</string>
+    <string name="german_decl_strong">strong</string>
+    <string name="german_why_subject">Subject of the clause, so it is in the nominative.</string>
+    <string name="german_why_direct">Direct object of the verb, so it is in the accusative.</string>
+    <string name="german_why_dative">Dative object: %1$s takes the dative.</string>
+    <string name="german_why_dative_plain">Dative object (indirect object), so it is in the dative.</string>
+    <string name="german_why_after_prep">It follows the preposition \"%1$s\", which takes the %2$s.</string>
+    <string name="german_why_reflexive_verb">Reflexive: it repeats the subject, with the verb %1$s.</string>
+    <string name="german_why_reflexive">Reflexive: it repeats the subject of the clause.</string>
+    <string name="german_why_relative">Refers back to \"%1$s\" and starts a clause with the verb at the end. Gender and number come from that noun, the case from its job inside the clause.</string>
+    <string name="german_why_relative_plain">Starts a relative clause with the verb at the end. Gender and number come from the noun it refers to.</string>
+    <string name="german_why_demonstrative">Probably a demonstrative pronoun standing on its own, not an article before a noun.</string>
+    <string name="german_why_question_main">Question word: the verb comes second.</string>
+    <string name="german_why_question_sub">Question word in an indirect question: the verb goes to the end.</string>
+    <string name="german_why_determiner">Goes with \"%1$s\" and shows its case, gender and number.</string>
+    <string name="german_why_after_determiner">Adjectives after it take %1$s endings.</string>
+    <string name="german_why_prep_case">\"%1$s\" takes the %2$s.</string>
+    <string name="german_why_prep_twoway">Two-way preposition (Wechselpräposition): accusative for movement to a place, dative for position. Here: %1$s.</string>
+    <string name="german_why_prep_fixed">Fixed with \"%1$s\": here it does not work as a two-way preposition.</string>
+    <string name="german_why_prep_contraction">Contraction of the preposition and the article \"%1$s\".</string>
+    <string name="german_why_coord">Joins words or clauses and does not change the verb position.</string>
+    <string name="german_why_subord">Starts a subordinate clause: the verb goes to the end (%1$s).</string>
+    <string name="german_why_adj_attr">Stands before \"%1$s\" and agrees with it, so it takes an ending: -%2$s (%3$s declension).</string>
+    <string name="german_why_adj_pred">Predicate adjective after \"%1$s\": it has no ending.</string>
+    <string name="german_why_adj_adv">Adjective used as an adverb with \"%1$s\": it has no ending and is not a separate adverb.</string>
+    <string name="german_why_adv_verb">Modifies the verb \"%1$s\".</string>
+    <string name="german_why_adv_sentence">Comments on the whole sentence.</string>
+    <string name="german_why_adv_front">It opens the clause, so the verb comes second and the subject follows it.</string>
+    <string name="german_why_comparable">It has comparative forms.</string>
+    <string name="german_why_not_comparable">It cannot be compared.</string>
+    <string name="german_why_degree">Degree word: it strengthens \"%1$s\".</string>
+    <string name="german_why_tentative">Not certain: the line leaves more than one reading open.</string>
+    <string name="german_tense_table_present" translatable="false">Präsens</string>
+    <string name="german_tense_table_preterite" translatable="false">Präteritum</string>
+    <string name="german_tense_table_perfect" translatable="false">Perfekt</string>
+    <string name="german_tense_table_pluperfect" translatable="false">Plusquamperfekt</string>
+</resources>
