@@ -74,6 +74,10 @@ jobs:
     if: needs.prepare.outputs.eligible == 'true' && needs.prepare.outputs.release_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # The ANDROID_RELEASE_* signing secrets live only in the `release` environment, which
+    # accepts jobs from `main` alone (owner decision 2026-11-02, done 2026-11-15). A workflow
+    # pushed on any other branch therefore can never read the production signing key.
+    environment: release
     permissions:
       contents: write
     steps:
@@ -160,6 +164,12 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$release_apk" | tee release/signing-report.txt
           if grep -q 'CN=Android Debug' release/signing-report.txt; then
             echo "Official APK was signed with the Android debug certificate" >&2
+            exit 1
+          fi
+          # The production key registered in Android Developer Console (2026-11-15). Any other
+          # key would break updates for every installed copy, so never publish with it.
+          if ! grep -qi 'Signer #1 certificate SHA-256 digest: f664085b136e1facd93fe0ab897348d3393ccc5e8ed39193fa6df38c2b2a116c' release/signing-report.txt; then
+            echo "Official APK is not signed with the registered production key" >&2
             exit 1
           fi
           badging="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$release_apk" | head -n 1)"
