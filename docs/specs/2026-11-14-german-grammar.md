@@ -441,3 +441,39 @@ a modal and infinitive across `und` (`kann kochen und will heiraten`), a verb fo
 - The size of a release (R8, signed) APK and timings on a phone.
 - Python tests: **NOT RUN, reserved for manual execution by the user** (no Python test was executed in this work; the format gate runs the project's ratchet script, which is not a test).
 - Optional AI explanations (Stage 6) were not implemented, by decision.
+
+## Phase 2: word explanations and verb conjugation (2026-11-15)
+
+**Root cause.** The word card explained a word only when a Grammar Catalogue point matched it, so an adjective, adverb, pronoun, determiner, preposition or conjunction with no matching point got nothing.
+
+**What was built.**
+- `data/GermanWordRole.kt`: `germanWordRole(sentence, start, end)` gives the word's own job in its line (adjective degree and ending, adverb kind and word order, pronoun person, number, case and referent, articles, preposition government, conjunction verb position). It is independent of the catalogue. A role is `tentative` and keeps several cases when the line leaves it open (`sie`, `ihr`, `uns`); a word with no safe reading gets no role.
+- `data/GermanConjugationTable.kt`: Präsens, Präteritum, Perfekt and Plusquamperfekt for six persons, built from stored principal parts and the lexicon's auxiliaries (haben, sein, both). A table that cannot be derived is omitted, not guessed. A participle links to its lemma, and the selected word's actual tense and row are marked.
+- UI (`ui/GermanWordRoleCard.kt`, `GermanWordForm.kt`): header, dictionary form, properties, "Grammar in this sentence", a collapsed "Conjugation" section with tense chips, then grammar points. The open state is a new persisted key (`WORD_CARD_GERMAN_CONJUGATION_OPEN_PREFERENCE`, registered in `SETTING_SPECS`). Each conjugation row is one merged accessibility node.
+- Strings: `strings_german_role.xml` in all nine locales. German terms stay German; the non-English texts are machine-drafted and not reviewed by a German teacher.
+- No new AI request; Ask AI and the other languages are untouched; FrequencyWords is unchanged.
+
+**Validation (2026-11-15).** formatCheck, complexityCheck, lintDebug, assembleDebug and assembleDebugAndroidTest pass. testDebugUnitTest: 1780 tests, 0 failures (26 new: `GermanWordRoleTest` 16, `GermanConjugationTableTest` 10). Emulator (pixel2Api36, API 36): 38 tests, 0 failures, including the 11 new `GermanRoleUiTest` tests (adjective, adverb, pronoun, no-catalogue word, ambiguous pronoun, closed-then-open conjugation with four tenses and six rows, past tabs, participle link, Light theme, translated slot, 280 dp width) and the existing German, word-learning and grammar UI classes.
+
+**Not verified or known limits.**
+- Nothing was checked on a physical phone or with a live video.
+- No UI test for "models still loading" (`GermanMorphology` is a singleton); only the existing null-safe behaviour covers it.
+- Relative-pronoun and demonstrative detection is heuristic; adverb lists are finite; the dative reflexive is not guessed; a verb with no listed auxiliary has no perfect tables.
+- The role tests were written against this phase's own examples; they are not an independent accuracy estimate.
+- Python tests: **NOT RUN, reserved for manual execution by the user.**
+
+### Phase 2 completeness audit (2026-11-15)
+
+- **Preservation.** Phase 1 is commit `e13c0254` (12 modified and 37 added files against `mydevelop`); Phase 2 adds 9 modified and 17 untracked files on top of it. Nothing was deleted and every Phase 1 file is still present.
+- **Conjugation.** `GermanConjugationCoverageTest` checks 25 verbs (sein, haben, werden, gehen, fahren, kommen, sehen, lesen, essen, nehmen, geben, wissen, sprechen, helfen, arbeiten, the six modals, aufstehen, anrufen, mitkommen, sich freuen) in Präsens, Präteritum, Perfekt and Plusquamperfekt for all six persons, against forms written from standard grammar, not from the generator. All pass. `aufstehen` also shows `habe aufgestanden`: Wiktionary lists haben for it (regional) and the data says so; it is not marked as regional.
+- **Defects found and fixed.** (1) A lexicon form alone gave an adverb or adjective a verb reading and a conjugation table (`heute` as `heuen`, `schön` as `schönen`); a word the tagger does not call a verb and that is a known adverb or adjective no longer gets one (the tagger is noisy, e.g. `lese` is tagged ADV, so the tag alone is not trusted). (2) `nicht`, `nie`, `niemals`, `nirgends` had no explanation: now an adverb of negation. (3) `zu` before an infinitive had none: now the infinitive marker; before an adjective it stays a degree word.
+- **Loading state.** `GermanLoadingStateTest` covers `BackgroundLoaded` (nothing while loading, nothing after a failure) and an empty lexicon (no verb, table or adjective explanation invented). A Compose test with the singleton still unloaded was not written; no singleton refactor was justified for it.
+- **Remaining limits.** A real verb the tagger calls an adjective with an adjective reading (e.g. `liebe`) loses its table. `ja` and `doch` are described as attitude adverbs (modal particles), not as separate particle roles. Python tests: **NOT RUN, reserved for manual execution by the user.**
+
+### Phase 2 final validation (2026-11-15, run by the owner on the final working tree)
+
+- `lintDebug assembleDebug assembleDebugAndroidTest`: BUILD SUCCESSFUL, exit code 0, 82 actionable tasks.
+- `pixel2Api36DebugAndroidTest` (API 36 managed emulator, five German and word-learning classes): BUILD SUCCESSFUL, exit code 0. The generated XML (`app/build/outputs/androidTest-results/managedDevice/debug/pixel2Api36/TEST-pixel2Api36.xml`) reports 41 tests, 0 failures, 0 errors, 0 skipped: `GermanRoleUiTest` 14, `GermanWordDialogUiTest` 8, `WordLearningDialogTest` 13, `GrammarExplanationsUiTest` 4, `GermanPosColorUiTest` 2.
+- Earlier in the same session, on the same tree: `formatCheck`, `complexityCheck` and `testDebugUnitTest` (1788 tests, 0 failures).
+- Still unverified: a physical phone and a live video; a Compose test with the analyzer still unloaded (covered at unit level by `GermanLoadingStateTest`); an independent accuracy estimate. The FrequencyWords source is unchanged and its licensing caveat (OpenSubtitles2018 states no licence; release blocker) stands.
+- Python tests: **NOT RUN, reserved for manual execution by the user.**

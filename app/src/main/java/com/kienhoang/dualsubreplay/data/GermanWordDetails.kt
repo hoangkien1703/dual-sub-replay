@@ -86,6 +86,13 @@ private fun likeliestVerb(
     sentence: GermanSentence,
     word: GermanWord,
 ): GermanVerb? {
+    // A lexicon form alone makes "heute" a past tense of "heuen" and "schön" a form of "schönen". The tagger is not trusted
+    // alone (it tags "lese" as ADV), so only a word it does not call a verb AND that is a known adverb or adjective loses the reading.
+    if (!word.isTag("VERB", "AUX") &&
+        (word.adjectives.isNotEmpty() || word.lower in ADVERB_KINDS || word.lower in DEGREE_WORDS)
+    ) {
+        return null
+    }
     val verbs = word.verbs.map { it.verb }.distinct()
     if (verbs.isEmpty()) return null
     val clause = sentence.clauseWords(word.index)
@@ -94,7 +101,7 @@ private fun likeliestVerb(
 }
 
 /** The noun phrase the word is the noun, the determiner or an adjective of. */
-private fun nounPhraseOf(
+internal fun nounPhraseOf(
     sentence: GermanSentence,
     word: GermanWord,
 ): GermanNounPhrase? {

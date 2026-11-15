@@ -55,6 +55,9 @@ internal class GermanVerb(
     /** Participle II and, for modals and verbs like lassen, the infinitive that stands for it (hat lassen). */
     val participles: List<String> = participlesGiven.ifEmpty { listOf(participle) }
 
+    /** True when the preterite is the regular -te form the rules derive (a weak verb). */
+    val hasRegularPast: Boolean get() = past3Given.isEmpty()
+
     /** Past endings are -te (weak or mixed) or without a vowel (strong). */
     private val weakType: Boolean get() = past3Given.isEmpty() || past3.endsWith("te")
 

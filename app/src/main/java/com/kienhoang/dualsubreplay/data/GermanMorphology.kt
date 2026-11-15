@@ -44,6 +44,23 @@ internal object GermanMorphology {
         end: Int,
     ): GermanWordDetails? = sentence(line)?.let { germanWordDetails(it, start, end) }
 
+    /** What the tapped word does in its sentence (pronoun, adverb, article, ...), or null while data loads or when the line does not say. */
+    fun wordRole(
+        line: String,
+        start: Int,
+        end: Int,
+    ): GermanWordRole? = sentence(line)?.let { germanWordRole(it, start, end) }
+
+    /** The conjugation tables of the tapped verb, or null while data loads or when the word is not a listed verb. */
+    fun conjugation(
+        line: String,
+        start: Int,
+        end: Int,
+    ): GermanSelectionConjugation? {
+        val lexicon = lexicon.get() ?: return null
+        return sentence(line)?.let { germanSelectionConjugation(it, lexicon, start, end) }
+    }
+
     /** The lexicon, or null while it loads. */
     fun lexicon(): GermanLexicon? = lexicon.get()
 

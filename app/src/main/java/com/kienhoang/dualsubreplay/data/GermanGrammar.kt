@@ -20,7 +20,7 @@ private class Hit(
 )
 
 /** Verbs with a fixed preposition and the case it takes: infinitive (without sich), preposition, case. */
-private val VERB_PREPOSITIONS =
+internal val VERB_PREPOSITIONS =
     listOf(
         Triple("warten", "auf", GermanCase.ACCUSATIVE),
         Triple("denken", "an", GermanCase.ACCUSATIVE),
@@ -69,7 +69,7 @@ private val VERB_PREPOSITIONS =
     )
 
 /** Adjectives with a fixed preposition and the case it takes: adjective, preposition, case. */
-private val ADJECTIVE_PREPOSITIONS =
+internal val ADJECTIVE_PREPOSITIONS =
     listOf(
         Triple("stolz", "auf", GermanCase.ACCUSATIVE),
         Triple("gespannt", "auf", GermanCase.ACCUSATIVE),
@@ -109,7 +109,7 @@ private val ADJECTIVE_PREPOSITIONS =
         Triple("höflich", "zu", GermanCase.DATIVE),
     )
 
-private val DATIVE_VERBS =
+internal val DATIVE_VERBS =
     setOf(
         "helfen",
         "danken",

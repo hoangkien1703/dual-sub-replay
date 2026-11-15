@@ -16,6 +16,7 @@ import com.kienhoang.dualsubreplay.data.GermanGender
 import com.kienhoang.dualsubreplay.data.GermanMorphology
 import com.kienhoang.dualsubreplay.data.GermanNoun
 import com.kienhoang.dualsubreplay.data.GermanTense
+import com.kienhoang.dualsubreplay.data.GermanWordDetails
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 
@@ -31,11 +32,23 @@ internal fun GermanWordForm(selection: LearningWordSelection) {
     val segment = selection.segment
     val line = (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
     val revision = tokenizerRevision()
-    val details =
-        remember(line, selection.token, revision) {
-            selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex)
-                ?.let { GermanMorphology.wordDetails(line, it.first, it.last + 1) }
-        } ?: return
+    val range =
+        remember(
+            line,
+            selection.token,
+        ) { selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex) }
+    val details = remember(line, range, revision) { range?.let { GermanMorphology.wordDetails(line, it.first, it.last + 1) } }
+    // The word's job in its sentence and the verb tables do not depend on a grammar point being found, so they stand on their own.
+    val role = remember(line, range, revision) { range?.let { GermanMorphology.wordRole(line, it.first, it.last + 1) } }
+    val conjugation = remember(line, range, revision) { range?.let { GermanMorphology.conjugation(line, it.first, it.last + 1) } }
+    if (details == null && role == null && conjugation == null) return
+    details?.let { GermanFormLines(it) }
+    role?.let { GermanRoleSection(it, selection.token.text) }
+    conjugation?.let { GermanConjugationSection(it) }
+}
+
+@Composable
+private fun GermanFormLines(details: GermanWordDetails) {
     details.verb?.let { verb ->
         Text(stringResource(R.string.german_word_lemma, verb.infinitive), modifier = Modifier.testTag("german_lemma"))
         val readings = details.cells.map { germanCellLabel(it) }
@@ -111,7 +124,7 @@ private fun featureLabel(feature: GermanFeature): String {
 }
 
 @StringRes
-private fun caseName(case: GermanCase): Int =
+internal fun caseName(case: GermanCase): Int =
     when (case) {
         GermanCase.NOMINATIVE -> R.string.german_case_nominative
         GermanCase.GENITIVE -> R.string.german_case_genitive
@@ -133,7 +146,7 @@ private fun tenseName(tense: GermanTense): Int =
     }
 
 @StringRes
-private fun genderName(gender: GermanGender): Int =
+internal fun genderName(gender: GermanGender): Int =
     when (gender) {
         GermanGender.MASCULINE -> R.string.german_word_masculine
         GermanGender.FEMININE -> R.string.german_word_feminine
