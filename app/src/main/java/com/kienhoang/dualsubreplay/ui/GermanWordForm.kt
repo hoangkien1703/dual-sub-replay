@@ -38,12 +38,11 @@ internal fun GermanWordForm(selection: LearningWordSelection) {
             selection.token,
         ) { selectionRangeIn(line, selection.token.text, selection.token.startIndex, selection.token.endIndex) }
     val details = remember(line, range, revision) { range?.let { GermanMorphology.wordDetails(line, it.first, it.last + 1) } }
-    // The word's job in its sentence and the verb tables do not depend on a grammar point being found, so they stand on their own.
-    val role = remember(line, range, revision) { range?.let { GermanMorphology.wordRole(line, it.first, it.last + 1) } }
+    // The verb tables do not depend on a grammar point being found, so they stand on their own. The word's job in its
+    // sentence ("Grammar in this sentence") is shown inside the Grammar section by GrammarExplanations.
     val conjugation = remember(line, range, revision) { range?.let { GermanMorphology.conjugation(line, it.first, it.last + 1) } }
-    if (details == null && role == null && conjugation == null) return
+    if (details == null && conjugation == null) return
     details?.let { GermanFormLines(it) }
-    role?.let { GermanRoleSection(it, selection.token.text) }
     conjugation?.let { GermanConjugationSection(it) }
 }
 

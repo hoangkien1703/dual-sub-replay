@@ -30,11 +30,19 @@ internal object GermanMorphology {
     /** Loads the tagger and the lexicon and waits, for tests. */
     fun awaitGrammarReady(timeoutMs: Long = 60_000): Boolean = tagger.awaitReady(timeoutMs) && lexicon.awaitReady(timeoutMs)
 
+    /**
+     * The last line read. One word card asks for the same line's sentence several times (grammar points, word details,
+     * role, conjugation); once the tagger and the lexicon are loaded they never change, so the line is read once.
+     */
+    @Volatile
+    private var lastSentence: GermanSentence? = null
+
     /** The words of [text] with every lexicon reading, for grammar, or null while the tagger or the lexicon loads. */
     fun sentence(text: String): GermanSentence? {
+        lastSentence?.takeIf { it.text == text }?.let { return it }
         val tagger = tagger.get() ?: return null
         val lexicon = lexicon.get() ?: return null
-        return germanSentence(tagger, lexicon, text)
+        return germanSentence(tagger, lexicon, text).also { lastSentence = it }
     }
 
     /** What to tell about the German word between [start] and [end] of [line], or null while data loads or for no listed word. */

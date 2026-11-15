@@ -110,6 +110,16 @@ class GermanRoleUiTest {
         compose.onNodeWithTag("german_role_line_0", useUnmergedTree = true).assertTextContains("whole sentence", substring = true)
     }
 
+    @Test fun theWordsRoleFollowsTheGrammarSection() {
+        // "Grammar in this sentence" sits inside Grammar: closing Grammar hides it on this and later cards, and counts it.
+        show("Leider bin ich krank.", "Leider")
+        compose.onNodeWithTag("grammar_section_header", useUnmergedTree = true).performClick()
+        assertTrue(compose.onAllNodesWithTag("german_role", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
+        assertTrue(compose.onAllNodesWithTag("grammar_section_count", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+        compose.onNodeWithTag("grammar_section_header", useUnmergedTree = true).performClick()
+        assertTrue(compose.onAllNodesWithTag("german_role", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+    }
+
     @Test fun anAmbiguousPronounSaysThatTheLineDoesNotDecide() {
         show("Wir sehen sie.", "sie")
         assertTrue(compose.onAllNodesWithTag("german_role_tentative", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
