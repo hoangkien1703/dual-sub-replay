@@ -203,7 +203,7 @@ object LanguageAwareTokenizer {
     /** Grows whenever an analyzer finishes loading, so lines split by the heuristic before are split again. */
     private fun analyzerRevision(): Int =
         JapaneseMorphology.revision.value + EnglishMorphology.revision.value + ChineseMorphology.revision.value +
-            GermanMorphology.revision.value + SpanishMorphology.revision.value
+            GermanMorphology.revision.value + GermanMorphology.lexiconRevision.value + SpanishMorphology.revision.value
 
     private fun tokenizeUncached(
         text: String,

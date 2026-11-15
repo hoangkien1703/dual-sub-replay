@@ -176,6 +176,7 @@ internal fun tokenizerRevision(): Int =
         EnglishMorphology.revision.collectAsState().value +
         ChineseMorphology.revision.collectAsState().value +
         GermanMorphology.revision.collectAsState().value +
+        GermanMorphology.lexiconRevision.collectAsState().value +
         SpanishMorphology.revision.collectAsState().value
 
 /** Rows split ahead of the playing line; about a screenful of subtitle rows. */

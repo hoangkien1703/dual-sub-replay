@@ -51,10 +51,10 @@ import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 /**
  * How each grammar meaning reads to the learner: the Japanese rule points here, the Japanese
  * catalogue in [GRAMMAR_POINT_TEXT], English and Chinese in `LearnerGrammarText.kt`, Spanish in
- * `SpanishGrammarText.kt`.
+ * `SpanishGrammarText.kt`, German in `GermanGrammarText.kt`.
  */
 internal val GRAMMAR_MEANING_TEXT: Map<GrammarMeaning, Int> by lazy {
-    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT + SPANISH_GRAMMAR_TEXT
+    GRAMMAR_RULE_TEXT + GRAMMAR_POINT_TEXT + ENGLISH_GRAMMAR_TEXT + CHINESE_GRAMMAR_TEXT + SPANISH_GRAMMAR_TEXT + GERMAN_GRAMMAR_TEXT
 }
 
 private val GRAMMAR_RULE_TEXT: Map<GrammarMeaning, Int> =
@@ -166,7 +166,7 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese, English, Chinese or Spanish selection, read from its whole subtitle line, and
+ * The grammar of a Japanese, English, Chinese, Spanish or German selection, read from its whole subtitle line, and
  * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
  * nothing for other languages.
  */
@@ -299,6 +299,14 @@ private fun GrammarPointCard(match: GrammarMatch) {
                     LevelBadge(match.level)
                 }
                 Text(text, modifier = Modifier.padding(top = 4.dp))
+            }
+            if (match.tentative) {
+                Text(
+                    stringResource(R.string.grammar_tentative),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp).testTag("grammar_tentative"),
+                )
             }
             val others = match.meanings.drop(1)
             if (others.isNotEmpty()) {

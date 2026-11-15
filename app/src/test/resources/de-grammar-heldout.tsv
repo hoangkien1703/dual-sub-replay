@@ -1,0 +1,55 @@
+# HISTORICAL (2026-11-14 hardening): this set was held out when written (precision 0.984, recall 0.940 then). The analyzer was afterwards fixed for its failures, so it is a regression set now and is NOT independent. See de-grammar-heldout-2.tsv.
+# Held-out German grammar sentences. Written AFTER the analyzer and the development corpus (de-grammar-eval.tsv) were
+# finished and annotated before they were run; the analyzer was NOT tuned on them. Same format and guideline as the
+# development corpus (evidence includes a noun phrase's determiner and adjectives). Reported, not gated: gating a held-out
+# set invites tuning on it. One author, small: an estimate of general accuracy at best, with wide uncertainty.
+Meine Schwester hat gestern einen Kuchen gebacken.	DE_PERFEKT|hat gebacken
+Sie sind gestern spät nach Hause gekommen.	DE_PERFEKT|sind gekommen;DE_PREP_DATIV|nach Hause
+Als wir ankamen, hatte der Film schon begonnen.	DE_SUB_ALS|Als ankamen;DE_PLUSQUAMPERFEKT|hatte begonnen
+Nächstes Jahr werde ich nach Spanien fliegen.	DE_FUTUR_I|werde fliegen
+Das Auto wird morgen repariert.	DE_VORGANGSPASSIV|wird repariert
+Du darfst hier nicht rauchen.	DE_MODALVERB|darfst rauchen
+Er räumt sein Zimmer auf.	DE_TRENNBARES_VERB|räumt auf
+Wann kommt der Zug an?	DE_W_FRAGE|Wann kommt;DE_TRENNBARES_VERB|kommt an
+Ich sehe fern.	DE_TRENNBARES_VERB|sehe fern
+Wir haben uns lange nicht gesehen.	DE_PERFEKT|haben gesehen
+Ich interessiere mich für Musik.	DE_REFLEXIVES_VERB|interessiere mich;DE_VERB_PREP_AKKUSATIV|interessiere für Musik
+Er fragt nach dem Weg.	DE_VERB_PREP_DATIV|fragt nach dem Weg
+Sie erinnert sich an ihre Kindheit.	DE_REFLEXIVES_VERB|erinnert sich;DE_VERB_PREP_AKKUSATIV|erinnert an ihre Kindheit
+Ich bin stolz auf meinen Sohn.	
+Die Katze sitzt auf dem Sofa.	DE_WECHSEL_DATIV|auf dem Sofa
+Wir fahren in die Berge.	DE_WECHSEL_AKKUSATIV|in die Berge
+Während des Urlaubs hat es geregnet.	DE_PREP_GENITIV|Während des Urlaubs;DE_PERFEKT|hat geregnet
+Sie wohnt außerhalb der Stadt.	DE_PREP_GENITIV|außerhalb der Stadt
+Ich gehe zu meiner Oma.	DE_PREP_DATIV|zu meiner Oma
+Das Geschenk ist für dich.	DE_PREP_AKKUSATIV|für dich
+Er antwortet seinem Lehrer.	DE_DATIV_VERB|antwortet seinem Lehrer
+Ich gebe meinem Bruder das Buch.	DE_DATIV_AKKUSATIV|gebe meinem Bruder das Buch
+Der Hund meines Nachbarn bellt laut.	DE_GENITIVATTRIBUT|Der Hund meines Nachbarn
+Wenn ich mehr Geld hätte, würde ich ein Haus kaufen.	DE_KONDITIONAL_IRREAL|Wenn hätte würde;DE_SUB_WENN|Wenn hätte;DE_KONJUNKTIV_II|hätte;DE_WUERDE_INFINITIV|würde kaufen
+Hätte ich das gewusst, wäre ich gekommen.	DE_KONJUNKTIV_II_VERGANGENHEIT|Hätte gewusst;DE_KONJUNKTIV_II_VERGANGENHEIT|wäre gekommen
+Sie sagte, er sei müde.	DE_KONJUNKTIV_I|er sei
+Er behauptet, sie habe das Geld gestohlen.	DE_KONJUNKTIV_I|sie habe;DE_PERFEKT|habe gestohlen
+Ich weiß nicht, wann der Bus kommt.	DE_INDIREKTE_FRAGE|wann kommt
+Sie fragt, ob ich Zeit habe.	DE_SUB_OB|ob habe
+Er bleibt zu Hause, weil er krank ist.	DE_SUB_WEIL|weil ist;DE_PREP_DATIV|zu Hause
+Ich hoffe, dass du bald kommst.	DE_SUB_DASS|dass kommst
+Bevor du gehst, ruf mich an.	DE_SUB_ZEIT|Bevor gehst;DE_TRENNBARES_VERB|ruf an
+Der Mann, den ich gestern gesehen habe, ist mein Lehrer.	DE_RELATIVSATZ|den gesehen habe;DE_PERFEKT|gesehen habe
+Wohin gehst du?	DE_W_FRAGE|Wohin gehst
+Kannst du mir helfen?	DE_JA_NEIN_FRAGE|Kannst;DE_MODALVERB|Kannst helfen
+Dann gehen wir nach Hause.	DE_INVERSION|Dann gehen;DE_PREP_DATIV|nach Hause
+Mach das Fenster zu!	DE_IMPERATIV|Mach;DE_TRENNBARES_VERB|Mach zu
+Sie ist älter als ihr Bruder.	DE_KOMPARATIV|älter als
+Er läuft am schnellsten.	DE_SUPERLATIV|am schnellsten
+Es gibt viele Möglichkeiten.	DE_ES_GIBT|Es gibt
+Die junge Frau trägt ein rotes Kleid.	DE_ADJEKTIV_SCHWACH|Die junge Frau;DE_ADJEKTIV_GEMISCHT|ein rotes Kleid
+Er trinkt gern frischen Orangensaft.	DE_ADJEKTIV_STARK|frischen Orangensaft
+Das Kind spielt mit dem Ball im Garten.	DE_PREP_DATIV|mit dem Ball;DE_WECHSEL_DATIV|im Garten
+Ich habe Kopfschmerzen.	
+Die Kinder sind zu Hause.	DE_PREP_DATIV|zu Hause
+Er hat keine Ahnung.	
+Wir wollen morgen früh aufstehen.	DE_MODALVERB|wollen aufstehen
+Sie lädt uns zum Essen ein.	DE_TRENNBARES_VERB|lädt ein;DE_PREP_DATIV|zum Essen
+Ich versuche, jeden Tag Deutsch zu lernen.	DE_ZU_INFINITIV|zu lernen
+Er arbeitet, um Geld zu verdienen.	DE_UM_ZU|um zu verdienen

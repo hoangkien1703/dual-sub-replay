@@ -33,6 +33,17 @@ by Wiktextract (kaikki.org), and ranked by the Spanish OpenSubtitles 2018 freque
 hermitdave/FrequencyWords (CC BY-SA 4.0). The two lists are licensed under the Creative Commons
 Attribution-ShareAlike 4.0 licence (https://creativecommons.org/licenses/by-sa/4.0/).
 
+German verb and word lists (de-verbs.txt, de-words.txt; data only, not under the Apache License):
+made from English Wiktionary entries (by the contributors named in each entry's history, CC BY-SA 4.0
+and GFDL; https://en.wiktionary.org/wiki/Wiktionary:Copyrights) as extracted by Wiktextract (MIT
+licence; kaikki.org; Tatu Ylonen, "Wiktextract: Wiktionary as Machine-Readable Structured Data",
+LREC 2022). Only inflection facts were kept, in a compact format, for the most frequent words; no
+definitions or examples. The words were ranked by the German OpenSubtitles 2018 word counts of
+hermitdave/FrequencyWords (CC BY-SA 4.0), which come from the OpenSubtitles corpus
+(http://www.opensubtitles.org/; Pierre Lison and Jörg Tiedemann, "OpenSubtitles2016", LREC 2016).
+The app contains no subtitle text. The two lists are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 licence (https://creativecommons.org/licenses/by-sa/4.0/).
+
 Kanji details on the word card use these data files (not under the Apache License):
 
 - KANJIDIC2 (database version 2026-296): Copyright James William Breen and the Electronic

@@ -168,7 +168,7 @@ class WordLearningDialogTest {
         val word = LanguageAwareTokenizer.tokenize(line, "es").first { it.text == "Dámelo" }
         val spanish = LearningWordSelection(word, "es", "en", "dQw4w9WgXcQ", SubtitleSegment(1, 1000, 3000, line, null), false)
         compose.setContent {
-            DualSubTheme { WordLearningDialog(spanish, false, { "give it to me" }, { _, _ -> }, {}, null, {}) }
+            DualSubTheme { WordLearningDialog(spanish, false, { "give it to me" }, { _, _, _ -> }, {}, null, {}) }
         }
         compose.onNodeWithTag("dictionary_form").assertTextEquals("Dictionary form: dar")
         compose.onNodeWithTag("spanish_verb_form").assertTextContains("Command · tú", substring = true)

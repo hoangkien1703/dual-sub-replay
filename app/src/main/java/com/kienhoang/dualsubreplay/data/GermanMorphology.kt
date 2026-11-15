@@ -11,9 +11,41 @@ import kotlinx.coroutines.flow.StateFlow
 internal object GermanMorphology {
     private val tagger = BackgroundLoaded("german-analyzer") { LearnerData.open("de-pos.zip").use(OpenNlpPosTagger::load) }
 
+    /** Verbs, nouns and adjectives of `de-verbs.txt` and `de-words.txt`; loaded apart from the tagger so coloring never waits for it. */
+    private val lexicon =
+        BackgroundLoaded("german-lexicon") {
+            LearnerData.open("de-verbs.txt").use { verbs -> LearnerData.open("de-words.txt").use { loadGermanLexicon(verbs, it) } }
+        }
+
     val revision: StateFlow<Int> get() = tagger.revision
 
-    fun warmUp() = tagger.warmUp()
+    /** Changes when the lexicon finishes loading, so grammar read before it loaded is read again. */
+    val lexiconRevision: StateFlow<Int> get() = lexicon.revision
+
+    fun warmUp() {
+        tagger.warmUp()
+        lexicon.warmUp()
+    }
+
+    /** Loads the tagger and the lexicon and waits, for tests. */
+    fun awaitGrammarReady(timeoutMs: Long = 60_000): Boolean = tagger.awaitReady(timeoutMs) && lexicon.awaitReady(timeoutMs)
+
+    /** The words of [text] with every lexicon reading, for grammar, or null while the tagger or the lexicon loads. */
+    fun sentence(text: String): GermanSentence? {
+        val tagger = tagger.get() ?: return null
+        val lexicon = lexicon.get() ?: return null
+        return germanSentence(tagger, lexicon, text)
+    }
+
+    /** What to tell about the German word between [start] and [end] of [line], or null while data loads or for no listed word. */
+    fun wordDetails(
+        line: String,
+        start: Int,
+        end: Int,
+    ): GermanWordDetails? = sentence(line)?.let { germanWordDetails(it, start, end) }
+
+    /** The lexicon, or null while it loads. */
+    fun lexicon(): GermanLexicon? = lexicon.get()
 
     fun awaitReady(timeoutMs: Long = 60_000): Boolean = tagger.awaitReady(timeoutMs)
 
