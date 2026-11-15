@@ -1,6 +1,7 @@
 [![Latest release](https://img.shields.io/github/v/release/hoangkien1703/dual-sub-replay?label=latest)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest)
 [![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fhoangkien1703.github.io%2Fdual-sub-replay%2Fdownloads.json)](https://github.com/hoangkien1703/dual-sub-replay/releases)
 [![Android 8+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](https://github.com/hoangkien1703/dual-sub-replay/releases/latest/download/DualSub-Replay.apk)
+[![Android developer: verified](https://img.shields.io/badge/Android_developer-verified-brightgreen)](#is-it-safe)
 [![CI](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml/badge.svg)](https://github.com/hoangkien1703/dual-sub-replay/actions/workflows/android.yml)
 [![Source: MIT](https://img.shields.io/badge/Source-MIT-26c6da.svg)](LICENSE)
 [![App distribution: GPL-3.0](https://img.shields.io/badge/App-GPL--3.0-blue.svg)](THIRD_PARTY_NOTICES.md)
@@ -30,7 +31,7 @@
 2. When the download finishes, open the file `DualSub-Replay.apk`.
 3. If your phone asks, allow your browser or file manager to **install unknown apps**, then tap **Install**.
 
-Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place.
+Android may show a warning because the app comes from GitHub instead of Google Play. This is normal for apps installed this way. Official versions update the installed app in place. Wondering whether it is safe? See [Is it safe?](#is-it-safe).
 
 **Updating:** open the menu at the top left and tap **Check for updates**. To get new versions without asking, turn on **Settings → App updates → Update automatically**.
 
@@ -170,6 +171,22 @@ The interface is available in English, Tiếng Việt, Español, Português (Bra
 **Does it work on Android TV?** Yes, in beta. Sideload the same APK (for example with the Downloader app) and the app shows on the TV home screen with a remote-friendly layout. See [Watch on Android TV](#watch-on-android-tv-beta).
 
 **Is it on Google Play?** Not yet. Install the official APK from [GitHub releases](https://github.com/hoangkien1703/dual-sub-replay/releases/latest).
+
+## Is it safe?
+
+- **Verified developer.** The developer, Kien Hoang, is verified through Google's [Android developer verification](https://developer.android.com/developer-verification): Google checked the developer's identity, and the app's package name (`com.kienhoang.dualsubreplay`) and signing key are registered to that account. This checks who publishes the app; it is not a review of the app itself.
+- **One signing key for every release.** Every official APK is built by [GitHub Actions](.github/workflows/release-on-main.yml) from the public code in this repository and signed with the same key. The release job refuses to publish an APK signed with any other key, and Android refuses to install an update signed with a different key over the app you already have. Each release also includes a `DualSub-Replay.apk.sha256` checksum.
+- **Open source, no ads, no tracking.** The source code is public here under the [MIT license](LICENSE). There is no account, and no ads, analytics or tracking SDKs. See [Privacy](#privacy) for what the app sends and where.
+
+To check that an APK is the official one, compare its signing certificate with this SHA-256 fingerprint:
+
+```text
+F6:64:08:5B:13:6E:1F:AC:D9:3F:E0:AB:89:73:48:D3:39:3C:CC:5E:8E:D3:91:93:FA:6D:F3:8C:2B:2A:11:6C
+```
+
+On a computer with the Android SDK, run `apksigner verify --print-certs DualSub-Replay.apk` and look at the `certificate SHA-256 digest` line (the same value, in lowercase without colons). On a phone, an app such as [AppVerifier](https://github.com/soupslurpr/AppVerifier) shows the fingerprint of an installed app.
+
+Some phone makers' installers show their own "unverified app" warning for any app from outside their app store. That check is separate from Google's developer verification.
 
 ## Privacy
 

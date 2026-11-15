@@ -253,6 +253,8 @@ summary {
 details p {
   color: var(--muted);
   margin: 10px 0 0;
+  /* Long words such as the signing fingerprint wrap on phones. */
+  overflow-wrap: break-word;
 }
 
 footer {
