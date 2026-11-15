@@ -1445,9 +1445,17 @@ class AppViewModel internal constructor(
         if (_state.value.browserTabs.active == null) changeTabs { it.opened(url) ?: it }
     }
 
-    fun showSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = true) }
+    /** Shows the panel again after an automatic hide (fullscreen, landscape), unless the person closed it. */
+    fun showSubtitlePanel() = _state.update { it.withPanelShown() }
 
     fun hideSubtitlePanel() = _state.update { it.copy(subtitlePanelVisible = false) }
+
+    /** The person closed the subtitles: they stay closed on later videos and across fullscreen. */
+    fun closeSubtitles() = _state.update { it.copy(subtitlesClosedByUser = true, subtitlePanelVisible = false) }
+
+    /** The person asked for the subtitles again (the bubble, a mode pick); [showPanel] is false while an overlay shows them. */
+    fun reopenSubtitles(showPanel: Boolean = true) =
+        _state.update { it.copy(subtitlesClosedByUser = false, subtitlePanelVisible = showPanel) }
 
     private fun openVideo(videoId: String) {
         if (_state.value.activeVideoId == videoId) return
@@ -1476,7 +1484,7 @@ class AppViewModel internal constructor(
                 liveOriginal = null,
                 liveTranslated = null,
                 retryingTranscript = false,
-                subtitlePanelVisible = true,
+                subtitlePanelVisible = !it.subtitlesClosedByUser,
                 availableSourceLanguages = emptyList(),
                 pickedTrack = null,
                 loadedTrackId = "",
@@ -1531,7 +1539,7 @@ class AppViewModel internal constructor(
                 noCaptions = preserveLive && it.noCaptions,
                 activeVideoId = videoId,
                 playbackPaused = if (playbackKnown) it.playbackPaused else true,
-                subtitlePanelVisible = showPanel,
+                subtitlePanelVisible = showPanel && !it.subtitlesClosedByUser,
                 availableSourceLanguages = emptyList(),
                 pickedTrack = if (it.activeVideoId == videoId) it.pickedTrack else null,
                 resolvedSourceLanguage = if (preserveLive) it.resolvedSourceLanguage else null,

@@ -31,6 +31,11 @@ data class DualSubUiState(
     val browserTabs: BrowserTabs = BrowserTabs(),
     val activeVideoId: String? = null,
     val subtitlePanelVisible: Boolean = true,
+    /**
+     * The person closed the subtitles (panel or box). They stay closed on other videos and across
+     * fullscreen until the bubble is tapped; kept in memory only, so closing the app resets it.
+     */
+    val subtitlesClosedByUser: Boolean = false,
     val sourcePreference: String = "auto",
     val targetLanguage: String = "vi",
     /** Settings → Subtitle text → Third subtitle line: one more translation under each subtitle; off by default. */
@@ -313,3 +318,6 @@ internal fun initialGuideCompleted(
     preferenceValue: Boolean,
     onboardingCompleted: Boolean,
 ): Boolean = if (preferenceExists) preferenceValue else onboardingCompleted
+
+/** A new video or an automatic restore opens the panel, but never after the person closed the subtitles. */
+internal fun DualSubUiState.withPanelShown(): DualSubUiState = if (subtitlesClosedByUser) this else copy(subtitlePanelVisible = true)
