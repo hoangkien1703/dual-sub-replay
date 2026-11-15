@@ -62,6 +62,12 @@ class FailedTestsTests(unittest.TestCase):
             "::error title=Test failed::A.b: first%0Asecond 100%25",
         )
 
+    def test_flaky_tests_are_warnings(self):
+        self.assertEqual(
+            report_failed_tests.annotation("A.b", "boom", "warning", "Passed on retry"),
+            "::warning title=Passed on retry::A.b: boom",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
