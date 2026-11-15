@@ -39,6 +39,7 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardPlace
+import com.kienhoang.dualsubreplay.data.CardSoundFirst
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
 import com.kienhoang.dualsubreplay.data.PageTokenMode
 import com.kienhoang.dualsubreplay.data.usualWordSoundPlace
@@ -180,6 +181,19 @@ internal fun FlashcardSettingsSection() {
             onChange = { preferences.edit().putString(CARD_SENTENCE_SOUND_PREFERENCE, it.storageValue).apply() },
             testTag = "card_sentence_sound",
         )
+        // The order only matters where both sounds go on a card; a Listening front starts with the line.
+        if (!listening && settings.cardWordSound != CardPlace.OFF && settings.cardSentenceSound != CardPlace.OFF) {
+            CardChoiceSettings(
+                title = stringResource(R.string.study_card_sound_first_title),
+                description = stringResource(R.string.study_card_sound_first_description),
+                selected = settings.cardSoundFirst,
+                choices = CardSoundFirst.entries,
+                label = { it.labelRes },
+                key = { it.storageValue },
+                onChange = { preferences.edit().putString(CARD_SOUND_FIRST_PREFERENCE, it.storageValue).apply() },
+                testTag = "card_sound_first",
+            )
+        }
         CardPlaceSettings(
             title = stringResource(R.string.study_card_picture_place_title),
             description = stringResource(R.string.study_card_picture_description),
@@ -200,7 +214,6 @@ internal fun FlashcardSettingsSection() {
  * Flashcards & Anki → Word sound, Sentence sound and Picture (lion737, #81, 2026-11-12): Front,
  * Back or Off, chips like Card front's.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CardPlaceSettings(
     title: String,
@@ -209,22 +222,44 @@ private fun CardPlaceSettings(
     onChange: (CardPlace) -> Unit,
     testTag: String,
     choices: List<CardPlace> = CardPlace.entries,
+) = CardChoiceSettings(title, description, place, choices, { it.labelRes }, { it.storageValue }, onChange, testTag)
+
+/** One Flashcards & Anki choice as a row of chips, each tagged [testTag]_[key]. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun <T> CardChoiceSettings(
+    title: String,
+    description: String,
+    selected: T,
+    choices: List<T>,
+    label: (T) -> Int,
+    key: (T) -> String,
+    onChange: (T) -> Unit,
+    testTag: String,
 ) {
     Column(Modifier.fillMaxWidth().settingAnchor(testTag).padding(start = 16.dp, bottom = 6.dp)) {
         Text(title, style = MaterialTheme.typography.bodyMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             choices.forEach { option ->
                 FilterChip(
-                    selected = place == option,
+                    selected = selected == option,
                     onClick = { onChange(option) },
-                    label = { Text(stringResource(option.labelRes)) },
-                    modifier = Modifier.testTag("${testTag}_${option.storageValue}"),
+                    label = { Text(stringResource(label(option))) },
+                    modifier = Modifier.testTag("${testTag}_${key(option)}"),
                 )
             }
         }
         Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
+
+/** Play first's chips name the two sounds as their own settings do. */
+internal val CardSoundFirst.labelRes: Int
+    get() =
+        when (this) {
+            CardSoundFirst.WORD -> R.string.study_card_word_sound_title
+            CardSoundFirst.SENTENCE -> R.string.study_card_sentence_sound_title
+        }
 
 internal val CardPlace.labelRes: Int
     get() =

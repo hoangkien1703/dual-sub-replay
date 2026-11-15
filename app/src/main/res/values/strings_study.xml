@@ -47,6 +47,8 @@
     <string name="study_card_place_front">Front</string>
     <string name="study_card_place_back">Back</string>
     <string name="study_card_place_off">Off</string>
+    <string name="study_card_sound_first_title">Play first</string>
+    <string name="study_card_sound_first_description">When one side of the card has both sounds, this one plays first.</string>
     <string name="study_card_place_note">What is on the front also shows on the back, because Anki shows the front above the answer.</string>
     <string name="study_card_front_title">Card front</string>
     <string name="study_card_front_word_sentence">Word and sentence</string>

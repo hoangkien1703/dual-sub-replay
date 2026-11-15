@@ -46,6 +46,8 @@
     <string name="study_card_place_front">Üz</string>
     <string name="study_card_place_back">Arxa</string>
     <string name="study_card_place_off">Yox</string>
+    <string name="study_card_sound_first_title">Əvvəl səslənən</string>
+    <string name="study_card_sound_first_description">Kartın bir üzündə hər iki səs olanda əvvəl bu səslənir.</string>
     <string name="study_card_place_note">Üzdə olan arxada da görünür, çünki Anki kartın üzünü cavabın üstündə göstərir.</string>
     <string name="study_card_front_title">Kartın üzü</string>
     <string name="study_card_front_word_sentence">Söz və cümlə</string>

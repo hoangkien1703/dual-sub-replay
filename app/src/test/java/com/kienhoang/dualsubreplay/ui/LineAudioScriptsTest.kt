@@ -36,6 +36,25 @@ class LineAudioScriptsTest {
     }
 
     @Test
+    fun theRecorderWakesWhenThePageVideoStartsPlaying() {
+        val script = webLineAudioScript(on = true, videoId = "abcdefghijk")
+        // A replay after a long pause must not wait for the app's next check (lion737, #81, 2026-11-14).
+        assertTrue("document.addEventListener('play', wake, true);" in script)
+        assertTrue("document.addEventListener('playing', wake, true);" in script)
+        assertTrue("document.removeEventListener('play', wake, true);" in script)
+        assertTrue("state.context.state !== 'running' && state.context.state !== 'closed'" in script)
+    }
+
+    @Test
+    fun theRecorderFollowsTheNewestTrackWhenTheVideoSourceChanges() {
+        val script = webLineAudioScript(on = true, videoId = "abcdefghijk")
+        // After an ad or another video in the same element, the old track only gives silence (#81, 2026-11-14).
+        assertTrue("state.stream.addEventListener('addtrack', follow);" in script)
+        assertTrue("tracks[tracks.length - 1]" in script)
+        assertTrue("else follow();" in script)
+    }
+
+    @Test
     fun anOddVideoIdTurnsTheRecorderOff() {
         assertTrue("if (!false)" in webLineAudioScript(on = true, videoId = "'); alert(1); ('"))
         assertTrue("if (!false)" in webLineAudioScript(on = false, videoId = "abcdefghijk"))

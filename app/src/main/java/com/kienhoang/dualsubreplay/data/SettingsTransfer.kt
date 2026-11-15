@@ -136,6 +136,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "anki_card_word_sound" to share(S),
         "anki_card_sentence_sound" to share(S),
         "anki_card_picture_place" to share(S),
+        "anki_card_sound_first" to share(S),
         "ankidroid_enabled" to backup(B),
         "send_to_app" to backup(S),
         "ankiconnect_deck" to backup(S),

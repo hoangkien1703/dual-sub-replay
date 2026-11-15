@@ -47,6 +47,8 @@
     <string name="study_card_place_front">Depan</string>
     <string name="study_card_place_back">Belakang</string>
     <string name="study_card_place_off">Mati</string>
+    <string name="study_card_sound_first_title">Diputar dulu</string>
+    <string name="study_card_sound_first_description">Jika satu sisi kartu punya kedua suara, suara ini diputar dulu.</string>
     <string name="study_card_place_note">Yang ada di depan juga tampil di belakang, karena Anki menampilkan sisi depan di atas jawaban.</string>
     <string name="study_card_front_title">Sisi depan kartu</string>
     <string name="study_card_front_word_sentence">Kata dan kalimat</string>

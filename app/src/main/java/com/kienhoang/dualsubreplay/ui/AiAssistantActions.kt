@@ -29,6 +29,7 @@ import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import com.kienhoang.dualsubreplay.data.savedWordId
 import com.kienhoang.dualsubreplay.data.storedCardFront
 import com.kienhoang.dualsubreplay.data.storedCardPlace
+import com.kienhoang.dualsubreplay.data.storedCardSoundFirst
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.validClipRange
 import com.kienhoang.dualsubreplay.data.withThirdLine
@@ -241,6 +242,7 @@ private fun aiStudySettingValue(
         AiSetting.CARD_WORD_SOUND -> study.cardWordSound.storageValue
         AiSetting.CARD_SENTENCE_SOUND -> study.cardSentenceSound.storageValue
         AiSetting.CARD_PICTURE -> study.cardPicture.storageValue
+        AiSetting.CARD_SOUND_FIRST -> study.cardSoundFirst.storageValue
         AiSetting.CARD_FRONT -> study.cardFront.storageValue
         AiSetting.BLUR_BOX -> onOff(study.blurBox)
         AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
@@ -702,6 +704,7 @@ internal class AppAiActions(
             AiSetting.CARD_SENTENCE_SOUND ->
                 editor.putString(CARD_SENTENCE_SOUND_PREFERENCE, storedCardPlace(value, CardPlace.BACK).storageValue)
             AiSetting.CARD_PICTURE -> editor.putString(CARD_PICTURE_PLACE_PREFERENCE, storedCardPlace(value, CardPlace.OFF).storageValue)
+            AiSetting.CARD_SOUND_FIRST -> editor.putString(CARD_SOUND_FIRST_PREFERENCE, storedCardSoundFirst(value).storageValue)
             AiSetting.CARD_FRONT -> editor.putString(CARD_FRONT_PREFERENCE, storedCardFront(value).storageValue)
             AiSetting.BLUR_BOX -> editor.putBoolean(BLUR_BOX_PREFERENCE, on)
             AiSetting.LOOP_BUTTON -> editor.putBoolean(LOOP_BUTTON_PREFERENCE, on)
@@ -904,6 +907,7 @@ internal class AppAiActions(
             AiSetting.CARD_SENTENCE_SOUND ->
                 named(R.string.study_card_sentence_sound_title, string(storedCardPlace(value, CardPlace.BACK).labelRes))
             AiSetting.CARD_PICTURE -> named(R.string.study_card_picture_place_title, string(storedCardPlace(value, CardPlace.OFF).labelRes))
+            AiSetting.CARD_SOUND_FIRST -> named(R.string.study_card_sound_first_title, string(storedCardSoundFirst(value).labelRes))
             AiSetting.CARD_FRONT -> named(R.string.study_card_front_title, string(storedCardFront(value).labelRes))
             // settingLabel and otherSettingLabel name the others.
             else -> value

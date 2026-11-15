@@ -146,6 +146,34 @@ class AnkiCardLayoutTest {
     }
 
     @Test
+    fun playFirstOrdersTheSoundsOnlyWhereASideHasBoth() {
+        // lion737, #81, 2026-11-13: the line's sound before the word's.
+        val sentenceFirst = CardSoundFirst.SENTENCE
+        val bothFront = CardOptions(CardPlace.FRONT, CardPlace.FRONT, front = CardFront.WORD, soundFirst = sentenceFirst).sides
+        val front = ankiCardTemplate(CardFront.WORD, bothFront)
+        assertTrue(front.question.endsWith("{{Sentence audio}}{{Word audio}}"))
+        assertEquals(1, Regex("\\{\\{Word audio}}").findAll(front.question + front.answer).count())
+        assertEquals("word+sound+sentencefirst", cardTemplateKey(CardFront.WORD, bothFront))
+        // Both on the back: the word's voice moves to just after the line's sound.
+        val bothBack = CardOptions(CardPlace.BACK, CardPlace.BACK, soundFirst = sentenceFirst).sides
+        val back = ankiCardTemplate(CardFront.WORD_AND_SENTENCE, bothBack)
+        assertTrue("{{Sentence audio}}{{Word audio}}" in back.answer)
+        assertEquals(fields.toSet(), shown(back.question + back.answer).toSet())
+        // Apart, a missing sound, or a Listening front: the template is the one without the pick.
+        val apart = CardOptions(CardPlace.FRONT, CardPlace.BACK, front = CardFront.WORD, soundFirst = sentenceFirst)
+        val wordFirst = apart.copy(soundFirst = CardSoundFirst.WORD)
+        assertEquals(ankiCardTemplate(CardFront.WORD, wordFirst.sides), ankiCardTemplate(CardFront.WORD, apart.sides))
+        assertEquals("word", cardTemplateKey(CardFront.WORD, apart.sides))
+        assertFalse(CardOptions(CardPlace.OFF, CardPlace.FRONT, soundFirst = sentenceFirst).sides.sentenceFirst)
+        val listening = CardOptions(CardPlace.FRONT, CardPlace.FRONT, front = CardFront.LISTENING, soundFirst = sentenceFirst).sides
+        assertEquals("listening+wordfront", cardTemplateKey(CardFront.LISTENING, listening))
+        // Word first is the default and what every card had before.
+        assertEquals(CardSoundFirst.WORD, storedCardSoundFirst(null))
+        assertEquals(CardSoundFirst.SENTENCE, storedCardSoundFirst("sentence"))
+        assertEquals(ankiCardTemplate(CardFront.WORD), ankiCardTemplate(CardFront.WORD, CardOptions(front = CardFront.WORD).sides))
+    }
+
+    @Test
     fun theWordsVoiceUsuallyGoesWithTheWord() {
         assertEquals(CardPlace.FRONT, usualWordSoundPlace(CardFront.WORD_AND_SENTENCE))
         assertEquals(CardPlace.FRONT, usualWordSoundPlace(CardFront.WORD))

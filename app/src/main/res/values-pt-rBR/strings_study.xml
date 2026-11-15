@@ -47,6 +47,8 @@
     <string name="study_card_place_front">Frente</string>
     <string name="study_card_place_back">Verso</string>
     <string name="study_card_place_off">Desligado</string>
+    <string name="study_card_sound_first_title">Tocar primeiro</string>
+    <string name="study_card_sound_first_description">Quando um lado do cartão tem os dois sons, este toca primeiro.</string>
     <string name="study_card_place_note">O que está na frente também aparece no verso, porque o Anki mostra a frente acima da resposta.</string>
     <string name="study_card_front_title">Frente do cartão</string>
     <string name="study_card_front_word_sentence">Palavra e frase</string>

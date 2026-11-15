@@ -98,6 +98,48 @@ class LineAudioWebViewTest {
     }
 
     @Test
+    fun aLineReplayedAfterALongPauseStillGivesItsClip() {
+        var web: WebView? = null
+        try {
+            // The line 4.0-6.0 s plays half way and the card is sent; the learner then stays paused
+            // for over a minute, so the recorder's audio context rests (lion737, #81, 2026-11-14)...
+            web = playingFixture(untilSecond = 5.0)
+            evaluate(web!!, "document.querySelector('video').pause()")
+            evaluate(web!!, "window.__dualSubLineAudio.rest()")
+            assertTrue("the audio context did not rest", waitForContext(web!!, "suspended"))
+            val line = audioLine("abcdefghijk", 4_000, 6_000)!!
+            // ...and the replay starts 1.75 s before the line, with no check of the app in between:
+            // the video's own play event has to wake the recorder.
+            evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 2.25; v.play(); })()")
+            assumeTrue("the fixture video did not play on", waitForVideo(web!!, 6.7))
+            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
+            assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
+            assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
+            assertTrue("the clip is silent", audible(clip))
+        } finally {
+            instrumentation.runOnMainSync { web?.destroy() }
+        }
+    }
+
+    @Test
+    fun aNewSourceInTheSameVideoElementIsStillRecorded() {
+        var web: WebView? = null
+        try {
+            // An ad ends, or another video opens, in the same video element (#81, 2026-11-14): the
+            // captured stream gains a new track and the old one only gives silence.
+            web = playingFixture(untilSecond = 1.0)
+            evaluate(web!!, "window.__newSource()")
+            assumeTrue("the new source did not start", waitForVideo(web!!, 0.3, below = 0.9))
+            playTo(web!!, 3.5)
+            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(audioLine("abcdefghijk", 2_000, 3_000)!!)))
+            assertNotNull("the new source's line has no clip; kept runs ${runs(web!!)}", clip)
+            assertTrue("the new source's clip is silent", audible(clip!!))
+        } finally {
+            instrumentation.runOnMainSync { web?.destroy() }
+        }
+    }
+
+    @Test
     fun aClipLentToAnkiDroidKeepsItsM4aName() {
         val context = instrumentation.targetContext
         val file = File(File(context.filesDir, LINE_AUDIO_DIRECTORY).apply { mkdirs() }, "abcdefghijk-1000-2000.m4a")
@@ -168,12 +210,26 @@ class LineAudioWebViewTest {
     private fun waitForVideo(
         web: WebView,
         second: Double,
+        below: Double = Double.MAX_VALUE,
     ): Boolean {
         val deadline = System.currentTimeMillis() + 20_000
         while (System.currentTimeMillis() < deadline) {
             val at = evaluate(web, "document.querySelector('video').currentTime")?.toDoubleOrNull() ?: 0.0
-            if (at >= second) return true
+            if (at >= second && at < below) return true
             Thread.sleep(200)
+        }
+        return false
+    }
+
+    private fun waitForContext(
+        web: WebView,
+        wanted: String,
+    ): Boolean {
+        val deadline = System.currentTimeMillis() + 5_000
+        while (System.currentTimeMillis() < deadline) {
+            val state = evaluate(web, "JSON.parse(window.__dualSubLineAudio.ensure('abcdefghijk')).state")
+            if (state == "\"$wanted\"") return true
+            Thread.sleep(100)
         }
         return false
     }
@@ -201,6 +257,7 @@ class LineAudioWebViewTest {
         val FIXTURE =
             """
             <html><body><div id="movie_player"><video class="html5-main-video"></video></div><script>
+            const tone = function() {
             const rate = 24000, seconds = 10, count = rate * seconds;
             const buffer = new ArrayBuffer(44 + count * 2), view = new DataView(buffer);
             const text = function(at, value) { for (let i = 0; i < value.length; i++) view.setUint8(at + i, value.charCodeAt(i)); };
@@ -209,9 +266,13 @@ class LineAudioWebViewTest {
             view.setUint32(24, rate, true); view.setUint32(28, rate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
             text(36, 'data'); view.setUint32(40, count * 2, true);
             for (let i = 0; i < count; i++) view.setInt16(44 + i * 2, Math.round(Math.sin(2 * Math.PI * 440 * i / rate) * 12000), true);
+            return URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+            };
             const video = document.querySelector('video');
-            video.src = URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+            video.src = tone();
             video.play();
+            // A new source in the same element, as when an ad ends.
+            window.__newSource = function() { video.src = tone(); video.play(); };
             </script></body></html>
             """.trimIndent()
     }

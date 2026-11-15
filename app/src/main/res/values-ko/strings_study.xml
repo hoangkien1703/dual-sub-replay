@@ -47,6 +47,8 @@
     <string name="study_card_place_front">앞면</string>
     <string name="study_card_place_back">뒷면</string>
     <string name="study_card_place_off">끄기</string>
+    <string name="study_card_sound_first_title">먼저 재생</string>
+    <string name="study_card_sound_first_description">카드 한 면에 두 소리가 모두 있으면 이 소리를 먼저 재생합니다.</string>
     <string name="study_card_place_note">Anki는 답 위에 앞면을 보여 주므로, 앞면에 있는 것은 뒷면에도 보입니다.</string>
     <string name="study_card_front_title">카드 앞면</string>
     <string name="study_card_front_word_sentence">단어와 문장</string>

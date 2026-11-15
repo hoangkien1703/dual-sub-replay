@@ -47,6 +47,8 @@
     <string name="study_card_place_front">Anverso</string>
     <string name="study_card_place_back">Reverso</string>
     <string name="study_card_place_off">No</string>
+    <string name="study_card_sound_first_title">Suena primero</string>
+    <string name="study_card_sound_first_description">Cuando un lado de la tarjeta tiene los dos sonidos, este suena primero.</string>
     <string name="study_card_place_note">Lo que está en el anverso también se ve en el reverso, porque Anki muestra el anverso encima de la respuesta.</string>
     <string name="study_card_front_title">Anverso de la tarjeta</string>
     <string name="study_card_front_word_sentence">Palabra y frase</string>

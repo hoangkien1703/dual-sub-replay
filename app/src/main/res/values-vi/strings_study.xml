@@ -47,6 +47,8 @@
     <string name="study_card_place_front">Mặt trước</string>
     <string name="study_card_place_back">Mặt sau</string>
     <string name="study_card_place_off">Tắt</string>
+    <string name="study_card_sound_first_title">Phát trước</string>
+    <string name="study_card_sound_first_description">Khi một mặt thẻ có cả hai âm thanh, âm thanh này phát trước.</string>
     <string name="study_card_place_note">Thứ ở mặt trước cũng hiện ở mặt sau, vì Anki hiện mặt trước phía trên câu trả lời.</string>
     <string name="study_card_front_title">Mặt trước thẻ</string>
     <string name="study_card_front_word_sentence">Từ và câu</string>

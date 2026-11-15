@@ -47,6 +47,8 @@
     <string name="study_card_place_front">正面</string>
     <string name="study_card_place_back">背面</string>
     <string name="study_card_place_off">关闭</string>
+    <string name="study_card_sound_first_title">先播放</string>
+    <string name="study_card_sound_first_description">卡片的一面同时有两种声音时，先播放这个。</string>
     <string name="study_card_place_note">Anki 会在答案上方显示正面，所以放在正面的内容也会显示在背面。</string>
     <string name="study_card_front_title">卡片正面</string>
     <string name="study_card_front_word_sentence">单词和句子</string>
