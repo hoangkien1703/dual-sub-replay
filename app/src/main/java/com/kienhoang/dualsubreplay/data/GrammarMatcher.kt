@@ -42,7 +42,9 @@ internal enum class CefrLevel : GrammarLevel {
 /**
  * One grammar point in a sentence: its usual written [form] (〜 or … stands for the words it joins),
  * the characters it covers, its [meanings] (the likeliest in this sentence first) and the [level]
- * it is taught at.
+ * it is taught at. [evidence] lists the words that make up a point whose parts are not next to each
+ * other (German habe … gelesen); empty means the whole of [start] until [end]. A [tentative] point
+ * rests on a heuristic, not on a reliable detection.
  */
 internal data class GrammarMatch(
     val form: String,
@@ -50,6 +52,8 @@ internal data class GrammarMatch(
     val end: Int,
     val meanings: List<GrammarMeaning>,
     val level: GrammarLevel = JlptLevel.N5,
+    val evidence: List<IntRange> = emptyList(),
+    val tentative: Boolean = false,
 )
 
 /** A rule's hit: how many morphemes from the start index it covers, and what it is. */
@@ -122,7 +126,15 @@ internal fun grammarForSelection(
     start: Int,
     end: Int,
 ): List<GrammarMatch> {
-    val inside = matches.filter { it.start < end && it.end > start }
-    val following = matches.filter { it.start == end }.take(1)
+    // A point with evidence belongs to the words it is made of, not to the words between them.
+    val inside =
+        matches.filter { match ->
+            if (match.evidence.isEmpty()) {
+                match.start < end && match.end > start
+            } else {
+                match.evidence.any { it.first < end && it.last + 1 > start }
+            }
+        }
+    val following = matches.filter { it.evidence.isEmpty() && it.start == end }.take(1)
     return (inside + following).distinctBy { it.form to it.meanings }
 }

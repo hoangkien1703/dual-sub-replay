@@ -343,7 +343,10 @@ private fun WordCardDetails(
     selection.token.baseForm
         ?.takeIf { !selection.isPhrase && it.isNotBlank() }
         ?.let { Text(stringResource(R.string.practice_dictionary_form, it), modifier = Modifier.testTag("dictionary_form")) }
-    if (!selection.isPhrase) SpanishVerbForm(selection)
+    if (!selection.isPhrase) {
+        SpanishVerbForm(selection)
+        GermanWordForm(selection)
+    }
     speechMessage?.let { Text(it) }
     onSpeechSettings?.let { open ->
         TextButton(onClick = open, modifier = Modifier.testTag("speech_settings")) {

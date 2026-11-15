@@ -42,18 +42,23 @@ internal const val WORD_CARD_HANZI_OPEN_PREFERENCE = "word_card_hanzi_open"
 /** Whether the word card's Grammar section is open; open by default. */
 internal const val WORD_CARD_GRAMMAR_OPEN_PREFERENCE = "word_card_grammar_open"
 
+/** Whether the German verb conjugation tables are open; closed by default because they are long. */
+internal const val WORD_CARD_GERMAN_CONJUGATION_OPEN_PREFERENCE = "word_card_german_conjugation_open"
+
 /** The word card's remembered open/closed sections, all reset by Reset all settings. */
 internal val WORD_CARD_SECTION_KEYS =
     listOf(
         WORD_CARD_KANJI_OPEN_PREFERENCE,
         WORD_CARD_HANZI_OPEN_PREFERENCE,
         WORD_CARD_GRAMMAR_OPEN_PREFERENCE,
+        WORD_CARD_GERMAN_CONJUGATION_OPEN_PREFERENCE,
     )
 
 internal fun wordCardSectionOpen(
     preferences: SharedPreferences,
     key: String,
-): Boolean = preferences.getBoolean(key, true)
+    defaultOpen: Boolean = true,
+): Boolean = preferences.getBoolean(key, defaultOpen)
 
 /**
  * A word card section with an arrow heading: a tap on the heading hides or shows [content], and
@@ -66,11 +71,12 @@ internal fun CollapsibleWordCardSection(
     count: Int,
     preferenceKey: String,
     testTag: String,
+    defaultOpen: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val context = LocalContext.current
     val preferences = remember(context) { studyPreferences(context) }
-    var open by remember(preferences, preferenceKey) { mutableStateOf(wordCardSectionOpen(preferences, preferenceKey)) }
+    var open by remember(preferences, preferenceKey) { mutableStateOf(wordCardSectionOpen(preferences, preferenceKey, defaultOpen)) }
     val expansionState = stringResource(if (open) R.string.settings_section_expanded else R.string.settings_section_collapsed)
     Column(Modifier.fillMaxWidth().testTag(testTag), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(

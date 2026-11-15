@@ -203,7 +203,7 @@ object LanguageAwareTokenizer {
     /** Grows whenever an analyzer finishes loading, so lines split by the heuristic before are split again. */
     private fun analyzerRevision(): Int =
         JapaneseMorphology.revision.value + EnglishMorphology.revision.value + ChineseMorphology.revision.value +
-            SpanishMorphology.revision.value
+            GermanMorphology.revision.value + GermanMorphology.lexiconRevision.value + SpanishMorphology.revision.value
 
     private fun tokenizeUncached(
         text: String,
@@ -216,6 +216,9 @@ object LanguageAwareTokenizer {
             isJapaneseOrCjk -> tokenizeCjk(text, languageCode)
             isEnglishCode(languageCode) -> EnglishMorphology.analyze(text) ?: tokenizeSpacedLanguage(text)
             isSpanishCode(languageCode) -> SpanishMorphology.analyze(text) ?: tokenizeSpacedLanguage(text)
+            isGermanCode(languageCode) ->
+                GermanMorphology.analyze(text)
+                    ?: tokenizeSpacedLanguage(text).map { it.copy(partOfSpeech = PartOfSpeech.OTHER) }
             else -> tokenizeSpacedLanguage(text)
         }
     }
@@ -240,6 +243,9 @@ object LanguageAwareTokenizer {
 
     internal fun isSpanishCode(languageCode: String?): Boolean =
         languageCode?.lowercase(Locale.ROOT)?.let { it == "es" || it.startsWith("es-") || it.startsWith("es_") } == true
+
+    internal fun isGermanCode(languageCode: String?): Boolean =
+        languageCode?.lowercase(Locale.ROOT)?.let { it == "de" || it.startsWith("de-") || it.startsWith("de_") } == true
 
     internal fun isChineseCode(languageCode: String?): Boolean =
         languageCode?.lowercase(Locale.ROOT)?.let { it == "zh" || it.startsWith("zh-") || it.startsWith("zh_") } == true

@@ -14,6 +14,9 @@ DualSub Replay includes these libraries, all under the Apache License 2.0 (full 
   data only): Copyright 2025 The
   Apache Software Foundation. This product includes software developed at The Apache Software
   Foundation (http://www.apache.org/).
+- Apache OpenNLP German part-of-speech model (UD German GSD, CC BY-SA 4.0, data only): Copyright
+  2025 The Apache Software Foundation. This product includes software developed at The Apache
+  Software Foundation (http://www.apache.org/).
 - HanLP pinyin and traditional-to-simplified tables (data only): Copyright hankcs.
 - jieba Chinese word list (data only), under the MIT License (text at the end).
 - WordNet 3.1 English word and irregular-form lists (data only, from extJWNL's packaging),
@@ -28,6 +31,17 @@ Spanish verb and word lists (es-verbs.txt, es-words.txt; data only, not under th
 made from Wiktionary entries (English Wiktionary, by its contributors, CC BY-SA 4.0) as extracted
 by Wiktextract (kaikki.org), and ranked by the Spanish OpenSubtitles 2018 frequency list of
 hermitdave/FrequencyWords (CC BY-SA 4.0). The two lists are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 licence (https://creativecommons.org/licenses/by-sa/4.0/).
+
+German verb and word lists (de-verbs.txt, de-words.txt; data only, not under the Apache License):
+made from English Wiktionary entries (by the contributors named in each entry's history, CC BY-SA 4.0
+and GFDL; https://en.wiktionary.org/wiki/Wiktionary:Copyrights) as extracted by Wiktextract (MIT
+licence; kaikki.org; Tatu Ylonen, "Wiktextract: Wiktionary as Machine-Readable Structured Data",
+LREC 2022). Only inflection facts were kept, in a compact format, for the most frequent words; no
+definitions or examples. The words were ranked by the German OpenSubtitles 2018 word counts of
+hermitdave/FrequencyWords (CC BY-SA 4.0), which come from the OpenSubtitles corpus
+(http://www.opensubtitles.org/; Pierre Lison and Jörg Tiedemann, "OpenSubtitles2016", LREC 2016).
+The app contains no subtitle text. The two lists are licensed under the Creative Commons
 Attribution-ShareAlike 4.0 licence (https://creativecommons.org/licenses/by-sa/4.0/).
 
 Kanji details on the word card use these data files (not under the Apache License):

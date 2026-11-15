@@ -7,7 +7,7 @@ import java.util.zip.ZipInputStream
 import kotlin.math.exp
 
 /**
- * Apache OpenNLP's part-of-speech models (Universal Dependencies English EWT and Spanish GSD, maxent,
+ * Apache OpenNLP's part-of-speech models (Universal Dependencies English EWT, German GSD and Spanish GSD, maxent,
  * beam 3), run without the OpenNLP library: its loader asks Android's XML parser for a feature that
  * Android rejects. The features below are the ones OpenNLP 2.5.4 uses with these models'
  * `generator.featuregen` (the same file in both), so the tags are the same. Tags are UD parts of speech (NOUN, VERB, AUX,
