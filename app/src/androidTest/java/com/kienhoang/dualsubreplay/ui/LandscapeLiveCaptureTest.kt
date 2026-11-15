@@ -143,7 +143,7 @@ class LandscapeLiveCaptureTest {
         return result.get()
     }
 
-    private class DelayedTranscript : CaptionProvider {
+    internal class DelayedTranscript : CaptionProvider {
         override suspend fun fetch(
             videoId: String,
             preferredLanguages: List<String>,
@@ -167,7 +167,7 @@ class LandscapeLiveCaptureTest {
     }
 
     companion object {
-        private val OFFLINE_PAGE =
+        internal val OFFLINE_PAGE =
             """
             <html><body>
             <div id="movie_player" class="html5-video-player ytp-autohide">
