@@ -141,7 +141,17 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertNotIn("secrets.", self.text)
 
     def test_only_checks_out_main(self):
-        checkouts = re.findall(r"uses: actions/checkout@.*\n((?:\s+.*\n)*?)\s+- ", self.text + "\n      - ")
+        # Each checkout step's lines, up to the next step.
+        checkouts, current = [], None
+        for line in self.text.splitlines():
+            if line.lstrip().startswith("- "):
+                current = None
+            if "uses: actions/checkout@" in line:
+                current = []
+                checkouts.append(current)
+            elif current is not None:
+                current.append(line.strip())
+        checkouts = ["\n".join(lines) for lines in checkouts]
         self.assertEqual(1, len(checkouts))
         self.assertIn("ref: ${{ github.event.repository.default_branch }}", checkouts[0])
         self.assertIn("persist-credentials: false", checkouts[0])
