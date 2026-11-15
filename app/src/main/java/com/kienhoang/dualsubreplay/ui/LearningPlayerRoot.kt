@@ -335,7 +335,6 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         )
     }
     var restoreTranscriptAfterAutomaticOverlay by remember { mutableStateOf(false) }
-    var fullscreenOverlayHiddenByUser by remember { mutableStateOf(false) }
     var settingsRequestId by remember { mutableLongStateOf(0L) }
     var navigationOpen by remember { mutableStateOf(false) }
 
@@ -398,13 +397,14 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
             preferences
                 .edit()
                 .putString(PLAYER_EXPERIENCE_MODE_PREFERENCE, newMode.storageValue)
+        // Picking a view is asking for the subtitles, so it also undoes an earlier close.
         if (newMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-            viewModel.hideSubtitlePanel()
+            viewModel.reopenSubtitles(showPanel = false)
         } else {
             autoOverlayLandscape = false
             editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, false)
             restoreTranscriptAfterAutomaticOverlay = false
-            viewModel.showSubtitlePanel()
+            viewModel.reopenSubtitles()
         }
         editor.apply()
     }
@@ -465,8 +465,12 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     }
 
-    LaunchedEffect(youtubeFullscreen) {
-        if (!youtubeFullscreen) fullscreenOverlayHiddenByUser = false
+    // The bubble on the video: the box comes back now, and the panel once fullscreen or landscape ends.
+    fun reopenSubtitlesFromBubble() {
+        viewModel.reopenSubtitles(showPanel = false)
+        if (mode == PlayerExperienceMode.TRANSCRIPT_PANEL && automaticPresentationOverlay) {
+            restoreTranscriptAfterAutomaticOverlay = true
+        }
     }
 
     // Opening another video normally re-opens the transcript panel. While overlay presentation is
@@ -506,9 +510,9 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val fullscreenLearningOverlay: @Composable BoxScope.() -> Unit = {
         HideFullscreenSystemBars()
         if (!youtubeDialogVisible && overlayContent != null && effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY) {
-            if (fullscreenOverlayHiddenByUser || overlayContent.isEmpty()) {
+            if (state.subtitlesClosedByUser || overlayContent.isEmpty()) {
                 MovableSubtitleFab(
-                    onClick = { fullscreenOverlayHiddenByUser = false },
+                    onClick = ::reopenSubtitlesFromBubble,
                     modifier = Modifier.fillMaxSize(),
                     autoDimAfterMillis = 1_000L,
                     isFullscreen = true,
@@ -543,7 +547,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     onPositionChangeFinished = ::commitOverlayPosition,
                     onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
                     onSettings = ::requestSubtitleSettings,
-                    onClose = { fullscreenOverlayHiddenByUser = true },
+                    onClose = viewModel::closeSubtitles,
                 )
             }
         }
@@ -585,12 +589,18 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 onNavigationVisibilityChange = { navigationOpen = it },
             )
 
-            if (
+            val videoOverlayShown =
                 !youtubeDialogVisible && !navigationOpen && state.onboardingCompleted &&
-                state.guideCompleted && state.dailyGoalPromptCompleted &&
-                state.activeVideoId != null &&
-                effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
-            ) {
+                    state.guideCompleted && state.dailyGoalPromptCompleted &&
+                    state.activeVideoId != null &&
+                    effectiveMode == PlayerExperienceMode.SCROLL_FRIENDLY_OVERLAY
+            if (videoOverlayShown && state.subtitlesClosedByUser) {
+                // Closed earlier (often in fullscreen): the box stays closed until the bubble is tapped.
+                // Fullscreen draws its own bubble above this window.
+                if (overlayContent != null && !youtubeFullscreen) {
+                    MovableSubtitleFab(onClick = ::reopenSubtitlesFromBubble, modifier = Modifier.fillMaxSize())
+                }
+            } else if (videoOverlayShown) {
                 overlayContent?.let { content ->
                     val overlayModifier =
                         if (

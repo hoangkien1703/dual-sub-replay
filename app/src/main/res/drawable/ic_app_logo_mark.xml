@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app logo's player plate with the play triangle cut out, cropped to the plate.
+  One color: tint it, and the triangle shows the color behind it, like the launcher icon.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <group
+        android:translateX="-30"
+        android:translateY="-30">
+        <path
+            android:fillColor="#0B1C20"
+            android:fillType="evenOdd"
+            android:pathData="M40,37 H68 C73.5,37 78,41.5 78,47 V61 C78,66.5 73.5,71 68,71 H40 C34.5,71 30,66.5 30,61 V47 C30,41.5 34.5,37 40,37 Z M49,46 C49,44.8 50.3,44.1 51.3,44.7 L62.5,52.7 C63.5,53.3 63.5,54.7 62.5,55.3 L51.3,63.3 C50.3,63.9 49,63.2 49,62.0 Z" />
+    </group>
+</vector>
