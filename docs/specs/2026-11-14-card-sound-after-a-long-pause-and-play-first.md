@@ -35,11 +35,11 @@ Implemented. The owner picked "Fix sound + order picker" on 2026-11-14 after rea
 - [x] The recorder listens for the page video's `play` / `playing` events and removes them when stopped (unit test `theRecorderWakesWhenThePageVideoStartsPlaying`).
 - [x] A line paused half way, left until the recorder rests, and replayed from 1.75 s before the line with no app check in between gives its clip (device test `aLineReplayedAfterALongPauseStillGivesItsClip`, PR CI).
 - [x] The recorder follows the newest audio track (unit test `theRecorderFollowsTheNewestTrackWhenTheVideoSourceChanges`).
-- [ ] A new source in the same video element is recorded with sound (device test `aNewSourceInTheSameVideoElementIsStillRecorded`).
+- [x] A new source in the same video element is recorded with sound (device test `aNewSourceInTheSameVideoElementIsStillRecorded`, PR CI).
 - [x] Play first orders the sounds only on a side with both; defaults stay byte for byte the same; the template key changes only when the order does (unit tests in `AnkiCardLayoutTest`, `AnkiConnectNotesTest`).
 - [x] Play first shows and stores its choice, and hides with one sound off or a Listening front (Compose test `playFirstShowsOnlyWhileBothSoundsGoOnCards`, PR CI).
 - [x] On an emulator with a real YouTube video (build 750, Pixel 7 API 37, AnkiDroid 2.25.3): a card sent mid-line and three cards sent after 1 min 55 s to 2 min 16 s of pause (Home and AnkiDroid in between) all got a 1.8-4.8 s clip with speech (peak about -2 dB). v1.9.1 left the same flow empty. Play first = Sentence played the sentence before the word in AnkiDroid's preview.
-- [ ] On an emulator with a real YouTube video: a card from a video that started with an ad, and from a second video, gets its sound.
+- [x] On an emulator with a real YouTube video (build 752): a card after a 15 s pre-roll ad, a card mid-line and one after the line on the next video, and a long-pause card on that video all got clips with speech (2.5-4.4 s). The recorder followed the newest track each time (old tracks gave only zeros).
 - [ ] A new card sent to AnkiDroid after a long pause plays the line's sound (owner, preview APK).
 
 ## Validation plan
@@ -67,4 +67,4 @@ As planned. `CardSoundFirst` and `CardSides.sentenceFirst` in `AnkiCardLayout.kt
 
 ## Validation result
 
-Local: `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` passed. Device tests run in PR CI; the live YouTube and phone checks are listed above.
+Local: `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest` passed. Device tests passed in PR CI. Live YouTube was checked on the owner's laptop emulator (Pixel 7 API 37, AnkiDroid 2.25.3) with builds 750 and 752; v1.9.1 left the same long-pause cards empty. Only the owner's phone check is open. Note: in this WebView only the newest `captureStream()` call on a video gets sound, so nothing else may call it; only the recorder does today.
