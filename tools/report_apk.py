@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Inspect and report on DualSub Replay APK size, structure, permissions, and forbidden components.
-Enforces size limits (hard cap 80MB, stretch target 40MB) and asserts absence of forbidden components.
+Fails above the hard size limit (--max-bytes) and on forbidden components; compares the size with the
+last published release (--baseline-bytes) and warns, without failing, when one change grows it a lot.
 """
 
 import argparse
@@ -113,6 +114,33 @@ def parse_axml_strings_and_permissions(raw_bytes: bytes):
     return package_name, version_code, version_name, permissions
 
 
+def size_growth_lines(total_bytes: int, max_bytes: int, baseline_bytes, baseline_label, warn_growth_bytes: int):
+    """The job summary's size table, and a warning when the APK grew more than warn_growth_bytes."""
+    lines = [
+        "### Release APK size",
+        "",
+        "| | Bytes | MB |",
+        "|---|---:|---:|",
+        f"| This build | {total_bytes:,} | {total_bytes / 1_000_000:.2f} |",
+    ]
+    warning = None
+    if baseline_bytes:
+        growth = total_bytes - baseline_bytes
+        lines.append(f"| {baseline_label or 'Last release'} | {baseline_bytes:,} | {baseline_bytes / 1_000_000:.2f} |")
+        lines.append(f"| Change | {growth:+,} | {growth / 1_000_000:+.2f} |")
+        if growth > warn_growth_bytes:
+            warning = (
+                f"The release APK grew by {growth:,} bytes since {baseline_label or 'the last release'} "
+                f"(warning above {warn_growth_bytes:,})."
+            )
+    lines.append(f"| Limit (fails above) | {max_bytes:,} | {max_bytes / 1_000_000:.2f} |")
+    lines.append("")
+    if warning:
+        lines.append(f"> [!WARNING]\n> {warning}")
+        lines.append("")
+    return lines, warning
+
+
 def inspect_apk(apk_path: str, max_bytes: int, stretch_bytes: int):
     if not os.path.isfile(apk_path):
         raise FileNotFoundError(f"APK not found: {apk_path}")
@@ -189,6 +217,15 @@ def main():
     parser.add_argument("--max-bytes", type=int, default=80_000_000, help="Hard size limit in bytes (default 80MB)")
     parser.add_argument("--stretch-bytes", type=int, default=40_000_000, help="Stretch target in bytes (default 40MB)")
     parser.add_argument("--output-json", help="Optional path to write JSON report")
+    parser.add_argument("--baseline-bytes", type=int, help="Size of the last published release APK, to compare with")
+    parser.add_argument("--baseline-label", help="Name of that release, such as v1.9.2")
+    parser.add_argument(
+        "--warn-growth-bytes",
+        type=int,
+        default=500_000,
+        help="Warn (never fail) when the APK grew more than this since the baseline (default 500 kB)",
+    )
+    parser.add_argument("--summary", help="Optional Markdown file to append the size table to (GITHUB_STEP_SUMMARY)")
 
     args = parser.parse_args()
     report = inspect_apk(args.apk, args.max_bytes, args.stretch_bytes)
@@ -197,9 +234,22 @@ def main():
     print("DualSub Replay APK Inspection Report")
     print("=" * 60)
     print(f"APK:                 {report['apk_path']}")
-    print(f"Total Size:          {report['total_bytes']:,} bytes ({report['total_mb']} MB)")
-    print(f"Limit (80 MB):       {'PASS' if report['below_limit'] else 'FAIL'}")
-    print(f"Stretch Target (40MB):{'PASS' if report['below_stretch_target'] else 'EXCEEDED'}")
+    print(f"Total Size:          {report['total_bytes']:,} bytes ({report['total_bytes'] / 1_000_000:.2f} MB)")
+    print(f"Limit ({args.max_bytes / 1_000_000:g} MB): {'PASS' if report['below_limit'] else 'FAIL'}")
+    print(f"Stretch ({args.stretch_bytes / 1_000_000:g} MB): {'PASS' if report['below_stretch_target'] else 'EXCEEDED'}")
+    summary_lines, growth_warning = size_growth_lines(
+        report["total_bytes"], args.max_bytes, args.baseline_bytes, args.baseline_label, args.warn_growth_bytes
+    )
+    if args.baseline_bytes:
+        report["baseline_bytes"] = args.baseline_bytes
+        report["baseline_label"] = args.baseline_label
+        report["growth_bytes"] = report["total_bytes"] - args.baseline_bytes
+        print(f"Change since {args.baseline_label or 'baseline'}: {report['growth_bytes']:+,} bytes")
+    if growth_warning:
+        print(f"::warning title=APK size::{growth_warning}")
+    if args.summary:
+        with open(args.summary, "a", encoding="utf-8") as f:
+            f.write("\n".join(summary_lines) + "\n")
     print("\nCompressed Size Breakdown:")
     print(f"  DEX:               {report['compressed_breakdown']['dex_bytes']:,} bytes")
     print(f"  Resources:         {report['compressed_breakdown']['resources_bytes']:,} bytes")

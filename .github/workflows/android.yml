@@ -100,11 +100,28 @@ jobs:
             --stacktrace
 
       - name: Verify release APK size, permissions, and forbidden components
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          # Fails above the hard limit; growth since the last release only warns
+          # (docs/specs/2026-11-15-ai-request-and-size-checks.md). Raise the limit on purpose when a feature needs it.
+          baseline=()
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" \
+            --jq '[.tag_name, (.assets[] | select(.name == "DualSub-Replay.apk") | .size | tostring)] | join(" ")' 2>/dev/null || true)
+          read -r tag size <<< "$latest" || true
+          if [[ -n "${size:-}" ]]; then
+            baseline=(--baseline-bytes "$size" --baseline-label "$tag")
+          else
+            echo "No published release APK to compare with."
+          fi
           python3 tools/report_apk.py app/build/outputs/apk/release/app-release.apk \
-            --max-bytes 80000000 \
-            --stretch-bytes 40000000 \
-            --output-json apk-size-report.json
+            --max-bytes 32000000 \
+            --stretch-bytes 28000000 \
+            --warn-growth-bytes 500000 \
+            --summary "$GITHUB_STEP_SUMMARY" \
+            --output-json apk-size-report.json \
+            "${baseline[@]}"
 
       - name: Upload size report and R8 mapping
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -119,6 +136,10 @@ jobs:
   managed-device-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
+      # Reads main's last memory report to compare with (report only).
+      actions: read
 
     steps:
       - name: Check out source
@@ -165,6 +186,33 @@ jobs:
             app/build/outputs/androidTest-results/managedDevice/ 2>/dev/null | sort -u || true)
           echo "${lines:-No PageCpuUseTest results found.}"
           { echo "### Page CPU use (ms of CPU per second)"; echo '```'; echo "${lines:-No results found.}"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report memory and storage use
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Report only, never fails (docs/specs/2026-11-15-ai-request-and-size-checks.md): compares with main's last green run.
+          baseline=()
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow android.yml --branch main --event push \
+              --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty' 2>/dev/null || true)
+            if [[ -n "$run_id" ]] && gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name memory-use --dir memory-baseline; then
+              baseline=(--baseline memory-baseline/memory-use.json --baseline-label "main")
+            fi
+          fi
+          python3 tools/report_memory.py app/build/outputs/androidTest-results/managedDevice/ \
+            --output-json memory-use.json --summary "$GITHUB_STEP_SUMMARY" "${baseline[@]}"
+
+      - name: Upload memory use
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: memory-use
+          path: memory-use.json
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: List failed device tests
         if: failure()

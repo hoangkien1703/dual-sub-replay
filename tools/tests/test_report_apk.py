@@ -29,5 +29,23 @@ class ForbiddenPermissionTests(unittest.TestCase):
         self.assertFalse(report_apk.is_forbidden_permission("android.permission.REQUEST_INSTALL_PACKAGES"))
 
 
+class SizeGrowthTests(unittest.TestCase):
+    def test_small_growth_is_only_reported(self):
+        lines, warning = report_apk.size_growth_lines(27_700_000, 32_000_000, 27_663_792, "v1.9.2", 500_000)
+        self.assertIsNone(warning)
+        self.assertIn("| v1.9.2 | 27,663,792 | 27.66 |", lines)
+        self.assertIn("| Change | +36,208 | +0.04 |", lines)
+
+    def test_large_growth_warns_without_a_baseline_label(self):
+        _, warning = report_apk.size_growth_lines(29_000_000, 32_000_000, 27_000_000, None, 500_000)
+        self.assertIn("grew by 2,000,000 bytes since the last release", warning)
+
+    def test_no_baseline_still_shows_the_build_and_its_limit(self):
+        lines, warning = report_apk.size_growth_lines(27_000_000, 32_000_000, None, None, 500_000)
+        self.assertIsNone(warning)
+        self.assertIn("| Limit (fails above) | 32,000,000 | 32.00 |", lines)
+        self.assertFalse(any(line.startswith("| Change") for line in lines))
+
+
 if __name__ == "__main__":
     unittest.main()
