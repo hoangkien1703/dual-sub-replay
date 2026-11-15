@@ -9,6 +9,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -71,8 +74,10 @@ class SubtitlesStayClosedTest {
 
             // Fullscreen shows the box; its X leaves the bubble.
             enterFullscreen(page.get())
-            compose.waitUntil(5000) { exists("learning_subtitle_overlay") }
-            compose.onNodeWithTag("learning_subtitle_overlay").performClick()
+            // The window under fullscreen keeps its own box; tap the one in fullscreen.
+            val fullscreenBox = hasTestTag("learning_subtitle_overlay") and hasAnyAncestor(isDialog())
+            compose.waitUntil(5000) { compose.onAllNodes(fullscreenBox).fetchSemanticsNodes().isNotEmpty() }
+            compose.onNode(fullscreenBox).performClick()
             compose.onNodeWithContentDescription("Hide dual subtitles").performClick()
             compose.waitUntil(5000) { model.state.value.subtitlesClosedByUser && exists("show_subtitles") }
             compose.waitForIdle()
