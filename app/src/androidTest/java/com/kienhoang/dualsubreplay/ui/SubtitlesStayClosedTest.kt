@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDialog
@@ -17,6 +18,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.lifecycle.viewModelScope
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.cancel
@@ -77,7 +79,8 @@ class SubtitlesStayClosedTest {
             // The window under fullscreen keeps its own box; tap the one in fullscreen.
             val fullscreenBox = hasTestTag("learning_subtitle_overlay") and hasAnyAncestor(isDialog())
             compose.waitUntil(5000) { compose.onAllNodes(fullscreenBox).fetchSemanticsNodes().isNotEmpty() }
-            compose.onNode(fullscreenBox).performClick()
+            // Tap the box's edge: a tap on a word opens the word card instead of the box's buttons.
+            compose.onNode(fullscreenBox).performTouchInput { click(centerLeft.copy(x = 6f)) }
             compose.onNodeWithContentDescription("Hide dual subtitles").performClick()
             compose.waitUntil(5000) { model.state.value.subtitlesClosedByUser && exists("show_subtitles") }
             compose.waitForIdle()
