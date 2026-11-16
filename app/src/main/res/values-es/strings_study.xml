@@ -135,7 +135,7 @@
     <string name="study_known_words_offer_confirm">Activar</string>
     <string name="study_known_words_offer_dismiss">Ahora no</string>
     <string name="study_send_to_app_title">Enviar palabras a</string>
-    <string name="study_ankidroid_description">Las tarjetas van a un mazo DualSub Replay. Deja AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras está en ejecución.</string>
+    <string name="study_ankidroid_description">Las tarjetas van al mazo DualSub Replay, en un submazo por idioma (o por mazo de Práctica). Deja AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras está en ejecución.</string>
     <string name="study_ankiconnect_description">Envía a AnkiConnect en este teléfono (127.0.0.1:8765), que usan la app AnkiConnect Android, Yomitan y asbplayer. Abre AnkiConnect Android una vez para que su servidor funcione. Si AnkiConnect no puede crear un tipo de nota DualSub Replay, las tarjetas usan el tipo de nota Basic de Anki.</string>
     <string name="study_ankiconnect_deck_title">Mazo de AnkiConnect</string>
     <string name="study_ankiconnect_deck_value">Mazo: %1$s</string>

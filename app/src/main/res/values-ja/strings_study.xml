@@ -123,7 +123,7 @@
     <string name="study_known_words_offer_confirm">オンにする</string>
     <string name="study_known_words_offer_dismiss">今はしない</string>
     <string name="study_send_to_app_title">単語の送信先</string>
-    <string name="study_ankidroid_description">カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
+    <string name="study_ankidroid_description">カードは DualSub Replay デッキの、言語ごと(または練習のデッキごと)のサブデッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
     <string name="study_ankiconnect_description">このスマホの AnkiConnect(127.0.0.1:8765)に送ります。AnkiConnect Android アプリ、Yomitan、asbplayer が使うアドレスです。サーバーが動くように AnkiConnect Android を一度開いてください。AnkiConnect が DualSub Replay ノートタイプを作れない場合、カードは Anki の Basic ノートタイプを使います。</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect のデッキ</string>
     <string name="study_ankiconnect_deck_value">デッキ: %1$s</string>

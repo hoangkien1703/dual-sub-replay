@@ -70,7 +70,7 @@
     <string name="study_card_sound_waits">Cümlənin səsi cümlə sona qədər oynadıqdan sonra əlavə olunur.</string>
     <string name="study_card_sound_replaying">Səsi karta əlavə olunsun deyə cümlə səssiz bir dəfə oynadılır.</string>
     <string name="study_send_to_app_title">Sözləri göndər</string>
-    <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
+    <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə, hər dil (və ya Məşq dəstəsi) üçün ayrıca alt dəstəyə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
     <string name="study_ankiconnect_description">Bu telefondakı AnkiConnect-ə (127.0.0.1:8765) göndərir, ondan AnkiConnect Android tətbiqi, Yomitan və asbplayer istifadə edir. Serverinin işləməsi üçün AnkiConnect Android-i bir dəfə açın. AnkiConnect DualSub Replay qeyd növü yarada bilmədikdə kartlar Anki-nin Basic qeyd növündən istifadə edir.</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect dəstəsi</string>
     <string name="study_ankiconnect_deck_value">Dəstə: %1$s</string>

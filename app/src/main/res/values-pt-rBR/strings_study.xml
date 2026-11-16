@@ -135,7 +135,7 @@
     <string name="study_known_words_offer_confirm">Ligar</string>
     <string name="study_known_words_offer_dismiss">Agora não</string>
     <string name="study_send_to_app_title">Enviar palavras para</string>
-    <string name="study_ankidroid_description">Os cartões vão para um baralho DualSub Replay. Deixe o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
+    <string name="study_ankidroid_description">Os cartões vão para o baralho DualSub Replay, em um sub-baralho por idioma (ou por baralho da Prática). Deixe o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
     <string name="study_ankiconnect_description">Envia para o AnkiConnect neste celular (127.0.0.1:8765), usado pelo app AnkiConnect Android, pelo Yomitan e pelo asbplayer. Abra o AnkiConnect Android uma vez para que o servidor dele funcione. Se o AnkiConnect não puder criar um tipo de nota DualSub Replay, os cartões usam o tipo de nota Basic do Anki.</string>
     <string name="study_ankiconnect_deck_title">Baralho do AnkiConnect</string>
     <string name="study_ankiconnect_deck_value">Baralho: %1$s</string>

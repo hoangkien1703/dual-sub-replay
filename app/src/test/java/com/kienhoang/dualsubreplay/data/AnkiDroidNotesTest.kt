@@ -48,6 +48,16 @@ class AnkiDroidNotesTest {
     }
 
     @Test
+    fun cardsGoToASubdeckPerLanguageOrPracticeDeck() {
+        assertEquals("DualSub Replay::Japanese", ankiDeckName(word("1")))
+        assertEquals("DualSub Replay::English", ankiDeckName(word("1").copy(wordLanguage = "en")))
+        assertEquals("DualSub Replay::Chinese", ankiDeckName(word("1").copy(wordLanguage = "zh-CN")))
+        // A word in a named Practice deck goes to a subdeck of that name, without Anki's separator.
+        assertEquals("DualSub Replay::Anime N3", ankiDeckName(word("1").copy(deck = "Anime::  N3")))
+        assertEquals("DualSub Replay::Japanese", ankiDeckName(word("1").copy(deck = " \" ")))
+    }
+
+    @Test
     fun theLinesSoundHasALabelOnlyWhenThereIsASound() {
         assertEquals(
             "<span style=\"font-size:14px;opacity:.7\">Sentence from the video</span> [sound:a.m4a]",

@@ -123,7 +123,7 @@
     <string name="study_known_words_offer_confirm">开启</string>
     <string name="study_known_words_offer_dismiss">暂不</string>
     <string name="study_send_to_app_title">单词发送到</string>
-    <string name="study_ankidroid_description">卡片会放入 DualSub Replay 牌组。请让 AnkiDroid 在后台保持打开:在许多手机上,AnkiDroid 只在运行时接收卡片。</string>
+    <string name="study_ankidroid_description">卡片会放入 DualSub Replay 牌组中按语言(或练习牌组)分开的子牌组。请让 AnkiDroid 在后台保持打开:在许多手机上,AnkiDroid 只在运行时接收卡片。</string>
     <string name="study_ankiconnect_description">发送到本机的 AnkiConnect(127.0.0.1:8765),AnkiConnect Android 应用、Yomitan 和 asbplayer 都使用这个地址。请先打开一次 AnkiConnect Android,让它的服务器运行。如果 AnkiConnect 无法创建 DualSub Replay 笔记类型,卡片会使用 Anki 的 Basic 笔记类型。</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect 牌组</string>
     <string name="study_ankiconnect_deck_value">牌组:%1$s</string>

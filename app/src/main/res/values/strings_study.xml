@@ -73,7 +73,7 @@
     <string name="study_send_to_app_title">Send words to</string>
     <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
     <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>
-    <string name="study_ankidroid_description">Cards go to a DualSub Replay deck. Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
+    <string name="study_ankidroid_description">Cards go to the DualSub Replay deck, in one subdeck per language (or per Practice deck). Keep AnkiDroid open in the background: on many phones it only accepts cards while it is running.</string>
     <string name="study_ankiconnect_description">Sends to AnkiConnect on this phone (127.0.0.1:8765), which the AnkiConnect Android app, Yomitan and asbplayer use. Open AnkiConnect Android once so its server runs. Where AnkiConnect cannot make a DualSub Replay note type, cards use Anki\'s Basic note type.</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect deck</string>
     <string name="study_ankiconnect_deck_value">Deck: %1$s</string>

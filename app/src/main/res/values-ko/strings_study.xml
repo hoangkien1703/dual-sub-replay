@@ -123,7 +123,7 @@
     <string name="study_known_words_offer_confirm">켜기</string>
     <string name="study_known_words_offer_dismiss">나중에</string>
     <string name="study_send_to_app_title">단어를 보낼 곳</string>
-    <string name="study_ankidroid_description">카드는 DualSub Replay 덱에 들어갑니다. AnkiDroid를 백그라운드에서 열어 두세요. 많은 휴대폰에서 AnkiDroid는 실행 중일 때만 카드를 받습니다.</string>
+    <string name="study_ankidroid_description">카드는 DualSub Replay 덱 안의 언어별(또는 연습 덱별) 하위 덱에 들어갑니다. AnkiDroid를 백그라운드에서 열어 두세요. 많은 휴대폰에서 AnkiDroid는 실행 중일 때만 카드를 받습니다.</string>
     <string name="study_ankiconnect_description">이 휴대폰의 AnkiConnect(127.0.0.1:8765)로 보냅니다. AnkiConnect Android 앱, Yomitan, asbplayer가 쓰는 주소입니다. 서버가 실행되도록 AnkiConnect Android를 한 번 여세요. AnkiConnect가 DualSub Replay 노트 유형을 만들 수 없으면 카드는 Anki의 Basic 노트 유형을 씁니다.</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect 덱</string>
     <string name="study_ankiconnect_deck_value">덱: %1$s</string>

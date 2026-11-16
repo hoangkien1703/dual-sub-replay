@@ -123,7 +123,7 @@
     <string name="study_known_words_offer_confirm">Bật</string>
     <string name="study_known_words_offer_dismiss">Để sau</string>
     <string name="study_send_to_app_title">Gửi từ tới</string>
-    <string name="study_ankidroid_description">Thẻ được đưa vào bộ thẻ DualSub Replay. Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
+    <string name="study_ankidroid_description">Thẻ được đưa vào bộ thẻ DualSub Replay, chia bộ con theo từng ngôn ngữ (hoặc theo bộ thẻ Luyện tập). Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
     <string name="study_ankiconnect_description">Gửi tới AnkiConnect trên điện thoại này (127.0.0.1:8765), địa chỉ mà ứng dụng AnkiConnect Android, Yomitan và asbplayer dùng. Hãy mở AnkiConnect Android một lần để máy chủ của nó chạy. Nếu AnkiConnect không tạo được kiểu ghi chú DualSub Replay, thẻ sẽ dùng kiểu ghi chú Basic của Anki.</string>
     <string name="study_ankiconnect_deck_title">Bộ thẻ AnkiConnect</string>
     <string name="study_ankiconnect_deck_value">Bộ thẻ: %1$s</string>

@@ -178,6 +178,31 @@ internal fun labeledSentenceSound(
 /** The authority of the provider that lends AnkiDroid the media files (read-only, for one copy). */
 internal fun cardAudioAuthority(context: Context): String = "${context.packageName}.cardaudio"
 
+/**
+ * The AnkiDroid deck for [word], split like Practice (owner pick 2026-11-16): a subdeck of
+ * DualSub Replay named after the word's Practice deck, else after its language in English (so the
+ * name doesn't change with the app's language). Anki reviews a parent deck with all its subdecks.
+ */
+internal fun ankiDeckName(word: SavedWord): String {
+    val sub = word.deck?.let(::ankiDeckPart) ?: ankiDeckPart(ankiLanguageName(word.wordLanguage))
+    return sub?.let { "$ANKI_DECK_NAME::$it" } ?: ANKI_DECK_NAME
+}
+
+/** [code]'s language name in English ("English", "Japanese"), or the code itself when unknown. */
+internal fun ankiLanguageName(code: String): String {
+    val name = Locale.forLanguageTag(code.trim()).getDisplayLanguage(Locale.ENGLISH)
+    return name.ifBlank { code }
+}
+
+/** [name] as one level of a deck name: Anki's "::" separator and quotes taken out; null when nothing is left. */
+private fun ankiDeckPart(name: String): String? =
+    name
+        .replace("::", " ")
+        .replace("\"", "")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .takeIf { it.isNotEmpty() }
+
 /** The words of [words] that were not sent before, by id. */
 internal fun unsentAnkiWords(
     words: List<SavedWord>,
@@ -247,11 +272,16 @@ internal class AnkiDroidNotes(
             var sent = 0
             var waiting = 0
             try {
-                val deck = deckId() ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
+                val decks = HashMap<String, Long?>()
+                val parent =
+                    decks.getOrPut(ANKI_DECK_NAME) { deckId(ANKI_DECK_NAME) }
+                        ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 val noteType =
-                    noteTypeId(deck, options.front, options.sides)
+                    noteTypeId(parent, options.front, options.sides)
                         ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 for (word in unsent) {
+                    // A subdeck per language or Practice deck, like Practice; the parent deck if AnkiDroid refuses it.
+                    val deck = decks.getOrPut(ankiDeckName(word)) { deckId(ankiDeckName(word)) } ?: parent
                     val added =
                         addNote(noteType, deck, word, media, options)
                             ?: return@withContext AnkiSendResult(sent, skipped, AnkiProblem.FAILED, waiting = waiting)
@@ -268,16 +298,17 @@ internal class AnkiDroidNotes(
             }
         }
 
-    private fun deckId(): Long? {
+    /** The id of the deck called [wanted], made (with its parent) when missing; null when AnkiDroid refused. */
+    private fun deckId(wanted: String): Long? {
         val decks = Uri.withAppendedPath(base, "decks")
         resolver.query(decks, arrayOf("deck_id", "deck_name"), null, null, null)?.use { cursor ->
             val id = cursor.getColumnIndex("deck_id")
             val name = cursor.getColumnIndex("deck_name")
             while (id >= 0 && name >= 0 && cursor.moveToNext()) {
-                if (cursor.getString(name) == ANKI_DECK_NAME) return cursor.getLong(id)
+                if (cursor.getString(name) == wanted) return cursor.getLong(id)
             }
         }
-        val created = resolver.insert(decks, ContentValues().apply { put("deck_name", ANKI_DECK_NAME) })
+        val created = runCatching { resolver.insert(decks, ContentValues().apply { put("deck_name", wanted) }) }.getOrNull()
         return created?.lastPathSegment?.toLongOrNull()
     }
 
