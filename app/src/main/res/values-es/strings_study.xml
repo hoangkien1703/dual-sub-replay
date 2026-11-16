@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Se olvidan todas las palabras que marcaste como conocidas, en todos los idiomas. Las palabras guardadas se quedan.</string>
     <string name="study_known_words_clear_confirm">Borrar</string>
     <string name="study_anki_title">Enviar a apps de tarjetas</string>
-    <string name="study_anki_description">Muestra un botón Enviar a en la tarjeta de palabra y en Práctica → Exportar. Envía a AnkiDroid salvo que elijas otra app con ▾ en el botón o aquí abajo; entonces el botón muestra esa app.</string>
+    <string name="study_anki_description">Muestra un botón Anki en la tarjeta de palabra y Enviar todo en Práctica → Exportar. Ambos envían a la app elegida aquí abajo (AnkiDroid si no la cambias).</string>
     <string name="study_card_picture_description">Las tarjetas llevan una imagen del vídeo, tomada mientras la frase de la palabra está en pantalla. Si no hay ninguna, se usa la miniatura del vídeo.</string>
     <string name="study_card_word_sound_title">Sonido de la palabra</string>
     <string name="study_card_word_sound_description">La palabra con la voz que usa la tarjeta de palabra.</string>
@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">Marcar como conocidas</string>
     <string name="study_known_word_toggle">Conozco esta palabra</string>
     <string name="study_send_to_anki">Enviar a %1$s</string>
-    <string name="study_sending_to_anki">Enviando…</string>
     <string name="study_sent_to_anki">Enviada a %1$s</string>
     <string name="study_send_again_title">¿Enviar esta tarjeta otra vez?</string>
     <string name="study_send_again_text">%1$s ya tiene una tarjeta de esta palabra. Se añade otra y puedes borrar la antigua allí.</string>
@@ -130,10 +129,6 @@
     <string name="study_known_words_off">No</string>
     <string name="study_known_words_after_title">Contar como conocida después de verla</string>
     <string name="study_word_seen">Vista %1$d de %2$d veces</string>
-    <string name="study_known_words_offer_title">¿Activar Palabras conocidas?</string>
-    <string name="study_known_words_offer_message">El panel de subtítulos mostrará cuánto de cada video ya conoces, y las palabras que ves a menudo contarán como conocidas por sí solas. Puedes cambiarlo luego en Ajustes → Aprendizaje de palabras.</string>
-    <string name="study_known_words_offer_confirm">Activar</string>
-    <string name="study_known_words_offer_dismiss">Ahora no</string>
     <string name="study_send_to_app_title">Enviar palabras a</string>
     <string name="study_ankidroid_description">Las tarjetas van al mazo DualSub Replay, en un submazo por idioma (o por mazo de Práctica). Deja AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras está en ejecución.</string>
     <string name="study_ankiconnect_description">Envía a AnkiConnect en este teléfono (127.0.0.1:8765), que usan la app AnkiConnect Android, Yomitan y asbplayer. Abre AnkiConnect Android una vez para que su servidor funcione. Si AnkiConnect no puede crear un tipo de nota DualSub Replay, las tarjetas usan el tipo de nota Basic de Anki.</string>
@@ -157,4 +152,8 @@
     <string name="dictation_perfect">¡Perfecto!</string>
     <string name="dictation_score">%1$d de %2$d bien</string>
     <string name="dictation_hidden_line">Línea oculta</string>
+    <string name="study_saved_word_video_example_title">Ejemplo en video para palabras guardadas</string>
+    <string name="study_saved_word_video_example_description">Las palabras que guardas pueden volver a reproducir su línea del video en Práctica. Puedes cambiarlo para cada palabra allí.</string>
+    <string name="study_send_on_save_title">Enviar también las palabras guardadas</string>
+    <string name="study_send_on_save_description">Guardar en Práctica en la tarjeta de palabra también envía la palabra a %1$s.</string>
 </resources>

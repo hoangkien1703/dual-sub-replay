@@ -121,7 +121,6 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "word_card_german_conjugation_open" to share(B),
         "known_words_mode" to share(S),
         "known_words_after" to share(I),
-        "known_words_offered" to backup(B),
         "mark_new_words" to share(B),
         // Study tools and flashcards; which flashcard app and deck depends on this phone's apps.
         "study_play_mode" to share(S),
@@ -144,6 +143,8 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "anki_card_read_translation" to share(B),
         "ankidroid_enabled" to backup(B),
         "send_to_app" to backup(S),
+        "send_saved_words" to backup(B),
+        "saved_word_video_example" to share(B),
         "ankiconnect_deck" to backup(S),
         // Ads and sponsors.
         "skip_ads" to share(B),

@@ -133,12 +133,19 @@ internal fun KnownWordsAndCharacterSettings() {
     )
 }
 
-/** Settings → Flashcards & Anki: Send to and card audio (owner pick 2026-11-09). */
+/** Settings → Flashcards & Anki: the saved words' video example, Send to and card audio (owner pick 2026-11-09). */
 @Composable
 internal fun FlashcardSettingsSection() {
     val context = LocalContext.current
     val preferences = remember(context) { studyPreferences(context) }
     val settings by rememberStudySettings()
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_saved_word_video_example_title),
+        description = stringResource(R.string.study_saved_word_video_example_description),
+        checked = settings.savedWordVideoExample,
+        onCheckedChange = { preferences.edit().putBoolean(SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE, it).apply() },
+        testTag = "saved_word_video_example_switch",
+    )
     SettingsSwitchRow(
         title = stringResource(R.string.study_anki_title),
         description = stringResource(R.string.study_anki_description),
@@ -155,6 +162,13 @@ internal fun FlashcardSettingsSection() {
                 if (deck == null) editor.remove(ANKICONNECT_DECK_PREFERENCE) else editor.putString(ANKICONNECT_DECK_PREFERENCE, deck)
                 editor.apply()
             },
+        )
+        SettingsSwitchRow(
+            title = stringResource(R.string.study_send_on_save_title),
+            description = stringResource(R.string.study_send_on_save_description, stringResource(settings.sendTo.nameRes)),
+            checked = settings.sendOnSave,
+            onCheckedChange = { preferences.edit().putBoolean(SEND_ON_SAVE_PREFERENCE, it).apply() },
+            testTag = "send_on_save_switch",
         )
         CardFrontSettings(
             front = settings.cardFront,

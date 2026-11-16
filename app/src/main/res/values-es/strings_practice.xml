@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">Copia de seguridad completa (JSON)</string>
     <string name="practice_export_anki_text">Texto de Anki (TSV)</string>
     <string name="practice_word_translation_unavailable">Traducción no disponible. Puedes escribir un significado y guardar la palabra.</string>
-    <string name="practice_example_plays_original">El ejemplo reproduce la oración original, no la palabra traducida.</string>
     <string name="practice_save_failed">No se pudo guardar. Revisa el almacenamiento disponible e inténtalo de nuevo.</string>
-    <string name="practice_saved_to_vocabulary">Guardada en tu vocabulario</string>
     <string name="practice_phrase">Frase</string>
     <string name="practice_saving">Guardando…</string>
-    <string name="practice_saved">Guardada</string>
-    <string name="practice_save_to_vocabulary">Guardar en vocabulario</string>
     <string name="practice_word_by_word">Palabra por palabra</string>
     <string name="practice_dictionary_form">Forma de diccionario: %1$s</string>
     <string name="practice_word_level_description">Nivel de la palabra: MCER %1$s</string>
@@ -181,4 +177,14 @@
     <string name="practice_from_video">De: %1$s</string>
     <string name="practice_notes_label">Notas</string>
     <string name="practice_save_notes">Guardar notas</string>
+    <string name="word_card_save_to_practice">Guardar en Práctica</string>
+    <string name="word_card_in_practice">En Práctica</string>
+    <string name="word_card_saved_note">Guardada. La encontrarás cuando quieras en la pestaña Práctica.</string>
+    <string name="word_card_saved_and_sent">Guardada en Práctica y enviada a %1$s.</string>
+    <string name="word_card_ask_ai">Preguntar a la IA</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">Enviada</string>
+    <string name="word_card_more">Más</string>
+    <string name="word_card_more_description">Más para esta palabra</string>
+    <string name="word_card_settings">Ajustes de la tarjeta de palabra</string>
 </resources>

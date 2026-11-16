@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">すべての言語で、既知として印を付けた単語がすべて消去されます。保存した単語は残ります。</string>
     <string name="study_known_words_clear_confirm">消去</string>
     <string name="study_anki_title">単語カードアプリに送る</string>
-    <string name="study_anki_description">単語カードと「練習」→「エクスポート」に「送る」ボタンを表示します。ボタンの ▾ または下の設定で別のアプリを選ばない限り AnkiDroid に送ります。選んだアプリはボタンに表示されます。</string>
+    <string name="study_anki_description">単語カードに Anki ボタン、「練習」→「エクスポート」に「すべて送る」を表示します。どちらも下で選んだアプリに送ります(変更しなければ AnkiDroid)。</string>
     <string name="study_card_picture_description">単語のセリフが画面に出ている間に動画から撮った画像をカードに付けます。画像がないときは動画のサムネイルを使います。</string>
     <string name="study_card_word_sound_title">単語の音声</string>
     <string name="study_card_word_sound_description">単語カードと同じ声で読む単語。</string>
@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">既知にする</string>
     <string name="study_known_word_toggle">この単語を知っている</string>
     <string name="study_send_to_anki">%1$s に送る</string>
-    <string name="study_sending_to_anki">送信中…</string>
     <string name="study_sent_to_anki">%1$s に送りました</string>
     <string name="study_send_again_title">このカードをもう一度送りますか？</string>
     <string name="study_send_again_text">%1$s にはこの単語のカードがすでにあります。もう 1 枚追加されるので、古いカードはそちらで削除できます。</string>
@@ -118,10 +117,6 @@
     <string name="study_known_words_off">オフ</string>
     <string name="study_known_words_after_title">既知とするまでに見る回数</string>
     <string name="study_word_seen">%2$d回中%1$d回見ました</string>
-    <string name="study_known_words_offer_title">既知の単語をオンにしますか？</string>
-    <string name="study_known_words_offer_message">字幕パネルに各動画のうち既に知っている割合が表示され、よく見る単語は自動で既知として数えられます。あとで設定 → 単語学習で変更できます。</string>
-    <string name="study_known_words_offer_confirm">オンにする</string>
-    <string name="study_known_words_offer_dismiss">今はしない</string>
     <string name="study_send_to_app_title">単語の送信先</string>
     <string name="study_ankidroid_description">カードは DualSub Replay デッキの、言語ごと(または練習のデッキごと)のサブデッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
     <string name="study_ankiconnect_description">このスマホの AnkiConnect(127.0.0.1:8765)に送ります。AnkiConnect Android アプリ、Yomitan、asbplayer が使うアドレスです。サーバーが動くように AnkiConnect Android を一度開いてください。AnkiConnect が DualSub Replay ノートタイプを作れない場合、カードは Anki の Basic ノートタイプを使います。</string>
@@ -145,4 +140,8 @@
     <string name="dictation_perfect">完璧！</string>
     <string name="dictation_score">%2$d 個中 %1$d 個正解</string>
     <string name="dictation_hidden_line">非表示の行</string>
+    <string name="study_saved_word_video_example_title">保存した単語の動画例</string>
+    <string name="study_saved_word_video_example_description">保存した単語は、練習で動画のその行をもう一度再生できます。単語ごとに練習で変えられます。</string>
+    <string name="study_send_on_save_title">保存した単語も送る</string>
+    <string name="study_send_on_save_description">単語カードの「練習に保存」で、単語を %1$s にも送ります。</string>
 </resources>

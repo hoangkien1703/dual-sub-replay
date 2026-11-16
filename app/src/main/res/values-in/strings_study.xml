@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Semua kata yang Anda tandai sebagai dikenal, di semua bahasa, akan dilupakan. Kata yang disimpan tetap ada.</string>
     <string name="study_known_words_clear_confirm">Hapus</string>
     <string name="study_anki_title">Kirim ke aplikasi kartu hafalan</string>
-    <string name="study_anki_description">Menampilkan tombol Kirim ke di kartu kata dan di Latihan → Ekspor. Tombol ini mengirim ke AnkiDroid kecuali Anda memilih aplikasi lain dengan ▾ di tombol atau di bawah; tombol lalu menampilkan aplikasi itu.</string>
+    <string name="study_anki_description">Menampilkan tombol Anki di kartu kata dan Kirim semua di Latihan → Ekspor. Keduanya mengirim ke aplikasi yang dipilih di bawah (AnkiDroid kecuali Anda menggantinya).</string>
     <string name="study_card_picture_description">Kartu mendapat gambar dari video, diambil saat kalimat kata itu tampil di layar. Jika tidak ada, gambar mini video yang dipakai.</string>
     <string name="study_card_word_sound_title">Suara kata</string>
     <string name="study_card_word_sound_description">Kata dengan suara yang dipakai kartu kata.</string>
@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">Tandai sebagai dikenal</string>
     <string name="study_known_word_toggle">Saya tahu kata ini</string>
     <string name="study_send_to_anki">Kirim ke %1$s</string>
-    <string name="study_sending_to_anki">Mengirim…</string>
     <string name="study_sent_to_anki">Terkirim ke %1$s</string>
     <string name="study_send_again_title">Kirim kartu ini lagi?</string>
     <string name="study_send_again_text">%1$s sudah punya kartu untuk kata ini. Satu kartu lagi ditambahkan, dan Anda bisa menghapus yang lama di sana.</string>
@@ -118,10 +117,6 @@
     <string name="study_known_words_off">Mati</string>
     <string name="study_known_words_after_title">Hitung sebagai dikenal setelah dilihat</string>
     <string name="study_word_seen">Dilihat %1$d dari %2$d kali</string>
-    <string name="study_known_words_offer_title">Nyalakan Kata yang dikenal?</string>
-    <string name="study_known_words_offer_message">Panel subtitle lalu menunjukkan seberapa banyak isi tiap video yang sudah kamu kenal, dan kata yang sering kamu lihat otomatis dihitung sebagai dikenal. Kamu bisa mengubahnya nanti di Setelan → Belajar kata.</string>
-    <string name="study_known_words_offer_confirm">Nyalakan</string>
-    <string name="study_known_words_offer_dismiss">Nanti saja</string>
     <string name="study_send_to_app_title">Kirim kata ke</string>
     <string name="study_ankidroid_description">Kartu masuk ke dek DualSub Replay, dalam subdek per bahasa (atau per dek Latihan). Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
     <string name="study_ankiconnect_description">Mengirim ke AnkiConnect di ponsel ini (127.0.0.1:8765), yang dipakai aplikasi AnkiConnect Android, Yomitan, dan asbplayer. Buka AnkiConnect Android sekali agar servernya berjalan. Jika AnkiConnect tidak bisa membuat jenis catatan DualSub Replay, kartu memakai jenis catatan Basic dari Anki.</string>
@@ -145,4 +140,8 @@
     <string name="dictation_perfect">Sempurna!</string>
     <string name="dictation_score">%1$d dari %2$d benar</string>
     <string name="dictation_hidden_line">Baris tersembunyi</string>
+    <string name="study_saved_word_video_example_title">Contoh video untuk kata tersimpan</string>
+    <string name="study_saved_word_video_example_description">Kata yang Anda simpan bisa memutar ulang barisnya dari video di Latihan. Anda bisa mengubahnya untuk tiap kata di sana.</string>
+    <string name="study_send_on_save_title">Kirim juga kata yang disimpan</string>
+    <string name="study_send_on_save_description">Simpan ke Latihan di kartu kata juga mengirim kata ke %1$s.</string>
 </resources>

@@ -143,6 +143,10 @@ internal enum class AiSetting(
     MARK_NEW_WORDS("mark_new_words"),
     SEND_TO_ANKIDROID("send_to_ankidroid"),
     SEND_TO_APP("send_to_app", AI_SEND_TO_APPS),
+
+    /** Flashcards & Anki → Also send saved words and Video example for saved words (2026-11-17). */
+    SEND_SAVED_WORDS("send_saved_words"),
+    SAVED_WORD_VIDEO_EXAMPLE("saved_word_video_example"),
     CARD_FRONT("anki_card_front", AI_CARD_FRONTS),
     CARD_WORD_SOUND("anki_card_word_sound", AI_CARD_PLACES),
     CARD_SENTENCE_SOUND("anki_card_sentence_sound", AI_CARD_PLACES),

@@ -271,6 +271,17 @@ private fun aiStudySettingValue(
         AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
         AiSetting.KANJI_DETAILS -> onOff(study.kanjiDetails)
         AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
+        else -> aiFlashcardSwitchValue(study, setting)
+    }
+
+/** Flashcards & Anki → Also send saved words and Video example for saved words (2026-11-17). */
+private fun aiFlashcardSwitchValue(
+    study: StudySettings,
+    setting: AiSetting,
+): String? =
+    when (setting) {
+        AiSetting.SEND_SAVED_WORDS -> onOff(study.sendOnSave)
+        AiSetting.SAVED_WORD_VIDEO_EXAMPLE -> onOff(study.savedWordVideoExample)
         else -> null
     }
 
@@ -737,6 +748,20 @@ internal class AppAiActions(
                         PAGE_TOKEN_CAPTIONS_PREFERENCE,
                         storedPageTokenMode(value).storageValue,
                     ).remove(PAGE_TOKEN_NEEDED_PREFERENCE)
+            else -> return putFlashcardSwitch(editor, setting, on)
+        }
+        return true
+    }
+
+    /** Writes Also send saved words or Video example for saved words; false when [setting] is neither. */
+    private fun putFlashcardSwitch(
+        editor: SharedPreferences.Editor,
+        setting: AiSetting,
+        on: Boolean,
+    ): Boolean {
+        when (setting) {
+            AiSetting.SEND_SAVED_WORDS -> editor.putBoolean(SEND_ON_SAVE_PREFERENCE, on)
+            AiSetting.SAVED_WORD_VIDEO_EXAMPLE -> editor.putBoolean(SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE, on)
             else -> return false
         }
         return true
@@ -922,6 +947,8 @@ internal class AppAiActions(
         when (setting) {
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
+            AiSetting.SEND_SAVED_WORDS -> switch(R.string.study_send_on_save_title, value)
+            AiSetting.SAVED_WORD_VIDEO_EXAMPLE -> switch(R.string.study_saved_word_video_example_title, value)
             AiSetting.CARD_WORD_SOUND ->
                 named(
                     R.string.study_card_word_sound_title,

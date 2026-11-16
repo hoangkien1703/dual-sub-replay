@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">Full backup (JSON)</string>
     <string name="practice_export_anki_text">Anki text (TSV)</string>
     <string name="practice_word_translation_unavailable">Translation unavailable. You can enter a meaning and save the word.</string>
-    <string name="practice_example_plays_original">The example plays the original sentence, not the translated word.</string>
     <string name="practice_save_failed">Could not save. Check your available storage and try again.</string>
-    <string name="practice_saved_to_vocabulary">Saved to your vocabulary</string>
     <string name="practice_phrase">Phrase</string>
     <string name="practice_saving">Saving…</string>
-    <string name="practice_saved">Saved</string>
-    <string name="practice_save_to_vocabulary">Save to vocabulary</string>
     <string name="practice_word_by_word">Word by word</string>
     <string name="practice_dictionary_form">Dictionary form: %1$s</string>
     <string name="practice_word_level_description">Word level: CEFR %1$s</string>
@@ -171,4 +167,14 @@
     <string name="practice_from_video">From: %1$s</string>
     <string name="practice_notes_label">Notes</string>
     <string name="practice_save_notes">Save notes</string>
+    <string name="word_card_save_to_practice">Save to Practice</string>
+    <string name="word_card_in_practice">In Practice</string>
+    <string name="word_card_saved_note">Saved. Find it any time in the Practice tab.</string>
+    <string name="word_card_saved_and_sent">Saved to Practice and sent to %1$s.</string>
+    <string name="word_card_ask_ai">Ask AI</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">Sent</string>
+    <string name="word_card_more">More</string>
+    <string name="word_card_more_description">More for this word</string>
+    <string name="word_card_settings">Word card settings</string>
 </resources>

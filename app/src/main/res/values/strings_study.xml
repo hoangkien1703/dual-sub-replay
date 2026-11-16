@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Every word you marked as known, in every language, is forgotten. Saved words stay.</string>
     <string name="study_known_words_clear_confirm">Clear</string>
     <string name="study_anki_title">Send to flashcard apps</string>
-    <string name="study_anki_description">Shows a Send to button on the word card and in Practice → Export. It sends to AnkiDroid unless you pick another app with ▾ on the button or below; the button then shows that app.</string>
+    <string name="study_anki_description">Shows an Anki button on the word card and Send all in Practice → Export. Both send to the app picked below (AnkiDroid unless you change it).</string>
     <string name="study_card_picture_description">Cards get a picture from the video, taken while the word\'s line is on screen. When there is none, the video\'s thumbnail is used.</string>
     <string name="study_card_word_sound_title">Word sound</string>
     <string name="study_card_word_sound_description">The word in the voice the word card uses.</string>
@@ -92,7 +92,6 @@
     <string name="study_known_word_toggle">I know this word</string>
     <string name="study_send_to_anki">Send to %1$s</string>
     <string name="study_send_to_choose">Choose where to send</string>
-    <string name="study_sending_to_anki">Sending…</string>
     <string name="study_sent_to_anki">Sent to %1$s</string>
     <string name="study_send_again_title">Send this card again?</string>
     <string name="study_send_again_text">%1$s already has a card for this word. Another one is added, and you can delete the old one there.</string>
@@ -139,10 +138,6 @@
     <string name="study_known_words_off">Off</string>
     <string name="study_known_words_after_title">Count a word as known after seeing it</string>
     <string name="study_word_seen">Seen %1$d of %2$d times</string>
-    <string name="study_known_words_offer_title">Turn on Known words?</string>
-    <string name="study_known_words_offer_message">The subtitle panel then shows how much of each video you already know, and words you see often count as known by themselves. You can change this later in Settings → Word learning.</string>
-    <string name="study_known_words_offer_confirm">Turn on</string>
-    <string name="study_known_words_offer_dismiss">Not now</string>
     <string name="study_loop_button_title">Loop button on the playing line</string>
     <string name="study_loop_button_description">Shows a small loop icon on the line that is playing in the transcript. Tap it to repeat that line until you tap it again. Tapping another line or moving the video loops that line instead.</string>
     <string name="dictation_type_what_you_heard">Type what you heard</string>
@@ -153,4 +148,8 @@
     <string name="dictation_perfect">Perfect!</string>
     <string name="dictation_score">%1$d of %2$d right</string>
     <string name="dictation_hidden_line">Hidden line</string>
+    <string name="study_saved_word_video_example_title">Video example for saved words</string>
+    <string name="study_saved_word_video_example_description">Words you save can replay their line from the video in Practice. You can change it for each word there.</string>
+    <string name="study_send_on_save_title">Also send saved words</string>
+    <string name="study_send_on_save_description">Save to Practice on the word card also sends the word to %1$s.</string>
 </resources>

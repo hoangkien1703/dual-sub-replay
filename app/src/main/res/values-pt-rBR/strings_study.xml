@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Todas as palavras que você marcou como conhecidas, em todos os idiomas, são esquecidas. As palavras salvas ficam.</string>
     <string name="study_known_words_clear_confirm">Limpar</string>
     <string name="study_anki_title">Enviar para apps de flashcards</string>
-    <string name="study_anki_description">Mostra um botão Enviar para no cartão da palavra e em Prática → Exportar. Ele envia para o AnkiDroid, a menos que você escolha outro app com ▾ no botão ou aqui embaixo; então o botão mostra esse app.</string>
+    <string name="study_anki_description">Mostra um botão Anki no cartão da palavra e Enviar tudo em Prática → Exportar. Os dois enviam para o app escolhido aqui embaixo (AnkiDroid, a menos que você mude).</string>
     <string name="study_card_picture_description">Os cartões recebem uma imagem do vídeo, tirada enquanto a frase da palavra está na tela. Se não houver nenhuma, é usada a miniatura do vídeo.</string>
     <string name="study_card_word_sound_title">Som da palavra</string>
     <string name="study_card_word_sound_description">A palavra na voz que o cartão de palavra usa.</string>
@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">Marcar como conhecidas</string>
     <string name="study_known_word_toggle">Conheço esta palavra</string>
     <string name="study_send_to_anki">Enviar para o %1$s</string>
-    <string name="study_sending_to_anki">Enviando…</string>
     <string name="study_sent_to_anki">Enviado para o %1$s</string>
     <string name="study_send_again_title">Enviar este cartão de novo?</string>
     <string name="study_send_again_text">O %1$s já tem um cartão desta palavra. Outro é adicionado, e você pode apagar o antigo lá.</string>
@@ -130,10 +129,6 @@
     <string name="study_known_words_off">Desligado</string>
     <string name="study_known_words_after_title">Contar como conhecida depois de vê-la</string>
     <string name="study_word_seen">Vista %1$d de %2$d vezes</string>
-    <string name="study_known_words_offer_title">Ligar Palavras conhecidas?</string>
-    <string name="study_known_words_offer_message">O painel de legendas passa a mostrar quanto de cada vídeo você já conhece, e as palavras que você vê com frequência contam como conhecidas sozinhas. Você pode mudar isso depois em Configurações → Aprendizado de palavras.</string>
-    <string name="study_known_words_offer_confirm">Ligar</string>
-    <string name="study_known_words_offer_dismiss">Agora não</string>
     <string name="study_send_to_app_title">Enviar palavras para</string>
     <string name="study_ankidroid_description">Os cartões vão para o baralho DualSub Replay, em um sub-baralho por idioma (ou por baralho da Prática). Deixe o AnkiDroid aberto em segundo plano: em muitos celulares ele só aceita cartões enquanto está em execução.</string>
     <string name="study_ankiconnect_description">Envia para o AnkiConnect neste celular (127.0.0.1:8765), usado pelo app AnkiConnect Android, pelo Yomitan e pelo asbplayer. Abra o AnkiConnect Android uma vez para que o servidor dele funcione. Se o AnkiConnect não puder criar um tipo de nota DualSub Replay, os cartões usam o tipo de nota Basic do Anki.</string>
@@ -157,4 +152,8 @@
     <string name="dictation_perfect">Perfeito!</string>
     <string name="dictation_score">%1$d de %2$d certas</string>
     <string name="dictation_hidden_line">Linha escondida</string>
+    <string name="study_saved_word_video_example_title">Exemplo em vídeo para palavras salvas</string>
+    <string name="study_saved_word_video_example_description">As palavras que você salva podem tocar de novo a linha do vídeo em Praticar. Você pode mudar isso para cada palavra lá.</string>
+    <string name="study_send_on_save_title">Enviar também as palavras salvas</string>
+    <string name="study_send_on_save_description">Salvar em Praticar no cartão de palavra também envia a palavra para o %1$s.</string>
 </resources>

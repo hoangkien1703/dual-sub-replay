@@ -326,9 +326,8 @@ class StudyPlaybackTest {
         assertTrue(defaults.copy(knownWordsMode = KnownWordsMode.AUTO).knownWords)
         assertEquals(KnownWordsMode.MANUAL, storedKnownWordsMode("manual"))
         assertEquals(KnownWordsMode.OFF, storedKnownWordsMode(null))
-        assertTrue(shouldOfferKnownWords(defaults, offeredBefore = false))
-        assertFalse("Offered once", shouldOfferKnownWords(defaults, offeredBefore = true))
-        assertFalse(shouldOfferKnownWords(defaults.copy(knownWordsMode = KnownWordsMode.MANUAL), offeredBefore = false))
+        assertFalse("Save to Practice sends nothing else until asked", defaults.sendOnSave)
+        assertTrue("Saved words keep their video example, as the old box did", defaults.savedWordVideoExample)
         assertEquals(20, storedKnownWordsAfter(20))
         assertEquals(DEFAULT_KNOWN_WORDS_AFTER, storedKnownWordsAfter(7))
     }
