@@ -70,19 +70,21 @@ internal fun cardSoundFirstFor(
 ): CardSoundFirst = picked ?: if (front == CardFront.LISTENING) CardSoundFirst.SENTENCE else CardSoundFirst.WORD
 
 /**
- * Which parts of the back Anki reads aloud (lion737, #81, 2026-11-15, for hands-free review; owner
- * pick 2026-11-16: all on): the meaning in this sentence, the dictionary meaning and the sentence's
- * translation, each in the voice of the meaning's language. [NONE] adds no sound.
+ * Which parts of the back Anki reads aloud (lion737, #81, 2026-11-15, for hands-free review): the meaning
+ * in this sentence, the dictionary meaning and the sentence's translation, each in the voice of the
+ * meaning's language. All off by default, so the back plays only the line's sound (owner pick
+ * 2026-11-16, after trying them all on); [ALL] reads every part.
  */
 internal data class CardReadAloud(
-    val meaningInSentence: Boolean = true,
-    val dictionaryMeaning: Boolean = true,
-    val translation: Boolean = true,
+    val meaningInSentence: Boolean = false,
+    val dictionaryMeaning: Boolean = false,
+    val translation: Boolean = false,
 ) {
     val any: Boolean get() = meaningInSentence || dictionaryMeaning || translation
 
     companion object {
-        val NONE = CardReadAloud(meaningInSentence = false, dictionaryMeaning = false, translation = false)
+        val NONE = CardReadAloud()
+        val ALL = CardReadAloud(meaningInSentence = true, dictionaryMeaning = true, translation = true)
     }
 }
 

@@ -348,14 +348,9 @@ internal class AnkiDroidNotes(
                 put("flds", ankiNoteFields(word, fieldMedia).joinToString(ANKI_FIELD_SEPARATOR))
                 put("tags", ANKI_TAG)
             }
-        val notes =
-            Uri
-                .withAppendedPath(base, "notes")
-                .buildUpon()
-                .appendQueryParameter("deckId", deck.toString())
-                .build()
-        val added = resolver.insert(notes, values) ?: return null
+        val added = resolver.insert(Uri.withAppendedPath(base, "notes"), values) ?: return null
         val noteId = added.lastPathSegment?.toLongOrNull()
+        moveToDeck(added, deck)
         val line = audioLineOf(word)
         val pending =
             if (media != null && options.sentenceAudio && fieldMedia.sentence.isEmpty() && noteId != null && line != null) {
@@ -365,6 +360,21 @@ internal class AnkiDroidNotes(
             }
         pending?.let { media?.awaitSentence(it) }
         return AddedNote(waiting = pending != null)
+    }
+
+    /**
+     * Puts the new note's card in [deck]. AnkiDroid adds a single note to its note type's default deck
+     * and ignores a deck asked for, and that default drifts: it follows the deck last used in
+     * AnkiDroid's own Add screen, and points to Default once its deck was deleted (owner's phone,
+     * 2026-11-16). AnkiDroid's own API moves the cards the same way. A refusal leaves the card where
+     * it is.
+     */
+    private fun moveToDeck(
+        note: Uri,
+        deck: Long,
+    ) {
+        val card = Uri.withAppendedPath(note, "cards/0")
+        runCatching { resolver.update(card, ContentValues().apply { put("deck_id", deck) }, null, null) }
     }
 
     /**

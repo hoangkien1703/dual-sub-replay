@@ -24,7 +24,7 @@ class CardReadAloudTextTest {
 
     @Test
     fun everyPartIsReadWhenEveryChipIsOn() {
-        assertEquals(ReadAloudText(listOf("are going", "to go"), "Where are you going?"), readAloudTexts(word, CardReadAloud()))
+        assertEquals(ReadAloudText(listOf("are going", "to go"), "Where are you going?"), readAloudTexts(word, CardReadAloud.ALL))
     }
 
     @Test
@@ -43,12 +43,12 @@ class CardReadAloudTextTest {
 
     @Test
     fun blankRepeatedOrSameAsTheWordPartsAreLeftOut() {
-        assertEquals(listOf("cat"), readAloudTexts(word.copy(meaning = "cat (Cat)"), CardReadAloud()).meanings)
-        assertEquals(listOf("dog"), readAloudTexts(word.copy(meaning = "dog"), CardReadAloud()).meanings)
-        assertTrue(readAloudTexts(word.copy(meaning = "Gehst"), CardReadAloud()).meanings.isEmpty())
-        assertEquals(null, readAloudTexts(word.copy(translatedSentence = " "), CardReadAloud()).translation)
+        assertEquals(listOf("cat"), readAloudTexts(word.copy(meaning = "cat (Cat)"), CardReadAloud.ALL).meanings)
+        assertEquals(listOf("dog"), readAloudTexts(word.copy(meaning = "dog"), CardReadAloud.ALL).meanings)
+        assertTrue(readAloudTexts(word.copy(meaning = "Gehst"), CardReadAloud.ALL).meanings.isEmpty())
+        assertEquals(null, readAloudTexts(word.copy(translatedSentence = " "), CardReadAloud.ALL).translation)
         // Tapped in the translation line: the sentence in the meaning's language is the original line.
-        assertEquals("Wohin gehst du?", readAloudTexts(word.copy(translated = true), CardReadAloud()).translation)
+        assertEquals("Wohin gehst du?", readAloudTexts(word.copy(translated = true), CardReadAloud.ALL).translation)
     }
 
     @Test

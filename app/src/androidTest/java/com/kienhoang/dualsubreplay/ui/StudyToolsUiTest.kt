@@ -237,12 +237,12 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("card_reading_back").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("card_reading_front").performClick()
         composeRule.runOnIdle { assertEquals("front", preferences.getString(CARD_READING_PLACE_PREFERENCE, null)) }
-        // All three parts are read aloud until turned off (owner pick 2026-11-16).
+        // Nothing is read aloud until picked, so the back plays only the line (owner pick 2026-11-16).
         composeRule.onNodeWithTag(CARD_READ_DICTIONARY_PREFERENCE).performScrollTo().performClick()
         composeRule.runOnIdle {
-            assertFalse(preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, true))
-            assertTrue(preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, true))
-            assertTrue(preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, true))
+            assertTrue(preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, false))
+            assertFalse(preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, false))
+            assertFalse(preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, false))
         }
         composeRule.waitForIdle()
         saveUiEvidence("flashcards-reading-and-read-aloud")
