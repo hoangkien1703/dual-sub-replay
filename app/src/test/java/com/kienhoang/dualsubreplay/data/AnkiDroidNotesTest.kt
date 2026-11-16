@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.data
 
+import com.kienhoang.dualsubreplay.BuildConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -37,7 +38,9 @@ class AnkiDroidNotesTest {
                 "ねこ",
                 "<b>猫</b>が好き &amp; 犬も",
                 "I like cats<br>and dogs",
-                "<a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube 1:23</a>",
+                "<a href=\"intent://www.youtube.com/watch?v=abcdefghijk&amp;t=83s#Intent;scheme=https;" +
+                    "package=${BuildConfig.APPLICATION_ID};end\">DualSub Replay 1:23</a><a style=\"margin-left:12px\" " +
+                    "href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube</a>",
                 "",
                 "",
             ),
@@ -89,7 +92,12 @@ class AnkiDroidNotesTest {
     fun theSourceLinksOnlyToAYouTubeVideoId() {
         assertEquals("", ankiSourceLink(null, 0))
         assertEquals("", ankiSourceLink("\"><script>", 0))
-        assertEquals("<a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=0s\">YouTube 0:00</a>", ankiSourceLink("abcdefghijk", -5))
+        assertEquals(
+            "<a href=\"intent://www.youtube.com/watch?v=abcdefghijk&amp;t=0s#Intent;scheme=https;package=com.example.app;end\">" +
+                "DualSub Replay 0:00</a><a style=\"margin-left:12px\" " +
+                "href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=0s\">YouTube</a>",
+            ankiSourceLink("abcdefghijk", -5, appPackage = "com.example.app"),
+        )
         assertEquals("", ankiNoteFields(word("2", videoId = null))[5])
     }
 

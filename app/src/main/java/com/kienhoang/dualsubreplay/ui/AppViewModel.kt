@@ -506,7 +506,9 @@ class AppViewModel internal constructor(
 
     fun acceptSharedText(text: String) {
         val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
-        val watchUrl = mobileWatchUrl(videoId)
+        // A card's "DualSub Replay 1:23" link starts the video at its line.
+        val start = YouTubeUrlParser.extractStartSeconds(text)?.let { "&t=${it}s" }.orEmpty()
+        val watchUrl = mobileWatchUrl(videoId) + start
         ensureOpenTab(watchUrl)
         preferences.edit().putString("last_browser_url", watchUrl).apply()
         _state.update {

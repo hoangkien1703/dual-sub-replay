@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.kienhoang.dualsubreplay.BuildConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -63,15 +64,23 @@ internal fun ankiSentenceHtml(
     return ankiHtml(sentence.substring(0, at)) + "<b>" + ankiHtml(sentence.substring(at, end)) + "</b>" + ankiHtml(sentence.substring(end))
 }
 
-/** A link to the line's moment in the video, or empty text when the word has no video. */
+/**
+ * Links to the line's moment in the video, or empty text when the word has no video. The first link
+ * opens this app (an intent link naming [appPackage], because Android gives youtube.com links to the
+ * YouTube app); the plain YouTube link next to it keeps working in desktop Anki. No text sits between
+ * the links, because a picture-front template hides only the links and line breaks of this field.
+ */
 internal fun ankiSourceLink(
     videoId: String?,
     startMs: Long,
+    appPackage: String = BuildConfig.APPLICATION_ID,
 ): String {
     if (videoId == null || !videoId.matches(Regex("[A-Za-z0-9_-]{11}"))) return ""
     val seconds = (startMs.coerceAtLeast(0) / MS_PER_SECOND).toInt()
     val label = String.format(Locale.ROOT, "%d:%02d", seconds / SECONDS_PER_MINUTE, seconds % SECONDS_PER_MINUTE)
-    return "<a href=\"https://www.youtube.com/watch?v=$videoId&amp;t=${seconds}s\">YouTube $label</a>"
+    val watch = "www.youtube.com/watch?v=$videoId&amp;t=${seconds}s"
+    val app = "<a href=\"intent://$watch#Intent;scheme=https;package=$appPackage;end\">DualSub Replay $label</a>"
+    return "$app<a style=\"margin-left:12px\" href=\"https://$watch\">YouTube</a>"
 }
 
 /**

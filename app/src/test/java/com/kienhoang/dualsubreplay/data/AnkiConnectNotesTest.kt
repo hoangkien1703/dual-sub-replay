@@ -396,7 +396,7 @@ class AnkiConnectNotesTest {
                     .getJSONObject("fields")
                     .getString("Source")
             assertTrue(source.startsWith("<img src=\"dualsub_abcdefghijk-83400-85000_7.jpg\""))
-            assertTrue(source.endsWith("<br><a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube 1:23</a>"))
+            assertTrue(source.endsWith("<br>" + ankiSourceLink("abcdefghijk", 83_400)))
             // Without Add audio to cards no card waits for a sound.
             val quiet = FakeAnkiConnect(listOf("Default"), mapOf("Basic" to listOf("Front", "Back")), canMake = true)
             val silent = FakeCardAudio(soundFile("word-1.mp3"))

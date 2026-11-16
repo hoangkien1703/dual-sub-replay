@@ -38,6 +38,17 @@ object YouTubeUrlParser {
         return id?.takeIf(videoIdPattern::matches)
     }
 
+    /** The start time a watch link asks for ("t=83", "t=83s", "t=1m23s"), or null when it has none. */
+    fun extractStartSeconds(input: String): Int? {
+        if (input.length > MAX_SHARED_TEXT_LENGTH || extractVideoId(input) == null) return null
+        val url = urlPattern.find(input.trim())?.value ?: input.trim()
+        val raw = Regex("[?&#]t=([0-9hms]{1,12})(?:&|$)").find(url)?.groupValues?.get(1) ?: return null
+        val parts = Regex("^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$").find(raw) ?: return null
+        val (hours, minutes, seconds) = parts.destructured
+        val total = (hours.toIntOrNull() ?: 0) * 3_600 + (minutes.toIntOrNull() ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
+        return total.takeIf { it > 0 }
+    }
+
     private fun queryParameters(query: String?): Map<String, String>? {
         val result = mutableMapOf<String, String>()
         query.orEmpty().split('&').forEach { pair ->
