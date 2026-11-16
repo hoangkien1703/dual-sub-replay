@@ -57,22 +57,24 @@ def summary_markdown(title: str, failures) -> str:
     return "".join(parts)
 
 
-def annotation(name: str, message: str) -> str:
+def annotation(name: str, message: str, level: str = "error", label: str = "Test failed") -> str:
     # GitHub workflow commands need %, CR and LF escaped.
     text = f"{name}: {message}" if message else name
     text = text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-    return f"::error title=Test failed::{text}"
+    return f"::{level} title={label}::{text}"
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("result_dirs", nargs="+", help="Folders holding JUnit XML results")
     parser.add_argument("--title", default="Failed tests")
+    # Tests that failed once and then passed on CI's retry are flaky, not failed: a warning.
+    parser.add_argument("--flaky", action="store_true", help="Annotate as warnings for tests that passed on retry")
     args = parser.parse_args(argv)
 
     failures = failed_tests(args.result_dirs)
     for name, message in failures:
-        print(annotation(name, message))
+        print(annotation(name, message, "warning", "Passed on retry") if args.flaky else annotation(name, message))
     markdown = summary_markdown(args.title, failures)
     print(markdown)
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")

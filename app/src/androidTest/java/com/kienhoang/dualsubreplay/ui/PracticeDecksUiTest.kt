@@ -3,10 +3,13 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -37,6 +40,11 @@ class PracticeDecksUiTest {
         language: String,
         deck: String? = null,
     ) = SavedWord(id, "w$id", null, language, "en", "meaning $id", "", null, null, 0, 0, false, false, 0, 0, deck)
+
+    private fun headerShows(name: String) =
+        compose.onAllNodesWithTag("open_deck_name").fetchSemanticsNodes().any { node ->
+            node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == name } == true
+        }
 
     @Before fun closeDialogs() = closeSystemDialogs()
 
@@ -90,6 +98,9 @@ class PracticeDecksUiTest {
             compose.onNodeWithTag("deck_name_field").performTextReplacement("Masri")
             compose.onNodeWithTag("deck_name_confirm").performClick()
             compose.waitUntil(5_000) { repository.words.value.any { it.deck == "Masri" } }
+            // The header follows once the remembered deck is saved too, which a slow emulator can
+            // finish after the words (main run, 2026-11-15).
+            compose.waitUntil(5_000) { headerShows("Masri") }
             compose.onNodeWithTag("open_deck_name").assertTextEquals("Masri")
 
             compose.onNodeWithTag("deck_menu").performClick()

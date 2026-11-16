@@ -135,7 +135,8 @@ jobs:
 
   managed-device-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Room for one full retry when the emulator crashes a run.
+    timeout-minutes: 75
     permissions:
       contents: read
       # Reads main's last memory report to compare with (report only).
@@ -173,10 +174,47 @@ jobs:
         uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
       - name: Run offline WebView fixture tests on API 36
+        id: device_tests
+        continue-on-error: true
         run: >-
           bash ./gradlew pixel2Api36DebugAndroidTest
           -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
           --no-parallel --max-workers=2 --stacktrace
+
+      - name: Run failed device tests once more
+        if: steps.device_tests.outcome == 'failure'
+        run: |
+          # The hosted emulator sometimes fails a test that passes on the same code (main, 2026-11-15:
+          # three tries, three different tests). Failed tests run once more; failing twice fails the job,
+          # and tests that pass on retry are listed as warnings so flakes stay visible.
+          results=app/build/outputs/androidTest-results/managedDevice
+          first_try=app/build/outputs/androidTest-results/managedDevice-first-try
+          retry=app/build/outputs/androidTest-results/managedDevice-retry
+          plan=$(python3 tools/retry_device_tests.py "$results/")
+          echo "Retry: $plan"
+          if [[ "$plan" == none ]]; then
+            echo "::error title=Device tests::The run failed without a failed test (build or emulator start), so it is not retried."
+            exit 1
+          fi
+          mv "$results" "$first_try"
+          args=()
+          if [[ "$plan" != all ]]; then args=("-Pandroid.testInstrumentationRunnerArguments.class=$plan"); fi
+          status=0
+          bash ./gradlew pixel2Api36DebugAndroidTest \
+            -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+            --no-parallel --max-workers=2 --stacktrace "${args[@]}" || status=$?
+          if [[ "$plan" != all ]]; then
+            # The first try ran every test, so the CPU and memory reports keep reading it.
+            if [[ -d "$results" ]]; then mv "$results" "$retry"; else mkdir -p "$retry"; fi
+            mv "$first_try" "$results"
+            flaky="$results/"
+          else
+            flaky="$first_try/"
+          fi
+          if [[ $status -eq 0 ]]; then
+            python3 tools/report_failed_tests.py "$flaky" --flaky --title "Device tests that failed once, then passed on retry"
+          fi
+          exit "$status"
 
       - name: Report page CPU use
         if: always()
@@ -216,9 +254,11 @@ jobs:
 
       - name: List failed device tests
         if: failure()
-        run: >-
-          python3 tools/report_failed_tests.py app/build/outputs/androidTest-results/managedDevice/
-          --title "Failed device tests"
+        run: |
+          # After a retry of some tests, their second results are what failed the job.
+          results=app/build/outputs/androidTest-results/managedDevice-retry/
+          [[ -d "$results" ]] || results=app/build/outputs/androidTest-results/managedDevice/
+          python3 tools/report_failed_tests.py "$results" --title "Failed device tests"
 
       - name: Upload managed-device reports
         if: always()
@@ -227,5 +267,5 @@ jobs:
           name: pixel2-api36-test-reports
           path: |
             app/build/reports/androidTests/managedDevice/
-            app/build/outputs/androidTest-results/managedDevice/
+            app/build/outputs/androidTest-results/
           if-no-files-found: warn
