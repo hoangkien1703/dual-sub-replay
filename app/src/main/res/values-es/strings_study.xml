@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">El anverso solo reproduce el sonido de la frase; la frase y la palabra están en el reverso.</string>
     <string name="study_card_front_note">Cambiarlo también cambia las tarjetas que enviaste antes.</string>
     <string name="study_card_sound_waits">El sonido de la frase se añade cuando la frase termina de reproducirse.</string>
-    <string name="study_card_sound_replaying">Reproduciendo la frase una vez para añadir su sonido a la tarjeta.</string>
+    <string name="study_card_sound_replaying">Reproduciendo la frase una vez, en silencio, para añadir su sonido a la tarjeta.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>

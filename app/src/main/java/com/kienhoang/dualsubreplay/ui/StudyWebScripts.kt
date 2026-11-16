@@ -27,6 +27,7 @@ internal fun webSeekPausedScript(second: Float): String {
             || videos[0];
           if (!video) return false;
           clearInterval(window.__dualSubClipTimer);
+          if (window.__dualSubClipUnmute) window.__dualSubClipUnmute();
           video.pause();
           video.currentTime = $safeSecond;
           return true;

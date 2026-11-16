@@ -1494,7 +1494,8 @@ private fun BindLineSoundReplay(
         val token =
             LineAudioBridge.bindReplay { word ->
                 val clip = soundReplayClip(word)?.takeIf { it.videoId != null && it.videoId == playing }
-                clip?.let(webController::replayClip)
+                // Silent: the recorder still hears a muted page video (lion737, #81; checked on the emulator 2026-11-16).
+                clip?.let { webController.replayClip(it, muted = true) }
                 clip != null
             }
         onDispose { LineAudioBridge.unbindReplay(token) }

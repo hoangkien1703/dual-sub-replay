@@ -65,8 +65,8 @@ off by default.
 - **Sleep timer.** The gear popup gets a Sleep timer row: Off, 15, 30, 45, 60 minutes, or End of
   video. When it ends, the video pauses. The row shows the time left. It is not saved: it ends with
   the app.
-- **Muted replay.** See Implementation result: shipped only if the emulator check shows the muted
-  replay still records sound.
+- **Muted replay.** The replay that records a card's sentence sound plays without sound; pausing it
+  brings the sound back.
 
 ## Technical constraints / invariants
 
@@ -151,7 +151,12 @@ off by default.
   it on the back. Deviation: Off was added so a learner can drop readings from the card entirely.
 - Sleep timer: `playback/SleepTimer.kt` (`SleepTimerRunner`, checked every 30 s against
   `elapsedRealtime`) and `ui/SleepTimerRow.kt` in the gear popup.
-- Muted replay: not done in this PR; it waits for the laptop emulator check (owner's laptop).
+- Muted replay: the emulator check (owner's laptop, Pixel 7 API 37, Chrome 149, 2026-11-16) found
+  that `captureStream()` keeps the full sound while the video is muted or at volume 0 (average RMS
+  about 0.09 in every case, two runs of 30 readings). So the replay for a card's sound now runs muted:
+  `webClipReplayScript(..., muted = true)` from `BindLineSoundReplay` only, and the video's own mute
+  state comes back when the clip ends, the learner pauses, another clip starts or the app pauses
+  (`window.__dualSubClipUnmute`). The learner's own replay from Saved words keeps its sound.
 
 ## Validation result
 
@@ -160,5 +165,6 @@ off by default.
   `PronunciationCacheTest`, `AnkiCardLayoutTest` (Listening word first, reading place),
   `AnkiDroidNotesTest` (read-aloud sounds in fields), `CardReadAloudTextTest`, `EnglishIpaTest`,
   `SleepTimerTest`.
+- Emulator (owner's laptop): muted and volume-0 playback record at the same level as normal playback.
 - Not verified yet: managed-device tests (PR CI), the owner's phone (word card speed, AnkiDroid
-  cards reading aloud, sleep timer with the screen off), and the muted replay.
+  cards reading aloud, sleep timer with the screen off, the muted replay inside the app's WebView).

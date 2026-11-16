@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">Sisi depan hanya memutar suara kalimat; kalimat dan kata ada di belakang.</string>
     <string name="study_card_front_note">Mengubah ini juga mengubah kartu yang sudah Anda kirim.</string>
     <string name="study_card_sound_waits">Suara kalimat ditambahkan setelah kalimat selesai diputar.</string>
-    <string name="study_card_sound_replaying">Memutar kalimat sekali agar suaranya masuk ke kartu.</string>
+    <string name="study_card_sound_replaying">Memutar kalimat sekali tanpa suara agar suaranya masuk ke kartu.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>

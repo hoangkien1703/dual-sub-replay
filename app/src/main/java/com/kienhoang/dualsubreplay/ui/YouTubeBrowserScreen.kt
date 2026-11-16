@@ -225,6 +225,7 @@ internal class YouTubeWebController {
     private var replayAction: ((Float) -> Unit)? = null
     private var scriptAction: ((String) -> Unit)? = null
     private var pendingClip: com.kienhoang.dualsubreplay.data.SavedWord? = null
+    private var pendingClipMuted = false
     private var playingClipVideo: String? = null
 
     /** Told of each seek to a line that does not come from the play modes (a tapped line, the AI, the TV remote). */
@@ -236,9 +237,15 @@ internal class YouTubeWebController {
         playingClipVideo = null
         scriptAction?.invoke(webPauseScript())
     }
-    fun replayClip(word: com.kienhoang.dualsubreplay.data.SavedWord) {
+
+    /** Plays [word]'s clip in the page video; [muted] (a replay only for the card's sound) keeps it silent. */
+    fun replayClip(
+        word: com.kienhoang.dualsubreplay.data.SavedWord,
+        muted: Boolean = false,
+    ) {
         pause()
         pendingClip = word
+        pendingClipMuted = muted
     }
     fun pageChanged(url: String) {
         if (playingClipVideo != null && playingClipVideo != browseVideoSelection(url)?.videoId) pause()
@@ -250,7 +257,7 @@ internal class YouTubeWebController {
         if (videoId != clip.videoId) return
         pendingClip = null
         playingClipVideo = videoId
-        scriptAction?.invoke(webClipReplayScript(videoId.orEmpty(), clip.startMs, clip.endMs))
+        scriptAction?.invoke(webClipReplayScript(videoId.orEmpty(), clip.startMs, clip.endMs, pendingClipMuted))
     }
 
     fun bind(replayFrom: (Float) -> Unit): Any {

@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">Mặt trước chỉ phát âm thanh của câu; câu và từ nằm ở mặt sau.</string>
     <string name="study_card_front_note">Đổi mục này cũng đổi các thẻ bạn đã gửi trước đó.</string>
     <string name="study_card_sound_waits">Âm thanh của câu sẽ được thêm khi câu phát hết.</string>
-    <string name="study_card_sound_replaying">Đang phát lại câu một lần để thêm âm thanh vào thẻ.</string>
+    <string name="study_card_sound_replaying">Đang phát lại câu một lần (tắt tiếng) để thêm âm thanh vào thẻ.</string>
     <string name="study_blur_box_title">Ô làm mờ</string>
     <string name="study_blur_box_description">Đặt một ô làm mờ lên video để che phụ đề có sẵn trong hình. Kéo để di chuyển, kéo góc để đổi kích thước.</string>
     <string name="study_page_token_title">Tải phụ đề bằng mã của trang (thử nghiệm)</string>

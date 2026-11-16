@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">表面ではセリフの音声だけを再生し、文と単語は裏面に表示します。</string>
     <string name="study_card_front_note">変更すると、前に送ったカードも変わります。</string>
     <string name="study_card_sound_waits">文の音声は、セリフが最後まで再生されたあとに追加されます。</string>
-    <string name="study_card_sound_replaying">音声をカードに入れるため、セリフを1回再生しています。</string>
+    <string name="study_card_sound_replaying">音声をカードに入れるため、セリフを消音で1回再生しています。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>

@@ -660,6 +660,7 @@ internal fun webPauseScript(): String =
       const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
       if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
       clearInterval(window.__dualSubClipTimer);
+      if (window.__dualSubClipUnmute) window.__dualSubClipUnmute();
       document.querySelectorAll('video').forEach(function(video) { video.pause(); });
       return true;
     })();
@@ -685,6 +686,7 @@ internal fun webClipReplayScript(
     videoId: String,
     startMs: Long,
     endMs: Long,
+    muted: Boolean = false,
 ): String {
     require(
         com.kienhoang.dualsubreplay.data
@@ -701,20 +703,37 @@ internal fun webClipReplayScript(
           };
           if (!valid()) return false;
           clearInterval(window.__dualSubClipTimer);
+          if (window.__dualSubClipUnmute) window.__dualSubClipUnmute();
+          const muted = $muted;
           let started = false;
+          let startedAt = 0;
           const deadline = Date.now() + 30000;
+          const stop = function() {
+            clearInterval(window.__dualSubClipTimer);
+            if (window.__dualSubClipUnmute) window.__dualSubClipUnmute();
+          };
           window.__dualSubClipTimer = setInterval(function() {
-            if (!valid()) { clearInterval(window.__dualSubClipTimer); return; }
+            if (!valid()) { stop(); return; }
             const video = document.querySelector('video');
-            if (!started && Date.now() > deadline) { clearInterval(window.__dualSubClipTimer); return; }
+            if (!started && Date.now() > deadline) { stop(); return; }
             if (!video || video.readyState < 1 || document.querySelector('.ad-showing')) return;
             if (!started) {
               started = true;
+              startedAt = Date.now();
+              if (muted) {
+                // The recorder still hears a muted video (captureStream keeps its sound), the learner doesn't.
+                const wasMuted = video.muted;
+                video.muted = true;
+                window.__dualSubClipUnmute = function() { window.__dualSubClipUnmute = null; video.muted = wasMuted; };
+              }
               video.currentTime = ${startMs / 1000.0};
               const promise = video.play();
-              if (promise && promise.catch) promise.catch(function() { clearInterval(window.__dualSubClipTimer); });
+              if (promise && promise.catch) promise.catch(stop);
             } else if (video.ended || video.currentTime >= ${endMs / 1000.0} || video.currentTime < ${startMs / 1000.0} - 1) {
-              video.pause(); clearInterval(window.__dualSubClipTimer);
+              video.pause(); stop();
+            } else if (muted && video.paused && Date.now() - startedAt > 1500) {
+              // Paused part-way by the learner: the sound comes back at once.
+              stop();
             }
           }, 50);
           return true;

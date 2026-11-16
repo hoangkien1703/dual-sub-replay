@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">正面只播放这句台词的声音，句子和单词在背面。</string>
     <string name="study_card_front_note">更改此项也会改变你之前发送的卡片。</string>
     <string name="study_card_sound_waits">这句台词播完后，会补上句子的声音。</string>
-    <string name="study_card_sound_replaying">正在重播这句台词一次，把它的声音加到卡片上。</string>
+    <string name="study_card_sound_replaying">正在静音重播这句台词一次，把它的声音加到卡片上。</string>
     <string name="study_blur_box_title">模糊框</string>
     <string name="study_blur_box_description">在视频上放一个模糊框，遮住画面里自带的字幕。拖动可移动，拖动角可调整大小。</string>
     <string name="study_page_token_title">用页面令牌加载字幕（测试版）</string>

@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">The front only plays the line\'s sound; the sentence and the word are on the back.</string>
     <string name="study_card_front_note">Changing this also changes cards you sent before.</string>
     <string name="study_card_sound_waits">The sentence\'s sound is added once the line has played to the end.</string>
-    <string name="study_card_sound_replaying">Playing the line once so its sound goes on the card.</string>
+    <string name="study_card_sound_replaying">Playing the line once, muted, so its sound goes on the card.</string>
     <string name="study_send_to_app_title">Send words to</string>
     <string name="study_app_ankidroid" translatable="false">AnkiDroid</string>
     <string name="study_app_ankiconnect" translatable="false">AnkiConnect</string>

@@ -35,4 +35,25 @@ class WordClipPlaybackTest {
         assertTrue(script.contains("video.currentTime >= 3.0"))
         assertTrue(script.contains(".ad-showing"))
     }
+
+    @Test fun aReplayForTheCardsSoundIsMutedAndAlwaysUnmutesAgain() {
+        // lion737, #81: captureStream keeps a muted video's sound (emulator check 2026-11-16), so the replay is silent.
+        val controller = YouTubeWebController()
+        val scripts = mutableListOf<String>()
+        controller.bindScripts(scripts::add)
+        controller.replayClip(card(), muted = true)
+        controller.observePage("https://m.youtube.com/watch?v=dQw4w9WgXcQ")
+        val muted = scripts.last()
+        assertTrue(muted.contains("const muted = true;"))
+        assertTrue(muted.contains("video.muted = true;"))
+        assertTrue(muted.contains("video.muted = wasMuted;"))
+        assertTrue(webClipReplayScript("dQw4w9WgXcQ", 1000, 3000).contains("const muted = false;"))
+        // Pausing, or a new clip, gives the sound back.
+        assertTrue(webPauseScript().contains("window.__dualSubClipUnmute()"))
+        assertTrue(webSeekPausedScript(2f).contains("window.__dualSubClipUnmute()"))
+        // The learner's own replay from saved words keeps its sound.
+        controller.replayClip(card())
+        controller.observePage("https://m.youtube.com/watch?v=dQw4w9WgXcQ")
+        assertTrue(scripts.last().contains("const muted = false;"))
+    }
 }

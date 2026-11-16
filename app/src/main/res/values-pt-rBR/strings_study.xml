@@ -68,7 +68,7 @@
     <string name="study_card_front_listening_description">A frente só toca o som da frase; a frase e a palavra ficam no verso.</string>
     <string name="study_card_front_note">Mudar isso também muda os cartões que você já enviou.</string>
     <string name="study_card_sound_waits">O som da frase é adicionado depois que a frase toca até o fim.</string>
-    <string name="study_card_sound_replaying">Tocando a frase uma vez para colocar o som no cartão.</string>
+    <string name="study_card_sound_replaying">Tocando a frase uma vez, sem som, para colocar o som no cartão.</string>
     <string name="study_blur_box_title">Caixa desfocada</string>
     <string name="study_blur_box_description">Coloca uma caixa desfocada sobre o vídeo para esconder legendas embutidas na imagem. Arraste para mover e arraste o canto para mudar o tamanho.</string>
     <string name="study_page_token_title">Carregar legendas com um token da página (beta)</string>
