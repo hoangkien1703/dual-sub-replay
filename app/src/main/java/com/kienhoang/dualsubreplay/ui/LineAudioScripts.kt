@@ -44,7 +44,7 @@ internal fun webLineAudioScript(
  */
 private val WEB_LINE_AUDIO_RECORDER =
     """
-    const state = { context: null, node: null, source: null, stream: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0 };
+    const state = { context: null, node: null, source: null, stream: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0, got: 0, lags: [], lateRun: 0, cut: null };
     const pageVideo = function() {
       return document.querySelector('#movie_player video.html5-main-video') || document.querySelector('video.html5-main-video') || document.querySelector('video');
     };
@@ -56,8 +56,15 @@ private val WEB_LINE_AUDIO_RECORDER =
     };
     const adShowing = function() { return !!document.querySelector('.ad-showing, .ad-interrupting'); };
     const clear = function() { state.blocks = []; state.samples = 0; state.last = null; };
+    // The audio clock starts again when the context runs again after a rest.
+    const restart = function() { state.got = 0; state.lags = []; state.lateRun = 0; state.last = null; };
     const resume = function() {
-      if (state.context && state.context.state !== 'running' && state.context.state !== 'closed') state.context.resume().catch(function() {});
+      if (state.context && state.context.state !== 'running' && state.context.state !== 'closed') state.context.resume().then(restart).catch(function() {});
+    };
+    // Where the audio clock was when the page video paused, so a block that played before the pause
+    // but arrived after it keeps its part before the pause (the line's tail with Pause after each line).
+    const paused = function(event) {
+      if (state.context && event && event.target === state.video) state.cut = state.context.currentTime;
     };
     // The page video started playing: wake the recorder now rather than on the app's next check. After
     // a minute of pause the context rests, and a line replayed for a card's sound starts less than a
@@ -65,30 +72,57 @@ private val WEB_LINE_AUDIO_RECORDER =
     const wake = function(event) {
       if (!state.context || !event || event.target !== pageVideo()) return;
       state.pausedAt = 0;
+      state.cut = null;
       if (event.target !== state.video || !state.stream) attach(event.target);
       else follow();
       resume();
     };
+    // A busy page runs this late, and on a phone a big YouTube page often is. So the node takes big
+    // blocks (a small one lost pieces of sound: choppy clips, Kien 2026-11-17), and each block's time
+    // comes from the audio clock (samples received against the context's time), not from when this ran.
     const listen = function(event) {
+      const rate = event.inputBuffer.sampleRate;
+      const input = event.inputBuffer.getChannelData(0);
+      const length = input.length / rate;
+      state.got += input.length;
+      const lag = state.context.currentTime - state.got / rate;
+      state.lags.push(lag);
+      if (state.lags.length > 16) state.lags.shift();
+      let floor = Math.min.apply(null, state.lags);
+      let late = Math.max(0, lag - floor);
+      // Late by a whole block again and again: sound was lost, so the clock starts again and the run breaks.
+      state.lateRun = late > length * 0.9 ? state.lateRun + 1 : 0;
+      if (state.lateRun >= 3) { state.lags = [lag]; floor = lag; late = 0; state.lateRun = 0; state.last = null; }
       const video = state.video;
-      if (!video || video.paused || video.seeking || video.ended || video.readyState < 3 || adShowing() || pageVideoId() !== state.videoId) {
+      if (!video || video.seeking || video.ended || adShowing() || pageVideoId() !== state.videoId) {
         state.last = null;
         return;
       }
-      const input = event.inputBuffer.getChannelData(0);
-      const span = input.length / event.inputBuffer.sampleRate * (video.playbackRate || 1);
-      let start = video.currentTime - span;
-      if (state.last !== null && Math.abs(start - state.last) < 0.25) start = state.last;
-      const samples = new Int16Array(input.length);
-      for (let i = 0; i < input.length; i++) {
+      let keep = input.length;
+      let start = 0;
+      if (video.paused || video.readyState < 3) {
+        const blockStart = state.got / rate + floor - length;
+        keep = video.paused && state.cut !== null && state.last !== null ? Math.max(0, Math.min(input.length, Math.floor((state.cut - blockStart) * rate))) : 0;
+        if (keep === 0) {
+          state.last = null;
+          return;
+        }
+        start = state.last;
+      } else {
+        start = video.currentTime - (late + length) * (video.playbackRate || 1);
+        if (state.last !== null && Math.abs(start - state.last) < 0.25) start = state.last;
+      }
+      const span = keep / rate * (video.playbackRate || 1);
+      const samples = new Int16Array(keep);
+      for (let i = 0; i < keep; i++) {
         const value = Math.max(-1, Math.min(1, input[i]));
         samples[i] = value < 0 ? value * 32768 : value * 32767;
       }
       state.blocks.push({ start: start, end: start + span, samples: samples });
       state.samples += samples.length;
-      state.last = start + span;
-      const keep = event.inputBuffer.sampleRate * ${LINE_AUDIO_KEPT_MS / 1000};
-      while (state.blocks.length > 1 && state.samples - state.blocks[0].samples.length > keep) {
+      state.last = keep === input.length ? start + span : null;
+      const kept = rate * ${LINE_AUDIO_KEPT_MS / 1000};
+      while (state.blocks.length > 1 && state.samples - state.blocks[0].samples.length > kept) {
         state.samples -= state.blocks.shift().samples.length;
       }
     };
@@ -125,12 +159,15 @@ private val WEB_LINE_AUDIO_RECORDER =
         if (state.context && state.context.state === 'closed') { state.context = null; state.source = null; state.stream = null; state.track = null; state.video = null; }
         if (!state.context) {
           try { state.context = new AudioContext({ sampleRate: 24000 }); } catch (error) { state.context = new AudioContext(); }
-          state.node = state.context.createScriptProcessor(2048, 1, 1);
+          restart();
+          // About 0.7 s at 24 kHz: room for a busy page (see listen).
+          state.node = state.context.createScriptProcessor(16384, 1, 1);
           state.node.onaudioprocess = listen;
           state.node.connect(state.context.destination);
           // Media events don't bubble, so the document hears them while capturing.
           document.addEventListener('play', wake, true);
           document.addEventListener('playing', wake, true);
+          document.addEventListener('pause', paused, true);
           document.addEventListener('pointerdown', resume, true);
           document.addEventListener('touchend', resume, true);
           document.addEventListener('keydown', resume, true);
@@ -210,6 +247,7 @@ private val WEB_LINE_AUDIO_RECORDER =
       stop: function() {
         document.removeEventListener('play', wake, true);
         document.removeEventListener('playing', wake, true);
+        document.removeEventListener('pause', paused, true);
         document.removeEventListener('pointerdown', resume, true);
         document.removeEventListener('touchend', resume, true);
         document.removeEventListener('keydown', resume, true);
