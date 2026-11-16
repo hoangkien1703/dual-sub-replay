@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">Chọn ngôn ngữ</string>
     <string name="settings_quick_subtitles">Phụ đề</string>
     <string name="settings_hide_while_playing">Ẩn khi đang phát</string>
+    <string name="sleep_timer_title">Hẹn giờ tắt</string>
+    <string name="sleep_timer_off">Tắt</string>
+    <string name="sleep_timer_minutes">%1$d phút</string>
+    <string name="sleep_timer_end_of_video">Hết video</string>
+    <string name="sleep_timer_left">Còn %1$d phút</string>
+    <string name="sleep_timer_description">Tạm dừng video khi hết giờ, kể cả khi chạy nền và tắt màn hình.</string>
     <string name="settings_close_settings">Đóng cài đặt</string>
     <string name="settings_peek">Xem video. Giữ để xem nhanh, hoặc chạm để video hiện cho đến khi quay lại</string>
     <string name="settings_peek_back">Quay lại cài đặt</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">Hiện trước</string>
     <string name="settings_meaning_order_sentence">Nghĩa trong câu này</string>
     <string name="settings_meaning_order_dictionary">Nghĩa từ điển</string>
+    <string name="settings_prepare_meanings_title">Chuẩn bị nghĩa trước</string>
+    <string name="settings_prepare_meanings_description">Khi một dòng đang phát, ứng dụng hỏi AI nghĩa của từng từ trong dòng, để từ bạn chạm hiện nghĩa ngay. Việc này dùng khóa của bạn cả với những dòng bạn không chạm.</string>
     <string name="settings_word_learning_mode_title">Chế độ học từ (màu theo từ loại)</string>
     <string name="settings_word_learning_mode_description">Tô màu từ theo vai trò ngữ pháp (danh từ, động từ, tính từ, trợ từ) để thấy cấu trúc câu.</string>
     <string name="settings_colored_lines_title">Dòng phụ đề được tô màu</string>

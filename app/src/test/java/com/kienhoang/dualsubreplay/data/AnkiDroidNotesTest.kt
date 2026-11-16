@@ -48,6 +48,16 @@ class AnkiDroidNotesTest {
     }
 
     @Test
+    fun readAloudSoundsFollowTheMeaningAndTranslationText() {
+        val media = CardMedia(meaningSounds = "[sound:m1.mp3][sound:m2.mp3]", translationSound = "[sound:t.mp3]")
+        val fields = ankiNoteFields(word("1"), media)
+        assertEquals("cat &lt;animal&gt;[sound:m1.mp3][sound:m2.mp3]", fields[1])
+        assertEquals("I like cats<br>and dogs[sound:t.mp3]", fields[4])
+        val others = listOf(0, 2, 3, 5, 6, 7)
+        assertEquals(others.map(ankiNoteFields(word("1"))::get), others.map(fields::get))
+    }
+
+    @Test
     fun theSentenceBoldsTheFirstMatchIgnoringCase() {
         assertEquals("<b>Run</b>, run &quot;fast&quot;", ankiSentenceHtml("Run, run \"fast\"", "run"))
         assertEquals("no match here", ankiSentenceHtml("no match here", "cat"))

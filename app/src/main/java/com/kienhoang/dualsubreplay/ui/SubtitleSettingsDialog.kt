@@ -621,6 +621,7 @@ internal fun QuickLanguageSettingsDialog(
                 )
                 Spacer(Modifier.height(16.dp))
                 HideWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
+                SleepTimerRow()
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,

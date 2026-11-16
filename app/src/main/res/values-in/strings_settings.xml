@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">Pilih bahasa</string>
     <string name="settings_quick_subtitles">Subtitel</string>
     <string name="settings_hide_while_playing">Sembunyikan saat diputar</string>
+    <string name="sleep_timer_title">Timer tidur</string>
+    <string name="sleep_timer_off">Mati</string>
+    <string name="sleep_timer_minutes">%1$d mnt</string>
+    <string name="sleep_timer_end_of_video">Akhir video</string>
+    <string name="sleep_timer_left">Sisa %1$d mnt</string>
+    <string name="sleep_timer_description">Menjeda video saat waktunya habis, juga di latar belakang dan saat layar mati.</string>
     <string name="settings_close_settings">Tutup setelan</string>
     <string name="settings_peek">Lihat video. Tahan untuk mengintip, atau ketuk agar tetap terlihat</string>
     <string name="settings_peek_back">Kembali ke setelan</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">Tampilkan dulu</string>
     <string name="settings_meaning_order_sentence">Arti dalam kalimat ini</string>
     <string name="settings_meaning_order_dictionary">Arti kamus</string>
+    <string name="settings_prepare_meanings_title">Siapkan arti lebih dulu</string>
+    <string name="settings_prepare_meanings_description">Saat satu baris diputar, AI ditanya arti setiap katanya, jadi kata yang diketuk langsung menampilkan artinya. Ini memakai kuncimu bahkan untuk baris yang tidak kamu ketuk.</string>
     <string name="settings_word_learning_mode_title">Mode belajar kata (warna kelas kata)</string>
     <string name="settings_word_learning_mode_description">Warnai kata menurut peran tata bahasanya (kata benda, kata kerja, kata sifat, partikel) untuk melihat struktur kalimat.</string>
     <string name="settings_colored_lines_title">Baris subtitel berwarna</string>

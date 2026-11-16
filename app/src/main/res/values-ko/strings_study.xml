@@ -49,6 +49,13 @@
     <string name="study_card_place_off">끄기</string>
     <string name="study_card_sound_first_title">먼저 재생</string>
     <string name="study_card_sound_first_description">카드 한 면에 두 소리가 모두 있으면 이 소리를 먼저 재생합니다.</string>
+    <string name="study_card_reading_title">읽기</string>
+    <string name="study_card_reading_description">단어의 읽기: 가나, 병음, 또는 영어 단어의 IPA(발음 기호). 앞면에는 앞면에 단어가 있을 때만 보입니다.</string>
+    <string name="study_card_read_aloud_title">뒷면에서 읽어 주기</string>
+    <string name="study_card_read_aloud_meaning">이 문장에서의 뜻</string>
+    <string name="study_card_read_aloud_dictionary">사전 뜻</string>
+    <string name="study_card_read_aloud_translation">문장 번역</string>
+    <string name="study_card_read_aloud_description">새 카드는 뒷면에서 이것들을 뜻의 언어 음성으로 읽어 주므로 화면을 보지 않고 복습할 수 있습니다. 그 언어의 음성이 없는 부분은 빠집니다.</string>
     <string name="study_card_place_note">Anki는 답 위에 앞면을 보여 주므로, 앞면에 있는 것은 뒷면에도 보입니다.</string>
     <string name="study_card_front_title">카드 앞면</string>
     <string name="study_card_front_word_sentence">단어와 문장</string>

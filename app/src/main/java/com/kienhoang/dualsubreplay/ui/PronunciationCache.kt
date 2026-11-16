@@ -2,71 +2,89 @@ package com.kienhoang.dualsubreplay.ui
 
 import java.io.File
 
+/** How many words' recorded speech is kept: a line's words and the words of the last few lines. */
+internal const val PRONUNCIATION_CACHE_SIZE = 60
+
 /**
- * Recorded speech for the one word pronounced last, so hearing it again and again is instant.
- * Recording or choosing another word deletes it: a word's sound is kept only while it is the
- * word the learner is looking at.
+ * Recorded speech of the last words pronounced or fetched ahead (lion737, Discussion #81,
+ * 2026-11-15: the word card's other words of a line play at once). The oldest recording is deleted
+ * once more than [maxEntries] are kept; files a previous run left behind are deleted on the first
+ * recording. Main thread only.
  */
 internal class PronunciationCache(
     private val directory: File,
+    private val maxEntries: Int = PRONUNCIATION_CACHE_SIZE,
 ) {
-    private var key: String? = null
-    private var audio: File? = null
-    private var ready = false
+    private class Entry(
+        val audio: File,
+    ) {
+        var ready = false
+    }
+
+    private val entries = LinkedHashMap<String, Entry>(maxEntries, 0.75f, true)
+    private var cleaned = false
     private var counter = 0
 
-    /** The recorded speech of [text] in [language], if that is the cached word and it finished recording. */
+    /** The recorded speech of [text] in [language], if it finished recording. */
     fun lookup(
         text: String,
         language: String,
-    ): File? = audio?.takeIf { ready && key == keyOf(text, language) && it.isFile && it.length() > 0 }
+    ): File? = entries[pronunciationKey(text, language)]?.takeIf { it.ready }?.audio?.takeIf { it.isFile && it.length() > 0 }
 
-    /** Whether the cached (or still recording) speech is for [text] in [language]. */
+    /** Whether speech of [text] in [language] is kept or still being recorded. */
     fun holds(
         text: String,
         language: String,
-    ): Boolean = key == keyOf(text, language)
-
-    /** Deletes the cached speech unless it belongs to [text] in [language]. */
-    fun keepOnly(
-        text: String,
-        language: String,
-    ) {
-        if (!holds(text, language)) clear()
-    }
+    ): Boolean = entries.containsKey(pronunciationKey(text, language))
 
     /**
-     * Deletes the previous word's speech, and any file a previous run left behind, and returns
-     * the file to record [text] into, ending in [extension]. Call [markReady] once the recording is complete.
+     * Returns the file to record [text] into, ending in [extension], replacing any earlier
+     * recording of it. Call [markReady] once the recording is complete, or [remove] when it failed.
      */
     fun prepare(
         text: String,
         language: String,
         extension: String = "wav",
     ): File {
-        clear()
-        directory.mkdirs()
-        directory.listFiles()?.forEach { it.delete() }
-        counter++
-        return File(directory, "word-$counter.$extension").also {
-            key = keyOf(text, language)
-            audio = it
+        if (!cleaned) {
+            cleaned = true
+            directory.listFiles()?.forEach { it.delete() }
         }
+        remove(text, language)
+        directory.mkdirs()
+        counter++
+        val file = File(directory, "word-$counter.$extension")
+        entries[pronunciationKey(text, language)] = Entry(file)
+        while (entries.size > maxEntries) {
+            val eldest = entries.entries.first()
+            eldest.value.audio.delete()
+            entries.remove(eldest.key)
+        }
+        return file
     }
 
-    fun markReady() {
-        ready = audio != null
+    fun markReady(
+        text: String,
+        language: String,
+    ) {
+        entries[pronunciationKey(text, language)]?.ready = true
+    }
+
+    fun remove(
+        text: String,
+        language: String,
+    ) {
+        entries.remove(pronunciationKey(text, language))?.audio?.delete()
     }
 
     fun clear() {
-        audio?.delete()
-        audio = null
-        key = null
-        ready = false
+        entries.values.forEach { it.audio.delete() }
+        entries.clear()
     }
-
-    private fun keyOf(
-        text: String,
-        language: String,
-    ) = "${language.trim()}\u0000${text.trim()}"
 }
+
+/** The key one word's speech is kept and looked up under. */
+internal fun pronunciationKey(
+    text: String,
+    language: String,
+) = "${language.trim()}\u0000${text.trim()}"

@@ -221,6 +221,30 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("card_sound_first_sentence").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("card_front_listening").performScrollTo().performClick()
         composeRule.onNodeWithTag("card_sound_first_sentence").assertDoesNotExist()
+        // A Listening front with the word's voice on it too: the line plays first until changed (lion737, #81).
+        composeRule.onNodeWithTag("card_word_sound_front").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_sound_first_word").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_sound_first_sentence").assertIsDisplayed()
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-play-first-listening")
+    }
+
+    @Test
+    fun readingPlaceAndReadAloudChipsAreSaved() {
+        showSettings("settings_section_flashcards")
+        // Back by default, so Japanese and Chinese cards don't give the answer's reading away.
+        composeRule.onNodeWithTag("card_reading_back").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_reading_front").performClick()
+        composeRule.runOnIdle { assertEquals("front", preferences.getString(CARD_READING_PLACE_PREFERENCE, null)) }
+        // All three parts are read aloud until turned off (owner pick 2026-11-16).
+        composeRule.onNodeWithTag(CARD_READ_DICTIONARY_PREFERENCE).performScrollTo().performClick()
+        composeRule.runOnIdle {
+            assertFalse(preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, true))
+            assertTrue(preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, true))
+            assertTrue(preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, true))
+        }
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-reading-and-read-aloud")
     }
 
     @Test

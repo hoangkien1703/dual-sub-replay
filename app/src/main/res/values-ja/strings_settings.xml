@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">言語を選択</string>
     <string name="settings_quick_subtitles">字幕</string>
     <string name="settings_hide_while_playing">再生中は隠す</string>
+    <string name="sleep_timer_title">スリープタイマー</string>
+    <string name="sleep_timer_off">オフ</string>
+    <string name="sleep_timer_minutes">%1$d 分</string>
+    <string name="sleep_timer_end_of_video">動画の終わり</string>
+    <string name="sleep_timer_left">残り %1$d 分</string>
+    <string name="sleep_timer_description">時間になると動画を一時停止します。バックグラウンドや画面オフでも動きます。</string>
     <string name="settings_close_settings">設定を閉じる</string>
     <string name="settings_peek">動画を見る。長押しで一時的に表示、タップで表示したままにします</string>
     <string name="settings_peek_back">設定に戻る</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">先に表示</string>
     <string name="settings_meaning_order_sentence">この文での意味</string>
     <string name="settings_meaning_order_dictionary">辞書の意味</string>
+    <string name="settings_prepare_meanings_title">意味を先に用意</string>
+    <string name="settings_prepare_meanings_description">行の再生中に、その行の各単語の意味を AI に聞いておくので、タップした単語の意味がすぐに出ます。タップしない行でもキーを使います。</string>
     <string name="settings_word_learning_mode_title">単語学習モード（品詞の色分け）</string>
     <string name="settings_word_learning_mode_description">品詞（名詞、動詞、形容詞、助詞）ごとに単語を色分けして、文の構造をわかりやすくします。</string>
     <string name="settings_colored_lines_title">色分けする字幕の行</string>

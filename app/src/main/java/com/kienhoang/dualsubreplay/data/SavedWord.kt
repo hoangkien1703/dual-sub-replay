@@ -162,7 +162,7 @@ internal fun savedWordFrom(
     val word = selection.token.text.trim()
     val id = savedWordId(word, selection.wordLanguage, selection.meaningLanguage, selection.videoId, segment)
     val hasClip = validClipRange(selection.videoId, segment?.startMs ?: -1, segment?.endMs ?: -1)
-    val saved = SavedWord(id, word, selection.token.reading, selection.wordLanguage, selection.meaningLanguage,
+    val saved = SavedWord(id, word, wordReading(selection), selection.wordLanguage, selection.meaningLanguage,
         meaning.trim(), segment?.originalText.orEmpty(), segment?.translatedText, selection.videoId,
         segment?.startMs ?: 0, segment?.endMs ?: 0, selection.translated,
         online = online && hasClip, sourceTitle = cleanSourceTitle(sourceTitle))

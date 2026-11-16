@@ -49,6 +49,13 @@
     <string name="study_card_place_off">Mati</string>
     <string name="study_card_sound_first_title">Diputar dulu</string>
     <string name="study_card_sound_first_description">Jika satu sisi kartu punya kedua suara, suara ini diputar dulu.</string>
+    <string name="study_card_reading_title">Cara baca</string>
+    <string name="study_card_reading_description">Cara baca kata: kana, pinyin, atau IPA kata bahasa Inggris (bunyinya). Di depan hanya muncul jika bagian depan menampilkan kata itu.</string>
+    <string name="study_card_read_aloud_title">Bacakan di bagian belakang</string>
+    <string name="study_card_read_aloud_meaning">Arti dalam kalimat ini</string>
+    <string name="study_card_read_aloud_dictionary">Arti kamus</string>
+    <string name="study_card_read_aloud_translation">Terjemahan kalimat</string>
+    <string name="study_card_read_aloud_description">Kartu baru membacakan ini di bagian belakang, dengan suara bahasa artinya, jadi kamu bisa mengulang tanpa melihat. Bagian tanpa suara untuk bahasanya dilewati.</string>
     <string name="study_card_place_note">Yang ada di depan juga tampil di belakang, karena Anki menampilkan sisi depan di atas jawaban.</string>
     <string name="study_card_front_title">Sisi depan kartu</string>
     <string name="study_card_front_word_sentence">Kata dan kalimat</string>

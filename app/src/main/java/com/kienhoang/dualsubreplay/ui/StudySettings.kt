@@ -14,11 +14,13 @@ import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardOptions
 import com.kienhoang.dualsubreplay.data.CardPlace
+import com.kienhoang.dualsubreplay.data.CardReadAloud
 import com.kienhoang.dualsubreplay.data.CardSoundFirst
 import com.kienhoang.dualsubreplay.data.PageTokenMode
+import com.kienhoang.dualsubreplay.data.cardSoundFirstFor
+import com.kienhoang.dualsubreplay.data.pickedCardSoundFirst
 import com.kienhoang.dualsubreplay.data.storedCardFront
 import com.kienhoang.dualsubreplay.data.storedCardPlace
-import com.kienhoang.dualsubreplay.data.storedCardSoundFirst
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.data.usualWordSoundPlace
 
@@ -61,6 +63,17 @@ internal const val CARD_PICTURE_PLACE_PREFERENCE = "anki_card_picture_place"
 /** Flashcards & Anki → Play first (lion737, #81, 2026-11-13): a [CardSoundFirst] storage value, the word by default. */
 internal const val CARD_SOUND_FIRST_PREFERENCE = "anki_card_sound_first"
 
+/** Flashcards & Anki → Reading (2026-11-16): a [CardPlace] storage value, the back by default. */
+internal const val CARD_READING_PLACE_PREFERENCE = "anki_card_reading_place"
+
+/**
+ * Flashcards & Anki → Read aloud on the back (lion737, #81, 2026-11-15; owner pick 2026-11-16: all
+ * on by default): the meaning in this sentence, the dictionary meaning and the sentence translation.
+ */
+internal const val CARD_READ_MEANING_PREFERENCE = "anki_card_read_meaning"
+internal const val CARD_READ_DICTIONARY_PREFERENCE = "anki_card_read_dictionary"
+internal const val CARD_READ_TRANSLATION_PREFERENCE = "anki_card_read_translation"
+
 /** The word card's Kanji section for Japanese words (owner request 2026-10-24), on by default. */
 internal const val KANJI_DETAILS_PREFERENCE = "kanji_details"
 internal const val PAGE_TOKEN_CAPTIONS_PREFERENCE = "page_token_captions"
@@ -94,6 +107,10 @@ internal val STUDY_SETTING_KEYS =
         CARD_SENTENCE_SOUND_PREFERENCE,
         CARD_PICTURE_PLACE_PREFERENCE,
         CARD_SOUND_FIRST_PREFERENCE,
+        CARD_READING_PLACE_PREFERENCE,
+        CARD_READ_MEANING_PREFERENCE,
+        CARD_READ_DICTIONARY_PREFERENCE,
+        CARD_READ_TRANSLATION_PREFERENCE,
         BLUR_BOX_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
@@ -197,15 +214,22 @@ internal data class StudySettings(
     val cardSentenceSound: CardPlace = CardPlace.BACK,
     /** Where cards carry a still of the line from the video (else the video's thumbnail). */
     val cardPicture: CardPlace = CardPlace.OFF,
-    /** Which sound plays first on a card side with both. */
-    val cardSoundFirst: CardSoundFirst = CardSoundFirst.WORD,
+    /** The learner's Play first pick; null when never picked, so [cardSoundFirst] follows the front. */
+    val cardSoundFirstPicked: CardSoundFirst? = null,
     val cardFront: CardFront = CardFront.WORD_AND_SENTENCE,
+    /** Where cards show the word's reading (kana, pinyin, English IPA). */
+    val cardReading: CardPlace = CardPlace.BACK,
+    /** Which parts of the back Anki reads aloud. */
+    val cardReadAloud: CardReadAloud = CardReadAloud(),
     val blurBox: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
     /** Known words is on (Automatic or Manual): the score, new-word marks and "I know this word" show. */
     val knownWords: Boolean get() = knownWordsMode != KnownWordsMode.OFF
+
+    /** Which sound plays first on a card side with both. */
+    val cardSoundFirst: CardSoundFirst get() = cardSoundFirstFor(cardFront, cardSoundFirstPicked)
 
     /** What Send to puts on each card. */
     val cardOptions: CardOptions get() =
@@ -214,7 +238,9 @@ internal data class StudySettings(
             sentenceSound = cardSentenceSound,
             picture = cardPicture,
             front = cardFront,
-            soundFirst = cardSoundFirst,
+            soundFirst = cardSoundFirstPicked,
+            reading = cardReading,
+            readAloud = cardReadAloud,
         )
 
     /** Pause on lines with one new word needs the known-word list; without it the video plays normally. */
@@ -258,8 +284,15 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
                 preferences.getString(CARD_PICTURE_PLACE_PREFERENCE, null),
                 otherwise = if (preferences.getBoolean(CARD_PICTURE_PREFERENCE, false)) CardPlace.BACK else CardPlace.OFF,
             ),
-        cardSoundFirst = storedCardSoundFirst(preferences.getString(CARD_SOUND_FIRST_PREFERENCE, null)),
+        cardSoundFirstPicked = pickedCardSoundFirst(preferences.getString(CARD_SOUND_FIRST_PREFERENCE, null)),
         cardFront = storedCardFront(preferences.getString(CARD_FRONT_PREFERENCE, null)),
+        cardReading = storedCardPlace(preferences.getString(CARD_READING_PLACE_PREFERENCE, null), otherwise = CardPlace.BACK),
+        cardReadAloud =
+            CardReadAloud(
+                meaningInSentence = preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, true),
+                dictionaryMeaning = preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, true),
+                translation = preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, true),
+            ),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),

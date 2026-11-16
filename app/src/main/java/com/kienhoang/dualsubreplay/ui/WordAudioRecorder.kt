@@ -32,10 +32,18 @@ internal class WordAudioRecorder(
     private val googleSpeech = GoogleWebSpeech(application.googleAddressMemory(GOOGLE_SPEECH_ADDRESS_KEY))
     private val directory = File(application.cacheDir, CARD_AUDIO_CACHE_DIRECTORY)
 
-    suspend fun record(word: SavedWord): File? {
-        val text = spokenWord(word.word, word.reading).trim()
+    suspend fun record(word: SavedWord): File? = recordText(spokenWord(word.word, word.reading), word.wordLanguage)
+
+    /**
+     * Records [text] in [language] in the same voice, for the parts a card's back reads aloud. Text
+     * longer than Google's voice reads goes to the phone's voices.
+     */
+    suspend fun recordText(
+        spoken: String,
+        language: String,
+    ): File? {
+        val text = spoken.trim()
         if (text.isEmpty()) return null
-        val language = word.wordLanguage
         val name = wordAudioName(text, language)
         withContext(Dispatchers.IO) {
             directory.mkdirs()

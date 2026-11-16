@@ -207,6 +207,12 @@ internal enum class SearchableSetting(
         "meaning_in_context_switch",
         setOf(MEANING_IN_CONTEXT_PREFERENCE),
     ),
+    PREPARE_MEANINGS(
+        R.string.settings_prepare_meanings_title,
+        MoreSettingsSection.WORD_LEARNING,
+        "prepare_meanings_switch",
+        setOf(PREPARE_MEANINGS_PREFERENCE),
+    ),
     WORD_LEARNING_MODE(
         R.string.settings_word_learning_mode_title,
         MoreSettingsSection.WORD_LEARNING,
@@ -292,6 +298,24 @@ internal enum class SearchableSetting(
         "card_sound_first",
         setOf(CARD_SOUND_FIRST_PREFERENCE),
         CardSoundFirst.entries.map { it.labelRes },
+    ),
+    CARD_READING(
+        R.string.study_card_reading_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_reading",
+        setOf(CARD_READING_PLACE_PREFERENCE),
+        CARD_PLACE_LABELS,
+    ),
+    CARD_READ_ALOUD(
+        R.string.study_card_read_aloud_title,
+        MoreSettingsSection.FLASHCARDS,
+        "card_read_aloud",
+        setOf(CARD_READ_MEANING_PREFERENCE, CARD_READ_DICTIONARY_PREFERENCE, CARD_READ_TRANSLATION_PREFERENCE),
+        listOf(
+            R.string.study_card_read_aloud_meaning,
+            R.string.study_card_read_aloud_dictionary,
+            R.string.study_card_read_aloud_translation,
+        ),
     ),
     BLUR_BOX(R.string.study_blur_box_title, MoreSettingsSection.STUDY, "blur_box_switch", setOf(BLUR_BOX_PREFERENCE)),
     CHARACTER_DETAILS(

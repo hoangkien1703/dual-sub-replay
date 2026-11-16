@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">Elegir un idioma</string>
     <string name="settings_quick_subtitles">Subtítulos</string>
     <string name="settings_hide_while_playing">Ocultar al reproducir</string>
+    <string name="sleep_timer_title">Temporizador</string>
+    <string name="sleep_timer_off">No</string>
+    <string name="sleep_timer_minutes">%1$d min</string>
+    <string name="sleep_timer_end_of_video">Final del vídeo</string>
+    <string name="sleep_timer_left">Quedan %1$d min</string>
+    <string name="sleep_timer_description">Pausa el vídeo cuando se acaba el tiempo, también en segundo plano y con la pantalla apagada.</string>
     <string name="settings_close_settings">Cerrar ajustes</string>
     <string name="settings_peek">Ver el vídeo. Mantén pulsado para echar un vistazo o toca para dejarlo a la vista</string>
     <string name="settings_peek_back">Volver a los ajustes</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">Mostrar primero</string>
     <string name="settings_meaning_order_sentence">Significado en esta frase</string>
     <string name="settings_meaning_order_dictionary">Significado del diccionario</string>
+    <string name="settings_prepare_meanings_title">Preparar significados antes</string>
+    <string name="settings_prepare_meanings_description">Mientras suena una línea, pide a la IA el significado de cada una de sus palabras, para que una palabra tocada muestre su significado al instante. Usa tu clave incluso en líneas que no tocas.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizaje de palabras (colores por categoría)</string>
     <string name="settings_word_learning_mode_description">Colorea las palabras según su función gramatical (sustantivos, verbos, adjetivos, partículas) para ver la estructura de la oración.</string>
     <string name="settings_colored_lines_title">Líneas de subtítulos coloreadas</string>

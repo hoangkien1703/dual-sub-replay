@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">Dil seçin</string>
     <string name="settings_quick_subtitles">Altyazılar</string>
     <string name="settings_hide_while_playing">Oynayarkən gizlət</string>
+    <string name="sleep_timer_title">Yuxu taymeri</string>
+    <string name="sleep_timer_off">Yox</string>
+    <string name="sleep_timer_minutes">%1$d dəq</string>
+    <string name="sleep_timer_end_of_video">Videonun sonu</string>
+    <string name="sleep_timer_left">%1$d dəq qaldı</string>
+    <string name="sleep_timer_description">Vaxt bitəndə videonu dayandırır, arxa planda və ekran sönülü olanda da.</string>
     <string name="settings_close_settings">Ayarları bağla</string>
     <string name="settings_peek">Videonu görün. Baxmaq üçün basıb saxlayın və ya görünən qalması üçün toxunun</string>
     <string name="settings_peek_back">Ayarlara qayıt</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">Əvvəlcə göstər</string>
     <string name="settings_meaning_order_sentence">Bu cümlədəki mənası</string>
     <string name="settings_meaning_order_dictionary">Lüğət mənası</string>
+    <string name="settings_prepare_meanings_title">Mənaları əvvəlcədən hazırla</string>
+    <string name="settings_prepare_meanings_description">Sətir oynayarkən Sİ-dən onun hər sözünün mənasını soruşur, belə ki, toxunduğunuz sözün mənası dərhal görünür. Bu, toxunmadığınız sətirlər üçün də açarınızı istifadə edir.</string>
     <string name="settings_word_learning_mode_title">Söz öyrənmə rejimi (nitq hissəsi rəngləri)</string>
     <string name="settings_word_learning_mode_description">Cümlə quruluşunu görmək üçün sözləri qrammatik roluna görə (isimlər, fellər, sifətlər, ədatlar) rəngləyir.</string>
     <string name="settings_colored_lines_title">Rəngli altyazı sətirləri</string>

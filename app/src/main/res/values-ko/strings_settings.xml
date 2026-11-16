@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">언어 선택</string>
     <string name="settings_quick_subtitles">자막</string>
     <string name="settings_hide_while_playing">재생 중 숨기기</string>
+    <string name="sleep_timer_title">취침 타이머</string>
+    <string name="sleep_timer_off">끄기</string>
+    <string name="sleep_timer_minutes">%1$d분</string>
+    <string name="sleep_timer_end_of_video">동영상 끝</string>
+    <string name="sleep_timer_left">%1$d분 남음</string>
+    <string name="sleep_timer_description">시간이 되면 동영상을 일시정지합니다. 백그라운드와 화면이 꺼진 상태에서도 작동합니다.</string>
     <string name="settings_close_settings">설정 닫기</string>
     <string name="settings_peek">영상 보기. 길게 누르면 잠시 보이고, 탭하면 계속 보입니다</string>
     <string name="settings_peek_back">설정으로 돌아가기</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">먼저 보기</string>
     <string name="settings_meaning_order_sentence">이 문장에서의 뜻</string>
     <string name="settings_meaning_order_dictionary">사전 뜻</string>
+    <string name="settings_prepare_meanings_title">뜻 미리 준비</string>
+    <string name="settings_prepare_meanings_description">줄이 재생되는 동안 그 줄의 각 단어 뜻을 AI에 물어 두어, 누른 단어의 뜻이 바로 나옵니다. 누르지 않는 줄에도 키를 사용합니다.</string>
     <string name="settings_word_learning_mode_title">단어 학습 모드(품사별 색상)</string>
     <string name="settings_word_learning_mode_description">문법 역할(명사, 동사, 형용사, 조사)에 따라 단어에 색을 입혀 문장 구조를 보여 줘요.</string>
     <string name="settings_colored_lines_title">색상을 입힐 자막 줄</string>

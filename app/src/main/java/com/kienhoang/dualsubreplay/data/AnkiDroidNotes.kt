@@ -92,6 +92,10 @@ internal data class CardMedia(
     val word: String = "",
     val sentence: String = "",
     val picture: String = "",
+    /** Read aloud on the back: the meanings' sounds, after the Meaning field's text. */
+    val meaningSounds: String = "",
+    /** Read aloud on the back: the sentence translation's sound, after the Translation field's text. */
+    val translationSound: String = "",
 )
 
 /** The field text that plays the media file [name] in Anki; empty for a name Anki couldn't play. */
@@ -111,10 +115,10 @@ internal fun ankiNoteFields(
 ): List<String> =
     listOf(
         ankiHtml(word.word),
-        ankiHtml(word.meaning),
+        ankiHtml(word.meaning) + media.meaningSounds,
         ankiHtml(word.reading.orEmpty()),
         ankiSentenceHtml(word.sentence, word.word),
-        ankiTranslationHtml(word),
+        ankiTranslationHtml(word) + media.translationSound,
         listOf(media.picture, ankiSourceLink(word.videoId, word.startMs)).filter { it.isNotEmpty() }.joinToString("<br>"),
         media.word,
         media.sentence,
@@ -136,6 +140,9 @@ internal data class AnkiCardFiles(
     val word: File? = null,
     val sentence: File? = null,
     val picture: File? = null,
+    /** Read aloud on the back: the meaning in this sentence and the dictionary meaning, in the Meaning field's order. */
+    val meanings: List<File> = emptyList(),
+    val translation: File? = null,
 )
 
 /**
@@ -332,6 +339,8 @@ internal class AnkiDroidNotes(
                 word = files.word?.let { ankiSound(addMedia(it)) }.orEmpty(),
                 sentence = files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty(),
                 picture = files.picture?.let { ankiPicture(addMedia(it)) }.orEmpty(),
+                meaningSounds = files.meanings.joinToString("") { ankiSound(addMedia(it)) },
+                translationSound = files.translation?.let { ankiSound(addMedia(it)) }.orEmpty(),
             )
         val values =
             ContentValues().apply {

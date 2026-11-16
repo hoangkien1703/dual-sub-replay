@@ -31,6 +31,7 @@ import com.kienhoang.dualsubreplay.data.ImmersionRepository
 import com.kienhoang.dualsubreplay.data.ImmersionTimeTracker
 import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStore
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
+import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.LearnerData
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.PageFirstCaptionProvider
@@ -125,6 +126,9 @@ private const val CONTEXT_MEANING_CACHE_SIZE = 200
 
 /** A word card waits this long for the AI before showing only the dictionary meaning. */
 private const val CONTEXT_MEANING_TIMEOUT_MS = 20_000L
+
+/** A whole line's words take longer to answer than one word; it runs in the background. */
+private const val LINE_MEANINGS_TIMEOUT_MS = 45_000L
 
 class AppViewModel internal constructor(
     application: Application,
@@ -620,7 +624,25 @@ class AppViewModel internal constructor(
         val wordIndex = position?.wordIndex ?: -1
         if (index != current.currentIndex || wordIndex != current.activeWordIndex) {
             _state.update { it.copy(currentIndex = index, activeWordIndex = wordIndex) }
+            if (index != current.currentIndex && index >= 0) prepareMeaningsAhead(index)
         }
+    }
+
+    /**
+     * Settings → Word learning → Prepare meanings ahead (off by default: it spends the AI key on lines
+     * nobody taps): asks for the meanings of the words of the line that starts playing.
+     */
+    private fun prepareMeaningsAhead(index: Int) {
+        val application = getApplication<Application>()
+        if (!readMeaningInContext(application) || !readPrepareMeanings(application)) return
+        val current = _state.value
+        if (current.liveFallback) return
+        val segment = current.segments.getOrNull(index) ?: return
+        val context = meaningContext(segment, translated = false, current.segments) ?: return
+        val source =
+            com.kienhoang.dualsubreplay.data
+                .learningSourceLanguage(current.resolvedSourceLanguage, current.sourcePreference)
+        lineMeanings.prepare(context, source, current.targetLanguage)
     }
 
     private fun updateLiveSubtitle(
@@ -1048,10 +1070,16 @@ class AppViewModel internal constructor(
         if (!readMeaningInContext(application)) return ContextMeaning.None
         val context = meaningContext(selection, _state.value.segments) ?: return ContextMeaning.None
         val word = selection.token.text.trim()
-        val key =
-            listOf(selection.wordLanguage, selection.meaningLanguage, word, context.sentence, context.translation.orEmpty())
-                .joinToString("\u0000")
+        val key = contextMeaningKey(word, context, selection.wordLanguage, selection.meaningLanguage)
         contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
+        // A word tapped in an original line: once one request has answered every word of that line,
+        // its other words show at once (lion737, #81, 2026-11-15). A request already running for the
+        // line (the first tap's, or Prepare meanings ahead) is waited for instead of asking again.
+        val wholeLine = !selection.isPhrase && !selection.translated
+        if (wholeLine) {
+            lineMeanings.awaitRunning(context, selection.wordLanguage, selection.meaningLanguage)
+            contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
+        }
         // The bar above the line and the word card ask for the same selection: one request serves both,
         // and it finishes even when the bar closes first.
         val request =
@@ -1064,9 +1092,33 @@ class AppViewModel internal constructor(
                     }
                 }.also { contextMeaningRequests[key] = it }
         val found = request.await()
-        if (found is ContextMeaning.Found) contextMeanings.put(key, found.text)
+        if (found is ContextMeaning.Found) {
+            contextMeanings.put(key, found.text)
+            // The tapped word is answered first, then the line's other words in a second request.
+            if (wholeLine) lineMeanings.prepare(context, selection.wordLanguage, selection.meaningLanguage)
+        }
         return found
     }
+
+    /** Whole-line requests that fill [contextMeanings] (see LineMeanings.kt). */
+    private val lineMeanings =
+        LineMeanings(
+            scope = viewModelScope,
+            cached = contextMeanings::get,
+            store = { key, meaning -> contextMeanings.put(key, meaning) },
+            words = { sentence, language -> LanguageAwareTokenizer.tokenize(sentence, language).map { it.text } },
+            ask = { system, user ->
+                val model =
+                    withContext(Dispatchers.IO) {
+                        getApplication<Application>().aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport)
+                    }
+                try {
+                    model?.let { withTimeoutOrNull(LINE_MEANINGS_TIMEOUT_MS) { it.ask(system, user) }.orEmpty() }
+                } catch (_: IOException) {
+                    ""
+                }
+            },
+        )
 
     /** Requests for the meaning in a sentence still waiting for their answer, by [contextMeanings] key (main thread only). */
     private val contextMeaningRequests = HashMap<String, kotlinx.coroutines.Deferred<ContextMeaning>>()

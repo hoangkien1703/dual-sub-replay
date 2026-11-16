@@ -17,6 +17,7 @@ import com.kienhoang.dualsubreplay.translation.googleAddressMemory
 import com.kienhoang.dualsubreplay.translation.speaksWithGoogle
 import com.kienhoang.dualsubreplay.translation.storedTranslationEngine
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,6 +27,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
+
+/** At most this many words of a line are fetched ahead. */
+private const val MAX_PREPARED_WORDS = 30
 
 internal class WordPronouncer(
     context: Context,
@@ -38,6 +42,13 @@ internal class WordPronouncer(
     private val cache = PronunciationCache(File(application.cacheDir, "pronunciation"))
     private val googleSpeech = GoogleWebSpeech(application.googleAddressMemory(GOOGLE_SPEECH_ADDRESS_KEY))
     private var speech: Job? = null
+
+    /** The word [speech] says, as [pronunciationKey]. */
+    private var speaking: String? = null
+
+    /** Fetches a line's other words ahead ([prepare]), and the word it is recording, as [pronunciationKey], until done. */
+    private var preparing: Job? = null
+    private var preparingWord: Pair<String, CompletableDeferred<Unit>>? = null
     private var disposed = false
     private var lastResult: PronunciationResult? = null
     var message by mutableStateOf<String?>(null)
@@ -52,8 +63,11 @@ internal class WordPronouncer(
         if (disposed || word.isBlank()) return
         stop()
         if (cache.lookup(word, language) == null) message = resources.getString(R.string.practice_preparing_pronunciation)
+        speaking = pronunciationKey(word, language)
         speech =
             scope.launch {
+                // The word is being fetched ahead: wait for that recording instead of starting another.
+                preparingWord?.takeIf { it.first == pronunciationKey(word, language) }?.second?.await()
                 val result = pronounce(word, language)
                 lastResult = result
                 showSpeechSettings = result != PronunciationResult.SPOKEN && result != PronunciationResult.INVALID_LANGUAGE
@@ -69,19 +83,56 @@ internal class WordPronouncer(
     }
 
     /**
-     * Drops the recorded speech of the last word unless the learner is still on [word], and stops
-     * that word's speech if it is still being recorded or played, so it cannot start late.
+     * Stops the last word's speech unless the learner is still on [word], so it cannot start late.
+     * Its recording is kept for the next time.
      */
     fun forgetUnless(
         word: String,
         language: String,
     ) {
-        if (!cache.holds(word, language)) stop()
-        cache.keepOnly(word, language)
+        if (speaking != pronunciationKey(word, language)) stop()
     }
 
     /**
-     * Replays the recorded speech when [word] was the last word pronounced. Otherwise records it to
+     * Fetches Google's voice for [words] in [language] ahead, one at a time, so they play at once when
+     * tapped (lion737, #81, 2026-11-15). Only Google's online voice is fetched ahead: the phone's voice
+     * is quick anyway. A new call replaces the words of the previous one.
+     */
+    fun prepare(
+        words: List<String>,
+        language: String,
+    ) {
+        preparing?.cancel()
+        if (disposed || readPhoneVoice(application)) return
+        val engine = translationEngine()
+        val wanted =
+            words
+                .map(String::trim)
+                .distinct()
+                .filter { speaksWithGoogle(it, language, engine) && !cache.holds(it, language) }
+                .take(MAX_PREPARED_WORDS)
+        if (wanted.isEmpty()) return
+        preparing =
+            scope.launch {
+                for (word in wanted) {
+                    if (cache.holds(word, language)) continue
+                    val done = CompletableDeferred<Unit>()
+                    preparingWord = pronunciationKey(word, language) to done
+                    val file = cache.prepare(word, language, extension = "mp3")
+                    var ready = false
+                    try {
+                        ready = googleSpeech.record(word, language, file)
+                    } finally {
+                        preparingWord = null
+                        if (ready) cache.markReady(word, language) else cache.remove(word, language)
+                        done.complete(Unit)
+                    }
+                }
+            }
+    }
+
+    /**
+     * Replays the recorded speech when [word] is kept from before. Otherwise records it to
      * a file, keeps that file for the next replay and plays it; engines that cannot record speak it
      * directly instead. While Google translates subtitles, every language is first fetched from
      * Google's online voice, unless the learner picked the phone's voice; the phone's voices are the
@@ -98,20 +149,20 @@ internal class WordPronouncer(
         if (!readPhoneVoice(application) && speaksWithGoogle(word, language, translationEngine())) {
             val online = cache.prepare(word, language, extension = "mp3")
             if (googleSpeech.record(word, language, online)) {
-                cache.markReady()
+                cache.markReady(word, language)
                 if (withTimeoutOrNull(15_000) { playSpeechFile(online, volume) } == true) return PronunciationResult.SPOKEN
             }
-            cache.clear()
+            cache.remove(word, language)
         }
         val file = cache.prepare(word, language)
         val recorded = attempt(word, language, volume) { synthesize(word, file) && file.length() > 0 }
         if (recorded == PronunciationResult.SPOKEN) {
             // Engines record at very different levels; bring quiet recordings up to full loudness.
             withContext(Dispatchers.IO) { normalizeSpeechFile(file) }
-            cache.markReady()
+            cache.markReady(word, language)
             if (withTimeoutOrNull(15_000) { playSpeechFile(file, volume) } == true) return PronunciationResult.SPOKEN
         }
-        cache.clear()
+        cache.remove(word, language)
         // Only a recording or playback failure is worth a second try; the rest fail the same way.
         if (recorded != PronunciationResult.SPOKEN && recorded != PronunciationResult.PLAYBACK_FAILED) return recorded
         return attempt(word, language, volume) { speak(word) }
@@ -163,6 +214,7 @@ internal class WordPronouncer(
     fun stop() {
         speech?.cancel()
         speech = null
+        speaking = null
         message = null
         showSpeechSettings = false
     }
@@ -170,6 +222,7 @@ internal class WordPronouncer(
     fun close() {
         disposed = true
         stop()
+        preparing?.cancel()
         scope.cancel()
         cache.clear()
     }

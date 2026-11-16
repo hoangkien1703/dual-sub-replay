@@ -49,6 +49,13 @@
     <string name="study_card_place_off">Desligado</string>
     <string name="study_card_sound_first_title">Tocar primeiro</string>
     <string name="study_card_sound_first_description">Quando um lado do cartão tem os dois sons, este toca primeiro.</string>
+    <string name="study_card_reading_title">Leitura</string>
+    <string name="study_card_reading_description">A leitura da palavra: kana, pinyin ou o IPA de uma palavra em inglês (como ela soa). Na frente, só aparece quando a frente mostra a palavra.</string>
+    <string name="study_card_read_aloud_title">Ler em voz alta no verso</string>
+    <string name="study_card_read_aloud_meaning">Significado nesta frase</string>
+    <string name="study_card_read_aloud_dictionary">Significado do dicionário</string>
+    <string name="study_card_read_aloud_translation">Tradução da frase</string>
+    <string name="study_card_read_aloud_description">Os cartões novos leem isso em voz alta no verso, com a voz do idioma do significado, para revisar sem olhar. A parte sem voz para o idioma fica de fora.</string>
     <string name="study_card_place_note">O que está na frente também aparece no verso, porque o Anki mostra a frente acima da resposta.</string>
     <string name="study_card_front_title">Frente do cartão</string>
     <string name="study_card_front_word_sentence">Palavra e frase</string>

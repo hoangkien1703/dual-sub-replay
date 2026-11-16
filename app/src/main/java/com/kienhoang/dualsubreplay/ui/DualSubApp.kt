@@ -255,6 +255,11 @@ private fun SelectedWordDialog(
         androidx.compose.runtime.DisposableEffect(selection) {
             onDispose { pronouncer.stop() }
         }
+        // The word's voice and its line's other words are fetched while the card is read (lion737, #81).
+        androidx.compose.runtime.LaunchedEffect(selection) {
+            val words = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { lineSpokenWords(selection) }
+            pronouncer.prepare(words, selection.wordLanguage)
+        }
         val context = LocalContext.current
         val existingWord = savedWords.firstOrNull { it.id == com.kienhoang.dualsubreplay.data.savedWordFrom(selection, "", false).id }
         val namedDecks = remember(savedWords) { com.kienhoang.dualsubreplay.data.namedDecks(savedWords) }

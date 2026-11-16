@@ -49,6 +49,13 @@
     <string name="study_card_place_off">Tắt</string>
     <string name="study_card_sound_first_title">Phát trước</string>
     <string name="study_card_sound_first_description">Khi một mặt thẻ có cả hai âm thanh, âm thanh này phát trước.</string>
+    <string name="study_card_reading_title">Cách đọc</string>
+    <string name="study_card_reading_description">Cách đọc của từ: kana, pinyin, hoặc phiên âm IPA của từ tiếng Anh. Ở mặt trước, nó chỉ hiện khi mặt trước có từ đó.</string>
+    <string name="study_card_read_aloud_title">Đọc to ở mặt sau</string>
+    <string name="study_card_read_aloud_meaning">Nghĩa trong câu này</string>
+    <string name="study_card_read_aloud_dictionary">Nghĩa từ điển</string>
+    <string name="study_card_read_aloud_translation">Bản dịch câu</string>
+    <string name="study_card_read_aloud_description">Thẻ mới đọc to những phần này ở mặt sau bằng giọng của ngôn ngữ nghĩa, để bạn ôn mà không cần nhìn. Phần không có giọng cho ngôn ngữ đó sẽ bị bỏ qua.</string>
     <string name="study_card_place_note">Thứ ở mặt trước cũng hiện ở mặt sau, vì Anki hiện mặt trước phía trên câu trả lời.</string>
     <string name="study_card_front_title">Mặt trước thẻ</string>
     <string name="study_card_front_word_sentence">Từ và câu</string>

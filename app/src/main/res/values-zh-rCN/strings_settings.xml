@@ -67,6 +67,12 @@
     <string name="settings_third_line_choose">选择语言</string>
     <string name="settings_quick_subtitles">字幕</string>
     <string name="settings_hide_while_playing">播放时隐藏</string>
+    <string name="sleep_timer_title">定时关闭</string>
+    <string name="sleep_timer_off">关闭</string>
+    <string name="sleep_timer_minutes">%1$d 分钟</string>
+    <string name="sleep_timer_end_of_video">视频结束时</string>
+    <string name="sleep_timer_left">还剩 %1$d 分钟</string>
+    <string name="sleep_timer_description">时间到时暂停视频，在后台和熄屏时也有效。</string>
     <string name="settings_close_settings">关闭设置</string>
     <string name="settings_peek">查看视频。按住可临时查看，轻点可保持显示</string>
     <string name="settings_peek_back">返回设置</string>
@@ -118,6 +124,8 @@
     <string name="settings_meaning_order_title">优先显示</string>
     <string name="settings_meaning_order_sentence">在这句话中的意思</string>
     <string name="settings_meaning_order_dictionary">词典释义</string>
+    <string name="settings_prepare_meanings_title">提前准备释义</string>
+    <string name="settings_prepare_meanings_description">播放一行时，先向 AI 询问这一行每个词的意思，点词时立即显示释义。即使你没点的行也会使用你的密钥。</string>
     <string name="settings_word_learning_mode_title">单词学习模式（词性着色）</string>
     <string name="settings_word_learning_mode_description">按语法作用（名词、动词、形容词、助词）为单词着色，便于看清句子结构。</string>
     <string name="settings_colored_lines_title">着色的字幕行</string>

@@ -183,4 +183,48 @@ class AnkiCardLayoutTest {
         assertEquals(CardPlace.OFF, storedCardPlace("sideways", CardPlace.OFF))
         assertEquals(CardPlace.FRONT, storedCardPlace(null, CardPlace.FRONT))
     }
+
+    @Test
+    fun listeningPlaysTheLineFirstUnlessTheWordIsPicked() {
+        // lion737, #81: Play first on a Listening front. Never picked keeps the line first, as before.
+        val listening = CardOptions(wordSound = CardPlace.FRONT, sentenceSound = CardPlace.BACK, front = CardFront.LISTENING)
+        assertEquals(CardSoundFirst.SENTENCE, cardSoundFirstFor(CardFront.LISTENING, null))
+        assertEquals(CardSoundFirst.WORD, cardSoundFirstFor(CardFront.WORD, null))
+        assertFalse(listening.sides.listeningWordFirst)
+        assertEquals("listening+wordfront", cardTemplateKey(CardFront.LISTENING, listening.sides))
+        assertTrue(ankiCardTemplate(CardFront.LISTENING, listening.sides).question.startsWith("{{Sentence audio}}"))
+
+        val wordFirst = listening.copy(soundFirst = CardSoundFirst.WORD)
+        assertTrue(wordFirst.sides.listeningWordFirst)
+        assertEquals("listening+wordfront+wordfirst", cardTemplateKey(CardFront.LISTENING, wordFirst.sides))
+        val template = ankiCardTemplate(CardFront.LISTENING, wordFirst.sides)
+        assertTrue(template.question.startsWith("{{Word audio}}{{Sentence audio}}"))
+        assertEquals(fields, shown(template.question + template.answer))
+        // With the word's voice on the back there is nothing to play first on the front.
+        assertFalse(wordFirst.copy(wordSound = CardPlace.BACK).sides.listeningWordFirst)
+    }
+
+    @Test
+    fun theReadingGoesOnTheFrontOnlyWhenPickedAndTheFrontShowsTheWord() {
+        val back = ankiCardTemplate(CardFront.WORD, CardSides())
+        assertFalse("{{Reading}}" in back.question)
+        assertTrue("{{Reading}}" in back.answer)
+        assertEquals("word", cardTemplateKey(CardFront.WORD, CardSides()))
+
+        val front = ankiCardTemplate(CardFront.WORD, CardSides(reading = CardPlace.FRONT))
+        assertTrue(front.question.startsWith("<div class=word>{{Word}}</div><div class=reading>{{Reading}}</div>"))
+        assertFalse("{{Reading}}" in front.answer.removePrefix("{{FrontSide}}<hr id=answer>"))
+        assertEquals("word+readingfront", cardTemplateKey(CardFront.WORD, CardSides(reading = CardPlace.FRONT)))
+
+        // A sentence or listening front hides the word, so its reading stays on the back.
+        CardFront.entries.filterNot(::readingCanBeOnFront).forEach { hidden ->
+            val template = ankiCardTemplate(hidden, CardSides(reading = CardPlace.FRONT))
+            assertFalse(hidden.name, "{{Reading}}" in template.question)
+            assertTrue(hidden.name, "{{Reading}}" in template.answer)
+            assertEquals(cardTemplateKey(hidden), cardTemplateKey(hidden, CardSides(reading = CardPlace.FRONT)))
+        }
+        val off = ankiCardTemplate(CardFront.WORD_AND_SENTENCE, CardSides(reading = CardPlace.OFF))
+        assertFalse("{{Reading}}" in off.question + off.answer)
+        assertEquals("word_sentence+readingoff", cardTemplateKey(CardFront.WORD_AND_SENTENCE, CardSides(reading = CardPlace.OFF)))
+    }
 }

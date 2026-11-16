@@ -114,6 +114,7 @@ internal enum class AiSetting(
     PHONE_VOICE("phone_voice"),
     MEANING_IN_CONTEXT("meaning_in_context"),
     MEANING_ORDER("meaning_order", listOf("sentence_first", "dictionary_first")),
+    PREPARE_MEANINGS("prepare_meanings_ahead"),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
@@ -147,6 +148,10 @@ internal enum class AiSetting(
     CARD_SENTENCE_SOUND("anki_card_sentence_sound", AI_CARD_PLACES),
     CARD_PICTURE("anki_card_picture_place", AI_CARD_PLACES),
     CARD_SOUND_FIRST("anki_card_sound_first", AI_CARD_SOUNDS_FIRST),
+    CARD_READING("anki_card_reading_place", AI_CARD_PLACES),
+    CARD_READ_MEANING("anki_card_read_meaning"),
+    CARD_READ_DICTIONARY("anki_card_read_dictionary"),
+    CARD_READ_TRANSLATION("anki_card_read_translation"),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
     KANJI_DETAILS("kanji_details"),
@@ -874,7 +879,19 @@ private fun otherSettingValues(setting: AiSetting): String =
         AiSetting.CARD_SOUND_FIRST ->
             choiceList(setting.choices) +
                 " (which sound an Anki card plays first on a side that has both the word's voice and the line's sound; " +
-                "word by default; a listening front always starts with the line)"
+                "word by default; a listening front starts with the line unless word is picked)"
+        AiSetting.CARD_READING ->
+            choiceList(setting.choices) +
+                " (where an Anki card shows the word's reading: kana, pinyin or an English word's IPA; back by default; " +
+                "front only on fronts that show the word)"
+        AiSetting.CARD_READ_MEANING, AiSetting.CARD_READ_DICTIONARY, AiSetting.CARD_READ_TRANSLATION ->
+            choiceList(setting.choices) +
+                " (Read aloud on the back: new Anki cards read the meaning in this sentence, the dictionary meaning or the " +
+                "sentence translation aloud on the back, in the meaning's language; each on by default)"
+        AiSetting.PREPARE_MEANINGS ->
+            choiceList(setting.choices) +
+                " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +
+                "their meaning at once; uses the user's key even for lines they don't tap; off by default)"
         else -> choiceList(setting.choices)
     }
 
