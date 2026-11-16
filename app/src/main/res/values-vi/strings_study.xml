@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">Khi một mặt thẻ có cả hai âm thanh, âm thanh này phát trước.</string>
     <string name="study_card_reading_title">Cách đọc</string>
     <string name="study_card_reading_description">Cách đọc của từ: kana, pinyin, hoặc phiên âm IPA của từ tiếng Anh. Ở mặt trước, nó chỉ hiện khi mặt trước có từ đó.</string>
+    <string name="anki_sentence_sound_label">Câu trong video</string>
     <string name="study_card_read_aloud_title">Đọc to ở mặt sau</string>
     <string name="study_card_read_aloud_meaning">Nghĩa trong câu này</string>
     <string name="study_card_read_aloud_dictionary">Nghĩa từ điển</string>

@@ -48,6 +48,17 @@ class AnkiDroidNotesTest {
     }
 
     @Test
+    fun theLinesSoundHasALabelOnlyWhenThereIsASound() {
+        assertEquals(
+            "<span style=\"font-size:14px;opacity:.7\">Sentence from the video</span> [sound:a.m4a]",
+            labeledSentenceSound("Sentence from the video", "[sound:a.m4a]"),
+        )
+        assertEquals("", labeledSentenceSound("Sentence from the video", ""))
+        assertEquals("[sound:a.m4a]", labeledSentenceSound("", "[sound:a.m4a]"))
+        assertEquals("<span style=\"font-size:14px;opacity:.7\">A &lt;b&gt;</span> ", ankiSentenceSoundLabel("A <b>"))
+    }
+
+    @Test
     fun readAloudSoundsFollowTheMeaningAndTranslationText() {
         val media = CardMedia(meaningSounds = "[sound:m1.mp3][sound:m2.mp3]", translationSound = "[sound:t.mp3]")
         val fields = ankiNoteFields(word("1"), media)

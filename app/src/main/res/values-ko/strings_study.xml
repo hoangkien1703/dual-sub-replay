@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">카드 한 면에 두 소리가 모두 있으면 이 소리를 먼저 재생합니다.</string>
     <string name="study_card_reading_title">읽기</string>
     <string name="study_card_reading_description">단어의 읽기: 가나, 병음, 또는 영어 단어의 IPA(발음 기호). 앞면에는 앞면에 단어가 있을 때만 보입니다.</string>
+    <string name="anki_sentence_sound_label">동영상 속 문장</string>
     <string name="study_card_read_aloud_title">뒷면에서 읽어 주기</string>
     <string name="study_card_read_aloud_meaning">이 문장에서의 뜻</string>
     <string name="study_card_read_aloud_dictionary">사전 뜻</string>

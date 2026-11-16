@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">Google Translate no está instalado</string>
     <string name="practice_google_translate_cannot_open">Google Translate no pudo recibir el texto</string>
     <string name="practice_pronounce_item">Pronunciar %1$s</string>
+    <string name="practice_play_line">Reproducir la frase</string>
+    <string name="practice_read_meaning">Leer el significado en voz alta</string>
+    <string name="practice_read_translation">Leer la traducción en voz alta</string>
+    <string name="practice_picture">Imagen del vídeo</string>
     <string name="practice_speech_settings">Ajustes de voz</string>
     <string name="practice_show_meaning">Mostrar significado</string>
     <string name="practice_meaning_label">Significado (%1$s)</string>

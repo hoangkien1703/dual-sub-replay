@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">Jika satu sisi kartu punya kedua suara, suara ini diputar dulu.</string>
     <string name="study_card_reading_title">Cara baca</string>
     <string name="study_card_reading_description">Cara baca kata: kana, pinyin, atau IPA kata bahasa Inggris (bunyinya). Di depan hanya muncul jika bagian depan menampilkan kata itu.</string>
+    <string name="anki_sentence_sound_label">Kalimat dari video</string>
     <string name="study_card_read_aloud_title">Bacakan di bagian belakang</string>
     <string name="study_card_read_aloud_meaning">Arti dalam kalimat ini</string>
     <string name="study_card_read_aloud_dictionary">Arti kamus</string>

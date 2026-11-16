@@ -83,6 +83,25 @@ internal class WordPronouncer(
     }
 
     /**
+     * Plays a recorded line from [file] (Practice's sentence sound), or reads [fallback] in [language]
+     * when the file is missing or can't play.
+     */
+    fun play(
+        file: File?,
+        fallback: String,
+        language: String,
+    ) {
+        if (disposed) return
+        if (file == null) return speak(fallback, language)
+        stop()
+        speech =
+            scope.launch {
+                val played = withTimeoutOrNull(60_000) { playSpeechFile(file, readPronunciationVolume(application)) } == true
+                if (!played) speak(fallback, language)
+            }
+    }
+
+    /**
      * Stops the last word's speech unless the learner is still on [word], so it cannot start late.
      * Its recording is kept for the next time.
      */

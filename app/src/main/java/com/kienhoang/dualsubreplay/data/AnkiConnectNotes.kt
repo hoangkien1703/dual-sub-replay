@@ -337,7 +337,11 @@ internal class AnkiConnectNotes(
                     val fieldMedia =
                         CardMedia(
                             word = files.word?.let { ankiSound(storeMedia(it)) }.orEmpty(),
-                            sentence = files.sentence?.let { ankiSound(storeMedia(it)) }.orEmpty(),
+                            sentence =
+                                labeledSentenceSound(
+                                    media?.sentenceLabel,
+                                    files.sentence?.let { ankiSound(storeMedia(it)) }.orEmpty(),
+                                ),
                             picture = files.picture?.let { ankiPicture(storeMedia(it)) }.orEmpty(),
                             meaningSounds = files.meanings.map { ankiSound(storeMedia(it)) }.joinToString(""),
                             translationSound = files.translation?.let { ankiSound(storeMedia(it)) }.orEmpty(),
@@ -350,7 +354,14 @@ internal class AnkiConnectNotes(
                     val waits = options.sentenceAudio && fieldMedia.sentence.isEmpty()
                     if (waits && media != null && noteId != null && line != null && target != null) {
                         media.awaitSentence(
-                            PendingCardAudio(PENDING_ANKICONNECT, noteId, line, target.first, target.second, System.currentTimeMillis()),
+                            PendingCardAudio(
+                                PENDING_ANKICONNECT,
+                                noteId,
+                                line,
+                                target.first,
+                                target.second + ankiSentenceSoundLabel(media.sentenceLabel),
+                                System.currentTimeMillis(),
+                            ),
                         )
                         waiting++
                     }

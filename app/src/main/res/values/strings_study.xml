@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">When one side of the card has both sounds, this one plays first.</string>
     <string name="study_card_reading_title">Reading</string>
     <string name="study_card_reading_description">The word\'s reading: kana, pinyin, or an English word\'s IPA (how it sounds). On the front it shows only when the front shows the word.</string>
+    <string name="anki_sentence_sound_label">Sentence from the video</string>
     <string name="study_card_read_aloud_title">Read aloud on the back</string>
     <string name="study_card_read_aloud_meaning">Meaning in this sentence</string>
     <string name="study_card_read_aloud_dictionary">Dictionary meaning</string>

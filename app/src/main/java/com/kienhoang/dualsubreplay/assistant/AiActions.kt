@@ -894,7 +894,7 @@ private fun otherSettingValues(setting: AiSetting): String =
         AiSetting.CARD_READ_MEANING, AiSetting.CARD_READ_DICTIONARY, AiSetting.CARD_READ_TRANSLATION ->
             choiceList(setting.choices) +
                 " (Read aloud on the back: new Anki cards read the meaning in this sentence, the dictionary meaning or the " +
-                "sentence translation aloud on the back, in the meaning's language; each off by default, so the back plays only the line)"
+                "sentence translation aloud on the back, in the meaning's language; anki_card_read_meaning on by default, the other two off)"
         AiSetting.PREPARE_MEANINGS ->
             choiceList(setting.choices) +
                 " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +

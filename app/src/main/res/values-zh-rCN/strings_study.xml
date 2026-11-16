@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">卡片的一面同时有两种声音时，先播放这个。</string>
     <string name="study_card_reading_title">读音</string>
     <string name="study_card_reading_description">单词的读音：假名、拼音，或英语单词的国际音标（IPA）。只有正面显示单词时，正面才会显示读音。</string>
+    <string name="anki_sentence_sound_label">视频原句</string>
     <string name="study_card_read_aloud_title">背面朗读</string>
     <string name="study_card_read_aloud_meaning">在这句话中的意思</string>
     <string name="study_card_read_aloud_dictionary">词典释义</string>

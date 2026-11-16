@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">カードの片面に両方の音声があるとき、こちらを先に再生します。</string>
     <string name="study_card_reading_title">読み</string>
     <string name="study_card_reading_description">単語の読み：かな、ピンイン、または英単語の IPA（発音記号）。表面には、表面に単語があるときだけ表示されます。</string>
+    <string name="anki_sentence_sound_label">動画の文</string>
     <string name="study_card_read_aloud_title">裏面で読み上げ</string>
     <string name="study_card_read_aloud_meaning">この文での意味</string>
     <string name="study_card_read_aloud_dictionary">辞書の意味</string>

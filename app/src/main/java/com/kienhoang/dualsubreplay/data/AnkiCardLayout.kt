@@ -72,18 +72,19 @@ internal fun cardSoundFirstFor(
 /**
  * Which parts of the back Anki reads aloud (lion737, #81, 2026-11-15, for hands-free review): the meaning
  * in this sentence, the dictionary meaning and the sentence's translation, each in the voice of the
- * meaning's language. All off by default, so the back plays only the line's sound (owner pick
- * 2026-11-16, after trying them all on); [ALL] reads every part.
+ * meaning's language. By default only the meaning is read, so the back plays the word's meaning and
+ * the line (owner pick 2026-11-16, after trying all three on); a saved meaning without the "in
+ * sentence (dictionary)" shape counts as both. [NONE] reads nothing, [ALL] every part.
  */
 internal data class CardReadAloud(
-    val meaningInSentence: Boolean = false,
+    val meaningInSentence: Boolean = true,
     val dictionaryMeaning: Boolean = false,
     val translation: Boolean = false,
 ) {
     val any: Boolean get() = meaningInSentence || dictionaryMeaning || translation
 
     companion object {
-        val NONE = CardReadAloud()
+        val NONE = CardReadAloud(meaningInSentence = false)
         val ALL = CardReadAloud(meaningInSentence = true, dictionaryMeaning = true, translation = true)
     }
 }

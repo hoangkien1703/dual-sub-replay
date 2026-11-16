@@ -157,7 +157,23 @@ internal interface AnkiCardMedia {
     ): AnkiCardFiles
 
     fun awaitSentence(item: PendingCardAudio)
+
+    /** The small label before the line's sound on the card, in the app's language; empty for none. */
+    val sentenceLabel: String get() = ""
 }
+
+/**
+ * The text before the line's play button in the Sentence audio field, so learners know that button
+ * plays the line from the video (owner request 2026-11-16); empty for an empty [label].
+ */
+internal fun ankiSentenceSoundLabel(label: String?): String =
+    label?.takeIf { it.isNotBlank() }?.let { "<span style=\"font-size:14px;opacity:.7\">${ankiHtml(it)}</span> " }.orEmpty()
+
+/** [sound] with [label] before it; empty without a sound, so a card that waits for its clip shows no label yet. */
+internal fun labeledSentenceSound(
+    label: String?,
+    sound: String,
+): String = if (sound.isEmpty()) "" else ankiSentenceSoundLabel(label) + sound
 
 /** The authority of the provider that lends AnkiDroid the media files (read-only, for one copy). */
 internal fun cardAudioAuthority(context: Context): String = "${context.packageName}.cardaudio"
@@ -337,7 +353,7 @@ internal class AnkiDroidNotes(
         val fieldMedia =
             CardMedia(
                 word = files.word?.let { ankiSound(addMedia(it)) }.orEmpty(),
-                sentence = files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty(),
+                sentence = labeledSentenceSound(media?.sentenceLabel, files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty()),
                 picture = files.picture?.let { ankiPicture(addMedia(it)) }.orEmpty(),
                 meaningSounds = files.meanings.joinToString("") { ankiSound(addMedia(it)) },
                 translationSound = files.translation?.let { ankiSound(addMedia(it)) }.orEmpty(),
@@ -354,7 +370,14 @@ internal class AnkiDroidNotes(
         val line = audioLineOf(word)
         val pending =
             if (media != null && options.sentenceAudio && fieldMedia.sentence.isEmpty() && noteId != null && line != null) {
-                PendingCardAudio(PENDING_ANKIDROID, noteId, line, ANKI_SENTENCE_AUDIO_FIELD, "", System.currentTimeMillis())
+                PendingCardAudio(
+                    PENDING_ANKIDROID,
+                    noteId,
+                    line,
+                    ANKI_SENTENCE_AUDIO_FIELD,
+                    ankiSentenceSoundLabel(media.sentenceLabel),
+                    System.currentTimeMillis(),
+                )
             } else {
                 null
             }

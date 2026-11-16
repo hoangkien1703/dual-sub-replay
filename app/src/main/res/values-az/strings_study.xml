@@ -50,6 +50,7 @@
     <string name="study_card_sound_first_description">Kartın bir üzündə hər iki səs olanda əvvəl bu səslənir.</string>
     <string name="study_card_reading_title">Oxunuş</string>
     <string name="study_card_reading_description">Sözün oxunuşu: kana, pinyin və ya ingilis sözünün IPA-sı (necə səsləndiyi). Ön tərəfdə yalnız ön tərəf sözü göstərəndə görünür.</string>
+    <string name="anki_sentence_sound_label">Videodakı cümlə</string>
     <string name="study_card_read_aloud_title">Arxada səsli oxu</string>
     <string name="study_card_read_aloud_meaning">Bu cümlədəki mənası</string>
     <string name="study_card_read_aloud_dictionary">Lüğət mənası</string>

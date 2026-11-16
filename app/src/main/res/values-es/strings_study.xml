@@ -51,6 +51,7 @@
     <string name="study_card_sound_first_description">Cuando un lado de la tarjeta tiene los dos sonidos, este suena primero.</string>
     <string name="study_card_reading_title">Lectura</string>
     <string name="study_card_reading_description">La lectura de la palabra: kana, pinyin o el AFI de una palabra inglesa (cómo suena). En el anverso solo se ve cuando el anverso muestra la palabra.</string>
+    <string name="anki_sentence_sound_label">Frase del vídeo</string>
     <string name="study_card_read_aloud_title">Leer en voz alta en el reverso</string>
     <string name="study_card_read_aloud_meaning">Significado en esta frase</string>
     <string name="study_card_read_aloud_dictionary">Significado del diccionario</string>

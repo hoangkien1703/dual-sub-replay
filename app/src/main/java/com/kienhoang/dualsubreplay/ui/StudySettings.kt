@@ -289,7 +289,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         cardReading = storedCardPlace(preferences.getString(CARD_READING_PLACE_PREFERENCE, null), otherwise = CardPlace.BACK),
         cardReadAloud =
             CardReadAloud(
-                meaningInSentence = preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, false),
+                meaningInSentence = preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, true),
                 dictionaryMeaning = preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, false),
                 translation = preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, false),
             ),

@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">Google 翻訳がインストールされていません</string>
     <string name="practice_google_translate_cannot_open">Google 翻訳がテキストを受け取れませんでした</string>
     <string name="practice_pronounce_item">%1$s を発音</string>
+    <string name="practice_play_line">文を再生</string>
+    <string name="practice_read_meaning">意味を読み上げる</string>
+    <string name="practice_read_translation">訳を読み上げる</string>
+    <string name="practice_picture">動画の画像</string>
     <string name="practice_speech_settings">音声設定</string>
     <string name="practice_show_meaning">意味を表示</string>
     <string name="practice_meaning_label">意味(%1$s)</string>

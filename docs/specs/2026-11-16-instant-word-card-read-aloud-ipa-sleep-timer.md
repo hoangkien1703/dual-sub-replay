@@ -5,7 +5,7 @@
 Approved for implementation. Owner pick 2026-11-16 (thread "Review new GitHub comments"): build
 every recommendation for Discussion #81 comments 19625124, 19626135, 19629870, 19639979/19640011
 (lion737) and 19637480, 19637802 (25kiuo), with these owner changes: read-aloud on the card back is
-off by default (first on; the owner turned it off after trying the preview, 2026-11-16); English IPA is on by default; the AI part of "instant meanings" is a switch that is
+reads only the meaning by default (first all three; the owner changed it after trying the preview, 2026-11-16); English IPA is on by default; the AI part of "instant meanings" is a switch that is
 off by default.
 
 ## Context / problem
@@ -30,7 +30,8 @@ off by default.
    plays, for people who accept spending their key on lines they don't tap.
 3. Play first also on a Listening front.
 4. Read aloud on the back: Meaning in this sentence, Dictionary meaning, Sentence translation, each
-   a chip, all off by default (owner, after the first preview), so the back plays only the line.
+   a chip; only the meaning is on by default (owner, after the first preview). The line's play button
+   gets a small "Sentence from the video" label.
 5. English IPA under the word on the word card and in the card's Reading field; a Reading place
    (Front / Back) picks where the card shows it.
 6. Sleep timer in Settings → Playback, and in the subtitle gear popup when the learner asks for it.
@@ -55,7 +56,7 @@ off by default.
   meanings ahead** (off), asks for each line's words as the line starts playing.
 - **Play first** shows for a Listening front when the word sound is on the front: Sentence sound
   first (the default on Listening, as before) or Word sound first.
-- **Read aloud on the back** (Flashcards & Anki): three chips, all off by default. New cards get the picked meaning in
+- **Read aloud on the back** (Flashcards & Anki): three chips, only the meaning on by default. New cards get the picked meaning in
   this sentence, the dictionary meaning and the sentence translation as sounds on the back, in the
   voice of the meaning's language (Google's voice, else the phone's). A part with no voice, no text,
   or the same text as another part is skipped; a missing voice never stops a card.
@@ -121,8 +122,8 @@ off by default.
 
 ## Risks / edge cases
 
-- Read-aloud was first on by default; on the owner's phone the back then read three sounds after the
-  line, so it is off by default and each learner picks the parts.
+- Read-aloud first had all three parts on; on the owner's phone the back then read three sounds, so
+  only the meaning stays on by default and each learner picks more.
 - Google's voice has no Azerbaijani (checked: `translate_tts` with `tl=az` answers 400); such text
   uses the phone's voice or is skipped.
 - Meaning text edited by hand may not split into "in sentence (dictionary)"; it is then read as one.

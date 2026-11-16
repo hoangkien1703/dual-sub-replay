@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">Google 번역이 설치되어 있지 않습니다</string>
     <string name="practice_google_translate_cannot_open">Google 번역이 텍스트를 받을 수 없습니다</string>
     <string name="practice_pronounce_item">%1$s 발음</string>
+    <string name="practice_play_line">문장 재생</string>
+    <string name="practice_read_meaning">뜻 읽어 주기</string>
+    <string name="practice_read_translation">번역 읽어 주기</string>
+    <string name="practice_picture">동영상 사진</string>
     <string name="practice_speech_settings">음성 설정</string>
     <string name="practice_show_meaning">뜻 보기</string>
     <string name="practice_meaning_label">뜻(%1$s)</string>

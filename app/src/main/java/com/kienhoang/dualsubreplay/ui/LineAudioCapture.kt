@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnkiCardFiles
 import com.kienhoang.dualsubreplay.data.AnkiCardMedia
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
@@ -131,6 +132,8 @@ internal class CardMediaSource(
     private val clips = LineAudioStore.of(application)
     private val pictures = LinePictureStore.of(application)
     private val pending = PendingCardAudioStore(application)
+
+    override val sentenceLabel: String get() = application.getString(R.string.anki_sentence_sound_label)
 
     override suspend fun files(
         word: SavedWord,
