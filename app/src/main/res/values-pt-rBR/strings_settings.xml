@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">Fim do vídeo</string>
     <string name="sleep_timer_left">Faltam %1$d min</string>
     <string name="sleep_timer_description">Pausa o vídeo quando o tempo acaba, também em segundo plano e com a tela desligada.</string>
+    <string name="settings_section_playback_title">Reprodução</string>
+    <string name="sleep_timer_quick_title">Mostrar nas configurações rápidas</string>
+    <string name="sleep_timer_quick_description">Adiciona o timer ao menu pequeno que a engrenagem do painel de legendas abre.</string>
     <string name="settings_close_settings">Fechar configurações</string>
     <string name="settings_peek">Ver o vídeo. Segure para espiar ou toque para mantê-lo visível</string>
     <string name="settings_peek_back">Voltar às configurações</string>

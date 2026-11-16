@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">動画の終わり</string>
     <string name="sleep_timer_left">残り %1$d 分</string>
     <string name="sleep_timer_description">時間になると動画を一時停止します。バックグラウンドや画面オフでも動きます。</string>
+    <string name="settings_section_playback_title">再生</string>
+    <string name="sleep_timer_quick_title">クイック設定に表示</string>
+    <string name="sleep_timer_quick_description">字幕パネルの歯車で開く小さなメニューにスリープタイマーを追加します。</string>
     <string name="settings_close_settings">設定を閉じる</string>
     <string name="settings_peek">動画を見る。長押しで一時的に表示、タップで表示したままにします</string>
     <string name="settings_peek_back">設定に戻る</string>

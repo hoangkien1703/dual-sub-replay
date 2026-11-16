@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
@@ -52,7 +53,7 @@ class StudyToolsUiTest {
     fun forgetTheSettings() {
         preferences
             .edit()
-            .apply { (STUDY_SETTING_KEYS + APP_COLOR_THEME_PREFERENCE).forEach(::remove) }
+            .apply { (STUDY_SETTING_KEYS + PLAYBACK_SETTING_KEYS + APP_COLOR_THEME_PREFERENCE).forEach(::remove) }
             .commit()
     }
 
@@ -245,6 +246,18 @@ class StudyToolsUiTest {
         }
         composeRule.waitForIdle()
         saveUiEvidence("flashcards-reading-and-read-aloud")
+    }
+
+    @Test
+    fun theSleepTimerLivesInPlaybackAndOnlyJoinsTheGearPopupWhenAsked() {
+        showSettings("settings_section_playback")
+        composeRule.onNodeWithTag("sleep_timer").performScrollTo().assertIsDisplayed()
+        // Off by default, so the gear popup keeps only the languages and Hide while playing.
+        composeRule.onNodeWithTag("sleep_timer_quick_switch").performScrollTo().assertIsOff()
+        composeRule.waitForIdle()
+        saveUiEvidence("settings-playback-sleep-timer")
+        composeRule.onNodeWithTag("sleep_timer_quick_switch").performClick()
+        composeRule.runOnIdle { assertTrue(preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false)) }
     }
 
     @Test

@@ -33,7 +33,7 @@ off by default.
    a chip, all on by default.
 5. English IPA under the word on the word card and in the card's Reading field; a Reading place
    (Front / Back) picks where the card shows it.
-6. Sleep timer in the subtitle gear popup.
+6. Sleep timer in Settings → Playback, and in the subtitle gear popup when the learner asks for it.
 7. Try a muted replay for the sentence sound; ship it only if the recording still has sound.
 
 ## Non-goals
@@ -62,9 +62,10 @@ off by default.
 - **IPA.** An English word shows its American IPA (for example /ɡoʊ/) under the part of speech on
   the word card, and sends it in the card's Reading field. **Reading** (Flashcards & Anki): Front /
   Back, Back by default, so Japanese and Chinese cards don't show the answer's reading on the front.
-- **Sleep timer.** The gear popup gets a Sleep timer row: Off, 15, 30, 45, 60 minutes, or End of
-  video. When it ends, the video pauses. The row shows the time left. It is not saved: it ends with
-  the app.
+- **Sleep timer.** A new **Playback** section (Video group) holds the Sleep timer row: Off, 15, 30,
+  45, 60 minutes, or End of video. When it ends, the video pauses. The row and the section's line
+  show the time left. The timer is not saved: it ends with the app. **Show in quick settings** (off
+  by default, owner pick 2026-11-16) also puts the row in the subtitle gear popup.
 - **Muted replay.** The replay that records a card's sentence sound plays without sound; pausing it
   brings the sound back.
 
@@ -150,7 +151,10 @@ off by default.
   Reading place: Front / Back / Off (`+readingfront`, `+readingoff`); a front without the word keeps
   it on the back. Deviation: Off was added so a learner can drop readings from the card entirely.
 - Sleep timer: `playback/SleepTimer.kt` (`SleepTimerRunner`, checked every 30 s against
-  `elapsedRealtime`) and `ui/SleepTimerRow.kt` in the gear popup.
+  `elapsedRealtime`) and `ui/SleepTimerRow.kt`. Deviation (owner, 2026-11-16, after the first
+  preview): the row moved from the gear popup to Settings → Playback; `sleep_timer_in_quick_settings`
+  (off, shared in backups, reset by Reset all settings, settable by the assistant) shows it in the popup
+  too.
 - Muted replay: the emulator check (owner's laptop, Pixel 7 API 37, Chrome 149, 2026-11-16) found
   that `captureStream()` keeps the full sound while the video is muted or at volume 0 (average RMS
   about 0.09 in every case, two runs of 30 readings). So the replay for a card's sound now runs muted:

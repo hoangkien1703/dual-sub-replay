@@ -158,8 +158,22 @@ internal data class AiStoredSettings(
     val autoUpdate: Boolean = false,
     val adSkip: AdSkipSettings = AdSkipSettings(),
     val differentTabAccounts: Boolean = false,
+    val sleepTimerInQuickSettings: Boolean = false,
     val tvLayout: Boolean = false,
 )
+
+/** On/off settings the assistant writes straight to their preference, as their settings pages do. */
+private val STORED_SWITCHES =
+    mapOf(
+        AiSetting.UPDATE_REMINDERS to UPDATE_REMINDERS_PREFERENCE,
+        AiSetting.APP_AUTO_UPDATE to APP_AUTO_UPDATE_PREFERENCE,
+        AiSetting.SKIP_ADS to SKIP_ADS_PREFERENCE,
+        AiSetting.SKIP_SPONSORS to SKIP_SPONSORS_PREFERENCE,
+        AiSetting.ALWAYS_SKIP_SPONSORS to ALWAYS_SKIP_SPONSORS_PREFERENCE,
+        AiSetting.DIFFERENT_TAB_ACCOUNTS to DIFFERENT_TAB_ACCOUNTS_PREFERENCE,
+        AiSetting.SLEEP_TIMER_QUICK to SLEEP_TIMER_QUICK_PREFERENCE,
+        AiSetting.TV_LAYOUT to TV_LAYOUT_PREFERENCE,
+    )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
     val preferences = context.getSharedPreferences("dual_sub_preferences", 0)
@@ -183,6 +197,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         autoUpdate = preferences.getBoolean(APP_AUTO_UPDATE_PREFERENCE, false),
         adSkip = readAdSkipSettings(preferences),
         differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
+        sleepTimerInQuickSettings = preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false),
         tvLayout = readTvLayout(preferences, isTelevisionDevice(context)),
     )
 }
@@ -224,6 +239,7 @@ private fun aiStoredSettingValue(
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
         AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
         AiSetting.DIFFERENT_TAB_ACCOUNTS -> onOff(stored.differentTabAccounts)
+        AiSetting.SLEEP_TIMER_QUICK -> onOff(stored.sleepTimerInQuickSettings)
         AiSetting.TV_LAYOUT -> onOff(stored.tvLayout)
         else -> aiStudySettingValue(stored.study, setting)
     }
@@ -679,13 +695,7 @@ internal class AppAiActions(
                 // Like the settings page: turning it off forgets the dragged positions.
                 if (!on) REMEMBERED_POSITION_PREFERENCES.forEach(editor::remove)
             }
-            AiSetting.UPDATE_REMINDERS -> editor.putBoolean(UPDATE_REMINDERS_PREFERENCE, on)
-            AiSetting.APP_AUTO_UPDATE -> editor.putBoolean(APP_AUTO_UPDATE_PREFERENCE, on)
-            AiSetting.SKIP_ADS -> editor.putBoolean(SKIP_ADS_PREFERENCE, on)
-            AiSetting.SKIP_SPONSORS -> editor.putBoolean(SKIP_SPONSORS_PREFERENCE, on)
-            AiSetting.ALWAYS_SKIP_SPONSORS -> editor.putBoolean(ALWAYS_SKIP_SPONSORS_PREFERENCE, on)
-            AiSetting.DIFFERENT_TAB_ACCOUNTS -> editor.putBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, on)
-            AiSetting.TV_LAYOUT -> editor.putBoolean(TV_LAYOUT_PREFERENCE, on)
+            in STORED_SWITCHES -> editor.putBoolean(STORED_SWITCHES.getValue(setting), on)
             else -> if (!putStudySetting(editor, setting, value)) return false
         }
         editor.apply()
@@ -899,6 +909,7 @@ internal class AppAiActions(
             AiSetting.SKIP_SPONSORS -> switch(R.string.ads_skip_sponsors_title, value)
             AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
             AiSetting.DIFFERENT_TAB_ACCOUNTS -> switch(R.string.tabs_different_accounts_title, value)
+            AiSetting.SLEEP_TIMER_QUICK -> switch(R.string.sleep_timer_quick_title, value)
             AiSetting.TV_LAYOUT -> switch(R.string.tv_layout_title, value)
             else -> flashcardSettingLabel(setting, value)
         }

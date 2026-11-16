@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">Hết video</string>
     <string name="sleep_timer_left">Còn %1$d phút</string>
     <string name="sleep_timer_description">Tạm dừng video khi hết giờ, kể cả khi chạy nền và tắt màn hình.</string>
+    <string name="settings_section_playback_title">Phát video</string>
+    <string name="sleep_timer_quick_title">Hiện trong cài đặt nhanh</string>
+    <string name="sleep_timer_quick_description">Thêm Hẹn giờ tắt vào menu nhỏ mở từ nút bánh răng của khung phụ đề.</string>
     <string name="settings_close_settings">Đóng cài đặt</string>
     <string name="settings_peek">Xem video. Giữ để xem nhanh, hoặc chạm để video hiện cho đến khi quay lại</string>
     <string name="settings_peek_back">Quay lại cài đặt</string>

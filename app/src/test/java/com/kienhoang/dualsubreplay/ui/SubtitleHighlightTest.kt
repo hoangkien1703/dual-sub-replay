@@ -263,6 +263,7 @@ class SubtitleWordHighlightTest {
                 ALWAYS_SKIP_SPONSORS_PREFERENCE,
                 RECENT_TARGET_LANGUAGES_PREFERENCE,
                 DIFFERENT_TAB_ACCOUNTS_PREFERENCE,
+                SLEEP_TIMER_QUICK_PREFERENCE,
                 DRAWER_TABS_OPEN_PREFERENCE,
                 TV_LAYOUT_PREFERENCE,
             )

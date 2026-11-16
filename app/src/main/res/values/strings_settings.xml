@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">End of video</string>
     <string name="sleep_timer_left">%1$d min left</string>
     <string name="sleep_timer_description">Pauses the video when the time is up, also in the background and with the screen off.</string>
+    <string name="settings_section_playback_title">Playback</string>
+    <string name="sleep_timer_quick_title">Show in quick settings</string>
+    <string name="sleep_timer_quick_description">Adds the Sleep timer to the small menu that the subtitle panel’s gear opens.</string>
     <string name="settings_close_settings">Close settings</string>
     <string name="settings_peek">See the video. Hold to peek, or tap to keep it visible</string>
     <string name="settings_peek_back">Back to settings</string>

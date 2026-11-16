@@ -165,6 +165,9 @@ internal enum class AiSetting(
     /** Settings → YouTube tabs (2026-10-27). */
     DIFFERENT_TAB_ACCOUNTS("different_tab_accounts"),
 
+    /** Settings → Playback (2026-11-16). */
+    SLEEP_TIMER_QUICK("sleep_timer_in_quick_settings"),
+
     /** Settings → App updates (2026-10-30): reads GitHub once a day, so it waits for a tap. */
     UPDATE_REMINDERS("update_reminders", asks = true),
 
@@ -860,6 +863,10 @@ internal fun aiSettingValues(setting: AiSetting): String =
 /** What the settings [aiSettingValues] doesn't list take. */
 private fun otherSettingValues(setting: AiSetting): String =
     when (setting) {
+        AiSetting.SLEEP_TIMER_QUICK ->
+            choiceList(setting.choices) +
+                " (Settings → Playback → Show in quick settings: also shows the Sleep timer row in the small menu the " +
+                "subtitle panel's gear opens; off by default, then the timer is only in Settings → Playback)"
         AiSetting.CARD_FRONT ->
             choiceList(setting.choices) +
                 " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +

@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">Videonun sonu</string>
     <string name="sleep_timer_left">%1$d dəq qaldı</string>
     <string name="sleep_timer_description">Vaxt bitəndə videonu dayandırır, arxa planda və ekran sönülü olanda da.</string>
+    <string name="settings_section_playback_title">Oynatma</string>
+    <string name="sleep_timer_quick_title">Sürətli ayarlarda göstər</string>
+    <string name="sleep_timer_quick_description">Yuxu taymerini altyazı panelinin dişli düyməsinin açdığı kiçik menyuya əlavə edir.</string>
     <string name="settings_close_settings">Ayarları bağla</string>
     <string name="settings_peek">Videonu görün. Baxmaq üçün basıb saxlayın və ya görünən qalması üçün toxunun</string>
     <string name="settings_peek_back">Ayarlara qayıt</string>

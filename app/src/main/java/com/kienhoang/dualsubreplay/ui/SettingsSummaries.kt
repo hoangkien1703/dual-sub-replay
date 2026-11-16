@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.playback.SleepTimer
+import com.kienhoang.dualsubreplay.playback.SleepTimerChoice
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.update.APP_AUTO_UPDATE_PREFERENCE
 
@@ -31,10 +34,11 @@ internal sealed interface SummaryPart {
         val number: Int? = null,
     ) : SummaryPart
 
-    /** A setting and its value, shown as "Skip ads: On". */
+    /** A setting and its value, shown as "Skip ads: On"; [number] fills the value's `%1$d`. */
     data class Value(
         @StringRes val nameRes: Int,
         @StringRes val valueRes: Int,
+        val number: Int? = null,
     ) : SummaryPart
 }
 
@@ -57,6 +61,10 @@ internal data class SettingsSummaryState(
     val overlayInFullscreen: Boolean = true,
     val ads: AdSkipSettings = AdSkipSettings(),
     val differentTabAccounts: Boolean = false,
+    /** The running Sleep timer, null when it is off; [sleepTimerMinutesLeft] while minutes run. */
+    val sleepTimer: SleepTimerChoice? = null,
+    val sleepTimerMinutesLeft: Int = 0,
+    val sleepTimerInQuickSettings: Boolean = false,
     val appColors: AppColorThemeOption = AppColorThemeOption.DEEP_TEAL,
     /** Null in builds without the assistant, which have no AI section. */
     val ai: AiSummaryState? = null,
@@ -123,6 +131,7 @@ internal fun settingsSectionSummary(
             )
         MoreSettingsSection.TABS ->
             listOf(SummaryPart.Value(R.string.tabs_different_accounts_title, onOff(state.differentTabAccounts)))
+        MoreSettingsSection.PLAYBACK -> playbackSummary(state)
         MoreSettingsSection.COLORS -> listOf(SummaryPart.Label(state.appColors.labelRes))
         MoreSettingsSection.AI_ASSISTANT -> aiSummary(state.ai)
         MoreSettingsSection.UPDATES -> listOf(SummaryPart.Value(R.string.updates_auto_title, onOff(state.autoUpdate)))
@@ -130,6 +139,19 @@ internal fun settingsSectionSummary(
         // Nothing to switch here, so the line says what the section does.
         MoreSettingsSection.BACKUP -> listOf(SummaryPart.Label(R.string.backup_section_summary))
     }
+
+/** "Sleep timer: 15 min left", and "Show in quick settings: On" once the gear popup shows it. */
+private fun playbackSummary(state: SettingsSummaryState): List<SummaryPart> {
+    val timer =
+        when (state.sleepTimer) {
+            null -> SummaryPart.Value(R.string.sleep_timer_title, R.string.sleep_timer_off)
+            SleepTimerChoice.EndOfVideo -> SummaryPart.Value(R.string.sleep_timer_title, R.string.sleep_timer_end_of_video)
+            is SleepTimerChoice.Minutes ->
+                SummaryPart.Value(R.string.sleep_timer_title, R.string.sleep_timer_left, state.sleepTimerMinutesLeft)
+        }
+    val quick = SummaryPart.Value(R.string.sleep_timer_quick_title, R.string.ai_action_on)
+    return if (state.sleepTimerInQuickSettings) listOf(timer, quick) else listOf(timer)
+}
 
 private fun aiSummary(ai: AiSummaryState?): List<SummaryPart> =
     when {
@@ -149,7 +171,11 @@ internal fun settingsSummaryText(parts: List<SummaryPart>): String {
                 is SummaryPart.Plain -> part.text
                 is SummaryPart.Label -> part.number?.let { stringResource(part.res, it) } ?: stringResource(part.res)
                 is SummaryPart.Value ->
-                    stringResource(R.string.settings_summary_value, stringResource(part.nameRes), stringResource(part.valueRes))
+                    stringResource(
+                        R.string.settings_summary_value,
+                        stringResource(part.nameRes),
+                        part.number?.let { stringResource(part.valueRes, it) } ?: stringResource(part.valueRes),
+                    )
             }
         }
     return texts.joinToString(SETTINGS_SUMMARY_SEPARATOR)
@@ -157,7 +183,7 @@ internal fun settingsSummaryText(parts: List<SummaryPart>): String {
 
 /** A stored setting, read again whenever one of [keys] changes or Reset all settings clears them. */
 @Composable
-private fun <T> rememberStoredSetting(
+internal fun <T> rememberStoredSetting(
     vararg keys: String,
     read: (SharedPreferences) -> T,
 ): State<T> {
@@ -186,6 +212,9 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
     val ads by rememberAdSkipSettings()
     val differentTabAccounts by rememberDifferentTabAccounts()
     val tvLayout by rememberTvLayout()
+    val sleepTimer by SleepTimer.run.collectAsState()
+    val sleepTimerMinutesLeft = rememberSleepTimerMinutesLeft(sleepTimer)
+    val sleepTimerInQuickSettings by rememberSleepTimerInQuickSettings()
     val overlayInFullscreen by rememberStoredSetting(AUTO_OVERLAY_FULLSCREEN_PREFERENCE) {
         it.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true)
     }
@@ -203,6 +232,9 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
         overlayInFullscreen = overlayInFullscreen,
         ads = ads,
         differentTabAccounts = differentTabAccounts,
+        sleepTimer = sleepTimer?.choice,
+        sleepTimerMinutesLeft = sleepTimerMinutesLeft,
+        sleepTimerInQuickSettings = sleepTimerInQuickSettings,
         appColors = appColors,
         ai = ai,
         autoUpdate = autoUpdate,

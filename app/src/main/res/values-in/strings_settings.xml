@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">Akhir video</string>
     <string name="sleep_timer_left">Sisa %1$d mnt</string>
     <string name="sleep_timer_description">Menjeda video saat waktunya habis, juga di latar belakang dan saat layar mati.</string>
+    <string name="settings_section_playback_title">Pemutaran</string>
+    <string name="sleep_timer_quick_title">Tampilkan di setelan cepat</string>
+    <string name="sleep_timer_quick_description">Menambahkan Timer tidur ke menu kecil yang dibuka oleh ikon roda gigi di panel subtitel.</string>
     <string name="settings_close_settings">Tutup setelan</string>
     <string name="settings_peek">Lihat video. Tahan untuk mengintip, atau ketuk agar tetap terlihat</string>
     <string name="settings_peek_back">Kembali ke setelan</string>

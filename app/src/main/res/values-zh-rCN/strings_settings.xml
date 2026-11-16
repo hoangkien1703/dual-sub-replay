@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">视频结束时</string>
     <string name="sleep_timer_left">还剩 %1$d 分钟</string>
     <string name="sleep_timer_description">时间到时暂停视频，在后台和熄屏时也有效。</string>
+    <string name="settings_section_playback_title">播放</string>
+    <string name="sleep_timer_quick_title">在快捷设置中显示</string>
+    <string name="sleep_timer_quick_description">把定时关闭加到字幕面板齿轮按钮打开的小菜单里。</string>
     <string name="settings_close_settings">关闭设置</string>
     <string name="settings_peek">查看视频。按住可临时查看，轻点可保持显示</string>
     <string name="settings_peek_back">返回设置</string>

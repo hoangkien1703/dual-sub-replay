@@ -147,6 +147,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "ankiconnect_deck" to backup(S),
         // Ads and sponsors.
         "skip_ads" to share(B),
+        "sleep_timer_in_quick_settings" to share(B),
         "skip_sponsors" to share(B),
         "always_skip_sponsors" to share(B),
         // Progress, updates and TV.

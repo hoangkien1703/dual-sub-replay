@@ -73,6 +73,9 @@
     <string name="sleep_timer_end_of_video">동영상 끝</string>
     <string name="sleep_timer_left">%1$d분 남음</string>
     <string name="sleep_timer_description">시간이 되면 동영상을 일시정지합니다. 백그라운드와 화면이 꺼진 상태에서도 작동합니다.</string>
+    <string name="settings_section_playback_title">재생</string>
+    <string name="sleep_timer_quick_title">빠른 설정에 표시</string>
+    <string name="sleep_timer_quick_description">자막 패널의 톱니바퀴로 여는 작은 메뉴에 취침 타이머를 추가합니다.</string>
     <string name="settings_close_settings">설정 닫기</string>
     <string name="settings_peek">영상 보기. 길게 누르면 잠시 보이고, 탭하면 계속 보입니다</string>
     <string name="settings_peek_back">설정으로 돌아가기</string>

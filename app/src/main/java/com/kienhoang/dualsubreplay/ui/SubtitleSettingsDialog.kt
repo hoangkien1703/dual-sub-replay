@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -187,6 +188,9 @@ internal enum class MoreSettingsSection(
     ),
     ADS("ads", SettingsGroup.VIDEO, R.string.settings_section_ads_title, Icons.Default.FastForward),
     TABS("tabs", SettingsGroup.VIDEO, R.string.settings_section_tabs_title, Icons.Default.Tab),
+
+    /** The Sleep timer, out of the gear popup unless the learner puts it back (owner pick 2026-11-16). */
+    PLAYBACK("playback", SettingsGroup.VIDEO, R.string.settings_section_playback_title, Icons.Default.Bedtime),
     COLORS(
         "colors",
         SettingsGroup.APP,
@@ -560,7 +564,7 @@ private fun CompactLanguageRow(
 
 /**
  * The subtitle panel's gear opens this small popup over the video: the languages and Hide while
- * playing (owner pick 2026-11-10). "Settings" leads to the full settings page.
+ * playing (owner pick 2026-11-10), and the Sleep timer when Settings → Playback puts it here. "Settings" leads to the full settings page.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -621,7 +625,8 @@ internal fun QuickLanguageSettingsDialog(
                 )
                 Spacer(Modifier.height(16.dp))
                 HideWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
-                SleepTimerRow()
+                val sleepTimerHere by rememberSleepTimerInQuickSettings()
+                if (sleepTimerHere) SleepTimerRow()
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
@@ -1153,6 +1158,7 @@ private fun ColumnScope.SectionSettings(
         MoreSettingsSection.OVERLAY -> page.overlay(this)
         MoreSettingsSection.ADS -> AdSkipSettingsSection()
         MoreSettingsSection.TABS -> YouTubeTabsSettingsSection()
+        MoreSettingsSection.PLAYBACK -> PlaybackSettingsSection()
         MoreSettingsSection.COLORS -> page.colors(this)
         MoreSettingsSection.AI_ASSISTANT -> LocalAiAssistant.current?.let { AiAssistantSettingsSection(it, nested = true) }
         MoreSettingsSection.UPDATES -> AppUpdateSettingsSection()
