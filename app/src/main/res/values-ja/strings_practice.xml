@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">完全バックアップ(JSON)</string>
     <string name="practice_export_anki_text">Anki テキスト(TSV)</string>
     <string name="practice_word_translation_unavailable">翻訳を利用できません。意味を入力して単語を保存できます。</string>
-    <string name="practice_example_plays_original">例では翻訳後の単語ではなく、元の文が再生されます。</string>
     <string name="practice_save_failed">保存できませんでした。空き容量を確認して、もう一度お試しください。</string>
-    <string name="practice_saved_to_vocabulary">単語帳に保存しました</string>
     <string name="practice_phrase">フレーズ</string>
     <string name="practice_saving">保存中…</string>
-    <string name="practice_saved">保存済み</string>
-    <string name="practice_save_to_vocabulary">単語帳に保存</string>
     <string name="practice_word_by_word">単語ごと</string>
     <string name="practice_dictionary_form">辞書形：%1$s</string>
     <string name="practice_word_level_description">単語のレベル：CEFR %1$s</string>
@@ -161,4 +157,14 @@
     <string name="practice_from_video">出典: %1$s</string>
     <string name="practice_notes_label">メモ</string>
     <string name="practice_save_notes">メモを保存</string>
+    <string name="word_card_save_to_practice">練習に保存</string>
+    <string name="word_card_in_practice">練習に保存済み</string>
+    <string name="word_card_saved_note">保存しました。練習タブでいつでも見られます。</string>
+    <string name="word_card_saved_and_sent">練習に保存して %1$s に送りました。</string>
+    <string name="word_card_ask_ai">AIに聞く</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">送信済み</string>
+    <string name="word_card_more">その他</string>
+    <string name="word_card_more_description">この単語のその他の操作</string>
+    <string name="word_card_settings">単語カードの設定</string>
 </resources>

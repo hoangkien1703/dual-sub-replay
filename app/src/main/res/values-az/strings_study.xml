@@ -89,7 +89,6 @@
     <string name="study_known_word_toggle">Bu sözü bilirəm</string>
     <string name="study_send_to_anki">Göndər: %1$s</string>
     <string name="study_send_to_choose">Hara göndəriləcəyini seçin</string>
-    <string name="study_sending_to_anki">Göndərilir…</string>
     <string name="study_sent_to_anki">Göndərildi: %1$s</string>
     <string name="study_send_again_title">Bu kart yenidən göndərilsin?</string>
     <string name="study_send_again_text">%1$s artıq bu söz üçün kartı var. Daha biri əlavə olunur, köhnəsini orada silə bilərsiniz.</string>
@@ -136,10 +135,6 @@
     <string name="study_known_words_off">Söndürülüb</string>
     <string name="study_known_words_after_title">Sözü bu qədər gördükdən sonra bilinən say</string>
     <string name="study_word_seen">%2$d dəfədən %1$d dəfə görülüb</string>
-    <string name="study_known_words_offer_title">Bildiyim sözlər yandırılsın?</string>
-    <string name="study_known_words_offer_message">Bundan sonra altyazı paneli hər videonun nə qədərini artıq bildiyinizi göstərir, tez-tez gördüyünüz sözlər isə özü bilinən sayılır. Bunu sonra Ayarlar → Söz öyrənmə bölməsində dəyişə bilərsiniz.</string>
-    <string name="study_known_words_offer_confirm">Yandır</string>
-    <string name="study_known_words_offer_dismiss">İndi yox</string>
     <string name="study_loop_button_title">Oynayan sətirdə dövr düyməsi</string>
     <string name="study_loop_button_description">Transkriptdə oynayan sətirdə kiçik dövr işarəsi göstərir. Həmin sətri təkrarlamaq üçün ona toxunun; yenidən toxunana qədər təkrarlanır. Başqa sətrə toxunsanız və ya videonu irəli-geri çəksəniz, həmin sətir təkrarlanır.</string>
     <string name="dictation_type_what_you_heard">Eşitdiyinizi yazın</string>
@@ -150,4 +145,8 @@
     <string name="dictation_perfect">Mükəmməl!</string>
     <string name="dictation_score">Düz: %1$d / %2$d</string>
     <string name="dictation_hidden_line">Gizli sətir</string>
+    <string name="study_saved_word_video_example_title">Saxlanılan sözlər üçün video nümunə</string>
+    <string name="study_saved_word_video_example_description">Saxladığınız sözlər Məşqdə öz sətirlərini videodan təkrar oynada bilər. Hər söz üçün bunu orada dəyişə bilərsiniz.</string>
+    <string name="study_send_on_save_title">Saxlanılan sözləri həm də göndər</string>
+    <string name="study_send_on_save_description">Söz kartındakı “Məşqə saxla” sözü həm də %1$s tətbiqinə göndərir.</string>
 </resources>

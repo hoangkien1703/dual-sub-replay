@@ -8,21 +8,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,14 +53,12 @@ import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.AnkiProblem
 import com.kienhoang.dualsubreplay.data.AnkiSendResult
 import com.kienhoang.dualsubreplay.data.KnownWordsRepository
-import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.LineEncounters
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.VideoComprehension
 import com.kienhoang.dualsubreplay.data.knownWordKey
 import com.kienhoang.dualsubreplay.data.knownWordLanguage
 import com.kienhoang.dualsubreplay.data.lineWordKeys
-import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.videoComprehension
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -322,207 +314,7 @@ private fun ComprehensionDialog(
     )
 }
 
-/**
- * The word card's "I know this word" (for a single word in the video's language, with how often
- * Automatic saw it) and the Send to button (when that tool is on). While Known words is off (the
- * default), the first "I know this word" offers once to turn Automatic known words on.
- */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-internal fun StudyWordActions(
-    selection: LearningWordSelection,
-    meaning: String,
-) {
-    val tools = LocalStudyTools.current ?: return
-    val context = LocalContext.current
-    val preferences = remember(context) { studyPreferences(context) }
-    var offering by remember { mutableStateOf(false) }
-    val language = knownWordLanguage(selection.wordLanguage)?.takeIf { it == tools.wordsLanguage }
-    val key = selection.token.takeIf { !selection.isPhrase && !selection.translated }?.let(::knownWordKey)
-    val showKnown = language != null && key != null
-    if (!showKnown && !tools.sendToAvailable) return
-    val known = showKnown && key in tools.known
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (showKnown) {
-            FilterChip(
-                selected = known,
-                onClick = {
-                    tools.setKnown(language, key, !known)
-                    val offeredBefore = preferences.getBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, false)
-                    offering = !known && shouldOfferKnownWords(tools.settings, offeredBefore)
-                    if (offering) preferences.edit().putBoolean(KNOWN_WORDS_OFFERED_PREFERENCE, true).apply()
-                },
-                label = { Text(stringResource(R.string.study_known_word_toggle)) },
-                leadingIcon =
-                    if (known) {
-                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
-                    } else {
-                        null
-                    },
-                modifier = Modifier.testTag("known_word_toggle"),
-            )
-        }
-        if (tools.sendToAvailable) SendToButton(tools, selection, meaning)
-    }
-    val seen = if (showKnown && !known && tools.settings.knownWordsMode == KnownWordsMode.AUTO) tools.seen[key] ?: 0 else 0
-    if (seen > 0) {
-        Text(
-            stringResource(R.string.study_word_seen, seen, tools.settings.knownWordsAfter),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.testTag("known_word_seen"),
-        )
-    }
-    if (offering) {
-        KnownWordsOfferDialog(
-            onTurnOn = {
-                offering = false
-                preferences.edit().putString(KNOWN_WORDS_PREFERENCE, KnownWordsMode.AUTO.storageValue).apply()
-            },
-            onDismiss = { offering = false },
-        )
-    }
-}
-
-/** The first "I know this word" while Known words is off offers to turn it on, once. */
-internal fun shouldOfferKnownWords(
-    settings: StudySettings,
-    offeredBefore: Boolean,
-): Boolean = !settings.knownWords && !offeredBefore
-
-@Composable
-private fun KnownWordsOfferDialog(
-    onTurnOn: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { DialogTitle(stringResource(R.string.study_known_words_offer_title), onClose = onDismiss) },
-        text = { Text(stringResource(R.string.study_known_words_offer_message)) },
-        confirmButton = {
-            TextButton(onClick = onTurnOn, modifier = Modifier.testTag("turn_on_known_words")) {
-                Text(stringResource(R.string.study_known_words_offer_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.study_known_words_offer_dismiss)) }
-        },
-    )
-}
-
-/**
- * The word card's split Send to button (owner design 2026-10-23): the main part sends to the app
- * last picked (AnkiDroid at first) and names it; ▾ lists the apps, and picking one remembers it
- * and sends there at once.
- */
-@Composable
-private fun SendToButton(
-    tools: StudyTools,
-    selection: LearningWordSelection,
-    meaning: String,
-) {
-    val context = LocalContext.current
-    val preferences = remember(context) { studyPreferences(context) }
-    val word = savedWordFrom(selection, meaning, online = false)
-    val app = tools.settings.sendTo
-    val scope = rememberCoroutineScope()
-    var sending by remember(selection) { mutableStateOf(false) }
-    var sentNow by remember(selection) { mutableStateOf(emptySet<FlashcardApp>()) }
-    var problem by remember(selection) { mutableStateOf<Pair<FlashcardApp, AnkiSendResult>?>(null) }
-    var soundWaits by remember(selection) { mutableStateOf(false) }
-    var soundReplaying by remember(selection) { mutableStateOf(false) }
-    var menu by remember { mutableStateOf(false) }
-    var askAgain by remember(selection) { mutableStateOf(false) }
-    val sent = app in sentNow || tools.wasSent(app, word.id)
-    val send: (FlashcardApp, Boolean) -> Unit = { to, again ->
-        sending = true
-        problem = null
-        scope.launch {
-            val result = tools.send(to, listOf(word), again)
-            sending = false
-            soundWaits = result.waiting > 0
-            // The line was paused part-way: play it once now, so the card gets its sound without waiting.
-            soundReplaying = soundWaits && LineAudioBridge.replayForSound(word)
-            if (result.problem == null) sentNow = sentNow + to else problem = to to result
-        }
-    }
-    val permission =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                send(FlashcardApp.ANKIDROID, false)
-            } else {
-                problem =
-                    FlashcardApp.ANKIDROID to AnkiSendResult(problem = AnkiProblem.NO_PERMISSION)
-            }
-        }
-    val start: (FlashcardApp) -> Unit = { to ->
-        if (tools.needsPermission(to)) permission.launch(ANKIDROID_PERMISSION) else send(to, false)
-    }
-    val name = stringResource(app.nameRes)
-    Column {
-        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            FilterChip(
-                selected = sent,
-                // A sent card can go again (lion737, #81): after a settings change, or to replace one deleted in Anki.
-                enabled = !sending && meaning.isNotBlank(),
-                onClick = { if (sent) askAgain = true else start(app) },
-                label = {
-                    Text(
-                        when {
-                            sent -> stringResource(R.string.study_sent_to_anki, name)
-                            sending -> stringResource(R.string.study_sending_to_anki)
-                            else -> stringResource(R.string.study_send_to_anki, name)
-                        },
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Style,
-                        contentDescription = null,
-                        modifier = Modifier.size(FilterChipDefaults.IconSize),
-                    )
-                },
-                shape = SEND_TO_MAIN_SHAPE,
-                modifier = Modifier.testTag("send_to_anki"),
-            )
-            Box {
-                FilterChip(
-                    selected = false,
-                    enabled = !sending && meaning.isNotBlank(),
-                    onClick = { menu = true },
-                    label = { Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.study_send_to_choose)) },
-                    shape = SEND_TO_MENU_SHAPE,
-                    modifier = Modifier.testTag("send_to_menu"),
-                )
-                SendToMenu(
-                    expanded = menu,
-                    current = app,
-                    onDismiss = { menu = false },
-                    onPick = { picked ->
-                        menu = false
-                        preferences.edit().putString(SEND_TO_APP_PREFERENCE, picked.storageValue).apply()
-                        if (picked !in sentNow && !tools.wasSent(picked, word.id)) start(picked)
-                    },
-                )
-            }
-        }
-        if (askAgain) SendAgainDialog(name, { askAgain = false }) { send(app, true) }
-        if (soundWaits && problem == null) CardSoundWaitsNote(soundReplaying)
-        problem?.let { (to, result) ->
-            Text(
-                sendProblemText(LocalResources.current, to, result),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-            SendProblemAction(tools, to, result.problem)
-        }
-    }
-}
-
-private val SEND_TO_MAIN_SHAPE = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp, topEnd = 2.dp, bottomEnd = 2.dp)
-private val SEND_TO_MENU_SHAPE = RoundedCornerShape(topStart = 2.dp, bottomStart = 2.dp, topEnd = 8.dp, bottomEnd = 8.dp)
-
-/** The Send to button's list: every flashcard app, with a check by the one in use. */
+/** The Send all to button's list: every flashcard app, with a check by the one in use. */
 @Composable
 private fun SendToMenu(
     expanded: Boolean,
@@ -549,7 +341,7 @@ private fun SendToMenu(
  * only after it was opened: opening the app once lets the next try work.
  */
 @Composable
-private fun SendProblemAction(
+internal fun SendProblemAction(
     tools: StudyTools,
     app: FlashcardApp,
     problem: AnkiProblem?,
@@ -586,7 +378,7 @@ internal fun sendProblemText(
     }
 
 /**
- * The export dialog's "Send all to …" with the same ▾ list as the word card, when Send to shows.
+ * The export dialog's "Send all to …" with a ▾ list of the apps, when Send to shows.
  * Picking another app remembers it and sends every word there.
  */
 @Composable
@@ -654,7 +446,7 @@ internal fun sendResultText(
  * which [replaying] does right away.
  */
 @Composable
-private fun CardSoundWaitsNote(replaying: Boolean) {
+internal fun CardSoundWaitsNote(replaying: Boolean) {
     Text(
         stringResource(if (replaying) R.string.study_card_sound_replaying else R.string.study_card_sound_waits),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -665,7 +457,7 @@ private fun CardSoundWaitsNote(replaying: Boolean) {
 
 /** Asks before a second card of the same word goes to [appName]; Anki keeps both. */
 @Composable
-private fun SendAgainDialog(
+internal fun SendAgainDialog(
     appName: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,

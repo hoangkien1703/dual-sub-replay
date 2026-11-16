@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">Cadangan lengkap (JSON)</string>
     <string name="practice_export_anki_text">Teks Anki (TSV)</string>
     <string name="practice_word_translation_unavailable">Terjemahan tidak tersedia. Anda dapat memasukkan arti dan menyimpan kata.</string>
-    <string name="practice_example_plays_original">Contoh memutar kalimat asli, bukan kata yang diterjemahkan.</string>
     <string name="practice_save_failed">Tidak dapat menyimpan. Periksa ruang penyimpanan yang tersedia, lalu coba lagi.</string>
-    <string name="practice_saved_to_vocabulary">Disimpan ke kosakata Anda</string>
     <string name="practice_phrase">Frasa</string>
     <string name="practice_saving">Menyimpan…</string>
-    <string name="practice_saved">Tersimpan</string>
-    <string name="practice_save_to_vocabulary">Simpan ke kosakata</string>
     <string name="practice_word_by_word">Kata demi kata</string>
     <string name="practice_dictionary_form">Bentuk kamus: %1$s</string>
     <string name="practice_word_level_description">Level kata: CEFR %1$s</string>
@@ -161,4 +157,14 @@
     <string name="practice_from_video">Dari: %1$s</string>
     <string name="practice_notes_label">Catatan</string>
     <string name="practice_save_notes">Simpan catatan</string>
+    <string name="word_card_save_to_practice">Simpan ke Latihan</string>
+    <string name="word_card_in_practice">Di Latihan</string>
+    <string name="word_card_saved_note">Tersimpan. Temukan kapan saja di tab Latihan.</string>
+    <string name="word_card_saved_and_sent">Tersimpan ke Latihan dan terkirim ke %1$s.</string>
+    <string name="word_card_ask_ai">Tanya AI</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">Terkirim</string>
+    <string name="word_card_more">Lainnya</string>
+    <string name="word_card_more_description">Lainnya untuk kata ini</string>
+    <string name="word_card_settings">Setelan kartu kata</string>
 </resources>

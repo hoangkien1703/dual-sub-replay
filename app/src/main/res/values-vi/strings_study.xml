@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">Đánh dấu đã biết</string>
     <string name="study_known_word_toggle">Tôi biết từ này</string>
     <string name="study_send_to_anki">Gửi sang %1$s</string>
-    <string name="study_sending_to_anki">Đang gửi…</string>
     <string name="study_sent_to_anki">Đã gửi sang %1$s</string>
     <string name="study_send_again_title">Gửi lại thẻ này?</string>
     <string name="study_send_again_text">%1$s đã có thẻ cho từ này. Một thẻ nữa sẽ được thêm, và bạn có thể xóa thẻ cũ ở đó.</string>
@@ -118,10 +117,6 @@
     <string name="study_known_words_off">Tắt</string>
     <string name="study_known_words_after_title">Tính là đã biết sau khi gặp</string>
     <string name="study_word_seen">Đã gặp %1$d/%2$d lần</string>
-    <string name="study_known_words_offer_title">Bật Từ đã biết?</string>
-    <string name="study_known_words_offer_message">Khi đó bảng phụ đề sẽ cho biết bạn đã biết bao nhiêu phần của mỗi video, và những từ bạn gặp thường xuyên sẽ tự được tính là đã biết. Bạn có thể đổi lại sau trong Cài đặt → Học từ.</string>
-    <string name="study_known_words_offer_confirm">Bật</string>
-    <string name="study_known_words_offer_dismiss">Để sau</string>
     <string name="study_send_to_app_title">Gửi từ tới</string>
     <string name="study_ankidroid_description">Thẻ được đưa vào bộ thẻ DualSub Replay, chia bộ con theo từng ngôn ngữ (hoặc theo bộ thẻ Luyện tập). Hãy để AnkiDroid mở trong nền: trên nhiều điện thoại, AnkiDroid chỉ nhận thẻ khi đang chạy.</string>
     <string name="study_ankiconnect_description">Gửi tới AnkiConnect trên điện thoại này (127.0.0.1:8765), địa chỉ mà ứng dụng AnkiConnect Android, Yomitan và asbplayer dùng. Hãy mở AnkiConnect Android một lần để máy chủ của nó chạy. Nếu AnkiConnect không tạo được kiểu ghi chú DualSub Replay, thẻ sẽ dùng kiểu ghi chú Basic của Anki.</string>
@@ -145,4 +140,8 @@
     <string name="dictation_perfect">Hoàn hảo!</string>
     <string name="dictation_score">Đúng %1$d/%2$d</string>
     <string name="dictation_hidden_line">Dòng đang ẩn</string>
+    <string name="study_saved_word_video_example_title">Ví dụ video cho từ đã lưu</string>
+    <string name="study_saved_word_video_example_description">Từ bạn lưu có thể phát lại câu của nó từ video trong Luyện tập. Bạn có thể đổi cho từng từ ở đó.</string>
+    <string name="study_send_on_save_title">Gửi luôn từ đã lưu</string>
+    <string name="study_send_on_save_description">Nút Lưu vào Luyện tập trên thẻ từ cũng gửi từ sang %1$s.</string>
 </resources>

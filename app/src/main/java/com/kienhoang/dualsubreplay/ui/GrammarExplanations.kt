@@ -5,17 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -169,17 +163,13 @@ internal fun selectionRangeIn(
 }
 
 /**
- * The grammar of a Japanese, English, Chinese, Spanish or German selection, read from its whole subtitle line, and
- * the button that asks the assistant about the whole line ([onAskedAi] then closes the card);
- * nothing for other languages.
+ * The grammar of a Japanese, English, Chinese, Spanish or German selection, read from its whole
+ * subtitle line; nothing for other languages. The word card's Ask AI ([askAiAboutLine]) asks the
+ * assistant about the whole line.
  */
 @Composable
-internal fun GrammarExplanations(
-    selection: LearningWordSelection,
-    onAskedAi: () -> Unit = {},
-) {
-    val segment = selection.segment
-    val line = (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
+internal fun GrammarExplanations(selection: LearningWordSelection) {
+    val line = selectionLine(selection)
     val language = grammarLanguage(line, selection.wordLanguage) ?: return
     val revision = tokenizerRevision()
     val lineMatches = remember(line, language, revision) { grammarMatches(line, language).orEmpty() }
@@ -205,41 +195,46 @@ internal fun GrammarExplanations(
             { GermanRoleSection(germanRole, selection.token.text) }
         }
     GrammarPointList(matches, lead, leadCount = if (germanRole == null) 0 else 1)
-    AiGrammarButton(selection, line, lineMatches, onAskedAi)
 }
 
-/** Asks the assistant to explain the whole line's grammar; shown only while the assistant is on. */
+/** The subtitle line the selection was tapped in, in the selection's own language. */
+private fun selectionLine(selection: LearningWordSelection): String {
+    val segment = selection.segment
+    return (if (selection.translated) segment?.translatedText else segment?.originalText) ?: selection.token.text
+}
+
+/**
+ * Asks the assistant to explain the selection's whole line, with the grammar points found in it
+ * ([onAsked] then closes the card); null while the assistant is off, so Ask AI hides.
+ */
 @Composable
-private fun AiGrammarButton(
+internal fun askAiAboutLine(
     selection: LearningWordSelection,
-    line: String,
-    found: List<GrammarMatch>,
     onAsked: () -> Unit,
-) {
-    val host = LocalAiAssistant.current ?: return
+): (() -> Unit)? {
+    val host = LocalAiAssistant.current ?: return null
     val aiState by host.controller.state.collectAsStateWithLifecycle()
-    if (!aiState.settings.enabled) return
+    if (!aiState.settings.enabled) return null
     val question = stringResource(R.string.ai_explain_grammar_question)
-    OutlinedButton(
-        onClick = {
-            val segment = selection.segment
-            val context =
-                aiGrammarContext(
-                    line = line,
-                    lineLanguage = TranslationLanguages.displayName(selection.wordLanguage),
-                    otherLine = if (selection.translated) segment?.originalText else segment?.translatedText,
-                    otherLanguage = TranslationLanguages.displayName(selection.meaningLanguage),
-                    selected = selection.token.text,
-                    foundPoints = found.map { "${it.form} (${it.level.code})" },
-                )
-            host.controller.askFromApp(AiPendingQuestion(question, context, line))
-            onAsked()
-        },
-        modifier = Modifier.testTag("grammar_ask_ai"),
-    ) {
-        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(Modifier.width(8.dp))
-        Text(stringResource(R.string.ai_explain_grammar_button))
+    val line = selectionLine(selection)
+    val revision = tokenizerRevision()
+    val found =
+        remember(line, selection.wordLanguage, revision) {
+            grammarLanguage(line, selection.wordLanguage)?.let { grammarMatches(line, it) }.orEmpty()
+        }
+    return {
+        val segment = selection.segment
+        val context =
+            aiGrammarContext(
+                line = line,
+                lineLanguage = TranslationLanguages.displayName(selection.wordLanguage),
+                otherLine = if (selection.translated) segment?.originalText else segment?.translatedText,
+                otherLanguage = TranslationLanguages.displayName(selection.meaningLanguage),
+                selected = selection.token.text,
+                foundPoints = found.map { "${it.form} (${it.level.code})" },
+            )
+        host.controller.askFromApp(AiPendingQuestion(question, context, line))
+        onAsked()
     }
 }
 

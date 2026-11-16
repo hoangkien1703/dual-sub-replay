@@ -84,8 +84,17 @@ internal const val PAGE_TOKEN_NEEDED_PREFERENCE = "page_token_needed"
 /** Study tools → Loop button on the playing line (owner request 2026-11-06), off by default. */
 internal const val LOOP_BUTTON_PREFERENCE = "line_loop_button"
 
-/** The word card offered to turn Known words on once, after the first "I know this word". */
-internal const val KNOWN_WORDS_OFFERED_PREFERENCE = "known_words_offered"
+/**
+ * Flashcards & Anki → Also send saved words (owner pick 2026-11-17): Save to Practice on the word card
+ * also sends the card to the Send to app. Off by default.
+ */
+internal const val SEND_ON_SAVE_PREFERENCE = "send_saved_words"
+
+/**
+ * Flashcards & Anki → Video example for saved words (owner pick 2026-11-17): was the word card's
+ * "Online example" box. On by default, as the box was; each word can still change it in Practice.
+ */
+internal const val SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE = "saved_word_video_example"
 
 /** The Study tools settings, all reset by Reset all settings. */
 internal val STUDY_SETTING_KEYS =
@@ -116,7 +125,8 @@ internal val STUDY_SETTING_KEYS =
         KANJI_DETAILS_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
         PAGE_TOKEN_NEEDED_PREFERENCE,
-        KNOWN_WORDS_OFFERED_PREFERENCE,
+        SEND_ON_SAVE_PREFERENCE,
+        SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE,
     )
 
 /** How the video plays around each subtitle line (Settings → Study tools → Play mode). */
@@ -208,6 +218,10 @@ internal data class StudySettings(
     val ankiDroid: Boolean = true,
     val sendTo: FlashcardApp = FlashcardApp.ANKIDROID,
     val ankiConnectDeck: String? = null,
+    /** Save to Practice on the word card also sends the card to [sendTo]. */
+    val sendOnSave: Boolean = false,
+    /** New saved words get the Play online example button in Practice. */
+    val savedWordVideoExample: Boolean = true,
     /** Where cards carry the word's voice. */
     val cardWordSound: CardPlace = CardPlace.FRONT,
     /** Where cards carry the line's real sound from the video. */
@@ -225,7 +239,7 @@ internal data class StudySettings(
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
-    /** Known words is on (Automatic or Manual): the score, new-word marks and "I know this word" show. */
+    /** Known words is on (Automatic or Manual): the score, new-word marks and the word card's "I know this word" show. */
     val knownWords: Boolean get() = knownWordsMode != KnownWordsMode.OFF
 
     /** Which sound plays first on a card side with both. */
@@ -276,6 +290,8 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         ankiDroid = preferences.getBoolean(ANKIDROID_PREFERENCE, true),
         sendTo = storedFlashcardApp(preferences.getString(SEND_TO_APP_PREFERENCE, null)),
         ankiConnectDeck = preferences.getString(ANKICONNECT_DECK_PREFERENCE, null)?.takeIf { it.isNotBlank() },
+        sendOnSave = preferences.getBoolean(SEND_ON_SAVE_PREFERENCE, false),
+        savedWordVideoExample = preferences.getBoolean(SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE, true),
         cardWordSound = storedCardWordSound(preferences),
         cardSentenceSound = storedCardSentenceSound(preferences),
         // Add a picture to cards put it on the back.

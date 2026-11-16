@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">Backup completo (JSON)</string>
     <string name="practice_export_anki_text">Texto do Anki (TSV)</string>
     <string name="practice_word_translation_unavailable">Tradução indisponível. Você pode inserir um significado e salvar a palavra.</string>
-    <string name="practice_example_plays_original">O exemplo reproduz a frase original, não a palavra traduzida.</string>
     <string name="practice_save_failed">Não foi possível salvar. Verifique o armazenamento disponível e tente novamente.</string>
-    <string name="practice_saved_to_vocabulary">Salva no seu vocabulário</string>
     <string name="practice_phrase">Frase</string>
     <string name="practice_saving">Salvando…</string>
-    <string name="practice_saved">Salva</string>
-    <string name="practice_save_to_vocabulary">Salvar no vocabulário</string>
     <string name="practice_word_by_word">Palavra por palavra</string>
     <string name="practice_dictionary_form">Forma de dicionário: %1$s</string>
     <string name="practice_word_level_description">Nível da palavra: QECR %1$s</string>
@@ -181,4 +177,14 @@
     <string name="practice_from_video">De: %1$s</string>
     <string name="practice_notes_label">Notas</string>
     <string name="practice_save_notes">Salvar notas</string>
+    <string name="word_card_save_to_practice">Salvar em Praticar</string>
+    <string name="word_card_in_practice">Em Praticar</string>
+    <string name="word_card_saved_note">Salva. Encontre-a quando quiser na aba Praticar.</string>
+    <string name="word_card_saved_and_sent">Salva em Praticar e enviada para o %1$s.</string>
+    <string name="word_card_ask_ai">Perguntar à IA</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">Enviada</string>
+    <string name="word_card_more">Mais</string>
+    <string name="word_card_more_description">Mais para esta palavra</string>
+    <string name="word_card_settings">Configurações do cartão de palavra</string>
 </resources>

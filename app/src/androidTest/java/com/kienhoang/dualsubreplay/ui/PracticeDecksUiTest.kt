@@ -179,7 +179,7 @@ class PracticeDecksUiTest {
         compose.runOnIdle { assertEquals("Phrasal verbs", deck) }
         compose.onNodeWithTag("deck_chip").assertTextContains("Phrasal verbs", substring = true)
         saveUiEvidence("word-card-deck")
-        compose.onNodeWithTag("save_word").performScrollTo().performClick()
+        compose.onNodeWithTag("save_word").performClick()
         compose.runOnIdle { assertEquals("Phrasal verbs", savedDeck) }
 
         compose.onNodeWithTag("deck_chip").performScrollTo().performClick()

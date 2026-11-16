@@ -81,7 +81,6 @@
     <string name="study_mark_all_known_confirm">标记为认识</string>
     <string name="study_known_word_toggle">我认识这个词</string>
     <string name="study_send_to_anki">发送到 %1$s</string>
-    <string name="study_sending_to_anki">正在发送…</string>
     <string name="study_sent_to_anki">已发送到 %1$s</string>
     <string name="study_send_again_title">再次发送这张卡片？</string>
     <string name="study_send_again_text">%1$s 中已有这个单词的卡片。会再添加一张，你可以在那里删除旧的。</string>
@@ -118,10 +117,6 @@
     <string name="study_known_words_off">关闭</string>
     <string name="study_known_words_after_title">见过几次后算作认识</string>
     <string name="study_word_seen">已见 %1$d/%2$d 次</string>
-    <string name="study_known_words_offer_title">要开启已认识的词吗？</string>
-    <string name="study_known_words_offer_message">开启后，字幕面板会显示每个视频中你已认识的比例，常见到的词也会自动算作已认识。之后可在设置 → 单词学习中更改。</string>
-    <string name="study_known_words_offer_confirm">开启</string>
-    <string name="study_known_words_offer_dismiss">暂不</string>
     <string name="study_send_to_app_title">单词发送到</string>
     <string name="study_ankidroid_description">卡片会放入 DualSub Replay 牌组中按语言(或练习牌组)分开的子牌组。请让 AnkiDroid 在后台保持打开:在许多手机上,AnkiDroid 只在运行时接收卡片。</string>
     <string name="study_ankiconnect_description">发送到本机的 AnkiConnect(127.0.0.1:8765),AnkiConnect Android 应用、Yomitan 和 asbplayer 都使用这个地址。请先打开一次 AnkiConnect Android,让它的服务器运行。如果 AnkiConnect 无法创建 DualSub Replay 笔记类型,卡片会使用 Anki 的 Basic 笔记类型。</string>
@@ -145,4 +140,8 @@
     <string name="dictation_perfect">完全正确！</string>
     <string name="dictation_score">共 %2$d 个，对了 %1$d 个</string>
     <string name="dictation_hidden_line">隐藏的行</string>
+    <string name="study_saved_word_video_example_title">已保存单词的视频示例</string>
+    <string name="study_saved_word_video_example_description">你保存的单词可以在练习中重播视频里的那一句。也可以在那里为每个单词单独更改。</string>
+    <string name="study_send_on_save_title">同时发送保存的单词</string>
+    <string name="study_send_on_save_description">在单词卡上点“保存到练习”时，也会把单词发送到 %1$s。</string>
 </resources>

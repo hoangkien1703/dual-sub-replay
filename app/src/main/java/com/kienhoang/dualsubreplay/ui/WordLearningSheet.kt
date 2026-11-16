@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.BookmarkAdded
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -30,6 +28,7 @@ import com.kienhoang.dualsubreplay.data.EnglishIpa
 import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
+import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.validClipRange
 import com.kienhoang.dualsubreplay.data.wordReading
 import kotlinx.coroutines.CancellationException
@@ -53,19 +52,41 @@ internal fun WordLearningDialog(
     namedDecks: List<String> = emptyList(),
     onDeckChange: ((String?) -> Unit)? = null,
     onMeaningInContext: suspend () -> ContextMeaning = { ContextMeaning.None },
+    /** More → Word card settings: opens Settings at Word learning; hidden when null. */
+    onOpenSettings: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val word = remember(selection) { WordMeaningState(existingWord?.meaning.orEmpty(), readMeaningInContextFirst(context)) }
-    var saved by remember(selection) { mutableStateOf(existingWord != null) }
-    var saving by remember(selection) { mutableStateOf(false) }
-    var online by remember(selection) { mutableStateOf(existingWord?.online ?: true) }
+    val saving = remember(selection) { WordSaving(saved = existingWord != null) }
     var characterPage by remember(selection) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val canClip = validClipRange(selection.videoId, selection.segment?.startMs ?: -1, selection.segment?.endMs ?: -1)
+    // Settings → Flashcards & Anki → Video example for saved words; a saved word keeps its own choice.
+    val studySettings by rememberStudySettings()
+    val send = rememberWordCardSend(selection)
 
     LaunchedEffect(selection) {
         if (autoPronounce) onSpeak()
         if (existingWord == null) word.load(onTranslateWord, onMeaningInContext) else word.loading = false
+    }
+    val save: () -> Unit = {
+        saving.saving = true
+        scope.launch {
+            try {
+                onSave(word.saved, (existingWord?.online ?: studySettings.savedWordVideoExample) && canClip)
+                saving.saved = true
+                word.error = null
+                // Also send saved words (off by default): Save to Practice sends the card too.
+                val card = savedWordFrom(selection, word.saved, online = false)
+                if (send != null && send.sendsOnSave && !send.isSent(card)) send.start(card)
+            } catch (cancel: CancellationException) {
+                throw cancel
+            } catch (_: Exception) {
+                word.error = R.string.practice_save_failed
+            } finally {
+                saving.saving = false
+            }
+        }
     }
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -74,62 +95,86 @@ internal fun WordLearningDialog(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             tonalElevation = 6.dp,
         ) {
-            Column(
-                Modifier
-                    .heightIn(
-                        max = 560.dp,
-                    ).verticalScroll(rememberScrollState())
-                    .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                WordCardHeader(selection.token.text, onSpeak, onDismiss)
-                Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val openCharacter = characterPage
-                    if (openCharacter != null) {
-                        CharacterPage(openCharacter, selection, onBack = { characterPage = null }, onAskedAi = onDismiss)
-                        return@Column
-                    }
-                    WordMeaningSection(word, selection, enabled = !saving) { saved = false }
-                    WordCardDetails(selection, speechMessage, onSpeechSettings)
-                    CharacterSection(selection) { characterPage = it }
-                    GrammarExplanations(selection, onAskedAi = onDismiss)
-                    if (canClip) {
-                        ClipChoice(stringResource(R.string.practice_online_example), online, {
-                            online = it
-                            saved = false
-                        }, "online_clip_choice")
-                        if (selection.translated) {
-                            Text(
-                                stringResource(R.string.practice_example_plays_original),
-                                style = MaterialTheme.typography.bodySmall,
+            Column(Modifier.heightIn(max = 560.dp)) {
+                Column(
+                    Modifier
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState())
+                        .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    WordCardHeader(selection.token.text, onSpeak, onDismiss)
+                    Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val openCharacter = characterPage
+                        if (openCharacter != null) {
+                            CharacterPage(openCharacter, selection, onBack = { characterPage = null }, onAskedAi = onDismiss)
+                            return@Column
+                        }
+                        WordMeaningSection(word, selection, enabled = !saving.saving) { saving.saved = false }
+                        WordCardDetails(selection, speechMessage, onSpeechSettings)
+                        CharacterSection(selection) { characterPage = it }
+                        GrammarExplanations(selection)
+                        // The deck shows once there is more than the language's own deck to pick.
+                        if (onDeckChange != null && (namedDecks.isNotEmpty() || deck != null)) {
+                            DeckChip(
+                                deck,
+                                selection.wordLanguage,
+                                namedDecks,
+                                { onDeckChange(it).also { saving.saved = false } },
+                                enabled = !saving.saving,
                             )
                         }
+                        if (selection.isPhrase) WordByWord(selection.parts, onSpeakPart)
                     }
-                    onDeckChange?.let { change ->
-                        DeckChip(deck, selection.wordLanguage, namedDecks, { change(it).also { saved = false } }, enabled = !saving)
-                    }
-                    SaveWordButton(saving = saving, saved = saved, enabled = !saving && !word.loading && !saved) {
-                        saving = true
-                        scope.launch {
-                            try {
-                                onSave(word.saved, online && canClip)
-                                saved = true
-                                word.error = null
-                            } catch (cancel: CancellationException) {
-                                throw cancel
-                            } catch (_: Exception) {
-                                word.error = R.string.practice_save_failed
-                            } finally {
-                                saving = false
-                            }
-                        }
-                    }
-                    if (saved) Text(stringResource(R.string.practice_saved_to_vocabulary), modifier = Modifier.testTag("word_saved"))
-                    StudyWordActions(selection, word.saved)
-                    if (selection.isPhrase) WordByWord(selection.parts, onSpeakPart)
                 }
+                if (characterPage == null) WordCardBottom(selection, word, saving, send, save, onDismiss, onOpenSettings)
             }
         }
+    }
+}
+
+/** Whether the word card's word is being saved, or was saved. */
+@Stable
+private class WordSaving(
+    saved: Boolean,
+) {
+    var saved by mutableStateOf(saved)
+    var saving by mutableStateOf(false)
+}
+
+/** The bar under the card's scrolling part, always in view, and the lines under it. */
+@Composable
+private fun WordCardBottom(
+    selection: LearningWordSelection,
+    word: WordMeaningState,
+    saving: WordSaving,
+    send: WordCardSend?,
+    onSave: () -> Unit,
+    onDismiss: () -> Unit,
+    onOpenSettings: (() -> Unit)?,
+) {
+    val known = knownWordToggle(selection)
+    val card = remember(selection, word.saved) { savedWordFrom(selection, word.saved, online = false) }
+    HorizontalDivider(Modifier.padding(horizontal = 20.dp))
+    Column(Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        WordCardActionBar(
+            save =
+                when {
+                    saving.saving -> SaveToPracticeState.SAVING
+                    saving.saved -> SaveToPracticeState.SAVED
+                    else -> SaveToPracticeState.READY
+                },
+            saveEnabled = !word.loading,
+            onSave = onSave,
+            askAi = askAiAboutLine(selection, onAsked = onDismiss),
+            anki =
+                send?.takeIf { it.showsButton }?.let { shown ->
+                    { modifier -> WordCardAnkiButton(shown, card, enabled = word.saved.isNotBlank(), modifier = modifier) }
+                },
+            known = known,
+            onOpenSettings = onOpenSettings,
+        )
+        WordCardStatus(saved = saving.saved, send = send, word = card, known = known)
     }
 }
 
@@ -375,30 +420,6 @@ private fun WordCardHeader(
         IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.Top).testTag("close_word_card")) {
             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.practice_close))
         }
-    }
-}
-
-@Composable
-private fun SaveWordButton(
-    saving: Boolean,
-    saved: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    Button(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth().testTag("save_word")) {
-        Icon(if (saved) Icons.Default.BookmarkAdded else Icons.Default.BookmarkAdd, contentDescription = null)
-        Spacer(Modifier.width(8.dp))
-        Text(
-            stringResource(
-                if (saving) {
-                    R.string.practice_saving
-                } else if (saved) {
-                    R.string.practice_saved
-                } else {
-                    R.string.practice_save_to_vocabulary
-                },
-            ),
-        )
     }
 }
 

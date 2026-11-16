@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">Tam ehtiyat nüsxə (JSON)</string>
     <string name="practice_export_anki_text">Anki mətni (TSV)</string>
     <string name="practice_word_translation_unavailable">Tərcümə mümkün deyil. Mənanı özünüz yazıb sözü saxlaya bilərsiniz.</string>
-    <string name="practice_example_plays_original">Nümunə tərcümə olunmuş sözü yox, orijinal cümləni oynadır.</string>
     <string name="practice_save_failed">Saxlamaq mümkün olmadı. Boş yaddaşı yoxlayın və yenidən cəhd edin.</string>
-    <string name="practice_saved_to_vocabulary">Lüğətinizə saxlanıldı</string>
     <string name="practice_phrase">İfadə</string>
     <string name="practice_saving">Saxlanılır…</string>
-    <string name="practice_saved">Saxlanıldı</string>
-    <string name="practice_save_to_vocabulary">Lüğətə saxla</string>
     <string name="practice_word_by_word">Söz-söz</string>
     <string name="practice_dictionary_form">Lüğət forması: %1$s</string>
     <string name="practice_word_level_description">Söz səviyyəsi: CEFR %1$s</string>
@@ -171,4 +167,14 @@
     <string name="practice_from_video">Mənbə: %1$s</string>
     <string name="practice_notes_label">Qeydlər</string>
     <string name="practice_save_notes">Qeydləri yadda saxla</string>
+    <string name="word_card_save_to_practice">Məşqə saxla</string>
+    <string name="word_card_in_practice">Məşqdədir</string>
+    <string name="word_card_saved_note">Saxlanıldı. Onu istənilən vaxt Məşq bölməsində tapa bilərsiniz.</string>
+    <string name="word_card_saved_and_sent">Məşqə saxlanıldı və %1$s tətbiqinə göndərildi.</string>
+    <string name="word_card_ask_ai">AI-dan soruş</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">Göndərildi</string>
+    <string name="word_card_more">Daha çox</string>
+    <string name="word_card_more_description">Bu söz üçün daha çox</string>
+    <string name="word_card_settings">Söz kartı ayarları</string>
 </resources>

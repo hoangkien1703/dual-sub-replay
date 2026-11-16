@@ -258,11 +258,23 @@ internal enum class SearchableSetting(
         "mark_new_words_switch",
         setOf(MARK_NEW_WORDS_PREFERENCE),
     ),
+    SAVED_WORD_VIDEO_EXAMPLE(
+        R.string.study_saved_word_video_example_title,
+        MoreSettingsSection.FLASHCARDS,
+        "saved_word_video_example_switch",
+        setOf(SAVED_WORD_VIDEO_EXAMPLE_PREFERENCE),
+    ),
     SEND_TO(
         R.string.study_anki_title,
         MoreSettingsSection.FLASHCARDS,
         "ankidroid_switch",
         setOf(ANKIDROID_PREFERENCE, SEND_TO_APP_PREFERENCE, ANKICONNECT_DECK_PREFERENCE),
+    ),
+    SEND_ON_SAVE(
+        R.string.study_send_on_save_title,
+        MoreSettingsSection.FLASHCARDS,
+        "send_on_save_switch",
+        setOf(SEND_ON_SAVE_PREFERENCE),
     ),
     CARD_FRONT(
         R.string.study_card_front_title,

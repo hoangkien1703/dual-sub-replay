@@ -122,6 +122,8 @@ class AiActionsTest {
         assertEquals("ankiconnect", setting("send_to_app", "anki connect"))
         assertEquals("ankidroid", setting("send_to_app", "Anki"))
         assertEquals(null, setting("send_to_app", "Quizlet"))
+        assertEquals("on", setting("send_saved_words", "on"))
+        assertEquals("off", setting("saved_word_video_example", "off"))
         assertTrue(AiAction.ChangeSetting(AiSetting.PAGE_TOKEN_CAPTIONS, "on").alwaysAsks)
         assertEquals("auto", setting("page_token_captions", "Automatic"))
         assertEquals("auto", setting("known_words", "on"))

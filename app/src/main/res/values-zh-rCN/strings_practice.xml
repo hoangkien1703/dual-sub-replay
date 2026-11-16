@@ -74,13 +74,9 @@
     <string name="practice_export_full_backup">完整备份(JSON)</string>
     <string name="practice_export_anki_text">Anki 文本(TSV)</string>
     <string name="practice_word_translation_unavailable">翻译不可用。你可以输入释义并保存单词。</string>
-    <string name="practice_example_plays_original">示例播放的是原句,而不是翻译后的单词。</string>
     <string name="practice_save_failed">无法保存。请检查可用存储空间后重试。</string>
-    <string name="practice_saved_to_vocabulary">已保存到你的生词本</string>
     <string name="practice_phrase">短语</string>
     <string name="practice_saving">正在保存…</string>
-    <string name="practice_saved">已保存</string>
-    <string name="practice_save_to_vocabulary">保存到生词本</string>
     <string name="practice_word_by_word">逐词解析</string>
     <string name="practice_dictionary_form">词典形式：%1$s</string>
     <string name="practice_word_level_description">单词等级：CEFR %1$s</string>
@@ -161,4 +157,14 @@
     <string name="practice_from_video">来自：%1$s</string>
     <string name="practice_notes_label">笔记</string>
     <string name="practice_save_notes">保存笔记</string>
+    <string name="word_card_save_to_practice">保存到练习</string>
+    <string name="word_card_in_practice">已在练习中</string>
+    <string name="word_card_saved_note">已保存。随时可在“练习”标签中找到。</string>
+    <string name="word_card_saved_and_sent">已保存到练习并发送到 %1$s。</string>
+    <string name="word_card_ask_ai">问 AI</string>
+    <string name="word_card_anki">Anki</string>
+    <string name="word_card_sent">已发送</string>
+    <string name="word_card_more">更多</string>
+    <string name="word_card_more_description">这个词的更多选项</string>
+    <string name="word_card_settings">单词卡设置</string>
 </resources>

@@ -139,6 +139,8 @@ fun DualSubApp(
     var showProgress by remember { mutableStateOf(false) }
     // The no-captions card's "Add a free Gemini key" opens Settings → AI assistant.
     var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
+    // The word card's More → Word card settings opens Settings → Word learning.
+    var wordSettingsRequestId by remember { mutableLongStateOf(0L) }
     val aiSubtitleActions = remember(viewModel) { AiSubtitleActions(viewModel::makeAiSubtitles) { aiSettingsRequestId++ } }
 
     DualSubTheme {
@@ -169,6 +171,7 @@ fun DualSubApp(
                     onPlayerModeChange = onPlayerModeChange,
                     externalSettingsRequestId = externalSettingsRequestId,
                     aiSettingsRequestId = aiSettingsRequestId,
+                    wordSettingsRequestId = wordSettingsRequestId,
                     fullscreenLearningOverlay = fullscreenLearningOverlay,
                     onNavigationVisibilityChange = onNavigationVisibilityChange,
                     onPageChanged = viewModel::onYouTubePageChanged,
@@ -218,7 +221,10 @@ fun DualSubApp(
         // A setup link from the landing site or a chat asks before it changes anything.
         if (state.onboardingCompleted) PendingSetupDialog()
         state.selectedLearningWord?.let { selection ->
-            SelectedWordDialog(selection, state, savedWords, viewModel, webController, pronouncer)
+            SelectedWordDialog(selection, state, savedWords, viewModel, webController, pronouncer) {
+                viewModel.selectLearningWord(null)
+                wordSettingsRequestId++
+            }
         }
         if (showVocabulary) SavedWordsScreen(
             repository = viewModel.vocabulary,
@@ -250,6 +256,7 @@ private fun SelectedWordDialog(
     viewModel: AppViewModel,
     webController: YouTubeWebController,
     pronouncer: WordPronouncer,
+    onOpenSettings: () -> Unit,
 ) {
     androidx.compose.runtime.key(selection) {
         androidx.compose.runtime.DisposableEffect(selection) {
@@ -288,6 +295,7 @@ private fun SelectedWordDialog(
             speechMessage = pronouncer.message,
             onSpeechSettings = if (pronouncer.showSpeechSettings) pronouncer::openSpeechSettings else null,
             onDismiss = { viewModel.selectLearningWord(null) },
+            onOpenSettings = onOpenSettings,
             onSpeakPart = { part ->
                 webController.pause()
                 pronouncer.speak(spokenWord(part.text, part.reading), selection.wordLanguage)
@@ -309,6 +317,7 @@ private fun DualSubExperience(
     onPlayerModeChange: (PlayerExperienceMode) -> Unit,
     externalSettingsRequestId: Long,
     aiSettingsRequestId: Long = 0L,
+    wordSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)?,
     onNavigationVisibilityChange: (Boolean) -> Unit,
     onPageChanged: (String) -> Unit,
@@ -417,6 +426,10 @@ private fun DualSubExperience(
     }
     OnSettingsRequest(aiSettingsRequestId) {
         settingsJumpSection = MoreSettingsSection.AI_ASSISTANT
+        showSettings = true
+    }
+    OnSettingsRequest(wordSettingsRequestId) {
+        settingsJumpSection = MoreSettingsSection.WORD_LEARNING
         showSettings = true
     }
     val differentTabAccounts by rememberDifferentTabAccounts()
@@ -655,7 +668,7 @@ private fun DualSubExperience(
     }
 }
 
-/** Runs [open] for each new [requestId] above 0, such as the no-captions card's "Add a free Gemini key". */
+/** Runs [open] for each new [requestId] above 0, such as the no-captions card's "Add a free Gemini key" or the word card's Word card settings. */
 @Composable
 private fun OnSettingsRequest(
     requestId: Long,
