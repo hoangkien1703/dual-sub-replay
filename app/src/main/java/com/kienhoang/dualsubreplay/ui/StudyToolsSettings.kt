@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,8 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -181,8 +186,10 @@ internal fun FlashcardSettingsSection() {
             onChange = { preferences.edit().putString(CARD_SENTENCE_SOUND_PREFERENCE, it.storageValue).apply() },
             testTag = "card_sentence_sound",
         )
-        // The order only matters where both sounds go on a card; a Listening front starts with the line.
-        if (!listening && settings.cardWordSound != CardPlace.OFF && settings.cardSentenceSound != CardPlace.OFF) {
+        // The order only matters where both sounds go on a card; a Listening front has the line's sound
+        // on the front, so there it matters when the word's voice is on the front too.
+        val bothSounds = settings.cardWordSound != CardPlace.OFF && settings.cardSentenceSound != CardPlace.OFF
+        if (if (listening) settings.cardWordSound == CardPlace.FRONT else bothSounds) {
             CardChoiceSettings(
                 title = stringResource(R.string.study_card_sound_first_title),
                 description = stringResource(R.string.study_card_sound_first_description),
@@ -194,6 +201,7 @@ internal fun FlashcardSettingsSection() {
                 testTag = "card_sound_first",
             )
         }
+        CardReadingAndReadAloudSettings(settings, preferences)
         CardPlaceSettings(
             title = stringResource(R.string.study_card_picture_place_title),
             description = stringResource(R.string.study_card_picture_description),
@@ -206,6 +214,54 @@ internal fun FlashcardSettingsSection() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 16.dp, bottom = 6.dp),
+        )
+    }
+}
+
+/**
+ * Flashcards & Anki → Reading (where the card shows kana, pinyin or an English word's IPA) and Read
+ * aloud on the back (lion737, #81, 2026-11-15; owner pick 2026-11-16: all three on by default).
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CardReadingAndReadAloudSettings(
+    settings: StudySettings,
+    preferences: SharedPreferences,
+) {
+    CardPlaceSettings(
+        title = stringResource(R.string.study_card_reading_title),
+        description = stringResource(R.string.study_card_reading_description),
+        place = settings.cardReading,
+        onChange = { preferences.edit().putString(CARD_READING_PLACE_PREFERENCE, it.storageValue).apply() },
+        testTag = "card_reading",
+    )
+    val readAloud = settings.cardReadAloud
+    Column(Modifier.fillMaxWidth().settingAnchor("card_read_aloud").padding(start = 16.dp, bottom = 6.dp)) {
+        Text(stringResource(R.string.study_card_read_aloud_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                Triple(CARD_READ_MEANING_PREFERENCE, readAloud.meaningInSentence, R.string.study_card_read_aloud_meaning),
+                Triple(CARD_READ_DICTIONARY_PREFERENCE, readAloud.dictionaryMeaning, R.string.study_card_read_aloud_dictionary),
+                Triple(CARD_READ_TRANSLATION_PREFERENCE, readAloud.translation, R.string.study_card_read_aloud_translation),
+            ).forEach { (key, on, label) ->
+                FilterChip(
+                    selected = on,
+                    onClick = { preferences.edit().putBoolean(key, !on).apply() },
+                    label = { Text(stringResource(label)) },
+                    leadingIcon =
+                        if (on) {
+                            { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
+                        } else {
+                            null
+                        },
+                    modifier = Modifier.testTag(key),
+                )
+            }
+        }
+        Text(
+            stringResource(R.string.study_card_read_aloud_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

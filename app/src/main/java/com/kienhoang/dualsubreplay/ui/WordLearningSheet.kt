@@ -26,10 +26,12 @@ import androidx.compose.ui.window.Dialog
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.CefrLevel
+import com.kienhoang.dualsubreplay.data.EnglishIpa
 import com.kienhoang.dualsubreplay.data.EnglishMorphology
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
 import com.kienhoang.dualsubreplay.data.validClipRange
+import com.kienhoang.dualsubreplay.data.wordReading
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -337,9 +339,10 @@ private fun WordCardDetails(
         Text(stringResource(if (selection.isPhrase) R.string.practice_phrase else partOfSpeechLabel(selection.token.partOfSpeech)))
         wordLevel?.let { LevelBadge(it, stringResource(R.string.practice_word_level_description, it.code), tag = "word_level") }
     }
-    selection.token.reading
-        ?.takeIf { it.isNotBlank() }
-        ?.let { Text(it) }
+    // An English word's IPA comes from bundled data that loads on first use.
+    val ipaLoaded by EnglishIpa.revision.collectAsState()
+    remember(selection, ipaLoaded) { wordReading(selection) }
+        ?.let { Text(it, modifier = Modifier.testTag("word_reading")) }
     selection.token.baseForm
         ?.takeIf { !selection.isPhrase && it.isNotBlank() }
         ?.let { Text(stringResource(R.string.practice_dictionary_form, it), modifier = Modifier.testTag("dictionary_form")) }

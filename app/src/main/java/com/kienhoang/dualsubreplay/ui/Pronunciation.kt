@@ -159,3 +159,18 @@ internal suspend fun pronounceWord(
         else -> PronunciationResult.UNAVAILABLE
     }
 }
+
+/**
+ * What the word card says for [selection] and then for each other word of its line, in order: the
+ * words fetched ahead so they play at once when tapped.
+ */
+internal fun lineSpokenWords(selection: com.kienhoang.dualsubreplay.data.LearningWordSelection): List<String> {
+    val tapped = spokenText(selection.token.text, selection.token.startIndex, selection.parts)
+    val line = selection.segment?.let { if (selection.translated) it.translatedText else it.originalText }.orEmpty()
+    val others =
+        com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
+            .tokenize(line, selection.wordLanguage)
+            .filter { token -> token.text.any(Char::isLetter) }
+            .map { spokenWord(it.text, it.reading) }
+    return (listOf(tapped) + others).distinct()
+}

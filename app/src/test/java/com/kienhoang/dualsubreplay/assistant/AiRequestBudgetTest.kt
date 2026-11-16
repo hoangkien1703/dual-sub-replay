@@ -5,6 +5,8 @@ import com.kienhoang.dualsubreplay.data.AiSubtitleStore
 import com.kienhoang.dualsubreplay.translation.AiSubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.AiTranslationModel
 import com.kienhoang.dualsubreplay.ui.AiSubtitleRunner
+import com.kienhoang.dualsubreplay.ui.LineMeanings
+import com.kienhoang.dualsubreplay.ui.MeaningContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestScope
@@ -182,6 +184,47 @@ class AiRequestBudgetTest {
             skipAheadFor(minutes = 10, translator, model)
             assertWithinBudget(service.sent)
             assertEquals(1, service.sent.count { it.key == keys[0] })
+        }
+
+    /**
+     * Prepare meanings ahead (off by default) asks about every line that starts playing. A line
+     * starts every 2 s for 10 minutes, faster than the key may be asked. The fake request takes its
+     * turn from the key's pacer like the real one (whose disk and network steps leave virtual time).
+     * Only the newest line waits while a request runs, so the key stays within its budget, and no
+     * queue is left behind when playing stops.
+     */
+    @Test
+    fun preparingMeaningsAheadWhilePlayingStaysWithinTheBudget() =
+        runTest {
+            val clock = { testScheduler.currentTime }
+            val pacer = AiKeyPacer(now = clock)
+            val sent = Collections.synchronizedList(mutableListOf<Sent>())
+            val meanings = HashMap<String, String>()
+            val lines =
+                LineMeanings(
+                    scope = this,
+                    cached = meanings::get,
+                    store = { key, meaning -> meanings[key] = meaning },
+                    words = { sentence, _ -> sentence.split(' ') },
+                    ask = { _, _ ->
+                        val key = pacer.take(listOf("gemini/${keys[0]}"))!!
+                        sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
+                        delay(1_500)
+                        pacer.answered(key)
+                        "1. một\n2. hai\n3. ba"
+                    },
+                )
+            val end = currentTime + 10 * MINUTE_MS
+            var line = 0
+            while (currentTime < end) {
+                lines.prepare(MeaningContext("Line ${line++} plays now"), "en", "vi")
+                delay(2_000)
+            }
+            val whilePlaying = sent.size
+            testScheduler.advanceUntilIdle()
+            assertWithinBudget(sent)
+            assertTrue("Only $whilePlaying requests in 10 minutes", whilePlaying >= 90)
+            assertTrue("${sent.size - whilePlaying} requests were still queued", sent.size - whilePlaying <= 1)
         }
 
     /** Gemini's generateContent endpoint AI subtitles use; [status] picks the HTTP status of the n-th request (1 first). */

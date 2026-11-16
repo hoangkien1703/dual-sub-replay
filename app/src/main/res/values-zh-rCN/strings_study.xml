@@ -49,6 +49,14 @@
     <string name="study_card_place_off">关闭</string>
     <string name="study_card_sound_first_title">先播放</string>
     <string name="study_card_sound_first_description">卡片的一面同时有两种声音时，先播放这个。</string>
+    <string name="study_card_reading_title">读音</string>
+    <string name="study_card_reading_description">单词的读音：假名、拼音，或英语单词的国际音标（IPA）。只有正面显示单词时，正面才会显示读音。</string>
+    <string name="anki_sentence_sound_label">视频原句</string>
+    <string name="study_card_read_aloud_title">背面朗读</string>
+    <string name="study_card_read_aloud_meaning">在这句话中的意思</string>
+    <string name="study_card_read_aloud_dictionary">词典释义</string>
+    <string name="study_card_read_aloud_translation">句子翻译</string>
+    <string name="study_card_read_aloud_description">新卡片会在背面用释义语言的声音朗读这些内容，不看屏幕也能复习。没有该语言声音的部分会被跳过。</string>
     <string name="study_card_place_note">Anki 会在答案上方显示正面，所以放在正面的内容也会显示在背面。</string>
     <string name="study_card_front_title">卡片正面</string>
     <string name="study_card_front_word_sentence">单词和句子</string>
@@ -61,7 +69,7 @@
     <string name="study_card_front_listening_description">正面只播放这句台词的声音，句子和单词在背面。</string>
     <string name="study_card_front_note">更改此项也会改变你之前发送的卡片。</string>
     <string name="study_card_sound_waits">这句台词播完后，会补上句子的声音。</string>
-    <string name="study_card_sound_replaying">正在重播这句台词一次，把它的声音加到卡片上。</string>
+    <string name="study_card_sound_replaying">正在静音重播这句台词一次，把它的声音加到卡片上。</string>
     <string name="study_blur_box_title">模糊框</string>
     <string name="study_blur_box_description">在视频上放一个模糊框，遮住画面里自带的字幕。拖动可移动，拖动角可调整大小。</string>
     <string name="study_page_token_title">用页面令牌加载字幕（测试版）</string>
@@ -115,7 +123,7 @@
     <string name="study_known_words_offer_confirm">开启</string>
     <string name="study_known_words_offer_dismiss">暂不</string>
     <string name="study_send_to_app_title">单词发送到</string>
-    <string name="study_ankidroid_description">卡片会放入 DualSub Replay 牌组。请让 AnkiDroid 在后台保持打开:在许多手机上,AnkiDroid 只在运行时接收卡片。</string>
+    <string name="study_ankidroid_description">卡片会放入 DualSub Replay 牌组中按语言(或练习牌组)分开的子牌组。请让 AnkiDroid 在后台保持打开:在许多手机上,AnkiDroid 只在运行时接收卡片。</string>
     <string name="study_ankiconnect_description">发送到本机的 AnkiConnect(127.0.0.1:8765),AnkiConnect Android 应用、Yomitan 和 asbplayer 都使用这个地址。请先打开一次 AnkiConnect Android,让它的服务器运行。如果 AnkiConnect 无法创建 DualSub Replay 笔记类型,卡片会使用 Anki 的 Basic 笔记类型。</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect 牌组</string>
     <string name="study_ankiconnect_deck_value">牌组:%1$s</string>

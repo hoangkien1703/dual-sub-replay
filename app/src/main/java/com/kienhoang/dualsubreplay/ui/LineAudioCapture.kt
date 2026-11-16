@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AnkiCardFiles
 import com.kienhoang.dualsubreplay.data.AnkiCardMedia
 import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
@@ -21,6 +22,7 @@ import com.kienhoang.dualsubreplay.data.LinePictureStore
 import com.kienhoang.dualsubreplay.data.PENDING_ANKIDROID
 import com.kienhoang.dualsubreplay.data.PendingCardAudio
 import com.kienhoang.dualsubreplay.data.PendingCardAudioStore
+import com.kienhoang.dualsubreplay.data.ReadAloudText
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.audible
@@ -30,6 +32,7 @@ import com.kienhoang.dualsubreplay.data.linePictureTime
 import com.kienhoang.dualsubreplay.data.parseLinePcm
 import com.kienhoang.dualsubreplay.data.parseLinePicture
 import com.kienhoang.dualsubreplay.data.pictureLineOf
+import com.kienhoang.dualsubreplay.data.readAloudTexts
 import com.kienhoang.dualsubreplay.data.videoThumbnailUrl
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import kotlinx.coroutines.CancellationException
@@ -130,15 +133,23 @@ internal class CardMediaSource(
     private val pictures = LinePictureStore.of(application)
     private val pending = PendingCardAudioStore(application)
 
+    override val sentenceLabel: String get() = application.getString(R.string.anki_sentence_sound_label)
+
     override suspend fun files(
         word: SavedWord,
         options: CardOptions,
-    ): AnkiCardFiles =
-        AnkiCardFiles(
+    ): AnkiCardFiles {
+        val readAloud =
+            if (options.readAloud.any) readAloudTexts(word, options.readAloud, readMeaningInContextFirst(application)) else ReadAloudText()
+        return AnkiCardFiles(
             word = if (options.wordAudio) safely { words.record(word) } else null,
             sentence = if (options.sentenceAudio) safely { sentence(word) } else null,
             picture = if (options.pictureWanted) safely { picture(word) } else null,
+            // A part with no voice in its language is left out; it never stops the card.
+            meanings = readAloud.meanings.mapNotNull { text -> safely { words.recordText(text, word.meaningLanguage) } },
+            translation = readAloud.translation?.let { text -> safely { words.recordText(text, word.meaningLanguage) } },
         )
+    }
 
     private suspend fun sentence(word: SavedWord): File? {
         val line = audioLineOf(word) ?: return null

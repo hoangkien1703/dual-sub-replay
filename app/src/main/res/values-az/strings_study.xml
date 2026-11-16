@@ -48,6 +48,14 @@
     <string name="study_card_place_off">Yox</string>
     <string name="study_card_sound_first_title">Əvvəl səslənən</string>
     <string name="study_card_sound_first_description">Kartın bir üzündə hər iki səs olanda əvvəl bu səslənir.</string>
+    <string name="study_card_reading_title">Oxunuş</string>
+    <string name="study_card_reading_description">Sözün oxunuşu: kana, pinyin və ya ingilis sözünün IPA-sı (necə səsləndiyi). Ön tərəfdə yalnız ön tərəf sözü göstərəndə görünür.</string>
+    <string name="anki_sentence_sound_label">Videodakı cümlə</string>
+    <string name="study_card_read_aloud_title">Arxada səsli oxu</string>
+    <string name="study_card_read_aloud_meaning">Bu cümlədəki mənası</string>
+    <string name="study_card_read_aloud_dictionary">Lüğət mənası</string>
+    <string name="study_card_read_aloud_translation">Cümlənin tərcüməsi</string>
+    <string name="study_card_read_aloud_description">Yeni kartlar bunları arxa tərəfdə mənanın dilində səsli oxuyur, belə ki, ekrana baxmadan təkrar edə bilərsiniz. Dili üçün səs olmayan hissə buraxılır.</string>
     <string name="study_card_place_note">Üzdə olan arxada da görünür, çünki Anki kartın üzünü cavabın üstündə göstərir.</string>
     <string name="study_card_front_title">Kartın üzü</string>
     <string name="study_card_front_word_sentence">Söz və cümlə</string>
@@ -60,9 +68,9 @@
     <string name="study_card_front_listening_description">Üz yalnız cümlənin səsini oxudur; cümlə və söz arxadadır.</string>
     <string name="study_card_front_note">Bunu dəyişmək əvvəl göndərdiyiniz kartları da dəyişir.</string>
     <string name="study_card_sound_waits">Cümlənin səsi cümlə sona qədər oynadıqdan sonra əlavə olunur.</string>
-    <string name="study_card_sound_replaying">Səsi karta əlavə olunsun deyə cümlə bir dəfə oynadılır.</string>
+    <string name="study_card_sound_replaying">Səsi karta əlavə olunsun deyə cümlə səssiz bir dəfə oynadılır.</string>
     <string name="study_send_to_app_title">Sözləri göndər</string>
-    <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
+    <string name="study_ankidroid_description">Kartlar DualSub Replay dəstəsinə, hər dil (və ya Məşq dəstəsi) üçün ayrıca alt dəstəyə gedir. AnkiDroid-i arxa planda açıq saxlayın: bir çox telefonda o, kartları yalnız işləyərkən qəbul edir.</string>
     <string name="study_ankiconnect_description">Bu telefondakı AnkiConnect-ə (127.0.0.1:8765) göndərir, ondan AnkiConnect Android tətbiqi, Yomitan və asbplayer istifadə edir. Serverinin işləməsi üçün AnkiConnect Android-i bir dəfə açın. AnkiConnect DualSub Replay qeyd növü yarada bilmədikdə kartlar Anki-nin Basic qeyd növündən istifadə edir.</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect dəstəsi</string>
     <string name="study_ankiconnect_deck_value">Dəstə: %1$s</string>

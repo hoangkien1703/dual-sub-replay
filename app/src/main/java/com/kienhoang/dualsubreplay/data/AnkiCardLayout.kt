@@ -54,8 +54,40 @@ internal enum class CardSoundFirst(
     SENTENCE("sentence"),
 }
 
-internal fun storedCardSoundFirst(value: String?): CardSoundFirst =
-    CardSoundFirst.entries.firstOrNull { it.storageValue == value } ?: CardSoundFirst.WORD
+internal fun storedCardSoundFirst(value: String?): CardSoundFirst = pickedCardSoundFirst(value) ?: CardSoundFirst.WORD
+
+/** The learner's Play first pick, or null when they never picked one. */
+internal fun pickedCardSoundFirst(value: String?): CardSoundFirst? = CardSoundFirst.entries.firstOrNull { it.storageValue == value }
+
+/**
+ * Which sound plays first for [front] when the learner picked [picked] (null: never picked). A
+ * Listening front starts with the line unless the learner picks the word (lion737, #81, 2026-11-15);
+ * every other front starts with the word, as cards always did.
+ */
+internal fun cardSoundFirstFor(
+    front: CardFront,
+    picked: CardSoundFirst?,
+): CardSoundFirst = picked ?: if (front == CardFront.LISTENING) CardSoundFirst.SENTENCE else CardSoundFirst.WORD
+
+/**
+ * Which parts of the back Anki reads aloud (lion737, #81, 2026-11-15, for hands-free review): the meaning
+ * in this sentence, the dictionary meaning and the sentence's translation, each in the voice of the
+ * meaning's language. By default only the meaning is read, so the back plays the word's meaning and
+ * the line (owner pick 2026-11-16, after trying all three on); a saved meaning without the "in
+ * sentence (dictionary)" shape counts as both. [NONE] reads nothing, [ALL] every part.
+ */
+internal data class CardReadAloud(
+    val meaningInSentence: Boolean = true,
+    val dictionaryMeaning: Boolean = false,
+    val translation: Boolean = false,
+) {
+    val any: Boolean get() = meaningInSentence || dictionaryMeaning || translation
+
+    companion object {
+        val NONE = CardReadAloud(meaningInSentence = false)
+        val ALL = CardReadAloud(meaningInSentence = true, dictionaryMeaning = true, translation = true)
+    }
+}
 
 /** Where the word's voice usually goes for [front]: with the word, so on the back when the front hides the word. */
 internal fun usualWordSoundPlace(front: CardFront): CardPlace =
@@ -70,7 +102,11 @@ internal data class CardOptions(
     val sentenceSound: CardPlace = CardPlace.OFF,
     val picture: CardPlace = CardPlace.OFF,
     val front: CardFront = CardFront.WORD_AND_SENTENCE,
-    val soundFirst: CardSoundFirst = CardSoundFirst.WORD,
+    /** The learner's Play first pick; null when never picked (see [cardSoundFirstFor]). */
+    val soundFirst: CardSoundFirst? = null,
+    /** Where the card shows the word's reading (kana, pinyin, English IPA). */
+    val reading: CardPlace = CardPlace.BACK,
+    val readAloud: CardReadAloud = CardReadAloud.NONE,
 ) {
     val wordAudio: Boolean get() = wordSound != CardPlace.OFF
     val sentenceAudio: Boolean get() = sentenceSound != CardPlace.OFF
@@ -78,13 +114,17 @@ internal data class CardOptions(
 
     /** The note type's template sides; a medium that is off keeps its usual side, as its field stays empty. */
     val sides: CardSides
-        get() =
-            CardSides(
+        get() {
+            val first = cardSoundFirstFor(front, soundFirst)
+            return CardSides(
                 wordSoundFront = if (wordAudio) wordSound == CardPlace.FRONT else null,
                 sentenceSoundFront = sentenceSound == CardPlace.FRONT,
                 pictureFront = picture == CardPlace.FRONT,
-                sentenceFirst = soundFirst == CardSoundFirst.SENTENCE && wordAudio && sentenceAudio,
+                sentenceFirst = first == CardSoundFirst.SENTENCE && wordAudio && sentenceAudio,
+                listeningWordFirst = front == CardFront.LISTENING && first == CardSoundFirst.WORD && wordSound == CardPlace.FRONT,
+                reading = reading,
             )
+        }
 }
 
 /**
@@ -97,6 +137,10 @@ internal data class CardSides(
     val sentenceSoundFront: Boolean = false,
     val pictureFront: Boolean = false,
     val sentenceFirst: Boolean = false,
+    /** A Listening front plays the word's voice before the line (only with the word's voice on the front). */
+    val listeningWordFirst: Boolean = false,
+    /** Where `{{Reading}}` shows: with the word on the front, after it on the back (the default), or nowhere. */
+    val reading: CardPlace = CardPlace.BACK,
 )
 
 /** Whether the word's voice is on the front for [front] and [sides]. */
@@ -166,16 +210,20 @@ internal fun ankiCardTemplate(
     }
     val picture = if (sides.pictureFront) PICTURE_FRONT_HTML else ""
     val source = if (sides.pictureFront) SOURCE_LINK_HTML else SOURCE_HTML
-    val details = READING_HTML + MEANING_HTML
+    // The reading goes on the front only where the front shows the word.
+    val readingFront = sides.reading == CardPlace.FRONT && readingCanBeOnFront(front)
+    val frontWord = WORD_HTML + if (readingFront) READING_HTML else ""
+    val readingBack = sides.reading != CardPlace.OFF && !readingFront
+    val details = (if (readingBack) READING_HTML else "") + MEANING_HTML
     return when (front) {
         CardFront.WORD_AND_SENTENCE ->
             AnkiCardTemplate(
-                WORD_HTML + SENTENCE_HTML + picture + wordSound(true) + sentenceSound(true),
+                frontWord + SENTENCE_HTML + picture + wordSound(true) + sentenceSound(true),
                 BACK_START + wordSound(false) + details + TRANSLATION_HTML + sentenceSound(false) + source,
             )
         CardFront.WORD ->
             AnkiCardTemplate(
-                WORD_HTML + picture + wordSound(true) + sentenceSound(true),
+                frontWord + picture + wordSound(true) + sentenceSound(true),
                 BACK_START + wordSound(false) + details + SENTENCE_HTML + TRANSLATION_HTML + sentenceSound(false) + source,
             )
         CardFront.SENTENCE ->
@@ -185,7 +233,11 @@ internal fun ankiCardTemplate(
             )
         CardFront.LISTENING ->
             AnkiCardTemplate(
-                "$SENTENCE_AUDIO{{^Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" + picture + wordSound(true),
+                if (sides.listeningWordFirst) {
+                    "$WORD_AUDIO$SENTENCE_AUDIO{{^Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" + picture
+                } else {
+                    "$SENTENCE_AUDIO{{^Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" + picture + wordSound(true)
+                },
                 BACK_START + "{{#Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" +
                     WORD_HTML + wordSound(false) + details + TRANSLATION_HTML + source,
             )
@@ -211,15 +263,32 @@ internal fun cardTemplateKey(
         }
     val sound = if (sides.sentenceSoundFront && front != CardFront.LISTENING) FRONT_SOUND_SUFFIX else ""
     val picture = if (sides.pictureFront) PICTURE_FRONT_SUFFIX else ""
-    val order = if (sentenceSoundPlaysFirst(front, sides)) SENTENCE_FIRST_SUFFIX else ""
-    return front.storageValue + sound + word + picture + order
+    val order =
+        when {
+            sentenceSoundPlaysFirst(front, sides) -> SENTENCE_FIRST_SUFFIX
+            front == CardFront.LISTENING && sides.listeningWordFirst && wordSoundOnFront(front, sides) -> WORD_FIRST_SUFFIX
+            else -> ""
+        }
+    val reading =
+        when (sides.reading) {
+            CardPlace.FRONT -> if (readingCanBeOnFront(front)) READING_FRONT_SUFFIX else ""
+            CardPlace.BACK -> ""
+            CardPlace.OFF -> READING_OFF_SUFFIX
+        }
+    return front.storageValue + sound + word + picture + order + reading
 }
+
+/** Whether [front] shows the word, so its reading can go with it. */
+internal fun readingCanBeOnFront(front: CardFront): Boolean = front == CardFront.WORD_AND_SENTENCE || front == CardFront.WORD
 
 private const val FRONT_SOUND_SUFFIX = "+sound"
 private const val WORD_FRONT_SUFFIX = "+wordfront"
 private const val WORD_BACK_SUFFIX = "+wordback"
 private const val PICTURE_FRONT_SUFFIX = "+picture"
 private const val SENTENCE_FIRST_SUFFIX = "+sentencefirst"
+private const val WORD_FIRST_SUFFIX = "+wordfirst"
+private const val READING_FRONT_SUFFIX = "+readingfront"
+private const val READING_OFF_SUFFIX = "+readingoff"
 
 /**
  * Whether the note type's template has to change: it was last set to [applied] (null: never by this

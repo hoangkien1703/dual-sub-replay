@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.data
 
+import com.kienhoang.dualsubreplay.BuildConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -37,7 +38,9 @@ class AnkiDroidNotesTest {
                 "ねこ",
                 "<b>猫</b>が好き &amp; 犬も",
                 "I like cats<br>and dogs",
-                "<a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube 1:23</a>",
+                "<a href=\"intent://www.youtube.com/watch?v=abcdefghijk&amp;t=83s#Intent;scheme=https;" +
+                    "package=${BuildConfig.APPLICATION_ID};end\">DualSub Replay 1:23</a><a style=\"margin-left:12px\" " +
+                    "href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=83s\">YouTube</a>",
                 "",
                 "",
             ),
@@ -45,6 +48,37 @@ class AnkiDroidNotesTest {
         )
         // A field never holds Anki's own separator, so a note cannot gain or lose a field.
         assertEquals(ANKI_FIELDS.size, ankiNoteFields(word("1")).joinToString(ANKI_FIELD_SEPARATOR).split(ANKI_FIELD_SEPARATOR).size)
+    }
+
+    @Test
+    fun cardsGoToASubdeckPerLanguageOrPracticeDeck() {
+        assertEquals("DualSub Replay::Japanese", ankiDeckName(word("1")))
+        assertEquals("DualSub Replay::English", ankiDeckName(word("1").copy(wordLanguage = "en")))
+        assertEquals("DualSub Replay::Chinese", ankiDeckName(word("1").copy(wordLanguage = "zh-CN")))
+        // A word in a named Practice deck goes to a subdeck of that name, without Anki's separator.
+        assertEquals("DualSub Replay::Anime N3", ankiDeckName(word("1").copy(deck = "Anime::  N3")))
+        assertEquals("DualSub Replay::Japanese", ankiDeckName(word("1").copy(deck = " \" ")))
+    }
+
+    @Test
+    fun theLinesSoundHasALabelOnlyWhenThereIsASound() {
+        assertEquals(
+            "<span style=\"font-size:14px;opacity:.7\">Sentence from the video</span> [sound:a.m4a]",
+            labeledSentenceSound("Sentence from the video", "[sound:a.m4a]"),
+        )
+        assertEquals("", labeledSentenceSound("Sentence from the video", ""))
+        assertEquals("[sound:a.m4a]", labeledSentenceSound("", "[sound:a.m4a]"))
+        assertEquals("<span style=\"font-size:14px;opacity:.7\">A &lt;b&gt;</span> ", ankiSentenceSoundLabel("A <b>"))
+    }
+
+    @Test
+    fun readAloudSoundsFollowTheMeaningAndTranslationText() {
+        val media = CardMedia(meaningSounds = "[sound:m1.mp3][sound:m2.mp3]", translationSound = "[sound:t.mp3]")
+        val fields = ankiNoteFields(word("1"), media)
+        assertEquals("cat &lt;animal&gt;[sound:m1.mp3][sound:m2.mp3]", fields[1])
+        assertEquals("I like cats<br>and dogs[sound:t.mp3]", fields[4])
+        val others = listOf(0, 2, 3, 5, 6, 7)
+        assertEquals(others.map(ankiNoteFields(word("1"))::get), others.map(fields::get))
     }
 
     @Test
@@ -58,7 +92,12 @@ class AnkiDroidNotesTest {
     fun theSourceLinksOnlyToAYouTubeVideoId() {
         assertEquals("", ankiSourceLink(null, 0))
         assertEquals("", ankiSourceLink("\"><script>", 0))
-        assertEquals("<a href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=0s\">YouTube 0:00</a>", ankiSourceLink("abcdefghijk", -5))
+        assertEquals(
+            "<a href=\"intent://www.youtube.com/watch?v=abcdefghijk&amp;t=0s#Intent;scheme=https;package=com.example.app;end\">" +
+                "DualSub Replay 0:00</a><a style=\"margin-left:12px\" " +
+                "href=\"https://www.youtube.com/watch?v=abcdefghijk&amp;t=0s\">YouTube</a>",
+            ankiSourceLink("abcdefghijk", -5, appPackage = "com.example.app"),
+        )
         assertEquals("", ankiNoteFields(word("2", videoId = null))[5])
     }
 

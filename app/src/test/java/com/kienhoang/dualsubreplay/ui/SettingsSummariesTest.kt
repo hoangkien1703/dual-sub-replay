@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.CardPlace
+import com.kienhoang.dualsubreplay.playback.SleepTimerChoice
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,6 +27,30 @@ class SettingsSummariesTest {
             assertTrue(section.name, summary(section).isNotEmpty())
         }
         assertTrue(summary(MoreSettingsSection.AI_ASSISTANT).isEmpty())
+    }
+
+    @Test
+    fun playbackShowsTheSleepTimerAndWhetherTheGearShowsIt() {
+        val name = R.string.sleep_timer_title
+        assertEquals(listOf(SummaryPart.Value(name, R.string.sleep_timer_off)), summary(MoreSettingsSection.PLAYBACK))
+        assertEquals(
+            listOf(
+                SummaryPart.Value(name, R.string.sleep_timer_left, 12),
+                SummaryPart.Value(R.string.sleep_timer_quick_title, R.string.ai_action_on),
+            ),
+            summary(
+                MoreSettingsSection.PLAYBACK,
+                defaults.copy(
+                    sleepTimer = SleepTimerChoice.Minutes(15),
+                    sleepTimerMinutesLeft = 12,
+                    sleepTimerInQuickSettings = true,
+                ),
+            ),
+        )
+        assertEquals(
+            listOf(SummaryPart.Value(name, R.string.sleep_timer_end_of_video)),
+            summary(MoreSettingsSection.PLAYBACK, defaults.copy(sleepTimer = SleepTimerChoice.EndOfVideo)),
+        )
     }
 
     @Test

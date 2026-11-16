@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">Google Terjemahan belum terpasang</string>
     <string name="practice_google_translate_cannot_open">Google Terjemahan tidak dapat menerima teks</string>
     <string name="practice_pronounce_item">Ucapkan %1$s</string>
+    <string name="practice_play_line">Putar kalimat</string>
+    <string name="practice_read_meaning">Bacakan arti</string>
+    <string name="practice_read_translation">Bacakan terjemahan</string>
+    <string name="practice_picture">Gambar dari video</string>
     <string name="practice_speech_settings">Setelan ucapan</string>
     <string name="practice_show_meaning">Tampilkan arti</string>
     <string name="practice_meaning_label">Arti (%1$s)</string>

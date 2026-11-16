@@ -44,6 +44,16 @@ internal const val MEANING_ORDER_SENTENCE_FIRST = "sentence_first"
 internal const val MEANING_ORDER_DICTIONARY_FIRST = "dictionary_first"
 internal val MEANING_ORDERS = listOf(MEANING_ORDER_SENTENCE_FIRST, MEANING_ORDER_DICTIONARY_FIRST)
 
+/**
+ * Settings → Word learning → Prepare meanings ahead (lion737, #81, 2026-11-15; owner pick
+ * 2026-11-16: off by default, as it spends the key on lines nobody taps): while a line plays, the
+ * AI is asked about every word of it, so a tapped word's meaning shows at once.
+ */
+internal const val PREPARE_MEANINGS_PREFERENCE = "prepare_meanings_ahead"
+
+internal fun readPrepareMeanings(context: Context): Boolean =
+    context.getSharedPreferences("dual_sub_preferences", 0).getBoolean(PREPARE_MEANINGS_PREFERENCE, false)
+
 internal fun storedMeaningOrder(value: String?): String = value?.takeIf { it in MEANING_ORDERS } ?: MEANING_ORDER_SENTENCE_FIRST
 
 /** True when the meaning in the sentence comes first (the default). */
@@ -94,6 +104,15 @@ internal fun meaningContext(
 ): MeaningContext? {
     val segment = selection.segment ?: return null
     if (selection.token.text.isBlank()) return null
+    return meaningContext(segment, selection.translated, segments)
+}
+
+/** The [MeaningContext] of a word in [segment]'s original line, or in its translation when [translated]. */
+internal fun meaningContext(
+    segment: SubtitleSegment,
+    translated: Boolean,
+    segments: List<SubtitleSegment>,
+): MeaningContext? {
     val index = segments.indexOfFirst { it.id == segment.id }
     val rows = if (index >= 0) sentenceRows(segments, index) else IntRange.EMPTY
     val rowSegments = if (index >= 0) segments.subList(rows.first, rows.last + 1) else listOf(segment)
@@ -111,10 +130,10 @@ internal fun meaningContext(
             ?.joinToString(" ")
 
     fun lineText(row: SubtitleSegment?): String? =
-        (if (selection.translated) row?.translatedText else row?.originalText)?.trim()?.takeIf { it.isNotEmpty() }
+        (if (translated) row?.translatedText else row?.originalText)?.trim()?.takeIf { it.isNotEmpty() }
     val before = if (index >= 0) lineText(segments.getOrNull(rows.first - 1)) else null
     val after = if (index >= 0) lineText(segments.getOrNull(rows.last + 1)) else null
-    return if (selection.translated) {
+    return if (translated) {
         // A word tapped in the translation line is read in the translated sentence.
         val sentence = translation ?: segment.translatedText?.trim()?.takeIf { it.isNotEmpty() } ?: return null
         MeaningContext(sentence, original.takeIf { it.isNotEmpty() }, before, after)
@@ -221,12 +240,14 @@ internal fun MeaningInContextSetting() {
     val preferences = remember(context) { context.getSharedPreferences("dual_sub_preferences", 0) }
     var enabled by remember { mutableStateOf(readMeaningInContext(context)) }
     var contextFirst by remember { mutableStateOf(readMeaningInContextFirst(context)) }
+    var prepareAhead by remember { mutableStateOf(readPrepareMeanings(context)) }
     DisposableEffect(preferences) {
         // "Reset all settings" and the AI assistant change the key while this section is open.
         val listener =
             SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 if (key == MEANING_IN_CONTEXT_PREFERENCE || key == null) enabled = readMeaningInContext(context)
                 if (key == MEANING_ORDER_PREFERENCE || key == null) contextFirst = readMeaningInContextFirst(context)
+                if (key == PREPARE_MEANINGS_PREFERENCE || key == null) prepareAhead = readPrepareMeanings(context)
             }
         preferences.registerOnSharedPreferenceChangeListener(listener)
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -247,6 +268,16 @@ internal fun MeaningInContextSetting() {
             val order = if (first) MEANING_ORDER_SENTENCE_FIRST else MEANING_ORDER_DICTIONARY_FIRST
             preferences.edit().putString(MEANING_ORDER_PREFERENCE, order).apply()
         }
+        SettingsSwitchRow(
+            title = stringResource(R.string.settings_prepare_meanings_title),
+            description = stringResource(R.string.settings_prepare_meanings_description),
+            checked = prepareAhead,
+            onCheckedChange = {
+                prepareAhead = it
+                preferences.edit().putBoolean(PREPARE_MEANINGS_PREFERENCE, it).apply()
+            },
+            testTag = "prepare_meanings_switch",
+        )
     }
 }
 
@@ -274,3 +305,79 @@ private fun MeaningOrderChoice(
         }
     }
 }
+
+/** At most this many words of a line go in one request; a longer line's later words are asked one by one. */
+internal const val MAX_LINE_MEANING_WORDS = 24
+
+/**
+ * The words of a line the AI is asked about in one request (lion737, #81, 2026-11-15): each word
+ * with a letter, once, in order. [tokens] are the line's tokens as the subtitles split them.
+ */
+internal fun lineMeaningWords(tokens: List<String>): List<String> =
+    tokens
+        .map { it.trim() }
+        .filter { word -> word.any(Char::isLetter) }
+        .distinctBy { it.lowercase(Locale.ROOT) }
+        .take(MAX_LINE_MEANING_WORDS)
+
+/** The key [contextMeanings]-style caches keep [word]'s meaning in [context] under. */
+internal fun contextMeaningKey(
+    word: String,
+    context: MeaningContext,
+    wordLanguage: String,
+    meaningLanguage: String,
+): String = listOf(wordLanguage, meaningLanguage, word.trim(), context.sentence, context.translation.orEmpty()).joinToString("\u0000")
+
+/** The key of a whole line's request: every word of it shares the sentence and its translation. */
+internal fun lineMeaningKey(
+    context: MeaningContext,
+    wordLanguage: String,
+    meaningLanguage: String,
+): String = contextMeaningKey("", context, wordLanguage, meaningLanguage)
+
+/**
+ * One request for the meaning of every word of [words] in [context]: the same rules as
+ * [contextMeaningRequest], answered as numbered lines so the reply maps back to the words.
+ */
+internal fun lineMeaningsRequest(
+    words: List<String>,
+    context: MeaningContext,
+    wordLanguage: String,
+    meaningLanguage: String,
+): Pair<String, String> {
+    val meaningName = englishLanguageName(meaningLanguage)
+    val system =
+        "You help a language learner who reads a video subtitle. For each numbered word, give its meaning as used " +
+            "in this sentence, written in $meaningName: one to four words, in the form that fits the sentence (tense, " +
+            "person, number, case), as a good translation of the whole sentence would render it. When a translation of " +
+            "the sentence is given and it renders the word, use exactly the words of that translation that render it. " +
+            "Reply with one line per word, in the same order: its number, a period, a space, then only the meaning. " +
+            "No quotes, no explanation, no other text."
+    val user =
+        buildString {
+            context.before?.let { append("Line before: ").append(it).append('\n') }
+            append("Sentence (").append(englishLanguageName(wordLanguage)).append("): ").append(context.sentence)
+            context.after?.let { append("\nLine after: ").append(it) }
+            context.translation?.let { append("\nTranslation of the sentence (").append(meaningName).append("): ").append(it) }
+            append("\nWords:")
+            words.forEachIndexed { index, word -> append('\n').append(index + 1).append(". ").append(word) }
+        }
+    return system to user
+}
+
+/** The meanings in [reply] by word, for the [words] the request listed; a missing or long answer is left out. */
+internal fun parseLineMeanings(
+    reply: String?,
+    words: List<String>,
+): Map<String, String> {
+    if (reply.isNullOrBlank()) return emptyMap()
+    val meanings = LinkedHashMap<String, String>()
+    reply.lineSequence().forEach { line ->
+        val match = NUMBERED_LINE.matchEntire(line.trim()) ?: return@forEach
+        val word = words.getOrNull(match.groupValues[1].toInt() - 1) ?: return@forEach
+        cleanContextMeaning(match.groupValues[2])?.let { meanings.putIfAbsent(word, it) }
+    }
+    return meanings
+}
+
+private val NUMBERED_LINE = Regex("""(\d{1,3})\s*[.):]\s*(.+)""")

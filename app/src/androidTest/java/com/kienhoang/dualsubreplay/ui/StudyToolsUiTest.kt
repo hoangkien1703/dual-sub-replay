@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
@@ -52,7 +53,7 @@ class StudyToolsUiTest {
     fun forgetTheSettings() {
         preferences
             .edit()
-            .apply { (STUDY_SETTING_KEYS + APP_COLOR_THEME_PREFERENCE).forEach(::remove) }
+            .apply { (STUDY_SETTING_KEYS + PLAYBACK_SETTING_KEYS + APP_COLOR_THEME_PREFERENCE).forEach(::remove) }
             .commit()
     }
 
@@ -221,6 +222,42 @@ class StudyToolsUiTest {
         composeRule.onNodeWithTag("card_sound_first_sentence").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag("card_front_listening").performScrollTo().performClick()
         composeRule.onNodeWithTag("card_sound_first_sentence").assertDoesNotExist()
+        // A Listening front with the word's voice on it too: the line plays first until changed (lion737, #81).
+        composeRule.onNodeWithTag("card_word_sound_front").performScrollTo().performClick()
+        composeRule.onNodeWithTag("card_sound_first_word").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_sound_first_sentence").assertIsDisplayed()
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-play-first-listening")
+    }
+
+    @Test
+    fun readingPlaceAndReadAloudChipsAreSaved() {
+        showSettings("settings_section_flashcards")
+        // Back by default, so Japanese and Chinese cards don't give the answer's reading away.
+        composeRule.onNodeWithTag("card_reading_back").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("card_reading_front").performClick()
+        composeRule.runOnIdle { assertEquals("front", preferences.getString(CARD_READING_PLACE_PREFERENCE, null)) }
+        // Only the meaning is read aloud until more is picked (owner pick 2026-11-16).
+        composeRule.onNodeWithTag(CARD_READ_DICTIONARY_PREFERENCE).performScrollTo().performClick()
+        composeRule.runOnIdle {
+            assertTrue(preferences.getBoolean(CARD_READ_DICTIONARY_PREFERENCE, false))
+            assertTrue(preferences.getBoolean(CARD_READ_MEANING_PREFERENCE, true))
+            assertFalse(preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, false))
+        }
+        composeRule.waitForIdle()
+        saveUiEvidence("flashcards-reading-and-read-aloud")
+    }
+
+    @Test
+    fun theSleepTimerLivesInPlaybackAndOnlyJoinsTheGearPopupWhenAsked() {
+        showSettings("settings_section_playback")
+        composeRule.onNodeWithTag("sleep_timer").performScrollTo().assertIsDisplayed()
+        // Off by default, so the gear popup keeps only the languages and Hide while playing.
+        composeRule.onNodeWithTag("sleep_timer_quick_switch").performScrollTo().assertIsOff()
+        composeRule.waitForIdle()
+        saveUiEvidence("settings-playback-sleep-timer")
+        composeRule.onNodeWithTag("sleep_timer_quick_switch").performClick()
+        composeRule.runOnIdle { assertTrue(preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false)) }
     }
 
     @Test

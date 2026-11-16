@@ -1,0 +1,175 @@
+# Faster word card, translations read aloud on cards, English IPA, sleep timer
+
+## Status
+
+Approved for implementation. Owner pick 2026-11-16 (thread "Review new GitHub comments"): build
+every recommendation for Discussion #81 comments 19625124, 19626135, 19629870, 19639979/19640011
+(lion737) and 19637480, 19637802 (25kiuo), with these owner changes: read-aloud on the card back is
+reads only the meaning by default (first all three; the owner changed it after trying the preview, 2026-11-16); English IPA is on by default; the AI part of "instant meanings" is a switch that is
+off by default.
+
+## Context / problem
+
+- lion737 (19625124): the word card waits on "Asking AI for the meaning in this sentence…" and
+  "Preparing pronunciation…". Asks to prepare both ahead for the current and next lines.
+- lion737 (19626135): Settings → Flashcards & Anki shows no "Play first". It is hidden because his
+  Card front is Listening, which always plays the line first.
+- lion737 (19629870): when a card is sent before its line ended, the app replays the line out loud
+  to record it. Asks for the recording to happen silently.
+- lion737 (19639979, 19640011): read the meaning in this sentence, the dictionary meaning and the
+  sentence translation aloud on the card back, each with its own switch, in the translation's
+  language, for hands-free review with Anki Ring.
+- 25kiuo (19637480): show IPA on the word card and on the card front.
+- 25kiuo (19637802): a sleep timer, since the app plays in the background and with the screen off.
+
+## Goals
+
+1. Word card: the word's voice is fetched before it is needed, and other words of a line come up
+   at once after the first tap there.
+2. A switch "Prepare meanings ahead" (off by default) asks the AI about each line's words while it
+   plays, for people who accept spending their key on lines they don't tap.
+3. Play first also on a Listening front.
+4. Read aloud on the back: Meaning in this sentence, Dictionary meaning, Sentence translation, each
+   a chip; only the meaning is on by default (owner, after the first preview). The line's play button
+   gets a small "Sentence from the video" label.
+5. English IPA under the word on the word card and in the card's Reading field; a Reading place
+   (Front / Back) picks where the card shows it.
+6. Sleep timer in Settings → Playback, and in the subtitle gear popup when the learner asks for it.
+7. Try a muted replay for the sentence sound; ship it only if the recording still has sound.
+
+## Non-goals
+
+- No IPA for languages other than English in this change (bundled data only, APK size limit 32 MB).
+  Japanese and Chinese already show kana and pinyin.
+- No AI request while a video plays unless the new switch is on (owner rule: AI off by default).
+- No downloading of YouTube audio (architecture rule: line audio only listens to the page video).
+- No separate front and back "Play first": the back repeats the front (`{{FrontSide}}`).
+
+## User-visible behavior
+
+- **Word voice.** Opening the word card starts fetching the voice of every other word of the line
+  in the background (Google's voice only, one at a time). The app keeps the last 60 voices, so a
+  word tapped again or tapped after another word of the same line plays at once.
+- **Meanings of a line.** With Meaning in this sentence on, the first tap in a line asks the AI for
+  the tapped word as before and, in a second request, for every other word of that line; later taps
+  in that line show the meaning at once. Under Meaning in this sentence a new switch, **Prepare
+  meanings ahead** (off), asks for each line's words as the line starts playing.
+- **Play first** shows for a Listening front when the word sound is on the front: Sentence sound
+  first (the default on Listening, as before) or Word sound first.
+- **Read aloud on the back** (Flashcards & Anki): three chips, only the meaning on by default. New cards get the picked meaning in
+  this sentence, the dictionary meaning and the sentence translation as sounds on the back, in the
+  voice of the meaning's language (Google's voice, else the phone's). A part with no voice, no text,
+  or the same text as another part is skipped; a missing voice never stops a card.
+- **IPA.** An English word shows its American IPA (for example /ɡoʊ/) under the part of speech on
+  the word card, and sends it in the card's Reading field. **Reading** (Flashcards & Anki): Front /
+  Back, Back by default, so Japanese and Chinese cards don't show the answer's reading on the front.
+- **Sleep timer.** A new **Playback** section (Video group) holds the Sleep timer row: Off, 15, 30,
+  45, 60 minutes, or End of video. When it ends, the video pauses. The row and the section's line
+  show the time left. The timer is not saved: it ends with the app. **Show in quick settings** (off
+  by default, owner pick 2026-11-16) also puts the row in the subtitle gear popup.
+- **Muted replay.** The replay that records a card's sentence sound plays without sound; pausing it
+  brings the sound back.
+
+## Technical constraints / invariants
+
+- AI: the new automatic request paths (line batch, prepare ahead) go through `AiKeyPacer` and get
+  scenarios in `AiRequestBudgetTest` ([AI features](../project/tech-stack.md#ai-features)).
+- Learner data: `en-ipa.txt` is generated by `tools/english/build_english_ipa.py` from ipa-dict
+  (MIT) filtered by FrequencyWords (CC BY-SA 4.0), never hand-edited; credits in
+  `THIRD_PARTY_NOTICES.md` and the licence screen.
+- Settings: new prefs in `SETTING_SPECS`; switches in `SearchableSetting`; the assistant can set them.
+- Anki: no new fields (AnkiDroid can't add fields to the existing note type). Read-aloud sounds go
+  at the end of the Meaning and Translation fields; the Reading place is a template change with its
+  own template-key suffix.
+
+## Proposed approach / plan
+
+1. `PronunciationCache` keeps up to 60 recordings; `WordPronouncer.prepare(words, language)` fetches
+   Google voices into it; the word card calls it with the line's other words.
+2. `lineMeaningsRequest` / `parseLineMeanings` (one numbered request per line) fill the existing
+   `contextMeanings` cache; `prepareMeaningsAhead` pref; the player's playing line triggers it.
+3. `CardOptions.soundFirst` resolves per front; Listening gets a `+wordfirst` template suffix.
+4. `CardReadAloud` (three flags) in `CardOptions`; `WordAudioRecorder.recordText`; `AnkiCardFiles`
+   and `CardMedia` carry the extra sounds; AnkiDroid and AnkiConnect append them.
+5. `EnglishIpa` lexicon from `en-ipa.txt`; `wordReading(selection)` adds it for English words;
+   `CardPlace` for Reading with a `+readingfront` template suffix.
+6. `SleepTimer` object in `playback/`, pausing through `WebVideoBridge`; row in the gear popup.
+7. Muted replay: emulator check first (laptop Remote Control), then code only if it records sound.
+
+## Acceptance criteria
+
+- [x] A second word tapped in the same line (Meaning in this sentence on) shows its meaning without
+      a new request (unit test on the cache fill and parse).
+- [x] Prepare meanings ahead is off by default and its requests pass `AiRequestBudgetTest`.
+- [x] Play first shows on Listening with the word sound on the front; the template plays the word
+      first only when picked; existing Listening cards keep the line first (unit tests).
+- [x] New cards carry the three read-aloud sounds when on; off chips add nothing (unit tests on fields).
+- [x] "go" shows /ɡoʊ/ on the word card and in Reading; Japanese words keep their kana reading.
+- [x] Reading on the Front puts `{{Reading}}` on the question side only when picked.
+- [x] Sleep timer pauses the video when it ends (unit test with a fake clock) and End of video pauses
+      at the end or when the next video starts.
+- [ ] `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug` pass; APK under 32 MB.
+
+## Validation plan
+
+| Category | Command/scenario and expected result | Environment / applicability |
+| --- | --- | --- |
+| Unit tests | `./gradlew testDebugUnitTest`: new tests for each criterion | Cloud container |
+| Android lint/build | `./gradlew formatCheck complexityCheck lintDebug assembleDebug` | Cloud container |
+| Managed-device/emulator | PR CI `managed-device-tests`; settings screenshots | PR CI |
+| Physical-device/manual | Owner's phone: word card speed, AnkiDroid cards with read-aloud, sleep timer | Owner |
+| Live YouTube | Muted replay check on the laptop emulator | Laptop Remote Control |
+
+## Risks / edge cases
+
+- Read-aloud first had all three parts on; on the owner's phone the back then read three sounds, so
+  only the meaning stays on by default and each learner picks more.
+- Google's voice has no Azerbaijani (checked: `translate_tts` with `tl=az` answers 400); such text
+  uses the phone's voice or is skipped.
+- Meaning text edited by hand may not split into "in sentence (dictionary)"; it is then read as one.
+
+## Release intent
+
+`release:patch` (changes the APK; owner rule: patch releases only).
+
+## Implementation result
+
+- Word voice: `PronunciationCache` keeps the last 60 recordings (was one); `WordPronouncer.prepare`
+  fetches Google's voice for the tapped word and its line's other words when the word card opens
+  (`lineSpokenWords`), one at a time; a tap on a word being fetched waits for that recording.
+- Meanings of a line: `ui/LineMeanings.kt`. The tapped word is asked first as before, then one
+  numbered request (`lineMeaningsRequest`, up to 24 words, `parseLineMeanings`) for the words of the
+  sentence that are not cached yet. A tap while that request runs waits for it. Prepare meanings
+  ahead (`prepare_meanings_ahead`, off) calls the same class when a new line starts playing. At most
+  one line request runs; only the newest line waits behind it.
+- Play first: `cardSoundFirstFor(front, picked)`; never picked means Sentence first on Listening and
+  Word first elsewhere, so existing Listening cards keep their template. `+wordfirst` suffix.
+- Read aloud on the back: `CardReadAloud` chips, `readAloudTexts` (`data/CardReadAloudText.kt`) splits
+  the saved "in sentence (dictionary)" meaning; `WordAudioRecorder.recordText`; sounds are appended
+  to the Meaning and Translation fields (AnkiDroid and AnkiConnect).
+- English IPA: `data/EnglishIpa.kt` with `en-ipa.txt` (39,705 words, 855 KB raw) from
+  `tools/english/build_english_ipa.py`; `wordReading()` feeds the word card and the Reading field.
+  Reading place: Front / Back / Off (`+readingfront`, `+readingoff`); a front without the word keeps
+  it on the back. Deviation: Off was added so a learner can drop readings from the card entirely.
+- Sleep timer: `playback/SleepTimer.kt` (`SleepTimerRunner`, checked every 30 s against
+  `elapsedRealtime`) and `ui/SleepTimerRow.kt`. Deviation (owner, 2026-11-16, after the first
+  preview): the row moved from the gear popup to Settings → Playback; `sleep_timer_in_quick_settings`
+  (off, shared in backups, reset by Reset all settings, settable by the assistant) shows it in the popup
+  too.
+- Muted replay: the emulator check (owner's laptop, Pixel 7 API 37, Chrome 149, 2026-11-16) found
+  that `captureStream()` keeps the full sound while the video is muted or at volume 0 (average RMS
+  about 0.09 in every case, two runs of 30 readings). So the replay for a card's sound now runs muted:
+  `webClipReplayScript(..., muted = true)` from `BindLineSoundReplay` only, and the video's own mute
+  state comes back when the clip ends, the learner pauses, another clip starts or the app pauses
+  (`window.__dualSubClipUnmute`). The learner's own replay from Saved words keeps its sound.
+
+## Validation result
+
+- Passed in the cloud container: `formatCheck complexityCheck testDebugUnitTest lintDebug
+  assembleDebug`. New tests: `LineMeaningsTest`, `AiRequestBudgetTest.preparingMeaningsAheadWhilePlayingStaysWithinTheBudget`,
+  `PronunciationCacheTest`, `AnkiCardLayoutTest` (Listening word first, reading place),
+  `AnkiDroidNotesTest` (read-aloud sounds in fields), `CardReadAloudTextTest`, `EnglishIpaTest`,
+  `SleepTimerTest`.
+- Emulator (owner's laptop): muted and volume-0 playback record at the same level as normal playback.
+- Not verified yet: managed-device tests (PR CI), the owner's phone (word card speed, AnkiDroid
+  cards reading aloud, sleep timer with the screen off, the muted replay inside the app's WebView).

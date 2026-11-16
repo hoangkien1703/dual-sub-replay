@@ -163,7 +163,26 @@ private fun basicCardSides(
         onFront = sentenceSoundFirst(onFront, wordAudio, sentenceAudio)
         onBack = sentenceSoundFirst(onBack, wordAudio, sentenceAudio)
     }
-    return onFront to onBack
+    return placeReading(front, sides, values[2], onFront, onBack)
+}
+
+/** The reading after the word on the front, on the back (as listed), or nowhere, as [sides] says. */
+private fun placeReading(
+    front: CardFront,
+    sides: CardSides,
+    reading: String,
+    onFront: List<String>,
+    onBack: List<String>,
+): Pair<List<String>, List<String>> {
+    if (reading.isBlank()) return onFront to onBack
+    return when {
+        sides.reading == CardPlace.OFF -> onFront to onBack - reading
+        sides.reading == CardPlace.FRONT && readingCanBeOnFront(front) -> {
+            val at = onFront.indexOfFirst { it.isNotBlank() } + 1
+            (onFront.take(at) + reading + onFront.drop(at)) to onBack - reading
+        }
+        else -> onFront to onBack
+    }
 }
 
 /** [parts] with [wordAudio] moved to just after [sentenceAudio] when both are there. */
@@ -318,8 +337,14 @@ internal class AnkiConnectNotes(
                     val fieldMedia =
                         CardMedia(
                             word = files.word?.let { ankiSound(storeMedia(it)) }.orEmpty(),
-                            sentence = files.sentence?.let { ankiSound(storeMedia(it)) }.orEmpty(),
+                            sentence =
+                                labeledSentenceSound(
+                                    media?.sentenceLabel,
+                                    files.sentence?.let { ankiSound(storeMedia(it)) }.orEmpty(),
+                                ),
                             picture = files.picture?.let { ankiPicture(storeMedia(it)) }.orEmpty(),
+                            meaningSounds = files.meanings.map { ankiSound(storeMedia(it)) }.joinToString(""),
+                            translationSound = files.translation?.let { ankiSound(storeMedia(it)) }.orEmpty(),
                         )
                     val values = ankiConnectFields(fields, word, fieldMedia, options.front, options.sides)
                     val request = JSONObject().put("note", note(deck, noteType, values, allowDuplicate = again))
@@ -329,7 +354,14 @@ internal class AnkiConnectNotes(
                     val waits = options.sentenceAudio && fieldMedia.sentence.isEmpty()
                     if (waits && media != null && noteId != null && line != null && target != null) {
                         media.awaitSentence(
-                            PendingCardAudio(PENDING_ANKICONNECT, noteId, line, target.first, target.second, System.currentTimeMillis()),
+                            PendingCardAudio(
+                                PENDING_ANKICONNECT,
+                                noteId,
+                                line,
+                                target.first,
+                                target.second + ankiSentenceSoundLabel(media.sentenceLabel),
+                                System.currentTimeMillis(),
+                            ),
                         )
                         waiting++
                     }

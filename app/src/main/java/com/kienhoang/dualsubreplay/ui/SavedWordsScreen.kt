@@ -101,7 +101,8 @@ internal fun SavedWordsScreen(
     val due = shown.filter { it.dueAt <= now }.sortedBy { it.dueAt }
     val locale = currentInterfaceLocale()
     val searchLabel = stringResource(R.string.practice_search_label)
-    val pronounceLabel = stringResource(R.string.practice_pronounce)
+    val clips = remember(context) { LineAudioStore.of(context) }
+    val studySettings by rememberStudySettings()
     val showMeaningLabel = stringResource(R.string.practice_show_meaning)
     val originalSentenceNote = stringResource(R.string.practice_video_uses_original_sentence)
     val playOnlineLabel = stringResource(R.string.practice_play_online_example)
@@ -217,13 +218,20 @@ internal fun SavedWordsScreen(
                         }
                     }
                 } else {
+                    val playLine = {
+                        onPause()
+                        pronouncer.playLine(selected, clips)
+                    }
+                    val speak = { text: String, language: String ->
+                        onPause()
+                        pronouncer.speak(text, language)
+                    }
                     Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(selected.word, style = MaterialTheme.typography.headlineMedium)
-                        selected.reading?.let { Text(it) }
-                        TextButton(onClick = {
+                        PracticeWordTitle(selected) {
                             onPause()
                             pronouncer.speak(spokenWord(selected.word, selected.reading), selected.wordLanguage)
-                        }) { Text(pronounceLabel) }
+                        }
+                        selected.reading?.let { Text(it) }
                         pronouncer.message?.let { Text(it) }
                         if (pronouncer.showSpeechSettings) {
                             TextButton(
@@ -235,30 +243,40 @@ internal fun SavedWordsScreen(
                         }
                         if (practice && !revealed) {
                             // The front of the card, as on the Anki card: the word's own line as a hint, translations hidden.
-                            PracticeExample(selected, revealed = false)
+                            PracticeExample(selected, revealed = false, onPlayLine = playLine)
+                            PracticePicture(selected, studySettings.cardPicture, revealed = false)
                             Button(onClick = { revealed = true }, modifier = Modifier.testTag("reveal_meaning")) { Text(showMeaningLabel) }
                         } else {
-                            MeaningPanel(
-                                meaning = if (practice) selected.meaning else editedMeaning,
-                                language = selected.meaningLanguage,
-                                loading = false,
-                                enabled = !busy,
-                                onChange = { editedMeaning = it },
-                                editable = !practice,
-                                onDone = {
-                                    val meaning = editedMeaning.trim()
-                                    if (meaning.isNotEmpty() && meaning != selected.meaning) {
-                                        action { repository.update(selected.id) { it.copy(meaning = meaning) } }
-                                    }
-                                },
-                                textTag = if (practice) "review_meaning" else "word_meaning_text",
-                            )
+                            WithSpeaker(practiceMeaningText(selected), selected.meaningLanguage, speak) {
+                                MeaningPanel(
+                                    meaning = if (practice) selected.meaning else editedMeaning,
+                                    language = selected.meaningLanguage,
+                                    loading = false,
+                                    enabled = !busy,
+                                    onChange = { editedMeaning = it },
+                                    editable = !practice,
+                                    onDone = {
+                                        val meaning = editedMeaning.trim()
+                                        if (meaning.isNotEmpty() && meaning != selected.meaning) {
+                                            action { repository.update(selected.id) { it.copy(meaning = meaning) } }
+                                        }
+                                    },
+                                    textTag = if (practice) "review_meaning" else "word_meaning_text",
+                                )
+                            }
                             if (!practice) {
                                 DeckChip(selected.deck, selected.wordLanguage, named, { deck ->
                                     action { repository.update(selected.id) { it.copy(deck = deck) } }
                                 }, enabled = !busy, tag = "word_deck")
                             }
-                            PracticeExample(selected, revealed = true)
+                            val translationAloud = practiceTranslationText(selected)
+                            PracticeExample(
+                                selected,
+                                revealed = true,
+                                onPlayLine = playLine,
+                                onReadTranslation = translationAloud?.let { text -> { speak(text, selected.meaningLanguage) } },
+                            )
+                            PracticePicture(selected, studySettings.cardPicture, revealed = true)
                             if (selected.translated) Text(originalSentenceNote, style = MaterialTheme.typography.bodySmall)
                             if (practice) {
                                 if (selected.notes.isNotBlank()) {
@@ -361,17 +379,23 @@ internal fun SavedWordsScreen(
 /**
  * The word's example in a tinted box: its own line first, with the word in bold accent color as in the
  * word card, then the other lines smaller and dimmer, and the video it came from. Before "Show meaning"
- * ([revealed] false) only the word's own line shows.
+ * ([revealed] false) only the word's own line shows. The word's line plays its sound and the
+ * translation is read aloud from their speaker buttons, as on the Anki card.
  */
 @Composable
 private fun PracticeExample(
     word: SavedWord,
     revealed: Boolean,
+    onPlayLine: () -> Unit,
+    onReadTranslation: (() -> Unit)? = null,
 ) {
     val colors = MaterialTheme.colorScheme
     val own = if (word.translated) word.translatedSentence ?: word.sentence else word.sentence
     val lines = if (revealed) listOfNotNull(word.sentence, word.translatedSentence, word.thirdSentence) else listOf(own)
     if (lines.all { it.isBlank() } && (!revealed || word.sourceTitle == null)) return
+    val translationLine = if (word.translated) word.sentence else word.translatedSentence
+    val playLabel = stringResource(R.string.practice_play_line)
+    val translationLabel = stringResource(R.string.practice_read_translation)
     Surface(
         color = colors.surfaceVariant.copy(alpha = 0.5f),
         shape = RoundedCornerShape(12.dp),
@@ -385,6 +409,16 @@ private fun PracticeExample(
                     style = if (main) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium,
                     color = if (main) colors.onSurface else colors.onSurfaceVariant,
                     modifier = if (line == word.thirdSentence && revealed) Modifier.testTag("word_third_sentence") else Modifier,
+                    speaker =
+                        when {
+                            main -> {
+                                { SpeakerButton(playLabel, "practice_play_line", onPlayLine) }
+                            }
+                            line == translationLine && onReadTranslation != null -> {
+                                { SpeakerButton(translationLabel, "practice_read_translation", onReadTranslation) }
+                            }
+                            else -> null
+                        },
                 )
             }
             if (revealed) {
@@ -421,6 +455,14 @@ private fun PracticeSentence(
     style: TextStyle,
     color: Color,
     modifier: Modifier = Modifier,
+    speaker: (@Composable () -> Unit)? = null,
 ) {
-    Text(text, modifier.lineSide(text, LocalLayoutDirection.current), color = color, style = style.inLineDirection())
+    if (speaker == null) {
+        Text(text, modifier.lineSide(text, LocalLayoutDirection.current), color = color, style = style.inLineDirection())
+        return
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text, modifier.weight(1f).lineSide(text, LocalLayoutDirection.current), color = color, style = style.inLineDirection())
+        speaker()
+    }
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.kienhoang.dualsubreplay.BuildConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -63,15 +64,23 @@ internal fun ankiSentenceHtml(
     return ankiHtml(sentence.substring(0, at)) + "<b>" + ankiHtml(sentence.substring(at, end)) + "</b>" + ankiHtml(sentence.substring(end))
 }
 
-/** A link to the line's moment in the video, or empty text when the word has no video. */
+/**
+ * Links to the line's moment in the video, or empty text when the word has no video. The first link
+ * opens this app (an intent link naming [appPackage], because Android gives youtube.com links to the
+ * YouTube app); the plain YouTube link next to it keeps working in desktop Anki. No text sits between
+ * the links, because a picture-front template hides only the links and line breaks of this field.
+ */
 internal fun ankiSourceLink(
     videoId: String?,
     startMs: Long,
+    appPackage: String = BuildConfig.APPLICATION_ID,
 ): String {
     if (videoId == null || !videoId.matches(Regex("[A-Za-z0-9_-]{11}"))) return ""
     val seconds = (startMs.coerceAtLeast(0) / MS_PER_SECOND).toInt()
     val label = String.format(Locale.ROOT, "%d:%02d", seconds / SECONDS_PER_MINUTE, seconds % SECONDS_PER_MINUTE)
-    return "<a href=\"https://www.youtube.com/watch?v=$videoId&amp;t=${seconds}s\">YouTube $label</a>"
+    val watch = "www.youtube.com/watch?v=$videoId&amp;t=${seconds}s"
+    val app = "<a href=\"intent://$watch#Intent;scheme=https;package=$appPackage;end\">DualSub Replay $label</a>"
+    return "$app<a style=\"margin-left:12px\" href=\"https://$watch\">YouTube</a>"
 }
 
 /**
@@ -92,6 +101,10 @@ internal data class CardMedia(
     val word: String = "",
     val sentence: String = "",
     val picture: String = "",
+    /** Read aloud on the back: the meanings' sounds, after the Meaning field's text. */
+    val meaningSounds: String = "",
+    /** Read aloud on the back: the sentence translation's sound, after the Translation field's text. */
+    val translationSound: String = "",
 )
 
 /** The field text that plays the media file [name] in Anki; empty for a name Anki couldn't play. */
@@ -111,10 +124,10 @@ internal fun ankiNoteFields(
 ): List<String> =
     listOf(
         ankiHtml(word.word),
-        ankiHtml(word.meaning),
+        ankiHtml(word.meaning) + media.meaningSounds,
         ankiHtml(word.reading.orEmpty()),
         ankiSentenceHtml(word.sentence, word.word),
-        ankiTranslationHtml(word),
+        ankiTranslationHtml(word) + media.translationSound,
         listOf(media.picture, ankiSourceLink(word.videoId, word.startMs)).filter { it.isNotEmpty() }.joinToString("<br>"),
         media.word,
         media.sentence,
@@ -136,6 +149,9 @@ internal data class AnkiCardFiles(
     val word: File? = null,
     val sentence: File? = null,
     val picture: File? = null,
+    /** Read aloud on the back: the meaning in this sentence and the dictionary meaning, in the Meaning field's order. */
+    val meanings: List<File> = emptyList(),
+    val translation: File? = null,
 )
 
 /**
@@ -150,10 +166,51 @@ internal interface AnkiCardMedia {
     ): AnkiCardFiles
 
     fun awaitSentence(item: PendingCardAudio)
+
+    /** The small label before the line's sound on the card, in the app's language; empty for none. */
+    val sentenceLabel: String get() = ""
 }
+
+/**
+ * The text before the line's play button in the Sentence audio field, so learners know that button
+ * plays the line from the video (owner request 2026-11-16); empty for an empty [label].
+ */
+internal fun ankiSentenceSoundLabel(label: String?): String =
+    label?.takeIf { it.isNotBlank() }?.let { "<span style=\"font-size:14px;opacity:.7\">${ankiHtml(it)}</span> " }.orEmpty()
+
+/** [sound] with [label] before it; empty without a sound, so a card that waits for its clip shows no label yet. */
+internal fun labeledSentenceSound(
+    label: String?,
+    sound: String,
+): String = if (sound.isEmpty()) "" else ankiSentenceSoundLabel(label) + sound
 
 /** The authority of the provider that lends AnkiDroid the media files (read-only, for one copy). */
 internal fun cardAudioAuthority(context: Context): String = "${context.packageName}.cardaudio"
+
+/**
+ * The AnkiDroid deck for [word], split like Practice (owner pick 2026-11-16): a subdeck of
+ * DualSub Replay named after the word's Practice deck, else after its language in English (so the
+ * name doesn't change with the app's language). Anki reviews a parent deck with all its subdecks.
+ */
+internal fun ankiDeckName(word: SavedWord): String {
+    val sub = word.deck?.let(::ankiDeckPart) ?: ankiDeckPart(ankiLanguageName(word.wordLanguage))
+    return sub?.let { "$ANKI_DECK_NAME::$it" } ?: ANKI_DECK_NAME
+}
+
+/** [code]'s language name in English ("English", "Japanese"), or the code itself when unknown. */
+internal fun ankiLanguageName(code: String): String {
+    val name = Locale.forLanguageTag(code.trim()).getDisplayLanguage(Locale.ENGLISH)
+    return name.ifBlank { code }
+}
+
+/** [name] as one level of a deck name: Anki's "::" separator and quotes taken out; null when nothing is left. */
+private fun ankiDeckPart(name: String): String? =
+    name
+        .replace("::", " ")
+        .replace("\"", "")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .takeIf { it.isNotEmpty() }
 
 /** The words of [words] that were not sent before, by id. */
 internal fun unsentAnkiWords(
@@ -224,11 +281,16 @@ internal class AnkiDroidNotes(
             var sent = 0
             var waiting = 0
             try {
-                val deck = deckId() ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
+                val decks = HashMap<String, Long?>()
+                val parent =
+                    decks.getOrPut(ANKI_DECK_NAME) { deckId(ANKI_DECK_NAME) }
+                        ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 val noteType =
-                    noteTypeId(deck, options.front, options.sides)
+                    noteTypeId(parent, options.front, options.sides)
                         ?: return@withContext AnkiSendResult(skipped = skipped, problem = AnkiProblem.FAILED)
                 for (word in unsent) {
+                    // A subdeck per language or Practice deck, like Practice; the parent deck if AnkiDroid refuses it.
+                    val deck = decks.getOrPut(ankiDeckName(word)) { deckId(ankiDeckName(word)) } ?: parent
                     val added =
                         addNote(noteType, deck, word, media, options)
                             ?: return@withContext AnkiSendResult(sent, skipped, AnkiProblem.FAILED, waiting = waiting)
@@ -245,16 +307,17 @@ internal class AnkiDroidNotes(
             }
         }
 
-    private fun deckId(): Long? {
+    /** The id of the deck called [wanted], made (with its parent) when missing; null when AnkiDroid refused. */
+    private fun deckId(wanted: String): Long? {
         val decks = Uri.withAppendedPath(base, "decks")
         resolver.query(decks, arrayOf("deck_id", "deck_name"), null, null, null)?.use { cursor ->
             val id = cursor.getColumnIndex("deck_id")
             val name = cursor.getColumnIndex("deck_name")
             while (id >= 0 && name >= 0 && cursor.moveToNext()) {
-                if (cursor.getString(name) == ANKI_DECK_NAME) return cursor.getLong(id)
+                if (cursor.getString(name) == wanted) return cursor.getLong(id)
             }
         }
-        val created = resolver.insert(decks, ContentValues().apply { put("deck_name", ANKI_DECK_NAME) })
+        val created = runCatching { resolver.insert(decks, ContentValues().apply { put("deck_name", wanted) }) }.getOrNull()
         return created?.lastPathSegment?.toLongOrNull()
     }
 
@@ -330,8 +393,10 @@ internal class AnkiDroidNotes(
         val fieldMedia =
             CardMedia(
                 word = files.word?.let { ankiSound(addMedia(it)) }.orEmpty(),
-                sentence = files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty(),
+                sentence = labeledSentenceSound(media?.sentenceLabel, files.sentence?.let { ankiSound(addMedia(it)) }.orEmpty()),
                 picture = files.picture?.let { ankiPicture(addMedia(it)) }.orEmpty(),
+                meaningSounds = files.meanings.joinToString("") { ankiSound(addMedia(it)) },
+                translationSound = files.translation?.let { ankiSound(addMedia(it)) }.orEmpty(),
             )
         val values =
             ContentValues().apply {
@@ -339,23 +404,40 @@ internal class AnkiDroidNotes(
                 put("flds", ankiNoteFields(word, fieldMedia).joinToString(ANKI_FIELD_SEPARATOR))
                 put("tags", ANKI_TAG)
             }
-        val notes =
-            Uri
-                .withAppendedPath(base, "notes")
-                .buildUpon()
-                .appendQueryParameter("deckId", deck.toString())
-                .build()
-        val added = resolver.insert(notes, values) ?: return null
+        val added = resolver.insert(Uri.withAppendedPath(base, "notes"), values) ?: return null
         val noteId = added.lastPathSegment?.toLongOrNull()
+        moveToDeck(added, deck)
         val line = audioLineOf(word)
         val pending =
             if (media != null && options.sentenceAudio && fieldMedia.sentence.isEmpty() && noteId != null && line != null) {
-                PendingCardAudio(PENDING_ANKIDROID, noteId, line, ANKI_SENTENCE_AUDIO_FIELD, "", System.currentTimeMillis())
+                PendingCardAudio(
+                    PENDING_ANKIDROID,
+                    noteId,
+                    line,
+                    ANKI_SENTENCE_AUDIO_FIELD,
+                    ankiSentenceSoundLabel(media.sentenceLabel),
+                    System.currentTimeMillis(),
+                )
             } else {
                 null
             }
         pending?.let { media?.awaitSentence(it) }
         return AddedNote(waiting = pending != null)
+    }
+
+    /**
+     * Puts the new note's card in [deck]. AnkiDroid adds a single note to its note type's default deck
+     * and ignores a deck asked for, and that default drifts: it follows the deck last used in
+     * AnkiDroid's own Add screen, and points to Default once its deck was deleted (owner's phone,
+     * 2026-11-16). AnkiDroid's own API moves the cards the same way. A refusal leaves the card where
+     * it is.
+     */
+    private fun moveToDeck(
+        note: Uri,
+        deck: Long,
+    ) {
+        val card = Uri.withAppendedPath(note, "cards/0")
+        runCatching { resolver.update(card, ContentValues().apply { put("deck_id", deck) }, null, null) }
     }
 
     /**

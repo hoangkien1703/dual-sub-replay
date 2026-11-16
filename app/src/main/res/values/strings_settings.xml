@@ -67,6 +67,15 @@
     <string name="settings_third_line_choose">Choose a language</string>
     <string name="settings_quick_subtitles">Subtitles</string>
     <string name="settings_hide_while_playing">Hide while playing</string>
+    <string name="sleep_timer_title">Sleep timer</string>
+    <string name="sleep_timer_off">Off</string>
+    <string name="sleep_timer_minutes">%1$d min</string>
+    <string name="sleep_timer_end_of_video">End of video</string>
+    <string name="sleep_timer_left">%1$d min left</string>
+    <string name="sleep_timer_description">Pauses the video when the time is up, also in the background and with the screen off.</string>
+    <string name="settings_section_playback_title">Playback</string>
+    <string name="sleep_timer_quick_title">Show in quick settings</string>
+    <string name="sleep_timer_quick_description">Adds the Sleep timer to the small menu that the subtitle panel’s gear opens.</string>
     <string name="settings_close_settings">Close settings</string>
     <string name="settings_peek">See the video. Hold to peek, or tap to keep it visible</string>
     <string name="settings_peek_back">Back to settings</string>
@@ -118,6 +127,8 @@
     <string name="settings_meaning_order_title">Show first</string>
     <string name="settings_meaning_order_sentence">Meaning in this sentence</string>
     <string name="settings_meaning_order_dictionary">Dictionary meaning</string>
+    <string name="settings_prepare_meanings_title">Prepare meanings ahead</string>
+    <string name="settings_prepare_meanings_description">While a line plays, asks the AI for the meaning of each of its words, so a tapped word shows its meaning at once. This uses your key even for lines you don\'t tap.</string>
     <string name="settings_word_learning_mode_title">Word learning mode (POS colors)</string>
     <string name="settings_word_learning_mode_description">Color words by grammatical role (nouns, verbs, adjectives, particles) to see sentence structure.</string>
     <string name="settings_colored_lines_title">Colored subtitle lines</string>

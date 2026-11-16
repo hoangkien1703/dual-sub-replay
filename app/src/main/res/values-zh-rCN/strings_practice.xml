@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">未安装 Google 翻译</string>
     <string name="practice_google_translate_cannot_open">Google 翻译无法接收该文本</string>
     <string name="practice_pronounce_item">朗读 %1$s</string>
+    <string name="practice_play_line">播放句子</string>
+    <string name="practice_read_meaning">朗读释义</string>
+    <string name="practice_read_translation">朗读译文</string>
+    <string name="practice_picture">视频画面</string>
     <string name="practice_speech_settings">语音设置</string>
     <string name="practice_show_meaning">显示释义</string>
     <string name="practice_meaning_label">释义(%1$s)</string>

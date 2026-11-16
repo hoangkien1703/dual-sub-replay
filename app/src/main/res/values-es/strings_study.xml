@@ -49,6 +49,14 @@
     <string name="study_card_place_off">No</string>
     <string name="study_card_sound_first_title">Suena primero</string>
     <string name="study_card_sound_first_description">Cuando un lado de la tarjeta tiene los dos sonidos, este suena primero.</string>
+    <string name="study_card_reading_title">Lectura</string>
+    <string name="study_card_reading_description">La lectura de la palabra: kana, pinyin o el AFI de una palabra inglesa (cómo suena). En el anverso solo se ve cuando el anverso muestra la palabra.</string>
+    <string name="anki_sentence_sound_label">Frase del vídeo</string>
+    <string name="study_card_read_aloud_title">Leer en voz alta en el reverso</string>
+    <string name="study_card_read_aloud_meaning">Significado en esta frase</string>
+    <string name="study_card_read_aloud_dictionary">Significado del diccionario</string>
+    <string name="study_card_read_aloud_translation">Traducción de la frase</string>
+    <string name="study_card_read_aloud_description">Las tarjetas nuevas leen esto en voz alta en el reverso, con la voz del idioma del significado, para repasar sin mirar. Se omite la parte sin voz para su idioma.</string>
     <string name="study_card_place_note">Lo que está en el anverso también se ve en el reverso, porque Anki muestra el anverso encima de la respuesta.</string>
     <string name="study_card_front_title">Anverso de la tarjeta</string>
     <string name="study_card_front_word_sentence">Palabra y frase</string>
@@ -61,7 +69,7 @@
     <string name="study_card_front_listening_description">El anverso solo reproduce el sonido de la frase; la frase y la palabra están en el reverso.</string>
     <string name="study_card_front_note">Cambiarlo también cambia las tarjetas que enviaste antes.</string>
     <string name="study_card_sound_waits">El sonido de la frase se añade cuando la frase termina de reproducirse.</string>
-    <string name="study_card_sound_replaying">Reproduciendo la frase una vez para añadir su sonido a la tarjeta.</string>
+    <string name="study_card_sound_replaying">Reproduciendo la frase una vez, en silencio, para añadir su sonido a la tarjeta.</string>
     <string name="study_blur_box_title">Recuadro difuminado</string>
     <string name="study_blur_box_description">Pone un recuadro difuminado sobre el video para ocultar los subtítulos incrustados en la imagen. Arrástralo para moverlo y arrastra su esquina para cambiar su tamaño.</string>
     <string name="study_page_token_title">Cargar subtítulos con un token de la página (beta)</string>
@@ -127,7 +135,7 @@
     <string name="study_known_words_offer_confirm">Activar</string>
     <string name="study_known_words_offer_dismiss">Ahora no</string>
     <string name="study_send_to_app_title">Enviar palabras a</string>
-    <string name="study_ankidroid_description">Las tarjetas van a un mazo DualSub Replay. Deja AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras está en ejecución.</string>
+    <string name="study_ankidroid_description">Las tarjetas van al mazo DualSub Replay, en un submazo por idioma (o por mazo de Práctica). Deja AnkiDroid abierto en segundo plano: en muchos teléfonos solo acepta tarjetas mientras está en ejecución.</string>
     <string name="study_ankiconnect_description">Envía a AnkiConnect en este teléfono (127.0.0.1:8765), que usan la app AnkiConnect Android, Yomitan y asbplayer. Abre AnkiConnect Android una vez para que su servidor funcione. Si AnkiConnect no puede crear un tipo de nota DualSub Replay, las tarjetas usan el tipo de nota Basic de Anki.</string>
     <string name="study_ankiconnect_deck_title">Mazo de AnkiConnect</string>
     <string name="study_ankiconnect_deck_value">Mazo: %1$s</string>

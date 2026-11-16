@@ -68,4 +68,14 @@ class YouTubeUrlParserTest {
 
         assertNull(YouTubeUrlParser.extractVideoId(oversized))
     }
+
+    @Test
+    fun readsTheStartTimeOfAWatchLink() {
+        assertEquals(83, YouTubeUrlParser.extractStartSeconds("https://www.youtube.com/watch?v=$videoId&t=83s"))
+        assertEquals(12, YouTubeUrlParser.extractStartSeconds("https://www.youtube.com/watch?v=$videoId&t=12"))
+        assertEquals(3_723, YouTubeUrlParser.extractStartSeconds("https://youtu.be/$videoId?t=1h2m3s"))
+        assertNull(YouTubeUrlParser.extractStartSeconds("https://www.youtube.com/watch?v=$videoId&t=0s"))
+        assertNull(YouTubeUrlParser.extractStartSeconds("https://www.youtube.com/watch?v=$videoId"))
+        assertNull(YouTubeUrlParser.extractStartSeconds("https://example.com/watch?t=83s"))
+    }
 }

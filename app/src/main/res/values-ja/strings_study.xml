@@ -49,6 +49,14 @@
     <string name="study_card_place_off">オフ</string>
     <string name="study_card_sound_first_title">先に再生</string>
     <string name="study_card_sound_first_description">カードの片面に両方の音声があるとき、こちらを先に再生します。</string>
+    <string name="study_card_reading_title">読み</string>
+    <string name="study_card_reading_description">単語の読み：かな、ピンイン、または英単語の IPA（発音記号）。表面には、表面に単語があるときだけ表示されます。</string>
+    <string name="anki_sentence_sound_label">動画の文</string>
+    <string name="study_card_read_aloud_title">裏面で読み上げ</string>
+    <string name="study_card_read_aloud_meaning">この文での意味</string>
+    <string name="study_card_read_aloud_dictionary">辞書の意味</string>
+    <string name="study_card_read_aloud_translation">文の訳</string>
+    <string name="study_card_read_aloud_description">新しいカードは裏面でこれらを意味の言語の音声で読み上げるので、画面を見ずに復習できます。その言語の音声がない部分は省きます。</string>
     <string name="study_card_place_note">Ankiは答えの上に表面を表示するので、表面のものは裏面にも表示されます。</string>
     <string name="study_card_front_title">カードの表面</string>
     <string name="study_card_front_word_sentence">単語と文</string>
@@ -61,7 +69,7 @@
     <string name="study_card_front_listening_description">表面ではセリフの音声だけを再生し、文と単語は裏面に表示します。</string>
     <string name="study_card_front_note">変更すると、前に送ったカードも変わります。</string>
     <string name="study_card_sound_waits">文の音声は、セリフが最後まで再生されたあとに追加されます。</string>
-    <string name="study_card_sound_replaying">音声をカードに入れるため、セリフを1回再生しています。</string>
+    <string name="study_card_sound_replaying">音声をカードに入れるため、セリフを消音で1回再生しています。</string>
     <string name="study_blur_box_title">ぼかしボックス</string>
     <string name="study_blur_box_description">動画の上にぼかしたボックスを置き、映像に焼き込まれた字幕を隠します。ドラッグで移動し、角をドラッグして大きさを変えます。</string>
     <string name="study_page_token_title">ページのトークンで字幕を読み込む（ベータ）</string>
@@ -115,7 +123,7 @@
     <string name="study_known_words_offer_confirm">オンにする</string>
     <string name="study_known_words_offer_dismiss">今はしない</string>
     <string name="study_send_to_app_title">単語の送信先</string>
-    <string name="study_ankidroid_description">カードは DualSub Replay デッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
+    <string name="study_ankidroid_description">カードは DualSub Replay デッキの、言語ごと(または練習のデッキごと)のサブデッキに入ります。AnkiDroid をバックグラウンドで開いたままにしてください。多くのスマホでは、AnkiDroid は起動中しかカードを受け付けません。</string>
     <string name="study_ankiconnect_description">このスマホの AnkiConnect(127.0.0.1:8765)に送ります。AnkiConnect Android アプリ、Yomitan、asbplayer が使うアドレスです。サーバーが動くように AnkiConnect Android を一度開いてください。AnkiConnect が DualSub Replay ノートタイプを作れない場合、カードは Anki の Basic ノートタイプを使います。</string>
     <string name="study_ankiconnect_deck_title">AnkiConnect のデッキ</string>
     <string name="study_ankiconnect_deck_value">デッキ: %1$s</string>

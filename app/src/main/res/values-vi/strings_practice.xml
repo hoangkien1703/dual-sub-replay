@@ -21,6 +21,10 @@
     <string name="practice_google_translate_unavailable">Google Dịch chưa được cài đặt</string>
     <string name="practice_google_translate_cannot_open">Google Dịch không nhận được văn bản</string>
     <string name="practice_pronounce_item">Phát âm %1$s</string>
+    <string name="practice_play_line">Phát câu</string>
+    <string name="practice_read_meaning">Đọc nghĩa</string>
+    <string name="practice_read_translation">Đọc bản dịch</string>
+    <string name="practice_picture">Hình từ video</string>
     <string name="practice_speech_settings">Cài đặt giọng nói</string>
     <string name="practice_show_meaning">Hiện nghĩa</string>
     <string name="practice_meaning_label">Nghĩa (%1$s)</string>

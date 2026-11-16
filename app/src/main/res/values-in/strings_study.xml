@@ -49,6 +49,14 @@
     <string name="study_card_place_off">Mati</string>
     <string name="study_card_sound_first_title">Diputar dulu</string>
     <string name="study_card_sound_first_description">Jika satu sisi kartu punya kedua suara, suara ini diputar dulu.</string>
+    <string name="study_card_reading_title">Cara baca</string>
+    <string name="study_card_reading_description">Cara baca kata: kana, pinyin, atau IPA kata bahasa Inggris (bunyinya). Di depan hanya muncul jika bagian depan menampilkan kata itu.</string>
+    <string name="anki_sentence_sound_label">Kalimat dari video</string>
+    <string name="study_card_read_aloud_title">Bacakan di bagian belakang</string>
+    <string name="study_card_read_aloud_meaning">Arti dalam kalimat ini</string>
+    <string name="study_card_read_aloud_dictionary">Arti kamus</string>
+    <string name="study_card_read_aloud_translation">Terjemahan kalimat</string>
+    <string name="study_card_read_aloud_description">Kartu baru membacakan ini di bagian belakang, dengan suara bahasa artinya, jadi kamu bisa mengulang tanpa melihat. Bagian tanpa suara untuk bahasanya dilewati.</string>
     <string name="study_card_place_note">Yang ada di depan juga tampil di belakang, karena Anki menampilkan sisi depan di atas jawaban.</string>
     <string name="study_card_front_title">Sisi depan kartu</string>
     <string name="study_card_front_word_sentence">Kata dan kalimat</string>
@@ -61,7 +69,7 @@
     <string name="study_card_front_listening_description">Sisi depan hanya memutar suara kalimat; kalimat dan kata ada di belakang.</string>
     <string name="study_card_front_note">Mengubah ini juga mengubah kartu yang sudah Anda kirim.</string>
     <string name="study_card_sound_waits">Suara kalimat ditambahkan setelah kalimat selesai diputar.</string>
-    <string name="study_card_sound_replaying">Memutar kalimat sekali agar suaranya masuk ke kartu.</string>
+    <string name="study_card_sound_replaying">Memutar kalimat sekali tanpa suara agar suaranya masuk ke kartu.</string>
     <string name="study_blur_box_title">Kotak buram</string>
     <string name="study_blur_box_description">Menaruh kotak buram di atas video untuk menutupi subtitle yang menempel di gambar. Seret untuk memindahkan, dan seret sudutnya untuk mengubah ukuran.</string>
     <string name="study_page_token_title">Muat subtitle dengan token halaman (beta)</string>
@@ -115,7 +123,7 @@
     <string name="study_known_words_offer_confirm">Nyalakan</string>
     <string name="study_known_words_offer_dismiss">Nanti saja</string>
     <string name="study_send_to_app_title">Kirim kata ke</string>
-    <string name="study_ankidroid_description">Kartu masuk ke dek DualSub Replay. Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
+    <string name="study_ankidroid_description">Kartu masuk ke dek DualSub Replay, dalam subdek per bahasa (atau per dek Latihan). Biarkan AnkiDroid terbuka di latar belakang: di banyak ponsel, AnkiDroid hanya menerima kartu saat sedang berjalan.</string>
     <string name="study_ankiconnect_description">Mengirim ke AnkiConnect di ponsel ini (127.0.0.1:8765), yang dipakai aplikasi AnkiConnect Android, Yomitan, dan asbplayer. Buka AnkiConnect Android sekali agar servernya berjalan. Jika AnkiConnect tidak bisa membuat jenis catatan DualSub Replay, kartu memakai jenis catatan Basic dari Anki.</string>
     <string name="study_ankiconnect_deck_title">Dek AnkiConnect</string>
     <string name="study_ankiconnect_deck_value">Dek: %1$s</string>

@@ -4,6 +4,7 @@ import com.kienhoang.dualsubreplay.data.AudioLine
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardOptions
 import com.kienhoang.dualsubreplay.data.CardPlace
+import com.kienhoang.dualsubreplay.data.CardReadAloud
 import com.kienhoang.dualsubreplay.data.audioLine
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -117,7 +118,7 @@ class LineAudioScriptsTest {
         assertFalse(linePictureWanted(on.copy(cardPicture = CardPlace.OFF), ankiDroidInstalled = true))
         assertTrue(linePictureWanted(on.copy(cardSentenceSound = CardPlace.OFF), ankiDroidInstalled = true))
         assertEquals(
-            CardOptions(CardPlace.FRONT, CardPlace.BACK, CardPlace.OFF, CardFront.WORD),
+            CardOptions(CardPlace.FRONT, CardPlace.BACK, CardPlace.OFF, CardFront.WORD, readAloud = CardReadAloud()),
             on.copy(cardPicture = CardPlace.OFF, cardFront = CardFront.WORD).cardOptions,
         )
     }
