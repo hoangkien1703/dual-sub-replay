@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">所有语言中标记为认识的词都会被忘记。已保存的词会保留。</string>
     <string name="study_known_words_clear_confirm">清除</string>
     <string name="study_anki_title">发送到抽认卡应用</string>
-    <string name="study_anki_description">在单词卡片和“练习”→“导出”中显示“发送到”按钮。除非你用按钮上的 ▾ 或下方的设置选择其他应用,否则会发送到 AnkiDroid;之后按钮会显示所选应用。</string>
+    <string name="study_anki_description">在单词卡片上显示 Anki 按钮,在“练习”→“导出”中显示“全部发送”。两者都发送到下方选择的应用(未更改时为 AnkiDroid)。</string>
     <string name="study_card_picture_description">卡片会带上一张视频画面，在单词所在的台词显示时截取。没有画面时，使用视频的缩略图。</string>
     <string name="study_card_word_sound_title">单词声音</string>
     <string name="study_card_word_sound_description">用单词卡片的声音读出的单词。</string>

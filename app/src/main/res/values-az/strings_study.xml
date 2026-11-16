@@ -35,7 +35,7 @@
     <string name="study_known_words_clear_message">Bütün dillərdə bilinən kimi işarələdiyiniz hər söz unudulur. Saxlanmış sözlər qalır.</string>
     <string name="study_known_words_clear_confirm">Təmizlə</string>
     <string name="study_anki_title">Fləşkart tətbiqlərinə göndər</string>
-    <string name="study_anki_description">Söz kartında və Məşq → İxrac bölməsində Göndər düyməsini göstərir. Düymədəki və ya aşağıdakı ▾ ilə başqa tətbiq seçməsəniz, AnkiDroid-ə göndərir; sonra düymə həmin tətbiqi göstərir.</string>
+    <string name="study_anki_description">Söz kartında Anki düyməsini, Məşq → İxrac bölməsində isə Hamısını göndər düyməsini göstərir. Hər ikisi aşağıda seçilən tətbiqə göndərir (dəyişməsəniz, AnkiDroid).</string>
     <string name="study_card_picture_description">Kartlara videodan şəkil əlavə olunur, sözün cümləsi ekranda olarkən çəkilir. Şəkil yoxdursa, videonun miniatürü istifadə olunur.</string>
     <string name="study_card_word_sound_title">Söz səsi</string>
     <string name="study_card_word_sound_description">Söz kartının istifadə etdiyi səslə söz.</string>

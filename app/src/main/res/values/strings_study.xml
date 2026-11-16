@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Every word you marked as known, in every language, is forgotten. Saved words stay.</string>
     <string name="study_known_words_clear_confirm">Clear</string>
     <string name="study_anki_title">Send to flashcard apps</string>
-    <string name="study_anki_description">Shows a Send to button on the word card and in Practice → Export. It sends to AnkiDroid unless you pick another app with ▾ on the button or below; the button then shows that app.</string>
+    <string name="study_anki_description">Shows an Anki button on the word card and Send all in Practice → Export. Both send to the app picked below (AnkiDroid unless you change it).</string>
     <string name="study_card_picture_description">Cards get a picture from the video, taken while the word\'s line is on screen. When there is none, the video\'s thumbnail is used.</string>
     <string name="study_card_word_sound_title">Word sound</string>
     <string name="study_card_word_sound_description">The word in the voice the word card uses.</string>

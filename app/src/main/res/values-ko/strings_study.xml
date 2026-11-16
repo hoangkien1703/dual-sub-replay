@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">모든 언어에서 아는 단어로 표시한 단어가 모두 지워집니다. 저장한 단어는 남습니다.</string>
     <string name="study_known_words_clear_confirm">지우기</string>
     <string name="study_anki_title">플래시카드 앱으로 보내기</string>
-    <string name="study_anki_description">단어 카드와 연습 → 내보내기에 보내기 버튼을 표시합니다. 버튼의 ▾ 또는 아래에서 다른 앱을 고르지 않으면 AnkiDroid로 보냅니다. 고른 앱은 버튼에 표시됩니다.</string>
+    <string name="study_anki_description">단어 카드에 Anki 버튼을, 연습 → 내보내기에 모두 보내기를 표시합니다. 둘 다 아래에서 고른 앱으로 보냅니다(바꾸지 않으면 AnkiDroid).</string>
     <string name="study_card_picture_description">단어가 나온 문장이 화면에 있을 때 동영상에서 찍은 그림을 카드에 넣습니다. 그림이 없으면 동영상 썸네일을 씁니다.</string>
     <string name="study_card_word_sound_title">단어 소리</string>
     <string name="study_card_word_sound_description">단어 카드가 쓰는 목소리로 읽은 단어.</string>

@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">すべての言語で、既知として印を付けた単語がすべて消去されます。保存した単語は残ります。</string>
     <string name="study_known_words_clear_confirm">消去</string>
     <string name="study_anki_title">単語カードアプリに送る</string>
-    <string name="study_anki_description">単語カードと「練習」→「エクスポート」に「送る」ボタンを表示します。ボタンの ▾ または下の設定で別のアプリを選ばない限り AnkiDroid に送ります。選んだアプリはボタンに表示されます。</string>
+    <string name="study_anki_description">単語カードに Anki ボタン、「練習」→「エクスポート」に「すべて送る」を表示します。どちらも下で選んだアプリに送ります(変更しなければ AnkiDroid)。</string>
     <string name="study_card_picture_description">単語のセリフが画面に出ている間に動画から撮った画像をカードに付けます。画像がないときは動画のサムネイルを使います。</string>
     <string name="study_card_word_sound_title">単語の音声</string>
     <string name="study_card_word_sound_description">単語カードと同じ声で読む単語。</string>

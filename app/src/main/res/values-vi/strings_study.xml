@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Mọi từ bạn đã đánh dấu là đã biết, ở mọi ngôn ngữ, sẽ bị quên. Từ đã lưu vẫn còn.</string>
     <string name="study_known_words_clear_confirm">Xóa</string>
     <string name="study_anki_title">Gửi sang ứng dụng thẻ ghi nhớ</string>
-    <string name="study_anki_description">Hiện nút Gửi sang trên thẻ từ và trong Luyện tập → Xuất. Nút gửi sang AnkiDroid, trừ khi bạn chọn ứng dụng khác bằng ▾ trên nút hoặc ở bên dưới; khi đó nút sẽ hiện ứng dụng đó.</string>
+    <string name="study_anki_description">Hiện nút Anki trên thẻ từ và nút Gửi tất cả trong Luyện tập → Xuất. Cả hai gửi sang ứng dụng chọn ở bên dưới (AnkiDroid nếu bạn không đổi).</string>
     <string name="study_card_picture_description">Thẻ có một hình ảnh lấy từ video, chụp khi câu chứa từ đó đang hiện trên màn hình. Nếu không có, ảnh thu nhỏ của video sẽ được dùng.</string>
     <string name="study_card_word_sound_title">Âm thanh từ</string>
     <string name="study_card_word_sound_description">Từ được đọc bằng giọng mà thẻ từ dùng.</string>

@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Se olvidan todas las palabras que marcaste como conocidas, en todos los idiomas. Las palabras guardadas se quedan.</string>
     <string name="study_known_words_clear_confirm">Borrar</string>
     <string name="study_anki_title">Enviar a apps de tarjetas</string>
-    <string name="study_anki_description">Muestra un botón Enviar a en la tarjeta de palabra y en Práctica → Exportar. Envía a AnkiDroid salvo que elijas otra app con ▾ en el botón o aquí abajo; entonces el botón muestra esa app.</string>
+    <string name="study_anki_description">Muestra un botón Anki en la tarjeta de palabra y Enviar todo en Práctica → Exportar. Ambos envían a la app elegida aquí abajo (AnkiDroid si no la cambias).</string>
     <string name="study_card_picture_description">Las tarjetas llevan una imagen del vídeo, tomada mientras la frase de la palabra está en pantalla. Si no hay ninguna, se usa la miniatura del vídeo.</string>
     <string name="study_card_word_sound_title">Sonido de la palabra</string>
     <string name="study_card_word_sound_description">La palabra con la voz que usa la tarjeta de palabra.</string>

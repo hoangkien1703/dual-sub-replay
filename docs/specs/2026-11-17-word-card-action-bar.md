@@ -136,8 +136,17 @@ and More stays at the far right even when nothing else shows.
 ## Implementation result
 
 As planned. Unused strings of the removed controls (Save to vocabulary, the Known words offer,
-Sending…, the example note) were removed from every language.
+Sending…, the example note) were removed from every language. The Send to flashcard apps
+description no longer mentions a ▾ on the word card's button.
 
 ## Validation result
 
-To be filled from CI on the PR.
+- Cloud container: `formatCheck complexityCheck testDebugUnitTest lintDebug assembleDebug
+  assembleDebugAndroidTest` passed.
+- PR #241 CI on c8ed4b7: `verify-build` and `managed-device-tests` (Pixel 2, API 36) passed,
+  including every test named above. Screenshots checked: `word-card-bar-new-user` (Save and More
+  only, More at the far right), `word-card-more-menu-new-user` (Word card settings only),
+  `word-card-saved` (In Practice and the Practice tab note), `word-card-bar-anki` (Save, Anki,
+  More), `word-card-send-on-save-problem`, `study-known-word-seen` (More holds I know this word),
+  `flashcards-send-saved-words`, `word-card-deck`.
+- Still to do: the owner's phone check with the preview APK.

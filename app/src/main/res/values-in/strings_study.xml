@@ -36,7 +36,7 @@
     <string name="study_known_words_clear_message">Semua kata yang Anda tandai sebagai dikenal, di semua bahasa, akan dilupakan. Kata yang disimpan tetap ada.</string>
     <string name="study_known_words_clear_confirm">Hapus</string>
     <string name="study_anki_title">Kirim ke aplikasi kartu hafalan</string>
-    <string name="study_anki_description">Menampilkan tombol Kirim ke di kartu kata dan di Latihan → Ekspor. Tombol ini mengirim ke AnkiDroid kecuali Anda memilih aplikasi lain dengan ▾ di tombol atau di bawah; tombol lalu menampilkan aplikasi itu.</string>
+    <string name="study_anki_description">Menampilkan tombol Anki di kartu kata dan Kirim semua di Latihan → Ekspor. Keduanya mengirim ke aplikasi yang dipilih di bawah (AnkiDroid kecuali Anda menggantinya).</string>
     <string name="study_card_picture_description">Kartu mendapat gambar dari video, diambil saat kalimat kata itu tampil di layar. Jika tidak ada, gambar mini video yang dipakai.</string>
     <string name="study_card_word_sound_title">Suara kata</string>
     <string name="study_card_word_sound_description">Kata dengan suara yang dipakai kartu kata.</string>
