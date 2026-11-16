@@ -56,6 +56,17 @@ class LineAudioScriptsTest {
     }
 
     @Test
+    fun theRecorderTakesBigBlocksAndTimesThemByTheAudioClock() {
+        val script = webLineAudioScript(on = true, videoId = "abcdefghijk")
+        // Small blocks lost pieces of sound on a busy page (choppy clips, Kien 2026-11-17).
+        assertTrue("createScriptProcessor(16384, 1, 1)" in script)
+        assertTrue("state.context.currentTime - state.got / rate" in script)
+        // A video paused at the line's end keeps the line's tail from a block that arrived late.
+        assertTrue("document.addEventListener('pause', paused, true);" in script)
+        assertTrue("document.removeEventListener('pause', paused, true);" in script)
+    }
+
+    @Test
     fun anOddVideoIdTurnsTheRecorderOff() {
         assertTrue("if (!false)" in webLineAudioScript(on = true, videoId = "'); alert(1); ('"))
         assertTrue("if (!false)" in webLineAudioScript(on = false, videoId = "abcdefghijk"))
