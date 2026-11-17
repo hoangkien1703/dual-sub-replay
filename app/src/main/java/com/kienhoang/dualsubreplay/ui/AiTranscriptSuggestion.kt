@@ -197,7 +197,8 @@ private fun AiTranscriptProblem(
             )
             CloseIconButton(actions.closeSuggestion, Modifier.size(36.dp), tag = "ai_transcript_problem_close")
         }
-        if (problem == AiSubtitleProblem.NO_LYRICS_NEEDS_KEY && !geminiReady) {
+        val needsKey = problem == AiSubtitleProblem.NO_LYRICS_NEEDS_KEY || problem == AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY
+        if (needsKey && !geminiReady) {
             TextButton(onClick = actions.openAiSettings, modifier = Modifier.testTag("ai_transcript_add_key")) {
                 Text(stringResource(R.string.ai_subtitles_add_key))
             }

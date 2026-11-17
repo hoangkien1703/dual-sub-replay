@@ -252,20 +252,61 @@ internal data class AiSubtitleTrack(
     val youtubeTracks: List<CaptionLanguage> = emptyList(),
     /** The lines are a song's synced lyrics from LRCLIB, not written by Gemini. */
     val lyrics: Boolean = false,
+    /** A compilation's songs that have synced lyrics; Gemini's parts fill only the rest. */
+    val lyricChapters: List<LyricChapter> = emptyList(),
 ) {
-    /** Every part's lines in time order, without a line written twice where two parts meet. */
+    /**
+     * Every part's lines in time order, without a line written twice where two parts meet. In a
+     * compilation, the songs with synced lyrics keep them and Gemini's lines there are left out.
+     */
     fun cues(): List<RawCaptionCue> {
         val kept = ArrayList<RawCaptionCue>()
-        for (cue in parts
-            .toSortedMap()
-            .values
-            .flatten()
-            .sortedBy { it.startMs }) {
+        val gemini = parts.values.flatten().filter { cue -> lyricChapters.none { cue.startMs >= it.startMs && cue.startMs < it.endMs } }
+        for (cue in (gemini + lyricChapters.flatMap { it.cues }).sortedBy { it.startMs }) {
             val previous = kept.lastOrNull()
             if (previous != null && cue.startMs < previous.endMs - DUPLICATE_OVERLAP_MS) continue
             kept += cue
         }
         return kept
+    }
+
+    /**
+     * Gemini's parts that need no asking, because the songs with synced lyrics cover them whole.
+     * Only known once [endMs] is.
+     */
+    fun coveredParts(): Set<Long> {
+        val end = endMs ?: return emptySet()
+        if (lyricChapters.isEmpty()) return emptySet()
+        return (0 until end step AI_SUBTITLE_PART_MS)
+            .filter { start -> covered(start, minOf(start + AI_SUBTITLE_PART_MS, end)) }
+            .toSet()
+    }
+
+    private fun covered(
+        from: Long,
+        to: Long,
+    ): Boolean {
+        var at = from
+        for (chapter in lyricChapters.sortedBy { it.startMs }) {
+            if (chapter.startMs > at) break
+            if (chapter.endMs > at) at = chapter.endMs
+            if (at >= to) return true
+        }
+        return at >= to
+    }
+
+    /** A compilation with lyrics for some songs only: some of Gemini's parts are neither covered nor written. */
+    fun hasGaps(): Boolean {
+        val end = endMs ?: return false
+        if (lyricChapters.isEmpty()) return false
+        return nextAiSubtitlePart(0L, parts.keys + coveredParts(), end) != null
+    }
+
+    /** True when the lines are mostly synced lyrics: a single song's, or a compilation's for at least half of it. */
+    fun mostlyLyrics(): Boolean {
+        if (lyrics) return true
+        val end = endMs ?: return false
+        return lyricChapters.sumOf { it.endMs - it.startMs } * 2 >= end
     }
 
     fun withPart(
@@ -281,7 +322,7 @@ internal data class AiSubtitleTrack(
             cues = cues(),
             availableLanguages = youtubeTracks,
             trackId = AI_SUBTITLE_TRACK_ID,
-            lyrics = lyrics,
+            lyrics = mostlyLyrics(),
         )
 }
 
@@ -370,8 +411,39 @@ internal fun encodeAiSubtitleTrack(track: AiSubtitleTrack): String {
         .put("parts", parts)
         .put("youtubeTracks", youtube)
         .put("lyrics", track.lyrics)
+        .put("lyricChapters", encodeLyricChapters(track.lyricChapters))
         .toString()
 }
+
+private fun encodeLyricChapters(chapters: List<LyricChapter>): JSONArray {
+    val array = JSONArray()
+    chapters.forEach { chapter ->
+        val lines = JSONArray()
+        chapter.cues.forEach { lines.put(JSONArray().put(it.startMs).put(it.endMs).put(it.text)) }
+        array.put(
+            JSONObject()
+                .put("start", chapter.startMs)
+                .put("end", chapter.endMs)
+                .put("cues", lines),
+        )
+    }
+    return array
+}
+
+/** A compilation's songs with synced lyrics; older files have none. */
+private fun decodeLyricChapters(array: JSONArray?): List<LyricChapter> =
+    (0 until (array?.length() ?: 0)).mapNotNull { index ->
+        val chapter = array?.optJSONObject(index) ?: return@mapNotNull null
+        val lines = chapter.optJSONArray("cues") ?: return@mapNotNull null
+        LyricChapter(
+            chapter.getLong("start"),
+            chapter.getLong("end"),
+            (0 until lines.length()).map { line ->
+                val cue = lines.getJSONArray(line)
+                RawCaptionCue(cue.getLong(0), cue.getLong(1), cue.getString(2))
+            },
+        )
+    }
 
 /** YouTube's tracks saved beside an AI transcript; files from before 2026-11-17 have none. */
 private fun decodeYouTubeTracks(array: JSONArray?): List<CaptionLanguage> =
@@ -407,6 +479,7 @@ internal fun decodeAiSubtitleTrack(text: String): AiSubtitleTrack? =
                 complete = root.optBoolean("complete"),
                 youtubeTracks = decodeYouTubeTracks(root.optJSONArray("youtubeTracks")),
                 lyrics = root.optBoolean("lyrics"),
+                lyricChapters = decodeLyricChapters(root.optJSONArray("lyricChapters")),
             )
         }
     } catch (_: JSONException) {

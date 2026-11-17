@@ -24,6 +24,13 @@ import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
+import com.kienhoang.dualsubreplay.data.lyricChapter
+import com.kienhoang.dualsubreplay.data.descriptionChapters
+import com.kienhoang.dualsubreplay.data.chaptersFromPlaying
+import com.kienhoang.dualsubreplay.data.VideoDescriptions
+import com.kienhoang.dualsubreplay.data.SongChapter
+import com.kienhoang.dualsubreplay.data.LyricChapter
+import com.kienhoang.dualsubreplay.data.CHAPTER_LENGTH_SLACK_MS
 import com.kienhoang.dualsubreplay.data.AiSubtitleTrack
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
@@ -817,8 +824,13 @@ class AppViewModel internal constructor(
         _state.update {
             it.copy(pickedTrack = AI_SUBTITLE_TRACK_ID, aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId)
         }
-        if (current.loadedTrackId == AI_SUBTITLE_TRACK_ID || aiSubtitles.isRunning(videoId)) return true
+        if (aiSubtitles.isRunning(videoId)) return true
         val youtubeTracks = current.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID }
+        if (current.loadedTrackId == AI_SUBTITLE_TRACK_ID && current.segments.isNotEmpty() && !current.liveFallback) {
+            // A compilation shown with some songs' lyrics: with a key now, Gemini writes the rest.
+            if (geminiReady) viewModelScope.launch { fillCompilationGaps(videoId, youtubeTracks) }
+            return true
+        }
         viewModelScope.launch {
             val saved = withContext(Dispatchers.IO) { aiSubtitleStore.read(videoId) }?.takeIf { it.cues().isNotEmpty() }
             if (_state.value.activeVideoId != videoId) return@launch
@@ -826,7 +838,7 @@ class AppViewModel internal constructor(
                 loadVideo(videoId, showPanel = true)
                 return@launch
             }
-            if (song && playing?.durationMs != null && findSongLyrics(videoId, playing, current, youtubeTracks)) return@launch
+            if (song && playing?.durationMs != null && findSongLyrics(videoId, playing, current, youtubeTracks, geminiReady)) return@launch
             if (_state.value.activeVideoId != videoId) return@launch
             if (geminiReady) {
                 aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
@@ -847,8 +859,11 @@ class AppViewModel internal constructor(
         playing: WebVideoPlayback,
         current: DualSubUiState,
         youtubeTracks: List<CaptionLanguage>,
+        geminiReady: Boolean,
     ): Boolean {
         val duration = playing.durationMs ?: return false
+        val chapters = descriptionChapters(VideoDescriptions.of(videoId).orEmpty(), duration)
+        if (chapters.isNotEmpty()) return findCompilationLyrics(videoId, chapters, duration, current, youtubeTracks, geminiReady)
         _state.update { it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = true, lookingForLyrics = true)) }
         val found = syncedLyrics.find(playing.title, playing.channel, duration)
         _state.update { state -> if (state.aiSubtitles?.lookingForLyrics == true) state.copy(aiSubtitles = null) else state }
@@ -868,6 +883,67 @@ class AppViewModel internal constructor(
         withContext(Dispatchers.IO) { aiSubtitleStore.write(track) }
         loadVideo(videoId, showPanel = true)
         return true
+    }
+
+    /**
+     * A compilation (owner pick 2026-11-17): each song listed in the description is looked up on
+     * its own, from the one playing, and its lyrics are moved to where it starts. Gemini (with a
+     * key) writes only the parts no song covers; without a key those parts stay empty and the
+     * panel says how to fill them. False when no song had lyrics.
+     */
+    @Suppress("LongParameterList")
+    private suspend fun findCompilationLyrics(
+        videoId: String,
+        chapters: List<SongChapter>,
+        duration: Long,
+        current: DualSubUiState,
+        youtubeTracks: List<CaptionLanguage>,
+        geminiReady: Boolean,
+    ): Boolean {
+        val found = ArrayList<LyricChapter>()
+        for ((index, chapter) in chaptersFromPlaying(chapters, latestPlaybackSecondMs).withIndex()) {
+            if (_state.value.activeVideoId != videoId) return true
+            _state.update {
+                it.copy(
+                    aiSubtitles =
+                        AiSubtitleStatus(videoId, working = true, lookingForLyrics = true, lyricsChecked = index, lyricsTotal = chapters.size),
+                )
+            }
+            syncedLyrics.find(chapter.title, "", chapter.endMs - chapter.startMs, CHAPTER_LENGTH_SLACK_MS)?.let { found += lyricChapter(chapter, it) }
+        }
+        _state.update { state -> if (state.aiSubtitles?.lookingForLyrics == true) state.copy(aiSubtitles = null) else state }
+        ProblemLog.record(ProblemArea.CAPTIONS, "Compilation lyrics: ${found.size} of ${chapters.size} songs")
+        if (found.isEmpty() || _state.value.activeVideoId != videoId) return false
+        val track =
+            AiSubtitleTrack(
+                videoId = videoId,
+                language = current.resolvedSourceLanguage ?: learningLanguage() ?: "en",
+                parts = emptyMap(),
+                endMs = duration,
+                youtubeTracks = youtubeTracks,
+                lyricChapters = found.sortedBy { it.startMs },
+            )
+        val gaps = track.hasGaps()
+        // Without a key the gaps stay empty, so the track is complete and nothing resumes by itself.
+        withContext(Dispatchers.IO) { aiSubtitleStore.write(track.copy(complete = !(gaps && geminiReady))) }
+        if (gaps && geminiReady) aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
+        loadVideo(videoId, showPanel = true)
+        if (gaps && !geminiReady) {
+            _state.update { it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY)) }
+        }
+        return true
+    }
+
+    /** A compilation saved with only some songs' lyrics: Gemini writes the parts between them. */
+    private suspend fun fillCompilationGaps(
+        videoId: String,
+        youtubeTracks: List<CaptionLanguage>,
+    ) {
+        val saved = withContext(Dispatchers.IO) { aiSubtitleStore.read(videoId) } ?: return
+        if (!saved.hasGaps() || _state.value.activeVideoId != videoId) return
+        withContext(Dispatchers.IO) { aiSubtitleStore.write(saved.copy(complete = false)) }
+        _state.update { it.copy(aiSubtitles = null) }
+        aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks.ifEmpty { saved.youtubeTracks })
     }
 
     /** The song card's X: no more AI transcript offers (or problems) for the open video this session. */
@@ -1649,6 +1725,7 @@ class AppViewModel internal constructor(
                 availableSourceLanguages = emptyList(),
                 pickedTrack = null,
                 loadedTrackId = "",
+                loadedLyrics = false,
                 resolvedSourceLanguage = null,
                 generatedCaptions = false,
                 segments = emptyList(),
@@ -1661,8 +1738,13 @@ class AppViewModel internal constructor(
         }
     }
 
-    /** Before [videoId] loads: another video's AI subtitles stop, and its playback position is forgotten. */
+    /**
+     * Before [videoId] loads: another video's AI subtitles stop, and its playback position is forgotten.
+     * No track counts as loaded until this load finishes: a captionless video kept the last video's AI
+     * transcript as loaded, so the list showed it selected and Make subtitles with AI did nothing (2026-11-17).
+     */
     private fun leaveOtherVideo(videoId: String) {
+        _state.update { it.copy(loadedTrackId = "", loadedLyrics = false) }
         if (aiSubtitles.videoId != null && aiSubtitles.videoId != videoId) aiSubtitles.stop()
         // Reloading the same video (language change, retry) keeps tracking the
         // current position so subtitles resume exactly where playback is.

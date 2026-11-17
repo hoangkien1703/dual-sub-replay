@@ -100,6 +100,24 @@ class AiTranscriptBannerUiTest {
     }
 
     @Test
+    fun aCompilationCountsItsSongs() {
+        val looking = AiSubtitleStatus(videoId, working = true, lookingForLyrics = true, lyricsChecked = 4, lyricsTotal = 32)
+        show(song.copy(aiSubtitles = looking))
+        composeRule.onNodeWithText("Looking for synced lyrics… song 5 of 32").assertIsDisplayed()
+        saveEvidence("ai-transcript-compilation-songs")
+    }
+
+    @Test
+    fun someLyricsAndNoKeyOffersToAddOne() {
+        show(
+            song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY)),
+            geminiReady = false,
+        )
+        composeRule.onNodeWithTag("ai_transcript_add_key").assertIsDisplayed()
+        saveEvidence("ai-transcript-some-lyrics-no-key")
+    }
+
+    @Test
     fun progressShowsWhileYouTubesCaptionsStay() {
         show(song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = true, doneMs = 0L, totalMs = 218_000)))
         composeRule.onNodeWithTag("ai_transcript_progress").assertIsDisplayed()

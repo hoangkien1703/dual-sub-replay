@@ -30,6 +30,9 @@ data class AiSubtitleStatus(
     val problem: AiSubtitleProblem? = null,
     /** Asking LRCLIB for a song's synced lyrics, before Gemini. */
     val lookingForLyrics: Boolean = false,
+    /** A compilation's songs looked up so far, of [lyricsTotal]; 0 of 0 for a single song. */
+    val lyricsChecked: Int = 0,
+    val lyricsTotal: Int = 0,
 )
 
 /** Problems that may pass by themselves, so a part asked while the subtitles already show is asked again later. */
@@ -123,7 +126,7 @@ internal class AiSubtitleRunner(
         // A loaded unfinished track carries on quietly; the card shows progress only before anything shows.
         if (!showing) onStatus(progress(track, endMs))
         while (true) {
-            val start = nextAiSubtitlePart(first, track.parts.keys, endMs) ?: break
+            val start = nextAiSubtitlePart(first, track.parts.keys + track.copy(endMs = endMs).coveredParts(), endMs) ?: break
             val answer =
                 try {
                     askPart(videoId, start, start + AI_SUBTITLE_PART_MS)
@@ -167,7 +170,7 @@ internal class AiSubtitleRunner(
         track: AiSubtitleTrack,
         endMs: Long?,
     ): AiSubtitleStatus {
-        val made = track.parts.keys.size * AI_SUBTITLE_PART_MS
+        val made = (track.parts.keys + track.copy(endMs = endMs).coveredParts()).size * AI_SUBTITLE_PART_MS
         return AiSubtitleStatus(track.videoId, working = true, doneMs = endMs?.let { made.coerceAtMost(it) } ?: made, totalMs = endMs)
     }
 }

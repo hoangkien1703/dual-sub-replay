@@ -26,4 +26,6 @@
     <string name="ai_transcript_lyrics_track_label">%1$s (letra de la canción)</string>
     <string name="ai_transcript_looking_for_lyrics">Buscando letra sincronizada…</string>
     <string name="ai_transcript_no_lyrics_needs_key">No hay letra sincronizada que coincida con este video. Agrega una clave gratuita de Gemini y la IA podrá escribirla.</string>
+    <string name="ai_transcript_looking_for_song_lyrics">Buscando letra sincronizada… canción %1$d de %2$d</string>
+    <string name="ai_transcript_some_lyrics_needs_key">Se encontró letra sincronizada para algunas canciones. Agrega una clave gratuita de Gemini y la IA podrá escribir el resto.</string>
 </resources>

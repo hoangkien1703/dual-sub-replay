@@ -28,6 +28,9 @@ private const val LYRICS_TIMEOUT_MS = 10_000L
 /** A song may be this much longer or shorter than the video (lyric videos add a second or two). */
 internal const val LYRICS_LENGTH_SLACK_MS = 3_000L
 
+/** A compilation's song may run a little longer or shorter than the song, where songs fade into each other. */
+internal const val CHAPTER_LENGTH_SLACK_MS = 6_000L
+
 /** A line with no next line, or before a long instrumental part, lasts at most this long. */
 private const val LONGEST_LYRIC_LINE_MS = 8_000L
 
@@ -102,6 +105,7 @@ internal fun pickSyncedLyrics(
     reply: String,
     title: String,
     videoDurationMs: Long,
+    slackMs: Long = LYRICS_LENGTH_SLACK_MS,
 ): SyncedLyrics? {
     val songs =
         try {
@@ -117,7 +121,7 @@ internal fun pickSyncedLyrics(
             val seconds = song.optDouble("duration", Double.NaN).takeIf { it.isFinite() && it > 0 } ?: return@mapNotNull null
             val durationMs = (seconds * 1000).toLong()
             val track = song.optString("trackName")
-            if (song.optBoolean("instrumental") || abs(durationMs - videoDurationMs) > LYRICS_LENGTH_SLACK_MS) return@mapNotNull null
+            if (song.optBoolean("instrumental") || abs(durationMs - videoDurationMs) > slackMs) return@mapNotNull null
             if (!namesTheSong(lowerTitle, track)) return@mapNotNull null
             val cues = parseLrc(synced)
             if (cues.isEmpty()) null else SyncedLyrics(track, song.optString("artistName"), durationMs, cues)
@@ -176,10 +180,11 @@ internal class SyncedLyricsSource(
         title: String,
         channel: String,
         videoDurationMs: Long,
+        slackMs: Long = LYRICS_LENGTH_SLACK_MS,
     ): SyncedLyrics? {
         val query = lyricsSearchQuery(title, channel) ?: return null
         val reply = withContext(Dispatchers.IO) { runCatching { download(query) }.getOrNull() } ?: return null
-        return pickSyncedLyrics(reply, title, videoDurationMs)
+        return pickSyncedLyrics(reply, title, videoDurationMs, slackMs)
     }
 
     private fun download(query: String): String? {
