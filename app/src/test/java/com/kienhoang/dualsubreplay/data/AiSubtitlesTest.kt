@@ -234,10 +234,41 @@ class AiSubtitlesTest {
     }
 
     @Test
+    fun linesInAnotherLanguagesLettersAreNotTaken() {
+        // Kien's Chinese song (2026-11-17): Gemini named zh-Hans and copied the Vietnamese subtitles on screen.
+        val copied =
+            """{"language":"zh-Hans","lines":[{"start":"0:20","end":"0:23","text":"chúng ta đều như nhau cả"},""" +
+                """{"start":"0:24","end":"0:27","text":"Đoạn đường tương lai sẽ chẳng thiếu gì mưa gió"}]}"""
+        val wrong = assertThrows(AiSubtitleReplyException::class.java) { parseAiSubtitleReply(reply(copied), 0, 300_000) }
+        assertTrue(wrong.refused)
+        val chinese = """{"language":"zh-Hans","lines":[{"start":"0:20","end":"0:23","text":"换种活法 自己变得快乐"}]}"""
+        assertEquals("zh-Hans", parseAiSubtitleReply(reply(chinese), 0, 300_000).language)
+        // English words in a K-pop line, and a language written in Latin letters, are fine.
+        assertTrue(writtenInLanguage("ko", listOf(RawCaptionCue(0, 1_000, "Baby I love you 너를 사랑해"))))
+        assertTrue(writtenInLanguage("vi", listOf(RawCaptionCue(0, 1_000, "chúng ta đều như nhau cả"))))
+        assertFalse(writtenInLanguage("ja", listOf(RawCaptionCue(0, 1_000, "kimi no na wa"))))
+    }
+
+    @Test
+    fun savedLinesInAnotherLanguagesLettersAreAskedAgain() {
+        val wrong = listOf(RawCaptionCue(20_000, 23_000, "chúng ta đều như nhau cả"))
+        val right = listOf(RawCaptionCue(320_000, 323_000, "换种活法 自己变得快乐"))
+        val track = AiSubtitleTrack("aaaaaaaaaaa", "zh-Hans", mapOf(0L to wrong, 300_000L to right), endMs = 400_000, complete = true)
+        // Saved before the check: the copied part is dropped, so the track is unfinished.
+        val old = encodeAiSubtitleTrack(track).replace(",\"scriptChecked\":true", "")
+        val decoded = decodeAiSubtitleTrack(old)!!
+        assertEquals(setOf(300_000L), decoded.parts.keys)
+        assertFalse(decoded.complete)
+        // Saved after it: kept as written, so a part the check would drop is never asked again and again.
+        assertEquals(track, decodeAiSubtitleTrack(encodeAiSubtitleTrack(track)))
+    }
+
+    @Test
     fun thePromptAsksForSungLinesToo() {
         val body = aiSubtitleRequestBody("dQw4w9WgXcQ", 0, 300_000)
         assertTrue(body.contains("spoken or sung"))
         assertTrue(body.contains("Leave out music without words"))
+        assertTrue(body.contains("never copy text shown on screen"))
     }
 
     @Test

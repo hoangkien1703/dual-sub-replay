@@ -43,6 +43,9 @@ enum class AiSubtitleProblem {
 
     /** A song with no synced lyrics that fit, and no Gemini key to write them. */
     NO_LYRICS_NEEDS_KEY,
+
+    /** A compilation with synced lyrics for some songs only, and no Gemini key to write the rest. */
+    SOME_LYRICS_NEEDS_KEY,
 }
 
 internal class AiSubtitleException(

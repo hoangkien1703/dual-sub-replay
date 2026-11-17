@@ -26,4 +26,6 @@
     <string name="ai_transcript_lyrics_track_label">%1$s（歌词）</string>
     <string name="ai_transcript_looking_for_lyrics">正在查找同步歌词…</string>
     <string name="ai_transcript_no_lyrics_needs_key">没有找到与此视频匹配的同步歌词。添加免费的 Gemini 密钥后，AI 可以写出歌词。</string>
+    <string name="ai_transcript_looking_for_song_lyrics">正在查找同步歌词… 第 %1$d 首，共 %2$d 首</string>
+    <string name="ai_transcript_some_lyrics_needs_key">已找到部分歌曲的同步歌词。添加免费的 Gemini 密钥后，AI 可以写出其余部分。</string>
 </resources>

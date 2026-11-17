@@ -79,3 +79,27 @@ Patch (owner's standing rule: patch releases only).
 
 - Implemented as planned.
 - Not run here: device tests (no /dev/kvm; PR CI runs them) and the owner's phone test. Whether YouTube's mobile page includes `microformat` in `getPlayerResponse()` is unverified; title and channel words cover lyric videos either way.
+
+## Follow-up: compilations (owner pick 2026-11-17, "try that after this PR")
+
+A long music video made of many songs (2 hours or more) never matches one song's length, so before this it went straight to Gemini (24 parts for 2 hours, about a quarter of a free key's daily video allowance).
+
+- **Songs from the description**: lines with one timestamp and a name ("00:00 1. Ed Sheeran - Perfect", "[07:25] Shape of You | Ed Sheeran", "1:01:10 - Last Song"), at least 3, the first at 0:00, in order and inside the video (YouTube's own chapter rule) (`descriptionChapters`, `data/SongChapters.kt`). The description comes from the player details the caption lookup already reads (page and app download), kept in memory for the last 8 videos (`VideoDescriptions`).
+- **Per song**: LRCLIB is asked for each song, starting with the one playing, one request at a time ("Looking for synced lyrics… song 5 of 32"). A song is taken when its length is within 6 s of the chapter's (songs fade into each other), its lines moved to the chapter's start and cut at its end (`LyricChapter`).
+- **Gaps**: Gemini (with a key) writes only the 5-minute parts no song with lyrics covers whole (`AiSubtitleTrack.coveredParts`); in a part it does write, its lines inside a song with lyrics are left out. Without a key the gaps stay empty, the track is saved complete (nothing resumes by itself later), and the panel says "Synced lyrics were found for some songs. Add a free Gemini key…"; after adding one, Try again writes only the gaps.
+- The header says "(song lyrics)" when lyrics cover at least half of the video.
+- Acceptance: `SongChaptersTest` (description formats and rejections, order from the playing song, moving and cutting lines, covered parts, filtering Gemini lines, round trip), `AiSubtitleRunnerTest.aCompilationAsksGeminiOnlyBetweenTheSongsWithLyrics`, `AiTranscriptBannerUiTest` screenshots. Live LRCLIB: "Lewis Capaldi – Someone You Loved", "Shape of You | Ed Sheeran" and "Ed Sheeran - Perfect" chapter titles all found.
+- Not verified: real compilation descriptions on a phone; m.youtube.com's player details are expected to carry `shortDescription` (the app already reads it for language hints).
+
+## Fix: Make subtitles with AI after a song (Kien, 2026-11-17)
+
+On v1.9.9, a captionless video opened after a video with lyrics or an AI transcript kept that track as loaded, so the list showed "AI transcript (Gemini)" selected and **Make subtitles with AI** did nothing. Each load now starts with no loaded track, and the AI transcript counts as showing only while its lines are on screen (`NextVideoForgetsLoadedTrackTest`, PR CI).
+
+## Fix: Gemini copied another language's on-screen subtitles (Kien, 2026-11-17)
+
+On a Chinese song with Vietnamese subtitles in the picture, Gemini named the language zh-Hans but wrote the Vietnamese lines; the header said "Chinese (AI subtitles)" and Google Translate returned the Vietnamese unchanged. Four other uploads of the same song gave Chinese lines in a live test, so it happens only sometimes.
+
+- The prompt asks for the words heard, in the language's own writing system, and never text shown on screen.
+- A part named in a language with its own script (Chinese, Japanese, Korean, Thai, Arabic, Hebrew, Hindi, Cyrillic, Greek) whose lines have under 10% of their letters in that script is treated like a refusal: the next model is asked, and if every model does it, the "wouldn't write subtitles" problem shows (`writtenInLanguage`).
+- Saved transcripts from before the check drop such parts once, so asking again writes them anew; new files carry `scriptChecked` so a part is never dropped twice.
+- Acceptance: `AiSubtitlesTest.linesInAnotherLanguagesLettersAreNotTaken`, `savedLinesInAnotherLanguagesLettersAreAskedAgain`.

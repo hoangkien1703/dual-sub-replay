@@ -108,6 +108,8 @@ internal fun NoCaptionsCard(
 internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
     val total = status.totalMs
     return when {
+        status.lookingForLyrics && status.lyricsTotal > 1 ->
+            stringResource(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
         status.lookingForLyrics -> stringResource(R.string.ai_transcript_looking_for_lyrics)
         status.doneMs <= 0L -> stringResource(R.string.ai_subtitles_starting)
         total != null -> stringResource(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
@@ -127,6 +129,7 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.NO_SPEECH -> R.string.ai_subtitles_problem_no_speech
         AiSubtitleProblem.FAILED -> R.string.ai_subtitles_problem_failed
         AiSubtitleProblem.NO_LYRICS_NEEDS_KEY -> R.string.ai_transcript_no_lyrics_needs_key
+        AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY -> R.string.ai_transcript_some_lyrics_needs_key
     }
 
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */

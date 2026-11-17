@@ -26,4 +26,6 @@
     <string name="ai_transcript_lyrics_track_label">%1$s（歌詞）</string>
     <string name="ai_transcript_looking_for_lyrics">同期歌詞を探しています…</string>
     <string name="ai_transcript_no_lyrics_needs_key">この動画に合う同期歌詞が見つかりません。無料のGeminiキーを追加すると、AIが書き起こせます。</string>
+    <string name="ai_transcript_looking_for_song_lyrics">同期歌詞を探しています… %2$d曲中%1$d曲目</string>
+    <string name="ai_transcript_some_lyrics_needs_key">一部の曲の同期歌詞が見つかりました。無料のGeminiキーを追加すると、残りはAIが書き起こせます。</string>
 </resources>

@@ -280,6 +280,7 @@ class PageTranscriptSource(
         val root = runCatching { JSONObject(json) }.getOrNull() ?: return
         val details = root.optJSONObject("videoDetails")
         if (details?.optString("videoId") != request.videoId) return
+        VideoDescriptions.remember(request.videoId, details.optString("shortDescription"))
         request.found = pageTrackSources(root)
         val renderer = root.optJSONObject("captions")?.optJSONObject("playerCaptionsTracklistRenderer")
         val tracks = renderer?.optJSONArray("captionTracks")

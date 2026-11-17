@@ -735,6 +735,7 @@ class YouTubeCaptionProvider(
         deadlineNanos: Long,
         noTracksMessage: String,
     ): CaptionTrackResult {
+        root.optJSONObject("videoDetails")?.let { VideoDescriptions.remember(it.optString("videoId"), it.optString("shortDescription")) }
         val playability = root.optJSONObject("playabilityStatus")
         val playabilityStatus = playability?.optString("status").orEmpty()
         if (playabilityStatus.isNotBlank() && playabilityStatus != "OK") {
