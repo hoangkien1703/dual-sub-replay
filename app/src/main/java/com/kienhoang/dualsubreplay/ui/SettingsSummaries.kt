@@ -71,7 +71,19 @@ internal data class SettingsSummaryState(
     val ai: AiSummaryState? = null,
     val autoUpdate: Boolean = false,
     val tvLayout: Boolean = false,
+    val betaSites: List<BetaSite> = emptyList(),
 )
+
+/** The Beta features that are on, or Off when none is. */
+private fun betaSummary(state: SettingsSummaryState): List<SummaryPart> {
+    val parts =
+        listOfNotNull(
+            SummaryPart.Value(R.string.beta_bilibili_title, R.string.ai_action_on).takeIf { BetaSite.BILIBILI in state.betaSites },
+            SummaryPart.Value(R.string.beta_bilibili_tv_title, R.string.ai_action_on).takeIf { BetaSite.BILIBILI_TV in state.betaSites },
+            SummaryPart.Value(R.string.tv_layout_title, R.string.ai_action_on).takeIf { state.tvLayout },
+        )
+    return parts.ifEmpty { listOf(SummaryPart.Label(R.string.ai_action_off)) }
+}
 
 @StringRes
 private fun onOff(on: Boolean): Int = if (on) R.string.ai_action_on else R.string.ai_action_off
@@ -136,7 +148,7 @@ internal fun settingsSectionSummary(
         MoreSettingsSection.COLORS -> listOf(SummaryPart.Label(state.appColors.labelRes))
         MoreSettingsSection.AI_ASSISTANT -> aiSummary(state.ai)
         MoreSettingsSection.UPDATES -> listOf(SummaryPart.Value(R.string.updates_auto_title, onOff(state.autoUpdate)))
-        MoreSettingsSection.TV -> listOf(SummaryPart.Value(R.string.tv_layout_title, onOff(state.tvLayout)))
+        MoreSettingsSection.BETA -> betaSummary(state)
         // Nothing to switch here, so the line says what the section does.
         MoreSettingsSection.BACKUP -> listOf(SummaryPart.Label(R.string.backup_section_summary))
     }
@@ -214,6 +226,7 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
     val ads by rememberAdSkipSettings()
     val differentTabAccounts by rememberDifferentTabAccounts()
     val tvLayout by rememberTvLayout()
+    val betaSites by rememberBetaSitesOn()
     val sleepTimer by SleepTimer.run.collectAsState()
     val sleepTimerMinutesLeft = rememberSleepTimerMinutesLeft(sleepTimer)
     val sleepTimerInQuickSettings by rememberSleepTimerInQuickSettings()
@@ -243,5 +256,6 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
         ai = ai,
         autoUpdate = autoUpdate,
         tvLayout = tvLayout,
+        betaSites = betaSites,
     )
 }

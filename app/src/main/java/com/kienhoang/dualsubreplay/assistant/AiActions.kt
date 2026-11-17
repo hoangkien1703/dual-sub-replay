@@ -186,6 +186,10 @@ internal enum class AiSetting(
     /** Settings → Android TV (beta, 2026-10-30): changes the whole screen, so it waits for a tap; only a TV uses it. */
     TV_LAYOUT("tv_layout", asks = true),
 
+    /** Settings → Beta (2026-11-17): Bilibili and Bilibili International in the tabs. */
+    BILIBILI("bilibili"),
+    BILIBILI_TV("bilibili_international"),
+
     /** Of the open video only; YouTube may reset it on the next one. */
     PLAYBACK_SPEED("playback_speed", emptyList(), 0.25f..2f),
     ;
@@ -877,6 +881,11 @@ internal fun aiSettingValues(setting: AiSetting): String =
 /** What the settings [aiSettingValues] doesn't list take. */
 private fun otherSettingValues(setting: AiSetting): String =
     when (setting) {
+        AiSetting.BILIBILI, AiSetting.BILIBILI_TV ->
+            choiceList(setting.choices) +
+                " (Settings → Beta: watch bilibili.com (bilibili) or bilibili.tv (bilibili_international) videos with dual " +
+                "subtitles; Tabs → New tab then offers the site; most bilibili.com subtitles need the user signed in to " +
+                "Bilibili on its own page in the app; the first time it is turned on the site opens in a new tab; off by default)"
         AiSetting.SLEEP_TIMER_QUICK ->
             choiceList(setting.choices) +
                 " (Settings → Playback → Show in quick settings: also shows the Sleep timer row in the small menu the " +

@@ -5,6 +5,7 @@ import com.kienhoang.dualsubreplay.data.PageCaptionTarget
 import com.kienhoang.dualsubreplay.data.PageTranscriptReply
 import com.kienhoang.dualsubreplay.data.PageTranslationReply
 import com.kienhoang.dualsubreplay.data.PageTranslationTarget
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -31,12 +32,20 @@ internal data class WebPlaybackSnapshot(
     val playerFrame: PagePlayerFrame? = null,
 )
 
+/**
+ * The pages whose `<video>` the app reads and steers: YouTube, and Bilibili (Beta). The app checks
+ * the page's own address again, with the Beta switches, before it uses an answer.
+ */
+private const val VIDEO_SITE_HOST_CHECK =
+    "(host === 'youtube.com' || host.endsWith('.youtube.com') || host === 'bilibili.com' || host.endsWith('.bilibili.com') || " +
+        "host === 'bilibili.tv' || host.endsWith('.bilibili.tv'))"
+
 internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
     """
     (function() {
       const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
       if (window.location.protocol !== 'https:' ||
-          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          !$VIDEO_SITE_HOST_CHECK) return null;
       const videos = Array.from(document.querySelectorAll('video'));
       const video = videos.find(function(item) { return !item.paused && !item.ended; })
         || videos.find(function(item) { return item.readyState > 0; })
@@ -336,7 +345,7 @@ internal fun webReplayScript(second: Float): String {
         (function() {
           const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
           if (window.location.protocol !== 'https:' ||
-              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+              !$VIDEO_SITE_HOST_CHECK) return false;
           const videos = Array.from(document.querySelectorAll('video'));
           const video = videos.find(function(item) { return !item.paused && !item.ended; })
             || videos.find(function(item) { return item.readyState > 0; })
@@ -567,6 +576,24 @@ internal val WEB_HIDE_OPEN_APP_SCRIPT: String =
     """.trimIndent()
 
 /**
+ * Hides m.bilibili.com's two big "Download App" / "Open App" buttons (Bilibili beta; seen in a phone
+ * browser 2026-11-17); a tap would only try Bilibili's app, which the web view blocks.
+ */
+internal val WEB_HIDE_BILIBILI_OPEN_APP_SCRIPT: String =
+    """
+    (function() {
+      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
+      if (window.location.protocol !== 'https:' || !(host === 'bilibili.com' || host.endsWith('.bilibili.com'))) return false;
+      if (document.getElementById('dual-sub-hide-bilibili-open-app')) return true;
+      const style = document.createElement('style');
+      style.id = 'dual-sub-hide-bilibili-open-app';
+      style.textContent = '.m-nav-openapp, .m-video-main-launchapp { display: none !important; }';
+      (document.head || document.documentElement).appendChild(style);
+      return true;
+    })();
+    """.trimIndent()
+
+/**
  * Hides only YouTube's rendered player captions while our bilingual learning overlay is active.
  * The user's YouTube caption preference is left untouched and becomes visible again when the style
  * element is removed.
@@ -598,7 +625,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
     return runCatching {
         val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
         val json = JSONObject(decoded)
-        if (!isYouTubeWebUrl(json.optString("url"))) return@runCatching null
+        if (!isVideoSiteUrl(json.optString("url"))) return@runCatching null
         val liveCaption =
             json.optJSONObject("liveCaption")?.let { live ->
                 val text = live.optString("text").replace(Regex("\\s+"), " ").trim()
@@ -658,7 +685,7 @@ internal fun webPauseScript(): String =
     """
     (function() {
       const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
-      if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+      if (window.location.protocol !== 'https:' || !$VIDEO_SITE_HOST_CHECK) return false;
       clearInterval(window.__dualSubClipTimer);
       if (window.__dualSubClipUnmute) window.__dualSubClipUnmute();
       document.querySelectorAll('video').forEach(function(video) { video.pause(); });
@@ -672,7 +699,7 @@ internal fun webPlaybackSpeedScript(rate: Float): String {
     return """
         (function() {
           const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
-          if (window.location.protocol !== 'https:' || !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          if (window.location.protocol !== 'https:' || !$VIDEO_SITE_HOST_CHECK) return false;
           document.querySelectorAll('video').forEach(function(video) { video.playbackRate = $safeRate; });
           return true;
         })();
@@ -695,8 +722,12 @@ internal fun webClipReplayScript(
     return """
         (function() {
           const expected = '$videoId';
+          // A Bilibili address names its video in other ways: the clip stops once the page leaves this one.
+          const bilibili = ${VideoKeys.isBilibili(videoId)};
+          const startPath = window.location.pathname;
           const valid = function() {
             const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+            if (bilibili) return window.location.protocol === 'https:' && $VIDEO_SITE_HOST_CHECK && window.location.pathname === startPath;
             const url = new URL(window.location.href);
             const id = url.searchParams.get('v') || url.pathname.split('/')[2];
             return window.location.protocol === 'https:' && (host === 'youtube.com' || host.endsWith('.youtube.com')) && id === expected;

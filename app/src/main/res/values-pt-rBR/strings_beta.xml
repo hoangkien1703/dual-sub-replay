@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">Beta</string>
+    <string name="beta_section_hint">Recursos em teste. Eles podem mudar ou parar de funcionar, e cada um fica desligado até você ligar.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">Assista a vídeos do bilibili.com com legendas duplas. A maioria das legendas exige login no Bilibili. Abre o Bilibili na primeira vez que você liga.</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">Assista a vídeos do bilibili.tv com legendas duplas. Abre o bilibili.tv na primeira vez que você liga.</string>
+    <string name="tabs_new_tab_site">Nova aba: %1$s</string>
+    <string name="tabs_name_bilibili_video">Vídeo do Bilibili</string>
+    <string name="tabs_name_bilibili_page">Página do Bilibili</string>
+    <string name="tabs_open_new_site_tab">Abrir %1$s</string>
+    <string name="bilibili_sign_in_title">Entre no Bilibili para carregar as legendas</string>
+    <string name="bilibili_sign_in_body">O Bilibili mostra a maioria das legendas só para quem entrou na conta. Entre na página do Bilibili aqui (o app nunca vê sua senha) e toque em Tentar de novo.</string>
+    <string name="bilibili_no_subtitles_title">Este vídeo não tem legendas</string>
+    <string name="bilibili_no_subtitles_body">O Bilibili não tem legendas para este vídeo. Tente outro vídeo.</string>
+    <string name="bilibili_try_again">Tentar de novo</string>
+</resources>

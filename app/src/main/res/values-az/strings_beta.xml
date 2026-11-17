@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">Beta</string>
+    <string name="beta_section_hint">Erkən funksiyalar. Onlar dəyişə və ya işləməyə bilər, hər biri siz açana qədər bağlı qalır.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">bilibili.com videolarına ikidilli altyazı ilə baxın. Altyazıların çoxu üçün Bilibili-yə daxil olmaq lazımdır. İlk dəfə açanda Bilibili açılır.</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">bilibili.tv videolarına ikidilli altyazı ilə baxın. İlk dəfə açanda bilibili.tv açılır.</string>
+    <string name="tabs_new_tab_site">Yeni tab: %1$s</string>
+    <string name="tabs_name_bilibili_video">Bilibili videosu</string>
+    <string name="tabs_name_bilibili_page">Bilibili səhifəsi</string>
+    <string name="tabs_open_new_site_tab">%1$s aç</string>
+    <string name="bilibili_sign_in_title">Altyazıları yükləmək üçün Bilibili-yə daxil olun</string>
+    <string name="bilibili_sign_in_body">Bilibili altyazıların çoxunu yalnız daxil olmuş istifadəçilərə göstərir. Buradakı Bilibili səhifəsində daxil olun (tətbiq parolunuzu heç vaxt görmür), sonra Yenidən cəhd et düyməsinə toxunun.</string>
+    <string name="bilibili_no_subtitles_title">Bu videonun altyazısı yoxdur</string>
+    <string name="bilibili_no_subtitles_body">Bilibili bu video üçün altyazı vermir. Başqa video sınayın.</string>
+    <string name="bilibili_try_again">Yenidən cəhd et</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">测试版</string>
+    <string name="beta_section_hint">早期功能。它们可能会改变或失效，每一项在你打开之前都保持关闭。</string>
+    <string name="beta_bilibili_title">哔哩哔哩</string>
+    <string name="beta_bilibili_description">用双语字幕观看 bilibili.com 视频。大多数字幕需要登录哔哩哔哩。第一次打开时会打开哔哩哔哩。</string>
+    <string name="beta_bilibili_tv_title">哔哩哔哩国际版</string>
+    <string name="beta_bilibili_tv_description">用双语字幕观看 bilibili.tv 视频。第一次打开时会打开 bilibili.tv。</string>
+    <string name="tabs_new_tab_site">新标签页：%1$s</string>
+    <string name="tabs_name_bilibili_video">哔哩哔哩视频</string>
+    <string name="tabs_name_bilibili_page">哔哩哔哩页面</string>
+    <string name="tabs_open_new_site_tab">打开%1$s</string>
+    <string name="bilibili_sign_in_title">登录哔哩哔哩以加载字幕</string>
+    <string name="bilibili_sign_in_body">哔哩哔哩的大多数字幕只对已登录的用户显示。请在这里的哔哩哔哩页面上登录（应用不会看到你的密码），然后点按重试。</string>
+    <string name="bilibili_no_subtitles_title">这个视频没有字幕</string>
+    <string name="bilibili_no_subtitles_body">哔哩哔哩没有为这个视频提供字幕。换一个视频试试。</string>
+    <string name="bilibili_try_again">重试</string>
+</resources>

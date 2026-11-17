@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.SharedPreferences
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -90,14 +91,19 @@ internal fun browserTabTitle(pageTitle: String?): String {
             .orEmpty()
             .trim()
             .removeSuffix("- YouTube")
+            .removeSuffix("_哔哩哔哩_bilibili")
             .trim()
     return if (title.equals("YouTube", ignoreCase = true)) "" else title.take(MAX_TAB_TITLE_LENGTH)
 }
 
-internal enum class BrowserTabKind { VIDEO, HOME, SEARCH, OTHER }
+internal enum class BrowserTabKind { VIDEO, HOME, SEARCH, OTHER, BILIBILI_VIDEO, BILIBILI_PAGE }
 
 internal fun browserTabKind(url: String): BrowserTabKind {
     if (YouTubeUrlParser.extractVideoId(url) != null) return BrowserTabKind.VIDEO
+    val host = runCatching { URI(url).host }.getOrNull()?.lowercase()?.removeSuffix(".")
+    if (host != null && VideoKeys.bilibiliSiteOfHost(host) != null) {
+        return if (VideoKeys.bilibiliVideoAt(url) != null) BrowserTabKind.BILIBILI_VIDEO else BrowserTabKind.BILIBILI_PAGE
+    }
     val path = runCatching { URI(url).path }.getOrNull().orEmpty().trimEnd('/')
     return when (path) {
         "" -> BrowserTabKind.HOME
@@ -159,7 +165,7 @@ internal fun decodeBrowserTabs(stored: String?): BrowserTabs? {
                 .map { array.getJSONObject(it) }
                 .mapNotNull { item ->
                     val url = item.optString("url")
-                    if (!isYouTubeWebUrl(url)) return@mapNotNull null
+                    if (!isVideoSiteUrl(url)) return@mapNotNull null
                     BrowserTab(
                         id = item.getLong("id"),
                         url = url,
@@ -185,7 +191,7 @@ internal fun initialBrowserTabs(
     val saved =
         decodeBrowserTabs(stored)
             ?: return BrowserTabs(listOf(BrowserTab(id = 1, url = trustedEmbeddedUrlOrHome(lastUrl ?: YOUTUBE_HOME_URL))), activeId = 1)
-    val latest = lastUrl?.takeIf(::isYouTubeWebUrl) ?: return saved
+    val latest = lastUrl?.takeIf(::isVideoSiteUrl) ?: return saved
     return if (saved.active == null) saved else saved.withActiveUrl(latest)
 }
 

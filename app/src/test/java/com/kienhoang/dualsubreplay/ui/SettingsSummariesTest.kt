@@ -135,7 +135,12 @@ class SettingsSummariesTest {
         assertEquals(listOf(value(R.string.tabs_different_accounts_title, on = true)), summary(MoreSettingsSection.TABS, state))
         assertEquals(listOf(SummaryPart.Label(R.string.settings_color_navy)), summary(MoreSettingsSection.COLORS, state))
         assertEquals(listOf(value(R.string.updates_auto_title, on = true)), summary(MoreSettingsSection.UPDATES, state))
-        assertEquals(listOf(value(R.string.tv_layout_title, on = true)), summary(MoreSettingsSection.TV, state))
+        assertEquals(listOf(value(R.string.tv_layout_title, on = true)), summary(MoreSettingsSection.BETA, state))
+        assertEquals(
+            listOf(value(R.string.beta_bilibili_tv_title, on = true), value(R.string.tv_layout_title, on = true)),
+            summary(MoreSettingsSection.BETA, state.copy(betaSites = listOf(BetaSite.BILIBILI_TV))),
+        )
+        assertEquals(listOf(SummaryPart.Label(R.string.ai_action_off)), summary(MoreSettingsSection.BETA, state.copy(tvLayout = false)))
     }
 
     @Test

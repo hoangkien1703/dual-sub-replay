@@ -45,6 +45,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import androidx.compose.material3.OutlinedTextField
@@ -236,7 +237,7 @@ fun DualSubApp(
             onOnline = { word ->
                 pronouncer.stop()
                 if (state.activeVideoId != word.videoId) {
-                    viewModel.acceptSharedText("https://www.youtube.com/watch?v=${word.videoId}")
+                    word.videoId?.let { viewModel.acceptSharedText(VideoKeys.watchUrl(it)) }
                 }
                 webController.replayClip(word)
             },
@@ -444,6 +445,8 @@ private fun DualSubExperience(
         settingsJumpSection = MoreSettingsSection.WORD_LEARNING
         showSettings = true
     }
+    // Settings → Beta → Bilibili, first time on: Bilibili opens in a new tab at once (owner pick 2026-11-17).
+    OpenBetaSiteWhenFirstOn(tabActions.openSite) { showSettings = false }
     val differentTabAccounts by rememberDifferentTabAccounts()
     val snackbars = remember { SnackbarHostState() }
     val pageTabActions = rememberPageTabActions(tabActions, state.browserTabs, snackbars)
@@ -489,6 +492,7 @@ private fun DualSubExperience(
                         EmptyTabsPage(
                             onOpenNewTab = { tabActions.openNew(MAIN_TAB_ACCOUNT) },
                             modifier = Modifier.weight(1f).fillMaxHeight(),
+                            onOpenSite = { url -> tabActions.openSite(url) },
                         )
                     } else {
                         key(account) {

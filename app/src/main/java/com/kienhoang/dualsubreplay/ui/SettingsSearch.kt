@@ -432,7 +432,9 @@ internal enum class SearchableSetting(
         setOf(UPDATE_REMINDERS_PREFERENCE),
     ),
     AUTO_UPDATE(R.string.updates_auto_title, MoreSettingsSection.UPDATES, "auto_update_switch", setOf(APP_AUTO_UPDATE_PREFERENCE)),
-    TV_LAYOUT(R.string.tv_layout_title, MoreSettingsSection.TV, "tv_layout_switch", setOf(TV_LAYOUT_PREFERENCE)),
+    BILIBILI(R.string.beta_bilibili_title, MoreSettingsSection.BETA, "beta_bilibili_switch", setOf(BETA_BILIBILI_PREFERENCE)),
+    BILIBILI_TV(R.string.beta_bilibili_tv_title, MoreSettingsSection.BETA, "beta_bilibili_tv_switch", setOf(BETA_BILIBILI_TV_PREFERENCE)),
+    TV_LAYOUT(R.string.tv_layout_title, MoreSettingsSection.BETA, "tv_layout_switch", setOf(TV_LAYOUT_PREFERENCE)),
 
     // The assistant's own settings (owner pick 2026-11-11: Search found none of them). They live in the
     // assistant's preferences, which Often changed does not follow, so they have no keys.

@@ -95,7 +95,7 @@ internal fun reviewWord(word: SavedWord, rating: ReviewRating, now: Long): Saved
 }
 
 internal fun validClipRange(videoId: String?, start: Long, end: Long): Boolean =
-    videoId?.matches(Regex("[A-Za-z0-9_-]{11}")) == true && start >= 0 && end > start
+    VideoKeys.isValid(videoId) && start >= 0 && end > start
 
 /** The same word from the same line gets the same id, so saving it again updates it instead of adding a copy. */
 internal fun savedWordId(

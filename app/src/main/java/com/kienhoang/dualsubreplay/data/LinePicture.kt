@@ -29,7 +29,10 @@ internal fun linePictureTime(
 
 /** [word]'s line for a picture: any line of a video, also one too long to record. */
 internal fun pictureLineOf(word: SavedWord): AudioLine? =
-    word.videoId?.takeIf { validClipRange(it, word.startMs, word.endMs) }?.let { AudioLine(it, word.startMs, word.endMs) }
+    word.videoId
+        ?.takeIf {
+            validClipRange(it, word.startMs, word.endMs) && !VideoKeys.isBilibili(it)
+        }?.let { AudioLine(it, word.startMs, word.endMs) }
 
 /** The still's file name: like the clip's, so every word of a line shares it. */
 internal val AudioLine.pictureName: String get() = "$videoId-$startMs-$endMs.jpg"
