@@ -68,8 +68,12 @@ class WholeTranscriptUiTest {
         composeRule.onNodeWithTag("whole_transcript").assertIsDisplayed()
         // Opens at the playing line (row 10 starts at 1:00), not at the start.
         composeRule.onNodeWithTag("whole_transcript_row_10").assertIsDisplayed()
+        // A row is clickable, so its translation's tag lives in the unmerged tree.
         composeRule.waitUntil(5_000) {
-            composeRule.onAllNodesWithTag("whole_transcript_translation_10").fetchSemanticsNodes().isNotEmpty()
+            composeRule
+                .onAllNodesWithTag("whole_transcript_translation_10", useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
         composeRule.onNodeWithText("Dịch: This is line 11 of the talk.").assertIsDisplayed()
         saveUiEvidence("whole-transcript")
