@@ -3,6 +3,7 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -78,7 +79,8 @@ class WholeTranscriptUiTest {
         composeRule.onNodeWithText("Dịch: This is line 11 of the talk.").assertIsDisplayed()
         saveUiEvidence("whole-transcript")
         composeRule.onNodeWithTag("whole_transcript_search").performTextInput("kimchi")
-        composeRule.waitUntil(5_000) { composeRule.onAllNodesWithTag("whole_transcript_row_600").fetchSemanticsNodes().isNotEmpty() }
+        // Waits for the row's text, which loads from disk after the row appears.
+        composeRule.waitUntil(5_000) { composeRule.onAllNodesWithText("Let's make kimchi together.").fetchSemanticsNodes().isNotEmpty() }
         saveUiEvidence("whole-transcript-search")
         composeRule.onNodeWithTag("whole_transcript_row_600").performClick()
         composeRule.runOnIdle {

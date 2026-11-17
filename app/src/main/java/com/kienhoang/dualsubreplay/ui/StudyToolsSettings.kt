@@ -472,6 +472,13 @@ private fun StudyRepeatCountSettings(
         }
         if (custom && count != STUDY_REPEAT_FOREVER) {
             val range = STUDY_REPEAT_CUSTOM_RANGE
+            // The count sits above the slider so the slider gets the whole width.
+            Text(
+                pluralStringResource(R.plurals.study_repeat_count, count, count),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 8.dp, start = 12.dp).testTag("study_repeat_custom_count"),
+            )
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("study_repeat_custom_row")) {
                 IconButton(
                     onClick = { onChange((count - 1).coerceIn(range)) },
@@ -489,10 +496,6 @@ private fun StudyRepeatCountSettings(
                     enabled = count < range.last,
                     modifier = Modifier.testTag("study_repeat_more"),
                 ) { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.study_repeat_more)) }
-                Text(
-                    pluralStringResource(R.plurals.study_repeat_count, count, count),
-                    modifier = Modifier.padding(end = 8.dp).testTag("study_repeat_custom_count"),
-                )
             }
         }
     }
