@@ -54,6 +54,10 @@ Study tools (2026-10-20) include no third-party code or data. Load captions with
 
 The app's licence screen (Settings → Licenses) shows the MIT licence, the libraries and data above with the Apache-2.0 text, jieba's MIT notice and the WordNet License, the Spanish Wiktionary and FrequencyWords credits, the English IPA credits with the ipa-dict and cmudict-ipa MIT notice and the CMU Pronouncing Dictionary licence, the KANJIDIC2 and KanjiVG credits, the Chinese character data credits with the Arphic Public License and the GNU LGPL, and the ML Kit translation terms.
 
+## LRCLIB lyrics (asked for after a tap)
+
+"Get real lyrics" on a song asks [LRCLIB](https://lrclib.net), a free, open database of synced lyrics, for the song's timed lyrics. The app does not include or redistribute the database, keeps a matched song's lyrics in its private cache only, and uses no LRCLIB code. Lyrics belong to their rights holders.
+
 ## SponsorBlock segments (asked for while a video plays)
 
 Settings → Ads & sponsors → Skip sponsors uses sponsor segments from [SponsorBlock](https://sponsor.ajay.app) by Ajay Ramachandran and contributors. The app asks SponsorBlock's public API for the open video's segments, keeps them in memory only, and does not include or redistribute the database. SponsorBlock's data is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/); no SponsorBlock code is used.

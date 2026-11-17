@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
+import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
@@ -25,6 +26,10 @@ data class DualSubUiState(
     val noCaptions: Boolean = false,
     /** AI subtitles being made for a video, or why they could not be; null when nothing is going on. */
     val aiSubtitles: AiSubtitleStatus? = null,
+    /** The loaded AI track is a song's synced lyrics from LRCLIB rather than Gemini's transcript. */
+    val loadedLyrics: Boolean = false,
+    /** Videos whose "Make an AI transcript?" card the person closed; kept in memory only. */
+    val aiTranscriptSuggestionClosed: Set<String> = emptySet(),
     val browserUrl: String = YOUTUBE_HOME_URL,
     val browserNavigationRequestId: Long = 0L,
     /** The menu's YouTube tabs; the open one is shown in the one YouTube page, none shows an empty page. */
@@ -231,9 +236,16 @@ internal fun pickedCaptionTrack(
         ?.removePrefix(TRACK_CHOICE_PREFIX)
         ?.let { id -> availableSourceLanguages.firstOrNull { it.trackId == id } }
 
-/** What the source list shows as chosen: Auto, the loaded track, or the chosen language while loading. */
+/**
+ * The Original language list's "AI transcript (Gemini)" (owner pick 2026-11-17): Gemini writes this
+ * video's transcript from its sound, even when YouTube has auto-generated captions.
+ */
+internal const val AI_TRANSCRIPT_CHOICE = TRACK_CHOICE_PREFIX + AI_SUBTITLE_TRACK_ID
+
+/** What the source list shows as chosen: the AI transcript, Auto, the loaded track, or the chosen language while loading. */
 internal fun sourceChoiceSelection(state: DualSubUiState): String =
     when {
+        state.loadedTrackId == AI_SUBTITLE_TRACK_ID -> AI_TRANSCRIPT_CHOICE
         state.sourcePreference == "auto" -> "auto"
         state.loadedTrackId.isNotBlank() && state.availableSourceLanguages.any { it.trackId == state.loadedTrackId } ->
             TRACK_CHOICE_PREFIX + state.loadedTrackId

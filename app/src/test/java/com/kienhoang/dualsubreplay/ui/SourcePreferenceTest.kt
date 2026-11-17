@@ -12,7 +12,6 @@ import org.junit.Test
  * middle of a video must always take effect instead of being silently dropped.
  */
 class SourcePreferenceTest {
-
     @Test fun acceptsAutoAlways() {
         assertTrue(shouldAcceptSourcePreference("auto", emptyList()))
         assertTrue(shouldAcceptSourcePreference("auto", availableLanguages()))
@@ -64,8 +63,25 @@ class SourcePreferenceTest {
         assertEquals("ja", sourceChoiceSelection(loaded.copy(availableSourceLanguages = emptyList())))
     }
 
-    private fun availableLanguages() = listOf(
-        CaptionLanguage("en", "English"),
-        CaptionLanguage("es", "Spanish"),
-    )
+    @Test fun theAiTranscriptIsTheLastChoiceAndShowsAsChosenWhileLoaded() {
+        val tracks = listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true))
+        val choices = sourceLanguageChoices(tracks, "Auto (recommended)", "AI transcript (Gemini)")
+        assertEquals(listOf("auto", "track:a.en", AI_TRANSCRIPT_CHOICE), choices.map { it.code })
+        assertEquals(listOf("auto", "track:a.en"), sourceLanguageChoices(tracks, "Auto").map { it.code })
+
+        val aiLoaded = DualSubUiState(sourcePreference = "auto", availableSourceLanguages = tracks, loadedTrackId = "ai")
+        assertEquals(AI_TRANSCRIPT_CHOICE, sourceChoiceSelection(aiLoaded))
+        assertEquals(
+            "AI transcript (Gemini)",
+            sourceLanguageLabel(sourceChoiceSelection(aiLoaded), choices, "Auto", java.util.Locale.ENGLISH),
+        )
+        // The AI choice is not one of YouTube's tracks, so the assistant's setting change cannot pick it.
+        assertNull(pickedCaptionTrack(AI_TRANSCRIPT_CHOICE, tracks))
+    }
+
+    private fun availableLanguages() =
+        listOf(
+            CaptionLanguage("en", "English"),
+            CaptionLanguage("es", "Spanish"),
+        )
 }

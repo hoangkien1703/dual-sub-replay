@@ -6,6 +6,7 @@ import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_PART_MS
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
 import com.kienhoang.dualsubreplay.data.AiSubtitleTrack
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.ProblemArea
 import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.data.aiSubtitlePartStart
@@ -27,6 +28,8 @@ data class AiSubtitleStatus(
     /** The video's length, when known. */
     val totalMs: Long? = null,
     val problem: AiSubtitleProblem? = null,
+    /** Asking LRCLIB for a song's synced lyrics, before Gemini. */
+    val lookingForLyrics: Boolean = false,
 )
 
 /** Problems that may pass by themselves, so a part asked while the subtitles already show is asked again later. */
@@ -58,11 +61,16 @@ internal class AiSubtitleRunner(
 
     fun isRunning(videoId: String): Boolean = this.videoId == videoId && job?.isActive == true
 
-    /** The no-captions card's button: starts, or carries on after a problem. */
+    /**
+     * The no-captions card's button, or "AI transcript" picked over YouTube's captions: starts, or
+     * carries on after a problem. [youtubeTracks] are YouTube's own tracks of the video, kept with
+     * the transcript so the Original language list can still switch back to them.
+     */
     fun start(
         videoId: String,
         positionMs: Long,
-    ) = launch(videoId, positionMs, showing = false)
+        youtubeTracks: List<CaptionLanguage> = emptyList(),
+    ) = launch(videoId, positionMs, showing = false, youtubeTracks)
 
     /** A loaded AI track: makes its missing parts, unless it is complete or already being made. */
     fun resumeIfUnfinished(
@@ -89,11 +97,12 @@ internal class AiSubtitleRunner(
         videoId: String,
         positionMs: Long,
         showing: Boolean,
+        youtubeTracks: List<CaptionLanguage> = emptyList(),
     ) {
         if (isRunning(videoId)) return
         job?.cancel()
         this.videoId = videoId
-        job = scope.launch { run(videoId, positionMs, showing) }
+        job = scope.launch { run(videoId, positionMs, showing, youtubeTracks) }
     }
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
@@ -101,8 +110,10 @@ internal class AiSubtitleRunner(
         videoId: String,
         positionMs: Long,
         showingAtStart: Boolean,
+        youtubeTracks: List<CaptionLanguage>,
     ) {
         var track = withContext(io) { store.read(videoId) } ?: AiSubtitleTrack(videoId, "", emptyMap())
+        if (youtubeTracks.isNotEmpty()) track = track.copy(youtubeTracks = youtubeTracks)
         if (showingAtStart && track.complete) return
         var endMs = track.endMs ?: durationOf(videoId)
         val first = aiSubtitlePartStart(positionMs).let { start -> if (endMs != null && start >= endMs) 0L else start }

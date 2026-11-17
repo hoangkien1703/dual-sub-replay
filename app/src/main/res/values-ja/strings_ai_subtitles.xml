@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini はこの動画の字幕を作りませんでした。一部の曲ではこうなります。</string>
     <string name="ai_subtitles_problem_no_speech">この動画では話し声が聞き取れませんでした。</string>
     <string name="ai_subtitles_problem_failed">Gemini の回答を読み取れませんでした。もう一度お試しください。</string>
+    <string name="ai_transcript_choice">AI文字起こし（Gemini）</string>
+    <string name="ai_transcript_offer">自動字幕の曲のようです。自動字幕は歌詞をよく間違えます。</string>
+    <string name="ai_transcript_make">正しい歌詞を取得</string>
+    <string name="ai_transcript_offer_note">まず無料の同期歌詞を探します。見つからない場合だけGeminiキーでAIを使います。</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s（歌詞）</string>
+    <string name="ai_transcript_looking_for_lyrics">同期歌詞を探しています…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">この動画に合う同期歌詞が見つかりません。無料のGeminiキーを追加すると、AIが書き起こせます。</string>
 </resources>

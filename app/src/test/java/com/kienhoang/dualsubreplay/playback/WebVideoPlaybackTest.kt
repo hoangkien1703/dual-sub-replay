@@ -59,6 +59,16 @@ class WebVideoPlaybackTest {
     }
 
     @Test
+    fun readsWhetherYouTubeFilesTheVideoUnderMusic() {
+        val url = "https://m.youtube.com/watch?v=dQw4w9WgXcQ"
+        assertTrue(parseWebVideoPlayback(scriptResult(JSONObject().put("url", url).put("music", true)))!!.music)
+        assertFalse(parseWebVideoPlayback(scriptResult(JSONObject().put("url", url)))!!.music)
+        // Only the player's details of the open video count.
+        assertTrue(WEB_VIDEO_STATE_SCRIPT.contains("item.videoDetails.videoId === pageVideo"))
+        assertTrue(WEB_VIDEO_STATE_SCRIPT.contains("micro.category === 'Music'"))
+    }
+
+    @Test
     fun ignoresPagesWithoutAVideoAndOtherSites() {
         assertNull(parseWebVideoPlayback("null"))
         assertNull(parseWebVideoPlayback(null))

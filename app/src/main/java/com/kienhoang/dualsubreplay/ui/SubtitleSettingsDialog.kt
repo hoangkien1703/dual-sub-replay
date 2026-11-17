@@ -105,6 +105,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -351,14 +352,17 @@ internal class LanguagePickerState {
 
 /**
  * [autoLabel] names the "auto" choice; then every caption track of the video, named as YouTube
- * names it, each its own choice ([trackChoiceCode]).
+ * names it, each its own choice ([trackChoiceCode]); last [aiTranscriptLabel]'s AI transcript, when
+ * a video is open in a build with the AI assistant.
  */
 internal fun sourceLanguageChoices(
     availableSourceLanguages: List<CaptionLanguage>,
     autoLabel: String,
+    aiTranscriptLabel: String? = null,
 ): List<LanguageChoice> =
     listOf(LanguageChoice("auto", autoLabel)) +
-        availableSourceLanguages.map { LanguageChoice(trackChoiceCode(it), it.name) }
+        availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID }.map { LanguageChoice(trackChoiceCode(it), it.name) } +
+        listOfNotNull(aiTranscriptLabel?.let { LanguageChoice(AI_TRANSCRIPT_CHOICE, it) })
 
 /** [sourcePreference] is "auto", a track choice or a language code (see [sourceChoiceSelection]). */
 internal fun sourceLanguageLabel(
@@ -591,7 +595,7 @@ internal fun QuickLanguageSettingsDialog(
     val autoLabel = stringResource(R.string.settings_source_language_auto)
     val shortAutoLabel = stringResource(R.string.settings_source_language_auto_short)
     val interfaceLocale = currentInterfaceLocale()
-    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel, aiTranscriptChoiceLabel())
     val pickerOpen =
         showLanguagePickerIfOpen(
             picker = languagePicker,
@@ -805,7 +809,7 @@ internal fun SubtitleSettingsDialog(
     val translationEngineActions = LocalTranslationEngineActions.current
     var showLanguageDownloads by remember { mutableStateOf(false) }
     val autoLabel = stringResource(R.string.settings_source_language_auto)
-    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel)
+    val sourceChoices = sourceLanguageChoices(availableSourceLanguages, autoLabel, aiTranscriptChoiceLabel())
     val pickerOpen =
         showLanguagePickerIfOpen(
             picker = languagePicker,

@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini wouldn\'t write subtitles for this video. It does this for some songs.</string>
     <string name="ai_subtitles_problem_no_speech">Gemini heard no speech in this video.</string>
     <string name="ai_subtitles_problem_failed">Gemini\'s answer couldn\'t be read. Try again.</string>
+    <string name="ai_transcript_choice">AI transcript (Gemini)</string>
+    <string name="ai_transcript_offer">This looks like a song with auto-made captions, which often get the lyrics wrong.</string>
+    <string name="ai_transcript_make">Get real lyrics</string>
+    <string name="ai_transcript_offer_note">Free synced lyrics first. AI with your Gemini key only if none match.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (song lyrics)</string>
+    <string name="ai_transcript_looking_for_lyrics">Looking for synced lyrics…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">No synced lyrics match this video. Add a free Gemini key and AI can write them.</string>
 </resources>
