@@ -94,3 +94,12 @@ A long music video made of many songs (2 hours or more) never matches one song's
 ## Fix: Make subtitles with AI after a song (Kien, 2026-11-17)
 
 On v1.9.9, a captionless video opened after a video with lyrics or an AI transcript kept that track as loaded, so the list showed "AI transcript (Gemini)" selected and **Make subtitles with AI** did nothing. Each load now starts with no loaded track, and the AI transcript counts as showing only while its lines are on screen (`NextVideoForgetsLoadedTrackTest`, PR CI).
+
+## Fix: Gemini copied another language's on-screen subtitles (Kien, 2026-11-17)
+
+On a Chinese song with Vietnamese subtitles in the picture, Gemini named the language zh-Hans but wrote the Vietnamese lines; the header said "Chinese (AI subtitles)" and Google Translate returned the Vietnamese unchanged. Four other uploads of the same song gave Chinese lines in a live test, so it happens only sometimes.
+
+- The prompt asks for the words heard, in the language's own writing system, and never text shown on screen.
+- A part named in a language with its own script (Chinese, Japanese, Korean, Thai, Arabic, Hebrew, Hindi, Cyrillic, Greek) whose lines have under 10% of their letters in that script is treated like a refusal: the next model is asked, and if every model does it, the "wouldn't write subtitles" problem shows (`writtenInLanguage`).
+- Saved transcripts from before the check drop such parts once, so asking again writes them anew; new files carry `scriptChecked` so a part is never dropped twice.
+- Acceptance: `AiSubtitlesTest.linesInAnotherLanguagesLettersAreNotTaken`, `savedLinesInAnotherLanguagesLettersAreAskedAgain`.

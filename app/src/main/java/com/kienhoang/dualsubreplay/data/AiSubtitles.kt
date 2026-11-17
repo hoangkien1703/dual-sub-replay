@@ -102,6 +102,8 @@ private const val AI_SUBTITLE_PROMPT =
         "Song lyrics count: write each sung line. " +
         "Each line has at most about 12 words and its start and end time as MM:SS.mmm (minutes:seconds.milliseconds) " +
         "counted from the start of the whole video. Leave out music without words, sound descriptions and silence. " +
+        "Write the words you hear in that language's own writing system; never copy text shown on screen, " +
+        "such as subtitles in another language. " +
         "language is the spoken language as a BCP-47 code such as es, ja or zh-Hans."
 
 /**
@@ -137,7 +139,50 @@ internal fun parseAiSubtitleReply(
     val language = (answer as? JSONObject)?.optString("language")?.trim().orEmpty()
     val lines =
         (answer as? JSONObject)?.optJSONArray("lines") ?: answer as? JSONArray ?: throw AiSubtitleReplyException("The reply had no lines.")
-    return AiSubtitlePart(language, aiSubtitleCues(lines, partStartMs, partEndMs))
+    val cues = aiSubtitleCues(lines, partStartMs, partEndMs)
+    // Another model is asked, as when Gemini declines a song.
+    if (!writtenInLanguage(language, cues)) throw AiSubtitleReplyException("The lines were not written in $language.", refused = true)
+    return AiSubtitlePart(language, cues)
+}
+
+/** The writing systems of languages that have their own; languages written in Latin letters are left out (nothing to check). */
+private fun languageScripts(language: String): Set<Character.UnicodeScript>? =
+    when (language.substringBefore('-').substringBefore('_').lowercase()) {
+        "zh", "yue" -> setOf(Character.UnicodeScript.HAN)
+        "ja" -> setOf(Character.UnicodeScript.HAN, Character.UnicodeScript.HIRAGANA, Character.UnicodeScript.KATAKANA)
+        "ko" -> setOf(Character.UnicodeScript.HANGUL, Character.UnicodeScript.HAN)
+        "th" -> setOf(Character.UnicodeScript.THAI)
+        "ar", "fa", "ur" -> setOf(Character.UnicodeScript.ARABIC)
+        "he", "iw" -> setOf(Character.UnicodeScript.HEBREW)
+        "hi", "mr", "ne" -> setOf(Character.UnicodeScript.DEVANAGARI)
+        "ru", "uk", "bg", "be", "kk" -> setOf(Character.UnicodeScript.CYRILLIC)
+        "el" -> setOf(Character.UnicodeScript.GREEK)
+        else -> null
+    }
+
+/** Less than this share of a part's letters in its language's own script means the lines are in another language. */
+private const val MIN_OWN_SCRIPT_SHARE = 0.1
+
+/**
+ * False when Gemini named a language with its own writing system but wrote the lines in other
+ * letters. For a Chinese song with Vietnamese subtitles on screen it named zh-Hans and copied the
+ * Vietnamese, which then went to Google Translate as Chinese and came back unchanged (Kien,
+ * 2026-11-17). English words in a K-pop song are fine; a part almost without its own letters is not.
+ */
+internal fun writtenInLanguage(
+    language: String,
+    cues: List<RawCaptionCue>,
+): Boolean {
+    val scripts = languageScripts(language) ?: return true
+    var own = 0
+    var letters = 0
+    cues.forEach { cue ->
+        cue.text.codePoints().filter(Character::isLetter).forEach { codePoint ->
+            letters++
+            if (Character.UnicodeScript.of(codePoint) in scripts) own++
+        }
+    }
+    return letters == 0 || own >= letters * MIN_OWN_SCRIPT_SHARE
 }
 
 private val REFUSAL_REASONS = setOf("SAFETY", "RECITATION", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "OTHER")
@@ -412,6 +457,7 @@ internal fun encodeAiSubtitleTrack(track: AiSubtitleTrack): String {
         .put("youtubeTracks", youtube)
         .put("lyrics", track.lyrics)
         .put("lyricChapters", encodeLyricChapters(track.lyricChapters))
+        .put("scriptChecked", true)
         .toString()
 }
 
@@ -461,6 +507,8 @@ internal fun decodeAiSubtitleTrack(text: String): AiSubtitleTrack? =
             null
         } else {
             val parts = root.getJSONArray("parts")
+            val language = root.optString("language")
+            val lyrics = root.optBoolean("lyrics")
             val decoded =
                 (0 until parts.length()).associate { index ->
                     val part = parts.getJSONObject(index)
@@ -471,14 +519,17 @@ internal fun decodeAiSubtitleTrack(text: String): AiSubtitleTrack? =
                             RawCaptionCue(cue.getLong(0), cue.getLong(1), cue.getString(2))
                         }
                 }
+            // Parts saved before Gemini's lines were checked ([writtenInLanguage]) are written again when asked.
+            val checked = lyrics || root.optBoolean("scriptChecked")
+            val kept = if (checked) decoded else decoded.filterValues { writtenInLanguage(language, it) }
             AiSubtitleTrack(
                 videoId = root.getString("videoId"),
-                language = root.optString("language"),
-                parts = decoded,
+                language = language,
+                parts = kept,
                 endMs = if (root.isNull("endMs")) null else root.getLong("endMs"),
-                complete = root.optBoolean("complete"),
+                complete = root.optBoolean("complete") && kept.size == decoded.size,
                 youtubeTracks = decodeYouTubeTracks(root.optJSONArray("youtubeTracks")),
-                lyrics = root.optBoolean("lyrics"),
+                lyrics = lyrics,
                 lyricChapters = decodeLyricChapters(root.optJSONArray("lyricChapters")),
             )
         }
