@@ -98,9 +98,10 @@ internal fun aiSubtitleRequestBody(
  * (2.484 for 2:48.4) in the 2026-11-08 test.
  */
 private const val AI_SUBTITLE_PROMPT =
-    "Write subtitles for everything spoken in this video, in the language that is spoken. Do not translate. " +
+    "Write subtitles for everything spoken or sung in this video, in the language that is spoken or sung. Do not translate. " +
+        "Song lyrics count: write each sung line. " +
         "Each line has at most about 12 words and its start and end time as MM:SS.mmm (minutes:seconds.milliseconds) " +
-        "counted from the start of the whole video. Leave out music, sound descriptions and silence. " +
+        "counted from the start of the whole video. Leave out music without words, sound descriptions and silence. " +
         "language is the spoken language as a BCP-47 code such as es, ja or zh-Hans."
 
 /**
@@ -238,7 +239,9 @@ internal fun nextAiSubtitlePart(
 
 /**
  * Subtitles Gemini wrote for one video, part by part. [endMs] is where the video ends once known,
- * and [complete] says every part is in.
+ * and [complete] says every part is in. [youtubeTracks] are YouTube's own caption tracks of the
+ * video when it had some (an AI transcript picked over auto-generated captions), so the Original
+ * language list still offers them while the AI transcript shows.
  */
 internal data class AiSubtitleTrack(
     val videoId: String,
@@ -246,6 +249,9 @@ internal data class AiSubtitleTrack(
     val parts: Map<Long, List<RawCaptionCue>>,
     val endMs: Long? = null,
     val complete: Boolean = false,
+    val youtubeTracks: List<CaptionLanguage> = emptyList(),
+    /** The lines are a song's synced lyrics from LRCLIB, not written by Gemini. */
+    val lyrics: Boolean = false,
 ) {
     /** Every part's lines in time order, without a line written twice where two parts meet. */
     fun cues(): List<RawCaptionCue> {
@@ -273,11 +279,19 @@ internal data class AiSubtitleTrack(
             // Not YouTube's generated captions: the page has no live captions or word timing to read for it.
             isGenerated = false,
             cues = cues(),
+            availableLanguages = youtubeTracks,
             trackId = AI_SUBTITLE_TRACK_ID,
+            lyrics = lyrics,
         )
 }
 
 private val VIDEO_ID = Regex("[A-Za-z0-9_-]{11}")
+
+/**
+ * Videos whose transcripts stay saved (owner pick 2026-11-17: 600, up from 30). Each is about
+ * 5–20 KB, so about 3–12 MB at most, in the cache folder that Android's Clear cache empties.
+ */
+internal const val AI_SUBTITLE_STORE_ENTRIES = 600
 
 /**
  * Made subtitles, one JSON file per video in the cache folder, so a video opened again asks Gemini
@@ -285,7 +299,7 @@ private val VIDEO_ID = Regex("[A-Za-z0-9_-]{11}")
  */
 internal class AiSubtitleStore(
     private val directory: File,
-    private val maxEntries: Int = 30,
+    private val maxEntries: Int = AI_SUBTITLE_STORE_ENTRIES,
 ) {
     @Synchronized
     fun read(videoId: String): AiSubtitleTrack? {
@@ -337,6 +351,16 @@ internal fun encodeAiSubtitleTrack(track: AiSubtitleTrack): String {
         cues.forEach { lines.put(JSONArray().put(it.startMs).put(it.endMs).put(it.text)) }
         parts.put(JSONObject().put("start", start).put("cues", lines))
     }
+    val youtube = JSONArray()
+    track.youtubeTracks.forEach {
+        youtube.put(
+            JSONObject()
+                .put("code", it.code)
+                .put("name", it.name)
+                .put("trackId", it.trackId)
+                .put("generated", it.generated),
+        )
+    }
     return JSONObject()
         .put("version", STORE_VERSION)
         .put("videoId", track.videoId)
@@ -344,8 +368,18 @@ internal fun encodeAiSubtitleTrack(track: AiSubtitleTrack): String {
         .put("endMs", track.endMs ?: JSONObject.NULL)
         .put("complete", track.complete)
         .put("parts", parts)
+        .put("youtubeTracks", youtube)
+        .put("lyrics", track.lyrics)
         .toString()
 }
+
+/** YouTube's tracks saved beside an AI transcript; files from before 2026-11-17 have none. */
+private fun decodeYouTubeTracks(array: JSONArray?): List<CaptionLanguage> =
+    (0 until (array?.length() ?: 0)).mapNotNull { index ->
+        val item = array?.optJSONObject(index) ?: return@mapNotNull null
+        val code = item.optString("code").takeIf(String::isNotBlank) ?: return@mapNotNull null
+        CaptionLanguage(code, item.optString("name").ifBlank { code }, item.optString("trackId"), item.optBoolean("generated"))
+    }
 
 /** Null for a file of another version or a broken one. */
 internal fun decodeAiSubtitleTrack(text: String): AiSubtitleTrack? =
@@ -371,6 +405,8 @@ internal fun decodeAiSubtitleTrack(text: String): AiSubtitleTrack? =
                 parts = decoded,
                 endMs = if (root.isNull("endMs")) null else root.getLong("endMs"),
                 complete = root.optBoolean("complete"),
+                youtubeTracks = decodeYouTubeTracks(root.optJSONArray("youtubeTracks")),
+                lyrics = root.optBoolean("lyrics"),
             )
         }
     } catch (_: JSONException) {

@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini가 이 동영상의 자막을 만들지 않았습니다. 일부 노래에서 이런 일이 있습니다.</string>
     <string name="ai_subtitles_problem_no_speech">이 동영상에서 말소리를 듣지 못했습니다.</string>
     <string name="ai_subtitles_problem_failed">Gemini의 응답을 읽을 수 없습니다. 다시 시도하세요.</string>
+    <string name="ai_transcript_choice">AI 받아쓰기 (Gemini)</string>
+    <string name="ai_transcript_offer">자동 자막이 있는 노래로 보입니다. 자동 자막은 가사를 자주 틀립니다.</string>
+    <string name="ai_transcript_make">정확한 가사 가져오기</string>
+    <string name="ai_transcript_offer_note">먼저 무료 싱크 가사를 찾고, 없을 때만 Gemini 키로 AI를 사용합니다.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (노래 가사)</string>
+    <string name="ai_transcript_looking_for_lyrics">싱크 가사를 찾는 중…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">이 영상에 맞는 싱크 가사가 없습니다. 무료 Gemini 키를 추가하면 AI가 가사를 쓸 수 있어요.</string>
 </resources>

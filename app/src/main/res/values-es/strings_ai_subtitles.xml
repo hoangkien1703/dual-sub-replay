@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini no quiso escribir subtítulos para este video. Lo hace con algunas canciones.</string>
     <string name="ai_subtitles_problem_no_speech">Gemini no oyó ninguna voz en este video.</string>
     <string name="ai_subtitles_problem_failed">No se pudo leer la respuesta de Gemini. Inténtalo de nuevo.</string>
+    <string name="ai_transcript_choice">Transcripción con IA (Gemini)</string>
+    <string name="ai_transcript_offer">Parece una canción con subtítulos automáticos, que suelen equivocarse en la letra.</string>
+    <string name="ai_transcript_make">Obtener la letra real</string>
+    <string name="ai_transcript_offer_note">Primero letras sincronizadas gratis. IA con tu clave de Gemini solo si no hay coincidencia.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (letra de la canción)</string>
+    <string name="ai_transcript_looking_for_lyrics">Buscando letra sincronizada…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">No hay letra sincronizada que coincida con este video. Agrega una clave gratuita de Gemini y la IA podrá escribirla.</string>
 </resources>

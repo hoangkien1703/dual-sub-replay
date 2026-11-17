@@ -14,6 +14,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AiHttpTransport
 import com.kienhoang.dualsubreplay.assistant.AiKeyPacer
 import com.kienhoang.dualsubreplay.assistant.AiKeyStore
+import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.assistant.AiTranslationThinking
 import com.kienhoang.dualsubreplay.assistant.AiVideoSubtitleMaker
 import com.kienhoang.dualsubreplay.assistant.KeystoreSecretCipher
@@ -23,6 +24,8 @@ import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
+import com.kienhoang.dualsubreplay.data.AiSubtitleTrack
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.CaptionProvider
 import com.kienhoang.dualsubreplay.data.CaptionTrackResult
 import com.kienhoang.dualsubreplay.data.CaptionUnavailableException
@@ -47,6 +50,7 @@ import com.kienhoang.dualsubreplay.data.SoundCues
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
+import com.kienhoang.dualsubreplay.data.SyncedLyricsSource
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
@@ -59,6 +63,7 @@ import com.kienhoang.dualsubreplay.data.savedWordFrom
 import com.kienhoang.dualsubreplay.data.storedDailyGoalMinutes
 import com.kienhoang.dualsubreplay.data.storedPageTokenMode
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
+import com.kienhoang.dualsubreplay.playback.WebVideoPlayback
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AiSubtitleTranslator
@@ -161,6 +166,9 @@ class AppViewModel internal constructor(
 
     /** Subtitles Gemini made for videos without captions (owner pick 2026-11-08). */
     private val aiSubtitleStore = AiSubtitleStore(File(application.cacheDir, "ai-subtitles"))
+
+    /** Free synced lyrics for songs, asked before Gemini (owner pick 2026-11-17). */
+    private val syncedLyrics = SyncedLyricsSource()
     private val geminiSubtitles by lazy {
         AiVideoSubtitleMaker(
             StoredGeminiKeys(
@@ -756,13 +764,22 @@ class AppViewModel internal constructor(
 
     /** Fetches [videoId]'s captions in the picked track or chosen original language, or Auto's pick when none is chosen. */
     private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult {
-        // Subtitles Gemini made for this video earlier: YouTube had none for it.
-        aiSubtitleStore.read(videoId)?.takeIf { it.cues().isNotEmpty() }?.let { return it.asCaptionTrack(aiSubtitleLanguage(it.language)) }
+        val picked = _state.value.pickedTrack
+        val youtubeTrackPicked = picked != null && picked != AI_SUBTITLE_TRACK_ID
+        // A transcript Gemini made for this video earlier (YouTube had none, or the person picked the
+        // AI transcript), unless one of YouTube's own tracks was picked for it.
+        if (!youtubeTrackPicked) {
+            aiSubtitleStore
+                .read(
+                    videoId,
+                )?.takeIf { it.cues().isNotEmpty() }
+                ?.let { return it.asCaptionTrack(aiSubtitleLanguage(it.language)) }
+        }
         return captionProvider.fetch(
             videoId,
             preferredCaptionLanguages(_state.value.sourcePreference),
             learningLanguage(),
-            _state.value.pickedTrack,
+            picked?.takeIf { youtubeTrackPicked },
         )
     }
 
@@ -775,7 +792,88 @@ class AppViewModel internal constructor(
     /** The no-captions card's button: Gemini makes subtitles for the open video, starting with the playing part. */
     fun makeAiSubtitles() {
         val videoId = _state.value.activeVideoId ?: return
+        // A song without captions may have free synced lyrics: those come first.
+        if (looksLikeSong(WebVideoBridge.playback.value?.takeIf { it.videoId == videoId })) {
+            useAiTranscript(geminiReady = true)
+            return
+        }
         aiSubtitles.start(videoId, latestPlaybackSecondMs)
+    }
+
+    /**
+     * "AI transcript (Gemini)" in the Original language list, or the song card's button (owner picks
+     * 2026-11-17): a better transcript for the open video. A saved one loads at once. For a song,
+     * LRCLIB's free synced lyrics come first; otherwise (or when none fit) Gemini writes it from the
+     * playing part while YouTube's captions keep showing, and it replaces them as soon as its first
+     * part is in. YouTube's tracks are kept with it, so the list can go back. Returns false when
+     * there is nothing to try without a Gemini key, so the caller opens Settings → AI assistant.
+     */
+    fun useAiTranscript(geminiReady: Boolean): Boolean {
+        val current = _state.value
+        val videoId = current.activeVideoId ?: return true
+        val playing = WebVideoBridge.playback.value?.takeIf { it.videoId == videoId }
+        val song = looksLikeSong(playing)
+        if (!song && !geminiReady && aiSubtitleStore.read(videoId)?.cues().isNullOrEmpty()) return false
+        _state.update {
+            it.copy(pickedTrack = AI_SUBTITLE_TRACK_ID, aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId)
+        }
+        if (current.loadedTrackId == AI_SUBTITLE_TRACK_ID || aiSubtitles.isRunning(videoId)) return true
+        val youtubeTracks = current.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID }
+        viewModelScope.launch {
+            val saved = withContext(Dispatchers.IO) { aiSubtitleStore.read(videoId) }?.takeIf { it.cues().isNotEmpty() }
+            if (_state.value.activeVideoId != videoId) return@launch
+            if (saved != null) {
+                loadVideo(videoId, showPanel = true)
+                return@launch
+            }
+            if (song && playing?.durationMs != null && findSongLyrics(videoId, playing, current, youtubeTracks)) return@launch
+            if (_state.value.activeVideoId != videoId) return@launch
+            if (geminiReady) {
+                aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
+            } else {
+                _state.update {
+                    it.copy(
+                        aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_LYRICS_NEEDS_KEY),
+                    )
+                }
+            }
+        }
+        return true
+    }
+
+    /** Asks LRCLIB for the song's synced lyrics; when they fit the video, saves and shows them. */
+    private suspend fun findSongLyrics(
+        videoId: String,
+        playing: WebVideoPlayback,
+        current: DualSubUiState,
+        youtubeTracks: List<CaptionLanguage>,
+    ): Boolean {
+        val duration = playing.durationMs ?: return false
+        _state.update { it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = true, lookingForLyrics = true)) }
+        val found = syncedLyrics.find(playing.title, playing.channel, duration)
+        _state.update { state -> if (state.aiSubtitles?.lookingForLyrics == true) state.copy(aiSubtitles = null) else state }
+        if (found == null || _state.value.activeVideoId != videoId) return false
+        ProblemLog.record(ProblemArea.CAPTIONS, "Synced lyrics found (${found.cues.size} lines)")
+        val language = current.resolvedSourceLanguage ?: learningLanguage() ?: "en"
+        val track =
+            AiSubtitleTrack(
+                videoId = videoId,
+                language = language,
+                parts = mapOf(0L to found.cues),
+                endMs = duration,
+                complete = true,
+                youtubeTracks = youtubeTracks,
+                lyrics = true,
+            )
+        withContext(Dispatchers.IO) { aiSubtitleStore.write(track) }
+        loadVideo(videoId, showPanel = true)
+        return true
+    }
+
+    /** The song card's X: no more AI transcript offers (or problems) for the open video this session. */
+    fun closeAiTranscriptSuggestion() {
+        val videoId = _state.value.activeVideoId ?: return
+        _state.update { it.copy(aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed + videoId) }
     }
 
     private fun learningLanguage(): String? =
@@ -1644,6 +1742,7 @@ class AppViewModel internal constructor(
                                 ),
                             availableSourceLanguages = track.availableLanguages,
                             loadedTrackId = track.trackId,
+                            loadedLyrics = track.lyrics,
                             generatedCaptions = track.isGenerated,
                             segments = emptyList(),
                             stage = LoadStage.TRANSLATING,

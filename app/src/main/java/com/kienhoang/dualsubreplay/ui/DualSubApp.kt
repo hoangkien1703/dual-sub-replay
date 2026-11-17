@@ -141,7 +141,21 @@ fun DualSubApp(
     var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
     // The word card's More → Word card settings opens Settings → Word learning.
     var wordSettingsRequestId by remember { mutableLongStateOf(0L) }
-    val aiSubtitleActions = remember(viewModel) { AiSubtitleActions(viewModel::makeAiSubtitles) { aiSettingsRequestId++ } }
+    val aiAssistantHost = LocalAiAssistant.current
+    val aiSubtitleActions =
+        remember(viewModel, aiAssistantHost) {
+            AiSubtitleActions(
+                make = viewModel::makeAiSubtitles,
+                openAiSettings = { aiSettingsRequestId++ },
+                // Without a Gemini key and nothing free to try, it opens Settings → AI assistant.
+                useTranscript = {
+                    val keyReady = aiAssistantHost?.controller?.state?.value?.let(::geminiReady) == true
+                    if (!viewModel.useAiTranscript(keyReady)) aiSettingsRequestId++
+                },
+                closeSuggestion = viewModel::closeAiTranscriptSuggestion,
+                videoOpen = { viewModel.state.value.activeVideoId != null },
+            )
+        }
     val wholeTranscript =
         remember(viewModel) {
             WholeTranscriptAccess(viewModel.wholeTranscript, viewModel.transcriptExport) { viewModel.videoTitle(viewModel.state.value.activeVideoId) }
@@ -185,7 +199,9 @@ fun DualSubApp(
                     onShowSubtitles = { viewModel.reopenSubtitles() },
                     onHideSubtitles = viewModel::closeSubtitles,
                     onRetry = viewModel::retryCaptions,
-                    onSourceChange = viewModel::setSourcePreference,
+                    onSourceChange = { choice ->
+                        if (choice == AI_TRANSCRIPT_CHOICE) aiSubtitleActions.useTranscript() else viewModel.setSourcePreference(choice)
+                    },
                     onTargetChange = viewModel::setTargetLanguage,
                     onThirdLineChange = viewModel::setThirdLine,
                     onCaptionVisibilityChange = viewModel::setCaptionVisibility,
@@ -812,10 +828,23 @@ private fun SubtitlePanel(
                     state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                     state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                     state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
-                    else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
+                    else -> TimelineWithAiTranscriptBanner(state, onWordClick, onReplay)
                 }
             }
         }
+    }
+}
+
+/** The transcript, with the song lyrics card or the AI transcript's progress above it when there is one. */
+@Composable
+private fun TimelineWithAiTranscriptBanner(
+    state: DualSubUiState,
+    onWordClick: (WordTap) -> Unit,
+    onReplay: (SubtitleSegment) -> Unit,
+) {
+    Column(Modifier.fillMaxSize()) {
+        AiTranscriptBanner(state)
+        Box(Modifier.fillMaxWidth().weight(1f)) { TranslatedSubtitleTimeline(state, onWordClick, onReplay) }
     }
 }
 
@@ -991,7 +1020,7 @@ private fun SideSubtitlePanel(
                 state.liveFallback -> LiveSubtitlePanel(state, onRetry, onWordClick)
                 state.errorMessage != null -> CompactErrorPanel(state.errorMessage, onRetry)
                 state.segments.isEmpty() -> CompactLoadingPanel(state.statusMessage ?: stringResource(R.string.player_loading_captions))
-                else -> TranslatedSubtitleTimeline(state, onWordClick, onReplay)
+                else -> TimelineWithAiTranscriptBanner(state, onWordClick, onReplay)
             }
         }
     }
@@ -1485,7 +1514,8 @@ private fun sourceDescription(state: DualSubUiState): String {
     val interfaceLocale = currentInterfaceLocale()
     val source = state.resolvedSourceLanguage?.let { resolved ->
         if (state.loadedTrackId == AI_SUBTITLE_TRACK_ID) {
-            return@let stringResource(R.string.ai_subtitles_track_label, languageDisplayName(resolved, interfaceLocale))
+            val label = if (state.loadedLyrics) R.string.ai_transcript_lyrics_track_label else R.string.ai_subtitles_track_label
+            return@let stringResource(label, languageDisplayName(resolved, interfaceLocale))
         }
         // YouTube's own name of the loaded track already says when it is auto-generated.
         state.availableSourceLanguages.firstOrNull { state.loadedTrackId.isNotBlank() && it.trackId == state.loadedTrackId }?.name

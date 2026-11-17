@@ -5,6 +5,7 @@ import com.kienhoang.dualsubreplay.assistant.AiSubtitleException
 import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.data.AiSubtitlePart
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.RawCaptionCue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -55,6 +56,28 @@ class AiSubtitleRunnerTest {
             assertTrue(saved.complete)
             assertEquals(600_000L, saved.endMs)
             assertEquals(2, saved.cues().size)
+        }
+
+    @Test
+    fun anAiTranscriptOverYouTubesCaptionsKeepsTheirTracks() =
+        runBlocking {
+            val store = AiSubtitleStore(folder.root)
+            val youtube = listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true))
+            val runner =
+                AiSubtitleRunner(
+                    scope = this,
+                    store = store,
+                    askPart = { _, start, _ -> if (start >= 300_000) AiPartAnswer.PastTheEnd else line(start) },
+                    durationOf = { 218_000 },
+                    onStatus = {},
+                    onReady = {},
+                    io = Dispatchers.Unconfined,
+                )
+            runner.start(videoId, positionMs = 54_000, youtubeTracks = youtube)
+            runner.join()
+            val saved = store.read(videoId)!!
+            assertEquals(youtube, saved.youtubeTracks)
+            assertEquals(youtube, saved.asCaptionTrack("en").availableLanguages)
         }
 
     @Test

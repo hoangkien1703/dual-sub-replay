@@ -219,6 +219,28 @@ class AiSubtitlesTest {
     }
 
     @Test
+    fun youTubesOwnTracksAreKeptWithAnAiTranscript() {
+        val youtube =
+            listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true), CaptionLanguage("es", "Spanish", ".es"))
+        val track =
+            AiSubtitleTrack("dQw4w9WgXcQ", "en", mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Line"))), youtubeTracks = youtube)
+        val decoded = decodeAiSubtitleTrack(encodeAiSubtitleTrack(track))!!
+        assertEquals(youtube, decoded.youtubeTracks)
+        assertEquals(youtube, decoded.asCaptionTrack("en").availableLanguages)
+        assertEquals(AI_SUBTITLE_TRACK_ID, decoded.asCaptionTrack("en").trackId)
+        // A file saved before the AI transcript existed has no YouTube tracks.
+        val old = encodeAiSubtitleTrack(track.copy(youtubeTracks = emptyList())).replace(",\"youtubeTracks\":[]", "")
+        assertEquals(emptyList<CaptionLanguage>(), decodeAiSubtitleTrack(old)!!.youtubeTracks)
+    }
+
+    @Test
+    fun thePromptAsksForSungLinesToo() {
+        val body = aiSubtitleRequestBody("dQw4w9WgXcQ", 0, 300_000)
+        assertTrue(body.contains("spoken or sung"))
+        assertTrue(body.contains("Leave out music without words"))
+    }
+
+    @Test
     fun aVideoIsCaptionlessWhenTheDownloadOrThePagePlayerFindsNoTrack() {
         val none = NoPublicCaptionsException("This video does not provide a public caption track.")
         // A music video the page plays while the app's download answers UNPLAYABLE (owner's phone, 2026-11-08).

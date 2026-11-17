@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini không viết phụ đề cho video này. Gemini làm vậy với một số bài hát.</string>
     <string name="ai_subtitles_problem_no_speech">Gemini không nghe thấy lời nói nào trong video này.</string>
     <string name="ai_subtitles_problem_failed">Không đọc được câu trả lời của Gemini. Hãy thử lại.</string>
+    <string name="ai_transcript_choice">Bản ghi AI (Gemini)</string>
+    <string name="ai_transcript_offer">Video này giống một bài hát có phụ đề tự động, thường sai lời.</string>
+    <string name="ai_transcript_make">Lấy lời bài hát chuẩn</string>
+    <string name="ai_transcript_offer_note">Ưu tiên lời đồng bộ miễn phí. Chỉ dùng AI với khóa Gemini khi không tìm thấy.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (lời bài hát)</string>
+    <string name="ai_transcript_looking_for_lyrics">Đang tìm lời bài hát đồng bộ…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">Không tìm thấy lời đồng bộ khớp với video này. Thêm khóa Gemini miễn phí để AI viết lời.</string>
 </resources>

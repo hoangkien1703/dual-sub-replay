@@ -40,6 +40,9 @@ enum class AiSubtitleProblem {
     /** Every part came back without a line. */
     NO_SPEECH,
     FAILED,
+
+    /** A song with no synced lyrics that fit, and no Gemini key to write them. */
+    NO_LYRICS_NEEDS_KEY,
 }
 
 internal class AiSubtitleException(

@@ -19,4 +19,11 @@
     <string name="ai_subtitles_problem_refused">Gemini tidak mau menulis subtitle untuk video ini. Ini terjadi pada beberapa lagu.</string>
     <string name="ai_subtitles_problem_no_speech">Gemini tidak mendengar ucapan apa pun di video ini.</string>
     <string name="ai_subtitles_problem_failed">Jawaban Gemini tidak bisa dibaca. Coba lagi.</string>
+    <string name="ai_transcript_choice">Transkrip AI (Gemini)</string>
+    <string name="ai_transcript_offer">Ini tampaknya lagu dengan teks otomatis, yang sering salah menulis lirik.</string>
+    <string name="ai_transcript_make">Ambil lirik asli</string>
+    <string name="ai_transcript_offer_note">Lirik tersinkron gratis lebih dulu. AI dengan kunci Gemini hanya jika tidak ada yang cocok.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (lirik lagu)</string>
+    <string name="ai_transcript_looking_for_lyrics">Mencari lirik tersinkron…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">Tidak ada lirik tersinkron yang cocok dengan video ini. Tambahkan kunci Gemini gratis agar AI bisa menuliskannya.</string>
 </resources>

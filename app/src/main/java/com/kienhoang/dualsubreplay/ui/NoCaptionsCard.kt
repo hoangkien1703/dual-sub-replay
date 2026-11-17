@@ -32,6 +32,15 @@ import kotlinx.coroutines.flow.StateFlow
 internal class AiSubtitleActions(
     val make: () -> Unit,
     val openAiSettings: () -> Unit,
+    /**
+     * "AI transcript (Gemini)" in the Original language list, or the song card's button: the open
+     * video's Gemini transcript, made now when missing (Settings → AI assistant without a key).
+     */
+    val useTranscript: () -> Unit = make,
+    /** The song card's X: no more offers for this video. */
+    val closeSuggestion: () -> Unit = {},
+    /** True while a video is open, so the Original language list can offer the AI transcript. */
+    val videoOpen: () -> Boolean = { true },
 )
 
 internal val LocalAiSubtitleActions = staticCompositionLocalOf<AiSubtitleActions?> { null }
@@ -96,9 +105,10 @@ internal fun NoCaptionsCard(
 }
 
 @Composable
-private fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
+internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
     val total = status.totalMs
     return when {
+        status.lookingForLyrics -> stringResource(R.string.ai_transcript_looking_for_lyrics)
         status.doneMs <= 0L -> stringResource(R.string.ai_subtitles_starting)
         total != null -> stringResource(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
         else -> stringResource(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
@@ -116,6 +126,7 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.REFUSED -> R.string.ai_subtitles_problem_refused
         AiSubtitleProblem.NO_SPEECH -> R.string.ai_subtitles_problem_no_speech
         AiSubtitleProblem.FAILED -> R.string.ai_subtitles_problem_failed
+        AiSubtitleProblem.NO_LYRICS_NEEDS_KEY -> R.string.ai_transcript_no_lyrics_needs_key
     }
 
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */

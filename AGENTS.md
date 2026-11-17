@@ -65,7 +65,7 @@ Before changing an area, read its section in the [technical context](docs/projec
 
 ## Default settings
 
-- Defaults are the most stable choice (owner decision 2026-11-11): a new user must be able to use the app without changing any setting and without an AI key. Anything that spends a user's AI key quota is off by default, or runs only on an explicit tap or inside an assistant chat the user started; never turn such a setting on by default, run it in the background, or enable it in a migration. Current examples: AI translation (Google is the default), AI thinking for translation, Meaning in this sentence (AI), web search and Full access are off; AI subtitles for videos without captions and "Another story with AI" run only on a tap.
+- Defaults are the most stable choice (owner decision 2026-11-11): a new user must be able to use the app without changing any setting and without an AI key. Anything that spends a user's AI key quota is off by default, or runs only on an explicit tap or inside an assistant chat the user started; never turn such a setting on by default, run it in the background, or enable it in a migration. Current examples: AI translation (Google is the default), AI thinking for translation, Meaning in this sentence (AI), web search and Full access are off; AI subtitles for videos without captions, the AI transcript (Gemini) and "Another story with AI" run only on a tap.
 
 ## UI conventions
 
