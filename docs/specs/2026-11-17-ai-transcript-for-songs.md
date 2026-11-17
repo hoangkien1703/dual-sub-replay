@@ -90,3 +90,7 @@ A long music video made of many songs (2 hours or more) never matches one song's
 - The header says "(song lyrics)" when lyrics cover at least half of the video.
 - Acceptance: `SongChaptersTest` (description formats and rejections, order from the playing song, moving and cutting lines, covered parts, filtering Gemini lines, round trip), `AiSubtitleRunnerTest.aCompilationAsksGeminiOnlyBetweenTheSongsWithLyrics`, `AiTranscriptBannerUiTest` screenshots. Live LRCLIB: "Lewis Capaldi – Someone You Loved", "Shape of You | Ed Sheeran" and "Ed Sheeran - Perfect" chapter titles all found.
 - Not verified: real compilation descriptions on a phone; m.youtube.com's player details are expected to carry `shortDescription` (the app already reads it for language hints).
+
+## Fix: Make subtitles with AI after a song (Kien, 2026-11-17)
+
+On v1.9.9, a captionless video opened after a video with lyrics or an AI transcript kept that track as loaded, so the list showed "AI transcript (Gemini)" selected and **Make subtitles with AI** did nothing. Each load now starts with no loaded track, and the AI transcript counts as showing only while its lines are on screen (`NextVideoForgetsLoadedTrackTest`, PR CI).
