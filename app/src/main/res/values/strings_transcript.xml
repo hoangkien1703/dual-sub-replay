@@ -16,4 +16,5 @@
     <string name="whole_transcript_export_cancelled">Export stopped.</string>
     <string name="whole_transcript_export_cancel">Stop</string>
     <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">Adds Whole transcript to the small menu that the subtitle panel’s gear opens: every line of the video, with search, a tap to jump there, and export.</string>
 </resources>

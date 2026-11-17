@@ -15,4 +15,5 @@
     <string name="whole_transcript_export_cancelled">書き出しを中止しました。</string>
     <string name="whole_transcript_export_cancel">中止</string>
     <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">字幕パネルの歯車で開く小さなメニューに「字幕全文」を追加します。動画のすべての行を表示し、検索、タップでジャンプ、書き出しができます。</string>
 </resources>

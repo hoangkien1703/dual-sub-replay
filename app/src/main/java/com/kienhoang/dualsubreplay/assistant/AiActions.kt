@@ -175,6 +175,7 @@ internal enum class AiSetting(
 
     /** Settings → Playback (2026-11-16). */
     SLEEP_TIMER_QUICK("sleep_timer_in_quick_settings"),
+    WHOLE_TRANSCRIPT("whole_transcript"),
 
     /** Settings → App updates (2026-10-30): reads GitHub once a day, so it waits for a tap. */
     UPDATE_REMINDERS("update_reminders", asks = true),
@@ -880,6 +881,11 @@ private fun otherSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (Settings → Playback → Show in quick settings: also shows the Sleep timer row in the small menu the " +
                 "subtitle panel's gear opens; off by default, then the timer is only in Settings → Playback)"
+        AiSetting.WHOLE_TRANSCRIPT ->
+            choiceList(setting.choices) +
+                " (Settings → Playback → Whole transcript: adds Whole transcript to the small menu the subtitle panel's " +
+                "gear opens, a page with every line of the video, search, a tap to jump there, and export as a text or SRT " +
+                "file; off by default)"
         AiSetting.CARD_FRONT ->
             choiceList(setting.choices) +
                 " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +

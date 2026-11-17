@@ -55,8 +55,9 @@ Bilibili) is a separate PR and spec.
   Forever, Custom. Custom keeps the current count (Forever turns into 2) and shows − slider + and
   "N times". The AI assistant's `study_repeat_count` takes 2 to 99 or forever.
 
-- Gear popup (the subtitle panel's gear) → **Whole transcript**, shown only while a full transcript
-  is loaded (not with live subtitles). The sheet opens at the playing line, shows "m:ss" and each
+- Settings → Playback → **Whole transcript** (off by default, owner 2026-11-17). When on, the gear
+  popup (the subtitle panel's gear) shows **Whole transcript** while a full transcript is loaded (not
+  with live subtitles). The sheet opens at the playing line, shows "m:ss" and each
   row's text; a sentence's translation shows under its first row once the list rests for 0.6 s.
   Search lists up to 500 matching rows. The Download icon opens Export: Text file or Subtitle file
   (SRT), Include the translation (on), then Android's own save screen (no permission). Export runs on
@@ -85,6 +86,8 @@ Bilibili) is a separate PR and spec.
   at a time and drop them; export writes through a buffered writer (`TranscriptExporter`, view model
   scope, `CreateDocument`). A closed store makes reads return nothing and export stop.
 - `LocalWholeTranscript` hands the flow, exporter and title to `DualSubExperience`.
+  `WHOLE_TRANSCRIPT_PREFERENCE` gates the gear popup's link; it is in Settings search, the AI
+  assistant (`whole_transcript`), shared settings, Reset and the Playback summary.
 - `TAP_BAR_READING_PREFERENCE` (`ui/TapBarReading.kt`): `PhraseActions.readingInBar`; the bar shows
   `tapBarReading(token, language)`: the analyzer's reading, else English IPA. In Settings search,
   the AI assistant (`tap_bar_reading`), shared settings and Reset.
@@ -103,6 +106,8 @@ Bilibili) is a separate PR and spec.
   `study-repeat-custom`).
 - `WholeTranscriptTest`: paging, sentence translations, search, text and SRT export, a closed store,
   and a 6-hour transcript (14,400 lines) searched and exported through a writer that keeps nothing.
+- `StudyToolsUiTest.theSleepTimerLivesInPlaybackAndOnlyJoinsTheGearPopupWhenAsked`: the Whole
+  transcript switch is off by default.
 - `WholeTranscriptUiTest` (+ screenshots `whole-transcript`, `whole-transcript-search`,
   `whole-transcript-export`, `gear-popup-whole-transcript`).
 - `PhraseSelectionUiTest.theBarShowsTheWordsIpaOnlyWhenTheSettingIsOn` / `...WhileTheSettingIsOff`

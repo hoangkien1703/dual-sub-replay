@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
 internal const val SLEEP_TIMER_QUICK_PREFERENCE = "sleep_timer_in_quick_settings"
 
 /** Reset by Reset all settings. */
-internal val PLAYBACK_SETTING_KEYS = listOf(SLEEP_TIMER_QUICK_PREFERENCE)
+internal val PLAYBACK_SETTING_KEYS = listOf(SLEEP_TIMER_QUICK_PREFERENCE, WHOLE_TRANSCRIPT_PREFERENCE)
 
 @Composable
 internal fun rememberSleepTimerInQuickSettings(): State<Boolean> =
@@ -68,6 +68,7 @@ internal fun PlaybackSettingsSection() {
     val context = LocalContext.current
     val preferences = remember(context) { studyPreferences(context) }
     val inQuickSettings by rememberSleepTimerInQuickSettings()
+    val wholeTranscript by rememberWholeTranscriptEnabled()
     SleepTimerRow(Modifier.settingAnchor("sleep_timer").padding(vertical = 6.dp))
     SettingsHint(stringResource(R.string.sleep_timer_description))
     SettingsSwitchRow(
@@ -76,6 +77,13 @@ internal fun PlaybackSettingsSection() {
         checked = inQuickSettings,
         onCheckedChange = { preferences.edit().putBoolean(SLEEP_TIMER_QUICK_PREFERENCE, it).apply() },
         testTag = "sleep_timer_quick_switch",
+    )
+    SettingsSwitchRow(
+        title = stringResource(R.string.whole_transcript_title),
+        description = stringResource(R.string.whole_transcript_setting_description),
+        checked = wholeTranscript,
+        onCheckedChange = { preferences.edit().putBoolean(WHOLE_TRANSCRIPT_PREFERENCE, it).apply() },
+        testTag = "whole_transcript_switch",
     )
 }
 

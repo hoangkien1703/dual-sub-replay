@@ -160,6 +160,7 @@ internal data class AiStoredSettings(
     val adSkip: AdSkipSettings = AdSkipSettings(),
     val differentTabAccounts: Boolean = false,
     val sleepTimerInQuickSettings: Boolean = false,
+    val wholeTranscript: Boolean = false,
     val tvLayout: Boolean = false,
 )
 
@@ -173,6 +174,7 @@ private val STORED_SWITCHES =
         AiSetting.ALWAYS_SKIP_SPONSORS to ALWAYS_SKIP_SPONSORS_PREFERENCE,
         AiSetting.DIFFERENT_TAB_ACCOUNTS to DIFFERENT_TAB_ACCOUNTS_PREFERENCE,
         AiSetting.SLEEP_TIMER_QUICK to SLEEP_TIMER_QUICK_PREFERENCE,
+        AiSetting.WHOLE_TRANSCRIPT to WHOLE_TRANSCRIPT_PREFERENCE,
         AiSetting.TV_LAYOUT to TV_LAYOUT_PREFERENCE,
     )
 
@@ -200,6 +202,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         adSkip = readAdSkipSettings(preferences),
         differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
         sleepTimerInQuickSettings = preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false),
+        wholeTranscript = preferences.getBoolean(WHOLE_TRANSCRIPT_PREFERENCE, false),
         tvLayout = readTvLayout(preferences, isTelevisionDevice(context)),
     )
 }
@@ -236,12 +239,11 @@ private fun aiStoredSettingValue(
         AiSetting.SKIP_SPONSORS -> onOff(stored.adSkip.skipSponsors)
         AiSetting.ALWAYS_SKIP_SPONSORS -> onOff(stored.adSkip.alwaysSkipSponsors)
         AiSetting.DIFFERENT_TAB_ACCOUNTS -> onOff(stored.differentTabAccounts)
-        AiSetting.SLEEP_TIMER_QUICK -> onOff(stored.sleepTimerInQuickSettings)
         AiSetting.TV_LAYOUT -> onOff(stored.tvLayout)
         else -> aiWordSettingValue(stored, setting) ?: aiStudySettingValue(stored.study, setting)
     }
 
-/** Word learning's voice and meaning settings. */
+/** Word learning's voice and meaning settings, and what the gear popup shows. */
 private fun aiWordSettingValue(
     stored: AiStoredSettings,
     setting: AiSetting,
@@ -253,6 +255,8 @@ private fun aiWordSettingValue(
         AiSetting.MEANING_ORDER -> stored.meaningOrder
         AiSetting.PREPARE_MEANINGS -> onOff(stored.prepareMeanings)
         AiSetting.TAP_BAR_READING -> onOff(stored.tapBarReading)
+        AiSetting.SLEEP_TIMER_QUICK -> onOff(stored.sleepTimerInQuickSettings)
+        AiSetting.WHOLE_TRANSCRIPT -> onOff(stored.wholeTranscript)
         else -> null
     }
 
@@ -948,6 +952,7 @@ internal class AppAiActions(
             AiSetting.ALWAYS_SKIP_SPONSORS -> switch(R.string.ads_always_skip_sponsors_title, value)
             AiSetting.DIFFERENT_TAB_ACCOUNTS -> switch(R.string.tabs_different_accounts_title, value)
             AiSetting.SLEEP_TIMER_QUICK -> switch(R.string.sleep_timer_quick_title, value)
+            AiSetting.WHOLE_TRANSCRIPT -> switch(R.string.whole_transcript_title, value)
             AiSetting.TV_LAYOUT -> switch(R.string.tv_layout_title, value)
             else -> flashcardSettingLabel(setting, value)
         }

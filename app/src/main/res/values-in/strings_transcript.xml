@@ -15,4 +15,5 @@
     <string name="whole_transcript_export_cancelled">Ekspor dihentikan.</string>
     <string name="whole_transcript_export_cancel">Hentikan</string>
     <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">Menambahkan Seluruh transkrip ke menu kecil yang dibuka roda gigi panel subtitel: setiap baris video, dengan pencarian, ketuk untuk melompat ke sana, dan ekspor.</string>
 </resources>

@@ -276,6 +276,10 @@ class StudyToolsUiTest {
         saveUiEvidence("settings-playback-sleep-timer")
         composeRule.onNodeWithTag("sleep_timer_quick_switch").performClick()
         composeRule.runOnIdle { assertTrue(preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false)) }
+        // Whole transcript joins the gear popup only when turned on, too (owner, 2026-11-17).
+        composeRule.onNodeWithTag("whole_transcript_switch").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("whole_transcript_switch").performClick()
+        composeRule.runOnIdle { assertTrue(preferences.getBoolean(WHOLE_TRANSCRIPT_PREFERENCE, false)) }
     }
 
     @Test

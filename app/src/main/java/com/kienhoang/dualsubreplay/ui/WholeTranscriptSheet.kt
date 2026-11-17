@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -78,8 +79,16 @@ internal val LocalWholeTranscript = staticCompositionLocalOf<WholeTranscriptAcce
 internal fun rememberWholeTranscriptOpener(open: () -> Unit): (() -> Unit)? {
     val access = LocalWholeTranscript.current ?: return null
     val transcript by access.transcript.collectAsState()
-    return open.takeIf { transcript != null }
+    val enabled by rememberWholeTranscriptEnabled()
+    return open.takeIf { enabled && transcript != null }
 }
+
+/** Settings → Playback → Whole transcript: the gear popup's Whole transcript link. Off by default (owner, 2026-11-17). */
+internal const val WHOLE_TRANSCRIPT_PREFERENCE = "whole_transcript"
+
+@Composable
+internal fun rememberWholeTranscriptEnabled(): State<Boolean> =
+    rememberStoredSetting(WHOLE_TRANSCRIPT_PREFERENCE) { it.getBoolean(WHOLE_TRANSCRIPT_PREFERENCE, false) }
 
 /** The sheet for the playing video; closes itself when the video changes and its transcript goes. */
 @Composable

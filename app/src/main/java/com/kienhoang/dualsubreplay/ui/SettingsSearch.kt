@@ -411,6 +411,12 @@ internal enum class SearchableSetting(
         "sleep_timer_quick_switch",
         setOf(SLEEP_TIMER_QUICK_PREFERENCE),
     ),
+    WHOLE_TRANSCRIPT(
+        R.string.whole_transcript_title,
+        MoreSettingsSection.PLAYBACK,
+        "whole_transcript_switch",
+        setOf(WHOLE_TRANSCRIPT_PREFERENCE),
+    ),
     SKIP_ADS(R.string.ads_skip_ads_title, MoreSettingsSection.ADS, "skip_ads_switch", setOf(SKIP_ADS_PREFERENCE)),
     SKIP_SPONSORS(R.string.ads_skip_sponsors_title, MoreSettingsSection.ADS, "skip_sponsors_switch", setOf(SKIP_SPONSORS_PREFERENCE)),
     ALWAYS_SKIP_SPONSORS(
