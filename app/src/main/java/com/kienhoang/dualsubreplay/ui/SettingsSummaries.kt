@@ -65,6 +65,7 @@ internal data class SettingsSummaryState(
     val sleepTimer: SleepTimerChoice? = null,
     val sleepTimerMinutesLeft: Int = 0,
     val sleepTimerInQuickSettings: Boolean = false,
+    val wholeTranscript: Boolean = false,
     val appColors: AppColorThemeOption = AppColorThemeOption.DEEP_TEAL,
     /** Null in builds without the assistant, which have no AI section. */
     val ai: AiSummaryState? = null,
@@ -149,8 +150,9 @@ private fun playbackSummary(state: SettingsSummaryState): List<SummaryPart> {
             is SleepTimerChoice.Minutes ->
                 SummaryPart.Value(R.string.sleep_timer_title, R.string.sleep_timer_left, state.sleepTimerMinutesLeft)
         }
-    val quick = SummaryPart.Value(R.string.sleep_timer_quick_title, R.string.ai_action_on)
-    return if (state.sleepTimerInQuickSettings) listOf(timer, quick) else listOf(timer)
+    val quick = SummaryPart.Value(R.string.sleep_timer_quick_title, R.string.ai_action_on).takeIf { state.sleepTimerInQuickSettings }
+    val transcript = SummaryPart.Value(R.string.whole_transcript_title, R.string.ai_action_on).takeIf { state.wholeTranscript }
+    return listOfNotNull(timer, quick, transcript)
 }
 
 private fun aiSummary(ai: AiSummaryState?): List<SummaryPart> =
@@ -215,6 +217,7 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
     val sleepTimer by SleepTimer.run.collectAsState()
     val sleepTimerMinutesLeft = rememberSleepTimerMinutesLeft(sleepTimer)
     val sleepTimerInQuickSettings by rememberSleepTimerInQuickSettings()
+    val wholeTranscript by rememberWholeTranscriptEnabled()
     val overlayInFullscreen by rememberStoredSetting(AUTO_OVERLAY_FULLSCREEN_PREFERENCE) {
         it.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true)
     }
@@ -235,6 +238,7 @@ internal fun rememberSettingsSummaryState(pageValues: SettingsSummaryState): Set
         sleepTimer = sleepTimer?.choice,
         sleepTimerMinutesLeft = sleepTimerMinutesLeft,
         sleepTimerInQuickSettings = sleepTimerInQuickSettings,
+        wholeTranscript = wholeTranscript,
         appColors = appColors,
         ai = ai,
         autoUpdate = autoUpdate,

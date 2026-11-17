@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">Nghĩa từ điển</string>
     <string name="settings_prepare_meanings_title">Chuẩn bị nghĩa trước</string>
     <string name="settings_prepare_meanings_description">Khi một dòng đang phát, ứng dụng hỏi AI nghĩa của từng từ trong dòng, để từ bạn chạm hiện nghĩa ngay. Việc này dùng khóa của bạn cả với những dòng bạn không chạm.</string>
+    <string name="settings_tap_bar_reading_title">Phát âm trên thanh khi chạm</string>
+    <string name="settings_tap_bar_reading_description">Khi bạn chạm một từ, thanh phía trên cũng cho biết cách đọc: IPA cho tiếng Anh, kana cho tiếng Nhật, pinyin cho tiếng Trung.</string>
     <string name="settings_word_learning_mode_title">Chế độ học từ (màu theo từ loại)</string>
     <string name="settings_word_learning_mode_description">Tô màu từ theo vai trò ngữ pháp (danh từ, động từ, tính từ, trợ từ) để thấy cấu trúc câu.</string>
     <string name="settings_colored_lines_title">Dòng phụ đề được tô màu</string>

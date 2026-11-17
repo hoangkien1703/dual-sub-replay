@@ -1,12 +1,18 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AiTranslationAccessTest {
     private val gemini = AiAssistantSettings(provider = AiProvider.GEMINI, models = mapOf(AiProvider.GEMINI to "gemini-pro-latest"))
 
@@ -83,6 +89,30 @@ class AiTranslationAccessTest {
             val pacer = AiKeyPacer(intervalMs = 0)
             val asked = List(4) { pacer.take(listOf("a", "b")) }
             assertEquals(listOf("a", "b", "a", "b"), asked)
+        }
+
+    /**
+     * lion737 (Discussion #81, 2026-11-16): a tapped word's meaning waited up to 6 s behind the line's
+     * own request. An urgent request goes at once and pushes the waiting background request back.
+     */
+    @Test fun aTappedWordGoesAheadOfAWaitingBackgroundRequest() =
+        runTest {
+            val pacer = AiKeyPacer(now = { testScheduler.currentTime })
+            pacer.take(listOf("a"))
+            val background = async { pacer.take(listOf("a")).also { assertEquals(7_000L, currentTime) } }
+            delay(1_000)
+            assertEquals("a", pacer.take(listOf("a"), urgent = true))
+            assertEquals(1_000L, currentTime)
+            assertEquals("a", background.await())
+        }
+
+    @Test fun tappedWordsStillKeepTheMinuteBudget() =
+        runTest {
+            val pacer = AiKeyPacer(now = { testScheduler.currentTime })
+            repeat(AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE) { pacer.take(listOf("a"), urgent = true) }
+            assertEquals(0L, currentTime)
+            pacer.take(listOf("a"), urgent = true)
+            assertEquals(60_000L, currentTime)
         }
 
     @Test fun aLimitedKeyRestsLongerEachTimeAndEveryKeyRestingMeansGoogle() =

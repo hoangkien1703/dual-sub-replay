@@ -142,6 +142,10 @@ fun DualSubApp(
     // The word card's More → Word card settings opens Settings → Word learning.
     var wordSettingsRequestId by remember { mutableLongStateOf(0L) }
     val aiSubtitleActions = remember(viewModel) { AiSubtitleActions(viewModel::makeAiSubtitles) { aiSettingsRequestId++ } }
+    val wholeTranscript =
+        remember(viewModel) {
+            WholeTranscriptAccess(viewModel.wholeTranscript, viewModel.transcriptExport) { viewModel.videoTitle(viewModel.state.value.activeVideoId) }
+        }
 
     DualSubTheme {
         if (!state.onboardingCompleted) {
@@ -155,6 +159,7 @@ fun DualSubApp(
                 LocalLineLoop provides studyRunner.lineLoop,
                 LocalDictation provides studyRunner.dictation,
                 LocalAiSubtitleActions provides aiSubtitleActions,
+                LocalWholeTranscript provides wholeTranscript,
             ) {
                 DualSubExperience(
                     state = state,
@@ -374,6 +379,13 @@ private fun DualSubExperience(
     }
     // Gear icons on the player open a small Subtitles popup (languages, Hide while playing); the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }
+    // Opened from the gear popup: every line of the video, search and export (25kiuo, #81, 2026-11-17).
+    var showWholeTranscript by remember { mutableStateOf(false) }
+    val openWholeTranscript =
+        rememberWholeTranscriptOpener {
+            showQuickSettings = false
+            showWholeTranscript = true
+        }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val layoutPreferences =
@@ -596,8 +608,14 @@ private fun DualSubExperience(
                 showQuickSettings = false
                 showSettings = true
             },
+            onOpenWholeTranscript = openWholeTranscript,
             onDismiss = { showQuickSettings = false },
         )
+    }
+    if (showWholeTranscript) {
+        PlayerWholeTranscript(state, onJump = { segment -> webController.replayFrom(segment.startMs / 1_000f) }) {
+            showWholeTranscript = false
+        }
     }
     if (showSettings) {
         SubtitleSettingsDialog(

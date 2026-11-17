@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">字幕全文</string>
+    <string name="whole_transcript_search">字幕を検索</string>
+    <string name="whole_transcript_no_match">この言葉を含む行はありません。</string>
+    <string name="whole_transcript_export">書き出す</string>
+    <string name="whole_transcript_format_text">テキストファイル</string>
+    <string name="whole_transcript_format_srt">字幕ファイル (SRT)</string>
+    <string name="whole_transcript_with_translation">翻訳も含める</string>
+    <string name="whole_transcript_with_translation_note">まだ翻訳されていない行を先に翻訳するため、長い動画は数分かかることがあります。</string>
+    <string name="whole_transcript_export_save">保存</string>
+    <string name="whole_transcript_exporting">字幕を書き出しています…</string>
+    <string name="whole_transcript_saved">字幕を保存しました。</string>
+    <string name="whole_transcript_export_failed">字幕を保存できませんでした。</string>
+    <string name="whole_transcript_export_cancelled">書き出しを中止しました。</string>
+    <string name="whole_transcript_export_cancel">中止</string>
+    <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">字幕パネルの歯車で開く小さなメニューに「字幕全文」を追加します。動画のすべての行を表示し、検索、タップでジャンプ、書き出しができます。</string>
+</resources>

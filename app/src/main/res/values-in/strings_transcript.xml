@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">Seluruh transkrip</string>
+    <string name="whole_transcript_search">Cari di transkrip</string>
+    <string name="whole_transcript_no_match">Tidak ada baris dengan kata-kata ini.</string>
+    <string name="whole_transcript_export">Ekspor</string>
+    <string name="whole_transcript_format_text">File teks</string>
+    <string name="whole_transcript_format_srt">File subtitle (SRT)</string>
+    <string name="whole_transcript_with_translation">Sertakan terjemahan</string>
+    <string name="whole_transcript_with_translation_note">Baris yang belum diterjemahkan akan diterjemahkan dulu, jadi video panjang bisa memakan beberapa menit.</string>
+    <string name="whole_transcript_export_save">Simpan</string>
+    <string name="whole_transcript_exporting">Mengekspor transkrip…</string>
+    <string name="whole_transcript_saved">Transkrip disimpan.</string>
+    <string name="whole_transcript_export_failed">Tidak dapat menyimpan transkrip.</string>
+    <string name="whole_transcript_export_cancelled">Ekspor dihentikan.</string>
+    <string name="whole_transcript_export_cancel">Hentikan</string>
+    <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">Menambahkan Seluruh transkrip ke menu kecil yang dibuka roda gigi panel subtitel: setiap baris video, dengan pencarian, ketuk untuk melompat ke sana, dan ekspor.</string>
+</resources>

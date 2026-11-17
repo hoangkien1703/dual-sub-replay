@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">完整字幕</string>
+    <string name="whole_transcript_search">搜索字幕</string>
+    <string name="whole_transcript_no_match">没有包含这些词的句子。</string>
+    <string name="whole_transcript_export">导出</string>
+    <string name="whole_transcript_format_text">文本文件</string>
+    <string name="whole_transcript_format_srt">字幕文件 (SRT)</string>
+    <string name="whole_transcript_with_translation">包含翻译</string>
+    <string name="whole_transcript_with_translation_note">还没翻译的句子会先翻译，所以长视频可能需要几分钟。</string>
+    <string name="whole_transcript_export_save">保存</string>
+    <string name="whole_transcript_exporting">正在导出字幕…</string>
+    <string name="whole_transcript_saved">字幕已保存。</string>
+    <string name="whole_transcript_export_failed">无法保存字幕。</string>
+    <string name="whole_transcript_export_cancelled">已停止导出。</string>
+    <string name="whole_transcript_export_cancel">停止</string>
+    <string name="whole_transcript_export_ok">确定</string>
+    <string name="whole_transcript_setting_description">在字幕面板齿轮打开的小菜单中加入完整字幕:视频的每一行,可搜索、点按跳转并导出。</string>
+</resources>

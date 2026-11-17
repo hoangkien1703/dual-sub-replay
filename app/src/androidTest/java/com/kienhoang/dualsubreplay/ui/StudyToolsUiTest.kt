@@ -91,6 +91,22 @@ class StudyToolsUiTest {
     }
 
     @Test
+    fun customRepeatCountTakesAnyCountWithTheButtons() {
+        showSettings()
+        composeRule.onNodeWithTag("study_play_mode_repeat_line").performScrollTo().performClick()
+        composeRule.onNodeWithTag("study_repeat_custom").performScrollTo().performClick()
+        composeRule.onNodeWithTag("study_repeat_more").performScrollTo().performClick()
+        composeRule.onNodeWithTag("study_repeat_more").performClick()
+        composeRule.runOnIdle { assertEquals(4, preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, -1)) }
+        composeRule.onNodeWithTag("study_repeat_custom_count").assertTextContains("4 times")
+        composeRule.onNodeWithTag("study_repeat_custom_row").performScrollTo()
+        saveUiEvidence("study-repeat-custom")
+        composeRule.onNodeWithTag("study_repeat_10").performScrollTo().performClick()
+        composeRule.runOnIdle { assertEquals(10, preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, -1)) }
+        composeRule.onNodeWithTag("study_repeat_custom_row").assertDoesNotExist()
+    }
+
+    @Test
     fun pageTokensSitWithTheCaptionSettings() {
         showSettings("settings_section_translation")
         // Automatic by default, then On.
@@ -260,6 +276,10 @@ class StudyToolsUiTest {
         saveUiEvidence("settings-playback-sleep-timer")
         composeRule.onNodeWithTag("sleep_timer_quick_switch").performClick()
         composeRule.runOnIdle { assertTrue(preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false)) }
+        // Whole transcript joins the gear popup only when turned on, too (owner, 2026-11-17).
+        composeRule.onNodeWithTag("whole_transcript_switch").performScrollTo().assertIsOff()
+        composeRule.onNodeWithTag("whole_transcript_switch").performClick()
+        composeRule.runOnIdle { assertTrue(preferences.getBoolean(WHOLE_TRANSCRIPT_PREFERENCE, false)) }
     }
 
     @Test

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">전체 자막</string>
+    <string name="whole_transcript_search">자막 검색</string>
+    <string name="whole_transcript_no_match">이 단어가 들어간 줄이 없습니다.</string>
+    <string name="whole_transcript_export">내보내기</string>
+    <string name="whole_transcript_format_text">텍스트 파일</string>
+    <string name="whole_transcript_format_srt">자막 파일 (SRT)</string>
+    <string name="whole_transcript_with_translation">번역 포함</string>
+    <string name="whole_transcript_with_translation_note">아직 번역되지 않은 줄을 먼저 번역하므로 긴 영상은 몇 분 걸릴 수 있습니다.</string>
+    <string name="whole_transcript_export_save">저장</string>
+    <string name="whole_transcript_exporting">자막을 내보내는 중…</string>
+    <string name="whole_transcript_saved">자막을 저장했습니다.</string>
+    <string name="whole_transcript_export_failed">자막을 저장하지 못했습니다.</string>
+    <string name="whole_transcript_export_cancelled">내보내기를 멈췄습니다.</string>
+    <string name="whole_transcript_export_cancel">멈추기</string>
+    <string name="whole_transcript_export_ok">확인</string>
+    <string name="whole_transcript_setting_description">자막 패널의 톱니바퀴로 여는 작은 메뉴에 전체 자막을 추가합니다. 동영상의 모든 줄을 보고, 검색하고, 탭해서 이동하고, 내보낼 수 있습니다.</string>
+</resources>

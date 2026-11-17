@@ -109,6 +109,9 @@ Paths below are relative to
 - `data/SubtitleMerger.kt` prepares readable segments; `SubtitleStore.kt` keeps
   transcript text/timing on disk and exposes bounded playback windows. Preserve
   bounded loading and cancellation when changing long-video behavior.
+  The Whole transcript sheet (`ui/WholeTranscript.kt`, 2026-11-17) reads the same store a page at
+  a time (at most 8 pages of 50 rows), and its search and export stream through it; never load
+  every row of a video into memory (a 6-hour video once used up the app's memory).
 - `translation/OnDeviceTranslator.kt` uses downloadable ML Kit models with memory
   and disk caches. `ui/PlaybackTranslation.kt` and `TranslationCoordinator.kt`
   support playback-prioritized work; obsolete loads must not update current state.

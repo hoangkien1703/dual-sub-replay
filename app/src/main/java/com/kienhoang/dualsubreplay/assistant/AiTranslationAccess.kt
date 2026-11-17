@@ -22,6 +22,14 @@ internal const val AI_TRANSLATION_MODEL_PREFERENCE = "ai_translation_model"
  */
 internal const val AI_TRANSLATION_KEY_INTERVAL_MS = 6_000L
 
+/**
+ * The most requests one key is sent in any minute, whoever asks (AiRequestBudgetTest). A word the
+ * learner tapped is not held to [AI_TRANSLATION_KEY_INTERVAL_MS], only to this.
+ */
+internal const val AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE = 10
+
+private const val PACER_MINUTE_MS = 60_000L
+
 /** A key that answered "too many requests" or "quota" rests this long, doubling while it keeps refusing. */
 internal const val AI_TRANSLATION_KEY_REST_MS = 60_000L
 internal const val AI_TRANSLATION_KEY_MAX_REST_MS = 30 * 60_000L
@@ -139,18 +147,23 @@ internal fun aiTranslationModel(
     transport: AiChatTransport,
     pacer: AiKeyPacer = AiKeyPacer.Shared,
     thinking: AiTranslationThinking = AiTranslationThinking.OFF,
+    urgent: Boolean = false,
 ): AiTranslationModel? {
     val provider = settings.provider
     val model = aiTranslationModelName(settings, chosenModel)
     if (keyStore.keys(provider).isEmpty() || model.isBlank()) return null
-    return KeyedAiTranslationModel(provider, model, thinking, settings.baseUrlFor(provider), keyStore, transport, pacer)
+    return KeyedAiTranslationModel(provider, model, thinking, settings.baseUrlFor(provider), keyStore, transport, pacer, urgent)
 }
 
-/** Reads the AI assistant's settings and keys from the app's own storage. */
+/**
+ * Reads the AI assistant's settings and keys from the app's own storage. An [urgent] model's
+ * requests go ahead of background ones (see [AiKeyPacer]): only for what the learner just tapped.
+ */
 internal fun Context.aiTranslationModel(
     chosenModel: String?,
     thinking: AiTranslationThinking,
     transport: AiChatTransport,
+    urgent: Boolean = false,
 ): AiTranslationModel? =
     aiTranslationModel(
         readAiAssistantSettings(getSharedPreferences(AI_SETTINGS_PREFERENCES, 0)),
@@ -158,6 +171,7 @@ internal fun Context.aiTranslationModel(
         AiKeyStore(SharedPreferencesSecretStorage(getSharedPreferences(AI_KEYS_PREFERENCES, 0)), KeystoreSecretCipher()),
         transport,
         thinking = thinking,
+        urgent = urgent,
     )
 
 /** The thinking levels the AI assistant's current service offers for translation. */
@@ -175,13 +189,20 @@ internal fun Context.aiTranslationModelChoices(): Pair<String, List<String>> {
  * When each key was last asked and how long it rests, kept for the whole app run so a new video does
  * not start by asking a key that just ran out. Requests take turns over the keys: the key asked
  * longest ago goes first.
+ *
+ * Background requests (subtitle windows, the other words of a line, Prepare meanings ahead) keep
+ * [intervalMs] apart. An urgent request, a word the learner just tapped, goes at once and ahead of
+ * every background request still waiting (lion737, Discussion #81, 2026-11-16: the meaning waited up
+ * to 6 s behind the line's own request). Both stay within [perMinute] requests in any minute.
  */
 internal class AiKeyPacer(
     private val now: () -> Long = System::currentTimeMillis,
     private val intervalMs: Long = AI_TRANSLATION_KEY_INTERVAL_MS,
+    private val perMinute: Int = AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE,
 ) {
     private class KeyState {
-        var lastAskedAt = Long.MIN_VALUE / 2
+        /** The newest send times (an urgent request's may be just ahead), oldest first, at most perMinute of them. */
+        val sent = ArrayDeque<Long>()
         var turn = 0L
         var restUntil = Long.MIN_VALUE / 2
         var nextRestMs = AI_TRANSLATION_KEY_REST_MS
@@ -191,21 +212,51 @@ internal class AiKeyPacer(
     private var turns = 0L
     private val lock = Mutex()
 
-    /** Picks the key to ask now among [ids], waiting for its turn; null when every key rests. */
-    suspend fun take(ids: List<String>): String? {
-        val (id, waitMs) =
-            lock.withLock {
-                val time = now()
-                val ready = ids.filter { state(it).restUntil <= time }
-                val id = ready.minByOrNull { state(it).turn } ?: return null
-                val state = state(id)
-                val waitMs = (state.lastAskedAt + intervalMs - time).coerceAtLeast(0)
-                state.lastAskedAt = time + waitMs
-                state.turn = ++turns
-                id to waitMs
-            }
-        if (waitMs > 0) delay(waitMs)
-        return id
+    /**
+     * Picks the key to ask now among [ids], waiting for its turn; null when every key rests. An
+     * [urgent] request takes the next free moment at once; a background one that waited checks again,
+     * so an urgent request that went meanwhile pushes it back.
+     */
+    suspend fun take(
+        ids: List<String>,
+        urgent: Boolean = false,
+    ): String? {
+        while (true) {
+            val (id, waitMs) =
+                lock.withLock {
+                    val time = now()
+                    val ready = ids.filter { state(it).restUntil <= time }
+                    if (ready.isEmpty()) return null
+                    val id =
+                        if (urgent) {
+                            ready.minWith(compareBy<String> { earliest(state(it), time, urgent = true) }.thenBy { state(it).turn })
+                        } else {
+                            ready.minBy { state(it).turn }
+                        }
+                    val state = state(id)
+                    val at = earliest(state, time, urgent)
+                    // An urgent request keeps its moment; a background one only takes a moment that has come.
+                    if (urgent || at <= time) {
+                        state.sent.addLast(at)
+                        while (state.sent.size > perMinute) state.sent.removeFirst()
+                        state.turn = ++turns
+                    }
+                    id to (at - time)
+                }
+            if (waitMs > 0) delay(waitMs)
+            if (urgent || waitMs <= 0) return id
+        }
+    }
+
+    /** The first moment [state]'s key may be sent another request. */
+    private fun earliest(
+        state: KeyState,
+        time: Long,
+        urgent: Boolean,
+    ): Long {
+        val last = state.sent.lastOrNull() ?: return time
+        val minuteFree = if (state.sent.size < perMinute) time else state.sent.first() + PACER_MINUTE_MS
+        return maxOf(time, minuteFree, if (urgent) last else last + intervalMs)
     }
 
     /** The key answered: it may rest only briefly next time. */
@@ -249,6 +300,7 @@ private class KeyedAiTranslationModel(
     private val keyStore: AiKeyStore,
     private val transport: AiChatTransport,
     private val pacer: AiKeyPacer,
+    private val urgent: Boolean,
 ) : AiTranslationModel {
     override val scope: String = aiTranslationScope(provider, model, thinking)
 
@@ -272,7 +324,7 @@ private class KeyedAiTranslationModel(
         if (keyIds.isEmpty()) throw AiChatException(AiErrorKind.NO_KEY)
         val pacedIds = keyIds.map { "${provider.key}/$it" }
         repeat(keyIds.size) {
-            val paced = pacer.take(pacedIds) ?: throw failure
+            val paced = pacer.take(pacedIds, urgent) ?: throw failure
             val id = keyIds[pacedIds.indexOf(paced)]
             try {
                 val key = withContext(Dispatchers.IO) { keyStore.load(provider, id) }

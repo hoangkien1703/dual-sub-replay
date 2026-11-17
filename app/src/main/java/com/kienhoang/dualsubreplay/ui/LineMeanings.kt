@@ -17,20 +17,23 @@ private const val ASKED_LINES = 200
  * video that keeps playing never builds a queue of requests behind the key's pacer (AiKeyPacer
  * still spaces every request; AiRequestBudgetTest covers the playing case).
  *
- * [words] splits a sentence into its words for a language; [ask] sends (system, user) and returns
- * the reply, "" when the service did not answer, or null when there is no AI key. Main thread only.
+ * [words] splits a sentence into its words for a language; [ask] sends (system, user, urgent) and
+ * returns the reply, "" when the service did not answer, or null when there is no AI key. A line the
+ * learner tapped in is urgent: its request goes ahead of background ones (AiKeyPacer), so the next
+ * word tapped in that line does not wait behind them. Main thread only.
  */
 internal class LineMeanings(
     private val scope: CoroutineScope,
     private val cached: (key: String) -> String?,
     private val store: (key: String, meaning: String) -> Unit,
     private val words: (sentence: String, language: String) -> List<String>,
-    private val ask: suspend (system: String, user: String) -> String?,
+    private val ask: suspend (system: String, user: String, urgent: Boolean) -> String?,
 ) {
     private data class Line(
         val context: MeaningContext,
         val wordLanguage: String,
         val meaningLanguage: String,
+        val urgent: Boolean,
     ) {
         val key = lineMeaningKey(context, wordLanguage, meaningLanguage)
     }
@@ -42,13 +45,17 @@ internal class LineMeanings(
     private var running: Pair<String, Job>? = null
     private var waiting: Line? = null
 
-    /** Asks for the words of [context]'s sentence, unless they were asked already or are being asked. */
+    /**
+     * Asks for the words of [context]'s sentence, unless they were asked already or are being asked.
+     * [urgent] when the learner tapped a word in it; false for Prepare meanings ahead.
+     */
     fun prepare(
         context: MeaningContext,
         wordLanguage: String,
         meaningLanguage: String,
+        urgent: Boolean = false,
     ) {
-        val line = Line(context, wordLanguage, meaningLanguage)
+        val line = Line(context, wordLanguage, meaningLanguage, urgent)
         if (line.key in asked || running?.first == line.key) return
         if (running == null) start(line) else waiting = line
     }
@@ -72,7 +79,7 @@ internal class LineMeanings(
                     running = null
                     waiting?.let {
                         waiting = null
-                        prepare(it.context, it.wordLanguage, it.meaningLanguage)
+                        prepare(it.context, it.wordLanguage, it.meaningLanguage, it.urgent)
                     }
                 }
             }
@@ -89,7 +96,7 @@ internal class LineMeanings(
             return
         }
         val (system, user) = lineMeaningsRequest(wanted, line.context, line.wordLanguage, line.meaningLanguage)
-        val meanings = parseLineMeanings(ask(system, user) ?: return, wanted)
+        val meanings = parseLineMeanings(ask(system, user, line.urgent) ?: return, wanted)
         meanings.forEach { (word, meaning) ->
             store(contextMeaningKey(word, line.context, line.wordLanguage, line.meaningLanguage), meaning)
         }

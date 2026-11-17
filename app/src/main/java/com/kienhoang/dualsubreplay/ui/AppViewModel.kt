@@ -376,6 +376,13 @@ class AppViewModel internal constructor(
         )
     val state: StateFlow<DualSubUiState> = _state.asStateFlow()
 
+    /** The playing video's whole transcript for the Whole transcript sheet; null with live subtitles or between videos. */
+    private val openTranscript = MutableStateFlow<WholeTranscript?>(null)
+    internal val wholeTranscript: StateFlow<WholeTranscript?> = openTranscript.asStateFlow()
+
+    /** Saves the whole transcript to a file the learner picked; runs on after the sheet closes. */
+    internal val transcriptExport = TranscriptExporter(viewModelScope, application.contentResolver)
+
     private val thirdLineTranslation =
         ThirdLineTranslation(_state, playbackRequests, googleTranslator, translator, ::currentGoogleWaitMs, ::isCurrentLoad)
 
@@ -1097,7 +1104,7 @@ class AppViewModel internal constructor(
         if (found is ContextMeaning.Found) {
             contextMeanings.put(key, found.text)
             // The tapped word is answered first, then the line's other words in a second request.
-            if (wholeLine) lineMeanings.prepare(context, selection.wordLanguage, selection.meaningLanguage)
+            if (wholeLine) lineMeanings.prepare(context, selection.wordLanguage, selection.meaningLanguage, urgent = true)
         }
         return found
     }
@@ -1109,10 +1116,11 @@ class AppViewModel internal constructor(
             cached = contextMeanings::get,
             store = { key, meaning -> contextMeanings.put(key, meaning) },
             words = { sentence, language -> LanguageAwareTokenizer.tokenize(sentence, language).map { it.text } },
-            ask = { system, user ->
+            ask = { system, user, urgent ->
                 val model =
                     withContext(Dispatchers.IO) {
-                        getApplication<Application>().aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport)
+                        getApplication<Application>()
+                            .aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport, urgent)
                     }
                 try {
                     model?.let { withTimeoutOrNull(LINE_MEANINGS_TIMEOUT_MS) { it.ask(system, user) }.orEmpty() }
@@ -1132,7 +1140,8 @@ class AppViewModel internal constructor(
         val application = getApplication<Application>()
         val model =
             withContext(Dispatchers.IO) {
-                application.aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport)
+                // The learner is waiting for this word: it goes ahead of background requests.
+                application.aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport, urgent = true)
             } ?: return ContextMeaning.NoKey
         val word = selection.token.text.trim()
         val (system, user) = contextMeaningRequest(word, context, selection.wordLanguage, selection.meaningLanguage, selection.isPhrase)
@@ -1747,6 +1756,7 @@ class AppViewModel internal constructor(
             translate: suspend (String) -> String,
         ) {
             following = true
+            openTranscript.value = WholeTranscript(checkNotNull(displayStore), translate, prefetch)
             translatePlaybackWindow(
                 checkNotNull(displayStore),
                 playbackRequests,
@@ -1796,6 +1806,7 @@ class AppViewModel internal constructor(
                 }
             }
         } finally {
+            openTranscript.value = null
             withContext(NonCancellable + Dispatchers.IO) { displayStore?.close() }
         }
     }

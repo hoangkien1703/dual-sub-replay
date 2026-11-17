@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Subject
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Bedtime
@@ -580,6 +581,7 @@ internal fun QuickLanguageSettingsDialog(
     onThirdLineChange: (ThirdLineChoice) -> Unit = {},
     translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     onCaptionVisibilityChange: (original: Boolean, visibility: CaptionVisibility) -> Unit = { _, _ -> },
+    onOpenWholeTranscript: (() -> Unit)? = null,
     onDismiss: () -> Unit,
 ) {
     val languagePicker = remember { LanguagePickerState() }
@@ -631,6 +633,14 @@ internal fun QuickLanguageSettingsDialog(
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
+                onOpenWholeTranscript?.let { open ->
+                    QuickPopupLink(
+                        icon = Icons.AutoMirrored.Filled.Subject,
+                        label = stringResource(R.string.whole_transcript_title),
+                        tag = "open_whole_transcript",
+                        onClick = open,
+                    )
+                }
                 Row(
                     modifier =
                         Modifier
@@ -657,6 +667,40 @@ internal fun QuickLanguageSettingsDialog(
                 }
             }
         }
+    }
+}
+
+/** A row in the gear popup that opens another screen, like its Settings row. */
+@Composable
+private fun QuickPopupLink(
+    icon: ImageVector,
+    label: String,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(role = Role.Button, onClick = onClick)
+                .testTag(tag)
+                .padding(vertical = 10.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.width(12.dp))
+        Text(
+            label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -1284,6 +1328,7 @@ private fun WordLearningSettings(
     )
     PronunciationVolumeSetting()
     PhoneVoiceSetting()
+    TapBarReadingSetting()
     MeaningInContextSetting()
     SettingsSwitchRow(
         title = stringResource(R.string.settings_word_learning_mode_title),

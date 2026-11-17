@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">Toàn bộ phụ đề</string>
+    <string name="whole_transcript_search">Tìm trong phụ đề</string>
+    <string name="whole_transcript_no_match">Không có dòng nào chứa những từ này.</string>
+    <string name="whole_transcript_export">Xuất</string>
+    <string name="whole_transcript_format_text">Tệp văn bản</string>
+    <string name="whole_transcript_format_srt">Tệp phụ đề (SRT)</string>
+    <string name="whole_transcript_with_translation">Kèm bản dịch</string>
+    <string name="whole_transcript_with_translation_note">Những dòng chưa dịch sẽ được dịch trước, nên video dài có thể mất vài phút.</string>
+    <string name="whole_transcript_export_save">Lưu</string>
+    <string name="whole_transcript_exporting">Đang xuất phụ đề…</string>
+    <string name="whole_transcript_saved">Đã lưu phụ đề.</string>
+    <string name="whole_transcript_export_failed">Không lưu được phụ đề.</string>
+    <string name="whole_transcript_export_cancelled">Đã dừng xuất.</string>
+    <string name="whole_transcript_export_cancel">Dừng</string>
+    <string name="whole_transcript_export_ok">OK</string>
+    <string name="whole_transcript_setting_description">Thêm Toàn bộ phụ đề vào menu nhỏ mở từ nút bánh răng của bảng phụ đề: mọi dòng của video, có tìm kiếm, chạm để nhảy đến và xuất tệp.</string>
+</resources>

@@ -227,6 +227,7 @@ class SubtitleWordHighlightTest {
                 MEANING_IN_CONTEXT_PREFERENCE,
                 MEANING_ORDER_PREFERENCE,
                 PREPARE_MEANINGS_PREFERENCE,
+                TAP_BAR_READING_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,
                 STUDY_REPEAT_COUNT_PREFERENCE,
                 SKIP_SILENCE_PREFERENCE,
@@ -265,6 +266,7 @@ class SubtitleWordHighlightTest {
                 RECENT_TARGET_LANGUAGES_PREFERENCE,
                 DIFFERENT_TAB_ACCOUNTS_PREFERENCE,
                 SLEEP_TIMER_QUICK_PREFERENCE,
+                WHOLE_TRANSCRIPT_PREFERENCE,
                 DRAWER_TABS_OPEN_PREFERENCE,
                 TV_LAYOUT_PREFERENCE,
             )
