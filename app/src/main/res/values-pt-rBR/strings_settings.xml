@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">Significado do dicionário</string>
     <string name="settings_prepare_meanings_title">Preparar significados antes</string>
     <string name="settings_prepare_meanings_description">Enquanto uma linha toca, pergunta à IA o significado de cada palavra dela, para que a palavra tocada mostre o significado na hora. Isso usa sua chave até em linhas que você não toca.</string>
+    <string name="settings_tap_bar_reading_title">Pronúncia na barra ao tocar</string>
+    <string name="settings_tap_bar_reading_description">Ao tocar uma palavra, a barra acima também mostra como se fala: AFI para inglês, kana para japonês e pinyin para chinês.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizado de palavras (cores por classe gramatical)</string>
     <string name="settings_word_learning_mode_description">Colore as palavras pela função gramatical (substantivos, verbos, adjetivos, partículas) para ver a estrutura da frase.</string>
     <string name="settings_colored_lines_title">Linhas de legenda coloridas</string>

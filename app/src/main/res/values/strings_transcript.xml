@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Whole transcript sheet (25kiuo, Discussion #81, 2026-11-17): every line, search, jump, export. -->
+    <string name="whole_transcript_title">Whole transcript</string>
+    <string name="whole_transcript_search">Search the transcript</string>
+    <string name="whole_transcript_no_match">No line has these words.</string>
+    <string name="whole_transcript_export">Export</string>
+    <string name="whole_transcript_format_text">Text file</string>
+    <string name="whole_transcript_format_srt">Subtitle file (SRT)</string>
+    <string name="whole_transcript_with_translation">Include the translation</string>
+    <string name="whole_transcript_with_translation_note">Lines that aren\'t translated yet are translated first, so a long video can take a few minutes.</string>
+    <string name="whole_transcript_export_save">Save</string>
+    <string name="whole_transcript_exporting">Exporting the transcript…</string>
+    <string name="whole_transcript_saved">Transcript saved.</string>
+    <string name="whole_transcript_export_failed">Couldn\'t save the transcript.</string>
+    <string name="whole_transcript_export_cancelled">Export stopped.</string>
+    <string name="whole_transcript_export_cancel">Stop</string>
+    <string name="whole_transcript_export_ok">OK</string>
+</resources>

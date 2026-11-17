@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">Transcrição completa</string>
+    <string name="whole_transcript_search">Pesquisar na transcrição</string>
+    <string name="whole_transcript_no_match">Nenhuma linha tem estas palavras.</string>
+    <string name="whole_transcript_export">Exportar</string>
+    <string name="whole_transcript_format_text">Arquivo de texto</string>
+    <string name="whole_transcript_format_srt">Arquivo de legendas (SRT)</string>
+    <string name="whole_transcript_with_translation">Incluir a tradução</string>
+    <string name="whole_transcript_with_translation_note">As linhas ainda não traduzidas são traduzidas antes, então um vídeo longo pode levar alguns minutos.</string>
+    <string name="whole_transcript_export_save">Salvar</string>
+    <string name="whole_transcript_exporting">Exportando a transcrição…</string>
+    <string name="whole_transcript_saved">Transcrição salva.</string>
+    <string name="whole_transcript_export_failed">Não foi possível salvar a transcrição.</string>
+    <string name="whole_transcript_export_cancelled">Exportação interrompida.</string>
+    <string name="whole_transcript_export_cancel">Parar</string>
+    <string name="whole_transcript_export_ok">OK</string>
+</resources>

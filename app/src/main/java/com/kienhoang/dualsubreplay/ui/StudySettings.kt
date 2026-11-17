@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
+import com.kienhoang.dualsubreplay.assistant.AI_STUDY_REPEAT_RANGE
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardOptions
 import com.kienhoang.dualsubreplay.data.CardPlace
@@ -203,7 +204,13 @@ internal fun storedKnownWordsAfter(value: Int): Int = value.takeIf { it in KNOWN
 internal const val STUDY_REPEAT_FOREVER = 0
 
 /** How many times Repeat each line plays a line; [STUDY_REPEAT_FOREVER] has no limit. */
-internal val STUDY_REPEAT_COUNTS = listOf(2, 3, 5, STUDY_REPEAT_FOREVER)
+internal val STUDY_REPEAT_COUNTS = listOf(2, 3, 5, 10, STUDY_REPEAT_FOREVER)
+
+/**
+ * Custom picks any count in this range (25kiuo, Discussion #81, 2026-11-17, asked for any number of
+ * plays; a slider with − and + was picked over a slider alone, which can't hit an exact number).
+ */
+internal val STUDY_REPEAT_CUSTOM_RANGE = AI_STUDY_REPEAT_RANGE
 
 internal const val DEFAULT_STUDY_REPEAT_COUNT = 2
 
@@ -268,9 +275,10 @@ internal fun storedStudyPlayMode(value: String?): StudyPlayMode =
 internal fun storedSkipSilence(value: String?): SkipSilence =
     SkipSilence.entries.firstOrNull { it.storageValue == value } ?: SkipSilence.OFF
 
-internal fun storedStudyRepeatCount(value: Int): Int = value.takeIf { it in STUDY_REPEAT_COUNTS } ?: DEFAULT_STUDY_REPEAT_COUNT
+internal fun storedStudyRepeatCount(value: Int): Int =
+    value.takeIf { it == STUDY_REPEAT_FOREVER || it in STUDY_REPEAT_CUSTOM_RANGE } ?: DEFAULT_STUDY_REPEAT_COUNT
 
-/** The AI assistant's study_repeat_count ("2", "3", "5" or "forever") as a stored count. */
+/** The AI assistant's study_repeat_count ("2" to "99", or "forever") as a stored count. */
 internal fun aiStudyRepeatCount(value: String): Int =
     if (value == AI_REPEAT_FOREVER) {
         STUDY_REPEAT_FOREVER

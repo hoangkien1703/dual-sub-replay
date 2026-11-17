@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">Transcripción completa</string>
+    <string name="whole_transcript_search">Buscar en la transcripción</string>
+    <string name="whole_transcript_no_match">Ninguna línea tiene estas palabras.</string>
+    <string name="whole_transcript_export">Exportar</string>
+    <string name="whole_transcript_format_text">Archivo de texto</string>
+    <string name="whole_transcript_format_srt">Archivo de subtítulos (SRT)</string>
+    <string name="whole_transcript_with_translation">Incluir la traducción</string>
+    <string name="whole_transcript_with_translation_note">Las líneas aún sin traducir se traducen primero, así que un video largo puede tardar unos minutos.</string>
+    <string name="whole_transcript_export_save">Guardar</string>
+    <string name="whole_transcript_exporting">Exportando la transcripción…</string>
+    <string name="whole_transcript_saved">Transcripción guardada.</string>
+    <string name="whole_transcript_export_failed">No se pudo guardar la transcripción.</string>
+    <string name="whole_transcript_export_cancelled">Exportación detenida.</string>
+    <string name="whole_transcript_export_cancel">Detener</string>
+    <string name="whole_transcript_export_ok">OK</string>
+</resources>

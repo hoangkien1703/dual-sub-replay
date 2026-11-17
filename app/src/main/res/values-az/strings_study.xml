@@ -16,6 +16,9 @@
     <string name="study_play_mode_repeat">Hər sətri təkrarla</string>
     <string name="study_play_mode_repeat_description">Davam etməzdən əvvəl hər sətri bir neçə dəfə oynadır. Sonsuz seçimi başqa sətrə toxunana və ya videonu irəli-geri çəkənə qədər sətri təkrarlayır.</string>
     <string name="study_repeat_forever">Sonsuz</string>
+    <string name="study_repeat_custom">Fərdi</string>
+    <string name="study_repeat_less">Bir dəfə az</string>
+    <string name="study_repeat_more">Bir dəfə çox</string>
     <string name="study_play_mode_new_word">Bir yeni söz olan sətirlərdə dayan</string>
     <string name="study_play_mode_new_word_description">Yalnız hələ bilmədiyiniz düz bir söz olan sətirlərdən sonra dayanır. Bildiyim sözlər lazımdır.</string>
     <string name="study_play_mode_needs_known_words">Bu rejimdən istifadə etmək üçün aşağıda Bildiyim sözlər seçimini yandırın.</string>

@@ -20,6 +20,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import com.kienhoang.dualsubreplay.data.EnglishIpa
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
@@ -47,6 +48,7 @@ class PhraseSelectionUiTest {
     private fun showCard(
         inSentence: String? = null,
         inSentenceFirst: Boolean = true,
+        readingInBar: Boolean = false,
     ) {
         val controller = PhraseSelectionController()
         controller.actions =
@@ -66,6 +68,7 @@ class PhraseSelectionUiTest {
                         }
                     },
                 meaningInSentenceFirst = inSentenceFirst,
+                readingInBar = readingInBar,
             )
         compose.setContent {
             DualSubTheme {
@@ -158,6 +161,29 @@ class PhraseSelectionUiTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("In this sentence: mong chờ").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("nghĩa của looking").assertIsDisplayed()
         saveUiEvidence("phrase-action-bar-dictionary-first")
+    }
+
+    /** 25kiuo (Discussion #81, 2026-11-17): the word's IPA in the bar, while Pronunciation in the tap bar is on. */
+    @Test
+    fun theBarShowsTheWordsIpaOnlyWhenTheSettingIsOn() {
+        assertTrue("English IPA did not load", EnglishIpa.awaitReady())
+        showCard(readingInBar = true)
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_reading").assertIsDisplayed()
+        compose.onNodeWithText(EnglishIpa.of("looking")!!).assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-reading")
+        // A phrase has no single reading.
+        dragEndHandle(original, from = "looking", to = "to ")
+        compose.onNodeWithTag("phrase_reading").assertDoesNotExist()
+    }
+
+    @Test
+    fun theBarShowsNoReadingWhileTheSettingIsOff() {
+        assertTrue("English IPA did not load", EnglishIpa.awaitReady())
+        showCard()
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_quick_translation").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_reading").assertDoesNotExist()
     }
 
     @Test

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="whole_transcript_title">Bütün transkript</string>
+    <string name="whole_transcript_search">Transkriptdə axtar</string>
+    <string name="whole_transcript_no_match">Bu sözlər olan sətir yoxdur.</string>
+    <string name="whole_transcript_export">İxrac et</string>
+    <string name="whole_transcript_format_text">Mətn faylı</string>
+    <string name="whole_transcript_format_srt">Altyazı faylı (SRT)</string>
+    <string name="whole_transcript_with_translation">Tərcüməni də əlavə et</string>
+    <string name="whole_transcript_with_translation_note">Hələ tərcümə olunmamış sətirlər əvvəlcə tərcümə olunur, ona görə uzun video bir neçə dəqiqə çəkə bilər.</string>
+    <string name="whole_transcript_export_save">Yadda saxla</string>
+    <string name="whole_transcript_exporting">Transkript ixrac olunur…</string>
+    <string name="whole_transcript_saved">Transkript yadda saxlanıldı.</string>
+    <string name="whole_transcript_export_failed">Transkripti yadda saxlamaq olmadı.</string>
+    <string name="whole_transcript_export_cancelled">İxrac dayandırıldı.</string>
+    <string name="whole_transcript_export_cancel">Dayandır</string>
+    <string name="whole_transcript_export_ok">OK</string>
+</resources>

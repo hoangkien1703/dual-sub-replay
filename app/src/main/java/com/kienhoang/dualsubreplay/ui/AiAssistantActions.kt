@@ -146,6 +146,7 @@ internal data class AiStoredSettings(
     val meaningInContext: Boolean = false,
     val meaningOrder: String = MEANING_ORDER_SENTENCE_FIRST,
     val prepareMeanings: Boolean = false,
+    val tapBarReading: Boolean = false,
     val overlayInFullscreen: Boolean = true,
     val overlayWhenRotated: Boolean = true,
     val movableControls: Boolean = true,
@@ -186,6 +187,7 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         meaningInContext = preferences.getBoolean(MEANING_IN_CONTEXT_PREFERENCE, false),
         meaningOrder = storedMeaningOrder(preferences.getString(MEANING_ORDER_PREFERENCE, null)),
         prepareMeanings = preferences.getBoolean(PREPARE_MEANINGS_PREFERENCE, false),
+        tapBarReading = preferences.getBoolean(TAP_BAR_READING_PREFERENCE, false),
         overlayInFullscreen = preferences.getBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, true),
         overlayWhenRotated = preferences.getBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, true),
         movableControls = preferences.getBoolean(MOVABLE_OVERLAY_PREFERENCE, true),
@@ -222,11 +224,6 @@ private fun aiStoredSettingValue(
         AiSetting.OVERLAY_BACKGROUND -> stored.overlayBackground
         AiSetting.APP_COLORS -> stored.appColors
         AiSetting.ACCENT_COLOR -> stored.accentColor
-        AiSetting.PRONUNCIATION_VOLUME -> Math.round(stored.pronunciationVolume * PERCENT).toString()
-        AiSetting.PHONE_VOICE -> onOff(stored.phoneVoice)
-        AiSetting.MEANING_IN_CONTEXT -> onOff(stored.meaningInContext)
-        AiSetting.MEANING_ORDER -> stored.meaningOrder
-        AiSetting.PREPARE_MEANINGS -> onOff(stored.prepareMeanings)
         AiSetting.OVERLAY_IN_FULLSCREEN -> onOff(stored.overlayInFullscreen)
         AiSetting.OVERLAY_WHEN_ROTATED -> onOff(stored.overlayWhenRotated)
         AiSetting.MOVABLE_SUBTITLE_CONTROLS -> onOff(stored.movableControls)
@@ -241,7 +238,22 @@ private fun aiStoredSettingValue(
         AiSetting.DIFFERENT_TAB_ACCOUNTS -> onOff(stored.differentTabAccounts)
         AiSetting.SLEEP_TIMER_QUICK -> onOff(stored.sleepTimerInQuickSettings)
         AiSetting.TV_LAYOUT -> onOff(stored.tvLayout)
-        else -> aiStudySettingValue(stored.study, setting)
+        else -> aiWordSettingValue(stored, setting) ?: aiStudySettingValue(stored.study, setting)
+    }
+
+/** Word learning's voice and meaning settings. */
+private fun aiWordSettingValue(
+    stored: AiStoredSettings,
+    setting: AiSetting,
+): String? =
+    when (setting) {
+        AiSetting.PRONUNCIATION_VOLUME -> Math.round(stored.pronunciationVolume * PERCENT).toString()
+        AiSetting.PHONE_VOICE -> onOff(stored.phoneVoice)
+        AiSetting.MEANING_IN_CONTEXT -> onOff(stored.meaningInContext)
+        AiSetting.MEANING_ORDER -> stored.meaningOrder
+        AiSetting.PREPARE_MEANINGS -> onOff(stored.prepareMeanings)
+        AiSetting.TAP_BAR_READING -> onOff(stored.tapBarReading)
+        else -> null
     }
 
 /** The Study tools settings (2026-10-20). */
@@ -697,6 +709,7 @@ internal class AppAiActions(
             AiSetting.MEANING_IN_CONTEXT -> editor.putBoolean(MEANING_IN_CONTEXT_PREFERENCE, on)
             AiSetting.MEANING_ORDER -> editor.putString(MEANING_ORDER_PREFERENCE, storedMeaningOrder(value))
             AiSetting.PREPARE_MEANINGS -> editor.putBoolean(PREPARE_MEANINGS_PREFERENCE, on)
+            AiSetting.TAP_BAR_READING -> editor.putBoolean(TAP_BAR_READING_PREFERENCE, on)
             AiSetting.OVERLAY_IN_FULLSCREEN -> editor.putBoolean(AUTO_OVERLAY_FULLSCREEN_PREFERENCE, on)
             AiSetting.OVERLAY_WHEN_ROTATED -> editor.putBoolean(AUTO_OVERLAY_LANDSCAPE_PREFERENCE, on)
             AiSetting.MOVABLE_SUBTITLE_CONTROLS -> editor.putBoolean(MOVABLE_OVERLAY_PREFERENCE, on)
@@ -1047,6 +1060,7 @@ private val SETTING_SWITCH_TITLES =
         AiSetting.PHONE_VOICE to R.string.settings_phone_voice_title,
         AiSetting.MEANING_IN_CONTEXT to R.string.settings_meaning_in_context_title,
         AiSetting.PREPARE_MEANINGS to R.string.settings_prepare_meanings_title,
+        AiSetting.TAP_BAR_READING to R.string.settings_tap_bar_reading_title,
         AiSetting.OVERLAY_IN_FULLSCREEN to R.string.settings_overlay_fullscreen_title,
         AiSetting.OVERLAY_WHEN_ROTATED to R.string.settings_overlay_landscape_title,
         AiSetting.MOVABLE_SUBTITLE_CONTROLS to R.string.settings_movable_controls_title,

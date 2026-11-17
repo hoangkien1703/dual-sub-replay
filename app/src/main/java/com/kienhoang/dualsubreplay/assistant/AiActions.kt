@@ -73,7 +73,10 @@ internal val AI_CARD_PLACES = listOf("front", "back", "off")
 internal val AI_CARD_SOUNDS_FIRST = listOf("word", "sentence")
 
 /** The plays of each line in Repeat each line (`STUDY_REPEAT_COUNTS`), which a test keeps equal. */
-internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", AI_REPEAT_FOREVER)
+internal val AI_STUDY_REPEAT_COUNTS = listOf("2", "3", "5", "10", AI_REPEAT_FOREVER)
+
+/** Repeat each line's Custom counts, which the assistant may set too. */
+internal val AI_STUDY_REPEAT_RANGE = 2..99
 
 /** Repeat each line's count with no limit (`STUDY_REPEAT_FOREVER`). */
 internal const val AI_REPEAT_FOREVER = "forever"
@@ -115,6 +118,7 @@ internal enum class AiSetting(
     MEANING_IN_CONTEXT("meaning_in_context"),
     MEANING_ORDER("meaning_order", listOf("sentence_first", "dictionary_first")),
     PREPARE_MEANINGS("prepare_meanings_ahead"),
+    TAP_BAR_READING("tap_bar_reading"),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
     TAP_WORD_FOR_DEFINITION("tap_word_for_definition"),
@@ -708,7 +712,11 @@ internal fun aiSettingValue(
                 .removeSuffix("times")
                 .removeSuffix("x")
                 .trim('_')
-                .takeIf { it in setting.choices }
+                .takeIf {
+                    it in setting.choices ||
+                        // Repeat each line also takes Custom's counts.
+                        (setting == AiSetting.STUDY_REPEAT_COUNT && it.toIntOrNull() in AI_STUDY_REPEAT_RANGE)
+                }
         else ->
             listOfNotNull(key, SETTING_CHOICE_ALIASES[setting]?.get(key), CHOICE_ALIASES[key])
                 .firstOrNull { it in setting.choices }
@@ -820,7 +828,8 @@ internal fun aiSettingValues(setting: AiSetting): String =
                 "with exactly one new word and needs known_words on; all need the full transcript)"
         AiSetting.STUDY_REPEAT_COUNT ->
             choiceList(setting.choices) +
-                " (plays of each line in repeat_line; forever loops each line until the user taps another line or seeks)"
+                " (plays of each line in repeat_line, or any whole number from 2 to 99; forever loops each line until the user " +
+                "taps another line or seeks)"
         AiSetting.KNOWN_WORDS ->
             choiceList(setting.choices) +
                 " (auto also counts a word as known after it played in known_words_after lines, each line once per video; " +
@@ -899,6 +908,10 @@ private fun otherSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (Read aloud on the back: new Anki cards read the meaning in this sentence, the dictionary meaning or the " +
                 "sentence translation aloud on the back, in the meaning's language; anki_card_read_meaning on by default, the other two off)"
+        AiSetting.TAP_BAR_READING ->
+            choiceList(setting.choices) +
+                " (Pronunciation in the tap bar: a single tapped word's IPA, kana or pinyin shows above its meaning in the bar " +
+                "that opens on a tap; off by default)"
         AiSetting.PREPARE_MEANINGS ->
             choiceList(setting.choices) +
                 " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +

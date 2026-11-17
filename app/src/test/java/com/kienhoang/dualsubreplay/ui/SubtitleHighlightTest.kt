@@ -227,6 +227,7 @@ class SubtitleWordHighlightTest {
                 MEANING_IN_CONTEXT_PREFERENCE,
                 MEANING_ORDER_PREFERENCE,
                 PREPARE_MEANINGS_PREFERENCE,
+                TAP_BAR_READING_PREFERENCE,
                 STUDY_PLAY_MODE_PREFERENCE,
                 STUDY_REPEAT_COUNT_PREFERENCE,
                 SKIP_SILENCE_PREFERENCE,

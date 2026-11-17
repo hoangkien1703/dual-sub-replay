@@ -17,6 +17,9 @@
     <string name="study_play_mode_repeat">각 줄 반복</string>
     <string name="study_play_mode_repeat_description">각 줄을 여러 번 재생한 뒤 다음으로 넘어갑니다. 계속을 고르면 다른 줄을 탭하거나 탐색할 때까지 그 줄을 반복합니다.</string>
     <string name="study_repeat_forever">계속</string>
+    <string name="study_repeat_custom">직접 설정</string>
+    <string name="study_repeat_less">한 번 줄이기</string>
+    <string name="study_repeat_more">한 번 늘리기</string>
     <string name="study_play_mode_new_word">새 단어가 하나인 줄에서 일시정지</string>
     <string name="study_play_mode_new_word_description">아직 모르는 단어가 정확히 하나 있는 줄 뒤에서만 일시정지합니다. 아는 단어가 필요합니다.</string>
     <string name="study_play_mode_needs_known_words">이 모드를 쓰려면 아래의 아는 단어를 켜세요.</string>

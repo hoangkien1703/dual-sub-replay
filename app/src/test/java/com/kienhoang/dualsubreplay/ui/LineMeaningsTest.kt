@@ -26,7 +26,7 @@ class LineMeaningsTest {
         cached = meanings::get,
         store = { key, meaning -> meanings[key] = meaning },
         words = { sentence, _ -> sentence.split(' ', '.').filter(String::isNotEmpty) },
-        ask = { _, user ->
+        ask = { _, user, _ ->
             asked += user
             reply(user)
         },

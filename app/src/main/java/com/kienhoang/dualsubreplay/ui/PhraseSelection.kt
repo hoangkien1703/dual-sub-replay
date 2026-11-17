@@ -264,6 +264,8 @@ internal class PhraseActions(
     val meaningInSentenceFirst: Boolean = true,
     /** Sends the selected text to the Google Translate app. */
     val openGoogleTranslate: (text: String) -> Unit = {},
+    /** Settings → Word learning → Pronunciation in the tap bar (off by default): a single word's reading shows in the bar. */
+    val readingInBar: Boolean = false,
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -382,6 +384,7 @@ internal fun BindPhraseActions(
                 translate = translate,
                 meaningInSentence = meaningInSentence.takeIf { askAi },
                 meaningInSentenceFirst = readMeaningInContextFirst(context),
+                readingInBar = readTapBarReading(context),
                 openGoogleTranslate = { text ->
                     when (sendToGoogleTranslate(context, text)) {
                         TranslateSendResult.SENT -> Unit
@@ -483,6 +486,7 @@ internal fun SelectableSubtitleText(
                     phrase = text.substring(start, end),
                     copyText = copiedPhrase(text, tokens, words),
                     singleWord = words.first == words.last,
+                    reading = rememberBarReading(tokens, words, languageCode, controller.actions.readingInBar),
                     speechMessage = controller.actions.speechMessage(),
                     dictionaryNote =
                         japaneseDictionaryNote(dictionaryStatus).takeIf { LanguageAwareTokenizer.isJapanese(text, languageCode) },
@@ -770,6 +774,7 @@ private fun PhraseActionBar(
     phrase: String,
     copyText: String,
     singleWord: Boolean,
+    reading: String?,
     speechMessage: String?,
     @StringRes dictionaryNote: Int?,
     quickTranslate: (suspend () -> String)?,
@@ -843,6 +848,14 @@ private fun PhraseActionBar(
                             modifier = Modifier.size(18.dp),
                         )
                     }
+                }
+                reading?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 2.dp).testTag("phrase_reading"),
+                    )
                 }
                 quickTranslate?.let { QuickTranslation(phrase, it, meaningInSentence, meaningInSentenceFirst) }
                 val note =

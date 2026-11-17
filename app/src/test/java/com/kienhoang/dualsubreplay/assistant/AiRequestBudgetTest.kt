@@ -9,6 +9,7 @@ import com.kienhoang.dualsubreplay.ui.LineMeanings
 import com.kienhoang.dualsubreplay.ui.MeaningContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.currentTime
@@ -206,7 +207,7 @@ class AiRequestBudgetTest {
                     cached = meanings::get,
                     store = { key, meaning -> meanings[key] = meaning },
                     words = { sentence, _ -> sentence.split(' ') },
-                    ask = { _, _ ->
+                    ask = { _, _, _ ->
                         val key = pacer.take(listOf("gemini/${keys[0]}"))!!
                         sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
                         delay(1_500)
@@ -225,6 +226,48 @@ class AiRequestBudgetTest {
             assertWithinBudget(sent)
             assertTrue("Only $whilePlaying requests in 10 minutes", whilePlaying >= 90)
             assertTrue("${sent.size - whilePlaying} requests were still queued", sent.size - whilePlaying <= 1)
+        }
+
+    /**
+     * Words the learner taps go ahead of Prepare meanings ahead (lion737, Discussion #81,
+     * 2026-11-16), one every 4 s while a line starts every 2 s for 10 minutes. Together they still
+     * stay within the key's budget.
+     */
+    @Test
+    fun tappedWordsWhilePreparingAheadStayWithinTheBudget() =
+        runTest {
+            val clock = { testScheduler.currentTime }
+            val pacer = AiKeyPacer(now = clock)
+            val sent = Collections.synchronizedList(mutableListOf<Sent>())
+            val key = "gemini/${keys[0]}"
+            val meanings = HashMap<String, String>()
+            val lines =
+                LineMeanings(
+                    scope = this,
+                    cached = meanings::get,
+                    store = { key, meaning -> meanings[key] = meaning },
+                    words = { sentence, _ -> sentence.split(' ') },
+                    ask = { _, _, urgent ->
+                        pacer.take(listOf(key), urgent)!!
+                        sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
+                        delay(1_500)
+                        "1. một\n2. hai\n3. ba"
+                    },
+                )
+            val end = currentTime + 10 * MINUTE_MS
+            var line = 0
+            while (currentTime < end) {
+                lines.prepare(MeaningContext("Line ${line++} plays now"), "en", "vi")
+                if (line % 2 == 0) {
+                    launch {
+                        pacer.take(listOf(key), urgent = true)
+                        sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
+                    }
+                }
+                delay(2_000)
+            }
+            testScheduler.advanceUntilIdle()
+            assertWithinBudget(sent)
         }
 
     /** Gemini's generateContent endpoint AI subtitles use; [status] picks the HTTP status of the n-th request (1 first). */

@@ -17,6 +17,9 @@
     <string name="study_play_mode_repeat">Ulangi setiap baris</string>
     <string name="study_play_mode_repeat_description">Memutar setiap baris beberapa kali sebelum lanjut. Terus-menerus mengulang baris itu sampai kamu mengetuk baris lain atau menggeser video.</string>
     <string name="study_repeat_forever">Terus-menerus</string>
+    <string name="study_repeat_custom">Kustom</string>
+    <string name="study_repeat_less">Kurangi satu kali</string>
+    <string name="study_repeat_more">Tambah satu kali</string>
     <string name="study_play_mode_new_word">Jeda di baris dengan satu kata baru</string>
     <string name="study_play_mode_new_word_description">Hanya berhenti setelah baris yang berisi tepat satu kata yang belum Anda kenal. Perlu Kata yang dikenal.</string>
     <string name="study_play_mode_needs_known_words">Aktifkan Kata yang dikenal di bawah untuk memakai mode ini.</string>

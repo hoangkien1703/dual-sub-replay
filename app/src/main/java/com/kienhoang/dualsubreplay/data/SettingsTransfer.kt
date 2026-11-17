@@ -109,6 +109,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "auto_pronounce" to share(B),
         "pronunciation_volume" to share(F),
         "phone_voice" to share(B),
+        "tap_bar_reading" to share(B),
         "meaning_order" to share(S),
         "word_learning_mode_enabled" to share(B),
         "word_learning_target" to share(S),
