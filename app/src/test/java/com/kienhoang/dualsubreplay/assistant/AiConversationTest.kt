@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.assistant
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,6 +21,39 @@ class AiConversationTest {
         assertEquals(listOf(AiRole.SYSTEM, AiRole.USER, AiRole.ASSISTANT, AiRole.USER), wire.map { it.role })
         assertEquals("guide", wire.first().content)
         assertEquals("message 3\n\nline: 本当に", wire.last().content)
+    }
+
+    @Test
+    fun answersThatReadTheVideoASearchOrTheSavedWordsCarryOtherText() {
+        fun answer(
+            kind: AiActionKind,
+            note: String,
+            state: AiActionState = AiActionState.DONE,
+        ) = message(2, AiRole.ASSISTANT).copy(actions = listOf(AiActionRecord("r", kind, "label", note, state)))
+        assertTrue(answer(AiActionKind.LOOK, aiActionNote(AiAction.LookAtVideo(3))).carriesOtherText())
+        assertTrue(answer(AiActionKind.WEB, "Search the web").carriesOtherText())
+        assertTrue(answer(AiActionKind.VIDEO, aiFoundVideosNote("cats", emptyList())).carriesOtherText())
+        assertTrue(answer(AiActionKind.WORD, aiActionNote(AiAction.FindSavedWords("猫"))).carriesOtherText())
+        assertTrue(answer(AiActionKind.WORD, aiActionNote(AiAction.FindSavedWords(null))).carriesOtherText())
+        // Actions that only changed something, and a search that failed, read nothing.
+        assertFalse(answer(AiActionKind.SETTING, "Set text_size to 150").carriesOtherText())
+        assertFalse(answer(AiActionKind.WORD, aiActionNote(AiAction.SaveWord("猫", "cat", null))).carriesOtherText())
+        assertFalse(answer(AiActionKind.VIDEO, aiActionNote(AiAction.SearchYouTube("cats"))).carriesOtherText())
+        assertFalse(answer(AiActionKind.WEB, "Search the web", AiActionState.FAILED).carriesOtherText())
+        assertFalse(message(1, AiRole.USER, context = " ").carriesOtherText())
+    }
+
+    @Test
+    fun theRequestHistoryIsWhatGoesWithTheRequest() {
+        val history =
+            (1..40).map { index ->
+                val role = if (index % 2 == 1) AiRole.USER else AiRole.ASSISTANT
+                message(index, role, context = "line".takeIf { index == 1 })
+            }
+        assertEquals((37..40).map { "m$it" }, aiRequestHistory("guide", history, maxMessages = 5).map { it.id })
+        // The subtitle line of message 1 no longer goes along, so it no longer counts.
+        assertFalse(aiRequestHistory("guide", history).any { it.carriesOtherText() })
+        assertTrue(aiRequestHistory("guide", history.take(3)).any { it.carriesOtherText() })
     }
 
     @Test

@@ -50,8 +50,11 @@ internal class AiAnswerRun(
 
     private var tools = if (app != null) tools else emptyList()
 
-    /** Subtitle lines, problem details, files or pictures came with the question or were read while answering. */
-    private var otherText = history.lastOrNull()?.let { it.context != null || it.attachments.isNotEmpty() } == true
+    /**
+     * Subtitle lines, problem details, files, pictures or search results are in what the model reads:
+     * with this question, with an earlier message of the chat that goes along, or read while answering.
+     */
+    private var otherText = false
     private var changes = 0
     private var suggestions = 0
 
@@ -72,6 +75,7 @@ internal class AiAnswerRun(
 
     suspend fun run(systemPrompt: String) {
         messages += buildAiRequestMessages(systemPrompt, history)
+        otherText = aiRequestHistory(systemPrompt, history).any { it.carriesOtherText() }
         for (round in 1..MAX_AI_REQUESTS_PER_ANSWER) {
             val reply = request(firstRound = round == 1) ?: break
             addText(reply.text, continuing)
@@ -305,8 +309,4 @@ internal class AiAnswerRun(
         note: String = aiActionNote(action),
         undoable: Boolean = false,
     ): AiActionRecord = AiActionRecord(newId(), action.kind, text.label, note, state, text.button, undoable).also(records::add)
-
-    private companion object {
-        val FOUND_VIDEOS_NOTE = aiFoundVideosNote("", emptyList()).substringBefore('"')
-    }
 }

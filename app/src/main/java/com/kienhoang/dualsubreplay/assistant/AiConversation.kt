@@ -145,20 +145,62 @@ internal fun buildAiRequestMessages(
     maxAttachmentChars: Int = MAX_AI_REQUEST_ATTACHMENT_CHARS,
 ): List<AiWireMessage> {
     val kept = ArrayDeque<AiWireMessage>()
-    var chars = systemPrompt.length
     var attachmentChars = 0
-    for (message in history.asReversed()) {
-        if (message.role == AiRole.SYSTEM) continue
-        val content = message.wireContent()
-        if (kept.isNotEmpty() && (kept.size >= maxMessages || chars + content.length > maxChars)) break
+    for (message in aiRequestHistory(systemPrompt, history, maxMessages, maxChars).asReversed()) {
         // The newest pictures go first; older ones are dropped once the request would get too big.
         val files =
             message.binaryAttachments().filter { file ->
                 (attachmentChars + file.data.length <= maxAttachmentChars).also { fits -> if (fits) attachmentChars += file.data.length }
             }
-        kept.addFirst(AiWireMessage(message.role, content, files))
-        chars += content.length
+        kept.addFirst(AiWireMessage(message.role, message.wireContent(), files))
     }
-    while (kept.size > 1 && kept.first().role != AiRole.USER) kept.removeFirst()
     return listOf(AiWireMessage(AiRole.SYSTEM, systemPrompt)) + kept
 }
+
+/** The messages of [history] that [buildAiRequestMessages] sends with [systemPrompt], oldest first. */
+internal fun aiRequestHistory(
+    systemPrompt: String,
+    history: List<AiChatMessage>,
+    maxMessages: Int = MAX_AI_REQUEST_MESSAGES,
+    maxChars: Int = MAX_AI_REQUEST_CHARS,
+): List<AiChatMessage> {
+    val kept = ArrayDeque<AiChatMessage>()
+    var chars = systemPrompt.length
+    for (message in history.asReversed()) {
+        if (message.role == AiRole.SYSTEM) continue
+        val length = message.wireContent().length
+        if (kept.isNotEmpty() && (kept.size >= maxMessages || chars + length > maxChars)) break
+        kept.addFirst(message)
+        chars += length
+    }
+    while (kept.size > 1 && kept.first().role != AiRole.USER) kept.removeFirst()
+    return kept
+}
+
+/** How the note of a YouTube search's chip starts. */
+internal val FOUND_VIDEOS_NOTE = aiFoundVideosNote("", emptyList()).substringBefore('"')
+private val FIND_WORDS_NOTES =
+    listOf(
+        aiFullAccessActionNote(AiAction.FindSavedWords(null)),
+        aiFullAccessActionNote(AiAction.FindSavedWords("")).substringBefore('"'),
+    )
+
+/**
+ * Whether this message brought the model text the user did not type: subtitle lines, a problem's
+ * details, files or pictures, web sources, or an answer that read the video, the screen, a search
+ * or the saved words. Such a message is sent again with every later question of the chat, so it
+ * still counts there ([aiActionAsks]).
+ */
+internal fun AiChatMessage.carriesOtherText(): Boolean =
+    !context.isNullOrBlank() ||
+        attachments.isNotEmpty() ||
+        sources.isNotEmpty() ||
+        actions.any { it.state == AiActionState.DONE && it.readsOtherText() }
+
+private fun AiActionRecord.readsOtherText(): Boolean =
+    when (kind) {
+        AiActionKind.LOOK, AiActionKind.SCREEN, AiActionKind.WEB -> true
+        AiActionKind.VIDEO -> note.startsWith(FOUND_VIDEOS_NOTE)
+        AiActionKind.WORD -> FIND_WORDS_NOTES.any(note::startsWith)
+        else -> false
+    }
