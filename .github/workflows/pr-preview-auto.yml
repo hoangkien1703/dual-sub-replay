@@ -29,6 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     # Most of this is waiting for the build job, which has 30 minutes itself.
     timeout-minutes: 45
+    # The preview signing key lives only in the `preview` environment, which accepts jobs from
+    # `main` alone; a workflow_run job always runs main's copy of this file (security review
+    # 2026-11-18). The PR's own CI never sees the key.
+    environment: preview
     permissions:
       actions: read
       contents: write
@@ -118,9 +122,21 @@ jobs:
             echo "publish=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Fork PRs publish too (owner request 2026-10-28); their CI runs only once GitHub's
-          # fork approval allows it, and nothing from the artifact is executed here.
+          # Fork PRs publish too (owner request 2026-10-28), but only once the owner has read the code
+          # and added the `publish-preview` label (security review 2026-11-18): a preview on this
+          # page looks official. Their APK keeps the throwaway key of the CI run that built it and
+          # its own package (.forkpreview), so it can never install over a normal preview.
           echo "PR #$PR_NUMBER comes from $head_repo."
+          if [[ "$head_repo" == "$GH_REPO" ]]; then
+            echo "fork=false" >> "$GITHUB_OUTPUT"
+          else
+            if ! jq -e '.labels | map(.name) | index("publish-preview")' <<< "$pr_json" > /dev/null; then
+              echo "::notice::Fork PR #$PR_NUMBER has no publish-preview label; no preview. Add the label, then re-run its Android CI."
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "fork=true" >> "$GITHUB_OUTPUT"
+          fi
 
           # The fallback has nothing to do when this build went up as soon as its build job passed.
           if [[ "$EVENT_ACTION" == "completed" ]]; then
@@ -144,6 +160,53 @@ jobs:
           path: verified
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Set up Android SDK
+        if: steps.pr.outputs.publish == 'true'
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Install Android build tools
+        if: steps.pr.outputs.publish == 'true'
+        run: sdkmanager "build-tools;36.0.0"
+
+      - name: Check the package and sign own-branch previews
+        if: steps.pr.outputs.publish == 'true'
+        env:
+          FORK: ${{ steps.pr.outputs.fork }}
+          PREVIEW_KEYSTORE_BASE64: ${{ secrets.PREVIEW_KEYSTORE_BASE64 }}
+          PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.PREVIEW_KEYSTORE_PASSWORD }}
+          PREVIEW_KEY_ALIAS: ${{ secrets.PREVIEW_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          apk=verified/DualSub-Replay-preview.apk
+          if [[ "$FORK" == "true" ]]; then expected=com.kienhoang.dualsubreplay.forkpreview; else expected=com.kienhoang.dualsubreplay.preview; fi
+          badging="$("$tools/aapt" dump badging "$apk" | head -n 1)"
+          echo "$badging"
+          if [[ "$badging" != "package: name='$expected' "* ]]; then
+            echo "::error::The preview APK is not package $expected." >&2
+            exit 1
+          fi
+          if [[ "$FORK" == "true" ]]; then
+            echo "Fork preview: kept with its CI run's throwaway key."
+            exit 0
+          fi
+          if [[ -z "$PREVIEW_KEYSTORE_BASE64" || -z "$PREVIEW_KEYSTORE_PASSWORD" || -z "$PREVIEW_KEY_ALIAS" ]]; then
+            echo "::error::The preview environment has no PREVIEW_KEYSTORE_BASE64, PREVIEW_KEYSTORE_PASSWORD or PREVIEW_KEY_ALIAS secret; see docs/releasing.md." >&2
+            exit 1
+          fi
+          keystore="$RUNNER_TEMP/preview.jks"
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$PREVIEW_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          chmod 600 "$keystore"
+          "$tools/apksigner" sign --ks "$keystore" --ks-key-alias "$PREVIEW_KEY_ALIAS" \
+            --ks-pass env:PREVIEW_KEYSTORE_PASSWORD --key-pass env:PREVIEW_KEYSTORE_PASSWORD \
+            --out verified/signed.apk "$apk"
+          mv verified/signed.apk "$apk"
+          "$tools/apksigner" verify --print-certs "$apk" | grep -i 'certificate SHA-256'
 
       # main's own patch tool, never the PR's code.
       - name: Check out the patch tool from main

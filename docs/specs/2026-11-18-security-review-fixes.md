@@ -2,8 +2,9 @@
 
 ## Status
 
-Approved for implementation (owner pick 2026-11-18: "A and B, as two PRs"). Part B (app) is in
-this PR; part A (CI and signing) follows in its own PR. Merge and release stay the owner's call.
+Approved for implementation (owner pick 2026-11-18: "A and B, as two PRs"). Part B (app) shipped
+in PR #246 (merged 2026-11-18 after the owner tested sign-in on a phone); part A (CI and signing)
+is in its own PR, below. Merge and release stay the owner's call.
 
 ## Context / problem
 
@@ -101,3 +102,58 @@ As planned. `FOUND_VIDEOS_NOTE` moved to `AiConversation.kt` and is shared with 
 
 Unit tests and format/complexity checks: see the PR. Real-phone sign-in: not run yet (needs the
 owner's phone).
+
+## Part A: CI and signing
+
+### Problem
+
+- **1 (medium).** `android.yml` restored the preview signing key (`~/.android/debug.keystore`) from
+  the Actions cache `dual-sub-replay-preview-signing-v1`. Main's runs save that cache, and every PR
+  run, approved fork runs too, may read the default branch's caches. A PR's unit test could send
+  the key out. With it, an APK installs over any preview build and keeps its YouTube sign-in and AI
+  keys. Fork builds were also published to the official `preview` release automatically.
+- **2 (medium).** `publish-main` handed the production keystore and passwords to the whole Gradle
+  build: every plugin, build script and downloaded library ran next to the key, with no dependency
+  verification.
+- **4 (low).** `tools/pr_review_flags.py` did not count test and benchmark code as code that runs
+  on CI.
+
+### Approach
+
+1. `verify-build` restores no key: its debug APK keeps the runner's throwaway debug key. Fork PRs
+   build the package `com.kienhoang.dualsubreplay.forkpreview` (`.forkpreview`), which has no
+   update channel and never installs over a `.preview` app.
+2. `publish-pr-preview` (runs main's file on `workflow_run`) uses the `preview` environment
+   (deployment branches: `main`). It checks the package with `aapt`, then re-signs own-branch
+   previews with `apksigner` and `PREVIEW_KEYSTORE_BASE64` / `PREVIEW_KEYSTORE_PASSWORD` /
+   `PREVIEW_KEY_ALIAS`. Fork PRs publish only with the owner's `publish-preview` label (then re-run
+   their CI), keeping their throwaway key.
+3. `release-on-main.yml`: `build-release` builds `app-release-unsigned.apk` with `contents: read`
+   and no secrets and uploads it as a one-day artifact. `publish-main` (environment `release`)
+   downloads it, runs `zipalign -f -p 4` and `apksigner sign` with the production key, then keeps
+   every existing check (pinned certificate f664…116c, package, version) and step.
+4. `RUNS_CODE` gains `app/src/test/*`, `app/src/androidTest/*`, `benchmark/*`, and the comment says
+   approving runs all of the PR's code.
+
+### Owner setup before merge
+
+1. On the computer: `keytool -genkeypair -keystore preview.jks -alias preview -keyalg RSA -keysize
+   3072 -validity 10000 -dname "CN=DualSub Replay preview"` (pick a password), then base64 the file
+   (PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("preview.jks"))`).
+2. Settings → Environments → New environment `preview`; Deployment branches: selected, `main`.
+3. Add the secrets `PREVIEW_KEYSTORE_BASE64`, `PREVIEW_KEYSTORE_PASSWORD`, `PREVIEW_KEY_ALIAS`
+   (`preview`) to that environment.
+4. Afterwards testers uninstall the old preview app once: the new key cannot update it.
+
+### Acceptance criteria
+
+- [x] `zipalign` + `apksigner` on a real APK give a v2 + v3 signature with one signer, aligned;
+  re-signing a debug-signed APK replaces its signature (dry run in the cloud container, 2026-11-18).
+- [x] `actionlint` (with shellcheck) reports nothing new on the three workflows; `tools/tests` pass.
+- [ ] The first own-branch PR after merge publishes a preview signed with the new key.
+- [ ] The next release publishes through `build-release` + `publish-main` and passes the pinned
+  certificate check.
+
+### Release intent
+
+`release:skip`: workflows, tools and docs only.
