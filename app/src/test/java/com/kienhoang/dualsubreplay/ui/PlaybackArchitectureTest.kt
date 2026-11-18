@@ -118,22 +118,26 @@ class PlaybackArchitectureTest {
     }
 
     @Test
-    fun activeSignInKeepsUnknownHostsEmbeddedInsteadOfChrome() {
-        assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = true),
-        )
-        assertFalse(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.OPEN_EXTERNAL, signInEmbeddingActive = false),
-        )
-        assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.YOUTUBE_WEB, signInEmbeddingActive = false),
-        )
-        assertTrue(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.GOOGLE_SIGN_IN, signInEmbeddingActive = false),
-        )
-        assertFalse(
-            shouldOpenInsideApp(EmbeddedNavigationDecision.BLOCK, signInEmbeddingActive = true),
-        )
+    fun activeSignInKeepsGoogleHostsEmbeddedAndSendsOtherPagesToTheBrowser() {
+        fun inside(
+            url: String,
+            signIn: Boolean = true,
+        ) = shouldOpenInsideApp(url, classifyMainFrameUrl(url), signInEmbeddingActive = signIn)
+        // Sign-in steps on Google's other hosts keep their cookies in the app.
+        assertTrue(inside("https://accounts.google.com.vn/accounts/SetSID"))
+        assertTrue(inside("https://www.google.co.jp/accounts/SetSID"))
+        assertTrue(inside("https://www.google.de/"))
+        assertTrue(inside("https://ssl.gstatic.com/accounts/static/page.html"))
+        assertTrue(inside("https://lh3.googleusercontent.com/a/photo"))
+        // A page outside Google opens in the browser, sign-in or not.
+        assertFalse(inside("https://example.com/login"))
+        assertFalse(inside("https://google.com.evil.example/"))
+        assertFalse(inside("https://notgoogle.com/"))
+        assertFalse(inside("https://www.google.de/", signIn = false))
+        // YouTube and Google's account pages always stay; blocked addresses never open.
+        assertTrue(inside("https://m.youtube.com/", signIn = false))
+        assertTrue(inside("https://accounts.google.com/", signIn = false))
+        assertFalse(inside("http://www.google.de/"))
     }
 
     @Test
