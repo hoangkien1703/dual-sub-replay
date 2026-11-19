@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">Sin subtítulos en YouTube</string>
     <string name="ai_subtitles_no_captions_body">Este video no tiene subtítulos, ni siquiera automáticos. La IA puede escucharlo y escribirlos.</string>
+    <string name="live_no_captions_title">Esta transmisión en directo no tiene subtítulos</string>
+    <string name="live_no_captions_body">YouTube no muestra subtítulos para esta transmisión en directo. Si la transmisión empieza a enviarlos, aparecerán aquí con su traducción. La repetición suele tener subtítulos cuando termina la transmisión.</string>
     <string name="ai_subtitles_make">Crear subtítulos con IA</string>
     <string name="ai_subtitles_try_again">Reintentar</string>
     <string name="ai_subtitles_note">Usa tu clave gratuita de Gemini. Gemini escucha el video en los servidores de Google.</string>

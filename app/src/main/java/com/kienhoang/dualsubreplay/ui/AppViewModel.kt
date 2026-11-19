@@ -260,6 +260,7 @@ class AppViewModel internal constructor(
     private var appVisible = true
     private var studySteering = false
     private val liveCaptionTracker = LiveCaptionTracker()
+    private val rollUpCaptions = RollUpCaptionAssembler()
     private val captionHighlightResolver = CaptionHighlightResolver()
     private var liveCaptionProgress: LiveCaptionProgress? = null
     private var playbackSessionId: String? = null
@@ -588,7 +589,7 @@ class AppViewModel internal constructor(
         playbackKnown = true
         updatePlaybackRequest(seek)
         if (current.liveFallback) {
-            updateLiveFallbackPlayback(videoId, liveCaption, seek)
+            updateLiveFallbackPlayback(videoId, rollUpCaptions.transform(liveCaption, timeMs, seek), seek, liveCaption?.rollUp == true)
         } else {
             updateTranscriptPlayback(current, liveCaption, timeMs)
         }
@@ -598,6 +599,7 @@ class AppViewModel internal constructor(
         videoId: String,
         liveCaption: LiveCaptionSample?,
         seek: Boolean,
+        rollUp: Boolean,
     ) {
         val current = _state.value
         updateLiveSubtitle(videoId, liveCaption, seek)
@@ -607,9 +609,14 @@ class AppViewModel internal constructor(
                     liveTranslationKey(it, videoId, current.targetLanguage, current.hideSoundCues) == liveTranslationGate.key &&
                     it.revision != rejectedLiveRevision
             }
-        liveCaptionProgress = accepted?.let { reconcileLiveCaptionProgress(liveCaptionProgress, it) }
+        // A roll-up sentence is shown once it is finished, so there is no word to follow.
+        liveCaptionProgress = accepted?.takeUnless { rollUp }?.let { reconcileLiveCaptionProgress(liveCaptionProgress, it) }
         _state.update {
-            it.copy(activeWordIndex = if (it.wordHighlightEnabled) liveCaptionProgress?.activeWordIndex ?: -1 else -1)
+            it.copy(
+                activeWordIndex = if (it.wordHighlightEnabled) liveCaptionProgress?.activeWordIndex ?: -1 else -1,
+                // Live streams list no caption tracks; the no-captions card must not offer AI subtitles for them.
+                liveStream = pageTranscripts.isLive(videoId),
+            )
         }
     }
 

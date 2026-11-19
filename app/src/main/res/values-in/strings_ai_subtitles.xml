@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">Tidak ada subtitle di YouTube</string>
     <string name="ai_subtitles_no_captions_body">Video ini tidak punya teks, termasuk teks otomatis. AI bisa mendengarkannya dan menuliskan subtitlenya.</string>
+    <string name="live_no_captions_title">Siaran langsung ini tidak punya teks</string>
+    <string name="live_no_captions_body">YouTube tidak menampilkan teks untuk siaran langsung ini. Jika siaran mulai mengirim teks, teks akan muncul di sini beserta terjemahannya. Tayangan ulangnya biasanya mendapat teks setelah siaran selesai.</string>
     <string name="ai_subtitles_make">Buat subtitle dengan AI</string>
     <string name="ai_subtitles_try_again">Coba lagi</string>
     <string name="ai_subtitles_note">Memakai kunci Gemini gratis Anda. Gemini mendengarkan video di server Google.</string>

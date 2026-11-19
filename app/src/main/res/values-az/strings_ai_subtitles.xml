@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube-da altyazı yoxdur</string>
     <string name="ai_subtitles_no_captions_body">Bu videonun heç bir altyazısı yoxdur, avtomatik altyazı da. Sİ videonu dinləyib altyazı yaza bilər.</string>
+    <string name="live_no_captions_title">Bu canlı yayımda altyazı yoxdur</string>
+    <string name="live_no_captions_body">YouTube bu canlı yayım üçün altyazı göstərmir. Yayım altyazı göndərməyə başlasa, onlar tərcüməsi ilə burada görünəcək. Yayım bitəndən sonra təkrar yayım adətən altyazı alır.</string>
     <string name="ai_subtitles_make">Sİ ilə altyazı yarat</string>
     <string name="ai_subtitles_try_again">Yenidən cəhd et</string>
     <string name="ai_subtitles_note">Pulsuz Gemini açarınızdan istifadə edir. Gemini videonu Google serverlərində dinləyir.</string>

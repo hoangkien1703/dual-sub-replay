@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">Sem legendas no YouTube</string>
     <string name="ai_subtitles_no_captions_body">Este vídeo não tem legendas, nem automáticas. A IA pode ouvir o vídeo e escrevê-las.</string>
+    <string name="live_no_captions_title">Esta transmissão ao vivo não tem legendas</string>
+    <string name="live_no_captions_body">O YouTube não mostra legendas para esta transmissão ao vivo. Se a transmissão começar a enviá-las, elas aparecem aqui com a tradução. A gravação costuma ganhar legendas depois que a transmissão termina.</string>
     <string name="ai_subtitles_make">Criar legendas com IA</string>
     <string name="ai_subtitles_try_again">Tentar de novo</string>
     <string name="ai_subtitles_note">Usa sua chave gratuita do Gemini. O Gemini ouve o vídeo nos servidores do Google.</string>

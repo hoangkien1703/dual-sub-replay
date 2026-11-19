@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">No subtitles on YouTube</string>
     <string name="ai_subtitles_no_captions_body">This video has no captions, not even automatic ones. AI can listen to it and write them.</string>
+    <string name="live_no_captions_title">No captions on this live stream</string>
+    <string name="live_no_captions_body">YouTube shows no captions for this live stream. If the stream starts sending some, they show up here with a translation. The replay usually gets captions after the stream ends.</string>
     <string name="ai_subtitles_make">Make subtitles with AI</string>
     <string name="ai_subtitles_try_again">Try again</string>
     <string name="ai_subtitles_note">Uses your free Gemini key. Gemini listens to the video on Google\'s servers.</string>

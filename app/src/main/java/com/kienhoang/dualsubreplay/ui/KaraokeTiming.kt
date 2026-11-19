@@ -20,6 +20,8 @@ internal data class LiveCaptionSample(
     val present: Boolean,
     val videoId: String? = null,
     val languageCode: String? = null,
+    /** YouTube draws it as a roll-up window (TV-style live captions), see [RollUpCaptionAssembler]. */
+    val rollUp: Boolean = false,
 )
 
 internal data class KaraokePosition(

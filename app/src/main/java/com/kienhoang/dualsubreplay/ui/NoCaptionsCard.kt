@@ -104,6 +104,18 @@ internal fun NoCaptionsCard(
     }
 }
 
+/**
+ * A live stream with no captions now. AI subtitles can't listen to a live stream (Gemini can't open
+ * one), so there is no button: the player's own captions show up here if the stream starts sending them.
+ */
+@Composable
+internal fun LiveStreamNoCaptionsCard() {
+    Column(Modifier.fillMaxWidth().testTag("live_no_captions_card"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.live_no_captions_title), style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.live_no_captions_body), style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
 @Composable
 internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
     val total = status.totalMs
@@ -153,6 +165,10 @@ internal fun geminiReady(state: AiAssistantUiState): Boolean =
 /** The no-captions card with this screen's actions and the assistant's key state. */
 @Composable
 internal fun NoCaptionsSection(state: DualSubUiState) {
+    if (state.liveStream) {
+        LiveStreamNoCaptionsCard()
+        return
+    }
     val host = LocalAiAssistant.current
     if (host != null) {
         NoCaptionsSectionWithAssistant(state, host.controller.state)

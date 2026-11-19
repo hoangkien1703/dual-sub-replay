@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube에 자막이 없습니다</string>
     <string name="ai_subtitles_no_captions_body">이 동영상에는 자동 자막을 포함해 자막이 없습니다. AI가 듣고 자막을 만들 수 있습니다.</string>
+    <string name="live_no_captions_title">이 라이브 방송에는 자막이 없습니다</string>
+    <string name="live_no_captions_body">YouTube에서 이 라이브 방송의 자막을 표시하지 않습니다. 방송에서 자막을 보내기 시작하면 번역과 함께 여기에 표시됩니다. 다시보기에는 보통 방송이 끝난 뒤 자막이 생깁니다.</string>
     <string name="ai_subtitles_make">AI로 자막 만들기</string>
     <string name="ai_subtitles_try_again">다시 시도</string>
     <string name="ai_subtitles_note">무료 Gemini 키를 사용합니다. Gemini가 Google 서버에서 동영상을 듣습니다.</string>
