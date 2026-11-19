@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube 上没有字幕</string>
     <string name="ai_subtitles_no_captions_body">这个视频没有字幕，连自动字幕也没有。AI 可以听视频并写出字幕。</string>
+    <string name="live_no_captions_title">此直播没有字幕</string>
+    <string name="live_no_captions_body">YouTube 没有为此直播显示字幕。如果直播开始提供字幕，字幕会连同翻译显示在这里。直播结束后，回放通常会有字幕。</string>
     <string name="ai_subtitles_make">用 AI 生成字幕</string>
     <string name="ai_subtitles_try_again">重试</string>
     <string name="ai_subtitles_note">使用你的免费 Gemini 密钥。Gemini 在 Google 的服务器上收听视频。</string>

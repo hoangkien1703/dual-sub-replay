@@ -86,8 +86,9 @@ internal fun LiveSubtitlePanel(
     onWordClick: (WordTap) -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(12.dp)) {
-        if (state.noCaptions) {
+        if (state.noCaptions && state.liveOriginal == null) {
             // No captions to wait for: say so and offer AI subtitles; the diagnostic lines stay below for reports.
+            // A live stream's TV-style captions list no track, so once the player shows some, they win.
             NoCaptionsSection(state)
             state.fullTranscriptProblem?.let { problem ->
                 Spacer(Modifier.height(12.dp))

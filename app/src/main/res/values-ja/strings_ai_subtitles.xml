@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube に字幕がありません</string>
     <string name="ai_subtitles_no_captions_body">この動画には自動字幕も含めて字幕がありません。AI が音声を聞いて字幕を作れます。</string>
+    <string name="live_no_captions_title">このライブ配信には字幕がありません</string>
+    <string name="live_no_captions_body">YouTube はこのライブ配信の字幕を表示していません。配信が字幕を送り始めたら、翻訳つきでここに表示されます。アーカイブには配信終了後に字幕が付くことが多いです。</string>
     <string name="ai_subtitles_make">AI で字幕を作る</string>
     <string name="ai_subtitles_try_again">もう一度試す</string>
     <string name="ai_subtitles_note">無料の Gemini キーを使います。Gemini は Google のサーバーで動画を聞きます。</string>

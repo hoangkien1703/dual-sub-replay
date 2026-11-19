@@ -128,6 +128,41 @@ class NoCaptionsCardUiTest {
         composeRule.onNodeWithTag("no_captions_card").assertDoesNotExist()
     }
 
+    @Test
+    fun aLiveStreamWithoutCaptionsOffersNoAiButton() {
+        showPanel(
+            noCaptions.copy(
+                liveStream = true,
+                fullTranscriptProblem =
+                    "Full transcript: YouTube lists no captions for this video.\n" +
+                        "Page check: player details 0 tracks, captions menu 0, downloaded 0",
+            ),
+        )
+        composeRule.onNodeWithText("No captions on this live stream").assertIsDisplayed()
+        composeRule.onNodeWithTag("live_no_captions_card").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_subtitles_add_key").assertDoesNotExist()
+        composeRule.onNodeWithTag("ai_subtitles_make").assertDoesNotExist()
+        saveEvidence("no-captions-live-stream")
+    }
+
+    @Test
+    fun liveStreamCaptionsWinOverTheNoCaptionsCard() {
+        // ABC News Live sends TV-style captions inside the video: no track, but the player draws them.
+        showPanel(
+            noCaptions.copy(
+                liveStream = true,
+                liveOriginal = "Daily on ABC news live.",
+                liveTranslated = "Hằng ngày trên ABC News Live.",
+                resolvedSourceLanguage = "en",
+                targetLanguage = "vi",
+            ),
+        )
+        composeRule.onNodeWithTag("live_no_captions_card").assertDoesNotExist()
+        composeRule.onNodeWithTag("no_captions_card").assertDoesNotExist()
+        composeRule.onNodeWithText("Hằng ngày trên ABC News Live.").assertIsDisplayed()
+        saveEvidence("live-stream-captions")
+    }
+
     private companion object {
         const val PANEL = "no_captions_test_panel"
     }
