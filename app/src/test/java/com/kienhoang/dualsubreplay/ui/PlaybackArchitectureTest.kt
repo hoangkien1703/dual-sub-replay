@@ -156,6 +156,23 @@ class PlaybackArchitectureTest {
     }
 
     @Test
+    fun liveStreamCaptionsTakeTheirLanguageFromTheCaptionWindow() {
+        // TV-style live captions have no track; the window they are drawn in names the language.
+        val script = webLiveCaptionConfigurationScript(enabled = true)
+        assertTrue(script.contains("document.querySelector('.caption-window[lang]')"))
+        assertTrue(script.contains("const rollUp = !!document.querySelector('.ytp-caption-window-rollup');"))
+        assertTrue(WEB_PLAYBACK_SNAPSHOT_SCRIPT.contains("rollUp: !!liveState.rollUp,"))
+        assertTrue(WEB_PAGE_CAPTION_TRACKS_SCRIPT.contains("isLive: details.isLive === true"))
+        val json =
+            """{"url":"https://m.youtube.com/watch?v=KQhNZQ_Uag8","currentSecond":46834.6,"liveCaption":""" +
+                """{"text":"DAILY ON ABC NEWS LIVE.","revision":7,"mediaSecond":46834.6,"videoId":"KQhNZQ_Uag8",""" +
+                """"languageCode":"en","rollUp":true,"present":true}}"""
+        val sample = parseWebPlaybackSnapshot(org.json.JSONObject.quote(json))!!.liveCaption!!
+        assertTrue(sample.rollUp)
+        assertEquals("en", sample.languageCode)
+    }
+
+    @Test
     fun playbackSnapshotCarriesSanitizedLiveCaptionSample() {
         val payload = JSONObject()
             .put("url", "https://m.youtube.com/watch?v=dQw4w9WgXcQ")
