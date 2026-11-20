@@ -31,6 +31,8 @@ RUNS_CODE = [
     ".github/*",
     "*.gradle", "*.gradle.kts", "gradle.properties", "gradle/*", "gradlew", "gradlew.bat", "buildSrc/*",
     "tools/*",
+    # Unit, device and benchmark tests run on CI as soon as the run is approved.
+    "app/src/test/*", "app/src/androidTest/*", "benchmark/*",
     "*.sh", "*.bash", "*.zsh", "*.ps1", "*.psm1", "*.bat", "*.cmd", "*.py", "*.js", "*.mjs", "*.cjs",
     "*.ts", "*.tsx", "*.rb", "*.pl",
     "package.json", "*/package.json", "package-lock.json", "*/package-lock.json", "*.lock",
@@ -177,7 +179,8 @@ def render(flags: Flags, head_sha: str) -> str:
         "",
         "This PR comes from a fork. The files below can run code on CI or on a computer, change what the app "
         "may do, or bring in files that can't be read as text. Nothing here says they are harmful; it says "
-        "a person should read them first. Approve the workflow run only once they look right.",
+        "a person should read them first. Approve the workflow run only once they look right: approving runs "
+        "all of this PR's code, its tests too, on GitHub's machines.",
     ]
     for section, entries in flags.sections.items():
         lines += ["", f"**{section}**"]

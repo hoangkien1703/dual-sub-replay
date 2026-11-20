@@ -68,15 +68,70 @@ jobs:
           RELEASE_PR: ${{ inputs.pr_number }}
         run: python3 tools/automatic_release.py prepare
 
-  publish-main:
+  # Builds the release APK UNSIGNED, with no secrets: every Gradle plugin, build script and library
+  # runs here, so the production key must not (security review 2026-11-18,
+  # docs/specs/2026-11-18-security-review-fixes.md). publish-main signs the result with apksigner.
+  build-release:
     needs: prepare
     # release:skip merges publish nothing (owner decision 2026-10-18: no rolling main preview APK).
     if: needs.prepare.outputs.eligible == 'true' && needs.prepare.outputs.release_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact reserved release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          persist-credentials: false
+
+      - name: Set up Java 17
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Install Android build SDK
+        run: sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
+
+      # Read-only: this job builds a reserved merged-PR commit (also on workflow_dispatch), and a
+      # build that ran that code must not write caches that later main and PR runs restore.
+      # android.yml's main push runs keep the Gradle cache fresh.
+      - name: Set up Gradle cache (read-only)
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-read-only: true
+
+      - name: Build unsigned release APK
+        run: |
+          set -euo pipefail
+          bash ./gradlew assembleRelease --stacktrace
+          test -f app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Upload unsigned release APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unsigned-release
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-main:
+    needs: [prepare, build-release]
+    if: needs.prepare.outputs.eligible == 'true' && needs.prepare.outputs.release_needed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     # The ANDROID_RELEASE_* signing secrets live only in the `release` environment, which
     # accepts jobs from `main` alone (owner decision 2026-11-02, done 2026-11-15). A workflow
-    # pushed on any other branch therefore can never read the production signing key.
+    # pushed on any other branch therefore can never read the production signing key. This job
+    # runs no Gradle: only the Android SDK's own zipalign and apksigner see the key.
     environment: release
     permissions:
       contents: write
@@ -107,13 +162,6 @@ jobs:
           ref: ${{ needs.prepare.outputs.source_sha }}
           persist-credentials: false
 
-      - name: Set up Java 17
-        if: steps.resume.outputs.build == 'true'
-        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Set up Android SDK
         if: steps.resume.outputs.build == 'true'
         uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
@@ -121,13 +169,16 @@ jobs:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
 
-      - name: Install Android build SDK
+      - name: Install Android build tools
         if: steps.resume.outputs.build == 'true'
-        run: sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
+        run: sdkmanager "build-tools;36.0.0"
 
-      - name: Set up Gradle cache
+      - name: Download the unsigned release APK
         if: steps.resume.outputs.build == 'true'
-        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: unsigned-release
+          path: unsigned
 
       - name: Restore production signing key
         if: steps.resume.outputs.build == 'true'
@@ -141,14 +192,21 @@ jobs:
           printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/dual-sub-replay-release.jks"
           chmod 600 "$RUNNER_TEMP/dual-sub-replay-release.jks"
 
-      - name: Build production release APK
+      - name: Sign the release APK
         if: steps.resume.outputs.build == 'true'
         env:
-          ANDROID_RELEASE_STORE_FILE: ${{ runner.temp }}/dual-sub-replay-release.jks
           ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
           ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
           ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
-        run: bash ./gradlew assembleRelease -PrequireReleaseSigning=true --stacktrace
+        run: |
+          set -euo pipefail
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          mkdir -p app/build/outputs/apk/release
+          "$tools/zipalign" -f -p 4 unsigned/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" sign --ks "$RUNNER_TEMP/dual-sub-replay-release.jks" --ks-key-alias "$ANDROID_RELEASE_KEY_ALIAS" \
+            --ks-pass env:ANDROID_RELEASE_STORE_PASSWORD --key-pass env:ANDROID_RELEASE_KEY_PASSWORD \
+            --out app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/aligned.apk"
+          rm -f "$RUNNER_TEMP/aligned.apk"
 
       - name: Verify and package official APK
         if: steps.resume.outputs.build == 'true'

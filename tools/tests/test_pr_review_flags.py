@@ -34,7 +34,9 @@ class ClassifyTests(unittest.TestCase):
         for name in [".github/workflows/android.yml", ".github/actions/x/action.yml", "app/build.gradle.kts",
                      "settings.gradle.kts", "gradle/wrapper/gradle-wrapper.properties", "gradlew",
                      "gradle.properties", "tools/release.py", "scripts/setup.sh", "a/b/run.ps1",
-                     "tools/promo-video/package.json", ".vscode/tasks.json", ".gitmodules"]:
+                     "tools/promo-video/package.json", ".vscode/tasks.json", ".gitmodules",
+                     "app/src/test/java/app/PlayerTest.kt", "app/src/androidTest/java/app/PlayerTest.kt",
+                     "benchmark/src/main/java/app/StartupBenchmark.kt"]:
             with self.subTest(name=name):
                 self.assertIn("Runs on CI or on your computer", self.sections(file(name)))
 
