@@ -1422,7 +1422,7 @@ internal fun LanguagePickerDialog(
     val recentChoices =
         if (searchQuery.isBlank()) {
             recentCodes.mapNotNull { code ->
-                shownChoices.firstOrNull { TranslationLanguages.normalize(it.first.code) == TranslationLanguages.normalize(code) }
+                shownChoices.firstOrNull { TranslationLanguages.targetCode(it.first.code) == TranslationLanguages.targetCode(code) }
             }
         } else {
             emptyList()
@@ -1451,7 +1451,7 @@ internal fun LanguagePickerDialog(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(shown, modifier = Modifier.weight(1f))
-            if (TranslationLanguages.normalize(choice.code) == TranslationLanguages.normalize(selectedCode)) {
+            if (TranslationLanguages.targetCode(choice.code) == TranslationLanguages.targetCode(selectedCode)) {
                 Text(selectedLabel, style = MaterialTheme.typography.labelSmall)
             }
         }

@@ -27,6 +27,13 @@ class RecentLanguagesTest {
     }
 
     @Test
+    fun simplifiedAndTraditionalChineseAreTwoRecentLanguages() {
+        assertEquals(listOf("zh-TW", "zh"), rememberRecentLanguage(emptyList(), previous = "zh", picked = "zh-TW"))
+        assertEquals(listOf("zh-TW", "zh"), parseRecentLanguages("zh-TW,zh"))
+        assertEquals(listOf("zh-TW", "zh"), recentLanguagesToShow(listOf("zh"), selected = "zh-TW"))
+    }
+
+    @Test
     fun storedListSurvivesARoundTripAndDropsUnknownCodes() {
         assertEquals(listOf("en", "ja"), parseRecentLanguages(encodeRecentLanguages(listOf("en", "ja"))))
         assertEquals(listOf("en", "zh"), parseRecentLanguages("en, xx,,en,zh-CN"))

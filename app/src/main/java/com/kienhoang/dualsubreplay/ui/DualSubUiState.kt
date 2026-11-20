@@ -293,7 +293,7 @@ internal fun normalizedOnboardingLanguages(
     learningLanguage: String,
 ): Pair<String, String>? {
     val native =
-        TranslationLanguages.normalize(nativeLanguage).takeIf(TranslationLanguages::isSupported)
+        TranslationLanguages.targetCode(nativeLanguage).takeIf(TranslationLanguages::isSupported)
             ?: return null
     val learning =
         TranslationLanguages.normalize(learningLanguage).takeIf(TranslationLanguages::isSupported)

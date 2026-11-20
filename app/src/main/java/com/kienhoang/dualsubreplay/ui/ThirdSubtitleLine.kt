@@ -41,7 +41,7 @@ internal val DualSubUiState.thirdLine: ThirdLineChoice get() = ThirdLineChoice(t
 internal fun storedThirdLanguage(raw: String?): String? =
     raw
         ?.takeIf(String::isNotBlank)
-        ?.let(TranslationLanguages::normalize)
+        ?.let(TranslationLanguages::targetCode)
         ?.takeIf(TranslationLanguages::isSupported)
 
 /** The third lines of [videoId]'s rows near playback, by row id, in [language]. */
@@ -57,8 +57,8 @@ internal fun thirdLineLanguage(
     source: String?,
     target: String,
 ): String? {
-    val language = third?.let(TranslationLanguages::normalize) ?: return null
-    val shown = listOfNotNull(source, target).map(TranslationLanguages::normalize)
+    val language = third?.let(TranslationLanguages::targetCode) ?: return null
+    val shown = listOfNotNull(source, target).map(TranslationLanguages::targetCode)
     return language.takeIf { it !in shown }
 }
 

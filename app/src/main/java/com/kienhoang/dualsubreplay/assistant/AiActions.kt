@@ -589,7 +589,7 @@ private fun memoryNumbers(memories: List<AiMemory>): String =
 internal fun aiLanguageCode(value: String): String? {
     val trimmed = value.trim()
     TranslationLanguages.find(trimmed)?.let { return it.code }
-    return TranslationLanguages.all.firstOrNull { it.name.equals(trimmed, ignoreCase = true) }?.code
+    return TranslationLanguages.findByName(trimmed)?.code
 }
 
 internal fun aiSwitch(value: String): String? =

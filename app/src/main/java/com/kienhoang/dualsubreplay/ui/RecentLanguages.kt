@@ -13,7 +13,7 @@ internal fun parseRecentLanguages(stored: String?): List<String> =
     stored
         .orEmpty()
         .split(',')
-        .map { TranslationLanguages.normalize(it.trim()) }
+        .map { TranslationLanguages.targetCode(it.trim()) }
         .filter { it.isNotEmpty() && TranslationLanguages.isSupported(it) }
         .distinct()
         .take(MAX_RECENT_LANGUAGES)
@@ -30,7 +30,7 @@ internal fun rememberRecentLanguage(
     picked: String,
 ): List<String> =
     (listOf(picked, previous) + recent)
-        .map(TranslationLanguages::normalize)
+        .map(TranslationLanguages::targetCode)
         .filter(TranslationLanguages::isSupported)
         .distinct()
         .take(MAX_RECENT_LANGUAGES)
@@ -45,7 +45,7 @@ internal fun recentLanguagesToShow(
 ): List<String> {
     val shown =
         (listOf(selected) + recent)
-            .map(TranslationLanguages::normalize)
+            .map(TranslationLanguages::targetCode)
             .filter(TranslationLanguages::isSupported)
             .distinct()
             .take(MAX_RECENT_LANGUAGES)

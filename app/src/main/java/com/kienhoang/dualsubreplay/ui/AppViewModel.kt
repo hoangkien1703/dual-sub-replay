@@ -987,7 +987,7 @@ class AppViewModel internal constructor(
         )
 
     fun setTargetLanguage(language: String) {
-        val normalized = TranslationLanguages.normalize(language)
+        val normalized = TranslationLanguages.targetCode(language)
         if (!TranslationLanguages.isSupported(normalized) || _state.value.targetLanguage == normalized) return
         val recent = rememberRecentLanguage(_state.value.recentTargetLanguages, _state.value.targetLanguage, normalized)
         preferences
@@ -1002,7 +1002,7 @@ class AppViewModel internal constructor(
 
     /** Subtitle text → Third subtitle line, and its language; the open video's third lines follow at once. */
     fun setThirdLine(choice: ThirdLineChoice) {
-        val language = choice.language?.let(TranslationLanguages::normalize)?.takeIf(TranslationLanguages::isSupported)
+        val language = choice.language?.let(TranslationLanguages::targetCode)?.takeIf(TranslationLanguages::isSupported)
         preferences
             .edit()
             .putBoolean(THIRD_LINE_ENABLED_PREFERENCE, choice.enabled)
@@ -2306,7 +2306,8 @@ class AppViewModel internal constructor(
         source: Pair<String, Boolean>,
         targetLanguage: String,
     ): Map<String, String> {
-        val cues = pageTranslations.translation(videoId, source.first, source.second, targetLanguage)
+        val youTubeTarget = TranslationLanguages.youTubeTranslationCode(targetLanguage)
+        val cues = pageTranslations.translation(videoId, source.first, source.second, youTubeTarget)
         val rows =
             try {
                 if (cues == null) emptyList() else withContext(Dispatchers.IO) { store.read(0 until store.size) }

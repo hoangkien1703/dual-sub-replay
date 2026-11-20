@@ -202,6 +202,10 @@ class AiActionsTest {
     @Test
     fun translationChangesTakeACodeOrAnEnglishName() {
         assertEquals(AiAction.ChangeTranslation(null, "vi"), parsed(AI_TRANSLATION_TOOL, """{"target_language":"Vietnamese"}"""))
+        assertEquals(AiAction.ChangeTranslation(null, "zh"), parsed(AI_TRANSLATION_TOOL, """{"target_language":"Chinese"}"""))
+        val traditional = """{"target_language":"Traditional Chinese"}"""
+        assertEquals(AiAction.ChangeTranslation(null, "zh-TW"), parsed(AI_TRANSLATION_TOOL, traditional))
+        assertEquals(AiAction.ChangeTranslation(null, "zh-TW"), parsed(AI_TRANSLATION_TOOL, """{"target_language":"zh-Hant"}"""))
         assertEquals(
             AiAction.ChangeTranslation(false, "pt"),
             parsed(AI_TRANSLATION_TOOL, """{"google_translate":false,"target_language":"pt-BR"}"""),

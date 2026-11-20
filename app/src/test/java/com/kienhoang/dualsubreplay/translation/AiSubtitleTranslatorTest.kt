@@ -394,4 +394,9 @@ class AiSubtitleTranslatorTest {
         assertTrue(prompt.contains("misheard"))
         assertTrue(prompt.contains("subjects"))
     }
+
+    @Test fun thePromptNamesTheChineseScriptToWrite() {
+        assertTrue(aiTranslationSystemPrompt("en", "zh-TW").contains("English (en) to Traditional Chinese (zh-TW)"))
+        assertTrue(aiTranslationSystemPrompt("en", "zh").contains("English (en) to Simplified Chinese (zh)"))
+    }
 }

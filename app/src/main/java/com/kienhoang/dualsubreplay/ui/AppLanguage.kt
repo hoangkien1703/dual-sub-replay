@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.LocaleList
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalResources
+import com.kienhoang.dualsubreplay.translation.TRADITIONAL_CHINESE
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
 
@@ -71,8 +72,14 @@ internal fun languageDisplayName(
 ): String {
     val english = TranslationLanguages.displayName(code)
     if (canonicalLanguage(interfaceLocale.language) == "en") return english
-    val language = TranslationLanguages.normalize(code)
-    val localized = Locale.forLanguageTag(language).getDisplayLanguage(interfaceLocale)
+    val language = TranslationLanguages.targetCode(code)
+    val localized =
+        when (language) {
+            // "中文（简体）", "Tiếng Trung (Giản thể)": the script's name tells the two Chinese entries apart.
+            "zh" -> Locale.forLanguageTag("zh-Hans").getDisplayName(interfaceLocale)
+            TRADITIONAL_CHINESE -> Locale.forLanguageTag("zh-Hant").getDisplayName(interfaceLocale)
+            else -> Locale.forLanguageTag(language).getDisplayLanguage(interfaceLocale)
+        }
     if (localized.isBlank() || localized.equals(language, ignoreCase = true)) return english
     return localized.replaceFirstChar { it.titlecase(interfaceLocale) }
 }

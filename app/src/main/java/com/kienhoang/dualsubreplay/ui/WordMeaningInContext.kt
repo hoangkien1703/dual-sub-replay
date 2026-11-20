@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
 
 /**
@@ -165,7 +166,7 @@ internal fun contextMeaningRequest(
     meaningLanguage: String,
     phrase: Boolean = false,
 ): Pair<String, String> {
-    val meaningName = englishLanguageName(meaningLanguage)
+    val meaningName = TranslationLanguages.englishTargetName(meaningLanguage)
     val selected = if (phrase) "selected words" else "tapped word"
     // "One to four words" cut a selected phrase to its first words (lion737, 2026-11-11).
     val length = if (phrase) "the whole selection, as many words as it needs" else "one to four words"
@@ -345,7 +346,7 @@ internal fun lineMeaningsRequest(
     wordLanguage: String,
     meaningLanguage: String,
 ): Pair<String, String> {
-    val meaningName = englishLanguageName(meaningLanguage)
+    val meaningName = TranslationLanguages.englishTargetName(meaningLanguage)
     val system =
         "You help a language learner who reads a video subtitle. For each numbered word, give its meaning as used " +
             "in this sentence, written in $meaningName: one to four words, in the form that fits the sentence (tense, " +

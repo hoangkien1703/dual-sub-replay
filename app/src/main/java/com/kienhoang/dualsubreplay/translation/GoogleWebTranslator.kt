@@ -136,9 +136,9 @@ internal fun googleRefusedEverywhere(refusals: List<Pair<GoogleEndpoint, GoogleT
     return GoogleTranslateException("Google Translate refused on every address: ${answers.joinToString(", ")}.", blocked = true)
 }
 
-/** Google's language codes match the app's except for Chinese. */
+/** Google's language codes match the app's except for Chinese: Simplified is zh-CN, Traditional keeps zh-TW. */
 internal fun googleLanguageCode(appCode: String): String =
-    when (val normalized = TranslationLanguages.normalize(appCode)) {
+    when (val normalized = TranslationLanguages.targetCode(appCode)) {
         "zh" -> "zh-CN"
         else -> normalized
     }
@@ -301,8 +301,8 @@ class GoogleWebTranslator(
     ): String? =
         translateAll(sourceLanguageCode, targetLanguageCode, listOf(text)).single()
             ?: askOtherAddresses(
-                TranslationLanguages.normalize(sourceLanguageCode),
-                TranslationLanguages.normalize(targetLanguageCode),
+                TranslationLanguages.targetCode(sourceLanguageCode),
+                TranslationLanguages.targetCode(targetLanguageCode),
                 text,
             )
 
@@ -315,8 +315,8 @@ class GoogleWebTranslator(
         targetLanguageCode: String,
         texts: List<String>,
     ): List<String?> {
-        val source = TranslationLanguages.normalize(sourceLanguageCode)
-        val target = TranslationLanguages.normalize(targetLanguageCode)
+        val source = TranslationLanguages.targetCode(sourceLanguageCode)
+        val target = TranslationLanguages.targetCode(targetLanguageCode)
         if (source == target) return texts
         val results = HashMap<String, String>()
         val missing = LinkedHashSet<String>()
@@ -341,8 +341,8 @@ class GoogleWebTranslator(
         targetLanguageCode: String,
         texts: List<String>,
     ): List<String> {
-        val source = TranslationLanguages.normalize(sourceLanguageCode)
-        val target = TranslationLanguages.normalize(targetLanguageCode)
+        val source = TranslationLanguages.targetCode(sourceLanguageCode)
+        val target = TranslationLanguages.targetCode(targetLanguageCode)
         if (source == target) return emptyList()
         val missing = texts.distinct().filter { !it.isBlank() && cached(source, target, it) == null }
         val batch = googleBatches(missing).firstOrNull() ?: return emptyList()
@@ -378,8 +378,8 @@ class GoogleWebTranslator(
         targetLanguageCode: String,
         text: String,
     ): String? {
-        val source = TranslationLanguages.normalize(sourceLanguageCode)
-        val target = TranslationLanguages.normalize(targetLanguageCode)
+        val source = TranslationLanguages.targetCode(sourceLanguageCode)
+        val target = TranslationLanguages.targetCode(targetLanguageCode)
         if (source == target || text.isBlank()) return text
         return cached(source, target, text)
     }
@@ -390,8 +390,8 @@ class GoogleWebTranslator(
         targetLanguageCode: String,
         text: String,
     ): Boolean {
-        val source = TranslationLanguages.normalize(sourceLanguageCode)
-        val target = TranslationLanguages.normalize(targetLanguageCode)
+        val source = TranslationLanguages.targetCode(sourceLanguageCode)
+        val target = TranslationLanguages.targetCode(targetLanguageCode)
         if (source == target || text.isBlank()) return true
         return try {
             val translated = request(googleLanguageCode(source), googleLanguageCode(target), listOf(text))
