@@ -29,13 +29,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import java.time.LocalDate
 
 /**
  * Settings → Word learning → Tap bar buttons (lion737, Discussion #81, 2026-11-19; owner pick
  * 2026-11-20: switches in Settings, not a drag-and-drop editor). Each of the bar's actions shows as
  * an icon in the bar while its chip is on; every action stays in the bar's ▾ list either way. The
  * order is fixed, with Add to Anki next to Pronounce as lion737 asked. Add to Anki shows only while
- * Send to can be used, as on the word card.
+ * Send to can be used, as on the word card. Its icon is off at first (owner pick 2026-11-20): the
+ * third Add to Anki picked from the ▾ list in one day turns it on, unless the learner set its chip.
  */
 internal enum class TapBarButton(
     val preference: String,
@@ -46,8 +48,48 @@ internal enum class TapBarButton(
     COPY("tap_bar_copy", R.string.practice_copy, "copy", true),
     TRANSLATE("tap_bar_translate", R.string.practice_translate, "translate", true),
     PRONOUNCE("tap_bar_pronounce", R.string.practice_pronounce, "pronounce", true),
-    ANKI("tap_bar_anki", R.string.phrase_add_to_anki, "anki", true),
+    ANKI("tap_bar_anki", R.string.phrase_add_to_anki, "anki", false),
     GOOGLE_TRANSLATE("tap_bar_google_translate", R.string.practice_open_google_translate, "google_translate", false),
+}
+
+/** How many Add to Anki picks from the ▾ list in one day put its icon in the bar. */
+internal const val ANKI_PICKS_FOR_THE_BAR = 3
+
+/** Add to Anki picks from the ▾ list today, as "epochDay:count", until its icon joins the bar. */
+internal const val TAP_BAR_ANKI_PICKS_PREFERENCE = "tap_bar_anki_picks"
+
+/** Today's picks after one more on [today], from [stored] ("epochDay:count"); a new day starts again at 1. */
+internal fun ankiPicksAfterOneMore(
+    stored: String?,
+    today: Long,
+): Int {
+    val day = stored?.substringBefore(':')?.toLongOrNull()
+    val count = stored?.substringAfter(':', "")?.toIntOrNull() ?: 0
+    return if (day == today) count + 1 else 1
+}
+
+/**
+ * Counts an Add to Anki picked from the ▾ list. The [ANKI_PICKS_FOR_THE_BAR]th in one day turns its
+ * Tap bar buttons chip on and returns true. Nothing is counted once the learner set that chip either way.
+ */
+internal fun countAnkiPickedFromList(
+    preferences: SharedPreferences,
+    today: Long = LocalDate.now().toEpochDay(),
+): Boolean {
+    if (preferences.contains(TapBarButton.ANKI.preference)) return false
+    val picks = ankiPicksAfterOneMore(preferences.getString(TAP_BAR_ANKI_PICKS_PREFERENCE, null), today)
+    val joins = picks >= ANKI_PICKS_FOR_THE_BAR
+    preferences
+        .edit()
+        .apply {
+            if (joins) {
+                putBoolean(TapBarButton.ANKI.preference, true)
+                remove(TAP_BAR_ANKI_PICKS_PREFERENCE)
+            } else {
+                putString(TAP_BAR_ANKI_PICKS_PREFERENCE, "$today:$picks")
+            }
+        }.apply()
+    return joins
 }
 
 /** Every Tap bar buttons preference key, for backups, search and Reset all settings. */

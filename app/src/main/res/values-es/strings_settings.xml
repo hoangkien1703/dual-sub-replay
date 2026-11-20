@@ -132,7 +132,7 @@
     <string name="settings_tap_bar_reading_title">Pronunciación en la barra al tocar</string>
     <string name="settings_tap_bar_reading_description">Al tocar una palabra, la barra de arriba también muestra cómo se dice: AFI para inglés, kana para japonés y pinyin para chino.</string>
     <string name="settings_tap_bar_buttons_title">Botones de la barra al tocar</string>
-    <string name="settings_tap_bar_buttons_description">Elige qué botones muestra la barra sobre la palabra que tocas. Los demás siguen en su lista ▾. Añadir a Anki aparece cuando Tarjetas y Anki puede enviar tarjetas.</string>
+    <string name="settings_tap_bar_buttons_description">Elige qué botones muestra la barra sobre la palabra que tocas. Los demás siguen en su lista ▾. Añadir a Anki aparece cuando Tarjetas y Anki puede enviar tarjetas, y su icono pasa a la barra cuando lo eliges 3 veces en un día desde la lista ▾.</string>
     <string name="settings_word_learning_mode_title">Modo de aprendizaje de palabras (colores por categoría)</string>
     <string name="settings_word_learning_mode_description">Colorea las palabras según su función gramatical (sustantivos, verbos, adjetivos, partículas) para ver la estructura de la oración.</string>
     <string name="settings_colored_lines_title">Líneas de subtítulos coloreadas</string>

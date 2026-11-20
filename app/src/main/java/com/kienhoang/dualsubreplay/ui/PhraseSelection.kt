@@ -276,6 +276,8 @@ internal class PhraseActions(
     val buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
     /** The card Add to Anki sends for a selection with this meaning; null hides Add to Anki. */
     val ankiCard: ((tap: WordTap, meaning: String) -> SavedWord)? = null,
+    /** Counts an Add to Anki picked from the ▾ list; true when that puts its icon in the bar from now on. */
+    val ankiPickedFromList: () -> Boolean = { false },
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -398,6 +400,7 @@ internal fun BindPhraseActions(
                 readingInBar = readTapBarReading(context),
                 buttons = readTapBarButtons(context),
                 ankiCard = ankiCard,
+                ankiPickedFromList = { countAnkiPickedFromList(context.getSharedPreferences("dual_sub_preferences", 0)) },
                 openGoogleTranslate = { text ->
                     when (sendToGoogleTranslate(context, text)) {
                         TranslateSendResult.SENT -> Unit
@@ -516,6 +519,7 @@ internal fun SelectableSubtitleText(
                         onWordClick(tap)
                     },
                     buttons = controller.actions.buttons,
+                    onAnkiFromList = controller.actions.ankiPickedFromList,
                     ankiCard = barAnkiCard(controller.actions, phraseTap(text, tokens, words, segment, translated)),
                     onPronounce = { spoken?.let { controller.actions.pronounce(it, translated) } },
                     onOpenGoogleTranslate = {
@@ -800,8 +804,11 @@ private fun PhraseActionBar(
     onOpenGoogleTranslate: () -> Unit,
     onClose: () -> Unit,
     buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
+    onAnkiFromList: () -> Boolean = { false },
     ankiCard: ((meaning: String) -> SavedWord)? = null,
 ) {
+    // The third Add to Anki from the ▾ list in a day puts its icon in this bar too, not only the next one.
+    var shown by remember(buttons) { mutableStateOf(buttons) }
     val density = LocalDensity.current
     val meaning = remember(phrase) { QuickMeaning(asking = meaningInSentence != null) }
     val anki = rememberBarAnki(phrase, ankiCard)
@@ -851,7 +858,7 @@ private fun PhraseActionBar(
                             onClick = onOpenGoogleTranslate,
                         ),
                     ).filterNotNull()
-                        .shownIn(buttons)
+                        .shownIn(shown)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     actions.filter { it.inBar }.forEach { action ->
                         IconButton(
@@ -862,7 +869,9 @@ private fun PhraseActionBar(
                             Icon(action.icon, contentDescription = stringResource(action.label), tint = MaterialTheme.colorScheme.primary)
                         }
                     }
-                    PhraseActionMenu(actions)
+                    PhraseActionMenu(actions) { picked ->
+                        if (picked.tag == TapBarButton.ANKI.tag && !picked.inBar && onAnkiFromList()) shown = shown + TapBarButton.ANKI
+                    }
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onClose, modifier = Modifier.testTag("phrase_close")) {
                         Icon(
@@ -973,7 +982,10 @@ private class PhraseAction(
 
 /** The ▾ button listing every action with its icon and name, for anyone unsure what an icon does. */
 @Composable
-private fun PhraseActionMenu(actions: List<PhraseAction>) {
+private fun PhraseActionMenu(
+    actions: List<PhraseAction>,
+    onPicked: (PhraseAction) -> Unit = {},
+) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("phrase_all_actions")) {
@@ -991,6 +1003,7 @@ private fun PhraseActionMenu(actions: List<PhraseAction>) {
                     enabled = action.enabled,
                     onClick = {
                         expanded = false
+                        onPicked(action)
                         action.onClick()
                     },
                     modifier = Modifier.testTag("phrase_menu_${action.tag}"),

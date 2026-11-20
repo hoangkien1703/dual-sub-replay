@@ -13,6 +13,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -64,6 +66,7 @@ class PhraseSelectionUiTest {
         readingInBar: Boolean = false,
         buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
         anki: Boolean = false,
+        ankiPickedFromList: () -> Boolean = { false },
     ) {
         val controller = PhraseSelectionController()
         controller.actions =
@@ -85,6 +88,7 @@ class PhraseSelectionUiTest {
                 meaningInSentenceFirst = inSentenceFirst,
                 readingInBar = readingInBar,
                 buttons = buttons,
+                ankiPickedFromList = ankiPickedFromList,
                 ankiCard =
                     if (anki) {
                         { tap, meaning ->
@@ -435,7 +439,7 @@ class PhraseSelectionUiTest {
     /** lion737 (#81, 2026-11-19): Add to Anki sits next to Pronounce and sends the bar's meaning in one tap. */
     @Test
     fun addToAnkiSendsTheMeaningInTheSentenceInOneTap() {
-        showCard(inSentence = "đang mong chờ", anki = true)
+        showCard(inSentence = "đang mong chờ", buttons = defaultButtons + TapBarButton.ANKI, anki = true)
         tapWord(original, "looking")
         compose.onNodeWithTag("phrase_anki").assertIsDisplayed()
         // The bar asks about the sentence after a short pause, so the second line comes a moment later.
@@ -467,6 +471,33 @@ class PhraseSelectionUiTest {
         compose.onNodeWithTag("phrase_menu_copy").assertIsDisplayed()
         compose.onNodeWithTag("phrase_menu_translate").assertIsDisplayed()
         compose.onNodeWithTag("phrase_menu_anki").assertIsDisplayed()
+    }
+
+    @Test
+    fun addToAnkiJoinsTheBarAfterThreePicksFromTheList() {
+        var picks = 0
+        showCard(anki = true, ankiPickedFromList = { ++picks >= ANKI_PICKS_FOR_THE_BAR })
+        tapWord(original, "looking")
+        // Off at first (owner pick 2026-11-20): only the ▾ list has Add to Anki.
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        pickAnkiFromList(1)
+        pickAnkiFromList(2)
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        pickAnkiFromList(3)
+        compose.onNodeWithTag("phrase_anki").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-anki-joined")
+    }
+
+    private val defaultButtons = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault }
+
+    /** Opens the ▾ list and picks Add to Anki once its last send has finished, then waits for card [count]. */
+    private fun pickAnkiFromList(count: Int) {
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.waitUntil(10_000) {
+            compose.onAllNodes(hasTestTag("phrase_menu_anki") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("phrase_menu_anki").performClick()
+        compose.waitUntil(10_000) { ankiCards.size == count }
     }
 
     @Test

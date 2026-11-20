@@ -132,7 +132,7 @@
     <string name="settings_tap_bar_reading_title">탭 바에 발음 표시</string>
     <string name="settings_tap_bar_reading_description">단어 하나를 탭하면 위의 바에도 읽는 법을 보여 줍니다. 영어는 IPA, 일본어는 가나, 중국어는 병음입니다.</string>
     <string name="settings_tap_bar_buttons_title">탭 바 버튼</string>
-    <string name="settings_tap_bar_buttons_description">탭한 단어 위 바에 표시할 버튼을 고르세요. 나머지는 ▾ 목록에 남습니다. Anki에 추가는 플래시카드 및 Anki에서 카드를 보낼 수 있을 때 나타납니다.</string>
+    <string name="settings_tap_bar_buttons_description">탭한 단어 위 바에 표시할 버튼을 고르세요. 나머지는 ▾ 목록에 남습니다. Anki에 추가는 플래시카드 및 Anki에서 카드를 보낼 수 있을 때 나타나며, 하루에 ▾ 목록에서 3번 고르면 아이콘이 바에 추가됩니다.</string>
     <string name="settings_word_learning_mode_title">단어 학습 모드(품사별 색상)</string>
     <string name="settings_word_learning_mode_description">문법 역할(명사, 동사, 형용사, 조사)에 따라 단어에 색을 입혀 문장 구조를 보여 줘요.</string>
     <string name="settings_colored_lines_title">색상을 입힐 자막 줄</string>

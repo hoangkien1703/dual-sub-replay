@@ -42,7 +42,9 @@ in one PR") for Discussion #81 comments from lion737: 19674441, 19674625, 196821
    the handles makes a sentence card.
 6. **Settings → Word learning → Tap bar buttons**: one chip per action (Copy, Translate, Pronounce,
    Add to Anki, Open in Google Translate). On shows the icon in the bar; every action stays in the ▾
-   list. Defaults: today's bar plus Add to Anki.
+   list. Defaults: today's bar. Add to Anki starts in the ▾ list only (owner pick 2026-11-20, after
+   his phone test): the third Add to Anki picked from the list in one day turns its chip on for good,
+   unless the learner already set that chip either way.
 
 ## Non-goals
 
@@ -66,7 +68,8 @@ in one PR") for Discussion #81 comments from lion737: 19674441, 19674625, 196821
   (anywhere in the cause chain) with nothing translated yet, it sends the first half again once.
 - `TapBarButton` (`ui/TapBarButtons.kt`): five boolean preferences `tap_bar_*` (SHARE in
   `SETTING_SPECS`, in `RESETTABLE_SETTING_KEYS`, one `SearchableSetting` that also finds each chip's
-  name).
+  name). `countAnkiPickedFromList` keeps today's picks as `tap_bar_anki_picks` ("epochDay:count",
+  NEVER in backups) while `tap_bar_anki` is unset, and sets it to true on the third pick of a day.
 - `PhraseActions.ankiCard` (from `AppViewModel.ankiCard`, `savedWordFrom` like the word card) and
   `rememberCardSend` (the word card's `WordCardSend`, now keyed by any value). The bar keeps its
   meanings in `QuickMeaning`; Add to Anki waits for the dictionary meaning and the AI's meaning (at
@@ -82,7 +85,9 @@ in one PR") for Discussion #81 comments from lion737: 19674441, 19674625, 196821
 - [ ] `LineMeaningsTest`: a word is stored as soon as its line arrives; a tap waits at most 2 s.
 - [ ] `AiSubtitleTranslatorTest`: a timed-out request is asked again at once with half its sentences.
 - [ ] `PhraseSelectionUiTest`: Add to Anki sends the bar's combined meaning in one tap; Tap bar
-      buttons hide icons while the ▾ list keeps every action; Add to Anki hides without Send to.
+      buttons hide icons while the ▾ list keeps every action; Add to Anki hides without Send to;
+      Add to Anki joins the bar after three picks from the list (`TapBarAnkiPicksTest`: only within
+      one day, never over a chip the learner set).
 - [ ] Screenshots of the bar with Add to Anki checked before handoff.
 - [ ] Phone check by the owner / lion737: meaning appears within a few seconds with Prepare meanings
       ahead on.
