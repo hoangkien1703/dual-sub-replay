@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">베타</string>
+    <string name="beta_section_hint">초기 기능입니다. 바뀌거나 작동하지 않을 수 있으며, 직접 켜기 전까지 모두 꺼져 있습니다.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">bilibili.com 동영상을 이중 자막으로 봅니다. 대부분의 자막은 Bilibili 로그인이 필요합니다. 처음 켜면 Bilibili가 열립니다.</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">bilibili.tv 동영상을 이중 자막으로 봅니다. 처음 켜면 bilibili.tv가 열립니다.</string>
+    <string name="tabs_new_tab_site">새 탭: %1$s</string>
+    <string name="tabs_name_bilibili_video">Bilibili 동영상</string>
+    <string name="tabs_name_bilibili_page">Bilibili 페이지</string>
+    <string name="tabs_open_new_site_tab">%1$s 열기</string>
+    <string name="bilibili_sign_in_title">자막을 불러오려면 Bilibili에 로그인하세요</string>
+    <string name="bilibili_sign_in_body">Bilibili는 대부분의 자막을 로그인한 사용자에게만 보여 줍니다. 여기 Bilibili 페이지에서 로그인한 뒤(앱은 비밀번호를 볼 수 없습니다) 다시 시도를 누르세요.</string>
+    <string name="bilibili_no_subtitles_title">이 동영상에는 자막이 없습니다</string>
+    <string name="bilibili_no_subtitles_body">Bilibili에 이 동영상의 자막이 없습니다. 다른 동영상을 시도해 보세요.</string>
+    <string name="bilibili_try_again">다시 시도</string>
+</resources>

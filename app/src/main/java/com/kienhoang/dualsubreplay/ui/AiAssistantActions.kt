@@ -161,6 +161,8 @@ internal data class AiStoredSettings(
     val differentTabAccounts: Boolean = false,
     val sleepTimerInQuickSettings: Boolean = false,
     val wholeTranscript: Boolean = false,
+    val bilibili: Boolean = false,
+    val bilibiliTv: Boolean = false,
     val tvLayout: Boolean = false,
 )
 
@@ -176,6 +178,8 @@ private val STORED_SWITCHES =
         AiSetting.SLEEP_TIMER_QUICK to SLEEP_TIMER_QUICK_PREFERENCE,
         AiSetting.WHOLE_TRANSCRIPT to WHOLE_TRANSCRIPT_PREFERENCE,
         AiSetting.TV_LAYOUT to TV_LAYOUT_PREFERENCE,
+        AiSetting.BILIBILI to BETA_BILIBILI_PREFERENCE,
+        AiSetting.BILIBILI_TV to BETA_BILIBILI_TV_PREFERENCE,
     )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -203,6 +207,8 @@ internal fun readAiStoredSettings(context: Context): AiStoredSettings {
         differentTabAccounts = preferences.getBoolean(DIFFERENT_TAB_ACCOUNTS_PREFERENCE, false),
         sleepTimerInQuickSettings = preferences.getBoolean(SLEEP_TIMER_QUICK_PREFERENCE, false),
         wholeTranscript = preferences.getBoolean(WHOLE_TRANSCRIPT_PREFERENCE, false),
+        bilibili = preferences.getBoolean(BETA_BILIBILI_PREFERENCE, false),
+        bilibiliTv = preferences.getBoolean(BETA_BILIBILI_TV_PREFERENCE, false),
         tvLayout = readTvLayout(preferences, isTelevisionDevice(context)),
     )
 }
@@ -257,6 +263,8 @@ private fun aiWordSettingValue(
         AiSetting.TAP_BAR_READING -> onOff(stored.tapBarReading)
         AiSetting.SLEEP_TIMER_QUICK -> onOff(stored.sleepTimerInQuickSettings)
         AiSetting.WHOLE_TRANSCRIPT -> onOff(stored.wholeTranscript)
+        AiSetting.BILIBILI -> onOff(stored.bilibili)
+        AiSetting.BILIBILI_TV -> onOff(stored.bilibiliTv)
         else -> null
     }
 
@@ -963,6 +971,8 @@ internal class AppAiActions(
         value: String,
     ): String =
         when (setting) {
+            AiSetting.BILIBILI -> switch(R.string.beta_bilibili_title, value)
+            AiSetting.BILIBILI_TV -> switch(R.string.beta_bilibili_tv_title, value)
             AiSetting.SEND_TO_ANKIDROID -> switch(R.string.study_anki_title, value)
             AiSetting.SEND_TO_APP -> named(R.string.study_send_to_app_title, string(storedFlashcardApp(value).nameRes))
             AiSetting.SEND_SAVED_WORDS -> switch(R.string.study_send_on_save_title, value)

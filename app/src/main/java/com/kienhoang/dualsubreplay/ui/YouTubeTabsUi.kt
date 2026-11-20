@@ -46,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
@@ -96,6 +97,8 @@ internal class BrowserTabActions(
     /** False when [MAX_BROWSER_TABS] are open. */
     val openNew: (account: Int) -> Boolean = { false },
     val openInNew: (url: String) -> Boolean = { false },
+    /** New tab → Bilibili: a new tab at a Beta site's home page, opened at once. */
+    val openSite: (url: String) -> Boolean = { false },
     /** The page at this address got this title. */
     val pageTitle: (url: String, title: String?) -> Unit = { _, _ -> },
 )
@@ -106,6 +109,7 @@ internal fun browserTabActions(viewModel: AppViewModel) =
         close = viewModel::closeTab,
         openNew = { account -> viewModel.openNewTab(account) },
         openInNew = viewModel::openInNewTab,
+        openSite = { url -> viewModel.openNewTabAt(url) },
         pageTitle = viewModel::onYouTubePageTitle,
     )
 
@@ -146,9 +150,12 @@ internal fun DrawerTabsSection(
                     onClose = { actions.close(tab.id) },
                 )
             }
-            NewTabRows(tabs.full, differentAccounts) { account ->
-                if (actions.openNew(account)) closeDrawer()
-            }
+            NewTabRows(
+                full = tabs.full,
+                differentAccounts = differentAccounts,
+                onNewTab = { account -> if (actions.openNew(account)) closeDrawer() },
+                onNewSite = { url -> if (actions.openSite(url)) closeDrawer() },
+            )
         }
     }
 }
@@ -158,7 +165,9 @@ private fun NewTabRows(
     full: Boolean,
     differentAccounts: Boolean,
     onNewTab: (account: Int) -> Unit,
+    onNewSite: (url: String) -> Unit,
 ) {
+    val betaSites by rememberBetaSitesOn()
     if (full) {
         Text(
             stringResource(R.string.tabs_full, MAX_BROWSER_TABS),
@@ -166,6 +175,10 @@ private fun NewTabRows(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        return
+    }
+    if (betaSites.isNotEmpty()) {
+        NewTabSiteMenu(betaSites, differentAccounts, onNewTab, onNewSite)
         return
     }
     TabMenuRow(Icons.Default.Add, stringResource(R.string.tabs_new_tab), "new_tab") { onNewTab(MAIN_TAB_ACCOUNT) }
@@ -183,6 +196,49 @@ private fun NewTabRows(
                     onClick = {
                         chooseAccount = false
                         onNewTab(account)
+                    },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * New tab with a Beta site on (owner pick 2026-11-17): a menu of YouTube (each account when
+ * Different accounts is on) and the Bilibili sites that are on.
+ */
+@Composable
+private fun NewTabSiteMenu(
+    sites: List<BetaSite>,
+    differentAccounts: Boolean,
+    onNewTab: (account: Int) -> Unit,
+    onNewSite: (url: String) -> Unit,
+) {
+    var open by remember { mutableStateOf(false) }
+    val youtube = stringResource(R.string.tabs_site_youtube)
+    Box {
+        TabMenuRow(Icons.Default.Add, stringResource(R.string.tabs_new_tab), "new_tab") { open = true }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }, offset = DpOffset(48.dp, 0.dp)) {
+            val accounts = if (differentAccounts) (MAIN_TAB_ACCOUNT..TAB_ACCOUNT_COUNT).toList() else listOf(MAIN_TAB_ACCOUNT)
+            accounts.forEach { account ->
+                DropdownMenuItem(
+                    text = { Text(if (differentAccounts) "$youtube · ${tabAccountName(account)}" else youtube) },
+                    leadingIcon = { Icon(Icons.Default.OndemandVideo, contentDescription = null) },
+                    modifier = Modifier.testTag("new_tab_youtube_$account"),
+                    onClick = {
+                        open = false
+                        onNewTab(account)
+                    },
+                )
+            }
+            sites.forEach { site ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(site.title)) },
+                    leadingIcon = { Icon(Icons.Default.Public, contentDescription = null) },
+                    modifier = Modifier.testTag("new_tab_site_${site.name.lowercase()}"),
+                    onClick = {
+                        open = false
+                        onNewSite(site.homeUrl)
                     },
                 )
             }
@@ -277,6 +333,8 @@ internal fun browserTabName(tab: BrowserTab): String =
                 BrowserTabKind.HOME -> R.string.tabs_name_home
                 BrowserTabKind.SEARCH -> R.string.tabs_name_search
                 BrowserTabKind.OTHER -> R.string.tabs_name_page
+                BrowserTabKind.BILIBILI_VIDEO -> R.string.tabs_name_bilibili_video
+                BrowserTabKind.BILIBILI_PAGE -> R.string.tabs_name_bilibili_page
             },
         )
     }
@@ -307,10 +365,10 @@ private fun TabPicture(url: String) {
         } else {
             val icon =
                 when (browserTabKind(url)) {
-                    BrowserTabKind.VIDEO -> Icons.Default.OndemandVideo
+                    BrowserTabKind.VIDEO, BrowserTabKind.BILIBILI_VIDEO -> Icons.Default.OndemandVideo
                     BrowserTabKind.HOME -> Icons.Default.Home
                     BrowserTabKind.SEARCH -> Icons.Default.Search
-                    BrowserTabKind.OTHER -> Icons.Default.Public
+                    BrowserTabKind.OTHER, BrowserTabKind.BILIBILI_PAGE -> Icons.Default.Public
                 }
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
         }
@@ -359,7 +417,9 @@ internal object TabThumbnails {
 internal fun EmptyTabsPage(
     onOpenNewTab: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenSite: (String) -> Unit = {},
 ) {
+    val betaSites by rememberBetaSitesOn()
     // Back leaves the app as on the YouTube page, keeping the app's state.
     val context = LocalContext.current
     BackHandler { (context as? Activity)?.leaveKeepingState() }
@@ -382,6 +442,14 @@ internal fun EmptyTabsPage(
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.tabs_open_new_youtube_tab))
+            }
+            betaSites.forEach { site ->
+                OutlinedButton(
+                    onClick = { onOpenSite(site.homeUrl) },
+                    modifier = Modifier.testTag("empty_tabs_open_${site.name.lowercase()}"),
+                ) {
+                    Text(stringResource(R.string.tabs_open_new_site_tab, stringResource(site.title)))
+                }
             }
         }
     }

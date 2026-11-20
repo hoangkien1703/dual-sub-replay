@@ -269,6 +269,8 @@ class SubtitleWordHighlightTest {
                 WHOLE_TRANSCRIPT_PREFERENCE,
                 DRAWER_TABS_OPEN_PREFERENCE,
                 TV_LAYOUT_PREFERENCE,
+                BETA_BILIBILI_PREFERENCE,
+                BETA_BILIBILI_TV_PREFERENCE,
             )
         assertEquals(expected, RESETTABLE_SETTING_KEYS.toSet())
         assertEquals(RESETTABLE_SETTING_KEYS.size, RESETTABLE_SETTING_KEYS.distinct().size)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">Beta</string>
+    <string name="beta_section_hint">Funciones en prueba. Pueden cambiar o dejar de funcionar, y cada una está desactivada hasta que la actives.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">Mira vídeos de bilibili.com con subtítulos dobles. La mayoría de los subtítulos requieren iniciar sesión en Bilibili. Abre Bilibili la primera vez que lo activas.</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">Mira vídeos de bilibili.tv con subtítulos dobles. Abre bilibili.tv la primera vez que lo activas.</string>
+    <string name="tabs_new_tab_site">Nueva pestaña: %1$s</string>
+    <string name="tabs_name_bilibili_video">Vídeo de Bilibili</string>
+    <string name="tabs_name_bilibili_page">Página de Bilibili</string>
+    <string name="tabs_open_new_site_tab">Abrir %1$s</string>
+    <string name="bilibili_sign_in_title">Inicia sesión en Bilibili para cargar sus subtítulos</string>
+    <string name="bilibili_sign_in_body">Bilibili muestra la mayoría de los subtítulos solo a quien ha iniciado sesión. Inicia sesión en la página de Bilibili aquí (la app nunca ve tu contraseña) y toca Reintentar.</string>
+    <string name="bilibili_no_subtitles_title">Este vídeo no tiene subtítulos</string>
+    <string name="bilibili_no_subtitles_body">Bilibili no tiene subtítulos para este vídeo. Prueba con otro vídeo.</string>
+    <string name="bilibili_try_again">Reintentar</string>
+</resources>

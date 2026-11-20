@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -54,11 +55,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
-import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.playback.WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT
 import com.kienhoang.dualsubreplay.playback.WEB_VIDEO_STATE_SCRIPT
 import com.kienhoang.dualsubreplay.playback.YOUTUBE_DOCUMENT_START_ORIGINS
@@ -117,19 +119,30 @@ internal data class BrowseVideoSelection(val videoId: String, val canonicalUrl: 
 
 internal enum class EmbeddedNavigationDecision {
     YOUTUBE_WEB,
+
+    /** A Bilibili page (and its sign-in pages) while that Beta site is on. */
+    BILIBILI_WEB,
     GOOGLE_SIGN_IN,
     OPEN_EXTERNAL,
     BLOCK,
 }
 
+/** The video a page [url] plays: a YouTube id, or a Bilibili key on a Beta Bilibili page. */
 internal fun browseVideoSelection(url: String): BrowseVideoSelection? {
-    val videoId = YouTubeUrlParser.extractVideoId(url) ?: return null
-    return BrowseVideoSelection(videoId, "https://www.youtube.com/watch?v=$videoId")
+    val videoId = VideoKeys.fromUrl(url) ?: return null
+    if (VideoKeys.isBilibili(videoId) && !isVideoSiteUrl(url)) return null
+    return BrowseVideoSelection(videoId, VideoKeys.watchUrl(videoId))
 }
 
 internal fun isYouTubeWebUrl(url: String): Boolean {
     return classifyMainFrameUrl(url) == EmbeddedNavigationDecision.YOUTUBE_WEB
 }
+
+/** A page the app shows and reads: YouTube, or a Bilibili site whose Beta switch is on. */
+internal fun isVideoSiteUrl(url: String): Boolean = classifyMainFrameUrl(url).isVideoSite()
+
+internal fun EmbeddedNavigationDecision.isVideoSite(): Boolean =
+    this == EmbeddedNavigationDecision.YOUTUBE_WEB || this == EmbeddedNavigationDecision.BILIBILI_WEB
 
 internal fun classifyMainFrameUrl(url: String): EmbeddedNavigationDecision {
     val uri = runCatching { URI(url) }.getOrNull() ?: return EmbeddedNavigationDecision.BLOCK
@@ -144,9 +157,36 @@ internal fun classifyMainFrameUrl(url: String): EmbeddedNavigationDecision {
         host == "youtube.com" || host.endsWith(".youtube.com") -> {
             EmbeddedNavigationDecision.YOUTUBE_WEB
         }
+        isBilibiliAppDownload(host, uri.rawQuery) -> EmbeddedNavigationDecision.BLOCK
+        VideoKeys.bilibiliSiteOfHost(host)?.let(BetaSites::isOn) == true -> EmbeddedNavigationDecision.BILIBILI_WEB
         else -> EmbeddedNavigationDecision.OPEN_EXTERNAL
     }
 }
+
+/** Bilibili's own app pages: its download pages, and Google Play's pages for its apps (Bilibili beta). */
+private val BILIBILI_APP_PACKAGES = setOf("tv.danmaku.bili", "com.bilibili.app.in", "com.bstar.intl")
+
+private fun isBilibiliAppDownload(
+    host: String,
+    rawQuery: String?,
+): Boolean =
+    host == "d.bilibili.com" || host == "d.biliintl.com" ||
+        (host == "play.google.com" && rawQuery.orEmpty().split('&').any { it.removePrefix("id=") in BILIBILI_APP_PACKAGES })
+
+/**
+ * A Bilibili page that sends itself to another site with no tap (its app fallback, seen on the laptop
+ * emulator 2026-11-20) must not open the browser or another app; a link the user taps still does.
+ */
+internal fun blocksUntappedExit(
+    currentUrl: String?,
+    destination: EmbeddedNavigationDecision,
+    hasGesture: Boolean,
+): Boolean =
+    !hasGesture && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL &&
+        currentUrl?.let(::classifyMainFrameUrl) == EmbeddedNavigationDecision.BILIBILI_WEB
+
+/** The open tab's id, so a tab switch can drop the shared web view's Back history. */
+internal val LocalBrowserTabId = compositionLocalOf<Long?> { null }
 
 internal fun isSignOutNavigation(url: String): Boolean {
     val uri = runCatching { URI(url) }.getOrNull() ?: return false
@@ -159,8 +199,7 @@ internal fun isSignOutNavigation(url: String): Boolean {
 }
 
 internal fun shouldOpenInsideApp(destination: EmbeddedNavigationDecision): Boolean =
-    destination == EmbeddedNavigationDecision.YOUTUBE_WEB ||
-        destination == EmbeddedNavigationDecision.GOOGLE_SIGN_IN
+    destination.isVideoSite() || destination == EmbeddedNavigationDecision.GOOGLE_SIGN_IN
 
 /**
  * While Google sign-in runs, its steps pass through Google's other hosts (country domains such as
@@ -387,12 +426,16 @@ internal fun SingleYouTubePage(
     var signInReturnUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(trustedEmbeddedUrlOrHome(initialUrl)) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
+    // Every tab shows in this one web view: after a switch, Back must not lead into the last tab's pages.
+    val tabId = LocalBrowserTabId.current
+    var shownTabId by remember { mutableStateOf(tabId) }
+    var forgetHistoryOnLoad by remember { mutableStateOf(false) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
         controller.pageChanged(currentUrl)
         canGoBack = view.canGoBack()
-        if (classifyMainFrameUrl(currentUrl) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
+        if (!isVideoSiteUrl(currentUrl)) return
         lastKnownUrl = currentUrl
         currentOnPageChanged(currentUrl)
         if (googleSignInInProgress || signInEmbedUntilYouTubeLands) {
@@ -447,7 +490,7 @@ internal fun SingleYouTubePage(
                     title: String?,
                 ) {
                     val url = view.url.orEmpty()
-                    if (isYouTubeWebUrl(url)) tabActions?.pageTitle?.invoke(url, title)
+                    if (isVideoSiteUrl(url)) tabActions?.pageTitle?.invoke(url, title)
                 }
 
                 override fun onHideCustomView() {
@@ -483,7 +526,7 @@ internal fun SingleYouTubePage(
                     }
                     val signInEmbeddingActive = googleSignInInProgress || signInEmbedUntilYouTubeLands
                     if (shouldOpenInsideApp(url, destination, signInEmbeddingActive)) {
-                        if (destination == EmbeddedNavigationDecision.YOUTUBE_WEB) {
+                        if (destination.isVideoSite()) {
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress && !isSignOutNavigation(url)) {
                             signInReturnUrl = lastKnownUrl
@@ -504,6 +547,7 @@ internal fun SingleYouTubePage(
                             true
                         }
                         EmbeddedNavigationDecision.YOUTUBE_WEB,
+                        EmbeddedNavigationDecision.BILIBILI_WEB,
                         EmbeddedNavigationDecision.GOOGLE_SIGN_IN -> false
                     }
                 }
@@ -513,7 +557,9 @@ internal fun SingleYouTubePage(
                     request: WebResourceRequest,
                 ): Boolean {
                     if (!request.isForMainFrame) return false
-                    return handleMainFrameUrl(view, request.url.toString())
+                    val url = request.url.toString()
+                    if (blocksUntappedExit(view.url, classifyMainFrameUrl(url), request.hasGesture())) return true
+                    return handleMainFrameUrl(view, url)
                 }
 
                 @Suppress("DEPRECATION")
@@ -543,7 +589,17 @@ internal fun SingleYouTubePage(
                     if (url != null && handleMainFrameUrl(view, url)) return
                     rendererRecoveryUsed = false
                     webViewUnavailable = false
+                    if (forgetHistoryOnLoad) {
+                        forgetHistoryOnLoad = false
+                        view.clearHistory()
+                    }
                     reportNavigation(view, url)
+                    if (url != null && classifyMainFrameUrl(url) == EmbeddedNavigationDecision.BILIBILI_WEB) {
+                        // Keeps a Bilibili sign-in, whose cookies the subtitle requests send.
+                        cookies.flush()
+                        view.evaluateJavascript(WEB_HIDE_BILIBILI_APP_SCRIPT, null)
+                        view.evaluateJavascript(webCaptionVisibilityScript(currentSuppressPageCaptions), null)
+                    }
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         cookies.flush()
                         view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
@@ -616,11 +672,16 @@ internal fun SingleYouTubePage(
     LaunchedEffect(navigationRequestId, initialUrl, webView) {
         if (navigationRequestId == handledNavigationRequestId) return@LaunchedEffect
         handledNavigationRequestId = navigationRequestId
-        if (isYouTubeWebUrl(initialUrl)) webView.loadUrl(initialUrl)
+        if (!isVideoSiteUrl(initialUrl)) return@LaunchedEffect
+        if (tabId != shownTabId) {
+            shownTabId = tabId
+            forgetHistoryOnLoad = true
+        }
+        webView.loadUrl(initialUrl)
     }
 
     LaunchedEffect(webView, suppressPageCaptions) {
-        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+        if (webView.url.orEmpty().let(::isVideoSiteUrl)) {
             webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
         }
     }
@@ -696,7 +757,7 @@ internal fun SingleYouTubePage(
                 val due =
                     woken || url != lastUrl ||
                         now - lastRequest >= playbackPollIntervalMs(browseVideoSelection(url) != null, latest)
-                if (due && polling() && isYouTubeWebUrl(url) && (!pending || now - lastRequest > 500)) {
+                if (due && polling() && isVideoSiteUrl(url) && (!pending || now - lastRequest > 500)) {
                     lastUrl = url
                     pending = true
                     val requestedUrl = webView.url
@@ -767,7 +828,7 @@ internal fun SingleYouTubePage(
             pollNow.trySend(Unit)
         }
         val token = controller.bind { second ->
-            if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+            if (webView.url.orEmpty().let(::isVideoSiteUrl)) {
                 // A play mode or the loop replays a line off screen: the hidden page may play again.
                 if (!lifecycleStarted) keepPageShownOffScreen()
                 webView.evaluateJavascript(webReplayScript(second), null)
@@ -851,7 +912,9 @@ internal fun SingleYouTubePage(
         }
     }
 
-    BackHandler {
+    // The open menu closes first (AppNavigation's own Back).
+    val menuOpen by navigationMenuOpen.collectAsStateWithLifecycle()
+    BackHandler(enabled = !menuOpen) {
         if (canGoBack) webView.goBack() else (context as? Activity)?.leaveKeepingState()
     }
 
@@ -879,7 +942,7 @@ internal fun SingleYouTubePage(
         OpenInNewTabMenu(
             link = longPressedLink,
             onOpenInNewTab = { url -> tabActions?.openInNew?.invoke(url) },
-            onOpenHere = { url -> if (isYouTubeWebUrl(url)) webView.loadUrl(url) },
+            onOpenHere = { url -> if (isVideoSiteUrl(url)) webView.loadUrl(url) },
             onDismiss = { longPressedLink = null },
         )
     }

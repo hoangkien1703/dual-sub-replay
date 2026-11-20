@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Style
@@ -49,7 +50,6 @@ import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.ViewDay
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
@@ -213,7 +213,9 @@ internal enum class MoreSettingsSection(
         R.string.settings_section_updates_title,
         Icons.Default.SystemUpdate,
     ),
-    TV("tv", SettingsGroup.APP, R.string.settings_section_tv_title, Icons.Default.Tv),
+
+    /** Bilibili, Bilibili International and the TV layout (owner picks 2026-11-17): off until turned on. */
+    BETA("beta", SettingsGroup.APP, R.string.settings_section_beta_title, Icons.Default.Science),
 
     /** Back up, restore, and share a setup by link (owner pick 2026-11-10); last, just above Reset. */
     BACKUP(
@@ -1210,7 +1212,7 @@ private fun ColumnScope.SectionSettings(
         MoreSettingsSection.COLORS -> page.colors(this)
         MoreSettingsSection.AI_ASSISTANT -> LocalAiAssistant.current?.let { AiAssistantSettingsSection(it, nested = true) }
         MoreSettingsSection.UPDATES -> AppUpdateSettingsSection()
-        MoreSettingsSection.TV -> TvLayoutSettingsSection()
+        MoreSettingsSection.BETA -> BetaSettingsSection()
         MoreSettingsSection.BACKUP -> BackupSharingSettingsSection()
     }
 }

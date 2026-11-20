@@ -24,6 +24,8 @@ data class DualSubUiState(
     val fullTranscriptProblem: String? = null,
     /** YouTube has no caption track at all for the open video, so the panel offers AI subtitles. */
     val noCaptions: Boolean = false,
+    /** With [noCaptions]: Bilibili shows this video's subtitles only to signed-in viewers (Bilibili beta). */
+    val captionsNeedSignIn: Boolean = false,
     /** With [noCaptions]: the open video is a live stream now, which AI subtitles can't listen to. */
     val liveStream: Boolean = false,
     /** AI subtitles being made for a video, or why they could not be; null when nothing is going on. */

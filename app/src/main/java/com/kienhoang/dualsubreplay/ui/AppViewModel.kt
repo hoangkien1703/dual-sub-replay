@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.SystemClock
 import android.util.LruCache
+import android.webkit.CookieManager
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.assistant.storedAiTranslationThinking
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
+import com.kienhoang.dualsubreplay.data.BilibiliCaptionProvider
 import com.kienhoang.dualsubreplay.data.lyricChapter
 import com.kienhoang.dualsubreplay.data.descriptionChapters
 import com.kienhoang.dualsubreplay.data.chaptersFromPlaying
@@ -53,10 +55,12 @@ import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.RemoteSwitchState
 import com.kienhoang.dualsubreplay.data.SavedWord
+import com.kienhoang.dualsubreplay.data.SiteCaptionProvider
 import com.kienhoang.dualsubreplay.data.SoundCues
 import com.kienhoang.dualsubreplay.data.SubtitleMerger
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.data.SyncedLyricsSource
 import com.kienhoang.dualsubreplay.data.VocabularyRepository
 import com.kienhoang.dualsubreplay.data.WordTap
@@ -64,6 +68,7 @@ import com.kienhoang.dualsubreplay.data.YouTubeCaptionProvider
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.data.immersionLanguage
 import com.kienhoang.dualsubreplay.data.initialDailyGoalPromptCompleted
+import com.kienhoang.dualsubreplay.data.meansBilibiliSignInNeeded
 import com.kienhoang.dualsubreplay.data.meansNoCaptionsAtAll
 import com.kienhoang.dualsubreplay.data.retireLegacyDownloadJobs
 import com.kienhoang.dualsubreplay.data.savedWordFrom
@@ -153,7 +158,11 @@ class AppViewModel internal constructor(
         // Survives Android closing the app in the background, so returning skips the caption download.
         // The YouTube page fetches the track first; the app's own lookup runs alongside as the fallback.
         RecentCaptionTracks(
-            PageFirstCaptionProvider(PageTranscriptSource.Shared, YouTubeCaptionProvider()),
+            SiteCaptionProvider(
+                youtube = PageFirstCaptionProvider(PageTranscriptSource.Shared, YouTubeCaptionProvider()),
+                // Bilibili beta: asked with the web view's cookies, so a sign-in on Bilibili's page counts.
+                bilibili = BilibiliCaptionProvider.withCookies { url -> CookieManager.getInstance().getCookie(url) },
+            ),
             File(application.cacheDir, "recent-caption-tracks"),
         ),
     )
@@ -214,6 +223,8 @@ class AppViewModel internal constructor(
     internal val immersion = ImmersionRepository.get(application)
 
     init {
+        // Before the saved tabs are read: a Bilibili tab stays only while its Beta switch is on.
+        BetaSites.read(preferences)
         // Japanese word analysis downloads its dictionary here the first time Japanese is shown.
         JapaneseMorphology.useStore(JapaneseDictionaryStore(File(application.filesDir, "japanese-dictionary")))
         // Chinese word analysis reads data packaged in the APK.
@@ -414,6 +425,7 @@ class AppViewModel internal constructor(
                 }
             }
             if (key == PAGE_TOKEN_CAPTIONS_PREFERENCE || key == PAGE_TOKEN_NEEDED_PREFERENCE || key == null) readPageTokenMode()
+            if (key in BETA_SETTING_KEYS || key == null) BetaSites.read(preferences)
         }
 
     private fun readPageTokenMode() {
@@ -528,10 +540,12 @@ class AppViewModel internal constructor(
     }
 
     fun acceptSharedText(text: String) {
-        val videoId = YouTubeUrlParser.extractVideoId(text) ?: return
+        val youtubeId = YouTubeUrlParser.extractVideoId(text)
         // A card's "DualSub Replay 1:23" link starts the video at its line.
         val start = YouTubeUrlParser.extractStartSeconds(text)?.let { "&t=${it}s" }.orEmpty()
-        val watchUrl = mobileWatchUrl(videoId) + start
+        val watchUrl = youtubeId?.let { mobileWatchUrl(it) + start } ?: sharedBilibiliUrl(text) ?: return
+        // A b23.tv short link names no video yet: the page reports it once Bilibili has redirected.
+        val videoId = youtubeId ?: VideoKeys.fromUrl(watchUrl)
         ensureOpenTab(watchUrl)
         preferences.edit().putString("last_browser_url", watchUrl).apply()
         _state.update {
@@ -540,11 +554,17 @@ class AppViewModel internal constructor(
                 browserNavigationRequestId = it.browserNavigationRequestId + 1,
             )
         }
-        openVideo(videoId)
+        if (videoId != null) openVideo(videoId)
     }
 
+    /** The first Bilibili address in shared [text] (Bilibili's share text puts a title before it), while its Beta site is on. */
+    private fun sharedBilibiliUrl(text: String): String? =
+        Regex("https://[^\\s]+").findAll(text).map { it.value.trimEnd('.', ',', ')', '】') }.firstOrNull { url ->
+            classifyMainFrameUrl(url) == EmbeddedNavigationDecision.BILIBILI_WEB
+        }
+
     fun onYouTubePageChanged(url: String) {
-        if (classifyMainFrameUrl(url) != EmbeddedNavigationDecision.YOUTUBE_WEB) return
+        if (!isVideoSiteUrl(url)) return
         if (_state.value.browserTabs.active == null) return
         if (isLeftTabReport(url)) return
         changeTabs { it.withActiveUrl(url) }
@@ -553,7 +573,7 @@ class AppViewModel internal constructor(
             _state.update { it.copy(browserUrl = url) }
         }
 
-        val videoId = YouTubeUrlParser.extractVideoId(url)
+        val videoId = browseVideoSelection(url)?.videoId
         if (videoId == null) {
             clearActiveVideo()
         } else {
@@ -805,7 +825,8 @@ class AppViewModel internal constructor(
 
     /** The no-captions card's button: Gemini makes subtitles for the open video, starting with the playing part. */
     fun makeAiSubtitles() {
-        val videoId = _state.value.activeVideoId ?: return
+        // Gemini reads YouTube links only.
+        val videoId = _state.value.activeVideoId?.takeUnless(VideoKeys::isBilibili) ?: return
         // A song without captions may have free synced lyrics: those come first.
         if (looksLikeSong(WebVideoBridge.playback.value?.takeIf { it.videoId == videoId })) {
             useAiTranscript(geminiReady = true)
@@ -1623,8 +1644,15 @@ class AppViewModel internal constructor(
     }
 
     /** Menu → Tabs → + New tab: YouTube's home page in a new tab, signed in with [account]. */
-    fun openNewTab(account: Int = MAIN_TAB_ACCOUNT): Boolean {
-        val opened = rememberActiveTabPosition().opened(YOUTUBE_HOME_URL, account) ?: return false
+    fun openNewTab(account: Int = MAIN_TAB_ACCOUNT): Boolean = openNewTabAt(YOUTUBE_HOME_URL, account)
+
+    /** A new tab at [url] (New tab → Bilibili, or a Beta site's first opening), opened at once. */
+    fun openNewTabAt(
+        url: String,
+        account: Int = MAIN_TAB_ACCOUNT,
+    ): Boolean {
+        if (!isVideoSiteUrl(url)) return false
+        val opened = rememberActiveTabPosition().opened(url, account) ?: return false
         changeTabs { opened }
         showActiveTab()
         return true
@@ -1632,7 +1660,7 @@ class AppViewModel internal constructor(
 
     /** Long-press a video → Open in new tab: the tab waits in the menu; the open page stays. */
     fun openInNewTab(url: String): Boolean {
-        if (!isYouTubeWebUrl(url)) return false
+        if (!isVideoSiteUrl(url)) return false
         val current = _state.value.browserTabs
         val opened = current.opened(url, current.active?.account ?: MAIN_TAB_ACCOUNT, activate = false) ?: return false
         changeTabs { opened }
@@ -1680,7 +1708,7 @@ class AppViewModel internal constructor(
         leftTabUrlUntil = SystemClock.elapsedRealtime() + LEFT_TAB_REPORT_MS
         preferences.edit().putString("last_browser_url", tab.url).apply()
         _state.update { it.copy(browserUrl = tab.url, browserNavigationRequestId = it.browserNavigationRequestId + 1) }
-        val videoId = YouTubeUrlParser.extractVideoId(tab.url)
+        val videoId = browseVideoSelection(tab.url)?.videoId
         if (videoId == null) clearActiveVideo() else openVideo(videoId)
     }
 
@@ -1787,6 +1815,7 @@ class AppViewModel internal constructor(
                 retryingTranscript = preserveLive,
                 fullTranscriptProblem = if (preserveLive) it.fullTranscriptProblem else null,
                 noCaptions = preserveLive && it.noCaptions,
+                captionsNeedSignIn = preserveLive && it.captionsNeedSignIn,
                 activeVideoId = videoId,
                 playbackPaused = if (playbackKnown) it.playbackPaused else true,
                 subtitlePanelVisible = showPanel && !it.subtitlesClosedByUser,
@@ -1823,6 +1852,7 @@ class AppViewModel internal constructor(
                             retryingTranscript = false,
                             fullTranscriptProblem = null,
                             noCaptions = false,
+                            captionsNeedSignIn = false,
                             resolvedSourceLanguage = track.languageCode,
                             sourcePreference =
                                 resolvedSourcePreference(
@@ -1843,29 +1873,61 @@ class AppViewModel internal constructor(
                     followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, track.isGenerated, natural)
                 } catch (error: Exception) {
                     if (error is CancellationException) throw error
-                    _state.update { current ->
-                        if (!isCurrentLoad(current, videoId, generation)) return@update current
-                        current.copy(
-                            stage = LoadStage.READY,
-                            liveFallback = true,
-                            retryingTranscript = false,
-                            fullTranscriptProblem = fullTranscriptProblem(videoId, error),
-                            noCaptions = meansNoCaptionsAtAll(error, pageTranscripts.problem(videoId)),
-                            statusMessage =
-                                if (current.liveOriginal !=
-                                    null
-                                ) {
-                                    current.statusMessage
-                                } else {
-                                    text(R.string.status_waiting_for_captions)
-                                },
-                            errorMessage = null,
-                        )
-                    }
+                    showLiveFallback(videoId, generation, error)
                 } finally {
                     withContext(NonCancellable + Dispatchers.IO) { rawStore?.close() }
                 }
             }
+    }
+
+    /** The track could not load: live subtitles from the page take over, or the no-captions card shows. */
+    private fun showLiveFallback(
+        videoId: String,
+        generation: Long,
+        error: Exception,
+    ) {
+        if (VideoKeys.isBilibili(videoId)) {
+            showBilibiliProblem(videoId, generation, error)
+            return
+        }
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) return@update current
+            current.copy(
+                stage = LoadStage.READY,
+                liveFallback = true,
+                retryingTranscript = false,
+                fullTranscriptProblem = fullTranscriptProblem(videoId, error),
+                noCaptions = meansNoCaptionsAtAll(error, pageTranscripts.problem(videoId)),
+                statusMessage = if (current.liveOriginal != null) current.statusMessage else text(R.string.status_waiting_for_captions),
+                errorMessage = null,
+            )
+        }
+    }
+
+    /**
+     * A Bilibili video (beta) has no live captions to fall back on: its own card shows, in Bilibili's
+     * words, with the error below it unless it only says to sign in.
+     */
+    private fun showBilibiliProblem(
+        videoId: String,
+        generation: Long,
+        error: Exception,
+    ) {
+        val signIn = error.meansBilibiliSignInNeeded()
+        ProblemLog.record(ProblemArea.CAPTIONS, "bilibili ${error.javaClass.simpleName}")
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) return@update current
+            current.copy(
+                stage = LoadStage.READY,
+                liveFallback = true,
+                retryingTranscript = false,
+                fullTranscriptProblem = if (signIn) null else error.message?.takeIf(String::isNotBlank) ?: error.javaClass.simpleName,
+                noCaptions = true,
+                captionsNeedSignIn = signIn,
+                statusMessage = text(if (signIn) R.string.bilibili_sign_in_title else R.string.bilibili_no_subtitles_title),
+                errorMessage = null,
+            )
+        }
     }
 
     private suspend fun persistCaptionTrack(

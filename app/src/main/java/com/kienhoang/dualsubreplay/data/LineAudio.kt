@@ -70,7 +70,8 @@ internal fun audioLine(
     startMs: Long,
     endMs: Long,
 ): AudioLine? {
-    if (!validClipRange(videoId, startMs, endMs) || endMs - startMs > LINE_AUDIO_MAX_MS) return null
+    // The line's sound and picture come from YouTube's page only (Bilibili beta leaves them out).
+    if (!validClipRange(videoId, startMs, endMs) || VideoKeys.isBilibili(videoId) || endMs - startMs > LINE_AUDIO_MAX_MS) return null
     return AudioLine(videoId!!, startMs, endMs)
 }
 
