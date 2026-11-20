@@ -131,6 +131,8 @@
     <string name="settings_prepare_meanings_description">Sətir oynayarkən Sİ-dən onun hər sözünün mənasını soruşur, belə ki, toxunduğunuz sözün mənası dərhal görünür. Bu, toxunmadığınız sətirlər üçün də açarınızı istifadə edir.</string>
     <string name="settings_tap_bar_reading_title">Toxunma panelində tələffüz</string>
     <string name="settings_tap_bar_reading_description">Bir sözə toxunanda yuxarıdakı panel onun necə oxunduğunu da göstərir: ingilis dili üçün IPA, yapon dili üçün kana, çin dili üçün pinyin.</string>
+    <string name="settings_tap_bar_buttons_title">Toxunma panelinin düymələri</string>
+    <string name="settings_tap_bar_buttons_description">Toxunduğunuz sözün üstündəki paneldə hansı düymələrin görünəcəyini seçin. Qalanları onun ▾ siyahısında qalır. Anki-yə əlavə et, Fləşkartlar və Anki kart göndərə bildikdə görünür; bir gündə ▾ siyahısından 3 dəfə seçdikdən sonra onun ikonu panelə əlavə olunur.</string>
     <string name="settings_word_learning_mode_title">Söz öyrənmə rejimi (nitq hissəsi rəngləri)</string>
     <string name="settings_word_learning_mode_description">Cümlə quruluşunu görmək üçün sözləri qrammatik roluna görə (isimlər, fellər, sifətlər, ədatlar) rəngləyir.</string>
     <string name="settings_colored_lines_title">Rəngli altyazı sətirləri</string>

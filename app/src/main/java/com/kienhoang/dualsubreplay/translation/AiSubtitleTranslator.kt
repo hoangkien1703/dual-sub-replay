@@ -555,12 +555,17 @@ internal class AiSubtitleTranslator(
         }
     }
 
-    /** Sends one request; each sentence is cached as soon as the model has written it. */
+    /**
+     * Sends one request; each sentence is cached as soon as the model has written it. A request that
+     * timed out before any sentence arrived is sent again at once with its first half ([halveOnTimeout]),
+     * instead of resting 30 s (lion737, Discussion #81, 2026-11-17: "InterruptedIOException: timeout").
+     */
     private suspend fun translateNow(
         model: AiTranslationModel,
         languages: Pair<String, String>,
         scoped: Pair<String, String>,
         batch: List<AiSentence>,
+        halveOnTimeout: Boolean = true,
     ) {
         val (source, target) = scoped
         val pending = batch.filter { cache.get(source, target, it.text) == null && attemptKey(source, target, it.text) !in attempted }
@@ -590,6 +595,11 @@ internal class AiSubtitleTranslator(
                     aiTranslationRequest(recent[contextKey].orEmpty(), pending),
                 ) { piece -> reader.add(piece).forEach { (index, rows) -> keep(index, rows) } }
             } catch (error: IOException) {
+                if (halveOnTimeout && translated.isEmpty() && pending.size > 1 && isTimeout(error)) {
+                    // The other half is asked by the rows that follow, like any sentence not yet translated.
+                    translateNow(model, languages, scoped, pending.take((pending.size + 1) / 2), halveOnTimeout = false)
+                    return
+                }
                 restUntil = now() + AI_FAILURE_REST_MS
                 // Sentences that arrived before the failure stay; the others are asked again after the rest.
                 translated.forEach { attempted += attemptKey(source, target, pending[it].text) }
@@ -618,6 +628,10 @@ internal class AiSubtitleTranslator(
     ) = withContext(Dispatchers.IO) {
         found.forEach { (text, translation) -> diskCache?.put(scoped.first, scoped.second, text, translation) }
     }
+
+    /** A request that never answered in time: OkHttp's timeouts are all [java.io.InterruptedIOException]. */
+    private fun isTimeout(error: Throwable): Boolean =
+        generateSequence(error) { it.cause }.take(5).any { it is java.io.InterruptedIOException }
 
     private fun attemptKey(
         source: String,

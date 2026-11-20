@@ -4,6 +4,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -26,9 +27,9 @@ class LineMeaningsTest {
         cached = meanings::get,
         store = { key, meaning -> meanings[key] = meaning },
         words = { sentence, _ -> sentence.split(' ', '.').filter(String::isNotEmpty) },
-        ask = { _, user, _ ->
+        ask = { _, user, _, onText ->
             asked += user
-            reply(user)
+            reply(user)?.also(onText)
         },
     )
 
@@ -92,8 +93,7 @@ class LineMeaningsTest {
             var found: String? = null
             val tap =
                 launch {
-                    lines.awaitRunning(line, "en", "vi")
-                    found = meanings[key("school")]
+                    found = lines.awaitWord("school", line, "en", "vi", maxMs = 2_000)
                 }
             assertNull(found)
             answer.complete("1. tôi\n2. đi\n3. đến\n4. trường")
@@ -111,4 +111,48 @@ class LineMeaningsTest {
         assertEquals(emptyMap<String, String>(), parseLineMeanings(null, words))
         assertEquals(listOf("I", "go", "school"), lineMeaningWords(listOf("I", " go", ",", "I", "school", "…")))
     }
+
+    /** lion737 (#81, 2026-11-20): a word near the start of the reply shows before the rest is written. */
+    @Test
+    fun eachWordIsStoredAsSoonAsItsLineArrives() =
+        runTest(UnconfinedTestDispatcher()) {
+            val rest = CompletableDeferred<Unit>()
+            val lines =
+                LineMeanings(
+                    scope = this,
+                    cached = meanings::get,
+                    store = { key, meaning -> meanings[key] = meaning },
+                    words = { sentence, _ -> sentence.split(' ', '.').filter(String::isNotEmpty) },
+                    ask = { _, _, _, onText ->
+                        onText("1. tôi\n2. đ")
+                        rest.await()
+                        onText("i\n3. đến\n4. trường")
+                        "1. tôi\n2. đi\n3. đến\n4. trường"
+                    },
+                )
+            lines.prepare(line, "en", "vi", urgent = true)
+            assertEquals("tôi", meanings[key("I")])
+            assertNull(meanings[key("go")])
+            assertEquals("tôi", lines.awaitWord("I", line, "en", "vi", maxMs = 2_000))
+            rest.complete(Unit)
+            assertEquals("đi", meanings[key("go")])
+            // The last line had no line break: the whole reply still stores it.
+            assertEquals("trường", meanings[key("school")])
+        }
+
+    /** lion737 (#81, 2026-11-20): a tap waits briefly for the line's request, then asks on its own. */
+    @Test
+    fun aTapWaitsOnlyBrieflyForTheLinesRequest() =
+        runTest {
+            val never = CompletableDeferred<String>()
+            val lines = lineMeanings(this) { never.await() }
+            lines.prepare(line, "en", "vi")
+            val start = currentTime
+            assertNull(lines.awaitWord("school", line, "en", "vi", maxMs = 2_000))
+            assertEquals(2_000L, currentTime - start)
+            // No request about another line: nothing to wait for.
+            assertNull(lines.awaitWord("one", MeaningContext("one"), "en", "vi", maxMs = 2_000))
+            assertEquals(2_000L, currentTime - start)
+            never.complete("")
+        }
 }

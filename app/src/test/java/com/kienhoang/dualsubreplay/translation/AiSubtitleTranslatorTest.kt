@@ -244,6 +244,32 @@ class AiSubtitleTranslatorTest {
             assertEquals("Một.", translator.cachedTranslation(model, "en", "vi", "One."))
         }
 
+    /**
+     * lion737 (Discussion #81, 2026-11-17): "InterruptedIOException: timeout" paused the AI for 30 s.
+     * A request that timed out is sent again at once with half its sentences.
+     */
+    @Test fun aTimedOutRequestIsAskedAgainAtOnceWithHalfItsSentences() =
+        runBlocking {
+            val asked = mutableListOf<Int>()
+            val model =
+                FakeModel { user ->
+                    val ids = Regex("\"id\":(\\d+)").findAll(user).map { it.groupValues[1] }.toList()
+                    asked += ids.size
+                    if (asked.size == 1) throw java.io.InterruptedIOException("timeout")
+                    """{"sentences":[${ids.joinToString(",") { "{\"id\":$it,\"rows\":[\"Dòng $it.\"]}" }}]}"""
+                }
+            val translator = AiSubtitleTranslator(cacheDirectory = null, now = { 0L })
+            val texts = List(4) { "Sentence number $it." }
+            translator.translateAll(model, "en", "vi", texts)
+            assertEquals(listOf(4, 2), asked)
+            assertEquals("Dòng 1.", translator.cachedTranslation(model, "en", "vi", texts[0]))
+            assertNull(translator.problem.value)
+            // The other half is asked next, with no rest.
+            translator.translateAll(model, "en", "vi", texts)
+            assertEquals(listOf(4, 2, 2), asked)
+            assertEquals("Dòng 2.", translator.cachedTranslation(model, "en", "vi", texts[3]))
+        }
+
     @Test fun aFailureIsReportedUntilARequestSucceeds() =
         runBlocking {
             var failing = true

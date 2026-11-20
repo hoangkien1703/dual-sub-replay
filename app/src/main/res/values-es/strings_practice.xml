@@ -18,6 +18,7 @@
     <string name="practice_next_review">Próximo repaso: %1$s</string>
     <string name="practice_pronounce">Pronunciar</string>
     <string name="practice_open_google_translate">Abrir en Google Translate</string>
+    <string name="phrase_add_to_anki">Añadir a Anki</string>
     <string name="practice_google_translate_unavailable">Google Translate no está instalado</string>
     <string name="practice_google_translate_cannot_open">Google Translate no pudo recibir el texto</string>
     <string name="practice_pronounce_item">Pronunciar %1$s</string>

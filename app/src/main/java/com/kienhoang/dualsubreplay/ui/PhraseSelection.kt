@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -53,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,12 +99,16 @@ import com.kienhoang.dualsubreplay.data.JapaneseDictionaryStatus
 import com.kienhoang.dualsubreplay.data.JapaneseMorphology
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.PartOfSpeech
+import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.learningSourceLanguage
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 /** The selected words of one subtitle line: [owner] identifies the line, [words] the inclusive word range. */
@@ -266,6 +272,12 @@ internal class PhraseActions(
     val openGoogleTranslate: (text: String) -> Unit = {},
     /** Settings → Word learning → Pronunciation in the tap bar (off by default): a single word's reading shows in the bar. */
     val readingInBar: Boolean = false,
+    /** Settings → Word learning → Tap bar buttons: the actions that show as icons in the bar. */
+    val buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
+    /** The card Add to Anki sends for a selection with this meaning; null hides Add to Anki. */
+    val ankiCard: ((tap: WordTap, meaning: String) -> SavedWord)? = null,
+    /** Counts an Add to Anki picked from the ▾ list; true when that puts its icon in the bar from now on. */
+    val ankiPickedFromList: () -> Boolean = { false },
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -350,6 +362,7 @@ internal fun BindPhraseActions(
     pronouncer: WordPronouncer,
     translate: suspend (text: String, translated: Boolean) -> String,
     meaningInSentence: suspend (WordTap) -> ContextMeaning = { ContextMeaning.None },
+    ankiCard: ((WordTap, String) -> SavedWord)? = null,
 ) {
     val controller = LocalPhraseSelection.current ?: return
     val source = learningSourceLanguage(state.resolvedSourceLanguage, state.sourcePreference)
@@ -385,6 +398,9 @@ internal fun BindPhraseActions(
                 meaningInSentence = meaningInSentence.takeIf { askAi },
                 meaningInSentenceFirst = readMeaningInContextFirst(context),
                 readingInBar = readTapBarReading(context),
+                buttons = readTapBarButtons(context),
+                ankiCard = ankiCard,
+                ankiPickedFromList = { countAnkiPickedFromList(context.getSharedPreferences("dual_sub_preferences", 0)) },
                 openGoogleTranslate = { text ->
                     when (sendToGoogleTranslate(context, text)) {
                         TranslateSendResult.SENT -> Unit
@@ -502,6 +518,9 @@ internal fun SelectableSubtitleText(
                         controller.clear(owner)
                         onWordClick(tap)
                     },
+                    buttons = controller.actions.buttons,
+                    onAnkiFromList = controller.actions.ankiPickedFromList,
+                    ankiCard = barAnkiCard(controller.actions, phraseTap(text, tokens, words, segment, translated)),
                     onPronounce = { spoken?.let { controller.actions.pronounce(it, translated) } },
                     onOpenGoogleTranslate = {
                         controller.actions.openGoogleTranslate(text.substring(start, end))
@@ -784,8 +803,15 @@ private fun PhraseActionBar(
     onPronounce: () -> Unit,
     onOpenGoogleTranslate: () -> Unit,
     onClose: () -> Unit,
+    buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
+    onAnkiFromList: () -> Boolean = { false },
+    ankiCard: ((meaning: String) -> SavedWord)? = null,
 ) {
+    // The third Add to Anki from the ▾ list in a day puts its icon in this bar too, not only the next one.
+    var shown by remember(buttons) { mutableStateOf(buttons) }
     val density = LocalDensity.current
+    val meaning = remember(phrase) { QuickMeaning(asking = meaningInSentence != null) }
+    val anki = rememberBarAnki(phrase, ankiCard)
     val minTop = WindowInsets.statusBars.getTop(density)
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
@@ -824,22 +850,28 @@ private fun PhraseActionBar(
                         },
                         PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onClick = onTranslate),
                         PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onClick = onPronounce),
-                        // Only in the ▾ list, so the bar keeps its few everyday icons.
+                        anki?.action(scope, meaning, meaningInSentenceFirst),
                         PhraseAction(
                             Icons.AutoMirrored.Filled.OpenInNew,
                             R.string.practice_open_google_translate,
                             "google_translate",
-                            inBar = false,
                             onClick = onOpenGoogleTranslate,
                         ),
-                    )
+                    ).filterNotNull()
+                        .shownIn(shown)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     actions.filter { it.inBar }.forEach { action ->
-                        IconButton(onClick = action.onClick, modifier = Modifier.testTag("phrase_${action.tag}")) {
+                        IconButton(
+                            onClick = action.onClick,
+                            enabled = action.enabled,
+                            modifier = Modifier.testTag("phrase_${action.tag}"),
+                        ) {
                             Icon(action.icon, contentDescription = stringResource(action.label), tint = MaterialTheme.colorScheme.primary)
                         }
                     }
-                    PhraseActionMenu(actions)
+                    PhraseActionMenu(actions) { picked ->
+                        if (picked.tag == TapBarButton.ANKI.tag && !picked.inBar && onAnkiFromList()) shown = shown + TapBarButton.ANKI
+                    }
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onClose, modifier = Modifier.testTag("phrase_close")) {
                         Icon(
@@ -857,7 +889,9 @@ private fun PhraseActionBar(
                         modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 2.dp).testTag("phrase_reading"),
                     )
                 }
-                quickTranslate?.let { QuickTranslation(phrase, it, meaningInSentence, meaningInSentenceFirst) }
+                quickTranslate?.let { QuickTranslation(phrase, meaning, it, meaningInSentence, meaningInSentenceFirst) }
+                // After Add to Anki: what stopped a send, when the card's sound comes, Send again.
+                anki?.word?.let { WordCardStatusInBar(anki.send, it) }
                 val note =
                     speechMessage
                         ?: dictionaryNote?.let { stringResource(it) }
@@ -875,18 +909,83 @@ private fun PhraseActionBar(
     }
 }
 
+/** The tap bar's Add to Anki for [tap]'s words, or null while it does not show. */
+private fun barAnkiCard(
+    actions: PhraseActions,
+    tap: WordTap,
+): ((meaning: String) -> SavedWord)? = actions.ankiCard?.let { card -> { meaning -> card(tap, meaning) } }
+
+/** Shows each action as an icon while Settings → Word learning → Tap bar buttons has it on. */
+private fun List<PhraseAction>.shownIn(buttons: Set<TapBarButton>): List<PhraseAction> =
+    onEach { action -> action.inBar = TapBarButton.entries.any { it.tag == action.tag && it in buttons } }
+
+/**
+ * Add to Anki in the bar (lion737, Discussion #81, 2026-11-19): the word card's Send to logic (the
+ * Send to app, AnkiDroid's permission, Send again) for the card [card] makes from the bar's meaning.
+ */
+@Stable
+private class BarAnki(
+    val send: WordCardSend,
+    private val card: (meaning: String) -> SavedWord,
+) {
+    /** The card last sent, so the icon shows Sent and the lines under the bar can say what happened. */
+    var word by mutableStateOf<SavedWord?>(null)
+    var waiting by mutableStateOf(false)
+
+    fun action(
+        scope: CoroutineScope,
+        meaning: QuickMeaning,
+        contextFirst: Boolean,
+    ): PhraseAction {
+        val sent = word?.let(send::isSent) == true
+        return PhraseAction(
+            icon = if (sent) Icons.Default.Check else Icons.Default.Style,
+            label = if (sent) R.string.word_card_sent else R.string.phrase_add_to_anki,
+            tag = "anki",
+            enabled = !send.sending && !waiting,
+        ) {
+            waiting = true
+            scope.launch {
+                try {
+                    // The card carries the meaning in the sentence too, once the AI has answered.
+                    val made = card(meaning.awaitForCard(contextFirst) ?: return@launch)
+                    word = made
+                    send.tap(made)
+                } finally {
+                    waiting = false
+                }
+            }
+        }
+    }
+}
+
+/** Add to Anki for [phrase], or null while Send to does not show or no card can be made. */
+@Composable
+private fun rememberBarAnki(
+    phrase: String,
+    card: ((meaning: String) -> SavedWord)?,
+): BarAnki? {
+    val send = (if (card != null) rememberCardSend(phrase) else null) ?: return null
+    val current by rememberUpdatedState(card)
+    return remember(phrase, send) { BarAnki(send) { meaning -> current!!(meaning) } }
+}
+
 /** One action of the phrase bar: an icon in the bar when [inBar], and always the icon with its name in the ▾ list. */
 private class PhraseAction(
     val icon: ImageVector,
     @StringRes val label: Int,
     val tag: String,
-    val inBar: Boolean = true,
+    var inBar: Boolean = true,
+    val enabled: Boolean = true,
     val onClick: () -> Unit,
 )
 
 /** The ▾ button listing every action with its icon and name, for anyone unsure what an icon does. */
 @Composable
-private fun PhraseActionMenu(actions: List<PhraseAction>) {
+private fun PhraseActionMenu(
+    actions: List<PhraseAction>,
+    onPicked: (PhraseAction) -> Unit = {},
+) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("phrase_all_actions")) {
@@ -901,8 +1000,10 @@ private fun PhraseActionMenu(actions: List<PhraseAction>) {
                 DropdownMenuItem(
                     text = { Text(stringResource(action.label)) },
                     leadingIcon = { Icon(action.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    enabled = action.enabled,
                     onClick = {
                         expanded = false
+                        onPicked(action)
                         action.onClick()
                     },
                     modifier = Modifier.testTag("phrase_menu_${action.tag}"),
@@ -920,16 +1021,14 @@ private fun PhraseActionMenu(actions: List<PhraseAction>) {
 @Composable
 private fun QuickTranslation(
     word: String,
+    state: QuickMeaning,
     translate: suspend () -> String,
     meaningInSentence: (suspend () -> ContextMeaning)?,
     contextFirst: Boolean,
 ) {
-    var meaning by remember(word) { mutableStateOf<String?>(null) }
-    var inContext by remember(word) { mutableStateOf<String?>(null) }
-    var asking by remember(word) { mutableStateOf(meaningInSentence != null) }
     val unavailable = stringResource(R.string.practice_translation_unavailable)
     LaunchedEffect(word) {
-        meaning =
+        state.dictionary =
             try {
                 translate().ifBlank { null } ?: unavailable
             } catch (cancel: CancellationException) {
@@ -937,12 +1036,13 @@ private fun QuickTranslation(
             } catch (_: Exception) {
                 unavailable
             }
+        if (state.dictionary == unavailable) state.failed = true
     }
     if (meaningInSentence != null) {
         LaunchedEffect(word) {
             // Tapping more words grows the selection a word at a time: ask only where it stops.
             delay(QUICK_CONTEXT_MEANING_DELAY_MS)
-            inContext =
+            state.inContext =
                 try {
                     (meaningInSentence() as? ContextMeaning.Found)?.text
                 } catch (cancel: CancellationException) {
@@ -950,10 +1050,11 @@ private fun QuickTranslation(
                 } catch (_: Exception) {
                     null
                 }
-            asking = false
+            state.asking = false
         }
     }
-    val dictionary = meaning
+    val dictionary = state.dictionary
+    val inContext = state.inContext
     val differs = dictionary != null && dictionary != unavailable && differsFromDictionary(inContext, dictionary)
     val big = if (differs && contextFirst) inContext else dictionary
     Text(
@@ -975,7 +1076,7 @@ private fun QuickTranslation(
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp).testTag("phrase_meaning_in_sentence"),
         )
     }
-    if (asking && dictionary != null) {
+    if (state.asking && dictionary != null) {
         Text(
             stringResource(R.string.practice_meaning_in_sentence_loading),
             style = MaterialTheme.typography.bodySmall,
@@ -984,6 +1085,47 @@ private fun QuickTranslation(
         )
     }
 }
+
+/** Under the bar after Add to Anki: the word card's lines about a send (a problem, the card's sound, Send again). */
+@Composable
+private fun WordCardStatusInBar(
+    send: WordCardSend,
+    word: SavedWord,
+) {
+    Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp)) {
+        WordCardStatus(saved = false, send = send, word = word, known = null)
+    }
+}
+
+/** What the bar shows of the selection's meaning, kept outside [QuickTranslation] so Add to Anki can send it. */
+@Stable
+internal class QuickMeaning(
+    asking: Boolean,
+) {
+    var dictionary by mutableStateOf<String?>(null)
+    var inContext by mutableStateOf<String?>(null)
+    var asking by mutableStateOf(asking)
+
+    /** The dictionary meaning could not be found: [dictionary] holds the "unavailable" note, not a meaning. */
+    var failed by mutableStateOf(false)
+
+    /**
+     * The meaning Add to Anki puts on the card, as the word card saves it: waits for the dictionary
+     * meaning and for the AI's meaning in the sentence, at most [QUICK_MEANING_CARD_WAIT_MS]. Null when
+     * no meaning came.
+     */
+    suspend fun awaitForCard(contextFirst: Boolean): String? {
+        withTimeoutOrNull(QUICK_MEANING_CARD_WAIT_MS) { snapshotFlow { dictionary != null && !asking }.first { it } }
+        val found = dictionary?.takeUnless { failed }
+        return when {
+            found != null -> combinedMeaning(inContext, found, contextFirst)
+            else -> inContext
+        }?.takeIf { it.isNotBlank() }
+    }
+}
+
+/** How long Add to Anki waits for the bar's meanings before it gives up. */
+private const val QUICK_MEANING_CARD_WAIT_MS = 25_000L
 
 /** How long a selection must stay put before the bar asks the AI for its meaning in the sentence. */
 private const val QUICK_CONTEXT_MEANING_DELAY_MS = 500L

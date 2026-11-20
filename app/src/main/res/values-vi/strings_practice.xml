@@ -18,6 +18,7 @@
     <string name="practice_next_review">Lần ôn tiếp theo: %1$s</string>
     <string name="practice_pronounce">Phát âm</string>
     <string name="practice_open_google_translate">Mở trong Google Dịch</string>
+    <string name="phrase_add_to_anki">Thêm vào Anki</string>
     <string name="practice_google_translate_unavailable">Google Dịch chưa được cài đặt</string>
     <string name="practice_google_translate_cannot_open">Google Dịch không nhận được văn bản</string>
     <string name="practice_pronounce_item">Phát âm %1$s</string>

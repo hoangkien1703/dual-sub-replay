@@ -5,13 +5,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,7 +25,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.data.AnkiConnectNotes
+import com.kienhoang.dualsubreplay.data.AnkiDroidNotes
 import com.kienhoang.dualsubreplay.data.EnglishIpa
+import com.kienhoang.dualsubreplay.data.KnownWordsRepository
+import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
@@ -29,8 +39,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 
 class PhraseSelectionUiTest {
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @get:Rule
     val compose = createComposeRule()
 
@@ -45,10 +58,15 @@ class PhraseSelectionUiTest {
 
     private val askedInSentence = mutableListOf<WordTap>()
 
+    private val ankiCards = mutableListOf<Pair<WordTap, String>>()
+
     private fun showCard(
         inSentence: String? = null,
         inSentenceFirst: Boolean = true,
         readingInBar: Boolean = false,
+        buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
+        anki: Boolean = false,
+        ankiPickedFromList: () -> Boolean = { false },
     ) {
         val controller = PhraseSelectionController()
         controller.actions =
@@ -69,10 +87,45 @@ class PhraseSelectionUiTest {
                     },
                 meaningInSentenceFirst = inSentenceFirst,
                 readingInBar = readingInBar,
+                buttons = buttons,
+                ankiPickedFromList = ankiPickedFromList,
+                ankiCard =
+                    if (anki) {
+                        { tap, meaning ->
+                            ankiCards += tap to meaning
+                            SavedWord(
+                                "card-${tap.token.text}",
+                                tap.token.text,
+                                null,
+                                "en",
+                                "vi",
+                                meaning,
+                                original,
+                                translated,
+                                null,
+                                1_000,
+                                3_000,
+                                false,
+                            )
+                        }
+                    } else {
+                        null
+                    },
             )
         compose.setContent {
+            val scope = rememberCoroutineScope()
+            // AnkiConnect counts as set up without an app installed, so Add to Anki shows on any emulator.
+            val tools =
+                remember {
+                    StudyTools(
+                        KnownWordsRepository(File(context.cacheDir, "known-words-phrase-test")),
+                        AnkiDroidNotes(context),
+                        AnkiConnectNotes.create(context),
+                        scope,
+                    ).apply { settings = StudySettings(sendTo = FlashcardApp.ANKICONNECT) }
+                }
             DualSubTheme {
-                CompositionLocalProvider(LocalPhraseSelection provides controller) {
+                CompositionLocalProvider(LocalPhraseSelection provides controller, LocalStudyTools provides tools.takeIf { anki }) {
                     CompactSubtitleCard(
                         segment = SubtitleSegment(1, 1_000, 3_000, original, translated),
                         active = true,
@@ -381,5 +434,78 @@ class PhraseSelectionUiTest {
         tapCharacter(original, original.indexOf(' '))
         compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
         compose.runOnIdle { assertEquals(1, replays) }
+    }
+
+    /** lion737 (#81, 2026-11-19): Add to Anki sits next to Pronounce and sends the bar's meaning in one tap. */
+    @Test
+    fun addToAnkiSendsTheMeaningInTheSentenceInOneTap() {
+        showCard(inSentence = "đang mong chờ", buttons = defaultButtons + TapBarButton.ANKI, anki = true)
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_anki").assertIsDisplayed()
+        // The bar asks about the sentence after a short pause, so the second line comes a moment later.
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("phrase_meaning_in_sentence").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("phrase_meaning_in_sentence").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-add-to-anki")
+        compose.onNodeWithTag("phrase_anki").performClick()
+        compose.waitUntil(5_000) { ankiCards.isNotEmpty() }
+        val (tap, meaning) = ankiCards.single()
+        assertEquals("looking", tap.token.text)
+        // As the word card saves it: the meaning in the sentence, then the dictionary meaning.
+        assertEquals(combinedMeaning("đang mong chờ", "nghĩa của looking"), meaning)
+        // No AnkiConnect runs on the emulator: the bar says what stopped the card, as the word card does.
+        compose.waitForIdle()
+        saveUiEvidence("phrase-action-bar-add-to-anki-sent")
+    }
+
+    @Test
+    fun tapBarButtonsHideIconsButTheListKeepsEveryAction() {
+        showCard(buttons = setOf(TapBarButton.PRONOUNCE, TapBarButton.GOOGLE_TRANSLATE), anki = true)
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_copy").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_translate").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_pronounce").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_google_translate").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-picked-buttons")
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_copy").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_menu_translate").assertIsDisplayed()
+        compose.onNodeWithTag("phrase_menu_anki").assertIsDisplayed()
+    }
+
+    @Test
+    fun addToAnkiJoinsTheBarAfterThreePicksFromTheList() {
+        var picks = 0
+        showCard(anki = true, ankiPickedFromList = { ++picks >= ANKI_PICKS_FOR_THE_BAR })
+        tapWord(original, "looking")
+        // Off at first (owner pick 2026-11-20): only the ▾ list has Add to Anki.
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        pickAnkiFromList(1)
+        pickAnkiFromList(2)
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        pickAnkiFromList(3)
+        compose.onNodeWithTag("phrase_anki").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-anki-joined")
+    }
+
+    private val defaultButtons = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault }
+
+    /** Opens the ▾ list and picks Add to Anki once its last send has finished, then waits for card [count]. */
+    private fun pickAnkiFromList(count: Int) {
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.waitUntil(10_000) {
+            compose.onAllNodes(hasTestTag("phrase_menu_anki") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("phrase_menu_anki").performClick()
+        compose.waitUntil(10_000) { ankiCards.size == count }
+    }
+
+    @Test
+    fun addToAnkiHidesWhileSendToIsNotSetUp() {
+        showCard()
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_anki").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_anki").assertDoesNotExist()
     }
 }

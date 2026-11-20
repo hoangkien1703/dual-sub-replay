@@ -32,6 +32,15 @@ class PhraseSelectionTest {
     private val segment = SubtitleSegment(1, 1_000, 3_000, sentence, "Mình rất mong được gặp bạn.")
 
     @Test
+    fun addToAnkiPicksCountOnlyWithinOneDay() {
+        assertEquals(1, ankiPicksAfterOneMore(null, today = 100))
+        assertEquals(3, ankiPicksAfterOneMore("100:2", today = 100))
+        assertEquals(1, ankiPicksAfterOneMore("99:2", today = 100))
+        assertEquals(1, ankiPicksAfterOneMore("broken", today = 100))
+        assertFalse(TapBarButton.ANKI.inBarByDefault)
+    }
+
+    @Test
     fun tapsSelectMoveAndClearAWordAsAndroidDoes() {
         assertEquals(3..3, nextPhraseRange(null, 3))
         // Another word moves the selection there instead of growing it: the handles grow it.

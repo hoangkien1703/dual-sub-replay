@@ -329,11 +329,18 @@ internal class WordCardSend(
 
 /** The word card's sending to the Send to app, or null while Send to does not show. */
 @Composable
-internal fun rememberWordCardSend(selection: LearningWordSelection): WordCardSend? {
+internal fun rememberWordCardSend(selection: LearningWordSelection): WordCardSend? = rememberCardSend(selection)
+
+/**
+ * Sending cards to the Send to app for whatever [key] names (the word card's selection, or the tap
+ * bar's selected words), or null while Send to does not show. Both use this one Send to button logic.
+ */
+@Composable
+internal fun rememberCardSend(key: Any?): WordCardSend? {
     val tools = LocalStudyTools.current ?: return null
     val scope = rememberCoroutineScope()
-    val send = remember(selection, tools) { WordCardSend(tools, scope) }
-    var waiting by remember(selection) { mutableStateOf<SavedWord?>(null) }
+    val send = remember(key, tools) { WordCardSend(tools, scope) }
+    var waiting by remember(key) { mutableStateOf<SavedWord?>(null) }
     val permission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             waiting?.let { send.permissionAnswered(it, granted) }
