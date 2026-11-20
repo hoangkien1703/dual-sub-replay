@@ -219,6 +219,13 @@ internal enum class SearchableSetting(
         "tap_bar_reading_switch",
         setOf(TAP_BAR_READING_PREFERENCE),
     ),
+    TAP_BAR_BUTTONS(
+        R.string.settings_tap_bar_buttons_title,
+        MoreSettingsSection.WORD_LEARNING,
+        TAP_BAR_BUTTONS_ANCHOR,
+        TAP_BAR_BUTTON_PREFERENCES.toSet(),
+        TapBarButton.entries.map { it.label },
+    ),
     WORD_LEARNING_MODE(
         R.string.settings_word_learning_mode_title,
         MoreSettingsSection.WORD_LEARNING,

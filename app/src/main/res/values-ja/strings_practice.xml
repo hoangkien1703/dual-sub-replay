@@ -18,6 +18,7 @@
     <string name="practice_next_review">次の復習: %1$s</string>
     <string name="practice_pronounce">発音</string>
     <string name="practice_open_google_translate">Google 翻訳で開く</string>
+    <string name="phrase_add_to_anki">Ankiに追加</string>
     <string name="practice_google_translate_unavailable">Google 翻訳がインストールされていません</string>
     <string name="practice_google_translate_cannot_open">Google 翻訳がテキストを受け取れませんでした</string>
     <string name="practice_pronounce_item">%1$s を発音</string>

@@ -131,6 +131,8 @@
     <string name="settings_prepare_meanings_description">播放一行时，先向 AI 询问这一行每个词的意思，点词时立即显示释义。即使你没点的行也会使用你的密钥。</string>
     <string name="settings_tap_bar_reading_title">在点词栏中显示读音</string>
     <string name="settings_tap_bar_reading_description">点一个词时，上方的栏也会显示读音：英语显示国际音标，日语显示假名，中文显示拼音。</string>
+    <string name="settings_tap_bar_buttons_title">点词栏按钮</string>
+    <string name="settings_tap_bar_buttons_description">选择点词后上方栏里显示哪些按钮。其余按钮仍在 ▾ 列表中。可以通过“抽认卡与 Anki”发送卡片时，才会显示“添加到 Anki”；一天内从 ▾ 列表中选择它 3 次后，它的图标会加入栏中。</string>
     <string name="settings_word_learning_mode_title">单词学习模式（词性着色）</string>
     <string name="settings_word_learning_mode_description">按语法作用（名词、动词、形容词、助词）为单词着色，便于看清句子结构。</string>
     <string name="settings_colored_lines_title">着色的字幕行</string>

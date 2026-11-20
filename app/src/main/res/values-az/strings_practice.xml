@@ -18,6 +18,7 @@
     <string name="practice_next_review">Növbəti təkrar: %1$s</string>
     <string name="practice_pronounce">Tələffüz et</string>
     <string name="practice_open_google_translate">Google Tərcümədə aç</string>
+    <string name="phrase_add_to_anki">Anki-yə əlavə et</string>
     <string name="practice_google_translate_unavailable">Google Tərcümə quraşdırılmayıb</string>
     <string name="practice_google_translate_cannot_open">Google Tərcümə mətni qəbul edə bilmədi</string>
     <string name="practice_pronounce_item">Tələffüz et: %1$s</string>

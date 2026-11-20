@@ -110,6 +110,13 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "pronunciation_volume" to share(F),
         "phone_voice" to share(B),
         "tap_bar_reading" to share(B),
+        "tap_bar_copy" to share(B),
+        "tap_bar_translate" to share(B),
+        "tap_bar_pronounce" to share(B),
+        "tap_bar_anki" to share(B),
+        "tap_bar_google_translate" to share(B),
+        // Add to Anki picks from the ▾ list today, until its icon joins the tap bar: phone state.
+        "tap_bar_anki_picks" to never(S),
         "meaning_order" to share(S),
         "word_learning_mode_enabled" to share(B),
         "word_learning_target" to share(S),

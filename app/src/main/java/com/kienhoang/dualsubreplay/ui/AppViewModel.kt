@@ -147,6 +147,9 @@ private const val CONTEXT_MEANING_TIMEOUT_MS = 20_000L
 /** A whole line's words take longer to answer than one word; it runs in the background. */
 private const val LINE_MEANINGS_TIMEOUT_MS = 45_000L
 
+/** How long a tapped word waits for the line's running request before it is asked on its own. */
+private const val LINE_MEANING_WAIT_MS = 2_000L
+
 class AppViewModel internal constructor(
     application: Application,
     private val captionProvider: CaptionProvider,
@@ -1242,6 +1245,15 @@ class AppViewModel internal constructor(
         )
     }
 
+    /**
+     * The card the tap bar's Add to Anki sends for [tap] with [meaning]: the one the word card sends
+     * for the same words (lion737, Discussion #81, 2026-11-19: one tap instead of opening the word card).
+     */
+    internal fun ankiCard(
+        tap: WordTap,
+        meaning: String,
+    ): SavedWord = savedWordFrom(learningSelectionOf(tap), meaning, online = false)
+
     /** [meaningInContext] for a selection in the bar above a subtitle line, before any word card opens. */
     internal suspend fun meaningInContext(tap: WordTap): ContextMeaning = meaningInContext(learningSelectionOf(tap))
 
@@ -1285,11 +1297,13 @@ class AppViewModel internal constructor(
         contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
         // A word tapped in an original line: once one request has answered every word of that line,
         // its other words show at once (lion737, #81, 2026-11-15). A request already running for the
-        // line (the first tap's, or Prepare meanings ahead) is waited for instead of asking again.
+        // line (the first tap's, or Prepare meanings ahead) is waited for briefly; after that the word
+        // is asked on its own, ahead of background requests (lion737, #81, 2026-11-20: 22 s).
         val wholeLine = !selection.isPhrase && !selection.translated
         if (wholeLine) {
-            lineMeanings.awaitRunning(context, selection.wordLanguage, selection.meaningLanguage)
-            contextMeanings.get(key)?.let { return ContextMeaning.Found(it) }
+            lineMeanings
+                .awaitWord(word, context, selection.wordLanguage, selection.meaningLanguage, LINE_MEANING_WAIT_MS)
+                ?.let { return ContextMeaning.Found(it) }
         }
         // The bar above the line and the word card ask for the same selection: one request serves both,
         // and it finishes even when the bar closes first.
@@ -1318,14 +1332,14 @@ class AppViewModel internal constructor(
             cached = contextMeanings::get,
             store = { key, meaning -> contextMeanings.put(key, meaning) },
             words = { sentence, language -> LanguageAwareTokenizer.tokenize(sentence, language).map { it.text } },
-            ask = { system, user, urgent ->
+            ask = { system, user, urgent, onText ->
                 val model =
                     withContext(Dispatchers.IO) {
                         getApplication<Application>()
                             .aiTranslationModel(_state.value.aiTranslationModel, AiTranslationThinking.OFF, aiTransport, urgent)
                     }
                 try {
-                    model?.let { withTimeoutOrNull(LINE_MEANINGS_TIMEOUT_MS) { it.ask(system, user) }.orEmpty() }
+                    model?.let { withTimeoutOrNull(LINE_MEANINGS_TIMEOUT_MS) { it.ask(system, user, onText) }.orEmpty() }
                 } catch (_: IOException) {
                     ""
                 }

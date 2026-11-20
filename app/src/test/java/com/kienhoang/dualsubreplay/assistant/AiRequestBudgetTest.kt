@@ -18,6 +18,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -76,6 +77,10 @@ private fun translationAnswer(user: String): String {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AiRequestBudgetTest {
+    /** Refusals are remembered for the app run; each test starts from a service that refused nothing. */
+    @Before
+    fun forgetRefusals() = AiRefusedSettings.clear()
+
     @get:Rule
     val folder = TemporaryFolder()
 
@@ -139,8 +144,9 @@ class AiRequestBudgetTest {
             val (translator, model, service) = translation(keyCount = 1)
             skipAheadFor(minutes = 10, translator, model)
             assertWithinBudget(service.sent)
-            // The pacer should not starve the player either: about one request every 6 s.
-            assertTrue("Only ${service.sent.size} requests in 10 minutes", service.sent.size >= 90)
+            // The pacer should not starve the player either: 6 background requests a minute, the other
+            // AI_TRANSLATION_KEY_URGENT_RESERVE stay free for tapped words.
+            assertTrue("Only ${service.sent.size} requests in 10 minutes", service.sent.size >= 55)
         }
 
     @Test
@@ -207,7 +213,7 @@ class AiRequestBudgetTest {
                     cached = meanings::get,
                     store = { key, meaning -> meanings[key] = meaning },
                     words = { sentence, _ -> sentence.split(' ') },
-                    ask = { _, _, _ ->
+                    ask = { _, _, _, _ ->
                         val key = pacer.take(listOf("gemini/${keys[0]}"))!!
                         sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
                         delay(1_500)
@@ -224,7 +230,8 @@ class AiRequestBudgetTest {
             val whilePlaying = sent.size
             testScheduler.advanceUntilIdle()
             assertWithinBudget(sent)
-            assertTrue("Only $whilePlaying requests in 10 minutes", whilePlaying >= 90)
+            // Background requests leave AI_TRANSLATION_KEY_URGENT_RESERVE of the 10 a minute for tapped words.
+            assertTrue("Only $whilePlaying requests in 10 minutes", whilePlaying >= 55)
             assertTrue("${sent.size - whilePlaying} requests were still queued", sent.size - whilePlaying <= 1)
         }
 
@@ -247,7 +254,7 @@ class AiRequestBudgetTest {
                     cached = meanings::get,
                     store = { key, meaning -> meanings[key] = meaning },
                     words = { sentence, _ -> sentence.split(' ') },
-                    ask = { _, _, urgent ->
+                    ask = { _, _, urgent, _ ->
                         pacer.take(listOf(key), urgent)!!
                         sent += Sent(clock(), keys[0], "gemini-flash-lite-latest")
                         delay(1_500)
@@ -268,6 +275,52 @@ class AiRequestBudgetTest {
             }
             testScheduler.advanceUntilIdle()
             assertWithinBudget(sent)
+        }
+
+    /**
+     * lion737 (Discussion #81, 2026-11-20): with Prepare meanings ahead on, a tapped word took about
+     * 22 s. Background requests filled the key's whole minute, so the tap waited for the oldest to leave
+     * it. They now leave room: a word tapped every 15 s goes at once while a line starts every 2 s.
+     */
+    @Test
+    fun aTappedWordGoesAtOnceWhilePreparingAhead() =
+        runTest {
+            val clock = { testScheduler.currentTime }
+            val pacer = AiKeyPacer(now = clock)
+            val key = "gemini/${keys[0]}"
+            val meanings = HashMap<String, String>()
+            val lines =
+                LineMeanings(
+                    scope = this,
+                    cached = meanings::get,
+                    store = { key, meaning -> meanings[key] = meaning },
+                    words = { sentence, _ -> sentence.split(' ') },
+                    ask = { _, _, urgent, _ ->
+                        pacer.take(listOf(key), urgent)!!
+                        delay(1_500)
+                        "1. một\n2. hai\n3. ba"
+                    },
+                )
+            val waits = mutableListOf<Long>()
+            val end = currentTime + 10 * MINUTE_MS
+            var line = 0
+            while (currentTime < end) {
+                lines.prepare(MeaningContext("Line ${line++} plays now"), "en", "vi")
+                if (line % 15 == 0) {
+                    launch {
+                        // The tapped word, then the rest of its line: both urgent.
+                        repeat(2) {
+                            val asked = currentTime
+                            pacer.take(listOf(key), urgent = true)
+                            waits += currentTime - asked
+                        }
+                    }
+                }
+                delay(2_000)
+            }
+            testScheduler.advanceUntilIdle()
+            assertTrue("No tap was made", waits.size >= 30)
+            assertEquals("Taps waited ${waits.filter { it > 0 }} ms", 0L, waits.max())
         }
 
     /** Gemini's generateContent endpoint AI subtitles use; [status] picks the HTTP status of the n-th request (1 first). */

@@ -10,10 +10,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AiTranslationAccessTest {
+    /** Refusals are remembered for the app run; each test starts from a service that refused nothing. */
+    @Before
+    fun forgetRefusals() = AiRefusedSettings.clear()
+
     private val gemini = AiAssistantSettings(provider = AiProvider.GEMINI, models = mapOf(AiProvider.GEMINI to "gemini-pro-latest"))
 
     @Test fun translationDefaultsToTheAssistantsModel() {
@@ -115,6 +120,19 @@ class AiTranslationAccessTest {
             assertEquals(60_000L, currentTime)
         }
 
+    /** lion737 (Discussion #81, 2026-11-20): background requests leave part of the minute for taps. */
+    @Test fun backgroundRequestsLeaveRoomForTappedWords() =
+        runTest {
+            val pacer = AiKeyPacer(now = { testScheduler.currentTime }, intervalMs = 0)
+            val background = AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE - AI_TRANSLATION_KEY_URGENT_RESERVE
+            repeat(background) { pacer.take(listOf("a")) }
+            assertEquals(0L, currentTime)
+            repeat(AI_TRANSLATION_KEY_URGENT_RESERVE) { pacer.take(listOf("a"), urgent = true) }
+            assertEquals(0L, currentTime)
+            pacer.take(listOf("a"))
+            assertEquals(60_000L, currentTime)
+        }
+
     @Test fun aLimitedKeyRestsLongerEachTimeAndEveryKeyRestingMeansGoogle() =
         runBlocking {
             var now = 0L
@@ -195,6 +213,28 @@ class AiTranslationAccessTest {
             val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0))!!
             assertEquals("ok", model.ask("system", "user"))
             assertEquals(listOf("none", null), efforts)
+        }
+
+    /**
+     * lion737 (Discussion #81, 2026-11-20): every tapped word gets a new model. A thinking setting the
+     * service refused is not sent again by the next one, so the word is not asked twice.
+     */
+    @Test fun aRefusedThinkingSettingIsRememberedForTheNextTappedWord() =
+        runBlocking {
+            val store = AiKeyStore(MapStorage(), FakeCipher())
+            store.add(AiProvider.GEMINI, "AIzaOnlyKey0000000000000000000000000000")
+            val efforts = mutableListOf<String?>()
+            val transport =
+                AiChatTransport { request ->
+                    efforts += request.reasoningEffort
+                    if (request.reasoningEffort != null) throw AiChatException(AiErrorKind.UNSUPPORTED_THINKING)
+                    AiReply("ok")
+                }
+            repeat(2) {
+                val model = aiTranslationModel(gemini, null, store, transport, AiKeyPacer(intervalMs = 0), urgent = true)!!
+                assertEquals("ok", model.ask("system", "user"))
+            }
+            assertEquals(listOf("none", null, null), efforts)
         }
 
     @Test fun theAnswerIsHandedOverWhileItStreams() =
