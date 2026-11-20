@@ -1333,6 +1333,7 @@ private fun WordLearningSettings(
     PronunciationVolumeSetting()
     PhoneVoiceSetting()
     TapBarReadingSetting()
+    TapBarButtonsSetting()
     MeaningInContextSetting()
     SettingsSwitchRow(
         title = stringResource(R.string.settings_word_learning_mode_title),

@@ -123,7 +123,14 @@ fun DualSubApp(
     val savedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
     val webController = rememberYouTubeWebController()
     val pronouncer = rememberWordPronouncer()
-    BindPhraseActions(state, webController, pronouncer, viewModel::translateSubtitleText) { tap -> viewModel.meaningInContext(tap) }
+    BindPhraseActions(
+        state,
+        webController,
+        pronouncer,
+        viewModel::translateSubtitleText,
+        meaningInSentence = { tap -> viewModel.meaningInContext(tap) },
+        ankiCard = viewModel::ankiCard,
+    )
     BindLineSoundReplay(webController, state.activeVideoId.takeUnless { state.liveFallback })
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
     DisposableEffect(studyRunner, viewModel) {

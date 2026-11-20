@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.concurrent.ConcurrentHashMap
 
 /** A subtitle request waits this long for the model; a window of sentences takes a few seconds. */
 internal const val AI_TRANSLATION_TIMEOUT_MS = 45_000L
@@ -27,6 +28,15 @@ internal const val AI_TRANSLATION_KEY_INTERVAL_MS = 6_000L
  * learner tapped is not held to [AI_TRANSLATION_KEY_INTERVAL_MS], only to this.
  */
 internal const val AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE = 10
+
+/**
+ * Of a key's [AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE], this many in any minute are kept for words the
+ * learner taps: background requests (subtitle windows, Prepare meanings ahead) never take them. Without
+ * this, background requests at [AI_TRANSLATION_KEY_INTERVAL_MS] filled the whole minute, and a tapped
+ * word waited for the oldest of them to leave it (lion737, Discussion #81, 2026-11-20: about 22 s with
+ * Prepare meanings ahead on).
+ */
+internal const val AI_TRANSLATION_KEY_URGENT_RESERVE = 4
 
 private const val PACER_MINUTE_MS = 60_000L
 
@@ -193,12 +203,14 @@ internal fun Context.aiTranslationModelChoices(): Pair<String, List<String>> {
  * Background requests (subtitle windows, the other words of a line, Prepare meanings ahead) keep
  * [intervalMs] apart. An urgent request, a word the learner just tapped, goes at once and ahead of
  * every background request still waiting (lion737, Discussion #81, 2026-11-16: the meaning waited up
- * to 6 s behind the line's own request). Both stay within [perMinute] requests in any minute.
+ * to 6 s behind the line's own request). Both stay within [perMinute] requests in any minute, and
+ * background requests leave [urgentReserve] of them for urgent ones.
  */
 internal class AiKeyPacer(
     private val now: () -> Long = System::currentTimeMillis,
     private val intervalMs: Long = AI_TRANSLATION_KEY_INTERVAL_MS,
     private val perMinute: Int = AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE,
+    private val urgentReserve: Int = AI_TRANSLATION_KEY_URGENT_RESERVE,
 ) {
     private class KeyState {
         /** The newest send times (an urgent request's may be just ahead), oldest first, at most perMinute of them. */
@@ -255,7 +267,9 @@ internal class AiKeyPacer(
         urgent: Boolean,
     ): Long {
         val last = state.sent.lastOrNull() ?: return time
-        val minuteFree = if (state.sent.size < perMinute) time else state.sent.first() + PACER_MINUTE_MS
+        // Urgent requests may use the whole minute; background ones leave the reserve free.
+        val cap = if (urgent) perMinute else (perMinute - urgentReserve).coerceAtLeast(1)
+        val minuteFree = if (state.sent.size < cap) time else state.sent[state.sent.size - cap] + PACER_MINUTE_MS
         return maxOf(time, minuteFree, if (urgent) last else last + intervalMs)
     }
 
@@ -292,6 +306,34 @@ internal class AiKeyPacer(
     }
 }
 
+/**
+ * The thinking settings and JSON schemas a service's model refused, for the whole app run. Each
+ * tapped word gets a new model, and each used to send the refused setting first, fail, then wait for
+ * the key's next turn before asking again (lion737, Discussion #81, 2026-11-20).
+ */
+internal object AiRefusedSettings {
+    private val thinking: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    private val format: MutableSet<String> = ConcurrentHashMap.newKeySet()
+
+    fun refusedThinking(key: String): Boolean = key in thinking
+
+    fun refusedFormat(key: String): Boolean = key in format
+
+    fun thinkingRefused(key: String) {
+        thinking += key
+    }
+
+    fun formatRefused(key: String) {
+        format += key
+    }
+
+    /** For tests: forget every refusal. */
+    fun clear() {
+        thinking.clear()
+        format.clear()
+    }
+}
+
 private class KeyedAiTranslationModel(
     private val provider: AiProvider,
     private val model: String,
@@ -304,11 +346,20 @@ private class KeyedAiTranslationModel(
 ) : AiTranslationModel {
     override val scope: String = aiTranslationScope(provider, model, thinking)
 
-    /** Cleared once the model refuses the thinking setting, so later requests do not fail first. */
-    @Volatile private var effort = aiTranslationEffort(provider, model, thinking)
+    /** Where [AiRefusedSettings] remembers what this service's model refused. */
+    private val refusalKey = "${provider.key} $baseUrl $model"
+
+    private val wantedEffort = aiTranslationEffort(provider, model, thinking)
+    private val effortKey = "$refusalKey $wantedEffort"
+
+    /**
+     * Cleared once the model refuses the thinking setting, so later requests do not fail first. A new
+     * model is made for every tapped word, so the refusal is remembered for the app run, not here only.
+     */
+    @Volatile private var effort = wantedEffort.takeUnless { AiRefusedSettings.refusedThinking(effortKey) }
 
     /** Cleared once the model refuses the JSON schema, so later requests do not fail first. */
-    @Volatile private var responseFormat = aiTranslationResponseFormat(provider)
+    @Volatile private var responseFormat = aiTranslationResponseFormat(provider).takeUnless { AiRefusedSettings.refusedFormat(refusalKey) }
 
     override suspend fun ask(
         system: String,
@@ -329,7 +380,7 @@ private class KeyedAiTranslationModel(
             try {
                 val key = withContext(Dispatchers.IO) { keyStore.load(provider, id) }
                 if (key !is StoredAiKey.Found) throw AiChatException(AiErrorKind.KEY_UNREADABLE)
-                val reply = completeWhenBusy(key.key, messages, text) { pacer.take(listOf(paced)) != null }
+                val reply = completeWhenBusy(key.key, messages, text) { pacer.take(listOf(paced), urgent) != null }
                 pacer.answered(paced)
                 return reply.text
             } catch (error: AiChatException) {
@@ -378,10 +429,12 @@ private class KeyedAiTranslationModel(
                     text.started -> throw error
                     responseFormat != null && error.kind in FORMAT_REFUSALS -> {
                         responseFormat = null
+                        AiRefusedSettings.formatRefused(refusalKey)
                         if (!nextTurn()) throw error
                     }
                     effort != null && error.kind in setOf(AiErrorKind.UNSUPPORTED_THINKING, AiErrorKind.BAD_REQUEST) -> {
                         effort = null
+                        AiRefusedSettings.thinkingRefused(effortKey)
                         if (!nextTurn()) throw error
                     }
                     error.kind == AiErrorKind.SERVER && waits.hasNext() -> delay(waits.next())

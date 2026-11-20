@@ -160,6 +160,12 @@ val RESETTABLE_SETTING_KEYS =
         MEANING_ORDER_PREFERENCE,
         PREPARE_MEANINGS_PREFERENCE,
         TAP_BAR_READING_PREFERENCE,
+        // Tap bar buttons (TapBarButton): written out, since another file's list may not exist yet while this one starts.
+        "tap_bar_copy",
+        "tap_bar_translate",
+        "tap_bar_pronounce",
+        "tap_bar_anki",
+        "tap_bar_google_translate",
         "font_scale",
         PORTRAIT_PANEL_OFFSET_PREFERENCE,
         "preferred_caption_language",

@@ -131,6 +131,8 @@
     <string name="settings_prepare_meanings_description">While a line plays, asks the AI for the meaning of each of its words, so a tapped word shows its meaning at once. This uses your key even for lines you don\'t tap.</string>
     <string name="settings_tap_bar_reading_title">Pronunciation in the tap bar</string>
     <string name="settings_tap_bar_reading_description">When you tap one word, the bar above it also shows how to say it: IPA for English, kana for Japanese, pinyin for Chinese.</string>
+    <string name="settings_tap_bar_buttons_title">Tap bar buttons</string>
+    <string name="settings_tap_bar_buttons_description">Pick which buttons show in the bar above a word you tap. The others stay in its ▾ list. Add to Anki shows once Flashcards &amp; Anki can send cards.</string>
     <string name="settings_word_learning_mode_title">Word learning mode (POS colors)</string>
     <string name="settings_word_learning_mode_description">Color words by grammatical role (nouns, verbs, adjectives, particles) to see sentence structure.</string>
     <string name="settings_colored_lines_title">Colored subtitle lines</string>

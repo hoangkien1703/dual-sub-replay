@@ -18,6 +18,7 @@
     <string name="practice_next_review">다음 복습: %1$s</string>
     <string name="practice_pronounce">발음</string>
     <string name="practice_open_google_translate">Google 번역에서 열기</string>
+    <string name="phrase_add_to_anki">Anki에 추가</string>
     <string name="practice_google_translate_unavailable">Google 번역이 설치되어 있지 않습니다</string>
     <string name="practice_google_translate_cannot_open">Google 번역이 텍스트를 받을 수 없습니다</string>
     <string name="practice_pronounce_item">%1$s 발음</string>

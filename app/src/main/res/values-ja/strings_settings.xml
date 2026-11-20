@@ -131,6 +131,8 @@
     <string name="settings_prepare_meanings_description">行の再生中に、その行の各単語の意味を AI に聞いておくので、タップした単語の意味がすぐに出ます。タップしない行でもキーを使います。</string>
     <string name="settings_tap_bar_reading_title">タップバーに読みを表示</string>
     <string name="settings_tap_bar_reading_description">単語を1つタップすると、上のバーにも読み方を表示します。英語はIPA、日本語はかな、中国語はピンイン。</string>
+    <string name="settings_tap_bar_buttons_title">タップバーのボタン</string>
+    <string name="settings_tap_bar_buttons_description">タップした単語の上のバーに表示するボタンを選びます。ほかのボタンは ▾ の一覧に残ります。「Ankiに追加」は「単語カードと Anki」でカードを送れるときに表示されます。</string>
     <string name="settings_word_learning_mode_title">単語学習モード（品詞の色分け）</string>
     <string name="settings_word_learning_mode_description">品詞（名詞、動詞、形容詞、助詞）ごとに単語を色分けして、文の構造をわかりやすくします。</string>
     <string name="settings_colored_lines_title">色分けする字幕の行</string>

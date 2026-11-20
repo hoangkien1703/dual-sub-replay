@@ -18,6 +18,7 @@
     <string name="practice_next_review">Ulasan berikutnya: %1$s</string>
     <string name="practice_pronounce">Ucapkan</string>
     <string name="practice_open_google_translate">Buka di Google Terjemahan</string>
+    <string name="phrase_add_to_anki">Tambah ke Anki</string>
     <string name="practice_google_translate_unavailable">Google Terjemahan belum terpasang</string>
     <string name="practice_google_translate_cannot_open">Google Terjemahan tidak dapat menerima teks</string>
     <string name="practice_pronounce_item">Ucapkan %1$s</string>

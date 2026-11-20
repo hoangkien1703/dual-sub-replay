@@ -18,6 +18,7 @@
     <string name="practice_next_review">下次复习:%1$s</string>
     <string name="practice_pronounce">发音</string>
     <string name="practice_open_google_translate">在 Google 翻译中打开</string>
+    <string name="phrase_add_to_anki">添加到 Anki</string>
     <string name="practice_google_translate_unavailable">未安装 Google 翻译</string>
     <string name="practice_google_translate_cannot_open">Google 翻译无法接收该文本</string>
     <string name="practice_pronounce_item">朗读 %1$s</string>
