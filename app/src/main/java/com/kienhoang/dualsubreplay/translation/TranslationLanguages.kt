@@ -40,7 +40,7 @@ object TranslationLanguages {
         // Chinese keeps its old code "zh" for Simplified, so an earlier pick of "Chinese" stays the same;
         // Traditional is online only: ML Kit's one Chinese model writes Simplified (owner pick 2026-11-20).
         TranslationLanguageOption("zh", "Chinese (Simplified)", aliases = listOf("Chinese", "Simplified Chinese")),
-        TranslationLanguageOption(TRADITIONAL_CHINESE, "Chinese (Traditional)", onDevice = false, aliases = listOf("Traditional Chinese")),
+        TranslationLanguageOption("zh-TW", "Chinese (Traditional)", onDevice = false, aliases = listOf("Traditional Chinese")),
         TranslationLanguageOption("hr", "Croatian"),
         TranslationLanguageOption("cs", "Czech"),
         TranslationLanguageOption("da", "Danish"),

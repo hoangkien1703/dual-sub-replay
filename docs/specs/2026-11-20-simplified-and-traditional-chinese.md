@@ -53,6 +53,7 @@ Implemented. Owner pick 2026-11-20 ("Split entry, Traditional online only") afte
 - [x] Google gets zh-TW for Traditional and zh-CN for Simplified (`GoogleWebTranslatorTest`, `TranslationLanguagesTest`).
 - [x] Traditional has no on-device model (`TranslationLanguagesTest.traditionalChineseTranslatesOnlineInItsOwnScript`, `onDeviceFlagMatchesMlKitModels`).
 - [x] The AI prompt says "Traditional Chinese (zh-TW)" / "Simplified Chinese (zh)" (`AiSubtitleTranslatorTest`).
+- [x] The landing site and README list both entries and say 102 languages (`tools/tests/test_site.py`).
 - [x] Recent languages, third line and first-run choices keep the two apart (`RecentLanguagesTest`, `ThirdLineAndVideoFilterTest`, `OnboardingPreferencesTest`); the assistant maps names (`AiActionsTest`).
 - [ ] The picker shows both entries with Traditional marked selected (`SubtitleUiTest.translateToListsSimplifiedAndTraditionalChinese`, screenshot `translate-to-chinese-scripts`): PR CI.
 - [ ] Phone check: pick Chinese (Traditional), play an English video with Google, then with AI translation: lines in Traditional characters (owner, preview APK).
