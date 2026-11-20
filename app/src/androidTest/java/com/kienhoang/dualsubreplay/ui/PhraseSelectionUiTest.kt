@@ -14,6 +14,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -437,6 +438,8 @@ class PhraseSelectionUiTest {
         showCard(inSentence = "đang mong chờ", anki = true)
         tapWord(original, "looking")
         compose.onNodeWithTag("phrase_anki").assertIsDisplayed()
+        // The bar asks about the sentence after a short pause, so the second line comes a moment later.
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("phrase_meaning_in_sentence").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("phrase_meaning_in_sentence").assertIsDisplayed()
         saveUiEvidence("phrase-action-bar-add-to-anki")
         compose.onNodeWithTag("phrase_anki").performClick()
