@@ -22,7 +22,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+
+/** True while the side menu is open: the page's own Back waits, so Back closes the menu. */
+internal val navigationMenuOpen = MutableStateFlow(false)
 
 @Composable
 internal fun AppNavigation(
@@ -38,9 +42,16 @@ internal fun AppNavigation(
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     LaunchedEffect(drawer.currentValue, drawer.targetValue) {
-        onVisibilityChange(drawer.currentValue == DrawerValue.Open || drawer.targetValue == DrawerValue.Open)
+        val open = drawer.currentValue == DrawerValue.Open || drawer.targetValue == DrawerValue.Open
+        navigationMenuOpen.value = open
+        onVisibilityChange(open)
     }
-    DisposableEffect(Unit) { onDispose { onVisibilityChange(false) } }
+    DisposableEffect(Unit) {
+        onDispose {
+            navigationMenuOpen.value = false
+            onVisibilityChange(false)
+        }
+    }
     BackHandler(drawer.isOpen) { scope.launch { drawer.close() } }
     ModalNavigationDrawer(
         drawerState = drawer,

@@ -59,4 +59,14 @@ class BilibiliVideosTest {
             ankiSourceLink("bili-BV1kYsW6NE6E-p3", 83_000),
         )
     }
+
+    @Test
+    fun avLinksAndTheOverseasDesktopPathNameTheSameVideo() {
+        assertEquals("BV17x411w7KC", bvidOfAid(170001))
+        assertEquals("BV1L9Uoa9EUx", bvidOfAid(111298867365120))
+        assertEquals("bili-BV17x411w7KC", VideoKeys.fromUrl("https://m.bilibili.com/video/av170001"))
+        assertEquals("bili-BV1kYsW6NE6E", VideoKeys.fromUrl("https://www.bilibili.com/en/video/BV1kYsW6NE6E"))
+        assertNull(VideoKeys.fromUrl("https://m.bilibili.com/space/video/BV1kYsW6NE6E"))
+        assertNull(bvidOfAid(0))
+    }
 }

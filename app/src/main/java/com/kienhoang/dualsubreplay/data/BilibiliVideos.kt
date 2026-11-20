@@ -65,6 +65,30 @@ private val TV_KEY_PATTERN = Regex("^bilitv-(?:ss(\\d{1,20})(?:-ep(\\d{1,20}))?|
 private val DIGITS = Regex("^\\d{1,20}$")
 private val YOUTUBE_ID_PATTERN = Regex("[A-Za-z0-9_-]{11}")
 
+private val LOCALE_PART = Regex("^[a-z]{2}(?:-[A-Za-z]{2,4})?$")
+private val AV_PATTERN = Regex("^av(\\d{1,16})$", RegexOption.IGNORE_CASE)
+
+// Bilibili's own av to BV mapping (since 2024): one video, two names. The key keeps the BV name.
+private const val BV_XOR = 23_442_827_791_579L
+private const val BV_MAX_AID = 1L shl 51
+private const val BV_BASE = 58
+private const val BV_ALPHABET = "FcwAPNKTMug3GV5Lj7EJnHpWsx4tb8haYeviqBz6rkCy12mUSDQX9RdoZf"
+
+/** The BV id of video [aid], or null outside the ids Bilibili gives. */
+internal fun bvidOfAid(aid: Long): String? {
+    if (aid <= 0 || aid >= BV_MAX_AID) return null
+    val chars = "BV1000000000".toCharArray()
+    var rest = (BV_MAX_AID or aid) xor BV_XOR
+    var index = chars.size - 1
+    while (rest > 0 && index >= 3) {
+        chars[index--] = BV_ALPHABET[(rest % BV_BASE).toInt()]
+        rest /= BV_BASE
+    }
+    chars[3] = chars[9].also { chars[9] = chars[3] }
+    chars[4] = chars[7].also { chars[7] = chars[4] }
+    return String(chars)
+}
+
 internal object VideoKeys {
     /** The site a [key] belongs to. */
     fun site(key: String): VideoSite =
@@ -139,12 +163,24 @@ internal object VideoKeys {
         }
     }
 
+    /** `/video/BV…`, `/video/av<aid>` (cards' and old share links) and `/en/video/BV…` (the overseas desktop page). */
     private fun chinaVideo(
         parts: List<String>,
         rawQuery: String?,
     ): BilibiliVideo.China? {
-        if (parts.getOrNull(0) != "video") return null
-        val bvid = parts.getOrNull(1)?.takeIf(BVID_PATTERN::matches) ?: return null
+        // Only a language may come first (`/en/video/…`), not a section such as `/space/…`.
+        val start = if (parts.getOrNull(0)?.matches(LOCALE_PART) == true) 1 else 0
+        if (parts.getOrNull(start) != "video") return null
+        val id = parts.getOrNull(start + 1) ?: return null
+        val bvid =
+            id.takeIf(BVID_PATTERN::matches)
+                ?: AV_PATTERN
+                    .find(id)
+                    ?.groupValues
+                    ?.get(1)
+                    ?.toLongOrNull()
+                    ?.let(::bvidOfAid)
+                ?: return null
         val page =
             rawQuery.orEmpty().split('&').firstNotNullOfOrNull { pair ->
                 pair.takeIf { it.startsWith("p=") }?.removePrefix("p=")?.toIntOrNull()

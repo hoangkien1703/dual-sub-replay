@@ -512,25 +512,32 @@ private fun DualSubExperience(
                         )
                     } else {
                         key(account) {
-                            SingleYouTubePage(
-                                initialUrl = state.browserUrl,
-                                navigationRequestId = state.browserNavigationRequestId,
-                                controller = webController,
-                                onPageChanged = onPageChanged,
-                                onPlaybackSecond = onPlaybackSecond,
-                                onPlaybackPaused = onPlaybackPaused,
-                                liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
-                                suppressPageCaptions = shouldSuppressNativeCaptions(state, liveCaptionCaptureEnabled, effectivePlayerMode),
-                                captionTrackTarget = captionTrackTarget(state),
-                                fullscreenOverlay = fullscreenLearningOverlay,
-                                modifier =
-                                    Modifier
-                                        .weight(if (sideBySide) landscapeVideoFraction else 1f)
-                                        .fillMaxHeight()
-                                        .testTag("youtube_web_app"),
-                                account = account,
-                                tabActions = pageTabActions,
-                            )
+                            CompositionLocalProvider(LocalBrowserTabId provides activeTab.id) {
+                                SingleYouTubePage(
+                                    initialUrl = state.browserUrl,
+                                    navigationRequestId = state.browserNavigationRequestId,
+                                    controller = webController,
+                                    onPageChanged = onPageChanged,
+                                    onPlaybackSecond = onPlaybackSecond,
+                                    onPlaybackPaused = onPlaybackPaused,
+                                    liveCaptionCaptureEnabled = liveCaptionCaptureEnabled,
+                                    suppressPageCaptions =
+                                        shouldSuppressNativeCaptions(
+                                            state,
+                                            liveCaptionCaptureEnabled,
+                                            effectivePlayerMode,
+                                        ),
+                                    captionTrackTarget = captionTrackTarget(state),
+                                    fullscreenOverlay = fullscreenLearningOverlay,
+                                    modifier =
+                                        Modifier
+                                            .weight(if (sideBySide) landscapeVideoFraction else 1f)
+                                            .fillMaxHeight()
+                                            .testTag("youtube_web_app"),
+                                    account = account,
+                                    tabActions = pageTabActions,
+                                )
+                            }
                         }
                     }
 

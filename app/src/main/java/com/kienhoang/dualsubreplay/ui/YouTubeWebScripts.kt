@@ -583,19 +583,73 @@ internal val WEB_HIDE_OPEN_APP_SCRIPT: String =
     """.trimIndent()
 
 /**
- * Hides m.bilibili.com's two big "Download App" / "Open App" buttons (Bilibili beta; seen in a phone
- * browser 2026-11-17); a tap would only try Bilibili's app, which the web view blocks.
+ * Hides every "open the app" and "download the app" button, badge and popup on Bilibili's pages
+ * (owner asked 2026-11-20; found on the laptop emulator), which can only fail in the web view.
+ * - bilibili.com outside China shows its "overseas" page: the player is hidden behind a cover card
+ *   whose Play Now only opens the app. The style shows the page's own player instead.
+ * - Video cards there only open the app: a tap goes to the card's web page instead.
+ * - A hidden popup leaves the page locked against scrolling, so the lock is lifted.
+ * Popups that name the app are found by text on bilibili.tv (they have no class of their own); one with
+ * a text field (sign-in) is always kept. Run when a page finishes loading; safe to run again.
  */
-internal val WEB_HIDE_BILIBILI_OPEN_APP_SCRIPT: String =
+internal val WEB_HIDE_BILIBILI_APP_SCRIPT: String =
     """
     (function() {
-      const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
-      if (window.location.protocol !== 'https:' || !(host === 'bilibili.com' || host.endsWith('.bilibili.com'))) return false;
-      if (document.getElementById('dual-sub-hide-bilibili-open-app')) return true;
+      const host = location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+      const china = host === 'bilibili.com' || host.endsWith('.bilibili.com');
+      const intl = host === 'bilibili.tv' || host.endsWith('.bilibili.tv');
+      if (location.protocol !== 'https:' || !(china || intl)) return false;
+      if (window.__dualSubBiliHide) return true;
+      window.__dualSubBiliHide = true;
+      const CHINA_CSS = ['.m-nav-openapp', '.m-video-main-launchapp', 'm-open-app.fixed-openapp',
+        '.v-dialog:has(.open-app-dialog)', '.login-entry__title', '.login-entry__btn-wrapper',
+        '.fixed-wrapper', '.gsl-poster', '.gsl-callapp-dom', '.gsl-buffer-app', '.gsl-control-dot', '.v-card-toapp .open-app'
+      ].join(',') + '{display:none!important}' +
+        '.video-share{display:block!important}.m-video-player{position:relative!important;height:auto!important}';
+      const INTL_CSS = ['.bstar-header__openapp', '.bstar-open-app', '.video-toapp-dialog',
+        '.interactive__actions_flex:has(> .interactive__download)', '.dual-sub-app-dialog'].join(',') + '{display:none!important}';
+      const APP_DIALOG_TEXT = /on the App|Open the App|BiliBili App|Download/i;
       const style = document.createElement('style');
-      style.id = 'dual-sub-hide-bilibili-open-app';
-      style.textContent = '.m-nav-openapp, .m-video-main-launchapp { display: none !important; }';
+      style.id = 'dual-sub-hide-bilibili-app';
+      style.textContent = china ? CHINA_CSS : INTL_CSS;
       (document.head || document.documentElement).appendChild(style);
+      const unlock = function() {
+        if (!document.getElementById(style.id) && (document.head || document.documentElement)) (document.head || document.documentElement).appendChild(style);
+        if (intl) {
+          document.querySelectorAll('.dialog:not(.dual-sub-app-dialog)').forEach(function(d) {
+            if (!d.querySelector('input') && APP_DIALOG_TEXT.test(d.textContent || '')) d.classList.add('dual-sub-app-dialog');
+          });
+        }
+        const dialogOpen = china ? document.querySelector('.v-dialog:has(.open-app-dialog)') : document.querySelector('.video-toapp-dialog .dialog__wrap--show, .dual-sub-app-dialog .dialog__wrap--show');
+        const otherDialog = china ? document.querySelector('.v-dialog:not(:has(.open-app-dialog))') : document.querySelector('.dialog__wrap--show:not(.video-toapp-dialog *):not(.dual-sub-app-dialog *)');
+        if (!dialogOpen || otherDialog) return;
+        const b = document.body;
+        if (!b || b.style.overflow !== 'hidden') return;
+        const top = parseFloat(b.style.top) || 0;
+        b.style.overflow = ''; b.style.top = ''; b.style.position = ''; b.style.width = ''; b.style.height = '';
+        document.documentElement.style.overflow = '';
+        if (top < 0) window.scrollTo(0, -top);
+      };
+      document.addEventListener('click', function(event) {
+        if (!china) return;
+        const t = event.target;
+        const card = t.closest && t.closest('m-open-app.v-card-toapp, m-open-app.video-item-space');
+        if (card && card.getAttribute('universallink')) { event.preventDefault(); event.stopImmediatePropagation(); location.href = card.getAttribute('universallink'); return; }
+        const result = t.closest && t.closest('.v-card-single');
+        if (result) {
+          const vm = result.__vue__ || (result.parentElement && result.parentElement.__vue__);
+          const info = vm && vm.${'$'}props && vm.${'$'}props.info;
+          if (info && /^BV[0-9A-Za-z]{10}${'$'}/.test(info.bvid || '')) { event.preventDefault(); event.stopImmediatePropagation(); location.href = 'https://m.bilibili.com/video/' + info.bvid; }
+        }
+      }, true);
+      // The pages change all the time (danmaku, progress): look again at most four times a second.
+      let pending = false;
+      new MutationObserver(function() {
+        if (pending) return;
+        pending = true;
+        setTimeout(function() { pending = false; unlock(); }, 250);
+      }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+      unlock();
       return true;
     })();
     """.trimIndent()
@@ -611,13 +665,14 @@ internal fun webCaptionVisibilityScript(hidden: Boolean): String {
         (function() {
           const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
           if (window.location.protocol !== 'https:' ||
-              !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+              !$VIDEO_SITE_HOST_CHECK) return false;
           const styleId = '$YOUTUBE_CAPTION_STYLE_ID';
           const existing = document.getElementById(styleId);
           if ($hiddenLiteral) {
             const style = existing || document.createElement('style');
             style.id = styleId;
-            style.textContent = '.ytp-caption-window-container, .caption-window, .ytp-caption-segment { visibility: hidden !important; opacity: 0 !important; }';
+            // YouTube's caption boxes, and bilibili.tv's own subtitle line (Bilibili beta).
+            style.textContent = '.ytp-caption-window-container, .caption-window, .ytp-caption-segment, .player-mobile-ass-subtitle { visibility: hidden !important; opacity: 0 !important; }';
             if (!existing) (document.head || document.documentElement).appendChild(style);
           } else if (existing) {
             existing.remove();

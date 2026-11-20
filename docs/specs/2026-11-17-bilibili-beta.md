@@ -71,6 +71,26 @@ Approved for implementation. Owner picks on 2026-11-17 (thread "Add Bilibili bet
 - No subtitles: Bilibili China signed out says "Sign in to Bilibili to load its subtitles" with the
   usual no-captions card; otherwise "This video has no subtitles".
 
+### Fixes after the emulator test (2026-11-20)
+
+The owner's laptop emulator found these on the first preview; each is fixed in the same PR:
+
+- No button, box or link that opens or downloads Bilibili's app is left (owner's ask). On every
+  Bilibili page `WEB_HIDE_BILIBILI_APP_SCRIPT` hides the "Open app" and "Download" buttons, banners
+  and popups, and lifts the scroll lock a hidden popup leaves. bilibili.tv popups have no class of
+  their own, so they are found by their text; one with a text field (sign-in) is kept.
+- Outside China, m.bilibili.com hides its player behind an app-only cover. The script shows the
+  player again, and its app-only video cards go to the card's web page instead.
+- Bilibili's download pages (d.bilibili.com, d.biliintl.com) and Google Play's pages for its apps
+  are blocked. A Bilibili page that sends itself to another site with no tap (its app fallback
+  after a blocked `bstar://`) is stopped (`blocksUntappedExit`); a tapped link still opens outside.
+- `/video/av<aid>` and `/<locale>/video/<BVid>` links read as the same video (av→BV conversion).
+- Back closes the open side menu first, and a tab switch no longer keeps the other tab's Back
+  history (all tabs share one web view).
+- No-subtitle messages on Bilibili say Bilibili, not YouTube.
+- In landscape, bilibili.tv's own subtitle line is hidden while ours shows, like YouTube's.
+- Tab names drop "_哔哩哔哩_bilibili" and "- BiliBili".
+
 ## Design
 
 - `data/BilibiliVideos.kt`: `VideoSite` (YOUTUBE, BILIBILI, BILIBILI_TV) and video keys that are
@@ -106,7 +126,8 @@ Approved for implementation. Owner picks on 2026-11-17 (thread "Add Bilibili bet
   language mapping and track pick.
 - Navigation (in `BetaSitesTest`): Bilibili hosts stay inside only when their switch is on;
   `bilibili://` and `intent://` are blocked.
-- `BetaSitesTest` (unit): the same rules for `classifyMainFrameUrl`, tab names and restored tabs.
+- `BetaSitesTest` (unit): the same rules for `classifyMainFrameUrl`, tab names and restored tabs;
+  download pages blocked, untapped exits stopped, the hide script is Bilibili-only.
 - `BetaSettingsUiTest` (+ screenshots `settings-beta`, `new-tab-chooser`, `bilibili-sign-in-card`).
 - Device check on a real phone with a signed-in Bilibili account: owner (not possible from cloud).
 

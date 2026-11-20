@@ -1886,6 +1886,10 @@ class AppViewModel internal constructor(
         generation: Long,
         error: Exception,
     ) {
+        if (VideoKeys.isBilibili(videoId)) {
+            showBilibiliProblem(videoId, generation, error)
+            return
+        }
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             current.copy(
@@ -1893,10 +1897,34 @@ class AppViewModel internal constructor(
                 liveFallback = true,
                 retryingTranscript = false,
                 fullTranscriptProblem = fullTranscriptProblem(videoId, error),
-                // Bilibili (beta) has no live captions to fall back on: its card shows, with the error below it.
-                noCaptions = meansNoCaptionsAtAll(error, pageTranscripts.problem(videoId)) || VideoKeys.isBilibili(videoId),
-                captionsNeedSignIn = error.meansBilibiliSignInNeeded(),
+                noCaptions = meansNoCaptionsAtAll(error, pageTranscripts.problem(videoId)),
                 statusMessage = if (current.liveOriginal != null) current.statusMessage else text(R.string.status_waiting_for_captions),
+                errorMessage = null,
+            )
+        }
+    }
+
+    /**
+     * A Bilibili video (beta) has no live captions to fall back on: its own card shows, in Bilibili's
+     * words, with the error below it unless it only says to sign in.
+     */
+    private fun showBilibiliProblem(
+        videoId: String,
+        generation: Long,
+        error: Exception,
+    ) {
+        val signIn = error.meansBilibiliSignInNeeded()
+        ProblemLog.record(ProblemArea.CAPTIONS, "bilibili ${error.javaClass.simpleName}")
+        _state.update { current ->
+            if (!isCurrentLoad(current, videoId, generation)) return@update current
+            current.copy(
+                stage = LoadStage.READY,
+                liveFallback = true,
+                retryingTranscript = false,
+                fullTranscriptProblem = if (signIn) null else error.message?.takeIf(String::isNotBlank) ?: error.javaClass.simpleName,
+                noCaptions = true,
+                captionsNeedSignIn = signIn,
+                statusMessage = text(if (signIn) R.string.bilibili_sign_in_title else R.string.bilibili_no_subtitles_title),
                 errorMessage = null,
             )
         }

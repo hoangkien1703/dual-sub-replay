@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -54,6 +55,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.kienhoang.dualsubreplay.BuildConfig
@@ -155,10 +157,36 @@ internal fun classifyMainFrameUrl(url: String): EmbeddedNavigationDecision {
         host == "youtube.com" || host.endsWith(".youtube.com") -> {
             EmbeddedNavigationDecision.YOUTUBE_WEB
         }
+        isBilibiliAppDownload(host, uri.rawQuery) -> EmbeddedNavigationDecision.BLOCK
         VideoKeys.bilibiliSiteOfHost(host)?.let(BetaSites::isOn) == true -> EmbeddedNavigationDecision.BILIBILI_WEB
         else -> EmbeddedNavigationDecision.OPEN_EXTERNAL
     }
 }
+
+/** Bilibili's own app pages: its download pages, and Google Play's pages for its apps (Bilibili beta). */
+private val BILIBILI_APP_PACKAGES = setOf("tv.danmaku.bili", "com.bilibili.app.in", "com.bstar.intl")
+
+private fun isBilibiliAppDownload(
+    host: String,
+    rawQuery: String?,
+): Boolean =
+    host == "d.bilibili.com" || host == "d.biliintl.com" ||
+        (host == "play.google.com" && rawQuery.orEmpty().split('&').any { it.removePrefix("id=") in BILIBILI_APP_PACKAGES })
+
+/**
+ * A Bilibili page that sends itself to another site with no tap (its app fallback, seen on the laptop
+ * emulator 2026-11-20) must not open the browser or another app; a link the user taps still does.
+ */
+internal fun blocksUntappedExit(
+    currentUrl: String?,
+    destination: EmbeddedNavigationDecision,
+    hasGesture: Boolean,
+): Boolean =
+    !hasGesture && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL &&
+        currentUrl?.let(::classifyMainFrameUrl) == EmbeddedNavigationDecision.BILIBILI_WEB
+
+/** The open tab's id, so a tab switch can drop the shared web view's Back history. */
+internal val LocalBrowserTabId = compositionLocalOf<Long?> { null }
 
 internal fun isSignOutNavigation(url: String): Boolean {
     val uri = runCatching { URI(url) }.getOrNull() ?: return false
@@ -398,6 +426,10 @@ internal fun SingleYouTubePage(
     var signInReturnUrl by remember { mutableStateOf<String?>(null) }
     var lastKnownUrl by remember { mutableStateOf(trustedEmbeddedUrlOrHome(initialUrl)) }
     var handledNavigationRequestId by remember { mutableLongStateOf(navigationRequestId) }
+    // Every tab shows in this one web view: after a switch, Back must not lead into the last tab's pages.
+    val tabId = LocalBrowserTabId.current
+    var shownTabId by remember { mutableStateOf(tabId) }
+    var forgetHistoryOnLoad by remember { mutableStateOf(false) }
 
     fun reportNavigation(view: WebView, url: String?) {
         val currentUrl = url?.takeIf(String::isNotBlank) ?: return
@@ -525,7 +557,9 @@ internal fun SingleYouTubePage(
                     request: WebResourceRequest,
                 ): Boolean {
                     if (!request.isForMainFrame) return false
-                    return handleMainFrameUrl(view, request.url.toString())
+                    val url = request.url.toString()
+                    if (blocksUntappedExit(view.url, classifyMainFrameUrl(url), request.hasGesture())) return true
+                    return handleMainFrameUrl(view, url)
                 }
 
                 @Suppress("DEPRECATION")
@@ -555,9 +589,16 @@ internal fun SingleYouTubePage(
                     if (url != null && handleMainFrameUrl(view, url)) return
                     rendererRecoveryUsed = false
                     webViewUnavailable = false
+                    if (forgetHistoryOnLoad) {
+                        forgetHistoryOnLoad = false
+                        view.clearHistory()
+                    }
                     reportNavigation(view, url)
                     if (url != null && classifyMainFrameUrl(url) == EmbeddedNavigationDecision.BILIBILI_WEB) {
-                        view.evaluateJavascript(WEB_HIDE_BILIBILI_OPEN_APP_SCRIPT, null)
+                        // Keeps a Bilibili sign-in, whose cookies the subtitle requests send.
+                        cookies.flush()
+                        view.evaluateJavascript(WEB_HIDE_BILIBILI_APP_SCRIPT, null)
+                        view.evaluateJavascript(webCaptionVisibilityScript(currentSuppressPageCaptions), null)
                     }
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         cookies.flush()
@@ -631,11 +672,16 @@ internal fun SingleYouTubePage(
     LaunchedEffect(navigationRequestId, initialUrl, webView) {
         if (navigationRequestId == handledNavigationRequestId) return@LaunchedEffect
         handledNavigationRequestId = navigationRequestId
-        if (isVideoSiteUrl(initialUrl)) webView.loadUrl(initialUrl)
+        if (!isVideoSiteUrl(initialUrl)) return@LaunchedEffect
+        if (tabId != shownTabId) {
+            shownTabId = tabId
+            forgetHistoryOnLoad = true
+        }
+        webView.loadUrl(initialUrl)
     }
 
     LaunchedEffect(webView, suppressPageCaptions) {
-        if (webView.url.orEmpty().let(::isYouTubeWebUrl)) {
+        if (webView.url.orEmpty().let(::isVideoSiteUrl)) {
             webView.evaluateJavascript(webCaptionVisibilityScript(suppressPageCaptions), null)
         }
     }
@@ -866,7 +912,9 @@ internal fun SingleYouTubePage(
         }
     }
 
-    BackHandler {
+    // The open menu closes first (AppNavigation's own Back).
+    val menuOpen by navigationMenuOpen.collectAsStateWithLifecycle()
+    BackHandler(enabled = !menuOpen) {
         if (canGoBack) webView.goBack() else (context as? Activity)?.leaveKeepingState()
     }
 

@@ -92,8 +92,12 @@ internal fun browserTabTitle(pageTitle: String?): String {
             .trim()
             .removeSuffix("- YouTube")
             .removeSuffix("_哔哩哔哩_bilibili")
+            .removeSuffix("- BiliBili")
+            .removeSuffix("-bilibili")
             .trim()
-    return if (title.equals("YouTube", ignoreCase = true)) "" else title.take(MAX_TAB_TITLE_LENGTH)
+    // A site's own name (YouTube's or Bilibili's home page) leaves the tab to its kind's name.
+    val siteName = title.equals("YouTube", ignoreCase = true) || title.equals("BiliBili", ignoreCase = true) || title.startsWith("哔哩哔哩")
+    return if (siteName) "" else title.take(MAX_TAB_TITLE_LENGTH)
 }
 
 internal enum class BrowserTabKind { VIDEO, HOME, SEARCH, OTHER, BILIBILI_VIDEO, BILIBILI_PAGE }

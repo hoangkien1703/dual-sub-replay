@@ -54,6 +54,37 @@ class BetaSitesTest {
     }
 
     @Test
+    fun bilibilisAppDownloadPagesNeverOpenAndPagesCannotLeaveWithoutATap() {
+        BetaSites.set(setOf(VideoSite.BILIBILI, VideoSite.BILIBILI_TV))
+        listOf(
+            "https://d.bilibili.com/download_app.html",
+            "https://d.biliintl.com/download?from=web",
+            "https://play.google.com/store/apps/details?id=tv.danmaku.bili",
+            "https://play.google.com/store/apps/details?hl=en&id=com.bstar.intl",
+        ).forEach { url -> assertEquals(url, EmbeddedNavigationDecision.BLOCK, classifyMainFrameUrl(url)) }
+        val otherApp = "https://play.google.com/store/apps/details?id=com.google.android.youtube"
+        assertEquals(EmbeddedNavigationDecision.OPEN_EXTERNAL, classifyMainFrameUrl(otherApp))
+
+        val video = "https://m.bilibili.com/video/BV1GJ411x7h7"
+        assertTrue(blocksUntappedExit(video, EmbeddedNavigationDecision.OPEN_EXTERNAL, hasGesture = false))
+        assertFalse(blocksUntappedExit(video, EmbeddedNavigationDecision.OPEN_EXTERNAL, hasGesture = true))
+        assertFalse(blocksUntappedExit(video, EmbeddedNavigationDecision.BILIBILI_WEB, hasGesture = false))
+        assertFalse(blocksUntappedExit("https://m.youtube.com/", EmbeddedNavigationDecision.OPEN_EXTERNAL, hasGesture = false))
+    }
+
+    @Test
+    fun theHideScriptRunsOnlyOnBilibiliAndCoversItsAppButtons() {
+        val script = WEB_HIDE_BILIBILI_APP_SCRIPT
+        assertTrue(script.contains("location.protocol !== 'https:'"))
+        assertTrue(script.contains("host.endsWith('.bilibili.com')"))
+        assertTrue(script.contains("host.endsWith('.bilibili.tv')"))
+        listOf(".m-nav-openapp", ".m-video-main-launchapp", ".bstar-header__openapp", ".interactive__download", ".fixed-wrapper")
+            .forEach { selector -> assertTrue(selector, script.contains(selector)) }
+        assertFalse(script.contains("youtube"))
+        assertTrue(webCaptionVisibilityScript(true).contains(".player-mobile-ass-subtitle"))
+    }
+
+    @Test
     fun aBilibiliPageNamesItsVideoOnlyWhileItsSiteIsOn() {
         val url = "https://m.bilibili.com/video/BV1GJ411x7h7?p=2"
         assertNull(browseVideoSelection(url))
@@ -67,6 +98,8 @@ class BetaSitesTest {
         assertEquals(BrowserTabKind.BILIBILI_VIDEO, browserTabKind("https://www.bilibili.tv/en/video/4789581127420416"))
         assertEquals(BrowserTabKind.BILIBILI_PAGE, browserTabKind("https://m.bilibili.com/"))
         assertEquals("可爱的猫", browserTabTitle("可爱的猫_哔哩哔哩_bilibili"))
+        assertEquals("Frieren E1", browserTabTitle("Frieren E1 - BiliBili"))
+        assertEquals("", browserTabTitle("哔哩哔哩 (゜-゜)つロ 干杯~-bilibili"))
 
         val stored = encodeBrowserTabs(BrowserTabs(listOf(BrowserTab(1, "https://m.bilibili.com/video/BV1GJ411x7h7")), activeId = 1))
         assertTrue(decodeBrowserTabs(stored)!!.tabs.isEmpty())
