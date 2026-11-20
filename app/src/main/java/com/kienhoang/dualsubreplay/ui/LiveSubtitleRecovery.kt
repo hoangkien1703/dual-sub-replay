@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SoundCues
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 
@@ -89,7 +90,11 @@ internal fun LiveSubtitlePanel(
         if (state.noCaptions && state.liveOriginal == null) {
             // No captions to wait for: say so and offer AI subtitles; the diagnostic lines stay below for reports.
             // A live stream's TV-style captions list no track, so once the player shows some, they win.
-            NoCaptionsSection(state)
+            if (VideoKeys.isBilibili(state.activeVideoId)) {
+                BilibiliNoSubtitlesCard(state.captionsNeedSignIn, onRetry)
+            } else {
+                NoCaptionsSection(state)
+            }
             state.fullTranscriptProblem?.let { problem ->
                 Spacer(Modifier.height(12.dp))
                 Text(problem, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

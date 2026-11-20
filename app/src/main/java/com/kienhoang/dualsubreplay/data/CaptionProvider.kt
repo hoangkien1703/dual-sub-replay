@@ -21,7 +21,7 @@ open class CaptionUnavailableException(
 ) : Exception(message, cause)
 
 /** YouTube lists no caption track at all for the video, not even an automatic one. */
-class NoPublicCaptionsException(
+open class NoPublicCaptionsException(
     message: String,
     cause: Throwable? = null,
 ) : CaptionUnavailableException(message, cause)

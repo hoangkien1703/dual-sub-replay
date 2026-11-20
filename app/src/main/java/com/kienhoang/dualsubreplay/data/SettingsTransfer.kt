@@ -166,6 +166,10 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "app_auto_update" to backup(B),
         "update_reminders" to backup(B),
         "tv_layout" to backup(B),
+        "beta_bilibili" to share(B),
+        "beta_bilibili_tv" to share(B),
+        "beta_bilibili_opened" to backup(B),
+        "beta_bilibili_tv_opened" to backup(B),
         // AI: backups only, so a shared link can never turn on anything that uses an API key.
         "ai_subtitle_translation" to backup(B),
         "ai_subtitle_translation_only" to backup(B),

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">ベータ</string>
+    <string name="beta_section_hint">試験中の機能です。変更されたり動かなくなったりすることがあり、オンにするまではすべてオフです。</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">bilibili.com の動画を二言語字幕で視聴します。ほとんどの字幕は Bilibili へのログインが必要です。初めてオンにすると Bilibili を開きます。</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">bilibili.tv の動画を二言語字幕で視聴します。初めてオンにすると bilibili.tv を開きます。</string>
+    <string name="tabs_new_tab_site">新しいタブ：%1$s</string>
+    <string name="tabs_name_bilibili_video">Bilibili の動画</string>
+    <string name="tabs_name_bilibili_page">Bilibili のページ</string>
+    <string name="tabs_open_new_site_tab">%1$s を開く</string>
+    <string name="bilibili_sign_in_title">字幕を読み込むには Bilibili にログインしてください</string>
+    <string name="bilibili_sign_in_body">Bilibili はほとんどの字幕をログインしたユーザーにだけ表示します。ここの Bilibili ページでログインし（アプリがパスワードを見ることはありません）、もう一度試すをタップしてください。</string>
+    <string name="bilibili_no_subtitles_title">この動画には字幕がありません</string>
+    <string name="bilibili_no_subtitles_body">Bilibili にはこの動画の字幕がありません。別の動画をお試しください。</string>
+    <string name="bilibili_try_again">もう一度試す</string>
+</resources>

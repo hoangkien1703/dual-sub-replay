@@ -189,7 +189,7 @@ internal fun exportAnkiTsv(words: List<SavedWord>): String {
                 word.meaningLanguage,
                 word.sentence,
                 word.translatedSentence.orEmpty(),
-                word.videoId?.let { "https://www.youtube.com/watch?v=$it" }.orEmpty(),
+                word.videoId?.let { VideoKeys.watchUrl(it) }.orEmpty(),
                 word.startMs.toString(),
                 word.endMs.toString(),
                 word.deck.orEmpty(),
@@ -235,9 +235,9 @@ internal fun previewImport(
                 fun field(name: String) = row.getOrNull(mapping[name] ?: -1).orEmpty()
                 val source = field("source").trim()
                 val videoId =
-                    source.takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) }
-                        ?: YouTubeUrlParser.extractVideoId(source)
-                require(source.isBlank() || videoId != null) { "Invalid YouTube source." }
+                    source.takeIf(VideoKeys::isValid)
+                        ?: VideoKeys.fromUrl(source)
+                require(source.isBlank() || videoId != null) { "Invalid video source." }
                 val start = field("startMs").ifBlank { "0" }.toLong()
                 val end = field("endMs").ifBlank { "0" }.toLong()
                 val word =

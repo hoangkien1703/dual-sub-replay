@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">Beta</string>
+    <string name="beta_section_hint">Early features. They may change or stop working, and each one stays off until you turn it on.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">Watch bilibili.com videos with dual subtitles. Most subtitles need you to sign in to Bilibili. Opens Bilibili the first time you turn it on.</string>
+    <string name="beta_bilibili_tv_title">Bilibili International</string>
+    <string name="beta_bilibili_tv_description">Watch bilibili.tv videos with dual subtitles. Opens bilibili.tv the first time you turn it on.</string>
+    <string name="tabs_new_tab_site">New tab: %1$s</string>
+    <string name="tabs_name_bilibili_video">Bilibili video</string>
+    <string name="tabs_name_bilibili_page">Bilibili page</string>
+    <string name="tabs_open_new_site_tab">Open %1$s</string>
+    <string name="bilibili_sign_in_title">Sign in to Bilibili to load its subtitles</string>
+    <string name="bilibili_sign_in_body">Bilibili shows most subtitles only to signed-in viewers. Sign in on the Bilibili page here (the app never sees your password), then tap Try again.</string>
+    <string name="bilibili_no_subtitles_title">This video has no subtitles</string>
+    <string name="bilibili_no_subtitles_body">Bilibili lists no subtitles for this video. Try another video.</string>
+    <string name="bilibili_try_again">Try again</string>
+    <string name="tabs_site_youtube" translatable="false">YouTube</string>
+</resources>

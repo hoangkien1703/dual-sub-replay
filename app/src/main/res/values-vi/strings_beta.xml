@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_beta_title">Beta</string>
+    <string name="beta_section_hint">Tính năng thử nghiệm. Chúng có thể thay đổi hoặc ngừng hoạt động, và mỗi tính năng đều tắt cho đến khi bạn bật.</string>
+    <string name="beta_bilibili_title">Bilibili</string>
+    <string name="beta_bilibili_description">Xem video bilibili.com với phụ đề song ngữ. Phần lớn phụ đề cần bạn đăng nhập Bilibili. Lần đầu bật sẽ mở Bilibili.</string>
+    <string name="beta_bilibili_tv_title">Bilibili Quốc tế</string>
+    <string name="beta_bilibili_tv_description">Xem video bilibili.tv với phụ đề song ngữ. Lần đầu bật sẽ mở bilibili.tv.</string>
+    <string name="tabs_new_tab_site">Thẻ mới: %1$s</string>
+    <string name="tabs_name_bilibili_video">Video Bilibili</string>
+    <string name="tabs_name_bilibili_page">Trang Bilibili</string>
+    <string name="tabs_open_new_site_tab">Mở %1$s</string>
+    <string name="bilibili_sign_in_title">Đăng nhập Bilibili để tải phụ đề</string>
+    <string name="bilibili_sign_in_body">Bilibili chỉ hiện phần lớn phụ đề cho người đã đăng nhập. Hãy đăng nhập trên trang Bilibili ở đây (ứng dụng không bao giờ thấy mật khẩu của bạn), rồi nhấn Thử lại.</string>
+    <string name="bilibili_no_subtitles_title">Video này không có phụ đề</string>
+    <string name="bilibili_no_subtitles_body">Bilibili không có phụ đề nào cho video này. Hãy thử video khác.</string>
+    <string name="bilibili_try_again">Thử lại</string>
+</resources>

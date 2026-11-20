@@ -177,3 +177,28 @@ internal fun NoCaptionsSection(state: DualSubUiState) {
         NoCaptionsCard(state.aiSubtitles?.takeIf { it.videoId == state.activeVideoId }, geminiReady = false, LocalAiSubtitleActions.current)
     }
 }
+
+/**
+ * A Bilibili video (beta) without subtitles: Bilibili China shows most of them only to signed-in
+ * viewers, so the card asks for a sign-in on the page; Try again loads them again. No AI subtitles: Gemini
+ * reads YouTube links only.
+ */
+@Composable
+internal fun BilibiliNoSubtitlesCard(
+    signInNeeded: Boolean,
+    onRetry: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().testTag("bilibili_no_subtitles_card"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(if (signInNeeded) R.string.bilibili_sign_in_title else R.string.bilibili_no_subtitles_title),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Text(
+            stringResource(if (signInNeeded) R.string.bilibili_sign_in_body else R.string.bilibili_no_subtitles_body),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Button(onClick = onRetry, modifier = Modifier.testTag("bilibili_try_again")) {
+            Text(stringResource(R.string.bilibili_try_again))
+        }
+    }
+}

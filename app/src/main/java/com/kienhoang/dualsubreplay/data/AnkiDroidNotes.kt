@@ -75,8 +75,10 @@ internal fun ankiSourceLink(
     startMs: Long,
     appPackage: String = BuildConfig.APPLICATION_ID,
 ): String {
-    if (videoId == null || !videoId.matches(Regex("[A-Za-z0-9_-]{11}"))) return ""
+    if (videoId == null || !VideoKeys.isValid(videoId)) return ""
     val seconds = (startMs.coerceAtLeast(0) / MS_PER_SECOND).toInt()
+    // A Bilibili line (beta) gets the plain page link only: the app's own link opens YouTube pages.
+    if (VideoKeys.isBilibili(videoId)) return "<a href=\"${VideoKeys.watchUrl(videoId, seconds).replace("&", "&amp;")}\">Bilibili</a>"
     val label = String.format(Locale.ROOT, "%d:%02d", seconds / SECONDS_PER_MINUTE, seconds % SECONDS_PER_MINUTE)
     val watch = "www.youtube.com/watch?v=$videoId&amp;t=${seconds}s"
     val app = "<a href=\"intent://$watch#Intent;scheme=https;package=$appPackage;end\">DualSub Replay $label</a>"
