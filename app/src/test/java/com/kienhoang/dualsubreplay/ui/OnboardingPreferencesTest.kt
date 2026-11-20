@@ -13,6 +13,8 @@ class OnboardingPreferencesTest {
     @Test fun normalizesRegionalTagsInOnboardingChoices() {
         assertEquals("en" to "zh", normalizedOnboardingLanguages("en-US", "zh-CN"))
         assertEquals("he" to "en", normalizedOnboardingLanguages("iw", "en"))
+        // Traditional Chinese stays its own translation language; captions in it are Chinese.
+        assertEquals("zh-TW" to "zh", normalizedOnboardingLanguages("zh-TW", "zh-TW"))
     }
 
     @Test fun rejectsUnsupportedOnboardingLanguages() {

@@ -48,6 +48,12 @@ class AppLanguageTest {
         assertEquals("日本語", languageDisplayName("ja", Locale.JAPANESE))
         assertEquals("Japonés", languageDisplayName("ja", Locale.forLanguageTag("es")))
         assertEquals("Tiếng Nhật", languageDisplayName("ja", Locale.forLanguageTag("vi")))
+        // The two Chinese entries name their script in every interface language.
+        assertEquals("Chinese (Simplified)", languageDisplayName("zh", Locale.ENGLISH))
+        assertEquals("Chinese (Traditional)", languageDisplayName("zh-TW", Locale.ENGLISH))
+        assertEquals("Tiếng Trung (Giản thể)", languageDisplayName("zh", Locale.forLanguageTag("vi")))
+        assertEquals("Tiếng Trung (Phồn thể)", languageDisplayName("zh-TW", Locale.forLanguageTag("vi")))
+        assertEquals("Chino (tradicional)", languageDisplayName("zh-TW", Locale.forLanguageTag("es")))
     }
 
     @Test

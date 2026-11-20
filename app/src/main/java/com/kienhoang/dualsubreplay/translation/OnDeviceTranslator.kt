@@ -118,13 +118,13 @@ class OnDeviceTranslator(
         targetLanguageCode: String,
     ): Boolean =
         TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(sourceLanguageCode)) != null &&
-            TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(targetLanguageCode)) != null
+            onDeviceTarget(targetLanguageCode) != null
 
     /** The app languages whose model this build can download. English is built in, so it is not listed. */
     suspend fun downloadableLanguages(): List<String> =
         TranslationLanguages.all
             .map(TranslationLanguageOption::code)
-            .filter { it != TranslateLanguage.ENGLISH && TranslateLanguage.fromLanguageTag(it) != null }
+            .filter { it != TranslateLanguage.ENGLISH && onDeviceTarget(it) != null }
 
     /** The app languages whose model is on this device, English excluded. */
     suspend fun downloadedLanguages(): Set<String> =
@@ -156,6 +156,17 @@ class OnDeviceTranslator(
         }
     }
 
+    /**
+     * ML Kit's language for translating into [languageCode], or null without a model. Traditional
+     * Chinese has none: ML Kit's one Chinese model writes Simplified, so it stays online only.
+     */
+    private fun onDeviceTarget(languageCode: String): String? =
+        if (TranslationLanguages.find(languageCode)?.onDevice == false) {
+            null
+        } else {
+            TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(languageCode))
+        }
+
     private fun remoteModel(languageCode: String): TranslateRemoteModel {
         val language =
             TranslateLanguage.fromLanguageTag(TranslationLanguages.normalize(languageCode))
@@ -168,14 +179,13 @@ class OnDeviceTranslator(
         targetLanguageCode: String,
     ): TranslationPair {
         val normalizedSource = TranslationLanguages.normalize(sourceLanguageCode)
-        val normalizedTarget = TranslationLanguages.normalize(targetLanguageCode)
         val source =
             TranslateLanguage.fromLanguageTag(normalizedSource)
                 ?: throw IllegalArgumentException(
                     "${TranslationLanguages.displayName(sourceLanguageCode)} translation is not supported.",
                 )
         val target =
-            TranslateLanguage.fromLanguageTag(normalizedTarget)
+            onDeviceTarget(targetLanguageCode)
                 ?: throw IllegalArgumentException(
                     "${TranslationLanguages.displayName(targetLanguageCode)} translation is not supported.",
                 )

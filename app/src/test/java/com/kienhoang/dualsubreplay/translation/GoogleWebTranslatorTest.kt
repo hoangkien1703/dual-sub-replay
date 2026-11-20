@@ -44,7 +44,9 @@ class GoogleWebTranslatorTest {
 
     @Test fun mapsAppLanguageCodesToGoogleCodes() {
         assertEquals("zh-CN", googleLanguageCode("zh"))
-        assertEquals("zh-CN", googleLanguageCode("zh-TW"))
+        assertEquals("zh-CN", googleLanguageCode("zh-Hans"))
+        assertEquals("zh-TW", googleLanguageCode("zh-TW"))
+        assertEquals("zh-TW", googleLanguageCode("zh-Hant"))
         assertEquals("he", googleLanguageCode("iw"))
         assertEquals("ja", googleLanguageCode("ja"))
         assertEquals("auto", googleLanguageCode("auto"))

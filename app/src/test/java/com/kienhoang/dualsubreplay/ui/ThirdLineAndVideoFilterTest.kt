@@ -22,6 +22,9 @@ class ThirdLineAndVideoFilterTest {
         assertNull(thirdLineLanguage("de", source = "de", target = "en"))
         assertNull(thirdLineLanguage(null, source = "de", target = "en"))
         assertEquals("fa", thirdLineLanguage("fa", source = null, target = "en"))
+        // Traditional Chinese is its own language next to Simplified.
+        assertEquals("zh-TW", thirdLineLanguage("zh-TW", source = "en", target = "zh"))
+        assertNull(thirdLineLanguage("zh-Hant", source = "en", target = "zh-TW"))
     }
 
     @Test fun rowsShowTheirThirdLineOnlyForTheOpenVideoAndLanguage() {

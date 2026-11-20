@@ -118,7 +118,7 @@ internal fun aiTranslationSystemPrompt(
     target: String,
 ): String {
     val from = languageName(source)
-    val to = languageName(target)
+    val to = TranslationLanguages.englishTargetName(target)
     return """
         You translate video subtitles from $from ($source) to $to ($target) for someone learning $from who reads $to.
         The input is JSON: "context" holds earlier sentences of the same video, for meaning only; "sentences" holds the sentences to translate, in the order they are spoken, each split into the rows the screen shows.
@@ -528,7 +528,7 @@ internal class AiSubtitleTranslator(
         target: String,
         texts: List<String>,
     ): List<AiSentence> {
-        if (TranslationLanguages.normalize(source) == TranslationLanguages.normalize(target) || now() < restUntil) return emptyList()
+        if (TranslationLanguages.targetCode(source) == TranslationLanguages.targetCode(target) || now() < restUntil) return emptyList()
         val (scopedSource, scopedTarget) = pair(model, source, target)
         return aiSentences(texts).filter { sentence ->
             val key = attemptKey(scopedSource, scopedTarget, sentence.text)
@@ -590,7 +590,7 @@ internal class AiSubtitleTranslator(
                 model.ask(
                     aiTranslationSystemPrompt(
                         TranslationLanguages.normalize(languages.first),
-                        TranslationLanguages.normalize(languages.second),
+                        TranslationLanguages.targetCode(languages.second),
                     ),
                     aiTranslationRequest(recent[contextKey].orEmpty(), pending),
                 ) { piece -> reader.add(piece).forEach { (index, rows) -> keep(index, rows) } }
@@ -645,5 +645,5 @@ internal class AiSubtitleTranslator(
         source: String,
         target: String,
     ): Pair<String, String> =
-        "${model.scope}:p$AI_PROMPT_VERSION:${TranslationLanguages.normalize(source)}" to TranslationLanguages.normalize(target)
+        "${model.scope}:p$AI_PROMPT_VERSION:${TranslationLanguages.normalize(source)}" to TranslationLanguages.targetCode(target)
 }

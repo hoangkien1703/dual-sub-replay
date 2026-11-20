@@ -67,7 +67,7 @@ fun LanguageSetupScreen(
             onSearchQueryChange = { searchQuery = it },
             onChoice = { choice ->
                 if (activeMode == SetupPickerMode.NATIVE) {
-                    nativeLanguage = TranslationLanguages.normalize(choice.code)
+                    nativeLanguage = TranslationLanguages.targetCode(choice.code)
                 } else {
                     learningLanguage = TranslationLanguages.normalize(choice.code)
                 }

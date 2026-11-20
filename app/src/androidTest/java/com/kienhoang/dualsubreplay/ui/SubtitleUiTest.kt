@@ -128,6 +128,34 @@ class SubtitleUiTest {
     }
 
     @Test
+    fun translateToListsSimplifiedAndTraditionalChinese() {
+        var selectedTarget: String? = null
+        composeRule.setContent {
+            DualSubTheme {
+                QuickLanguageSettingsDialog(
+                    sourcePreference = "auto",
+                    targetLanguage = "zh-TW",
+                    availableSourceLanguages = listOf(CaptionLanguage("en", "English")),
+                    onSourceChange = {},
+                    onTargetChange = { selectedTarget = it },
+                    onOpenAllSettings = {},
+                    onDismiss = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Chinese (Traditional)", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag("target_language_picker").performClick()
+        composeRule.onNodeWithTag("language_search").performTextInput("Chinese")
+        composeRule.onNodeWithTag("language_option_target_zh").assertIsDisplayed()
+        composeRule.onNodeWithTag("language_option_target_zh-TW").assertIsDisplayed()
+        Thread.sleep(700)
+        saveUiEvidence("translate-to-chinese-scripts")
+        composeRule.onNodeWithTag("language_option_target_zh").performClick()
+        composeRule.runOnIdle { assertEquals("zh", selectedTarget) }
+    }
+
+    @Test
     fun quickSettingsHideWhilePlayingTogglesCaptionVisibility() {
         var translated by mutableStateOf(CaptionVisibility.PAUSED)
         var originalChanged = false
