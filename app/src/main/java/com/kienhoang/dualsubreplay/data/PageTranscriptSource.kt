@@ -179,6 +179,9 @@ class PageTranscriptSource(
 
     @Volatile private var current: Request? = null
 
+    /** The last video the page player said is a live stream now. */
+    @Volatile private var liveVideoId: String? = null
+
     /** A document that arrived after the provider stopped waiting, kept for the next request. */
     @Volatile private var ready: Pair<Request, PageDocument>? = null
 
@@ -251,6 +254,9 @@ class PageTranscriptSource(
         }
     }
 
+    /** True when the page player said [videoId] is a live stream now (live streams list no caption tracks). */
+    fun isLive(videoId: String): Boolean = liveVideoId == videoId
+
     /** Why the page gave no transcript for [videoId] the last time it was asked, if it gave none. */
     fun problem(videoId: String): PageTranscriptProblem? = problem?.takeIf { it.first == videoId }?.second
 
@@ -280,6 +286,12 @@ class PageTranscriptSource(
         val root = runCatching { JSONObject(json) }.getOrNull() ?: return
         val details = root.optJSONObject("videoDetails")
         if (details?.optString("videoId") != request.videoId) return
+        VideoDescriptions.remember(request.videoId, details.optString("shortDescription"))
+        if (details.optBoolean("isLive")) {
+            liveVideoId = request.videoId
+        } else if (liveVideoId == request.videoId) {
+            liveVideoId = null
+        }
         request.found = pageTrackSources(root)
         val renderer = root.optJSONObject("captions")?.optJSONObject("playerCaptionsTracklistRenderer")
         val tracks = renderer?.optJSONArray("captionTracks")

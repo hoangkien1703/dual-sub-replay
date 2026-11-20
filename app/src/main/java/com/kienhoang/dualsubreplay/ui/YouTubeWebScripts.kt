@@ -135,6 +135,7 @@ internal val WEB_PLAYBACK_SNAPSHOT_SCRIPT: String =
           mediaSecond: liveState.captionMediaSecond,
           videoId: liveState.videoId || null,
           languageCode: liveState.languageCode || null,
+          rollUp: !!liveState.rollUp,
           present: !!liveState.text
         } : null
       });
@@ -293,10 +294,16 @@ internal fun webLiveCaptionConfigurationScript(enabled: Boolean): String {
             try { response = player && player.getPlayerResponse ? player.getPlayerResponse() : null; } catch (_) {}
             const videoId = response && response.videoDetails ? response.videoDetails.videoId : null;
             const track = state.activeCaptionTrack(player);
-            const languageCode = track && (track.translationLanguage ? track.translationLanguage.languageCode : track.languageCode);
+            // Live streams' TV-style captions come inside the video, with no track; their window names the language.
+            const captionWindow = document.querySelector('.caption-window[lang]');
+            const windowLanguage = captionWindow ? captionWindow.getAttribute('lang') : null;
+            const languageCode = (track && (track.translationLanguage ? track.translationLanguage.languageCode : track.languageCode)) ||
+              windowLanguage;
+            const rollUp = !!document.querySelector('.ytp-caption-window-rollup');
             if (text === state.text && videoId === state.videoId && languageCode === state.languageCode) return;
             state.videoId = videoId;
             state.languageCode = languageCode;
+            state.rollUp = rollUp;
             const video = state.activeVideo();
             // Timestamp new captions from the same media clock as playback snapshots
             // (fullscreen custom video surfaces can freeze the page element's frames).
@@ -644,6 +651,7 @@ internal fun parseWebPlaybackSnapshot(rawValue: String?): WebPlaybackSnapshot? {
                         present = live.optBoolean("present", text.isNotBlank()) && text.isNotBlank(),
                         videoId = live.optString("videoId").takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) },
                         languageCode = live.optString("languageCode").takeIf { it.length in 2..35 && it != "null" },
+                        rollUp = live.optBoolean("rollUp", false),
                     )
                 } else {
                     null
@@ -979,7 +987,10 @@ internal val WEB_PAGE_CAPTION_TRACKS_SCRIPT: String =
       const playable = holder && holder.getAttribute('playable');
       return JSON.stringify({
         ready: (!loading || loading === 'false') && (!playable || playable === 'true'),
-        videoDetails: { videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '' },
+        videoDetails: {
+          videoId: details.videoId, title: details.title || '', shortDescription: details.shortDescription || '',
+          isLive: details.isLive === true
+        },
         captions: { playerCaptionsTracklistRenderer: {
           captionTracks: tracks,
           audioTracks: renderer.audioTracks || [],

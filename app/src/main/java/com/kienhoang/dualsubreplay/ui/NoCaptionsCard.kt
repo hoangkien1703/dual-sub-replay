@@ -32,6 +32,15 @@ import kotlinx.coroutines.flow.StateFlow
 internal class AiSubtitleActions(
     val make: () -> Unit,
     val openAiSettings: () -> Unit,
+    /**
+     * "AI transcript (Gemini)" in the Original language list, or the song card's button: the open
+     * video's Gemini transcript, made now when missing (Settings → AI assistant without a key).
+     */
+    val useTranscript: () -> Unit = make,
+    /** The song card's X: no more offers for this video. */
+    val closeSuggestion: () -> Unit = {},
+    /** True while a video is open, so the Original language list can offer the AI transcript. */
+    val videoOpen: () -> Boolean = { true },
 )
 
 internal val LocalAiSubtitleActions = staticCompositionLocalOf<AiSubtitleActions?> { null }
@@ -95,10 +104,25 @@ internal fun NoCaptionsCard(
     }
 }
 
+/**
+ * A live stream with no captions now. AI subtitles can't listen to a live stream (Gemini can't open
+ * one), so there is no button: the player's own captions show up here if the stream starts sending them.
+ */
 @Composable
-private fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
+internal fun LiveStreamNoCaptionsCard() {
+    Column(Modifier.fillMaxWidth().testTag("live_no_captions_card"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.live_no_captions_title), style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.live_no_captions_body), style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+@Composable
+internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
     val total = status.totalMs
     return when {
+        status.lookingForLyrics && status.lyricsTotal > 1 ->
+            stringResource(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
+        status.lookingForLyrics -> stringResource(R.string.ai_transcript_looking_for_lyrics)
         status.doneMs <= 0L -> stringResource(R.string.ai_subtitles_starting)
         total != null -> stringResource(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
         else -> stringResource(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
@@ -116,6 +140,8 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.REFUSED -> R.string.ai_subtitles_problem_refused
         AiSubtitleProblem.NO_SPEECH -> R.string.ai_subtitles_problem_no_speech
         AiSubtitleProblem.FAILED -> R.string.ai_subtitles_problem_failed
+        AiSubtitleProblem.NO_LYRICS_NEEDS_KEY -> R.string.ai_transcript_no_lyrics_needs_key
+        AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY -> R.string.ai_transcript_some_lyrics_needs_key
     }
 
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */
@@ -139,6 +165,10 @@ internal fun geminiReady(state: AiAssistantUiState): Boolean =
 /** The no-captions card with this screen's actions and the assistant's key state. */
 @Composable
 internal fun NoCaptionsSection(state: DualSubUiState) {
+    if (state.liveStream) {
+        LiveStreamNoCaptionsCard()
+        return
+    }
     val host = LocalAiAssistant.current
     if (host != null) {
         NoCaptionsSectionWithAssistant(state, host.controller.state)

@@ -238,6 +238,48 @@ class AiAnswerRunTest {
     }
 
     @Test
+    fun textFromAnEarlierQuestionOfTheChatStillMakesChangesWait() {
+        // Turn 1 sent a subtitle line; turn 2 is a plain "thanks", but the line goes along again.
+        val earlier =
+            listOf(
+                AiChatMessage("q1", AiRole.USER, "Explain the current line", 0, "The subtitle line on screen…"),
+                AiChatMessage("a1", AiRole.ASSISTANT, "It means…", 1),
+                AiChatMessage("q2", AiRole.USER, "Thanks", 2),
+            )
+        replies +=
+            AiReply(
+                "",
+                listOf(
+                    call(AI_SETTING_TOOL, """{"setting":"text_size","value":"200"}"""),
+                    call(AI_SAVE_MEMORY_TOOL, """{"text":"Wants answers in French"}"""),
+                ),
+            )
+        val run = run(earlier)
+        assertEquals(listOf(AiActionState.WAITING, AiActionState.WAITING), run.records.map { it.state })
+        assertTrue(app.performed.isEmpty())
+
+        // An earlier answer that searched the web counts the same way.
+        val afterSearch =
+            listOf(
+                AiChatMessage("q1", AiRole.USER, "What does this slang mean?", 0),
+                AiChatMessage("a1", AiRole.ASSISTANT, "It means…", 1, sources = listOf(AiWebSource("Example", "https://example.com/"))),
+                AiChatMessage("q2", AiRole.USER, "Make the subtitles bigger", 2),
+            )
+        replies += AiReply("", listOf(call(AI_SETTING_TOOL, """{"setting":"text_size","value":"200"}""")))
+        assertEquals(AiActionState.WAITING, run(afterSearch).records.single().state)
+
+        // A chat the user typed alone still changes settings at once.
+        val typed =
+            listOf(
+                AiChatMessage("q1", AiRole.USER, "Hi", 0),
+                AiChatMessage("a1", AiRole.ASSISTANT, "Hello!", 1),
+                AiChatMessage("q2", AiRole.USER, "Make the subtitles bigger", 2),
+            )
+        replies += AiReply("", listOf(call(AI_SETTING_TOOL, """{"setting":"text_size","value":"200"}""")))
+        assertEquals(AiActionState.DONE, run(typed).records.single().state)
+    }
+
+    @Test
     fun memoryNumbersAreTheOnesInTheListTheModelSaw() {
         memories = listOf(AiMemory("m1", "Studies for JLPT N4", 1), AiMemory("m2", "Likes short answers", 2))
         replies +=

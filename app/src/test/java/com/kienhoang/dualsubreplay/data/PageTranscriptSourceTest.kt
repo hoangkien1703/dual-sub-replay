@@ -90,6 +90,20 @@ class PageTranscriptSourceTest {
             assertEquals("", watching.target!!.baseUrl)
         }
 
+    @Test fun thePageSaysWhenTheVideoIsALiveStream() =
+        runBlocking {
+            val source = PageTranscriptSource()
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null), timeoutMs = 300) }
+            val request = awaitRequest(source)
+            assertFalse(source.isLive(VIDEO))
+            source.offerTracks(request, NO_TRACKS.replace("{\"videoId\":\"$VIDEO\"}", "{\"videoId\":\"$VIDEO\",\"isLive\":true}"))
+            assertTrue("Live streams list no tracks; the no-captions card must not offer AI for them", source.isLive(VIDEO))
+            assertFalse(source.isLive("zzzzzzzzzzz"))
+            source.offerTracks(request, NO_TRACKS)
+            assertFalse("The stream ended", source.isLive(VIDEO))
+            result.cancel()
+        }
+
     @Test fun anEmptyListCountsOnlyOnceThePlayerHasLoaded() =
         runBlocking {
             var now = 0L

@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube 上没有字幕</string>
     <string name="ai_subtitles_no_captions_body">这个视频没有字幕，连自动字幕也没有。AI 可以听视频并写出字幕。</string>
+    <string name="live_no_captions_title">此直播没有字幕</string>
+    <string name="live_no_captions_body">YouTube 没有为此直播显示字幕。如果直播开始提供字幕，字幕会连同翻译显示在这里。直播结束后，回放通常会有字幕。</string>
     <string name="ai_subtitles_make">用 AI 生成字幕</string>
     <string name="ai_subtitles_try_again">重试</string>
     <string name="ai_subtitles_note">使用你的免费 Gemini 密钥。Gemini 在 Google 的服务器上收听视频。</string>
@@ -19,4 +21,13 @@
     <string name="ai_subtitles_problem_refused">Gemini 不愿为这个视频写字幕。部分歌曲会这样。</string>
     <string name="ai_subtitles_problem_no_speech">Gemini 在这个视频里没有听到说话声。</string>
     <string name="ai_subtitles_problem_failed">无法读取 Gemini 的回答。请重试。</string>
+    <string name="ai_transcript_choice">AI 转写（Gemini）</string>
+    <string name="ai_transcript_offer">这看起来是一首只有自动字幕的歌曲，自动字幕常把歌词弄错。</string>
+    <string name="ai_transcript_make">获取正确歌词</string>
+    <string name="ai_transcript_offer_note">先找免费的同步歌词，找不到时才用你的 Gemini 密钥让 AI 生成。</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s（歌词）</string>
+    <string name="ai_transcript_looking_for_lyrics">正在查找同步歌词…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">没有找到与此视频匹配的同步歌词。添加免费的 Gemini 密钥后，AI 可以写出歌词。</string>
+    <string name="ai_transcript_looking_for_song_lyrics">正在查找同步歌词… 第 %1$d 首，共 %2$d 首</string>
+    <string name="ai_transcript_some_lyrics_needs_key">已找到部分歌曲的同步歌词。添加免费的 Gemini 密钥后，AI 可以写出其余部分。</string>
 </resources>

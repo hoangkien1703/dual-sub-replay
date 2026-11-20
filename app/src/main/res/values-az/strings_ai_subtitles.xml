@@ -2,6 +2,8 @@
 <resources>
     <string name="ai_subtitles_no_captions_title">YouTube-da altyazı yoxdur</string>
     <string name="ai_subtitles_no_captions_body">Bu videonun heç bir altyazısı yoxdur, avtomatik altyazı da. Sİ videonu dinləyib altyazı yaza bilər.</string>
+    <string name="live_no_captions_title">Bu canlı yayımda altyazı yoxdur</string>
+    <string name="live_no_captions_body">YouTube bu canlı yayım üçün altyazı göstərmir. Yayım altyazı göndərməyə başlasa, onlar tərcüməsi ilə burada görünəcək. Yayım bitəndən sonra təkrar yayım adətən altyazı alır.</string>
     <string name="ai_subtitles_make">Sİ ilə altyazı yarat</string>
     <string name="ai_subtitles_try_again">Yenidən cəhd et</string>
     <string name="ai_subtitles_note">Pulsuz Gemini açarınızdan istifadə edir. Gemini videonu Google serverlərində dinləyir.</string>
@@ -19,4 +21,13 @@
     <string name="ai_subtitles_problem_refused">Gemini bu video üçün altyazı yazmadı. Bəzi mahnılarda belə olur.</string>
     <string name="ai_subtitles_problem_no_speech">Gemini bu videoda danışıq eşitmədi.</string>
     <string name="ai_subtitles_problem_failed">Gemini-nin cavabını oxumaq olmadı. Yenidən cəhd edin.</string>
+    <string name="ai_transcript_choice">Sİ transkripti (Gemini)</string>
+    <string name="ai_transcript_offer">Bu, avtomatik altyazılı mahnıya bənzəyir; belə altyazılar sözləri tez-tez səhv yazır.</string>
+    <string name="ai_transcript_make">Əsl sözləri al</string>
+    <string name="ai_transcript_offer_note">Əvvəlcə pulsuz sinxron sözlər. Uyğun gəlməsə, yalnız Gemini açarınızla Sİ.</string>
+    <string name="ai_transcript_lyrics_track_label">%1$s (mahnı sözləri)</string>
+    <string name="ai_transcript_looking_for_lyrics">Sinxron sözlər axtarılır…</string>
+    <string name="ai_transcript_no_lyrics_needs_key">Bu videoya uyğun sinxron sözlər tapılmadı. Pulsuz Gemini açarı əlavə edin, Sİ sözləri yaza bilər.</string>
+    <string name="ai_transcript_looking_for_song_lyrics">Sinxron sözlər axtarılır… %2$d mahnıdan %1$d-ci</string>
+    <string name="ai_transcript_some_lyrics_needs_key">Bəzi mahnılar üçün sinxron sözlər tapıldı. Pulsuz Gemini açarı əlavə edin, qalanını Sİ yaza bilər.</string>
 </resources>

@@ -22,6 +22,8 @@ internal data class WebVideoPlayback(
     val playbackRate: Float,
     /** The YouTube channel's name, shown under the title; blank when the page does not show it yet. */
     val channel: String = "",
+    /** YouTube files the video under Music (or marks it a music video), so its captions may be song lyrics. */
+    val music: Boolean = false,
 )
 
 internal sealed interface WebVideoCommand {
@@ -163,6 +165,7 @@ internal fun parseWebVideoPlayback(rawValue: String?): WebVideoPlayback? {
             durationMs = durationSecond?.let { (it * 1000).toLong() },
             playbackRate = rate.toFloat(),
             channel = cleanChannelName(json.optString("channel")),
+            music = json.optBoolean("music"),
         )
     }.getOrNull()
 }
@@ -207,10 +210,29 @@ internal val WEB_VIDEO_STATE_SCRIPT: String =
         const owner = document.querySelector('$CHANNEL_NAME_SELECTORS');
         return owner ? owner.textContent : '';
       })();
+      // The player's own details of the open video: YouTube's Music category or a music video type.
+      const music = (function() {
+        try {
+          const player = document.getElementById('movie_player');
+          const responses = [];
+          if (player && typeof player.getPlayerResponse === 'function') responses.push(player.getPlayerResponse());
+          responses.push(window.ytInitialPlayerResponse || null);
+          const pageVideo = new URL(window.location.href).searchParams.get('v') || window.location.pathname.split('/')[2];
+          const response = responses.find(function(item) {
+            return item && item.videoDetails && item.videoDetails.videoId === pageVideo;
+          });
+          if (!response) return false;
+          const micro = response.microformat && response.microformat.playerMicroformatRenderer;
+          return !!response.videoDetails.musicVideoType || !!(micro && micro.category === 'Music');
+        } catch (error) {
+          return false;
+        }
+      })();
       return JSON.stringify({
         url: window.location.href,
         title: document.title,
         channel: channel,
+        music: music,
         paused: video.paused || video.ended,
         currentSecond: video.currentTime,
         durationSecond: isFinite(video.duration) ? video.duration : null,

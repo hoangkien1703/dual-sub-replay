@@ -42,6 +42,8 @@ data class CaptionTrackResult(
     val availableLanguages: List<CaptionLanguage> = emptyList(),
     /** YouTube's id of the track the cues came from (`vssId`, such as `a.ja`), or blank when unknown. */
     val trackId: String = "",
+    /** The cues are a song's synced lyrics from LRCLIB (an [AI_SUBTITLE_TRACK_ID] track not written by Gemini). */
+    val lyrics: Boolean = false,
 )
 
 /** One caption track of a video, as the "Original caption language" list offers it. */

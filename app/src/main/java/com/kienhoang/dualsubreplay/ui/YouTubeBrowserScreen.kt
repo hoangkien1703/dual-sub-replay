@@ -173,11 +173,36 @@ internal fun isSignOutNavigation(url: String): Boolean {
 internal fun shouldOpenInsideApp(destination: EmbeddedNavigationDecision): Boolean =
     destination.isVideoSite() || destination == EmbeddedNavigationDecision.GOOGLE_SIGN_IN
 
+/**
+ * While Google sign-in runs, its steps pass through Google's other hosts (country domains such as
+ * google.com.vn, gstatic.com, googleusercontent.com), and their cookies must land in this WebView, so
+ * those stay inside. Any other page opens in the browser as usual: the WebView shows no address, so
+ * a page outside Google would be one the user cannot check.
+ */
 internal fun shouldOpenInsideApp(
+    url: String,
     destination: EmbeddedNavigationDecision,
     signInEmbeddingActive: Boolean,
-): Boolean = shouldOpenInsideApp(destination) ||
-    (signInEmbeddingActive && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL)
+): Boolean {
+    if (shouldOpenInsideApp(destination)) return true
+    return signInEmbeddingActive && destination == EmbeddedNavigationDecision.OPEN_EXTERNAL && isGoogleSignInStepUrl(url)
+}
+
+private val googleSignInStepDomains =
+    listOf(
+        """google(?:\.com|\.co)?\.[a-z]{2,3}""",
+        """gstatic\.com""",
+        """googleusercontent\.com""",
+        """googleapis\.com""",
+        """withgoogle\.com""",
+    )
+private val googleSignInStepHost = Regex("^(?:[a-z0-9-]+\\.)*(?:" + googleSignInStepDomains.joinToString("|") + ")$")
+
+/** An `https` address on one of Google's own hosts ([classifyMainFrameUrl] has checked scheme, port and user info). */
+internal fun isGoogleSignInStepUrl(url: String): Boolean {
+    val host = runCatching { URI(url).host }.getOrNull()?.lowercase()?.removeSuffix(".") ?: return false
+    return googleSignInStepHost.matches(host)
+}
 
 internal fun trustedEmbeddedUrlOrHome(url: String): String =
     url.takeIf { shouldOpenInsideApp(classifyMainFrameUrl(it)) } ?: YOUTUBE_HOME_URL
@@ -468,7 +493,7 @@ internal fun SingleYouTubePage(
                         Log.d(BROWSER_LOG_TAG, "Main frame $destination: $sanitized")
                     }
                     val signInEmbeddingActive = googleSignInInProgress || signInEmbedUntilYouTubeLands
-                    if (shouldOpenInsideApp(destination, signInEmbeddingActive)) {
+                    if (shouldOpenInsideApp(url, destination, signInEmbeddingActive)) {
                         if (destination.isVideoSite()) {
                             reportNavigation(view, url)
                         } else if (!googleSignInInProgress && !isSignOutNavigation(url)) {

@@ -5,6 +5,9 @@ import com.kienhoang.dualsubreplay.assistant.AiSubtitleException
 import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.data.AiSubtitlePart
 import com.kienhoang.dualsubreplay.data.AiSubtitleStore
+import com.kienhoang.dualsubreplay.data.AiSubtitleTrack
+import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import com.kienhoang.dualsubreplay.data.LyricChapter
 import com.kienhoang.dualsubreplay.data.RawCaptionCue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -55,6 +58,56 @@ class AiSubtitleRunnerTest {
             assertTrue(saved.complete)
             assertEquals(600_000L, saved.endMs)
             assertEquals(2, saved.cues().size)
+        }
+
+    @Test
+    fun anAiTranscriptOverYouTubesCaptionsKeepsTheirTracks() =
+        runBlocking {
+            val store = AiSubtitleStore(folder.root)
+            val youtube = listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true))
+            val runner =
+                AiSubtitleRunner(
+                    scope = this,
+                    store = store,
+                    askPart = { _, start, _ -> if (start >= 300_000) AiPartAnswer.PastTheEnd else line(start) },
+                    durationOf = { 218_000 },
+                    onStatus = {},
+                    onReady = {},
+                    io = Dispatchers.Unconfined,
+                )
+            runner.start(videoId, positionMs = 54_000, youtubeTracks = youtube)
+            runner.join()
+            val saved = store.read(videoId)!!
+            assertEquals(youtube, saved.youtubeTracks)
+            assertEquals(youtube, saved.asCaptionTrack("en").availableLanguages)
+        }
+
+    @Test
+    fun aCompilationAsksGeminiOnlyBetweenTheSongsWithLyrics() =
+        runBlocking {
+            val store = AiSubtitleStore(folder.root)
+            val song = LyricChapter(0, 300_000, listOf(RawCaptionCue(1_000, 2_000, "Song one")))
+            store.write(AiSubtitleTrack(videoId, "en", emptyMap(), endMs = 600_000, lyricChapters = listOf(song)))
+            val asked = mutableListOf<Long>()
+            val runner =
+                AiSubtitleRunner(
+                    scope = this,
+                    store = store,
+                    askPart = { _, start, _ ->
+                        asked += start
+                        line(start)
+                    },
+                    durationOf = { 600_000 },
+                    onStatus = {},
+                    onReady = {},
+                    io = Dispatchers.Unconfined,
+                )
+            runner.start(videoId, positionMs = 0)
+            runner.join()
+            assertEquals(listOf(300_000L), asked)
+            val saved = store.read(videoId)!!
+            assertTrue(saved.complete)
+            assertEquals(listOf("Song one", "Hola"), saved.cues().map { it.text })
         }
 
     @Test
