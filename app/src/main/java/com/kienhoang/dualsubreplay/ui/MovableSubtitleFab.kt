@@ -6,8 +6,10 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.graphicsLayer
@@ -33,6 +36,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.ui.theme.brandBackground
+import com.kienhoang.dualsubreplay.ui.theme.brandColors
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -340,11 +345,20 @@ internal fun MovableSubtitleFab(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {
-            // The app logo (owner request 2026-11-15): its play triangle is cut out, so it shows the bubble's color.
-            Icon(
-                painterResource(R.drawable.ic_app_logo_mark),
-                contentDescription = stringResource(R.string.player_show_dual_subtitles),
-            )
+            // The app logo (owner request 2026-11-15): its play triangle is cut out, so it shows the bubble's
+            // color, filled with the launcher icon's gradient (owner pick 2026-11-21).
+            Box(
+                Modifier.size(SUBTITLE_BUBBLE_SIZE).brandBackground(brandColors(), androidx.compose.foundation.shape.CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_app_logo_mark),
+                    contentDescription = stringResource(R.string.player_show_dual_subtitles),
+                )
+            }
         }
     }
 }
+
+/** Material's small floating action button size, so the gradient fills the whole bubble. */
+private val SUBTITLE_BUBBLE_SIZE = 40.dp
