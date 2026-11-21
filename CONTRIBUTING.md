@@ -9,6 +9,10 @@ Thank you for helping make language learning on Android more accessible.
 - Read [AGENTS.md](AGENTS.md), the [project mission](docs/project/mission.md), and [technical context](docs/project/tech-stack.md). For significant changes, follow the [spec workflow](docs/specs/README.md): define acceptance criteria, a plan, validation, and release intent before coding. Discuss unresolved larger scope in an issue; an already-authorized change does not require another approval round.
 - Never include credentials, signing files, personal YouTube data, or copyrighted video/caption dumps.
 
+## Credit for every kind of help
+
+Code is not the only way to contribute. When a release ships an idea you posted in Discussions, a bug you reported or a build you tested, its pull request adds you to [CONTRIBUTORS.md](CONTRIBUTORS.md) and the release notes thank you by name. When the feature was clearly your idea, the commit that ships it also lists you as a co-author. If we missed you, say so in a Discussion.
+
 ## Local setup
 
 Requirements: JDK 17, Android SDK 36, and an Android Studio version compatible with Android Gradle Plugin 9.3. The Gradle 9.5 wrapper is included.

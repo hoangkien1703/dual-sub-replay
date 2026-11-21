@@ -46,6 +46,14 @@ How releases are reserved, built, verified and retried is in [releasing](docs/re
 - Merges into `main` publish no preview APK (owner decision 2026-10-18); the `preview` release holds only open PRs' builds. Keep the PR CI artifact named `DualSub-Replay-preview` and the build job named `verify-build`: `pr-preview-auto.yml` depends on both. PR CI never holds a signing key: the preview key is in the main-only `preview` environment and only `publish-pr-preview` uses it; fork PRs build `.forkpreview` and publish only with the owner's `publish-preview` label ([spec](docs/specs/2026-11-18-security-review-fixes.md)). It runs from `main`, so a change to it can only be checked on the first PR after it merges.
 - Release builds require the four `ANDROID_RELEASE_*` env vars plus `-PrequireReleaseSigning=true`. Never commit signing material (`*.jks`/`*.keystore` are gitignored). The signing secrets are `release` environment secrets, not repository secrets: that environment only runs jobs from `main` (owner decision 2026-11-02), and only `publish-main` may name it. Never add `environment: release` to another job, never give that job a Gradle step (it signs the `build-release` artifact with `apksigner` only), never widen the environment's branch rule, and never change the pinned production certificate SHA-256 (`f664085b…116c`, registered in Android Developer Console) without the owner.
 
+## Crediting contributors
+
+Owner decision 2026-11-21 ([spec](docs/specs/2026-11-21-contributor-credits.md)): people who help through Discussions and Issues get credit even without code. When a PR ships what a specific person clearly asked for, reported or tested (check their comment and login on GitHub first; never credit a guess, a vote or a "+1"):
+
+- Put `Thanks: @login` (several: `Thanks: @a, @b`) on its own line in the PR body, outside comments. `tools/automatic_release.py` turns it into the thank-you line of that release's notes; nobody edits notes by hand.
+- Only when the feature was clearly their idea, end the commit that ships it with `Co-authored-by: login <ID+login@users.noreply.github.com>` (`ID` is their numeric GitHub user id). Not for bug reports or small tweaks to someone else's idea.
+- Add or update their entry in `.all-contributorsrc` (types from the [CONTRIBUTORS.md](CONTRIBUTORS.md) key, usually `ideas`, `bug` or `userTesting`) and run `npx all-contributors-cli@6.26.1 generate`; commit `CONTRIBUTORS.md` and README's badge with it. The full table stays in CONTRIBUTORS.md; README only shows the badge and a link. `tools/tests/test_contributors.py` checks they match.
+
 ## Architecture rules
 
 Before changing an area, read its section in the [technical context](docs/project/tech-stack.md#architecture-invariants) and the specs it links. That file holds the current design; specs are dated records and an older one may be superseded. Tests enforce most of it. The rules that must never break:
