@@ -212,6 +212,13 @@ Ideas and questions are welcome in [Discussions](https://github.com/hoangkien170
   </picture>
 </a>
 
+## On a computer (preview)
+
+A Chrome extension in [`browser-extension/`](browser-extension/README.md) brings the same learning to YouTube on a
+computer: two subtitle lines, replay any sentence, word cards with English grammar help, AI translation with your own
+key, and saved-word practice that imports and exports this app's backups. Load it in Chrome with
+`chrome://extensions` → Developer mode → Load unpacked → `browser-extension/`.
+
 ## For developers
 
 ### Build
