@@ -136,3 +136,55 @@ The complete application source and build scripts are available without charge a
 Use JDK 17, Android SDK 36, and the committed Gradle wrapper. Run `bash ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest`. Dependencies are pinned in `app/build.gradle.kts` and resolved from Maven Central/Google Maven. Building a modified debug APK requires no production signing key. Install with Android's normal APK installation flow or `adb install`; uninstall a differently signed build first if Android reports a signature mismatch (uninstalling erases local data).
 
 The release signing keys are not necessary to build or install modified versions. This application does not restrict installation of user-built variants.
+
+## Browser extension (`browser-extension/`)
+
+The Chrome extension carries these data files (the first two are copies of the app's own):
+
+- **English word levels** (`browser-extension/data/learner-data/en-levels.txt`): from the CEFR-J Wordlist Version 1.5,
+  compiled by Yukio Tono, Tokyo University of Foreign Studies ([cefr-j.org](http://www.cefr-j.org/download.html), via
+  [Open Language Profiles](https://github.com/openlanguageprofiles/olp-en-cefrj)), reduced to word, part of speech and
+  level. Free for research and commercial purposes with this citation.
+- **English IPA** (`browser-extension/data/learner-data/en-ipa.txt`): American English pronunciations from
+  [open-dict-data/ipa-dict](https://github.com/open-dict-data/ipa-dict) `en_US.txt` (MIT, Copyright (c) 2016
+  dohliam), from [cmudict-ipa](https://github.com/lingz/cmudict-ipa) (MIT, Copyright (c) 2016 Lingliang Zhang), a
+  conversion of the [CMU Pronouncing Dictionary](https://github.com/cmusphinx/cmudict) (Copyright (C) 1993-2015
+  Carnegie Mellon University, BSD-style licence). Only the words of the English OpenSubtitles 2018 top 50,000 list of
+  [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords) (CC BY-SA 4.0) are kept, so this file is
+  shared under CC BY-SA 4.0.
+- **Dictionary meanings** are fetched from [Wiktionary](https://en.wiktionary.org/) at lookup time (CC BY-SA 4.0 and
+  GFDL) and are only stored when the user saves a word.
+- **English part-of-speech model** (`browser-extension/data/learner-data/en-pos.model`): `pos.model` from
+  `opennlp-en-ud-ewt-pos-1.3-2.5.4.bin` in `org.apache.opennlp:opennlp-models-pos-en:1.3.0` (Maven Central), Apache
+  OpenNLP's model trained on the Universal Dependencies English Web Treebank, under the Apache License 2.0
+  (https://www.apache.org/licenses/LICENSE-2.0). Its NOTICE: "Apache OpenNLP Models :: Part-Of-Speech :: English. Copyright 2025
+  The Apache Software Foundation. This product includes software developed at The Apache Software Foundation
+  (http://www.apache.org/)."
+- **WordNet word and exception lists** (`browser-extension/data/learner-data/en-words.txt`, `en-exceptions.txt`): WordNet 3.1's
+  `index.*` and `*.exc` files in `net.sf.extjwnl:extjwnl-data-wn31:1.2`, reduced to words with their parts of speech and
+  irregular forms, under the WordNet License:
+
+  > WordNet Release 3.0
+  >
+  > This software and database is being provided to you, the LICENSEE, by Princeton University under the following
+  > license. By obtaining, using and/or copying this software and database, you agree that you have read, understood,
+  > and will comply with these terms and conditions.:
+  >
+  > Permission to use, copy, modify and distribute this software and database and its documentation for any purpose
+  > and without fee or royalty is hereby granted, provided that you agree to comply with the following copyright notice
+  > and statements, including the disclaimer, and that the same appear on ALL copies of the software, database and
+  > documentation, including modifications that you make for internal use or for distribution.
+  >
+  > WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved.
+  >
+  > THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND PRINCETON UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES,
+  > EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON UNIVERSITY MAKES NO REPRESENTATIONS OR
+  > WARRANTIES OF MERCHANT-ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE LICENSED SOFTWARE,
+  > DATABASE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+  >
+  > The name of Princeton University or Princeton may not be used in advertising or publicity pertaining to
+  > distribution of the software and/or database. Title to copyright in this software, database and any associated
+  > documentation shall at all times remain with Princeton University and LICENSEE agrees to preserve same.
+- **English grammar points** (`browser-extension/data/english-grammar.js`): the Android app's catalogue and explanations,
+  generated from its source (MIT). Their CEFR levels follow the CEFR-J Grammar Profile Version 20180315 (only the
+  levels are used).

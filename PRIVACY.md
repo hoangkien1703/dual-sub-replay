@@ -39,3 +39,20 @@ DualSub Replay is designed without an application account, analytics SDK, advert
 Deleting the app clears its local app data under Android's normal uninstall behavior. You can also clear the app's storage from Android Settings.
 
 This overview describes the current open-source implementation. Review the source and release notes before installing if your privacy requirements are strict.
+
+## Browser extension (preview)
+
+The Chrome extension in `browser-extension/` has no account, analytics or project server either.
+
+- It runs only on `www.youtube.com`. It reads the caption replies YouTube's own player downloads, in the page; it
+  never changes a request and never sends the page's token anywhere.
+- Subtitle lines and looked-up words go to Google Translate (`translate.googleapis.com`, else `clients5.google.com`),
+  words to Wiktionary (`en.wiktionary.org`) for their meanings, and a word you ask to hear to Google's voice
+  (`translate.googleapis.com/translate_tts`).
+- With AI translation chosen and your own key added, subtitle sentences (with up to four earlier ones as context) go
+  to the AI service you picked (Google Gemini, OpenRouter, OpenAI or Anthropic), whose terms and privacy policy apply.
+  The key is kept in Chrome's extension storage on your computer (not synced, not encrypted) and sent only to that
+  service.
+- Send to Anki sends the word card to AnkiConnect at `127.0.0.1:8765` on your own computer only.
+- Saved words, notes, review dates, settings and AI translations already received are kept in Chrome's extension
+  storage on your computer and are not sent anywhere. Export writes a file only when you click it.
