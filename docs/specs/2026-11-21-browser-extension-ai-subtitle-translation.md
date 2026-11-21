@@ -108,3 +108,19 @@ for the rest of that video. Ported from Android:
 
 Validation: headless Chrome, with the service worker's `fetch` patched to answer 503. Three tries and then the
 busy message, and after 30 s the same batch was asked again. Unit tests passed.
+
+## Follow-up 0.6.2: a line's meaning stays under that line
+
+The owner reported that some translated lines missed part of their meaning, which showed up in the line before
+instead (and the other way round). Auto captions without punctuation cut one long spoken sentence across several
+lines (the 120-character / 8-second joining limit). Android's prompt asked the model to translate such a piece "so that
+reading the translations in order gives the whole sentence naturally". In a verb-final language such as Persian, the
+model then moved a line's verb or object into the next or previous line's translation.
+
+The prompt is now version 3, a deliberate difference from Android's version 2. A piece is translated on its own, even
+as an unfinished phrase ending with "…", and the model must never move words or meaning into another sentence's
+translation, because each translation is shown under its own line. The cache key carries `AI_PROMPT_VERSION`, so
+sentences cached with version 2 are asked again.
+
+Validation: unit tests pass (`test/ai.test.js` pins version 3 and the new rule). The owner checks the Persian with a
+real key; there is no key here.

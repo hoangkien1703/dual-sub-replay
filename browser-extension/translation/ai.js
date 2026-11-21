@@ -22,14 +22,20 @@ const languageName = (code) => {
   }
 };
 
-// Android's aiTranslationSystemPrompt (AI_PROMPT_VERSION 2), word for word.
+// Raised when the prompt changes, so sentences cached with the old one are translated again (Android's AI_PROMPT_VERSION).
+const AI_PROMPT_VERSION = 3;
+
+// Android's aiTranslationSystemPrompt (its version 2), with one deliberate change in version 3 (owner report
+// 2026-11-21): a piece of a longer sentence is translated on its own. Android's "translate it so that reading the
+// translations in order gives the whole sentence" let the model move words between lines (in a verb-final language
+// such as Persian, a line's verb ended up under the line before), so a line's translation no longer matched it.
 function aiSystemPrompt(source, target) {
   const from = languageName(source);
   const to = languageName(target);
   return [
     `You translate video subtitles from ${from} (${source}) to ${to} (${target}) for someone learning ${from} who reads ${to}.`,
     'The input is JSON: "context" holds earlier sentences of the same video, for meaning only; "sentences" holds the sentences to translate, in the order they are spoken, each split into the rows the screen shows.',
-    'Captions are often made by automatic speech recognition: punctuation may be missing, so one spoken sentence can be cut across several input sentences, and some words are misheard. Read the sentences as one continuous speech. When a sentence is only a piece of a longer one, translate it as that piece so that reading the translations in order gives the whole sentence naturally. When a word makes no sense in context, translate what the speaker most likely said (a word that sounds similar), not the misheard word.',
+    'Captions are often made by automatic speech recognition: punctuation may be missing, so one spoken sentence can be cut across several input sentences, and some words are misheard. Read the sentences as one continuous speech. When a sentence is only a piece of a longer one, translate just that piece, even if its translation is an unfinished phrase (end it with … when the sentence goes on in the next one); never move words or meaning into the translation of an earlier or later sentence, because each translation is shown under its own line and must say exactly what that line says. When a word makes no sense in context, translate what the speaker most likely said (a word that sounds similar), not the misheard word.',
     'Fill in subjects the source leaves out (common in Japanese, Korean, Chinese and Vietnamese) from context; when someone talks about their own life, it is usually "I".',
     "Translate naturally, as a native speaker would say it in this situation, keeping the speaker's tone, slang and jokes. Keep names, brands, code and numbers as they are.",
     'Write only the translation in each row, never a copy of the source text.',
@@ -135,4 +141,4 @@ function parseAiReply(reply, sentences) {
   });
 }
 
-globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, AI_CONTEXT_SENTENCES, languageName, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });
+globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, AI_PROMPT_VERSION, AI_CONTEXT_SENTENCES, languageName, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });

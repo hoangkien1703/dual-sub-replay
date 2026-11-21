@@ -7,6 +7,10 @@ const { aiSystemPrompt, aiRequest, aiBatches, parseAiReply } = globalThis.DualSu
 const prompt = aiSystemPrompt('en', 'fa');
 assert.ok(prompt.startsWith('You translate video subtitles from English (en) to Persian (fa) for someone learning English who reads Persian.'));
 assert.ok(prompt.includes('Answer with JSON only'));
+// Version 3: a line's meaning stays in its own translation; Android's "gives the whole sentence" moved words between lines.
+assert.strictEqual(globalThis.DualSub.AI_PROMPT_VERSION, 3);
+assert.ok(prompt.includes('never move words or meaning into the translation of an earlier or later sentence'));
+assert.ok(!prompt.includes('reading the translations in order gives the whole sentence'));
 
 // The request is data: context, then numbered sentences with one row each.
 assert.deepStrictEqual(JSON.parse(aiRequest(['Before.'], ['One.', 'Two.'])), {

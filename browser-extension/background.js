@@ -127,7 +127,7 @@ async function aiTranslate({ source, target, sentences, context }) {
   const service = DualSub.AI_SERVICES[ai.service] || DualSub.AI_SERVICES.gemini;
   const model = ai.model || service.model;
   // The prompt version, service, model and languages are part of the key, as in Android's cache.
-  const cacheKey = (text) => `aic:2|${ai.service || 'gemini'}|${model}|${source}|${target}|${text}`;
+  const cacheKey = (text) => `aic:${DualSub.AI_PROMPT_VERSION}|${ai.service || 'gemini'}|${model}|${source}|${target}|${text}`;
   const cached = await chrome.storage.local.get(sentences.map(cacheKey));
   const missing = sentences.filter((s) => cached[cacheKey(s)] == null);
   if (!missing.length) return { texts: sentences.map((s) => cached[cacheKey(s)]) };

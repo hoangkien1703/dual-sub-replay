@@ -76,7 +76,8 @@ overlay shows. Only json3, the format the desktop player asks for, is parsed.
 Toolbar menu → Translate subtitles with → AI translation ([spec](../specs/2026-11-21-browser-extension-ai-subtitle-translation.md)).
 Google translates every line, while at the same time `translation/ai.js` batches the sentences into requests of 60
 sentences or 6,000 characters, each with the 4 sentences before it as context. The batch at the playing time goes
-first. The prompt is Android's word for word. Each answered line replaces Google's, Google keeps what the AI leaves
+first. The prompt is Android's, except that a piece of a longer sentence is translated on its own and never moves
+meaning into another line's translation (version 3, [follow-up](../specs/2026-11-21-browser-extension-ai-subtitle-translation.md)). Each answered line replaces Google's, Google keeps what the AI leaves
 out. A busy service is asked again after 1 s and 3 s, then after a 30 s rest while Google's lines show, as Android
 does; other failures stop the AI for that load. The service, key and model live in `chrome.storage.local.ai`
 (never synced), and the key is sent only to that service's API host. Answers are kept per sentence under `aic:` keys
