@@ -191,6 +191,8 @@ android {
         versionName = appVersionName + previewVersionNameSuffix
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // The Google Play build (`play` below) turns this on; see data/PlayBuild.kt.
+        buildConfigField("boolean", "PLAY_STORE", "false")
     }
 
     buildFeatures {
@@ -242,6 +244,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+        }
+        // Google Play (owner picks 2026-11-21, docs/specs/2026-11-21-google-play-build.md): the release
+        // build, same package and version, as an Android App Bundle (`bundlePlay`). It leaves out what
+        // Play's rules forbid (ad and sponsor skipping, screen-off playback, installing its own updates,
+        // the Bilibili beta) and drops their permissions in src/play/AndroidManifest.xml. It is never
+        // signed here: the upload key signs the bundle outside Gradle, like the GitHub APK.
+        create("play") {
+            initWith(getByName("release"))
+            signingConfig = null
+            applicationIdSuffix = null
+            buildConfigField("boolean", "PLAY_STORE", "true")
+            matchingFallbacks += "release"
         }
         create("benchmark") {
             initWith(getByName("release"))

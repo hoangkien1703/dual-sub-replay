@@ -250,4 +250,12 @@
     <string name="ai_search_tavily_saved">Guardada como tu clave de búsqueda de Tavily (Ajustes de IA → Búsqueda y pantalla).</string>
     <string name="ai_search_screen_title">Mirar la pantalla</string>
     <string name="ai_search_screen_description">El asistente puede hacer una captura de la app cuando necesita ver algo. La imagen solo va a tu servicio de IA y nunca se guarda.</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">Denunciar</string>
+    <string name="ai_report_title">Denunciar esta respuesta</string>
+    <string name="ai_report_intro">Avísanos si esta respuesta de la IA fue ofensiva, dañina o incorrecta. Tu app de correo se abre con la respuesta ya escrita; no se envía nada hasta que la envíes tú.</string>
+    <string name="ai_report_offensive">Ofensiva o dañina</string>
+    <string name="ai_report_wrong">Incorrecta o engañosa</string>
+    <string name="ai_report_other">Otro motivo</string>
+    <string name="ai_report_no_email">No hay ninguna app de correo configurada en este teléfono. Puedes escribir a %1$s.</string>
 </resources>

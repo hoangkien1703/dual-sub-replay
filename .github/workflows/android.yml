@@ -140,6 +140,23 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      # The Google Play build (docs/specs/2026-11-21-google-play-build.md): an unsigned App Bundle, so a
+      # change that breaks it fails here, and its manifest must not ask for what Play forbids.
+      - name: Build the Google Play bundle and check its manifest
+        run: |
+          set -euo pipefail
+          bash ./gradlew bundlePlay --stacktrace
+          python3 tools/check_play_manifest.py \
+            app/build/intermediates/merged_manifest/play/processPlayMainManifest/AndroidManifest.xml
+
+      - name: Upload the unsigned Google Play bundle
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: DualSub-Replay-play-bundle
+          path: app/build/outputs/bundle/play/app-play.aab
+          if-no-files-found: error
+          retention-days: 7
+
   managed-device-tests:
     runs-on: ubuntu-latest
     # Room for one full retry when the emulator crashes a run.

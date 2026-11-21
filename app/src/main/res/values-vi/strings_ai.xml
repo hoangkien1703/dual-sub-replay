@@ -249,4 +249,12 @@
     <string name="ai_search_tavily_saved">Đã lưu làm khóa tìm kiếm Tavily (Cài đặt AI → Tìm kiếm và màn hình).</string>
     <string name="ai_search_screen_title">Xem màn hình</string>
     <string name="ai_search_screen_description">Trợ lý có thể chụp màn hình ứng dụng khi cần xem. Ảnh chỉ gửi tới dịch vụ AI của bạn và không bao giờ được lưu.</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">Báo cáo</string>
+    <string name="ai_report_title">Báo cáo câu trả lời này</string>
+    <string name="ai_report_intro">Cho chúng tôi biết nếu câu trả lời AI này xúc phạm, có hại hoặc sai. Ứng dụng email sẽ mở với câu trả lời đã điền sẵn; không có gì được gửi cho đến khi bạn tự gửi.</string>
+    <string name="ai_report_offensive">Xúc phạm hoặc có hại</string>
+    <string name="ai_report_wrong">Sai hoặc gây hiểu lầm</string>
+    <string name="ai_report_other">Lý do khác</string>
+    <string name="ai_report_no_email">Điện thoại chưa có ứng dụng email. Bạn có thể viết thư tới %1$s.</string>
 </resources>

@@ -45,6 +45,9 @@ internal sealed interface UpdateChannel {
         val build: Int,
     ) : UpdateChannel
 
+    /** The Google Play build ([IS_PLAY_BUILD]): Play updates it, so it never downloads or installs a version itself. */
+    data object GooglePlay : UpdateChannel
+
     /** A locally built copy, signed with another key: it cannot update itself. */
     data object None : UpdateChannel
 
@@ -65,7 +68,9 @@ internal fun updateChannelFor(
     debuggable: Boolean,
     versionName: String,
     supportedAbis: List<String> = listOf("arm64-v8a"),
+    playStore: Boolean = IS_PLAY_BUILD,
 ): UpdateChannel {
+    if (playStore) return UpdateChannel.GooglePlay
     if (applicationId == OFFICIAL_APPLICATION_ID && !debuggable) {
         return if (canRunReleaseApk(supportedAbis)) UpdateChannel.Official else UpdateChannel.UnsupportedDevice
     }

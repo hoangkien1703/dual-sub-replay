@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.BuildConfig
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.PLAY_STORE_PAGE_URL
 import com.kienhoang.dualsubreplay.data.UPDATE_PREVIEW_PAGE_URL
 import com.kienhoang.dualsubreplay.data.UPDATE_RELEASES_PAGE_URL
 import com.kienhoang.dualsubreplay.data.UpdateChannel
@@ -46,7 +47,7 @@ import com.kienhoang.dualsubreplay.update.UpdateProblem
 import com.kienhoang.dualsubreplay.update.UpdateState
 import com.kienhoang.dualsubreplay.update.canUpdateItself
 
-/** The drawer's Check for updates row: it asks GitHub only when tapped. */
+/** The drawer's Check for updates row: it asks GitHub only when tapped; the Play build opens its Play Store page. */
 @Composable
 internal fun CheckForUpdatesRow(onOpen: () -> Unit) {
     val context = LocalContext.current
@@ -64,6 +65,11 @@ internal fun CheckForUpdatesRow(onOpen: () -> Unit) {
                 .clip(RoundedCornerShape(28.dp))
                 .clickable(role = Role.Button) {
                     onOpen()
+                    // Google Play updates the Play build: its Play Store page shows whether one is waiting.
+                    if (AppUpdater.channel(context) == UpdateChannel.GooglePlay) {
+                        openExternalPage(context, PLAY_STORE_PAGE_URL)
+                        return@clickable
+                    }
                     AppUpdater.showDialog()
                     if (state !is UpdateState.Available && state !is UpdateState.Ready && state !is UpdateState.Downloading) {
                         AppUpdater.check(context)

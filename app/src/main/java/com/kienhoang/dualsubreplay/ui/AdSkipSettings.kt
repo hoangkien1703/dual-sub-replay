@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 import com.kienhoang.dualsubreplay.data.RemoteSwitches
 
 // Settings → Ads & sponsors (owner request 2026-10-25): both switches are on by default.
@@ -40,6 +41,13 @@ internal fun readAdSkipSettings(preferences: SharedPreferences): AdSkipSettings 
 /** What the page does: the user's switches, unless a remote switch turned skipping off for now. */
 internal fun AdSkipSettings.withRemote(switches: RemoteSwitches): AdSkipSettings =
     copy(skipAds = skipAds && !switches.skipAdsOff, skipSponsors = skipSponsors && !switches.skipSponsorsOff)
+
+/**
+ * The Google Play build never skips ads or sponsor parts ([IS_PLAY_BUILD]): Play's rules forbid an app
+ * to interfere with another app's ads, so whatever is stored, both stay off there.
+ */
+internal fun AdSkipSettings.forBuild(playStore: Boolean = IS_PLAY_BUILD): AdSkipSettings =
+    if (playStore) AdSkipSettings(skipAds = false, skipSponsors = false, alwaysSkipSponsors = false) else this
 
 /** The Ads and sponsors settings, following every change (from the settings page or the assistant). */
 @Composable

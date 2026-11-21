@@ -107,6 +107,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 import com.kienhoang.dualsubreplay.translation.SubtitleTranslator
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import kotlinx.coroutines.delay
@@ -227,15 +228,33 @@ internal enum class MoreSettingsSection(
 }
 
 /**
+ * The sections the Google Play build leaves out ([IS_PLAY_BUILD]): it never skips ads, and Play
+ * updates it, so Ads & sponsors and App updates would only hold switches that do nothing.
+ */
+private val SECTIONS_NOT_IN_PLAY_BUILD = setOf(MoreSettingsSection.ADS, MoreSettingsSection.UPDATES)
+
+/** Whether Search settings lists the setting: only in builds with its section. */
+private fun SearchableSetting.inSearch(withAiAssistant: Boolean): Boolean =
+    (withAiAssistant || section != MoreSettingsSection.AI_ASSISTANT) && inBuild()
+
+/** Whether this build shows the section. */
+internal fun MoreSettingsSection.inBuild(playStore: Boolean = IS_PLAY_BUILD): Boolean = !playStore || this !in SECTIONS_NOT_IN_PLAY_BUILD
+
+/**
  * What the settings page lists, top to bottom: each group that has a section to show, with its
  * sections in [MoreSettingsSection] order. The AI assistant section exists only in builds with it.
  */
-internal fun settingsGroupsOnPage(withAiAssistant: Boolean): List<Pair<SettingsGroup, List<MoreSettingsSection>>> =
+internal fun settingsGroupsOnPage(
+    withAiAssistant: Boolean,
+    playStore: Boolean = IS_PLAY_BUILD,
+): List<Pair<SettingsGroup, List<MoreSettingsSection>>> =
     SettingsGroup.entries
         .map { group ->
             group to
-                MoreSettingsSection.entries.filter {
-                    it.group == group && (withAiAssistant || it != MoreSettingsSection.AI_ASSISTANT)
+                MoreSettingsSection.entries.filter { section ->
+                    section.group == group &&
+                        (withAiAssistant || section != MoreSettingsSection.AI_ASSISTANT) &&
+                        section.inBuild(playStore)
                 }
         }.filter { it.second.isNotEmpty() }
 
@@ -312,7 +331,7 @@ private fun settingsSearchEntries(withAiAssistant: Boolean): List<SettingsSearch
     val groupTitles = SettingsGroup.entries.associateWith { stringResource(it.titleRes) }
     val sectionTitles = MoreSettingsSection.entries.associateWith { stringResource(it.titleRes) }
     val settings =
-        SearchableSetting.entries.filter { withAiAssistant || it.section != MoreSettingsSection.AI_ASSISTANT }.map { setting ->
+        SearchableSetting.entries.filter { it.inSearch(withAiAssistant) }.map { setting ->
             SettingsSearchEntry(
                 stringResource(setting.titleRes),
                 sectionTitles.getValue(setting.section),

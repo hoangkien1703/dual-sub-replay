@@ -424,7 +424,7 @@ internal fun AdSkipPageScripts(
 ) {
     val stored by rememberAdSkipSettings()
     val remote by RemoteSwitchState.switches.collectAsState()
-    val settings = stored.withRemote(remote)
+    val settings = stored.withRemote(remote).forBuild()
     val note = stringResource(R.string.ads_skipped_sponsor_note)
     val source = remember { SponsorSegmentSource() }
     val currentPageView by rememberUpdatedState(pageView)
