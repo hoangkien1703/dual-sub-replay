@@ -66,3 +66,7 @@ const spoken = sentenceLines(parseCaptions(asr).slice(0, 1).concat({ start: 3, e
 assert.strictEqual(spoken.text, 'hello world again');
 assert.deepStrictEqual(wordTimes(spoken, tokens(spoken.text, 'en')), [1, null, 1.4, null, 3.2]);
 assert.strictEqual(wordTimes({ text: 'no timing', start: 0, end: 1 }, tokens('no timing', 'en')), null);
+
+// Word times ignore case: an AI sentence starts with a capital the captions' word lacks.
+const capital = { start: 0, end: 2, text: 'Then I wrote.', words: [{ text: 'then', time: 0 }, { text: 'i', time: 0.5 }, { text: 'wrote.', time: 1 }] };
+assert.deepStrictEqual(wordTimes(capital, tokens(capital.text, 'en')), [0, null, 0.5, null, 1, null]);

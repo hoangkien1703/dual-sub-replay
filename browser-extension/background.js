@@ -131,17 +131,34 @@ async function aiTranslate({ source, target, sentences, context }) {
   const cached = await chrome.storage.local.get(sentences.map(cacheKey));
   const missing = sentences.filter((s) => cached[cacheKey(s)] == null);
   if (!missing.length) return { texts: sentences.map((s) => cached[cacheKey(s)]) };
-  const reply = await aiAsk(service, ai.key, model, source, target, missing, context);
-  if (!reply.texts) return reply;
+  const reply = await aiAsk(service, ai.key, model, DualSub.aiSystemPrompt(source, target), DualSub.aiRequest(context, missing), DualSub.AI_JSON_SCHEMA);
+  if (reply.text == null) return reply;
+  const texts = DualSub.parseAiReply(reply.text, missing);
   const fresh = {};
-  missing.forEach((s, i) => reply.texts[i] && (fresh[cacheKey(s)] = reply.texts[i]));
+  missing.forEach((s, i) => texts[i] && (fresh[cacheKey(s)] = texts[i]));
   await chrome.storage.local.set(fresh);
   return { texts: sentences.map((s) => cached[cacheKey(s)] ?? fresh[cacheKey(s)] ?? null) };
 }
 
-async function aiAsk(service, key, model, source, target, sentences, context) {
-  const system = DualSub.aiSystemPrompt(source, target);
-  const user = DualSub.aiRequest(context, sentences);
+// Splits a chunk of unpunctuated caption [words] into sentences and translates them, with the 3 sentences before as
+// [context]; { sentences: [{ start, text, translation }] }. Each chunk's answer is cached ("ais:" keys).
+async function aiSegment({ source, target, words, context }) {
+  const { ai = {} } = await chrome.storage.local.get('ai');
+  if (!ai.key) return { noKey: true };
+  const service = DualSub.AI_SERVICES[ai.service] || DualSub.AI_SERVICES.gemini;
+  const model = ai.model || service.model;
+  const key = `ais:${DualSub.AI_SEGMENT_VERSION}|${ai.service || 'gemini'}|${model}|${source}|${target}|${words.join(' ')}`;
+  const cached = (await chrome.storage.local.get(key))[key];
+  if (cached) return { sentences: cached };
+  const reply = await aiAsk(service, ai.key, model, DualSub.aiSegmentPrompt(source, target), DualSub.aiSegmentRequest(context, words), DualSub.AI_SEGMENT_SCHEMA);
+  if (reply.text == null) return reply;
+  const sentences = DualSub.parseSegmentReply(reply.text, words.length);
+  await chrome.storage.local.set({ [key]: sentences });
+  return { sentences };
+}
+
+// One request to the AI service: { text } of its answer, or { error, busy }.
+async function aiAsk(service, key, model, system, user, schema) {
   const request = service.anthropic
     ? {
         url: `${service.base}/messages`,
@@ -152,7 +169,7 @@ async function aiAsk(service, key, model, source, target, sentences, context) {
     : {
         url: `${service.base}/chat/completions`,
         headers: { authorization: `Bearer ${key}` },
-        body: { model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], ...(service.schema && { response_format: DualSub.AI_JSON_SCHEMA }) },
+        body: { model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], ...(service.schema && { response_format: schema }) },
       };
   // A busy service (5xx, Anthropic's 529, or a short rate limit) is asked again after these waits, as Android's
   // AI_BUSY_RETRY_DELAYS_MS: free Gemini answers 503 "high demand" to about half of all requests at busy times.
@@ -167,7 +184,7 @@ async function aiAsk(service, key, model, source, target, sentences, context) {
     const body = await reply.json().catch(() => ({}));
     if (reply.ok) {
       const text = service.anthropic ? (body.content || []).map((c) => c.text || '').join('') : body.choices?.[0]?.message?.content || '';
-      return { texts: DualSub.parseAiReply(text, sentences) };
+      return { text };
     }
     const detail = (Array.isArray(body) ? body[0] : body)?.error?.message?.replace(/\.$/, '') || '';
     const busy = reply.status >= 500 || (reply.status === 429 && !/quota|credit|billing/i.test(detail));
@@ -181,6 +198,7 @@ async function aiAsk(service, key, model, source, target, sentences, context) {
 
 const handlers = {
   aiTranslate,
+  aiSegment,
   speech,
   englishLines,
   translate: (m) => translate(m.texts, m.target, m.source).then((texts) => ({ texts })),

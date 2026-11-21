@@ -27,11 +27,13 @@ function parseCaptions(body) {
 }
 
 // Where each timed word chunk starts in [text], or null when one cannot be found (then nothing is highlighted).
+// Case does not count: the AI's sentences start with a capital that the captions' words lack.
 function placeWords(text, words) {
+  const lower = text.toLowerCase();
   let cursor = 0;
   const places = [];
   for (const w of words) {
-    const at = text.indexOf(w.text, cursor);
+    const at = lower.indexOf(w.text.toLowerCase(), cursor);
     if (at < 0) return null;
     places.push(at);
     cursor = at + w.text.length;

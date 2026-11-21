@@ -99,6 +99,14 @@ Auto-generated json3 pieces keep their chunk times (`words`). Pieces are cut at 
 joining ([spec](../specs/2026-11-21-browser-extension-spoken-word-and-sentence-splits.md)). The content script underlines the latest
 word whose time has come, every 150 ms.
 
+## AI sentence splitting
+
+With AI translation on, a track without punctuation and with word timing is split into sentences by the AI, in the
+same requests that translate it (`aiSegment`, chunks of up to 300 words cut at long pauses, cached under `ais:` keys).
+Each chunk's lines replace the ones in its time range. A line keeps the AI's punctuated text only when it has the
+same words ([spec](../specs/2026-11-21-browser-extension-ai-sentence-splitting.md)). Rows live on their line objects, so translations
+for replaced lines go nowhere.
+
 ## Part of speech
 
 `data/words.js` ports Android's `PartOfSpeech` colors and the fallback rules of `LanguageAwareTokenizer` (closed-class

@@ -63,8 +63,10 @@ window.addEventListener('message', (event) => {
   const data = event.data;
   if (event.source !== window || !data || data.dualsub !== 'track' || data.videoId !== currentVideoId()) return;
   let lines;
+  let pieces;
   try {
-    lines = DualSub.sentenceLines(DualSub.splitAtSentenceEnds(DualSub.parseCaptions(data.text)));
+    pieces = DualSub.parseCaptions(data.text);
+    lines = DualSub.sentenceLines(DualSub.splitAtSentenceEnds(pieces));
   } catch {
     return;
   }
@@ -72,7 +74,9 @@ window.addEventListener('message', (event) => {
   if (!lines.length || key === state.trackKey) return; // the player re-downloads the same track often
   state.trackKey = key;
   state.lang = data.lang;
+  state.pieces = pieces; // the track as YouTube cut it, which the AI can split into sentences again
   state.lines = lines;
+  state.status = null;
   state.active = -1;
   renderPanel();
   translateAll();
@@ -83,7 +87,7 @@ window.addEventListener('message', (event) => {
 });
 
 function reset(videoId) {
-  Object.assign(state, { videoId, lang: '', trackKey: null, lines: [], rows: [], active: -1, ccTried: false, since: Date.now() });
+  Object.assign(state, { videoId, lang: '', trackKey: null, pieces: null, lines: [], rows: [], active: -1, ccTried: false, since: Date.now(), status: null });
   state.gen++;
   lookups.clear();
   closeCard();
@@ -94,11 +98,10 @@ function reset(videoId) {
 
 // English lines are tagged in context by the service worker (Android's EnglishMorphology), which recolors their words
 // and gives the word card its dictionary form, level and grammar points.
-async function analyzeEnglish() {
-  if (!/^en\b/.test(state.lang)) return;
-  const lines = state.lines;
+async function analyzeEnglish(lines = state.lines) {
+  if (!/^en\b/.test(state.lang) || !lines.length) return;
   const reply = await ask({ type: 'englishLines', texts: lines.map((l) => l.text) });
-  if (lines !== state.lines || !reply.lines) return;
+  if (!state.lines.includes(lines[0]) || !reply.lines) return; // replaced meanwhile by a newer track or the AI's sentences
   reply.lines.forEach((en, i) => (lines[i].en = en));
   renderPanel();
   state.active = -1; // redraw the overlay in the new colors
@@ -180,8 +183,10 @@ function mount() {
   }
 }
 
-// The panel's status line; [link] adds an action such as "Set up AI".
+// The panel's status line; [link] adds an action such as "Set up AI". It is kept in state, so a redrawn panel shows
+// it again.
 function status(text, link) {
+  state.status = { text, link };
   const line = panel && panel.querySelector('.dualsub-status');
   if (!line) return;
   line.textContent = text;
@@ -223,25 +228,30 @@ function renderPanel() {
     body.append(original(line), el('div', 'dualsub-tr', line.tr || ''));
     row.append(play, body);
     row.onclick = () => replay(i);
+    line.row = row; // kept on the line, so a translation for a line the AI has since replaced finds no row
     list.appendChild(row);
     return row;
   });
   panel.replaceChildren(head, list);
+  if (state.status && state.lines.length) status(state.status.text, state.status.link);
 }
 
-function setTranslation(index, tr) {
-  state.lines[index].tr = tr;
-  const cell = state.rows[index] && state.rows[index].querySelector('.dualsub-tr');
+function setTranslation(line, tr) {
+  line.tr = tr;
+  const cell = line.row && line.row.isConnected && line.row.querySelector('.dualsub-tr');
   if (cell) cell.textContent = tr;
   state.active = -1; // redraw the overlay with its translation
 }
 
 // Google translates every line; with AI translation chosen the AI runs at the same time and replaces Google's
-// lines as its requests answer, as the Android app does.
+// lines as its requests answer, as the Android app does. Captions without punctuation are split into sentences by
+// the AI in the same requests, when the track has word timing (docs/specs/2026-11-21-browser-extension-ai-sentence-splitting.md).
 async function translateAll() {
   const gen = ++state.gen;
   state.lines.forEach((l) => delete l.ai);
-  await Promise.all([translateWithGoogle(gen), translator === 'ai' && translateWithAi(gen)]);
+  const pieces = state.pieces;
+  const split = translator === 'ai' && pieces && DualSub.isUnpunctuated(pieces) && DualSub.captionWords(pieces);
+  await Promise.all([translateWithGoogle(gen), translator === 'ai' && (split ? splitWithAi(gen, pieces) : translateWithAi(gen))]);
 }
 
 async function translateWithGoogle(gen) {
@@ -252,7 +262,7 @@ async function translateWithGoogle(gen) {
     const reply = await ask({ type: 'translate', texts, target, source: state.lang });
     if (gen !== state.gen) return; // a newer video, track or language took over
     if (reply.error) return status(`Translation failed: ${reply.error}`);
-    reply.texts.forEach((tr, i) => lines[from + i].ai || setTranslation(from + i, tr));
+    reply.texts.forEach((tr, i) => lines[from + i].ai || setTranslation(lines[from + i], tr));
   }
 }
 
@@ -274,6 +284,50 @@ function playingFirst(batches, lines) {
 
 const AI_REST_MS = 30_000;
 
+// Sends an AI [message], resting 30 s while the service stays busy after its quick retries (Android's
+// AI_FAILURE_REST_MS), Google's lines showing meanwhile; null when a newer video, track or language took over.
+async function askAi(message, gen) {
+  for (;;) {
+    status('AI translating…');
+    const reply = await ask(message);
+    if (gen !== state.gen) return null;
+    if (!reply.busy) return reply;
+    status(`AI is busy (${reply.error}). Showing Google; trying again in 30 s.`);
+    await new Promise((r) => setTimeout(r, AI_REST_MS));
+    if (gen !== state.gen) return null;
+  }
+}
+
+function aiStopped(reply, count) {
+  if (reply.noKey) status(`${count} lines · Google translation (AI has no key yet)`, { label: 'Set up AI', open: 'openGuide' });
+  else status(`AI translation failed: ${reply.error}. Showing Google.`, { label: 'Help', open: 'openGuide' });
+}
+
+// The AI splits the track's timed words into sentences and translates them, a chunk at a time from the part being
+// played; each chunk's lines replace the ones in its time range.
+async function splitWithAi(gen, pieces) {
+  const words = DualSub.captionWords(pieces);
+  const trackEnd = pieces.at(-1).end;
+  const chunkEnd = (to) => (to < words.length ? words[to].time : Math.max(trackEnd, words.at(-1).time + 1));
+  const chunks = DualSub.wordChunks(words);
+  const now = playingTime();
+  const first = Math.max(0, chunks.findIndex(([, to]) => chunkEnd(to) > now));
+  for (const [from, to] of [...chunks.slice(first), ...chunks.slice(0, first)]) {
+    const start = words[from].time;
+    const end = chunkEnd(to);
+    const context = state.lines.filter((l) => l.end <= start).slice(-3).map((l) => l.text);
+    const reply = await askAi({ type: 'aiSegment', source: state.lang || 'en', target, words: words.slice(from, to).map((w) => w.text), context }, gen);
+    if (!reply) return;
+    if (reply.error || reply.noKey) return aiStopped(reply, state.lines.length);
+    const fresh = DualSub.segmentLines(reply.sentences, words.slice(from, to), end);
+    state.lines = [...state.lines.filter((l) => !(l.start < end && l.end > start)), ...fresh].sort((a, b) => a.start - b.start);
+    renderPanel();
+    state.active = -1;
+    analyzeEnglish(fresh);
+  }
+  status(`${state.lines.length} sentences · AI translation`);
+}
+
 async function translateWithAi(gen) {
   const lines = state.lines;
   const texts = lines.map((l) => l.text);
@@ -283,23 +337,13 @@ async function translateWithAi(gen) {
   const first = Math.max(0, ranges.findIndex(([, to]) => lines[to - 1].end > now));
   for (const [from, to] of [...ranges.slice(first), ...ranges.slice(0, first)]) {
     const context = texts.slice(Math.max(0, from - DualSub.AI_CONTEXT_SENTENCES), from);
-    let reply;
-    for (;;) {
-      status('AI translating…');
-      reply = await ask({ type: 'aiTranslate', source: state.lang || 'en', target, sentences: texts.slice(from, to), context });
-      if (gen !== state.gen) return;
-      if (!reply.busy) break;
-      // Busy even after its quick retries: Google's lines stay while the AI rests, as Android's AI_FAILURE_REST_MS.
-      status(`AI is busy (${reply.error}). Showing Google; trying again in 30 s.`);
-      await new Promise((r) => setTimeout(r, AI_REST_MS));
-      if (gen !== state.gen) return;
-    }
-    if (reply.noKey) return status(`${lines.length} lines · Google translation (AI has no key yet)`, { label: 'Set up AI', open: 'openGuide' });
-    if (reply.error) return status(`AI translation failed: ${reply.error}. Showing Google.`, { label: 'Help', open: 'openGuide' });
+    const reply = await askAi({ type: 'aiTranslate', source: state.lang || 'en', target, sentences: texts.slice(from, to), context }, gen);
+    if (!reply) return;
+    if (reply.error || reply.noKey) return aiStopped(reply, lines.length);
     reply.texts.forEach((tr, i) => {
       if (!tr) return; // Google keeps what the AI leaves out
       lines[from + i].ai = true;
-      setTranslation(from + i, tr);
+      setTranslation(lines[from + i], tr);
     });
   }
   status(`${lines.length} lines · AI translation`);
@@ -459,8 +503,11 @@ function tick() {
   document.documentElement.classList.add('dualsub-on');
   const v = video();
   const active = v ? DualSub.activeLine(state.lines, v.currentTime) : -1;
-  if (v) highlightSpoken(v.currentTime);
-  if (active === state.active) return;
+  if (active !== state.active) showLine(active);
+  if (v) highlightSpoken(v.currentTime); // after a redraw too, so the new line's spoken word shows at once
+}
+
+function showLine(active) {
   const previous = panel && panel.querySelector('.dualsub-active');
   if (previous) previous.classList.remove('dualsub-active');
   state.active = active;

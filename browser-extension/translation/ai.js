@@ -141,4 +141,118 @@ function parseAiReply(reply, sentences) {
   });
 }
 
-globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, AI_PROMPT_VERSION, AI_CONTEXT_SENTENCES, languageName, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });
+// ---- AI sentence splitting for captions without punctuation ----
+// Automatic captions are cut every few seconds, not where sentences end, so a translated line either loses its start
+// or borrows words from its neighbour. The AI splits the timed words into sentences and translates each, in one
+// request per chunk (docs/specs/2026-11-21-browser-extension-ai-sentence-splitting.md).
+
+// Raised when the splitting prompt changes, so chunks cached with the old one are asked again.
+const AI_SEGMENT_VERSION = 1;
+const MAX_SEGMENT_WORDS = 300;
+const SEGMENT_CUT_WINDOW = 60;
+
+// The track's timed words [{ text, time }] from parsed pieces, or null when a piece has no word timing.
+function captionWords(pieces) {
+  if (!pieces.length || pieces.some((p) => !p.words || !p.words.length)) return null;
+  return pieces.flatMap((p) => p.words);
+}
+
+// True when fewer than one piece in five ends a sentence: automatic captions without punctuation.
+const isUnpunctuated = (pieces) => pieces.filter((p) => /[.!?。！？…]["'’”)]*$/.test(p.text.trim())).length * 5 < pieces.length;
+
+// Index ranges [from, to) of at most 300 words, each cut at the longest pause among its last 60 words.
+function wordChunks(words, max = MAX_SEGMENT_WORDS, window = SEGMENT_CUT_WINDOW) {
+  const chunks = [];
+  let from = 0;
+  while (from < words.length) {
+    let to = words.length;
+    if (to - from > max) {
+      to = from + max;
+      for (let j = from + max; j > from + max - window; j--) {
+        if (words[j].time - words[j - 1].time > words[to].time - words[to - 1].time) to = j;
+      }
+    }
+    chunks.push([from, to]);
+    from = to;
+  }
+  return chunks;
+}
+
+function aiSegmentPrompt(source, target) {
+  const from = languageName(source);
+  const to = languageName(target);
+  return [
+    `You get the automatic captions of a video in ${from} (${source}): numbered words without punctuation, in the order they are spoken. Split them into the sentences the speaker said and translate each sentence into ${to} (${target}) for someone learning ${from} who reads ${to}.`,
+    'The input is JSON: "context" holds the sentences just before these words, for meaning only; "words" holds "number:word" items.',
+    'Each sentence starts at a word number; the sentences follow each other and together cover every word, in order. Keep each sentence under about 25 words: split a longer one where a clause ends.',
+    "Write each sentence's text with punctuation and capital letters, using exactly its words: never add, drop or change a word.",
+    "Translate each whole sentence naturally, as a native speaker would say it in this situation, keeping the speaker's tone; a sentence's translation says exactly what that sentence says. Keep names, brands and numbers as they are. When a word makes no sense in context, translate what the speaker most likely said.",
+    'Answer with JSON only, no comments and no code fences: {"sentences":[{"start":<word number>,"text":"…","translation":"…"}, …]}.',
+  ].join('\n');
+}
+
+const aiSegmentRequest = (context, words) => JSON.stringify({ context, words: words.map((w, i) => `${i}:${w}`).join(' ') });
+
+// The response_format that makes Gemini and OpenAI answer valid JSON of the splitting prompt's shape.
+const AI_SEGMENT_SCHEMA = {
+  type: 'json_schema',
+  json_schema: {
+    name: 'caption_sentences',
+    strict: true,
+    schema: {
+      type: 'object',
+      properties: {
+        sentences: {
+          type: 'array',
+          items: { type: 'object', properties: { start: { type: 'integer' }, text: { type: 'string' }, translation: { type: 'string' } }, required: ['start', 'text', 'translation'], additionalProperties: false },
+        },
+      },
+      required: ['sentences'],
+      additionalProperties: false,
+    },
+  },
+};
+
+// The reply's sentences [{ start, text, translation }] for [count] words: starts inside the words, increasing, once
+// each; the first always starts at word 0, so every word belongs to a sentence.
+function parseSegmentReply(reply, count) {
+  const start = reply.indexOf('{');
+  const end = reply.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('The AI reply has no JSON.');
+  const json = reply.slice(start, end + 1);
+  let items;
+  try {
+    items = JSON.parse(json).sentences;
+  } catch {
+    try {
+      items = JSON.parse(withStrayQuotesEscaped(json)).sentences;
+    } catch (error) {
+      throw new Error(`The AI reply is not the JSON asked for: ${error.message}`);
+    }
+  }
+  const seen = new Set();
+  const sentences = (Array.isArray(items) ? items : [])
+    .filter((s) => s && Number.isInteger(s.start) && s.start >= 0 && s.start < count)
+    .sort((a, b) => a.start - b.start)
+    .filter((s) => !seen.has(s.start) && seen.add(s.start))
+    .map((s) => ({ start: s.start, text: cleanRow(s.text), translation: cleanRow(s.translation) }));
+  if (!sentences.length) throw new Error('The AI reply has no sentences.');
+  sentences[0].start = 0;
+  return sentences;
+}
+
+const letters = (text) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
+// Caption lines from the AI's sentences over [words] ({ text, time }), the chunk's own; [endTime] ends the last one.
+// A sentence keeps the AI's punctuated text only when it has the same words as its range.
+function segmentLines(sentences, words, endTime) {
+  return sentences.map((s, i) => {
+    const to = i + 1 < sentences.length ? sentences[i + 1].start : words.length;
+    const own = words.slice(s.start, to);
+    const original = own.map((w) => w.text).join(' ');
+    const text = s.text && letters(s.text) === letters(original) ? s.text : original.charAt(0).toUpperCase() + original.slice(1);
+    return { start: own[0].time, end: i + 1 < sentences.length ? words[to].time : endTime, text, words: own, tr: s.translation, ai: true };
+  });
+}
+
+globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, AI_PROMPT_VERSION, AI_SEGMENT_VERSION, AI_SEGMENT_SCHEMA, AI_CONTEXT_SENTENCES, languageName, captionWords, isUnpunctuated, wordChunks, aiSegmentPrompt, aiSegmentRequest, parseSegmentReply, segmentLines, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });
