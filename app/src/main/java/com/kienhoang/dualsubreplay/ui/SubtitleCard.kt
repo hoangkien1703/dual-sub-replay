@@ -53,6 +53,8 @@ import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
+import com.kienhoang.dualsubreplay.ui.theme.brandBackground
+import com.kienhoang.dualsubreplay.ui.theme.brandColors
 
 @Composable
 internal fun CompactSubtitleCard(
@@ -96,11 +98,7 @@ internal fun CompactSubtitleCard(
                 .then(focusModifier)
                 .tvFocusRing()
                 .clickable(enabled = replayEnabled, onClick = onReplay),
-        border =
-            BorderStroke(
-                width = if (active) 2.dp else 1.dp,
-                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-            ),
+        border = if (active) activeLineBorder() else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         colors =
             CardDefaults.outlinedCardColors(
                 containerColor =
@@ -171,15 +169,32 @@ internal fun CompactSubtitleCard(
     }
 }
 
-/** The round play icon at a row's start: filled with the accent colour on the playing row. */
+/**
+ * The playing row's outline in the logo's gradient (owner pick 2026-11-21): the accent, with sapphire
+ * fading in from the bottom-left corner; a plain accent outline when the person picked another accent.
+ */
+@Composable
+private fun activeLineBorder(): BorderStroke =
+    BorderStroke(
+        2.dp,
+        brandColors().brush(reachFraction = ACTIVE_LINE_SAPPHIRE_WIDTH_SHARE, maxReachInHeights = ACTIVE_LINE_SAPPHIRE_MAX_HEIGHTS),
+    )
+
+/** How far along the playing row's outline the sapphire reaches, as a share of the row's width. */
+private const val ACTIVE_LINE_SAPPHIRE_WIDTH_SHARE = 0.45f
+private const val ACTIVE_LINE_SAPPHIRE_MAX_HEIGHTS = 2f
+
+/** The round play icon at a row's start: filled with the logo's gradient on the playing row. */
 @Composable
 private fun ReplayCircle(active: Boolean) {
+    val brand = brandColors()
     Card(
-        modifier = Modifier.size(34.dp),
+        modifier = Modifier.size(34.dp).then(if (active) Modifier.brandBackground(brand, CircleShape) else Modifier),
         shape = CircleShape,
         colors =
             CardDefaults.cardColors(
-                containerColor = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                // The playing row's circle shows the logo's gradient drawn behind it.
+                containerColor = if (active) Color.Transparent else MaterialTheme.colorScheme.surfaceVariant,
             ),
     ) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

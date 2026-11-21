@@ -98,6 +98,8 @@ import com.kienhoang.dualsubreplay.data.DictationCheck
 import com.kienhoang.dualsubreplay.data.soundReplayClip
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import com.kienhoang.dualsubreplay.ui.theme.brandColors
+import com.kienhoang.dualsubreplay.ui.theme.brandTint
 import java.util.Locale
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -809,7 +811,8 @@ private fun SubtitlePanel(
                         Icons.Default.ClosedCaption,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp),
+                        // The logo's gradient (owner pick 2026-11-21); the plain accent for other accents.
+                        modifier = Modifier.size(20.dp).brandTint(brandColors()),
                     )
                     Spacer(Modifier.size(10.dp))
                     Column(Modifier.weight(1f)) {
@@ -1001,7 +1004,8 @@ private fun SideSubtitlePanel(
                         Icons.Default.ClosedCaption,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp),
+                        // The logo's gradient (owner pick 2026-11-21); the plain accent for other accents.
+                        modifier = Modifier.size(20.dp).brandTint(brandColors()),
                     )
                     Spacer(Modifier.size(8.dp))
                     Column(Modifier.weight(1f)) {

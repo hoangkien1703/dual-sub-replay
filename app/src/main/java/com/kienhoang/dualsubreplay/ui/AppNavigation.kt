@@ -16,12 +16,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.ui.theme.brandBackground
+import com.kienhoang.dualsubreplay.ui.theme.brandColors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -131,11 +134,12 @@ private fun DrawerHeader(onClose: () -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // The app logo, as on the launcher and in the README: a rounded square in the accent color.
+        // The app logo, as on the launcher and in the README: a rounded square in the logo's gradient
+        // (owner pick 2026-11-21: only the logo changes, the header stays as it was).
         Surface(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(40.dp).brandBackground(brandColors(), RoundedCornerShape(10.dp)),
             shape = RoundedCornerShape(10.dp),
-            color = MaterialTheme.colorScheme.primary,
+            color = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {
             Box(contentAlignment = Alignment.Center) {
