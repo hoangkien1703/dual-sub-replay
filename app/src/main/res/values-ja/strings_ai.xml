@@ -249,4 +249,12 @@
     <string name="ai_search_tavily_saved">Tavily の検索キーとして保存しました（AI 設定 → 検索と画面）。</string>
     <string name="ai_search_screen_title">画面を見る</string>
     <string name="ai_search_screen_description">アシスタントは必要なときにアプリのスクリーンショットを撮れます。画像は AI サービスにだけ送られ、保存されることはありません。</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">報告</string>
+    <string name="ai_report_title">この回答を報告</string>
+    <string name="ai_report_intro">このAIの回答が不快・有害・誤りだった場合はお知らせください。回答を入力した状態でメールアプリが開きます。送信するまで何も送られません。</string>
+    <string name="ai_report_offensive">不快または有害</string>
+    <string name="ai_report_wrong">誤りまたは誤解を招く</string>
+    <string name="ai_report_other">その他</string>
+    <string name="ai_report_no_email">このスマートフォンにはメールアプリが設定されていません。%1$s 宛てにご連絡ください。</string>
 </resources>

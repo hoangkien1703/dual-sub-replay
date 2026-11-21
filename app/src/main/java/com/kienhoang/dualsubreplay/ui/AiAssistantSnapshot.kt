@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.assistant.AiAppSnapshot
 import com.kienhoang.dualsubreplay.assistant.AiSetting
+import com.kienhoang.dualsubreplay.assistant.aiSettingsInBuild
 import com.kienhoang.dualsubreplay.translation.TranslationEngine
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
 import java.util.Locale
@@ -51,7 +52,7 @@ internal fun aiSettingsSummary(
     stored: AiStoredSettings,
     speed: Float,
 ): List<Pair<String, String>> =
-    AiSetting.entries
+    aiSettingsInBuild()
         .filter { it != AiSetting.PLAYBACK_SPEED || state.activeVideoId != null }
         .map { it.key to aiSettingCurrentValue(state, playerMode, speed, stored, it) } +
         ("google_translate (change_translation)" to onOff(state.translationEngine == TranslationEngine.GOOGLE_WEB))

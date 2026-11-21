@@ -121,6 +121,30 @@ internal fun problemEmailUri(
 /** English, like the report: it is for the project, not the person sending it. */
 internal fun problemEmailSubject(appVersion: String): String = "DualSub Replay problem report ($appVersion)"
 
+/**
+ * Report this answer (Google Play's rules for AI apps, owner pick 2026-11-21): the AI answer the person
+ * flagged, at most [MAX_REPORTED_ANSWER_CHARS] of it, and why. English, like a problem report.
+ */
+internal fun aiAnswerReportBody(
+    reason: String,
+    answer: String,
+    appVersion: String,
+): String {
+    val shown = if (answer.length > MAX_REPORTED_ANSWER_CHARS) answer.take(MAX_REPORTED_ANSWER_CHARS) + "…" else answer
+    return "Reason: $reason\nApp version: $appVersion\n\nAI answer:\n$shown"
+}
+
+internal fun aiAnswerReportSubject(appVersion: String): String = "DualSub Replay AI answer report ($appVersion)"
+
+/** A `mailto:` address for an AI answer report, for mail apps that ignore the intent's extras. */
+internal fun aiAnswerReportEmailUri(
+    body: String,
+    appVersion: String,
+): String = "mailto:$PROBLEM_REPORT_EMAIL?subject=${urlEncoded(aiAnswerReportSubject(appVersion))}&body=${urlEncoded(body)}"
+
+/** Keeps the `mailto:` address short enough for every mail app. */
+internal const val MAX_REPORTED_ANSWER_CHARS = 1_500
+
 private fun urlEncoded(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
 
 /**

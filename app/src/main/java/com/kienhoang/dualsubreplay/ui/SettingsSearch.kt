@@ -57,6 +57,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_TRANSLATION_THINKING_PREFERENCE
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.data.CardFront
 import com.kienhoang.dualsubreplay.data.CardSoundFirst
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_ONLY_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.AI_TRANSLATION_PREFERENCE
 import com.kienhoang.dualsubreplay.translation.GOOGLE_WAIT_PREFERENCE
@@ -518,6 +519,12 @@ internal enum class SearchableSetting(
     }
 }
 
+/** Whether this build shows the setting: the Play build has no Ads & sponsors, App updates or Bilibili switches. */
+internal fun SearchableSetting.inBuild(playStore: Boolean = IS_PLAY_BUILD): Boolean {
+    val betaSite = this == SearchableSetting.BILIBILI || this == SearchableSetting.BILIBILI_TV
+    return section.inBuild(playStore) && (!betaSite || betaSitesInBuild(playStore).isNotEmpty())
+}
+
 /** One search result: a setting, or a whole settings section when its name matches. */
 internal data class SettingsSearchEntry(
     val title: String,
@@ -651,7 +658,7 @@ internal class SettingsUsage(
     }
 
     fun oftenChanged(nowMs: Long = System.currentTimeMillis()): List<SearchableSetting> =
-        oftenChangedSettings(history(), nowMs).mapNotNull(SearchableSetting::named)
+        oftenChangedSettings(history(), nowMs).mapNotNull(SearchableSetting::named).filter { it.inBuild() }
 
     fun clear() {
         recording = false

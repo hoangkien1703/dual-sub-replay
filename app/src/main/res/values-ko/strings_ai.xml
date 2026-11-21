@@ -249,4 +249,12 @@
     <string name="ai_search_tavily_saved">Tavily 검색 키로 저장했어요(AI 설정 → 검색 및 화면).</string>
     <string name="ai_search_screen_title">화면 보기</string>
     <string name="ai_search_screen_description">어시스턴트가 무언가를 봐야 할 때 앱 스크린샷을 찍을 수 있어요. 사진은 내 AI 서비스로만 가고 저장되지 않아요.</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">신고</string>
+    <string name="ai_report_title">이 답변 신고</string>
+    <string name="ai_report_intro">이 AI 답변이 불쾌하거나 해롭거나 틀렸다면 알려 주세요. 답변이 채워진 채로 이메일 앱이 열리며, 직접 보내기 전에는 아무것도 전송되지 않습니다.</string>
+    <string name="ai_report_offensive">불쾌하거나 해로움</string>
+    <string name="ai_report_wrong">틀리거나 오해의 소지가 있음</string>
+    <string name="ai_report_other">기타</string>
+    <string name="ai_report_no_email">이 휴대전화에 설정된 이메일 앱이 없습니다. %1$s(으)로 직접 보내 주세요.</string>
 </resources>

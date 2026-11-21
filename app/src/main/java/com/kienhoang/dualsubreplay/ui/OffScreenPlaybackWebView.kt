@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.View
 import android.webkit.WebView
 import android.widget.FrameLayout
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 
 /**
  * Android's WebView pauses a page's video itself as soon as its window is hidden (screen off,
@@ -41,4 +42,12 @@ internal class OffScreenPlaybackFrame(
 internal fun windowVisibilityForPage(
     actualVisibility: Int,
     keepPlaying: Boolean,
-): Int = if (keepPlaying) View.VISIBLE else actualVisibility
+    playStore: Boolean = IS_PLAY_BUILD,
+): Int = if (keepPlaying && playsOffScreen(playStore)) View.VISIBLE else actualVisibility
+
+/**
+ * Screen-off playback (owner decision 2026-10-13) is in the GitHub build only. YouTube keeps it for
+ * Premium and Google Play removes apps that break YouTube's terms, so the Play build ([IS_PLAY_BUILD])
+ * pauses the video when the app is hidden, with no media notification or earphone controls.
+ */
+internal fun playsOffScreen(playStore: Boolean = IS_PLAY_BUILD): Boolean = !playStore

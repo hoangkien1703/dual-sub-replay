@@ -249,4 +249,12 @@
     <string name="ai_search_tavily_saved">Disimpan sebagai kunci penelusuran Tavily Anda (Setelan AI → Penelusuran dan layar).</string>
     <string name="ai_search_screen_title">Lihat layar</string>
     <string name="ai_search_screen_description">Asisten bisa mengambil tangkapan layar aplikasi saat perlu melihat sesuatu. Gambar hanya dikirim ke layanan AI Anda dan tidak pernah disimpan.</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">Laporkan</string>
+    <string name="ai_report_title">Laporkan jawaban ini</string>
+    <string name="ai_report_intro">Beri tahu kami jika jawaban AI ini menyinggung, berbahaya, atau salah. Aplikasi email terbuka dengan jawaban yang sudah terisi; tidak ada yang terkirim sampai Anda mengirimnya.</string>
+    <string name="ai_report_offensive">Menyinggung atau berbahaya</string>
+    <string name="ai_report_wrong">Salah atau menyesatkan</string>
+    <string name="ai_report_other">Alasan lain</string>
+    <string name="ai_report_no_email">Belum ada aplikasi email di ponsel ini. Anda bisa menulis ke %1$s.</string>
 </resources>
