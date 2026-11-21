@@ -40,6 +40,12 @@ active example exact-version directive. Do not manually bump Gradle version cons
 See AGENTS.md for handoff and docs/releasing.md for release recovery.
 -->
 
+## Credits
+
+<!-- People outside the project whose idea, bug report or testing this PR ships. Put one line
+outside this comment, such as "Thanks: @login, @login"; the release notes thank them by name.
+Leave this section empty when there is nobody to credit. See AGENTS.md "Crediting contributors". -->
+
 ## Checklist
 
 <!-- Tick what is true; leave the rest unticked and explain in Notes. See CONTRIBUTING.md "How review works". -->

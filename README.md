@@ -205,6 +205,12 @@ No account or API key is required, and the app has no analytics or advertising S
 
 Ideas and questions are welcome in [Discussions](https://github.com/hoangkien1703/dual-sub-replay/discussions). Bug reports and feature requests go to [Issues](https://github.com/hoangkien1703/dual-sub-replay/issues).
 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All contributors: 9](https://img.shields.io/badge/all_contributors-9-orange.svg)](CONTRIBUTORS.md)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+Many features started as someone's idea, bug report or test in Discussions and Issues. Everyone who helped, with or without code, is thanked in [CONTRIBUTORS.md](CONTRIBUTORS.md) and in the notes of the release their idea shipped in.
+
 <a href="https://star-history.com/#hoangkien1703/dual-sub-replay&Date">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangkien1703/dual-sub-replay&type=Date&theme=dark">

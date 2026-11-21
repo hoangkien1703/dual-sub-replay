@@ -1,0 +1,83 @@
+{
+  "projectName": "dual-sub-replay",
+  "projectOwner": "hoangkien1703",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "CONTRIBUTORS.md",
+    "README.md"
+  ],
+  "imageSize": 80,
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": false,
+  "badgeTemplate": "[![All contributors: <%= contributors.length %>](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg)](CONTRIBUTORS.md)",
+  "linkToUsage": false,
+  "skipCi": true,
+  "commit": false,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "hoangkien1703",
+      "name": "Kien Hoang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92719520?v=4",
+      "profile": "https://github.com/hoangkien1703",
+      "contributions": ["code", "design", "doc", "ideas", "maintenance"]
+    },
+    {
+      "login": "mrAlishah",
+      "name": "Mostafa Alishah",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35867213?v=4",
+      "profile": "https://github.com/mrAlishah",
+      "contributions": ["code", "ideas"]
+    },
+    {
+      "login": "lion737",
+      "name": "lion737",
+      "avatar_url": "https://avatars.githubusercontent.com/u/351501310?v=4",
+      "profile": "https://github.com/lion737",
+      "contributions": ["ideas", "bug", "userTesting"]
+    },
+    {
+      "login": "25kiuo",
+      "name": "25kiuo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86703679?v=4",
+      "profile": "https://github.com/25kiuo",
+      "contributions": ["ideas", "bug"]
+    },
+    {
+      "login": "lovoro",
+      "name": "lovoro",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3872819?v=4",
+      "profile": "https://github.com/lovoro",
+      "contributions": ["ideas"]
+    },
+    {
+      "login": "Rozen-x",
+      "name": "Rozen-x",
+      "avatar_url": "https://avatars.githubusercontent.com/u/288693496?v=4",
+      "profile": "https://github.com/Rozen-x",
+      "contributions": ["ideas"]
+    },
+    {
+      "login": "musdarrt-ctrl",
+      "name": "musdarrt-ctrl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/351146810?v=4",
+      "profile": "https://github.com/musdarrt-ctrl",
+      "contributions": ["ideas"]
+    },
+    {
+      "login": "jarsin918",
+      "name": "jarsin918",
+      "avatar_url": "https://avatars.githubusercontent.com/u/339452757?v=4",
+      "profile": "https://github.com/jarsin918",
+      "contributions": ["ideas"]
+    },
+    {
+      "login": "xmha97",
+      "name": "xmha97",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23485114?v=4",
+      "profile": "https://github.com/xmha97",
+      "contributions": ["ideas"]
+    }
+  ]
+}

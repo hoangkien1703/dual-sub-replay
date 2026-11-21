@@ -111,6 +111,23 @@ class ReleaseTests(unittest.TestCase):
         self.pr["body"] = "## Notes\nRelease-Version: 1.2.0\n"
         self.assertEqual(release.prepare(self.api, self.pr)["version"], "1.2.0")
 
+    def test_thanks_line_thanks_people_in_the_release_notes(self):
+        self.pr["body"] = "## Credits\nThanks: @lion737, @25kiuo (idea) and @lion737\n"
+        release.prepare(self.api, self.pr)
+        body = self.api.releases[-1]["body"]
+        self.assertIn("🙏 Thanks to @lion737 and @25kiuo for helping shape this release.\n\n## What's changed", body)
+
+    def test_thanks_line_ignores_comments_the_owner_and_non_logins(self):
+        for text in ["", "<!--\nThanks: @lion737\n-->", "Thanks: @hoangkien1703", "Thanks: lion737",
+                     "Thanks: me@example.com", "Thanks: @-bad @bad-", "Thanks to @lion737",
+                     "Thanks: $(echo @)"]:
+            with self.subTest(text=text):
+                self.assertEqual(release.thanks_note({"body": text}), "")
+        self.assertEqual(release.thanks_note({"body": "Thanks: @a @b @c"}),
+                         "🙏 Thanks to @a, @b and @c for helping shape this release.\n\n")
+        many = " ".join(f"@user{i}" for i in range(30))
+        self.assertEqual(release.thanks_note({"body": "Thanks: " + many}).count("@"), release.MAX_THANKED)
+
     def test_minor_label(self):
         self.pr["labels"] = [{"name": "release:minor"}]
         self.assertEqual(release.prepare(self.api, self.pr)["version"], "1.1.0")

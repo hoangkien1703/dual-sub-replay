@@ -24,6 +24,11 @@ APK_NAME = "DualSub-Replay.apk"
 SECURITY_NOTE = ("🔒 **This release fixes a security problem.** Please update. "
                  "Older versions show a Security update message until they do.\n\n")
 UPDATE_INFO_NAME = "update-info.json"
+# A PR's "Thanks: @login, @login" line names the people outside the project whose idea, bug
+# report or testing it ships (owner decision 2026-11-21); its release notes thank them by name.
+THANKS = re.compile(r"^[ \t]*Thanks:[ \t]*([^\r\n]*)$", re.MULTILINE)
+GITHUB_LOGIN = re.compile(r"(?<![\w@/.-])@([A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38})(?![\w-])")
+MAX_THANKED = 20
 
 
 def command(*args, input_text=None):
@@ -75,6 +80,21 @@ def release_request(pr):
         version_tuple(requested)
         return requested
     return next(iter(modes), "release:patch").split(":")[1]
+
+
+def thanks_note(pr):
+    """The release notes' thank-you line for the PR's `Thanks:` logins, or "" when it has none."""
+    body = re.sub(r"<!--[\s\S]*?-->", "", pr.get("body") or "")
+    logins = {}
+    for line in THANKS.findall(body):
+        for login in GITHUB_LOGIN.findall(line):
+            if login.lower() != OWNER:
+                logins.setdefault(login.lower(), login)
+    names = ["@" + login for login in list(logins.values())[:MAX_THANKED]]
+    if not names:
+        return ""
+    joined = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    return f"🙏 Thanks to {joined} for helping shape this release.\n\n"
 
 
 def security_fix(pr):
@@ -265,7 +285,7 @@ def prepare(api, pr):
             + "Download **DualSub-Replay.apk** below to install or update the official app. "
             "Preview builds install separately. The `.sha256` file verifies the download.\n\n"
             f"Built from merged PR #{pr['number']} (`{merge}`), with automatic release versioning.\n\n"
-            + notes + "\n\n<!-- automatic-release-v1 " + json.dumps(meta, sort_keys=True) + " -->\n")
+            + thanks_note(pr) + notes + "\n\n<!-- automatic-release-v1 " + json.dumps(meta, sort_keys=True) + " -->\n")
     # Persist before building. Drafts reserve both version numbers across failures.
     release = api.api("releases", {"tag_name": "v" + version, "target_commitish": commit["sha"],
                                    "name": f"DualSub Replay v{version}", "body": body,
