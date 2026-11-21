@@ -298,6 +298,8 @@ class AiAssistantPanelUiTest {
     /** Report under an answer (Google Play build spec 2026-11-21): reasons first, nothing sent from here. */
     @Test
     fun reportUnderAnAnswerAsksWhyBeforeOpeningEmail() {
+        // The emulator's "System UI isn't responding" dialog covered this screenshot in CI.
+        closeSystemDialogs()
         checkedGeminiKey()
         showTopBarAndPanel()
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
