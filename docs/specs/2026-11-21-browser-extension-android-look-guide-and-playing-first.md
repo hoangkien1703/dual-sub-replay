@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner reported on 2026-11-21 that grammar did not show and the UI needed work, and asked for a guide
+Implemented. The contributor reported on 2026-11-21 that grammar did not show and the UI needed work, and asked for a guide
 to using AI. They also reported that subtitles fell behind the video when a video was opened from Saved words.
 
 ## Context / problem
@@ -55,4 +55,4 @@ to using AI. They also reported that subtitles fell behind the video when a vide
 ## Validation result
 
 All of the above passed, and unit tests pass. Not checked: the real YouTube dark and light themes beside the panel,
-and the owner's own grammar case. If the owner's card still shows no grammar, its new message says why.
+and the contributor's own grammar case. If the contributor's card still shows no grammar, its new message says why.

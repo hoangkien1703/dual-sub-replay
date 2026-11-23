@@ -17,22 +17,7 @@
 </style>
 <header><img src="../icons/icon32.png" alt="" width="24" height="24"><b>DualSub</b></header>
 <label for="target">Translate subtitles into</label>
-<select id="target">
-  <option value="fa">فارسی</option>
-  <option value="en">English</option>
-  <option value="ar">العربية</option>
-  <option value="tr">Türkçe</option>
-  <option value="de">Deutsch</option>
-  <option value="fr">Français</option>
-  <option value="es">Español</option>
-  <option value="it">Italiano</option>
-  <option value="pt">Português</option>
-  <option value="ru">Русский</option>
-  <option value="ja">日本語</option>
-  <option value="ko">한국어</option>
-  <option value="zh-CN">中文 (简体)</option>
-  <option value="hi">हिन्दी</option>
-</select>
+<select id="target"></select>
 <label for="translator">Translate subtitles with</label>
 <select id="translator">
   <option value="google">Google</option>
@@ -49,6 +34,8 @@
 </div>
 <button class="primary" id="open">Saved words &amp; practice (<span id="count">0</span>)</button>
 <div class="links"><button class="secondary" id="guide">Guide &amp; AI setup</button></div>
+<script src="../data/languages.js"></script>
+<script src="../data/language-codes.js"></script>
 <script src="../data/vocabulary.js"></script>
 <script src="../translation/ai.js"></script>
 <script src="popup.js"></script>

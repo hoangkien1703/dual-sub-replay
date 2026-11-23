@@ -19,7 +19,7 @@ async function translate(texts, target, source) {
     try {
       const body = new URLSearchParams();
       texts.forEach((t) => body.append('q', t));
-      const reply = await fetch(`${address}?client=${client}&sl=${encodeURIComponent(googleSource(source))}&tl=${encodeURIComponent(target)}`, { method: 'POST', body });
+      const reply = await fetch(`${address}?client=${client}&sl=${encodeURIComponent(googleSource(source))}&tl=${encodeURIComponent(DualSub.googleTarget(target))}`, { method: 'POST', body });
       if (!reply.ok) throw new Error(`Google Translate returned HTTP ${reply.status}`);
       const entries = await reply.json();
       if (!Array.isArray(entries) || entries.length !== texts.length) throw new Error('Google Translate returned an unexpected reply');
@@ -84,7 +84,7 @@ async function speech({ text, lang }) {
   return { url: `data:audio/mpeg;base64,${btoa(binary)}` };
 }
 
-importScripts('translation/ai.js', 'data/english.js', 'data/english-tagger.js', 'data/english-grammar-match.js', 'data/english-grammar.js');
+importScripts('data/languages.js', 'data/language-codes.js', 'translation/ai.js', 'data/english.js', 'data/english-tagger.js', 'data/english-grammar-match.js', 'data/english-grammar.js');
 
 // English analysis data, loaded on the first English line and again after Chrome stops the idle worker:
 // the tagger model (1.6 MB), WordNet's words and irregular forms, CEFR-J levels and IPA.
@@ -120,7 +120,7 @@ async function englishLines({ texts }) {
 
 // Translates [sentences] with the AI service and key the user saved; { noKey } when there is no key.
 // Answers are kept per sentence in storage.local ("aic:" keys), so a video opened again costs no requests.
-// shortcut: the cache is never pruned; storage.local holds about 10 MB (~30,000 sentences), add pruning when that is near.
+// When storage.local nears its quota, the oldest cached answers go (pruneAiCache).
 async function aiTranslate({ source, target, sentences, context }) {
   const { ai = {} } = await chrome.storage.local.get('ai');
   if (!ai.key) return { noKey: true };
@@ -129,15 +129,17 @@ async function aiTranslate({ source, target, sentences, context }) {
   // The prompt version, service, model and languages are part of the key, as in Android's cache.
   const cacheKey = (text) => `aic:${DualSub.AI_PROMPT_VERSION}|${ai.service || 'gemini'}|${model}|${source}|${target}|${text}`;
   const cached = await chrome.storage.local.get(sentences.map(cacheKey));
-  const missing = sentences.filter((s) => cached[cacheKey(s)] == null);
-  if (!missing.length) return { texts: sentences.map((s) => cached[cacheKey(s)]) };
+  const hit = (s) => DualSub.cacheValue(cached[cacheKey(s)]);
+  const missing = sentences.filter((s) => hit(s) == null);
+  if (!missing.length) return { texts: sentences.map(hit) };
   const reply = await aiAsk(service, ai.key, model, DualSub.aiSystemPrompt(source, target), DualSub.aiRequest(context, missing), DualSub.AI_JSON_SCHEMA);
   if (reply.text == null) return reply;
   const texts = DualSub.parseAiReply(reply.text, missing);
   const fresh = {};
-  missing.forEach((s, i) => texts[i] && (fresh[cacheKey(s)] = texts[i]));
+  missing.forEach((s, i) => texts[i] && (fresh[cacheKey(s)] = { t: Date.now(), v: texts[i] }));
   await chrome.storage.local.set(fresh);
-  return { texts: sentences.map((s) => cached[cacheKey(s)] ?? fresh[cacheKey(s)] ?? null) };
+  pruneAiCache();
+  return { texts: sentences.map((s) => hit(s) ?? fresh[cacheKey(s)]?.v ?? null) };
 }
 
 // Splits a chunk of unpunctuated caption [words] into sentences and translates them, with the 3 sentences before as
@@ -149,12 +151,35 @@ async function aiSegment({ source, target, words, context }) {
   const model = ai.model || service.model;
   const key = `ais:${DualSub.AI_SEGMENT_VERSION}|${ai.service || 'gemini'}|${model}|${source}|${target}|${words.join(' ')}`;
   const cached = (await chrome.storage.local.get(key))[key];
-  if (cached) return { sentences: cached };
+  if (cached) return { sentences: DualSub.cacheValue(cached) };
   const reply = await aiAsk(service, ai.key, model, DualSub.aiSegmentPrompt(source, target), DualSub.aiSegmentRequest(context, words), DualSub.AI_SEGMENT_SCHEMA);
   if (reply.text == null) return reply;
   const sentences = DualSub.parseSegmentReply(reply.text, words.length);
-  await chrome.storage.local.set({ [key]: sentences });
+  await chrome.storage.local.set({ [key]: { t: Date.now(), v: sentences } });
+  pruneAiCache();
   return { sentences };
+}
+
+// Drops the oldest cached AI answers once storage.local passes 80% of its quota (10 MB), so saving words never fails
+// for a heavy user of AI translation.
+async function pruneAiCache() {
+  const quota = chrome.storage.local.QUOTA_BYTES;
+  const used = await chrome.storage.local.getBytesInUse(null);
+  if (used < quota * 0.8) return;
+  const all = await chrome.storage.local.get(null);
+  const entries = Object.entries(all).filter(([k]) => k.startsWith('aic:') || k.startsWith('ais:'));
+  await chrome.storage.local.remove(DualSub.aiCacheToDrop(entries, used, quota));
+}
+
+// Send times per key and model, so every request, retries too, keeps the app's budget of 10 a minute.
+// shortcut: kept in memory, so a service worker Chrome restarts starts a fresh minute; store it if keys hit limits.
+const aiSent = new Map();
+async function aiTurn(id) {
+  for (;;) {
+    const { wait, sent } = DualSub.aiPacerWait(aiSent.get(id) || [], Date.now());
+    if (!wait) return aiSent.set(id, [...sent, Date.now()]);
+    await new Promise((r) => setTimeout(r, wait));
+  }
 }
 
 // One request to the AI service: { text } of its answer, or { error, busy }.
@@ -175,6 +200,7 @@ async function aiAsk(service, key, model, system, user, schema) {
   // AI_BUSY_RETRY_DELAYS_MS: free Gemini answers 503 "high demand" to about half of all requests at busy times.
   const waits = [1000, 3000];
   for (;;) {
+    await aiTurn(`${service.base}|${key}|${model}`);
     let reply;
     try {
       reply = await fetch(request.url, { method: 'POST', headers: { 'content-type': 'application/json', ...request.headers }, body: JSON.stringify(request.body) });

@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked on 2026-11-21 to port the Android app's English grammar help, after the
+Implemented. The contributor asked on 2026-11-21 to port the Android app's English grammar help, after the
 [first part](2026-11-21-browser-extension-english-word-help.md).
 
 ## Context / problem

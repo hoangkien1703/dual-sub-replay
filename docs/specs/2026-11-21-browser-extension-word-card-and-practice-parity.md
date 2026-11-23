@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked on 2026-11-21 to do the remaining work toward the Android app, and picked this group
+Implemented. The contributor asked on 2026-11-21 to do the remaining work toward the Android app, and picked this group
 first.
 
 ## Context / problem
@@ -50,4 +50,4 @@ TSV import, decks, editing a word's fields, Android's preview dialog before impo
 
 ## Validation result
 
-All of the above passed. Not run: real Anki import of the TSV, and importing a backup exported by the owner's phone.
+All of the above passed. Not run: real Anki import of the TSV, and importing a backup exported by the contributor's phone.

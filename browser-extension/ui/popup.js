@@ -1,7 +1,9 @@
 const $ = (id) => document.getElementById(id);
 
-chrome.storage.sync.get({ target: 'fa', translator: 'google' }, (v) => {
-  $('target').value = v.target;
+// The app's languages; until the user picks one, the browser's language (or English) is selected.
+for (const [code, name] of DualSub.TRANSLATION_LANGUAGES) $('target').append(new Option(name, code));
+chrome.storage.sync.get({ target: '', translator: 'google' }, (v) => {
+  $('target').value = v.target ? DualSub.targetCode(v.target) : DualSub.defaultTarget(chrome.i18n.getUILanguage());
   $('translator').value = v.translator;
   $('ai').hidden = v.translator !== 'ai';
 });

@@ -1,5 +1,7 @@
 # DualSub for Chrome (preview)
 
+Maintainer: @parastouh
+
 Learn a language with YouTube on a computer: a Chrome extension that brings DualSub Replay's learning to the desktop.
 
 - **Two subtitle lines over the video:** the original line and its translation.
@@ -16,7 +18,7 @@ No account, no server, no key.
 
 1. Open `chrome://extensions` and turn on **Developer mode**.
 2. Click **Load unpacked** and pick this `browser-extension` folder.
-3. Open a YouTube video that has captions. Pick the translation language from the extension's toolbar icon (default: Persian).
+3. Open a YouTube video that has captions. Pick the translation language from the extension's toolbar icon (default: your browser's language, or English).
    The same menu opens **Saved words & practice**.
 
 The guide (the panel's **?** or the menu's **Guide & AI setup**) shows how to set up AI translation with a free

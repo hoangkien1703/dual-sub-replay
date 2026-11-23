@@ -1,15 +1,19 @@
 // Watch-page UI: a dual-subtitle overlay on the player, a clickable transcript beside it, and a word card.
 const state = { videoId: null, lang: '', trackKey: null, lines: [], rows: [], active: -1, ccTried: false, since: 0, gen: 0 };
-let target = 'fa';
+let target = 'en';
 let translator = 'google'; // or 'ai'
 let overlay;
 let panel;
 let card;
 
-chrome.storage.sync.get({ target: 'fa', translator: 'google' }, (v) => ({ target, translator } = v));
+// Until the user picks one, translate into the browser's language (or English), as the app follows the phone's.
+chrome.storage.sync.get({ target: '', translator: 'google' }, (v) => {
+  target = v.target ? DualSub.targetCode(v.target) : DualSub.defaultTarget(chrome.i18n.getUILanguage());
+  translator = v.translator;
+});
 chrome.storage.onChanged.addListener((change) => {
   if (!change.target && !change.translator && !change.ai) return;
-  if (change.target) target = change.target.newValue;
+  if (change.target) target = DualSub.targetCode(change.target.newValue);
   if (change.target && panel && state.lines.length) panel.querySelector('.dualsub-title').textContent = `${DualSub.languageName(state.lang)} → ${DualSub.languageName(target)}`;
   if (change.translator) translator = change.translator.newValue;
   translateAll();

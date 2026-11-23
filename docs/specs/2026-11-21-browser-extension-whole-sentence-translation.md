@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked on 2026-11-21, after comparing the Persian translation with the Android app's.
+Implemented. The contributor asked on 2026-11-21, after comparing the Persian translation with the Android app's.
 
 ## Context / problem
 
@@ -63,7 +63,7 @@ The separator is a space, except between two Japanese or Chinese characters.
 | --- | --- | --- |
 | Unit tests | `cd browser-extension && node --test` | Linux, Node 22 |
 | Headless Chrome | Sample track of auto-caption fragments; panel rows and translations read through DevTools | Chrome 156 |
-| Live YouTube | Persian translation reads naturally on a real video | Owner's Chrome |
+| Live YouTube | Persian translation reads naturally on a real video | Contributor's Chrome |
 
 ## Risks / edge cases
 
@@ -85,4 +85,4 @@ difference from Android's request; Android's default display is also Whole sente
 
 - Unit tests: passed.
 - Headless Chrome: passed. Five fragments became two sentence rows, each with one translation.
-- Live YouTube: not run; the owner judges the Persian.
+- Live YouTube: not run; the contributor judges the Persian.

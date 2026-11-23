@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked on 2026-11-21: words colored as in the Android app, and a proper place for saved
+Implemented. The contributor asked on 2026-11-21: words colored as in the Android app, and a proper place for saved
 words. The same request moved the project to the Android repository's layout and workflow.
 
 ## Context / problem
@@ -68,7 +68,7 @@ The [Data modules, Saved words and Android parity rules](../../AGENTS.md#browser
 | --- | --- | --- |
 | Unit tests | `cd browser-extension && node --test`: captions, words and vocabulary pass | Linux, Node 22 |
 | Headless Chrome | Sample track, colors read through `getComputedStyle`, card, save, saved words page and practice keys | Chrome 156 |
-| Live YouTube | Colors and saving on real captions; dark and light YouTube themes | Owner's Chrome |
+| Live YouTube | Colors and saving on real captions; dark and light YouTube themes | Contributor's Chrome |
 
 ## Risks / edge cases
 
@@ -89,4 +89,4 @@ run past the top of the window (`box-sizing: border-box` and a max height for th
 
 - Unit tests: passed (3 files).
 - Headless Chrome: passed for every criterion above.
-- Live YouTube and YouTube's dark theme: not run. The owner checks them in their own Chrome.
+- Live YouTube and YouTube's dark theme: not run. The contributor checks them in their own Chrome.

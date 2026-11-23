@@ -104,6 +104,8 @@ translation endpoints, AI prompt, word colors, English tagger and grammar catalo
 format. Its source map is [docs/project/browser-extension.md](docs/project/browser-extension.md); its specs are
 `docs/specs/*-browser-extension-*.md`. It never changes the APK, so a PR that only touches it, its specs and its
 tools takes `release:skip`. Port learner-facing behavior from the app rather than inventing it, and say so in a spec.
+Android PRs don't have to update the extension: it follows the app when its maintainer (@parastouh, named in
+`browser-extension/README.md`) ports a change.
 
 ### Commands
 

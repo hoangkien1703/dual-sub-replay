@@ -14,7 +14,10 @@ const MAX_AI_BATCH_SENTENCES = 60;
 const MAX_AI_BATCH_CHARS = 6000;
 const AI_CONTEXT_SENTENCES = 4; // sentences of the previous request sent again, so pronouns and tone carry over
 
+// A language's English name; Chinese by script, as the app's englishTargetName.
 const languageName = (code) => {
+  if (code === 'zh' || code === 'zh-CN') return 'Simplified Chinese';
+  if (code === 'zh-TW') return 'Traditional Chinese';
   try {
     return new Intl.DisplayNames(['en'], { type: 'language' }).of(code) || code;
   } catch {
@@ -25,7 +28,7 @@ const languageName = (code) => {
 // Raised when the prompt changes, so sentences cached with the old one are translated again (Android's AI_PROMPT_VERSION).
 const AI_PROMPT_VERSION = 3;
 
-// Android's aiTranslationSystemPrompt (its version 2), with one deliberate change in version 3 (owner report
+// Android's aiTranslationSystemPrompt (its version 2), with one deliberate change in version 3 (contributor report
 // 2026-11-21): a piece of a longer sentence is translated on its own. Android's "translate it so that reading the
 // translations in order gives the whole sentence" let the model move words between lines (in a verb-final language
 // such as Persian, a line's verb ended up under the line before), so a line's translation no longer matched it.
@@ -139,6 +142,38 @@ function parseAiReply(reply, sentences) {
     const joined = rows.map(cleanRow).map((r) => withoutEcho(r, text)).filter(Boolean).join(' ');
     return joined && !(canBeEcho(text.trim()) && joined === text.trim()) ? joined : null; // a bare copy of the source is no translation
   });
+}
+
+// ---- Cache size ----
+// AI answers are cached in storage.local ("aic:" sentences, "ais:" split chunks) as { t: write time, v: value };
+// entries from before the time was kept are plain values and count as the oldest.
+const cacheValue = (entry) => (entry && typeof entry === 'object' && 't' in entry ? entry.v : entry);
+
+// The cache keys to remove, oldest first, so that [bytesInUse] falls to half of [quota] once it passes 80% of it.
+// [entries] are [key, stored value] pairs of the cache only; saved words and settings are never in them.
+function aiCacheToDrop(entries, bytesInUse, quota) {
+  if (bytesInUse < quota * 0.8) return [];
+  let excess = bytesInUse - quota * 0.5;
+  const drop = [];
+  for (const [key, value] of [...entries].sort((a, b) => (a[1]?.t ?? 0) - (b[1]?.t ?? 0))) {
+    if (excess <= 0) break;
+    drop.push(key);
+    excess -= key.length + JSON.stringify(value).length;
+  }
+  return drop;
+}
+
+// ---- Request pacing ----
+// At most 10 automatic requests per key and model in any minute, the app's budget (AiKeyPacer,
+// AI_TRANSLATION_KEY_REQUESTS_PER_MINUTE): free Gemini keys allow few requests a minute, and a long video would
+// otherwise send all its batches back to back.
+const AI_REQUESTS_PER_MINUTE = 10;
+
+// How long to wait before the next request, given the times of the earlier ones ([sent], oldest first), and those
+// times that still count: { wait, sent }.
+function aiPacerWait(sent, now, perMinute = AI_REQUESTS_PER_MINUTE) {
+  const recent = sent.filter((t) => t > now - 60_000);
+  return { wait: recent.length < perMinute ? 0 : recent[recent.length - perMinute] + 60_000 - now, sent: recent };
 }
 
 // ---- AI sentence splitting for captions without punctuation ----
@@ -255,4 +290,4 @@ function segmentLines(sentences, words, endTime) {
   });
 }
 
-globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, AI_PROMPT_VERSION, AI_SEGMENT_VERSION, AI_SEGMENT_SCHEMA, AI_CONTEXT_SENTENCES, languageName, captionWords, isUnpunctuated, wordChunks, aiSegmentPrompt, aiSegmentRequest, parseSegmentReply, segmentLines, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });
+globalThis.DualSub = Object.assign(globalThis.DualSub || {}, { AI_SERVICES, cacheValue, aiCacheToDrop, AI_REQUESTS_PER_MINUTE, aiPacerWait, AI_PROMPT_VERSION, AI_SEGMENT_VERSION, AI_SEGMENT_SCHEMA, AI_CONTEXT_SENTENCES, languageName, captionWords, isUnpunctuated, wordChunks, aiSegmentPrompt, aiSegmentRequest, parseSegmentReply, segmentLines, AI_JSON_SCHEMA, aiSystemPrompt, aiRequest, aiBatches, parseAiReply });

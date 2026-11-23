@@ -3,7 +3,7 @@
 ## Status
 
 Implemented (first part). Its spelling-only dictionary forms were replaced by WordNet's in
-[English grammar points](2026-11-21-browser-extension-english-grammar-points.md). The owner asked for Android's English grammar and word help on 2026-11-21.
+[English grammar points](2026-11-21-browser-extension-english-grammar-points.md). The contributor asked for Android's English grammar and word help on 2026-11-21.
 
 ## Context / problem
 

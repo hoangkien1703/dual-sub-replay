@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. Owner report 2026-11-21, after [prompt version 3](2026-11-21-browser-extension-ai-subtitle-translation.md): lines match
+Implemented. Contributor report 2026-11-21, after [prompt version 3](2026-11-21-browser-extension-ai-subtitle-translation.md): lines match
 their own meaning better, but the start of a line is still sometimes translated wrongly, with no link to the line
 before.
 
@@ -70,7 +70,7 @@ auto-generated captions gives each word its time, so new sentence lines can keep
       original words.
 - [x] Headless Chrome with a fake AI: an unpunctuated 3-piece track whose sentence spans pieces becomes 2 sentence
       lines with the AI's translations and correct start times. The spoken word is still underlined.
-- [ ] The owner's real video with a real key.
+- [ ] The contributor's real video with a real key.
 
 ## Version
 

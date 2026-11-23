@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked for "subtitles like Android" on 2026-11-21.
+Implemented. The contributor asked for "subtitles like Android" on 2026-11-21.
 
 ## Context / problem
 

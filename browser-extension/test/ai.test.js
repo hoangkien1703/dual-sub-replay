@@ -72,3 +72,32 @@ assert.deepStrictEqual(lines.map((l) => [l.start, l.end, l.text, l.tr, l.words.l
 const changed = segmentLines([{ start: 0, text: 'So in college I was a politics major.', translation: 't' }], words.slice(0, 8), 3.6);
 assert.strictEqual(changed[0].text, 'So in college i was a government major');
 assert.throws(() => parseSegmentReply('{"sentences":[]}', 5), /no sentences/);
+
+// ---- Pacing: no more than 10 requests per key and model in any minute (the app's AiKeyPacer budget) ----
+const { aiPacerWait } = globalThis.DualSub;
+// A fake clock: 30 requests asked for at once, each sent when the pacer allows it.
+let now = 0;
+let sentTimes = [];
+const sends = [];
+for (let n = 0; n < 30; n++) {
+  for (;;) {
+    const { wait, sent } = aiPacerWait(sentTimes, now);
+    sentTimes = sent;
+    if (!wait) break;
+    now += wait;
+  }
+  sentTimes.push(now);
+  sends.push(now);
+}
+for (const t of sends) assert.ok(sends.filter((x) => x >= t && x < t + 60_000).length <= 10, `more than 10 requests in the minute from ${t}`);
+assert.deepStrictEqual([sends[9], sends[10], sends[20]], [0, 60_000, 120_000]); // ten at once, then the next minute
+assert.strictEqual(aiPacerWait([0, 1000], 61_500).wait, 0); // requests older than a minute no longer count
+
+// ---- Cache size: the oldest answers go once storage passes 80% of its quota ----
+const { cacheValue, aiCacheToDrop } = globalThis.DualSub;
+assert.strictEqual(cacheValue({ t: 5, v: 'ترجمه' }), 'ترجمه');
+assert.strictEqual(cacheValue('old plain value'), 'old plain value');
+assert.deepStrictEqual(cacheValue({ t: 5, v: [{ start: 0 }] }), [{ start: 0 }]);
+const entries = [['aic:new', { t: 300, v: 'x'.repeat(90) }], ['aic:old', { t: 100, v: 'x'.repeat(90) }], ['aic:plain', 'x'.repeat(90)], ['aic:mid', { t: 200, v: 'x'.repeat(90) }]];
+assert.deepStrictEqual(aiCacheToDrop(entries, 700, 1000), []); // below 80%
+assert.deepStrictEqual(aiCacheToDrop(entries, 800, 1000), ['aic:plain', 'aic:old', 'aic:mid']); // down to half: oldest first, untimed first of all

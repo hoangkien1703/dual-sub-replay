@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented. The owner asked on 2026-11-21: their Android app translates with AI, and Google's Persian is hard to
+Implemented. The contributor asked on 2026-11-21: their Android app translates with AI, and Google's Persian is hard to
 understand even in whole sentences.
 
 ## Context / problem
@@ -63,7 +63,7 @@ context, so the translation reads naturally.
 - [x] Reply parsing reads fenced JSON, repairs a stray quote, strips markup and a leading comma, and gives null for a
       missing id (unit test).
 - [x] With AI chosen and an invalid key, Google's lines stay and the header names the failure (headless Chrome).
-- [ ] With the owner's real key, the lines switch to the AI's Persian (owner's Chrome).
+- [ ] With the contributor's real key, the lines switch to the AI's Persian (contributor's Chrome).
 
 ## Validation plan
 
@@ -71,7 +71,7 @@ context, so the translation reads naturally.
 | --- | --- | --- |
 | Unit tests | `cd browser-extension && node --test` | Linux, Node 22 |
 | Headless Chrome | AI chosen with a fake key: the failure message appears and Google's lines stay | Chrome 156 |
-| Live AI | The owner's key and a real video | Owner's Chrome; no key here |
+| Live AI | The contributor's key and a real video | Contributor's Chrome; no key here |
 
 ## Risks / edge cases
 
@@ -93,11 +93,11 @@ key, the header says "add an AI key in the DualSub menu" and Google's lines stay
 - Headless Chrome: passed. With no key, Google's lines show with the hint. With a fake key, each service's own
   refusal appears in the header while Google's lines stay: "Gemini returned HTTP 400: Please pass a valid API key",
   "Claude returned HTTP 401: invalid x-api-key", and OpenAI's 401. So the requests reach each service's real API.
-- Live AI translation: not run, because there is no key here. The owner checks with their own key.
+- Live AI translation: not run, because there is no key here. The contributor checks with their own key.
 
 ## Follow-up 0.3.1: busy services
 
-The owner's Gemini key got "HTTP 503: This model is currently experiencing high demand", and AI translation stopped
+The contributor's Gemini key got "HTTP 503: This model is currently experiencing high demand", and AI translation stopped
 for the rest of that video. Ported from Android:
 
 - `background.js` asks again after 1 s and 3 s on 5xx (including Anthropic's 529), on a 429 that is not about
@@ -111,7 +111,7 @@ busy message, and after 30 s the same batch was asked again. Unit tests passed.
 
 ## Follow-up 0.6.2: a line's meaning stays under that line
 
-The owner reported that some translated lines missed part of their meaning, which showed up in the line before
+The contributor reported that some translated lines missed part of their meaning, which showed up in the line before
 instead (and the other way round). Auto captions without punctuation cut one long spoken sentence across several
 lines (the 120-character / 8-second joining limit). Android's prompt asked the model to translate such a piece "so that
 reading the translations in order gives the whole sentence naturally". In a verb-final language such as Persian, the
@@ -122,5 +122,5 @@ as an unfinished phrase ending with "…", and the model must never move words o
 translation, because each translation is shown under its own line. The cache key carries `AI_PROMPT_VERSION`, so
 sentences cached with version 2 are asked again.
 
-Validation: unit tests pass (`test/ai.test.js` pins version 3 and the new rule). The owner checks the Persian with a
+Validation: unit tests pass (`test/ai.test.js` pins version 3 and the new rule). The contributor checks the Persian with a
 real key; there is no key here.

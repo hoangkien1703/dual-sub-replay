@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DualSub",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Dual subtitles on YouTube: original line, its translation, click a line to hear it again.",
   "icons": {
     "16": "icons/icon16.png",
@@ -48,6 +48,8 @@
         "https://www.youtube.com/*"
       ],
       "js": [
+        "data/languages.js",
+        "data/language-codes.js",
         "data/captions.js",
         "data/words.js",
         "data/vocabulary.js",

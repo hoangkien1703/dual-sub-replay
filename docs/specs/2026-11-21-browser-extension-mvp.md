@@ -2,12 +2,12 @@
 
 ## Status
 
-Implemented. The owner asked for the MVP, the word card, faster lookups and the spacing fix on 2026-11-21.
+Implemented. The contributor asked for the MVP, the word card, faster lookups and the spacing fix on 2026-11-21.
 This record was written after the code, when the project took on the Android repository's workflow.
 
 ## Context / problem
 
-DualSub Replay exists only for Android. The owner wants the same learning on a computer. The Android app already
+DualSub Replay exists only for Android. The contributor wants the same learning on a computer. The Android app already
 works as a YouTube page with injected scripts, so a content script can do the same job.
 
 ## Goals
@@ -53,7 +53,7 @@ Wiktionary and talks to AnkiConnect. `ui/content.js` draws the UI.
 | --- | --- | --- |
 | Unit tests | `cd browser-extension && node --test` | Linux, Node 22 |
 | Headless Chrome | Sample track through `postMessage`; panel, overlay, seek and card checked through DevTools | Chrome 156 |
-| Live YouTube | Real captions on a TED talk | Owner's Chrome |
+| Live YouTube | Real captions on a TED talk | Contributor's Chrome |
 
 ## Risks / edge cases
 
@@ -67,7 +67,7 @@ Wiktionary and talks to AnkiConnect. `ui/content.js` draws the UI.
 
 ## Implementation result
 
-As planned. Google's dictionary endpoint answered 429 on the owner's network, so meanings come from Wiktionary.
+As planned. Google's dictionary endpoint answered 429 on the contributor's network, so meanings come from Wiktionary.
 Lookups were sped up: the translation shows before the dictionary does, each line's words are pre-translated, a hover
 starts the lookup, and the connection opens when captions load.
 
@@ -76,5 +76,5 @@ starts the lookup, and the connection opens when captions load.
 - Unit tests: passed.
 - Headless Chrome: passed with a sample track. The real caption request was made with `fmt=json3` and a `pot` token,
   but YouTube answered headless Chrome with an empty body.
-- Live YouTube: the owner reported on 2026-11-21 that everything works.
+- Live YouTube: the contributor reported on 2026-11-21 that everything works.
 - Real Anki note creation: not run, because Anki was not available here.
