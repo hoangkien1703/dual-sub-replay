@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google Play build only (docs/specs/2026-11-21-google-play-build.md): Play updates the app and its
+     rules forbid screen-off YouTube playback, so the installer permission, the update receiver, the
+     media playback service and its foreground permissions are removed from the merged manifest.
+     tools/check_play_manifest.py fails CI if any of them comes back. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        tools:node="remove" />
+
+    <application>
+        <service
+            android:name=".playback.WebVideoPlaybackService"
+            tools:node="remove" />
+        <receiver
+            android:name=".update.AppUpdateReceiver"
+            tools:node="remove" />
+    </application>
+</manifest>

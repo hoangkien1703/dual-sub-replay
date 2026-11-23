@@ -475,7 +475,7 @@ internal object AppUpdater {
                     when (val channel = channel(context)) {
                         UpdateChannel.Official -> officialUpdate()
                         is UpdateChannel.Preview -> parsePreviewRelease(fetchText(UPDATE_PREVIEW_RELEASE_URL), channel)
-                        UpdateChannel.None, UpdateChannel.UnsupportedDevice -> null
+                        UpdateChannel.None, UpdateChannel.UnsupportedDevice, UpdateChannel.GooglePlay -> null
                     }
                 when {
                     update == null -> {

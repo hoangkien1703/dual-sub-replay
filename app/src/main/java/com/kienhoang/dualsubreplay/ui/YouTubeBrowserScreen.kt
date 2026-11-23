@@ -505,11 +505,13 @@ internal fun SingleYouTubePage(
             cookies.setAcceptThirdPartyCookies(this, true)
             if (tabActions != null) listenForVideoLongPress { longPressedLink = it }
             if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-                WebViewCompat.addDocumentStartJavaScript(
-                    this,
-                    WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
-                    YOUTUBE_DOCUMENT_START_ORIGINS,
-                )
+                if (playsOffScreen()) {
+                    WebViewCompat.addDocumentStartJavaScript(
+                        this,
+                        WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
+                        YOUTUBE_DOCUMENT_START_ORIGINS,
+                    )
+                }
                 // Before the page player loads, so its caption downloads are kept for the full transcript.
                 WebViewCompat.addDocumentStartJavaScript(this, WEB_CAPTION_CAPTURE_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
                 WebViewCompat.addDocumentStartJavaScript(this, WEB_HIDE_OPEN_APP_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
@@ -602,7 +604,7 @@ internal fun SingleYouTubePage(
                     }
                     if (url?.let(::isYouTubeWebUrl) == true) {
                         cookies.flush()
-                        view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
+                        if (playsOffScreen()) view.evaluateJavascript(WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT, null)
                         view.evaluateJavascript(WEB_HIDE_OPEN_APP_SCRIPT, null)
                         view.evaluateJavascript(webCaptionTrackSyncScript(currentCaptionTrackTarget), null)
                         view.evaluateJavascript(
@@ -817,6 +819,7 @@ internal fun SingleYouTubePage(
     // WebView pauses a hidden page's video and resumes it once the page is shown again. Off
     // screen, tell WebView (and the full-screen view, which has its own window) it is visible.
     fun keepPageShownOffScreen() {
+        if (!playsOffScreen()) return
         webView.onResume()
         webView.dispatchWindowVisibilityChanged(View.VISIBLE)
         fullscreenSession?.view?.dispatchWindowVisibilityChanged(View.VISIBLE)
@@ -851,7 +854,7 @@ internal fun SingleYouTubePage(
             val currentVideoId = browseVideoSelection(webView.url.orEmpty())?.videoId
             val playback = parseWebVideoPlayback(rawValue)?.takeIf { it.videoId == currentVideoId }
             WebVideoBridge.publish(playback)
-            if (playback.isPlaying()) WebVideoPlaybackService.startIfNeeded(context)
+            if (playback.isPlaying() && playsOffScreen()) WebVideoPlaybackService.startIfNeeded(context)
         }
     }
 
@@ -881,7 +884,7 @@ internal fun SingleYouTubePage(
                 lifecycleStarted -> webView.onResume()
                 // A playing video keeps playing with the screen off. Android may hide the window
                 // just after this, so say it again once that has happened.
-                WebVideoBridge.playback.value.isPlaying() -> {
+                WebVideoBridge.playback.value.isPlaying() && playsOffScreen() -> {
                     keepPageShownOffScreen()
                     OFF_SCREEN_REPEAT_DELAYS_MS.forEach { delayMs ->
                         webView.postDelayed({ if (!lifecycleStarted) keepPageShownOffScreen() }, delayMs)

@@ -127,7 +127,7 @@ internal fun AiWelcome(
     }
 }
 
-/** A message, and under an answer what it did in the app ([AiActionList]) and the pages its web searches used. */
+/** A message, and under an answer what it did in the app ([AiActionList]), the pages its web searches used and Report. */
 @Composable
 internal fun AiMessageBubble(
     message: AiChatMessage,
@@ -136,6 +136,7 @@ internal fun AiMessageBubble(
     if (message.role == AiRole.USER || message.text.isNotEmpty()) AiMessageText(message)
     if (message.actions.isNotEmpty()) AiActionList(message.actions, handlers)
     if (message.sources.isNotEmpty()) AiSourceList(message.sources)
+    if (message.role == AiRole.ASSISTANT && message.text.isNotBlank()) AiReportAnswerButton(message.text)
 }
 
 /** "Sources", then each page's title and site; a tap opens the page in the browser. */

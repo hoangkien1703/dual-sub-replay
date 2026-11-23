@@ -283,6 +283,7 @@ matching part here in the same PR when a change moves one of these rules.
 
 ### Releases
 
+- Google Play build (owner picks 2026-11-21, [spec](../specs/2026-11-21-google-play-build.md)): the `play` build type (`./gradlew bundlePlay`, an App Bundle with the same package, version and signing key as the GitHub release) sets `BuildConfig.PLAY_STORE`, read as `IS_PLAY_BUILD` in `data/PlayBuild.kt`. It leaves out what Play's rules forbid: ad and sponsor skipping, screen-off playback with its media service, checking for and installing its own updates (Check for updates opens the Play Store page) and the Bilibili beta; `src/play/AndroidManifest.xml` removes their permissions and components, and `tools/check_play_manifest.py` fails CI if one comes back. Gate a new feature of that kind through a small function with a `playStore` parameter next to its code, and test both builds. Every AI assistant answer has Report (both builds), which opens an email to the report inbox; never add a server for it.
 - Preserve release/signing continuity and preview package isolation. Normal feature branches do
   not change Gradle version constants or release reservations. See [releasing](../releasing.md).
 

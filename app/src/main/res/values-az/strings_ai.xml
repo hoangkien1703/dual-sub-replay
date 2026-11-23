@@ -248,4 +248,12 @@
     <string name="ai_search_tavily_saved">Tavily axtarış açarınız kimi saxlanıldı (Sİ ayarları → Axtarış və ekran).</string>
     <string name="ai_search_screen_title">Ekrana bax</string>
     <string name="ai_search_screen_description">Köməkçi nəyisə görmək lazım olanda tətbiqin ekran görüntüsünü çəkə bilər. Şəkil yalnız Sİ xidmətinizə gedir və heç vaxt saxlanılmır.</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">Şikayət et</string>
+    <string name="ai_report_title">Bu cavabı şikayət et</string>
+    <string name="ai_report_intro">Bu AI cavabı təhqiramiz, zərərli və ya yanlış idisə, bizə bildirin. E-poçt tətbiqi cavab doldurulmuş halda açılır; siz göndərənə qədər heç nə göndərilmir.</string>
+    <string name="ai_report_offensive">Təhqiramiz və ya zərərli</string>
+    <string name="ai_report_wrong">Yanlış və ya çaşdırıcı</string>
+    <string name="ai_report_other">Başqa səbəb</string>
+    <string name="ai_report_no_email">Bu telefonda e-poçt tətbiqi qurulmayıb. %1$s ünvanına yaza bilərsiniz.</string>
 </resources>

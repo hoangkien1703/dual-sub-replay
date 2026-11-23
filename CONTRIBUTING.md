@@ -9,6 +9,10 @@ Thank you for helping make language learning on Android more accessible.
 - Read [AGENTS.md](AGENTS.md), the [project mission](docs/project/mission.md), and [technical context](docs/project/tech-stack.md). For significant changes, follow the [spec workflow](docs/specs/README.md): define acceptance criteria, a plan, validation, and release intent before coding. Discuss unresolved larger scope in an issue; an already-authorized change does not require another approval round.
 - Never include credentials, signing files, personal YouTube data, or copyrighted video/caption dumps.
 
+## Credit for every kind of help
+
+Code is not the only way to contribute. When a release ships an idea you posted in Discussions, a bug you reported or a build you tested, its pull request adds you to [CONTRIBUTORS.md](CONTRIBUTORS.md) and the release notes thank you by name. When the feature was clearly your idea, the commit that ships it also lists you as a co-author. If we missed you, say so in a Discussion.
+
 ## Local setup
 
 Requirements: JDK 17, Android SDK 36, and an Android Studio version compatible with Android Gradle Plugin 9.3. The Gradle 9.5 wrapper is included.
@@ -39,6 +43,8 @@ Managed-device tests additionally require the API 36 AOSP x86_64 system image:
 ## How review works
 
 The maintainer's job is to review: check the code, security and privacy, try the build on a phone, and decide. Fixing the code is the contributor's job.
+
+**What to expect:** almost every first version gets some change requests, and one or two rounds is normal. Comments are about fitting this app (stable defaults, AI features off by default, every language, API key limits, a phone test), not a judgment of your work, and disagreeing with a reason is welcome. Review happens when the owner has time, which can be a few days. For a big feature, open an issue or Discussion first: agreeing on the plan before the code saves the most time. If an AI agent writes your PR, it should tell you this too and check the common requests first ([AGENTS.md](AGENTS.md#agents-working-for-an-outside-contributor)).
 
 1. **CI runs first.** On your first pull request the owner has to approve the workflow before CI starts, so a short wait is normal. Both Android CI jobs (`verify-build`, `managed-device-tests`) must pass. If one fails, the job summary lists the failed tests; please fix them yourself. Once the build job (`verify-build`) passes, every pull request, from a fork too, gets a test APK named `DualSub-Replay-PR<number>-build<run>-preview.apk` on the [`preview` release](https://github.com/hoangkien1703/dual-sub-replay/releases/tag/preview).
    If your pull request changes files that can run code (workflows, Gradle files, scripts), the app's permissions, or adds binary files, a bot labels it `needs careful review` and lists those files. That is routine, not an accusation: it tells the maintainer what to read before approving CI.

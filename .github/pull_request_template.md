@@ -1,3 +1,9 @@
+<!-- From a fork? Thank you! What to expect: the owner reviews every outside PR and usually asks
+for some changes, so one or two rounds is normal for a first version. Comments are about fitting the
+app, not a judgment of your work. The first CI run waits for the owner's approval, and review can take
+a few days. For a big feature, an issue or Discussion first saves rework. Details: CONTRIBUTING.md
+"How review works"; agents follow AGENTS.md "Agents working for an outside contributor". -->
+
 ## What changed
 
 <!-- Explain the problem, focused change, and why it is needed. -->
@@ -39,6 +45,12 @@ report any required label that could not be applied before handoff. Never leave 
 active example exact-version directive. Do not manually bump Gradle version constants.
 See AGENTS.md for handoff and docs/releasing.md for release recovery.
 -->
+
+## Credits
+
+<!-- People outside the project whose idea, bug report or testing this PR ships. Put one line
+outside this comment, such as "Thanks: @login, @login"; the release notes thank them by name.
+Leave this section empty when there is nobody to credit. See AGENTS.md "Crediting contributors". -->
 
 ## Checklist
 

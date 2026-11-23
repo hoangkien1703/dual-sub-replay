@@ -249,4 +249,12 @@
     <string name="ai_search_tavily_saved">已保存为你的 Tavily 搜索密钥（AI 设置 → 搜索和屏幕）。</string>
     <string name="ai_search_screen_title">查看屏幕</string>
     <string name="ai_search_screen_description">助手需要看东西时可以给应用截图。图片只发送到你的 AI 服务，永远不会保存。</string>
+    <!-- Report this answer (Google Play build spec 2026-11-21). -->
+    <string name="ai_report_answer">举报</string>
+    <string name="ai_report_title">举报此回答</string>
+    <string name="ai_report_intro">如果这条 AI 回答令人反感、有害或有误，请告诉我们。邮件应用会打开并填好回答；在你发送之前不会发送任何内容。</string>
+    <string name="ai_report_offensive">令人反感或有害</string>
+    <string name="ai_report_wrong">错误或误导</string>
+    <string name="ai_report_other">其他原因</string>
+    <string name="ai_report_no_email">此手机未设置邮件应用。你可以发送邮件至 %1$s。</string>
 </resources>

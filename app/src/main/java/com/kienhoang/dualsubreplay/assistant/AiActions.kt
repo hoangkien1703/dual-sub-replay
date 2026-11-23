@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.assistant
 
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.YouTubeUrlParser
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -196,6 +197,22 @@ internal enum class AiSetting(
 
     val isColor: Boolean get() = choices === AI_SUBTITLE_COLORS
 }
+
+/** What the Google Play build leaves out ([IS_PLAY_BUILD]), so its assistant can't turn them on. */
+private val AI_SETTINGS_NOT_IN_PLAY_BUILD =
+    setOf(
+        AiSetting.SKIP_ADS,
+        AiSetting.SKIP_SPONSORS,
+        AiSetting.ALWAYS_SKIP_SPONSORS,
+        AiSetting.UPDATE_REMINDERS,
+        AiSetting.APP_AUTO_UPDATE,
+        AiSetting.BILIBILI,
+        AiSetting.BILIBILI_TV,
+    )
+
+/** The settings the assistant may change in this build. */
+internal fun aiSettingsInBuild(playStore: Boolean = IS_PLAY_BUILD): List<AiSetting> =
+    if (playStore) AiSetting.entries.filter { it !in AI_SETTINGS_NOT_IN_PLAY_BUILD } else AiSetting.entries
 
 internal enum class AiPlayback(
     val key: String,
@@ -530,7 +547,7 @@ private fun parsePlayback(arguments: JSONObject): AiActionParse {
 private fun parseSetting(arguments: JSONObject): AiActionParse {
     val name = text(arguments, "setting", MAX_WORD_CHARS)?.lowercase(Locale.ROOT)
     val setting =
-        AiSetting.entries.firstOrNull { it.key == name }
+        aiSettingsInBuild().firstOrNull { it.key == name }
             ?: return invalid("The app has no setting \"$name\" that the assistant may change.")
     val value =
         aiSettingValue(setting, argument(arguments, "value")?.toString().orEmpty())
@@ -989,13 +1006,13 @@ internal val AI_TOOLS: List<AiTool> by lazy {
         AiTool(
             AI_SETTING_TOOL,
             "Change one app setting the user asked for. Most run at once and the user sees Undo; " +
-                AiSetting.entries.filter { it.asks }.joinToString(", ") { it.key } +
+                aiSettingsInBuild().filter { it.asks }.joinToString(", ") { it.key } +
                 " show an Apply button and change nothing until the user taps it. Only change what the user asked for. " +
                 "The current values are in the system prompt. Values: " +
-                AiSetting.entries.joinToString("; ") { "${it.key}: ${aiSettingValues(it)}" } + ".",
+                aiSettingsInBuild().joinToString("; ") { "${it.key}: ${aiSettingValues(it)}" } + ".",
             schema(
                 JSONObject()
-                    .put("setting", stringProperty("The setting.", AiSetting.entries.map { it.key }))
+                    .put("setting", stringProperty("The setting.", aiSettingsInBuild().map { it.key }))
                     .put("value", stringProperty("The new value, as listed for the setting.")),
                 "setting",
                 "value",

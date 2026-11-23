@@ -1,0 +1,115 @@
+name: Post to Discussions
+
+# GitHub Discussions can only be written through GitHub's GraphQL API, which Claude's cloud
+# sessions can't reach. This hand-started job does the posting on GitHub's own runners instead,
+# with the owner's fine-grained token (Discussions: read and write, this repository only), so the
+# post shows as the owner (owner pick 2026-11-23). The token lives only in the `discussions`
+# environment, which accepts jobs from `main` alone, so a workflow on any other branch can't read it.
+#
+# Posts go out in the owner's name: start it only with text the owner has OK'd (AGENTS.md).
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "new = start a Discussion; comment = comment on one; reply = reply under a comment"
+        required: true
+        type: choice
+        options: [new, comment, reply]
+      body:
+        description: "The text, in Markdown"
+        required: true
+        type: string
+      title:
+        description: "new: the Discussion's title"
+        required: false
+        type: string
+      category:
+        description: "new: the category slug (announcements, general, ideas, polls, q-a, show-and-tell)"
+        required: false
+        type: string
+        default: general
+      discussion:
+        description: "comment / reply: the Discussion's number"
+        required: false
+        type: string
+      reply_to:
+        description: "reply: the node_id of the top-level comment to reply under (REST gives it as node_id)"
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: discussion-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: discussions
+    steps:
+      - name: Post
+        env:
+          GH_TOKEN: ${{ secrets.DISCUSSIONS_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          ACTION: ${{ inputs.action }}
+          BODY: ${{ inputs.body }}
+          TITLE: ${{ inputs.title }}
+          CATEGORY: ${{ inputs.category }}
+          DISCUSSION: ${{ inputs.discussion }}
+          REPLY_TO: ${{ inputs.reply_to }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::The discussions environment has no DISCUSSIONS_TOKEN secret." >&2
+            exit 1
+          fi
+          case "$ACTION" in
+            new)
+              [[ -n "$TITLE" ]] || { echo "::error::A new Discussion needs a title." >&2; exit 1; }
+              ids="$(gh api graphql -f owner="$OWNER" -f name="$REPO" -f query='
+                query($owner: String!, $name: String!) {
+                  repository(owner: $owner, name: $name) {
+                    id
+                    discussionCategories(first: 50) { nodes { id slug } }
+                  }
+                }')"
+              repo_id="$(jq -r '.data.repository.id' <<<"$ids")"
+              category_id="$(jq -r --arg slug "$CATEGORY" '.data.repository.discussionCategories.nodes[] | select(.slug == $slug) | .id' <<<"$ids")"
+              [[ -n "$category_id" ]] || { echo "::error::No Discussion category with the slug '$CATEGORY'." >&2; exit 1; }
+              url="$(gh api graphql -f repo="$repo_id" -f category="$category_id" -f title="$TITLE" -f body="$BODY" -f query='
+                mutation($repo: ID!, $category: ID!, $title: String!, $body: String!) {
+                  createDiscussion(input: {repositoryId: $repo, categoryId: $category, title: $title, body: $body}) {
+                    discussion { url }
+                  }
+                }' --jq '.data.createDiscussion.discussion.url')"
+              ;;
+            comment|reply)
+              [[ "$DISCUSSION" =~ ^[0-9]+$ ]] || { echo "::error::Give the Discussion's number." >&2; exit 1; }
+              discussion_id="$(gh api graphql -f owner="$OWNER" -f name="$REPO" -F number="$DISCUSSION" -f query='
+                query($owner: String!, $name: String!, $number: Int!) {
+                  repository(owner: $owner, name: $name) { discussion(number: $number) { id } }
+                }' --jq '.data.repository.discussion.id')"
+              if [[ "$ACTION" == reply ]]; then
+                [[ -n "$REPLY_TO" ]] || { echo "::error::A reply needs reply_to (the comment's node_id)." >&2; exit 1; }
+                url="$(gh api graphql -f discussion="$discussion_id" -f body="$BODY" -f replyTo="$REPLY_TO" -f query='
+                  mutation($discussion: ID!, $body: String!, $replyTo: ID!) {
+                    addDiscussionComment(input: {discussionId: $discussion, body: $body, replyToId: $replyTo}) {
+                      comment { url }
+                    }
+                  }' --jq '.data.addDiscussionComment.comment.url')"
+              else
+                url="$(gh api graphql -f discussion="$discussion_id" -f body="$BODY" -f query='
+                  mutation($discussion: ID!, $body: String!) {
+                    addDiscussionComment(input: {discussionId: $discussion, body: $body}) {
+                      comment { url }
+                    }
+                  }' --jq '.data.addDiscussionComment.comment.url')"
+              fi
+              ;;
+          esac
+          echo "Posted: $url"
+          echo "Posted: $url" >> "$GITHUB_STEP_SUMMARY"

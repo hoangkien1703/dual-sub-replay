@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.BILIBILI_HOME_URL
 import com.kienhoang.dualsubreplay.data.BILIBILI_TV_HOME_URL
+import com.kienhoang.dualsubreplay.data.IS_PLAY_BUILD
 import com.kienhoang.dualsubreplay.data.VideoSite
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,6 +57,12 @@ internal enum class BetaSite(
 }
 
 /**
+ * The Beta sites this build offers: none in the Google Play build ([IS_PLAY_BUILD]), which keeps to
+ * YouTube; there the TV layout is the only Beta setting.
+ */
+internal fun betaSitesInBuild(playStore: Boolean = IS_PLAY_BUILD): List<BetaSite> = if (playStore) emptyList() else BetaSite.entries
+
+/**
  * The Beta sites that are on, for code without a composition (the web view's navigation rules).
  * [AppViewModel] keeps it in step with the stored switches.
  */
@@ -65,7 +72,7 @@ internal object BetaSites {
 
     fun read(preferences: SharedPreferences) {
         on.value =
-            BetaSite.entries
+            betaSitesInBuild()
                 .filter { preferences.getBoolean(it.preference, false) }
                 .map { it.site }
                 .toSet()
@@ -82,7 +89,7 @@ internal object BetaSites {
 @Composable
 internal fun rememberBetaSitesOn(): State<List<BetaSite>> =
     rememberStoredSetting(*BETA_SETTING_KEYS.toTypedArray()) { preferences ->
-        BetaSite.entries.filter { preferences.getBoolean(it.preference, false) }
+        betaSitesInBuild().filter { preferences.getBoolean(it.preference, false) }
     }
 
 /** Settings → Beta (owner pick 2026-11-17): Bilibili, Bilibili International, then the TV layout. */
@@ -91,21 +98,24 @@ internal fun BetaSettingsSection() {
     val context = LocalContext.current
     val preferences = remember(context) { studyPreferences(context) }
     val on by rememberBetaSitesOn()
-    SettingsHint(stringResource(R.string.beta_section_hint))
-    SettingsSwitchRow(
-        title = stringResource(R.string.beta_bilibili_title),
-        description = stringResource(R.string.beta_bilibili_description),
-        checked = BetaSite.BILIBILI in on,
-        onCheckedChange = { preferences.edit().putBoolean(BETA_BILIBILI_PREFERENCE, it).apply() },
-        testTag = "beta_bilibili_switch",
-    )
-    SettingsSwitchRow(
-        title = stringResource(R.string.beta_bilibili_tv_title),
-        description = stringResource(R.string.beta_bilibili_tv_description),
-        checked = BetaSite.BILIBILI_TV in on,
-        onCheckedChange = { preferences.edit().putBoolean(BETA_BILIBILI_TV_PREFERENCE, it).apply() },
-        testTag = "beta_bilibili_tv_switch",
-    )
+    // The Play build offers no Beta sites: only the TV layout is left.
+    if (betaSitesInBuild().isNotEmpty()) {
+        SettingsHint(stringResource(R.string.beta_section_hint))
+        SettingsSwitchRow(
+            title = stringResource(R.string.beta_bilibili_title),
+            description = stringResource(R.string.beta_bilibili_description),
+            checked = BetaSite.BILIBILI in on,
+            onCheckedChange = { preferences.edit().putBoolean(BETA_BILIBILI_PREFERENCE, it).apply() },
+            testTag = "beta_bilibili_switch",
+        )
+        SettingsSwitchRow(
+            title = stringResource(R.string.beta_bilibili_tv_title),
+            description = stringResource(R.string.beta_bilibili_tv_description),
+            checked = BetaSite.BILIBILI_TV in on,
+            onCheckedChange = { preferences.edit().putBoolean(BETA_BILIBILI_TV_PREFERENCE, it).apply() },
+            testTag = "beta_bilibili_tv_switch",
+        )
+    }
     TvLayoutSettingsSection()
 }
 

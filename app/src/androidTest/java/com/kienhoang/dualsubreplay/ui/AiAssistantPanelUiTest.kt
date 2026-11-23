@@ -295,6 +295,25 @@ class AiAssistantPanelUiTest {
         saveUiEvidence("ai_panel_answer")
     }
 
+    /** Report under an answer (Google Play build spec 2026-11-21): reasons first, nothing sent from here. */
+    @Test
+    fun reportUnderAnAnswerAsksWhyBeforeOpeningEmail() {
+        // The emulator's "System UI isn't responding" dialog covered this screenshot in CI.
+        closeSystemDialogs()
+        checkedGeminiKey()
+        showTopBarAndPanel()
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_problem_ask").performClick()
+        composeRule.onNodeWithTag("ai_report_answer").performClick()
+        composeRule.onNodeWithTag("ai_report_reason_offensive").assertIsSelected()
+        composeRule.onNodeWithTag("ai_report_reason_wrong").performClick().assertIsSelected()
+        composeRule.onNodeWithTag("ai_report_send").assertIsDisplayed()
+        saveUiEvidence("ai_report_answer")
+        composeRule.onNodeWithTag(DIALOG_CLOSE_TAG).performClick()
+        composeRule.onNodeWithTag("ai_report_send").assertDoesNotExist()
+        assertEquals(1, requests.size)
+    }
+
     @Test
     fun theWordCardsGrammarButtonAsksTheAssistantAboutTheWholeLine() {
         checkedGeminiKey()

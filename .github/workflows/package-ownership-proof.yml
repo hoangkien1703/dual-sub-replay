@@ -1,0 +1,109 @@
+name: Package ownership proof
+
+# Android developer verification (Play Console or Android Developer Console) asks for proof that we
+# hold the app's signing key before it registers com.kienhoang.dualsubreplay: an APK that carries the
+# console's snippet in assets/adi-registration.properties, signed with that key. This copies the
+# latest published release APK, adds the snippet, re-signs it with the production key and uploads it
+# as a short-lived artifact for the owner to upload in the console. The APK is only for that check;
+# never publish or install it.
+#
+# The signing secrets live in the `release` environment, which accepts jobs from `main` alone, so
+# this runs only from main and only when someone with write access starts it by hand.
+
+on:
+  workflow_dispatch:
+    inputs:
+      snippet:
+        description: "The console's snippet for adi-registration.properties (one line)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  proof-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    steps:
+      - name: Check the snippet
+        env:
+          SNIPPET: ${{ inputs.snippet }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$SNIPPET" =~ ^[A-Za-z0-9_.:=+/\ -]{1,300}$ ]]; then
+            echo "::error::The snippet must be one line of letters, digits and = . _ : + / - (as the console shows it)." >&2
+            exit 1
+          fi
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Install Android build tools
+        run: sdkmanager "build-tools;36.0.0"
+
+      - name: Download the latest release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh release download --pattern DualSub-Replay.apk --dir "$RUNNER_TEMP/release"
+
+      - name: Add the snippet
+        env:
+          SNIPPET: ${{ inputs.snippet }}
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/proof"
+          mkdir -p "$work/assets"
+          printf '%s\n' "$SNIPPET" > "$work/assets/adi-registration.properties"
+          cp "$RUNNER_TEMP/release/DualSub-Replay.apk" "$work/unsigned.apk"
+          # Drop the old v1 signature files, if any; apksigner writes fresh v2/v3 signatures.
+          zip -q -d "$work/unsigned.apk" 'META-INF/*.SF' 'META-INF/*.RSA' 'META-INF/*.EC' 'META-INF/*.MF' || true
+          (cd "$work" && zip -q unsigned.apk assets/adi-registration.properties)
+
+      - name: Restore production signing key
+        env:
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          if [[ -z "$ANDROID_RELEASE_KEYSTORE_BASE64" ]]; then
+            echo "ANDROID_RELEASE_KEYSTORE_BASE64 is not configured" >&2
+            exit 1
+          fi
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/dual-sub-replay-release.jks"
+          chmod 600 "$RUNNER_TEMP/dual-sub-replay-release.jks"
+
+      - name: Sign and check the proof APK
+        env:
+          ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          work="$RUNNER_TEMP/proof"
+          mkdir -p proof
+          "$tools/zipalign" -f -p 4 "$work/unsigned.apk" "$work/aligned.apk"
+          "$tools/apksigner" sign --ks "$RUNNER_TEMP/dual-sub-replay-release.jks" --ks-key-alias "$ANDROID_RELEASE_KEY_ALIAS" \
+            --ks-pass env:ANDROID_RELEASE_STORE_PASSWORD --key-pass env:ANDROID_RELEASE_KEY_PASSWORD \
+            --out proof/DualSub-Replay-ownership-proof.apk "$work/aligned.apk"
+          rm -f "$RUNNER_TEMP/dual-sub-replay-release.jks"
+          "$tools/apksigner" verify --print-certs proof/DualSub-Replay-ownership-proof.apk | tee "$work/certs.txt"
+          if ! grep -qi 'Signer #1 certificate SHA-256 digest: f664085b136e1facd93fe0ab897348d3393ccc5e8ed39193fa6df38c2b2a116c' "$work/certs.txt"; then
+            echo "The proof APK is not signed with the registered production key" >&2
+            exit 1
+          fi
+          unzip -p proof/DualSub-Replay-ownership-proof.apk assets/adi-registration.properties
+
+      - name: Upload the proof APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: DualSub-Replay-ownership-proof
+          path: proof/DualSub-Replay-ownership-proof.apk
+          if-no-files-found: error
+          retention-days: 3
