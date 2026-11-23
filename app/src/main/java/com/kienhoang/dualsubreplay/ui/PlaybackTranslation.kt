@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 internal data class CaptionPlaybackRequest(
     val timeMs: Long = 0,
@@ -106,6 +107,10 @@ private fun alreadyShows(
  * [prefetch], when given, receives the texts of the next row and of the next minute's sentences first,
  * so an online engine can translate them in one request and [translate] then finds them cached.
  * [upgrades], when given, replace shown translations as they arrive, also while paused.
+ *
+ * [known], when given, fills rows entering the window with a translation kept from earlier windows,
+ * so moving back never asks for them again. [retryAfterFailureMs], when given, tries again after
+ * that long or at the next seek instead of waiting for "Retry translation".
  */
 internal suspend fun translatePlaybackWindow(
     store: SubtitleStore,
@@ -114,6 +119,8 @@ internal suspend fun translatePlaybackWindow(
     onTranslationFailure: (Exception) -> Unit = {},
     prefetch: (suspend (List<String>) -> Unit)? = null,
     upgrades: TranslationUpgrades? = null,
+    known: ((Long) -> String?)? = null,
+    retryAfterFailureMs: Long? = null,
     onWindow: (List<SubtitleSegment>, Boolean) -> Unit,
 ) {
     var indices = IntRange.EMPTY
@@ -132,7 +139,7 @@ internal suspend fun translatePlaybackWindow(
             val previous = rows.associateBy { it.id }
             rows =
                 withContext(Dispatchers.IO) { store.read(nextIndices) }.map { row ->
-                    row.copy(translatedText = previous[row.id]?.translatedText)
+                    row.copy(translatedText = previous[row.id]?.translatedText ?: known?.invoke(row.id))
                 }
             indices = nextIndices
             upgradedAt = null
@@ -160,13 +167,31 @@ internal suspend fun translatePlaybackWindow(
             } catch (error: Exception) {
                 // Cancelling this loop still ends it; a translator error only stops translating.
                 currentCoroutineContext().ensureActive()
-                failedAttempt = request.translationAttempt
                 onTranslationFailure(error)
+                if (retryAfterFailureMs == null) {
+                    failedAttempt = request.translationAttempt
+                } else {
+                    onWindow(rows, false)
+                    waitToRetry(requests, request, retryAfterFailureMs)
+                }
                 continue
             }
         // An in-flight task may finish after a seek/pause. Cache it, but never publish at the wrong position.
         if (requests.value.enabled && requests.value.seekGeneration == request.seekGeneration) {
             onWindow(rows, nextWindowTranslation(rows, requests.value) != null)
+        }
+    }
+}
+
+/** Waits [ms], or less when the video seeks, translation is retried or turned off, after a failed row. */
+private suspend fun waitToRetry(
+    requests: StateFlow<CaptionPlaybackRequest>,
+    failed: CaptionPlaybackRequest,
+    ms: Long,
+) {
+    withTimeoutOrNull(ms) {
+        requests.first {
+            !it.enabled || it.seekGeneration != failed.seekGeneration || it.translationAttempt != failed.translationAttempt
         }
     }
 }

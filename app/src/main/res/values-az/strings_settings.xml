@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">Üçüncü altyazı sətri</string>
     <string name="settings_third_line_choose">Dil seçin</string>
     <string name="settings_quick_subtitles">Altyazılar</string>
-    <string name="settings_hide_while_playing">Oynayarkən gizlət</string>
+    <string name="settings_show_while_playing">Oynayarkən göstər</string>
     <string name="sleep_timer_title">Yuxu taymeri</string>
     <string name="sleep_timer_off">Yox</string>
     <string name="sleep_timer_minutes">%1$d dəq</string>

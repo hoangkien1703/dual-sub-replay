@@ -15,4 +15,7 @@
     <string name="bilibili_no_subtitles_title">这个视频没有字幕</string>
     <string name="bilibili_no_subtitles_body">哔哩哔哩没有为这个视频提供字幕。换一个视频试试。</string>
     <string name="bilibili_try_again">重试</string>
+    <string name="beta_offer_title">打开%1$s（测试版）？</string>
+    <string name="beta_offer_message">这是一个%1$s链接。%1$s是 DualSub Replay 的测试版网站：打开后即可用双语字幕观看这个视频。之后可以在 设置 → 测试版 里关闭。</string>
+    <string name="beta_offer_turn_on">打开</string>
 </resources>

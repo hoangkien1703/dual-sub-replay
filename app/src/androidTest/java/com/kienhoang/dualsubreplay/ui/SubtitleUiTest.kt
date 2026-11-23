@@ -156,7 +156,7 @@ class SubtitleUiTest {
     }
 
     @Test
-    fun quickSettingsHideWhilePlayingTogglesCaptionVisibility() {
+    fun quickSettingsShowWhilePlayingTogglesCaptionVisibility() {
         var translated by mutableStateOf(CaptionVisibility.PAUSED)
         var originalChanged = false
         composeRule.setContent {
@@ -177,21 +177,22 @@ class SubtitleUiTest {
             }
         }
 
-        composeRule.onNodeWithText("Hide while playing").assertIsDisplayed()
+        composeRule.onNodeWithText("Show while playing").assertIsDisplayed()
         // Only Translation is offered here, so the popup can never hide both lines.
-        composeRule.onNodeWithTag("hide_original_while_playing").assertDoesNotExist()
-        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsSelected()
-        Thread.sleep(700)
-        saveUiEvidence("subtitle-quick-hide-while-playing")
-        composeRule.onNodeWithTag("hide_translation_while_playing").performClick()
+        composeRule.onNodeWithTag("show_original_while_playing").assertDoesNotExist()
+        // Only when paused: the translation doesn't show while playing, so the chip is not ticked.
+        composeRule.onNodeWithTag("show_translation_while_playing").assertIsNotSelected()
+        composeRule.onNodeWithTag("show_translation_while_playing").performClick()
         composeRule.runOnIdle { assertEquals(CaptionVisibility.ALWAYS, translated) }
-        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsNotSelected()
-        composeRule.onNodeWithTag("hide_translation_while_playing").performClick()
+        composeRule.onNodeWithTag("show_translation_while_playing").assertIsSelected()
+        Thread.sleep(700)
+        saveUiEvidence("subtitle-quick-show-while-playing")
+        composeRule.onNodeWithTag("show_translation_while_playing").performClick()
         composeRule.runOnIdle {
             assertEquals(CaptionVisibility.PAUSED, translated)
             assertFalse(originalChanged)
         }
-        composeRule.onNodeWithTag("hide_translation_while_playing").assertIsSelected()
+        composeRule.onNodeWithTag("show_translation_while_playing").assertIsNotSelected()
     }
 
     @Test

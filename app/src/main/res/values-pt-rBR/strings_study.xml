@@ -159,4 +159,17 @@
     <string name="study_saved_word_video_example_description">As palavras que você salva podem tocar de novo a linha do vídeo em Praticar. Você pode mudar isso para cada palavra lá.</string>
     <string name="study_send_on_save_title">Enviar também as palavras salvas</string>
     <string name="study_send_on_save_description">Salvar em Praticar no cartão de palavra também envia a palavra para o %1$s.</string>
+    <string name="study_repeat_pause_title">Pausa entre repetições</string>
+    <string name="study_repeat_pause_description">Depois de cada reprodução da linha, o vídeo espera para você falar em voz alta (shadowing). Toque em reproduzir para seguir antes.</string>
+    <string name="study_repeat_pause_off">Desligado</string>
+    <string name="study_repeat_pause_line">O tempo da linha</string>
+    <string name="study_repeat_pause_2">2 s</string>
+    <string name="study_repeat_pause_5">5 s</string>
+    <string name="study_repeat_pause_search">Shadowing</string>
+    <string name="study_slow_replay_title">Repetição lenta no segundo toque</string>
+    <string name="study_slow_replay_description">Toque de novo numa linha enquanto ela repete para ouvi-la uma vez a 0,75×. Sua velocidade volta depois da linha.</string>
+    <string name="study_card_front_meaning">Significado</string>
+    <string name="study_card_front_meaning_description">A frente mostra o significado da palavra e a tradução da frase no seu idioma: diga a palavra e vire o cartão para vê-la na frase.</string>
+    <string name="study_card_front_fill_gap">Complete a lacuna</string>
+    <string name="study_card_front_fill_gap_description">A frente mostra a frase com a palavra escondida; o verso mostra a palavra no lugar dela, com o significado.</string>
 </resources>

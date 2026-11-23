@@ -56,6 +56,15 @@ internal sealed interface StudyAction {
     ) : StudyAction
 
     /**
+     * Pauses with the video at [ms], then plays from there after [waitMs] unless the learner moved
+     * or played the video meanwhile (Repeat each line → Pause between repeats).
+     */
+    data class PlayFromAfter(
+        val ms: Long,
+        val waitMs: Long,
+    ) : StudyAction
+
+    /**
      * Plays a part with no subtitle line at [rate], keeping the user's own speed to come back to.
      * The page brings that speed back by itself after [safetyMs], should no tick ask for it first.
      */
@@ -380,13 +389,19 @@ internal class StudyPlaybackDriver {
             repeats = 0
         }
         val count = tick.settings.repeatCount
-        if (count != STUDY_REPEAT_FOREVER && repeats >= count - 1) return null
+        // Pause between repeats waits after every play, the last one too, so each can be said aloud.
+        val pause = repeatPauseMs(tick.settings.repeatPause, lineBoundary(tick.segments, line) - segment.startMs)
+        if (count != STUDY_REPEAT_FOREVER && repeats >= count - 1) {
+            if (pause == null) return null
+            ownSeek = OwnSeek(tick.timeMs)
+            return StudyAction.PlayFromAfter(tick.timeMs, pause)
+        }
         repeats++
         val start = segment.startMs
         ownSeek = OwnSeek(start, replay = true)
         seekFloor = start
         floorLanded = false
-        return StudyAction.PlayFrom(start)
+        return if (pause == null) StudyAction.PlayFrom(start) else StudyAction.PlayFromAfter(start, pause)
     }
 
     private fun readNext(
@@ -515,6 +530,10 @@ internal class StudyPlaybackRunner(
     private val driver = StudyPlaybackDriver()
     private var paused = false
 
+    /** Raised to call off a [StudyAction.PlayFromAfter] that is waiting: the learner sought or played. */
+    private var resumeToken = 0L
+    private val handler by lazy { android.os.Handler(android.os.Looper.getMainLooper()) }
+
     /** The loop button's line, shared with the transcript panel. */
     val lineLoop = LineLoop()
 
@@ -547,11 +566,30 @@ internal class StudyPlaybackRunner(
 
     /** A line the learner tapped: see [StudyPlaybackDriver.learnerSeek]. */
     fun onLearnerSeek(second: Float) {
+        resumeToken++
         driver.learnerSeek((second * MS_PER_SECOND).toLong())
     }
 
     fun onPaused(paused: Boolean) {
+        // The learner pressed play during a pause between repeats: the video goes on from there.
+        if (this.paused && !paused) resumeToken++
         this.paused = paused
+    }
+
+    /** Plays from [ms] after [waitMs], unless [resumeToken] changed meanwhile or the video plays already. */
+    private fun playFromAfter(
+        videoId: String,
+        ms: Long,
+        waitMs: Long,
+    ) {
+        val token = ++resumeToken
+        controller.seekPaused(ms / MS_PER_SECOND)
+        handler.postDelayed({
+            val current = liveState?.invoke() ?: state
+            if (token == resumeToken && paused && current?.activeVideoId == videoId) {
+                controller.replayFrom(ms / MS_PER_SECOND, byPlayMode = true)
+            }
+        }, waitMs)
     }
 
     /** The page's paused tick for [next] (the view model), then for the play modes. */
@@ -595,6 +633,7 @@ internal class StudyPlaybackRunner(
             StudyAction.Pause -> controller.pause()
             is StudyAction.PlayFrom -> controller.replayFrom(action.ms / MS_PER_SECOND, byPlayMode = true)
             is StudyAction.PauseAt -> controller.seekPaused(action.ms / MS_PER_SECOND)
+            is StudyAction.PlayFromAfter -> playFromAfter(videoId, action.ms, action.waitMs)
             is StudyAction.GapSpeed -> controller.setGapSpeed(action.rate, action.safetyMs)
             StudyAction.NormalSpeed -> controller.setGapSpeed(null, 0L)
             null -> Unit

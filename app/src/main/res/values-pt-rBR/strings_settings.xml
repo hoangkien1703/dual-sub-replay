@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">Terceira linha de legenda</string>
     <string name="settings_third_line_choose">Escolher um idioma</string>
     <string name="settings_quick_subtitles">Legendas</string>
-    <string name="settings_hide_while_playing">Ocultar ao reproduzir</string>
+    <string name="settings_show_while_playing">Mostrar ao reproduzir</string>
     <string name="sleep_timer_title">Timer para dormir</string>
     <string name="sleep_timer_off">Desligado</string>
     <string name="sleep_timer_minutes">%1$d min</string>

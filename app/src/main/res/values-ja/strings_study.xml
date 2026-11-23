@@ -147,4 +147,17 @@
     <string name="study_saved_word_video_example_description">保存した単語は、練習で動画のその行をもう一度再生できます。単語ごとに練習で変えられます。</string>
     <string name="study_send_on_save_title">保存した単語も送る</string>
     <string name="study_send_on_save_description">単語カードの「練習に保存」で、単語を %1$s にも送ります。</string>
+    <string name="study_repeat_pause_title">繰り返しの間に一時停止</string>
+    <string name="study_repeat_pause_description">行を再生するたびに動画が止まり、声に出して言う時間を取れます（シャドーイング）。再生を押すと早めに続けられます。</string>
+    <string name="study_repeat_pause_off">オフ</string>
+    <string name="study_repeat_pause_line">行と同じ長さ</string>
+    <string name="study_repeat_pause_2">2 秒</string>
+    <string name="study_repeat_pause_5">5 秒</string>
+    <string name="study_repeat_pause_search">シャドーイング</string>
+    <string name="study_slow_replay_title">2 回目のタップでゆっくり再生</string>
+    <string name="study_slow_replay_description">再生し直している行をもう一度タップすると、0.75× の速さで 1 回再生します。その行のあと、元の速さに戻ります。</string>
+    <string name="study_card_front_meaning">意味</string>
+    <string name="study_card_front_meaning_description">表面には単語の意味と文の訳（あなたの言語）を表示します。単語を言ってから、カードを裏返して文の中で確かめます。</string>
+    <string name="study_card_front_fill_gap">穴埋め</string>
+    <string name="study_card_front_fill_gap_description">表面には単語を隠した文を表示し、裏面ではその位置に単語と意味を表示します。</string>
 </resources>

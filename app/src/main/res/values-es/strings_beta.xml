@@ -15,4 +15,7 @@
     <string name="bilibili_no_subtitles_title">Este vídeo no tiene subtítulos</string>
     <string name="bilibili_no_subtitles_body">Bilibili no tiene subtítulos para este vídeo. Prueba con otro vídeo.</string>
     <string name="bilibili_try_again">Reintentar</string>
+    <string name="beta_offer_title">¿Activar %1$s (Beta)?</string>
+    <string name="beta_offer_message">Este es un enlace de %1$s. %1$s es un sitio Beta en DualSub Replay: actívalo para ver este vídeo con subtítulos dobles. Puedes desactivarlo en Ajustes → Beta.</string>
+    <string name="beta_offer_turn_on">Activar</string>
 </resources>

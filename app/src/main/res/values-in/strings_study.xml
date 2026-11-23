@@ -147,4 +147,17 @@
     <string name="study_saved_word_video_example_description">Kata yang Anda simpan bisa memutar ulang barisnya dari video di Latihan. Anda bisa mengubahnya untuk tiap kata di sana.</string>
     <string name="study_send_on_save_title">Kirim juga kata yang disimpan</string>
     <string name="study_send_on_save_description">Simpan ke Latihan di kartu kata juga mengirim kata ke %1$s.</string>
+    <string name="study_repeat_pause_title">Jeda di antara pengulangan</string>
+    <string name="study_repeat_pause_description">Setelah baris diputar setiap kali, video menunggu agar Anda bisa mengucapkannya (shadowing). Tekan putar untuk lanjut lebih cepat.</string>
+    <string name="study_repeat_pause_off">Mati</string>
+    <string name="study_repeat_pause_line">Selama baris itu</string>
+    <string name="study_repeat_pause_2">2 dtk</string>
+    <string name="study_repeat_pause_5">5 dtk</string>
+    <string name="study_repeat_pause_search">Shadowing</string>
+    <string name="study_slow_replay_title">Putar ulang lambat dengan ketukan kedua</string>
+    <string name="study_slow_replay_description">Ketuk lagi baris yang sedang diputar ulang untuk mendengarnya sekali dengan kecepatan 0,75×. Kecepatan Anda kembali setelah baris itu.</string>
+    <string name="study_card_front_meaning">Arti</string>
+    <string name="study_card_front_meaning_description">Sisi depan menampilkan arti kata dan terjemahan kalimat dalam bahasa Anda: ucapkan katanya, lalu balik kartu untuk melihatnya dalam kalimat.</string>
+    <string name="study_card_front_fill_gap">Isi bagian kosong</string>
+    <string name="study_card_front_fill_gap_description">Sisi depan menampilkan kalimat dengan kata yang disembunyikan; sisi belakang menampilkan kata di tempatnya, beserta artinya.</string>
 </resources>

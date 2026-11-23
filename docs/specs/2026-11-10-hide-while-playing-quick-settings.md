@@ -4,6 +4,8 @@
 
 Implemented. The owner picked option B ("Hide while playing" toggles) on 2026-11-10 after comparing it with two dropdown rows. Merge and release need the owner's OK.
 
+Turned around 2026-11-23 (owner request, [spec](2026-11-23-github-comments-batch.md)): the line is now **Show while playing**, and a ticked Translation chip means Always (the default), so a tick no longer hides something. The stored setting is unchanged, so no migration.
+
 ## Context / problem
 
 The owner switches Settings → Captions & translation → *Translated captions* between *Always* and *Only when paused* often. Today that takes the gear, *Dual-subtitle settings*, the right section, a dropdown and a pick. The gear's popup only had the languages, and the owner worried that adding more would clutter it.

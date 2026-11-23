@@ -66,8 +66,11 @@ internal val AI_KNOWN_WORDS_AFTER = listOf("5", "10", "20")
 /** Where Send to sends words (`FlashcardApp`), which a test keeps equal. */
 internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
 
+/** Repeat each line's pause between plays (`RepeatPause`), which a test keeps equal. */
+internal val AI_REPEAT_PAUSES = listOf("off", "line", "2", "5")
+
 /** The Anki card fronts (`CardFront`), which a test keeps equal. */
-internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "listening")
+internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "listening", "meaning", "fill_gap")
 
 /** Where a card carries the word's voice, the line's sound or the picture (`CardPlace` storage values). */
 internal val AI_CARD_PLACES = listOf("front", "back", "off")
@@ -142,6 +145,7 @@ internal enum class AiSetting(
     DAILY_GOAL("daily_goal", AI_DAILY_GOALS),
     STUDY_PLAY_MODE("study_play_mode", AI_STUDY_PLAY_MODES),
     STUDY_REPEAT_COUNT("study_repeat_count", AI_STUDY_REPEAT_COUNTS),
+    STUDY_REPEAT_PAUSE("study_repeat_pause", AI_REPEAT_PAUSES),
     SKIP_SILENCE("skip_silence", AI_SKIP_SILENCE),
     KNOWN_WORDS("known_words", AI_KNOWN_WORDS_MODES),
     KNOWN_WORDS_AFTER("known_words_after", AI_KNOWN_WORDS_AFTER),
@@ -163,6 +167,7 @@ internal enum class AiSetting(
     CARD_READ_TRANSLATION("anki_card_read_translation"),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
+    SLOW_REPLAY("slow_replay_second_tap"),
     KANJI_DETAILS("kanji_details"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
@@ -916,7 +921,9 @@ private fun otherSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (what an Anki card sent with Send to shows before it is turned; the rest is on the back: word_sentence the " +
                 "word with its sentence, word only the word, sentence the sentence with the word in bold, listening only the " +
-                "line's sound; it changes cards sent before too)"
+                "line's sound, meaning the word's meaning and the sentence's translation in the user's language (to say the " +
+                "word in the language being learned), fill_gap the sentence with the word hidden; it changes cards sent " +
+                "before too)"
         AiSetting.CARD_WORD_SOUND ->
             choiceList(setting.choices) +
                 " (where an Anki card sent with Send to plays the word in the word card's voice; front also shows it on the " +
@@ -944,6 +951,14 @@ private fun otherSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (Pronunciation in the tap bar: a single tapped word's IPA, kana or pinyin shows above its meaning in the bar " +
                 "that opens on a tap; off by default)"
+        AiSetting.STUDY_REPEAT_PAUSE ->
+            choiceList(setting.choices) +
+                " (Pause between repeats in repeat_line: after each play of a line the video waits so the user can say it " +
+                "aloud, as long as the line took (line), 2 or 5 seconds; off by default)"
+        AiSetting.SLOW_REPLAY ->
+            choiceList(setting.choices) +
+                " (Slow replay on a second tap: tapping a subtitle line again while it replays plays it once at 0.75x speed, " +
+                "then the user's own speed comes back; off by default)"
         AiSetting.PREPARE_MEANINGS ->
             choiceList(setting.choices) +
                 " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +

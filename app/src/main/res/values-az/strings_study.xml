@@ -152,4 +152,17 @@
     <string name="study_saved_word_video_example_description">Saxladığınız sözlər Məşqdə öz sətirlərini videodan təkrar oynada bilər. Hər söz üçün bunu orada dəyişə bilərsiniz.</string>
     <string name="study_send_on_save_title">Saxlanılan sözləri həm də göndər</string>
     <string name="study_send_on_save_description">Söz kartındakı “Məşqə saxla” sözü həm də %1$s tətbiqinə göndərir.</string>
+    <string name="study_repeat_pause_title">Təkrarlar arasında fasilə</string>
+    <string name="study_repeat_pause_description">Sətir hər dəfə oynadıqdan sonra video gözləyir ki, onu ucadan deyəsiniz (shadowing). Daha tez davam etmək üçün oynatmanı basın.</string>
+    <string name="study_repeat_pause_off">Söndürülüb</string>
+    <string name="study_repeat_pause_line">Sətir qədər</string>
+    <string name="study_repeat_pause_2">2 san</string>
+    <string name="study_repeat_pause_5">5 san</string>
+    <string name="study_repeat_pause_search">Shadowing</string>
+    <string name="study_slow_replay_title">İkinci toxunuşla yavaş təkrar</string>
+    <string name="study_slow_replay_description">Təkrar oynayan sətrə yenidən toxunun ki, onu bir dəfə 0,75× sürətlə eşidəsiniz. Sətirdən sonra öz sürətiniz qayıdır.</string>
+    <string name="study_card_front_meaning">Məna</string>
+    <string name="study_card_front_meaning_description">Üzdə sözün mənası və cümlənin tərcüməsi sizin dilinizdə görünür: sözü deyin, sonra kartı çevirib onu cümlədə görün.</string>
+    <string name="study_card_front_fill_gap">Boşluğu doldur</string>
+    <string name="study_card_front_fill_gap_description">Üzdə söz gizlədilmiş cümlə görünür; arxada söz öz yerində, mənası ilə birlikdə görünür.</string>
 </resources>

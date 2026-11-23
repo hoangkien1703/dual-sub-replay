@@ -159,4 +159,17 @@
     <string name="study_saved_word_video_example_description">Las palabras que guardas pueden volver a reproducir su línea del video en Práctica. Puedes cambiarlo para cada palabra allí.</string>
     <string name="study_send_on_save_title">Enviar también las palabras guardadas</string>
     <string name="study_send_on_save_description">Guardar en Práctica en la tarjeta de palabra también envía la palabra a %1$s.</string>
+    <string name="study_repeat_pause_title">Pausa entre repeticiones</string>
+    <string name="study_repeat_pause_description">Después de cada reproducción de la línea, el vídeo espera para que la digas en voz alta (shadowing). Pulsa reproducir para seguir antes.</string>
+    <string name="study_repeat_pause_off">No</string>
+    <string name="study_repeat_pause_line">Lo que dura la línea</string>
+    <string name="study_repeat_pause_2">2 s</string>
+    <string name="study_repeat_pause_5">5 s</string>
+    <string name="study_repeat_pause_search">Shadowing</string>
+    <string name="study_slow_replay_title">Repetición lenta con un segundo toque</string>
+    <string name="study_slow_replay_description">Toca otra vez una línea mientras se repite para oírla una vez a velocidad 0,75×. Tu velocidad vuelve después de la línea.</string>
+    <string name="study_card_front_meaning">Significado</string>
+    <string name="study_card_front_meaning_description">El anverso muestra el significado de la palabra y la traducción de la frase en tu idioma: di la palabra y luego gira la tarjeta para verla en su frase.</string>
+    <string name="study_card_front_fill_gap">Rellenar el hueco</string>
+    <string name="study_card_front_fill_gap_description">El anverso muestra la frase con la palabra oculta; el reverso muestra la palabra en su lugar, con su significado.</string>
 </resources>

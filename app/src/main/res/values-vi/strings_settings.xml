@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">Dòng phụ đề thứ ba</string>
     <string name="settings_third_line_choose">Chọn ngôn ngữ</string>
     <string name="settings_quick_subtitles">Phụ đề</string>
-    <string name="settings_hide_while_playing">Ẩn khi đang phát</string>
+    <string name="settings_show_while_playing">Hiện khi đang phát</string>
     <string name="sleep_timer_title">Hẹn giờ tắt</string>
     <string name="sleep_timer_off">Tắt</string>
     <string name="sleep_timer_minutes">%1$d phút</string>
