@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">세 번째 자막 줄</string>
     <string name="settings_third_line_choose">언어 선택</string>
     <string name="settings_quick_subtitles">자막</string>
-    <string name="settings_hide_while_playing">재생 중 숨기기</string>
+    <string name="settings_show_while_playing">재생 중 표시</string>
     <string name="sleep_timer_title">취침 타이머</string>
     <string name="sleep_timer_off">끄기</string>
     <string name="sleep_timer_minutes">%1$d분</string>

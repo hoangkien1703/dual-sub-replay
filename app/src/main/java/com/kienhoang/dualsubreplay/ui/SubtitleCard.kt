@@ -83,6 +83,8 @@ internal fun CompactSubtitleCard(
     focusModifier: Modifier = Modifier,
     /** Settings → Languages → Third line: plain text under the other lines; null shows nothing. */
     thirdText: String? = null,
+    /** The third line's language; with it, the third line's words can be tapped like the other lines'. */
+    thirdLanguage: String? = null,
     /** The loop button at the row's end (Study tools → Loop button on the playing line), or null for none. */
     loop: LineLoopButton? = null,
     /** Dictation: the line is hidden until revealed, and this (one dot per word) shows instead. */
@@ -161,7 +163,22 @@ internal fun CompactSubtitleCard(
                             )
                         }
                     }
-                    thirdText?.let { ThirdLineText(it, fontScale, translatedColor, Modifier.padding(top = 2.dp)) }
+                    thirdText?.let { third ->
+                        if (wordLearningEnabled && tapToLearnEnabled && thirdLanguage != null) {
+                            TappableThirdLineText(
+                                third,
+                                thirdLanguage,
+                                segment,
+                                fontScale,
+                                translatedColor,
+                                highlightColor,
+                                onWordClick,
+                                onReplay,
+                            )
+                        } else {
+                            ThirdLineText(third, fontScale, translatedColor, Modifier.padding(top = 2.dp))
+                        }
+                    }
                 }
             }
             loop?.let { LineLoopIconButton(it) }
@@ -259,7 +276,43 @@ private fun LineLoopIconButton(button: LineLoopButton) {
     }
 }
 
-/** The third line: plain text (no word taps) in the translation's color, a little smaller; right to left by its own script. */
+/**
+ * The third line with tap-to-learn (25kiuo, Discussion #81, 2026-11-21): its words select like the
+ * translation's, in the third line's own language. The tapped word's segment carries the third line
+ * as its translation, so the word card's sentence is the third line, under the original.
+ */
+@Composable
+private fun TappableThirdLineText(
+    text: String,
+    language: String,
+    segment: SubtitleSegment,
+    fontScale: Float,
+    color: Color,
+    highlightColor: Color,
+    onWordClick: (WordTap) -> Unit,
+    onReplay: () -> Unit,
+) {
+    SelectableSubtitleText(
+        text = text,
+        annotated = AnnotatedString(text),
+        style =
+            TextStyle(
+                fontSize = (13 * fontScale).sp,
+                lineHeight = (17 * fontScale).sp,
+                color = color.copy(alpha = color.alpha * THIRD_LINE_ALPHA),
+            ),
+        languageCode = language,
+        segment = segment.copy(translatedText = text),
+        translated = true,
+        highlightColor = highlightColor,
+        onWordClick = onWordClick,
+        onBlankTap = onReplay,
+        modifier = Modifier.padding(top = 2.dp).testTag("third_line"),
+        lineLanguage = language,
+    )
+}
+
+/** The third line without tap-to-learn: plain text in the translation's color, a little smaller; right to left by its own script. */
 @Composable
 internal fun ThirdLineText(
     text: String,

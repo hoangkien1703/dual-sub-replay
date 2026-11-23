@@ -15,4 +15,7 @@
     <string name="bilibili_no_subtitles_title">この動画には字幕がありません</string>
     <string name="bilibili_no_subtitles_body">Bilibili にはこの動画の字幕がありません。別の動画をお試しください。</string>
     <string name="bilibili_try_again">もう一度試す</string>
+    <string name="beta_offer_title">%1$s（ベータ）をオンにしますか？</string>
+    <string name="beta_offer_message">これは %1$s のリンクです。%1$s は DualSub Replay のベータ版サイトです。オンにすると、この動画を二言語字幕で見られます。設定 → ベータ でいつでもオフにできます。</string>
+    <string name="beta_offer_turn_on">オンにする</string>
 </resources>

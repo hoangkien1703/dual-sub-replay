@@ -147,4 +147,17 @@
     <string name="study_saved_word_video_example_description">你保存的单词可以在练习中重播视频里的那一句。也可以在那里为每个单词单独更改。</string>
     <string name="study_send_on_save_title">同时发送保存的单词</string>
     <string name="study_send_on_save_description">在单词卡上点“保存到练习”时，也会把单词发送到 %1$s。</string>
+    <string name="study_repeat_pause_title">重复之间暂停</string>
+    <string name="study_repeat_pause_description">每次播放完这一行，视频会停一下，让你跟着说（跟读）。按播放可以提前继续。</string>
+    <string name="study_repeat_pause_off">关闭</string>
+    <string name="study_repeat_pause_line">和这一行一样长</string>
+    <string name="study_repeat_pause_2">2 秒</string>
+    <string name="study_repeat_pause_5">5 秒</string>
+    <string name="study_repeat_pause_search">跟读</string>
+    <string name="study_slow_replay_title">再点一次慢速重播</string>
+    <string name="study_slow_replay_description">一行正在重播时再点它一次，就会用 0.75× 速度再听一遍。这一行播完后恢复你自己的速度。</string>
+    <string name="study_card_front_meaning">释义</string>
+    <string name="study_card_front_meaning_description">正面显示单词的释义和句子的翻译（你的语言）：先说出这个单词，再翻面看它在句子里的样子。</string>
+    <string name="study_card_front_fill_gap">填空</string>
+    <string name="study_card_front_fill_gap_description">正面显示隐藏了单词的句子；背面在原位置显示这个单词和它的释义。</string>
 </resources>

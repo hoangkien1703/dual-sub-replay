@@ -133,6 +133,8 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         // Study tools and flashcards; which flashcard app and deck depends on this phone's apps.
         "study_play_mode" to share(S),
         "study_repeat_count" to share(I),
+        "study_repeat_pause" to share(S),
+        "slow_replay_second_tap" to share(B),
         "skip_silence" to share(S),
         "blur_box_enabled" to share(B),
         "line_loop_button" to share(B),

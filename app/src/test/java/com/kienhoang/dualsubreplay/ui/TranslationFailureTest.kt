@@ -235,6 +235,90 @@ class TranslationFailureTest {
         assertTrue(!onlyTranslationFailed(showing.copy(segments = emptyList())))
     }
 
+    @Test
+    fun withARetryDelayAFailedLineTriesAgainByItself() =
+        runBlocking {
+            withStore { store ->
+                val requests = MutableStateFlow(CaptionPlaybackRequest(0, paused = false, enabled = true))
+                val publications = MutableStateFlow<Publication?>(null)
+                var calls = 0
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, { text ->
+                            calls++
+                            if (calls == 1) throw java.io.IOException("Google is slow")
+                            "third: $text"
+                        }, retryAfterFailureMs = 50) { snapshot, preparing -> publications.value = Publication(snapshot, preparing) }
+                    }
+                try {
+                    // No "Retry translation": the third line tries again after its delay.
+                    val ready = withTimeout(5000) { publications.first { it?.rows?.first()?.translatedText != null } }!!
+                    assertEquals("third: Caption 0", ready.rows.first().translatedText)
+                } finally {
+                    job.cancelAndJoin()
+                }
+            }
+        }
+
+    @Test
+    fun withARetryDelayASeekTriesAgainAtOnce() =
+        runBlocking {
+            withStore { store ->
+                val requests = MutableStateFlow(CaptionPlaybackRequest(0, paused = false, enabled = true))
+                val publications = MutableStateFlow<Publication?>(null)
+                val failures = mutableListOf<Exception>()
+                var online = false
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, { text ->
+                            if (!online) throw java.io.IOException("Google is slow")
+                            "third: $text"
+                        }, { failures += it }, retryAfterFailureMs = 600_000) { snapshot, preparing ->
+                            publications.value = Publication(snapshot, preparing)
+                        }
+                    }
+                try {
+                    withTimeout(5000) { publications.first { failures.isNotEmpty() && it != null } }
+                    online = true
+                    requests.value = CaptionPlaybackRequest(340_000, paused = false, enabled = true, seekGeneration = 1)
+                    val ready =
+                        withTimeout(5000) {
+                            publications.first { p ->
+                                p?.rows?.any { it.translatedText == "third: Caption 100" } ==
+                                    true
+                            }
+                        }
+                    assertTrue(ready!!.rows.isNotEmpty())
+                } finally {
+                    job.cancelAndJoin()
+                }
+            }
+        }
+
+    @Test
+    fun rowsKnownFromEarlierWindowsAreNeverAskedAgain() =
+        runBlocking {
+            withStore { store ->
+                val requests = MutableStateFlow(CaptionPlaybackRequest(0, paused = false, enabled = true))
+                val publications = MutableStateFlow<Publication?>(null)
+                val asked = mutableListOf<String>()
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, { text ->
+                            asked += text
+                            "third: $text"
+                        }, known = { id -> "kept $id" }) { snapshot, preparing -> publications.value = Publication(snapshot, preparing) }
+                    }
+                try {
+                    val ready = withTimeout(5000) { publications.first { it != null && !it.preparing } }!!
+                    assertEquals("kept 0", ready.rows.first().translatedText)
+                    assertEquals(emptyList<String>(), asked)
+                } finally {
+                    job.cancelAndJoin()
+                }
+            }
+        }
+
     private suspend fun withStore(
         segments: List<SubtitleSegment> = rows,
         block: suspend (SubtitleStore) -> Unit,

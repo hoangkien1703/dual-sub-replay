@@ -155,4 +155,17 @@
     <string name="study_saved_word_video_example_description">Words you save can replay their line from the video in Practice. You can change it for each word there.</string>
     <string name="study_send_on_save_title">Also send saved words</string>
     <string name="study_send_on_save_description">Save to Practice on the word card also sends the word to %1$s.</string>
+    <string name="study_repeat_pause_title">Pause between repeats</string>
+    <string name="study_repeat_pause_description">After each play of the line, the video waits so you can say it aloud (shadowing). Press play to go on sooner.</string>
+    <string name="study_repeat_pause_off">Off</string>
+    <string name="study_repeat_pause_line">As long as the line</string>
+    <string name="study_repeat_pause_2">2 s</string>
+    <string name="study_repeat_pause_5">5 s</string>
+    <string name="study_repeat_pause_search">Shadowing</string>
+    <string name="study_slow_replay_title">Slow replay on a second tap</string>
+    <string name="study_slow_replay_description">Tap a line again while it replays to hear it once at 0.75× speed. Your own speed comes back after the line.</string>
+    <string name="study_card_front_meaning">Meaning</string>
+    <string name="study_card_front_meaning_description">The front shows the word\'s meaning and the sentence\'s translation in your language: say the word, then turn the card to see it in its sentence.</string>
+    <string name="study_card_front_fill_gap">Fill the gap</string>
+    <string name="study_card_front_fill_gap_description">The front shows the sentence with the word hidden; the back shows the word in its place, with its meaning.</string>
 </resources>

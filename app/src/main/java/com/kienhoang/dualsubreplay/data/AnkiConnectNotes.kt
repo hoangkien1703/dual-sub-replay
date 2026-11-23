@@ -217,8 +217,22 @@ private fun basicCardSidesOf(
             } else {
                 listOf(sentenceAudio) to listOf(sentence, word, wordAudio, reading, meaning, translation, source)
             }
+        CardFront.MEANING -> listOf(meaning, translation) to listOf(word, wordAudio, reading, sentence, sentenceAudio, source)
+        CardFront.FILL_GAP ->
+            listOf(gappedSentence(sentence)) to listOf(word, wordAudio, reading, meaning, sentence, translation, sentenceAudio, source)
     }
 }
+
+/**
+ * A Basic card's Fill the gap front: [sentence] (Anki HTML) with its bold word replaced by a gap.
+ * Basic cards have no template to hide it with, and their back shows the whole sentence again.
+ */
+internal fun gappedSentence(sentence: String): String = BOLD_WORD.replace(sentence, "<b>$ANKI_GAP</b>")
+
+private val BOLD_WORD = Regex("<b>.*?</b>")
+
+/** What a Basic card's gap shows. */
+private const val ANKI_GAP = "＿＿＿"
 
 /**
  * Where a card sent without its sentence clip gets it later: the Sentence audio field of the

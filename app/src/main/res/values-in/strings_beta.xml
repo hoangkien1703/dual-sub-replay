@@ -15,4 +15,7 @@
     <string name="bilibili_no_subtitles_title">Video ini tidak memiliki subtitle</string>
     <string name="bilibili_no_subtitles_body">Bilibili tidak memiliki subtitle untuk video ini. Coba video lain.</string>
     <string name="bilibili_try_again">Coba lagi</string>
+    <string name="beta_offer_title">Aktifkan %1$s (Beta)?</string>
+    <string name="beta_offer_message">Ini tautan %1$s. %1$s adalah situs Beta di DualSub Replay: aktifkan untuk menonton video ini dengan subtitle ganda. Anda bisa menonaktifkannya lagi di Setelan → Beta.</string>
+    <string name="beta_offer_turn_on">Aktifkan</string>
 </resources>

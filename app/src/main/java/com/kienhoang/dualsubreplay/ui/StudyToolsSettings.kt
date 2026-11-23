@@ -64,6 +64,9 @@ internal fun StudyToolsSettingsSection() {
     StudyPlayModeSettings(settings) { mode -> preferences.edit().putString(STUDY_PLAY_MODE_PREFERENCE, mode.storageValue).apply() }
     if (settings.playMode == StudyPlayMode.REPEAT_LINE) {
         StudyRepeatCountSettings(settings.repeatCount) { count -> preferences.edit().putInt(STUDY_REPEAT_COUNT_PREFERENCE, count).apply() }
+        RepeatPauseSettings(
+            settings.repeatPause,
+        ) { pause -> preferences.edit().putString(STUDY_REPEAT_PAUSE_PREFERENCE, pause.storageValue).apply() }
     }
     if (settings.playMode == StudyPlayMode.NEW_WORD_LINES && !settings.knownWords) {
         SettingsHint(stringResource(R.string.study_play_mode_needs_known_words))
@@ -75,6 +78,13 @@ internal fun StudyToolsSettingsSection() {
         checked = settings.loopButton,
         onCheckedChange = { preferences.edit().putBoolean(LOOP_BUTTON_PREFERENCE, it).apply() },
         testTag = "loop_button_switch",
+    )
+    SettingsSwitchRow(
+        title = stringResource(R.string.study_slow_replay_title),
+        description = stringResource(R.string.study_slow_replay_description),
+        checked = settings.slowReplay,
+        onCheckedChange = { preferences.edit().putBoolean(SLOW_REPLAY_PREFERENCE, it).apply() },
+        testTag = "slow_replay_switch",
     )
     SettingsSectionDivider()
     SkipSilenceSettings(settings.skipSilence) { skip -> preferences.edit().putString(SKIP_SILENCE_PREFERENCE, skip.storageValue).apply() }
@@ -384,6 +394,8 @@ internal val CardFront.labelRes: Int
             CardFront.WORD -> R.string.study_card_front_word
             CardFront.SENTENCE -> R.string.study_card_front_sentence
             CardFront.LISTENING -> R.string.study_card_front_listening
+            CardFront.MEANING -> R.string.study_card_front_meaning
+            CardFront.FILL_GAP -> R.string.study_card_front_fill_gap
         }
 
 private val CardFront.descriptionRes: Int
@@ -393,6 +405,8 @@ private val CardFront.descriptionRes: Int
             CardFront.WORD -> R.string.study_card_front_word_description
             CardFront.SENTENCE -> R.string.study_card_front_sentence_description
             CardFront.LISTENING -> R.string.study_card_front_listening_description
+            CardFront.MEANING -> R.string.study_card_front_meaning_description
+            CardFront.FILL_GAP -> R.string.study_card_front_fill_gap_description
         }
 
 @Composable
@@ -424,6 +438,33 @@ private fun StudyPlayModeSettings(
                 }
             }
         }
+    }
+}
+
+/** Repeat each line → Pause between repeats: Off, As long as the line, 2 s, 5 s (Discussion #257). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RepeatPauseSettings(
+    pause: RepeatPause,
+    onChange: (RepeatPause) -> Unit,
+) {
+    Column(Modifier.settingAnchor("study_repeat_pause").padding(start = 48.dp, top = 8.dp)) {
+        Text(stringResource(R.string.study_repeat_pause_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            RepeatPause.entries.forEach { option ->
+                FilterChip(
+                    selected = pause == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("study_repeat_pause_${option.storageValue}"),
+                )
+            }
+        }
+        Text(
+            stringResource(R.string.study_repeat_pause_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

@@ -258,7 +258,15 @@ internal enum class SearchableSetting(
         setOf(STUDY_PLAY_MODE_PREFERENCE, STUDY_REPEAT_COUNT_PREFERENCE),
         StudyPlayMode.entries.map { it.titleRes },
     ),
+    REPEAT_PAUSE(
+        R.string.study_repeat_pause_title,
+        MoreSettingsSection.STUDY,
+        "study_repeat_pause",
+        setOf(STUDY_REPEAT_PAUSE_PREFERENCE),
+        listOf(R.string.study_repeat_pause_search),
+    ),
     LOOP_BUTTON(R.string.study_loop_button_title, MoreSettingsSection.STUDY, "loop_button_switch", setOf(LOOP_BUTTON_PREFERENCE)),
+    SLOW_REPLAY(R.string.study_slow_replay_title, MoreSettingsSection.STUDY, "slow_replay_switch", setOf(SLOW_REPLAY_PREFERENCE)),
     SKIP_SILENCE(R.string.study_skip_silence_title, MoreSettingsSection.STUDY, "skip_silence", setOf(SKIP_SILENCE_PREFERENCE)),
     KNOWN_WORDS(
         R.string.study_known_words_title,

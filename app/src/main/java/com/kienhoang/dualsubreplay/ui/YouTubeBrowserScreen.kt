@@ -365,6 +365,14 @@ internal class YouTubeWebController {
         scriptAction?.invoke(webSeekPausedScript(second))
     }
 
+    /** Slow replay on a second tap: plays at [rate] for [safetyMs], or brings the user's speed back when null. */
+    fun setSlowReplay(
+        rate: Float?,
+        safetyMs: Long,
+    ) {
+        scriptAction?.invoke(webSlowReplayScript(rate, safetyMs))
+    }
+
     /** Skip silence: plays at [rate] for at most [safetyMs], or brings the user's speed back when null. */
     fun setGapSpeed(
         rate: Float?,

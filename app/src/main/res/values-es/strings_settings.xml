@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">Tercera línea de subtítulos</string>
     <string name="settings_third_line_choose">Elegir un idioma</string>
     <string name="settings_quick_subtitles">Subtítulos</string>
-    <string name="settings_hide_while_playing">Ocultar al reproducir</string>
+    <string name="settings_show_while_playing">Mostrar al reproducir</string>
     <string name="sleep_timer_title">Temporizador</string>
     <string name="sleep_timer_off">No</string>
     <string name="sleep_timer_minutes">%1$d min</string>

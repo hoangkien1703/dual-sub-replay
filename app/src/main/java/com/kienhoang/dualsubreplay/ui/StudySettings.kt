@@ -27,6 +27,12 @@ import com.kienhoang.dualsubreplay.data.usualWordSoundPlace
 
 internal const val STUDY_PLAY_MODE_PREFERENCE = "study_play_mode"
 internal const val STUDY_REPEAT_COUNT_PREFERENCE = "study_repeat_count"
+
+/** Repeat each line → Pause between repeats (ansidalia-lansi, Discussion #257, 2026-11-23): a [RepeatPause] storage value, off by default. */
+internal const val STUDY_REPEAT_PAUSE_PREFERENCE = "study_repeat_pause"
+
+/** Study tools → Slow replay on a second tap (25kiuo, Discussion #81, 2026-11-21), off by default. */
+internal const val SLOW_REPLAY_PREFERENCE = "slow_replay_second_tap"
 internal const val SKIP_SILENCE_PREFERENCE = "skip_silence"
 internal const val KNOWN_WORDS_PREFERENCE = "known_words_mode"
 internal const val KNOWN_WORDS_AFTER_PREFERENCE = "known_words_after"
@@ -102,6 +108,8 @@ internal val STUDY_SETTING_KEYS =
     listOf(
         STUDY_PLAY_MODE_PREFERENCE,
         STUDY_REPEAT_COUNT_PREFERENCE,
+        STUDY_REPEAT_PAUSE_PREFERENCE,
+        SLOW_REPLAY_PREFERENCE,
         SKIP_SILENCE_PREFERENCE,
         KNOWN_WORDS_PREFERENCE,
         KNOWN_WORDS_AFTER_PREFERENCE,
@@ -146,6 +154,40 @@ enum class StudyPlayMode(
     REPEAT_LINE("repeat_line", R.string.study_play_mode_repeat, R.string.study_play_mode_repeat_description),
     NEW_WORD_LINES("new_word_lines", R.string.study_play_mode_new_word, R.string.study_play_mode_new_word_description),
 }
+
+/**
+ * The pause after each play of a line in Repeat each line, so the learner can say it aloud
+ * (shadowing; ansidalia-lansi, Discussion #257, 2026-11-23). One choice instead of separate count,
+ * length and "after the last one" settings: [LINE] waits as long as the line took, the usual
+ * shadowing gap.
+ */
+internal enum class RepeatPause(
+    val storageValue: String,
+    @StringRes val labelRes: Int,
+) {
+    OFF("off", R.string.study_repeat_pause_off),
+    LINE("line", R.string.study_repeat_pause_line),
+    TWO_SECONDS("2", R.string.study_repeat_pause_2),
+    FIVE_SECONDS("5", R.string.study_repeat_pause_5),
+}
+
+internal fun storedRepeatPause(value: String?): RepeatPause =
+    RepeatPause.entries.firstOrNull { it.storageValue == value } ?: RepeatPause.OFF
+
+/** [LINE]'s pause stays in this range, so a one-word line still leaves time and a long one never stalls. */
+internal val REPEAT_PAUSE_LINE_RANGE_MS = 1_000L..15_000L
+
+/** How long the video waits after a play of a line [lineMs] long, or null for no pause. */
+internal fun repeatPauseMs(
+    pause: RepeatPause,
+    lineMs: Long,
+): Long? =
+    when (pause) {
+        RepeatPause.OFF -> null
+        RepeatPause.LINE -> lineMs.coerceIn(REPEAT_PAUSE_LINE_RANGE_MS)
+        RepeatPause.TWO_SECONDS -> 2_000L
+        RepeatPause.FIVE_SECONDS -> 5_000L
+    }
 
 /** What happens in a part with no subtitle line (Settings → Study tools → Skip silence). */
 internal enum class SkipSilence(
@@ -217,6 +259,9 @@ internal const val DEFAULT_STUDY_REPEAT_COUNT = 2
 internal data class StudySettings(
     val playMode: StudyPlayMode = StudyPlayMode.NORMAL,
     val repeatCount: Int = DEFAULT_STUDY_REPEAT_COUNT,
+    val repeatPause: RepeatPause = RepeatPause.OFF,
+    /** Tapping the line that is replaying again plays it once more, slower. */
+    val slowReplay: Boolean = false,
     val loopButton: Boolean = false,
     val skipSilence: SkipSilence = SkipSilence.OFF,
     val knownWordsMode: KnownWordsMode = KnownWordsMode.OFF,
@@ -290,6 +335,8 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
     StudySettings(
         playMode = storedStudyPlayMode(preferences.getString(STUDY_PLAY_MODE_PREFERENCE, null)),
         repeatCount = storedStudyRepeatCount(preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, DEFAULT_STUDY_REPEAT_COUNT)),
+        repeatPause = storedRepeatPause(preferences.getString(STUDY_REPEAT_PAUSE_PREFERENCE, null)),
+        slowReplay = preferences.getBoolean(SLOW_REPLAY_PREFERENCE, false),
         loopButton = preferences.getBoolean(LOOP_BUTTON_PREFERENCE, false),
         skipSilence = storedSkipSilence(preferences.getString(SKIP_SILENCE_PREFERENCE, null)),
         knownWordsMode = storedKnownWordsMode(preferences.getString(KNOWN_WORDS_PREFERENCE, null)),

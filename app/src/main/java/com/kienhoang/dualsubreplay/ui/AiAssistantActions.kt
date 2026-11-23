@@ -295,6 +295,17 @@ private fun aiStudySettingValue(
         AiSetting.LOOP_BUTTON -> onOff(study.loopButton)
         AiSetting.KANJI_DETAILS -> onOff(study.kanjiDetails)
         AiSetting.PAGE_TOKEN_CAPTIONS -> study.pageTokenCaptions.storageValue
+        else -> aiReplaySettingValue(study, setting)
+    }
+
+/** Pause between repeats and Slow replay on a second tap (2026-11-23). */
+private fun aiReplaySettingValue(
+    study: StudySettings,
+    setting: AiSetting,
+): String? =
+    when (setting) {
+        AiSetting.STUDY_REPEAT_PAUSE -> study.repeatPause.storageValue
+        AiSetting.SLOW_REPLAY -> onOff(study.slowReplay)
         else -> aiFlashcardSwitchValue(study, setting)
     }
 
@@ -773,7 +784,21 @@ internal class AppAiActions(
                         PAGE_TOKEN_CAPTIONS_PREFERENCE,
                         storedPageTokenMode(value).storageValue,
                     ).remove(PAGE_TOKEN_NEEDED_PREFERENCE)
-            else -> return putFlashcardSwitch(editor, setting, on)
+            else -> return putReplaySetting(editor, setting, value)
+        }
+        return true
+    }
+
+    /** Writes Pause between repeats or Slow replay on a second tap, else a flashcard switch. */
+    private fun putReplaySetting(
+        editor: SharedPreferences.Editor,
+        setting: AiSetting,
+        value: String,
+    ): Boolean {
+        when (setting) {
+            AiSetting.STUDY_REPEAT_PAUSE -> editor.putString(STUDY_REPEAT_PAUSE_PREFERENCE, storedRepeatPause(value).storageValue)
+            AiSetting.SLOW_REPLAY -> editor.putBoolean(SLOW_REPLAY_PREFERENCE, value == "on")
+            else -> return putFlashcardSwitch(editor, setting, value == "on")
         }
         return true
     }
@@ -962,6 +987,17 @@ internal class AppAiActions(
             AiSetting.SLEEP_TIMER_QUICK -> switch(R.string.sleep_timer_quick_title, value)
             AiSetting.WHOLE_TRANSCRIPT -> switch(R.string.whole_transcript_title, value)
             AiSetting.TV_LAYOUT -> switch(R.string.tv_layout_title, value)
+            else -> replaySettingLabel(setting, value)
+        }
+
+    /** Labels of Pause between repeats and Slow replay on a second tap (2026-11-23). */
+    private fun replaySettingLabel(
+        setting: AiSetting,
+        value: String,
+    ): String =
+        when (setting) {
+            AiSetting.STUDY_REPEAT_PAUSE -> named(R.string.study_repeat_pause_title, string(storedRepeatPause(value).labelRes))
+            AiSetting.SLOW_REPLAY -> switch(R.string.study_slow_replay_title, value)
             else -> flashcardSettingLabel(setting, value)
         }
 
