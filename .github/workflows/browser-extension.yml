@@ -1,0 +1,48 @@
+name: Browser extension checks
+
+# The Chrome extension in browser-extension/ (PR #253, docs/specs/2026-11-23-browser-extension-ci.md) is plain
+# JavaScript with no build step and no dependencies: this job only runs Node's own test runner and syntax check.
+# It never changes the APK and is not a required check; android.yml still runs on every PR, and
+# tools/automatic_release.py still needs both Android jobs green before a merge publishes anything.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "browser-extension/**"
+      - ".github/workflows/browser-extension.yml"
+  push:
+    branches: [main]
+    paths:
+      - "browser-extension/**"
+      - ".github/workflows/browser-extension.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-extension-${{ github.event.pull_request.number || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  extension-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The runner's own Node; no setup action or npm install, so nothing is downloaded.
+      - name: Syntax check and unit tests
+        run: |
+          set -euo pipefail
+          if [[ ! -d browser-extension ]]; then
+            echo "No browser-extension/ folder on this commit; nothing to check."
+            exit 0
+          fi
+          node --version
+          cd browser-extension
+          find . -name '*.js' -print0 | xargs -0 -n1 node --check
+          node --test
