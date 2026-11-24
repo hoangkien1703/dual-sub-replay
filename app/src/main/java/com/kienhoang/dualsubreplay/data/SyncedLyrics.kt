@@ -99,12 +99,13 @@ internal data class SyncedLyrics(
 /**
  * The song in LRCLIB's search reply whose length is closest to the video's [videoDurationMs]
  * (within [LYRICS_LENGTH_SLACK_MS]), that has timed lyrics and whose name appears in [title].
- * Null when none fits: the wrong song's lyrics would be worse than none.
+ * Null when none fits: the wrong song's lyrics would be worse than none. With no length (a song
+ * of a playlist, placed later by [alignLyrics]), the song that best names [title] wins.
  */
 internal fun pickSyncedLyrics(
     reply: String,
     title: String,
-    videoDurationMs: Long,
+    videoDurationMs: Long?,
     slackMs: Long = LYRICS_LENGTH_SLACK_MS,
 ): SyncedLyrics? {
     val songs =
@@ -121,11 +122,29 @@ internal fun pickSyncedLyrics(
             val seconds = song.optDouble("duration", Double.NaN).takeIf { it.isFinite() && it > 0 } ?: return@mapNotNull null
             val durationMs = (seconds * 1000).toLong()
             val track = song.optString("trackName")
-            if (song.optBoolean("instrumental") || abs(durationMs - videoDurationMs) > slackMs) return@mapNotNull null
+            if (song.optBoolean("instrumental")) return@mapNotNull null
+            if (videoDurationMs != null && abs(durationMs - videoDurationMs) > slackMs) return@mapNotNull null
             if (!namesTheSong(lowerTitle, track)) return@mapNotNull null
             val cues = parseLrc(synced)
             if (cues.isEmpty()) null else SyncedLyrics(track, song.optString("artistName"), durationMs, cues)
-        }.minByOrNull { abs(it.durationMs - videoDurationMs) }
+        }.let { songs ->
+            if (videoDurationMs != null) {
+                songs.minByOrNull { abs(it.durationMs - videoDurationMs) }
+            } else {
+                // LRCLIB lists the best matches first; a song whose whole name and artist are in the title goes ahead.
+                songs.maxByOrNull {
+                    (
+                        if (it.track.lowercase() in
+                            lowerTitle
+                        ) {
+                            2
+                        } else {
+                            0
+                        }
+                    ) + (if (it.artist.lowercase() in lowerTitle) 1 else 0)
+                }
+            }
+        }
 }
 
 /** True when a word of the song's name (or the whole name, for languages without spaces) is in the title. */
@@ -179,12 +198,17 @@ internal class SyncedLyricsSource(
     suspend fun find(
         title: String,
         channel: String,
-        videoDurationMs: Long,
+        videoDurationMs: Long?,
         slackMs: Long = LYRICS_LENGTH_SLACK_MS,
-    ): SyncedLyrics? {
+    ): SyncedLyrics? = search(title, channel)?.let { pickSyncedLyrics(it, title, videoDurationMs, slackMs) }
+
+    /** LRCLIB's search reply for the song [title] names, for [pickSyncedLyrics]; null when it can't be reached. */
+    suspend fun search(
+        title: String,
+        channel: String,
+    ): String? {
         val query = lyricsSearchQuery(title, channel) ?: return null
-        val reply = withContext(Dispatchers.IO) { runCatching { download(query) }.getOrNull() } ?: return null
-        return pickSyncedLyrics(reply, title, videoDurationMs, slackMs)
+        return withContext(Dispatchers.IO) { runCatching { download(query) }.getOrNull() }
     }
 
     private fun download(query: String): String? {

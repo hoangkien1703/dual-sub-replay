@@ -116,6 +116,8 @@ fun DualSubApp(
     effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     externalSettingsRequestId: Long = 0L,
+    /** The no-captions button on the box over the video: opens Settings → AI assistant to add a Gemini key. */
+    externalAiSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
     onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
@@ -160,14 +162,14 @@ fun DualSubApp(
     val aiAssistantHost = LocalAiAssistant.current
     val aiSubtitleActions =
         remember(viewModel, aiAssistantHost) {
+            val keyReady = { aiAssistantHost?.controller?.state?.value?.let(::geminiReady) == true }
             AiSubtitleActions(
                 make = viewModel::makeAiSubtitles,
                 openAiSettings = { aiSettingsRequestId++ },
                 // Without a Gemini key and nothing free to try, it opens Settings → AI assistant.
-                useTranscript = {
-                    val keyReady = aiAssistantHost?.controller?.state?.value?.let(::geminiReady) == true
-                    if (!viewModel.useAiTranscript(keyReady)) aiSettingsRequestId++
-                },
+                useTranscript = { if (!viewModel.useAiTranscript(keyReady())) aiSettingsRequestId++ },
+                findLyrics = { viewModel.useAiTranscript(keyReady(), TranscriptAsk.FREE_LYRICS) },
+                writeWithAi = { if (!viewModel.useAiTranscript(keyReady(), TranscriptAsk.AI_NOW)) aiSettingsRequestId++ },
                 closeSuggestion = viewModel::closeAiTranscriptSuggestion,
                 videoOpen = { viewModel.state.value.activeVideoId != null },
             )
@@ -205,7 +207,7 @@ fun DualSubApp(
                     effectivePlayerMode = effectivePlayerMode,
                     onPlayerModeChange = onPlayerModeChange,
                     externalSettingsRequestId = externalSettingsRequestId,
-                    aiSettingsRequestId = aiSettingsRequestId,
+                    aiSettingsRequestId = aiSettingsRequestId + externalAiSettingsRequestId,
                     wordSettingsRequestId = wordSettingsRequestId,
                     fullscreenLearningOverlay = fullscreenLearningOverlay,
                     onNavigationVisibilityChange = onNavigationVisibilityChange,

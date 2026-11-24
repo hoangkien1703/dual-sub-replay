@@ -55,6 +55,48 @@ internal fun descriptionChapters(
     }
 }
 
+/**
+ * A listed song: "Artist - Song" or "Song – Artist", often numbered ("01.", "1)", "#1"). A long dash
+ * may lose a space ("Lose control —Teddy Swims"); a hyphen needs both, so "Hip-hop" stays one name.
+ */
+private val LISTED_SONG = Regex("""^\s*(?:#?\d{1,3}\s*[.)\-:]?\s+)?(.{2,80}?(?:\s*[–—]\s*|\s-\s).{2,80}?)\s*$""")
+
+/** The number after a song in a picture's right-hand column ("Risk It All — Bruno Mars .01"). */
+private val TRAILING_NUMBER = Regex("""\s*[.)]?\s*\d{1,3}\s*$""")
+
+/** Lines that are links, hashtags or credits, never a song. */
+private val NOT_A_SONG =
+    Regex("""https?://|www\.|^\s*#[^\d\s]|@\w|(?i)\b(subscribe|instagram|facebook|tiktok\.com|spotify\.com|copyright|licensed)\b""")
+
+/**
+ * The songs a playlist video's [description] lists without times (owner pick 2026-11-24): at least
+ * [MIN_CHAPTERS] lines like "01. Taylor Swift - The Fate of Ophelia". Their lyrics are then placed
+ * by matching them against the auto-generated captions ([alignLyrics]). Empty when there is no such list.
+ */
+internal fun descriptionSongList(description: String): List<String> {
+    val songs =
+        description
+            .lineSequence()
+            .filterNot { NOT_A_SONG.containsMatchIn(it) || CHAPTER_TIME.containsMatchIn(it) }
+            .mapNotNull { line ->
+                LISTED_SONG
+                    .matchEntire(line)
+                    ?.groupValues
+                    ?.get(1)
+                    ?.replace(Regex("\\s+"), " ")
+                    ?.trim()
+            }.distinctBy { it.lowercase() }
+            .toList()
+    return if (songs.size >= MIN_CHAPTERS) songs else emptyList()
+}
+
+/**
+ * The songs a playlist video's picture lists ([lines] of its text, read on the phone), like
+ * [descriptionSongList]; a list printed on both sides counts each song once.
+ */
+internal fun pictureSongList(lines: List<String>): List<String> =
+    descriptionSongList(lines.joinToString("\n") { it.replace(TRAILING_NUMBER, "") })
+
 private fun chapterTimeMs(text: String): Long? {
     val parts = text.split(':').map { it.toLongOrNull() ?: return null }
     if (parts.drop(1).any { it >= 60 }) return null

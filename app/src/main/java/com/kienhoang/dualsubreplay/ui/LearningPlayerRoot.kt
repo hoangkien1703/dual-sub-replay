@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -485,7 +488,25 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
         }
     }
 
-    val overlayContent = learningOverlayContent(state)
+    val aiViewModel: AiAssistantViewModel = viewModel()
+    val aiAssistant = remember(aiViewModel) { AiAssistantHost(aiViewModel.controller) { aiViewModel.guide } }
+    val aiAssistantState by aiAssistant.controller.state.collectAsStateWithLifecycle()
+    // A video with no captions: the box on the video offers AI subtitles, like the panel's card.
+    val noCaptionsAction = noCaptionsOverlayAction(state, geminiReady(aiAssistantState))
+    var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
+
+    fun openAiSettings() {
+        aiSettingsRequestId += 1L
+    }
+
+    val overlayButton: (() -> Unit)? =
+        when (noCaptionsAction) {
+            NoCaptionsOverlayAction.MAKE_AI_SUBTITLES -> viewModel::makeAiSubtitles
+            NoCaptionsOverlayAction.ADD_GEMINI_KEY -> ::openAiSettings
+            null -> if (showsOverlayRetry(state)) viewModel::retryCaptions else null
+        }
+
+    val overlayContent = learningOverlayContent(state)?.copy(noCaptionsAction = noCaptionsAction)
     val controlsLiftDp =
         playerControlsAvoidanceLiftDp(
             enabled = autoAvoidPlayerControls,
@@ -545,7 +566,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                     onPositionChange = ::updateOverlayPosition,
                     onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                     onPositionChangeFinished = ::commitOverlayPosition,
-                    onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
+                    onRetryTranscript = overlayButton,
                     onSettings = ::requestSubtitleSettings,
                     onClose = viewModel::closeSubtitles,
                 )
@@ -565,8 +586,6 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 viewModel::setAiTranslationThinking,
             )
         }
-    val aiViewModel: AiAssistantViewModel = viewModel()
-    val aiAssistant = remember(aiViewModel) { AiAssistantHost(aiViewModel.controller) { aiViewModel.guide } }
     val studySavedWords by viewModel.vocabulary.words.collectAsStateWithLifecycle()
     val studyTools = rememberStudyTools(state, studySavedWords)
     CompositionLocalProvider(
@@ -585,6 +604,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                 effectivePlayerMode = effectiveMode,
                 onPlayerModeChange = ::selectMode,
                 externalSettingsRequestId = settingsRequestId,
+                externalAiSettingsRequestId = aiSettingsRequestId,
                 fullscreenLearningOverlay = fullscreenLearningOverlay,
                 onNavigationVisibilityChange = { navigationOpen = it },
             )
@@ -648,7 +668,7 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
                         onPositionChange = ::updateOverlayPosition,
                         onHorizontalPositionChange = ::updateOverlayHorizontalPosition,
                         onPositionChangeFinished = ::commitOverlayPosition,
-                        onRetryTranscript = if (state.liveFallback && !state.retryingTranscript) viewModel::retryCaptions else null,
+                        onRetryTranscript = overlayButton,
                         onSettings = ::requestSubtitleSettings,
                         onClose = {
                             selectMode(PlayerExperienceMode.TRANSCRIPT_PANEL)
@@ -939,25 +959,7 @@ internal fun LearningSubtitleOverlay(
                     val align = if (isFullscreen) TextAlign.Center else TextAlign.Unspecified
                     ThirdLineText(third, fontScale, translatedColor, textAlign = align)
                 }
-                onRetryTranscript?.let { retry ->
-                    // The overlay stays dark on every app theme, so the button takes a light subtitle color.
-                    androidx.compose.material3.TextButton(
-                        onClick = retry,
-                        colors =
-                            androidx.compose.material3.ButtonDefaults.textButtonColors(
-                                contentColor = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY),
-                            ),
-                    ) { Text(stringResource(R.string.player_retry_full_transcript)) }
-                }
-                content.statusText?.let { status ->
-                    Text(
-                        text = status,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFC9D9DB),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                OverlayStatusAndButton(content, onRetryTranscript)
             }
             if (overlayActionsVisible) {
                 IconButton(onClick = onSettings) {
@@ -969,4 +971,53 @@ internal fun LearningSubtitleOverlay(
             }
         }
     }
+}
+
+/**
+ * The box's status line and its one button: Retry full transcript above the status, or, for a
+ * video with no captions, the AI subtitles button under the line that says so.
+ */
+@Composable
+private fun OverlayStatusAndButton(
+    content: LearningOverlayContent,
+    onButton: (() -> Unit)?,
+) {
+    val noCaptions = content.noCaptionsAction
+    if (noCaptions == null && onButton != null) {
+        OverlayTextButton(onButton) { Text(stringResource(R.string.player_retry_full_transcript)) }
+    }
+    content.statusText?.let { status ->
+        Text(
+            text = status,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFFC9D9DB),
+            // Three lines fit the no-captions explanation in every interface language.
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+    if (noCaptions == null || onButton == null) return
+    OverlayTextButton(onButton, Modifier.testTag("overlay_no_captions_action")) {
+        val make = noCaptions == NoCaptionsOverlayAction.MAKE_AI_SUBTITLES
+        if (make) {
+            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.size(8.dp))
+        }
+        Text(stringResource(if (make) R.string.ai_subtitles_make else R.string.ai_subtitles_add_key))
+    }
+}
+
+/** The overlay stays dark on every app theme, so its buttons take a light subtitle color. */
+@Composable
+private fun OverlayTextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable RowScope.() -> Unit,
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.textButtonColors(contentColor = subtitleColor(DEFAULT_TRANSLATED_COLOR_KEY)),
+        content = label,
+    )
 }

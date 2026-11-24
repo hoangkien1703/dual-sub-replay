@@ -30,20 +30,29 @@ data class AiSubtitleStatus(
     val problem: AiSubtitleProblem? = null,
     /** Asking LRCLIB for a song's synced lyrics, before Gemini. */
     val lookingForLyrics: Boolean = false,
-    /** A compilation's songs looked up so far, of [lyricsTotal]; 0 of 0 for a single song. */
+    /** A playlist's songs looked up so far, of [lyricsTotal]; 0 of 0 for a single song. */
     val lyricsChecked: Int = 0,
     val lyricsTotal: Int = 0,
+    /** A playlist's songs whose free lyrics were found and placed, of [lyricsTotal]. */
+    val lyricsFound: Int = 0,
 )
 
 /** Problems that may pass by themselves, so a part asked while the subtitles already show is asked again later. */
 private val PASSING_PROBLEMS = setOf(AiSubtitleProblem.LIMIT, AiSubtitleProblem.BUSY, AiSubtitleProblem.NETWORK)
+
+/**
+ * A new part this close ahead of the playing time is shown as soon as it is in, so a long video
+ * never runs past its subtitles; parts further ahead wait for the next reload.
+ */
+internal const val AI_SUBTITLE_SHOW_AHEAD_MS = 10 * 60_000L
 
 /** Waits before asking again for a later part, while the parts made so far already show. */
 internal val AI_SUBTITLE_RETRY_WAITS_MS = listOf(30_000L, 60_000L, 120_000L)
 
 /**
  * Makes AI subtitles for one video, part by part, from the part that is playing: [onReady] loads
- * them as soon as the first part has lines, and once more when every part is in. Each part is saved
+ * them as soon as the first part has lines, again whenever a new part starts within
+ * [AI_SUBTITLE_SHOW_AHEAD_MS] of [playbackMs], and once more when every part is in. Each part is saved
  * to [store] as it comes, so leaving the video and opening it again carries on where it stopped.
  */
 internal class AiSubtitleRunner(
@@ -53,6 +62,7 @@ internal class AiSubtitleRunner(
     private val durationOf: (videoId: String) -> Long?,
     private val onStatus: (AiSubtitleStatus?) -> Unit,
     private val onReady: (videoId: String) -> Unit,
+    private val playbackMs: () -> Long = { 0L },
     private val retryWaitsMs: List<Long> = AI_SUBTITLE_RETRY_WAITS_MS,
     private val io: CoroutineDispatcher = Dispatchers.IO,
 ) {
@@ -149,7 +159,13 @@ internal class AiSubtitleRunner(
                     is AiPartAnswer.Written -> track.withPart(start, answer.part)
                 }
             withContext(io) { store.write(track) }
-            if (!showing && track.cues().isNotEmpty()) {
+            val showNow =
+                if (showing) {
+                    answer is AiPartAnswer.Written && start !in shownParts && start <= playbackMs() + AI_SUBTITLE_SHOW_AHEAD_MS
+                } else {
+                    track.cues().isNotEmpty()
+                }
+            if (showNow) {
                 showing = true
                 shownParts = track.parts.keys
                 onReady(videoId)

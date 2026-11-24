@@ -24,10 +24,14 @@
     <string name="ai_transcript_choice">Bản ghi AI (Gemini)</string>
     <string name="ai_transcript_offer">Video này giống một bài hát có phụ đề tự động, thường sai lời.</string>
     <string name="ai_transcript_make">Lấy lời bài hát chuẩn</string>
-    <string name="ai_transcript_offer_note">Ưu tiên lời đồng bộ miễn phí. Chỉ dùng AI với khóa Gemini khi không tìm thấy.</string>
+    <string name="ai_transcript_offer_note">Lời đồng bộ miễn phí từ LRCLIB. Không dùng AI.</string>
     <string name="ai_transcript_lyrics_track_label">%1$s (lời bài hát)</string>
     <string name="ai_transcript_looking_for_lyrics">Đang tìm lời bài hát đồng bộ…</string>
     <string name="ai_transcript_no_lyrics_needs_key">Không tìm thấy lời đồng bộ khớp với video này. Thêm khóa Gemini miễn phí để AI viết lời.</string>
     <string name="ai_transcript_looking_for_song_lyrics">Đang tìm lời đồng bộ… bài %1$d / %2$d</string>
     <string name="ai_transcript_some_lyrics_needs_key">Đã tìm thấy lời đồng bộ cho một số bài. Thêm khóa Gemini miễn phí để AI viết phần còn lại.</string>
+    <string name="ai_transcript_no_free_lyrics">Không tìm thấy lời đồng bộ miễn phí khớp với video này.</string>
+    <string name="ai_transcript_some_free_lyrics">Đã tìm thấy lời đồng bộ miễn phí cho %1$d trên %2$d bài.</string>
+    <string name="ai_transcript_write_with_ai">Viết lời bằng AI</string>
+    <string name="ai_transcript_write_rest_with_ai">Viết phần còn lại bằng AI</string>
 </resources>

@@ -24,10 +24,14 @@
     <string name="ai_transcript_choice">AI文字起こし（Gemini）</string>
     <string name="ai_transcript_offer">自動字幕の曲のようです。自動字幕は歌詞をよく間違えます。</string>
     <string name="ai_transcript_make">正しい歌詞を取得</string>
-    <string name="ai_transcript_offer_note">まず無料の同期歌詞を探します。見つからない場合だけGeminiキーでAIを使います。</string>
+    <string name="ai_transcript_offer_note">LRCLIBの無料同期歌詞を使います。AIは使いません。</string>
     <string name="ai_transcript_lyrics_track_label">%1$s（歌詞）</string>
     <string name="ai_transcript_looking_for_lyrics">同期歌詞を探しています…</string>
     <string name="ai_transcript_no_lyrics_needs_key">この動画に合う同期歌詞が見つかりません。無料のGeminiキーを追加すると、AIが書き起こせます。</string>
     <string name="ai_transcript_looking_for_song_lyrics">同期歌詞を探しています… %2$d曲中%1$d曲目</string>
     <string name="ai_transcript_some_lyrics_needs_key">一部の曲の同期歌詞が見つかりました。無料のGeminiキーを追加すると、残りはAIが書き起こせます。</string>
+    <string name="ai_transcript_no_free_lyrics">この動画に合う無料の同期歌詞が見つかりません。</string>
+    <string name="ai_transcript_some_free_lyrics">%2$d曲中%1$d曲の無料同期歌詞が見つかりました。</string>
+    <string name="ai_transcript_write_with_ai">AIで歌詞を書き起こす</string>
+    <string name="ai_transcript_write_rest_with_ai">残りをAIで書き起こす</string>
 </resources>

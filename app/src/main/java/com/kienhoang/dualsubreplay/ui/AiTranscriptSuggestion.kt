@@ -148,7 +148,7 @@ private fun AiTranscriptOffer(actions: AiSubtitleActions) {
             CloseIconButton(actions.closeSuggestion, Modifier.size(36.dp), tag = "ai_transcript_offer_close")
         }
         Row(Modifier.padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            FilledTonalButton(onClick = actions.useTranscript, modifier = Modifier.testTag("ai_transcript_make")) {
+            FilledTonalButton(onClick = actions.findLyrics, modifier = Modifier.testTag("ai_transcript_make")) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.ai_transcript_make))
@@ -187,25 +187,47 @@ private fun AiTranscriptProblem(
     actions: AiSubtitleActions,
 ) {
     val problem = status.problem ?: return
+    val freeLyricsShort = problem == AiSubtitleProblem.NO_FREE_LYRICS || problem == AiSubtitleProblem.SOME_FREE_LYRICS
+    val text =
+        when {
+            !freeLyricsShort || !geminiReady -> stringResource(aiSubtitleProblemText(problem))
+            problem == AiSubtitleProblem.SOME_FREE_LYRICS && status.lyricsTotal > 0 ->
+                stringResource(R.string.ai_transcript_some_free_lyrics, status.lyricsFound, status.lyricsTotal)
+            else -> stringResource(R.string.ai_transcript_no_free_lyrics)
+        }
     BannerSurface("ai_transcript_problem") {
         Row(verticalAlignment = Alignment.Top) {
             Text(
-                stringResource(aiSubtitleProblemText(problem)),
+                text,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                color = if (freeLyricsShort) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                 modifier = Modifier.weight(1f).padding(top = 4.dp),
             )
             CloseIconButton(actions.closeSuggestion, Modifier.size(36.dp), tag = "ai_transcript_problem_close")
         }
-        val needsKey = problem == AiSubtitleProblem.NO_LYRICS_NEEDS_KEY || problem == AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY
-        if (needsKey && !geminiReady) {
-            TextButton(onClick = actions.openAiSettings, modifier = Modifier.testTag("ai_transcript_add_key")) {
-                Text(stringResource(R.string.ai_subtitles_add_key))
-            }
-        } else {
-            TextButton(onClick = actions.useTranscript, modifier = Modifier.testTag("ai_transcript_retry")) {
-                Text(stringResource(R.string.ai_subtitles_try_again))
-            }
+        when {
+            freeLyricsShort && !geminiReady ->
+                TextButton(onClick = actions.openAiSettings, modifier = Modifier.testTag("ai_transcript_add_key")) {
+                    Text(stringResource(R.string.ai_subtitles_add_key))
+                }
+            // AI only on this tap (owner pick 2026-11-24): free lyrics never fall back to Gemini by themselves.
+            freeLyricsShort -> WriteWithAiButton(rest = problem == AiSubtitleProblem.SOME_FREE_LYRICS, onClick = actions.writeWithAi)
+            else ->
+                TextButton(onClick = actions.useTranscript, modifier = Modifier.testTag("ai_transcript_retry")) {
+                    Text(stringResource(R.string.ai_subtitles_try_again))
+                }
         }
+    }
+}
+
+@Composable
+private fun WriteWithAiButton(
+    rest: Boolean,
+    onClick: () -> Unit,
+) {
+    FilledTonalButton(onClick = onClick, modifier = Modifier.padding(end = 8.dp).testTag("ai_transcript_write_with_ai")) {
+        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(if (rest) R.string.ai_transcript_write_rest_with_ai else R.string.ai_transcript_write_with_ai))
     }
 }

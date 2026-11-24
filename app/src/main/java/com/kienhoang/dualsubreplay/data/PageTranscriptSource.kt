@@ -191,6 +191,8 @@ class PageTranscriptSource(
 
     private val late = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
+    private val lateNoTracks = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
     /** Settings → Study tools → Load captions with a page token (beta); targets made from now on follow it. */
     @Volatile var pageTokenMode: PageTokenMode = PageTokenMode.AUTO
 
@@ -202,6 +204,12 @@ class PageTranscriptSource(
 
     /** Video ids whose full transcript the page got after the provider stopped waiting. */
     val lateTranscripts: SharedFlow<String> = late.asSharedFlow()
+
+    /**
+     * Video ids whose page, still watching after the provider stopped waiting, found that YouTube
+     * lists no caption track at all: often the player only finishes loading once the video plays.
+     */
+    val lateNoCaptions: SharedFlow<String> = lateNoTracks.asSharedFlow()
 
     /** The page's transcript of [videoId], or null when the page cannot get it within [timeoutMs]. */
     internal suspend fun transcript(
@@ -316,8 +324,15 @@ class PageTranscriptSource(
             if (clock() - since < PAGE_NO_TRACKS_GRACE_MS) return
             // Last resort: YouTube's own transcript panel, in the language the lines turn out to be.
             val guess = request.choice.preferred.firstOrNull() ?: request.choice.learning ?: "en"
-            request.target = PageCaptionTarget(request.videoId, guess, false, "", request.attempt, panelOnly = true)
+            // The provider may already have stopped waiting with an older reason: it is replaced and announced.
+            val late =
+                synchronized(this) {
+                    request.target = PageCaptionTarget(request.videoId, guess, false, "", request.attempt, panelOnly = true)
+                    if (request.late) fail(request, PageTranscriptProblem.NO_TRACKS)
+                    request.late
+                }
             request.stopWaiting.complete(Unit)
+            if (late) lateNoTracks.tryEmit(request.videoId)
             return
         }
         val baseUrl = track.optString("baseUrl").takeIf { trustedYouTubeCaptionUrl(it) != null }.orEmpty()
@@ -385,19 +400,20 @@ class PageTranscriptSource(
 
     /** Leaves [request] open so the page keeps watching; false when the page answered meanwhile. */
     private fun watchLater(request: Request): Boolean {
-        val reason =
-            when {
-                request.target?.panelOnly == true -> PageTranscriptProblem.NO_TRACKS
-                request.target == null && request.loading -> PageTranscriptProblem.NO_PLAYER
-                request.target == null -> PageTranscriptProblem.NO_ANSWER
-                request.step == "no-player" -> PageTranscriptProblem.NO_PLAYER
-                else -> PageTranscriptProblem.WAITING_FOR_CAPTIONS
-            }
+        // Under the lock, so a no-tracks target set meanwhile is either seen here or announced late.
         synchronized(this) {
             if (current !== request || request.document.isCompleted) return false
             request.late = true
+            val reason =
+                when {
+                    request.target?.panelOnly == true -> PageTranscriptProblem.NO_TRACKS
+                    request.target == null && request.loading -> PageTranscriptProblem.NO_PLAYER
+                    request.target == null -> PageTranscriptProblem.NO_ANSWER
+                    request.step == "no-player" -> PageTranscriptProblem.NO_PLAYER
+                    else -> PageTranscriptProblem.WAITING_FOR_CAPTIONS
+                }
+            fail(request, reason)
         }
-        fail(request, reason)
         return true
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,10 @@ internal class AiSubtitleActions(
      * video's Gemini transcript, made now when missing (Settings → AI assistant without a key).
      */
     val useTranscript: () -> Unit = make,
+    /** The song card's "Get real lyrics": free synced lyrics only, never AI (owner pick 2026-11-24). */
+    val findLyrics: () -> Unit = useTranscript,
+    /** "Write lyrics with AI" (or "Write the rest with AI") after free lyrics fell short: Gemini now. */
+    val writeWithAi: () -> Unit = useTranscript,
     /** The song card's X: no more offers for this video. */
     val closeSuggestion: () -> Unit = {},
     /** True while a video is open, so the Original language list can offer the AI transcript. */
@@ -117,15 +122,20 @@ internal fun LiveStreamNoCaptionsCard() {
 }
 
 @Composable
-internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
+internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String = aiSubtitleProgressText(status, LocalResources.current.uiStrings())
+
+internal fun aiSubtitleProgressText(
+    status: AiSubtitleStatus,
+    strings: UiStrings,
+): String {
     val total = status.totalMs
     return when {
         status.lookingForLyrics && status.lyricsTotal > 1 ->
-            stringResource(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
-        status.lookingForLyrics -> stringResource(R.string.ai_transcript_looking_for_lyrics)
-        status.doneMs <= 0L -> stringResource(R.string.ai_subtitles_starting)
-        total != null -> stringResource(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
-        else -> stringResource(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
+            strings.get(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
+        status.lookingForLyrics -> strings.get(R.string.ai_transcript_looking_for_lyrics)
+        status.doneMs <= 0L -> strings.get(R.string.ai_subtitles_starting)
+        total != null -> strings.get(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
+        else -> strings.get(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
     }
 }
 
@@ -140,8 +150,8 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.REFUSED -> R.string.ai_subtitles_problem_refused
         AiSubtitleProblem.NO_SPEECH -> R.string.ai_subtitles_problem_no_speech
         AiSubtitleProblem.FAILED -> R.string.ai_subtitles_problem_failed
-        AiSubtitleProblem.NO_LYRICS_NEEDS_KEY -> R.string.ai_transcript_no_lyrics_needs_key
-        AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY -> R.string.ai_transcript_some_lyrics_needs_key
+        AiSubtitleProblem.NO_FREE_LYRICS -> R.string.ai_transcript_no_lyrics_needs_key
+        AiSubtitleProblem.SOME_FREE_LYRICS -> R.string.ai_transcript_some_lyrics_needs_key
     }
 
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */
