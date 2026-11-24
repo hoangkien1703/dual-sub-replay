@@ -4,6 +4,12 @@ name: Browser extension checks
 # JavaScript with no build step and no dependencies: this job only runs Node's own test runner and syntax check.
 # It never changes the APK and is not a required check; android.yml still runs on every PR, and
 # tools/automatic_release.py still needs both Android jobs green before a merge publishes anything.
+#
+# On main (push or a manual run), publish-preview-zip puts the extension, tests left out, on the rolling
+# `extension-preview` pre-release as DualSub-Chrome-extension.zip, so people can try it without git
+# (owner pick 2026-11-24, docs/specs/2026-11-24-browser-extension-preview-zip.md). It is a pre-release that is
+# never marked latest: the app's updater reads only releases/latest and the `preview` tag, and
+# tools/automatic_release.py only counts vX.Y.Z tags, so neither ever sees it.
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -15,13 +21,15 @@ on:
     paths:
       - "browser-extension/**"
       - ".github/workflows/browser-extension.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
   group: browser-extension-${{ github.event.pull_request.number || github.ref_name }}
-  cancel-in-progress: true
+  # PR runs give way to newer pushes; a main run is never cut off halfway through publishing.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   extension-tests:
@@ -46,3 +54,58 @@ jobs:
           cd browser-extension
           find . -name '*.js' -print0 | xargs -0 -n1 node --check
           node --test
+
+  publish-preview-zip:
+    needs: extension-tests
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Zip the extension
+        run: |
+          set -euo pipefail
+          if [[ ! -f browser-extension/manifest.json ]]; then
+            echo "No browser-extension/ on main; nothing to publish."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          version="$(jq -r .version browser-extension/manifest.json)"
+          echo "EXT_VERSION=$version" >> "$GITHUB_ENV"
+          # The folder people pick in Load unpacked, without its tests; file times fixed so the zip only changes with its content.
+          find browser-extension -exec touch -d '2000-01-01T00:00:00Z' {} +
+          zip -qrX DualSub-Chrome-extension.zip browser-extension -x 'browser-extension/test/*'
+          unzip -l DualSub-Chrome-extension.zip | tail -n 1
+
+      - name: Publish to the extension-preview release
+        if: env.SKIP != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          short="${SHA:0:7}"
+          notes="$(printf '%s\n\n%s\n\n%s\n%s\n%s\n%s\n\n%s' \
+            "Chrome extension preview ${EXT_VERSION}, built from main at ${short}. Updated on every main change to browser-extension/." \
+            "How to try it:" \
+            "1. Download DualSub-Chrome-extension.zip below and unzip it." \
+            "2. In Chrome (or Edge, Brave, Opera, Vivaldi), open chrome://extensions and turn on Developer mode." \
+            "3. Click Load unpacked and choose the unzipped browser-extension folder." \
+            "4. Open a YouTube video with captions and pick your language from the DualSub icon." \
+            "To update, replace the folder with a newer zip and press the reload arrow on the extension. This is not the Android app; its releases are the vX.Y.Z ones.")"
+          if ! gh release view extension-preview > /dev/null 2>&1; then
+            gh release create extension-preview --prerelease --latest=false --target "$SHA" \
+              --title "Chrome extension (preview)" --notes "$notes"
+          else
+            gh release edit extension-preview --prerelease --latest=false --title "Chrome extension (preview)" --notes "$notes"
+          fi
+          gh release upload extension-preview DualSub-Chrome-extension.zip --clobber
+          echo "Published DualSub-Chrome-extension.zip (${EXT_VERSION}, ${short})."

@@ -222,8 +222,9 @@ Many features started as someone's idea, bug report or test in Discussions and I
 
 A Chrome extension in [`browser-extension/`](browser-extension/README.md) brings the same learning to YouTube on a
 computer: two subtitle lines, replay any sentence, word cards with English grammar help, AI translation with your own
-key, and saved-word practice that imports and exports this app's backups. Load it in Chrome with
-`chrome://extensions` → Developer mode → Load unpacked → `browser-extension/`.
+key, and saved-word practice that imports and exports this app's backups. Download
+[DualSub-Chrome-extension.zip](https://github.com/hoangkien1703/dual-sub-replay/releases/download/extension-preview/DualSub-Chrome-extension.zip), unzip it, then in Chrome open
+`chrome://extensions` → Developer mode → Load unpacked → the unzipped `browser-extension` folder.
 
 ## For developers
 
