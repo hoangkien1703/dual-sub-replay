@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.res.Configuration
+import android.os.SystemClock
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -133,8 +134,13 @@ fun DualSubApp(
         viewModel::translateSubtitleText,
         meaningInSentence = { tap -> viewModel.meaningInContext(tap) },
         ankiCard = viewModel::ankiCard,
+        translateFrom = viewModel::translateLineText,
     )
     BindLineSoundReplay(webController, state.activeVideoId.takeUnless { state.liveFallback })
+    val betaSiteOffer by viewModel.betaSiteOffer.collectAsStateWithLifecycle()
+    betaSiteOffer?.let { offer ->
+        BetaSiteOfferDialog(offer, onTurnOn = viewModel::acceptBetaSiteOffer, onDismiss = viewModel::dismissBetaSiteOffer)
+    }
     val studyRunner = rememberStudyPlaybackRunner(webController, state)
     DisposableEffect(studyRunner, viewModel) {
         studyRunner.liveState = { viewModel.state.value }
@@ -393,6 +399,12 @@ private fun DualSubExperience(
     tabActions: BrowserTabActions = BrowserTabActions(),
     onOpenVideo: (videoId: String) -> Unit = {},
 ) {
+    // Slow replay on a second tap (Settings → Study tools): a tapped line again while it replays plays slower once.
+    val slowReplayTaps = remember { SlowReplayTaps() }
+    val slowReplayOn = rememberStudySettings().value.slowReplay
+    val replayTappedLine: (SubtitleSegment) -> Unit = { segment ->
+        replayLine(segment, webController, slowReplayTaps, slowReplayOn, SystemClock.elapsedRealtime())
+    }
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)
     var showSettings by remember { mutableStateOf(false) }
@@ -403,7 +415,7 @@ private fun DualSubExperience(
         settingsJumpSection = MoreSettingsSection.LAYOUT
         showSettings = true
     }
-    // Gear icons on the player open a small Subtitles popup (languages, Hide while playing); the sidebar opens the full page.
+    // Gear icons on the player open a small Subtitles popup (languages, Show while playing); the sidebar opens the full page.
     var showQuickSettings by remember { mutableStateOf(false) }
     // Opened from the gear popup: every line of the video, search and export (25kiuo, #81, 2026-11-17).
     var showWholeTranscript by remember { mutableStateOf(false) }
@@ -575,9 +587,7 @@ private fun DualSubExperience(
                             onLongPressSettings = openLayoutSettings,
                             onRetry = onRetry,
                             onWordClick = onWordClick,
-                            onReplay = { segment ->
-                                webController.replayFrom(segment.startMs / 1_000f)
-                            },
+                            onReplay = replayTappedLine,
                         )
                     }
                 }
@@ -592,9 +602,7 @@ private fun DualSubExperience(
                             onLongPressSettings = openLayoutSettings,
                             onRetry = onRetry,
                             onWordClick = onWordClick,
-                            onReplay = { segment ->
-                                webController.replayFrom(segment.startMs / 1_000f)
-                            },
+                            onReplay = replayTappedLine,
                         )
                     }
                     if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -1128,6 +1136,7 @@ internal fun SubtitleTimeline(
                     translationUnavailable = state.translationError != null,
                     onWordClick = onWordClick,
                     thirdText = if (showTranslation) state.thirdLineFor(segment) else null,
+                    thirdLanguage = state.thirdLines.language,
                     loop =
                         lineLoop?.let { loop ->
                             val looping = loop.lineId == segment.id

@@ -195,9 +195,10 @@ internal fun phraseTap(
     words: IntRange,
     segment: SubtitleSegment?,
     translated: Boolean,
+    language: String? = null,
 ): WordTap {
     val parts = tokens.subList(words.first, words.last + 1)
-    if (parts.size == 1) return WordTap(parts.single(), segment, translated)
+    if (parts.size == 1) return WordTap(parts.single(), segment, translated, language = language)
     val start = parts.first().startIndex
     val end = parts.last().endIndex
     val readings = parts.mapNotNull { part -> part.reading?.takeIf { it.isNotBlank() } }
@@ -209,7 +210,7 @@ internal fun phraseTap(
             partOfSpeech = PartOfSpeech.OTHER,
             reading = readings.takeIf { it.size == parts.size }?.joinToString(" "),
         )
-    return WordTap(phrase, segment, translated, parts)
+    return WordTap(phrase, segment, translated, parts, language)
 }
 
 /**
@@ -278,6 +279,14 @@ internal class PhraseActions(
     val ankiCard: ((tap: WordTap, meaning: String) -> SavedWord)? = null,
     /** Counts an Add to Anki picked from the ▾ list; true when that puts its icon in the bar from now on. */
     val ankiPickedFromList: () -> Boolean = { false },
+    /**
+     * [pronounce], [select] and [translate] for a line in a language of its own: the third subtitle
+     * line (25kiuo, Discussion #81, 2026-11-21). Its words are read in [language] and translated into
+     * the translation's language.
+     */
+    val pronounceIn: (text: String, language: String) -> Unit = { _, _ -> },
+    val selectIn: (text: String, language: String, singleWord: Boolean) -> Unit = { _, _, _ -> },
+    val translateFrom: (suspend (text: String, language: String) -> String)? = null,
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -363,6 +372,7 @@ internal fun BindPhraseActions(
     translate: suspend (text: String, translated: Boolean) -> String,
     meaningInSentence: suspend (WordTap) -> ContextMeaning = { ContextMeaning.None },
     ankiCard: ((WordTap, String) -> SavedWord)? = null,
+    translateFrom: (suspend (text: String, language: String) -> String)? = null,
 ) {
     val controller = LocalPhraseSelection.current ?: return
     val source = learningSourceLanguage(state.resolvedSourceLanguage, state.sourcePreference)
@@ -384,14 +394,20 @@ internal fun BindPhraseActions(
                     pronouncer.speak(text, if (translated) target else source)
                 },
                 select = { text, translated, singleWord ->
-                    val language = if (translated) target else source
-                    if (speaksOnSelect(text, singleWord, autoPronounce)) {
-                        webController.pause()
-                        pronouncer.speak(text, language)
-                    } else {
-                        pronouncer.forgetUnless(text, language)
-                    }
+                    selectSpoken(text, if (translated) target else source, singleWord, autoPronounce, webController, pronouncer)
                 },
+                pronounceIn = { text, language ->
+                    webController.pause()
+                    pronouncer.speak(text, language)
+                },
+                selectIn = {
+                    text,
+                    language,
+                    singleWord,
+                    ->
+                    selectSpoken(text, language, singleWord, autoPronounce, webController, pronouncer)
+                },
+                translateFrom = translateFrom,
                 stopSpeech = pronouncer::stop,
                 speechMessage = { pronouncer.message },
                 translate = translate,
@@ -413,6 +429,50 @@ internal fun BindPhraseActions(
             )
     }
 }
+
+/** A new selection of [text] in [language]: read aloud when [speaksOnSelect], else only a held recording that fits. */
+private fun selectSpoken(
+    text: String,
+    language: String,
+    singleWord: Boolean,
+    autoPronounce: Boolean,
+    webController: YouTubeWebController,
+    pronouncer: WordPronouncer,
+) {
+    if (speaksOnSelect(text, singleWord, autoPronounce)) {
+        webController.pause()
+        pronouncer.speak(text, language)
+    } else {
+        pronouncer.forgetUnless(text, language)
+    }
+}
+
+/** Selects [text] in its line's language: [lineLanguage] for the third line, else the original or the translation. */
+private fun PhraseActions.selectLine(
+    text: String,
+    translated: Boolean,
+    singleWord: Boolean,
+    lineLanguage: String?,
+) = if (lineLanguage != null) selectIn(text, lineLanguage, singleWord) else select(text, translated, singleWord)
+
+/** Reads [text] aloud in its line's language. */
+private fun PhraseActions.pronounceLine(
+    text: String,
+    translated: Boolean,
+    lineLanguage: String?,
+) = if (lineLanguage != null) pronounceIn(text, lineLanguage) else pronounce(text, translated)
+
+/** The bar's quick translation of [phrase] from its line's language, or null when there is none. */
+private fun PhraseActions.quickTranslateOf(
+    phrase: String,
+    translated: Boolean,
+    lineLanguage: String?,
+): (suspend () -> String)? =
+    if (lineLanguage != null) {
+        translateFrom?.let { translate -> { translate(phrase, lineLanguage) } }
+    } else {
+        translate?.let { translate -> { translate(phrase, translated) } }
+    }
 
 /**
  * A subtitle line whose words can be selected the way Android selects text: tapping a word selects
@@ -437,6 +497,8 @@ internal fun SelectableSubtitleText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     centered: Boolean = false,
+    /** The line's own language when it is neither the original nor the translation (the third line). */
+    lineLanguage: String? = null,
 ) {
     val controller = rememberPhraseSelection()
     val owner = remember { Any() }
@@ -464,7 +526,9 @@ internal fun SelectableSubtitleText(
     val singleWord = words != null && words.first == words.last
     // While a finger drags, the selection changes word by word: speak and translate where it stops.
     LaunchedEffect(spoken, singleWord, drag.active) {
-        if (!drag.active) spoken?.let { controller.actions.select(it, translated, singleWord) }
+        if (!drag.active) {
+            spoken?.let { said -> controller.actions.selectLine(said, translated, singleWord, lineLanguage) }
+        }
     }
     val shown =
         if (start != null && end != null) {
@@ -506,22 +570,20 @@ internal fun SelectableSubtitleText(
                     speechMessage = controller.actions.speechMessage(),
                     dictionaryNote =
                         japaneseDictionaryNote(dictionaryStatus).takeIf { LanguageAwareTokenizer.isJapanese(text, languageCode) },
-                    quickTranslate =
-                        controller.actions.translate
-                            ?.let { translate -> { translate(text.substring(start, end), translated) } },
+                    quickTranslate = controller.actions.quickTranslateOf(text.substring(start, end), translated, lineLanguage),
                     meaningInSentence =
                         controller.actions.meaningInSentence
-                            ?.let { ask -> { ask(phraseTap(text, tokens, words, segment, translated)) } },
+                            ?.let { ask -> { ask(phraseTap(text, tokens, words, segment, translated, lineLanguage)) } },
                     meaningInSentenceFirst = controller.actions.meaningInSentenceFirst,
                     onTranslate = {
-                        val tap = phraseTap(text, tokens, words, segment, translated)
+                        val tap = phraseTap(text, tokens, words, segment, translated, lineLanguage)
                         controller.clear(owner)
                         onWordClick(tap)
                     },
                     buttons = controller.actions.buttons,
                     onAnkiFromList = controller.actions.ankiPickedFromList,
-                    ankiCard = barAnkiCard(controller.actions, phraseTap(text, tokens, words, segment, translated)),
-                    onPronounce = { spoken?.let { controller.actions.pronounce(it, translated) } },
+                    ankiCard = barAnkiCard(controller.actions, phraseTap(text, tokens, words, segment, translated, lineLanguage)),
+                    onPronounce = { spoken?.let { said -> controller.actions.pronounceLine(said, translated, lineLanguage) } },
                     onOpenGoogleTranslate = {
                         controller.actions.openGoogleTranslate(text.substring(start, end))
                     },

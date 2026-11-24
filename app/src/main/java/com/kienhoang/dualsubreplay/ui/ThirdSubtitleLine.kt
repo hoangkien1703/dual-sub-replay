@@ -26,6 +26,9 @@ internal const val THIRD_LANGUAGE_PREFERENCE = "third_subtitle_language"
 /** Settings → Subtitle text → Third subtitle line; off by default (owner request 2026-11-02). */
 internal const val THIRD_LINE_ENABLED_PREFERENCE = "third_subtitle_line_enabled"
 
+/** After a failed third line, the next try comes this long later, or at the next seek. */
+internal const val THIRD_LINE_RETRY_MS = 10_000L
+
 /** The switch and the language it remembers; the language is kept while the switch is off. */
 data class ThirdLineChoice(
     val enabled: Boolean = false,
@@ -73,6 +76,20 @@ internal fun DualSubUiState.thirdLineFor(segment: SubtitleSegment?): String? {
         ?.takeIf(String::isNotBlank)
 }
 
+/**
+ * A word tapped on the third line: its selection's segment carries the third line as the line's
+ * translation, so the card keeps the real translation (the second line) as the card's third line.
+ */
+internal fun LearningWordSelection.withSecondLineAsThird(state: DualSubUiState): LearningWordSelection {
+    val id = segment?.id ?: return this
+    val second =
+        state.segments
+            .firstOrNull { it.id == id }
+            ?.translatedText
+            ?.takeIf(String::isNotBlank) ?: return this
+    return copy(thirdText = second, thirdLanguage = state.targetLanguage)
+}
+
 /** [selection] with its line's third subtitle line, when it has none yet and that line is on screen for its video. */
 internal fun DualSubUiState.withThirdLineOnScreen(selection: LearningWordSelection): LearningWordSelection {
     if (selection.thirdText != null || selection.videoId == null || selection.videoId != activeVideoId) return selection
@@ -83,8 +100,9 @@ internal fun DualSubUiState.withThirdLineOnScreen(selection: LearningWordSelecti
 /**
  * Translates the rows near playback into the third language with the same window loop as the second
  * line, on the same display store so the row ids match. Google first (an unanswered or blank line goes
- * to the device when it has a model), or only the device with "On this device only". A failure only
- * stops this line until the next "Retry translation": the other two lines never wait for it.
+ * to the device when it has a model), or only the device with "On this device only". A failure (a
+ * slow Google answer behind a VPN, 25kiuo, Discussion #81, 2026-11-21) only pauses this line for
+ * [THIRD_LINE_RETRY_MS] or until the next seek: the other two lines never wait for it.
  */
 internal class ThirdLineTranslation(
     private val state: MutableStateFlow<DualSubUiState>,
@@ -107,9 +125,12 @@ internal class ThirdLineTranslation(
             .collectLatest { (third, engine) ->
                 publish(videoId, generation, ThirdLines(videoId, third))
                 if (third == null) return@collectLatest
+                // Every third line of this video and language so far, so lines played before still
+                // show after a seek back (25kiuo, Discussion #81, 2026-11-21).
+                val kept = HashMap<Long, String>()
                 val publishRows = { rows: List<SubtitleSegment>, _: Boolean ->
-                    val lines = rows.mapNotNull { row -> row.translatedText?.let { row.id to it } }.toMap()
-                    publish(videoId, generation, ThirdLines(videoId, third, lines))
+                    rows.forEach { row -> row.translatedText?.takeIf(String::isNotBlank)?.let { kept[row.id] = it } }
+                    publish(videoId, generation, ThirdLines(videoId, third, HashMap(kept)))
                 }
                 val deviceCan = onDevice.supports(source, third)
                 if (engine == TranslationEngine.ON_DEVICE) {
@@ -118,7 +139,16 @@ internal class ThirdLineTranslation(
                     onDevice.withSession(
                         source,
                         third,
-                    ) { translate -> translatePlaybackWindow(store, requests, translate, onWindow = publishRows) }
+                    ) { translate ->
+                        translatePlaybackWindow(
+                            store,
+                            requests,
+                            translate,
+                            known = kept::get,
+                            retryAfterFailureMs = THIRD_LINE_RETRY_MS,
+                            onWindow = publishRows,
+                        )
+                    }
                     return@collectLatest
                 }
                 translatePlaybackWindow(
@@ -126,6 +156,8 @@ internal class ThirdLineTranslation(
                     requests,
                     translate = { text -> viaGoogle(source, third, text, googleRequests, deviceCan) },
                     prefetch = { texts -> prefetchGoogle(source, third, texts, googleRequests) },
+                    known = kept::get,
+                    retryAfterFailureMs = THIRD_LINE_RETRY_MS,
                     onWindow = publishRows,
                 )
             }

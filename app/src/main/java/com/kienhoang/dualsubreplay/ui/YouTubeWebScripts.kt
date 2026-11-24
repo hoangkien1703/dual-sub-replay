@@ -756,6 +756,52 @@ internal fun webPauseScript(): String =
     })();
     """.trimIndent()
 
+/**
+ * Slow replay on a second tap: plays the page video at [rate] (keeping the speed it had) and brings
+ * that speed back after [safetyMs], when the line has played; a null [rate] brings it back at once
+ * unless the learner changed the speed meanwhile.
+ */
+internal fun webSlowReplayScript(
+    rate: Float?,
+    safetyMs: Long,
+): String {
+    val safeRate = rate?.takeIf { it.isFinite() }?.coerceIn(MIN_SLOW_REPLAY_RATE, 1f)
+    val safeDelay = safetyMs.coerceIn(0L, 120_000L)
+    return """
+        (function() {
+          const host = window.location.hostname.toLowerCase().replace(/\.${'$'}/, '');
+          if (window.location.protocol !== 'https:' || !$VIDEO_SITE_HOST_CHECK) return false;
+          const restore = function() {
+            clearTimeout(window.__dualSubSlowTimer);
+            window.__dualSubSlowTimer = null;
+            document.querySelectorAll('video').forEach(function(video) {
+              if (typeof video.__dualSubSlowRate !== 'number') return;
+              if (video.playbackRate === video.__dualSubSlow) video.playbackRate = video.__dualSubSlowRate;
+              delete video.__dualSubSlowRate;
+              delete video.__dualSubSlow;
+            });
+            return true;
+          };
+          const rate = ${safeRate ?: "null"};
+          if (rate === null) return restore();
+          const videos = Array.from(document.querySelectorAll('video'));
+          const video = videos.find(function(item) { return !item.paused && !item.ended; })
+            || videos.find(function(item) { return item.readyState > 0; })
+            || videos[0];
+          if (!video) return false;
+          if (typeof video.__dualSubSlowRate !== 'number') video.__dualSubSlowRate = video.playbackRate;
+          video.__dualSubSlow = rate;
+          video.playbackRate = rate;
+          clearTimeout(window.__dualSubSlowTimer);
+          window.__dualSubSlowTimer = setTimeout(restore, $safeDelay);
+          return true;
+        })();
+        """.trimIndent()
+}
+
+/** The slowest speed Slow replay asks for. */
+private const val MIN_SLOW_REPLAY_RATE = 0.5f
+
 /** Sets the page video's speed (0.25 to 2); the assistant's playback speed action. */
 internal fun webPlaybackSpeedScript(rate: Float): String {
     val safeRate = rate.takeIf { it.isFinite() }?.coerceIn(MIN_WEB_PLAYBACK_SPEED, MAX_WEB_PLAYBACK_SPEED) ?: 1f

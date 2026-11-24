@@ -23,6 +23,7 @@ The icons follow the [all-contributors key](https://allcontributors.org/docs/en/
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jarsin918"><img src="https://avatars.githubusercontent.com/u/339452757?v=4?s=80" width="80px;" alt="jarsin918"/><br /><sub><b>jarsin918</b></sub></a><br /><a href="#ideas-jarsin918" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/xmha97"><img src="https://avatars.githubusercontent.com/u/23485114?v=4?s=80" width="80px;" alt="xmha97"/><br /><sub><b>xmha97</b></sub></a><br /><a href="#ideas-xmha97" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ansidalia-lansi"><img src="https://avatars.githubusercontent.com/u/346827753?v=4?s=80" width="80px;" alt="ansidalia-lansi"/><br /><sub><b>ansidalia-lansi</b></sub></a><br /><a href="#ideas-ansidalia-lansi" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

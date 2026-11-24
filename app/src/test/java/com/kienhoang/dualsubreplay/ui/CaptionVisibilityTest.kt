@@ -61,13 +61,15 @@ class CaptionVisibilityTest {
         assertNull(broken.playerFrame)
     }
 
-    @Test fun hideWhilePlayingToggleSwitchesAlwaysAndOnlyWhenPaused() {
-        assertFalse(CaptionVisibility.ALWAYS.hiddenWhilePlaying)
-        assertTrue(CaptionVisibility.PAUSED.hiddenWhilePlaying)
-        assertTrue(CaptionVisibility.NEVER.hiddenWhilePlaying)
-        assertEquals(CaptionVisibility.PAUSED, CaptionVisibility.ALWAYS.toggledHideWhilePlaying())
-        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.PAUSED.toggledHideWhilePlaying())
+    @Test fun showWhilePlayingToggleSwitchesAlwaysAndOnlyWhenPaused() {
+        // Ticked means the translation shows while playing, so the default (Always) is ticked.
+        assertTrue(CaptionVisibility.ALWAYS.shownWhilePlaying)
+        assertFalse(CaptionVisibility.PAUSED.shownWhilePlaying)
+        assertFalse(CaptionVisibility.NEVER.shownWhilePlaying)
+        assertEquals(CaptionVisibility.ALWAYS, storedCaptionVisibility(null))
+        assertEquals(CaptionVisibility.PAUSED, CaptionVisibility.ALWAYS.toggledShowWhilePlaying())
+        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.PAUSED.toggledShowWhilePlaying())
         // Never is only in the full settings; a tap here shows the line again.
-        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.NEVER.toggledHideWhilePlaying())
+        assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.NEVER.toggledShowWhilePlaying())
     }
 }

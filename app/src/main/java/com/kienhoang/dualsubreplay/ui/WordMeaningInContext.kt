@@ -105,7 +105,8 @@ internal fun meaningContext(
 ): MeaningContext? {
     val segment = selection.segment ?: return null
     if (selection.token.text.isBlank()) return null
-    return meaningContext(segment, selection.translated, segments)
+    // A third-line word's segment carries the third line; the transcript's rows only know the second.
+    return meaningContext(segment, selection.translated, if (selection.lineLanguage != null) emptyList() else segments)
 }
 
 /** The [MeaningContext] of a word in [segment]'s original line, or in its translation when [translated]. */

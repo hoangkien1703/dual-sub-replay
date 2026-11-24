@@ -651,7 +651,7 @@ internal fun QuickLanguageSettingsDialog(
                     onPick = languagePicker::open,
                 )
                 Spacer(Modifier.height(16.dp))
-                HideWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
+                ShowWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
                 val sleepTimerHere by rememberSleepTimerInQuickSettings()
                 if (sleepTimerHere) SleepTimerRow()
                 HorizontalDivider(

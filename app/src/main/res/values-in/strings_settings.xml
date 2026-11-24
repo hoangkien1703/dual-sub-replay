@@ -66,7 +66,7 @@
     <string name="settings_third_line_title">Baris subtitle ketiga</string>
     <string name="settings_third_line_choose">Pilih bahasa</string>
     <string name="settings_quick_subtitles">Subtitel</string>
-    <string name="settings_hide_while_playing">Sembunyikan saat diputar</string>
+    <string name="settings_show_while_playing">Tampilkan saat diputar</string>
     <string name="sleep_timer_title">Timer tidur</string>
     <string name="sleep_timer_off">Mati</string>
     <string name="sleep_timer_minutes">%1$d mnt</string>

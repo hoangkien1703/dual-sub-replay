@@ -147,4 +147,17 @@
     <string name="study_saved_word_video_example_description">저장한 단어는 연습에서 동영상의 해당 줄을 다시 재생할 수 있어요. 단어마다 연습에서 바꿀 수 있어요.</string>
     <string name="study_send_on_save_title">저장한 단어도 보내기</string>
     <string name="study_send_on_save_description">단어 카드에서 연습에 저장하면 단어를 %1$s로도 보내요.</string>
+    <string name="study_repeat_pause_title">반복 사이에 일시 정지</string>
+    <string name="study_repeat_pause_description">줄을 한 번 재생할 때마다 동영상이 멈춰서 소리 내어 따라 말할 수 있습니다(섀도잉). 재생을 누르면 더 빨리 이어집니다.</string>
+    <string name="study_repeat_pause_off">끄기</string>
+    <string name="study_repeat_pause_line">줄 길이만큼</string>
+    <string name="study_repeat_pause_2">2초</string>
+    <string name="study_repeat_pause_5">5초</string>
+    <string name="study_repeat_pause_search">섀도잉</string>
+    <string name="study_slow_replay_title">두 번째 탭으로 느리게 다시 듣기</string>
+    <string name="study_slow_replay_description">다시 재생 중인 줄을 한 번 더 탭하면 0.75× 속도로 한 번 들려줍니다. 그 줄이 끝나면 원래 속도로 돌아갑니다.</string>
+    <string name="study_card_front_meaning">뜻</string>
+    <string name="study_card_front_meaning_description">앞면에 단어의 뜻과 문장 번역(내 언어)을 보여 줍니다. 단어를 말해 본 뒤 카드를 뒤집어 문장 속에서 확인하세요.</string>
+    <string name="study_card_front_fill_gap">빈칸 채우기</string>
+    <string name="study_card_front_fill_gap_description">앞면에는 단어를 가린 문장을, 뒷면에는 그 자리에 단어와 뜻을 보여 줍니다.</string>
 </resources>

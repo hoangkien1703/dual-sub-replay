@@ -20,6 +20,19 @@ internal enum class CardFront(
 
     /** Only the line's sound; until the sound is there, the sentence shows instead. */
     LISTENING("listening"),
+
+    /**
+     * The word's meaning with the sentence's translation, in the learner's language: say the word in
+     * the language being learned (ansidalia-lansi, Discussion #257, 2026-11-23: "English on the front,
+     * German on the back").
+     */
+    MEANING("meaning"),
+
+    /**
+     * The sentence with the word hidden, to fill in (lion737's movie card, Discussion #81,
+     * 2026-11-21). The back shows the word in its place.
+     */
+    FILL_GAP("fill_gap"),
 }
 
 internal fun storedCardFront(value: String?): CardFront =
@@ -91,7 +104,7 @@ internal data class CardReadAloud(
 
 /** Where the word's voice usually goes for [front]: with the word, so on the back when the front hides the word. */
 internal fun usualWordSoundPlace(front: CardFront): CardPlace =
-    if (front == CardFront.SENTENCE || front == CardFront.LISTENING) CardPlace.BACK else CardPlace.FRONT
+    if (front == CardFront.WORD_AND_SENTENCE || front == CardFront.WORD) CardPlace.FRONT else CardPlace.BACK
 
 /**
  * What Send to puts on each card, and where (Settings → Flashcards & Anki): the word's voice, the
@@ -170,6 +183,20 @@ private const val SENTENCE_HTML = "<div class=sentence>{{Sentence}}</div>"
 /** The note type's CSS can't change once AnkiDroid made it, so the sentence front sizes itself. */
 private const val SENTENCE_FRONT_HTML = "<div class=sentence style=\"font-size:26px\">{{Sentence}}</div>"
 private const val READING_HTML = "<div class=reading>{{Reading}}</div>"
+
+/** A Meaning front: the meaning big, as the question. */
+private const val MEANING_FRONT_HTML = "<div class=meaning style=\"font-size:24px\">{{Meaning}}</div>"
+
+/**
+ * A Fill the gap front: the sentence with its bold word (the tapped word, see `ankiSentenceHtml`)
+ * kept in place but not drawn, over a line, so the gap is as long as the word.
+ */
+private const val GAP_FRONT_HTML =
+    "<div class=\"sentence gap\" style=\"font-size:26px\">{{Sentence}}</div>" +
+        "<style>.gap b{-webkit-text-fill-color:transparent;border-bottom:2px solid}</style>"
+
+/** The back shows the front above it: this draws the hidden word there again. */
+private const val GAP_REVEAL_HTML = "<style>.gap b{-webkit-text-fill-color:inherit!important;border-bottom:0!important}</style>"
 private const val MEANING_HTML = "<div class=meaning>{{Meaning}}</div>"
 private const val TRANSLATION_HTML = "<div class=translation>{{Translation}}</div>"
 private const val SOURCE_HTML = "<div class=source>{{Source}}</div>"
@@ -240,6 +267,19 @@ internal fun ankiCardTemplate(
                 },
                 BACK_START + "{{#Sentence audio}}$SENTENCE_HTML{{/Sentence audio}}" +
                     WORD_HTML + wordSound(false) + details + TRANSLATION_HTML + source,
+            )
+        CardFront.MEANING ->
+            AnkiCardTemplate(
+                // A word saved without a meaning shows itself, so Anki never makes an empty card.
+                MEANING_FRONT_HTML + "{{^Meaning}}$WORD_HTML{{/Meaning}}" + TRANSLATION_HTML + picture + wordSound(true) +
+                    sentenceSound(true),
+                BACK_START + WORD_HTML + wordSound(false) + (if (readingBack) READING_HTML else "") + SENTENCE_HTML +
+                    sentenceSound(false) + source,
+            )
+        CardFront.FILL_GAP ->
+            AnkiCardTemplate(
+                GAP_FRONT_HTML + picture + wordSound(true) + sentenceSound(true),
+                BACK_START + GAP_REVEAL_HTML + WORD_HTML + wordSound(false) + details + TRANSLATION_HTML + sentenceSound(false) + source,
             )
     }
 }

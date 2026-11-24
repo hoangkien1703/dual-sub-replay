@@ -40,14 +40,14 @@ enum class CaptionVisibility(
 }
 
 /**
- * The gear popup's Hide while playing toggles (owner pick 2026-11-10): ticked unless the line always
- * shows, so Never counts as hidden too.
+ * The gear popup's Show while playing toggle (owner pick 2026-11-10, turned around 2026-11-23 so a tick
+ * means the line shows): ticked only when the line always shows, so Never counts as not shown.
  */
-internal val CaptionVisibility.hiddenWhilePlaying: Boolean
-    get() = this != CaptionVisibility.ALWAYS
+internal val CaptionVisibility.shownWhilePlaying: Boolean
+    get() = this == CaptionVisibility.ALWAYS
 
-/** A tap on a Hide while playing toggle switches Always and Only when paused; from Never it shows the line again. */
-internal fun CaptionVisibility.toggledHideWhilePlaying(): CaptionVisibility =
+/** A tap on the Show while playing toggle switches Always and Only when paused; from Never it shows the line again. */
+internal fun CaptionVisibility.toggledShowWhilePlaying(): CaptionVisibility =
     if (this == CaptionVisibility.ALWAYS) CaptionVisibility.PAUSED else CaptionVisibility.ALWAYS
 
 internal fun storedCaptionVisibility(value: String?): CaptionVisibility =
@@ -108,34 +108,34 @@ internal fun CaptionVisibilitySettings() {
  * Original stays on the settings page, so the popup can't hide both lines and leave the video blank.
  */
 @Composable
-internal fun HideWhilePlayingRow(
+internal fun ShowWhilePlayingRow(
     translated: CaptionVisibility,
     onChange: (original: Boolean, visibility: CaptionVisibility) -> Unit,
 ) {
     Row(
-        Modifier.fillMaxWidth().testTag("hide_while_playing"),
+        Modifier.fillMaxWidth().testTag("show_while_playing"),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.settings_hide_while_playing),
+            stringResource(R.string.settings_show_while_playing),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f),
         )
-        HideWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "hide_translation_while_playing") {
-            onChange(false, translated.toggledHideWhilePlaying())
+        ShowWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "show_translation_while_playing") {
+            onChange(false, translated.toggledShowWhilePlaying())
         }
     }
 }
 
 @Composable
-private fun HideWhilePlayingChip(
+private fun ShowWhilePlayingChip(
     @StringRes labelRes: Int,
     visibility: CaptionVisibility,
     tag: String,
     onClick: () -> Unit,
 ) {
-    val selected = visibility.hiddenWhilePlaying
+    val selected = visibility.shownWhilePlaying
     FilterChip(
         selected = selected,
         onClick = onClick,

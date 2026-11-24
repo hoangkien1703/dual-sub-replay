@@ -9,6 +9,11 @@ data class WordTap(
     val segment: SubtitleSegment?,
     val translated: Boolean,
     val parts: List<AnalyzedToken> = listOf(token),
+    /**
+     * The word's language when its line has one of its own: the third subtitle line (25kiuo,
+     * Discussion #81, 2026-11-21). Its [segment] then carries the third line as its translation.
+     */
+    val language: String? = null,
 )
 
 data class LearningWordSelection(
@@ -22,6 +27,8 @@ data class LearningWordSelection(
     /** The line's third subtitle line (Settings → Subtitle text) and its language; null while that line is off or not translated yet. */
     val thirdText: String? = null,
     val thirdLanguage: String? = null,
+    /** The tapped line's own language when it is the third line ([WordTap.language]); null for the other two lines. */
+    val lineLanguage: String? = null,
 ) {
     val isPhrase: Boolean get() = parts.size > 1
 }
@@ -34,12 +41,14 @@ internal fun learningSelection(
 ): LearningWordSelection =
     LearningWordSelection(
         token = tap.token,
-        wordLanguage = if (tap.translated) target else source,
-        meaningLanguage = if (tap.translated) source else target,
+        // A third-line word is explained in the translation's language, the learner's own.
+        wordLanguage = tap.language ?: if (tap.translated) target else source,
+        meaningLanguage = if (tap.translated && tap.language == null) source else target,
         videoId = videoId,
         segment = tap.segment,
         translated = tap.translated,
         parts = tap.parts,
+        lineLanguage = tap.language,
     )
 
 /** The language of original subtitle lines, falling back to English until one is known. */

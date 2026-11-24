@@ -542,11 +542,33 @@ class AppViewModel internal constructor(
         }
     }
 
+    private val betaSiteOfferFlow = MutableStateFlow<BetaSiteOffer?>(null)
+
+    /** A shared link to a Beta site that is off, waiting for "Turn on" or the X; null otherwise. */
+    internal val betaSiteOffer: StateFlow<BetaSiteOffer?> = betaSiteOfferFlow.asStateFlow()
+
+    /** The learner turned the offered Beta site on: the link they shared opens now. */
+    internal fun acceptBetaSiteOffer() {
+        val offer = betaSiteOfferFlow.value ?: return
+        betaSiteOfferFlow.value = null
+        turnOnBetaSite(preferences, offer.site)
+        acceptSharedText(offer.url)
+    }
+
+    internal fun dismissBetaSiteOffer() {
+        betaSiteOfferFlow.value = null
+    }
+
     fun acceptSharedText(text: String) {
         val youtubeId = YouTubeUrlParser.extractVideoId(text)
         // A card's "DualSub Replay 1:23" link starts the video at its line.
         val start = YouTubeUrlParser.extractStartSeconds(text)?.let { "&t=${it}s" }.orEmpty()
-        val watchUrl = youtubeId?.let { mobileWatchUrl(it) + start } ?: sharedBilibiliUrl(text) ?: return
+        val watchUrl = youtubeId?.let { mobileWatchUrl(it) + start } ?: sharedBilibiliUrl(text)
+        if (watchUrl == null) {
+            // A link to a Beta site that is off asks to turn it on instead of doing nothing.
+            offBetaSiteLink(text)?.let { betaSiteOfferFlow.value = it }
+            return
+        }
         // A b23.tv short link names no video yet: the page reports it once Bilibili has redirected.
         val videoId = youtubeId ?: VideoKeys.fromUrl(watchUrl)
         ensureOpenTab(watchUrl)
@@ -1235,14 +1257,15 @@ class AppViewModel internal constructor(
         val source =
             com.kienhoang.dualsubreplay.data
                 .learningSourceLanguage(current.resolvedSourceLanguage, current.sourcePreference)
-        return current.withThirdLineOnScreen(
+        val selection =
             com.kienhoang.dualsubreplay.data.learningSelection(
                 if (current.liveFallback) tap.copy(segment = null) else tap,
                 source,
                 current.targetLanguage,
                 current.activeVideoId.takeUnless { current.liveFallback },
-            ),
-        )
+            )
+        if (tap.language != null) return selection.withSecondLineAsThird(current)
+        return current.withThirdLineOnScreen(selection)
     }
 
     /**
@@ -1277,6 +1300,12 @@ class AppViewModel internal constructor(
             translateText(source, current.targetLanguage, text)
         }
     }
+
+    /** Translates [text] from a line in [language] of its own (the third line) into the target language. */
+    internal suspend fun translateLineText(
+        text: String,
+        language: String,
+    ): String = translateText(language, _state.value.targetLanguage, text)
 
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
         translateText(selection.wordLanguage, selection.meaningLanguage, selection.token.text)

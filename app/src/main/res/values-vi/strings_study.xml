@@ -147,4 +147,17 @@
     <string name="study_saved_word_video_example_description">Từ bạn lưu có thể phát lại câu của nó từ video trong Luyện tập. Bạn có thể đổi cho từng từ ở đó.</string>
     <string name="study_send_on_save_title">Gửi luôn từ đã lưu</string>
     <string name="study_send_on_save_description">Nút Lưu vào Luyện tập trên thẻ từ cũng gửi từ sang %1$s.</string>
+    <string name="study_repeat_pause_title">Dừng giữa các lần lặp</string>
+    <string name="study_repeat_pause_description">Sau mỗi lần phát dòng, video dừng lại để bạn nói theo (shadowing). Bấm phát để tiếp tục sớm hơn.</string>
+    <string name="study_repeat_pause_off">Tắt</string>
+    <string name="study_repeat_pause_line">Bằng độ dài của dòng</string>
+    <string name="study_repeat_pause_2">2 giây</string>
+    <string name="study_repeat_pause_5">5 giây</string>
+    <string name="study_repeat_pause_search">Shadowing nói đuổi</string>
+    <string name="study_slow_replay_title">Phát chậm khi chạm lần thứ hai</string>
+    <string name="study_slow_replay_description">Chạm lại vào dòng khi nó đang phát lại để nghe một lần với tốc độ 0,75×. Tốc độ của bạn trở lại sau dòng đó.</string>
+    <string name="study_card_front_meaning">Nghĩa</string>
+    <string name="study_card_front_meaning_description">Mặt trước hiện nghĩa của từ và bản dịch của câu bằng ngôn ngữ của bạn: hãy nói từ đó, rồi lật thẻ để xem nó trong câu.</string>
+    <string name="study_card_front_fill_gap">Điền vào chỗ trống</string>
+    <string name="study_card_front_fill_gap_description">Mặt trước hiện câu với từ bị ẩn; mặt sau hiện từ ở đúng chỗ của nó, kèm nghĩa.</string>
 </resources>

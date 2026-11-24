@@ -16,4 +16,7 @@
     <string name="bilibili_no_subtitles_body">Bilibili lists no subtitles for this video. Try another video.</string>
     <string name="bilibili_try_again">Try again</string>
     <string name="tabs_site_youtube" translatable="false">YouTube</string>
+    <string name="beta_offer_title">Turn on %1$s (Beta)?</string>
+    <string name="beta_offer_message">This is a %1$s link. %1$s is a Beta site in DualSub Replay: turn it on to watch this video with dual subtitles. You can turn it off again in Settings → Beta.</string>
+    <string name="beta_offer_turn_on">Turn on</string>
 </resources>
