@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DualSub · Saved words</title>
+<link rel="icon" href="../icons/icon32.png">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="saved-words.css">
+<header>
+  <h1><img src="../icons/icon32.png" alt="" width="28" height="28"> DualSub</h1>
+  <nav>
+    <button id="tab-list" class="tab" aria-pressed="true">Saved words (<span id="count">0</span>)</button>
+    <button id="tab-practice" class="tab" aria-pressed="false">Practice (<span id="due">0</span> due)</button>
+  </nav>
+  <select id="video" aria-label="Video"></select>
+</header>
+<main>
+  <section id="list-view">
+    <input id="search" type="search" placeholder="Search words, meanings or sentences" aria-label="Search saved words">
+    <div class="transfer">
+      <button id="export-json" title="Full backup in the Android app's format">Export backup</button>
+      <button id="export-tsv" title="Anki text file (tab-separated), as the Android app writes it">Export for Anki</button>
+      <button id="import" title="A JSON backup from this page or from the Android app">Import backup</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+    </div>
+    <p id="transfer-note" class="note"></p>
+    <p id="empty" hidden>No saved words yet. Click a word under a YouTube video and press Save.</p>
+    <ul id="words"></ul>
+  </section>
+  <section id="practice-view" hidden>
+    <div id="review" class="review"></div>
+  </section>
+</main>
+<script src="../data/words.js"></script>
+<script src="../data/vocabulary.js"></script>
+<script src="saved-words.js"></script>
+</html>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- The 16 and 32 px icon: the same tile and screen with only the two subtitle lines. Edges sit on multiples of 8,
+       whole pixels at 16 px, so the lines stay sharp. -->
+  <rect width="128" height="128" rx="32" fill="#00C5E5"/>
+  <rect x="16" y="24" width="96" height="80" rx="16" fill="#0B1C20"/>
+  <rect x="32" y="40" width="64" height="16" rx="5" fill="#F3FAFA"/>
+  <rect x="40" y="64" width="48" height="16" rx="5" fill="#9EDCE4"/>
+</svg>

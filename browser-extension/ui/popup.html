@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>DualSub · Settings</title>
+<link rel="icon" href="../icons/icon32.png">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { width: 300px; margin: 0 auto; padding: 14px; }
+  header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  header b { flex: 1; font-size: 17px; }
+  label { display: block; margin: 12px 0 4px; color: var(--muted); font-size: 13px; }
+  select, input { width: 100%; }
+  small { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+  #ai { margin-top: 8px; padding: 2px 12px 12px; border-radius: 12px; background: var(--card); }
+  .primary { width: 100%; margin-top: 16px; }
+  .links { display: flex; gap: 8px; margin-top: 8px; }
+  .links button { flex: 1; }
+</style>
+<header><img src="../icons/icon32.png" alt="" width="24" height="24"><b>DualSub</b></header>
+<label for="target">Translate subtitles into</label>
+<select id="target"></select>
+<label for="translator">Translate subtitles with</label>
+<select id="translator">
+  <option value="google">Google</option>
+  <option value="ai">AI translation (best quality)</option>
+</select>
+<div id="ai" hidden>
+  <label for="service">AI service</label>
+  <select id="service"></select>
+  <label for="key">API key · <a id="get-key" target="_blank">Get a key</a> · <a id="how" href="#">How?</a></label>
+  <input id="key" type="password" autocomplete="off" spellcheck="false">
+  <label for="model">Model</label>
+  <input id="model" spellcheck="false">
+  <small id="key-note"></small>
+</div>
+<button class="primary" id="open">Saved words &amp; practice (<span id="count">0</span>)</button>
+<div class="links"><button class="secondary" id="guide">Guide &amp; AI setup</button></div>
+<script src="../data/languages.js"></script>
+<script src="../data/language-codes.js"></script>
+<script src="../data/vocabulary.js"></script>
+<script src="../translation/ai.js"></script>
+<script src="popup.js"></script>

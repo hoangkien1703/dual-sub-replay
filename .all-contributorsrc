@@ -85,6 +85,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/346827753?v=4",
       "profile": "https://github.com/ansidalia-lansi",
       "contributions": ["ideas"]
+    },
+    {
+      "login": "parastouh",
+      "name": "parastouh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55647928?v=4",
+      "profile": "https://github.com/parastouh",
+      "contributions": ["code", "doc"]
     }
   ]
 }

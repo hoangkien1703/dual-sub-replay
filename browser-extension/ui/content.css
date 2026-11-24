@@ -1,0 +1,165 @@
+/* DualSub on the watch page, in the Android app's dark teal look (ui/SubtitleColors.kt defaults: ice white original,
+   sky blue translation, mint highlight, deep teal box, cyan accent). Always dark, whatever YouTube's theme. */
+:root {
+  --ds-bg: #0a1d20;
+  --ds-card: #10282c;
+  --ds-card-hi: #163338;
+  --ds-line: rgba(243, 250, 250, 0.12);
+  --ds-text: #f3fafa;
+  --ds-tr: #9edce4;
+  --ds-muted: #8fb0b4;
+  --ds-accent: #13c6d7;
+  --ds-mint: #75e7c1;
+  --ds-box: rgba(6, 23, 25, 0.84);
+}
+
+.dualsub-on .ytp-caption-window-container { display: none !important; }
+
+/* ---- Subtitles over the video ---- */
+.dualsub-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  max-width: 86%;
+  z-index: 60;
+  padding: 8px 16px 10px;
+  border-radius: 14px;
+  background: var(--ds-box);
+  text-align: center;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+}
+.dualsub-overlay:empty { display: none; }
+.dualsub-overlay .dualsub-orig { color: var(--ds-text); font-size: 24px; line-height: 1.35; }
+.dualsub-overlay .dualsub-tr { margin-top: 2px; color: var(--ds-tr); font-size: 20px; line-height: 1.35; }
+.dualsub-overlay .dualsub-tr:empty { display: none; }
+
+/* ---- Sentence panel beside the video ---- */
+.dualsub-panel {
+  margin-bottom: 12px;
+  border: 1px solid var(--ds-line);
+  border-radius: 16px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: 15px/1.4 Roboto, Arial, sans-serif;
+  overflow: hidden;
+}
+.dualsub-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--ds-line); }
+.dualsub-logo { flex: none; width: 24px; height: 24px; }
+.dualsub-head-text { flex: 1; min-width: 0; }
+.dualsub-title { font-size: 15px; font-weight: 500; }
+.dualsub-status { color: var(--ds-muted); font-size: 12px; }
+.dualsub-status a { color: var(--ds-accent); cursor: pointer; }
+.dualsub-icon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 17px;
+  line-height: 32px;
+  cursor: pointer;
+}
+.dualsub-icon:hover { background: var(--ds-card-hi); }
+.dualsub-list { list-style: none; margin: 0; padding: 8px; max-height: 460px; overflow-y: auto; position: relative; }
+.dualsub-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-line);
+  border-radius: 12px;
+  background: var(--ds-card);
+  cursor: pointer;
+}
+.dualsub-row:hover { background: var(--ds-card-hi); }
+.dualsub-row.dualsub-active { border-color: var(--ds-accent); }
+.dualsub-play {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-top: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ds-card-hi);
+  color: var(--ds-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.dualsub-active .dualsub-play { background: var(--ds-accent); color: var(--ds-bg); }
+.dualsub-text { flex: 1; min-width: 0; }
+.dualsub-row .dualsub-orig { font-size: 16px; }
+.dualsub-row .dualsub-tr { color: var(--ds-tr); font-size: 14px; }
+
+/* Words take their part-of-speech color (--pos), made for these dark backgrounds. */
+.dualsub-word { cursor: pointer; border-radius: 3px; color: var(--pos); }
+.dualsub-word:hover { background: rgba(19, 198, 215, 0.25); }
+/* The spoken word, underlined in Android's default highlight color. */
+.dualsub-word.dualsub-spoken { text-decoration: underline 3px var(--ds-mint); text-underline-offset: 4px; }
+
+/* ---- Word card ---- */
+.dualsub-card {
+  position: fixed;
+  z-index: 10000;
+  box-sizing: border-box;
+  width: 360px;
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-line) transparent;
+  padding: 16px 18px;
+  border: 1px solid var(--ds-line);
+  border-radius: 22px;
+  background: var(--ds-card);
+  color: var(--ds-text);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5);
+  font: 14px/1.45 Roboto, Arial, sans-serif;
+}
+.dualsub-card-top { display: flex; align-items: center; gap: 6px; }
+.dualsub-card-word { flex: 1; min-width: 0; font-size: 26px; font-weight: 500; color: var(--pos); overflow-wrap: anywhere; }
+.dualsub-card-info { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--ds-muted); font-size: 13px; }
+.dualsub-card-info .dualsub-pos-label { color: var(--ds-text); font-size: 14px; }
+.dualsub-level { padding: 0 6px; border-radius: 8px; color: #0f0f0f; font-weight: 600; font-size: 11px; }
+.dualsub-level-A { background: #81c784; }
+.dualsub-level-B { background: #ffb74d; }
+.dualsub-level-C { background: #f06292; }
+.dualsub-section { margin: 12px 0 4px; font-size: 14px; font-weight: 500; }
+.dualsub-meaning { position: relative; margin-top: 14px; padding: 12px 14px 10px; border: 1px solid rgba(243, 250, 250, 0.35); border-radius: 10px; font-size: 18px; }
+.dualsub-meaning-label { position: absolute; top: -9px; inset-inline-start: 12px; padding: 0 4px; background: var(--ds-card); color: var(--ds-muted); font-size: 12px; }
+.dualsub-grammar-point { padding: 8px 12px; border-radius: 12px; background: var(--ds-card-hi); }
+.dualsub-grammar-point + .dualsub-grammar-point { margin-top: 6px; }
+.dualsub-grammar-form { color: var(--ds-accent); font-weight: 600; }
+.dualsub-grammar-form .dualsub-level { margin-inline-start: 6px; }
+.dualsub-note-text { color: var(--ds-muted); font-size: 13px; }
+.dualsub-card-defs .dualsub-card-pos { margin-top: 6px; color: var(--ds-muted); font-style: italic; }
+.dualsub-card-defs ol { margin: 2px 0; padding-inline-start: 20px; }
+.dualsub-save {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--ds-accent);
+  color: #062226;
+  font: 500 15px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+.dualsub-save:disabled { opacity: 0.6; cursor: default; }
+.dualsub-card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.dualsub-card-actions button {
+  padding: 4px 12px;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  background: none;
+  color: var(--ds-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.dualsub-card-actions button:disabled { opacity: 0.5; cursor: default; }
+.dualsub-card-note { margin-top: 6px; color: var(--ds-muted); font-size: 12px; }
+.dualsub-card-note a { color: var(--ds-accent); }

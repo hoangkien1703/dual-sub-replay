@@ -96,6 +96,59 @@ Before changing an area, read its section in the [technical context](docs/projec
 - The transcript the player holds is a window of lines around the playing time, not the whole video. Code that keeps a line across seeks (loops, repeats) must handle that line leaving the window. Check long seeks and ads on an emulator with a real video; unit tests alone miss both cases.
 - `formatNewCode -PformatFiles=...` reformats each whole file, including code you did not touch. Revert unrelated hunks so the PR stays focused; `formatCheck` only ratchets per-file counts.
 
+## Browser extension
+
+`browser-extension/` is a Chrome extension (Manifest V3, plain JavaScript, no build step) that brings the app's
+learning to YouTube on a computer, ported from the app's own code: the same caption capture, sentence joining,
+translation endpoints, AI prompt, word colors, English tagger and grammar catalogue, review intervals and backup
+format. Its source map is [docs/project/browser-extension.md](docs/project/browser-extension.md); its specs are
+`docs/specs/*-browser-extension-*.md`. It never changes the APK, so a PR that only touches it, its specs and its
+tools takes `release:skip`. Port learner-facing behavior from the app rather than inventing it, and say so in a spec.
+Android PRs don't have to update the extension: it follows the app when its maintainer (@parastouh, named in
+`browser-extension/README.md`) ports a change.
+
+### Commands
+
+```bash
+cd browser-extension && node --test                       # all unit tests (test/*.test.js)
+cd browser-extension && for f in $(find . -name '*.js'); do node --check "$f"; done   # syntax check
+```
+
+- Data: `python3 -I tools/english/build_extension_english_data.py <opennlp jar> <wordnet jar> browser-extension/data/learner-data`
+  extracts the tagger model and WordNet lists; `python3 -I tools/english/build_extension_english_grammar.py . <commit>`
+  regenerates the grammar catalogue. Never hand-edit generated files.
+- Icons: `browser-extension/icons/logo.svg` (48 and 128 px) and `logo-small.svg` (16 and 32 px, edges on whole pixels) are the
+  sources; regenerate the PNGs with `convert -background none -density 384 logo.svg -resize 128x128 icon128.png` (and
+  the other sizes).
+- Try it: `chrome://extensions` → Developer mode → Load unpacked → `browser-extension/`. After a change, press ↻ on the
+  extension and reload the YouTube tab.
+- Branded Google Chrome ignores `--load-extension`. Automated checks load the folder with the DevTools
+  `Extensions.loadUnpacked` command (`--remote-debugging-pipe --enable-unsafe-extension-debugging`).
+- YouTube returns empty caption replies to headless Chrome. Headless checks feed a sample track through the same
+  `window.postMessage` the page hook sends. They never fake a user agent to get past YouTube's bot detection.
+
+### Rules
+
+Before changing an area, read its section in the [technical context](docs/project/browser-extension.md). These rules must
+never break:
+
+- **Captions:** `page/hook.js` only reads `/api/timedtext` replies from the page's own player on YouTube hosts. It
+  never changes a request, never sends the page's token anywhere, and only `postMessage`s the reply to the page's
+  own origin.
+- **Network:** only `background.js` makes requests, and only to the hosts in `manifest.json`'s `host_permissions`.
+  Never add a project server or a shared key. AI features use only the user's own key, kept in `chrome.storage.local`
+  (never `sync`) and sent only to the chosen service; subtitle text goes to the model as JSON data, never as instructions.
+- **Page text:** caption, dictionary and saved text always reaches the page through `textContent` or DOM nodes, never
+  `innerHTML`. Wiktionary's HTML is parsed with `DOMParser`, which runs no scripts, and only its text is kept.
+- **Data modules:** `data/*.js` hold the logic and stay free of DOM and page code so Node can test them. They add
+  their names to `globalThis.DualSub`. Classic scripts share one global scope (content scripts, the service worker
+  with its `importScripts`, and each page), so pages use those names through `DualSub.` and never redeclare them.
+  `test/scopes.test.js` fails on a name declared twice in one group.
+- **Saved words:** live in `chrome.storage.local` under `words`, read and written only through `data/vocabulary.js`.
+  Keep old entries loadable: add fields with defaults in `savedWords()`, never rename them.
+- **Android parity:** colors, part-of-speech rules and review intervals are ports of the Android code named in the
+  file headers. Change them on purpose, say so in a spec, and keep the test that pins them.
+
 ## AI agents opening or updating pull requests
 
 These rules apply to any coding agent (Claude, Copilot, Codex, Cursor and others), whether it works for an outside contributor or for the owner. The human process is in [CONTRIBUTING.md](CONTRIBUTING.md#how-review-works); agents follow it too.

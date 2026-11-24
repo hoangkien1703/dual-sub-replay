@@ -1,0 +1,693 @@
+{
+"source": "dual-sub-replay b3dab09 EnglishGrammarCatalogueTest.kt",
+"examples": [
+[
+"EN_WOULD_RATHER",
+"I'd rather stay at home."
+],
+[
+"EN_DO_NEGATIVE",
+"I don't like coffee."
+],
+[
+"EN_DO_QUESTION",
+"Do you like music?"
+],
+[
+"EN_LETS",
+"Let's go to the beach."
+],
+[
+"EN_WOULD_LIKE",
+"I'd like a cup of tea."
+],
+[
+"EN_WANT_TO",
+"I want to learn English."
+],
+[
+"EN_CAN",
+"She can swim very well."
+],
+[
+"EN_PRESENT_CONTINUOUS",
+"They are watching TV now."
+],
+[
+"EN_THERE_BE",
+"There are two cats in the garden."
+],
+[
+"EN_LIKE_ING",
+"I love dancing."
+],
+[
+"EN_A_LOT_OF",
+"She has a lot of friends."
+],
+[
+"EN_HOW_MANY",
+"How many brothers do you have?"
+],
+[
+"EN_TO_INFINITIVE",
+"I went to the shop to buy bread."
+],
+[
+"EN_BE",
+"She is a doctor."
+],
+[
+"EN_PRESENT_S",
+"He plays tennis every Sunday."
+],
+[
+"EN_PAST_SIMPLE",
+"We visited Paris last year."
+],
+[
+"EN_A_AN",
+"She has a dog."
+],
+[
+"EN_THE",
+"Close the door, please."
+],
+[
+"EN_AND",
+"I bought apples and oranges."
+],
+[
+"EN_BUT",
+"It's small but comfortable."
+],
+[
+"EN_OR",
+"Is it hot or cold?"
+],
+[
+"EN_BECAUSE",
+"I stayed home because I was sick."
+],
+[
+"EN_FREQUENCY",
+"I always get up early."
+],
+[
+"EN_POSSESSIVE",
+"This is Tom's bag."
+],
+[
+"EN_TOO_ALSO",
+"I like it too."
+],
+[
+"EN_AGO",
+"I met him three years ago."
+],
+[
+"EN_IN",
+"She lives in London."
+],
+[
+"EN_ON",
+"The book is on the table."
+],
+[
+"EN_AT",
+"Let's meet at six o'clock."
+],
+[
+"EN_TO",
+"We went to the park."
+],
+[
+"EN_FOR",
+"This gift is for you."
+],
+[
+"EN_FROM",
+"I come from Vietnam."
+],
+[
+"EN_WITH",
+"I live with my parents."
+],
+[
+"EN_OF",
+"She drank a glass of water."
+],
+[
+"EN_ABOUT",
+"Tell me about your trip."
+],
+[
+"EN_WH_QUESTION",
+"Where do you live?"
+],
+[
+"EN_YES_NO_QUESTION",
+"Are you ready?"
+],
+[
+"EN_IMPERATIVE",
+"Open the window, please."
+],
+[
+"EN_DONT_HAVE_TO",
+"You don't have to come."
+],
+[
+"EN_WHY_DONT",
+"Why don't we eat out tonight?"
+],
+[
+"EN_GOING_TO",
+"It's going to rain."
+],
+[
+"EN_USED_TO",
+"She used to live in Tokyo."
+],
+[
+"EN_HAVE_TO",
+"I have to work tomorrow."
+],
+[
+"EN_NEED_TO",
+"I need to buy some milk."
+],
+[
+"EN_MUST_NOT",
+"You mustn't smoke here."
+],
+[
+"EN_VERB_TO",
+"We decided to stay at home."
+],
+[
+"EN_PAST_CONTINUOUS",
+"I was reading when you called."
+],
+[
+"EN_HAVE_GOT",
+"I've got a new phone."
+],
+[
+"EN_PRESENT_PERFECT",
+"I have finished my homework."
+],
+[
+"EN_WILL",
+"I will call you tomorrow."
+],
+[
+"EN_COULD",
+"Could you help me?"
+],
+[
+"EN_MUST",
+"You must wear a seatbelt."
+],
+[
+"EN_SHOULD",
+"You should see a doctor."
+],
+[
+"EN_COMPARATIVE",
+"My brother is taller than me."
+],
+[
+"EN_SUPERLATIVE",
+"This is the biggest house in town."
+],
+[
+"EN_TOO_ADJ",
+"This coffee is too hot."
+],
+[
+"EN_ENOUGH",
+"She is old enough to drive."
+],
+[
+"EN_SO_ADJ",
+"The film was so boring."
+],
+[
+"EN_SO_RESULT",
+"It was raining, so we stayed home."
+],
+[
+"EN_BEFORE_AFTER",
+"Wash your hands before eating."
+],
+[
+"EN_UNTIL",
+"Wait here until I come back."
+],
+[
+"EN_ALREADY",
+"They already know the answer."
+],
+[
+"EN_YET",
+"Has she called yet?"
+],
+[
+"EN_STILL",
+"He is still asleep."
+],
+[
+"EN_JUST",
+"It's just a game."
+],
+[
+"EN_EVER",
+"Have you ever been to Japan?"
+],
+[
+"EN_SOME_ANY",
+"Do you have any questions?"
+],
+[
+"EN_MUCH_MANY",
+"There aren't many people here."
+],
+[
+"EN_A_FEW",
+"I'll be back in a few minutes."
+],
+[
+"EN_EVERY_EACH",
+"I go running every morning."
+],
+[
+"EN_NO_NOUN",
+"There is no milk left."
+],
+[
+"EN_REFLEXIVE",
+"Did you hurt yourself?"
+],
+[
+"EN_LY_ADVERB",
+"Please drive carefully."
+],
+[
+"EN_PHRASAL_VERB",
+"He gave up smoking."
+],
+[
+"EN_HOW_ABOUT",
+"How about going to the cinema?"
+],
+[
+"EN_BY",
+"I go to school by bus."
+],
+[
+"EN_DURING",
+"I fell asleep during the movie."
+],
+[
+"EN_WITHOUT",
+"He left without saying goodbye."
+],
+[
+"EN_INTO",
+"She jumped into the pool."
+],
+[
+"EN_BETWEEN",
+"The shop is between the bank and the cafe."
+],
+[
+"EN_BOTH",
+"Both my parents are teachers."
+],
+[
+"EN_IF_REAL",
+"If it rains, we will stay home."
+],
+[
+"EN_WHEN_CLAUSE",
+"Call me when you arrive."
+],
+[
+"EN_PRESENT_PERFECT_CONTINUOUS",
+"I have been living here for three years."
+],
+[
+"EN_PAST_PERFECT",
+"When we arrived, the film had started."
+],
+[
+"EN_FUTURE_CONTINUOUS",
+"This time tomorrow I'll be flying to Rome."
+],
+[
+"EN_MODAL_PASSIVE",
+"The work must be finished today."
+],
+[
+"EN_PASSIVE",
+"The book was written by my friend."
+],
+[
+"EN_BE_ABLE_TO",
+"She wasn't able to come."
+],
+[
+"EN_SUPPOSED_TO",
+"You're supposed to be at work."
+],
+[
+"EN_HAD_BETTER",
+"You'd better hurry."
+],
+[
+"EN_HAVE_GOT_TO",
+"I've got to go now."
+],
+[
+"EN_BE_USED_TO",
+"I'm used to getting up early."
+],
+[
+"EN_BE_ABOUT_TO",
+"The train is about to leave."
+],
+[
+"EN_MAY",
+"It may rain later."
+],
+[
+"EN_MIGHT",
+"I might be late."
+],
+[
+"EN_SHALL",
+"Shall we dance?"
+],
+[
+"EN_WOULD",
+"I would buy a house if I had money."
+],
+[
+"EN_VERB_ING",
+"I enjoy reading books."
+],
+[
+"EN_VERB_SOMEONE_TO",
+"She asked me to help her."
+],
+[
+"EN_LET_MAKE",
+"My parents let me stay up late."
+],
+[
+"EN_PREPOSITION_ING",
+"Thank you for coming."
+],
+[
+"EN_IN_ORDER_TO",
+"He left early in order to catch the train."
+],
+[
+"EN_SO_THAT",
+"Speak louder so that everyone can hear."
+],
+[
+"EN_SO_ADJ_THAT",
+"It was so cold that we stayed inside."
+],
+[
+"EN_BECAUSE_OF",
+"The game was cancelled because of the rain."
+],
+[
+"EN_ALTHOUGH",
+"Although it was late, we kept working."
+],
+[
+"EN_EVEN_IF",
+"I'll go even if it rains."
+],
+[
+"EN_WHILE",
+"I listen to music while I work."
+],
+[
+"EN_AS_SOON_AS",
+"Call me as soon as you arrive."
+],
+[
+"EN_IN_CASE",
+"Take an umbrella in case it rains."
+],
+[
+"EN_WHETHER",
+"I don't know whether he will come."
+],
+[
+"EN_UNLESS",
+"You will miss the bus unless you hurry."
+],
+[
+"EN_SINCE",
+"I have lived here since 2010."
+],
+[
+"EN_INSTEAD_OF",
+"Let's walk instead of taking the bus."
+],
+[
+"EN_EITHER_NEITHER",
+"You can have either tea or coffee."
+],
+[
+"EN_WISH",
+"I wish I knew the answer."
+],
+[
+"EN_RELATIVE_NONDEFINING",
+"My brother, who lives in Paris, is a chef."
+],
+[
+"EN_WHOSE",
+"That's the girl whose father is a pilot."
+],
+[
+"EN_RELATIVE",
+"The man who lives next door is a doctor."
+],
+[
+"EN_REPORTED",
+"She said that she was tired."
+],
+[
+"EN_THAT_CLAUSE",
+"I think that he is right."
+],
+[
+"EN_LOOK_FORWARD",
+"I look forward to seeing you."
+],
+[
+"EN_GET_ADJECTIVE",
+"She got angry."
+],
+[
+"EN_SO_DO_I",
+"I love pizza. So do I."
+],
+[
+"EN_IT_ADJ_TO",
+"It is important to drink water."
+],
+[
+"EN_QUESTION_TAG",
+"You're coming, aren't you?"
+],
+[
+"EN_SUCH_AS",
+"I like fruits such as apples and bananas."
+],
+[
+"EN_ACCORDING_TO",
+"According to the news, it will snow."
+],
+[
+"EN_HOWEVER",
+"It was cheap. However, it broke quickly."
+],
+[
+"EN_SUFFIX_NESS",
+"Kindness is important."
+],
+[
+"EN_SUFFIX_MENT",
+"The government made an announcement."
+],
+[
+"EN_SUFFIX_TION",
+"We need more information."
+],
+[
+"EN_SUFFIX_FUL",
+"What a beautiful day!"
+],
+[
+"EN_SUFFIX_LESS",
+"The phone is useless."
+],
+[
+"EN_SUFFIX_ABLE",
+"This chair is very comfortable."
+],
+[
+"EN_IF_UNREAL",
+"If I were you, I would go home."
+],
+[
+"EN_PAST_PERFECT_CONTINUOUS",
+"She had been waiting for an hour when he arrived."
+],
+[
+"EN_FUTURE_PERFECT",
+"By next year, I will have graduated."
+],
+[
+"EN_PERFECT_PASSIVE",
+"The window has been broken."
+],
+[
+"EN_CONTINUOUS_PASSIVE",
+"The road is being repaired."
+],
+[
+"EN_GET_PASSIVE",
+"He got caught by the police."
+],
+[
+"EN_SHOULD_HAVE",
+"You should have told me."
+],
+[
+"EN_COULD_HAVE",
+"We could have won the game."
+],
+[
+"EN_MUST_HAVE",
+"She must have forgotten."
+],
+[
+"EN_MIGHT_HAVE",
+"He might have missed the bus."
+],
+[
+"EN_WOULD_HAVE",
+"I would have helped you."
+],
+[
+"EN_OUGHT_TO",
+"You ought to apologize."
+],
+[
+"EN_IF_ONLY",
+"If only I had more time."
+],
+[
+"EN_AS_IF",
+"He talks as if he knows everything."
+],
+[
+"EN_AS_LONG_AS",
+"You can go out as long as you finish your homework."
+],
+[
+"EN_DESPITE",
+"Despite the rain, we went out."
+],
+[
+"EN_NOT_ONLY",
+"She is not only smart but also kind."
+],
+[
+"EN_OTHERWISE",
+"Hurry up, otherwise we'll be late."
+],
+[
+"EN_THEREFORE",
+"He was ill and therefore absent."
+],
+[
+"EN_DUE_TO",
+"The flight was delayed due to fog."
+],
+[
+"EN_WHATEVER",
+"Do whatever you want."
+],
+[
+"EN_IF_PAST_UNREAL",
+"If I had known, I would have told you."
+],
+[
+"EN_NEGATIVE_INVERSION",
+"Never have I seen such a mess."
+],
+[
+"EN_SUBJUNCTIVE",
+"I suggest that he go home."
+],
+[
+"EN_AS_AS",
+"He is as tall as his father."
+],
+[
+"EN_THIS_THAT",
+"This song is great."
+],
+[
+"EN_NOT",
+"I'm not hungry."
+],
+[
+"EN_ALL",
+"All the students passed the test."
+],
+[
+"EN_LIKE_SIMILAR",
+"She sings like a bird."
+],
+[
+"EN_PLACE_MOVEMENT",
+"The cat is sleeping under the table."
+],
+[
+"EN_AS",
+"She works as a nurse."
+],
+[
+"EN_THAN",
+"He has more money than me."
+],
+[
+"EN_ANOTHER",
+"Can I have another cup?"
+],
+[
+"EN_SUCH",
+"It was such a nice day."
+],
+[
+"EN_EXCEPT",
+"Everyone came except Tom."
+],
+[
+"EN_ING_AFTER_NOUN",
+"I saw a dog running in the park."
+]
+]
+}
