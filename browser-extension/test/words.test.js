@@ -8,7 +8,14 @@ assert.deepStrictEqual(words("I don't know, really.", 'en'), ["I", "don't", 'kno
 assert.ok(words('ご飯を食べる', 'ja').length >= 3); // Japanese has no spaces; the segmenter still splits it
 assert.strictEqual(tokens('a, b', 'not a lang!').map((t) => t.text).join(''), 'a, b');
 
-const strip = (html) => html.replace(/<[^>]+>/g, '').trim();
+// The page uses DOMParser; this stand-in removes tags until none is left, as ai.js's cleanRow does.
+const strip = (html) => {
+  for (let before = null; before !== html; ) {
+    before = html;
+    html = html.replace(/<[^>]+>/g, '');
+  }
+  return html.trim();
+};
 const wiki = {
   en: [
     { partOfSpeech: 'Verb', language: 'English', definitions: [{ definition: 'to <a>move</a> fast' }, { definition: '<span></span>' }] },
