@@ -175,4 +175,30 @@ class AiSubtitleRunnerTest {
             second.join()
             assertEquals(2, calls)
         }
+
+    @Test
+    fun aLongVideoShowsNewPartsNearThePlayingTimeAsTheyArrive() =
+        runBlocking {
+            val store = AiSubtitleStore(folder.root)
+            val ready = mutableListOf<Int>()
+            var parts = 0
+            val runner =
+                AiSubtitleRunner(
+                    scope = this,
+                    store = store,
+                    askPart = { _, start, _ ->
+                        parts++
+                        line(start)
+                    },
+                    durationOf = { 1_800_000 },
+                    onStatus = {},
+                    onReady = { ready += parts },
+                    playbackMs = { 60_000 },
+                    io = Dispatchers.Unconfined,
+                )
+            runner.start(videoId, positionMs = 60_000)
+            runner.join()
+            // The first part, the parts from 5:00 and 10:00 (within 10 minutes of 1:00), then the rest at the end.
+            assertEquals(listOf(1, 2, 3, 6), ready)
+        }
 }

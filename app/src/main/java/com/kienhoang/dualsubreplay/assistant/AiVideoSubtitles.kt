@@ -41,11 +41,11 @@ enum class AiSubtitleProblem {
     NO_SPEECH,
     FAILED,
 
-    /** A song with no synced lyrics that fit, and no Gemini key to write them. */
-    NO_LYRICS_NEEDS_KEY,
+    /** A song with no free synced lyrics that fit; Gemini writes them only when the person taps for it. */
+    NO_FREE_LYRICS,
 
-    /** A compilation with synced lyrics for some songs only, and no Gemini key to write the rest. */
-    SOME_LYRICS_NEEDS_KEY,
+    /** A playlist with free synced lyrics for some songs only; Gemini writes the rest only on a tap. */
+    SOME_FREE_LYRICS,
 }
 
 internal class AiSubtitleException(

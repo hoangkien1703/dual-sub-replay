@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import com.kienhoang.dualsubreplay.data.RawCaptionCue
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
 import kotlinx.coroutines.CancellationException
@@ -28,6 +29,9 @@ private const val EXPORT_BATCH_SENTENCES = 40
 
 /** Rows search and export read from disk at a time; they are dropped before the next batch. */
 private const val SCAN_ROWS = 500
+
+/** A 4-hour playlist has about 6,000 caption lines; more than this is not read for matching lyrics. */
+private const val MAX_TIMED_LINES = 20_000
 
 /**
  * The whole transcript of the playing video, for the Whole transcript sheet (25kiuo, Discussion #81,
@@ -78,6 +82,22 @@ internal class WholeTranscript(
         val missing = starts.map { sentenceText(it.second) }.filter { text -> knownText(text) == null }.distinct()
         translateTexts(missing)
         return starts.mapNotNull { (index, row) -> knownTranslation(row)?.let { index to it } }.toMap()
+    }
+
+    /**
+     * Every row's time and text (at most [MAX_TIMED_LINES]), to place a playlist's song lyrics by
+     * matching them against these captions ([alignLyrics]); null once the video changed.
+     */
+    suspend fun timedLines(): List<RawCaptionCue>? {
+        val lines = ArrayList<RawCaptionCue>()
+        var first = 0
+        val last = minOf(size, MAX_TIMED_LINES) - 1
+        while (first <= last) {
+            val range = first..minOf(last, first + SCAN_ROWS - 1)
+            read(range)?.forEach { lines += RawCaptionCue(it.startMs, it.endMs, it.originalText) } ?: return null
+            first = range.last + 1
+        }
+        return lines
     }
 
     /** Rows whose text contains [query] (ignoring case), at most [WHOLE_TRANSCRIPT_MAX_MATCHES]. */

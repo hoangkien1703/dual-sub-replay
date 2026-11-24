@@ -38,6 +38,10 @@ internal class AiSubtitleActions(
      * video's Gemini transcript, made now when missing (Settings → AI assistant without a key).
      */
     val useTranscript: () -> Unit = make,
+    /** The song card's "Get real lyrics": free synced lyrics only, never AI (owner pick 2026-11-24). */
+    val findLyrics: () -> Unit = useTranscript,
+    /** "Write lyrics with AI" (or "Write the rest with AI") after free lyrics fell short: Gemini now. */
+    val writeWithAi: () -> Unit = useTranscript,
     /** The song card's X: no more offers for this video. */
     val closeSuggestion: () -> Unit = {},
     /** True while a video is open, so the Original language list can offer the AI transcript. */
@@ -146,8 +150,8 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.REFUSED -> R.string.ai_subtitles_problem_refused
         AiSubtitleProblem.NO_SPEECH -> R.string.ai_subtitles_problem_no_speech
         AiSubtitleProblem.FAILED -> R.string.ai_subtitles_problem_failed
-        AiSubtitleProblem.NO_LYRICS_NEEDS_KEY -> R.string.ai_transcript_no_lyrics_needs_key
-        AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY -> R.string.ai_transcript_some_lyrics_needs_key
+        AiSubtitleProblem.NO_FREE_LYRICS -> R.string.ai_transcript_no_lyrics_needs_key
+        AiSubtitleProblem.SOME_FREE_LYRICS -> R.string.ai_transcript_some_lyrics_needs_key
     }
 
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */

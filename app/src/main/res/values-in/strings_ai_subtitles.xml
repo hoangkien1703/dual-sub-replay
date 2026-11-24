@@ -24,10 +24,14 @@
     <string name="ai_transcript_choice">Transkrip AI (Gemini)</string>
     <string name="ai_transcript_offer">Ini tampaknya lagu dengan teks otomatis, yang sering salah menulis lirik.</string>
     <string name="ai_transcript_make">Ambil lirik asli</string>
-    <string name="ai_transcript_offer_note">Lirik tersinkron gratis lebih dulu. AI dengan kunci Gemini hanya jika tidak ada yang cocok.</string>
+    <string name="ai_transcript_offer_note">Lirik tersinkron gratis dari LRCLIB. Tanpa AI.</string>
     <string name="ai_transcript_lyrics_track_label">%1$s (lirik lagu)</string>
     <string name="ai_transcript_looking_for_lyrics">Mencari lirik tersinkron…</string>
     <string name="ai_transcript_no_lyrics_needs_key">Tidak ada lirik tersinkron yang cocok dengan video ini. Tambahkan kunci Gemini gratis agar AI bisa menuliskannya.</string>
     <string name="ai_transcript_looking_for_song_lyrics">Mencari lirik tersinkron… lagu %1$d dari %2$d</string>
     <string name="ai_transcript_some_lyrics_needs_key">Lirik tersinkron ditemukan untuk beberapa lagu. Tambahkan kunci Gemini gratis agar AI bisa menulis sisanya.</string>
+    <string name="ai_transcript_no_free_lyrics">Tidak ada lirik tersinkron gratis yang cocok dengan video ini.</string>
+    <string name="ai_transcript_some_free_lyrics">Lirik tersinkron gratis ditemukan untuk %1$d dari %2$d lagu.</string>
+    <string name="ai_transcript_write_with_ai">Tulis lirik dengan AI</string>
+    <string name="ai_transcript_write_rest_with_ai">Tulis sisanya dengan AI</string>
 </resources>

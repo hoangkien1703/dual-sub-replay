@@ -30,10 +30,19 @@ class AiTranscriptBannerUiTest {
     val composeRule = createComposeRule()
 
     private var used = 0
+    private var lyricsAsked = 0
+    private var aiAsked = 0
     private var closed = 0
     private var settingsOpened = 0
     private val actions =
-        AiSubtitleActions(make = {}, openAiSettings = { settingsOpened++ }, useTranscript = { used++ }, closeSuggestion = { closed++ })
+        AiSubtitleActions(
+            make = {},
+            openAiSettings = { settingsOpened++ },
+            useTranscript = { used++ },
+            findLyrics = { lyricsAsked++ },
+            writeWithAi = { aiAsked++ },
+            closeSuggestion = { closed++ },
+        )
     private val videoId = "dQw4w9WgXcQ"
 
     private val song =
@@ -74,8 +83,10 @@ class AiTranscriptBannerUiTest {
         show(song)
         composeRule.onNodeWithText("Get real lyrics").assertIsDisplayed()
         saveEvidence("ai-transcript-offer")
+        // Free lyrics only: AI never starts from this button (owner pick 2026-11-24).
         composeRule.onNodeWithTag("ai_transcript_make").performClick()
-        assertEquals(1, used)
+        assertEquals(1, lyricsAsked)
+        assertEquals(0, used)
         composeRule.onNodeWithTag("ai_transcript_offer_close").performClick()
         assertEquals(1, closed)
     }
@@ -83,13 +94,34 @@ class AiTranscriptBannerUiTest {
     @Test
     fun noLyricsAndNoKeyOffersToAddOne() {
         show(
-            song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_LYRICS_NEEDS_KEY)),
+            song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS)),
             geminiReady = false,
         )
         composeRule.onNodeWithTag("ai_transcript_add_key").assertIsDisplayed()
         saveEvidence("ai-transcript-no-lyrics-no-key")
         composeRule.onNodeWithTag("ai_transcript_add_key").performClick()
         assertEquals(1, settingsOpened)
+    }
+
+    @Test
+    fun noFreeLyricsWithAKeyOffersAiOnlyOnATap() {
+        show(song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS)))
+        composeRule.onNodeWithText("No free synced lyrics match this video.").assertIsDisplayed()
+        composeRule.onNodeWithText("Write lyrics with AI").assertIsDisplayed()
+        saveEvidence("ai-transcript-no-free-lyrics")
+        composeRule.onNodeWithTag("ai_transcript_write_with_ai").performClick()
+        assertEquals(1, aiAsked)
+    }
+
+    @Test
+    fun somePlaylistSongsFoundWithAKeyCountsThemAndOffersTheRest() {
+        val status =
+            AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.SOME_FREE_LYRICS, lyricsFound = 21, lyricsTotal = 30)
+        show(song.copy(aiSubtitles = status))
+        composeRule.onNodeWithText("Free synced lyrics found for 21 of 30 songs.").assertIsDisplayed()
+        saveEvidence("ai-transcript-some-free-lyrics")
+        composeRule.onNodeWithText("Write the rest with AI").performClick()
+        assertEquals(1, aiAsked)
     }
 
     @Test
@@ -110,7 +142,7 @@ class AiTranscriptBannerUiTest {
     @Test
     fun someLyricsAndNoKeyOffersToAddOne() {
         show(
-            song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.SOME_LYRICS_NEEDS_KEY)),
+            song.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.SOME_FREE_LYRICS)),
             geminiReady = false,
         )
         composeRule.onNodeWithTag("ai_transcript_add_key").assertIsDisplayed()

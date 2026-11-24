@@ -24,10 +24,14 @@
     <string name="ai_transcript_choice">Transcrição com IA (Gemini)</string>
     <string name="ai_transcript_offer">Parece uma música com legendas automáticas, que costumam errar a letra.</string>
     <string name="ai_transcript_make">Obter a letra real</string>
-    <string name="ai_transcript_offer_note">Primeiro letras sincronizadas grátis. IA com sua chave do Gemini só se nada combinar.</string>
+    <string name="ai_transcript_offer_note">Letras sincronizadas grátis do LRCLIB. Sem IA.</string>
     <string name="ai_transcript_lyrics_track_label">%1$s (letra da música)</string>
     <string name="ai_transcript_looking_for_lyrics">Procurando letra sincronizada…</string>
     <string name="ai_transcript_no_lyrics_needs_key">Nenhuma letra sincronizada combina com este vídeo. Adicione uma chave gratuita do Gemini e a IA poderá escrevê-la.</string>
     <string name="ai_transcript_looking_for_song_lyrics">Procurando letra sincronizada… música %1$d de %2$d</string>
     <string name="ai_transcript_some_lyrics_needs_key">Encontramos letra sincronizada para algumas músicas. Adicione uma chave gratuita do Gemini e a IA poderá escrever o resto.</string>
+    <string name="ai_transcript_no_free_lyrics">Nenhuma letra sincronizada grátis combina com este vídeo.</string>
+    <string name="ai_transcript_some_free_lyrics">Encontramos letra sincronizada grátis para %1$d de %2$d músicas.</string>
+    <string name="ai_transcript_write_with_ai">Escrever a letra com IA</string>
+    <string name="ai_transcript_write_rest_with_ai">Escrever o resto com IA</string>
 </resources>

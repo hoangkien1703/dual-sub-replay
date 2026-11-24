@@ -24,10 +24,14 @@
     <string name="ai_transcript_choice">AI transcript (Gemini)</string>
     <string name="ai_transcript_offer">This looks like a song with auto-made captions, which often get the lyrics wrong.</string>
     <string name="ai_transcript_make">Get real lyrics</string>
-    <string name="ai_transcript_offer_note">Free synced lyrics first. AI with your Gemini key only if none match.</string>
+    <string name="ai_transcript_offer_note">Free synced lyrics from LRCLIB. No AI is used.</string>
     <string name="ai_transcript_lyrics_track_label">%1$s (song lyrics)</string>
     <string name="ai_transcript_looking_for_lyrics">Looking for synced lyrics…</string>
     <string name="ai_transcript_no_lyrics_needs_key">No synced lyrics match this video. Add a free Gemini key and AI can write them.</string>
     <string name="ai_transcript_looking_for_song_lyrics">Looking for synced lyrics… song %1$d of %2$d</string>
     <string name="ai_transcript_some_lyrics_needs_key">Synced lyrics were found for some songs. Add a free Gemini key and AI can write the rest.</string>
+    <string name="ai_transcript_no_free_lyrics">No free synced lyrics match this video.</string>
+    <string name="ai_transcript_some_free_lyrics">Free synced lyrics found for %1$d of %2$d songs.</string>
+    <string name="ai_transcript_write_with_ai">Write lyrics with AI</string>
+    <string name="ai_transcript_write_rest_with_ai">Write the rest with AI</string>
 </resources>

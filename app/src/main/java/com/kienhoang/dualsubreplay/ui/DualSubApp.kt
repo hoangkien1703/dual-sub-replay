@@ -162,14 +162,14 @@ fun DualSubApp(
     val aiAssistantHost = LocalAiAssistant.current
     val aiSubtitleActions =
         remember(viewModel, aiAssistantHost) {
+            val keyReady = { aiAssistantHost?.controller?.state?.value?.let(::geminiReady) == true }
             AiSubtitleActions(
                 make = viewModel::makeAiSubtitles,
                 openAiSettings = { aiSettingsRequestId++ },
                 // Without a Gemini key and nothing free to try, it opens Settings → AI assistant.
-                useTranscript = {
-                    val keyReady = aiAssistantHost?.controller?.state?.value?.let(::geminiReady) == true
-                    if (!viewModel.useAiTranscript(keyReady)) aiSettingsRequestId++
-                },
+                useTranscript = { if (!viewModel.useAiTranscript(keyReady())) aiSettingsRequestId++ },
+                findLyrics = { viewModel.useAiTranscript(keyReady(), TranscriptAsk.FREE_LYRICS) },
+                writeWithAi = { if (!viewModel.useAiTranscript(keyReady(), TranscriptAsk.AI_NOW)) aiSettingsRequestId++ },
                 closeSuggestion = viewModel::closeAiTranscriptSuggestion,
                 videoOpen = { viewModel.state.value.activeVideoId != null },
             )
