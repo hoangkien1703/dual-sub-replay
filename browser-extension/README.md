@@ -16,8 +16,9 @@ No account, no server, no key.
 
 ## Install (developer mode)
 
-1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Click **Load unpacked** and pick this `browser-extension` folder.
+1. Download [DualSub-Chrome-extension.zip](https://github.com/hoangkien1703/dual-sub-replay/releases/download/extension-preview/DualSub-Chrome-extension.zip) (rebuilt from `main` on every change to this folder) and unzip it,
+   or use this folder from a clone of the repository.
+2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the `browser-extension` folder.
 3. Open a YouTube video that has captions. Pick the translation language from the extension's toolbar icon (default: your browser's language, or English).
    The same menu opens **Saved words & practice**.
 
