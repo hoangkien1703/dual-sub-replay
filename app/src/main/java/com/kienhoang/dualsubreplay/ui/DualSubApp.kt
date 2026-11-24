@@ -116,6 +116,8 @@ fun DualSubApp(
     effectivePlayerMode: PlayerExperienceMode = playerMode,
     onPlayerModeChange: (PlayerExperienceMode) -> Unit = {},
     externalSettingsRequestId: Long = 0L,
+    /** The no-captions button on the box over the video: opens Settings → AI assistant to add a Gemini key. */
+    externalAiSettingsRequestId: Long = 0L,
     fullscreenLearningOverlay: (@Composable BoxScope.() -> Unit)? = null,
     onNavigationVisibilityChange: (Boolean) -> Unit = {},
 ) {
@@ -205,7 +207,7 @@ fun DualSubApp(
                     effectivePlayerMode = effectivePlayerMode,
                     onPlayerModeChange = onPlayerModeChange,
                     externalSettingsRequestId = externalSettingsRequestId,
-                    aiSettingsRequestId = aiSettingsRequestId,
+                    aiSettingsRequestId = aiSettingsRequestId + externalAiSettingsRequestId,
                     wordSettingsRequestId = wordSettingsRequestId,
                     fullscreenLearningOverlay = fullscreenLearningOverlay,
                     onNavigationVisibilityChange = onNavigationVisibilityChange,

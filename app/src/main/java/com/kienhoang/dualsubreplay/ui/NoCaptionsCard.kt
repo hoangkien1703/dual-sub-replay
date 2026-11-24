@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -117,15 +118,20 @@ internal fun LiveStreamNoCaptionsCard() {
 }
 
 @Composable
-internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String {
+internal fun aiSubtitleProgressText(status: AiSubtitleStatus): String = aiSubtitleProgressText(status, LocalResources.current.uiStrings())
+
+internal fun aiSubtitleProgressText(
+    status: AiSubtitleStatus,
+    strings: UiStrings,
+): String {
     val total = status.totalMs
     return when {
         status.lookingForLyrics && status.lyricsTotal > 1 ->
-            stringResource(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
-        status.lookingForLyrics -> stringResource(R.string.ai_transcript_looking_for_lyrics)
-        status.doneMs <= 0L -> stringResource(R.string.ai_subtitles_starting)
-        total != null -> stringResource(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
-        else -> stringResource(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
+            strings.get(R.string.ai_transcript_looking_for_song_lyrics, status.lyricsChecked + 1, status.lyricsTotal)
+        status.lookingForLyrics -> strings.get(R.string.ai_transcript_looking_for_lyrics)
+        status.doneMs <= 0L -> strings.get(R.string.ai_subtitles_starting)
+        total != null -> strings.get(R.string.ai_subtitles_progress, formatPlaybackClock(status.doneMs), formatPlaybackClock(total))
+        else -> strings.get(R.string.ai_subtitles_progress_unknown_length, formatPlaybackClock(status.doneMs))
     }
 }
 

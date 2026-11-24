@@ -90,6 +90,43 @@ class PageTranscriptSourceTest {
             assertEquals("", watching.target!!.baseUrl)
         }
 
+    @Test fun aVideoFoundWithoutTracksAfterTheWaitIsAnnounced() =
+        runBlocking {
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
+            // The paused page player had not loaded yet when the provider stopped waiting (Reddit report 2026-11-24).
+            assertNull(source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null), timeoutMs = 50))
+            assertEquals(PageTranscriptProblem.NO_ANSWER, source.problem(VIDEO))
+            val watching = source.pending(VIDEO)!!
+            val announced = async(start = CoroutineStart.UNDISPATCHED) { source.lateNoCaptions.first() }
+            source.offerTracks(watching, NO_TRACKS)
+            now = PAGE_NO_TRACKS_GRACE_MS - 1
+            source.offerTracks(watching, NO_TRACKS)
+            assertFalse("The player may still list its tracks", announced.isCompleted)
+            now = PAGE_NO_TRACKS_GRACE_MS
+            source.offerTracks(watching, NO_TRACKS)
+            assertEquals(VIDEO, announced.await())
+            assertEquals(PageTranscriptProblem.NO_TRACKS, source.problem(VIDEO))
+            assertTrue("The page still watches YouTube's transcript panel", source.pending(VIDEO)!!.target!!.panelOnly)
+        }
+
+    @Test fun noTracksFoundWithinTheWaitIsNotAnnouncedAgain() =
+        runBlocking {
+            var now = 0L
+            val source = PageTranscriptSource(clock = { now })
+            val announced = async(start = CoroutineStart.UNDISPATCHED) { source.lateNoCaptions.first() }
+            val result = async { source.transcript(VIDEO, CaptionLanguageChoice(emptyList(), null)) }
+            val request = awaitRequest(source)
+            source.offerTracks(request, NO_TRACKS)
+            now = PAGE_NO_TRACKS_GRACE_MS
+            source.offerTracks(request, NO_TRACKS)
+            assertNull(result.await())
+            assertEquals(PageTranscriptProblem.NO_TRACKS, source.problem(VIDEO))
+            yield()
+            assertFalse("The provider's own answer already says so", announced.isCompleted)
+            announced.cancel()
+        }
+
     @Test fun thePageSaysWhenTheVideoIsALiveStream() =
         runBlocking {
             val source = PageTranscriptSource()

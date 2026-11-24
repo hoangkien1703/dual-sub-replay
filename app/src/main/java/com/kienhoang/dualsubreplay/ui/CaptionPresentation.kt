@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalResources
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
+import com.kienhoang.dualsubreplay.data.VideoKeys
 
 internal data class LearningOverlayContent(
     val originalText: String?,
@@ -17,6 +18,8 @@ internal data class LearningOverlayContent(
     val words: List<SubtitleWord> = segment?.words.orEmpty(),
     /** Settings → Languages → Third line, under the translation; null while off or not translated yet. */
     val thirdText: String? = null,
+    /** A video with no captions: what the box's button offers (see [noCaptionsOverlayAction]); null shows Retry. */
+    val noCaptionsAction: NoCaptionsOverlayAction? = null,
 )
 
 /** Looks up the app's own texts, so plain JVM tests can pass a stub instead of Android resources. */
@@ -59,6 +62,10 @@ private fun unfilteredLearningOverlayContent(
     strings: UiStrings,
 ): LearningOverlayContent? {
     if (state.activeVideoId == null) return null
+    if (state.showsNoCaptions()) {
+        // Nothing to wait for: say so, never "Live subtitles · Waiting for YouTube captions".
+        return LearningOverlayContent(originalText = null, translatedText = null, statusText = noCaptionsStatus(state, strings))
+    }
     if (state.liveFallback) {
         return LearningOverlayContent(
             activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1,
@@ -85,6 +92,55 @@ private fun unfilteredLearningOverlayContent(
     return status?.let {
         LearningOverlayContent(originalText = null, translatedText = null, statusText = it)
     }
+}
+
+/**
+ * True while YouTube has no captions at all for the open video and its player shows none: the
+ * subtitle panel shows the no-captions card, and the box on the video says so in one line.
+ */
+internal fun DualSubUiState.showsNoCaptions(): Boolean = liveFallback && noCaptions && liveOriginal == null
+
+/** The open video's AI subtitles run, if any. */
+internal fun DualSubUiState.openVideoAiSubtitles(): AiSubtitleStatus? = aiSubtitles?.takeIf { it.videoId == activeVideoId }
+
+/** What the button on the box over the video offers for a video with no captions (see [noCaptionsOverlayAction]). */
+internal enum class NoCaptionsOverlayAction {
+    /** The AI assistant has a Gemini key: make the subtitles now, as the panel card's button does. */
+    MAKE_AI_SUBTITLES,
+
+    /** No Gemini key yet: open Settings → AI assistant. Nothing turns on by itself. */
+    ADD_GEMINI_KEY,
+}
+
+/**
+ * The button the box over the video shows for a YouTube video with no captions, like the panel's
+ * no-captions card: none for a live stream (Gemini can't listen to one), a Bilibili video (Gemini
+ * reads YouTube links only) or while AI subtitles are being made.
+ */
+internal fun noCaptionsOverlayAction(
+    state: DualSubUiState,
+    geminiReady: Boolean,
+): NoCaptionsOverlayAction? {
+    if (!state.showsNoCaptions() || state.liveStream || VideoKeys.isBilibili(state.activeVideoId)) return null
+    if (state.openVideoAiSubtitles()?.working == true) return null
+    return if (geminiReady) NoCaptionsOverlayAction.MAKE_AI_SUBTITLES else NoCaptionsOverlayAction.ADD_GEMINI_KEY
+}
+
+/** "Retry full transcript" on the box over the video: only while live subtitles may still come, or for Bilibili's Try again. */
+internal fun showsOverlayRetry(state: DualSubUiState): Boolean =
+    state.liveFallback && !state.retryingTranscript && (!state.showsNoCaptions() || VideoKeys.isBilibili(state.activeVideoId))
+
+private fun noCaptionsStatus(
+    state: DualSubUiState,
+    strings: UiStrings,
+): String {
+    // Bilibili's own words (sign in, or no subtitles) are already the status.
+    if (VideoKeys.isBilibili(state.activeVideoId)) return state.statusMessage ?: strings.get(R.string.bilibili_no_subtitles_title)
+    if (state.liveStream) return strings.get(R.string.live_no_captions_title)
+    val ai = state.openVideoAiSubtitles()
+    if (ai?.working == true) return aiSubtitleProgressText(ai, strings)
+    ai?.problem?.let { return strings.get(aiSubtitleProblemText(it)) }
+    return strings.get(R.string.ai_subtitles_no_captions_body)
 }
 
 internal fun LearningOverlayContent.isEmpty(): Boolean = originalText == null && translatedText == null && statusText == null

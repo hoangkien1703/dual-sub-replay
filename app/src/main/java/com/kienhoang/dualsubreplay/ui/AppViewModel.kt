@@ -540,6 +540,10 @@ class AppViewModel internal constructor(
                 }
             }
         }
+        // The page found, after live subtitles took over, that the video has no captions at all.
+        viewModelScope.launch {
+            pageTranscripts.lateNoCaptions.collect(::showLateNoCaptions)
+        }
     }
 
     private val betaSiteOfferFlow = MutableStateFlow<BetaSiteOffer?>(null)
@@ -1923,6 +1927,24 @@ class AppViewModel internal constructor(
             }
     }
 
+    /** Why the open video's track could not load, kept so a later page finding can say it again. */
+    private var liveFallbackError: Pair<String, Exception>? = null
+
+    /**
+     * The page, still watching, found no caption track at all: "waiting for captions" becomes the
+     * no-captions card (and its line on the video), unless the player shows captions meanwhile.
+     */
+    private fun showLateNoCaptions(videoId: String) {
+        val error = liveFallbackError?.takeIf { it.first == videoId }?.second ?: return
+        val shown = _state.value
+        if (shown.activeVideoId != videoId || !shown.liveFallback || shown.retryingTranscript || shown.noCaptions) return
+        val problem = fullTranscriptProblem(videoId, error)
+        _state.update { current ->
+            if (current.activeVideoId != videoId || !current.liveFallback || current.retryingTranscript) return@update current
+            current.copy(noCaptions = true, fullTranscriptProblem = problem)
+        }
+    }
+
     /** The track could not load: live subtitles from the page take over, or the no-captions card shows. */
     private fun showLiveFallback(
         videoId: String,
@@ -1933,6 +1955,7 @@ class AppViewModel internal constructor(
             showBilibiliProblem(videoId, generation, error)
             return
         }
+        liveFallbackError = videoId to error
         _state.update { current ->
             if (!isCurrentLoad(current, videoId, generation)) return@update current
             current.copy(
