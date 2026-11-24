@@ -106,8 +106,16 @@ function withStrayQuotesEscaped(json) {
   return out;
 }
 
-// Plain text without markup or a leading comma (Android's cleanAiRow).
-const cleanRow = (row) => String(row ?? '').replace(/<\/?[A-Za-z][^<>]*>/g, '').trim().replace(/^[,;，、；]+/, '').trim();
+// Plain text without markup or a leading comma (Android's cleanAiRow). Tags are removed until none is left, so a
+// nested one such as "<b<i>>" can't leave a tag behind; rows reach the page as text anyway, never as HTML.
+function cleanRow(row) {
+  let text = String(row ?? '');
+  for (let before = null; before !== text; ) {
+    before = text;
+    text = text.replace(/<\/?[A-Za-z][^<>]*>/g, '');
+  }
+  return text.trim().replace(/^[,;，、；]+/, '').trim();
+}
 
 // Three words or more, or four characters written without spaces: too long to be a name kept as it is.
 const canBeEcho = (text) => text.split(/\s+/).filter(Boolean).length >= 3 || (text.length >= 4 && !/\s/.test(text) && /^[぀-ヿ㐀-鿿฀-๿]/.test(text));

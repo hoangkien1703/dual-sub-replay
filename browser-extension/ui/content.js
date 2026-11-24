@@ -65,7 +65,7 @@ function prefetchWords(line) {
 
 window.addEventListener('message', (event) => {
   const data = event.data;
-  if (event.source !== window || !data || data.dualsub !== 'track' || data.videoId !== currentVideoId()) return;
+  if (event.source !== window || event.origin !== location.origin || !data || data.dualsub !== 'track' || data.videoId !== currentVideoId()) return;
   let lines;
   let pieces;
   try {

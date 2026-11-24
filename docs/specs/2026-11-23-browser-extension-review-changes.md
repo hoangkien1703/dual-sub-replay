@@ -69,3 +69,6 @@ The owner took the PR over to merge it. Three small changes from checking it in 
 
 Checked in headless Chromium with the extension loaded and an offline YouTube page fixture: English → English shows
 the note and empty second lines; switching to Vietnamese translates both lines and the status returns to "2 lines".
+- **CodeQL** flagged two high alerts on the PR. AI rows now have tags stripped until none is left (a nested tag
+  could survive one pass; rows were already shown as text only), and the caption message listener also checks
+  `event.origin`.
