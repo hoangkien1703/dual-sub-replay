@@ -253,6 +253,17 @@ function setTranslation(line, tr) {
 async function translateAll() {
   const gen = ++state.gen;
   state.lines.forEach((l) => delete l.ai);
+  // Captions already in the language picked (an English browser on an English video, say): one line, no requests.
+  if (state.lang && DualSub.targetCode(state.lang) === target) {
+    state.lines.forEach((l) => setTranslation(l, ''));
+    return status(`The captions are already in ${DualSub.languageName(target)}`, { label: 'Pick your language', open: 'openSettings' });
+  }
+  if (state.status) {
+    // A note about an earlier language or a failed try no longer applies.
+    state.status = null;
+    const line = panel && panel.querySelector('.dualsub-status');
+    if (line) line.textContent = `${state.lines.length} lines`;
+  }
   const pieces = state.pieces;
   const split = translator === 'ai' && pieces && DualSub.isUnpunctuated(pieces) && DualSub.captionWords(pieces);
   await Promise.all([translateWithGoogle(gen), translator === 'ai' && (split ? splitWithAi(gen, pieces) : translateWithAi(gen))]);

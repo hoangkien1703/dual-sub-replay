@@ -37,10 +37,15 @@ async function translate(texts, target, source) {
 // Google's own dictionary endpoint (translate_a/single) answers 429 on many networks, so it is not used.
 async function define(word) {
   const forms = [...new Set([word, word.toLowerCase()])];
+  // 404 means no entry; any other failure (a 429 rate limit, a server error) is reported, not shown as "no entry".
   const replies = await Promise.all(
-    forms.map((w) => fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(w)}`).then((r) => (r.ok ? r.json() : null))),
+    forms.map((w) => fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(w)}`).then((r) => (r.ok ? r.json() : r.status))),
   );
-  return replies.find(Boolean) || {};
+  const found = replies.find((r) => typeof r === 'object' && r);
+  if (found) return found;
+  const failed = replies.find((r) => typeof r === 'number' && r !== 404);
+  if (failed) throw new Error(`Wiktionary returned HTTP ${failed}`);
+  return {};
 }
 
 const escape = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);

@@ -109,6 +109,8 @@
   width: 360px;
   max-height: 60vh;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-line) transparent;
   padding: 16px 18px;
   border: 1px solid var(--ds-line);
   border-radius: 22px;

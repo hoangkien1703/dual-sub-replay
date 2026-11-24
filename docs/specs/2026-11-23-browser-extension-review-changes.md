@@ -54,3 +54,18 @@ Implemented. The changes the owner's review of PR #253 asked for (2026-11-23).
 ## Validation result
 
 Passed as above. `node --test` passes 8 test files, and `node --check` passes every file.
+
+## Owner follow-up (2026-11-24)
+
+The owner took the PR over to merge it. Three small changes from checking it in headless Chrome:
+
+- **Captions already in the chosen language.** With an English browser on an English video, the default target is the
+  caption language, so every line showed itself twice. Now nothing is translated (no requests), the second line stays
+  empty, and the status line says "The captions are already in English · Pick your language" (opens the menu).
+  Picking another language clears that note and translates as usual.
+- **Dictionary failures.** Wiktionary's 404 still means "No dictionary entry"; any other failure (a 429 rate limit,
+  a server error) now shows "Dictionary failed: Wiktionary returned HTTP …" instead of looking like a missing word.
+- **Word card scrollbar** is thin and dark instead of Chrome's white default.
+
+Checked in headless Chromium with the extension loaded and an offline YouTube page fixture: English → English shows
+the note and empty second lines; switching to Vietnamese translates both lines and the status returns to "2 lines".
