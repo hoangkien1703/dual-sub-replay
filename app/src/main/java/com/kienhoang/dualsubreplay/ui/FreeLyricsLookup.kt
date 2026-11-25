@@ -17,12 +17,16 @@ import com.kienhoang.dualsubreplay.data.withoutOverlaps
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.atomic.AtomicInteger
 
 /** LRCLIB is asked about this many songs of a playlist at once. */
-private const val PARALLEL_SONG_LOOKUPS = 4
+private const val PARALLEL_SONG_LOOKUPS = 2
+
+/** A pause after each song's lookup, as LRCLIB asks of apps that look up many songs (2026-11-25). */
+private const val SONG_LOOKUP_GAP_MS = 250L
 
 /** A playlist chapter's song may be sung a little before or after the time the description gives. */
 private const val CHAPTER_SEARCH_SLACK_MS = 15_000L
@@ -200,7 +204,9 @@ internal class FreeLyricsLookup(
             items
                 .map { item ->
                     async {
-                        permits.withPermit { look(item) }.also { onProgress(checked.incrementAndGet(), items.size) }
+                        permits
+                            .withPermit { look(item).also { delay(SONG_LOOKUP_GAP_MS) } }
+                            .also { onProgress(checked.incrementAndGet(), items.size) }
                     }
                 }.awaitAll()
                 .filterNotNull()

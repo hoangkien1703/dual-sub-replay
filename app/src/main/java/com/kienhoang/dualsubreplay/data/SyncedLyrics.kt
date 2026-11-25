@@ -2,6 +2,7 @@ package com.kienhoang.dualsubreplay.data
 
 import com.kienhoang.dualsubreplay.BuildConfig
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -10,6 +11,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
+import kotlin.random.Random
 
 /*
  * Free synced lyrics for songs (owner pick 2026-11-17): before Gemini writes a song's transcript,
@@ -24,6 +26,21 @@ internal const val LRCLIB_HOST = "lrclib.net"
 private const val MAX_LYRICS_REPLY_BYTES = 2 * 1024 * 1024
 
 private const val LYRICS_TIMEOUT_MS = 10_000L
+
+/**
+ * LRCLIB's public ID for this app (registered as a client-side Android app on 2026-11-25), sent as
+ * `Lrclib-App-Id`. It is not a secret: it names the app so LRCLIB can reach its developer.
+ */
+internal const val LRCLIB_APP_ID = "vayTMJ6YCjJ60p0rtI7Q2p56iZPmzxs1hA99R82r2R0"
+
+/** A "too many requests" wait this short is waited out once; a longer one skips lookups until it ends. */
+private const val LYRICS_LONGEST_RETRY_WAIT_MS = 10_000L
+
+/** How long to leave LRCLIB alone when it is busy without saying for how long. */
+private const val LYRICS_DEFAULT_RETRY_MS = 30_000L
+
+/** Up to this share of a wait is added at random, so phones told to wait at once don't all come back at once. */
+private const val LYRICS_RETRY_JITTER = 0.3
 
 /** A song may be this much longer or shorter than the video (lyric videos add a second or two). */
 internal const val LYRICS_LENGTH_SLACK_MS = 3_000L
@@ -209,7 +226,31 @@ internal fun parseLrc(text: String): List<RawCaptionCue> {
     }
 }
 
-/** Asks LRCLIB for a song's synced lyrics; null when it has none that fit or cannot be reached. */
+/** What LRCLIB answered: its reply (null when it failed), or "busy, ask again in [retryAfterMs]". */
+private sealed interface LyricsAnswer {
+    data class Reply(
+        val body: String?,
+    ) : LyricsAnswer
+
+    data class Busy(
+        val retryAfterMs: Long,
+    ) : LyricsAnswer
+}
+
+/** A `Retry-After` in seconds; LRCLIB's default wait when it gives none or a date. */
+internal fun lyricsRetryAfterMs(header: String?): Long =
+    header
+        ?.trim()
+        ?.toLongOrNull()
+        ?.takeIf { it >= 0 }
+        ?.let { it * 1000 }
+        ?: LYRICS_DEFAULT_RETRY_MS
+
+/**
+ * Asks LRCLIB for a song's synced lyrics; null when it has none that fit or cannot be reached.
+ * Follows LRCLIB's API terms: names the app, and when told "too many requests" (429 or 503) waits
+ * the time it gives, plus a little at random, before asking again (owner pick 2026-11-25).
+ */
 internal class SyncedLyricsSource(
     private val client: OkHttpClient =
         OkHttpClient
@@ -219,7 +260,13 @@ internal class SyncedLyricsSource(
             .callTimeout(LYRICS_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .followRedirects(false)
             .build(),
+    private val now: () -> Long = System::currentTimeMillis,
+    private val wait: suspend (Long) -> Unit = { delay(it) },
+    private val jitter: (Long) -> Long = { (it * LYRICS_RETRY_JITTER * Random.nextDouble()).toLong() },
 ) {
+    /** LRCLIB said to wait until then: no lookups are sent before it. */
+    @Volatile private var busyUntil = 0L
+
     suspend fun find(
         title: String,
         channel: String,
@@ -233,10 +280,23 @@ internal class SyncedLyricsSource(
         channel: String,
     ): String? {
         val query = lyricsSearchQuery(title, channel) ?: return null
-        return withContext(Dispatchers.IO) { runCatching { download(query) }.getOrNull() }
+        for (attempt in 0..1) {
+            if (now() < busyUntil) return null
+            when (val answer = withContext(Dispatchers.IO) { runCatching { download(query) }.getOrNull() }) {
+                null -> return null
+                is LyricsAnswer.Reply -> return answer.body
+                is LyricsAnswer.Busy -> {
+                    val waitMs = answer.retryAfterMs + jitter(answer.retryAfterMs)
+                    busyUntil = maxOf(busyUntil, now() + waitMs)
+                    if (attempt > 0 || answer.retryAfterMs > LYRICS_LONGEST_RETRY_WAIT_MS) return null
+                    wait(waitMs)
+                }
+            }
+        }
+        return null
     }
 
-    private fun download(query: String): String? {
+    private fun download(query: String): LyricsAnswer {
         val request =
             Request
                 .Builder()
@@ -244,11 +304,18 @@ internal class SyncedLyricsSource(
                 .header("Accept", "application/json")
                 // LRCLIB asks apps to name themselves.
                 .header("User-Agent", "DualSub-Replay/${BuildConfig.VERSION_NAME} (https://github.com/hoangkien1703/dual-sub-replay)")
+                .header("Lrclib-App-Id", LRCLIB_APP_ID)
                 .get()
                 .build()
         client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return null
-            return response.body.byteStream().use { readUtf8WithLimit(it, MAX_LYRICS_REPLY_BYTES) }
+            if (response.code == HTTP_TOO_MANY_REQUESTS || response.code == HTTP_UNAVAILABLE) {
+                return LyricsAnswer.Busy(lyricsRetryAfterMs(response.header("Retry-After")))
+            }
+            if (!response.isSuccessful) return LyricsAnswer.Reply(null)
+            return LyricsAnswer.Reply(response.body.byteStream().use { readUtf8WithLimit(it, MAX_LYRICS_REPLY_BYTES) })
         }
     }
 }
+
+private const val HTTP_TOO_MANY_REQUESTS = 429
+private const val HTTP_UNAVAILABLE = 503
