@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini tidak mendengar ucapan apa pun di video ini.</string>
     <string name="ai_subtitles_problem_failed">Jawaban Gemini tidak bisa dibaca. Coba lagi.</string>
     <string name="ai_transcript_choice">Transkrip AI (Gemini)</string>
+    <string name="song_lyrics_choice">Lirik lagu (LRCLIB)</string>
     <string name="ai_transcript_offer">Ini tampaknya lagu dengan teks otomatis, yang sering salah menulis lirik.</string>
     <string name="ai_transcript_make">Ambil lirik asli</string>
     <string name="ai_transcript_offer_note">Lirik tersinkron gratis dari LRCLIB. Tanpa AI.</string>

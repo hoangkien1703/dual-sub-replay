@@ -11,6 +11,12 @@ import java.io.IOException
 internal const val AI_SUBTITLE_TRACK_ID = "ai"
 
 /**
+ * The `trackId` of a song's free synced lyrics from LRCLIB, with no AI in them, saved apart from
+ * the AI transcript so the Original language list can switch between the two (owner pick 2026-11-25).
+ */
+internal const val SONG_LYRICS_TRACK_ID = "lyrics"
+
+/**
  * How much of the video one request covers. Flash-Lite answered a 3-minute part in 6–9 s in the
  * 2026-11-08 test, so a 5-minute part shows its first lines quickly and long videos stay well under
  * the free per-minute token limit.
@@ -347,28 +353,70 @@ internal data class AiSubtitleTrack(
         return nextAiSubtitlePart(0L, parts.keys + coveredParts(), end) != null
     }
 
-    /** True when the lines are mostly synced lyrics: a single song's, or a compilation's for at least half of it. */
-    fun mostlyLyrics(): Boolean {
-        if (lyrics) return true
-        val end = endMs ?: return false
-        return lyricChapters.sumOf { it.endMs - it.startMs } * 2 >= end
-    }
-
     fun withPart(
         startMs: Long,
         part: AiSubtitlePart,
     ): AiSubtitleTrack = copy(language = language.ifBlank { part.language }, parts = parts + (startMs to part.cues))
 
-    fun asCaptionTrack(languageCode: String): CaptionTrackResult =
+    /**
+     * Free synced lyrics only: a song's, or a compilation's songs with no Gemini part. Such a track
+     * saved with the AI transcripts by v1.9.19 counts as the song lyrics.
+     */
+    fun freeLyricsOnly(): Boolean = lyrics || (lyricChapters.isNotEmpty() && parts.isEmpty() && complete)
+
+    /** As [trackId]: the AI transcript (labelled AI even when part of it is lyrics), or [SONG_LYRICS_TRACK_ID]. */
+    fun asCaptionTrack(
+        languageCode: String,
+        trackId: String = AI_SUBTITLE_TRACK_ID,
+    ): CaptionTrackResult =
         CaptionTrackResult(
             languageCode = languageCode,
             // Not YouTube's generated captions: the page has no live captions or word timing to read for it.
             isGenerated = false,
             cues = cues(),
             availableLanguages = youtubeTracks,
-            trackId = AI_SUBTITLE_TRACK_ID,
-            lyrics = mostlyLyrics(),
+            trackId = trackId,
+            lyrics = trackId == SONG_LYRICS_TRACK_ID,
         )
+}
+
+/**
+ * A video's saved AI transcript and its free song lyrics, kept in two stores so the Original
+ * language list can switch between them (owner pick 2026-11-25).
+ */
+internal class SavedTranscripts(
+    private val ai: AiSubtitleStore,
+    private val songLyrics: AiSubtitleStore,
+) {
+    /** Gemini's lines, with any songs' lyrics among them. */
+    fun aiTranscript(videoId: String): AiSubtitleTrack? = ai.read(videoId)?.takeIf { !it.freeLyricsOnly() && it.cues().isNotEmpty() }
+
+    /** The free song lyrics; ones v1.9.19 saved with the AI transcripts move over. */
+    fun songLyrics(videoId: String): AiSubtitleTrack? =
+        songLyrics.read(videoId)?.takeIf { it.cues().isNotEmpty() }
+            ?: ai
+                .read(videoId)
+                ?.takeIf { it.freeLyricsOnly() && it.cues().isNotEmpty() }
+                ?.also(songLyrics::write)
+
+    /**
+     * The track to show for [picked] ([AI_SUBTITLE_TRACK_ID], [SONG_LYRICS_TRACK_ID], or null for
+     * Auto, which takes the AI transcript and then the lyrics), with its `trackId`; null when it is
+     * not saved or one of YouTube's tracks was picked.
+     */
+    fun forPick(
+        videoId: String,
+        picked: String?,
+    ): Pair<String, AiSubtitleTrack>? {
+        val aiTrack = { aiTranscript(videoId)?.let { AI_SUBTITLE_TRACK_ID to it } }
+        val lyricsTrack = { songLyrics(videoId)?.let { SONG_LYRICS_TRACK_ID to it } }
+        return when (picked) {
+            AI_SUBTITLE_TRACK_ID -> aiTrack()
+            SONG_LYRICS_TRACK_ID -> lyricsTrack()
+            null -> aiTrack() ?: lyricsTrack()
+            else -> null
+        }
+    }
 }
 
 private val VIDEO_ID = Regex("[A-Za-z0-9_-]{11}")

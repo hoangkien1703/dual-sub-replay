@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini không nghe thấy lời nói nào trong video này.</string>
     <string name="ai_subtitles_problem_failed">Không đọc được câu trả lời của Gemini. Hãy thử lại.</string>
     <string name="ai_transcript_choice">Bản ghi AI (Gemini)</string>
+    <string name="song_lyrics_choice">Lời bài hát (LRCLIB)</string>
     <string name="ai_transcript_offer">Video này giống một bài hát có phụ đề tự động, thường sai lời.</string>
     <string name="ai_transcript_make">Lấy lời bài hát chuẩn</string>
     <string name="ai_transcript_offer_note">Lời đồng bộ miễn phí từ LRCLIB. Không dùng AI.</string>

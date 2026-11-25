@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
+import com.kienhoang.dualsubreplay.playback.WebVideoPlayback
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,6 +89,38 @@ class SubtitleUiTest {
         composeRule.runOnIdle { assertEquals("en", selectedTarget) }
         composeRule.onNodeWithTag("close_settings").performClick()
         composeRule.runOnIdle { assertTrue(dismissed) }
+    }
+
+    @Test
+    fun aSongsOriginalLanguageListOffersItsFreeLyrics() {
+        // Owner pick 2026-11-25: the song lyrics are their own choice, apart from YouTube's track and the AI transcript.
+        var selected: String? = null
+        WebVideoBridge.publish(WebVideoPlayback("dQw4w9WgXcQ", "Opalite - Taylor Swift (Lyrics)", false, 0L, 210_000L, 1f))
+        try {
+            composeRule.setContent {
+                DualSubTheme {
+                    CompositionLocalProvider(LocalAiSubtitleActions provides AiSubtitleActions(make = {}, openAiSettings = {})) {
+                        QuickLanguageSettingsDialog(
+                            sourcePreference = SONG_LYRICS_CHOICE,
+                            targetLanguage = "vi",
+                            availableSourceLanguages = listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true)),
+                            onSourceChange = { selected = it },
+                            onTargetChange = {},
+                            onOpenAllSettings = {},
+                            onDismiss = {},
+                        )
+                    }
+                }
+            }
+            composeRule.onNodeWithText("Song lyrics (LRCLIB)").assertIsDisplayed()
+            composeRule.onNodeWithTag("source_language_picker").performClick()
+            Thread.sleep(700)
+            saveUiEvidence("original-language-song-lyrics")
+            composeRule.onNodeWithTag("language_option_source_track:a.en").performClick()
+            composeRule.runOnIdle { assertEquals("track:a.en", selected) }
+        } finally {
+            WebVideoBridge.publish(null)
+        }
     }
 
     @Test

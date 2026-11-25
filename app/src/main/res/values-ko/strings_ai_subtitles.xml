@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">이 동영상에서 말소리를 듣지 못했습니다.</string>
     <string name="ai_subtitles_problem_failed">Gemini의 응답을 읽을 수 없습니다. 다시 시도하세요.</string>
     <string name="ai_transcript_choice">AI 받아쓰기 (Gemini)</string>
+    <string name="song_lyrics_choice">노래 가사 (LRCLIB)</string>
     <string name="ai_transcript_offer">자동 자막이 있는 노래로 보입니다. 자동 자막은 가사를 자주 틀립니다.</string>
     <string name="ai_transcript_make">정확한 가사 가져오기</string>
     <string name="ai_transcript_offer_note">LRCLIB의 무료 싱크 가사를 사용합니다. AI는 쓰지 않습니다.</string>

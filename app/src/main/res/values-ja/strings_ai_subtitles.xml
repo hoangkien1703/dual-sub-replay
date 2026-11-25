@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">この動画では話し声が聞き取れませんでした。</string>
     <string name="ai_subtitles_problem_failed">Gemini の回答を読み取れませんでした。もう一度お試しください。</string>
     <string name="ai_transcript_choice">AI文字起こし（Gemini）</string>
+    <string name="song_lyrics_choice">歌詞（LRCLIB）</string>
     <string name="ai_transcript_offer">自動字幕の曲のようです。自動字幕は歌詞をよく間違えます。</string>
     <string name="ai_transcript_make">正しい歌詞を取得</string>
     <string name="ai_transcript_offer_note">LRCLIBの無料同期歌詞を使います。AIは使いません。</string>

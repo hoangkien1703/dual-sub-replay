@@ -90,18 +90,18 @@ class SongChaptersTest {
         // 0–5:00 is covered whole; 5:00–10:00 is, too (songs run to 10:40); 10:00–15:00 is not.
         assertEquals(setOf(0L, 300_000L), track.coveredParts())
         assertTrue(track.hasGaps())
-        // Songs cover 10:40 of 15:00, so the header says song lyrics.
-        assertTrue(track.mostlyLyrics())
-        assertFalse(track.copy(endMs = 1_400_000).mostlyLyrics())
+        // Songs alone are the free song lyrics, until Gemini is asked to write a part.
+        assertTrue(track.copy(complete = true).freeLyricsOnly())
+        assertFalse(track.freeLyricsOnly())
         val geminiLine = RawCaptionCue(390_000, 391_000, "Gemini inside song one")
         val later = RawCaptionCue(700_000, 701_000, "Gemini after the songs")
         val filled = track.copy(parts = mapOf(300_000L to listOf(geminiLine), 600_000L to listOf(later)))
         assertEquals(listOf("Song one", "Song two", "Gemini after the songs"), filled.cues().map { it.text })
         assertFalse(filled.hasGaps())
+        assertFalse(filled.copy(complete = true).freeLyricsOnly())
         val whole = track.copy(endMs = 640_000)
         assertEquals(setOf(0L, 300_000L, 600_000L), whole.coveredParts())
         assertFalse(whole.hasGaps())
-        assertTrue(whole.mostlyLyrics())
         assertEquals(songs, decodeAiSubtitleTrack(encodeAiSubtitleTrack(whole))!!.lyricChapters)
     }
 

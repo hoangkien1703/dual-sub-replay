@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
+import com.kienhoang.dualsubreplay.data.SONG_LYRICS_TRACK_ID
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.playback.WebVideoPlayback
 import com.kienhoang.dualsubreplay.translation.TranslationLanguages
@@ -68,7 +69,8 @@ internal fun shouldSuggestAiTranscript(
 ): Boolean {
     val videoId = state.activeVideoId ?: return false
     if (!song || videoId in state.aiTranscriptSuggestionClosed) return false
-    if (state.liveFallback || state.segments.isEmpty() || state.loadedTrackId == AI_SUBTITLE_TRACK_ID) return false
+    if (state.liveFallback || state.segments.isEmpty()) return false
+    if (state.loadedTrackId == AI_SUBTITLE_TRACK_ID || state.loadedTrackId == SONG_LYRICS_TRACK_ID) return false
     if (!state.generatedCaptions) return false
     val loaded = state.resolvedSourceLanguage?.let(TranslationLanguages::normalize)
     val humanTrack =
@@ -85,6 +87,18 @@ internal fun aiTranscriptChoiceLabel(): String? {
     val actions = LocalAiSubtitleActions.current ?: return null
     if (LocalAiAssistant.current == null || !actions.videoOpen()) return null
     return stringResource(R.string.ai_transcript_choice)
+}
+
+/**
+ * The Original language list's free song lyrics choice (owner pick 2026-11-25), while a song is
+ * open. It needs no AI key, so it shows in every build.
+ */
+@Composable
+internal fun songLyricsChoiceLabel(): String? {
+    val actions = LocalAiSubtitleActions.current ?: return null
+    val playback by WebVideoBridge.playback.collectAsStateWithLifecycle()
+    if (!actions.videoOpen() || !looksLikeSong(playback)) return null
+    return stringResource(R.string.song_lyrics_choice)
 }
 
 /**

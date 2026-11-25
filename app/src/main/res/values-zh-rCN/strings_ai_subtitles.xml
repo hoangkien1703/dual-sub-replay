@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini 在这个视频里没有听到说话声。</string>
     <string name="ai_subtitles_problem_failed">无法读取 Gemini 的回答。请重试。</string>
     <string name="ai_transcript_choice">AI 转写（Gemini）</string>
+    <string name="song_lyrics_choice">歌词（LRCLIB）</string>
     <string name="ai_transcript_offer">这看起来是一首只有自动字幕的歌曲，自动字幕常把歌词弄错。</string>
     <string name="ai_transcript_make">获取正确歌词</string>
     <string name="ai_transcript_offer_note">使用 LRCLIB 的免费同步歌词，不使用 AI。</string>

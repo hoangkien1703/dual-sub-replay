@@ -45,6 +45,8 @@ Songs with description times use the old exact-length match first. If that fails
 - **Songs without captions.** A song whose video has no captions at all (lyrics burned into the picture) got only "Make subtitles with AI" on the no-captions card and the box over the video. It now gets **Get real lyrics** first, and AI only after no free lyrics matched.
 - **Slowed and sped-up edits.** "double take - dhruv (slowed)" is 3:06 against the 2:50 song, so no length matched. When the title says slowed, sped up, nightcore or daycore, the song's lyrics are stretched by the length ratio (0.7–1.45×).
 
+- **Lyrics and AI as separate choices.** The header said "English (song lyrics)" while the Original language list said "AI transcript (Gemini)". The owner picked "In the Original language list": for a song the list now shows YouTube's tracks, **Song lyrics (LRCLIB)** and **AI transcript (Gemini)**. Free lyrics are saved in their own store (`song-lyrics`), apart from the AI transcripts (`ai-subtitles`), so switching back and forth is instant once each is made, and picking a YouTube track uses neither (Gemini stops; its parts stay saved). The header says "(song lyrics)" only for the LRCLIB choice; a playlist whose gaps Gemini wrote is the AI transcript and says "(AI subtitles)". "AI transcript (Gemini)" goes straight to Gemini (for a playlist with some songs' lyrics, Gemini writes only the rest). Lyrics that v1.9.19 saved with the AI transcripts count as song lyrics and move over.
+
 ## Acceptance criteria
 
 - [x] Tapping **Get real lyrics** never calls Gemini (`TranscriptAsk.FREE_LYRICS`; banner UI test checks it calls `findLyrics`, not `useTranscript`).
@@ -54,6 +56,7 @@ Songs with description times use the old exact-length match first. If that fails
 - [x] Chapters naming the artist in brackets, with a song listed past the end, are found; a slowed edit gets stretched lyrics (`FreeLyricsLookupTest`, `SongChaptersTest`).
 - [x] A song with no captions offers Get real lyrics before AI (`NoCaptionsOverlayTest`, `NoCaptionsCardUiTest` screenshots `no-captions-song`, `no-captions-song-no-lyrics`).
 - [x] AI parts within 10 minutes of the playing time load as they arrive (`AiSubtitleRunnerTest.aLongVideoShowsNewPartsNearThePlayingTimeAsTheyArrive`).
+- [x] Song lyrics and the AI transcript are separate list choices, each saved apart (`AiSubtitlesTest.songLyricsAndTheAiTranscriptAreSavedApartAndPickedEachOnItsOwn`, `SourcePreferenceTest`).
 - [ ] On a real phone: the owner's chapter playlist (uQMMckzKOXc) finds most songs. Live LRCLIB check from the cloud: the first 5 chapters have a song of the chapter's length.
 
 ## Validation

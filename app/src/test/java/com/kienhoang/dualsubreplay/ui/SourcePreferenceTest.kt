@@ -79,6 +79,19 @@ class SourcePreferenceTest {
         assertNull(pickedCaptionTrack(AI_TRANSCRIPT_CHOICE, tracks))
     }
 
+    @Test fun aSongOffersItsFreeLyricsBeforeTheAiTranscriptEachShownAsChosenWhileLoaded() {
+        // Owner pick 2026-11-25: free lyrics and the AI transcript are separate choices, so each can be picked back.
+        val tracks = listOf(CaptionLanguage("en", "English (auto-generated)", "a.en", generated = true))
+        val choices = sourceLanguageChoices(tracks, "Auto", "AI transcript (Gemini)", "Song lyrics (LRCLIB)")
+        assertEquals(listOf("auto", "track:a.en", SONG_LYRICS_CHOICE, AI_TRANSCRIPT_CHOICE), choices.map { it.code })
+
+        val lyricsLoaded = DualSubUiState(sourcePreference = "auto", availableSourceLanguages = tracks, loadedTrackId = "lyrics")
+        assertEquals(SONG_LYRICS_CHOICE, sourceChoiceSelection(lyricsLoaded))
+        assertEquals("Song lyrics (LRCLIB)", sourceLanguageLabel(SONG_LYRICS_CHOICE, choices, "Auto", java.util.Locale.ENGLISH))
+        assertEquals(AI_TRANSCRIPT_CHOICE, sourceChoiceSelection(lyricsLoaded.copy(loadedTrackId = "ai")))
+        assertNull(pickedCaptionTrack(SONG_LYRICS_CHOICE, tracks))
+    }
+
     private fun availableLanguages() =
         listOf(
             CaptionLanguage("en", "English"),
