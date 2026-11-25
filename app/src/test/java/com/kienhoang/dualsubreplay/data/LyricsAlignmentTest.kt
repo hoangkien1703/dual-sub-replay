@@ -138,23 +138,12 @@ class LyricsAlignmentTest {
     }
 
     @Test
-    fun aPlaylistPictureListsEachSongOnceFromBothColumns() {
-        val picture =
-            listOf(
-                "01. Risk It All — Bruno Mars",
-                "Risk It All — Bruno Mars .01",
-                "16. Lose control —Teddy Swims",
-                "Lose control —Teddy Swims .16",
-                "TOP HITS SPOTIFY",
-                "17. Folded —   Kehlani",
-                "24. Car's outside —   James Arthur",
-                "JS.VIBES MUSIC",
-            )
-        assertEquals(
-            listOf("Risk It All — Bruno Mars", "Lose control —Teddy Swims", "Folded — Kehlani", "Car's outside — James Arthur"),
-            pictureSongList(picture),
-        )
-        assertEquals(emptyList<String>(), pictureSongList(listOf("TOP HITS SPOTIFY", "Hip-hop mix", "JS.VIBES MUSIC")))
+    fun aChapterNamingItsArtistInBracketsIsSearchedWithIt() {
+        assertEquals("2002 - Anne-Marie", chapterSongName("2002 (Anne-Marie)"))
+        assertEquals("Fate of Ophelia - Taylor Swift", chapterSongName("Fate of Ophelia (Taylor Swift)"))
+        assertEquals("Golden (Remix)", chapterSongName("Golden (Remix)"))
+        assertEquals("Havana (feat. Young Thug)", chapterSongName("Havana (feat. Young Thug)"))
+        assertEquals("Camila Cabello - Havana (Live)", chapterSongName("Camila Cabello - Havana (Live)"))
     }
 
     private fun assertNear(

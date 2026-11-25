@@ -5,13 +5,14 @@ import com.kienhoang.dualsubreplay.data.CHAPTER_LENGTH_SLACK_MS
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.LyricChapter
 import com.kienhoang.dualsubreplay.data.RawCaptionCue
+import com.kienhoang.dualsubreplay.data.SyncedLyrics
 import com.kienhoang.dualsubreplay.data.alignLyrics
+import com.kienhoang.dualsubreplay.data.chapterSongName
 import com.kienhoang.dualsubreplay.data.chaptersFromPlaying
 import com.kienhoang.dualsubreplay.data.descriptionChapters
 import com.kienhoang.dualsubreplay.data.descriptionSongList
 import com.kienhoang.dualsubreplay.data.lyricChapter
 import com.kienhoang.dualsubreplay.data.pickSyncedLyrics
-import com.kienhoang.dualsubreplay.data.pictureSongList
 import com.kienhoang.dualsubreplay.data.withoutOverlaps
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -26,11 +27,28 @@ private const val PARALLEL_SONG_LOOKUPS = 4
 /** A playlist chapter's song may be sung a little before or after the time the description gives. */
 private const val CHAPTER_SEARCH_SLACK_MS = 15_000L
 
-/** A video this long may be a playlist whose picture lists its songs. */
-private const val SHORTEST_PICTURE_PLAYLIST_MS = 10 * 60_000L
-
 /** A single song this long or shorter is matched against its captions when its length fits no LRCLIB song. */
 private const val LONGEST_SINGLE_SONG_MS = 20 * 60_000L
+
+/** A slowed or sped-up edit plays the whole song at another speed ("slowed + reverb", "sped up", nightcore). */
+private val SPEED_CHANGED = Regex("\\b(slowed|sped[ -]?up|speed[ -]?up|nightcore|daycore)\\b", RegexOption.IGNORE_CASE)
+
+/** A speed edit's song is this much slower or faster at most. */
+private const val SLOWEST_EDIT = 0.7
+private const val FASTEST_EDIT = 1.45
+
+/**
+ * [lyrics] timed for a slowed or sped-up edit of [videoMs]: every time stretched by the same share
+ * (owner's song 2026-11-25, "double take" slowed to 3:06 from 2:50). Null when the lengths are too far apart.
+ */
+internal fun stretched(
+    lyrics: SyncedLyrics,
+    videoMs: Long,
+): List<RawCaptionCue>? {
+    val share = videoMs.toDouble() / lyrics.durationMs.coerceAtLeast(1)
+    if (share !in SLOWEST_EDIT..FASTEST_EDIT) return null
+    return lyrics.cues.map { it.copy(startMs = (it.startMs * share).toLong(), endMs = (it.endMs * share).toLong(), words = emptyList()) }
+}
 
 /** How far a better transcript goes (owner pick 2026-11-24: AI only when the person taps for it). */
 internal enum class TranscriptAsk {
@@ -114,15 +132,13 @@ internal fun FreeLyrics.summary(): String =
  * Free synced lyrics for a song or a playlist (owner picks 2026-11-17 and 2026-11-24), never AI:
  * - a playlist whose description gives each song's start: each song's lyrics of the same length,
  *   else of any length placed by its captions near that start;
- * - a playlist whose description (or, from 10 minutes, its picture) lists songs without times: each
- *   song's lyrics placed by matching them against the captions ([alignLyrics]);
+ * - a playlist whose description lists songs without times: each song's lyrics placed by matching
+ *   them against the captions ([alignLyrics]);
  * - otherwise one song: lyrics of the video's length, else (up to 20 minutes) placed by its captions.
- * [search] asks LRCLIB for a title and gives its raw reply; [pictureText] reads the lines of text in
- * the video's picture on the phone.
+ * [search] asks LRCLIB for a title and gives its raw reply.
  */
 internal class FreeLyricsLookup(
     private val search: suspend (title: String, channel: String) -> String?,
-    private val pictureText: suspend () -> List<String> = { emptyList() },
 ) {
     suspend fun find(
         video: VideoForLyrics,
@@ -132,16 +148,17 @@ internal class FreeLyricsLookup(
         if (chapters.isNotEmpty()) {
             val songs =
                 eachSong(chaptersFromPlaying(chapters, video.playingMs), onProgress) { chapter ->
-                    val reply = search(chapter.title, "") ?: return@eachSong null
+                    val name = chapterSongName(chapter.title)
+                    val reply = search(name, "") ?: return@eachSong null
                     val length = chapter.endMs - chapter.startMs
                     pickSyncedLyrics(
                         reply,
-                        chapter.title,
+                        name,
                         length,
                         CHAPTER_LENGTH_SLACK_MS,
                     )?.let { return@eachSong lyricChapter(chapter, it) }
                     val captions = video.captions ?: return@eachSong null
-                    pickSyncedLyrics(reply, chapter.title, null)?.let { lyrics ->
+                    pickSyncedLyrics(reply, name, null)?.let { lyrics ->
                         alignLyrics(
                             lyrics.cues,
                             captions,
@@ -152,16 +169,7 @@ internal class FreeLyricsLookup(
                 }
             return FreeLyrics.Playlist(withoutOverlaps(songs), chapters.size)
         }
-        val listed =
-            descriptionSongList(video.description).ifEmpty {
-                if (video.captions != null &&
-                    video.durationMs >= SHORTEST_PICTURE_PLAYLIST_MS
-                ) {
-                    pictureSongList(pictureText())
-                } else {
-                    emptyList()
-                }
-            }
+        val listed = descriptionSongList(video.description)
         if (listed.isNotEmpty() && video.captions != null) {
             val songs =
                 eachSong(listed, onProgress) { title ->
@@ -171,6 +179,9 @@ internal class FreeLyricsLookup(
         }
         val reply = search(video.title, video.channel) ?: return FreeLyrics.None
         pickSyncedLyrics(reply, video.title, video.durationMs)?.let { return FreeLyrics.Song(it.cues) }
+        if (SPEED_CHANGED.containsMatchIn(video.title)) {
+            pickSyncedLyrics(reply, video.title, null)?.let { stretched(it, video.durationMs) }?.let { return FreeLyrics.Song(it) }
+        }
         if (video.captions == null || video.durationMs > LONGEST_SINGLE_SONG_MS) return FreeLyrics.None
         val placed = pickSyncedLyrics(reply, video.title, null)?.let { alignLyrics(it.cues, video.captions) }
         return placed?.let { FreeLyrics.Song(it.cues) } ?: FreeLyrics.None

@@ -27,6 +27,7 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.assistant.AiAssistantUiState
 import com.kienhoang.dualsubreplay.assistant.AiProvider
 import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import kotlinx.coroutines.flow.StateFlow
 
 /** What the no-captions card's buttons do: make the subtitles, or open Settings → AI assistant to add a key. */
@@ -53,12 +54,14 @@ internal val LocalAiSubtitleActions = staticCompositionLocalOf<AiSubtitleActions
 /**
  * Shown in place of live subtitles when YouTube has no captions at all for the video (owner pick
  * 2026-11-08): says so, and offers AI subtitles with the AI assistant's Gemini key, or a way to add one.
+ * A [song] offers its free synced lyrics first, and AI only once none matched (owner pick 2026-11-25).
  */
 @Composable
 internal fun NoCaptionsCard(
     status: AiSubtitleStatus?,
     geminiReady: Boolean,
     actions: AiSubtitleActions?,
+    song: Boolean = false,
 ) {
     Column(Modifier.fillMaxWidth().testTag("no_captions_card"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.ai_subtitles_no_captions_title), style = MaterialTheme.typography.titleSmall)
@@ -77,19 +80,28 @@ internal fun NoCaptionsCard(
             Text(aiSubtitleProgressText(status), style = MaterialTheme.typography.bodySmall)
             return@Column
         }
+        val noFreeLyrics = status?.problem == AiSubtitleProblem.NO_FREE_LYRICS
         status?.problem?.let { problem ->
             Text(
-                stringResource(aiSubtitleProblemText(problem)),
+                stringResource(if (noFreeLyrics && geminiReady) R.string.ai_transcript_no_free_lyrics else aiSubtitleProblemText(problem)),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                color = if (noFreeLyrics) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                 modifier = Modifier.testTag("ai_subtitles_problem"),
             )
         }
-        if (geminiReady) {
+        if (song && !noFreeLyrics) {
+            FreeLyricsButton(actions.findLyrics)
+        } else if (geminiReady) {
             Button(onClick = actions.make, modifier = Modifier.testTag("ai_subtitles_make")) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(if (status?.problem != null) R.string.ai_subtitles_try_again else R.string.ai_subtitles_make))
+                val label =
+                    when {
+                        noFreeLyrics -> R.string.ai_transcript_write_with_ai
+                        status?.problem != null -> R.string.ai_subtitles_try_again
+                        else -> R.string.ai_subtitles_make
+                    }
+                Text(stringResource(label))
             }
             Text(
                 stringResource(R.string.ai_subtitles_note),
@@ -154,17 +166,34 @@ internal fun aiSubtitleProblemText(problem: AiSubtitleProblem): Int =
         AiSubtitleProblem.SOME_FREE_LYRICS -> R.string.ai_transcript_some_lyrics_needs_key
     }
 
+/** A song's first step on the no-captions card: its free synced lyrics, with no key and no AI. */
+@Composable
+private fun FreeLyricsButton(onClick: () -> Unit) {
+    Button(onClick = onClick, modifier = Modifier.testTag("ai_subtitles_find_lyrics")) {
+        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.ai_transcript_make))
+    }
+    Text(
+        stringResource(R.string.ai_transcript_offer_note),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
 /** The no-captions card with the assistant's key state: it updates as soon as a key is added in settings. */
 @Composable
 private fun NoCaptionsSectionWithAssistant(
     state: DualSubUiState,
     assistant: StateFlow<AiAssistantUiState>,
+    song: Boolean,
 ) {
     val aiState by assistant.collectAsStateWithLifecycle()
     NoCaptionsCard(
         status = state.aiSubtitles?.takeIf { it.videoId == state.activeVideoId },
         geminiReady = geminiReady(aiState),
         actions = LocalAiSubtitleActions.current,
+        song = song,
     )
 }
 
@@ -180,11 +209,14 @@ internal fun NoCaptionsSection(state: DualSubUiState) {
         return
     }
     val host = LocalAiAssistant.current
+    val playback by WebVideoBridge.playback.collectAsStateWithLifecycle()
+    val song = looksLikeSong(playback?.takeIf { it.videoId == state.activeVideoId })
+    val status = state.aiSubtitles?.takeIf { it.videoId == state.activeVideoId }
     if (host != null) {
-        NoCaptionsSectionWithAssistant(state, host.controller.state)
+        NoCaptionsSectionWithAssistant(state, host.controller.state, song)
     } else {
-        // Builds without the assistant: no key to use, so only the explanation and the settings button.
-        NoCaptionsCard(state.aiSubtitles?.takeIf { it.videoId == state.activeVideoId }, geminiReady = false, LocalAiSubtitleActions.current)
+        // Builds without the assistant: no key to use, so the explanation, a song's free lyrics and the settings button.
+        NoCaptionsCard(status, geminiReady = false, LocalAiSubtitleActions.current, song)
     }
 }
 

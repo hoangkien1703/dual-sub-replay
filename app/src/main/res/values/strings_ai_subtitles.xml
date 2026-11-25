@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini heard no speech in this video.</string>
     <string name="ai_subtitles_problem_failed">Gemini\'s answer couldn\'t be read. Try again.</string>
     <string name="ai_transcript_choice">AI transcript (Gemini)</string>
+    <string name="song_lyrics_choice">Song lyrics (LRCLIB)</string>
     <string name="ai_transcript_offer">This looks like a song with auto-made captions, which often get the lyrics wrong.</string>
     <string name="ai_transcript_make">Get real lyrics</string>
     <string name="ai_transcript_offer_note">Free synced lyrics from LRCLIB. No AI is used.</string>

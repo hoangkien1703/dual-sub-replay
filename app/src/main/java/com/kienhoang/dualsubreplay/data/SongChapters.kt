@@ -25,8 +25,8 @@ private const val MIN_CHAPTERS = 3
 
 /**
  * The songs of a compilation from its [description], in time order: lines with one timestamp and a
- * name, the first at the start of the video, every later one inside [durationMs]. Empty when the
- * description does not list songs like that.
+ * name, the first at the start of the video; songs listed from [durationMs] on are left out. Empty
+ * when the description does not list songs like that.
  */
 internal fun descriptionChapters(
     description: String,
@@ -49,9 +49,12 @@ internal fun descriptionChapters(
                 chapterTimeMs(time.groupValues[1])?.let { it to name }
             }.toList()
     if (starts.size < MIN_CHAPTERS || starts.first().first != 0L) return emptyList()
-    if (starts.zipWithNext().any { (a, b) -> b.first <= a.first } || starts.last().first >= durationMs) return emptyList()
-    return starts.mapIndexed { index, (start, name) ->
-        SongChapter(start, starts.getOrNull(index + 1)?.first ?: durationMs, name)
+    if (starts.zipWithNext().any { (a, b) -> b.first <= a.first }) return emptyList()
+    // A description often lists a song the video was cut short of (seen 2026-11-25): only those are left out.
+    val inVideo = starts.filter { (start, _) -> start < durationMs }
+    if (inVideo.size < MIN_CHAPTERS) return emptyList()
+    return inVideo.mapIndexed { index, (start, name) ->
+        SongChapter(start, inVideo.getOrNull(index + 1)?.first ?: durationMs, name)
     }
 }
 
@@ -60,9 +63,6 @@ internal fun descriptionChapters(
  * may lose a space ("Lose control —Teddy Swims"); a hyphen needs both, so "Hip-hop" stays one name.
  */
 private val LISTED_SONG = Regex("""^\s*(?:#?\d{1,3}\s*[.)\-:]?\s+)?(.{2,80}?(?:\s*[–—]\s*|\s-\s).{2,80}?)\s*$""")
-
-/** The number after a song in a picture's right-hand column ("Risk It All — Bruno Mars .01"). */
-private val TRAILING_NUMBER = Regex("""\s*[.)]?\s*\d{1,3}\s*$""")
 
 /** Lines that are links, hashtags or credits, never a song. */
 private val NOT_A_SONG =
@@ -89,13 +89,6 @@ internal fun descriptionSongList(description: String): List<String> {
             .toList()
     return if (songs.size >= MIN_CHAPTERS) songs else emptyList()
 }
-
-/**
- * The songs a playlist video's picture lists ([lines] of its text, read on the phone), like
- * [descriptionSongList]; a list printed on both sides counts each song once.
- */
-internal fun pictureSongList(lines: List<String>): List<String> =
-    descriptionSongList(lines.joinToString("\n") { it.replace(TRAILING_NUMBER, "") })
 
 private fun chapterTimeMs(text: String): Long? {
     val parts = text.split(':').map { it.toLongOrNull() ?: return null }

@@ -184,6 +184,11 @@ class AiSubtitlesTest {
         val result = track.asCaptionTrack("es")
         assertEquals(AI_SUBTITLE_TRACK_ID, result.trackId)
         assertFalse(result.isGenerated)
+        assertFalse(result.lyrics)
+        // The same lines saved as free song lyrics say so, for the header's "(song lyrics)".
+        val lyrics = track.asCaptionTrack("es", SONG_LYRICS_TRACK_ID)
+        assertEquals(SONG_LYRICS_TRACK_ID, lyrics.trackId)
+        assertTrue(lyrics.lyrics)
     }
 
     @Test
@@ -209,6 +214,39 @@ class AiSubtitlesTest {
                 .filter { it.endsWith(".json") }
                 .toSet()
         assertEquals(setOf("bbbbbbbbbbb.json", "ccccccccccc.json"), kept)
+    }
+
+    @Test
+    fun songLyricsAndTheAiTranscriptAreSavedApartAndPickedEachOnItsOwn() {
+        // Owner pick 2026-11-25: the Original language list switches between free lyrics and AI, and back.
+        val ai = AiSubtitleStore(folder.newFolder("ai"))
+        val lyrics = AiSubtitleStore(folder.newFolder("lyrics"))
+        val saved = SavedTranscripts(ai, lyrics)
+        val id = "dQw4w9WgXcQ"
+        val realLine = mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Real line")))
+        val song = AiSubtitleTrack(id, "en", realLine, complete = true, lyrics = true)
+        // Saved by v1.9.19 with the AI transcripts: it is the song lyrics, and moves over.
+        ai.write(song)
+        assertNull(saved.aiTranscript(id))
+        assertEquals(SONG_LYRICS_TRACK_ID to song, saved.forPick(id, null))
+        assertEquals(song, lyrics.read(id))
+        assertNull(saved.forPick(id, AI_SUBTITLE_TRACK_ID))
+
+        val misheard = mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Misheard line")))
+        val gemini = AiSubtitleTrack(id, "en", misheard, complete = true)
+        ai.write(gemini)
+        assertEquals(AI_SUBTITLE_TRACK_ID to gemini, saved.forPick(id, AI_SUBTITLE_TRACK_ID))
+        assertEquals(SONG_LYRICS_TRACK_ID to song, saved.forPick(id, SONG_LYRICS_TRACK_ID))
+        // Auto takes the AI transcript; one of YouTube's tracks takes neither.
+        assertEquals(AI_SUBTITLE_TRACK_ID, saved.forPick(id, null)?.first)
+        assertNull(saved.forPick(id, "a.en"))
+
+        // A playlist's songs with Gemini writing the rest is the AI transcript, even before its first part.
+        val songs = listOf(LyricChapter(0, 200_000, listOf(RawCaptionCue(1_000, 2_000, "Song one"))))
+        val playlist = AiSubtitleTrack("bbbbbbbbbbb", "en", emptyMap(), endMs = 900_000, lyricChapters = songs)
+        ai.write(playlist)
+        assertEquals(AI_SUBTITLE_TRACK_ID to playlist, saved.forPick("bbbbbbbbbbb", null))
+        assertNull(saved.songLyrics("bbbbbbbbbbb"))
     }
 
     @Test

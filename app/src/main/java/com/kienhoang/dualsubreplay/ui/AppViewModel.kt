@@ -47,6 +47,8 @@ import com.kienhoang.dualsubreplay.data.ProblemArea
 import com.kienhoang.dualsubreplay.data.ProblemLog
 import com.kienhoang.dualsubreplay.data.RecentCaptionTracks
 import com.kienhoang.dualsubreplay.data.RemoteSwitchState
+import com.kienhoang.dualsubreplay.data.SONG_LYRICS_TRACK_ID
+import com.kienhoang.dualsubreplay.data.SavedTranscripts
 import com.kienhoang.dualsubreplay.data.SavedWord
 import com.kienhoang.dualsubreplay.data.SiteCaptionProvider
 import com.kienhoang.dualsubreplay.data.SoundCues
@@ -180,11 +182,12 @@ class AppViewModel internal constructor(
     /** Subtitles Gemini made for videos without captions (owner pick 2026-11-08). */
     private val aiSubtitleStore = AiSubtitleStore(File(application.cacheDir, "ai-subtitles"))
 
+    /** Songs' free synced lyrics, saved apart from the AI transcripts so each can be picked (owner pick 2026-11-25). */
+    private val songLyricsStore = AiSubtitleStore(File(application.cacheDir, "song-lyrics"))
+    private val savedTranscripts = SavedTranscripts(aiSubtitleStore, songLyricsStore)
+
     /** Free synced lyrics for songs, asked before Gemini (owner pick 2026-11-17). */
     private val syncedLyrics = SyncedLyricsSource()
-
-    /** A playlist's song list printed on its picture, read on the phone (owner pick 2026-11-24). */
-    private val pictureText = VideoPictureText(application)
     private val geminiSubtitles by lazy {
         AiVideoSubtitleMaker(
             StoredGeminiKeys(
@@ -826,23 +829,25 @@ class AppViewModel internal constructor(
     /** Fetches [videoId]'s captions in the picked track or chosen original language, or Auto's pick when none is chosen. */
     private suspend fun fetchCaptionTrack(videoId: String): CaptionTrackResult {
         val picked = _state.value.pickedTrack
-        val youtubeTrackPicked = picked != null && picked != AI_SUBTITLE_TRACK_ID
-        // A transcript Gemini made for this video earlier (YouTube had none, or the person picked the
-        // AI transcript), unless one of YouTube's own tracks was picked for it.
-        if (!youtubeTrackPicked) {
-            aiSubtitleStore
-                .read(
-                    videoId,
-                )?.takeIf { it.cues().isNotEmpty() }
-                ?.let { return it.asCaptionTrack(aiSubtitleLanguage(it.language)) }
-        }
+        // A transcript Gemini made for this video earlier, or the song's free lyrics, when picked;
+        // with nothing picked, the AI transcript and then the lyrics, as YouTube's captions are often worse.
+        val saved = savedTranscripts.forPick(videoId, picked)
+        if (saved != null) return saved.second.asCaptionTrack(aiSubtitleLanguage(saved.second.language), saved.first)
         return captionProvider.fetch(
             videoId,
             preferredCaptionLanguages(_state.value.sourcePreference),
             learningLanguage(),
-            picked?.takeIf { youtubeTrackPicked },
+            picked?.takeUnless { it == AI_SUBTITLE_TRACK_ID || it == SONG_LYRICS_TRACK_ID },
         )
     }
+
+    /** The video's own YouTube tracks, without the AI transcript or song lyrics. */
+    private fun youtubeTracksOf(state: DualSubUiState): List<CaptionLanguage> =
+        state.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID && it.trackId != SONG_LYRICS_TRACK_ID }
+
+    private fun savedAiTranscript(videoId: String): AiSubtitleTrack? = savedTranscripts.aiTranscript(videoId)
+
+    private fun savedSongLyrics(videoId: String): AiSubtitleTrack? = savedTranscripts.songLyrics(videoId)
 
     /** The language Gemini named, or the learning language when it named none the app knows. */
     private fun aiSubtitleLanguage(named: String): String =
@@ -854,23 +859,24 @@ class AppViewModel internal constructor(
     fun makeAiSubtitles() {
         // Gemini reads YouTube links only.
         val videoId = _state.value.activeVideoId?.takeUnless(VideoKeys::isBilibili) ?: return
-        // A song without captions may have free synced lyrics: those come first.
+        // A song without captions may have free synced lyrics: those come first, unless none matched already.
         if (looksLikeSong(WebVideoBridge.playback.value?.takeIf { it.videoId == videoId })) {
-            useAiTranscript(geminiReady = true)
+            useAiTranscript(geminiReady = true, if (_state.value.noFreeLyrics()) TranscriptAsk.AI_NOW else TranscriptAsk.LYRICS_THEN_AI)
             return
         }
         aiSubtitles.start(videoId, latestPlaybackSecondMs)
     }
 
     /**
-     * A better transcript for the open video (owner picks 2026-11-17 and 2026-11-24). A saved one
-     * loads at once. [ask] says how far it goes: the song card's "Get real lyrics" looks only for
-     * free synced lyrics and never uses AI; "AI transcript (Gemini)" in the Original language list
-     * and "Make subtitles with AI" try free lyrics for a song first, then Gemini; the problem card's
-     * "Write lyrics with AI" goes to Gemini at once. Gemini writes from the playing part while
-     * YouTube's captions keep showing, and replaces them as soon as its first part is in. YouTube's
-     * tracks are kept with it, so the list can go back. Returns false when AI is asked for without a
-     * Gemini key and nothing is saved, so the caller opens Settings → AI assistant.
+     * A better transcript for the open video (owner picks 2026-11-17, 2026-11-24 and 2026-11-25). A
+     * saved one loads at once. [ask] says which: "Get real lyrics" and "Song lyrics (LRCLIB)" in the
+     * Original language list look only for free synced lyrics and never use AI; "Make subtitles with
+     * AI" for a song tries free lyrics first, then Gemini; "AI transcript (Gemini)" in the list and
+     * "Write lyrics with AI" go to Gemini at once (for a playlist with some songs' lyrics, Gemini
+     * writes only the rest). Gemini writes from the playing part while the current lines keep
+     * showing, and replaces them as soon as its first part is in. YouTube's tracks are kept with it,
+     * so the list can go back. Returns false when AI is asked for without a Gemini key and nothing
+     * is saved, so the caller opens Settings → AI assistant.
      */
     internal fun useAiTranscript(
         geminiReady: Boolean,
@@ -879,53 +885,81 @@ class AppViewModel internal constructor(
         val current = _state.value
         val videoId = current.activeVideoId ?: return true
         val playing = WebVideoBridge.playback.value?.takeIf { it.videoId == videoId }
-        val song = looksLikeSong(playing)
-        val aiAllowed = geminiReady && ask != TranscriptAsk.FREE_LYRICS
-        val freeLyricsFirst = song && ask != TranscriptAsk.AI_NOW
-        if (!freeLyricsFirst && ask != TranscriptAsk.FREE_LYRICS && !geminiReady &&
-            aiSubtitleStore.read(videoId)?.cues().isNullOrEmpty()
-        ) {
-            return false
+        if (ask == TranscriptAsk.FREE_LYRICS) {
+            useSongLyrics(videoId, playing, current)
+            return true
         }
+        val freeLyricsFirst = looksLikeSong(playing) && ask != TranscriptAsk.AI_NOW
+        if (!freeLyricsFirst && !geminiReady && savedAiTranscript(videoId) == null) return false
         _state.update {
             it.copy(pickedTrack = AI_SUBTITLE_TRACK_ID, aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId)
         }
         if (aiSubtitles.isRunning(videoId)) return true
-        val youtubeTracks = current.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID }
-        if (current.loadedTrackId == AI_SUBTITLE_TRACK_ID && current.segments.isNotEmpty() && !current.liveFallback) {
-            // A playlist shown with some songs' lyrics: Gemini writes the rest when asked to.
-            if (aiAllowed) viewModelScope.launch { fillCompilationGaps(videoId, youtubeTracks) }
-            return true
-        }
+        val youtubeTracks = youtubeTracksOf(current)
         viewModelScope.launch {
-            val saved = withContext(Dispatchers.IO) { aiSubtitleStore.read(videoId) }?.takeIf { it.cues().isNotEmpty() }
+            val savedAi = withContext(Dispatchers.IO) { savedAiTranscript(videoId) }
+            val lyrics = if (savedAi == null) withContext(Dispatchers.IO) { savedSongLyrics(videoId) } else null
             if (_state.value.activeVideoId != videoId) return@launch
-            if (saved != null) {
-                loadVideo(videoId, showPanel = true)
-                return@launch
-            }
-            if (freeLyricsFirst && playing?.durationMs != null &&
-                findFreeLyrics(videoId, playing, current, youtubeTracks, aiAllowed)
-            ) {
-                return@launch
-            }
-            if (_state.value.activeVideoId != videoId) return@launch
-            if (aiAllowed) {
-                aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
-            } else {
-                _state.update {
-                    it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS))
-                }
+            when {
+                savedAi != null -> loadVideo(videoId, showPanel = true)
+                // A playlist with some songs' lyrics: Gemini writes only the rest.
+                lyrics != null && lyrics.lyricChapters.isNotEmpty() && geminiReady ->
+                    fillCompilationGaps(videoId, lyrics, youtubeTracks)
+                freeLyricsFirst && lyrics != null -> showSongLyrics(videoId)
+                freeLyricsFirst && playing?.durationMs != null &&
+                    findFreeLyrics(videoId, playing, current, youtubeTracks, geminiReady) -> Unit
+                _state.value.activeVideoId != videoId -> Unit
+                geminiReady -> aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
+                else ->
+                    _state.update {
+                        it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS))
+                    }
             }
         }
         return true
     }
 
     /**
+     * The song's free synced lyrics, saved or looked up now, never AI. Gemini stops writing (its
+     * parts so far stay saved for "AI transcript"). When none match, the lines shown stay and the
+     * panel says so.
+     */
+    private fun useSongLyrics(
+        videoId: String,
+        playing: WebVideoPlayback?,
+        current: DualSubUiState,
+    ) {
+        if (aiSubtitles.isRunning(videoId)) aiSubtitles.stop()
+        _state.update { it.copy(aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId) }
+        val youtubeTracks = youtubeTracksOf(current)
+        viewModelScope.launch {
+            val saved = withContext(Dispatchers.IO) { savedSongLyrics(videoId) }
+            if (_state.value.activeVideoId != videoId) return@launch
+            if (saved != null) {
+                showSongLyrics(videoId)
+                return@launch
+            }
+            val found = playing?.durationMs != null && findFreeLyrics(videoId, playing, current, youtubeTracks, aiForGaps = false)
+            if (found) return@launch
+            if (_state.value.activeVideoId != videoId) return@launch
+            _state.update {
+                it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS))
+            }
+            // Picked over an unfinished AI transcript: Gemini carries on with it.
+            if (_state.value.loadedTrackId == AI_SUBTITLE_TRACK_ID) aiSubtitles.resumeIfUnfinished(videoId, latestPlaybackSecondMs)
+        }
+    }
+
+    private fun showSongLyrics(videoId: String) {
+        _state.update { it.copy(pickedTrack = SONG_LYRICS_TRACK_ID) }
+        loadVideo(videoId, showPanel = true)
+    }
+
+    /**
      * Free synced lyrics from LRCLIB for the song, or for each song of a playlist (placed by its
      * description's times, or by matching them against YouTube's auto-generated captions): saves and
-     * shows them. Parts no song covers get Gemini only when [aiForGaps]; otherwise the panel says how
-     * many songs were found. False when nothing was found.
+     * shows them as the song lyrics. Parts no song covers get Gemini only when [aiForGaps], as the
+     * AI transcript; otherwise the panel says how many songs were found. False when nothing was found.
      */
     private suspend fun findFreeLyrics(
         videoId: String,
@@ -936,7 +970,8 @@ class AppViewModel internal constructor(
     ): Boolean {
         val duration = playing.durationMs ?: return false
         _state.update { it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = true, lookingForLyrics = true)) }
-        val captions = openTranscript.value?.takeIf { current.loadedTrackId != AI_SUBTITLE_TRACK_ID && !current.liveFallback }?.timedLines()
+        val ownTrack = current.loadedTrackId == AI_SUBTITLE_TRACK_ID || current.loadedTrackId == SONG_LYRICS_TRACK_ID
+        val captions = openTranscript.value?.takeIf { !ownTrack && !current.liveFallback }?.timedLines()
         val video =
             VideoForLyrics(
                 playing.title,
@@ -946,7 +981,7 @@ class AppViewModel internal constructor(
                 captions,
                 latestPlaybackSecondMs,
             )
-        val lookup = FreeLyricsLookup(syncedLyrics::search) { pictureText.lines(videoId) }
+        val lookup = FreeLyricsLookup(syncedLyrics::search)
         val found =
             withContext(Dispatchers.Default) {
                 lookup.find(video) { checked, total ->
@@ -964,12 +999,14 @@ class AppViewModel internal constructor(
         val track = found.track(videoId, language, duration, youtubeTracks, aiForGaps)
         ProblemLog.record(ProblemArea.CAPTIONS, "Free synced lyrics: ${found.summary()}")
         if (track == null) return false
-        // Without Gemini a playlist's gaps stay empty, so the track is complete and nothing resumes by itself.
-        val aiFillsGaps = !track.complete
-        withContext(Dispatchers.IO) { aiSubtitleStore.write(track) }
-        if (aiFillsGaps) aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks)
-        loadVideo(videoId, showPanel = true)
-        if (found is FreeLyrics.Playlist && found.songs.size < found.total && !aiFillsGaps) {
+        withContext(Dispatchers.IO) { songLyricsStore.write(track.copy(complete = true)) }
+        // Without Gemini a playlist's gaps stay empty, so the lyrics show as they are.
+        if (!track.complete) {
+            fillCompilationGaps(videoId, track, youtubeTracks)
+            return true
+        }
+        showSongLyrics(videoId)
+        if (found is FreeLyrics.Playlist && found.songs.size < found.total) {
             val status =
                 AiSubtitleStatus(
                     videoId,
@@ -983,16 +1020,22 @@ class AppViewModel internal constructor(
         return true
     }
 
-    /** A compilation saved with only some songs' lyrics: Gemini writes the parts between them. */
+    /**
+     * A compilation with only some songs' lyrics: saved as the AI transcript, whose parts between
+     * the songs Gemini writes.
+     */
     private suspend fun fillCompilationGaps(
         videoId: String,
+        lyrics: AiSubtitleTrack,
         youtubeTracks: List<CaptionLanguage>,
     ) {
-        val saved = withContext(Dispatchers.IO) { aiSubtitleStore.read(videoId) } ?: return
-        if (!saved.hasGaps() || _state.value.activeVideoId != videoId) return
-        withContext(Dispatchers.IO) { aiSubtitleStore.write(saved.copy(complete = false)) }
-        _state.update { it.copy(aiSubtitles = null) }
-        aiSubtitles.start(videoId, latestPlaybackSecondMs, youtubeTracks.ifEmpty { saved.youtubeTracks })
+        if (_state.value.activeVideoId != videoId) return
+        val tracks = youtubeTracks.ifEmpty { lyrics.youtubeTracks }
+        withContext(Dispatchers.IO) { aiSubtitleStore.write(lyrics.copy(complete = false, youtubeTracks = tracks)) }
+        _state.update { it.copy(pickedTrack = AI_SUBTITLE_TRACK_ID, aiSubtitles = null) }
+        aiSubtitles.start(videoId, latestPlaybackSecondMs, tracks)
+        // Shown song lyrics stay until Gemini's first part is in; otherwise the songs show at once.
+        if (_state.value.loadedTrackId != SONG_LYRICS_TRACK_ID) loadVideo(videoId, showPanel = true)
     }
 
     /** The song card's X: no more AI transcript offers (or problems) for the open video this session. */
@@ -1908,7 +1951,13 @@ class AppViewModel internal constructor(
                         )
                     }
 
-                    if (track.trackId == AI_SUBTITLE_TRACK_ID) aiSubtitles.resumeIfUnfinished(videoId, latestPlaybackSecondMs)
+                    // Another track picked over the AI transcript: Gemini stops; its parts stay saved.
+                    val otherPicked = _state.value.pickedTrack.let { it != null && it != AI_SUBTITLE_TRACK_ID }
+                    if (track.trackId == AI_SUBTITLE_TRACK_ID) {
+                        aiSubtitles.resumeIfUnfinished(videoId, latestPlaybackSecondMs)
+                    } else if (otherPicked && aiSubtitles.isRunning(videoId)) {
+                        aiSubtitles.stop()
+                    }
                     followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, track.isGenerated, natural)
                 } catch (error: Exception) {
                     if (error is CancellationException) throw error

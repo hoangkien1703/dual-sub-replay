@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini bu videoda danışıq eşitmədi.</string>
     <string name="ai_subtitles_problem_failed">Gemini-nin cavabını oxumaq olmadı. Yenidən cəhd edin.</string>
     <string name="ai_transcript_choice">Sİ transkripti (Gemini)</string>
+    <string name="song_lyrics_choice">Mahnı sözləri (LRCLIB)</string>
     <string name="ai_transcript_offer">Bu, avtomatik altyazılı mahnıya bənzəyir; belə altyazılar sözləri tez-tez səhv yazır.</string>
     <string name="ai_transcript_make">Əsl sözləri al</string>
     <string name="ai_transcript_offer_note">LRCLIB-dən pulsuz sinxron sözlər. Sİ istifadə olunmur.</string>

@@ -22,6 +22,7 @@
     <string name="ai_subtitles_problem_no_speech">Gemini no oyó ninguna voz en este video.</string>
     <string name="ai_subtitles_problem_failed">No se pudo leer la respuesta de Gemini. Inténtalo de nuevo.</string>
     <string name="ai_transcript_choice">Transcripción con IA (Gemini)</string>
+    <string name="song_lyrics_choice">Letra de la canción (LRCLIB)</string>
     <string name="ai_transcript_offer">Parece una canción con subtítulos automáticos, que suelen equivocarse en la letra.</string>
     <string name="ai_transcript_make">Obtener la letra real</string>
     <string name="ai_transcript_offer_note">Letras sincronizadas gratis de LRCLIB. No se usa IA.</string>

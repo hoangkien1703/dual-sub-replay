@@ -5,6 +5,7 @@ import com.kienhoang.dualsubreplay.assistant.aiTranslationModel
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
 import com.kienhoang.dualsubreplay.data.CaptionLanguage
 import com.kienhoang.dualsubreplay.data.LearningWordSelection
+import com.kienhoang.dualsubreplay.data.SONG_LYRICS_TRACK_ID
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.translation.GOOGLE_RECHECK_INTERVAL_MS
 import com.kienhoang.dualsubreplay.translation.GoogleWait
@@ -246,10 +247,17 @@ internal fun pickedCaptionTrack(
  */
 internal const val AI_TRANSCRIPT_CHOICE = TRACK_CHOICE_PREFIX + AI_SUBTITLE_TRACK_ID
 
-/** What the source list shows as chosen: the AI transcript, Auto, the loaded track, or the chosen language while loading. */
+/** The Original language list's "Song lyrics (LRCLIB)" (owner pick 2026-11-25): the song's free synced lyrics, never AI. */
+internal const val SONG_LYRICS_CHOICE = TRACK_CHOICE_PREFIX + SONG_LYRICS_TRACK_ID
+
+/**
+ * What the source list shows as chosen: the AI transcript, the song lyrics, Auto, the loaded track,
+ * or the chosen language while loading.
+ */
 internal fun sourceChoiceSelection(state: DualSubUiState): String =
     when {
         state.loadedTrackId == AI_SUBTITLE_TRACK_ID -> AI_TRANSCRIPT_CHOICE
+        state.loadedTrackId == SONG_LYRICS_TRACK_ID -> SONG_LYRICS_CHOICE
         state.sourcePreference == "auto" -> "auto"
         state.loadedTrackId.isNotBlank() && state.availableSourceLanguages.any { it.trackId == state.loadedTrackId } ->
             TRACK_CHOICE_PREFIX + state.loadedTrackId

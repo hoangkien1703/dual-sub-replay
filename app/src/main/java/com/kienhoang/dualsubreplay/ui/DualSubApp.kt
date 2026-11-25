@@ -49,6 +49,7 @@ import androidx.compose.material3.MaterialTheme
 import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.data.WordTap
 import com.kienhoang.dualsubreplay.data.AI_SUBTITLE_TRACK_ID
+import com.kienhoang.dualsubreplay.data.SONG_LYRICS_TRACK_ID
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -218,7 +219,11 @@ fun DualSubApp(
                     onHideSubtitles = viewModel::closeSubtitles,
                     onRetry = viewModel::retryCaptions,
                     onSourceChange = { choice ->
-                        if (choice == AI_TRANSCRIPT_CHOICE) aiSubtitleActions.useTranscript() else viewModel.setSourcePreference(choice)
+                        when (choice) {
+                            AI_TRANSCRIPT_CHOICE -> aiSubtitleActions.writeWithAi()
+                            SONG_LYRICS_CHOICE -> aiSubtitleActions.findLyrics()
+                            else -> viewModel.setSourcePreference(choice)
+                        }
                     },
                     onTargetChange = viewModel::setTargetLanguage,
                     onThirdLineChange = viewModel::setThirdLine,
@@ -1546,7 +1551,7 @@ private fun sourceDescription(state: DualSubUiState): String {
     val resources = LocalResources.current
     val interfaceLocale = currentInterfaceLocale()
     val source = state.resolvedSourceLanguage?.let { resolved ->
-        if (state.loadedTrackId == AI_SUBTITLE_TRACK_ID) {
+        if (state.loadedTrackId == AI_SUBTITLE_TRACK_ID || state.loadedTrackId == SONG_LYRICS_TRACK_ID) {
             val label = if (state.loadedLyrics) R.string.ai_transcript_lyrics_track_label else R.string.ai_subtitles_track_label
             return@let stringResource(label, languageDisplayName(resolved, interfaceLocale))
         }

@@ -72,6 +72,7 @@ import com.kienhoang.dualsubreplay.data.AnalyzedToken
 import com.kienhoang.dualsubreplay.data.LanguageAwareTokenizer
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.WordTap
+import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -491,8 +492,11 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
     val aiViewModel: AiAssistantViewModel = viewModel()
     val aiAssistant = remember(aiViewModel) { AiAssistantHost(aiViewModel.controller) { aiViewModel.guide } }
     val aiAssistantState by aiAssistant.controller.state.collectAsStateWithLifecycle()
-    // A video with no captions: the box on the video offers AI subtitles, like the panel's card.
-    val noCaptionsAction = noCaptionsOverlayAction(state, geminiReady(aiAssistantState))
+    // A video with no captions: the box on the video offers a song's free lyrics, or AI subtitles, like the panel's card.
+    val playback by WebVideoBridge.playback.collectAsStateWithLifecycle()
+    val song = looksLikeSong(playback?.takeIf { it.videoId == state.activeVideoId })
+    val keyReady = geminiReady(aiAssistantState)
+    val noCaptionsAction = noCaptionsOverlayAction(state, keyReady, song)
     var aiSettingsRequestId by remember { mutableLongStateOf(0L) }
 
     fun openAiSettings() {
@@ -501,12 +505,21 @@ fun LearningPlayerRoot(viewModel: AppViewModel) {
 
     val overlayButton: (() -> Unit)? =
         when (noCaptionsAction) {
+            NoCaptionsOverlayAction.GET_REAL_LYRICS -> {
+                { viewModel.useAiTranscript(keyReady, TranscriptAsk.FREE_LYRICS) }
+            }
             NoCaptionsOverlayAction.MAKE_AI_SUBTITLES -> viewModel::makeAiSubtitles
             NoCaptionsOverlayAction.ADD_GEMINI_KEY -> ::openAiSettings
             null -> if (showsOverlayRetry(state)) viewModel::retryCaptions else null
         }
 
-    val overlayContent = learningOverlayContent(state)?.copy(noCaptionsAction = noCaptionsAction)
+    val noFreeLyricsText = stringResource(R.string.ai_transcript_no_free_lyrics)
+    val overlayContent =
+        learningOverlayContent(state)?.let { content ->
+            // With a key, the AI button says the rest; the key advice would be wrong.
+            val status = if (keyReady && state.noFreeLyrics()) noFreeLyricsText else content.statusText
+            content.copy(noCaptionsAction = noCaptionsAction, statusText = status)
+        }
     val controlsLiftDp =
         playerControlsAvoidanceLiftDp(
             enabled = autoAvoidPlayerControls,
@@ -998,12 +1011,17 @@ private fun OverlayStatusAndButton(
     }
     if (noCaptions == null || onButton == null) return
     OverlayTextButton(onButton, Modifier.testTag("overlay_no_captions_action")) {
-        val make = noCaptions == NoCaptionsOverlayAction.MAKE_AI_SUBTITLES
-        if (make) {
+        val label =
+            when (noCaptions) {
+                NoCaptionsOverlayAction.GET_REAL_LYRICS -> R.string.ai_transcript_make
+                NoCaptionsOverlayAction.MAKE_AI_SUBTITLES -> R.string.ai_subtitles_make
+                NoCaptionsOverlayAction.ADD_GEMINI_KEY -> R.string.ai_subtitles_add_key
+            }
+        if (noCaptions != NoCaptionsOverlayAction.ADD_GEMINI_KEY) {
             Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.size(8.dp))
         }
-        Text(stringResource(if (make) R.string.ai_subtitles_make else R.string.ai_subtitles_add_key))
+        Text(stringResource(label))
     }
 }
 
