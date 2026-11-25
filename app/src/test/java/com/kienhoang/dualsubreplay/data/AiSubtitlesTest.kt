@@ -223,7 +223,8 @@ class AiSubtitlesTest {
         val lyrics = AiSubtitleStore(folder.newFolder("lyrics"))
         val saved = SavedTranscripts(ai, lyrics)
         val id = "dQw4w9WgXcQ"
-        val song = AiSubtitleTrack(id, "en", mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Real line"))), complete = true, lyrics = true)
+        val realLine = mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Real line")))
+        val song = AiSubtitleTrack(id, "en", realLine, complete = true, lyrics = true)
         // Saved by v1.9.19 with the AI transcripts: it is the song lyrics, and moves over.
         ai.write(song)
         assertNull(saved.aiTranscript(id))
@@ -231,7 +232,8 @@ class AiSubtitlesTest {
         assertEquals(song, lyrics.read(id))
         assertNull(saved.forPick(id, AI_SUBTITLE_TRACK_ID))
 
-        val gemini = AiSubtitleTrack(id, "en", mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Misheard line"))), complete = true)
+        val misheard = mapOf(0L to listOf(RawCaptionCue(18_000, 21_000, "Misheard line")))
+        val gemini = AiSubtitleTrack(id, "en", misheard, complete = true)
         ai.write(gemini)
         assertEquals(AI_SUBTITLE_TRACK_ID to gemini, saved.forPick(id, AI_SUBTITLE_TRACK_ID))
         assertEquals(SONG_LYRICS_TRACK_ID to song, saved.forPick(id, SONG_LYRICS_TRACK_ID))

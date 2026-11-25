@@ -841,6 +841,10 @@ class AppViewModel internal constructor(
         )
     }
 
+    /** The video's own YouTube tracks, without the AI transcript or song lyrics. */
+    private fun youtubeTracksOf(state: DualSubUiState): List<CaptionLanguage> =
+        state.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID && it.trackId != SONG_LYRICS_TRACK_ID }
+
     private fun savedAiTranscript(videoId: String): AiSubtitleTrack? = savedTranscripts.aiTranscript(videoId)
 
     private fun savedSongLyrics(videoId: String): AiSubtitleTrack? = savedTranscripts.songLyrics(videoId)
@@ -891,7 +895,7 @@ class AppViewModel internal constructor(
             it.copy(pickedTrack = AI_SUBTITLE_TRACK_ID, aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId)
         }
         if (aiSubtitles.isRunning(videoId)) return true
-        val youtubeTracks = current.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID && it.trackId != SONG_LYRICS_TRACK_ID }
+        val youtubeTracks = youtubeTracksOf(current)
         viewModelScope.launch {
             val savedAi = withContext(Dispatchers.IO) { savedAiTranscript(videoId) }
             val lyrics = if (savedAi == null) withContext(Dispatchers.IO) { savedSongLyrics(videoId) } else null
@@ -899,7 +903,8 @@ class AppViewModel internal constructor(
             when {
                 savedAi != null -> loadVideo(videoId, showPanel = true)
                 // A playlist with some songs' lyrics: Gemini writes only the rest.
-                lyrics != null && lyrics.lyricChapters.isNotEmpty() && geminiReady -> fillCompilationGaps(videoId, lyrics, youtubeTracks)
+                lyrics != null && lyrics.lyricChapters.isNotEmpty() && geminiReady ->
+                    fillCompilationGaps(videoId, lyrics, youtubeTracks)
                 freeLyricsFirst && lyrics != null -> showSongLyrics(videoId)
                 freeLyricsFirst && playing?.durationMs != null &&
                     findFreeLyrics(videoId, playing, current, youtubeTracks, geminiReady) -> Unit
@@ -926,7 +931,7 @@ class AppViewModel internal constructor(
     ) {
         if (aiSubtitles.isRunning(videoId)) aiSubtitles.stop()
         _state.update { it.copy(aiTranscriptSuggestionClosed = it.aiTranscriptSuggestionClosed - videoId) }
-        val youtubeTracks = current.availableSourceLanguages.filter { it.trackId != AI_SUBTITLE_TRACK_ID && it.trackId != SONG_LYRICS_TRACK_ID }
+        val youtubeTracks = youtubeTracksOf(current)
         viewModelScope.launch {
             val saved = withContext(Dispatchers.IO) { savedSongLyrics(videoId) }
             if (_state.value.activeVideoId != videoId) return@launch
@@ -934,7 +939,8 @@ class AppViewModel internal constructor(
                 showSongLyrics(videoId)
                 return@launch
             }
-            if (playing?.durationMs != null && findFreeLyrics(videoId, playing, current, youtubeTracks, aiForGaps = false)) return@launch
+            val found = playing?.durationMs != null && findFreeLyrics(videoId, playing, current, youtubeTracks, aiForGaps = false)
+            if (found) return@launch
             if (_state.value.activeVideoId != videoId) return@launch
             _state.update {
                 it.copy(aiSubtitles = AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS))
@@ -1945,10 +1951,11 @@ class AppViewModel internal constructor(
                         )
                     }
 
+                    // Another track picked over the AI transcript: Gemini stops; its parts stay saved.
+                    val otherPicked = _state.value.pickedTrack.let { it != null && it != AI_SUBTITLE_TRACK_ID }
                     if (track.trackId == AI_SUBTITLE_TRACK_ID) {
                         aiSubtitles.resumeIfUnfinished(videoId, latestPlaybackSecondMs)
-                    } else if (_state.value.pickedTrack.let { it != null && it != AI_SUBTITLE_TRACK_ID } && aiSubtitles.isRunning(videoId)) {
-                        // Another track picked over the AI transcript: Gemini stops; its parts stay saved.
+                    } else if (otherPicked && aiSubtitles.isRunning(videoId)) {
                         aiSubtitles.stop()
                     }
                     followStoredTranslation(checkNotNull(rawStore), videoId, generation, track.languageCode, track.isGenerated, natural)
