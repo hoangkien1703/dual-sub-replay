@@ -44,7 +44,7 @@ internal fun webLineAudioScript(
  */
 private val WEB_LINE_AUDIO_RECORDER =
     """
-    const state = { context: null, node: null, source: null, stream: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0, got: 0, lags: [], lateRun: 0, cut: null };
+    const state = { context: null, node: null, source: null, stream: null, track: null, video: null, videoId: '', blocks: [], samples: 0, last: null, pausedAt: 0, got: 0, heard: 0, lags: [], lateRun: 0, cut: null };
     const pageVideo = function() {
       return document.querySelector('#movie_player video.html5-main-video') || document.querySelector('video.html5-main-video') || document.querySelector('video');
     };
@@ -93,6 +93,8 @@ private val WEB_LINE_AUDIO_RECORDER =
       // Late by a whole block again and again: sound was lost, so the clock starts again and the run breaks.
       state.lateRun = late > length * 0.9 ? state.lateRun + 1 : 0;
       if (state.lateRun >= 3) { state.lags = [lag]; floor = lag; late = 0; state.lateRun = 0; state.last = null; }
+      // The audio clock's time of the newest sound that came in.
+      state.heard = state.got / rate + floor;
       const video = state.video;
       if (!video || video.seeking || video.ended || adShowing() || pageVideoId() !== state.videoId) {
         state.last = null;
@@ -188,12 +190,21 @@ private val WEB_LINE_AUDIO_RECORDER =
       clip: function(videoId, startSecond, endSecond, lineEnd) {
         if (videoId !== state.videoId || !state.context || !(endSecond > startSecond)) return null;
         const blocks = state.blocks;
+        // A block comes in up to a block's length (0.7 s) after it played. So while the video plays
+        // on, or the sound before its pause hasn't all come in, the rest of the line is on its way:
+        // the newest block isn't where the line's sound ends, and cutting there lost the tail.
+        const arriving = function() {
+          const video = state.video;
+          if (!video || video.ended) return false;
+          return !video.paused || (state.cut !== null && state.heard < state.cut);
+        };
         // The last block of an unbroken run of played sound from block [from] that reaches the line's end, or -1.
         const runEnd = function(from) {
           let at = from;
           while (blocks[at].end < endSecond) {
             const next = blocks[at + 1];
             if (!next || Math.abs(next.start - blocks[at].end) > 0.06) {
+              if (!next && arriving()) return -1;
               // A video paused right at the line's end (Pause after each line) has the line without its tail.
               return blocks[at].end >= lineEnd - 0.15 ? at : -1;
             }
