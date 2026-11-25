@@ -7,6 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.FileProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.kienhoang.dualsubreplay.data.AudioLine
 import com.kienhoang.dualsubreplay.data.LINE_AUDIO_DIRECTORY
 import com.kienhoang.dualsubreplay.data.LinePcm
 import com.kienhoang.dualsubreplay.data.audible
@@ -87,8 +88,9 @@ class LineAudioWebViewTest {
             // ...and the app replays the line from just before it (lion737, #81, 2026-11-12). The broken
             // first run is still kept, and must not hide the whole replayed one.
             evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 3.25; v.play(); })()")
-            playTo(web!!, 6.7)
-            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
+            // The app asks once the line's tail has played (6.4 s).
+            playTo(web!!, 6.4)
+            val clip = clipOf(web!!, line)
             assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
             assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
             assertTrue("the clip is silent", audible(clip))
@@ -111,8 +113,8 @@ class LineAudioWebViewTest {
             // ...and the replay starts 1.75 s before the line, with no check of the app in between:
             // the video's own play event has to wake the recorder.
             evaluate(web!!, "(function() { const v = document.querySelector('video'); v.currentTime = 2.25; v.play(); })()")
-            assumeTrue("the fixture video did not play on", waitForVideo(web!!, 6.7))
-            val clip = parseLinePcm(evaluate(web!!, webLineAudioClipScript(line)))
+            assumeTrue("the fixture video did not play on", waitForVideo(web!!, 6.4))
+            val clip = clipOf(web!!, line)
             assertNotNull("the replayed line has no clip; kept runs ${runs(web!!)}", clip)
             assertEquals(2.65, clip!!.samples.size.toDouble() / clip.sampleRate, 0.1)
             assertTrue("the clip is silent", audible(clip))
@@ -232,6 +234,23 @@ class LineAudioWebViewTest {
             Thread.sleep(100)
         }
         return false
+    }
+
+    /**
+     * [line]'s clip, asked for again as the app does until the page has it. The page's sound comes in
+     * blocks of 0.7 s, so just after the line's tail played the last block is still on its way: the
+     * page must answer null then, not a clip without its tail (2.34 s instead of 2.65 s, CI 2026-11-25).
+     */
+    private fun clipOf(
+        web: WebView,
+        line: AudioLine,
+    ): LinePcm? {
+        val deadline = System.currentTimeMillis() + 5_000
+        while (true) {
+            parseLinePcm(evaluate(web, webLineAudioClipScript(line)))?.let { return it }
+            if (System.currentTimeMillis() > deadline) return null
+            Thread.sleep(200)
+        }
     }
 
     private fun runs(web: WebView): String? = evaluate(web, "window.__dualSubLineAudio ? window.__dualSubLineAudio.runs() : null")

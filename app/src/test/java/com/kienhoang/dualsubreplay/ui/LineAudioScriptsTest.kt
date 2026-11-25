@@ -67,6 +67,15 @@ class LineAudioScriptsTest {
     }
 
     @Test
+    fun theRecorderWaitsForTheLastBlockBeforeCuttingAClip() {
+        val script = webLineAudioScript(on = true, videoId = "abcdefghijk")
+        // A clip asked right after the line's tail played lost the tail to a block still on its way (CI 2026-11-25).
+        assertTrue("state.heard = state.got / rate + floor;" in script)
+        assertTrue("return !video.paused || (state.cut !== null && state.heard < state.cut);" in script)
+        assertTrue("if (!next && arriving()) return -1;" in script)
+    }
+
+    @Test
     fun anOddVideoIdTurnsTheRecorderOff() {
         assertTrue("if (!false)" in webLineAudioScript(on = true, videoId = "'); alert(1); ('"))
         assertTrue("if (!false)" in webLineAudioScript(on = false, videoId = "abcdefghijk"))
