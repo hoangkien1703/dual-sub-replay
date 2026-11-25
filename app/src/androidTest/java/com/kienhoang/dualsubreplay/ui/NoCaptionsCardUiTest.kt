@@ -34,8 +34,9 @@ class NoCaptionsCardUiTest {
     val composeRule = createComposeRule()
 
     private var made = 0
+    private var lyricsAsked = 0
     private var settingsOpened = 0
-    private val actions = AiSubtitleActions(make = { made++ }, openAiSettings = { settingsOpened++ })
+    private val actions = AiSubtitleActions(make = { made++ }, openAiSettings = { settingsOpened++ }, findLyrics = { lyricsAsked++ })
     private val videoId = "yjsAuMiLc_A"
 
     private val noCaptions =
@@ -80,10 +81,11 @@ class NoCaptionsCardUiTest {
     private fun showCard(
         status: AiSubtitleStatus?,
         geminiReady: Boolean,
+        song: Boolean = false,
     ) {
         composeRule.setContent {
             DualSubTheme {
-                AppPanel { NoCaptionsCard(status, geminiReady, actions) }
+                AppPanel { NoCaptionsCard(status, geminiReady, actions, song) }
             }
         }
     }
@@ -175,6 +177,28 @@ class NoCaptionsCardUiTest {
         showCard(status = null, geminiReady = true)
         composeRule.onNodeWithText("Make subtitles with AI").assertIsDisplayed()
         saveEvidence("no-captions-make")
+        composeRule.onNodeWithTag("ai_subtitles_make").performClick()
+        assertEquals(1, made)
+    }
+
+    @Test
+    fun aSongWithoutCaptionsLooksForFreeLyricsFirst() {
+        // A lyric video with the words burned in (owner's report 2026-11-25): no AI until free lyrics fail.
+        showCard(status = null, geminiReady = true, song = true)
+        composeRule.onNodeWithText("Get real lyrics").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_subtitles_make").assertDoesNotExist()
+        saveEvidence("no-captions-song")
+        composeRule.onNodeWithTag("ai_subtitles_find_lyrics").performClick()
+        assertEquals(1, lyricsAsked)
+        assertEquals(0, made)
+    }
+
+    @Test
+    fun aSongWithNoFreeLyricsOffersAiOnATap() {
+        showCard(AiSubtitleStatus(videoId, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS), geminiReady = true, song = true)
+        composeRule.onNodeWithText("No free synced lyrics match this video.").assertIsDisplayed()
+        composeRule.onNodeWithText("Write lyrics with AI").assertIsDisplayed()
+        saveEvidence("no-captions-song-no-lyrics")
         composeRule.onNodeWithTag("ai_subtitles_make").performClick()
         assertEquals(1, made)
     }

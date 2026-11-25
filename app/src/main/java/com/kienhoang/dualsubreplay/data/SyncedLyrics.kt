@@ -132,19 +132,44 @@ internal fun pickSyncedLyrics(
                 songs.minByOrNull { abs(it.durationMs - videoDurationMs) }
             } else {
                 // LRCLIB lists the best matches first; a song whose whole name and artist are in the title goes ahead.
-                songs.maxByOrNull {
-                    (
-                        if (it.track.lowercase() in
-                            lowerTitle
-                        ) {
-                            2
-                        } else {
-                            0
-                        }
-                    ) + (if (it.artist.lowercase() in lowerTitle) 1 else 0)
-                }
+                songs.maxByOrNull { titleScore(it, lowerTitle) }
             }
         }
+}
+
+/** 2 when the song's name (without an "Artist - " in front) is in the title, plus 1 when its artist is. */
+private fun titleScore(
+    song: SyncedLyrics,
+    lowerTitle: String,
+): Int {
+    val artist = song.artist.lowercase()
+    val name =
+        song.track
+            .lowercase()
+            .removePrefix("$artist - ")
+            .trim()
+    return (if (name.isNotEmpty() && name in lowerTitle) 2 else 0) + (if (artist.isNotEmpty() && artist in lowerTitle) 1 else 0)
+}
+
+/** Words in brackets after a song's name that are not its artist: "(Remix)", "(Live)", "(feat. X)". */
+private val NOT_AN_ARTIST =
+    Regex(
+        "\\b(remix|live|acoustic|version|edit|cover|sped|slowed|reverb|feat|ft|mix|instrumental|remaster(ed)?)\\b",
+        RegexOption.IGNORE_CASE,
+    )
+
+private val SONG_THEN_BRACKETS = Regex("""^(.+?)\s*[(\[]([^)\]]{2,60})[)\]]\s*$""")
+
+/**
+ * A playlist chapter's name as LRCLIB finds it: "2002 (Anne-Marie)" names its artist in brackets,
+ * which [lyricsSearchQuery] would drop, so it becomes "2002 - Anne-Marie". Other names stay as they are.
+ */
+internal fun chapterSongName(title: String): String {
+    if (" - " in title) return title
+    val match = SONG_THEN_BRACKETS.matchEntire(title.trim()) ?: return title
+    val (song, inBrackets) = match.destructured
+    if (NOT_AN_ARTIST.containsMatchIn(inBrackets) || TITLE_NOISE.containsMatchIn(inBrackets)) return title
+    return "$song - $inBrackets"
 }
 
 /** True when a word of the song's name (or the whole name, for languages without spaces) is in the title. */

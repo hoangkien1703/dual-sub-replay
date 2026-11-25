@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalResources
 import com.kienhoang.dualsubreplay.R
+import com.kienhoang.dualsubreplay.assistant.AiSubtitleProblem
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleWord
 import com.kienhoang.dualsubreplay.data.VideoKeys
@@ -105,7 +106,10 @@ internal fun DualSubUiState.openVideoAiSubtitles(): AiSubtitleStatus? = aiSubtit
 
 /** What the button on the box over the video offers for a video with no captions (see [noCaptionsOverlayAction]). */
 internal enum class NoCaptionsOverlayAction {
-    /** The AI assistant has a Gemini key: make the subtitles now, as the panel card's button does. */
+    /** A song: free synced lyrics first, never AI (owner pick 2026-11-25). */
+    GET_REAL_LYRICS,
+
+    /** The AI assistant has a Gemini key: make the subtitles now (for a song, after no free lyrics matched). */
     MAKE_AI_SUBTITLES,
 
     /** No Gemini key yet: open Settings → AI assistant. Nothing turns on by itself. */
@@ -115,16 +119,22 @@ internal enum class NoCaptionsOverlayAction {
 /**
  * The button the box over the video shows for a YouTube video with no captions, like the panel's
  * no-captions card: none for a live stream (Gemini can't listen to one), a Bilibili video (Gemini
- * reads YouTube links only) or while AI subtitles are being made.
+ * reads YouTube links only) or while AI subtitles are being made. A [song] offers its free synced
+ * lyrics first.
  */
 internal fun noCaptionsOverlayAction(
     state: DualSubUiState,
     geminiReady: Boolean,
+    song: Boolean = false,
 ): NoCaptionsOverlayAction? {
     if (!state.showsNoCaptions() || state.liveStream || VideoKeys.isBilibili(state.activeVideoId)) return null
     if (state.openVideoAiSubtitles()?.working == true) return null
+    if (song && !state.noFreeLyrics()) return NoCaptionsOverlayAction.GET_REAL_LYRICS
     return if (geminiReady) NoCaptionsOverlayAction.MAKE_AI_SUBTITLES else NoCaptionsOverlayAction.ADD_GEMINI_KEY
 }
+
+/** Free synced lyrics were looked for and none matched the open video. */
+internal fun DualSubUiState.noFreeLyrics(): Boolean = openVideoAiSubtitles()?.problem == AiSubtitleProblem.NO_FREE_LYRICS
 
 /** "Retry full transcript" on the box over the video: only while live subtitles may still come, or for Bilibili's Try again. */
 internal fun showsOverlayRetry(state: DualSubUiState): Boolean =

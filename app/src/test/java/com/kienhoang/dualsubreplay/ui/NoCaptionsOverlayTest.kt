@@ -35,6 +35,15 @@ class NoCaptionsOverlayTest {
         assertFalse("Retrying finds no captions either", showsOverlayRetry(noCaptions))
     }
 
+    @Test fun aSongOffersItsFreeLyricsFirstAndAiOnlyAfterNoneMatched() {
+        // A lyric video with the words burned in and no captions (owner's report 2026-11-25).
+        assertEquals(NoCaptionsOverlayAction.GET_REAL_LYRICS, noCaptionsOverlayAction(noCaptions, geminiReady = true, song = true))
+        assertEquals(NoCaptionsOverlayAction.GET_REAL_LYRICS, noCaptionsOverlayAction(noCaptions, geminiReady = false, song = true))
+        val none = noCaptions.copy(aiSubtitles = AiSubtitleStatus(VIDEO, working = false, problem = AiSubtitleProblem.NO_FREE_LYRICS))
+        assertEquals(NoCaptionsOverlayAction.MAKE_AI_SUBTITLES, noCaptionsOverlayAction(none, geminiReady = true, song = true))
+        assertEquals(NoCaptionsOverlayAction.ADD_GEMINI_KEY, noCaptionsOverlayAction(none, geminiReady = false, song = true))
+    }
+
     @Test fun whileCaptionsMayStillComeTheWaitingHintAndRetryStay() {
         val waiting = noCaptions.copy(noCaptions = false)
         assertEquals(

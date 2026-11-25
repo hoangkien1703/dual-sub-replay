@@ -10,7 +10,7 @@ import org.junit.Test
 import kotlin.math.abs
 import kotlin.random.Random
 
-/** Free lyrics for a playlist that lists its songs only in its picture (owner pick 2026-11-24). */
+/** Free lyrics for a playlist video (owner picks 2026-11-24 and 2026-11-25). */
 class FreeLyricsLookupTest {
     private val vocabulary =
         (
@@ -72,25 +72,15 @@ class FreeLyricsLookupTest {
     ) = VideoForLyrics("TOP HITS SPOTIFY 2026", "JS Vibes", 3_600_000L, description, captions, playingMs = 0L)
 
     @Test
-    fun songsListedInThePictureAreFoundWhereTheCaptionsSingThem() =
+    fun songsListedWithoutTimesAreFoundWhereTheCaptionsSingThem() =
         runBlocking {
-            val picture =
-                listOf(
-                    "TOP HITS SPOTIFY",
-                    "01. Risk It All — Bruno Mars",
-                    "02. Ordinary — Alex warren",
-                    "03. Opalite — Taylor Swift",
-                    "Risk It All — Bruno Mars .01",
-                    "Ordinary — Alex warren .02",
-                    "Opalite — Taylor Swift .03",
-                    "JS.VIBES MUSIC",
-                )
             val searched = mutableListOf<String>()
-            val lookup =
-                FreeLyricsLookup(search = { title, _ -> replies[title].also { searched += title } }, pictureText = { picture })
-            val found = lookup.find(video()) as FreeLyrics.Playlist
+            val lookup = FreeLyricsLookup(search = { title, _ -> replies[title].also { searched += title } })
+            val description = "Tracklist:\n01. Risk It All — Bruno Mars\n02. Ordinary — Alex warren\n03. Opalite — Taylor Swift\n#pop #hits"
+            val found = lookup.find(video(description = description)) as FreeLyrics.Playlist
             assertEquals(3, found.total)
             assertEquals(replies.keys, searched.toSet())
+            // Opalite isn't sung in the captions, so it is left out rather than guessed.
             assertEquals(2, found.songs.size)
             assertNear(
                 310_000L,
@@ -110,31 +100,64 @@ class FreeLyricsLookupTest {
         }
 
     @Test
-    fun aDescriptionListComesBeforeThePicture() =
+    fun chaptersNamingTheArtistInBracketsAreFoundEvenWhenTheListRunsPastTheEnd() =
         runBlocking {
-            var pictureRead = false
-            val lookup =
-                FreeLyricsLookup(search = { title, _ -> replies[title] }, pictureText = {
-                    pictureRead = true
-                    emptyList()
-                })
-            val description = "Tracklist:\n1. Risk It All — Bruno Mars\n2. Ordinary — Alex warren\n3. Opalite — Taylor Swift"
-            val found = lookup.find(video(description = description)) as FreeLyrics.Playlist
-            assertEquals(2, found.songs.size)
-            assertTrue(!pictureRead)
+            // As in the owner's playlist (2026-11-25): "00:00 - 2002 (Anne-Marie)", and a last song the video was cut short of.
+            val description =
+                """
+                Tracklist:
+                00:00 - Risk It All (Bruno Mars)
+                03:30 - Ordinary (Alex warren)
+                07:00 - Opalite (Taylor Swift)
+                10:30 - i wasn't enough (Elsie Music)
+                """.trimIndent()
+            val searched = mutableListOf<String>()
+            val lookup = FreeLyricsLookup(search = { title, _ -> replies[title.replace(" - ", " — ")].also { searched += title } })
+            val captions = sung(third, 420_000L)
+            val found =
+                lookup.find(
+                    video(description = description, captions = captions).copy(durationMs = 600_000L),
+                ) as FreeLyrics.Playlist
+            assertEquals(3, found.total)
+            assertEquals(setOf("Risk It All - Bruno Mars", "Ordinary - Alex warren", "Opalite - Taylor Swift"), searched.toSet())
+            // The first two fit their chapters' length; the third (3:00 chapter, 3:30 song) is placed by the captions.
+            assertEquals(3, found.songs.size)
+            assertEquals(
+                210_000L + 10_000L,
+                found.songs[1]
+                    .cues
+                    .first()
+                    .startMs,
+            )
+            assertNear(
+                430_000L,
+                found.songs[2]
+                    .cues
+                    .first()
+                    .startMs,
+            )
         }
 
     @Test
-    fun withoutCaptionsThePictureIsNotRead() =
+    fun withoutCaptionsAListWithoutTimesFindsNothing() =
         runBlocking {
-            var pictureRead = false
-            val lookup =
-                FreeLyricsLookup(search = { _, _ -> null }, pictureText = {
-                    pictureRead = true
-                    emptyList()
-                })
-            assertEquals(FreeLyrics.None, lookup.find(video(captions = null)))
-            assertTrue(!pictureRead)
+            val lookup = FreeLyricsLookup(search = { title, _ -> replies[title] })
+            val description = "Tracklist:\n01. Risk It All — Bruno Mars\n02. Ordinary — Alex warren\n03. Opalite — Taylor Swift"
+            assertEquals(FreeLyrics.None, lookup.find(video(description = description, captions = null)))
+        }
+
+    @Test
+    fun aSlowedEditGetsItsSongsLyricsStretched() =
+        runBlocking {
+            // "[Lyrics + Vietsub] double take - dhruv (slowed)" is 3:06; the song is 2:50 (owner's report 2026-11-25).
+            val lookup = FreeLyricsLookup(search = { _, _ -> reply("double take", "dhruv", first) })
+            val slowed = VideoForLyrics("double take - dhruv (slowed + reverb)", "1106", 231_000L, "", captions = null, playingMs = 0L)
+            val found = lookup.find(slowed) as FreeLyrics.Song
+            // 3:51 for a 3:30 song: every time 10 % later.
+            assertEquals(11_000L, found.cues.first().startMs)
+            assertEquals(first.map { it.second }, found.cues.map { it.text })
+            // Without "slowed" or "sped up" in the title, a song of another length is not guessed.
+            assertEquals(FreeLyrics.None, lookup.find(slowed.copy(title = "double take - dhruv")))
         }
 
     private fun assertNear(

@@ -34,6 +34,22 @@ class SongChaptersTest {
     }
 
     @Test
+    fun songsListedPastTheVideosEndAreLeftOut() {
+        // The owner's playlist (2026-11-25) is 28:28 long but lists a song at 30:46.
+        val description =
+            "00:00 - 2002 (Anne-Marie)\n03:07 - Golden (Harry Styles)\n" +
+                "27:46 - Fate of Ophelia (Taylor Swift)\n30:46 - i wasn't enough"
+        assertEquals(
+            listOf(
+                SongChapter(0, 187_000, "2002 (Anne-Marie)"),
+                SongChapter(187_000, 1_666_000, "Golden (Harry Styles)"),
+                SongChapter(1_666_000, 1_708_000, "Fate of Ophelia (Taylor Swift)"),
+            ),
+            descriptionChapters(description, 1_708_000),
+        )
+    }
+
+    @Test
     fun aDescriptionWithoutAListOfSongsHasNoChapters() {
         // Too few, not from the start, out of order, or past the end.
         assertTrue(descriptionChapters("00:00 Intro\n01:00 Song", 300_000).isEmpty())

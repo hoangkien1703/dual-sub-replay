@@ -182,9 +182,6 @@ class AppViewModel internal constructor(
 
     /** Free synced lyrics for songs, asked before Gemini (owner pick 2026-11-17). */
     private val syncedLyrics = SyncedLyricsSource()
-
-    /** A playlist's song list printed on its picture, read on the phone (owner pick 2026-11-24). */
-    private val pictureText = VideoPictureText(application)
     private val geminiSubtitles by lazy {
         AiVideoSubtitleMaker(
             StoredGeminiKeys(
@@ -854,9 +851,9 @@ class AppViewModel internal constructor(
     fun makeAiSubtitles() {
         // Gemini reads YouTube links only.
         val videoId = _state.value.activeVideoId?.takeUnless(VideoKeys::isBilibili) ?: return
-        // A song without captions may have free synced lyrics: those come first.
+        // A song without captions may have free synced lyrics: those come first, unless none matched already.
         if (looksLikeSong(WebVideoBridge.playback.value?.takeIf { it.videoId == videoId })) {
-            useAiTranscript(geminiReady = true)
+            useAiTranscript(geminiReady = true, if (_state.value.noFreeLyrics()) TranscriptAsk.AI_NOW else TranscriptAsk.LYRICS_THEN_AI)
             return
         }
         aiSubtitles.start(videoId, latestPlaybackSecondMs)
@@ -946,7 +943,7 @@ class AppViewModel internal constructor(
                 captions,
                 latestPlaybackSecondMs,
             )
-        val lookup = FreeLyricsLookup(syncedLyrics::search) { pictureText.lines(videoId) }
+        val lookup = FreeLyricsLookup(syncedLyrics::search)
         val found =
             withContext(Dispatchers.Default) {
                 lookup.find(video) { checked, total ->

@@ -325,9 +325,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("com.google.mlkit:translate:17.0.3")
-    // Reads a playlist video's song list from its picture, on the phone (owner pick 2026-11-24). The text model comes
-    // from Google Play services, so the APK grows by about 0.3 MB instead of 9 MB for the bundled model.
-    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
     implementation("com.squareup.okhttp3:okhttp:5.5.1")
     // Japanese morphological analysis (MeCab IPADIC dictionary), Apache-2.0, pure Java.
     // The APK keeps only its code; the dictionary files are excluded from packaging below.

@@ -17,12 +17,12 @@ AI subtitles for a long video also showed only their first 5-minute part until e
 
 - **Get real lyrics** uses free LRCLIB lyrics only and never starts AI.
 - When free lyrics don't match, or only some songs do, the card says so. With a key it offers **Write lyrics with AI** or **Write the rest with AI**. Without a key it offers **Add a free Gemini key**.
-- A playlist that lists its songs without times gets each song's lyrics placed where it is sung. The list can come from the description or, from 10 minutes, from the text on its picture.
+- A playlist that lists its songs without times gets each song's lyrics placed where it is sung. The list comes from the description (the picture reader was tried and removed on 2026-11-25).
 - New AI parts near the playing time show as soon as they are in.
 
 ## Non-goals
 
-- No Gemini request to read the picture. Text is read on the phone.
+- No reading of the video picture (tried with on-phone text recognition, removed 2026-11-25).
 - No change to the "AI transcript (Gemini)" choice or the no-captions "Make subtitles with AI" button. Both are explicit AI taps, so they still try free lyrics for a song first and then Gemini.
 
 ## How songs are placed (`LyricsAlignment.kt`)
@@ -37,11 +37,13 @@ YouTube's auto-generated captions get sung words wrong but their timing right. F
 
 Songs with description times use the old exact-length match first. If that fails, they use the same matching within ±15 s of the chapter. A single song with no length match is also matched against its captions (up to 20 minutes).
 
-## Reading the picture (`VideoPictureText.kt`)
+## Follow-up 2026-11-25
 
-- Downloads `i.ytimg.com/vi/<id>/maxresdefault.jpg` (falls back to `sddefault`), scales it ×2, and reads it with ML Kit text recognition (Latin).
-- Uses the **Play services** model (`play-services-mlkit-text-recognition`, about 0.3 MB in the APK). The bundled model adds about 9 MB across arm64 and armv7 and would break the 32 MB APK limit (v1.9.18 is 29.8 MB). The first read may wait up to a minute while Play services downloads the model. On a phone without Google Play services, the picture is skipped quietly.
-- `pictureSongList` keeps lines like `01. Song — Artist` or `Song — Artist .01`, counts each song once (pictures often print the list on both sides), and needs at least 3.
+- **Picture reader removed.** The owner tried the preview and saw no gain from reading the song list on the video picture through Play services, so `VideoPictureText` and `play-services-mlkit-text-recognition` are gone. A playlist that lists its songs only on its picture gets no free lyrics; "Write lyrics with AI" stays one tap away.
+- **Chapters past the end.** The owner's 28:28 playlist lists a song at 30:46. `descriptionChapters` threw away the whole list for that; now it leaves out only the songs from the video's end on.
+- **Artist in brackets.** Chapter names like "2002 (Anne-Marie)" were searched as just "2002", because brackets are dropped from video titles ("(Official Video)"). `chapterSongName` turns them into "2002 - Anne-Marie", unless the brackets say Remix, Live, feat. and the like. With no length, a song whose name (without an "Artist - " in front) and artist are both in the title now wins.
+- **Songs without captions.** A song whose video has no captions at all (lyrics burned into the picture) got only "Make subtitles with AI" on the no-captions card and the box over the video. It now gets **Get real lyrics** first, and AI only after no free lyrics matched.
+- **Slowed and sped-up edits.** "double take - dhruv (slowed)" is 3:06 against the 2:50 song, so no length matched. When the title says slowed, sped up, nightcore or daycore, the song's lyrics are stretched by the length ratio (0.7–1.45×).
 
 ## Acceptance criteria
 
@@ -49,9 +51,10 @@ Songs with description times use the old exact-length match first. If that fails
 - [x] No match with a key: "No free synced lyrics match this video." plus **Write lyrics with AI** (UI test, screenshot `ai-transcript-no-free-lyrics`).
 - [x] Some songs: "Free synced lyrics found for 21 of 30 songs." plus **Write the rest with AI** (UI test, screenshot `ai-transcript-some-free-lyrics`).
 - [x] Listed songs are placed where misheard captions sing them, slower covers included, and songs the captions don't sing are left out (`LyricsAlignmentTest`).
-- [x] A picture list printed in two columns gives each song once; the description list wins over the picture; no captions means no picture read (`FreeLyricsLookupTest`).
+- [x] Chapters naming the artist in brackets, with a song listed past the end, are found; a slowed edit gets stretched lyrics (`FreeLyricsLookupTest`, `SongChaptersTest`).
+- [x] A song with no captions offers Get real lyrics before AI (`NoCaptionsOverlayTest`, `NoCaptionsCardUiTest` screenshots `no-captions-song`, `no-captions-song-no-lyrics`).
 - [x] AI parts within 10 minutes of the playing time load as they arrive (`AiSubtitleRunnerTest.aLongVideoShowsNewPartsNearThePlayingTimeAsTheyArrive`).
-- [ ] On a real phone: the owner's 30-song playlist finds most songs. **Unverified**: the cloud has no Play services emulator, so ML Kit reading and live LRCLIB matching need the preview APK.
+- [ ] On a real phone: the owner's chapter playlist (uQMMckzKOXc) finds most songs. Live LRCLIB check from the cloud: the first 5 chapters have a song of the chapter's length.
 
 ## Validation
 
