@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import android.content.ClipData
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
@@ -287,6 +289,11 @@ internal class PhraseActions(
     val pronounceIn: (text: String, language: String) -> Unit = { _, _ -> },
     val selectIn: (text: String, language: String, singleWord: Boolean) -> Unit = { _, _, _ -> },
     val translateFrom: (suspend (text: String, language: String) -> String)? = null,
+    /**
+     * Translate again with AI for the selected line's sentence, while Settings → Word learning →
+     * Translate again with AI is on (off by default, owner pick 2026-11-26); null hides it.
+     */
+    val translateAgain: ((SubtitleSegment) -> Unit)? = null,
 )
 
 /** Holds the one selection shared by every subtitle line on screen. */
@@ -373,8 +380,10 @@ internal fun BindPhraseActions(
     meaningInSentence: suspend (WordTap) -> ContextMeaning = { ContextMeaning.None },
     ankiCard: ((WordTap, String) -> SavedWord)? = null,
     translateFrom: (suspend (text: String, language: String) -> String)? = null,
+    translateAgain: (suspend (SubtitleSegment) -> TranslateAgainResult)? = null,
 ) {
     val controller = LocalPhraseSelection.current ?: return
+    val scope = rememberCoroutineScope()
     val source = learningSourceLanguage(state.resolvedSourceLanguage, state.sourcePreference)
     val target = state.targetLanguage
     // Playing the video again closes the bar; selecting pauses it, so this only fires on resume.
@@ -408,6 +417,10 @@ internal fun BindPhraseActions(
                     selectSpoken(text, language, singleWord, autoPronounce, webController, pronouncer)
                 },
                 translateFrom = translateFrom,
+                translateAgain =
+                    translateAgain?.takeIf { readTranslateAgain(context) }?.let { ask ->
+                        askAgainWithNotes(context, scope, ask)
+                    },
                 stopSpeech = pronouncer::stop,
                 speechMessage = { pronouncer.message },
                 translate = translate,
@@ -429,6 +442,50 @@ internal fun BindPhraseActions(
             )
     }
 }
+
+/**
+ * Translate again for [segment]'s line, or null while it is off. The third line has a language of
+ * its own ([lineLanguage]), so Translate again fixes the second line only.
+ */
+private fun translateAgainOf(
+    actions: PhraseActions,
+    segment: SubtitleSegment?,
+    lineLanguage: String?,
+    beforeAsking: () -> Unit,
+): (() -> Unit)? {
+    val again = actions.translateAgain ?: return null
+    if (lineLanguage != null || segment == null) return null
+    return {
+        beforeAsking()
+        again(segment)
+    }
+}
+
+private fun googleTranslateAction(onClick: () -> Unit) =
+    PhraseAction(Icons.AutoMirrored.Filled.OpenInNew, R.string.practice_open_google_translate, "google_translate", onClick = onClick)
+
+/** Translate again in the ▾ list only: it has no Tap bar buttons chip, so the bar keeps its icons. */
+private fun translateAgainAction(onClick: () -> Unit) =
+    PhraseAction(Icons.Default.AutoFixHigh, R.string.phrase_translate_again, "translate_again", onClick = onClick)
+
+/** Translate again for a line, saying what happens: asking, done, no AI key, or no new translation. */
+private fun askAgainWithNotes(
+    context: Context,
+    scope: CoroutineScope,
+    ask: suspend (SubtitleSegment) -> TranslateAgainResult,
+): (SubtitleSegment) -> Unit =
+    { segment ->
+        Toast.makeText(context, R.string.phrase_translate_again_asking, Toast.LENGTH_SHORT).show()
+        scope.launch {
+            val note =
+                when (ask(segment)) {
+                    TranslateAgainResult.DONE -> R.string.phrase_translate_again_done
+                    TranslateAgainResult.NO_KEY -> R.string.phrase_translate_again_no_key
+                    TranslateAgainResult.FAILED -> R.string.phrase_translate_again_failed
+                }
+            Toast.makeText(context, note, Toast.LENGTH_LONG).show()
+        }
+    }
 
 /** A new selection of [text] in [language]: read aloud when [speaksOnSelect], else only a held recording that fits. */
 private fun selectSpoken(
@@ -587,6 +644,7 @@ internal fun SelectableSubtitleText(
                     onOpenGoogleTranslate = {
                         controller.actions.openGoogleTranslate(text.substring(start, end))
                     },
+                    onTranslateAgain = translateAgainOf(controller.actions, segment, lineLanguage) { controller.clear(owner) },
                     onClose = { controller.clear(owner) },
                 )
             }
@@ -865,6 +923,7 @@ private fun PhraseActionBar(
     onPronounce: () -> Unit,
     onOpenGoogleTranslate: () -> Unit,
     onClose: () -> Unit,
+    onTranslateAgain: (() -> Unit)? = null,
     buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
     onAnkiFromList: () -> Boolean = { false },
     ankiCard: ((meaning: String) -> SavedWord)? = null,
@@ -913,12 +972,8 @@ private fun PhraseActionBar(
                         PhraseAction(Icons.Default.Translate, R.string.practice_translate, "translate", onClick = onTranslate),
                         PhraseAction(Icons.AutoMirrored.Filled.VolumeUp, R.string.practice_pronounce, "pronounce", onClick = onPronounce),
                         anki?.action(scope, meaning, meaningInSentenceFirst),
-                        PhraseAction(
-                            Icons.AutoMirrored.Filled.OpenInNew,
-                            R.string.practice_open_google_translate,
-                            "google_translate",
-                            onClick = onOpenGoogleTranslate,
-                        ),
+                        googleTranslateAction(onOpenGoogleTranslate),
+                        onTranslateAgain?.let(::translateAgainAction),
                     ).filterNotNull()
                         .shownIn(shown)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

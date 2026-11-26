@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">词典释义</string>
     <string name="settings_prepare_meanings_title">提前准备释义</string>
     <string name="settings_prepare_meanings_description">播放一行时，先向 AI 询问这一行每个词的意思，点词时立即显示释义。即使你没点的行也会使用你的密钥。</string>
+    <string name="settings_translate_again_title">用 AI 重新翻译</string>
+    <string name="settings_translate_again_description">在点词栏的 ▾ 列表中加入“重新翻译”。某行的翻译看起来不对时，选中该行的一个词，再选“重新翻译”：设置 → AI 助手中的 AI 会参考前后几行，重新翻译整句。只有在你选择时才会使用你的密钥。</string>
     <string name="settings_tap_bar_reading_title">在点词栏中显示读音</string>
     <string name="settings_tap_bar_reading_description">点一个词时，上方的栏也会显示读音：英语显示国际音标，日语显示假名，中文显示拼音。</string>
     <string name="settings_tap_bar_buttons_title">点词栏按钮</string>

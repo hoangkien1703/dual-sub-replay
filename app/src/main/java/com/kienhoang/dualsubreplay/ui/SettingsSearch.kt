@@ -214,6 +214,12 @@ internal enum class SearchableSetting(
         "prepare_meanings_switch",
         setOf(PREPARE_MEANINGS_PREFERENCE),
     ),
+    TRANSLATE_AGAIN(
+        R.string.settings_translate_again_title,
+        MoreSettingsSection.WORD_LEARNING,
+        "translate_again_switch",
+        setOf(TRANSLATE_AGAIN_PREFERENCE),
+    ),
     TAP_BAR_READING(
         R.string.settings_tap_bar_reading_title,
         MoreSettingsSection.WORD_LEARNING,

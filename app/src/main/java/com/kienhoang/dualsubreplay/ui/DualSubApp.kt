@@ -138,6 +138,7 @@ fun DualSubApp(
         meaningInSentence = { tap -> viewModel.meaningInContext(tap) },
         ankiCard = viewModel::ankiCard,
         translateFrom = viewModel::translateLineText,
+        translateAgain = viewModel::translateLineAgain,
     )
     BindLineSoundReplay(webController, state.activeVideoId.takeUnless { state.liveFallback })
     val betaSiteOffer by viewModel.betaSiteOffer.collectAsStateWithLifecycle()

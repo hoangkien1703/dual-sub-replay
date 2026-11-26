@@ -137,6 +137,7 @@ internal fun KnownWordsAndCharacterSettings() {
             onCheckedChange = { preferences.edit().putBoolean(MARK_NEW_WORDS_PREFERENCE, it).apply() },
             testTag = "mark_new_words_switch",
         )
+        AnkiKnownWordsButton()
     }
     KnownWordsCountRow()
     SettingsSwitchRow(

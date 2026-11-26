@@ -19,6 +19,11 @@
     <string name="practice_pronounce">Phát âm</string>
     <string name="practice_open_google_translate">Mở trong Google Dịch</string>
     <string name="phrase_add_to_anki">Thêm vào Anki</string>
+    <string name="phrase_translate_again">Dịch lại (AI)</string>
+    <string name="phrase_translate_again_asking">Đang nhờ AI dịch tốt hơn…</string>
+    <string name="phrase_translate_again_done">Dòng này đã có bản dịch mới.</string>
+    <string name="phrase_translate_again_no_key">Hãy thêm khóa AI trong Cài đặt → Trợ lý AI trước.</string>
+    <string name="phrase_translate_again_failed">Không nhận được bản dịch tốt hơn. Hãy thử lại sau.</string>
     <string name="practice_google_translate_unavailable">Google Dịch chưa được cài đặt</string>
     <string name="practice_google_translate_cannot_open">Google Dịch không nhận được văn bản</string>
     <string name="practice_pronounce_item">Phát âm %1$s</string>

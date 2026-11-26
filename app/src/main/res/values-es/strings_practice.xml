@@ -19,6 +19,11 @@
     <string name="practice_pronounce">Pronunciar</string>
     <string name="practice_open_google_translate">Abrir en Google Translate</string>
     <string name="phrase_add_to_anki">Añadir a Anki</string>
+    <string name="phrase_translate_again">Traducir de nuevo (IA)</string>
+    <string name="phrase_translate_again_asking">Pidiendo a la IA una traducción mejor…</string>
+    <string name="phrase_translate_again_done">La línea tiene una traducción nueva.</string>
+    <string name="phrase_translate_again_no_key">Primero añade una clave de IA en Ajustes → Asistente de IA.</string>
+    <string name="phrase_translate_again_failed">No llegó una traducción mejor. Inténtalo más tarde.</string>
     <string name="practice_google_translate_unavailable">Google Translate no está instalado</string>
     <string name="practice_google_translate_cannot_open">Google Translate no pudo recibir el texto</string>
     <string name="practice_pronounce_item">Pronunciar %1$s</string>

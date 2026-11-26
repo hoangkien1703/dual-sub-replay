@@ -122,6 +122,7 @@ internal enum class AiSetting(
     MEANING_IN_CONTEXT("meaning_in_context"),
     MEANING_ORDER("meaning_order", listOf("sentence_first", "dictionary_first")),
     PREPARE_MEANINGS("prepare_meanings_ahead"),
+    TRANSLATE_AGAIN("translate_line_again"),
     TAP_BAR_READING("tap_bar_reading"),
     WORD_LEARNING_MODE("word_learning_mode"),
     COLORED_SUBTITLE_LINES("colored_subtitle_lines", listOf("original", "translation", "both")),
@@ -963,6 +964,10 @@ private fun otherSettingValues(setting: AiSetting): String =
             choiceList(setting.choices) +
                 " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +
                 "their meaning at once; uses the user's key even for lines they don't tap; off by default)"
+        AiSetting.TRANSLATE_AGAIN ->
+            choiceList(setting.choices) +
+                " (adds Translate again to the tap bar's list: the AI translates the selected line's sentence again with the " +
+                "lines around it, when its translation looks wrong; uses the key only on that tap; off by default)"
         else -> choiceList(setting.choices)
     }
 

@@ -179,6 +179,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "ai_translation_thinking" to backup(S),
         "meaning_in_context" to backup(B),
         "prepare_meanings_ahead" to backup(B),
+        "translate_line_again" to backup(B),
         "ai_enabled" to backup(B),
         "ai_provider" to backup(S),
         "ai_history_retention" to backup(S),

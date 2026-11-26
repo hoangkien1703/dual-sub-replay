@@ -1364,6 +1364,7 @@ private fun WordLearningSettings(
     TapBarReadingSetting()
     TapBarButtonsSetting()
     MeaningInContextSetting()
+    TranslateAgainSetting()
     SettingsSwitchRow(
         title = stringResource(R.string.settings_word_learning_mode_title),
         description = stringResource(R.string.settings_word_learning_mode_description),

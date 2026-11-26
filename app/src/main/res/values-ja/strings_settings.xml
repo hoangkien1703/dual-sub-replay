@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">辞書の意味</string>
     <string name="settings_prepare_meanings_title">意味を先に用意</string>
     <string name="settings_prepare_meanings_description">行の再生中に、その行の各単語の意味を AI に聞いておくので、タップした単語の意味がすぐに出ます。タップしない行でもキーを使います。</string>
+    <string name="settings_translate_again_title">AIでもう一度翻訳</string>
+    <string name="settings_translate_again_description">タップバーの▾リストに「もう一度翻訳」を追加します。行の翻訳がおかしいときは、その行の単語を選んで「もう一度翻訳」を選ぶと、設定 → AI アシスタントのAIが前後の行を参考に文全体を翻訳し直します。キーが使われるのは選んだときだけです。</string>
     <string name="settings_tap_bar_reading_title">タップバーに読みを表示</string>
     <string name="settings_tap_bar_reading_description">単語を1つタップすると、上のバーにも読み方を表示します。英語はIPA、日本語はかな、中国語はピンイン。</string>
     <string name="settings_tap_bar_buttons_title">タップバーのボタン</string>
