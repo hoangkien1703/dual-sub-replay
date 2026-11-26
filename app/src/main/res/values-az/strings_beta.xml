@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">Altyazıları yükləmək üçün Bilibili-yə daxil olun</string>
     <string name="bilibili_sign_in_body">Bilibili altyazıların çoxunu yalnız daxil olmuş istifadəçilərə göstərir. Buradakı Bilibili səhifəsində daxil olun (tətbiq parolunuzu heç vaxt görmür), sonra Yenidən cəhd et düyməsinə toxunun.</string>
     <string name="bilibili_no_subtitles_title">Bu videonun altyazısı yoxdur</string>
-    <string name="bilibili_no_subtitles_body">Bilibili bu video üçün altyazı vermir. Başqa video sınayın.</string>
+    <string name="bilibili_no_subtitles_body">Bilibili bu video üçün altyazı vermir. Görüntünün içinə yazılmış altyazılar oxuna bilmir. Bilibili tətbiqində altyazısı açıla bilən video sınayın.</string>
     <string name="bilibili_try_again">Yenidən cəhd et</string>
     <string name="beta_offer_title">%1$s (Beta) yandırılsın?</string>
     <string name="beta_offer_message">Bu, %1$s linkidir. %1$s DualSub Replay-də Beta saytıdır: bu videonu ikidilli altyazı ilə izləmək üçün onu yandırın. Onu yenidən Ayarlar → Beta bölməsində söndürə bilərsiniz.</string>

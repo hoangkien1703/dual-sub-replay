@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">Entre no Bilibili para carregar as legendas</string>
     <string name="bilibili_sign_in_body">O Bilibili mostra a maioria das legendas só para quem entrou na conta. Entre na página do Bilibili aqui (o app nunca vê sua senha) e toque em Tentar de novo.</string>
     <string name="bilibili_no_subtitles_title">Este vídeo não tem legendas</string>
-    <string name="bilibili_no_subtitles_body">O Bilibili não tem legendas para este vídeo. Tente outro vídeo.</string>
+    <string name="bilibili_no_subtitles_body">O Bilibili não tem legendas para este vídeo. Legendas que fazem parte da imagem não podem ser lidas. Tente um vídeo com legendas que dá para ativar no app do Bilibili.</string>
     <string name="bilibili_try_again">Tentar de novo</string>
     <string name="beta_offer_title">Ligar %1$s (Beta)?</string>
     <string name="beta_offer_message">Este é um link do %1$s. %1$s é um site Beta no DualSub Replay: ligue-o para assistir a este vídeo com legendas duplas. Você pode desligá-lo em Configurações → Beta.</string>

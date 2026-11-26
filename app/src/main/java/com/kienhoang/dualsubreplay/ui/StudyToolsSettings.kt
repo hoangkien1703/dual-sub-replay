@@ -86,6 +86,11 @@ internal fun StudyToolsSettingsSection() {
         onCheckedChange = { preferences.edit().putBoolean(SLOW_REPLAY_PREFERENCE, it).apply() },
         testTag = "slow_replay_switch",
     )
+    if (settings.slowReplay) {
+        SlowReplaySpeedSettings(settings.slowReplaySpeed) { speed ->
+            preferences.edit().putString(SLOW_REPLAY_SPEED_PREFERENCE, speed.storageValue).apply()
+        }
+    }
     SettingsSectionDivider()
     SkipSilenceSettings(settings.skipSilence) { skip -> preferences.edit().putString(SKIP_SILENCE_PREFERENCE, skip.storageValue).apply() }
     SettingsSectionDivider()
@@ -466,6 +471,28 @@ private fun RepeatPauseSettings(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+/** Slow replay on a second tap → Speed: 0.5× or 0.75× (25kiuo, Discussion #81, 2026-11-26). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SlowReplaySpeedSettings(
+    speed: SlowReplaySpeed,
+    onChange: (SlowReplaySpeed) -> Unit,
+) {
+    Column(Modifier.settingAnchor("slow_replay_speed").padding(start = 48.dp, top = 8.dp)) {
+        Text(stringResource(R.string.study_slow_replay_speed_title), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SlowReplaySpeed.entries.forEach { option ->
+                FilterChip(
+                    selected = speed == option,
+                    onClick = { onChange(option) },
+                    label = { Text(stringResource(option.labelRes)) },
+                    modifier = Modifier.testTag("slow_replay_speed_${option.storageValue}"),
+                )
+            }
+        }
     }
 }
 

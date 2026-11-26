@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">Đăng nhập Bilibili để tải phụ đề</string>
     <string name="bilibili_sign_in_body">Bilibili chỉ hiện phần lớn phụ đề cho người đã đăng nhập. Hãy đăng nhập trên trang Bilibili ở đây (ứng dụng không bao giờ thấy mật khẩu của bạn), rồi nhấn Thử lại.</string>
     <string name="bilibili_no_subtitles_title">Video này không có phụ đề</string>
-    <string name="bilibili_no_subtitles_body">Bilibili không có phụ đề nào cho video này. Hãy thử video khác.</string>
+    <string name="bilibili_no_subtitles_body">Bilibili không có phụ đề nào cho video này. Phụ đề in sẵn trong hình không đọc được. Hãy thử video có phụ đề bật được trong ứng dụng Bilibili.</string>
     <string name="bilibili_try_again">Thử lại</string>
     <string name="beta_offer_title">Bật %1$s (Beta)?</string>
     <string name="beta_offer_message">Đây là liên kết %1$s. %1$s là trang Beta trong DualSub Replay: hãy bật nó để xem video này với phụ đề kép. Bạn có thể tắt lại trong Cài đặt → Beta.</string>

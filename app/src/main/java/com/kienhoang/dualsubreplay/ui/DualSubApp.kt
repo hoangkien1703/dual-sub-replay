@@ -409,9 +409,16 @@ private fun DualSubExperience(
 ) {
     // Slow replay on a second tap (Settings → Study tools): a tapped line again while it replays plays slower once.
     val slowReplayTaps = remember { SlowReplayTaps() }
-    val slowReplayOn = rememberStudySettings().value.slowReplay
+    val studySettings by rememberStudySettings()
     val replayTappedLine: (SubtitleSegment) -> Unit = { segment ->
-        replayLine(segment, webController, slowReplayTaps, slowReplayOn, SystemClock.elapsedRealtime())
+        replayLine(
+            segment,
+            webController,
+            slowReplayTaps,
+            studySettings.slowReplay,
+            studySettings.slowReplaySpeed,
+            SystemClock.elapsedRealtime(),
+        )
     }
     // The assistant panel beside the app may pause, replay and change the speed of the page video.
     BindAiPlayerControls(webController)

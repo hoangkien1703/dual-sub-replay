@@ -171,7 +171,10 @@
     <string name="study_repeat_pause_5">5 秒</string>
     <string name="study_repeat_pause_search">跟读</string>
     <string name="study_slow_replay_title">再点一次慢速重播</string>
-    <string name="study_slow_replay_description">一行正在重播时再点它一次，就会用 0.75× 速度再听一遍。这一行播完后恢复你自己的速度。</string>
+    <string name="study_slow_replay_description">一行正在重播时再点它一次，就会放慢速度再听一遍。这一行播完后恢复你自己的速度。</string>
+    <string name="study_slow_replay_speed_title">速度</string>
+    <string name="study_slow_replay_speed_half">0.5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0.75×</string>
     <string name="study_card_front_meaning">释义</string>
     <string name="study_card_front_meaning_description">正面显示单词的释义和句子的翻译（你的语言）：先说出这个单词，再翻面看它在句子里的样子。</string>
     <string name="study_card_front_fill_gap">填空</string>

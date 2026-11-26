@@ -183,7 +183,10 @@
     <string name="study_repeat_pause_5">5 s</string>
     <string name="study_repeat_pause_search">Shadowing</string>
     <string name="study_slow_replay_title">Repetición lenta con un segundo toque</string>
-    <string name="study_slow_replay_description">Toca otra vez una línea mientras se repite para oírla una vez a velocidad 0,75×. Tu velocidad vuelve después de la línea.</string>
+    <string name="study_slow_replay_description">Toca otra vez una línea mientras se repite para oírla una vez más despacio. Tu velocidad vuelve después de la línea.</string>
+    <string name="study_slow_replay_speed_title">Velocidad</string>
+    <string name="study_slow_replay_speed_half">0,5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0,75×</string>
     <string name="study_card_front_meaning">Significado</string>
     <string name="study_card_front_meaning_description">El anverso muestra el significado de la palabra y la traducción de la frase en tu idioma: di la palabra y luego gira la tarjeta para verla en su frase.</string>
     <string name="study_card_front_fill_gap">Rellenar el hueco</string>

@@ -171,7 +171,10 @@
     <string name="study_repeat_pause_5">5 giây</string>
     <string name="study_repeat_pause_search">Shadowing nói đuổi</string>
     <string name="study_slow_replay_title">Phát chậm khi chạm lần thứ hai</string>
-    <string name="study_slow_replay_description">Chạm lại vào dòng khi nó đang phát lại để nghe một lần với tốc độ 0,75×. Tốc độ của bạn trở lại sau dòng đó.</string>
+    <string name="study_slow_replay_description">Chạm lại vào dòng khi nó đang phát lại để nghe thêm một lần chậm hơn. Tốc độ của bạn trở lại sau dòng đó.</string>
+    <string name="study_slow_replay_speed_title">Tốc độ</string>
+    <string name="study_slow_replay_speed_half">0,5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0,75×</string>
     <string name="study_card_front_meaning">Nghĩa</string>
     <string name="study_card_front_meaning_description">Mặt trước hiện nghĩa của từ và bản dịch của câu bằng ngôn ngữ của bạn: hãy nói từ đó, rồi lật thẻ để xem nó trong câu.</string>
     <string name="study_card_front_fill_gap">Điền vào chỗ trống</string>

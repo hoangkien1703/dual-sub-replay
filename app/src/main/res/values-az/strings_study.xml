@@ -176,7 +176,10 @@
     <string name="study_repeat_pause_5">5 san</string>
     <string name="study_repeat_pause_search">Shadowing</string>
     <string name="study_slow_replay_title">İkinci toxunuşla yavaş təkrar</string>
-    <string name="study_slow_replay_description">Təkrar oynayan sətrə yenidən toxunun ki, onu bir dəfə 0,75× sürətlə eşidəsiniz. Sətirdən sonra öz sürətiniz qayıdır.</string>
+    <string name="study_slow_replay_description">Təkrar oynayan sətrə yenidən toxunun ki, onu bir dəfə yavaş eşidəsiniz. Sətirdən sonra öz sürətiniz qayıdır.</string>
+    <string name="study_slow_replay_speed_title">Sürət</string>
+    <string name="study_slow_replay_speed_half">0,5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0,75×</string>
     <string name="study_card_front_meaning">Məna</string>
     <string name="study_card_front_meaning_description">Üzdə sözün mənası və cümlənin tərcüməsi sizin dilinizdə görünür: sözü deyin, sonra kartı çevirib onu cümlədə görün.</string>
     <string name="study_card_front_fill_gap">Boşluğu doldur</string>

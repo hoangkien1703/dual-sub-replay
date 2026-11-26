@@ -69,6 +69,9 @@ internal val AI_SEND_TO_APPS = listOf("ankidroid", "ankiconnect")
 /** Repeat each line's pause between plays (`RepeatPause`), which a test keeps equal. */
 internal val AI_REPEAT_PAUSES = listOf("off", "line", "2", "5")
 
+/** Slow replay on a second tap: off, or on at a `SlowReplaySpeed` storage value, which a test keeps equal. */
+internal val AI_SLOW_REPLAY = listOf("off", "0.5", "0.75")
+
 /** The Anki card fronts (`CardFront`), which a test keeps equal. */
 internal val AI_CARD_FRONTS = listOf("word_sentence", "word", "sentence", "listening", "meaning", "fill_gap")
 
@@ -168,7 +171,7 @@ internal enum class AiSetting(
     CARD_READ_TRANSLATION("anki_card_read_translation"),
     BLUR_BOX("blur_box"),
     LOOP_BUTTON("loop_button"),
-    SLOW_REPLAY("slow_replay_second_tap"),
+    SLOW_REPLAY("slow_replay_second_tap", AI_SLOW_REPLAY),
     KANJI_DETAILS("kanji_details"),
     PAGE_TOKEN_CAPTIONS("page_token_captions", AI_PAGE_TOKEN_MODES, asks = true),
 
@@ -958,8 +961,8 @@ private fun otherSettingValues(setting: AiSetting): String =
                 "aloud, as long as the line took (line), 2 or 5 seconds; off by default)"
         AiSetting.SLOW_REPLAY ->
             choiceList(setting.choices) +
-                " (Slow replay on a second tap: tapping a subtitle line again while it replays plays it once at 0.75x speed, " +
-                "then the user's own speed comes back; off by default)"
+                " (Slow replay on a second tap: tapping a subtitle line again while it replays plays it once at the picked " +
+                "speed, 0.5x or 0.75x, then the user's own speed comes back; off by default, 0.5x when turned on)"
         AiSetting.PREPARE_MEANINGS ->
             choiceList(setting.choices) +
                 " (with meaning_in_context on, asks the AI about every word of each line while it plays, so tapped words show " +

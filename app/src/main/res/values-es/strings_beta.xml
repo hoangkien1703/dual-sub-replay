@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">Inicia sesión en Bilibili para cargar sus subtítulos</string>
     <string name="bilibili_sign_in_body">Bilibili muestra la mayoría de los subtítulos solo a quien ha iniciado sesión. Inicia sesión en la página de Bilibili aquí (la app nunca ve tu contraseña) y toca Reintentar.</string>
     <string name="bilibili_no_subtitles_title">Este vídeo no tiene subtítulos</string>
-    <string name="bilibili_no_subtitles_body">Bilibili no tiene subtítulos para este vídeo. Prueba con otro vídeo.</string>
+    <string name="bilibili_no_subtitles_body">Bilibili no tiene subtítulos para este vídeo. Los subtítulos que forman parte de la imagen no se pueden leer. Prueba con un vídeo cuyos subtítulos se puedan activar en la app de Bilibili.</string>
     <string name="bilibili_try_again">Reintentar</string>
     <string name="beta_offer_title">¿Activar %1$s (Beta)?</string>
     <string name="beta_offer_message">Este es un enlace de %1$s. %1$s es un sitio Beta en DualSub Replay: actívalo para ver este vídeo con subtítulos dobles. Puedes desactivarlo en Ajustes → Beta.</string>

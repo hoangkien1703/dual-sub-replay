@@ -12,6 +12,7 @@ import com.kienhoang.dualsubreplay.assistant.AI_PAGE_TOKEN_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_REPEAT_FOREVER
 import com.kienhoang.dualsubreplay.assistant.AI_SEND_TO_APPS
 import com.kienhoang.dualsubreplay.assistant.AI_SKIP_SILENCE
+import com.kienhoang.dualsubreplay.assistant.AI_SLOW_REPLAY
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_PLAY_MODES
 import com.kienhoang.dualsubreplay.assistant.AI_STUDY_REPEAT_COUNTS
 import com.kienhoang.dualsubreplay.assistant.AI_SUBTITLE_COLORS
@@ -69,6 +70,7 @@ class AiAssistantActionsTest {
         assertEquals(KNOWN_WORDS_AFTER_CHOICES.map { it.toString() }, AI_KNOWN_WORDS_AFTER)
         assertEquals(FlashcardApp.entries.map { it.storageValue }, AI_SEND_TO_APPS)
         assertEquals(CardFront.entries.map { it.storageValue }, AI_CARD_FRONTS)
+        assertEquals(listOf("off") + SlowReplaySpeed.entries.map { it.storageValue }, AI_SLOW_REPLAY)
     }
 
     @Test

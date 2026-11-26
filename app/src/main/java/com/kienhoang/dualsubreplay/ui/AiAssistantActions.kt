@@ -308,7 +308,7 @@ private fun aiReplaySettingValue(
 ): String? =
     when (setting) {
         AiSetting.STUDY_REPEAT_PAUSE -> study.repeatPause.storageValue
-        AiSetting.SLOW_REPLAY -> onOff(study.slowReplay)
+        AiSetting.SLOW_REPLAY -> if (study.slowReplay) study.slowReplaySpeed.storageValue else "off"
         else -> aiFlashcardSwitchValue(study, setting)
     }
 
@@ -801,7 +801,10 @@ internal class AppAiActions(
     ): Boolean {
         when (setting) {
             AiSetting.STUDY_REPEAT_PAUSE -> editor.putString(STUDY_REPEAT_PAUSE_PREFERENCE, storedRepeatPause(value).storageValue)
-            AiSetting.SLOW_REPLAY -> editor.putBoolean(SLOW_REPLAY_PREFERENCE, value == "on")
+            AiSetting.SLOW_REPLAY -> {
+                editor.putBoolean(SLOW_REPLAY_PREFERENCE, value != "off")
+                if (value != "off") editor.putString(SLOW_REPLAY_SPEED_PREFERENCE, storedSlowReplaySpeed(value).storageValue)
+            }
             else -> return putFlashcardSwitch(editor, setting, value == "on")
         }
         return true
@@ -1001,7 +1004,12 @@ internal class AppAiActions(
     ): String =
         when (setting) {
             AiSetting.STUDY_REPEAT_PAUSE -> named(R.string.study_repeat_pause_title, string(storedRepeatPause(value).labelRes))
-            AiSetting.SLOW_REPLAY -> switch(R.string.study_slow_replay_title, value)
+            AiSetting.SLOW_REPLAY ->
+                if (value == "off") {
+                    switch(R.string.study_slow_replay_title, value)
+                } else {
+                    named(R.string.study_slow_replay_title, string(storedSlowReplaySpeed(value).labelRes))
+                }
             else -> flashcardSettingLabel(setting, value)
         }
 
