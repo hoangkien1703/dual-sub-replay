@@ -56,6 +56,19 @@ proof-of-origin token, which YouTube now demands. The player only downloads capt
 `ui/content.js` presses CC once per video if it is off, and hides YouTube's own caption window while DualSub's
 overlay shows. Only json3, the format the desktop player asks for, is parsed.
 
+Found testing in a real Chrome (2026-11-23 to 25, [spec](../specs/2026-11-23-browser-extension-review-changes.md)):
+
+- With YouTube's auto-translate on, the player downloads only the translated track (`tlang`). The hook then asks once
+  for the same address without `tlang`, from the page, and gets the original.
+- After a page reload YouTube can show CC as on without loading the track. After 5 s without captions, CC is turned
+  off and on once.
+- During an ad (`#movie_player.ad-showing`) the page's video is the ad: the overlay is empty, and the wait for captions
+  restarts after it. The ad's own captions carry another video id and are ignored.
+- After the extension is reloaded or updated, the old content script stays in open tabs without an extension context.
+  It removes its panel, overlay and card and stops its timer, so the new one works alone.
+- Automatic tracks without word timing share each piece's time evenly among its words (the app's
+  `estimateWordTimings`), so AI sentence splitting works for them too.
+
 ## Translation and word help
 
 - Google's batches and the AI's requests start with the part being played (or the address's `t=` time before the
