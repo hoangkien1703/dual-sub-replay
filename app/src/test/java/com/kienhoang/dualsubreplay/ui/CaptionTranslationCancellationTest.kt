@@ -216,10 +216,33 @@ class CaptionTranslationCancellationTest {
     @Test
     fun longSilencesDoNotTriggerTranslationOutsideTheTimeWindow() {
         val later = listOf(SubtitleSegment(0, 100_000, 101_000, "Later"))
-        check(nextWindowTranslation(later, CaptionPlaybackRequest(0, paused = false, enabled = true)) == null)
+        val earlier = SubtitleSegment(1, 0, 2_000, "Earlier", translatedText = "Trước")
+        check(
+            nextWindowTranslation(
+                listOf(earlier) + later.map { it.copy(id = 2) },
+                CaptionPlaybackRequest(10_000, paused = false, enabled = true),
+            ) ==
+                null,
+        )
         check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = false, enabled = true)) == 0)
         check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = true, enabled = true)) == 0)
         check(nextWindowTranslation(later, CaptionPlaybackRequest(40_000, paused = true, enabled = false)) == null)
+    }
+
+    @Test
+    fun aFirstLineAfterALongIntroIsTranslatedWhilePaused() {
+        // The only row a window holds when the video's first line starts more than a minute in.
+        val firstLine = listOf(SubtitleSegment(0, 100_000, 101_000, "But now the sky is open light"))
+        check(nextWindowTranslation(firstLine, CaptionPlaybackRequest(24_000, paused = true, enabled = true)) == 0)
+        check(
+            nextWindowTranslation(
+                firstLine.map {
+                    it.copy(translatedText = "Nhưng giờ bầu trời")
+                },
+                CaptionPlaybackRequest(24_000, paused = true, enabled = true),
+            ) ==
+                null,
+        )
     }
 
     @Test
@@ -255,6 +278,27 @@ class CaptionTranslationCancellationTest {
                     check(output.map { it.translatedText } == listOf("Cuộc Cách mạng Pháp tạm thời làm đình trệ", "các nỗ lực di dời.")) {
                         output.map { it.translatedText }
                     }
+                } finally {
+                    job.cancelAndJoin()
+                }
+            }
+        }
+
+    @Test
+    fun aPausedVideoBeforeALongIntroEndsShowsItsFirstLineTranslated() =
+        runBlocking {
+            // AI subtitles of a song playlist: the first line comes 100 s in, the video is paused at 0:24.
+            val song = List(30) { SubtitleSegment(it.toLong(), 100_000 + it * 4000L, 104_000 + it * 4000L, "Line $it") }
+            withStore(song) { store ->
+                val requests = MutableStateFlow(CaptionPlaybackRequest(24_000, paused = true, enabled = true))
+                val shown = MutableStateFlow<List<SubtitleSegment>>(emptyList())
+                val job =
+                    launch {
+                        translatePlaybackWindow(store, requests, { text -> "Dịch $text" }) { window, _ -> shown.value = window }
+                    }
+                try {
+                    val window = withTimeout(5000) { shown.first { it.isNotEmpty() && it.all { row -> row.translatedText != null } } }
+                    check(window.map { it.translatedText } == listOf("Dịch Line 0")) { window.toString() }
                 } finally {
                     job.cancelAndJoin()
                 }

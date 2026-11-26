@@ -355,6 +355,10 @@ internal fun withTranslation(
  * The next row of the window to translate, also while paused (owner request 2026-10-27): the first
  * request carries the next minute, so a paused video gets that minute at once. Only the background
  * look-ahead of minutes 2 to 5 waits for playback.
+ *
+ * A video whose first line starts more than a minute in (a song's long intro, owner report
+ * 2026-11-24) shows that line alone; it is translated too, or it says "Translating…" until playback
+ * comes within a minute of it.
  */
 internal fun nextWindowTranslation(
     rows: List<SubtitleSegment>,
@@ -369,7 +373,7 @@ internal fun nextWindowTranslation(
         rows[it].translatedText == null && rows[it].startMs <= ahead && rows[it].endMs > request.timeMs
     } ?: (current downTo 0).firstOrNull {
         rows[it].translatedText == null && rows[it].endMs > behind && rows[it].startMs <= request.timeMs
-    }
+    } ?: rows.indices.firstOrNull { rows.first().startMs > ahead && rows[it].translatedText == null }
 }
 
 /**
