@@ -91,7 +91,7 @@ window.addEventListener('message', (event) => {
 });
 
 function reset(videoId) {
-  Object.assign(state, { videoId, lang: '', trackKey: null, pieces: null, lines: [], rows: [], active: -1, ccTried: false, since: Date.now(), status: null });
+  Object.assign(state, { videoId, lang: '', trackKey: null, pieces: null, lines: [], rows: [], active: -1, ccTried: false, ccRetried: false, since: Date.now(), status: null });
   state.gen++;
   lookups.clear();
   closeCard();
@@ -208,19 +208,19 @@ function renderPanel() {
   const head = el('div', 'dualsub-head');
   const text = el('div', 'dualsub-head-text');
   text.append(
-    el('div', 'dualsub-title', state.lang ? `${DualSub.languageName(state.lang)} → ${DualSub.languageName(target)}` : 'DualSub'),
+    el('div', 'dualsub-title', state.lang ? `${DualSub.languageName(state.lang)} → ${DualSub.languageName(target)}` : 'DualSub Replay'),
     el('div', 'dualsub-status', state.lines.length ? `${state.lines.length} lines` : 'Waiting for captions…'),
   );
   const settings = el('button', 'dualsub-icon', '⚙');
   settings.title = 'Settings';
   settings.onclick = () => ask({ type: 'openSettings' });
   const guide = el('button', 'dualsub-icon', '?');
-  guide.title = 'Guide: how to use DualSub and AI translation';
+  guide.title = 'Guide: how to use DualSub Replay and AI translation';
   guide.onclick = () => ask({ type: 'openGuide' });
   const logo = document.createElement('img');
   logo.className = 'dualsub-logo';
   logo.src = chrome.runtime.getURL('icons/icon32.png');
-  logo.alt = 'DualSub';
+  logo.alt = 'DualSub Replay';
   head.append(logo, text, settings, guide);
 
   const list = el('ol', 'dualsub-list');
@@ -501,18 +501,41 @@ document.addEventListener('mousedown', (e) => card && !card.contains(e.target) &
 document.addEventListener('keydown', (e) => e.key === 'Escape' && closeCard(), true);
 
 function tick() {
+  // After the extension is reloaded or updated, this copy stays in open tabs but can no longer reach the extension
+  // ("Extension context invalidated"). It removes its panel and subtitles and stops, so the new copy works alone.
+  if (!chrome.runtime?.id) {
+    clearInterval(ticker);
+    for (const node of [panel, overlay, card]) node?.remove();
+    panel = overlay = card = null; // the old message listener stays; renderPanel() then does nothing
+    document.documentElement.classList.remove('dualsub-on');
+    return;
+  }
   const id = currentVideoId();
   if (id !== state.videoId) reset(id);
   if (!id) return;
   mount();
+  // During an ad the page's video is the ad: no subtitle for its time, and the wait for captions starts after it.
+  if (document.querySelector('#movie_player.ad-showing')) {
+    if (overlay) overlay.replaceChildren();
+    state.active = -1;
+    state.since = Date.now();
+    return;
+  }
   if (!state.lines.length) {
     // The player only downloads captions while CC is on, so press it once.
     const cc = document.querySelector('.ytp-subtitles-button');
-    if (!state.ccTried && cc && Date.now() - state.since > 1500) {
+    const waited = Date.now() - state.since;
+    if (!state.ccTried && cc && waited > 1500) {
       state.ccTried = true;
       if (cc.getAttribute('aria-pressed') === 'false') cc.click();
+    } else if (!state.ccRetried && cc && waited > 5000 && cc.getAttribute('aria-pressed') === 'true') {
+      // After a page reload YouTube can show CC as on without loading the track (seen 2026-11-23 in Chrome 156):
+      // turning it off and on makes the player download it.
+      state.ccRetried = true;
+      cc.click();
+      setTimeout(() => cc.click(), 400);
     }
-    if (state.ccTried && Date.now() - state.since > 8000) status('No captions found for this video.');
+    if (state.ccTried && waited > 10000) status('No captions found for this video.');
     return;
   }
   document.documentElement.classList.add('dualsub-on');
@@ -549,4 +572,4 @@ function highlightSpoken(now) {
   }
 }
 
-setInterval(tick, 150);
+const ticker = setInterval(tick, 150);

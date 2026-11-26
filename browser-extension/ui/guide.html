@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DualSub · Guide</title>
+<title>DualSub Replay · Guide</title>
 <link rel="icon" href="../icons/icon32.png">
 <link rel="stylesheet" href="theme.css">
 <style>
@@ -29,17 +29,17 @@
   kbd { padding: 1px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--card-hi); font-size: 12px; }
 </style>
 <main>
-  <h1><img src="../icons/icon128.png" alt="" width="40" height="40"> DualSub guide</h1>
+  <h1><img src="../icons/icon128.png" alt="" width="40" height="40"> DualSub Replay guide</h1>
   <p class="lead">Learn a language with YouTube: two subtitle lines, replay any sentence, and help with every word.</p>
 
   <h2>1. Watch</h2>
   <ol class="steps">
-    <li>Open a YouTube video that has captions. DualSub turns captions on by itself and shows the sentences at the top of the right column.</li>
+    <li>Open a YouTube video that has captions. DualSub Replay turns captions on by itself and shows the sentences at the top of the right column.</li>
     <li>Click a sentence (in the list or over the video) to hear it again from its start.</li>
     <li>Click a word for its card: meaning, part of speech, pronunciation and, for English, its dictionary form, level and grammar. Click a second word in the same sentence to select the phrase between them.</li>
-    <li><b>Save to vocabulary</b> keeps the word with its sentence. Practice it from the DualSub menu → <b>Saved words &amp; practice</b>.</li>
+    <li><b>Save to vocabulary</b> keeps the word with its sentence. Practice it from the DualSub Replay menu → <b>Saved words &amp; practice</b>.</li>
   </ol>
-  <p class="lead">Tip: pin DualSub so its menu is one click away: the puzzle piece 🧩 at the top right of Chrome → the pin 📌 next to DualSub.</p>
+  <p class="lead">Tip: pin DualSub Replay so its menu is one click away: the puzzle piece 🧩 at the top right of Chrome → the pin 📌 next to DualSub Replay.</p>
 
   <h2>2. Better translation with AI</h2>
   <p>Google translates each sentence on its own. AI translation reads the sentences around it too, as the Android app does, so the translation is natural and follows the speaker. It uses your own key from one of these services:</p>
@@ -51,7 +51,7 @@
       <button class="primary" id="save">Save and turn on AI translation</button>
     </div>
     <p id="result" class="lead"></p>
-    <p class="lead">Your key stays in this browser (unencrypted in your Chrome profile) and is sent only to the service you picked. You can change it any time in the DualSub menu.</p>
+    <p class="lead">Your key stays in this browser (unencrypted in your Chrome profile) and is sent only to the service you picked. You can change it any time in the DualSub Replay menu.</p>
   </div>
   <p class="lead">After saving, reload the YouTube video. The panel's status line shows <b>AI translating…</b>, then <b>AI translation</b>. Google's lines show until each AI line arrives, and sentences already translated are kept, so reopening a video costs nothing.</p>
 
@@ -59,7 +59,7 @@
   <p class="lead">The panel's status line says what happened; Google's translation stays meanwhile.</p>
   <table>
     <tr><td>HTTP 401 / 400: invalid API key</td><td>The key does not belong to the service you picked. Keys start with: Gemini <kbd>AIza</kbd>, OpenAI <kbd>sk-</kbd>, Claude <kbd>sk-ant-</kbd>, OpenRouter <kbd>sk-or-</kbd>.</td></tr>
-    <tr><td>HTTP 503: high demand</td><td>The service is busy. DualSub asks again after 1 and 3 seconds, then every 30 seconds by itself. If it happens a lot with Gemini, type <kbd>gemini-2.5-flash</kbd> in the menu's Model field.</td></tr>
+    <tr><td>HTTP 503: high demand</td><td>The service is busy. DualSub Replay asks again after 1 and 3 seconds, then every 30 seconds by itself. If it happens a lot with Gemini, type <kbd>gemini-2.5-flash</kbd> in the menu's Model field.</td></tr>
     <tr><td>HTTP 429: quota, credit or billing</td><td>The key's free daily limit is used up (it resets the next day), or a paid service needs credit.</td></tr>
     <tr><td>could not be reached</td><td>Your connection cannot reach the service. If you use a VPN or proxy, it has to cover the service's address too.</td></tr>
   </table>

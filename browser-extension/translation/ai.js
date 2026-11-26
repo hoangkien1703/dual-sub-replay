@@ -194,10 +194,16 @@ const AI_SEGMENT_VERSION = 1;
 const MAX_SEGMENT_WORDS = 300;
 const SEGMENT_CUT_WINDOW = 60;
 
-// The track's timed words [{ text, time }] from parsed pieces, or null when a piece has no word timing.
+// The track's timed words [{ text, time }] from parsed pieces, or null for an empty track. A piece without word
+// timing (some automatic tracks have none) shares its time evenly among its words, as the app's
+// estimateWordTimings does, so its words can still be split into sentences.
 function captionWords(pieces) {
-  if (!pieces.length || pieces.some((p) => !p.words || !p.words.length)) return null;
-  return pieces.flatMap((p) => p.words);
+  if (!pieces.length) return null;
+  return pieces.flatMap((p) => {
+    if (p.words && p.words.length) return p.words;
+    const words = p.text.split(/\s+/).filter(Boolean);
+    return words.map((text, i) => ({ text, time: p.start + (i * (p.end - p.start)) / words.length }));
+  });
 }
 
 // True when fewer than one piece in five ends a sentence: automatic captions without punctuation.

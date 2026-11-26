@@ -47,7 +47,9 @@ const pieces = [
   { start: 4, end: 6, text: 'i wrote papers', words: [w('i', 4.1), w('wrote', 4.4), w('papers', 4.9)] },
 ];
 assert.strictEqual(captionWords(pieces).length, 12);
-assert.strictEqual(captionWords([...pieces, { start: 6, end: 7, text: 'no timing' }]), null);
+// A piece without word timing shares its time evenly among its words (the app's estimateWordTimings).
+assert.deepStrictEqual(captionWords([...pieces, { start: 6, end: 7, text: 'no timing' }]).slice(-2), [w('no', 6), w('timing', 6.5)]);
+assert.strictEqual(captionWords([]), null);
 assert.strictEqual(isUnpunctuated(pieces), true);
 assert.strictEqual(isUnpunctuated([{ text: 'Hello there.' }, { text: 'Yes!' }]), false);
 

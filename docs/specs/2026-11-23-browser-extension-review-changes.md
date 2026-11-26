@@ -49,7 +49,7 @@ Implemented. The changes the owner's review of PR #253 asked for (2026-11-23).
 
 ## Version
 
-0.8.0.
+0.8.0; 0.8.1 after the real-Chrome fixes below.
 
 ## Validation result
 
@@ -72,3 +72,35 @@ the note and empty second lines; switching to Vietnamese translates both lines a
 - **CodeQL** flagged two high alerts on the PR. AI rows now have tags stripped until none is left (a nested tag
   could survive one pass; rows were already shown as text only), and the caption message listener also checks
   `event.origin`.
+## Follow-up 0.8.1: found testing in a real Chrome
+
+The review asked for tests on real videos. They were run in the contributor's own Chrome 156 (Ubuntu 24.04.5 LTS),
+driven through Claude in Chrome, after the PR merged (so the owner's same-language fix was already in). A Chrome started by DevTools gets empty captions from YouTube (it reports
+`navigator.webdriver`), so that kind of window can't be used. Bugs found and fixed:
+
+| Bug | Fix |
+| --- | --- |
+| After a page reload, CC showed as on but the player never downloaded the track ("No captions found") | After 5 s without captions, CC is turned off and on once |
+| With YouTube's auto-translate on, only the translated track was downloaded, so nothing was captured | The hook asks once for the same address without `tlang` |
+| During an ad, the main video's lines would show for the ad's time | The overlay is empty while `ad-showing`, and the caption wait restarts after it |
+| After reloading the extension, the orphaned content script ("Extension context invalidated") broke the new one | An orphaned script removes its UI and stops |
+| AI per-line translations shifted between lines on unpunctuated tracks without word timing | Word times are estimated (as `estimateWordTimings`), so AI sentence splitting runs |
+
+Results on real videos:
+
+- Manual captions (TED, "Inside the Mind of a Master Procrastinator"): passed. 198 lines; after seeking to 1:00, 3:05
+  and 6:40 the overlay and active row show the right line; clicking a row plays from its start.
+- Automatic Spanish captions without punctuation, with YouTube auto-translate on and AI translation (Gemini): passed.
+  276 lines; AI split them into sentences, each with its own translation. Gemini often answered 503, and the
+  retries and the 30 s rest worked.
+- No captions (a piano music video): passed. "No captions found for this video." after 10 s.
+- An ad before the video (a 15 s ad): passed. No subtitle during the ad; the video's lines loaded when it ended and
+  followed playback.
+- Fullscreen: passed. The overlay stays at the bottom of the screen, and the word card opens over the video.
+
+Owner follow-up (2026-11-26, taken over from PR #266 in the owner's PR): the Network rule in `AGENTS.md` names the
+hook's one YouTube request too; an orphaned content script also clears `panel`, `overlay` and `card`, so its still
+attached message listener can't render into the removed panel; and the visible name is **DualSub Replay** (store title
+"DualSub Replay: Dual Subtitles for YouTube", `short_name` and toolbar title "DualSub Replay"), because Firefox Add-ons
+already lists an older, different "Dualsub". Internal names (`globalThis.DualSub`, `dualsub-` classes, the Anki deck
+"DualSub") stay.
