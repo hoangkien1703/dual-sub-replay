@@ -67,6 +67,7 @@ class PhraseSelectionUiTest {
         buttons: Set<TapBarButton> = TapBarButton.entries.filterTo(LinkedHashSet()) { it.inBarByDefault },
         anki: Boolean = false,
         ankiPickedFromList: () -> Boolean = { false },
+        translateAgain: ((SubtitleSegment) -> Unit)? = null,
     ) {
         val controller = PhraseSelectionController()
         controller.actions =
@@ -89,6 +90,7 @@ class PhraseSelectionUiTest {
                 readingInBar = readingInBar,
                 buttons = buttons,
                 ankiPickedFromList = ankiPickedFromList,
+                translateAgain = translateAgain,
                 ankiCard =
                     if (anki) {
                         { tap, meaning ->
@@ -498,6 +500,30 @@ class PhraseSelectionUiTest {
         }
         compose.onNodeWithTag("phrase_menu_anki").performClick()
         compose.waitUntil(10_000) { ankiCards.size == count }
+    }
+
+    /** Translate again with AI (owner pick 2026-11-26): only in the ▾ list, for the whole line, and it closes the bar. */
+    @Test
+    fun translateAgainIsInTheListOnlyAndAsksForTheLine() {
+        val asked = mutableListOf<SubtitleSegment>()
+        showCard(translateAgain = { asked += it })
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_translate_again").assertDoesNotExist()
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_translate_again").assertIsDisplayed()
+        saveUiEvidence("phrase-action-bar-translate-again")
+        compose.onNodeWithTag("phrase_menu_translate_again").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("phrase_action_bar").assertDoesNotExist()
+        compose.runOnIdle { assertEquals(original, asked.single().originalText) }
+    }
+
+    @Test
+    fun translateAgainHidesWhileTheSettingIsOff() {
+        showCard()
+        tapWord(original, "looking")
+        compose.onNodeWithTag("phrase_all_actions").performClick()
+        compose.onNodeWithTag("phrase_menu_translate_again").assertDoesNotExist()
     }
 
     @Test

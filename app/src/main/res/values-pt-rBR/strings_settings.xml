@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">Significado do dicionário</string>
     <string name="settings_prepare_meanings_title">Preparar significados antes</string>
     <string name="settings_prepare_meanings_description">Enquanto uma linha toca, pergunta à IA o significado de cada palavra dela, para que a palavra tocada mostre o significado na hora. Isso usa sua chave até em linhas que você não toca.</string>
+    <string name="settings_translate_again_title">Traduzir de novo com IA</string>
+    <string name="settings_translate_again_description">Adiciona Traduzir de novo à lista ▾ da barra ao tocar. Quando a tradução de uma linha parecer errada, selecione uma palavra dela e escolha Traduzir de novo: a IA de Configurações → Assistente de IA traduz a frase inteira de novo, usando as linhas ao redor. Sua chave só é usada quando você escolhe isso.</string>
     <string name="settings_tap_bar_reading_title">Pronúncia na barra ao tocar</string>
     <string name="settings_tap_bar_reading_description">Ao tocar uma palavra, a barra acima também mostra como se fala: AFI para inglês, kana para japonês e pinyin para chinês.</string>
     <string name="settings_tap_bar_buttons_title">Botões da barra ao tocar</string>

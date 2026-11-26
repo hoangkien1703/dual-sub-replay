@@ -19,6 +19,11 @@
     <string name="practice_pronounce">発音</string>
     <string name="practice_open_google_translate">Google 翻訳で開く</string>
     <string name="phrase_add_to_anki">Ankiに追加</string>
+    <string name="phrase_translate_again">もう一度翻訳（AI）</string>
+    <string name="phrase_translate_again_asking">AIにより良い翻訳を頼んでいます…</string>
+    <string name="phrase_translate_again_done">この行の翻訳を新しくしました。</string>
+    <string name="phrase_translate_again_no_key">先に設定 → AI アシスタントでAIキーを追加してください。</string>
+    <string name="phrase_translate_again_failed">より良い翻訳は届きませんでした。後でもう一度お試しください。</string>
     <string name="practice_google_translate_unavailable">Google 翻訳がインストールされていません</string>
     <string name="practice_google_translate_cannot_open">Google 翻訳がテキストを受け取れませんでした</string>
     <string name="practice_pronounce_item">%1$s を発音</string>

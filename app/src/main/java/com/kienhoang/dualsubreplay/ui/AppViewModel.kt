@@ -177,6 +177,7 @@ class AppViewModel internal constructor(
             addressMemory = application.googleAddressMemory(GOOGLE_TRANSLATE_ADDRESS_KEY),
         )
     private val aiTranslator = AiSubtitleTranslator(File(application.cacheDir, "ai-translations"))
+    private val lineCorrections = LineCorrections(File(application.filesDir, "line-corrections.tsv"))
     private val aiTransport by lazy { AiHttpTransport() }
 
     /** Subtitles Gemini made for videos without captions (owner pick 2026-11-08). */
@@ -1346,6 +1347,35 @@ class AppViewModel internal constructor(
         language: String,
     ): String = translateText(language, _state.value.targetLanguage, text)
 
+    /**
+     * Translate again (Settings → Word learning → Translate again with AI, off by default): asks the
+     * AI for a new translation of [segment]'s whole sentence, with the lines around it, and keeps it
+     * in place of the translator's from now on. Runs only on the learner's tap.
+     */
+    internal suspend fun translateLineAgain(segment: SubtitleSegment): TranslateAgainResult {
+        val application = getApplication<Application>()
+        val current = _state.value
+        val context = meaningContext(segment, false, current.segments) ?: return TranslateAgainResult.FAILED
+        val model =
+            withContext(Dispatchers.IO) {
+                // The learner is waiting: it goes ahead of background requests.
+                application.aiTranslationModel(current.aiTranslationModel, AiTranslationThinking.OFF, aiTransport, urgent = true)
+            } ?: return TranslateAgainResult.NO_KEY
+        val source =
+            com.kienhoang.dualsubreplay.data
+                .learningSourceLanguage(current.resolvedSourceLanguage, current.sourcePreference)
+        val (system, user) = translateAgainRequest(context, source, current.targetLanguage)
+        val reply =
+            try {
+                withTimeoutOrNull(TRANSLATE_AGAIN_TIMEOUT_MS) { model.ask(system, user) }
+            } catch (_: IOException) {
+                null
+            }
+        val better = cleanTranslateAgainReply(reply, context.sentence, context.translation) ?: return TranslateAgainResult.FAILED
+        lineCorrections.put(current.targetLanguage, rowTranslationTexts(segment).first(), better)
+        return TranslateAgainResult.DONE
+    }
+
     internal suspend fun translateSelection(selection: LearningWordSelection): String =
         translateText(selection.wordLanguage, selection.meaningLanguage, selection.token.text)
 
@@ -2114,15 +2144,19 @@ class AppViewModel internal constructor(
         ) {
             following = true
             openTranscript.value = WholeTranscript(checkNotNull(displayStore), translate, prefetch)
-            translatePlaybackWindow(
-                checkNotNull(displayStore),
-                playbackRequests,
-                translate,
-                onTranslationFailure = { error -> showTranslationUnavailable(videoId, generation, error) },
-                prefetch = prefetch,
-                upgrades = upgrades,
-            ) { rows, preparing ->
-                publishSubtitleWindow(videoId, generation, rows, preparing)
+            lineCorrections.load()
+            coroutineScope {
+                translatePlaybackWindow(
+                    checkNotNull(displayStore),
+                    playbackRequests,
+                    translate,
+                    onTranslationFailure = { error -> showTranslationUnavailable(videoId, generation, error) },
+                    prefetch = prefetch,
+                    // Translate again's corrections come first, over the AI's lines when those replace Google's.
+                    upgrades = lineCorrections.over(upgrades, targetLanguage, this),
+                ) { rows, preparing ->
+                    publishSubtitleWindow(videoId, generation, rows, preparing)
+                }
             }
         }
         try {

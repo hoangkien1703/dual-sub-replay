@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">Arti kamus</string>
     <string name="settings_prepare_meanings_title">Siapkan arti lebih dulu</string>
     <string name="settings_prepare_meanings_description">Saat satu baris diputar, AI ditanya arti setiap katanya, jadi kata yang diketuk langsung menampilkan artinya. Ini memakai kuncimu bahkan untuk baris yang tidak kamu ketuk.</string>
+    <string name="settings_translate_again_title">Terjemahkan ulang dengan AI</string>
+    <string name="settings_translate_again_description">Menambahkan Terjemahkan ulang ke daftar ▾ bilah ketuk. Jika terjemahan sebuah baris tampak salah, pilih satu kata di baris itu lalu pilih Terjemahkan ulang: AI dari Setelan → Asisten AI menerjemahkan ulang seluruh kalimat dengan melihat baris di sekitarnya. Kunci Anda hanya dipakai saat Anda memilihnya.</string>
     <string name="settings_tap_bar_reading_title">Pelafalan di bilah ketuk</string>
     <string name="settings_tap_bar_reading_description">Saat Anda mengetuk satu kata, bilah di atasnya juga menunjukkan cara mengucapkannya: IPA untuk bahasa Inggris, kana untuk Jepang, pinyin untuk Mandarin.</string>
     <string name="settings_tap_bar_buttons_title">Tombol bilah ketuk</string>

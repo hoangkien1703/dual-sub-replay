@@ -19,6 +19,11 @@
     <string name="practice_pronounce">Ucapkan</string>
     <string name="practice_open_google_translate">Buka di Google Terjemahan</string>
     <string name="phrase_add_to_anki">Tambah ke Anki</string>
+    <string name="phrase_translate_again">Terjemahkan ulang (AI)</string>
+    <string name="phrase_translate_again_asking">Meminta terjemahan yang lebih baik dari AI…</string>
+    <string name="phrase_translate_again_done">Baris ini punya terjemahan baru.</string>
+    <string name="phrase_translate_again_no_key">Tambahkan kunci AI di Setelan → Asisten AI terlebih dulu.</string>
+    <string name="phrase_translate_again_failed">Tidak ada terjemahan yang lebih baik. Coba lagi nanti.</string>
     <string name="practice_google_translate_unavailable">Google Terjemahan belum terpasang</string>
     <string name="practice_google_translate_cannot_open">Google Terjemahan tidak dapat menerima teks</string>
     <string name="practice_pronounce_item">Ucapkan %1$s</string>

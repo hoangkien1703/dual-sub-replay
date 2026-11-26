@@ -63,17 +63,6 @@ DualSub Replay is a free, open-source **dual subtitles app for YouTube on Androi
 
 I built DualSub Replay because I wanted a really good app for learning languages from YouTube, one that anyone can use for free. I also hope it raises the bar for other apps in this field: if a free, open-source app can do this, paid apps should do at least as well.
 
-### How it compares
-
-| App | On Android | Cost | Best at |
-| --- | --- | --- | --- |
-| **DualSub Replay** | App with YouTube inside | Free, open source, no ads | Tap-to-replay, word lookup, grammar help, saved-word practice |
-| Trancy | App and browser extension | Free plan; Premium from about $3.49 a month | Bilingual subtitles; AI tools need Premium, free plan saves up to 100 words |
-| LingoTube | App on Google Play | Free, with ads | Dual captions with A-B repeat |
-| Language Reactor | No Android app (desktop Chrome only) | Free, paid Pro plan | Studying YouTube and Netflix on a computer |
-
-Facts checked in October 2026. See the [full comparison](https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/) for Migaku, Dualsub and more.
-
 If DualSub Replay helps your learning, consider [starring the repository](https://github.com/hoangkien1703/dual-sub-replay). It helps other language learners discover the project.
 
 <p align="center">
@@ -115,6 +104,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - For Spanish, each word is colored by its part of speech in that sentence, the card shows its dictionary form (fuimos → ir, canciones → canción), the verb's tense and person (Preterite · nosotros) and pronouns joined to it (dámelo), and it explains grammar points such as ser and estar, the preterite and imperfect, the subjunctive after quiero que or ojalá, or se, with their CEFR level. The data is in the app, so it works offline.
 - For Chinese, lines are split into words colored by their part of speech, the card shows each word's pinyin (银行 yínháng), and it explains grammar points such as 了, 把 or 虽然…但是 with their HSK 3.0 level. Traditional characters work too. The data is in the app, so it works offline from the first video.
 - **Pronounce** uses the voices installed on your phone, preferring offline voices.
+- A translation that looks wrong? Turn on **Settings → Word learning → Translate again with AI** (off by default), select a word in that line and pick **Translate again** from the bar's ▾ list: the AI from your own key translates the sentence again with the lines around it, and the line keeps the new translation.
 
 ### Practice saved words
 
@@ -122,6 +112,7 @@ If DualSub Replay helps your learning, consider [starring the repository](https:
 - Each card remembers which video it came from, so **Video: All videos** shows and practices the words of one video. Add your own **Notes** to any card; search finds them too.
 - Reviews use spaced repetition: **Again** (10 minutes), **Hard** (1 day), **Good** (3 days), or **Easy** (7 days), with intervals growing on later reviews.
 - Export a full backup or Anki text, and import it on another phone. See [Practice transfer](docs/practice-transfer.md).
+- Already studying in AnkiDroid? With **Known words** on, **Settings → Word learning → Add words from Anki** marks the words of a deck's cards as known, so known words show from your first video. Nothing in Anki changes.
 
 ### Ask the AI assistant
 
@@ -157,6 +148,16 @@ The interface is available in English, Tiếng Việt, Español, Português (Bra
 3. Read the original and translated subtitles below the video, or beside it in landscape.
 4. Tap a subtitle line to replay it, or tap a word to learn it.
 5. Press Back to keep browsing YouTube as usual.
+
+## How it compares
+
+- **DualSub Replay**: free, open source, no ads. An Android app with YouTube inside: tap-to-replay, word lookup, grammar help and saved-word practice, with translations into 102 languages.
+- **Trancy**: an app and a browser extension, with a free plan and Premium from about $3.49 a month. Bilingual subtitles; its AI tools need Premium, and the free plan saves up to 100 words.
+- **LingoTube**: an app on Google Play, free with ads. Dual captions with A-B repeat.
+- **Language Reactor**: free with a paid Pro plan, but only in desktop Chrome, with no Android app. Good for YouTube and Netflix on a computer.
+- **Fushi**: free and open source, for Android and computers. A deep Japanese-first immersion suite (Yomitan dictionaries, one-tap Anki cards, books and manga) that does not translate subtitles.
+
+Facts checked in October and November 2026. See the [full comparison](https://hoangkien1703.github.io/dual-sub-replay/dual-subtitles-youtube-android/) for Migaku, Dualsub and more.
 
 ## FAQ
 

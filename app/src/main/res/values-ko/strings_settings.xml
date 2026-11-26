@@ -129,6 +129,8 @@
     <string name="settings_meaning_order_dictionary">사전 뜻</string>
     <string name="settings_prepare_meanings_title">뜻 미리 준비</string>
     <string name="settings_prepare_meanings_description">줄이 재생되는 동안 그 줄의 각 단어 뜻을 AI에 물어 두어, 누른 단어의 뜻이 바로 나옵니다. 누르지 않는 줄에도 키를 사용합니다.</string>
+    <string name="settings_translate_again_title">AI로 다시 번역</string>
+    <string name="settings_translate_again_description">탭 바의 ▾ 목록에 다시 번역을 추가합니다. 줄의 번역이 이상해 보이면 그 줄의 단어를 선택하고 다시 번역을 고르세요. 설정 → AI 도우미의 AI가 앞뒤 줄을 참고해 문장 전체를 다시 번역합니다. 키는 이것을 고를 때만 사용됩니다.</string>
     <string name="settings_tap_bar_reading_title">탭 바에 발음 표시</string>
     <string name="settings_tap_bar_reading_description">단어 하나를 탭하면 위의 바에도 읽는 법을 보여 줍니다. 영어는 IPA, 일본어는 가나, 중국어는 병음입니다.</string>
     <string name="settings_tap_bar_buttons_title">탭 바 버튼</string>
