@@ -6,7 +6,7 @@
     try {
       const url = new URL(String(value), location.href);
       const ok = url.protocol === 'https:' && /(^|\.)youtube\.com$/.test(url.hostname) &&
-        url.pathname === '/api/timedtext' && url.searchParams.get('v') && !url.searchParams.get('tlang') !== translated;
+        url.pathname === '/api/timedtext' && url.searchParams.get('v') && Boolean(url.searchParams.get('tlang')) === translated;
       return ok ? url : null;
     } catch {
       return null;

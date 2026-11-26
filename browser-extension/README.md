@@ -1,4 +1,4 @@
-# DualSub for Chrome (preview)
+# DualSub Replay for Chrome (preview)
 
 Maintainer: @parastouh
 

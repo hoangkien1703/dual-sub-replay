@@ -97,3 +97,10 @@ Results on real videos:
 - An ad before the video (a 15 s ad): passed. No subtitle during the ad; the video's lines loaded when it ended and
   followed playback.
 - Fullscreen: passed. The overlay stays at the bottom of the screen, and the word card opens over the video.
+
+Owner follow-up (2026-11-26, taken over from PR #266 in the owner's PR): the Network rule in `AGENTS.md` names the
+hook's one YouTube request too; an orphaned content script also clears `panel`, `overlay` and `card`, so its still
+attached message listener can't render into the removed panel; and the visible name is **DualSub Replay** (store title
+"DualSub Replay: Dual Subtitles for YouTube", `short_name` and toolbar title "DualSub Replay"), because Firefox Add-ons
+already lists an older, different "Dualsub". Internal names (`globalThis.DualSub`, `dualsub-` classes, the Anki deck
+"DualSub") stay.

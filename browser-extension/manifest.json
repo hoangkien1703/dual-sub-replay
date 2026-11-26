@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "DualSub",
+  "name": "DualSub Replay: Dual Subtitles for YouTube",
+  "short_name": "DualSub Replay",
   "version": "0.8.1",
   "description": "Dual subtitles on YouTube: original line, its translation, click a line to hear it again.",
   "icons": {
@@ -26,6 +27,7 @@
     "service_worker": "background.js"
   },
   "action": {
+    "default_title": "DualSub Replay",
     "default_popup": "ui/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

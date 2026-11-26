@@ -136,7 +136,8 @@ never break:
   never changes a request, never sends the page's token anywhere, and only `postMessage`s the reply to the page's
   own origin. Its one request of its own is the original of a track the player asked for translated: the same
   YouTube address without `tlang`, once per address (as the app's page fetch).
-- **Network:** only `background.js` makes requests, and only to the hosts in `manifest.json`'s `host_permissions`.
+- **Network:** only `background.js` makes requests (apart from the hook's one YouTube request above), and only to the
+  hosts in `manifest.json`'s `host_permissions`.
   Never add a project server or a shared key. AI features use only the user's own key, kept in `chrome.storage.local`
   (never `sync`) and sent only to the chosen service; subtitle text goes to the model as JSON data, never as instructions.
 - **Page text:** caption, dictionary and saved text always reaches the page through `textContent` or DOM nodes, never

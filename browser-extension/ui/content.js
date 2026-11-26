@@ -208,19 +208,19 @@ function renderPanel() {
   const head = el('div', 'dualsub-head');
   const text = el('div', 'dualsub-head-text');
   text.append(
-    el('div', 'dualsub-title', state.lang ? `${DualSub.languageName(state.lang)} → ${DualSub.languageName(target)}` : 'DualSub'),
+    el('div', 'dualsub-title', state.lang ? `${DualSub.languageName(state.lang)} → ${DualSub.languageName(target)}` : 'DualSub Replay'),
     el('div', 'dualsub-status', state.lines.length ? `${state.lines.length} lines` : 'Waiting for captions…'),
   );
   const settings = el('button', 'dualsub-icon', '⚙');
   settings.title = 'Settings';
   settings.onclick = () => ask({ type: 'openSettings' });
   const guide = el('button', 'dualsub-icon', '?');
-  guide.title = 'Guide: how to use DualSub and AI translation';
+  guide.title = 'Guide: how to use DualSub Replay and AI translation';
   guide.onclick = () => ask({ type: 'openGuide' });
   const logo = document.createElement('img');
   logo.className = 'dualsub-logo';
   logo.src = chrome.runtime.getURL('icons/icon32.png');
-  logo.alt = 'DualSub';
+  logo.alt = 'DualSub Replay';
   head.append(logo, text, settings, guide);
 
   const list = el('ol', 'dualsub-list');
@@ -506,6 +506,7 @@ function tick() {
   if (!chrome.runtime?.id) {
     clearInterval(ticker);
     for (const node of [panel, overlay, card]) node?.remove();
+    panel = overlay = card = null; // the old message listener stays; renderPanel() then does nothing
     document.documentElement.classList.remove('dualsub-on');
     return;
   }
