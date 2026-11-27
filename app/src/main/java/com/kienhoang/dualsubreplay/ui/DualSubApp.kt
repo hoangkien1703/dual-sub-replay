@@ -192,6 +192,7 @@ fun DualSubApp(
             CompositionLocalProvider(
                 LocalLineLoop provides studyRunner.lineLoop,
                 LocalDictation provides studyRunner.dictation,
+                LocalListeningPractice provides studyRunner.listening,
                 LocalAiSubtitleActions provides aiSubtitleActions,
                 LocalWholeTranscript provides wholeTranscript,
             ) {
@@ -661,6 +662,7 @@ private fun DualSubExperience(
             onTargetChange = onTargetChange,
             thirdLine = state.thirdLine,
             onThirdLineChange = onThirdLineChange,
+            originalVisibility = state.originalVisibility,
             translatedVisibility = state.translatedVisibility,
             onCaptionVisibilityChange = onCaptionVisibilityChange,
             onOpenAllSettings = {
@@ -846,13 +848,16 @@ private fun SubtitlePanel(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
-                        Text(
-                            text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        // Only while something is happening (loading, a problem): no note once the lines are ready.
+                        state.statusMessage?.let { status ->
+                            Text(
+                                text = status,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                     ComprehensionChip()
                     PanelSettingsButton(onClick = onSettings, onLongClick = onLongPressSettings, size = 48.dp, iconSize = 24.dp)
@@ -1039,13 +1044,16 @@ private fun SideSubtitlePanel(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
-                        Text(
-                            text = state.statusMessage ?: stringResource(R.string.player_tap_paragraph_to_replay),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        // Only while something is happening (loading, a problem): no note once the lines are ready.
+                        state.statusMessage?.let { status ->
+                            Text(
+                                text = status,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                     ComprehensionChip()
                     PanelSettingsButton(onClick = onSettings, onLongClick = onLongPressSettings, size = 36.dp, iconSize = 20.dp)
@@ -1099,10 +1107,9 @@ internal fun SubtitleTimeline(
 
     // TV layout: OK on a line opens its words (no touch to select them), and text is larger.
     val tvLayout = LocalTvLayout.current
-    // Dictation hides each line until it is revealed; on TV (no box to type in) it acts like Listen first.
-    val hiding = dictation?.takeIf { !tvLayout && state.dictationInPanel() }
-    val showOriginal = if (hiding != null) state.originalVisibility != CaptionVisibility.NEVER else state.showOriginal()
-    val showTranslation = if (hiding != null) state.translatedVisibility != CaptionVisibility.NEVER else state.showTranslation()
+    val hiding = rememberPanelLineHiding(state, dictation, tvLayout)
+    val showOriginal = if (hiding.active) state.originalVisibility != CaptionVisibility.NEVER else state.showOriginal()
+    val showTranslation = if (hiding.active) state.translatedVisibility != CaptionVisibility.NEVER else state.showTranslation()
     val sourceLanguage = state.resolvedSourceLanguage ?: state.sourcePreference
     val activeWordIndex = if (state.wordHighlightEnabled) state.activeWordIndex else -1
     var tvLine by remember { mutableStateOf<SubtitleSegment?>(null) }
@@ -1124,16 +1131,19 @@ internal fun SubtitleTimeline(
         ) {
             itemsIndexed(state.segments, key = { _, segment -> segment.id }) { index, segment ->
                 val active = index == state.currentIndex
-                val hidden = hiding != null && !hiding.isRevealed(DictationKey(state.activeVideoId, segment.id))
+                val hidden = hiding.hidden(segment.id)
+                val reveal = hiding.revealAction(segment.id)
                 CompactSubtitleCard(
                     hiddenHint = if (hidden) DictationCheck.hiddenDots(segment.originalText, sourceLanguage) else null,
+                    onRevealHidden = reveal.takeIf { !tvLayout },
+                    onHideLine = hiding.hideAction(segment.id).takeIf { !tvLayout },
                     segment = segment,
                     showOriginal = showOriginal,
                     showTranslation = showTranslation,
                     translationPosition = state.translationPosition,
                     active = active,
                     fontScale = fontScale,
-                    onReplay = { if (tvLayout) tvLine = segment else onReplay(segment) },
+                    onReplay = panelRowTap(tvLayout, reveal, openTvWords = { tvLine = segment }, replay = { onReplay(segment) }),
                     focusModifier = if (active) Modifier.focusRequester(activeRowFocus) else Modifier,
                     // Only the active row draws the spoken word. Giving the others a constant lets them
                     // skip recomposition each time the highlighted word moves.
@@ -1171,6 +1181,60 @@ internal fun SubtitleTimeline(
     }
     tvLine?.let { TvLineWords(it, state.resolvedSourceLanguage ?: state.sourcePreference, onReplay, onWordClick) { tvLine = null } }
 }
+
+/**
+ * Which panel rows are hidden: Dictation hides each line until Check or Show (on TV, with no box to
+ * type in, it acts like Listen first); Listening practice until a tap on its dots (on TV, OK on the row).
+ */
+private class PanelLineHiding(
+    private val videoId: String?,
+    private val dictation: DictationState?,
+    private val listening: ListeningPracticeState?,
+) {
+    val active: Boolean get() = dictation != null || listening != null
+
+    fun hidden(lineId: Long): Boolean {
+        val key = DictationKey(videoId, lineId)
+        return dictation?.isRevealed(key) == false || listening?.isRevealed(key) == false
+    }
+
+    /** What shows a hidden line, or null when a tap can't (Dictation, or the line already shows). */
+    fun revealAction(lineId: Long): (() -> Unit)? {
+        val key = DictationKey(videoId, lineId)
+        return listening?.takeIf { !it.isRevealed(key) }?.let { practice -> { practice.reveal(key) } }
+    }
+
+    /** What turns a line the learner showed back into dots, or null when it is hidden (or not Listening practice). */
+    fun hideAction(lineId: Long): (() -> Unit)? {
+        val key = DictationKey(videoId, lineId)
+        return listening?.takeIf { it.isRevealed(key) }?.let { practice -> { practice.hide(key) } }
+    }
+}
+
+@Composable
+private fun rememberPanelLineHiding(
+    state: DualSubUiState,
+    dictation: DictationState?,
+    tvLayout: Boolean,
+): PanelLineHiding {
+    val listeningState = LocalListeningPractice.current ?: remember { ListeningPracticeState() }
+    val dictating = dictation?.takeIf { !tvLayout && state.dictationInPanel() }
+    val listening = listeningState.takeIf { dictating == null && state.listeningInPanel() }
+    return PanelLineHiding(state.activeVideoId, dictating, listening)
+}
+
+/** A tap on a panel row: on TV, OK shows a hidden line or opens a shown line's words; on a phone it replays the line. */
+private fun panelRowTap(
+    tvLayout: Boolean,
+    reveal: (() -> Unit)?,
+    openTvWords: () -> Unit,
+    replay: () -> Unit,
+): () -> Unit =
+    when {
+        tvLayout && reveal != null -> reveal
+        tvLayout -> openTvWords
+        else -> replay
+    }
 
 /**
  * Scrolls the transcript with playback: in the middle ([TranscriptFollow.CENTER]) every line

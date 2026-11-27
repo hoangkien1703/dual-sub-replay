@@ -540,6 +540,9 @@ internal class StudyPlaybackRunner(
     /** Dictation's revealed lines and answers, kept while the panel closes or the phone turns. */
     val dictation = DictationState()
 
+    /** Listening practice's revealed lines, kept the same way. */
+    val listening = ListeningPracticeState()
+
     @Volatile var state: DualSubUiState? = null
 
     @Volatile var settings = StudySettings()

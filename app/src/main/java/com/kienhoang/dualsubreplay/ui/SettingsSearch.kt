@@ -96,6 +96,7 @@ internal enum class SearchableSetting(
         MoreSettingsSection.READING,
         ORIGINAL_VISIBILITY,
         setOf(ORIGINAL_VISIBILITY),
+        alsoFinds = listOf(R.string.listening_practice_title),
     ),
     TRANSLATED_CAPTIONS(
         R.string.settings_translated_captions_name,

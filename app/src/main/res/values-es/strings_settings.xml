@@ -213,4 +213,7 @@
     <string name="settings_pronunciation_volume_name">Volumen de pronunciación</string>
     <string name="settings_original_captions_name">Subtítulos originales</string>
     <string name="settings_translated_captions_name">Subtítulos traducidos</string>
+    <string name="listening_practice_title">Práctica de escucha</string>
+    <string name="listening_show_line">Mostrar esta línea</string>
+    <string name="listening_hide_line">Ocultar esta línea</string>
 </resources>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="player_tap_paragraph_to_replay">Təkrar oynatmaq üçün abzasa toxunun</string>
     <string name="player_subtitle_settings">Altyazı ayarları</string>
     <string name="player_dual_subtitle_settings">İkidilli altyazı ayarları</string>
     <string name="player_show_dual_subtitles">İkidilli altyazıları göstər</string>

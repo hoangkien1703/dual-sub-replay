@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="player_tap_paragraph_to_replay">Ketuk paragraf untuk memutarnya ulang</string>
     <string name="player_subtitle_settings">Setelan subtitel</string>
     <string name="player_dual_subtitle_settings">Setelan subtitel ganda</string>
     <string name="player_show_dual_subtitles">Tampilkan subtitel ganda</string>

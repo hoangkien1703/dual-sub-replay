@@ -12,7 +12,6 @@
     <string name="status_downloading_translation_model">Tərcümə modeli endirilir…</string>
     <string name="status_subtitles_load_failed">Altyazılar yüklənmədi. Davam etmək üçün yenidən cəhd edin.</string>
     <string name="status_original_captions_only">Yalnız orijinal altyazılar · tərcümə mümkün deyil</string>
-    <string name="status_subtitles_ready">Oynatma yerinin yaxınlığındakı altyazılar hazırdır</string>
     <string name="status_preparing_translation">Tərcümə hazırlanır: %1$s…</string>
     <string name="status_translation_unavailable_retry">Tərcümə hazırda mümkün deyil. Bağlantınızı yoxlayın, sonra yenidən cəhd edin.</string>
     <string name="status_live_subtitles_title">Canlı altyazılar</string>

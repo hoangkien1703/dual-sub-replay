@@ -213,4 +213,7 @@
     <string name="settings_pronunciation_volume_name">Volume pengucapan</string>
     <string name="settings_original_captions_name">Subtitel asli</string>
     <string name="settings_translated_captions_name">Subtitel terjemahan</string>
+    <string name="listening_practice_title">Latihan mendengar</string>
+    <string name="listening_show_line">Tampilkan baris ini</string>
+    <string name="listening_hide_line">Sembunyikan baris ini</string>
 </resources>

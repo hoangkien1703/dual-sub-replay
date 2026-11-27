@@ -72,4 +72,56 @@ class CaptionVisibilityTest {
         // Never is only in the full settings; a tap here shows the line again.
         assertEquals(CaptionVisibility.ALWAYS, CaptionVisibility.NEVER.toggledShowWhilePlaying())
     }
+
+    @Test fun listeningPracticeStartsWhenNeitherLineShowsWhilePlaying() {
+        val always = CaptionVisibility.ALWAYS
+        val paused = CaptionVisibility.PAUSED
+        val never = CaptionVisibility.NEVER
+        // Both chips off in the gear popup.
+        assertTrue(listeningPractice(paused, paused))
+        // Set on the settings page: one line hidden for good, the other only while playing.
+        assertTrue(listeningPractice(never, paused))
+        assertTrue(listeningPractice(paused, never))
+        // Either line showing while playing: the usual panel.
+        assertFalse(listeningPractice(always, paused))
+        assertFalse(listeningPractice(paused, always))
+        assertFalse(listeningPractice(always, always))
+        // Both Never: nothing to show, so the panel still goes away.
+        assertFalse(listeningPractice(never, never))
+    }
+
+    @Test fun listeningPracticeKeepsThePanelWhileThePlayingVideoHidesBothLines() {
+        val playing =
+            DualSubUiState(
+                activeVideoId = "dQw4w9WgXcQ",
+                originalVisibility = CaptionVisibility.PAUSED,
+                translatedVisibility = CaptionVisibility.PAUSED,
+                playbackPaused = false,
+            )
+        assertFalse(playing.showOriginal())
+        assertFalse(playing.showTranslation())
+        assertTrue(playing.listeningInPanel())
+        assertTrue("The panel no longer disappears, so the video never looks blank", playing.tracksVisible())
+        assertFalse("Live subtitles have no fixed lines to hide", playing.copy(liveFallback = true).listeningInPanel())
+        // Listen first and Dictation keep their own rules.
+        assertFalse(playing.copy(studyPlayMode = StudyPlayMode.LISTEN_FIRST).listeningInPanel())
+        assertFalse(playing.copy(studyPlayMode = StudyPlayMode.DICTATION).listeningInPanel())
+        assertTrue(playing.copy(studyPlayMode = StudyPlayMode.REPEAT_LINE).listeningInPanel())
+        // The overlay and full screen keep Only when paused: the line shows once the video pauses.
+        assertTrue(playing.copy(playbackPaused = true).showOriginal())
+        // Turning a line back on ends it.
+        assertFalse(playing.copy(translatedVisibility = CaptionVisibility.ALWAYS).listeningInPanel())
+    }
+
+    @Test fun listeningPracticeRemembersRevealedLinesPerVideo() {
+        val listening = ListeningPracticeState()
+        val line = DictationKey("dQw4w9WgXcQ", 3)
+        assertFalse(listening.isRevealed(line))
+        listening.reveal(line)
+        assertTrue(listening.isRevealed(line))
+        assertFalse(listening.isRevealed(DictationKey("dQw4w9WgXcQ", 4)))
+        assertFalse(listening.isRevealed(DictationKey("abcdefghijk", 3)))
+        listening.hide(line)
+        assertFalse("The hide icon turns it back into dots", listening.isRevealed(line))
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,10 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -87,8 +91,12 @@ internal fun CompactSubtitleCard(
     thirdLanguage: String? = null,
     /** The loop button at the row's end (Study tools → Loop button on the playing line), or null for none. */
     loop: LineLoopButton? = null,
-    /** Dictation: the line is hidden until revealed, and this (one dot per word) shows instead. */
+    /** Dictation and Listening practice: the line is hidden until revealed, and this (one dot per word) shows instead. */
     hiddenHint: String? = null,
+    /** Listening practice: a tap on the dots shows the line (null: the dots are not a button, as in Dictation). */
+    onRevealHidden: (() -> Unit)? = null,
+    /** Listening practice: a line the learner showed gets a hide icon at its end, which turns it back into dots. */
+    onHideLine: (() -> Unit)? = null,
 ) {
     if (hiddenHint == null && !showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -116,7 +124,7 @@ internal fun CompactSubtitleCard(
             if (replayEnabled) ReplayCircle(active)
             if (replayEnabled) Spacer(Modifier.size(9.dp))
             if (hiddenHint != null) {
-                HiddenLineText(hiddenHint, fontScale, Modifier.weight(1f))
+                HiddenLineText(hiddenHint, fontScale, Modifier.weight(1f), onRevealHidden)
             } else {
                 Column(Modifier.weight(1f)) {
                     val isSentenceEligibleForPos = !wordLearningActiveOnly || active
@@ -181,6 +189,7 @@ internal fun CompactSubtitleCard(
                     }
                 }
             }
+            onHideLine?.let { HideLineIconButton(it) }
             loop?.let { LineLoopIconButton(it) }
         }
     }
@@ -225,21 +234,42 @@ private fun ReplayCircle(active: Boolean) {
     }
 }
 
-/** A line Dictation hides: dots in place of its words, read out as "Hidden line". */
+/**
+ * A hidden line: dots in place of its words, read out as "Hidden line". With [onReveal] (Listening
+ * practice) the dots fill the row beside ▶ and a tap on them shows the line; ▶ still replays it.
+ */
 @Composable
 private fun HiddenLineText(
     dots: String,
     fontScale: Float,
     modifier: Modifier,
+    onReveal: (() -> Unit)? = null,
 ) {
     val description = stringResource(R.string.dictation_hidden_line)
-    Text(
-        text = dots,
-        modifier = modifier.semantics { contentDescription = description }.testTag("dictation_hidden_line"),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontSize = (16 * fontScale).sp,
-        letterSpacing = 1.sp,
-    )
+    val text: @Composable (Modifier) -> Unit = { textModifier ->
+        Text(
+            text = dots,
+            modifier = textModifier,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = (16 * fontScale).sp,
+            letterSpacing = 1.sp,
+        )
+    }
+    if (onReveal == null) {
+        text(modifier.semantics { contentDescription = description }.testTag("dictation_hidden_line"))
+        return
+    }
+    Box(
+        modifier
+            .heightIn(min = 40.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClickLabel = stringResource(R.string.listening_show_line), role = Role.Button, onClick = onReveal)
+            .semantics { contentDescription = description }
+            .testTag("listening_hidden_line"),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        text(Modifier)
+    }
 }
 
 /** The loop button of one transcript row: whether its line loops, and what a tap does. */
@@ -247,6 +277,19 @@ internal data class LineLoopButton(
     val looping: Boolean,
     val onToggle: () -> Unit,
 )
+
+/** Listening practice: hides a line the learner showed again, as dots. */
+@Composable
+private fun HideLineIconButton(onHide: () -> Unit) {
+    IconButton(onClick = onHide, modifier = Modifier.padding(start = 4.dp).size(40.dp).testTag("listening_hide_line")) {
+        Icon(
+            Icons.Default.VisibilityOff,
+            contentDescription = stringResource(R.string.listening_hide_line),
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 /** A small repeat-one icon; on a filled accent circle while the line loops. */
 @Composable
