@@ -106,3 +106,34 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # Tell Bing and the other IndexNow engines which pages changed, so they recrawl them soon
+  # (tools/indexnow.py). Releases and the daily badge refresh change no page, so they skip this;
+  # a manual run submits every page.
+  indexnow:
+    needs: deploy
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Submit changed pages to IndexNow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            python3 tools/indexnow.py --all --send
+          else
+            gh api "repos/$GH_REPO/compare/$BEFORE...$AFTER" --jq '.files[].filename' \
+              | python3 tools/indexnow.py --changed --send
+          fi
