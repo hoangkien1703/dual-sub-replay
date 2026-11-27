@@ -1136,6 +1136,7 @@ internal fun SubtitleTimeline(
                 CompactSubtitleCard(
                     hiddenHint = if (hidden) DictationCheck.hiddenDots(segment.originalText, sourceLanguage) else null,
                     onRevealHidden = reveal.takeIf { !tvLayout },
+                    onHideLine = hiding.hideAction(segment.id).takeIf { !tvLayout },
                     segment = segment,
                     showOriginal = showOriginal,
                     showTranslation = showTranslation,
@@ -1201,6 +1202,12 @@ private class PanelLineHiding(
     fun revealAction(lineId: Long): (() -> Unit)? {
         val key = DictationKey(videoId, lineId)
         return listening?.takeIf { !it.isRevealed(key) }?.let { practice -> { practice.reveal(key) } }
+    }
+
+    /** What turns a line the learner showed back into dots, or null when it is hidden (or not Listening practice). */
+    fun hideAction(lineId: Long): (() -> Unit)? {
+        val key = DictationKey(videoId, lineId)
+        return listening?.takeIf { it.isRevealed(key) }?.let { practice -> { practice.hide(key) } }
     }
 }
 

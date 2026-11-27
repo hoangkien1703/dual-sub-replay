@@ -215,4 +215,5 @@
     <string name="settings_translated_captions_name">번역 자막</string>
     <string name="listening_practice_title">듣기 연습</string>
     <string name="listening_show_line">이 줄 보기</string>
+    <string name="listening_hide_line">이 줄 숨기기</string>
 </resources>

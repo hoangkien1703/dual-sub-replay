@@ -215,4 +215,5 @@
     <string name="settings_translated_captions_name">Legendas traduzidas</string>
     <string name="listening_practice_title">Prática de escuta</string>
     <string name="listening_show_line">Mostrar esta linha</string>
+    <string name="listening_hide_line">Ocultar esta linha</string>
 </resources>

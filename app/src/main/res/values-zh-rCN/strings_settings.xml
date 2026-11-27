@@ -215,4 +215,5 @@
     <string name="settings_translated_captions_name">翻译字幕</string>
     <string name="listening_practice_title">听力练习</string>
     <string name="listening_show_line">显示这一行</string>
+    <string name="listening_hide_line">隐藏这一行</string>
 </resources>

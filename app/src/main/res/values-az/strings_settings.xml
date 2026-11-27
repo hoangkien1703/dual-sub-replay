@@ -215,4 +215,5 @@
     <string name="settings_translated_captions_name">Tərcümə altyazıları</string>
     <string name="listening_practice_title">Dinləmə məşqi</string>
     <string name="listening_show_line">Bu sətri göstər</string>
+    <string name="listening_hide_line">Bu sətri gizlət</string>
 </resources>

@@ -15,13 +15,14 @@ Dictation already hides panel rows as dots (one per word) and remembers revealed
 - The *Original* chip is back in the gear popup's *Show while playing*, beside *Translation*, on its own row under the label.
 - **Listening practice** starts when neither line shows while playing (`listeningPractice()` in `ui/CaptionVisibility.kt`): both chips off, or on the settings page any mix of *Only when paused* and *Never* except both *Never*.
 - While it is on, the subtitle panel stays (it no longer disappears) and every row shows dots instead of its text. A tap on a row's dots shows that line, original and translation (each only if not set to *Never*), with word colors and tap-to-look-up as usual. A shown line stays shown while the app runs (per video and line, in memory, like Dictation). ▶ and the rest of the row still replay the line.
+- A shown line gets a small hide icon (eye with a slash) at its end, which turns it back into dots (owner question 2026-11-27, option A). Only shown lines have it, so hidden rows stay clean. Tapping the shown text can't hide it: a word tap opens the word card and a row tap replays.
 - The playing row keeps its outline, so the learner can follow along.
 - Settings search finds the setting with "listening".
 
 ## Non-goals
 
 - No hint text under the chips or on the settings page (owner, 2026-11-27: "unnecessary … the user can try it").
-- No new setting, no new Play mode, no icon per row.
+- No new setting, no new Play mode, no icon on hidden rows.
 - Pausing does not reveal the lines in the panel: the next lines would give themselves away.
 - No blur: it needs Android 12, and blurred text still shows word shapes.
 
@@ -31,7 +32,7 @@ Dictation already hides panel rows as dots (one per word) and remembers revealed
 | --- | --- |
 | Subtitle panel | Stays while playing; rows as dots; tap the dots to show a line. |
 | Full screen box, overlay player mode | Unchanged: *Only when paused*, so the playing line shows when the video pauses. |
-| TV layout | Rows as dots; OK on a hidden row shows it, OK on a shown row opens its words as before. |
+| TV layout | Rows as dots; OK on a hidden row shows it, OK on a shown row opens its words as before (no hide icon on TV). |
 | Live subtitles | Unchanged (no fixed lines to hide): the panel goes away while playing, as before. |
 | Listen first, Dictation | Unchanged: their own rules win. Other Play modes (Pause after each line, Repeat each line …) work with it. |
 | Both lines *Never* | Unchanged: the panel goes away. |

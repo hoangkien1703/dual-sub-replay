@@ -121,5 +121,7 @@ class CaptionVisibilityTest {
         assertTrue(listening.isRevealed(line))
         assertFalse(listening.isRevealed(DictationKey("dQw4w9WgXcQ", 4)))
         assertFalse(listening.isRevealed(DictationKey("abcdefghijk", 3)))
+        listening.hide(line)
+        assertFalse("The hide icon turns it back into dots", listening.isRevealed(line))
     }
 }

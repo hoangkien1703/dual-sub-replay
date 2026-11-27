@@ -215,4 +215,5 @@
     <string name="settings_translated_captions_name">Phụ đề dịch</string>
     <string name="listening_practice_title">Luyện nghe</string>
     <string name="listening_show_line">Hiện dòng này</string>
+    <string name="listening_hide_line">Ẩn dòng này</string>
 </resources>

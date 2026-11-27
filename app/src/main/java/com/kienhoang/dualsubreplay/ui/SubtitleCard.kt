@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -94,6 +95,8 @@ internal fun CompactSubtitleCard(
     hiddenHint: String? = null,
     /** Listening practice: a tap on the dots shows the line (null: the dots are not a button, as in Dictation). */
     onRevealHidden: (() -> Unit)? = null,
+    /** Listening practice: a line the learner showed gets a hide icon at its end, which turns it back into dots. */
+    onHideLine: (() -> Unit)? = null,
 ) {
     if (hiddenHint == null && !showOriginal && !showTranslation) return
     val rowState = stringResource(if (active) R.string.player_active_subtitle else R.string.player_subtitle)
@@ -186,6 +189,7 @@ internal fun CompactSubtitleCard(
                     }
                 }
             }
+            onHideLine?.let { HideLineIconButton(it) }
             loop?.let { LineLoopIconButton(it) }
         }
     }
@@ -273,6 +277,19 @@ internal data class LineLoopButton(
     val looping: Boolean,
     val onToggle: () -> Unit,
 )
+
+/** Listening practice: hides a line the learner showed again, as dots. */
+@Composable
+private fun HideLineIconButton(onHide: () -> Unit) {
+    IconButton(onClick = onHide, modifier = Modifier.padding(start = 4.dp).size(40.dp).testTag("listening_hide_line")) {
+        Icon(
+            Icons.Default.VisibilityOff,
+            contentDescription = stringResource(R.string.listening_hide_line),
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 /** A small repeat-one icon; on a filled accent circle while the line loops. */
 @Composable

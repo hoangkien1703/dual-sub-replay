@@ -17,6 +17,11 @@ internal class ListeningPracticeState {
     fun reveal(key: DictationKey) {
         revealed[key] = true
     }
+
+    /** The hide icon on a shown line turns it back into dots (owner question 2026-11-27). */
+    fun hide(key: DictationKey) {
+        revealed.remove(key)
+    }
 }
 
 internal val LocalListeningPractice = staticCompositionLocalOf<ListeningPracticeState?> { null }

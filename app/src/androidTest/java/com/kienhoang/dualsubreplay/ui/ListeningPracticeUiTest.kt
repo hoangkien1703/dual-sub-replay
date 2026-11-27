@@ -96,7 +96,16 @@ class ListeningPracticeUiTest {
         composeRule.onNodeWithText("We begin to make a snowman.").assertDoesNotExist()
         assertEquals(2, hiddenLines().fetchSemanticsNodes().size)
         composeRule.runOnIdle { assertTrue(played.isEmpty()) }
+        // Only shown lines get the hide icon: the first line and the one just tapped.
+        assertEquals(2, composeRule.onAllNodesWithTag("listening_hide_line", useUnmergedTree = true).fetchSemanticsNodes().size)
         saveUiEvidence("listening-practice-revealed", composeRule.onNodeWithTag(PANEL).captureToImage())
+
+        // The hide icon turns the line back into dots.
+        composeRule.onAllNodesWithTag("listening_hide_line", useUnmergedTree = true)[1].performClick()
+        composeRule.onNodeWithText("My little brother brings a carrot.").assertDoesNotExist()
+        assertEquals(3, hiddenLines().fetchSemanticsNodes().size)
+        assertEquals(1, composeRule.onAllNodesWithTag("listening_hide_line", useUnmergedTree = true).fetchSemanticsNodes().size)
+        composeRule.runOnIdle { assertTrue(played.isEmpty()) }
     }
 
     @Test
