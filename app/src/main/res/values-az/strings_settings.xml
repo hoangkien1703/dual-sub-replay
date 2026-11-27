@@ -216,6 +216,4 @@
     <string name="listening_practice_title">Dinləmə məşqi</string>
     <string name="listening_show_line">Bu sətri göstər</string>
     <string name="listening_hide_line">Bu sətri gizlət</string>
-    <string name="listening_keep_hidden_title">Fasilə zamanı sətirləri gizli saxla</string>
-    <string name="listening_keep_hidden_description">Oynayarkən göstər bölməsində hər iki sətir söndürüləndə, fasilə verdikdə indicə eşitdiyiniz sətir göstərilmir.</string>
 </resources>

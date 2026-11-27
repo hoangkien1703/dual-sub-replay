@@ -216,6 +216,4 @@
     <string name="listening_practice_title">Luyện nghe</string>
     <string name="listening_show_line">Hiện dòng này</string>
     <string name="listening_hide_line">Ẩn dòng này</string>
-    <string name="listening_keep_hidden_title">Giữ ẩn các dòng khi tạm dừng</string>
-    <string name="listening_keep_hidden_description">Khi tắt cả hai dòng trong Hiện khi đang phát, tạm dừng sẽ không hiện dòng bạn vừa nghe.</string>
 </resources>

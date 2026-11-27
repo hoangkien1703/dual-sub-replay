@@ -181,7 +181,6 @@ private val STORED_SWITCHES =
         AiSetting.TV_LAYOUT to TV_LAYOUT_PREFERENCE,
         AiSetting.BILIBILI to BETA_BILIBILI_PREFERENCE,
         AiSetting.BILIBILI_TV to BETA_BILIBILI_TV_PREFERENCE,
-        AiSetting.LISTENING_KEEP_HIDDEN to LISTENING_KEEP_HIDDEN_PREFERENCE,
     )
 
 internal fun readAiStoredSettings(context: Context): AiStoredSettings {
@@ -302,7 +301,7 @@ private fun aiStudySettingValue(
         else -> aiReplaySettingValue(study, setting)
     }
 
-/** Pause between repeats and Slow replay on a second tap (2026-11-23), and Keep lines hidden when paused (2026-11-27). */
+/** Pause between repeats and Slow replay on a second tap (2026-11-23). */
 private fun aiReplaySettingValue(
     study: StudySettings,
     setting: AiSetting,
@@ -310,7 +309,6 @@ private fun aiReplaySettingValue(
     when (setting) {
         AiSetting.STUDY_REPEAT_PAUSE -> study.repeatPause.storageValue
         AiSetting.SLOW_REPLAY -> if (study.slowReplay) study.slowReplaySpeed.storageValue else "off"
-        AiSetting.LISTENING_KEEP_HIDDEN -> onOff(study.listeningKeepHidden)
         else -> aiFlashcardSwitchValue(study, setting)
     }
 
@@ -984,7 +982,6 @@ internal class AppAiActions(
             }
             AiSetting.MARK_NEW_WORDS -> switch(R.string.study_mark_new_words_title, value)
             AiSetting.BLUR_BOX -> switch(R.string.study_blur_box_title, value)
-            AiSetting.LISTENING_KEEP_HIDDEN -> switch(R.string.listening_keep_hidden_title, value)
             AiSetting.LOOP_BUTTON -> switch(R.string.study_loop_button_title, value)
             AiSetting.KANJI_DETAILS -> switch(R.string.study_kanji_details_title, value)
             AiSetting.PAGE_TOKEN_CAPTIONS -> named(R.string.study_page_token_title, string(pageTokenModeLabel(storedPageTokenMode(value))))

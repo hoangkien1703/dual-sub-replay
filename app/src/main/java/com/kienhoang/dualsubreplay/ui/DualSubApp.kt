@@ -1190,20 +1190,18 @@ private class PanelLineHiding(
     private val videoId: String?,
     private val dictation: DictationState?,
     private val listening: ListeningPracticeState?,
-    /** Listening practice while paused: the line just heard shows until the video plays (owner pick 2026-11-27). */
-    private val pausedLineId: Long? = null,
 ) {
     val active: Boolean get() = dictation != null || listening != null
 
     fun hidden(lineId: Long): Boolean {
         val key = DictationKey(videoId, lineId)
-        return dictation?.isRevealed(key) == false || (listening?.isRevealed(key) == false && lineId != pausedLineId)
+        return dictation?.isRevealed(key) == false || listening?.isRevealed(key) == false
     }
 
     /** What shows a hidden line, or null when a tap can't (Dictation, or the line already shows). */
     fun revealAction(lineId: Long): (() -> Unit)? {
         val key = DictationKey(videoId, lineId)
-        return listening?.takeIf { !it.isRevealed(key) && lineId != pausedLineId }?.let { practice -> { practice.reveal(key) } }
+        return listening?.takeIf { !it.isRevealed(key) }?.let { practice -> { practice.reveal(key) } }
     }
 
     /** What turns a line the learner showed back into dots, or null when it is hidden (or not Listening practice). */
@@ -1222,10 +1220,7 @@ private fun rememberPanelLineHiding(
     val listeningState = LocalListeningPractice.current ?: remember { ListeningPracticeState() }
     val dictating = dictation?.takeIf { !tvLayout && state.dictationInPanel() }
     val listening = listeningState.takeIf { dictating == null && state.listeningInPanel() }
-    val lastLine = rememberDictationLine(state)
-    val keepHidden = rememberStudySettings().value.listeningKeepHidden
-    val pausedLineId = lastLine?.id?.takeIf { listening != null && state.playbackPaused && !keepHidden }
-    return PanelLineHiding(state.activeVideoId, dictating, listening, pausedLineId)
+    return PanelLineHiding(state.activeVideoId, dictating, listening)
 }
 
 /** A tap on a panel row: on TV, OK shows a hidden line or opens a shown line's words; on a phone it replays the line. */

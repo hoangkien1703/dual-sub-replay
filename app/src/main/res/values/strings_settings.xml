@@ -216,6 +216,4 @@
     <string name="listening_practice_title">Listening practice</string>
     <string name="listening_show_line">Show this line</string>
     <string name="listening_hide_line">Hide this line</string>
-    <string name="listening_keep_hidden_title">Keep lines hidden when paused</string>
-    <string name="listening_keep_hidden_description">When both lines are off in Show while playing, pausing doesn\'t show the line you just heard.</string>
 </resources>

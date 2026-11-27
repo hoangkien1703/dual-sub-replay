@@ -121,14 +121,6 @@ internal fun CaptionVisibilitySettings() {
                 }
             }
         }
-        val study by rememberStudySettings()
-        SettingsSwitchRow(
-            title = stringResource(R.string.listening_keep_hidden_title),
-            description = stringResource(R.string.listening_keep_hidden_description),
-            checked = study.listeningKeepHidden,
-            onCheckedChange = { preferences.edit().putBoolean(LISTENING_KEEP_HIDDEN_PREFERENCE, it).apply() },
-            testTag = "listening_keep_hidden_switch",
-        )
     }
 }
 

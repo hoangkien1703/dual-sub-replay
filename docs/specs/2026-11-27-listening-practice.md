@@ -17,15 +17,13 @@ Dictation already hides panel rows as dots (one per word) and remembers revealed
 - While it is on, the subtitle panel stays (it no longer disappears) and every row shows dots instead of its text. A tap on a row's dots shows that line, original and translation (each only if not set to *Never*), with word colors and tap-to-look-up as usual. A shown line stays shown while the app runs (per video and line, in memory, like Dictation). ▶ and the rest of the row still replay the line.
 - A shown line gets a small hide icon (eye with a slash) at its end, which turns it back into dots (owner question 2026-11-27, option A). Only shown lines have it, so hidden rows stay clean. Tapping the shown text can't hide it: a word tap opens the word card and a row tap replays.
 - The playing row keeps its outline, so the learner can follow along.
-- Pausing shows the line just heard (the playing line, or the last one played between lines) until the video plays again (owner pick 2026-11-27): "Show while playing" promises the lines come back on pause, so no note is needed. It has no hide icon, as it is shown only for the pause.
-- Settings → Reading → **Keep lines hidden when paused** (`listening_keep_hidden_when_paused`, off; shared in backups; the AI assistant can switch it) keeps that line hidden too, for strict practice.
 - Settings search finds the setting with "listening".
 
 ## Non-goals
 
 - No hint text under the chips or on the settings page (owner, 2026-11-27: "unnecessary … the user can try it").
 - No new setting, no new Play mode, no icon on hidden rows.
-- Pausing never reveals the other lines in the panel: the next lines would give themselves away.
+- Pausing does not reveal the lines in the panel: the next lines would give themselves away.
 - No blur: it needs Android 12, and blurred text still shows word shapes.
 
 ## User-visible behavior
@@ -52,5 +50,5 @@ Also in this PR (owner, 2026-11-27): the panel header's second line no longer sa
 ## Validation
 
 - Unit: `CaptionVisibilityTest` (when it starts, which modes keep their rules, the overlay keeps *Only when paused*, revealed lines per video).
-- Device: `ListeningPracticeUiTest` (dots, a tap shows one line without replaying, the hide icon, pausing shows only the line just heard, Keep lines hidden when paused, a line shown while playing turns it off; screenshot `listening-practice-paused` too; screenshots `listening-practice-hidden`, `listening-practice-revealed`); `SubtitleUiTest.quickSettingsShowWhilePlayingTogglesCaptionVisibility` (both chips; screenshot `subtitle-quick-show-while-playing-both-off`).
+- Device: `ListeningPracticeUiTest` (dots, a tap shows one line without replaying, pausing reveals nothing, a line shown while playing turns it off; screenshots `listening-practice-hidden`, `listening-practice-revealed`); `SubtitleUiTest.quickSettingsShowWhilePlayingTogglesCaptionVisibility` (both chips; screenshot `subtitle-quick-show-while-playing-both-off`).
 - Not verified here: a real phone with a real video (owner's preview test).

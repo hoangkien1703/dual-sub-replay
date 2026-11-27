@@ -98,13 +98,6 @@ internal enum class SearchableSetting(
         setOf(ORIGINAL_VISIBILITY),
         alsoFinds = listOf(R.string.listening_practice_title),
     ),
-    LISTENING_KEEP_HIDDEN(
-        R.string.listening_keep_hidden_title,
-        MoreSettingsSection.READING,
-        "listening_keep_hidden_switch",
-        setOf(LISTENING_KEEP_HIDDEN_PREFERENCE),
-        alsoFinds = listOf(R.string.listening_practice_title),
-    ),
     TRANSLATED_CAPTIONS(
         R.string.settings_translated_captions_name,
         MoreSettingsSection.READING,

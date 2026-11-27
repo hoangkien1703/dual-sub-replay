@@ -138,7 +138,6 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "slow_replay_speed" to share(S),
         "skip_silence" to share(S),
         "blur_box_enabled" to share(B),
-        "listening_keep_hidden_when_paused" to share(B),
         "line_loop_button" to share(B),
         "page_token_captions" to backup(S),
         "anki_card_audio" to share(B),
