@@ -49,6 +49,9 @@ internal const val SEND_TO_APP_PREFERENCE = "send_to_app"
 internal const val ANKICONNECT_DECK_PREFERENCE = "ankiconnect_deck"
 internal const val BLUR_BOX_PREFERENCE = "blur_box_enabled"
 
+/** Listening practice: pausing keeps the line just heard hidden too (owner pick 2026-11-27, off by default). */
+internal const val LISTENING_KEEP_HIDDEN_PREFERENCE = "listening_keep_hidden_when_paused"
+
 /** Study tools → Send to → Add audio to cards (owner pick 2026-11-09), on by default. */
 internal const val CARD_AUDIO_PREFERENCE = "anki_card_audio"
 
@@ -134,6 +137,7 @@ internal val STUDY_SETTING_KEYS =
         CARD_READ_DICTIONARY_PREFERENCE,
         CARD_READ_TRANSLATION_PREFERENCE,
         BLUR_BOX_PREFERENCE,
+        LISTENING_KEEP_HIDDEN_PREFERENCE,
         LOOP_BUTTON_PREFERENCE,
         KANJI_DETAILS_PREFERENCE,
         PAGE_TOKEN_CAPTIONS_PREFERENCE,
@@ -309,6 +313,8 @@ internal data class StudySettings(
     /** Which parts of the back Anki reads aloud. */
     val cardReadAloud: CardReadAloud = CardReadAloud(),
     val blurBox: Boolean = false,
+    /** Listening practice: pausing shows the line just heard unless this is on. */
+    val listeningKeepHidden: Boolean = false,
     val kanjiDetails: Boolean = true,
     val pageTokenCaptions: PageTokenMode = PageTokenMode.AUTO,
 ) {
@@ -387,6 +393,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
                 translation = preferences.getBoolean(CARD_READ_TRANSLATION_PREFERENCE, false),
             ),
         blurBox = preferences.getBoolean(BLUR_BOX_PREFERENCE, false),
+        listeningKeepHidden = preferences.getBoolean(LISTENING_KEEP_HIDDEN_PREFERENCE, false),
         kanjiDetails = preferences.getBoolean(KANJI_DETAILS_PREFERENCE, true),
         pageTokenCaptions = storedPageTokenMode(preferences.all[PAGE_TOKEN_CAPTIONS_PREFERENCE]),
     )

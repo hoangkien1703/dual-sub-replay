@@ -216,4 +216,6 @@
     <string name="listening_practice_title">Prática de escuta</string>
     <string name="listening_show_line">Mostrar esta linha</string>
     <string name="listening_hide_line">Ocultar esta linha</string>
+    <string name="listening_keep_hidden_title">Manter as linhas ocultas ao pausar</string>
+    <string name="listening_keep_hidden_description">Com as duas linhas desativadas em Mostrar ao reproduzir, pausar não mostra a linha que você acabou de ouvir.</string>
 </resources>

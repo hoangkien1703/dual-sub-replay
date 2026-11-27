@@ -1,5 +1,6 @@
 package com.kienhoang.dualsubreplay.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +17,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -25,7 +28,7 @@ import org.junit.Test
 
 /**
  * Listening practice (owner pick 2026-11-27): with neither line shown while playing, the panel keeps
- * every line as dots, and a tap on a line's dots shows just that line.
+ * every line as dots, a tap on a line's dots shows just that line, and pausing shows the line just heard.
  */
 class ListeningPracticeUiTest {
     @get:Rule
@@ -55,6 +58,14 @@ class ListeningPracticeUiTest {
         )
 
     private val played = mutableListOf<Long>()
+
+    private val preferences =
+        InstrumentationRegistry.getInstrumentation().targetContext.getSharedPreferences("dual_sub_preferences", Context.MODE_PRIVATE)
+
+    @After
+    fun resetSetting() {
+        preferences.edit().remove(LISTENING_KEEP_HIDDEN_PREFERENCE).commit()
+    }
 
     private fun showPanel(
         state: DualSubUiState,
@@ -109,12 +120,24 @@ class ListeningPracticeUiTest {
     }
 
     @Test
-    fun pausingRevealsNothingAndAShownLineStaysShown() {
+    fun pausingShowsOnlyTheLineJustHeard() {
         val listening = ListeningPracticeState().apply { reveal(DictationKey(videoId, 3)) }
         showPanel(playing.copy(playbackPaused = true), listening)
-        // Pausing would give the next lines away, so they stay hidden.
-        assertEquals(3, hiddenLines().fetchSemanticsNodes().size)
+        // The playing line shows while paused; the others stay hidden, so nothing is given away.
+        composeRule.onNodeWithText("My little brother brings a carrot.").assertIsDisplayed()
         composeRule.onNodeWithText("Then we take a photo together.").assertIsDisplayed()
+        assertEquals(2, hiddenLines().fetchSemanticsNodes().size)
+        // Shown only for the pause, so it has no hide icon; the line shown by a tap has one.
+        assertEquals(1, composeRule.onAllNodesWithTag("listening_hide_line", useUnmergedTree = true).fetchSemanticsNodes().size)
+        saveUiEvidence("listening-practice-paused", composeRule.onNodeWithTag(PANEL).captureToImage())
+    }
+
+    @Test
+    fun keepLinesHiddenWhenPausedKeepsThePlayingLineHidden() {
+        preferences.edit().putBoolean(LISTENING_KEEP_HIDDEN_PREFERENCE, true).commit()
+        showPanel(playing.copy(playbackPaused = true))
+        composeRule.onNodeWithText("My little brother brings a carrot.").assertDoesNotExist()
+        assertEquals(4, hiddenLines().fetchSemanticsNodes().size)
     }
 
     @Test

@@ -216,4 +216,6 @@
     <string name="listening_practice_title">듣기 연습</string>
     <string name="listening_show_line">이 줄 보기</string>
     <string name="listening_hide_line">이 줄 숨기기</string>
+    <string name="listening_keep_hidden_title">일시정지해도 줄 숨기기</string>
+    <string name="listening_keep_hidden_description">재생 중 표시에서 두 줄을 모두 끄면, 일시정지해도 방금 들은 줄이 표시되지 않습니다.</string>
 </resources>

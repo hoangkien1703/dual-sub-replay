@@ -216,4 +216,6 @@
     <string name="listening_practice_title">听力练习</string>
     <string name="listening_show_line">显示这一行</string>
     <string name="listening_hide_line">隐藏这一行</string>
+    <string name="listening_keep_hidden_title">暂停时仍隐藏各行</string>
+    <string name="listening_keep_hidden_description">在“播放时显示”中关闭两行后，暂停时也不显示刚听到的那一行。</string>
 </resources>

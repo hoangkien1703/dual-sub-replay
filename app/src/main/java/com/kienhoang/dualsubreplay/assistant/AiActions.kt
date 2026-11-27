@@ -170,6 +170,7 @@ internal enum class AiSetting(
     CARD_READ_DICTIONARY("anki_card_read_dictionary"),
     CARD_READ_TRANSLATION("anki_card_read_translation"),
     BLUR_BOX("blur_box"),
+    LISTENING_KEEP_HIDDEN("listening_keep_hidden_when_paused"),
     LOOP_BUTTON("loop_button"),
     SLOW_REPLAY("slow_replay_second_tap", AI_SLOW_REPLAY),
     KANJI_DETAILS("kanji_details"),

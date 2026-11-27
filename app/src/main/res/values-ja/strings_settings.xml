@@ -216,4 +216,6 @@
     <string name="listening_practice_title">リスニング練習</string>
     <string name="listening_show_line">この行を表示</string>
     <string name="listening_hide_line">この行を隠す</string>
+    <string name="listening_keep_hidden_title">一時停止中も行を隠す</string>
+    <string name="listening_keep_hidden_description">「再生中に表示」で両方の行をオフにしているとき、一時停止しても今聞いた行を表示しません。</string>
 </resources>

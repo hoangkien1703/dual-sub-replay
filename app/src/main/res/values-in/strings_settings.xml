@@ -216,4 +216,6 @@
     <string name="listening_practice_title">Latihan mendengar</string>
     <string name="listening_show_line">Tampilkan baris ini</string>
     <string name="listening_hide_line">Sembunyikan baris ini</string>
+    <string name="listening_keep_hidden_title">Tetap sembunyikan baris saat dijeda</string>
+    <string name="listening_keep_hidden_description">Jika kedua baris dimatikan di Tampilkan saat diputar, menjeda tidak menampilkan baris yang baru saja Anda dengar.</string>
 </resources>
