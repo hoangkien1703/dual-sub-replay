@@ -33,6 +33,9 @@ internal const val STUDY_REPEAT_PAUSE_PREFERENCE = "study_repeat_pause"
 
 /** Study tools → Slow replay on a second tap (25kiuo, Discussion #81, 2026-11-21), off by default. */
 internal const val SLOW_REPLAY_PREFERENCE = "slow_replay_second_tap"
+
+/** Study tools → Slow replay's speed (25kiuo, Discussion #81, 2026-11-26: 0.75× sounded too close to normal): a [SlowReplaySpeed] storage value. */
+internal const val SLOW_REPLAY_SPEED_PREFERENCE = "slow_replay_speed"
 internal const val SKIP_SILENCE_PREFERENCE = "skip_silence"
 internal const val KNOWN_WORDS_PREFERENCE = "known_words_mode"
 internal const val KNOWN_WORDS_AFTER_PREFERENCE = "known_words_after"
@@ -110,6 +113,7 @@ internal val STUDY_SETTING_KEYS =
         STUDY_REPEAT_COUNT_PREFERENCE,
         STUDY_REPEAT_PAUSE_PREFERENCE,
         SLOW_REPLAY_PREFERENCE,
+        SLOW_REPLAY_SPEED_PREFERENCE,
         SKIP_SILENCE_PREFERENCE,
         KNOWN_WORDS_PREFERENCE,
         KNOWN_WORDS_AFTER_PREFERENCE,
@@ -170,6 +174,22 @@ internal enum class RepeatPause(
     TWO_SECONDS("2", R.string.study_repeat_pause_2),
     FIVE_SECONDS("5", R.string.study_repeat_pause_5),
 }
+
+/**
+ * How slow Slow replay on a second tap plays the line. 0.5× is the default: 25kiuo (Discussion #81,
+ * 2026-11-26) found 0.75× too close to normal speed to hear the sounds apart.
+ */
+internal enum class SlowReplaySpeed(
+    val storageValue: String,
+    val rate: Float,
+    @StringRes val labelRes: Int,
+) {
+    HALF("0.5", 0.5f, R.string.study_slow_replay_speed_half),
+    THREE_QUARTERS("0.75", 0.75f, R.string.study_slow_replay_speed_three_quarters),
+}
+
+internal fun storedSlowReplaySpeed(value: String?): SlowReplaySpeed =
+    SlowReplaySpeed.entries.firstOrNull { it.storageValue == value } ?: SlowReplaySpeed.HALF
 
 internal fun storedRepeatPause(value: String?): RepeatPause =
     RepeatPause.entries.firstOrNull { it.storageValue == value } ?: RepeatPause.OFF
@@ -262,6 +282,7 @@ internal data class StudySettings(
     val repeatPause: RepeatPause = RepeatPause.OFF,
     /** Tapping the line that is replaying again plays it once more, slower. */
     val slowReplay: Boolean = false,
+    val slowReplaySpeed: SlowReplaySpeed = SlowReplaySpeed.HALF,
     val loopButton: Boolean = false,
     val skipSilence: SkipSilence = SkipSilence.OFF,
     val knownWordsMode: KnownWordsMode = KnownWordsMode.OFF,
@@ -337,6 +358,7 @@ internal fun readStudySettings(preferences: SharedPreferences): StudySettings =
         repeatCount = storedStudyRepeatCount(preferences.getInt(STUDY_REPEAT_COUNT_PREFERENCE, DEFAULT_STUDY_REPEAT_COUNT)),
         repeatPause = storedRepeatPause(preferences.getString(STUDY_REPEAT_PAUSE_PREFERENCE, null)),
         slowReplay = preferences.getBoolean(SLOW_REPLAY_PREFERENCE, false),
+        slowReplaySpeed = storedSlowReplaySpeed(preferences.getString(SLOW_REPLAY_SPEED_PREFERENCE, null)),
         loopButton = preferences.getBoolean(LOOP_BUTTON_PREFERENCE, false),
         skipSilence = storedSkipSilence(preferences.getString(SKIP_SILENCE_PREFERENCE, null)),
         knownWordsMode = storedKnownWordsMode(preferences.getString(KNOWN_WORDS_PREFERENCE, null)),

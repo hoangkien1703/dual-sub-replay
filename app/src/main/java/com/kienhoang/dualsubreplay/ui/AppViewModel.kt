@@ -749,12 +749,11 @@ class AppViewModel internal constructor(
                 liveTranslated = null,
                 resolvedSourceLanguage = key?.language,
                 statusMessage =
-                    if (key ==
-                        null
-                    ) {
-                        text(R.string.status_waiting_for_captions)
-                    } else {
-                        text(R.string.status_translating_live_captions)
+                    when {
+                        key != null -> text(R.string.status_translating_live_captions)
+                        // A Bilibili video (beta) keeps its own card's words, never "Waiting for YouTube captions" (25kiuo, #81).
+                        VideoKeys.isBilibili(videoId) -> it.statusMessage
+                        else -> text(R.string.status_waiting_for_captions)
                     },
             )
         }

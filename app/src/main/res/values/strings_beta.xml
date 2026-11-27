@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">Sign in to Bilibili to load its subtitles</string>
     <string name="bilibili_sign_in_body">Bilibili shows most subtitles only to signed-in viewers. Sign in on the Bilibili page here (the app never sees your password), then tap Try again.</string>
     <string name="bilibili_no_subtitles_title">This video has no subtitles</string>
-    <string name="bilibili_no_subtitles_body">Bilibili lists no subtitles for this video. Try another video.</string>
+    <string name="bilibili_no_subtitles_body">Bilibili lists no subtitles for this video. Subtitles that are part of the picture can\'t be read. Try a video whose subtitles you can turn on in Bilibili\'s own app.</string>
     <string name="bilibili_try_again">Try again</string>
     <string name="tabs_site_youtube" translatable="false">YouTube</string>
     <string name="beta_offer_title">Turn on %1$s (Beta)?</string>

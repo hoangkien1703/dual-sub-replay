@@ -13,7 +13,7 @@
     <string name="bilibili_sign_in_title">登录哔哩哔哩以加载字幕</string>
     <string name="bilibili_sign_in_body">哔哩哔哩的大多数字幕只对已登录的用户显示。请在这里的哔哩哔哩页面上登录（应用不会看到你的密码），然后点按重试。</string>
     <string name="bilibili_no_subtitles_title">这个视频没有字幕</string>
-    <string name="bilibili_no_subtitles_body">哔哩哔哩没有为这个视频提供字幕。换一个视频试试。</string>
+    <string name="bilibili_no_subtitles_body">哔哩哔哩没有为这个视频提供字幕。印在画面里的字幕（硬字幕）无法读取。请换一个在哔哩哔哩 App 里可以打开字幕的视频。</string>
     <string name="bilibili_try_again">重试</string>
     <string name="beta_offer_title">打开%1$s（测试版）？</string>
     <string name="beta_offer_message">这是一个%1$s链接。%1$s是 DualSub Replay 的测试版网站：打开后即可用双语字幕观看这个视频。之后可以在 设置 → 测试版 里关闭。</string>

@@ -171,7 +171,10 @@
     <string name="study_repeat_pause_5">5 秒</string>
     <string name="study_repeat_pause_search">シャドーイング</string>
     <string name="study_slow_replay_title">2 回目のタップでゆっくり再生</string>
-    <string name="study_slow_replay_description">再生し直している行をもう一度タップすると、0.75× の速さで 1 回再生します。その行のあと、元の速さに戻ります。</string>
+    <string name="study_slow_replay_description">再生し直している行をもう一度タップすると、ゆっくり 1 回再生します。その行のあと、元の速さに戻ります。</string>
+    <string name="study_slow_replay_speed_title">速さ</string>
+    <string name="study_slow_replay_speed_half">0.5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0.75×</string>
     <string name="study_card_front_meaning">意味</string>
     <string name="study_card_front_meaning_description">表面には単語の意味と文の訳（あなたの言語）を表示します。単語を言ってから、カードを裏返して文の中で確かめます。</string>
     <string name="study_card_front_fill_gap">穴埋め</string>

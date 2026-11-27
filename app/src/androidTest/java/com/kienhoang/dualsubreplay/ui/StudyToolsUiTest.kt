@@ -107,6 +107,19 @@ class StudyToolsUiTest {
     }
 
     @Test
+    fun slowReplayShowsItsSpeedOnlyWhenOn() {
+        showSettings()
+        composeRule.onNodeWithTag("slow_replay_speed_0.5").assertDoesNotExist()
+        composeRule.onNodeWithTag("slow_replay_switch").performScrollTo().performClick()
+        // 0.5× when turned on (25kiuo, Discussion #81: 0.75× sounded too close to normal).
+        composeRule.onNodeWithTag("slow_replay_speed_0.5").performScrollTo().assertIsDisplayed()
+        composeRule.runOnIdle { assertEquals(SlowReplaySpeed.HALF, readStudySettings(preferences).slowReplaySpeed) }
+        saveUiEvidence("study-slow-replay-speed")
+        composeRule.onNodeWithTag("slow_replay_speed_0.75").performClick()
+        composeRule.runOnIdle { assertEquals("0.75", preferences.getString(SLOW_REPLAY_SPEED_PREFERENCE, null)) }
+    }
+
+    @Test
     fun pageTokensSitWithTheCaptionSettings() {
         showSettings("settings_section_translation")
         // Automatic by default, then On.

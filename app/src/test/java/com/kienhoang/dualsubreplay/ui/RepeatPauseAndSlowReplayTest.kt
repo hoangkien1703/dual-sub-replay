@@ -72,18 +72,28 @@ class RepeatPauseAndSlowReplayTest {
     }
 
     @Test
+    fun slowReplayIsHalfSpeedUnlessThreeQuartersIsPicked() {
+        assertEquals(SlowReplaySpeed.HALF, StudySettings().slowReplaySpeed)
+        assertEquals(SlowReplaySpeed.HALF, storedSlowReplaySpeed(null))
+        assertEquals(SlowReplaySpeed.HALF, storedSlowReplaySpeed("2"))
+        assertEquals(SlowReplaySpeed.THREE_QUARTERS, storedSlowReplaySpeed("0.75"))
+        assertEquals(0.5f, SlowReplaySpeed.HALF.rate)
+        assertEquals(6_000L, slowedLineMs(3_000, SlowReplaySpeed.HALF.rate))
+        assertEquals(4_000L, slowedLineMs(3_000, SlowReplaySpeed.THREE_QUARTERS.rate))
+    }
+
+    @Test
     fun onlyASecondTapOnTheSameLineWhileItReplaysIsSlow() {
         val taps = SlowReplayTaps()
-        // A 3 s line plays 4 s at 0.75×; a second tap counts until a second after that.
+        // A 3 s line plays at most 6 s (at 0.5×); a second tap counts until a second after that.
         assertFalse(taps.tap(lineId = 1, lineMs = 3_000, nowMs = 10_000))
         assertTrue(taps.tap(lineId = 1, lineMs = 3_000, nowMs = 11_000))
         // Tapping again during the slow replay slows it once more.
         assertTrue(taps.tap(lineId = 1, lineMs = 3_000, nowMs = 13_000))
         // Too late: a normal replay.
-        assertFalse(taps.tap(lineId = 1, lineMs = 3_000, nowMs = 19_000))
+        assertFalse(taps.tap(lineId = 1, lineMs = 3_000, nowMs = 21_000))
         // Another line is a normal replay.
-        assertFalse(taps.tap(lineId = 2, lineMs = 3_000, nowMs = 19_500))
-        assertEquals(4_000L, slowedLineMs(3_000))
+        assertFalse(taps.tap(lineId = 2, lineMs = 3_000, nowMs = 21_500))
     }
 
     @Test

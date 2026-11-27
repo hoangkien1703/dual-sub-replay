@@ -135,6 +135,7 @@ internal val SETTING_SPECS: Map<String, SettingSpec> =
         "study_repeat_count" to share(I),
         "study_repeat_pause" to share(S),
         "slow_replay_second_tap" to share(B),
+        "slow_replay_speed" to share(S),
         "skip_silence" to share(S),
         "blur_box_enabled" to share(B),
         "line_loop_button" to share(B),

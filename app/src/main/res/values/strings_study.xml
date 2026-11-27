@@ -179,7 +179,10 @@
     <string name="study_repeat_pause_5">5 s</string>
     <string name="study_repeat_pause_search">Shadowing</string>
     <string name="study_slow_replay_title">Slow replay on a second tap</string>
-    <string name="study_slow_replay_description">Tap a line again while it replays to hear it once at 0.75× speed. Your own speed comes back after the line.</string>
+    <string name="study_slow_replay_description">Tap a line again while it replays to hear it once more, slower. Your own speed comes back after the line.</string>
+    <string name="study_slow_replay_speed_title">Speed</string>
+    <string name="study_slow_replay_speed_half">0.5×</string>
+    <string name="study_slow_replay_speed_three_quarters">0.75×</string>
     <string name="study_card_front_meaning">Meaning</string>
     <string name="study_card_front_meaning_description">The front shows the word\'s meaning and the sentence\'s translation in your language: say the word, then turn the card to see it in its sentence.</string>
     <string name="study_card_front_fill_gap">Fill the gap</string>
