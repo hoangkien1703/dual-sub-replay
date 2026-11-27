@@ -2626,14 +2626,13 @@ class AppViewModel internal constructor(
                         else -> -1
                     },
                 stage = if (preparing) LoadStage.TRANSLATING else LoadStage.READY,
+                // Nothing to say once the lines are ready (owner, 2026-11-27): no "Subtitles ready" note.
                 statusMessage =
-                    text(
-                        when {
-                            current.translationError != null -> R.string.status_original_captions_only
-                            preparing -> R.string.status_preparing_nearby_translations
-                            else -> R.string.status_subtitles_ready
-                        },
-                    ),
+                    when {
+                        current.translationError != null -> text(R.string.status_original_captions_only)
+                        preparing -> text(R.string.status_preparing_nearby_translations)
+                        else -> null
+                    },
             )
         }
     }

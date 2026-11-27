@@ -213,4 +213,6 @@
     <string name="settings_pronunciation_volume_name">発音の音量</string>
     <string name="settings_original_captions_name">元の字幕</string>
     <string name="settings_translated_captions_name">翻訳字幕</string>
+    <string name="listening_practice_title">リスニング練習</string>
+    <string name="listening_show_line">この行を表示</string>
 </resources>

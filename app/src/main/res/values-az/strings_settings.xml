@@ -213,4 +213,6 @@
     <string name="settings_pronunciation_volume_name">Tələffüz səsi</string>
     <string name="settings_original_captions_name">Orijinal altyazılar</string>
     <string name="settings_translated_captions_name">Tərcümə altyazıları</string>
+    <string name="listening_practice_title">Dinləmə məşqi</string>
+    <string name="listening_show_line">Bu sətri göstər</string>
 </resources>

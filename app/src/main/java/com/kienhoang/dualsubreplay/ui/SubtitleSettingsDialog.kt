@@ -612,6 +612,7 @@ internal fun QuickLanguageSettingsDialog(
     recentTargetLanguages: List<String> = emptyList(),
     thirdLine: ThirdLineChoice = ThirdLineChoice(),
     onThirdLineChange: (ThirdLineChoice) -> Unit = {},
+    originalVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     translatedVisibility: CaptionVisibility = CaptionVisibility.ALWAYS,
     onCaptionVisibilityChange: (original: Boolean, visibility: CaptionVisibility) -> Unit = { _, _ -> },
     onOpenWholeTranscript: (() -> Unit)? = null,
@@ -659,7 +660,7 @@ internal fun QuickLanguageSettingsDialog(
                     onPick = languagePicker::open,
                 )
                 Spacer(Modifier.height(16.dp))
-                ShowWhilePlayingRow(translatedVisibility, onCaptionVisibilityChange)
+                ShowWhilePlayingRow(originalVisibility, translatedVisibility, onCaptionVisibilityChange)
                 val sleepTimerHere by rememberSleepTimerInQuickSettings()
                 if (sleepTimerHere) SleepTimerRow()
                 HorizontalDivider(

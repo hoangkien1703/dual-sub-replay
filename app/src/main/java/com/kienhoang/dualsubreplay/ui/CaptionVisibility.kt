@@ -3,7 +3,8 @@ package com.kienhoang.dualsubreplay.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -17,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -57,8 +57,29 @@ internal fun DualSubUiState.showOriginal() = studyCaptionVisibility(originalVisi
 
 internal fun DualSubUiState.showTranslation() = studyCaptionVisibility(translatedVisibility, studyPlayMode).visible(playbackPaused)
 
-/** The subtitle panel has something to show; Dictation keeps it while the video plays, as its rows and box hide the lines. */
-internal fun DualSubUiState.tracksVisible() = showOriginal() || showTranslation() || dictationInPanel()
+/**
+ * The subtitle panel has something to show; Dictation and Listening practice keep it while the video
+ * plays, as their rows hide the lines.
+ */
+internal fun DualSubUiState.tracksVisible() = showOriginal() || showTranslation() || dictationInPanel() || listeningInPanel()
+
+/**
+ * Listening practice (owner pick 2026-11-27): neither line shows while the video plays, but at least
+ * one is not set to Never. The panel then stays, each line hidden as dots until the learner taps them.
+ */
+internal fun listeningPractice(
+    original: CaptionVisibility,
+    translated: CaptionVisibility,
+): Boolean =
+    !original.shownWhilePlaying && !translated.shownWhilePlaying &&
+        (original != CaptionVisibility.NEVER || translated != CaptionVisibility.NEVER)
+
+/**
+ * The panel hides lines for [listeningPractice]. Listen first and Dictation keep their own rules, and
+ * live subtitles have no fixed lines to hide, so they keep today's behaviour.
+ */
+internal fun DualSubUiState.listeningInPanel(): Boolean =
+    !liveFallback && !studyPlayMode.hidesWhilePlaying && listeningPractice(originalVisibility, translatedVisibility)
 
 /** Hiding the transcript for an overlay must not disconnect its live timing source. */
 internal fun shouldCaptureCaptionsForPresentation(
@@ -104,26 +125,27 @@ internal fun CaptionVisibilitySettings() {
 }
 
 /**
- * One line in the gear popup for the setting people flip most: translated lines only when paused.
- * Original stays on the settings page, so the popup can't hide both lines and leave the video blank.
+ * The gear popup's Show while playing row: the label, then an Original and a Translation chip. The
+ * Original chip came back with Listening practice (owner pick 2026-11-27): with both off the panel
+ * no longer disappears, it hides each line as dots, so the video never looks blank. No hint text
+ * under the chips (owner, 2026-11-27): people find out by trying.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun ShowWhilePlayingRow(
+    original: CaptionVisibility,
     translated: CaptionVisibility,
     onChange: (original: Boolean, visibility: CaptionVisibility) -> Unit,
 ) {
-    Row(
-        Modifier.fillMaxWidth().testTag("show_while_playing"),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            stringResource(R.string.settings_show_while_playing),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f),
-        )
-        ShowWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "show_translation_while_playing") {
-            onChange(false, translated.toggledShowWhilePlaying())
+    Column(Modifier.fillMaxWidth().testTag("show_while_playing"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.settings_show_while_playing), style = MaterialTheme.typography.bodyMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ShowWhilePlayingChip(R.string.settings_colored_lines_original, original, "show_original_while_playing") {
+                onChange(true, original.toggledShowWhilePlaying())
+            }
+            ShowWhilePlayingChip(R.string.settings_colored_lines_translation, translated, "show_translation_while_playing") {
+                onChange(false, translated.toggledShowWhilePlaying())
+            }
         }
     }
 }

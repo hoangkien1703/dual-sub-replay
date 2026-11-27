@@ -36,7 +36,6 @@ import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.playback.WebVideoPlayback
 import com.kienhoang.dualsubreplay.ui.theme.DualSubTheme
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -192,8 +191,8 @@ class SubtitleUiTest {
 
     @Test
     fun quickSettingsShowWhilePlayingTogglesCaptionVisibility() {
+        var original by mutableStateOf(CaptionVisibility.ALWAYS)
         var translated by mutableStateOf(CaptionVisibility.PAUSED)
-        var originalChanged = false
         composeRule.setContent {
             DualSubTheme {
                 QuickLanguageSettingsDialog(
@@ -203,9 +202,10 @@ class SubtitleUiTest {
                     onSourceChange = {},
                     onTargetChange = {},
                     onOpenAllSettings = {},
+                    originalVisibility = original,
                     translatedVisibility = translated,
                     onCaptionVisibilityChange = { isOriginal, visibility ->
-                        if (isOriginal) originalChanged = true else translated = visibility
+                        if (isOriginal) original = visibility else translated = visibility
                     },
                     onDismiss = {},
                 )
@@ -213,8 +213,7 @@ class SubtitleUiTest {
         }
 
         composeRule.onNodeWithText("Show while playing").assertIsDisplayed()
-        // Only Translation is offered here, so the popup can never hide both lines.
-        composeRule.onNodeWithTag("show_original_while_playing").assertDoesNotExist()
+        composeRule.onNodeWithTag("show_original_while_playing").assertIsSelected()
         // Only when paused: the translation doesn't show while playing, so the chip is not ticked.
         composeRule.onNodeWithTag("show_translation_while_playing").assertIsNotSelected()
         composeRule.onNodeWithTag("show_translation_while_playing").performClick()
@@ -223,11 +222,17 @@ class SubtitleUiTest {
         Thread.sleep(700)
         saveUiEvidence("subtitle-quick-show-while-playing")
         composeRule.onNodeWithTag("show_translation_while_playing").performClick()
+        composeRule.runOnIdle { assertEquals(CaptionVisibility.PAUSED, translated) }
+
+        // Both off turns on Listening practice: the panel keeps the lines as dots (owner pick 2026-11-27).
+        composeRule.onNodeWithTag("show_original_while_playing").performClick()
         composeRule.runOnIdle {
-            assertEquals(CaptionVisibility.PAUSED, translated)
-            assertFalse(originalChanged)
+            assertEquals(CaptionVisibility.PAUSED, original)
+            assertTrue(listeningPractice(original, translated))
         }
-        composeRule.onNodeWithTag("show_translation_while_playing").assertIsNotSelected()
+        composeRule.onNodeWithTag("show_original_while_playing").assertIsNotSelected()
+        Thread.sleep(700)
+        saveUiEvidence("subtitle-quick-show-while-playing-both-off")
     }
 
     @Test

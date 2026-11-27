@@ -213,4 +213,6 @@
     <string name="settings_pronunciation_volume_name">발음 음량</string>
     <string name="settings_original_captions_name">원본 자막</string>
     <string name="settings_translated_captions_name">번역 자막</string>
+    <string name="listening_practice_title">듣기 연습</string>
+    <string name="listening_show_line">이 줄 보기</string>
 </resources>
