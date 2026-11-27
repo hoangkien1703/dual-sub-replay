@@ -23,7 +23,7 @@ Dictation already hides panel rows as dots (one per word) and remembers revealed
 
 - No hint text under the chips or on the settings page (owner, 2026-11-27: "unnecessary … the user can try it").
 - No new setting, no new Play mode, no icon on hidden rows.
-- Pausing does not reveal the lines in the panel: the next lines would give themselves away.
+- Pausing does not reveal the lines in the panel: the next lines would give themselves away. (Showing only the line just heard on pause, with a "Keep lines hidden when paused" switch, was built and then dropped by the owner on 2026-11-27: lines stay hidden on pause. The "Show while playing" label stays, as it is still true when one chip is off.)
 - No blur: it needs Android 12, and blurred text still shows word shapes.
 
 ## User-visible behavior
