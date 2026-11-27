@@ -251,6 +251,7 @@ class SubtitleWordHighlightTest {
                 CARD_READ_DICTIONARY_PREFERENCE,
                 CARD_READ_TRANSLATION_PREFERENCE,
                 BLUR_BOX_PREFERENCE,
+                LISTENING_KEEP_HIDDEN_PREFERENCE,
                 LOOP_BUTTON_PREFERENCE,
                 STUDY_REPEAT_PAUSE_PREFERENCE,
                 SLOW_REPLAY_PREFERENCE,
