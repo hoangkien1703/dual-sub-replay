@@ -1,6 +1,7 @@
 package com.kienhoang.dualsubreplay.ui
 
 import com.kienhoang.dualsubreplay.data.MAX_WINDOW_SEGMENTS
+import com.kienhoang.dualsubreplay.data.SUBTITLE_LOOK_BEHIND_MS
 import com.kienhoang.dualsubreplay.data.SubtitleSegment
 import com.kienhoang.dualsubreplay.data.SubtitleStore
 import kotlinx.coroutines.CompletableDeferred
@@ -41,7 +42,7 @@ class CaptionTranslationCancellationTest {
                     check(inputs.first() == "Caption ${position / 3400}")
                     check(inputs.size in 1..MAX_WINDOW_SEGMENTS)
                     check(output.all { it.translatedText != null })
-                    check(output.first().startMs >= position - 34_000)
+                    check(output.first().startMs >= position - SUBTITLE_LOOK_BEHIND_MS - 4_000)
                     check(output.last().startMs <= position + 60_000)
                     check(job.isActive) // Waiting for playback, not draining the rest of the transcript.
                 } finally {
@@ -71,7 +72,7 @@ class CaptionTranslationCancellationTest {
                             text
                         }) { snapshot, preparing ->
                             if (requests.value.seekGeneration == 1L) {
-                                check(snapshot.all { it.startMs > target - 34_000 })
+                                check(snapshot.all { it.startMs > target - SUBTITLE_LOOK_BEHIND_MS - 4_000 })
                                 if (!preparing) ready.complete(Unit)
                             }
                         }
