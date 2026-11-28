@@ -35,6 +35,8 @@ internal enum class AiProvider(
     /** A few models to offer first in the model menu; the full list comes from the service. */
     val suggestedModels: List<String>,
     val format: AiWireFormat = AiWireFormat.OPENAI_CHAT,
+    /** Model names the service no longer offers, each with the one that took its place. */
+    val replacedModels: Map<String, String> = emptyMap(),
 ) {
     GEMINI(
         key = "gemini",
@@ -73,14 +75,15 @@ internal enum class AiProvider(
         labelRes = R.string.ai_provider_openai,
         noteRes = R.string.ai_provider_openai_note,
         baseUrl = "https://api.openai.com/v1",
-        // The cheapest current GPT (owner pick 2026-10-29): $0.10 / $0.50 per million tokens in / out,
-        // against gpt-5-mini's $0.25 / $2.00.
+        // The cheapest current GPT (owner pick 2026-10-29): $0.10 / $0.50 per million tokens in / out.
         defaultModel = "gpt-6-luna",
         keyPageUrl = "https://platform.openai.com/api-keys",
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_openai,
         createKeyStepRes = R.string.ai_setup_step_create_openai,
-        suggestedModels = listOf("gpt-6-luna", "gpt-6.1-sol", "gpt-5-mini"),
+        // Checked 2026-11-28: then GPT-6.1 Terra ($1 / $5) and GPT-6.2 Sol ($2 / $10). The Astra models
+        // ($8 / $40 and up) are on the full model page only.
+        suggestedModels = listOf("gpt-6-luna", "gpt-6.1-terra", "gpt-6.2-sol"),
     ),
 
     /** Anthropic's Claude, through its own Messages API. Keys start with `sk-ant-`. */
@@ -90,6 +93,8 @@ internal enum class AiProvider(
         noteRes = R.string.ai_provider_claude_note,
         baseUrl = "https://api.anthropic.com/v1",
         // The cheapest current Claude model; Sonnet and Opus are a tap away in the model menu.
+        // Fable 5.2 ($8 / $40 per million tokens) is on the full model page only: it costs 80 times
+        // Haiku and always thinks, so chat answers are slow (checked 2026-11-28).
         defaultModel = "claude-haiku-5-5",
         keyPageUrl = "https://platform.claude.com/settings/keys",
         freeKeys = false,
@@ -110,7 +115,10 @@ internal enum class AiProvider(
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_zen,
         createKeyStepRes = R.string.ai_setup_step_create_opencode,
-        suggestedModels = listOf("big-pickle", "deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
+        // Checked 2026-11-28 against opencode.ai/zen/v1/models: only chat/completions models.
+        suggestedModels = listOf("big-pickle", "deepseek-v4.1-flash", "glm-5.3", "kimi-k3.1-pro"),
+        // OpenCode's own successor, so a model someone picked or checked a key with keeps working.
+        replacedModels = mapOf("deepseek-v4-flash" to "deepseek-v4.1-flash"),
     ),
 
     /** OpenCode's monthly plan for open models, with the same kind of key as Zen. */
@@ -119,12 +127,14 @@ internal enum class AiProvider(
         labelRes = R.string.ai_provider_opencode_go,
         noteRes = R.string.ai_provider_opencode_go_note,
         baseUrl = "https://opencode.ai/zen/go/v1",
-        defaultModel = "deepseek-v4-flash",
+        // deepseek-v4-flash left the Go plan by 2026-11-28; V4.1 Flash took its place.
+        defaultModel = "deepseek-v4.1-flash",
         keyPageUrl = "https://opencode.ai/auth",
         freeKeys = false,
         getKeyStepRes = R.string.ai_setup_step_get_opencode_go,
         createKeyStepRes = R.string.ai_setup_step_create_opencode,
-        suggestedModels = listOf("deepseek-v4-flash", "kimi-k2.6", "glm-5.3"),
+        suggestedModels = listOf("deepseek-v4.1-flash", "kimi-k3.1-pro", "glm-5.3"),
+        replacedModels = mapOf("deepseek-v4-flash" to "deepseek-v4.1-flash"),
     ),
     CUSTOM(
         key = "custom",
