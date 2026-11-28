@@ -193,6 +193,7 @@ fun DualSubApp(
                 LocalLineLoop provides studyRunner.lineLoop,
                 LocalDictation provides studyRunner.dictation,
                 LocalListeningPractice provides studyRunner.listening,
+                LocalLinePractice provides studyRunner.linePractice,
                 LocalAiSubtitleActions provides aiSubtitleActions,
                 LocalWholeTranscript provides wholeTranscript,
             ) {
@@ -515,13 +516,16 @@ private fun DualSubExperience(
     ) { menuButton ->
         Scaffold(contentWindowInsets = contentInsets, snackbarHost = { SnackbarHost(snackbars) }, topBar = {
             Surface {
-                Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
-                    menuButton()
+                // Top-aligned: a button moved below a corner camera hole leaves the other one where it was.
+                Row(Modifier.fillMaxWidth().statusBarsPadding(), verticalAlignment = Alignment.Top) {
+                    Box(Modifier.clearOfCornerCutout(start = true, TOP_BAR_BUTTON_WIDTH, TOP_BAR_BUTTON_HEIGHT)) { menuButton() }
                     Spacer(Modifier.weight(1f))
                     // Translation problems show here instead of interrupting the video: in the
                     // assistant panel when the assistant is on, otherwise in their own icon.
                     val tryGoogleAgain = LocalTranslationEngineActions.current?.tryGoogleAgain ?: {}
-                    TopBarAssistantOrIssueButton(state, appProblems(state, tryGoogleAgain, onRetry), tryGoogleAgain, onRetry)
+                    Box(Modifier.clearOfCornerCutout(start = false, TOP_BAR_BUTTON_WIDTH, TOP_BAR_BUTTON_HEIGHT)) {
+                        TopBarAssistantOrIssueButton(state, appProblems(state, tryGoogleAgain, onRetry), tryGoogleAgain, onRetry)
+                    }
                 }
             }
         }) { innerPadding ->
@@ -964,6 +968,10 @@ private fun LandscapeSplitDivider(
 }
 
 internal const val SIDE_PANEL_SWIPE_VELOCITY_THRESHOLD = 1_500f
+
+/** The top bar's corner buttons (menu, AI assistant): wide, so a tap near the corner reaches them. */
+internal val TOP_BAR_BUTTON_WIDTH = 72.dp
+internal val TOP_BAR_BUTTON_HEIGHT = 48.dp
 
 internal fun shouldCollapseSidePanel(
     dragOffsetPx: Float,

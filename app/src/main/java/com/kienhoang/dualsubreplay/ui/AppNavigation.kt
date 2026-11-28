@@ -112,7 +112,7 @@ internal fun AppNavigation(
         content {
             if (tvLayout) return@content
             Box(
-                modifier = Modifier.size(width = 72.dp, height = 48.dp)
+                modifier = Modifier.size(width = TOP_BAR_BUTTON_WIDTH, height = TOP_BAR_BUTTON_HEIGHT)
                     .testTag("navigation_menu_button")
                     .clickable(role = Role.Button) { scope.launch { drawer.open() } },
                 contentAlignment = Alignment.CenterStart,

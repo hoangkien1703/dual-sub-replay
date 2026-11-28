@@ -5,14 +5,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -152,12 +154,21 @@ internal fun TopBarAssistantOrIssueButton(
             problems.all { it.mild } -> mildProblemTint()
             else -> MaterialTheme.colorScheme.error
         }
-    IconButton(onClick = host.controller::openPanel, modifier = Modifier.testTag("ai_assistant_button")) {
-        Box {
+    // As wide as the menu button on the left (owner request 2026-11-28): a tap near the corner opens it too.
+    Box(
+        modifier =
+            Modifier
+                .size(width = TOP_BAR_BUTTON_WIDTH, height = TOP_BAR_BUTTON_HEIGHT)
+                .testTag("ai_assistant_button")
+                .clickable(role = Role.Button, onClick = host.controller::openPanel),
+        contentAlignment = Alignment.CenterEnd,
+    ) {
+        Box(Modifier.padding(end = 12.dp)) {
             Icon(
                 Icons.Default.AutoAwesome,
                 contentDescription =
                     stringResource(if (tint == null) R.string.ai_button else R.string.ai_button_with_problem),
+                modifier = Modifier.size(24.dp),
             )
             if (tint != null) {
                 Box(

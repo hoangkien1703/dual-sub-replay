@@ -2,12 +2,17 @@ package com.kienhoang.dualsubreplay.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
@@ -44,13 +50,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kienhoang.dualsubreplay.R
@@ -62,6 +73,8 @@ import com.kienhoang.dualsubreplay.assistant.AiRole
 import com.kienhoang.dualsubreplay.assistant.ChatHistoryRetention
 import com.kienhoang.dualsubreplay.assistant.aiProblemContext
 import com.kienhoang.dualsubreplay.assistant.aiSystemPrompt
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private val PanelMaxWidth = 420.dp
 private const val PANEL_WIDTH_FRACTION = 0.88f
@@ -114,8 +127,29 @@ internal fun AiAssistantPanel(
             enter = slideInHorizontally { it },
             exit = slideOutHorizontally { it },
         ) {
+            // A swipe to the right closes the panel (owner request 2026-11-28), like the subtitle side panel.
+            // Kept inside the animation so each opening starts in place.
+            var dragX by remember { mutableFloatStateOf(0f) }
+            val dragState = rememberDraggableState { delta -> dragX = (dragX + delta).coerceAtLeast(0f) }
+            val closeDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
+            val scope = rememberCoroutineScope()
             Surface(
-                modifier = Modifier.width(width).fillMaxHeight().testTag("ai_panel"),
+                modifier =
+                    Modifier
+                        .width(width)
+                        .fillMaxHeight()
+                        .offset { IntOffset(dragX.roundToInt(), 0) }
+                        .draggable(
+                            state = dragState,
+                            orientation = Orientation.Horizontal,
+                            onDragStopped = { velocity ->
+                                if (shouldCollapseSidePanel(dragX, velocity, closeDistancePx)) {
+                                    controller.closePanel()
+                                } else {
+                                    scope.launch { animate(dragX, 0f, animationSpec = tween(220)) { value, _ -> dragX = value } }
+                                }
+                            },
+                        ).testTag("ai_panel"),
                 shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 shadowElevation = 12.dp,
