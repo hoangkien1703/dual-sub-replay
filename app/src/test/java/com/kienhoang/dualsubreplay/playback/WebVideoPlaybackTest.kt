@@ -1,6 +1,8 @@
 package com.kienhoang.dualsubreplay.playback
 
 import android.support.v4.media.session.PlaybackStateCompat
+import com.kienhoang.dualsubreplay.data.VideoSite
+import com.kienhoang.dualsubreplay.ui.BetaSites
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -144,7 +146,7 @@ class WebVideoPlaybackTest {
     }
 
     @Test
-    fun everyScriptChecksTheYouTubeOrigin() {
+    fun everyScriptChecksTheVideoSiteOrigin() {
         val scripts =
             listOf(
                 WEB_VIDEO_STATE_SCRIPT,
@@ -178,12 +180,47 @@ class WebVideoPlaybackTest {
     }
 
     @Test
-    fun pageIsAlwaysToldItIsVisibleOnYouTubeOnly() {
+    fun pageIsAlwaysToldItIsVisibleOnYouTubeAndBilibiliOnly() {
         val script = WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT
         assertTrue(script.contains("visible('hidden', false);"))
         assertTrue(script.contains("visible('visibilityState', 'visible');"))
         assertTrue(script.contains("window.addEventListener(type, swallow, true);"))
         assertTrue(script.contains("'visibilitychange', 'webkitvisibilitychange'"))
-        assertEquals(setOf("https://youtube.com", "https://*.youtube.com"), YOUTUBE_DOCUMENT_START_ORIGINS)
+        assertTrue(script.contains("host === 'bilibili.com' || host.endsWith('.bilibili.com')"))
+        assertTrue(script.contains("host === 'bilibili.tv' || host.endsWith('.bilibili.tv')"))
+        assertEquals(
+            setOf(
+                "https://youtube.com",
+                "https://*.youtube.com",
+                "https://bilibili.com",
+                "https://*.bilibili.com",
+                "https://bilibili.tv",
+                "https://*.bilibili.tv",
+            ),
+            VIDEO_SITE_DOCUMENT_START_ORIGINS,
+        )
+    }
+
+    @Test
+    fun readsABilibiliVideoOnlyWhileItsBetaSiteIsOn() {
+        val raw =
+            scriptResult(
+                JSONObject()
+                    .put("url", "https://m.bilibili.com/video/BV1GJ411x7h7")
+                    .put("title", "学中文_哔哩哔哩_bilibili")
+                    .put("paused", false)
+                    .put("currentSecond", 3.0),
+            )
+        try {
+            BetaSites.set(emptySet())
+            assertNull(parseWebVideoPlayback(raw))
+            BetaSites.set(setOf(VideoSite.BILIBILI))
+            val playback = parseWebVideoPlayback(raw)!!
+            assertEquals("bili-BV1GJ411x7h7", playback.videoId)
+            assertEquals("学中文", playback.title)
+            assertFalse(playback.paused)
+        } finally {
+            BetaSites.set(emptySet())
+        }
     }
 }

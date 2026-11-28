@@ -2,7 +2,7 @@ package com.kienhoang.dualsubreplay.playback
 
 import android.support.v4.media.session.PlaybackStateCompat
 import com.kienhoang.dualsubreplay.ui.browseVideoSelection
-import com.kienhoang.dualsubreplay.ui.isYouTubeWebUrl
+import com.kienhoang.dualsubreplay.ui.isVideoSiteUrl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -123,9 +123,13 @@ internal fun sessionActions(playback: WebVideoPlayback?): Long {
     return toggle or playOrPause or seek
 }
 
+/** bilibili.com's page title ends with "_哔哩哔哩_bilibili" (after the part number on a multi-part video). */
+private val BILIBILI_TITLE_SUFFIX = Regex("_哔哩哔哩_bilibili$")
+
 /**
  * YouTube's page title is "(3) Video name - YouTube" (the count is unread notifications); the
  * notification shows only the video's name. Blank while the page still says just "YouTube".
+ * Bilibili's title loses its site suffix the same way.
  */
 internal fun cleanVideoTitle(pageTitle: String?): String =
     pageTitle
@@ -134,6 +138,7 @@ internal fun cleanVideoTitle(pageTitle: String?): String =
         .trim()
         .replace(Regex("^\\(\\d+\\+?\\) "), "")
         .removeSuffix(" - YouTube")
+        .replace(BILIBILI_TITLE_SUFFIX, "")
         .trim()
         .takeUnless { it == "YouTube" }
         .orEmpty()
@@ -152,7 +157,7 @@ internal fun parseWebVideoPlayback(rawValue: String?): WebVideoPlayback? {
         val decoded = JSONTokener(rawValue).nextValue() as? String ?: return@runCatching null
         val json = JSONObject(decoded)
         val url = json.optString("url")
-        if (!isYouTubeWebUrl(url)) return@runCatching null
+        if (!isVideoSiteUrl(url)) return@runCatching null
         val selection = browseVideoSelection(url) ?: return@runCatching null
         val positionSecond = json.optDouble("currentSecond", 0.0).takeIf { it.isFinite() && it >= 0 } ?: 0.0
         val durationSecond = json.optDouble("durationSecond", Double.NaN).takeIf { it.isFinite() && it > 0 }
@@ -181,11 +186,20 @@ private const val CHANNEL_NAME_SELECTORS =
     ".ytVideoSubtitleViewModelBoldSubstring, .slim-owner-channel-name, " +
         "ytd-watch-metadata ytd-channel-name a"
 
+/**
+ * The sites whose page video gets the notification, earphone buttons and off-screen playback:
+ * YouTube, and Bilibili (Beta; 25kiuo, Discussion #81, 2026-11-27: the video stopped with the screen
+ * off). The page only loads a Bilibili site while its Beta switch is on.
+ */
+private const val PLAYBACK_SITE_HOST_CHECK =
+    "(host === 'youtube.com' || host.endsWith('.youtube.com') || host === 'bilibili.com' || host.endsWith('.bilibili.com') || " +
+        "host === 'bilibili.tv' || host.endsWith('.bilibili.tv'))"
+
 private const val YOUTUBE_ORIGIN_CHECK =
     """
       const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
       if (window.location.protocol !== 'https:' ||
-          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return null;
+          !$PLAYBACK_SITE_HOST_CHECK) return null;
       const videos = Array.from(document.querySelectorAll('video'));
       const video = videos.find(function(item) { return !item.paused && !item.ended; })
         || videos.find(function(item) { return item.readyState > 0; })
@@ -260,7 +274,7 @@ internal fun webVideoCommandScript(command: WebVideoCommand): String {
 
 /**
  * YouTube's page pauses its video when the page becomes hidden (screen off, app in the
- * background) unless the account has Premium. The owner chose on 2026-10-13 that the video keeps
+ * background) unless the account has Premium; Bilibili's page pauses it too. The owner chose on 2026-10-13 that the video keeps
  * playing for every account, so the page is always told it is visible: `document.hidden` and
  * `visibilityState` report visible and `visibilitychange` never reaches the page's own listeners.
  * Runs before the page's scripts where WebView supports it, and again after each load otherwise.
@@ -270,7 +284,7 @@ internal val WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT: String =
     (function() {
       const host = window.location.hostname.toLowerCase().replace(/\.$/, '');
       if (window.location.protocol !== 'https:' ||
-          !(host === 'youtube.com' || host.endsWith('.youtube.com'))) return false;
+          !$PLAYBACK_SITE_HOST_CHECK) return false;
       if (window.__dualSubAlwaysVisible) return true;
       window.__dualSubAlwaysVisible = true;
       const visible = function(name, value) {
@@ -291,4 +305,12 @@ internal val WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT: String =
     """.trimIndent()
 
 /** Origins [WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT] is injected into before the page's own scripts. */
-internal val YOUTUBE_DOCUMENT_START_ORIGINS = setOf("https://youtube.com", "https://*.youtube.com")
+internal val VIDEO_SITE_DOCUMENT_START_ORIGINS =
+    setOf(
+        "https://youtube.com",
+        "https://*.youtube.com",
+        "https://bilibili.com",
+        "https://*.bilibili.com",
+        "https://bilibili.tv",
+        "https://*.bilibili.tv",
+    )
