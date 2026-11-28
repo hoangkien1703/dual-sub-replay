@@ -24,7 +24,10 @@ class AiTranslationAccessTest {
     @Test fun translationDefaultsToTheAssistantsModel() {
         assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, null))
         assertEquals("gemini-pro-latest", aiTranslationModelName(gemini, ""))
-        assertEquals(listOf("gemini-flash-lite-latest", "gemini-flash-latest"), aiTranslationModelChoices(gemini))
+        assertEquals(
+            listOf("gemini-flash-lite-latest", "gemini-flash-latest", "gemini-4-hydrogen"),
+            aiTranslationModelChoices(gemini),
+        )
     }
 
     @Test fun aChosenModelIsUsedOnlyWhileTheServiceOffersIt() {

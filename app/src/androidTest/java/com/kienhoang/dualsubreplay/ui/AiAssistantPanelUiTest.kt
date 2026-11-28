@@ -583,6 +583,8 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_model_button").performClick()
         // Fixed versions such as gemini-2.5-flash are on the full model page only.
         composeRule.onNodeWithText("gemini-2.5-flash").assertDoesNotExist()
+        composeRule.onNodeWithText("gemini-4-hydrogen").assertIsDisplayed()
+        saveUiEvidence("ai_panel_model_menu")
         composeRule.onNodeWithText("gemini-flash-latest").performClick()
         composeRule.onNodeWithTag("ai_model_button").assertTextContains("gemini-flash-latest")
         assertEquals("gemini-flash-latest", requests.last().model)

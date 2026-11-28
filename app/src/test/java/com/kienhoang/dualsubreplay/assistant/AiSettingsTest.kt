@@ -107,9 +107,12 @@ class AiSettingsTest {
     }
 
     @Test
-    fun newGeminiKeysStartOnFlashLiteAndTheQuickListHasNoFixedVersions() {
+    fun newGeminiKeysStartOnFlashLiteAndTheQuickListAddsOnlyHydrogenAsAFixedName() {
         assertEquals("gemini-flash-lite-latest", AiAssistantSettings().modelFor(AiProvider.GEMINI))
-        assertEquals(listOf("gemini-flash-lite-latest", "gemini-flash-latest"), AiProvider.GEMINI.suggestedModels)
+        assertEquals(
+            listOf("gemini-flash-lite-latest", "gemini-flash-latest", "gemini-4-hydrogen"),
+            AiProvider.GEMINI.suggestedModels,
+        )
         assertEquals("claude-haiku-5-5", AiProvider.CLAUDE.defaultModel)
         assertEquals(listOf("claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"), AiProvider.CLAUDE.suggestedModels)
     }

@@ -50,7 +50,10 @@ internal enum class AiProvider(
         // Google's "latest" names follow each new release, so they do not expire. Fixed versions
         // such as gemini-2.5-flash are on the full model page only.
         // gemini-pro-latest is left out: free keys have no quota for it.
-        suggestedModels = listOf("gemini-flash-lite-latest", "gemini-flash-latest"),
+        // gemini-4-hydrogen (owner pick 2026-11-28) is the one named model here: the strongest model
+        // a free key can use, for harder questions. It is slower and has smaller free limits than
+        // Flash-Lite, so it is never a default; paid keys pay $1.50 / $7.50 per million tokens in / out.
+        suggestedModels = listOf("gemini-flash-lite-latest", "gemini-flash-latest", "gemini-4-hydrogen"),
     ),
     OPENROUTER(
         key = "openrouter",
