@@ -19,6 +19,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
@@ -32,6 +33,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeRight
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
 import com.kienhoang.dualsubreplay.assistant.AI_FIND_VIDEOS_TOOLS
@@ -228,6 +231,27 @@ class AiAssistantPanelUiTest {
         composeRule.onNodeWithTag("ai_assistant_button").performClick()
         composeRule.onNodeWithTag("ai_intro").assertDoesNotExist()
         assertTrue(requests.isEmpty())
+    }
+
+    /** Owner request 2026-11-28: a wider tap area, and a swipe to the right closes the panel. */
+    @Test
+    fun theButtonIsAsWideAsTheMenuButtonAndASwipeRightClosesThePanel() {
+        showTopBarAndPanel()
+        composeRule.onNodeWithTag("ai_assistant_button").assertWidthIsEqualTo(TOP_BAR_BUTTON_WIDTH)
+        composeRule.onNodeWithTag("ai_assistant_button").performClick()
+        composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
+        // A short drag springs back.
+        composeRule.onNodeWithTag("ai_panel").performTouchInput {
+            down(center)
+            moveBy(
+                androidx.compose.ui.geometry
+                    .Offset(20f, 0f),
+            )
+            up()
+        }
+        composeRule.onNodeWithTag("ai_panel").assertIsDisplayed()
+        composeRule.onNodeWithTag("ai_panel").performTouchInput { swipeRight(startX = centerX, endX = right) }
+        composeRule.waitUntil(5_000) { composeRule.onAllNodesWithTag("ai_panel").fetchSemanticsNodes().isEmpty() }
     }
 
     @Test

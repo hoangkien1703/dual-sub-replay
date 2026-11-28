@@ -63,7 +63,7 @@ import com.kienhoang.dualsubreplay.R
 import com.kienhoang.dualsubreplay.data.VideoKeys
 import com.kienhoang.dualsubreplay.playback.WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT
 import com.kienhoang.dualsubreplay.playback.WEB_VIDEO_STATE_SCRIPT
-import com.kienhoang.dualsubreplay.playback.YOUTUBE_DOCUMENT_START_ORIGINS
+import com.kienhoang.dualsubreplay.playback.VIDEO_SITE_DOCUMENT_START_ORIGINS
 import com.kienhoang.dualsubreplay.playback.WebVideoBridge
 import com.kienhoang.dualsubreplay.playback.WebVideoCommand
 import com.kienhoang.dualsubreplay.playback.WebVideoPlaybackService
@@ -517,12 +517,12 @@ internal fun SingleYouTubePage(
                     WebViewCompat.addDocumentStartJavaScript(
                         this,
                         WEB_KEEP_PLAYING_WHEN_HIDDEN_SCRIPT,
-                        YOUTUBE_DOCUMENT_START_ORIGINS,
+                        VIDEO_SITE_DOCUMENT_START_ORIGINS,
                     )
                 }
                 // Before the page player loads, so its caption downloads are kept for the full transcript.
-                WebViewCompat.addDocumentStartJavaScript(this, WEB_CAPTION_CAPTURE_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
-                WebViewCompat.addDocumentStartJavaScript(this, WEB_HIDE_OPEN_APP_SCRIPT, YOUTUBE_DOCUMENT_START_ORIGINS)
+                WebViewCompat.addDocumentStartJavaScript(this, WEB_CAPTION_CAPTURE_SCRIPT, VIDEO_SITE_DOCUMENT_START_ORIGINS)
+                WebViewCompat.addDocumentStartJavaScript(this, WEB_HIDE_OPEN_APP_SCRIPT, VIDEO_SITE_DOCUMENT_START_ORIGINS)
             }
 
             webViewClient = object : WebViewClient() {

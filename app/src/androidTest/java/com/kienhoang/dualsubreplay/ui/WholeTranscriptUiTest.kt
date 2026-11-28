@@ -49,6 +49,53 @@ class WholeTranscriptUiTest {
             WholeTranscript(SubtitleStore.create(folder, rows), { text -> "Dịch: $text" }, null)
         }
 
+    /** Practice picked lines (ansidalia-lansi, Discussion #257, 2026-11-27). */
+    @Test
+    fun pickedLinesArePracticedInVideoOrderInsteadOfJumping() {
+        val whole = transcript()
+        val practice = LinePractice()
+        var jumped: SubtitleSegment? = null
+        var closed = false
+        composeRule.setContent {
+            DualSubTheme {
+                WholeTranscriptSheet(
+                    transcript = whole,
+                    currentStartMs = 60_000,
+                    exporter = TranscriptExporter(scope, context.contentResolver),
+                    title = "Kimchi talk",
+                    onJump = { jumped = it },
+                    onDismiss = { closed = true },
+                    picks =
+                        TranscriptPicks(
+                            picked = practice.pickedLines("abcdefghijk").keys,
+                            onToggle = { practice.toggle("abcdefghijk", it.toPracticeLine()) },
+                            onClear = practice::clearPicks,
+                            onPractice = {
+                                practice.start("abcdefghijk")
+                                closed = true
+                            },
+                        ),
+                )
+            }
+        }
+        composeRule.onNodeWithTag("whole_transcript_practice_bar").assertDoesNotExist()
+        composeRule.onNodeWithTag("whole_transcript_pick").performClick()
+        composeRule.waitUntil(5_000) { composeRule.onAllNodesWithText("This is line 13 of the talk.").fetchSemanticsNodes().isNotEmpty() }
+        composeRule.onNodeWithTag("whole_transcript_row_12").performClick()
+        composeRule.onNodeWithTag("whole_transcript_row_10").performClick()
+        composeRule.onNodeWithText("Practice 2 lines").assertIsDisplayed()
+        saveUiEvidence("whole-transcript-pick-lines")
+        composeRule.runOnIdle {
+            assertEquals(null, jumped)
+            assertEquals(setOf(10L, 12L), practice.pickedLines("abcdefghijk").keys)
+        }
+        composeRule.onNodeWithTag("whole_transcript_practice").performClick()
+        composeRule.runOnIdle {
+            assertTrue(closed)
+            assertEquals(listOf(60_000L, 72_000L), practice.list?.lines?.map { it.startMs })
+        }
+    }
+
     @Test
     fun theSheetOpensAtThePlayingLineTranslatesItAndJumpsWhereTapped() {
         val whole = transcript()

@@ -22,15 +22,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -51,6 +54,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +107,8 @@ internal fun PlayerWholeTranscript(
         LaunchedEffect(Unit) { onDismiss() }
         return
     }
+    val practice = LocalLinePractice.current
+    val videoId = state.activeVideoId
     WholeTranscriptSheet(
         transcript = transcript,
         currentStartMs = state.segments.getOrNull(state.currentIndex)?.startMs,
@@ -110,8 +116,30 @@ internal fun PlayerWholeTranscript(
         title = remember(transcript) { access.title() },
         onJump = onJump,
         onDismiss = onDismiss,
+        picks =
+            if (practice != null && videoId != null) {
+                TranscriptPicks(
+                    picked = practice.pickedLines(videoId).keys,
+                    onToggle = { practice.toggle(videoId, it.toPracticeLine()) },
+                    onClear = practice::clearPicks,
+                    onPractice = {
+                        practice.start(videoId)
+                        onDismiss()
+                    },
+                )
+            } else {
+                null
+            },
     )
 }
+
+/** Picking lines to practice in the sheet ([LinePractice]); null hides the pick button. */
+internal class TranscriptPicks(
+    val picked: Set<Long>,
+    val onToggle: (SubtitleSegment) -> Unit,
+    val onClear: () -> Unit,
+    val onPractice: () -> Unit,
+)
 
 /** How long the list must rest before the rows on screen are translated, so a fast scroll asks nothing. */
 private const val TRANSLATE_AFTER_SCROLL_MS = 600L
@@ -133,8 +161,10 @@ internal fun WholeTranscriptSheet(
     title: String?,
     onJump: (SubtitleSegment) -> Unit,
     onDismiss: () -> Unit,
+    picks: TranscriptPicks? = null,
 ) {
     var query by remember { mutableStateOf("") }
+    var picking by remember { mutableStateOf(false) }
     var exporting by remember { mutableStateOf(false) }
     val matches by produceState<List<Int>?>(null, transcript, query) {
         value = null
@@ -167,20 +197,12 @@ internal fun WholeTranscriptSheet(
             contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
             Column(Modifier.fillMaxSize().safeDrawingPadding()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().height(56.dp).padding(start = 16.dp, end = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        stringResource(R.string.whole_transcript_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = { exporting = true }, modifier = Modifier.testTag("whole_transcript_export")) {
-                        Icon(Icons.Default.Download, contentDescription = stringResource(R.string.whole_transcript_export))
-                    }
-                    CloseIconButton(onDismiss)
-                }
+                SheetHeader(
+                    picking = picking.takeIf { picks != null },
+                    onPick = { picking = !picking },
+                    onExport = { exporting = true },
+                    onDismiss = onDismiss,
+                )
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
@@ -210,17 +232,20 @@ internal fun WholeTranscriptSheet(
                                 onJump(row)
                                 onDismiss()
                             }
+                            val pick = picks?.takeIf { picking }
+                            val tap: (SubtitleSegment) -> Unit = pick?.onToggle ?: jump
                             if (found == null) {
                                 items(transcript.size, key = { it }) { index ->
-                                    TranscriptRow(transcript, index, translations[index], currentStartMs, jump)
+                                    TranscriptRow(transcript, index, translations[index], currentStartMs, tap, pick?.picked)
                                 }
                             } else {
                                 items(found, key = { it }) { index ->
-                                    TranscriptRow(transcript, index, translations[index], currentStartMs, jump)
+                                    TranscriptRow(transcript, index, translations[index], currentStartMs, tap, pick?.picked)
                                 }
                             }
                         }
                 }
+                if (picking && picks != null && picks.picked.isNotEmpty()) PracticeBar(picks)
             }
         }
     }
@@ -280,6 +305,7 @@ private fun TranscriptRow(
     translation: String?,
     currentStartMs: Long?,
     onClick: (SubtitleSegment) -> Unit,
+    picked: Set<Long>? = null,
 ) {
     val row by produceState<SubtitleSegment?>(null, transcript, index) { value = transcript.row(index) }
     val segment = row
@@ -291,6 +317,14 @@ private fun TranscriptRow(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag("whole_transcript_row_$index"),
     ) {
+        if (picked != null) {
+            // The row's tap picks it; the box only shows it.
+            Checkbox(
+                checked = segment != null && segment.id in picked,
+                onCheckedChange = null,
+                modifier = Modifier.padding(end = 12.dp).testTag("whole_transcript_pick_$index"),
+            )
+        }
         Text(
             segment?.let { clockTime(it.startMs) }.orEmpty(),
             style = MaterialTheme.typography.labelMedium,
@@ -313,6 +347,55 @@ private fun TranscriptRow(
                     modifier = Modifier.testTag("whole_transcript_translation_$index"),
                 )
             }
+        }
+    }
+}
+
+/** Title, then the pick button (when lines can be picked; [picking] null otherwise), Export and close. */
+@Composable
+private fun SheetHeader(
+    picking: Boolean?,
+    onPick: () -> Unit,
+    onExport: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(56.dp).padding(start = 16.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.whole_transcript_title),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.weight(1f),
+        )
+        if (picking != null) {
+            IconButton(onClick = onPick, modifier = Modifier.testTag("whole_transcript_pick")) {
+                Icon(
+                    Icons.Default.Checklist,
+                    contentDescription = stringResource(R.string.whole_transcript_pick_lines),
+                    tint = if (picking) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                )
+            }
+        }
+        IconButton(onClick = onExport, modifier = Modifier.testTag("whole_transcript_export")) {
+            Icon(Icons.Default.Download, contentDescription = stringResource(R.string.whole_transcript_export))
+        }
+        CloseIconButton(onDismiss)
+    }
+}
+
+/** Under the list while lines are picked: clear them, or practice them. */
+@Composable
+private fun PracticeBar(picks: TranscriptPicks) {
+    HorizontalDivider()
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("whole_transcript_practice_bar"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextButton(onClick = picks.onClear) { Text(stringResource(R.string.practice_clear_selection)) }
+        Spacer(Modifier.weight(1f))
+        Button(onClick = picks.onPractice, modifier = Modifier.testTag("whole_transcript_practice")) {
+            Text(pluralStringResource(R.plurals.whole_transcript_practice_lines, picks.picked.size, picks.picked.size))
         }
     }
 }

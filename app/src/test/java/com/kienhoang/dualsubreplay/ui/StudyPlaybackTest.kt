@@ -201,6 +201,98 @@ class StudyPlaybackTest {
         assertEquals(emptyList<StudyAction>(), from(5_000, 7_500, "s4"))
     }
 
+    private fun practiceList(vararg picked: SubtitleSegment) =
+        LinePracticeList("abcdefghijk", picked.map { it.toPracticeLine() }, token = 1)
+
+    private fun practiceTicks(
+        driver: StudyPlaybackDriver,
+        settings: StudySettings,
+        list: LinePracticeList?,
+        fromMs: Long,
+        toMs: Long,
+        session: String,
+        paused: Boolean = false,
+    ): List<StudyAction> {
+        val asked = mutableListOf<StudyAction>()
+        var time = fromMs
+        while (time <= toMs) {
+            driver.tick(StudyTick("abcdefghijk", time, session, paused, lines, settings, practice = list))?.let { asked += it }
+            time += 33
+        }
+        return asked
+    }
+
+    @Test
+    fun pickedLinesPlayOneAfterAnotherWithTheRepeatCountThenPause() {
+        val driver = StudyPlaybackDriver()
+        // Play mode Normal: the picked lines still use the repeat count.
+        val settings = StudySettings(repeatCount = 2)
+        val list = practiceList(lines[0], lines[2])
+        // Practice starts at the first picked line, also from a paused video.
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), practiceTicks(driver, settings, list, 6_000, 6_000, "s1", paused = true))
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), practiceTicks(driver, settings, list, 1_000, 3_000, "s2"))
+        // Its second play ends: the unpicked line is skipped.
+        assertEquals(listOf(StudyAction.PlayFrom(9_000)), practiceTicks(driver, settings, list, 1_000, 3_000, "s3"))
+        assertEquals(listOf(StudyAction.PlayFrom(9_000)), practiceTicks(driver, settings, list, 9_000, 10_000, "s4"))
+        // After the last play of the last line the video pauses, and the list says it ended.
+        assertEquals(listOf(StudyAction.Pause), practiceTicks(driver, settings, list, 9_000, 10_000, "s5"))
+        assertEquals(1L, driver.takePracticeEnd())
+        // Until the panel lets the list go, the ended list starts nothing again.
+        assertEquals(emptyList<StudyAction>(), practiceTicks(driver, settings, list, 10_000, 11_000, "s5"))
+    }
+
+    @Test
+    fun pickedLinesWaitBetweenPlaysAndForeverGoesRoundAgain() {
+        val driver = StudyPlaybackDriver()
+        val settings = StudySettings(repeatCount = STUDY_REPEAT_FOREVER, repeatPause = RepeatPause.TWO_SECONDS)
+        val list = practiceList(lines[0], lines[1])
+        assertEquals(listOf(StudyAction.PlayFrom(1_000)), practiceTicks(driver, settings, list, 0, 0, "s1"))
+        assertEquals(listOf(StudyAction.PlayFromAfter(3_500, 2_000)), practiceTicks(driver, settings, list, 1_000, 3_000, "s2"))
+        assertEquals(listOf(StudyAction.PlayFromAfter(1_000, 2_000)), practiceTicks(driver, settings, list, 3_500, 5_000, "s3"))
+        assertNull(driver.takePracticeEnd())
+    }
+
+    @Test
+    fun aTappedLineOrASeekOfTheLearnersOwnEndsThePickedLines() {
+        val settings = StudySettings(repeatCount = 3)
+        val list = practiceList(lines[0], lines[2])
+        val tapped = StudyPlaybackDriver()
+        practiceTicks(tapped, settings, list, 0, 0, "s1")
+        practiceTicks(tapped, settings, list, 1_000, 2_000, "s2")
+        tapped.learnerSeek(3_500)
+        assertEquals(1L, tapped.takePracticeEnd())
+        // The tapped line plays on normally.
+        assertEquals(emptyList<StudyAction>(), practiceTicks(tapped, settings, list, 3_500, 11_000, "s3"))
+
+        val sought = StudyPlaybackDriver()
+        practiceTicks(sought, settings, list, 0, 0, "s1")
+        practiceTicks(sought, settings, list, 1_000, 2_000, "s2")
+        assertEquals(emptyList<StudyAction>(), practiceTicks(sought, settings, list, 6_000, 11_000, "bar"))
+        assertEquals(1L, sought.takePracticeEnd())
+    }
+
+    @Test
+    fun linePracticeKeepsPicksPerVideoAndStartsThemInVideoOrder() {
+        val practice = LinePractice()
+        practice.toggle("abcdefghijk", lines[2].toPracticeLine())
+        practice.toggle("abcdefghijk", lines[0].toPracticeLine())
+        practice.toggle("abcdefghijk", lines[1].toPracticeLine())
+        practice.toggle("abcdefghijk", lines[1].toPracticeLine())
+        assertEquals(setOf(1L, 3L), practice.pickedLines("abcdefghijk").keys)
+        assertTrue(practice.pickedLines("zzzzzzzzzzz").isEmpty())
+        practice.start("abcdefghijk")
+        val list = practice.list!!
+        assertEquals(listOf(1_000L, 9_000L), list.lines.map { it.startMs })
+        practice.ended(list.token + 1)
+        assertEquals(list, practice.list)
+        practice.ended(list.token)
+        assertNull(practice.list)
+        // Picking on another video starts its own picks.
+        practice.toggle("zzzzzzzzzzz", lines[1].toPracticeLine())
+        assertEquals(setOf(2L), practice.pickedLines("zzzzzzzzzzz").keys)
+        assertTrue(practice.pickedLines("abcdefghijk").isEmpty())
+    }
+
     @Test
     fun readFirstStopsAtTheStartOfEachLine() {
         val driver = StudyPlaybackDriver()

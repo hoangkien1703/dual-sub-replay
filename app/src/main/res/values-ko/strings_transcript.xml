@@ -16,4 +16,8 @@
     <string name="whole_transcript_export_cancel">멈추기</string>
     <string name="whole_transcript_export_ok">확인</string>
     <string name="whole_transcript_setting_description">자막 패널의 톱니바퀴로 여는 작은 메뉴에 전체 자막을 추가합니다. 동영상의 모든 줄을 보고, 검색하고, 탭해서 이동하고, 내보낼 수 있습니다.</string>
+    <string name="whole_transcript_pick_lines">연습할 줄 고르기</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="other">%1$d줄 연습</item>
+    </plurals>
 </resources>

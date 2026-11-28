@@ -16,4 +16,8 @@
     <string name="whole_transcript_export_cancel">Dừng</string>
     <string name="whole_transcript_export_ok">OK</string>
     <string name="whole_transcript_setting_description">Thêm Toàn bộ phụ đề vào menu nhỏ mở từ nút bánh răng của bảng phụ đề: mọi dòng của video, có tìm kiếm, chạm để nhảy đến và xuất tệp.</string>
+    <string name="whole_transcript_pick_lines">Chọn câu để luyện</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="other">Luyện %1$d câu</item>
+    </plurals>
 </resources>

@@ -16,4 +16,8 @@
     <string name="whole_transcript_export_cancel">停止</string>
     <string name="whole_transcript_export_ok">确定</string>
     <string name="whole_transcript_setting_description">在字幕面板齿轮打开的小菜单中加入完整字幕:视频的每一行,可搜索、点按跳转并导出。</string>
+    <string name="whole_transcript_pick_lines">选择要练习的句子</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="other">练习 %1$d 句</item>
+    </plurals>
 </resources>

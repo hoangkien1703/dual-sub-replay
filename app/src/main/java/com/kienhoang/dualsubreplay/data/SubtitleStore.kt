@@ -14,8 +14,15 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 internal const val SUBTITLE_LOOK_AHEAD_MS = 60_000L
-internal const val SUBTITLE_LOOK_BEHIND_MS = 30_000L
-internal const val MAX_WINDOW_SEGMENTS = 96
+
+/** A minute back, like the minute ahead (owner pick 2026-11-28, issue #276; was 30 s). */
+internal const val SUBTITLE_LOOK_BEHIND_MS = 60_000L
+
+/**
+ * The most rows a window holds, half of them before the playing line at most. It bounds memory on
+ * very dense or very long tracks (owner, 2026-11-17: a 6-hour video crashed the app without one).
+ */
+internal const val MAX_WINDOW_SEGMENTS = 128
 
 /** Only timestamps and file offsets stay in memory; text and word timings live on disk. */
 internal class SubtitleStore private constructor(
@@ -29,7 +36,7 @@ internal class SubtitleStore private constructor(
         if (size == 0) return IntRange.EMPTY
         val current = (upperBound(timeMs) - 1).coerceAtLeast(0)
         // Keep one boundary cue for a sentence that started before the time window.
-        val first = maxOf(0, upperBound(timeMs - SUBTITLE_LOOK_BEHIND_MS) - 1, current - MAX_WINDOW_SEGMENTS / 3)
+        val first = maxOf(0, upperBound(timeMs - SUBTITLE_LOOK_BEHIND_MS) - 1, current - MAX_WINDOW_SEGMENTS / 2)
         val last = minOf(size - 1, upperBound(timeMs + SUBTITLE_LOOK_AHEAD_MS) - 1, first + MAX_WINDOW_SEGMENTS - 1)
         return first..maxOf(first, last)
     }

@@ -25,6 +25,7 @@ The icons follow the [all-contributors key](https://allcontributors.org/docs/en/
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/xmha97"><img src="https://avatars.githubusercontent.com/u/23485114?v=4?s=80" width="80px;" alt="xmha97"/><br /><sub><b>xmha97</b></sub></a><br /><a href="#ideas-xmha97" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ansidalia-lansi"><img src="https://avatars.githubusercontent.com/u/346827753?v=4?s=80" width="80px;" alt="ansidalia-lansi"/><br /><sub><b>ansidalia-lansi</b></sub></a><br /><a href="#ideas-ansidalia-lansi" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/parastouh"><img src="https://avatars.githubusercontent.com/u/55647928?v=4?s=80" width="80px;" alt="parastouh"/><br /><sub><b>parastouh</b></sub></a><br /><a href="https://github.com/hoangkien1703/dual-sub-replay/commits?author=parastouh" title="Code">💻</a> <a href="https://github.com/hoangkien1703/dual-sub-replay/commits?author=parastouh" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rim3l"><img src="https://avatars.githubusercontent.com/u/245270602?v=4?s=80" width="80px;" alt="rim3l"/><br /><sub><b>rim3l</b></sub></a><br /><a href="#ideas-rim3l" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

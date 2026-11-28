@@ -16,4 +16,9 @@
     <string name="whole_transcript_export_cancel">Detener</string>
     <string name="whole_transcript_export_ok">OK</string>
     <string name="whole_transcript_setting_description">Añade Transcripción completa al menú pequeño que abre el engranaje del panel de subtítulos: todas las líneas del vídeo, con búsqueda, un toque para saltar ahí y exportación.</string>
+    <string name="whole_transcript_pick_lines">Elegir líneas para practicar</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="one">Practicar %1$d línea</item>
+        <item quantity="other">Practicar %1$d líneas</item>
+    </plurals>
 </resources>
