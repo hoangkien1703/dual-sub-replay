@@ -120,7 +120,12 @@ internal data class AiAssistantSettings(
     /** People who answered the intro before the current note see it once at the top of the chat. */
     val showsNews: Boolean get() = enabled && introSeen && newsSeen < AI_NEWS_VERSION
 
-    fun modelFor(provider: AiProvider): String = models[provider]?.trim()?.takeIf { it.isNotEmpty() } ?: provider.defaultModel
+    fun modelFor(provider: AiProvider): String =
+        models[provider]
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { provider.replacedModels[it] ?: it }
+            ?: provider.defaultModel
 
     fun baseUrlFor(provider: AiProvider): String = if (provider == AiProvider.CUSTOM) customBaseUrl.trim() else provider.baseUrl
 }

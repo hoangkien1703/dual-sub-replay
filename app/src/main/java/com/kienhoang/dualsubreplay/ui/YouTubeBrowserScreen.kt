@@ -69,6 +69,7 @@ import com.kienhoang.dualsubreplay.playback.WebVideoCommand
 import com.kienhoang.dualsubreplay.playback.WebVideoPlaybackService
 import com.kienhoang.dualsubreplay.playback.isPlaying
 import com.kienhoang.dualsubreplay.playback.parseWebVideoPlayback
+import com.kienhoang.dualsubreplay.playback.watchEarphonesUnplugged
 import com.kienhoang.dualsubreplay.playback.webVideoCommandScript
 import java.net.URI
 import java.util.Collections
@@ -882,7 +883,12 @@ internal fun SingleYouTubePage(
             }
         }
         val token = WebVideoBridge.bindCommands(::runCommand)
-        onDispose { WebVideoBridge.unbindCommands(token) }
+        // Each tab pauses its own video, so no tab keeps playing out of the speaker.
+        val stopEarphonesWatch = watchEarphonesUnplugged(context) { runCommand(WebVideoCommand.Pause) }
+        onDispose {
+            stopEarphonesWatch()
+            WebVideoBridge.unbindCommands(token)
+        }
     }
 
     DisposableEffect(lifecycleOwner, webView) {

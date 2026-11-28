@@ -107,9 +107,12 @@ class AiSettingsTest {
     }
 
     @Test
-    fun newGeminiKeysStartOnFlashLiteAndTheQuickListHasNoFixedVersions() {
+    fun newGeminiKeysStartOnFlashLiteAndTheQuickListAddsOnlyHydrogenAsAFixedName() {
         assertEquals("gemini-flash-lite-latest", AiAssistantSettings().modelFor(AiProvider.GEMINI))
-        assertEquals(listOf("gemini-flash-lite-latest", "gemini-flash-latest"), AiProvider.GEMINI.suggestedModels)
+        assertEquals(
+            listOf("gemini-flash-lite-latest", "gemini-flash-latest", "gemini-4-hydrogen"),
+            AiProvider.GEMINI.suggestedModels,
+        )
         assertEquals("claude-haiku-5-5", AiProvider.CLAUDE.defaultModel)
         assertEquals(listOf("claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"), AiProvider.CLAUDE.suggestedModels)
     }
@@ -117,7 +120,21 @@ class AiSettingsTest {
     @Test
     fun newOpenAiKeysStartOnGpt6Luna() {
         assertEquals("gpt-6-luna", AiAssistantSettings().modelFor(AiProvider.OPENAI))
-        assertEquals(listOf("gpt-6-luna", "gpt-6.1-sol", "gpt-5-mini"), AiProvider.OPENAI.suggestedModels)
+        assertEquals(listOf("gpt-6-luna", "gpt-6.1-terra", "gpt-6.2-sol"), AiProvider.OPENAI.suggestedModels)
+    }
+
+    @Test
+    fun aModelOpenCodeReplacedMovesToItsSuccessor() {
+        assertEquals("deepseek-v4.1-flash", AiAssistantSettings().modelFor(AiProvider.OPENCODE_GO))
+        val picked = mapOf(AiProvider.OPENCODE_ZEN to "deepseek-v4-flash", AiProvider.OPENCODE_GO to " deepseek-v4-flash ")
+        val settings = AiAssistantSettings(models = picked)
+        assertEquals("deepseek-v4.1-flash", settings.modelFor(AiProvider.OPENCODE_ZEN))
+        assertEquals("deepseek-v4.1-flash", settings.modelFor(AiProvider.OPENCODE_GO))
+        // Other services keep the name as it is.
+        assertEquals(
+            "deepseek-v4-flash",
+            AiAssistantSettings(models = mapOf(AiProvider.CUSTOM to "deepseek-v4-flash")).modelFor(AiProvider.CUSTOM),
+        )
     }
 
     @Test
