@@ -197,29 +197,12 @@ internal fun WholeTranscriptSheet(
             contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
             Column(Modifier.fillMaxSize().safeDrawingPadding()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().height(56.dp).padding(start = 16.dp, end = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        stringResource(R.string.whole_transcript_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (picks != null) {
-                        IconButton(onClick = { picking = !picking }, modifier = Modifier.testTag("whole_transcript_pick")) {
-                            Icon(
-                                Icons.Default.Checklist,
-                                contentDescription = stringResource(R.string.whole_transcript_pick_lines),
-                                tint = if (picking) MaterialTheme.colorScheme.primary else LocalContentColor.current,
-                            )
-                        }
-                    }
-                    IconButton(onClick = { exporting = true }, modifier = Modifier.testTag("whole_transcript_export")) {
-                        Icon(Icons.Default.Download, contentDescription = stringResource(R.string.whole_transcript_export))
-                    }
-                    CloseIconButton(onDismiss)
-                }
+                SheetHeader(
+                    picking = picking.takeIf { picks != null },
+                    onPick = { picking = !picking },
+                    onExport = { exporting = true },
+                    onDismiss = onDismiss,
+                )
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
@@ -365,6 +348,39 @@ private fun TranscriptRow(
                 )
             }
         }
+    }
+}
+
+/** Title, then the pick button (when lines can be picked; [picking] null otherwise), Export and close. */
+@Composable
+private fun SheetHeader(
+    picking: Boolean?,
+    onPick: () -> Unit,
+    onExport: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(56.dp).padding(start = 16.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.whole_transcript_title),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.weight(1f),
+        )
+        if (picking != null) {
+            IconButton(onClick = onPick, modifier = Modifier.testTag("whole_transcript_pick")) {
+                Icon(
+                    Icons.Default.Checklist,
+                    contentDescription = stringResource(R.string.whole_transcript_pick_lines),
+                    tint = if (picking) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                )
+            }
+        }
+        IconButton(onClick = onExport, modifier = Modifier.testTag("whole_transcript_export")) {
+            Icon(Icons.Default.Download, contentDescription = stringResource(R.string.whole_transcript_export))
+        }
+        CloseIconButton(onDismiss)
     }
 }
 

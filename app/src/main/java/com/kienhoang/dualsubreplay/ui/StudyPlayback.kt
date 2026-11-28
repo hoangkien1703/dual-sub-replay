@@ -247,11 +247,8 @@ internal class StudyPlaybackDriver {
         val seek = session != null && tick.sessionId != session
         session = tick.sessionId
         if (seek) landSeek(tick.timeMs)
-        startPractice(tick)?.let { return it }
-        if (practice != null) {
-            passSeekTargets(tick.timeMs)
-            return practiceStep(tick)
-        }
+        val (practicing, practiceAction) = practiceTick(tick)
+        if (practicing) return practiceAction
         val loopId = checkLoop(tick)
         if (!landedOnLearnerTarget(seek, tick.timeMs)) return if (gapRate != null) normalSpeed() else null
         passSeekTargets(tick.timeMs)
@@ -311,6 +308,14 @@ internal class StudyPlaybackDriver {
         val span = loopSpan?.takeIf { it.first == id }?.second ?: return null
         val away = tick.timeMs < span.first - LOOP_DRIFT_MS || tick.timeMs > span.last + LOOP_DRIFT_MS
         return tick.timeMs.takeIf { away }
+    }
+
+    /** Whether the picked lines steer this tick, and what they ask for. */
+    private fun practiceTick(tick: StudyTick): Pair<Boolean, StudyAction?> {
+        startPractice(tick)?.let { return true to it }
+        if (practice == null) return false to null
+        passSeekTargets(tick.timeMs)
+        return true to practiceStep(tick)
     }
 
     /** A new picked-line list starts at its first line, also from a paused video. */

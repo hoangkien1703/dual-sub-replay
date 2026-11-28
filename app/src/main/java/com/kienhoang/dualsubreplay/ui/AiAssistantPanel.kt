@@ -127,29 +127,13 @@ internal fun AiAssistantPanel(
             enter = slideInHorizontally { it },
             exit = slideOutHorizontally { it },
         ) {
-            // A swipe to the right closes the panel (owner request 2026-11-28), like the subtitle side panel.
-            // Kept inside the animation so each opening starts in place.
-            var dragX by remember { mutableFloatStateOf(0f) }
-            val dragState = rememberDraggableState { delta -> dragX = (dragX + delta).coerceAtLeast(0f) }
-            val closeDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
-            val scope = rememberCoroutineScope()
             Surface(
                 modifier =
                     Modifier
                         .width(width)
                         .fillMaxHeight()
-                        .offset { IntOffset(dragX.roundToInt(), 0) }
-                        .draggable(
-                            state = dragState,
-                            orientation = Orientation.Horizontal,
-                            onDragStopped = { velocity ->
-                                if (shouldCollapseSidePanel(dragX, velocity, closeDistancePx)) {
-                                    controller.closePanel()
-                                } else {
-                                    scope.launch { animate(dragX, 0f, animationSpec = tween(220)) { value, _ -> dragX = value } }
-                                }
-                            },
-                        ).testTag("ai_panel"),
+                        .swipeRightToClose(controller::closePanel)
+                        .testTag("ai_panel"),
                 shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 shadowElevation = 12.dp,
@@ -206,6 +190,30 @@ internal fun AiAssistantPanel(
             }
         }
     }
+}
+
+/**
+ * A swipe to the right closes the panel (owner request 2026-11-28), like the subtitle side panel;
+ * a short one springs back. Used inside the panel's animation, so each opening starts in place.
+ */
+@Composable
+private fun Modifier.swipeRightToClose(onClose: () -> Unit): Modifier {
+    var dragX by remember { mutableFloatStateOf(0f) }
+    val dragState = rememberDraggableState { delta -> dragX = (dragX + delta).coerceAtLeast(0f) }
+    val closeDistancePx = with(LocalDensity.current) { 72.dp.toPx() }
+    val scope = rememberCoroutineScope()
+    return offset { IntOffset(dragX.roundToInt(), 0) }
+        .draggable(
+            state = dragState,
+            orientation = Orientation.Horizontal,
+            onDragStopped = { velocity ->
+                if (shouldCollapseSidePanel(dragX, velocity, closeDistancePx)) {
+                    onClose()
+                } else {
+                    scope.launch { animate(dragX, 0f, animationSpec = tween(220)) { value, _ -> dragX = value } }
+                }
+            },
+        )
 }
 
 /** The chat page shows history, new chat and settings; the other pages show Back and their title. */
