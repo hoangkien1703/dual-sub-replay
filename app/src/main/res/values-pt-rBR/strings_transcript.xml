@@ -16,4 +16,9 @@
     <string name="whole_transcript_export_cancel">Parar</string>
     <string name="whole_transcript_export_ok">OK</string>
     <string name="whole_transcript_setting_description">Adiciona Transcrição completa ao menu pequeno que a engrenagem do painel de legendas abre: todas as linhas do vídeo, com busca, um toque para pular até lá e exportação.</string>
+    <string name="whole_transcript_pick_lines">Escolher linhas para praticar</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="one">Praticar %1$d linha</item>
+        <item quantity="other">Praticar %1$d linhas</item>
+    </plurals>
 </resources>

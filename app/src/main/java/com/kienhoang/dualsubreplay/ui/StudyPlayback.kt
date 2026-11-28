@@ -91,6 +91,8 @@ internal data class StudyTick(
     val active: Boolean = true,
     /** The line the loop button repeats ([LineLoop]), or null. */
     val loopLineId: Long? = null,
+    /** The picked lines to practice ([LinePractice]), or null. */
+    val practice: LinePracticeList? = null,
 )
 
 /**
@@ -183,6 +185,27 @@ internal class StudyPlaybackDriver {
     /** True while the loop waits for the lines to reach where the learner moved the video: it does nothing then. */
     private var loopWaiting = false
 
+    /** The picked lines playing ([LinePractice]), the one playing, and how many times it played again. */
+    private var practice: LinePracticeList? = null
+    private var practiceIndex = 0
+    private var practiceRepeats = 0
+
+    /** The last list that ended here: the panel may still send it until it hears so. */
+    private var practiceEnded: Long? = null
+
+    /** [practiceEnded], until [takePracticeEnd] passes it on. */
+    private var practiceEndToReport: Long? = null
+
+    /** The token of the picked-line list that ended since the last call, if one did. */
+    fun takePracticeEnd(): Long? = practiceEndToReport.also { practiceEndToReport = null }
+
+    private fun endPractice() {
+        val token = practice?.token ?: return
+        practice = null
+        practiceEnded = token
+        practiceEndToReport = token
+    }
+
     /** Where the loop went since the last call (another line, or ended by another video), if anywhere. */
     fun takeLoopMove(): LoopMove? = loopMoveToReport.also { loopMoveToReport = null }
 
@@ -203,6 +226,7 @@ internal class StudyPlaybackDriver {
      * took the video back to it.
      */
     fun learnerSeek(targetMs: Long) {
+        endPractice()
         ownSeek = null
         forgetLines()
         learnerTarget = targetMs
@@ -215,6 +239,7 @@ internal class StudyPlaybackDriver {
         if (tick.videoId != videoId) {
             val fast = gapRate != null
             if (videoId != null) moveLoop(null)
+            endPractice()
             reset()
             videoId = tick.videoId
             if (fast) return StudyAction.NormalSpeed
@@ -222,6 +247,11 @@ internal class StudyPlaybackDriver {
         val seek = session != null && tick.sessionId != session
         session = tick.sessionId
         if (seek) landSeek(tick.timeMs)
+        startPractice(tick)?.let { return it }
+        if (practice != null) {
+            passSeekTargets(tick.timeMs)
+            return practiceStep(tick)
+        }
         val loopId = checkLoop(tick)
         if (!landedOnLearnerTarget(seek, tick.timeMs)) return if (gapRate != null) normalSpeed() else null
         passSeekTargets(tick.timeMs)
@@ -281,6 +311,73 @@ internal class StudyPlaybackDriver {
         val span = loopSpan?.takeIf { it.first == id }?.second ?: return null
         val away = tick.timeMs < span.first - LOOP_DRIFT_MS || tick.timeMs > span.last + LOOP_DRIFT_MS
         return tick.timeMs.takeIf { away }
+    }
+
+    /** A new picked-line list starts at its first line, also from a paused video. */
+    private fun startPractice(tick: StudyTick): StudyAction? {
+        val asked = tick.practice?.takeIf { it.videoId == tick.videoId && it.token != practiceEnded && it.lines.isNotEmpty() }
+        if (asked == null) {
+            // The panel let the list go: nothing to report back.
+            practice = null
+            return null
+        }
+        if (asked.token == practice?.token) return null
+        practice = asked
+        practiceIndex = 0
+        practiceRepeats = 0
+        forgetLines()
+        learnerTarget = null
+        learnerMoveToCheck = null
+        val gap = gapRate != null
+        gapRate = null
+        if (gap) return StudyAction.NormalSpeed
+        return playLine(asked.lines.first().startMs, null)
+    }
+
+    /** The end of a picked line: again, the next picked line, round again for Forever, or a pause after the last. */
+    private fun practiceStep(tick: StudyTick): StudyAction? {
+        val list = practice ?: return null
+        if (!tick.active || ownSeek?.landed == false) return null
+        if (gapRate != null) return normalSpeed()
+        val line = list.lines[practiceIndex]
+        if (ownSeek == null && practiceRepeats == 0 && practiceIndex == 0 && tick.timeMs < line.startMs - LOOP_DRIFT_MS) {
+            // The first line's seek has not been asked yet (the list came while the speed went back).
+            return playLine(line.startMs, null)
+        }
+        if (tick.paused || tick.timeMs < line.endMs - STUDY_PAUSE_LEAD_MS) return null
+        val count = tick.settings.repeatCount
+        val pause = repeatPauseMs(tick.settings.repeatPause, line.endMs - line.startMs)
+        val next =
+            when {
+                count != STUDY_REPEAT_FOREVER && practiceRepeats < count - 1 -> {
+                    practiceRepeats++
+                    line
+                }
+                practiceIndex < list.lines.lastIndex -> {
+                    practiceRepeats = 0
+                    list.lines[++practiceIndex]
+                }
+                count == STUDY_REPEAT_FOREVER -> {
+                    practiceIndex = 0
+                    list.lines.first()
+                }
+                else -> {
+                    endPractice()
+                    return StudyAction.Pause
+                }
+            }
+        return playLine(next.startMs, pause)
+    }
+
+    /** Plays from [startMs], after [pauseMs] when there is one, as a seek of the driver's own. */
+    private fun playLine(
+        startMs: Long,
+        pauseMs: Long?,
+    ): StudyAction {
+        ownSeek = OwnSeek(startMs, replay = true)
+        seekFloor = startMs
+        floorLanded = false
+        return if (pauseMs == null) StudyAction.PlayFrom(startMs) else StudyAction.PlayFromAfter(startMs, pauseMs)
     }
 
     /** The looped line's start and end, as last seen in the lines. */
@@ -344,6 +441,8 @@ internal class StudyPlaybackDriver {
     private fun landSeek(timeMs: Long) {
         val own = ownSeek?.takeIf { abs(timeMs - it.targetMs) <= OWN_SEEK_TOLERANCE_MS }
         if (own == null) {
+            // A seek of the learner's own ends the picked lines' practice.
+            endPractice()
             // A seek of the learner's own (YouTube's bar, double tap) takes the loop along; a tapped line does so on its own.
             if (learnerTarget == null) learnerMoveToCheck = timeMs
             ownSeek = null
@@ -512,7 +611,9 @@ internal fun lineBoundary(
 internal fun studySteersPlayback(
     settings: StudySettings,
     loopLineId: Long?,
-): Boolean = settings.effectivePlayMode != StudyPlayMode.NORMAL || loopLineId != null || settings.skipSilence != SkipSilence.OFF
+    practicing: Boolean = false,
+): Boolean =
+    settings.effectivePlayMode != StudyPlayMode.NORMAL || loopLineId != null || settings.skipSilence != SkipSilence.OFF || practicing
 
 /** Read by the page's playback poll, which lives apart from the runner; see [studySteersPlayback]. */
 internal object StudyOffScreen {
@@ -543,6 +644,9 @@ internal class StudyPlaybackRunner(
     /** Listening practice's revealed lines, kept the same way. */
     val listening = ListeningPracticeState()
 
+    /** The lines picked in Whole transcript, and the ones playing. */
+    val linePractice = LinePractice()
+
     @Volatile var state: DualSubUiState? = null
 
     @Volatile var settings = StudySettings()
@@ -559,7 +663,7 @@ internal class StudyPlaybackRunner(
 
     /** Tells the page poll and [onSteeringChanged] whether the play modes steer the video now. */
     fun updateSteering() {
-        val now = studySteersPlayback(settings, if (settings.loopButton) lineLoop.lineId else null)
+        val now = studySteersPlayback(settings, if (settings.loopButton) lineLoop.lineId else null, linePractice.list != null)
         StudyOffScreen.steering = now
         if (now != steering) {
             steering = now
@@ -628,9 +732,11 @@ internal class StudyPlaybackRunner(
                 newWordLines = newWordLines,
                 active = active,
                 loopLineId = if (settings.loopButton) lineLoop.lineId else null,
+                practice = linePractice.list,
             )
         val action = driver.tick(tick)
         driver.takeLoopMove()?.let(lineLoop::follow)
+        driver.takePracticeEnd()?.let(linePractice::ended)
         updateSteering()
         when (action) {
             StudyAction.Pause -> controller.pause()

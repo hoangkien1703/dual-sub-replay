@@ -17,4 +17,10 @@
     <string name="whole_transcript_export_cancel">Stop</string>
     <string name="whole_transcript_export_ok">OK</string>
     <string name="whole_transcript_setting_description">Adds Whole transcript to the small menu that the subtitle panel’s gear opens: every line of the video, with search, a tap to jump there, and export.</string>
+    <!-- Practice picked lines (ansidalia-lansi, Discussion #257, 2026-11-27). -->
+    <string name="whole_transcript_pick_lines">Pick lines to practice</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="one">Practice %1$d line</item>
+        <item quantity="other">Practice %1$d lines</item>
+    </plurals>
 </resources>

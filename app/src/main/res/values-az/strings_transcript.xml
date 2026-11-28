@@ -16,4 +16,9 @@
     <string name="whole_transcript_export_cancel">Dayandır</string>
     <string name="whole_transcript_export_ok">OK</string>
     <string name="whole_transcript_setting_description">Altyazı panelinin dişli çarxının açdığı kiçik menyuya Bütün transkripti əlavə edir: videonun hər sətri, axtarış, ora keçmək üçün toxunma və ixrac.</string>
+    <string name="whole_transcript_pick_lines">Məşq üçün sətirləri seç</string>
+    <plurals name="whole_transcript_practice_lines">
+        <item quantity="one">%1$d sətri məşq et</item>
+        <item quantity="other">%1$d sətri məşq et</item>
+    </plurals>
 </resources>
